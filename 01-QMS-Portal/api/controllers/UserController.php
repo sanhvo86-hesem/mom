@@ -265,9 +265,7 @@ class UserController extends BaseController
             $roleKey = (string)$role;
             if ($roleKey === '') continue;
             $row = is_array($v) ? $v : [];
-            $clean[$roleKey] = [
-                'canCreateDocs' => (bool)($row['canCreateDocs'] ?? false),
-            ];
+            $clean[$roleKey] = sanitize_role_permission_row($row);
         }
 
         // Ensure defaults always exist

@@ -366,10 +366,36 @@ abstract class BaseController
      */
     protected function hasPermission(array $user, string $permission): bool
     {
-        $rolePermsFile = $this->confDir . '/role_permissions.json';
-        $perms = load_role_permissions($rolePermsFile);
-        $role  = (string)($user['role'] ?? '');
-        return (bool)($perms[$role][$permission] ?? false);
+        return $this->hasAnyPermission($user, [$permission]);
+    }
+
+    /**
+     * @param array<int, string> $permissions
+     */
+    protected function hasAnyPermission(array $user, array $permissions): bool
+    {
+        return user_has_any_permission($user, $permissions, $this->confDir . '/role_permissions.json');
+    }
+
+    /**
+     * @param array<int, string> $permissions
+     */
+    protected function permissionMatrixManages(array $permissions): bool
+    {
+        return permission_matrix_manages_permission($permissions, $this->confDir . '/role_permissions.json');
+    }
+
+    /**
+     * @param array<int, string> $permissions
+     */
+    protected function requireAnyPermission(array $user, array $permissions, bool $allowAdminBypass = true): void
+    {
+        if ($allowAdminBypass && user_is_admin($user)) {
+            return;
+        }
+        if (!$this->hasAnyPermission($user, $permissions)) {
+            $this->error('forbidden', 403);
+        }
     }
 
     // ── Validation Helpers ──────────────────────────────────────────────────

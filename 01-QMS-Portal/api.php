@@ -454,14 +454,173 @@ function sanitize_code(string $code): string {
 
 
 // ---------- Role permissions (server-backed) ----------
+function normalize_permission_value_list($value): array {
+  if (!is_array($value)) return [];
+  $patterns = [];
+  foreach ($value as $item) {
+    if (!is_scalar($item)) continue;
+    $pattern = trim((string)$item);
+    if ($pattern === '') continue;
+    $patterns[] = $pattern;
+  }
+  return array_values(array_unique($patterns));
+}
+
+function sanitize_role_permission_row(array $row): array {
+  $clean = [
+    'canCreateDocs' => (bool)($row['canCreateDocs'] ?? false),
+  ];
+
+  if (!empty($row['allowAllPermissions'])) {
+    $clean['allowAllPermissions'] = true;
+  }
+
+  $patterns = [];
+  foreach (['permissions', 'permission_keys', 'grants'] as $field) {
+    $patterns = array_merge($patterns, normalize_permission_value_list($row[$field] ?? null));
+  }
+  $patterns = array_values(array_unique($patterns));
+  if ($patterns !== []) {
+    $clean['permissions'] = $patterns;
+  }
+
+  foreach ($row as $key => $value) {
+    $permissionKey = trim((string)$key);
+    if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants'], true)) {
+      continue;
+    }
+    if (!is_bool($value)) continue;
+    $clean[$permissionKey] = (bool)$value;
+  }
+
+  return $clean;
+}
+
 function default_role_permissions(): array {
-  // Roles that can create new documents by default
   return [
-    'ceo' => ['canCreateDocs' => true],
-    'qa_manager' => ['canCreateDocs' => true],
-    'qms_engineer' => ['canCreateDocs' => true],
-    'it_admin' => ['canCreateDocs' => true],
-    'production_director' => ['canCreateDocs' => true],
+    'ceo' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'allowAllPermissions' => true,
+      'permissions' => ['*'],
+    ]),
+    'it_admin' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'allowAllPermissions' => true,
+      'permissions' => ['*'],
+    ]),
+    'qa_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'allowAllPermissions' => true,
+      'permissions' => ['*'],
+    ]),
+    'quality_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'allowAllPermissions' => true,
+      'permissions' => ['*'],
+    ]),
+    'qms_engineer' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'permissions' => [
+        '*.read',
+        'audit_risk.*',
+        'calibration_equipment.*',
+        'document_control.*',
+        'evidence_vault.*',
+        'fmea_apqp.*',
+        'forms_system.*',
+        'master_data_governance.*',
+        'quality_lab.*',
+        'quality_management.*',
+        'record_system.*',
+        'schema_studio.read',
+        'schema_studio.write',
+      ],
+    ]),
+    'developer' => sanitize_role_permission_row([
+      'canCreateDocs' => false,
+      'permissions' => ['schema_studio.read', 'schema_studio.write'],
+    ]),
+    'production_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => false,
+      'permissions' => [
+        '*.read',
+        'advanced_planning.*',
+        'demand_supply_planning.*',
+        'mes_execution.*',
+        'mobile_operations.*',
+        'plant_maintenance.*',
+        'production.*',
+        'tooling_lifecycle.*',
+      ],
+    ]),
+    'production_planner' => sanitize_role_permission_row([
+      'canCreateDocs' => false,
+      'permissions' => [
+        '*.read',
+        'advanced_planning.*',
+        'demand_supply_planning.*',
+        'production.*.read',
+        'production.*.update',
+        'production.*.transition',
+      ],
+    ]),
+    'engineering_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => false,
+      'permissions' => [
+        '*.read',
+        'cnc_programs.*',
+        'fmea_apqp.*',
+        'master_data_governance.*',
+        'mfg_engineering.*',
+        'plm_change_control.*',
+        'tooling_lifecycle.*',
+      ],
+    ]),
+    'supply_chain_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => false,
+      'permissions' => [
+        '*.read',
+        'inventory.*',
+        'outsource_execution.*',
+        'purchasing.*',
+        'shipping_compliance.*',
+        'supplier_relationship.*',
+        'traceability_serialization.*',
+        'transportation.*',
+        'warehouse_management.*',
+      ],
+    ]),
+    'finance_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => false,
+      'permissions' => [
+        '*.read',
+        'commercial_contracts.*',
+        'finance.*',
+        'finance_extended.*',
+        'finance_treasury.*',
+      ],
+    ]),
+    'hr_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'permissions' => [
+        '*.read',
+        'hcm_workforce.*',
+        'training_hr.*',
+      ],
+    ]),
+    'production_director' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'permissions' => [
+        '*.read',
+        'advanced_planning.*',
+        'demand_supply_planning.*',
+        'mes_execution.*',
+        'mobile_operations.*',
+        'plant_maintenance.*',
+        'production.*',
+        'tooling_lifecycle.*',
+      ],
+    ]),
   ];
 }
 
@@ -485,6 +644,145 @@ function role_can_create_docs(array $user, string $file): bool {
   $mRole = migrate_role($role);
   $creators = ['qa_manager', 'ceo', 'qms_engineer', 'it_admin', 'production_director'];
   return in_array($role, $creators, true) || in_array($mRole, $creators, true);
+}
+
+function normalize_permission_key(string $permission): string {
+  return strtolower(trim($permission));
+}
+
+/**
+ * @return array<int, string>
+ */
+function normalize_permission_patterns($patterns): array {
+  if (!is_array($patterns)) return [];
+  $normalized = [];
+  foreach ($patterns as $pattern) {
+    $value = normalize_permission_key((string)$pattern);
+    if ($value !== '' && !in_array($value, $normalized, true)) {
+      $normalized[] = $value;
+    }
+  }
+  return $normalized;
+}
+
+function permission_pattern_matches(string $permission, string $pattern): bool {
+  $permission = normalize_permission_key($permission);
+  $pattern = normalize_permission_key($pattern);
+
+  if ($permission === '' || $pattern === '') {
+    return false;
+  }
+  if ($pattern === '*') {
+    return true;
+  }
+
+  $regex = '/^' . str_replace('\*', '.*', preg_quote($pattern, '/')) . '$/';
+  return preg_match($regex, $permission) === 1;
+}
+
+/**
+ * @param array<string, mixed> $entry
+ * @return array<int, string>
+ */
+function role_permission_grants(array $entry): array {
+  $grants = normalize_permission_patterns($entry['permissions'] ?? []);
+  if (!empty($entry['allowAllPermissions']) && !in_array('*', $grants, true)) {
+    $grants[] = '*';
+  }
+  foreach ($entry as $key => $value) {
+    if (in_array($key, ['canCreateDocs', 'permissions', 'denies', 'allowAllPermissions'], true)) {
+      continue;
+    }
+    if (is_bool($value) && $value) {
+      $normalized = normalize_permission_key((string)$key);
+      if ($normalized !== '' && !in_array($normalized, $grants, true)) {
+        $grants[] = $normalized;
+      }
+    }
+  }
+  return $grants;
+}
+
+/**
+ * @param array<string, mixed> $entry
+ * @return array<int, string>
+ */
+function role_permission_denies(array $entry): array {
+  return normalize_permission_patterns($entry['denies'] ?? []);
+}
+
+/**
+ * @param string|array<int, string> $permissions
+ */
+function permission_matrix_manages_permission($permissions, string $file): bool {
+  $required = is_array($permissions) ? $permissions : [$permissions];
+  $required = normalize_permission_patterns($required);
+  if ($required === []) return false;
+
+  $perms = load_role_permissions($file);
+  foreach ($perms as $entry) {
+    if (!is_array($entry)) {
+      continue;
+    }
+    $patterns = array_merge(role_permission_grants($entry), role_permission_denies($entry));
+    foreach ($required as $permission) {
+      foreach ($patterns as $pattern) {
+        if ($pattern === '*') {
+          continue;
+        }
+        if (permission_pattern_matches($permission, $pattern)) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * @param string|array<int, string> $permissions
+ */
+function user_has_any_permission(array $user, $permissions, string $file): bool {
+  $required = is_array($permissions) ? $permissions : [$permissions];
+  $required = normalize_permission_patterns($required);
+  if ($required === []) return false;
+
+  $perms = load_role_permissions($file);
+  $userRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+
+  $grants = [];
+  $denies = [];
+  foreach ($userRoles as $role) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    if ($normalizedRole === '') {
+      continue;
+    }
+    $entry = $perms[$normalizedRole] ?? null;
+    if (!is_array($entry)) {
+      continue;
+    }
+    $grants = array_merge($grants, role_permission_grants($entry));
+    $denies = array_merge($denies, role_permission_denies($entry));
+  }
+
+  foreach ($required as $permission) {
+    foreach ($denies as $pattern) {
+      if (permission_pattern_matches($permission, $pattern)) {
+        return false;
+      }
+    }
+  }
+
+  foreach ($required as $permission) {
+    foreach ($grants as $pattern) {
+      if (permission_pattern_matches($permission, $pattern)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 function user_is_admin(array $user): bool {
@@ -12714,9 +13012,7 @@ switch ($action) {
       $roleKey = (string)$role;
       if ($roleKey === '') continue;
       $row = is_array($v) ? $v : [];
-      $clean[$roleKey] = [
-        'canCreateDocs' => (bool)($row['canCreateDocs'] ?? false),
-      ];
+      $clean[$roleKey] = sanitize_role_permission_row($row);
     }
     // Ensure defaults always exist (safety)
     foreach (default_role_permissions() as $k => $v) {

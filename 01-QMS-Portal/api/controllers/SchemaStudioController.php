@@ -35,9 +35,29 @@ class SchemaStudioController extends BaseController
         }
     }
 
+    private function requireReadAccess(array $user): void
+    {
+        $this->requireAnyPermission($user, ['studio.schema.read', 'studio.schema.write']);
+    }
+
     private function requireWriteAccess(array $user): void
     {
-        $this->requireAnyRole($user, array_merge(admin_roles(), ['developer', 'qms_engineer', 'quality_manager']));
+        $this->requireAnyPermission($user, ['studio.schema.write']);
+    }
+
+    private function requireMigrationAccess(array $user): void
+    {
+        $this->requireAnyPermission($user, ['studio.schema.migrate', 'studio.schema.write']);
+    }
+
+    private function requireExportAccess(array $user): void
+    {
+        $this->requireAnyPermission($user, ['studio.schema.export', 'studio.schema.read', 'studio.schema.write']);
+    }
+
+    private function requireDataWriteAccess(array $user): void
+    {
+        $this->requireAnyPermission($user, ['studio.schema.data_write', 'studio.schema.write']);
     }
 
     private function safeId(string $value, string $fallback = 'schema_studio'): string
@@ -419,7 +439,7 @@ class SchemaStudioController extends BaseController
     public function listDesigns(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireReadAccess($user);
         $this->requireCsrf();
         $designs = [];
         foreach (glob($this->designDir . '/*.json') ?: [] as $file) {
@@ -443,7 +463,7 @@ class SchemaStudioController extends BaseController
     public function getDesign(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireReadAccess($user);
         $this->requireCsrf();
         $id = $this->input('id', '') ?? '';
         if ($id === '') {
@@ -517,7 +537,7 @@ class SchemaStudioController extends BaseController
     public function loadFromRegistry(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireReadAccess($user);
         $this->requireCsrf();
         $registryPath = $this->dataDir . '/registry/table-registry.json';
         $relationPath = $this->dataDir . '/registry/relation-map.json';
@@ -724,7 +744,7 @@ class SchemaStudioController extends BaseController
     public function reverseEngineer(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireReadAccess($user);
         $this->requireCsrf();
         try {
             $pdo = $this->db();
@@ -894,7 +914,8 @@ class SchemaStudioController extends BaseController
 
     public function validateSchema(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
         $body = $this->jsonBody();
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $body;
         $issues = [];
@@ -909,7 +930,7 @@ class SchemaStudioController extends BaseController
     public function applyMigration(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireMigrationAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $sql = trim((string)($body['sql'] ?? ''));
@@ -960,7 +981,7 @@ class SchemaStudioController extends BaseController
     public function previewTableData(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireReadAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $schema = $this->safeIdentifier((string)($body['schema'] ?? 'public'), 'public');
@@ -1067,7 +1088,7 @@ class SchemaStudioController extends BaseController
     public function saveTableRow(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireDataWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -1207,7 +1228,7 @@ class SchemaStudioController extends BaseController
     public function export(): never
     {
         $user = $this->requireAuth();
-        $this->requireWriteAccess($user);
+        $this->requireExportAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $body;

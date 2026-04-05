@@ -27,9 +27,19 @@ class ModuleSchemaController extends BaseController
      *
      * @return void
      */
+    private function requireSchemaReadAccess(array $user): void
+    {
+        $this->requireAnyPermission($user, ['studio.module.read', 'studio.module.write']);
+    }
+
+    /**
+     * Module schema mutations are effectively low-code platform administration.
+     *
+     * @return void
+     */
     private function requireSchemaWriteAccess(array $user): void
     {
-        $this->requireAnyRole($user, array_merge(admin_roles(), ['qms_engineer', 'quality_manager']));
+        $this->requireAnyPermission($user, ['studio.module.write']);
     }
 
     private function schemaDir(): string
@@ -44,7 +54,8 @@ class ModuleSchemaController extends BaseController
     /** GET list â€” List all module schemas. */
     public function listSchemas(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireSchemaReadAccess($user);
         try {
             $dir = $this->schemaDir();
             $schemas = [];
@@ -82,7 +93,8 @@ class ModuleSchemaController extends BaseController
     /** GET get â€” Get single module schema. */
     public function getSchema(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireSchemaReadAccess($user);
         $id = $this->query('id') ?? '';
         if ($id === '') $this->error('missing_id', 400);
 
@@ -186,7 +198,8 @@ class ModuleSchemaController extends BaseController
     /** GET apiCatalog â€” List available API endpoints for binding. */
     public function apiCatalog(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireSchemaReadAccess($user);
 
         try {
             $catalog = $this->registry()->endpointCatalog();

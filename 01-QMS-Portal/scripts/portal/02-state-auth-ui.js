@@ -1,5 +1,5 @@
-// APP STATE
-// ═══════════════════════════════════════════════════
+﻿// APP STATE
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let currentUser = null;
 let currentPage = 'dashboard';
 let currentFilter = 'ALL';
@@ -32,11 +32,11 @@ function getPendingAuthExpiredMessage(kind){
   if(kind === 'enroll'){
     return lang==='en'
       ? 'Authenticator setup timed out. Please sign in again.'
-      : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng đăng nhập lại.';
+      : 'PhiÃªn thiáº¿t láº­p Authenticator Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.';
   }
   return lang==='en'
     ? 'Authenticator verification timed out. Please sign in again.'
-    : 'Phiên xác thực OTP đã hết hạn. Vui lòng đăng nhập lại.';
+    : 'PhiÃªn xÃ¡c thá»±c OTP Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.';
 }
 
 function schedulePendingAuthTimer(stage, pendingExpiresIn){
@@ -311,11 +311,11 @@ async function loadPortalDisplayConfigFromServer(options={}){
           try{ renderSidebar(); }catch(e){}
         }
       }else if(!options.silent){
-        showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en'?'display_config_load_failed':'Không tải được cấu hình hiển thị portal')));
+        showToast('âš  ' + ((res && res.error) ? res.error : (lang==='en'?'display_config_load_failed':'KhÃ´ng táº£i Ä‘Æ°á»£c cáº¥u hÃ¬nh hiá»ƒn thá»‹ portal')));
       }
     }catch(e){
       if(!options.silent){
-        showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'display_config_load_failed':'Không tải được cấu hình hiển thị portal')));
+        showToast('âš  ' + ((e && e.message) ? e.message : (lang==='en'?'display_config_load_failed':'KhÃ´ng táº£i Ä‘Æ°á»£c cáº¥u hÃ¬nh hiá»ƒn thá»‹ portal')));
       }
     }finally{
       portalDisplayConfigLoadPromise = null;
@@ -327,28 +327,28 @@ async function loadPortalDisplayConfigFromServer(options={}){
 
 function portalSidebarCoreItems(){
   return [
-    {id:'dashboard', icon:'🏠', label:lang==='en'?'Dashboard':'Dashboard'},
-    {id:'documents', icon:'📁', label:lang==='en'?'All documents':'Tất cả tài liệu'},
-    {id:'search', icon:'🔍', label:lang==='en'?'Search':'Tìm kiếm'},
-    {id:'dictionary', icon:'📖', label:lang==='en'?'Dictionary':'Từ điển thuật ngữ'},
-    {id:'deploy', icon:'🚀', label:lang==='en'?'Operations deploy':'Triển khai vận hành'},
+    {id:'dashboard', icon:'ðŸ ', label:lang==='en'?'Dashboard':'Dashboard'},
+    {id:'documents', icon:'ðŸ“', label:lang==='en'?'All documents':'Táº¥t cáº£ tÃ i liá»‡u'},
+    {id:'search', icon:'ðŸ”', label:lang==='en'?'Search':'TÃ¬m kiáº¿m'},
+    {id:'dictionary', icon:'ðŸ“–', label:lang==='en'?'Dictionary':'Tá»« Ä‘iá»ƒn thuáº­t ngá»¯'},
+    {id:'deploy', icon:'ðŸš€', label:lang==='en'?'Operations deploy':'Triá»ƒn khai váº­n hÃ nh'},
     {id:'exceptions', icon:'\u26a0\ufe0f', label:lang==='en'?'Exception dashboard':'B\u1ea3ng ngo\u1ea1i l\u1ec7'},
-    {id:'admin', icon:'⚙', label:'Admin', locked:true},
+    {id:'admin', icon:'âš™', label:'Admin', locked:true},
   ];
 }
 
 function portalSidebarSections(){
   return [
-    {id:'system', label:lang==='en'?'System documents':'Tài liệu hệ thống'},
-    {id:'ops', label:lang==='en'?'Operational documents':'Tài liệu vận hành'},
-    {id:'train', label:lang==='en'?'Training & competency':'Đào tạo & năng lực'}
+    {id:'system', label:lang==='en'?'System documents':'TÃ i liá»‡u há»‡ thá»‘ng'},
+    {id:'ops', label:lang==='en'?'Operational documents':'TÃ i liá»‡u váº­n hÃ nh'},
+    {id:'train', label:lang==='en'?'Training & competency':'ÄÃ o táº¡o & nÄƒng lá»±c'}
   ];
 }
 
 function portalSidebarCategoryItems(){
   return (Array.isArray(CATEGORIES) ? CATEGORIES : []).filter(cat => cat && !cat.hidden).map(cat => ({
     id: String(cat.id||'').toUpperCase(),
-    icon: cat.icon || '•',
+    icon: cat.icon || 'â€¢',
     label: (typeof catLabel === 'function') ? catLabel(cat) : String(cat.label || cat.id || ''),
     section: String(cat.section || '').toLowerCase()
   }));
@@ -456,12 +456,12 @@ function addPortalDisplayCustomExtension(){
   const input = document.getElementById('portal-display-new-ext');
   const ext = normalizePortalDisplayExt(input ? input.value : '');
   if(!ext){
-    showToast(lang==='en'?'⚠ Enter a valid extension':'⚠ Nhập đuôi file hợp lệ');
+    showToast(lang==='en'?'âš  Enter a valid extension':'âš  Nháº­p Ä‘uÃ´i file há»£p lá»‡');
     return;
   }
   const draft = ensurePortalDisplayConfigDraft();
   if((draft.extensions.known || []).includes(ext)){
-    showToast(lang==='en'?'ℹ Extension already exists':'ℹ Đuôi file đã tồn tại');
+    showToast(lang==='en'?'â„¹ Extension already exists':'â„¹ ÄuÃ´i file Ä‘Ã£ tá»“n táº¡i');
     return;
   }
   draft.extensions.custom = [...(draft.extensions.custom || []), ext];
@@ -485,7 +485,7 @@ async function savePortalDisplayConfig(){
   try{
     const res = await apiCall('admin_portal_display_config_save', {config: draft});
     if(!(res && res.ok && res.config)){
-      showToast('⚠ ' + ((res && res.error) ? res.error : 'save_failed'));
+      showToast('âš  ' + ((res && res.error) ? res.error : 'save_failed'));
       return;
     }
     applyPortalDisplayConfig(res.config, {forceDraftSync:true});
@@ -499,10 +499,10 @@ async function savePortalDisplayConfig(){
         if(currentPage==='dashboard' && typeof renderDashboard==='function') renderDashboard();
       }catch(e){}
     }
-    showToast(lang==='en'?'✅ Portal display settings saved':'✅ Đã lưu cấu hình hiển thị portal');
+    showToast(lang==='en'?'âœ… Portal display settings saved':'âœ… ÄÃ£ lÆ°u cáº¥u hÃ¬nh hiá»ƒn thá»‹ portal');
     if(currentPage === 'admin') renderAdmin();
   }catch(e){
-    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'Server error':'Lỗi server')));
+    showToast('âš  ' + ((e && e.message) ? e.message : (lang==='en'?'Server error':'Lá»—i server')));
   }
 }
 
@@ -573,9 +573,9 @@ async function loadCustomDocsFromServer(){
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // AUTH
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let csrfToken = null;
 let loginStage = 'password';
 let nextAfterLogin = null;
@@ -713,13 +713,13 @@ function setLoginStage(stage, msg='', pendingExpiresIn=null){
 
   if(stage === 'mfa'){
     if(enroll) enroll.style.display = 'none';
-    if(btn) btn.textContent = (lang==='en' ? 'Verify' : 'Xác minh');
+    if(btn) btn.textContent = (lang==='en' ? 'Verify' : 'XÃ¡c minh');
     document.getElementById('inp-otp')?.focus();
     return;
   }
   if(stage === 'enroll'){
     if(enroll) enroll.style.display = 'block';
-    if(btn) btn.textContent = (lang==='en' ? 'Complete' : 'Hoàn tất');
+    if(btn) btn.textContent = (lang==='en' ? 'Complete' : 'HoÃ n táº¥t');
     document.getElementById('inp-otp')?.focus();
     return;
   }
@@ -779,7 +779,7 @@ async function onLoggedIn(res){
     if(_RM[currentUser.role]) currentUser.role = _RM[currentUser.role];
   }
   if(!currentUser){
-    showLoginError(lang==='en' ? 'Login failed' : 'Đăng nhập thất bại');
+    showLoginError(lang==='en' ? 'Login failed' : 'ÄÄƒng nháº­p tháº¥t báº¡i');
     return;
   }
 
@@ -798,7 +798,7 @@ async function onLoggedIn(res){
   if(DATA_SETTINGS.require_consent){
     const accepted = await showConsentDialog();
     if(!accepted){
-      showToast(lang==='en'?'Access denied — consent required':'Truy cập bị từ chối — cần đồng ý điều khoản');
+      showToast(lang==='en'?'Access denied â€” consent required':'Truy cáº­p bá»‹ tá»« chá»‘i â€” cáº§n Ä‘á»“ng Ã½ Ä‘iá»u khoáº£n');
       syncCurrentUserRef(null); csrfToken = null;
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
@@ -809,16 +809,16 @@ async function onLoggedIn(res){
   // Geolocation (if enabled)
   let geo = {ok:true, lat:null, lng:null, accuracy:null};
   if(DATA_SETTINGS.collect_gps){
-    showToast(lang==='en'?'📍 Verifying location…':'📍 Đang xác minh vị trí…');
+    showToast(lang==='en'?'ðŸ“ Verifying locationâ€¦':'ðŸ“ Äang xÃ¡c minh vá»‹ trÃ­â€¦');
     geo = await requireGeolocation();
     if(!geo.ok){
       const reasons = {
-        denied: lang==='en'?'Location access was denied.':'Quyền truy cập vị trí bị từ chối.',
-        unavailable: lang==='en'?'Location unavailable. Enable GPS.':'Không xác định được vị trí. Bật GPS.',
-        timeout: lang==='en'?'Location request timed out.':'Yêu cầu vị trí quá thời gian.',
-        not_supported: lang==='en'?'Browser does not support geolocation.':'Trình duyệt không hỗ trợ định vị.'
+        denied: lang==='en'?'Location access was denied.':'Quyá»n truy cáº­p vá»‹ trÃ­ bá»‹ tá»« chá»‘i.',
+        unavailable: lang==='en'?'Location unavailable. Enable GPS.':'KhÃ´ng xÃ¡c Ä‘á»‹nh Ä‘Æ°á»£c vá»‹ trÃ­. Báº­t GPS.',
+        timeout: lang==='en'?'Location request timed out.':'YÃªu cáº§u vá»‹ trÃ­ quÃ¡ thá»i gian.',
+        not_supported: lang==='en'?'Browser does not support geolocation.':'TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ Ä‘á»‹nh vá»‹.'
       };
-      alert('⚠ ' + (reasons[geo.reason] || reasons.denied) + '\n\n' + (lang==='en'?'Session will be terminated.':'Phiên sẽ kết thúc.'));
+      alert('âš  ' + (reasons[geo.reason] || reasons.denied) + '\n\n' + (lang==='en'?'Session will be terminated.':'PhiÃªn sáº½ káº¿t thÃºc.'));
       syncCurrentUserRef(null); csrfToken = null;
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
@@ -853,11 +853,11 @@ function showRecoveryCodes(codes){
   modal.innerHTML = `
     <div class="modal" style="max-width:520px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div style="font-weight:700">✅ Đã bật 2FA — Mã dự phòng</div>
-        <button class="btn-admin secondary" onclick="document.getElementById('recovery-modal')?.remove()">✕ Đóng</button>
+        <div style="font-weight:700">âœ… ÄÃ£ báº­t 2FA â€” MÃ£ dá»± phÃ²ng</div>
+        <button class="btn-admin secondary" onclick="document.getElementById('recovery-modal')?.remove()">âœ• ÄÃ³ng</button>
       </div>
       <div style="font-size:13px;color:var(--text-3);margin-bottom:10px">
-        Lưu các mã này ở nơi an toàn. Mỗi mã chỉ dùng được 1 lần khi bạn mất Authenticator.
+        LÆ°u cÃ¡c mÃ£ nÃ y á»Ÿ nÆ¡i an toÃ n. Má»—i mÃ£ chá»‰ dÃ¹ng Ä‘Æ°á»£c 1 láº§n khi báº¡n máº¥t Authenticator.
       </div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
         ${codes.map(c=>`<code style="padding:8px;border:1px solid var(--border);border-radius:8px;background:#fafafa;text-align:center">${c}</code>`).join('')}
@@ -868,18 +868,18 @@ function showRecoveryCodes(codes){
 }
 
 // ACCESS CONTROL
-// ═══════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // JD DEPARTMENT HELPERS
-// ═══════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════
-// DYNAMIC SUBFOLDER HELPERS — derive from actual path
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// DYNAMIC SUBFOLDER HELPERS â€” derive from actual path
 // (replaces old static DEPT_MAP/ORDER blocks)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // Extract department/subfolder code from document path
-// e.g., "05-Processes/01-PROC-CNC/proc-cnc-001.html" → "PROC-CNC"
-// e.g., "10-Training-Academy/02-Course-Modules/C01.html" → "Modules"
+// e.g., "05-Processes/01-PROC-CNC/proc-cnc-001.html" â†’ "PROC-CNC"
+// e.g., "10-Training-Academy/02-Course-Modules/C01.html" â†’ "Modules"
 function getDocDeptFromPath(doc){
   const sub = getDocSubfolder(doc);
   if(!sub) return null;
@@ -894,7 +894,7 @@ function getAnnexDeptCode(doc){ return getDocDeptFromPath(doc); }
 
 // JD access: map subfolder to user dept codes
 const JD_SUBFOLDER_DEPT_MAP = {
-  // After getSubfolderLabel strips "01-" prefix → "JD-Executive"
+  // After getSubfolderLabel strips "01-" prefix â†’ "JD-Executive"
   'JD-Executive':['EXE','BOD'],
   'JD-Production':['PRO','CNC'],
   'JD-Engineering':['ENG'],
@@ -932,7 +932,7 @@ function canAccessJD(doc){
   // Check JD_SUBFOLDER_DEPT_MAP
   const allowed = JD_SUBFOLDER_DEPT_MAP[sub];
   if(allowed && allowed.includes(uDept)) return true;
-  // Fallback: extract dept code from subfolder name (JD-ENG → ENG, JD-Quality → QA)
+  // Fallback: extract dept code from subfolder name (JD-ENG â†’ ENG, JD-Quality â†’ QA)
   const m = sub.match(/^JD-([A-Za-z-]+)$/);
   if(m){
     const subDept = m[1].toUpperCase();
@@ -985,9 +985,9 @@ function getCatForDoc(doc){
   return CATEGORIES.find(c => c.id === doc.cat);
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // RENDER APP
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Auth flow hardening override:
 // - keep MFA/enroll pending on the login screen only
 // - expire pending OTP/enroll sessions cleanly
@@ -1000,7 +1000,7 @@ async function doLogin(){
 
   try{
     if(loginStage === 'password'){
-      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lòng nhập tài khoản và mật khẩu'); return; }
+      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lÃ²ng nháº­p tÃ i khoáº£n vÃ  máº­t kháº©u'); return; }
 
       const res = await apiCall('auth_login', {username:u, password:p});
       if(!res.ok){
@@ -1015,12 +1015,12 @@ async function doLogin(){
         document.getElementById('enroll-secret').textContent = res.secret || '';
         document.getElementById('enroll-otpauth').textContent = res.otpauth_url || '';
         renderEnrollQR(res.otpauth_url || '');
-        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', res.pending_expires_in);
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', res.pending_expires_in);
         return;
       }
       if(res.mfa_required){
         csrfToken = res.csrf_token || csrfToken;
-        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', res.pending_expires_in);
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', res.pending_expires_in);
         return;
       }
       if(res.logged_in){
@@ -1032,13 +1032,13 @@ async function doLogin(){
     }
 
     if(loginStage === 'enroll'){
-      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nhập mã 6 số để xác nhận'); return; }
+      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nháº­p mÃ£ 6 sá»‘ Ä‘á»ƒ xÃ¡c nháº­n'); return; }
       const res = await apiCall('auth_enroll_verify', {code: otp});
       if(!res.ok){
         if(res.error === 'unauthorized' || res.error === 'enroll_expired'){
-          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng đăng nhập lại.'});
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'PhiÃªn thiáº¿t láº­p Authenticator Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.'});
         } else {
-          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mÃ£'));
         }
         return;
       }
@@ -1050,13 +1050,13 @@ async function doLogin(){
     }
 
     if(loginStage === 'mfa'){
-      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nhập mã xác thực hoặc mã dự phòng'); return; }
+      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nháº­p mÃ£ xÃ¡c thá»±c hoáº·c mÃ£ dá»± phÃ²ng'); return; }
       const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
       if(!res.ok){
         if(res.error === 'mfa_expired' || res.error === 'unauthorized'){
-          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'Phiên xác thực OTP đã hết hạn. Vui lòng đăng nhập lại.'});
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'PhiÃªn xÃ¡c thá»±c OTP Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.'});
         } else {
-          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mÃ£'));
         }
         return;
       }
@@ -1065,7 +1065,7 @@ async function doLogin(){
     }
   }catch(err){
     console.error(err);
-    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'Không thể kết nối máy chủ. Vui lòng thử lại.');
+    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'KhÃ´ng thá»ƒ káº¿t ná»‘i mÃ¡y chá»§. Vui lÃ²ng thá»­ láº¡i.');
   }
 }
 
@@ -1089,7 +1089,7 @@ async function doLogout(){
 }
 
 async function checkSession(){
-  setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên đăng nhập…');
+  setLoginChecking(true, lang==='en' ? 'Checking sessionâ€¦' : 'Äang kiá»ƒm tra phiÃªn Ä‘Äƒng nháº­pâ€¦');
 
   let lastStatus = null;
   const delays = [0, 350, 900, 1600];
@@ -1117,13 +1117,13 @@ async function checkSession(){
         document.getElementById('enroll-otpauth').textContent = s.otpauth_url || '';
         renderEnrollQR(s.otpauth_url || '');
         setLoginChecking(false, '');
-        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', s.pending_expires_in);
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', s.pending_expires_in);
         return;
       }
       if(s && s.mfa_pending){
         csrfToken = s.csrf_token || null;
         setLoginChecking(false, '');
-        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', s.pending_expires_in);
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', s.pending_expires_in);
         return;
       }
       break;
@@ -1144,7 +1144,7 @@ async function checkSession(){
 
 async function showApp(){
   if(!currentUser){
-    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'Phiên đăng nhập không còn hợp lệ.'});
+    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'PhiÃªn Ä‘Äƒng nháº­p khÃ´ng cÃ²n há»£p lá»‡.'});
     return;
   }
 
@@ -1155,7 +1155,7 @@ async function showApp(){
   document.getElementById('hdr-name').textContent = currentUser.name;
   document.getElementById('hdr-title').textContent = (lang==='en' ? (r.labelEn||r.label||currentUser.title||'') : (r.label||currentUser.title||''));
   document.getElementById('dd-name').textContent = currentUser.name;
-  document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' · ' + currentUser.dept;
+  document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' Â· ' + currentUser.dept;
   document.getElementById('dd-access').textContent = lang==='en'?(r.labelEn||r.label):r.label;
 
   const docsLoaded = await loadDocsFromServer();
@@ -1171,23 +1171,23 @@ async function showApp(){
         document.getElementById('enroll-secret').textContent = status.secret || '';
         document.getElementById('enroll-otpauth').textContent = status.otpauth_url || '';
         renderEnrollQR(status.otpauth_url || '');
-        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', status.pending_expires_in);
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'BÆ°á»›c 2: Báº­t 2FA vÃ  nháº­p mÃ£ 6 sá»‘', status.pending_expires_in);
         return;
       }
       if(status && status.mfa_pending){
         csrfToken = status.csrf_token || null;
-        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', status.pending_expires_in);
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nháº­p mÃ£ xÃ¡c thá»±c 6 sá»‘ tá»« Authenticator', status.pending_expires_in);
         return;
       }
       resetPortalToLogin({
         stage:'password',
         errorMsg: status && status.auth_expired
           ? getPendingAuthExpiredMessage(status.auth_expired)
-          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại.')
+          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'PhiÃªn Ä‘Äƒng nháº­p khÃ´ng cÃ²n há»£p lá»‡. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.')
       });
       return;
     }
-    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh mục tài liệu tạm thời chưa tải được.');
+    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh má»¥c tÃ i liá»‡u táº¡m thá»i chÆ°a táº£i Ä‘Æ°á»£c.');
   }
 
   await loadFolderDescriptions();
@@ -1211,66 +1211,66 @@ function renderSidebar(){
   const coreButtons = [];
 
   if(isPortalSidebarCoreVisible('dashboard')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="navigateTo('dashboard')"><span class="icon">🏠</span><span>${T('dashboard')}</span></button>`);
+    coreButtons.push(`<button class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="navigateTo('dashboard')"><span class="icon">ðŸ </span><span>${T('dashboard')}</span></button>`);
   }
   if(isPortalSidebarCoreVisible('documents')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='documents'?'active':''}" onclick="navigateTo('documents')"><span class="icon">📁</span><span>${T('all_docs')}</span><span class="badge">${VDOCS.length}</span></button>`);
+    coreButtons.push(`<button class="nav-item ${currentPage==='documents'?'active':''}" onclick="navigateTo('documents')"><span class="icon">ðŸ“</span><span>${T('all_docs')}</span><span class="badge">${VDOCS.length}</span></button>`);
   }
   if(isPortalSidebarCoreVisible('search')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">🔍</span><span>${T('search')}</span></button>`);
+    coreButtons.push(`<button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">ðŸ”</span><span>${T('search')}</span></button>`);
   }
   if(isPortalSidebarCoreVisible('dictionary')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">📖</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>`);
+    coreButtons.push(`<button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">ðŸ“–</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>`);
   }
 
   let html = coreButtons.length ? `<div class="nav-section">${coreButtons.join('')}</div>` : '';
 
   if(isPortalSidebarCoreVisible('deploy')){
-    // ── SẢN XUẤT ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'PRODUCTION':'SẢN XUẤT'}</div>
-      <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Orders':'Đơn hàng'}</span></button>
-      <button class="nav-item ${currentPage==='dispatch'?'active':''}" onclick="navigateTo('dispatch')"><span class="icon">📋</span><span>${lang==='en'?'Production Dispatch':'Phân công sản xuất'}</span></button>
-      <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">🏭</span><span>${lang==='en'?'Shop Floor':'Xưởng sản xuất'}</span></button>
-      <button class="nav-item ${currentPage==='mobile-shopfloor'?'active':''}" onclick="navigateTo('mobile-shopfloor')"><span class="icon">📱</span><span>${lang==='en'?'Operator Mobile':'Công nhân di động'}</span></button>
-      <button class="nav-item ${currentPage==='quoting'?'active':''}" onclick="navigateTo('quoting')"><span class="icon">💰</span><span>${lang==='en'?'Quoting':'Báo giá'}</span></button>
+    // â”€â”€ Sáº¢N XUáº¤T â”€â”€
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'PRODUCTION':'Sáº¢N XUáº¤T'}</div>
+      <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">ðŸ“¦</span><span>${lang==='en'?'Orders':'ÄÆ¡n hÃ ng'}</span></button>
+      <button class="nav-item ${currentPage==='dispatch'?'active':''}" onclick="navigateTo('dispatch')"><span class="icon">ðŸ“‹</span><span>${lang==='en'?'Production Dispatch':'PhÃ¢n cÃ´ng sáº£n xuáº¥t'}</span></button>
+      <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">ðŸ­</span><span>${lang==='en'?'Shop Floor':'XÆ°á»Ÿng sáº£n xuáº¥t'}</span></button>
+      <button class="nav-item ${currentPage==='mobile-shopfloor'?'active':''}" onclick="navigateTo('mobile-shopfloor')"><span class="icon">ðŸ“±</span><span>${lang==='en'?'Operator Mobile':'CÃ´ng nhÃ¢n di Ä‘á»™ng'}</span></button>
+      <button class="nav-item ${currentPage==='quoting'?'active':''}" onclick="navigateTo('quoting')"><span class="icon">ðŸ’°</span><span>${lang==='en'?'Quoting':'BÃ¡o giÃ¡'}</span></button>
     </div>`;
-    // ── CHẤT LƯỢNG ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'QUALITY':'CHẤT LƯỢNG'}</div>
-      <button class="nav-item ${['quality-exceptions','exceptions'].indexOf(currentPage)>=0?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Nonconformance':'Sự không phù hợp'}</span></button>
-      <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏪</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
-      <button class="nav-item ${currentPage==='fmea'?'active':''}" onclick="navigateTo('fmea')"><span class="icon">⚡</span><span>${lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan'}</span></button>
-      <button class="nav-item ${currentPage==='apqp-ppap'?'active':''}" onclick="navigateTo('apqp-ppap')"><span class="icon">🎯</span><span>${lang==='en'?'APQP / PPAP':'APQP / PPAP'}</span></button>
-      <button class="nav-item ${currentPage==='ai-scheduling'?'active':''}" onclick="navigateTo('ai-scheduling')"><span class="icon">🤖</span><span>${lang==='en'?'AI Quality':'AI Chất lượng'}</span></button>
+    // â”€â”€ CHáº¤T LÆ¯á»¢NG â”€â”€
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'QUALITY':'CHáº¤T LÆ¯á»¢NG'}</div>
+      <button class="nav-item ${['quality-exceptions','exceptions'].indexOf(currentPage)>=0?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">ðŸ”´</span><span>${lang==='en'?'Nonconformance':'Sá»± khÃ´ng phÃ¹ há»£p'}</span></button>
+      <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">ðŸª</span><span>${lang==='en'?'Supplier Quality':'Cháº¥t lÆ°á»£ng NCC'}</span></button>
+      <button class="nav-item ${currentPage==='fmea'?'active':''}" onclick="navigateTo('fmea')"><span class="icon">âš¡</span><span>${lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan'}</span></button>
+      <button class="nav-item ${currentPage==='apqp-ppap'?'active':''}" onclick="navigateTo('apqp-ppap')"><span class="icon">ðŸŽ¯</span><span>${lang==='en'?'APQP / PPAP':'APQP / PPAP'}</span></button>
+      <button class="nav-item ${currentPage==='ai-scheduling'?'active':''}" onclick="navigateTo('ai-scheduling')"><span class="icon">ðŸ¤–</span><span>${lang==='en'?'AI Quality':'AI Cháº¥t lÆ°á»£ng'}</span></button>
     </div>`;
-    // ── HỒ SƠ & BÁO CÁO ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'RECORDS & REPORTS':'HỒ SƠ & BÁO CÁO'}</div>
-      <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
-      <button class="nav-item ${currentPage==='evidence'?'active':''}" onclick="navigateTo('evidence')"><span class="icon">🔒</span><span>${lang==='en'?'Evidence Vault':'Kho chứng cứ'}</span></button>
-      <button class="nav-item ${currentPage==='compliance-reports'?'active':''}" onclick="navigateTo('compliance-reports')"><span class="icon">📊</span><span>${lang==='en'?'Reports':'Báo cáo'}</span></button>
-      <button class="nav-item ${currentPage==='continuous-improvement'?'active':''}" onclick="navigateTo('continuous-improvement')"><span class="icon">🔄</span><span>${lang==='en'?'Improvement':'Cải tiến liên tục'}</span></button>
-      <button class="nav-item ${currentPage==='knowledge-base'?'active':''}" onclick="navigateTo('knowledge-base')"><span class="icon">💡</span><span>${lang==='en'?'Knowledge Base':'Kho kiến thức'}</span></button>
+    // â”€â”€ Há»’ SÆ  & BÃO CÃO â”€â”€
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'RECORDS & REPORTS':'Há»’ SÆ  & BÃO CÃO'}</div>
+      <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">ðŸ“‹</span><span>${lang==='en'?'Evidence Control':'Kiá»ƒm soÃ¡t chá»©ng cá»©'}</span></button>
+      <button class="nav-item ${currentPage==='evidence'?'active':''}" onclick="navigateTo('evidence')"><span class="icon">ðŸ”’</span><span>${lang==='en'?'Evidence Vault':'Kho chá»©ng cá»©'}</span></button>
+      <button class="nav-item ${currentPage==='compliance-reports'?'active':''}" onclick="navigateTo('compliance-reports')"><span class="icon">ðŸ“Š</span><span>${lang==='en'?'Reports':'BÃ¡o cÃ¡o'}</span></button>
+      <button class="nav-item ${currentPage==='continuous-improvement'?'active':''}" onclick="navigateTo('continuous-improvement')"><span class="icon">ðŸ”„</span><span>${lang==='en'?'Improvement':'Cáº£i tiáº¿n liÃªn tá»¥c'}</span></button>
+      <button class="nav-item ${currentPage==='knowledge-base'?'active':''}" onclick="navigateTo('knowledge-base')"><span class="icon">ðŸ’¡</span><span>${lang==='en'?'Knowledge Base':'Kho kiáº¿n thá»©c'}</span></button>
     </div>`;
-    // ── CÔNG CỤ ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TOOLS':'CÔNG CỤ'}</div>
-      <button class="nav-item ${currentPage==='cnc-programs'?'active':''}" onclick="navigateTo('cnc-programs')"><span class="icon">⚙</span><span>${lang==='en'?'CNC Programs':'Chương trình CNC'}</span></button>
-      <button class="nav-item ${currentPage==='product-passport'?'active':''}" onclick="navigateTo('product-passport')"><span class="icon">🔗</span><span>${lang==='en'?'Product Passport':'Hộ chiếu sản phẩm'}</span></button>
-      <button class="nav-item ${currentPage==='schema-studio'?'active':''}" onclick="navigateTo('schema-studio')"><span class="icon">🗄</span><span>${lang==='en'?'Schema Studio':'Schema Studio'}</span></button>
-      <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy':'Năng lượng'}</span></button>
-      <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Deploy':'Triển khai'}</span></button>
-      <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
+    // â”€â”€ CÃ”NG Cá»¤ â”€â”€
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TOOLS':'CÃ”NG Cá»¤'}</div>
+      <button class="nav-item ${currentPage==='cnc-programs'?'active':''}" onclick="navigateTo('cnc-programs')"><span class="icon">âš™</span><span>${lang==='en'?'CNC Programs':'ChÆ°Æ¡ng trÃ¬nh CNC'}</span></button>
+      <button class="nav-item ${currentPage==='product-passport'?'active':''}" onclick="navigateTo('product-passport')"><span class="icon">ðŸ”—</span><span>${lang==='en'?'Product Passport':'Há»™ chiáº¿u sáº£n pháº©m'}</span></button>
+      <button class="nav-item ${currentPage==='schema-studio'?'active':''}" onclick="navigateTo('schema-studio')"><span class="icon">ðŸ—„</span><span>${lang==='en'?'Schema Studio':'Schema Studio'}</span></button>
+      <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">âš¡</span><span>${lang==='en'?'Energy':'NÄƒng lÆ°á»£ng'}</span></button>
+      <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">ðŸš€</span><span>${lang==='en'?'Deploy':'Triá»ƒn khai'}</span></button>
+      <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">ðŸŒ</span><span>${lang==='en'?'Customer Portal':'Cá»•ng khÃ¡ch hÃ ng'}</span></button>
     </div>`;
-    // Nút + Tạo Module mới (luôn hiện cho admin)
+    // NÃºt + Táº¡o Module má»›i (luÃ´n hiá»‡n cho admin)
     if(isAdmin()){
-      html += `<div class="nav-section" style="padding:0 8px"><button class="nav-item" onclick="navigateTo('module-builder')" style="border:1px dashed rgba(255,255,255,0.3);justify-content:center;opacity:0.7"><span class="icon">➕</span><span>${lang==='en'?'Create Module':'Tạo Module mới'}</span></button></div>`;
+      html += `<div class="nav-section" style="padding:0 8px"><button class="nav-item" onclick="navigateTo('module-builder')" style="border:1px dashed rgba(255,255,255,0.3);justify-content:center;opacity:0.7"><span class="icon">âž•</span><span>${lang==='en'?'Create Module':'Táº¡o Module má»›i'}</span></button></div>`;
     }
   }
   if(isAdmin() && isPortalSidebarCoreVisible('admin')){
-    html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
+    html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">âš™</span><span>${T('admin_panel')}</span></button></div>`;
   }
 
   if(isAdmin()){
     html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TEMPLATE LAB':'TEMPLATE LAB'}</div>
-      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')"><span class="icon">🧩</span><span>${lang==='en'?'Master Module Template':'Master Module Template'}</span></button>
+      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')"><span class="icon">ðŸ§©</span><span>${lang==='en'?'Master Module Template':'Master Module Template'}</span></button>
     </div>`;
   }
 
@@ -1286,7 +1286,7 @@ function renderSidebar(){
       const visibleDocsInCat = VDOCS.filter(d=>d.cat===cat.id);
       const locked = visibleDocsInCat.length > 0 && !visibleDocsInCat.some(d=>canAccessDoc(d.code));
       html += `<button class="nav-item ${currentFilter===cat.id&&currentPage==='documents'?'active':''}" onclick="navigateTo('documents','${cat.id}')">
-        <span class="icon">${cat.icon}</span><span>${catLabel(cat)}</span><span class="badge">${locked?'🔒':cnt}</span>
+        <span class="icon">${cat.icon}</span><span>${catLabel(cat)}</span><span class="badge">${locked?'ðŸ”’':cnt}</span>
       </button>`;
     });
     html += '</div>';
@@ -1295,9 +1295,9 @@ function renderSidebar(){
   nav.innerHTML = html;
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // NAVIGATION
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function teardownCurrentPageModule(){
   try{
     if(currentPage === 'schema-studio' && window.SchemaStudio && typeof window.SchemaStudio.destroy === 'function'){
@@ -1313,15 +1313,15 @@ function resolvePortalScriptUrl(fragment){
 
 function renderModuleBuilderStatus(container, mode, detail){
   var title = mode === 'loading'
-    ? (lang==='en' ? 'Loading Module Builder...' : 'Đang nạp Module Builder...')
+    ? (lang==='en' ? 'Loading Module Builder...' : 'Äang náº¡p Module Builder...')
     : 'Module Builder';
   var body = mode === 'loading'
     ? (lang==='en'
         ? 'Please wait while the builder runtime is reloaded.'
-        : 'Vui lòng chờ trong khi hệ thống nạp lại runtime của builder.')
+        : 'Vui lÃ²ng chá» trong khi há»‡ thá»‘ng náº¡p láº¡i runtime cá»§a builder.')
     : (lang==='en'
         ? 'The builder could not be loaded automatically. Please reload once.'
-        : 'Không thể nạp Module Builder tự động. Vui lòng tải lại một lần.');
+        : 'KhÃ´ng thá»ƒ náº¡p Module Builder tá»± Ä‘á»™ng. Vui lÃ²ng táº£i láº¡i má»™t láº§n.');
   var extra = '';
   if(detail){
     extra = '<div style="margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(220,38,38,0.18);background:rgba(220,38,38,0.06);color:#991b1b;font-size:12px;word-break:break-word">' + String(detail).replace(/[&<>]/g, function(ch){
@@ -1334,8 +1334,8 @@ function renderModuleBuilderStatus(container, mode, detail){
       '<div style="color:var(--text-secondary);line-height:1.6">' + body + '</div>' +
       extra +
       '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">' +
-        '<button class="hm-btn hm-btn-primary" onclick="navigateTo(\'module-builder\', undefined, true)">' + (lang==='en' ? 'Retry builder' : 'Thử nạp lại builder') + '</button>' +
-        '<button class="hm-btn hm-btn-secondary" onclick="window.location.reload()">' + (lang==='en' ? 'Reload page' : 'Tải lại trang') + '</button>' +
+        '<button class="hm-btn hm-btn-primary" onclick="navigateTo(\'module-builder\', undefined, true)">' + (lang==='en' ? 'Retry builder' : 'Thá»­ náº¡p láº¡i builder') + '</button>' +
+        '<button class="hm-btn hm-btn-secondary" onclick="window.location.reload()">' + (lang==='en' ? 'Reload page' : 'Táº£i láº¡i trang') + '</button>' +
       '</div>' +
     '</div>';
 }
@@ -1456,17 +1456,17 @@ function navigateTo(page, filter, bypassGuard){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng','schema-studio':'Schema Studio'};
+  const pageTitles = {dashboard:'Tá»•ng quan',documents:'Danh sÃ¡ch tÃ i liá»‡u',search:'TÃ¬m kiáº¿m',dictionary:'Tá»« Ä‘iá»ƒn thuáº­t ngá»¯',access:'Ma tráº­n truy cáº­p',admin:'Quáº£n trá»‹ há»‡ thá»‘ng',deploy:'Triá»ƒn khai váº­n hÃ nh',mes:'Trung tÃ¢m Ä‘iá»u hÃ nh MES',exceptions:'Báº£ng ngoáº¡i lá»‡',orders:'Quáº£n lÃ½ Ä‘Æ¡n hÃ ng',forms:'Kiá»ƒm soÃ¡t chá»©ng cá»©','quality-exceptions':'Quáº£n lÃ½ ngoáº¡i lá»‡ cháº¥t lÆ°á»£ng','supplier-quality':'Quáº£n lÃ½ cháº¥t lÆ°á»£ng NCC','quoting':'BÃ¡o giÃ¡ & Æ¯á»›c tÃ­nh',evidence:'Kho chá»©ng cá»©','customer-portal':'Cá»•ng khÃ¡ch hÃ ng','cnc-programs':'ChÆ°Æ¡ng trÃ¬nh CNC','product-passport':'Há»™ chiáº¿u sáº£n pháº©m sá»‘','ai-scheduling':'AI Cháº¥t lÆ°á»£ng & Lá»‹ch trÃ¬nh','compliance-reports':'BÃ¡o cÃ¡o tuÃ¢n thá»§',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'XÆ°á»Ÿng di Ä‘á»™ng','knowledge-base':'Kho kiáº¿n thá»©c','continuous-improvement':'Cáº£i tiáº¿n liÃªn tá»¥c','energy-dashboard':'GiÃ¡m sÃ¡t nÄƒng lÆ°á»£ng','schema-studio':'Schema Studio'};
   pageTitles['module-builder'] = 'Module Builder';
-  trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
+  trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' â€” '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triá»ƒn khai váº­n hÃ nh',mes:lang==='en'?'MES Control Center':'Trung tÃ¢m Ä‘iá»u hÃ nh MES',exceptions:lang==='en'?'Exception Dashboard':'Báº£ng ngoáº¡i lá»‡',orders:lang==='en'?'Order Management':'Quáº£n lÃ½ Ä‘Æ¡n hÃ ng',forms:lang==='en'?'Evidence Control':'Kiá»ƒm soÃ¡t chá»©ng cá»©','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quáº£n lÃ½ ngoáº¡i lá»‡ cháº¥t lÆ°á»£ng','supplier-quality':lang==='en'?'Supplier Quality':'Quáº£n lÃ½ cháº¥t lÆ°á»£ng NCC',quoting:lang==='en'?'Quoting & Estimation':'BÃ¡o giÃ¡ & Æ¯á»›c tÃ­nh',evidence:lang==='en'?'Evidence Vault':'Kho chá»©ng cá»©','customer-portal':lang==='en'?'Customer Portal Admin':'Quáº£n trá»‹ cá»•ng khÃ¡ch hÃ ng','cnc-programs':lang==='en'?'CNC Programs':'ChÆ°Æ¡ng trÃ¬nh CNC','product-passport':lang==='en'?'Digital Product Passport':'Há»™ chiáº¿u sáº£n pháº©m sá»‘','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Cháº¥t lÆ°á»£ng & Lá»‹ch trÃ¬nh','compliance-reports':lang==='en'?'Compliance Reports':'BÃ¡o cÃ¡o tuÃ¢n thá»§',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'XÆ°á»Ÿng di Ä‘á»™ng','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiáº¿n thá»©c','continuous-improvement':lang==='en'?'Continuous Improvement':'Cáº£i tiáº¿n liÃªn tá»¥c','energy-dashboard':lang==='en'?'Energy Monitor':'GiÃ¡m sÃ¡t nÄƒng lÆ°á»£ng','schema-studio':'Schema Studio'};
   titles['template-demo'] = 'Master Module Template';
   titles['module-builder'] = 'Module Builder';
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
-    if(bcEl) bcEl.innerHTML = `<span>HESEM QMS</span><span style="margin:0 4px">›</span><span class="current">${titles[page]||page}</span>`;
+    if(bcEl) bcEl.innerHTML = `<span>HESEM QMS</span><span style="margin:0 4px">â€º</span><span class="current">${titles[page]||page}</span>`;
   }
 
   setDocHeaderToolbar('');
@@ -1715,12 +1715,12 @@ async function openDoc(code){
 
   // Block access to hidden documents for non-admins
   if(isDocHidden(doc.code) && !isAdmin()){
-    showToast(lang==='en' ? 'This document is currently hidden by Admin.' : 'Tài liệu này hiện đang bị ẩn bởi Admin.');
+    showToast(lang==='en' ? 'This document is currently hidden by Admin.' : 'TÃ i liá»‡u nÃ y hiá»‡n Ä‘ang bá»‹ áº©n bá»Ÿi Admin.');
     return;
   }
   if(!canAccessDoc(doc.code)) return;
 
-  // ── Unsaved Changes Guard ──
+  // â”€â”€ Unsaved Changes Guard â”€â”€
   if(editMode && editingDoc && editingDoc !== resolvedCode){
     let hasUnsaved=true;
     try{
@@ -1741,7 +1741,7 @@ async function openDoc(code){
   // Track document view
   const displayTitle = getDocDisplayTitle(doc);
   const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
-  trackPageView('doc/'+resolvedCode, (isDownloadOnlyDoc(doc)?'📊 ':'📄 ')+displayCode+' — '+displayTitle.substring(0,60));
+  trackPageView('doc/'+resolvedCode, (isDownloadOnlyDoc(doc)?'ðŸ“Š ':'ðŸ“„ ')+displayCode+' â€” '+displayTitle.substring(0,60));
   editMode=false;
   editingDoc=null;
   currentDoc=resolvedCode;
@@ -1758,25 +1758,25 @@ async function openDoc(code){
 
   const bc = document.getElementById('header-breadcrumb');
   if(bc){
-    let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">🏠</span>`;
+    let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">ðŸ </span>`;
     // Add category if we came from one
     if(currentFilter && currentFilter !== 'ALL'){
       const cat = CATEGORIES.find(c=>c.id===currentFilter);
-      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+      bcHtml += `<span style="color:var(--text-3);margin:0 4px">â€º</span>`;
       bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];navigateTo('documents','${currentFilter}')">${cat?cat.icon:''} ${cat?catLabel(cat).split('(')[0].trim():currentFilter}</span>`;
     }
     // Add folder path
     for(let i=0; i<currentFolderPath.length; i++){
       const seg = currentFolderPath[i];
       const label = getSubfolderLabel(seg);
-      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+      bcHtml += `<span style="color:var(--text-3);margin:0 4px">â€º</span>`;
       bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
     }
     const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
     const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
-    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
+    bcHtml += `<span style="color:var(--text-3);margin:0 4px">â€º</span><span style="font-weight:700">${safeCode}</span>`;
     if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
-      bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
+      bcHtml += `<span style="color:var(--text-3);margin:0 6px">â€¢</span><span class="current">${safeTitle}</span>`;
     }
     bc.innerHTML = bcHtml;
     bc.style.display = 'flex';
@@ -1897,9 +1897,9 @@ function buildDocHeaderActions(doc){
 
     if(isWorkbook && status==='draft' && canEdit(doc)){
       return `
-        ${renderDocHeaderButton(lang==='en'?'Upload draft':'Upload bản nháp', 'upload', 'primary', `uploadFormDraft('${doc.code}')`)}
+        ${renderDocHeaderButton(lang==='en'?'Upload draft':'Upload báº£n nhÃ¡p', 'upload', 'primary', `uploadFormDraft('${doc.code}')`)}
         ${activeDraft?renderDocHeaderButton(T('wf_submit_review'), 'submit', 'accent', `submitWorkbookForReview('${doc.code}')`):''}
-        ${hasDiscardableWorkbookDraft?renderDocHeaderButton(lang==='en'?'Discard draft':'Hủy nháp', 'cancel', 'danger', `deleteDraft('${doc.code}')`):''}
+        ${hasDiscardableWorkbookDraft?renderDocHeaderButton(lang==='en'?'Discard draft':'Há»§y nhÃ¡p', 'cancel', 'danger', `deleteDraft('${doc.code}')`):''}
       `;
     }
 
@@ -1938,23 +1938,23 @@ function applyRuntimeDocDisplayMetadata(doc, meta){
     if(bc){
       const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
       const displayTitle = getDocDisplayTitle(doc);
-      let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">🏠</span>`;
+      let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">ðŸ </span>`;
       if(currentFilter && currentFilter !== 'ALL'){
         const cat = CATEGORIES.find(c=>c.id===currentFilter);
-        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+        bcHtml += `<span style="color:var(--text-3);margin:0 4px">â€º</span>`;
         bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];navigateTo('documents','${currentFilter}')">${cat?cat.icon:''} ${cat?catLabel(cat).split('(')[0].trim():currentFilter}</span>`;
       }
       for(let i=0; i<currentFolderPath.length; i++){
         const seg = currentFolderPath[i];
         const label = getSubfolderLabel(seg);
-        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+        bcHtml += `<span style="color:var(--text-3);margin:0 4px">â€º</span>`;
         bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
       }
       const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
       const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
-      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
+      bcHtml += `<span style="color:var(--text-3);margin:0 4px">â€º</span><span style="font-weight:700">${safeCode}</span>`;
       if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
-        bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
+        bcHtml += `<span style="color:var(--text-3);margin:0 6px">â€¢</span><span class="current">${safeTitle}</span>`;
       }
       bc.innerHTML = bcHtml;
     }
@@ -1985,7 +1985,7 @@ function updateDocViewerHeader(doc){
   let lastEditMeta='';
   if(state && state.lastEdit && state.lastEdit.by && hasWorkingDraft){
     const le=state.lastEdit;
-    lastEditMeta=`<div class="dv-meta-note edit"><span class="dv-meta-note-label">${lang==='en'?'Last edited by':'Người chỉnh sửa cuối'}</span><b>${le.by}</b><span>${le.role?le.role+' · ':''}${le.date||''}</span></div>`;
+    lastEditMeta=`<div class="dv-meta-note edit"><span class="dv-meta-note-label">${lang==='en'?'Last edited by':'NgÆ°á»i chá»‰nh sá»­a cuá»‘i'}</span><b>${le.by}</b><span>${le.role?le.role+' Â· ':''}${le.date||''}</span></div>`;
   }
 
   // Build approved-by meta
@@ -2003,8 +2003,8 @@ function updateDocViewerHeader(doc){
   const displayDesc = getDocDisplayDescription(doc);
   const isWorkbook = isDownloadOnlyDoc(doc);
   const detailToggleLabel = docHeaderMetaCollapsed
-    ? (lang==='en' ? 'Show details' : 'Hiện chi tiết')
-    : (lang==='en' ? 'Hide details' : 'Ẩn chi tiết');
+    ? (lang==='en' ? 'Show details' : 'Hiá»‡n chi tiáº¿t')
+    : (lang==='en' ? 'Hide details' : 'áº¨n chi tiáº¿t');
   const detailToggleHtml = renderDocHeaderButton(
     detailToggleLabel,
     docHeaderMetaCollapsed ? 'expand' : 'collapse',
@@ -2014,17 +2014,17 @@ function updateDocViewerHeader(doc){
     `aria-expanded="${docHeaderMetaCollapsed?'false':'true'}"`
   );
   const ownerEditButton = canEdit(doc)
-    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chỉnh chủ sở hữu')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
+    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chá»‰nh chá»§ sá»Ÿ há»¯u')+'">'+(lang==='en'?'Edit':'Sá»­a')+'</button>'
     : '';
   const approverEditButton = canEdit(doc)
-    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'approver\')" title="'+(lang==='en'?'Edit approver':'Chỉnh người duyệt')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
+    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'approver\')" title="'+(lang==='en'?'Edit approver':'Chá»‰nh ngÆ°á»i duyá»‡t')+'">'+(lang==='en'?'Edit':'Sá»­a')+'</button>'
     : '';
   const activityNotes = [submittedMeta, lastEditMeta, approvedMeta].filter(Boolean).join('');
   const navActionsHtml = isWorkbook
     ? `<div class="dv-action-group dv-nav-actions">
           ${detailToggleHtml}
           ${renderDocHeaderButton(T('back'), 'back', 'neutral', 'closeDocViewer()')}
-          ${renderDocHeaderButton(lang==='en'?'Download':'Tải về', 'download', 'neutral', `downloadCurrentDoc('${doc.code}')`)}
+          ${renderDocHeaderButton(lang==='en'?'Download':'Táº£i vá»', 'download', 'neutral', `downloadCurrentDoc('${doc.code}')`)}
        </div>`
     : `<div class="dv-action-group dv-nav-actions">
           ${detailToggleHtml}
@@ -2061,9 +2061,9 @@ function updateDocViewerHeader(doc){
   syncDocViewerDetailVisibility();
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // RENDER PAGES
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // Edit doc metadata (owner, approver) - synced to server state
 async function editDocMeta(code, field){
@@ -2079,13 +2079,13 @@ async function editDocMeta(code, field){
     
     if(field === 'owner'){
       currentVal = (state.owner || doc.owner || '');
-      title = lang==='en'?'Edit Document Owner':'Chỉnh sửa Chủ sở hữu';
+      title = lang==='en'?'Edit Document Owner':'Chá»‰nh sá»­a Chá»§ sá»Ÿ há»¯u';
       // Build department list from CATEGORIES or known departments
       options = ['QA/QMS','Production','Engineering','Sales','Purchasing','HR/Admin','IT','Finance','Warehouse','Planning','Quality','Maintenance','Management'];
     } else if(field === 'approver'){
-      currentVal = (state.approver || (lang==='en'?'General Director':'Tổng Giám Đốc'));
-      title = lang==='en'?'Edit Approver':'Chỉnh sửa Người phê duyệt';
-      options = [lang==='en'?'General Director':'Tổng Giám Đốc', 'QMR', 'QA Manager', 'Production Manager', 'Engineering Manager'];
+      currentVal = (state.approver || (lang==='en'?'General Director':'Tá»•ng GiÃ¡m Äá»‘c'));
+      title = lang==='en'?'Edit Approver':'Chá»‰nh sá»­a NgÆ°á»i phÃª duyá»‡t';
+      options = [lang==='en'?'General Director':'Tá»•ng GiÃ¡m Äá»‘c', 'QMR', 'QA Manager', 'Production Manager', 'Engineering Manager'];
       // Add admin users if available
       try{
         if(typeof adminUsers !== 'undefined' && Array.isArray(adminUsers)){
@@ -2094,7 +2094,7 @@ async function editDocMeta(code, field){
       }catch(e){}
     }
     
-    const newVal = prompt(title + '\n\n' + (lang==='en'?'Current':'Hiện tại') + ': ' + currentVal + '\n\n' + (lang==='en'?'Options':'Tùy chọn') + ': ' + options.join(', ') + '\n\n' + (lang==='en'?'Enter new value:':'Nhập giá trị mới:'), currentVal);
+    const newVal = prompt(title + '\n\n' + (lang==='en'?'Current':'Hiá»‡n táº¡i') + ': ' + currentVal + '\n\n' + (lang==='en'?'Options':'TÃ¹y chá»n') + ': ' + options.join(', ') + '\n\n' + (lang==='en'?'Enter new value:':'Nháº­p giÃ¡ trá»‹ má»›i:'), currentVal);
     if(newVal === null || newVal.trim() === '' || newVal.trim() === currentVal) return;
     
     // Update state
@@ -2108,7 +2108,7 @@ async function editDocMeta(code, field){
     
     // Refresh header
     updateDocViewerHeader(doc);
-    showToast((lang==='en'?'Updated ':'Đã cập nhật ') + field);
+    showToast((lang==='en'?'Updated ':'ÄÃ£ cáº­p nháº­t ') + field);
   }catch(err){
     console.error('editDocMeta error:', err);
   }
@@ -2173,23 +2173,23 @@ function renderDashboard(){
   if(r.approve && pendingDocs.length > 0){
     pendingHtml = `
       <div class="card" style="border-left:3px solid #f59e0b;grid-column:1/-1">
-        <h3 style="color:#d97706">📬 ${T('pending_approval')} <span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${pendingDocs.length}</span></h3>
+        <h3 style="color:#d97706">ðŸ“¬ ${T('pending_approval')} <span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${pendingDocs.length}</span></h3>
         <div style="max-height:300px;overflow-y:auto">
           ${pendingDocs.map(d=>{
             const cat=getCatForDoc(d);
             const state=getDocState(d.code);
-            const submitter=state&&state.submittedBy?state.submittedBy.name:'—';
+            const submitter=state&&state.submittedBy?state.submittedBy.name:'â€”';
             const subDate=state&&state.submittedBy?state.submittedBy.date:'';
             const subType=state&&state.submittedBy&&state.submittedBy.updateType?state.submittedBy.updateType:'';
             const subTypeBadge=subType?('<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(subType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(subType==='major'?'MAJOR':'MINOR')+'</span>'):'';
             return `<div class="pa-card" onclick="openDoc('${d.code}')">
-              <div class="pa-badge" style="background:#3b82f615;color:#3b82f6">📤 IN REVIEW</div>
+              <div class="pa-badge" style="background:#3b82f615;color:#3b82f6">ðŸ“¤ IN REVIEW</div>
               <div class="pa-info">
                 <div class="pa-code">${d.code}${subTypeBadge}</div>
                 <div class="pa-title">${d.title}</div>
-                <div class="pa-sub">${T('submitted_by')}: ${submitter} · ${subDate} · v${getDocRevision(d)}</div>
+                <div class="pa-sub">${T('submitted_by')}: ${submitter} Â· ${subDate} Â· v${getDocRevision(d)}</div>
               </div>
-              <span style="color:#1565c0;font-size:18px">→</span>
+              <span style="color:#1565c0;font-size:18px">â†’</span>
             </div>`;
           }).join('')}
         </div>
@@ -2201,25 +2201,25 @@ function renderDashboard(){
   if(r.canEditDocs && myEditing.length > 0){
     draftsHtml = `
       <div class="card" style="border-left:3px solid #6366f1;grid-column:1/-1">
-        <h3 style="color:#6366f1">📝 ${T('my_drafts')} <span style="background:#eef2ff;color:#6366f1;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${myEditing.length}</span></h3>
+        <h3 style="color:#6366f1">ðŸ“ ${T('my_drafts')} <span style="background:#eef2ff;color:#6366f1;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${myEditing.length}</span></h3>
         <div style="max-height:200px;overflow-y:auto">
           ${myEditing.map(d=>{
             const state=getDocState(d.code);
             return `<div class="pa-card" onclick="openDoc('${d.code}')">
-              <div class="pa-badge" style="background:#f59e0b15;color:#f59e0b">📋 DRAFT</div>
+              <div class="pa-badge" style="background:#f59e0b15;color:#f59e0b">ðŸ“‹ DRAFT</div>
               <div class="pa-info">
                 <div class="pa-code">${d.code}</div>
                 <div class="pa-title">${d.title}</div>
-                <div class="pa-sub">v${getDocRevision(d)} · ${state&&state.lastEdit?state.lastEdit.date:''}</div>
+                <div class="pa-sub">v${getDocRevision(d)} Â· ${state&&state.lastEdit?state.lastEdit.date:''}</div>
               </div>
-              <span style="color:#1565c0;font-size:18px">→</span>
+              <span style="color:#1565c0;font-size:18px">â†’</span>
             </div>`;
           }).join('')}
         </div>
       </div>`;
   }
 
-  // High-impact execution shortcuts (RFQ → Cash, G0–G7)
+  // High-impact execution shortcuts (RFQ â†’ Cash, G0â€“G7)
   const execShortcutCodes = [
     "PROC-OPS-001",
     "WI-OPS-001",
@@ -2237,7 +2237,7 @@ function renderDashboard(){
 
   el.innerHTML = `
     <div class="stats-row">
-      <div class="stat-card" style="cursor:pointer;border-left:3px solid #059669" onclick="showFilteredDocs('recent')"><div class="value" style="color:#059669">${ruCount}</div><div class="label">${lang==='en'?'Updated (30d)':'Cập nhật (30d)'}</div><div class="sub">${lang==='en'?'Last 30 days':'30 ngày qua'}</div></div>
+      <div class="stat-card" style="cursor:pointer;border-left:3px solid #059669" onclick="showFilteredDocs('recent')"><div class="value" style="color:#059669">${ruCount}</div><div class="label">${lang==='en'?'Updated (30d)':'Cáº­p nháº­t (30d)'}</div><div class="sub">${lang==='en'?'Last 30 days':'30 ngÃ y qua'}</div></div>
       <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('approved')"><div class="value" style="color:#2e7d32">${approvedCount}</div><div class="label">${T('approved')}</div><div class="sub">${T('effective')}</div></div>
       <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('draft')"><div class="value" style="color:#f57f17">${draftCount}</div><div class="label">${T('draft')}</div><div class="sub">${T('editing')}</div></div>
       <div class="stat-card" style="cursor:pointer;${r.approve&&reviewCount>0?'border:2px solid #f59e0b':''}" onclick="showFilteredDocs('review')"><div class="value" style="color:#d97706">${reviewCount}</div><div class="label">${T('in_review_label')}</div><div class="sub">${r.approve&&reviewCount>0?T('click_review'):T('pending_waiting')}</div></div>
@@ -2245,58 +2245,58 @@ function renderDashboard(){
     </div>
     <div id="dash-pending">${pendingHtml}${draftsHtml}</div>
     <div class="card" style="margin-top:12px">
-      <h3 style="margin-bottom:8px">🏭 ${lang==='en'?'Job Order Lifecycle — G0 → G7 (8 Gates)':'Vòng đời đơn hàng — G0 → G7 (8 cổng)'}</h3>
+      <h3 style="margin-bottom:8px">ðŸ­ ${lang==='en'?'Job Order Lifecycle â€” G0 â†’ G7 (8 Gates)':'VÃ²ng Ä‘á»i Ä‘Æ¡n hÃ ng â€” G0 â†’ G7 (8 cá»•ng)'}</h3>
       <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;overflow-x:auto;padding:4px 0 8px">
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #4CAF50;background:#f8fdf8;min-width:0"><div style="font-weight:700;font-size:11px;color:#2e7d32;margin-bottom:3px">G0</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Contract</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'RFQ, order entry':'Xem xét RFQ, nhập đơn'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-201');return false" style="color:#0369a1">SOP-201</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #4CAF50;background:#f8fdf8;min-width:0"><div style="font-weight:700;font-size:11px;color:#2e7d32;margin-bottom:3px">G0</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Contract</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'RFQ, order entry':'Xem xÃ©t RFQ, nháº­p Ä‘Æ¡n'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-201');return false" style="color:#0369a1">SOP-201</a></div></div>
         <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #1565C0;background:#f0f4ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#0d47a1;margin-bottom:3px">G1</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Engineering</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'DFM, CAM/NC, baseline':'DFM, CAM/NC, baseline'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-303');return false" style="color:#0369a1">SOP-303</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #795548;background:#faf6f3;min-width:0"><div style="font-weight:700;font-size:11px;color:#4e342e;margin-bottom:3px">G2</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Receiving, incoming QC':'Nhận hàng, KT đầu vào'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('WI-701');return false" style="color:#0369a1">WI-701</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #2196F3;background:#f5f9ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#1565c0;margin-bottom:3px">G3</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Setup</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Program, machine setup':'CT, setup máy'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #FF9800;background:#fffbf0;min-width:0"><div style="font-weight:700;font-size:11px;color:#e65100;margin-bottom:3px">G4</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">FAI</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'First article inspection':'Kiểm tra bài đầu tiên'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #9C27B0;background:#fdf5ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#7b1fa2;margin-bottom:3px">G5</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IPQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'In-process QC, SPC':'KS trong quá trình'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #00BCD4;background:#f0fdff;min-width:0"><div style="font-weight:700;font-size:11px;color:#00838f;margin-bottom:3px">G6</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Final QC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Final inspection, pack':'KT cuối, đóng gói'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #F44336;background:#fff5f5;min-width:0"><div style="font-weight:700;font-size:11px;color:#c62828;margin-bottom:3px">G7</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Ship</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Shipment, CoC':'Giao hàng, CoC'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #795548;background:#faf6f3;min-width:0"><div style="font-weight:700;font-size:11px;color:#4e342e;margin-bottom:3px">G2</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Receiving, incoming QC':'Nháº­n hÃ ng, KT Ä‘áº§u vÃ o'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('WI-701');return false" style="color:#0369a1">WI-701</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #2196F3;background:#f5f9ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#1565c0;margin-bottom:3px">G3</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Setup</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Program, machine setup':'CT, setup mÃ¡y'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #FF9800;background:#fffbf0;min-width:0"><div style="font-weight:700;font-size:11px;color:#e65100;margin-bottom:3px">G4</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">FAI</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'First article inspection':'Kiá»ƒm tra bÃ i Ä‘áº§u tiÃªn'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #9C27B0;background:#fdf5ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#7b1fa2;margin-bottom:3px">G5</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IPQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'In-process QC, SPC':'KS trong quÃ¡ trÃ¬nh'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #00BCD4;background:#f0fdff;min-width:0"><div style="font-weight:700;font-size:11px;color:#00838f;margin-bottom:3px">G6</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Final QC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Final inspection, pack':'KT cuá»‘i, Ä‘Ã³ng gÃ³i'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #F44336;background:#fff5f5;min-width:0"><div style="font-weight:700;font-size:11px;color:#c62828;margin-bottom:3px">G7</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Ship</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Shipment, CoC':'Giao hÃ ng, CoC'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
       </div>
     </div>
     <div class="grid-2" style="margin-top:12px">
       <div class="card">
-        <h3>👤 ${lang==='en'?'Quick Access by Role':'Truy cập nhanh theo vai trò'}</h3>
+        <h3>ðŸ‘¤ ${lang==='en'?'Quick Access by Role':'Truy cáº­p nhanh theo vai trÃ²'}</h3>
         <div style="display:grid;grid-template-columns:1fr;gap:6px;font-size:12px">
-          <div style="padding:8px 10px;border-left:3px solid #2196F3;border-radius:4px;background:#f5f9ff"><b>CNC Operator</b> — <a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a> · <a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a> · <a href="#" onclick="openDoc('WI-519');return false" style="color:#0369a1">WI-519</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #4CAF50;border-radius:4px;background:#f8fdf8"><b>QC Inspector</b> — <a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a> · <a href="#" onclick="openDoc('SOP-604');return false" style="color:#0369a1">SOP-604</a> · <a href="#" onclick="openDoc('SOP-601');return false" style="color:#0369a1">SOP-601</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #FF9800;border-radius:4px;background:#fffbf0"><b>Team Leader / Foreman</b> — <a href="#" onclick="openDoc('WI-202');return false" style="color:#0369a1">WI-202</a> · <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> · <a href="#" onclick="openDoc('SOP-606');return false" style="color:#0369a1">SOP-606</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #9C27B0;border-radius:4px;background:#fdf5ff"><b>Planner / Engineer</b> — <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> · <a href="#" onclick="openDoc('SOP-303');return false" style="color:#0369a1">SOP-303</a> · <a href="#" onclick="openDoc('SOP-103');return false" style="color:#0369a1">SOP-103</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #0C2D48;border-radius:4px;background:#f0f4f8"><b>Manager / Director</b> — <a href="#" onclick="openDoc('SOP-902');return false" style="color:#0369a1">SOP-902</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">WI-901</a> · <a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">ANNEX-122</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #00BCD4;border-radius:4px;background:#f0fdff"><b>IT / QMS Admin</b> — <a href="#" onclick="openDoc('SOP-101');return false" style="color:#0369a1">SOP-101</a> · <a href="#" onclick="openDoc('SOP-104');return false" style="color:#0369a1">SOP-104</a> · <a href="#" onclick="openDoc('ANNEX-101');return false" style="color:#0369a1">ANNEX-101</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #2196F3;border-radius:4px;background:#f5f9ff"><b>CNC Operator</b> â€” <a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a> Â· <a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a> Â· <a href="#" onclick="openDoc('WI-519');return false" style="color:#0369a1">WI-519</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #4CAF50;border-radius:4px;background:#f8fdf8"><b>QC Inspector</b> â€” <a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a> Â· <a href="#" onclick="openDoc('SOP-604');return false" style="color:#0369a1">SOP-604</a> Â· <a href="#" onclick="openDoc('SOP-601');return false" style="color:#0369a1">SOP-601</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #FF9800;border-radius:4px;background:#fffbf0"><b>Team Leader / Foreman</b> â€” <a href="#" onclick="openDoc('WI-202');return false" style="color:#0369a1">WI-202</a> Â· <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> Â· <a href="#" onclick="openDoc('SOP-606');return false" style="color:#0369a1">SOP-606</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #9C27B0;border-radius:4px;background:#fdf5ff"><b>Planner / Engineer</b> â€” <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> Â· <a href="#" onclick="openDoc('SOP-303');return false" style="color:#0369a1">SOP-303</a> Â· <a href="#" onclick="openDoc('SOP-103');return false" style="color:#0369a1">SOP-103</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #0C2D48;border-radius:4px;background:#f0f4f8"><b>Manager / Director</b> â€” <a href="#" onclick="openDoc('SOP-902');return false" style="color:#0369a1">SOP-902</a> Â· <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">WI-901</a> Â· <a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">ANNEX-122</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #00BCD4;border-radius:4px;background:#f0fdff"><b>IT / QMS Admin</b> â€” <a href="#" onclick="openDoc('SOP-101');return false" style="color:#0369a1">SOP-101</a> Â· <a href="#" onclick="openDoc('SOP-104');return false" style="color:#0369a1">SOP-104</a> Â· <a href="#" onclick="openDoc('ANNEX-101');return false" style="color:#0369a1">ANNEX-101</a></div>
         </div>
       </div>
       <div class="card">
-        <h3>📋 ${lang==='en'?'Key Documents & Matrices':'Tài liệu trọng yếu'}</h3>
+        <h3>ðŸ“‹ ${lang==='en'?'Key Documents & Matrices':'TÃ i liá»‡u trá»ng yáº¿u'}</h3>
         <div style="display:grid;gap:6px;font-size:12px">
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-120')"><b>Authority Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-120 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-121')"><b>RACI Master</b><span style="color:#0369a1;font-size:11px">ANNEX-121 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-122')"><b>KPI Cascade Dictionary</b><span style="color:#0369a1;font-size:11px">ANNEX-122 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-123')"><b>Deputy / Backup Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-123 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('WI-201')"><b>Quality Gates & Hold Points</b><span style="color:#0369a1;font-size:11px">WI-201 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #fee2e2;border-left:3px solid #ef4444;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-118')"><b>⚠ Offline Fallback Kit</b><span style="color:#ef4444;font-size:11px">ANNEX-118 →</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-120')"><b>Authority Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-120 â†’</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-121')"><b>RACI Master</b><span style="color:#0369a1;font-size:11px">ANNEX-121 â†’</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-122')"><b>KPI Cascade Dictionary</b><span style="color:#0369a1;font-size:11px">ANNEX-122 â†’</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-123')"><b>Deputy / Backup Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-123 â†’</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('WI-201')"><b>Quality Gates & Hold Points</b><span style="color:#0369a1;font-size:11px">WI-201 â†’</span></div>
+          <div style="padding:8px 10px;border:1px solid #fee2e2;border-left:3px solid #ef4444;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-118')"><b>âš  Offline Fallback Kit</b><span style="color:#ef4444;font-size:11px">ANNEX-118 â†’</span></div>
         </div>
       </div>
     </div>
     <div class="card" style="margin-top:12px">
-      <h3>📊 ${lang==='en'?'Operational KPIs — ISO 9001:2026 §9.1':'KPI vận hành — ISO 9001:2026 §9.1'}</h3>
+      <h3>ðŸ“Š ${lang==='en'?'Operational KPIs â€” ISO 9001:2026 Â§9.1':'KPI váº­n hÃ nh â€” ISO 9001:2026 Â§9.1'}</h3>
       <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;font-size:12px">
-        <div style="padding:10px;border:1px solid #dcfce7;border-radius:8px;background:#f0fdf4;text-align:center;min-width:0"><div style="font-size:10px;color:#166534;font-weight:600;text-transform:uppercase">OTD</div><div style="font-size:18px;font-weight:700;color:#16a34a;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'On-Time Delivery':'Giao hàng đúng hạn'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
-        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e40af;font-weight:600;text-transform:uppercase">FPY</div><div style="font-size:18px;font-weight:700;color:#2563eb;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'First Pass Yield':'Tỷ lệ đạt lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 98%</div></div>
-        <div style="padding:10px;border:1px solid #fef3c7;border-radius:8px;background:#fffbeb;text-align:center;min-width:0"><div style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase">COPQ</div><div style="font-size:18px;font-weight:700;color:#d97706;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Cost of Poor Quality':'Chi phí CL kém'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 2%</div></div>
-        <div style="padding:10px;border:1px solid #fee2e2;border-radius:8px;background:#fef2f2;text-align:center;min-width:0"><div style="font-size:10px;color:var(--red);font-weight:600;text-transform:uppercase">NCR</div><div style="font-size:18px;font-weight:700;color:#dc2626;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Open NCRs':'NCR đang mở'}</div><div style="font-size:9px;color:#999;margin-top:2px">= 0</div></div>
-        <div style="padding:10px;border:1px solid #f3e8ff;border-radius:8px;background:#faf5ff;text-align:center;min-width:0"><div style="font-size:10px;color:#6b21a8;font-weight:600;text-transform:uppercase">IQC Pass</div><div style="font-size:18px;font-weight:700;color:#7c3aed;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'IQC Pass Rate':'Tỷ lệ đạt IQC'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 99%</div></div>
-        <div style="padding:10px;border:1px solid #e0f2fe;border-radius:8px;background:#f0f9ff;text-align:center;min-width:0"><div style="font-size:10px;color:#075985;font-weight:600;text-transform:uppercase">OEE</div><div style="font-size:18px;font-weight:700;color:#0284c7;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Equipment Effectiveness':'Hiệu suất thiết bị'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 85%</div></div>
-        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e3a5f;font-weight:600;text-transform:uppercase">ENG FTR</div><div style="font-size:18px;font-weight:700;color:#1565c0;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng First-Time-Right':'KT đúng lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
-        <div style="padding:10px;border:1px solid #fce7f3;border-radius:8px;background:#fdf2f8;text-align:center;min-width:0"><div style="font-size:10px;color:#831843;font-weight:600;text-transform:uppercase">ECN Lead</div><div style="font-size:18px;font-weight:700;color:#be185d;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng Change Lead':'TG thay đổi KT'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 48h</div></div>
+        <div style="padding:10px;border:1px solid #dcfce7;border-radius:8px;background:#f0fdf4;text-align:center;min-width:0"><div style="font-size:10px;color:#166534;font-weight:600;text-transform:uppercase">OTD</div><div style="font-size:18px;font-weight:700;color:#16a34a;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'On-Time Delivery':'Giao hÃ ng Ä‘Ãºng háº¡n'}</div><div style="font-size:9px;color:#999;margin-top:2px">â‰¥ 95%</div></div>
+        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e40af;font-weight:600;text-transform:uppercase">FPY</div><div style="font-size:18px;font-weight:700;color:#2563eb;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'First Pass Yield':'Tá»· lá»‡ Ä‘áº¡t láº§n Ä‘áº§u'}</div><div style="font-size:9px;color:#999;margin-top:2px">â‰¥ 98%</div></div>
+        <div style="padding:10px;border:1px solid #fef3c7;border-radius:8px;background:#fffbeb;text-align:center;min-width:0"><div style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase">COPQ</div><div style="font-size:18px;font-weight:700;color:#d97706;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'Cost of Poor Quality':'Chi phÃ­ CL kÃ©m'}</div><div style="font-size:9px;color:#999;margin-top:2px">â‰¤ 2%</div></div>
+        <div style="padding:10px;border:1px solid #fee2e2;border-radius:8px;background:#fef2f2;text-align:center;min-width:0"><div style="font-size:10px;color:var(--red);font-weight:600;text-transform:uppercase">NCR</div><div style="font-size:18px;font-weight:700;color:#dc2626;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'Open NCRs':'NCR Ä‘ang má»Ÿ'}</div><div style="font-size:9px;color:#999;margin-top:2px">= 0</div></div>
+        <div style="padding:10px;border:1px solid #f3e8ff;border-radius:8px;background:#faf5ff;text-align:center;min-width:0"><div style="font-size:10px;color:#6b21a8;font-weight:600;text-transform:uppercase">IQC Pass</div><div style="font-size:18px;font-weight:700;color:#7c3aed;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'IQC Pass Rate':'Tá»· lá»‡ Ä‘áº¡t IQC'}</div><div style="font-size:9px;color:#999;margin-top:2px">â‰¥ 99%</div></div>
+        <div style="padding:10px;border:1px solid #e0f2fe;border-radius:8px;background:#f0f9ff;text-align:center;min-width:0"><div style="font-size:10px;color:#075985;font-weight:600;text-transform:uppercase">OEE</div><div style="font-size:18px;font-weight:700;color:#0284c7;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'Equipment Effectiveness':'Hiá»‡u suáº¥t thiáº¿t bá»‹'}</div><div style="font-size:9px;color:#999;margin-top:2px">â‰¥ 85%</div></div>
+        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e3a5f;font-weight:600;text-transform:uppercase">ENG FTR</div><div style="font-size:18px;font-weight:700;color:#1565c0;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng First-Time-Right':'KT Ä‘Ãºng láº§n Ä‘áº§u'}</div><div style="font-size:9px;color:#999;margin-top:2px">â‰¥ 95%</div></div>
+        <div style="padding:10px;border:1px solid #fce7f3;border-radius:8px;background:#fdf2f8;text-align:center;min-width:0"><div style="font-size:10px;color:#831843;font-weight:600;text-transform:uppercase">ECN Lead</div><div style="font-size:18px;font-weight:700;color:#be185d;margin:4px 0">â€”</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng Change Lead':'TG thay Ä‘á»•i KT'}</div><div style="font-size:9px;color:#999;margin-top:2px">â‰¤ 48h</div></div>
       </div>
-      <div style="margin-top:8px;font-size:10px;color:var(--text-3);text-align:right"><a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">${lang==='en'?'Full KPI Dictionary':'Từ điển KPI đầy đủ'} → ANNEX-122</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">${lang==='en'?'Dashboard Guide':'Hướng dẫn Dashboard'} → WI-901</a></div>
+      <div style="margin-top:8px;font-size:10px;color:var(--text-3);text-align:right"><a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">${lang==='en'?'Full KPI Dictionary':'Tá»« Ä‘iá»ƒn KPI Ä‘áº§y Ä‘á»§'} â†’ ANNEX-122</a> Â· <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">${lang==='en'?'Dashboard Guide':'HÆ°á»›ng dáº«n Dashboard'} â†’ WI-901</a></div>
     </div>
     `;
-/* OLD DASHBOARD CODE REMOVED — see git history for reference */
+/* OLD DASHBOARD CODE REMOVED â€” see git history for reference */
 }
 
 var _lastDocRenderTarget = 'page-documents';
@@ -2305,10 +2305,10 @@ function renderDocuments(targetContainerId){
   const el = document.getElementById(_lastDocRenderTarget || 'page-documents');
   const VDOCS = getVisibleDocs();
 
-  // ═══ Update header breadcrumb ═══
+  // â•â•â• Update header breadcrumb â•â•â•
   updateDocBreadcrumb();
 
-  // ═══ SEARCH MODE: flat list ═══
+  // â•â•â• SEARCH MODE: flat list â•â•â•
   if(searchQuery){
     const q = searchQuery.toLowerCase();
     const filtered = VDOCS.filter(d => d.code.toLowerCase().includes(q) || d.title.toLowerCase().includes(q));
@@ -2316,13 +2316,13 @@ function renderDocuments(targetContainerId){
     return;
   }
 
-  // ═══ ALL DOCS MODE: show category cards ═══
+  // â•â•â• ALL DOCS MODE: show category cards â•â•â•
   if(currentFilter === 'ALL' && currentFolderPath.length === 0){
     el.innerHTML = renderDocSearchBar(VDOCS) + renderDocCategoryGrid(VDOCS);
     return;
   }
 
-  // ═══ CATEGORY/FOLDER BROWSING MODE ═══
+  // â•â•â• CATEGORY/FOLDER BROWSING MODE â•â•â•
   const catDocs = currentFilter !== 'ALL' ? VDOCS.filter(d=>d.cat===currentFilter) : VDOCS;
   const treeNode = currentFilter !== 'ALL'
     ? ((typeof getCategoryTreeRoot === 'function' ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs))
@@ -2339,12 +2339,12 @@ function renderDocuments(targetContainerId){
   if(canCreateNewDoc()){
     toolbar = `<div class="fm-toolbar" style="justify-content:flex-end">
       ${folderEditMode ? `
-        <button class="fm-btn primary" onclick="openCreateFolderDialog()">📁 ${lang==='en'?'New folder':'Tạo folder'}</button>
-        <button class="fm-btn primary" onclick="openCreateDocModalQuick()">📄 ${lang==='en'?'New document':'Tạo tài liệu'}</button>
-        <span style="font-size:11px;color:var(--text-3)">${lang==='en'?'Drag to move':'Kéo thả để di chuyển'}</span>
+        <button class="fm-btn primary" onclick="openCreateFolderDialog()">ðŸ“ ${lang==='en'?'New folder':'Táº¡o folder'}</button>
+        <button class="fm-btn primary" onclick="openCreateDocModalQuick()">ðŸ“„ ${lang==='en'?'New document':'Táº¡o tÃ i liá»‡u'}</button>
+        <span style="font-size:11px;color:var(--text-3)">${lang==='en'?'Drag to move':'KÃ©o tháº£ Ä‘á»ƒ di chuyá»ƒn'}</span>
       ` : ''}
       <button class="fm-btn ${folderEditMode?'active':''}" onclick="folderEditMode=!folderEditMode;renderDocuments()">
-        ${folderEditMode?'✕ '+(lang==='en'?'Exit':'Thoát'):'✏️ '+(lang==='en'?'Edit':'Chỉnh sửa')}
+        ${folderEditMode?'âœ• '+(lang==='en'?'Exit':'ThoÃ¡t'):'âœï¸ '+(lang==='en'?'Edit':'Chá»‰nh sá»­a')}
       </button>
     </div>`;
   }
@@ -2362,7 +2362,7 @@ function renderDocuments(targetContainerId){
       const dropAttr = folderEditMode ? `ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleFileDrop(event,this,'${escapeHtml(sub.path)}')"` : '';
       folderHtml += `
         <div class="fm-folder ${isLocked?'locked':''}" onclick="${isLocked?'':`currentFolderPath.push('${escapeHtml(subKey)}');renderDocuments();renderSidebar()`}" ${dropAttr} data-folder-path="${escapeHtml(sub.path)}" oncontextmenu="event.preventDefault();event.stopPropagation();openFolderEditMenu(event,'${escapeHtml(sub.path)}','${escapeHtml(subKey)}')">
-          ${folderEditMode?`<button class="fm-del-btn" onclick="event.stopPropagation();confirmDeleteFolder('${escapeHtml(sub.path)}','${escapeHtml(subKey)}')" title="${lang==='en'?'Delete folder':'Xóa folder'}">✕</button>`:''}
+          ${folderEditMode?`<button class="fm-del-btn" onclick="event.stopPropagation();confirmDeleteFolder('${escapeHtml(sub.path)}','${escapeHtml(subKey)}')" title="${lang==='en'?'Delete folder':'XÃ³a folder'}">âœ•</button>`:''}
           <div class="fm-icon" style="position:relative">
             <div class="folder-tab"></div>
             <div class="folder-back"></div>
@@ -2371,7 +2371,7 @@ function renderDocuments(targetContainerId){
             ${allSubDocs.length>0?`<div class="folder-badge">${allSubDocs.length}</div>`:''}
           </div>
           <div class="fm-label">${label}</div>
-          <div class="fm-desc">${getFolderDesc(sub.path) || (allSubDocs.length > 0 ? `${allSubDocs.length} ${lang==='en'?'docs':'tài liệu'}${isLocked?' 🔒':''}` : (lang==='en'?'Empty folder':'Thư mục trống'))}</div>
+          <div class="fm-desc">${getFolderDesc(sub.path) || (allSubDocs.length > 0 ? `${allSubDocs.length} ${lang==='en'?'docs':'tÃ i liá»‡u'}${isLocked?' ðŸ”’':''}` : (lang==='en'?'Empty folder':'ThÆ° má»¥c trá»‘ng'))}</div>
         </div>`;
     });
     folderHtml += `</div>`;
@@ -2385,22 +2385,22 @@ function renderDocuments(targetContainerId){
 
   // Empty state
   if(childFolders.length === 0 && docsHere.length === 0){
-    fileHtml = `<div class="fm-empty">${lang==='en'?'This folder is empty':'Thư mục này trống'}</div>`;
+    fileHtml = `<div class="fm-empty">${lang==='en'?'This folder is empty':'ThÆ° má»¥c nÃ y trá»‘ng'}</div>`;
   }
 
   el.innerHTML = renderDocSearchBar(VDOCS) + toolbar + folderHtml + fileHtml;
 }
 
-// ═══ DYNAMIC HEADER BREADCRUMB ═══
+// â•â•â• DYNAMIC HEADER BREADCRUMB â•â•â•
 function updateDocBreadcrumb(){
   const bcEl = document.getElementById('header-breadcrumb');
   if(!bcEl || currentPage !== 'documents') return;
 
-  let html = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];renderDocuments();renderSidebar()">🏠</span>`;
+  let html = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];renderDocuments();renderSidebar()">ðŸ </span>`;
 
   if(currentFilter !== 'ALL'){
     const cat = CATEGORIES.find(c=>c.id===currentFilter);
-    html += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+    html += `<span style="color:var(--text-3);margin:0 4px">â€º</span>`;
     if(currentFolderPath.length > 0){
       html += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];renderDocuments()">${cat?cat.icon:''} ${cat?catLabel(cat).split('(')[0].trim():currentFilter}</span>`;
     } else {
@@ -2411,11 +2411,11 @@ function updateDocBreadcrumb(){
   for(let i=0; i<currentFolderPath.length; i++){
     const seg = currentFolderPath[i];
     const label = getSubfolderLabel(seg);
-    html += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+    html += `<span style="color:var(--text-3);margin:0 4px">â€º</span>`;
     if(i < currentFolderPath.length - 1){
-      html += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});renderDocuments()">📁 ${label}</span>`;
+      html += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});renderDocuments()">ðŸ“ ${label}</span>`;
     } else {
-      html += `<span style="font-weight:700;color:var(--text-1)">📁 ${label}</span>`;
+      html += `<span style="font-weight:700;color:var(--text-1)">ðŸ“ ${label}</span>`;
     }
   }
 
@@ -2458,7 +2458,7 @@ function renderDocCategoryGrid(VDOCS){
       <div class="fm-folder" onclick="currentFilter='${cat.id}';currentFolderPath=[];renderDocuments();renderSidebar()" style="padding:20px 14px">
         <div style="width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:${cat.color};color:#fff;font-size:24px;box-shadow:0 4px 12px ${cat.color}33">${cat.icon}</div>
         <div class="fm-label" style="font-size:14px;margin-top:4px">${catLabel(cat).split('(')[0].trim()}</div>
-        <div class="fm-count">${cnt} ${lang==='en'?'docs':'tài liệu'}</div>
+        <div class="fm-count">${cnt} ${lang==='en'?'docs':'tÃ i liá»‡u'}</div>
       </div>`;
   });
   html += `</div>`;
@@ -2470,7 +2470,7 @@ function renderDocFileList(docs){
   if(docs.length === 0) return `<div class="fm-empty">${T('no_docs')}</div>`;
   let html = `<div class="fm-files">
     <div class="fm-header-row">
-      <span></span><span>${lang==='en'?'Document code / Standard title':'Mã tài liệu / Tên file chuẩn'}</span><span>${T('rev')}</span><span>${T('status')}</span><span>${T('access')}</span>
+      <span></span><span>${lang==='en'?'Document code / Standard title':'MÃ£ tÃ i liá»‡u / TÃªn file chuáº©n'}</span><span>${T('rev')}</span><span>${T('status')}</span><span>${T('access')}</span>
     </div>`;
   docs.forEach(doc => {
     const cat = getCatForDoc(doc);
@@ -2488,15 +2488,15 @@ function renderDocFileList(docs){
         </div>
         <div class="fm-file-rev">v${getDocRevision(doc)}</div>
         <div class="fm-file-status"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:${statusColor(getDocStatus(doc))}15;color:${statusColor(getDocStatus(doc))}">${statusLabel(getDocStatus(doc))}</span></div>
-        <div class="fm-file-access">${locked?'<span style="color:var(--red)">🔒</span>':'<span style="color:var(--green)">✓</span>'}</div>
-        ${folderEditMode&&canCreateNewDoc()?`<div class="fm-file-del"><button class="fm-del-btn-row" onclick="event.stopPropagation();confirmDeleteDoc('${escapeHtml(doc.code)}','${escapeHtml(displayTitle)}')" title="${lang==='en'?'Delete':'Xóa'}">🗑️</button></div>`:''}
+        <div class="fm-file-access">${locked?'<span style="color:var(--red)">ðŸ”’</span>':'<span style="color:var(--green)">âœ“</span>'}</div>
+        ${folderEditMode&&canCreateNewDoc()?`<div class="fm-file-del"><button class="fm-del-btn-row" onclick="event.stopPropagation();confirmDeleteDoc('${escapeHtml(doc.code)}','${escapeHtml(displayTitle)}')" title="${lang==='en'?'Delete':'XÃ³a'}">ðŸ—‘ï¸</button></div>`:''}
       </div>`;
   });
   html += `</div>`;
   return html;
 }
 
-// ═══ EDIT MODE: Folder creation dialog ═══
+// â•â•â• EDIT MODE: Folder creation dialog â•â•â•
 function openCreateFolderDialog(){
   // Auto-compute next folder number
   const catDocs = DOCS.filter(d=>d.cat===currentFilter);
@@ -2516,19 +2516,19 @@ function openCreateFolderDialog(){
   modal.innerHTML = `
     <div class="modal" style="max-width:440px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="font-weight:700;font-size:16px">📁 ${lang==='en'?'Create New Folder':'Tạo Folder Mới'}</div>
-        <button class="btn-admin secondary" onclick="document.getElementById('folder-create-modal')?.remove()">✕</button>
+        <div style="font-weight:700;font-size:16px">ðŸ“ ${lang==='en'?'Create New Folder':'Táº¡o Folder Má»›i'}</div>
+        <button class="btn-admin secondary" onclick="document.getElementById('folder-create-modal')?.remove()">âœ•</button>
       </div>
       <div class="modal-field">
-        <label>${lang==='en'?'Folder name':'Tên folder'}</label>
+        <label>${lang==='en'?'Folder name':'TÃªn folder'}</label>
         <input id="nf-name" type="text" placeholder="VD: PROC-NEW, Templates" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px" autofocus>
       </div>
       <div style="margin-top:10px;font-size:12px;color:var(--text-3)">
-        📂 ${lang==='en'?'Will create':'Sẽ tạo'}: <code>${parentPath}/<b>${String(nextNum).padStart(2,'0')}</b>-<span id="nf-preview">???</span>/</code>
+        ðŸ“‚ ${lang==='en'?'Will create':'Sáº½ táº¡o'}: <code>${parentPath}/<b>${String(nextNum).padStart(2,'0')}</b>-<span id="nf-preview">???</span>/</code>
       </div>
       <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn-admin secondary" onclick="document.getElementById('folder-create-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="doCreateFolder(${nextNum})">📁 ${lang==='en'?'Create':'Tạo'}</button>
+        <button class="btn-admin secondary" onclick="document.getElementById('folder-create-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin primary" onclick="doCreateFolder(${nextNum})">ðŸ“ ${lang==='en'?'Create':'Táº¡o'}</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -2539,7 +2539,7 @@ function openCreateFolderDialog(){
 
 async function doCreateFolder(nextNum){
   const name = (document.getElementById('nf-name')?.value||'').trim().replace(/[^A-Za-z0-9_-]/g,'-');
-  if(!name){ showToast(lang==='en'?'Enter folder name':'Nhập tên folder'); return; }
+  if(!name){ showToast(lang==='en'?'Enter folder name':'Nháº­p tÃªn folder'); return; }
   const folderName = String(nextNum).padStart(2,'0') + '-' + name;
   const catDocs = DOCS.filter(d=>d.cat===currentFilter);
   const treeNode = ((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
@@ -2548,7 +2548,7 @@ async function doCreateFolder(nextNum){
   try {
     const res = await apiCall('create_folder', {parent: parentPath, name: folderName});
     if(res && res.ok){
-      showToast('✅ ' + (lang==='en'?'Folder created':'Đã tạo folder'));
+      showToast('âœ… ' + (lang==='en'?'Folder created':'ÄÃ£ táº¡o folder'));
       document.getElementById('folder-create-modal')?.remove();
       await rescanDocs();
       renderDocuments();
@@ -2558,7 +2558,7 @@ async function doCreateFolder(nextNum){
   } catch(e){ showToast('\u26A0 Error: ' + e.message); }
 }
 
-// ═══ QUICK CREATE DOC — defaults to current folder ═══
+// â•â•â• QUICK CREATE DOC â€” defaults to current folder â•â•â•
 function openCreateDocModalQuick(){
   // Compute current folder path
   const catDocs = DOCS.filter(d=>d.cat===currentFilter);
@@ -2582,29 +2582,29 @@ function openCreateDocModalQuick(){
   modal.innerHTML = `
     <div class="modal" style="max-width:480px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="font-weight:700;font-size:16px">📄 ${lang==='en'?'Create New Document':'Tạo Tài Liệu Mới'}</div>
-        <button class="btn-admin secondary" onclick="document.getElementById('quick-create-modal')?.remove()">✕</button>
+        <div style="font-weight:700;font-size:16px">ðŸ“„ ${lang==='en'?'Create New Document':'Táº¡o TÃ i Liá»‡u Má»›i'}</div>
+        <button class="btn-admin secondary" onclick="document.getElementById('quick-create-modal')?.remove()">âœ•</button>
       </div>
       <div style="margin-bottom:10px;padding:8px 12px;background:var(--bg-2);border-radius:8px;font-size:12px">
-        📂 ${lang==='en'?'Folder':'Folder'}: <b>${folderPath}/</b>
+        ðŸ“‚ ${lang==='en'?'Folder':'Folder'}: <b>${folderPath}/</b>
       </div>
       <div class="modal-field">
-        <label>${lang==='en'?'Document code':'Mã tài liệu'}</label>
+        <label>${lang==='en'?'Document code':'MÃ£ tÃ i liá»‡u'}</label>
         <input id="qc-code" type="text" placeholder="VD: PROC-CNC-003" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px" autofocus>
       </div>
       <div class="modal-field" style="margin-top:8px">
-        <label>${lang==='en'?'English standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
-        <input id="qc-title" type="text" placeholder="${lang==='en'?'English standard title':'Tên file / tiêu đề chuẩn tiếng Anh'}" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px">
+        <label>${lang==='en'?'English standard title / file name':'TÃªn file / tiÃªu Ä‘á» chuáº©n'}</label>
+        <input id="qc-title" type="text" placeholder="${lang==='en'?'English standard title':'TÃªn file / tiÃªu Ä‘á» chuáº©n tiáº¿ng Anh'}" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px">
       </div>
       <div class="modal-field" style="margin-top:8px">
-        <label>${lang==='en'?'Owner':'Chủ sở hữu'}</label>
+        <label>${lang==='en'?'Owner':'Chá»§ sá»Ÿ há»¯u'}</label>
         <select id="qc-owner" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px">
           ${ownerOpts.map(o=>`<option value="${o.v}" ${o.v===ownerDept?'selected':''}>${o.v}</option>`).join('')}
         </select>
       </div>
       <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn-admin secondary" onclick="document.getElementById('quick-create-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="doQuickCreateDoc('${escapeHtml(folderPath)}','${escapeHtml(currentFilter)}')">📄 ${lang==='en'?'Create':'Tạo'}</button>
+        <button class="btn-admin secondary" onclick="document.getElementById('quick-create-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin primary" onclick="doQuickCreateDoc('${escapeHtml(folderPath)}','${escapeHtml(currentFilter)}')">ðŸ“„ ${lang==='en'?'Create':'Táº¡o'}</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -2615,13 +2615,13 @@ async function doQuickCreateDoc(folder, cat){
   const code = (document.getElementById('qc-code')?.value||'').trim();
   const title = (document.getElementById('qc-title')?.value||'').trim();
   const owner = (document.getElementById('qc-owner')?.value||'').trim();
-  if(!code){ showToast(lang==='en'?'Enter doc code':'Nhập mã tài liệu'); return; }
-  if(!title){ showToast(lang==='en'?'Enter title':'Nhập tiêu đề'); return; }
+  if(!code){ showToast(lang==='en'?'Enter doc code':'Nháº­p mÃ£ tÃ i liá»‡u'); return; }
+  if(!title){ showToast(lang==='en'?'Enter title':'Nháº­p tiÃªu Ä‘á»'); return; }
   if(!ensureEnglishStandardTitle(title)) return;
   try {
     const res = await apiCall('doc_create', {code, title, cat, owner, folder, revision:'0.0'});
     if(res && res.ok){
-      showToast('✅ ' + code);
+      showToast('âœ… ' + code);
       document.getElementById('quick-create-modal')?.remove();
       await rescanDocs();
       renderDocuments();
@@ -2631,7 +2631,7 @@ async function doQuickCreateDoc(folder, cat){
   } catch(e){ showToast('\u26A0 ' + e.message); }
 }
 
-// ═══ DRAG & DROP ═══
+// â•â•â• DRAG & DROP â•â•â•
 let draggedDocCode = null;
 function handleFileDragStart(event, code){
   draggedDocCode = code;
@@ -2649,7 +2649,7 @@ async function handleFileDrop(event, folderEl, targetFolderPath){
   try {
     const res = await apiCall('move_doc', {code, target_folder: targetFolderPath});
     if(res && res.ok){
-      showToast(`✅ ${code} → ${getSubfolderLabel(targetFolderPath.split('/').pop())}`);
+      showToast(`âœ… ${code} â†’ ${getSubfolderLabel(targetFolderPath.split('/').pop())}`);
       await rescanDocs();
       renderDocuments();
     } else {
@@ -2660,9 +2660,9 @@ async function handleFileDrop(event, folderEl, targetFolderPath){
 
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FOLDER CONTEXT MENU (rename, edit description)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function openFolderEditMenu(event, folderPath, folderKey){
   event.stopPropagation();
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
@@ -2671,8 +2671,8 @@ function openFolderEditMenu(event, folderPath, folderKey){
   menu.style.cssText = `position:fixed;top:${event.clientY}px;left:${event.clientX}px;z-index:9999;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:6px 0;min-width:180px`;
   const vi=lang!=='en';
   menu.innerHTML = `
-    <div class="ctx-item" onclick="openFolderEditDialog('${escapeHtml(folderPath)}','${escapeHtml(folderKey)}')">✏️ ${vi?'Chỉnh sửa folder':'Edit folder'}</div>
-    ${canCreateNewDoc()?`<div class="ctx-item ctx-danger" onclick="confirmDeleteFolder('${escapeHtml(folderPath)}','${escapeHtml(folderKey)}')">🗑️ ${vi?'Xóa folder':'Delete folder'}</div>`:''}
+    <div class="ctx-item" onclick="openFolderEditDialog('${escapeHtml(folderPath)}','${escapeHtml(folderKey)}')">âœï¸ ${vi?'Chá»‰nh sá»­a folder':'Edit folder'}</div>
+    ${canCreateNewDoc()?`<div class="ctx-item ctx-danger" onclick="confirmDeleteFolder('${escapeHtml(folderPath)}','${escapeHtml(folderKey)}')">ðŸ—‘ï¸ ${vi?'XÃ³a folder':'Delete folder'}</div>`:''}
   `;
   document.body.appendChild(menu);
   menu.querySelectorAll('.ctx-item').forEach(item=>{
@@ -2695,9 +2695,9 @@ function openDocEditMenu(event, code){
   menu.style.cssText = `position:fixed;top:${event.clientY}px;left:${event.clientX}px;z-index:9999;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:6px 0;min-width:180px`;
   const vi=lang!=='en';
   menu.innerHTML = `
-    <div class="ctx-item" onclick="openDoc('${escapeHtml(code)}')">📄 ${vi?'Mở tài liệu':'Open document'}</div>
-    <div class="ctx-item" onclick="openDocEditDialog('${escapeHtml(code)}')">✏️ ${vi?'Chỉnh sửa thông tin':'Edit info'}</div>
-    ${canCreateNewDoc()?`<div style="border-top:1px solid #f1f3f5;margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(standardTitle)}')">🗑️ ${vi?'Xóa tài liệu':'Delete document'}</div>`:''}
+    <div class="ctx-item" onclick="openDoc('${escapeHtml(code)}')">ðŸ“„ ${vi?'Má»Ÿ tÃ i liá»‡u':'Open document'}</div>
+    <div class="ctx-item" onclick="openDocEditDialog('${escapeHtml(code)}')">âœï¸ ${vi?'Chá»‰nh sá»­a thÃ´ng tin':'Edit info'}</div>
+    ${canCreateNewDoc()?`<div style="border-top:1px solid #f1f3f5;margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(standardTitle)}')">ðŸ—‘ï¸ ${vi?'XÃ³a tÃ i liá»‡u':'Delete document'}</div>`:''}
   `;
   document.body.appendChild(menu);
   menu.querySelectorAll('.ctx-item').forEach(item=>{
@@ -2710,7 +2710,7 @@ function openDocEditMenu(event, code){
   setTimeout(()=>document.addEventListener('click', close), 10);
 }
 
-// ═══ UNIFIED FOLDER EDIT DIALOG (name + desc + icon) ═══
+// â•â•â• UNIFIED FOLDER EDIT DIALOG (name + desc + icon) â•â•â•
 function openFolderEditDialog(folderPath, folderKey){
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
   const label = getSubfolderLabel(folderKey);
@@ -2724,20 +2724,20 @@ function openFolderEditDialog(folderPath, folderKey){
   modal.innerHTML = `
     <div class="modal" style="max-width:520px">
       <div class="modal-header">
-        <div class="modal-title">✏️ ${lang==='en'?'Edit Folder':'Chỉnh Sửa Folder'}</div>
-        <button class="icon-btn" onclick="document.getElementById('folder-edit-modal')?.remove()">✕</button>
+        <div class="modal-title">âœï¸ ${lang==='en'?'Edit Folder':'Chá»‰nh Sá»­a Folder'}</div>
+        <button class="icon-btn" onclick="document.getElementById('folder-edit-modal')?.remove()">âœ•</button>
       </div>
       <div class="modal-body">
-        <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">📂 ${escapeHtml(folderPath)}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">ðŸ“‚ ${escapeHtml(folderPath)}</div>
 
         <div class="modal-grid-2">
           <div class="modal-field" style="flex:1">
-            <label>${lang==='en'?'Folder name':'Tên folder'} (${numPrefix}...)</label>
+            <label>${lang==='en'?'Folder name':'TÃªn folder'} (${numPrefix}...)</label>
             <input id="fe-name" type="text" value="${escapeHtml(currentName)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px" autofocus>
-            <div style="font-size:10px;color:var(--text-3);margin-top:2px">${lang==='en'?'Preview':'Xem trước'}: <code>${numPrefix}<span id="fe-preview">${escapeHtml(currentName)}</span></code></div>
+            <div style="font-size:10px;color:var(--text-3);margin-top:2px">${lang==='en'?'Preview':'Xem trÆ°á»›c'}: <code>${numPrefix}<span id="fe-preview">${escapeHtml(currentName)}</span></code></div>
           </div>
           <div class="modal-field" style="width:80px">
-            <label>${lang==='en'?'Icon':'Biểu tượng'}</label>
+            <label>${lang==='en'?'Icon':'Biá»ƒu tÆ°á»£ng'}</label>
             <button id="fe-icon-btn" onclick="showIconPickerInline('folder','${escapeHtml(folderKey)}','fe-icon-btn')" 
               style="width:60px;height:48px;font-size:28px;border:1.5px solid var(--border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s"
               onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'"
@@ -2746,15 +2746,15 @@ function openFolderEditDialog(folderPath, folderKey){
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'Description / Notes':'Ghi chú / Mô tả'}</label>
-          <textarea id="fe-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief description':'Mô tả ngắn'}">${escapeHtml(desc)}</textarea>
+          <label>${lang==='en'?'Description / Notes':'Ghi chÃº / MÃ´ táº£'}</label>
+          <textarea id="fe-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief description':'MÃ´ táº£ ngáº¯n'}">${escapeHtml(desc)}</textarea>
         </div>
 
-        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Renaming updates all internal links automatically':'Đổi tên sẽ cập nhật tất cả liên kết nội bộ tự động'}</div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">âš ï¸ ${lang==='en'?'Renaming updates all internal links automatically':'Äá»•i tÃªn sáº½ cáº­p nháº­t táº¥t cáº£ liÃªn káº¿t ná»™i bá»™ tá»± Ä‘á»™ng'}</div>
       </div>
       <div class="modal-actions">
-        <button class="btn-admin" onclick="document.getElementById('folder-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="doSaveFolderEdit('${escapeHtml(folderPath)}','${escapeHtml(folderKey)}')">💾 ${lang==='en'?'Save':'Lưu'}</button>
+        <button class="btn-admin" onclick="document.getElementById('folder-edit-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin primary" onclick="doSaveFolderEdit('${escapeHtml(folderPath)}','${escapeHtml(folderKey)}')">ðŸ’¾ ${lang==='en'?'Save':'LÆ°u'}</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -2777,7 +2777,7 @@ async function doSaveFolderEdit(folderPath, folderKey){
     try {
       const res = await apiCall('rename_folder', {old_path: folderPath, new_name: newName});
       if(res && res.ok){
-        showToast(`✅ ${lang==='en'?'Saved':'Đã lưu'} (${res.updated_files} ${lang==='en'?'files':'tệp'})`);
+        showToast(`âœ… ${lang==='en'?'Saved':'ÄÃ£ lÆ°u'} (${res.updated_files} ${lang==='en'?'files':'tá»‡p'})`);
         document.getElementById('folder-edit-modal')?.remove();
         await rescanDocs();
         await loadFolderDescriptions();
@@ -2788,13 +2788,13 @@ async function doSaveFolderEdit(folderPath, folderKey){
       }
     } catch(e){ showToast('\u26A0 ' + e.message); }
   } else {
-    showToast('✅ '+(lang==='en'?'Saved':'Đã lưu'));
+    showToast('âœ… '+(lang==='en'?'Saved':'ÄÃ£ lÆ°u'));
   }
   document.getElementById('folder-edit-modal')?.remove();
   renderDocuments(); renderSidebar();
 }
 
-// ═══ UNIFIED DOC EDIT DIALOG (code + title + desc) ═══
+// â•â•â• UNIFIED DOC EDIT DIALOG (code + title + desc) â•â•â•
 function titleHasNonAsciiChars(text){
   return /[^\x20-\x7E]/.test(String(text||''));
 }
@@ -2802,15 +2802,15 @@ function titleHasNonAsciiChars(text){
 function ensureEnglishStandardTitle(title){
   const value = String(title || '').trim();
   if(!value){
-    showToast(lang==='en'?'⚠ Missing standard title':'⚠ Thiếu tên file chuẩn');
+    showToast(lang==='en'?'âš  Missing standard title':'âš  Thiáº¿u tÃªn file chuáº©n');
     return false;
   }
   if(titleHasNonAsciiChars(value)){
-    showToast(lang==='en'?'⚠ Standard title must be English (ASCII only)':'⚠ Tên file chuẩn phải là tiếng Anh (ASCII)');
+    showToast(lang==='en'?'âš  Standard title must be English (ASCII only)':'âš  TÃªn file chuáº©n pháº£i lÃ  tiáº¿ng Anh (ASCII)');
     return false;
   }
   if(!/[A-Za-z]/.test(value)){
-    showToast(lang==='en'?'⚠ Invalid standard title':'⚠ Tên file chuẩn không hợp lệ');
+    showToast(lang==='en'?'âš  Invalid standard title':'âš  TÃªn file chuáº©n khÃ´ng há»£p lá»‡');
     return false;
   }
   return true;
@@ -2828,17 +2828,17 @@ function openDocEditDialog(code){
   modal.innerHTML = `
     <div class="modal" style="max-width:520px">
       <div class="modal-header">
-        <div class="modal-title">✏️ ${lang==='en'?'Edit Document':'Chỉnh Sửa Tài Liệu'}</div>
-        <button class="icon-btn" onclick="document.getElementById('doc-edit-modal')?.remove()">✕</button>
+        <div class="modal-title">âœï¸ ${lang==='en'?'Edit Document':'Chá»‰nh Sá»­a TÃ i Liá»‡u'}</div>
+        <button class="icon-btn" onclick="document.getElementById('doc-edit-modal')?.remove()">âœ•</button>
       </div>
       <div class="modal-body">
         <div class="modal-grid-2">
           <div class="modal-field" style="flex:1">
-            <label>${lang==='en'?'Document code':'Mã tài liệu'}</label>
+            <label>${lang==='en'?'Document code':'MÃ£ tÃ i liá»‡u'}</label>
             <input id="de-code" type="text" value="${escapeHtml(code)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600">
           </div>
           <div class="modal-field" style="width:80px">
-            <label>${lang==='en'?'Icon':'Biểu tượng'}</label>
+            <label>${lang==='en'?'Icon':'Biá»ƒu tÆ°á»£ng'}</label>
             <button id="de-icon-btn" onclick="showIconPickerInline('doc','${escapeHtml(code)}','de-icon-btn')" 
               style="width:60px;height:48px;font-size:28px;border:1.5px solid var(--border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"
             >${curIcon}</button>
@@ -2846,20 +2846,20 @@ function openDocEditDialog(code){
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'English standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
+          <label>${lang==='en'?'English standard title / file name':'TÃªn file / tiÃªu Ä‘á» chuáº©n'}</label>
           <input id="de-title" data-original="${escapeHtml(standardTitle)}" type="text" value="${escapeHtml(standardTitle)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'Vietnamese description':'Mô tả tiếng Việt'}</label>
-          <textarea id="de-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief Vietnamese description':'Mô tả ngắn bằng tiếng Việt'}">${escapeHtml(desc)}</textarea>
+          <label>${lang==='en'?'Vietnamese description':'MÃ´ táº£ tiáº¿ng Viá»‡t'}</label>
+          <textarea id="de-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief Vietnamese description':'MÃ´ táº£ ngáº¯n báº±ng tiáº¿ng Viá»‡t'}">${escapeHtml(desc)}</textarea>
         </div>
 
-        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Document code + English standard title are SSOT for filename and header title. Vietnamese description syncs to the header note.':'Mã tài liệu + tên file / tiêu đề chuẩn là SSOT cho filename và title header. Mô tả tiếng Việt đồng bộ vào ghi chú trên header.'}</div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">âš ï¸ ${lang==='en'?'Document code + English standard title are SSOT for filename and header title. Vietnamese description syncs to the header note.':'MÃ£ tÃ i liá»‡u + tÃªn file / tiÃªu Ä‘á» chuáº©n lÃ  SSOT cho filename vÃ  title header. MÃ´ táº£ tiáº¿ng Viá»‡t Ä‘á»“ng bá»™ vÃ o ghi chÃº trÃªn header.'}</div>
       </div>
       <div class="modal-actions">
-        <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="doSaveDocEdit('${escapeHtml(code)}')">💾 ${lang==='en'?'Save':'Lưu'}</button>
+        <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin primary" onclick="doSaveDocEdit('${escapeHtml(code)}')">ðŸ’¾ ${lang==='en'?'Save':'LÆ°u'}</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -2875,7 +2875,7 @@ async function doSaveDocEdit(oldCode){
   const currentDocMeta = DOCS.find(d=>d.code===oldCode) || {};
   const originalDesc = String(getDocDesc(oldCode) || getDocDisplayDescription(currentDocMeta) || '').trim();
   if(!newCode){
-    showToast(lang==='en'?'⚠ Missing document code':'⚠ Thiếu mã tài liệu');
+    showToast(lang==='en'?'âš  Missing document code':'âš  Thiáº¿u mÃ£ tÃ i liá»‡u');
     return;
   }
   if(!ensureEnglishStandardTitle(newTitle)) return;
@@ -2889,7 +2889,7 @@ async function doSaveDocEdit(oldCode){
     try {
       const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle, new_desc: desc});
       if(res && res.ok){
-        showToast(`✅ ${lang==='en'?'Saved':'Đã lưu'}`);
+        showToast(`âœ… ${lang==='en'?'Saved':'ÄÃ£ lÆ°u'}`);
         document.getElementById('doc-edit-modal')?.remove();
         await rescanDocs(); renderDocuments(); renderSidebar();
         if(currentDoc && (currentDoc===oldCode || currentDoc===newCode)){
@@ -2901,13 +2901,13 @@ async function doSaveDocEdit(oldCode){
       }
     } catch(e){ showToast('\u26A0 ' + e.message); }
   } else {
-    showToast('✅ '+(lang==='en'?'Saved':'Đã lưu'));
+    showToast('âœ… '+(lang==='en'?'Saved':'ÄÃ£ lÆ°u'));
   }
   document.getElementById('doc-edit-modal')?.remove();
   renderDocuments();
 }
 
-// ═══ INLINE ICON PICKER (opens in modal context) ═══
+// â•â•â• INLINE ICON PICKER (opens in modal context) â•â•â•
 function showIconPickerInline(targetType, targetId, btnId){
   // Remove existing picker
   document.querySelectorAll('.icon-picker-inline').forEach(p=>p.remove());
@@ -2915,7 +2915,7 @@ function showIconPickerInline(targetType, targetId, btnId){
   if(!btn) return;
   const rect = btn.getBoundingClientRect();
   
-  const catLabels={docs:'📄 Tài liệu',folders:'📁 Thư mục',departments:'🏢 Phòng ban',tools:'🔧 Công cụ',industry:'🏭 Ngành',objects:'🎪 Đối tượng',symbols:'✨ Biểu tượng',nature:'🌍 Tự nhiên',flags:'🏳️ Cờ',food:'🍜 Ẩm thực',hands:'🤝 Biểu cảm'};
+  const catLabels={docs:'ðŸ“„ TÃ i liá»‡u',folders:'ðŸ“ ThÆ° má»¥c',departments:'ðŸ¢ PhÃ²ng ban',tools:'ðŸ”§ CÃ´ng cá»¥',industry:'ðŸ­ NgÃ nh',objects:'ðŸŽª Äá»‘i tÆ°á»£ng',symbols:'âœ¨ Biá»ƒu tÆ°á»£ng',nature:'ðŸŒ Tá»± nhiÃªn',flags:'ðŸ³ï¸ Cá»',food:'ðŸœ áº¨m thá»±c',hands:'ðŸ¤ Biá»ƒu cáº£m'};
   let gridHtml='';
   Object.entries(ICON_LIBRARY).forEach(([catKey,icons])=>{
     gridHtml+=`<div style="margin-bottom:8px">
@@ -2930,7 +2930,7 @@ function showIconPickerInline(targetType, targetId, btnId){
   });
   // Add reset option
   gridHtml += `<div style="text-align:center;margin-top:4px">
-    <a href="#" onclick="event.preventDefault();applyIconInline('${targetType}','${escapeHtml(targetId)}','','${btnId}')" style="font-size:11px;color:#dc2626">${lang==='en'?'Reset to default':'Đặt lại mặc định'}</a>
+    <a href="#" onclick="event.preventDefault();applyIconInline('${targetType}','${escapeHtml(targetId)}','','${btnId}')" style="font-size:11px;color:#dc2626">${lang==='en'?'Reset to default':'Äáº·t láº¡i máº·c Ä‘á»‹nh'}</a>
   </div>`;
   
   const picker = document.createElement('div');
@@ -2959,7 +2959,7 @@ function applyIconInline(type, id, icon, btnId){
 // Keep legacy functions as wrappers
 function openFolderContextMenu(event, folderPath, folderKey){ openFolderEditMenu(event, folderPath, folderKey); }
 
-// ═══ DELETE DOCUMENT — double confirmation + archive ═══
+// â•â•â• DELETE DOCUMENT â€” double confirmation + archive â•â•â•
 function confirmDeleteDoc(code, title){
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
   const vi=lang!=='en';
@@ -2969,27 +2969,27 @@ function confirmDeleteDoc(code, title){
   modal.innerHTML=`
     <div class="modal" style="max-width:460px">
       <div class="modal-header" style="background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border-bottom:1px solid color-mix(in srgb, var(--red) 24%, var(--border))">
-        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa tài liệu':'Delete Document'}</h3>
-        <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">✕</button>
+        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">ðŸ—‘ï¸ ${vi?'XÃ³a tÃ i liá»‡u':'Delete Document'}</h3>
+        <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">âœ•</button>
       </div>
       <div style="padding:20px">
         <div style="background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 24%, var(--border));border-radius:8px;padding:12px;margin-bottom:16px;display:flex;gap:10px;align-items:start">
-          <span style="font-size:20px;flex-shrink:0">⚠️</span>
+          <span style="font-size:20px;flex-shrink:0">âš ï¸</span>
           <div style="font-size:13px;color:var(--amber);line-height:1.5">
-            ${vi?'Bạn đang xóa tài liệu:':'You are about to delete:'}
-            <div style="margin-top:6px;font-weight:700;color:var(--text-primary)">${code} — ${title||'(untitled)'}</div>
-            <div style="margin-top:8px;font-size:12px;color:var(--text-secondary)">${vi?'Tài liệu sẽ được chuyển vào thư mục <b>_Deleted</b> và có thể khôi phục bởi Admin.':'The document will be moved to <b>_Deleted</b> folder and can be recovered by Admin.'}</div>
+            ${vi?'Báº¡n Ä‘ang xÃ³a tÃ i liá»‡u:':'You are about to delete:'}
+            <div style="margin-top:6px;font-weight:700;color:var(--text-primary)">${code} â€” ${title||'(untitled)'}</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-secondary)">${vi?'TÃ i liá»‡u sáº½ Ä‘Æ°á»£c chuyá»ƒn vÃ o thÆ° má»¥c <b>_Deleted</b> vÃ  cÃ³ thá»ƒ khÃ´i phá»¥c bá»Ÿi Admin.':'The document will be moved to <b>_Deleted</b> folder and can be recovered by Admin.'}</div>
           </div>
         </div>
         <div style="margin-bottom:12px">
           <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
             <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:var(--red)">
-            ${vi?'Tôi xác nhận muốn xóa tài liệu này':'I confirm I want to delete this document'}
+            ${vi?'TÃ´i xÃ¡c nháº­n muá»‘n xÃ³a tÃ i liá»‡u nÃ y':'I confirm I want to delete this document'}
           </label>
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
-          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteDoc('${escapeHtml(code)}')">🗑️ ${vi?'Xóa vĩnh viễn':'Delete'}</button>
+          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Há»§y':'Cancel'}</button>
+          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteDoc('${escapeHtml(code)}')">ðŸ—‘ï¸ ${vi?'XÃ³a vÄ©nh viá»…n':'Delete'}</button>
         </div>
       </div>
     </div>`;
@@ -3008,7 +3008,7 @@ async function executeDeleteDoc(code){
   try{
     const res=await apiCall('delete_doc',{code});
     if(res&&res.ok){
-      showToast('✅ '+(vi?'Đã xóa tài liệu '+code:'Deleted document '+code));
+      showToast('âœ… '+(vi?'ÄÃ£ xÃ³a tÃ i liá»‡u '+code:'Deleted document '+code));
       document.getElementById('delete-confirm-modal')?.remove();
       // Close doc viewer if this doc is open
       if(typeof closeDocViewerForce==='function')closeDocViewerForce();
@@ -3017,11 +3017,11 @@ async function executeDeleteDoc(code){
       renderSidebar();
     }else{
       const errMap={
-        'doc_not_found':vi?'Không tìm thấy tài liệu':'Document not found',
-        'forbidden':vi?'Bạn không có quyền xóa':'Permission denied',
-        'move_failed':vi?'Không thể di chuyển file':'Failed to move file',
-        'delete_failed':vi?'Xóa tài liệu thất bại trên server':'Document delete failed on server',
-        'server_error':vi?'Lỗi server khi xóa tài liệu':'Server error while deleting document'
+        'doc_not_found':vi?'KhÃ´ng tÃ¬m tháº¥y tÃ i liá»‡u':'Document not found',
+        'forbidden':vi?'Báº¡n khÃ´ng cÃ³ quyá»n xÃ³a':'Permission denied',
+        'move_failed':vi?'KhÃ´ng thá»ƒ di chuyá»ƒn file':'Failed to move file',
+        'delete_failed':vi?'XÃ³a tÃ i liá»‡u tháº¥t báº¡i trÃªn server':'Document delete failed on server',
+        'server_error':vi?'Lá»—i server khi xÃ³a tÃ i liá»‡u':'Server error while deleting document'
       };
       showToast('\u26A0 '+(errMap[res?.error]||res?.error||'Error'));
     }
@@ -3030,7 +3030,7 @@ async function executeDeleteDoc(code){
   }
 }
 
-// ═══ DELETE FOLDER — double confirmation + archive ═══
+// â•â•â• DELETE FOLDER â€” double confirmation + archive â•â•â•
 function confirmDeleteFolder(folderPath, folderKey){
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
   const vi=lang!=='en';
@@ -3056,42 +3056,42 @@ function confirmDeleteFolder(folderPath, folderKey){
   modal.innerHTML=`
     <div class="modal" style="max-width:480px">
       <div class="modal-header" style="background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border-bottom:1px solid color-mix(in srgb, var(--red) 24%, var(--border))">
-        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa folder':'Delete Folder'}</h3>
-        <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">✕</button>
+        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">ðŸ—‘ï¸ ${vi?'XÃ³a folder':'Delete Folder'}</h3>
+        <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">âœ•</button>
       </div>
       <div style="padding:20px">
         <div style="background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 24%, var(--border));border-radius:8px;padding:12px;margin-bottom:16px">
           <div style="display:flex;gap:10px;align-items:start">
-            <span style="font-size:20px;flex-shrink:0">⚠️</span>
+            <span style="font-size:20px;flex-shrink:0">âš ï¸</span>
             <div style="font-size:13px;color:var(--amber);line-height:1.5">
-              ${vi?'Bạn đang xóa folder:':'You are about to delete folder:'}
-              <div style="margin-top:6px;font-weight:700;color:var(--text-primary);font-size:15px">📁 ${label}</div>
+              ${vi?'Báº¡n Ä‘ang xÃ³a folder:':'You are about to delete folder:'}
+              <div style="margin-top:6px;font-weight:700;color:var(--text-primary);font-size:15px">ðŸ“ ${label}</div>
               <div style="margin-top:4px;font-size:11px;color:var(--text-secondary);font-family:monospace">${folderPath}</div>
             </div>
           </div>
           ${fileCount>0||subCount>0?`
           <div style="margin-top:12px;padding:10px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--red) 24%, var(--border));border-radius:6px">
-            <div style="font-size:12px;color:var(--red);font-weight:600">${vi?'⚠️ Cảnh báo: Folder này chứa dữ liệu!':'⚠️ Warning: This folder contains data!'}</div>
-            <div style="font-size:12px;color:var(--red);margin-top:4px">${fileCount>0?`• ${fileCount} ${vi?'tài liệu':'document(s)'}`:''} ${subCount>0?`• ${subCount} ${vi?'folder con':'subfolder(s)'}`:''}</div>
-            <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">${vi?'Tất cả sẽ được chuyển vào _Deleted':'All will be moved to _Deleted'}</div>
+            <div style="font-size:12px;color:var(--red);font-weight:600">${vi?'âš ï¸ Cáº£nh bÃ¡o: Folder nÃ y chá»©a dá»¯ liá»‡u!':'âš ï¸ Warning: This folder contains data!'}</div>
+            <div style="font-size:12px;color:var(--red);margin-top:4px">${fileCount>0?`â€¢ ${fileCount} ${vi?'tÃ i liá»‡u':'document(s)'}`:''} ${subCount>0?`â€¢ ${subCount} ${vi?'folder con':'subfolder(s)'}`:''}</div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">${vi?'Táº¥t cáº£ sáº½ Ä‘Æ°á»£c chuyá»ƒn vÃ o _Deleted':'All will be moved to _Deleted'}</div>
           </div>`:''}
         </div>
         <div style="margin-bottom:12px">
           <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
             <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:var(--red)">
-            ${vi?'Tôi xác nhận muốn xóa folder này':'I confirm I want to delete this folder'}
+            ${vi?'TÃ´i xÃ¡c nháº­n muá»‘n xÃ³a folder nÃ y':'I confirm I want to delete this folder'}
           </label>
         </div>
         ${fileCount>0?`
         <div style="margin-bottom:12px">
           <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
             <input type="checkbox" id="del-confirm-check2" style="width:16px;height:16px;accent-color:var(--red)">
-            ${vi?'Tôi hiểu rằng '+fileCount+' tài liệu bên trong cũng sẽ bị xóa':'I understand that '+fileCount+' documents inside will also be deleted'}
+            ${vi?'TÃ´i hiá»ƒu ráº±ng '+fileCount+' tÃ i liá»‡u bÃªn trong cÅ©ng sáº½ bá»‹ xÃ³a':'I understand that '+fileCount+' documents inside will also be deleted'}
           </label>
         </div>`:''}
         <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
-          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteFolder('${escapeHtml(folderPath)}')">🗑️ ${vi?'Xóa folder':'Delete folder'}</button>
+          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Há»§y':'Cancel'}</button>
+          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteFolder('${escapeHtml(folderPath)}')">ðŸ—‘ï¸ ${vi?'XÃ³a folder':'Delete folder'}</button>
         </div>
       </div>
     </div>`;
@@ -3118,7 +3118,7 @@ async function executeDeleteFolder(folderPath){
     const res=await apiCall('delete_folder',{folder_path:folderPath});
     if(res&&res.ok){
       const cnt=res.file_count||0;
-      showToast('✅ '+(vi?'Đã xóa folder'+(cnt>0?' ('+cnt+' tài liệu)':''):'Deleted folder'+(cnt>0?' ('+cnt+' docs)':'')));
+      showToast('âœ… '+(vi?'ÄÃ£ xÃ³a folder'+(cnt>0?' ('+cnt+' tÃ i liá»‡u)':''):'Deleted folder'+(cnt>0?' ('+cnt+' docs)':'')));
       document.getElementById('delete-confirm-modal')?.remove();
       // Go back to parent if we're inside the deleted folder
       if(currentFolderPath.length>0){
@@ -3132,12 +3132,12 @@ async function executeDeleteFolder(folderPath){
       renderSidebar();
     }else{
       const errMap={
-        'folder_not_found':vi?'Không tìm thấy folder':'Folder not found',
-        'forbidden':vi?'Bạn không có quyền xóa':'Permission denied',
-        'cannot_delete_system_folder':vi?'Không thể xóa folder hệ thống':'Cannot delete system folder',
-        'move_failed':vi?'Không thể di chuyển folder':'Failed to move folder',
-        'delete_failed':vi?'Xóa folder thất bại trên server':'Folder delete failed on server',
-        'server_error':vi?'Lỗi server khi xóa folder':'Server error while deleting folder'
+        'folder_not_found':vi?'KhÃ´ng tÃ¬m tháº¥y folder':'Folder not found',
+        'forbidden':vi?'Báº¡n khÃ´ng cÃ³ quyá»n xÃ³a':'Permission denied',
+        'cannot_delete_system_folder':vi?'KhÃ´ng thá»ƒ xÃ³a folder há»‡ thá»‘ng':'Cannot delete system folder',
+        'move_failed':vi?'KhÃ´ng thá»ƒ di chuyá»ƒn folder':'Failed to move folder',
+        'delete_failed':vi?'XÃ³a folder tháº¥t báº¡i trÃªn server':'Folder delete failed on server',
+        'server_error':vi?'Lá»—i server khi xÃ³a folder':'Server error while deleting folder'
       };
       showToast('\u26A0 '+(errMap[res?.error]||res?.error||'Error'));
     }
@@ -3150,11 +3150,11 @@ function openDocContextMenu(event, code, title){ openDocEditMenu(event, code); }
 // Legacy rename - kept for API compatibility
 async function doRenameFolder(oldPath){
   const newName = (document.getElementById('rf-name')?.value||'').trim();
-  if(!newName){ showToast(lang==='en'?'Enter name':'Nhập tên'); return; }
+  if(!newName){ showToast(lang==='en'?'Enter name':'Nháº­p tÃªn'); return; }
   try {
     const res = await apiCall('rename_folder', {old_path: oldPath, new_name: newName});
     if(res && res.ok){
-      showToast(`✅ ${lang==='en'?'Renamed':'Đã đổi tên'} (${res.updated_files} ${lang==='en'?'files updated':'tệp cập nhật'})`);
+      showToast(`âœ… ${lang==='en'?'Renamed':'ÄÃ£ Ä‘á»•i tÃªn'} (${res.updated_files} ${lang==='en'?'files updated':'tá»‡p cáº­p nháº­t'})`);
       document.getElementById('rename-folder-modal')?.remove();
       await rescanDocs();
       await loadFolderDescriptions();
@@ -3169,7 +3169,7 @@ async function doRenameFolder(oldPath){
 async function doSaveDesc(folderPath){
   const desc = (document.getElementById('ed-desc')?.value||'').trim();
   await saveFolderDesc(folderPath, desc);
-  showToast('✅ ' + (lang==='en'?'Saved':'Đã lưu'));
+  showToast('âœ… ' + (lang==='en'?'Saved':'ÄÃ£ lÆ°u'));
   document.getElementById('edit-desc-modal')?.remove();
   renderDocuments();
 }
@@ -3180,11 +3180,11 @@ function openRenameDocDialog(code, title){ openDocEditDialog(code); }
 async function doRenameDoc(oldCode){
   const newCode = (document.getElementById('rd-code')?.value||'').trim();
   const newTitle = (document.getElementById('rd-title')?.value||'').trim();
-  if(!newCode && !newTitle){ showToast(lang==='en'?'Enter code or title':'Nhập mã hoặc tiêu đề'); return; }
+  if(!newCode && !newTitle){ showToast(lang==='en'?'Enter code or title':'Nháº­p mÃ£ hoáº·c tiÃªu Ä‘á»'); return; }
   try {
     const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle});
     if(res && res.ok){
-      showToast(`✅ ${lang==='en'?'Renamed':'Đã đổi tên'}`);
+      showToast(`âœ… ${lang==='en'?'Renamed':'ÄÃ£ Ä‘á»•i tÃªn'}`);
       document.getElementById('rename-doc-modal')?.remove();
       await rescanDocs();
       renderDocuments();
@@ -3194,9 +3194,9 @@ async function doRenameDoc(oldCode){
   } catch(e){ showToast('\u26A0 ' + e.message); }
 }
 
-// ═══════════════════════════════════════════════════
-// FOLDER STRUCTURE MAP — mirrors actual server filesystem
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// FOLDER STRUCTURE MAP â€” mirrors actual server filesystem
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FOLDER_STRUCTURE is now dynamically built from FOLDER_TREE (api.php scan_folders)
 // This fallback is only used before FOLDER_TREE loads
 const FOLDER_STRUCTURE = {};
@@ -3215,17 +3215,17 @@ const DEFAULT_FOLDERS = {
 
 // Department labels for UI (shared across create modal)
 const DEPT_LABELS = {
-  CNC:{vi:'CNC',en:'CNC'},ENG:{vi:'Kỹ thuật',en:'Engineering'},FIN:{vi:'Tài chính',en:'Finance'},
-  HR:{vi:'Nhân sự',en:'HR'},HSE:{vi:'An toàn',en:'HSE'},IT:{vi:'CNTT',en:'IT'},
-  MNT:{vi:'Bảo trì',en:'Maintenance'},OPS:{vi:'Vận hành',en:'Operations'},
-  PLA:{vi:'Kế hoạch',en:'Planning'},PUR:{vi:'Mua hàng',en:'Purchasing'},
-  QA:{vi:'QA/QC',en:'QA/QC'},QMS:{vi:'Hệ thống QMS',en:'QMS System'},
-  SAL:{vi:'Kinh doanh',en:'Sales'},WHS:{vi:'Kho vận',en:'Warehouse'},
-  EXE:{vi:'Ban điều hành',en:'Executive'},PRO:{vi:'Sản xuất',en:'Production'},
-  GDL:{vi:'Hướng dẫn',en:'Guidelines'},
+  CNC:{vi:'CNC',en:'CNC'},ENG:{vi:'Ká»¹ thuáº­t',en:'Engineering'},FIN:{vi:'TÃ i chÃ­nh',en:'Finance'},
+  HR:{vi:'NhÃ¢n sá»±',en:'HR'},HSE:{vi:'An toÃ n',en:'HSE'},IT:{vi:'CNTT',en:'IT'},
+  MNT:{vi:'Báº£o trÃ¬',en:'Maintenance'},OPS:{vi:'Váº­n hÃ nh',en:'Operations'},
+  PLA:{vi:'Káº¿ hoáº¡ch',en:'Planning'},PUR:{vi:'Mua hÃ ng',en:'Purchasing'},
+  QA:{vi:'QA/QC',en:'QA/QC'},QMS:{vi:'Há»‡ thá»‘ng QMS',en:'QMS System'},
+  SAL:{vi:'Kinh doanh',en:'Sales'},WHS:{vi:'Kho váº­n',en:'Warehouse'},
+  EXE:{vi:'Ban Ä‘iá»u hÃ nh',en:'Executive'},PRO:{vi:'Sáº£n xuáº¥t',en:'Production'},
+  GDL:{vi:'HÆ°á»›ng dáº«n',en:'Guidelines'},
 };
 
-// Auto-generated dept label from folder name (e.g., "01-PROC-CNC" → "PROC-CNC")
+// Auto-generated dept label from folder name (e.g., "01-PROC-CNC" â†’ "PROC-CNC")
 function getDeptLabel(subName){
   const stripped = getSubfolderLabel(subName); // "PROC-CNC"
   // Check explicit labels first
@@ -3238,15 +3238,15 @@ function getDeptLabel(subName){
 
 // Category labels for create modal dropdown
 const CAT_OPTIONS = [
-  {id:'SOP',  label:'SOP — Quy trình hệ thống',  labelEn:'SOP — Standard Operating Procedure'},
-  {id:'PROC', label:'PROC — Quy trình phòng ban',  labelEn:'PROC — Department Process'},
-  {id:'WI',   label:'WI — Hướng dẫn công việc',   labelEn:'WI — Work Instruction'},
-  {id:'FRM',  label:'FRM — Biểu mẫu / Hồ sơ',    labelEn:'FRM — Forms & Records'},
-  {id:'ORG',  label:'ORG — Tổ chức & Nhân sự',    labelEn:'ORG — Organization & HR'},
-  {id:'ANNEX',label:'ANNEX — Phụ lục',labelEn:'ANNEX — Annexes'},
-  {id:'POL',  label:'POL — Chính sách',            labelEn:'POL — Policy'},
-  {id:'MAN',  label:'MAN — Sổ tay chất lượng',    labelEn:'MAN — Quality Manual'},
-  {id:'TRN',  label:'TRN — Đào tạo & Năng lực',   labelEn:'TRN — Training & Competency'},
+  {id:'SOP',  label:'SOP â€” Quy trÃ¬nh há»‡ thá»‘ng',  labelEn:'SOP â€” Standard Operating Procedure'},
+  {id:'PROC', label:'PROC â€” Quy trÃ¬nh phÃ²ng ban',  labelEn:'PROC â€” Department Process'},
+  {id:'WI',   label:'WI â€” HÆ°á»›ng dáº«n cÃ´ng viá»‡c',   labelEn:'WI â€” Work Instruction'},
+  {id:'FRM',  label:'FRM â€” Biá»ƒu máº«u / Há»“ sÆ¡',    labelEn:'FRM â€” Forms & Records'},
+  {id:'ORG',  label:'ORG â€” Tá»• chá»©c & NhÃ¢n sá»±',    labelEn:'ORG â€” Organization & HR'},
+  {id:'ANNEX',label:'ANNEX â€” Phá»¥ lá»¥c',labelEn:'ANNEX â€” Annexes'},
+  {id:'POL',  label:'POL â€” ChÃ­nh sÃ¡ch',            labelEn:'POL â€” Policy'},
+  {id:'MAN',  label:'MAN â€” Sá»• tay cháº¥t lÆ°á»£ng',    labelEn:'MAN â€” Quality Manual'},
+  {id:'TRN',  label:'TRN â€” ÄÃ o táº¡o & NÄƒng lá»±c',   labelEn:'TRN â€” Training & Competency'},
 ];
 
 function getDefaultFolderForCat(cat){
@@ -3306,7 +3306,7 @@ function getDynamicDeptOptions(catCode){
     return Object.entries(fs).map(([name, path])=>{
       const lb = DEPT_LABELS[name];
       const txt = lb ? (lang==='en'?(lb.en||name):(lb.vi||name)) : name;
-      return {value: name, label: name + ' — ' + txt, path: path};
+      return {value: name, label: name + ' â€” ' + txt, path: path};
     });
   }
   return [];
@@ -3314,7 +3314,7 @@ function getDynamicDeptOptions(catCode){
 
 function openCreateDocModal(cat){
   if(!canCreateNewDoc()){
-    showToast(lang==='en'?'⚠ You do not have permission to create new documents':'⚠ Bạn không có quyền tạo mới tài liệu');
+    showToast(lang==='en'?'âš  You do not have permission to create new documents':'âš  Báº¡n khÃ´ng cÃ³ quyá»n táº¡o má»›i tÃ i liá»‡u');
     return;
   }
   closeModal();
@@ -3336,33 +3336,33 @@ function openCreateDocModal(cat){
   const buildDeptOptions = (catId) => {
     return getDynamicDeptOptions(catId).map(opt=>{
       const txt = getDeptLabel(opt.value);
-      return `<option value="${opt.value}">${getSubfolderLabel(opt.value)} — ${txt}</option>`;
+      return `<option value="${opt.value}">${getSubfolderLabel(opt.value)} â€” ${txt}</option>`;
     }).join('');
   };
 
   modal.innerHTML=`
     <div class="modal" style="max-width:640px">
       <div class="modal-header">
-        <div class="modal-title">${lang==='en'?'Create new document':'Tạo mới tài liệu'}</div>
-        <button class="icon-btn" onclick="closeModal()" aria-label="Close">✕</button>
+        <div class="modal-title">${lang==='en'?'Create new document':'Táº¡o má»›i tÃ i liá»‡u'}</div>
+        <button class="icon-btn" onclick="closeModal()" aria-label="Close">âœ•</button>
       </div>
 
       <div class="modal-body">
         <!-- ROW 1: Category + Department -->
         <div class="modal-grid-2">
           <div class="modal-field">
-            <label>① ${lang==='en'?'Category':'Loại tài liệu'}</label>
+            <label>â‘  ${lang==='en'?'Category':'Loáº¡i tÃ i liá»‡u'}</label>
             <select id="cd-cat" onchange="onCreateDocCatChange()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-1);cursor:pointer">
               ${catSelectHTML}
             </select>
           </div>
           <div class="modal-field" id="cd-dept-wrap">
-            <label>② ${lang==='en'?'Department':'Phòng ban'}</label>
+            <label>â‘¡ ${lang==='en'?'Department':'PhÃ²ng ban'}</label>
             <select id="cd-dept" onchange="onCreateDocDeptChange()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-1);cursor:pointer;${hasDept?'':'opacity:0.4;pointer-events:none'}">
-              ${hasDept ? buildDeptOptions(cat) : `<option value="">— ${lang==='en'?'Not applicable':'Không áp dụng'} —</option>`}
+              ${hasDept ? buildDeptOptions(cat) : `<option value="">â€” ${lang==='en'?'Not applicable':'KhÃ´ng Ã¡p dá»¥ng'} â€”</option>`}
             </select>
             <div class="help-text" id="cd-dept-hint" style="margin-top:4px;font-size:11px;color:var(--text-3)">
-              ${hasDept ? (lang==='en'?'Select department for this document type':'Chọn phòng ban cho loại tài liệu này') : (lang==='en'?'This category has no department subdivision':'Loại tài liệu này không chia theo phòng ban')}
+              ${hasDept ? (lang==='en'?'Select department for this document type':'Chá»n phÃ²ng ban cho loáº¡i tÃ i liá»‡u nÃ y') : (lang==='en'?'This category has no department subdivision':'Loáº¡i tÃ i liá»‡u nÃ y khÃ´ng chia theo phÃ²ng ban')}
             </div>
           </div>
         </div>
@@ -3370,42 +3370,42 @@ function openCreateDocModal(cat){
         <!-- ROW 2: Code + Version -->
         <div class="modal-grid-2">
           <div class="modal-field">
-            <label>③ ${lang==='en'?'Document code':'Mã tài liệu'}</label>
+            <label>â‘¢ ${lang==='en'?'Document code':'MÃ£ tÃ i liá»‡u'}</label>
             <input id="cd-code" type="text" placeholder="${cat==='PROC'?'PROC-CNC-003':cat==='FRM'?'FRM-QA-020':'SOP-QMS-027'}" value="">
           </div>
           <div class="modal-field">
-            <label>${lang==='en'?'Initial version':'Phiên bản khởi tạo'}</label>
+            <label>${lang==='en'?'Initial version':'PhiÃªn báº£n khá»Ÿi táº¡o'}</label>
             <input id="cd-rev" type="text" value="0.0" placeholder="0.0">
           </div>
         </div>
 
         <!-- ROW 3: Title -->
         <div class="modal-field">
-          <label>④ ${lang==='en'?'Title':'Tiêu đề'}</label>
-          <input id="cd-title" type="text" placeholder="${lang==='en'?'Document title':'Tên tài liệu'}" value="">
+          <label>â‘£ ${lang==='en'?'Title':'TiÃªu Ä‘á»'}</label>
+          <input id="cd-title" type="text" placeholder="${lang==='en'?'Document title':'TÃªn tÃ i liá»‡u'}" value="">
         </div>
 
         <!-- ROW 4: Owner -->
         <div class="modal-field">
-          <label>${lang==='en'?'Owner':'Chủ sở hữu'}</label>
+          <label>${lang==='en'?'Owner':'Chá»§ sá»Ÿ há»¯u'}</label>
           <select id="cd-owner" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-1);cursor:pointer">
             ${[
-              {v:'QA/QMS',vi:'QA/QMS — Hệ thống chất lượng',en:'QA/QMS — Quality System'},
-              {v:'Production',vi:'Production — Sản xuất',en:'Production'},
-              {v:'Engineering',vi:'Engineering — Kỹ thuật',en:'Engineering'},
-              {v:'QA/QC',vi:'QA/QC — Kiểm tra chất lượng',en:'QA/QC — Quality Control'},
-              {v:'OPS',vi:'OPS — Vận hành',en:'OPS — Operations'},
-              {v:'Planning',vi:'Planning — Kế hoạch',en:'Planning'},
-              {v:'Purchasing',vi:'Purchasing — Mua hàng',en:'Purchasing'},
-              {v:'Sales',vi:'Sales — Kinh doanh',en:'Sales'},
-              {v:'Warehouse',vi:'Warehouse — Kho vận',en:'Warehouse'},
-              {v:'Maintenance',vi:'Maintenance — Bảo trì',en:'Maintenance'},
-              {v:'Finance',vi:'Finance — Tài chính',en:'Finance'},
-              {v:'HR',vi:'HR — Nhân sự',en:'HR — Human Resources'},
-              {v:'HSE',vi:'HSE — An toàn',en:'HSE — Health Safety Environment'},
-              {v:'IT',vi:'IT — Công nghệ thông tin',en:'IT — Information Technology'},
-              {v:'Executive',vi:'Executive — Ban điều hành',en:'Executive'},
-              {v:'Multi',vi:'Multi — Đa phòng ban',en:'Multi — Cross-department'},
+              {v:'QA/QMS',vi:'QA/QMS â€” Há»‡ thá»‘ng cháº¥t lÆ°á»£ng',en:'QA/QMS â€” Quality System'},
+              {v:'Production',vi:'Production â€” Sáº£n xuáº¥t',en:'Production'},
+              {v:'Engineering',vi:'Engineering â€” Ká»¹ thuáº­t',en:'Engineering'},
+              {v:'QA/QC',vi:'QA/QC â€” Kiá»ƒm tra cháº¥t lÆ°á»£ng',en:'QA/QC â€” Quality Control'},
+              {v:'OPS',vi:'OPS â€” Váº­n hÃ nh',en:'OPS â€” Operations'},
+              {v:'Planning',vi:'Planning â€” Káº¿ hoáº¡ch',en:'Planning'},
+              {v:'Purchasing',vi:'Purchasing â€” Mua hÃ ng',en:'Purchasing'},
+              {v:'Sales',vi:'Sales â€” Kinh doanh',en:'Sales'},
+              {v:'Warehouse',vi:'Warehouse â€” Kho váº­n',en:'Warehouse'},
+              {v:'Maintenance',vi:'Maintenance â€” Báº£o trÃ¬',en:'Maintenance'},
+              {v:'Finance',vi:'Finance â€” TÃ i chÃ­nh',en:'Finance'},
+              {v:'HR',vi:'HR â€” NhÃ¢n sá»±',en:'HR â€” Human Resources'},
+              {v:'HSE',vi:'HSE â€” An toÃ n',en:'HSE â€” Health Safety Environment'},
+              {v:'IT',vi:'IT â€” CÃ´ng nghá»‡ thÃ´ng tin',en:'IT â€” Information Technology'},
+              {v:'Executive',vi:'Executive â€” Ban Ä‘iá»u hÃ nh',en:'Executive'},
+              {v:'Multi',vi:'Multi â€” Äa phÃ²ng ban',en:'Multi â€” Cross-department'},
             ].map(o=>'<option value="'+o.v+'" '+(o.v===ownerDept?'selected':'')+'>'+
               (lang==='en'?o.en:o.vi)+'</option>').join('')}
           </select>
@@ -3413,23 +3413,23 @@ function openCreateDocModal(cat){
 
         <!-- ROW 5: Folder (auto-computed, read-only display) -->
         <div class="modal-field">
-          <label>📁 ${lang==='en'?'Save location':'Vị trí lưu'}</label>
+          <label>ðŸ“ ${lang==='en'?'Save location':'Vá»‹ trÃ­ lÆ°u'}</label>
           <div id="cd-folder-display" style="padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--text-2);display:flex;align-items:center;gap:8px">
-            <span style="font-size:16px">📂</span>
+            <span style="font-size:16px">ðŸ“‚</span>
             <span id="cd-folder-text">${initFolder}/</span>
           </div>
           <input type="hidden" id="cd-folder" value="${initFolder}">
           <div class="help-text" style="margin-top:4px;font-size:11px;color:var(--text-3)">
             ${lang==='en'
               ?'Auto-computed from Category + Department. Baseline V0 does not create an <b>_Archive</b> subfolder; control is maintained through the active file, checksum registry and release manifest.'
-              :'Tự động tính từ Loại + Phòng ban. Baseline V0 không tạo thư mục <b>_Archive</b>; kiểm soát được duy trì qua file active, checksum registry và release manifest.'}
+              :'Tá»± Ä‘á»™ng tÃ­nh tá»« Loáº¡i + PhÃ²ng ban. Baseline V0 khÃ´ng táº¡o thÆ° má»¥c <b>_Archive</b>; kiá»ƒm soÃ¡t Ä‘Æ°á»£c duy trÃ¬ qua file active, checksum registry vÃ  release manifest.'}
           </div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="submitCreateDoc(document.getElementById('cd-cat').value)">${lang==='en'?'Create':'Tạo mới'}</button>
+        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin primary" onclick="submitCreateDoc(document.getElementById('cd-cat').value)">${lang==='en'?'Create':'Táº¡o má»›i'}</button>
       </div>
     </div>
   `;
@@ -3437,7 +3437,7 @@ function openCreateDocModal(cat){
   setTimeout(()=>{ document.getElementById('cd-code')?.focus(); }, 50);
 }
 
-// When category changes → update dept dropdown + folder
+// When category changes â†’ update dept dropdown + folder
 function onCreateDocCatChange(){
   const cat = document.getElementById('cd-cat').value;
   const deptSel = document.getElementById('cd-dept');
@@ -3450,22 +3450,22 @@ function onCreateDocCatChange(){
     const keys = Object.keys(fs);
     deptSel.innerHTML = keys.map(d=>{
       const txt = getDeptLabel(d);
-      return `<option value="${d}">${getSubfolderLabel(d)} — ${txt}</option>`;
+      return `<option value="${d}">${getSubfolderLabel(d)} â€” ${txt}</option>`;
     }).join('');
     deptSel.style.opacity = '1';
     deptSel.style.pointerEvents = 'auto';
-    deptHint.textContent = lang==='en'?'Select department for this document type':'Chọn phòng ban cho loại tài liệu này';
+    deptHint.textContent = lang==='en'?'Select department for this document type':'Chá»n phÃ²ng ban cho loáº¡i tÃ i liá»‡u nÃ y';
   } else {
-    deptSel.innerHTML = `<option value="">— ${lang==='en'?'Not applicable':'Không áp dụng'} —</option>`;
+    deptSel.innerHTML = `<option value="">â€” ${lang==='en'?'Not applicable':'KhÃ´ng Ã¡p dá»¥ng'} â€”</option>`;
     deptSel.style.opacity = '0.4';
     deptSel.style.pointerEvents = 'none';
-    deptHint.textContent = lang==='en'?'This category has no department subdivision':'Loại tài liệu này không chia theo phòng ban';
+    deptHint.textContent = lang==='en'?'This category has no department subdivision':'Loáº¡i tÃ i liá»‡u nÃ y khÃ´ng chia theo phÃ²ng ban';
   }
 
   onCreateDocDeptChange();
 }
 
-// When dept changes → update folder display
+// When dept changes â†’ update folder display
 function onCreateDocDeptChange(){
   const cat = document.getElementById('cd-cat').value;
   const dept = document.getElementById('cd-dept').value;
@@ -3478,7 +3478,7 @@ function onCreateDocDeptChange(){
   if(codeInput){
     let prefix = `${cat}-`;
     if(dept){
-      // Derive prefix from subfolder name: "PROC-CNC" → "PROC-CNC-", "Job-Descriptions" → "JD-"
+      // Derive prefix from subfolder name: "PROC-CNC" â†’ "PROC-CNC-", "Job-Descriptions" â†’ "JD-"
       const subLabel = dept;
       if(subLabel.startsWith('PROC-')||subLabel.startsWith('FRM-')||subLabel.startsWith('WI-')||subLabel.startsWith('ANNEX-')||subLabel.startsWith('JD-')){
         prefix = subLabel + '-';
@@ -3502,17 +3502,17 @@ async function submitCreateDoc(cat){
   const revision=document.getElementById('cd-rev')?.value.trim();
   const folder=document.getElementById('cd-folder')?.value.trim();
 
-  if(!code){ showToast(lang==='en'?'⚠ Missing document code':'⚠ Thiếu mã tài liệu'); return; }
-  if(!title){ showToast(lang==='en'?'⚠ Missing title':'⚠ Thiếu tiêu đề'); return; }
+  if(!code){ showToast(lang==='en'?'âš  Missing document code':'âš  Thiáº¿u mÃ£ tÃ i liá»‡u'); return; }
+  if(!title){ showToast(lang==='en'?'âš  Missing title':'âš  Thiáº¿u tiÃªu Ä‘á»'); return; }
   if(!ensureEnglishStandardTitle(title)) return;
 
   if(revision && !/^\d+(?:\.\d+)?$/.test(revision)){
-    showToast(lang==='en'?'⚠ Invalid version (e.g., 0.0, 1.0, 1.1)':'⚠ Phiên bản không hợp lệ (ví dụ: 0.0, 1.0, 1.1)');
+    showToast(lang==='en'?'âš  Invalid version (e.g., 0.0, 1.0, 1.1)':'âš  PhiÃªn báº£n khÃ´ng há»£p lá»‡ (vÃ­ dá»¥: 0.0, 1.0, 1.1)');
     return;
   }
 
   if(DOCS.find(d=>d.code===code.toUpperCase())){
-    showToast(lang==='en'?'⚠ Code already exists':'⚠ Mã đã tồn tại');
+    showToast(lang==='en'?'âš  Code already exists':'âš  MÃ£ Ä‘Ã£ tá»“n táº¡i');
     return;
   }
 
@@ -3524,14 +3524,14 @@ async function submitCreateDoc(cat){
       if(res.state) SERVER_DOC_STATE[res.doc.code]=res.state;
       if(res.versions) SERVER_DOC_VERSIONS[res.doc.code]=res.versions;
       closeModal();
-      showToast(lang==='en'?'✅ Document created':'✅ Đã tạo tài liệu');
+      showToast(lang==='en'?'âœ… Document created':'âœ… ÄÃ£ táº¡o tÃ i liá»‡u');
       renderDocuments();
       renderSidebar();
       openDoc(res.doc.code);
       // Also refresh dashboard counters
       renderDashboard();
     }else{
-      showToast((res && res.error) ? ('⚠ '+res.error) : (lang==='en'?'⚠ Create failed':'⚠ Tạo thất bại'));
+      showToast((res && res.error) ? ('âš  '+res.error) : (lang==='en'?'âš  Create failed':'âš  Táº¡o tháº¥t báº¡i'));
     }
   }catch(err){
     showToast('Error: '+(err && err.message ? err.message : err));
@@ -3573,7 +3573,7 @@ function handleSearch(q){
       return `<div class="search-result ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`}>
         <div class="sr-badge" style="background:${cat.color}">${cat.icon}</div>
         <div class="sr-main"><div class="sr-code" style="color:${cat.color}">${doc.code}</div><div class="sr-title">${displayTitle}</div>${displayDesc?`<div class="sr-desc">${displayDesc}</div>`:''}</div>
-        <div class="sr-cat">${catLabel(cat).split('(')[0].trim()} ${locked?'🔒':''}</div>
+        <div class="sr-cat">${catLabel(cat).split('(')[0].trim()} ${locked?'ðŸ”’':''}</div>
       </div>`;
     }).join('');
 }
@@ -3600,21 +3600,21 @@ function renderAccessMatrix(){
               const full = accessCount === docsInCat.length;
               const partial = accessCount > 0 && !full;
               const none = accessCount === 0;
-              return `<td title="${accessCount}/${docsInCat.length}"><span class="${none?'cross':'check'}">${full?'✓':partial?accessCount:'✕'}</span></td>`;
+              return `<td title="${accessCount}/${docsInCat.length}"><span class="${none?'cross':'check'}">${full?'âœ“':partial?accessCount:'âœ•'}</span></td>`;
             }).join('')}
-            <td><span class="${r.approve?'check':'cross'}">${r.approve?'✓':'—'}</span></td>
+            <td><span class="${r.approve?'check':'cross'}">${r.approve?'âœ“':'â€”'}</span></td>
             <td style="font-size:10px;font-family:var(--mono)">${totalForRole}/${VDOCS.length}</td>
           </tr>`;
         }).join('')}
       </tbody>
     </table>
     </div>
-    <p style="font-size:11px;color:var(--text-3);margin-top:8px">✓ = ${lang==='en'?'Full access to category':'Toàn quyền danh mục'} | <i>number</i> = ${lang==='en'?'Partial (X docs)':'Một phần (X tài liệu)'} | ✕ = ${lang==='en'?'No access':'Không truy cập'}</p>`;
+    <p style="font-size:11px;color:var(--text-3);margin-top:8px">âœ“ = ${lang==='en'?'Full access to category':'ToÃ n quyá»n danh má»¥c'} | <i>number</i> = ${lang==='en'?'Partial (X docs)':'Má»™t pháº§n (X tÃ i liá»‡u)'} | âœ• = ${lang==='en'?'No access':'KhÃ´ng truy cáº­p'}</p>`;
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // DICTIONARY
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let dictData = null;
 let dictQuery = '';
 let dictCatFilter = 'ALL';
@@ -3665,11 +3665,11 @@ function renderDictionary(){
   el.innerHTML = `
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
       <div>
-        <h2 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px">📖 ${T('dict_title')} <span style="font-size:12px;font-weight:400;color:var(--text-3);background:#f1f3f5;padding:2px 10px;border-radius:20px">ANNEX-50470</span></h2>
+        <h2 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px">ðŸ“– ${T('dict_title')} <span style="font-size:12px;font-weight:400;color:var(--text-3);background:#f1f3f5;padding:2px 10px;border-radius:20px">ANNEX-50470</span></h2>
         <p style="font-size:13px;color:var(--text-3);margin-top:4px">${T('dict_desc')}</p>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-shrink:0">
-        ${isAdmin()?`<button class=\"btn-admin primary\" onclick=\"openDictTermModal()\">➕ ${lang==='en'?'Add term':'Thêm thuật ngữ'}</button>`:''}
+        ${isAdmin()?`<button class=\"btn-admin primary\" onclick=\"openDictTermModal()\">âž• ${lang==='en'?'Add term':'ThÃªm thuáº­t ngá»¯'}</button>`:''}
       </div>
     </div>
     <input class="search-input-lg" type="text" placeholder="${T('dict_ph')}" id="dict-search" oninput="handleDictSearch(this.value)" autofocus>
@@ -3684,7 +3684,7 @@ function normalizeDictionarySearchText(text){
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
+    .replace(/Ä‘/g, 'd')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
     .replace(/\s+/g, ' ');
@@ -3748,11 +3748,11 @@ function getDictionaryValidationError(term, meaning, def, originalTerm){
 
 function getDictionarySaveErrorMessage(errorCode){
   const viMessages = {
-    missing_term: 'Cần nhập thuật ngữ',
-    missing_meaning: 'Cần nhập tên đầy đủ tiếng Anh',
-    missing_definition: 'Cần nhập định nghĩa',
-    use_abbreviation_canonical_term: 'Dùng mã viết tắt làm term chính và điền tên đầy đủ tiếng Anh vào trường Meaning',
-    meaning_must_expand_abbreviation: 'Tên đầy đủ tiếng Anh phải khai triển mã viết tắt, không được lặp lại chính mã đó'
+    missing_term: 'Cáº§n nháº­p thuáº­t ngá»¯',
+    missing_meaning: 'Cáº§n nháº­p tÃªn Ä‘áº§y Ä‘á»§ tiáº¿ng Anh',
+    missing_definition: 'Cáº§n nháº­p Ä‘á»‹nh nghÄ©a',
+    use_abbreviation_canonical_term: 'DÃ¹ng mÃ£ viáº¿t táº¯t lÃ m term chÃ­nh vÃ  Ä‘iá»n tÃªn Ä‘áº§y Ä‘á»§ tiáº¿ng Anh vÃ o trÆ°á»ng Meaning',
+    meaning_must_expand_abbreviation: 'TÃªn Ä‘áº§y Ä‘á»§ tiáº¿ng Anh pháº£i khai triá»ƒn mÃ£ viáº¿t táº¯t, khÃ´ng Ä‘Æ°á»£c láº·p láº¡i chÃ­nh mÃ£ Ä‘Ã³'
   };
   const enMessages = {
     missing_term: 'Term is required',
@@ -3762,7 +3762,7 @@ function getDictionarySaveErrorMessage(errorCode){
     meaning_must_expand_abbreviation: 'Meaning must expand the abbreviation instead of repeating the code'
   };
   const messages = lang === 'en' ? enMessages : viMessages;
-  return messages[errorCode] || errorCode || (lang === 'en' ? 'Save failed' : 'Lưu thất bại');
+  return messages[errorCode] || errorCode || (lang === 'en' ? 'Save failed' : 'LÆ°u tháº¥t báº¡i');
 }
 
 function isDictionaryWordStart(text, index){
@@ -3906,20 +3906,20 @@ function renderDictBody(){
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
               <div class="dict-cat-badge"><span class="dot" style="background:${DICT_CAT_COLORS[d.cat]||'#94a3b8'}"></span>${d.cat}</div>
               ${isAdmin()?`
-                <button class="btn-admin secondary sm" title="${lang==='en'?'Edit term':'Sửa thuật ngữ'}" onclick="openDictTermModal('${safeTerm}')">✎</button>
-                <button class="btn-admin danger sm" title="${lang==='en'?'Delete term':'Xóa thuật ngữ'}" onclick="deleteDictTerm('${safeTerm}')">🗑</button>
+                <button class="btn-admin secondary sm" title="${lang==='en'?'Edit term':'Sá»­a thuáº­t ngá»¯'}" onclick="openDictTermModal('${safeTerm}')">âœŽ</button>
+                <button class="btn-admin danger sm" title="${lang==='en'?'Delete term':'XÃ³a thuáº­t ngá»¯'}" onclick="deleteDictTerm('${safeTerm}')">ðŸ—‘</button>
               `:''}
             </div>
           </div>
           <div class="dict-def">${highlightMatch(d.def, dictQuery)}</div>
           ${d.ctx ? `<div class="dict-ctx"><b>${T('dict_ctx')}:</b> ${d.ctx}</div>` : ''}
-          ${d.rec ? `<div class="dict-rec">📋 ${d.rec}</div>` : ''}
+          ${d.rec ? `<div class="dict-rec">ðŸ“‹ ${d.rec}</div>` : ''}
         </div>
       `;
       }).join('')}
     </div>
     ${hasMore ? `<button class="dict-more-btn" onclick="dictShowCount+=30;renderDictBody()">${T('dict_more')} (${filtered.length - dictShowCount > 0 ? filtered.length - dictShowCount : 0} ${T('dict_remaining')})</button>` : ''}
-    <div style="margin-top:12px;font-size:11px;color:var(--text-3);text-align:center">${T('showing')} ${Math.min(dictShowCount, filtered.length)} / ${filtered.length} · ${T('dict_source')}: ANNEX-50470</div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text-3);text-align:center">${T('showing')} ${Math.min(dictShowCount, filtered.length)} / ${filtered.length} Â· ${T('dict_source')}: ANNEX-50470</div>
   `;
 }
 
@@ -3938,12 +3938,12 @@ function handleDictSearch(q){
   renderDictBody();
 }
 
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // DICTIONARY CRUD (Admin only)
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openDictTermModal(term){
   if(!isAdmin()){
-    showToast(lang==='en'?'Not permitted':'Không có quyền');
+    showToast(lang==='en'?'Not permitted':'KhÃ´ng cÃ³ quyá»n');
     return;
   }
   const isEdit = !!term;
@@ -3954,21 +3954,21 @@ function openDictTermModal(term){
   modal.className='modal-overlay';
   modal.id='dict-modal';
   modal.innerHTML = `<div class="modal" style="max-width:720px">
-    <h3 style="margin-bottom:10px">${isEdit?(lang==='en'?'Edit term':'Sửa thuật ngữ'):(lang==='en'?'Add new term':'Thêm thuật ngữ mới')}</h3>
+    <h3 style="margin-bottom:10px">${isEdit?(lang==='en'?'Edit term':'Sá»­a thuáº­t ngá»¯'):(lang==='en'?'Add new term':'ThÃªm thuáº­t ngá»¯ má»›i')}</h3>
 
-    <div class="modal-field"><label>${lang==='en'?'Term (EN)':'Thuật ngữ (EN)'}</label><input id="dm-term" value="${existing?escapeHtml(existing.term):''}" ${isEdit?'disabled':''}></div>
-    <div class="modal-field"><label>${lang==='en'?'Vietnamese':'Tiếng Việt'}</label><input id="dm-vi" value="${existing?escapeHtml(existing.vi||''):''}"></div>
-    <div class="modal-field"><label>${lang==='en'?'Full English (required)':'Tên đầy đủ tiếng Anh (bắt buộc)'}</label><input id="dm-meaning" value="${existing?escapeHtml(existing.meaning||''):''}"></div>
-    <div class="modal-field"><label>${lang==='en'?'Category':'Nhóm'}</label>
+    <div class="modal-field"><label>${lang==='en'?'Term (EN)':'Thuáº­t ngá»¯ (EN)'}</label><input id="dm-term" value="${existing?escapeHtml(existing.term):''}" ${isEdit?'disabled':''}></div>
+    <div class="modal-field"><label>${lang==='en'?'Vietnamese':'Tiáº¿ng Viá»‡t'}</label><input id="dm-vi" value="${existing?escapeHtml(existing.vi||''):''}"></div>
+    <div class="modal-field"><label>${lang==='en'?'Full English (required)':'TÃªn Ä‘áº§y Ä‘á»§ tiáº¿ng Anh (báº¯t buá»™c)'}</label><input id="dm-meaning" value="${existing?escapeHtml(existing.meaning||''):''}"></div>
+    <div class="modal-field"><label>${lang==='en'?'Category':'NhÃ³m'}</label>
       <select id="dm-cat">${catOptions || '<option value="General">General</option>'}</select>
     </div>
-    <div class="modal-field"><label>${lang==='en'?'Definition':'Định nghĩa'}</label><textarea id="dm-def" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.def||''):''}</textarea></div>
-    <div class="modal-field"><label>${lang==='en'?'Context / Example':'Ngữ cảnh / Ví dụ'}</label><textarea id="dm-ctx" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.ctx||''):''}</textarea></div>
-    <div class="modal-field"><label>${lang==='en'?'Required records':'Hồ sơ phải có'}</label><textarea id="dm-rec" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.rec||''):''}</textarea></div>
+    <div class="modal-field"><label>${lang==='en'?'Definition':'Äá»‹nh nghÄ©a'}</label><textarea id="dm-def" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.def||''):''}</textarea></div>
+    <div class="modal-field"><label>${lang==='en'?'Context / Example':'Ngá»¯ cáº£nh / VÃ­ dá»¥'}</label><textarea id="dm-ctx" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.ctx||''):''}</textarea></div>
+    <div class="modal-field"><label>${lang==='en'?'Required records':'Há»“ sÆ¡ pháº£i cÃ³'}</label><textarea id="dm-rec" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.rec||''):''}</textarea></div>
 
     <div class="modal-actions">
-      <button class="btn-admin secondary" onclick="closeModal()">✕ ${T('admin_cancel')}</button>
-      <button class="btn-admin primary" onclick="saveDictTerm('${isEdit?String(term).replace(/'/g,"\\'"):''}')">✓ ${T('admin_save')}</button>
+      <button class="btn-admin secondary" onclick="closeModal()">âœ• ${T('admin_cancel')}</button>
+      <button class="btn-admin primary" onclick="saveDictTerm('${isEdit?String(term).replace(/'/g,"\\'"):''}')">âœ“ ${T('admin_save')}</button>
     </div>
   </div>`;
   document.body.appendChild(modal);
@@ -3994,32 +3994,32 @@ async function saveDictTerm(originalTerm){
   try{
     const res = await apiCall('dict_upsert',{term,vi,meaning,cat,def,ctx,rec,originalTerm});
     if(!(res && res.ok)){
-      showToast('⚠ ' + getDictionarySaveErrorMessage(res && res.error));
+      showToast('âš  ' + getDictionarySaveErrorMessage(res && res.error));
       return;
     }
     dictData = res.items || dictData;
     closeModal();
     renderDictBody();
-    showToast(lang==='en'?'✓ Saved':'✓ Đã lưu');
+    showToast(lang==='en'?'âœ“ Saved':'âœ“ ÄÃ£ lÆ°u');
   }catch(e){
-    showToast(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại');
+    showToast(lang==='en'?'âš  Save failed':'âš  LÆ°u tháº¥t báº¡i');
   }
 }
 
 async function deleteDictTerm(term){
   if(!isAdmin()) return;
-  if(!confirm((lang==='en'?'Delete term':'Xóa thuật ngữ')+': '+term+' ?')) return;
+  if(!confirm((lang==='en'?'Delete term':'XÃ³a thuáº­t ngá»¯')+': '+term+' ?')) return;
   try{
     const res = await apiCall('dict_delete',{term});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại'));
+      showToast((res && res.error)?('âš  '+res.error):(lang==='en'?'âš  Delete failed':'âš  XÃ³a tháº¥t báº¡i'));
       return;
     }
     dictData = res.items || dictData;
     renderDictBody();
-    showToast(lang==='en'?'✓ Deleted':'✓ Đã xóa');
+    showToast(lang==='en'?'âœ“ Deleted':'âœ“ ÄÃ£ xÃ³a');
   }catch(e){
-    showToast(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại');
+    showToast(lang==='en'?'âš  Delete failed':'âš  XÃ³a tháº¥t báº¡i');
   }
 }
 
@@ -4051,7 +4051,7 @@ function toggleSidebar(){
     const s = document.getElementById('sidebar');
     s.classList.toggle('collapsed');
     const icon = document.getElementById('collapse-icon');
-    icon.textContent = s.classList.contains('collapsed') ? '▷' : '◁';
+    icon.textContent = s.classList.contains('collapsed') ? 'â–·' : 'â—';
   } else {
     toggleMobileSidebar();
   }
@@ -4099,9 +4099,9 @@ document.addEventListener('click', e => {
 });
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ADMIN PANEL
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let adminTab = 'users';
 let adminUserViewMode = 'cards'; // 'cards' or 'list'
 let adminEditRole = 'ceo';
@@ -4126,10 +4126,10 @@ let adminDataSourceState = {
 function showToast(msg, type, duration){
   duration = duration || 3000;
   var colorMap = {
-    success: {bg:'#16a34a', icon:'✅'},
-    error: {bg:'#dc2626', icon:'❌'},
-    warning: {bg:'#d97706', icon:'⚠️'},
-    info: {bg:'#2563eb', icon:'ℹ️'}
+    success: {bg:'#16a34a', icon:'âœ…'},
+    error: {bg:'#dc2626', icon:'âŒ'},
+    warning: {bg:'#d97706', icon:'âš ï¸'},
+    info: {bg:'#2563eb', icon:'â„¹ï¸'}
   };
   var style = colorMap[type] || colorMap.info;
   var t=document.createElement('div');
@@ -4147,7 +4147,7 @@ function closeGitSyncModal(){
 
 function gitSyncShortHash(hash){
   const raw = String(hash||'').trim();
-  return raw ? raw.slice(0,7) : '—';
+  return raw ? raw.slice(0,7) : 'â€”';
 }
 
 function gitSyncStatusTone(status){
@@ -4175,8 +4175,8 @@ function gitSyncRenderSimpleFileTable(items, emptyText){
       <table class="git-sync-table">
         <thead>
           <tr>
-            <th>${lang==='en'?'Status':'Trạng thái'}</th>
-            <th>${lang==='en'?'Path':'Đường dẫn'}</th>
+            <th>${lang==='en'?'Status':'Tráº¡ng thÃ¡i'}</th>
+            <th>${lang==='en'?'Path':'ÄÆ°á»ng dáº«n'}</th>
           </tr>
         </thead>
         <tbody>
@@ -4203,9 +4203,9 @@ function gitSyncRenderChangedFileTable(items, emptyText){
       <table class="git-sync-table">
         <thead>
           <tr>
-            <th>${lang==='en'?'Change':'Thay đổi'}</th>
-            <th>${lang==='en'?'Current path':'Đường dẫn hiện tại'}</th>
-            <th>${lang==='en'?'Previous path':'Đường dẫn cũ'}</th>
+            <th>${lang==='en'?'Change':'Thay Ä‘á»•i'}</th>
+            <th>${lang==='en'?'Current path':'ÄÆ°á»ng dáº«n hiá»‡n táº¡i'}</th>
+            <th>${lang==='en'?'Previous path':'ÄÆ°á»ng dáº«n cÅ©'}</th>
           </tr>
         </thead>
         <tbody>
@@ -4216,7 +4216,7 @@ function gitSyncRenderChangedFileTable(items, emptyText){
             return `<tr>
               <td><span class="git-sync-status ${gitSyncStatusTone(status)}">${escapeHtml(status)}</span></td>
               <td><code>${escapeHtml(path)}</code></td>
-              <td>${oldPath ? `<code>${escapeHtml(oldPath)}</code>` : '<span class="git-sync-empty-inline">—</span>'}</td>
+              <td>${oldPath ? `<code>${escapeHtml(oldPath)}</code>` : '<span class="git-sync-empty-inline">â€”</span>'}</td>
             </tr>`;
           }).join('')}
         </tbody>
@@ -4260,12 +4260,12 @@ function gitSyncRenderPresyncSection(presync){
       <div class="git-sync-section-title">${sectionTitle}</div>
       <div class="git-sync-callout">${callout}</div>
       <div class="git-sync-summary-grid git-sync-summary-grid--compact">
-        ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', String(presync.branch || 'main'))}
-        ${gitSyncRenderSummaryCard(lang==='en'?'Files':'Số file', String(files.length))}
-        ${gitSyncRenderSummaryCard(lang==='en'?'Before':'Trước', gitSyncShortHash(presync.head_before))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'NhÃ¡nh', String(presync.branch || 'main'))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'Files':'Sá»‘ file', String(files.length))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'Before':'TrÆ°á»›c', gitSyncShortHash(presync.head_before))}
         ${gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(presync.head_after))}
       </div>
-      ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No meaningful file was auto-pushed before pull.':'Không có file meaningful nào được auto-push trước khi pull.')}
+      ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No meaningful file was auto-pushed before pull.':'KhÃ´ng cÃ³ file meaningful nÃ o Ä‘Æ°á»£c auto-push trÆ°á»›c khi pull.')}
       ${gitSyncRenderOutputBlock(lang==='en'?'Pre-sync commit output':'Log commit pre-sync', presync.commit_output)}
       ${gitSyncRenderOutputBlock(lang==='en'?'Pre-sync push output':'Log push pre-sync', presync.push_output)}
     </section>`;
@@ -4284,20 +4284,20 @@ function openGitSyncReportModal(kind, res){
   const beforeHead = String((res && (res.before_head || res.head_before)) || '');
   const afterHead = String((res && (res.after_head || res.head_after)) || '');
   const title = isPull
-    ? (lang==='en' ? 'Pull Detail' : 'Chi tiết Pull')
-    : (lang==='en' ? 'Push Detail' : 'Chi tiết Push');
+    ? (lang==='en' ? 'Pull Detail' : 'Chi tiáº¿t Pull')
+    : (lang==='en' ? 'Push Detail' : 'Chi tiáº¿t Push');
   const kicker = isPull ? 'GitHub -> Portal' : 'Portal -> GitHub';
   const summaryCards = isPull
     ? [
-        gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch),
-        gitSyncRenderSummaryCard(lang==='en'?'Changed files':'File thay đổi', String(changedFiles.length)),
-        gitSyncRenderSummaryCard(lang==='en'?'From':'Từ commit', gitSyncShortHash(beforeHead)),
-        gitSyncRenderSummaryCard(lang==='en'?'To':'Đến commit', gitSyncShortHash(afterHead)),
+        gitSyncRenderSummaryCard(lang==='en'?'Branch':'NhÃ¡nh', branch),
+        gitSyncRenderSummaryCard(lang==='en'?'Changed files':'File thay Ä‘á»•i', String(changedFiles.length)),
+        gitSyncRenderSummaryCard(lang==='en'?'From':'Tá»« commit', gitSyncShortHash(beforeHead)),
+        gitSyncRenderSummaryCard(lang==='en'?'To':'Äáº¿n commit', gitSyncShortHash(afterHead)),
       ].join('')
     : [
-        gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch),
+        gitSyncRenderSummaryCard(lang==='en'?'Branch':'NhÃ¡nh', branch),
         gitSyncRenderSummaryCard(lang==='en'?'Committed files':'File commit', String(files.length)),
-        gitSyncRenderSummaryCard(lang==='en'?'Before':'Trước', gitSyncShortHash(beforeHead)),
+        gitSyncRenderSummaryCard(lang==='en'?'Before':'TrÆ°á»›c', gitSyncShortHash(beforeHead)),
         gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(afterHead)),
       ].join('');
   const pullSummaryMessageBase = (() => {
@@ -4305,7 +4305,7 @@ function openGitSyncReportModal(kind, res){
     if(!pulled && presync && presync.pushed){
       return `${base} ${lang==='en'
         ? 'The pre-sync section below shows server-side changes only; workstation edits appear here only after they are pushed to GitHub.'
-        : 'Phần pre-sync bên dưới chỉ hiển thị thay đổi phía server; thay đổi trên máy local chỉ xuất hiện ở đây sau khi đã đẩy lên GitHub.'}`;
+        : 'Pháº§n pre-sync bÃªn dÆ°á»›i chá»‰ hiá»ƒn thá»‹ thay Ä‘á»•i phÃ­a server; thay Ä‘á»•i trÃªn mÃ¡y local chá»‰ xuáº¥t hiá»‡n á»Ÿ Ä‘Ã¢y sau khi Ä‘Ã£ Ä‘áº©y lÃªn GitHub.'}`;
     }
     return base;
   })();
@@ -4315,7 +4315,7 @@ function openGitSyncReportModal(kind, res){
     if(!pulled && presync && presync.pushed){
       return `${base} ${lang==='en'
         ? 'The pre-sync section below shows server-side changes only; workstation edits appear here only after they are pushed to GitHub.'
-        : 'Phần pre-sync bên dưới chỉ hiển thị thay đổi phía server; thay đổi trên máy local chỉ xuất hiện ở đây sau khi đã đẩy lên GitHub.'}`;
+        : 'Pháº§n pre-sync bÃªn dÆ°á»›i chá»‰ hiá»ƒn thá»‹ thay Ä‘á»•i phÃ­a server; thay Ä‘á»•i trÃªn mÃ¡y local chá»‰ xuáº¥t hiá»‡n á»Ÿ Ä‘Ã¢y sau khi Ä‘Ã£ Ä‘áº©y lÃªn GitHub.'}`;
     }
     return base;
   })();
@@ -4323,36 +4323,36 @@ function openGitSyncReportModal(kind, res){
   const bodySections = isPull
     ? `
       <section class="git-sync-section">
-        <div class="git-sync-section-title">${lang==='en'?'Pull summary':'Tóm tắt pull'}</div>
+        <div class="git-sync-section-title">${lang==='en'?'Pull summary':'TÃ³m táº¯t pull'}</div>
         <div class="git-sync-callout">${escapeHtml(pullSummaryMessage)}</div>
       </section>
       ${gitSyncRenderPresyncSection(presync)}
       <section class="git-sync-section">
-        <div class="git-sync-section-title">${lang==='en'?'Files applied to portal':'Danh sách file áp dụng xuống portal'}</div>
-        ${gitSyncRenderChangedFileTable(changedFiles, lang==='en'?'No remote file change was applied in this pull.':'Không có file remote nào được áp xuống trong lần pull này.')}
+        <div class="git-sync-section-title">${lang==='en'?'Files applied to portal':'Danh sÃ¡ch file Ã¡p dá»¥ng xuá»‘ng portal'}</div>
+        ${gitSyncRenderChangedFileTable(changedFiles, lang==='en'?'No remote file change was applied in this pull.':'KhÃ´ng cÃ³ file remote nÃ o Ä‘Æ°á»£c Ã¡p xuá»‘ng trong láº§n pull nÃ y.')}
       </section>
       ${gitSyncRenderOutputBlock(lang==='en'?'Fetch output':'Log fetch', res && res.fetch_output)}
       ${gitSyncRenderOutputBlock(lang==='en'?'Pull output':'Log pull', res && res.pull_output)}
     `
     : `
       <section class="git-sync-section">
-        <div class="git-sync-section-title">${lang==='en'?'Push summary':'Tóm tắt push'}</div>
+        <div class="git-sync-section-title">${lang==='en'?'Push summary':'TÃ³m táº¯t push'}</div>
         <div class="git-sync-callout">${escapeHtml(String(res && res.message || (pushed ? 'Changes pushed.' : 'Nothing to sync.')))}</div>
       </section>
       <section class="git-sync-section">
-        <div class="git-sync-section-title">${lang==='en'?'Detected meaningful changes before commit':'Các thay đổi meaningful được phát hiện trước khi commit'}</div>
-        ${gitSyncRenderSimpleFileTable(statusEntries, lang==='en'?'No meaningful file was detected for a new commit.':'Không phát hiện file meaningful nào để tạo commit mới.')}
+        <div class="git-sync-section-title">${lang==='en'?'Detected meaningful changes before commit':'CÃ¡c thay Ä‘á»•i meaningful Ä‘Æ°á»£c phÃ¡t hiá»‡n trÆ°á»›c khi commit'}</div>
+        ${gitSyncRenderSimpleFileTable(statusEntries, lang==='en'?'No meaningful file was detected for a new commit.':'KhÃ´ng phÃ¡t hiá»‡n file meaningful nÃ o Ä‘á»ƒ táº¡o commit má»›i.')}
       </section>
       <section class="git-sync-section">
-        <div class="git-sync-section-title">${lang==='en'?'Files included in push':'Danh sách file đi cùng lần push'}</div>
-        ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No new file was included in this push.':'Không có file mới nào nằm trong lần push này.')}
+        <div class="git-sync-section-title">${lang==='en'?'Files included in push':'Danh sÃ¡ch file Ä‘i cÃ¹ng láº§n push'}</div>
+        ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No new file was included in this push.':'KhÃ´ng cÃ³ file má»›i nÃ o náº±m trong láº§n push nÃ y.')}
       </section>
       ${gitSyncRenderOutputBlock(lang==='en'?'Commit output':'Log commit', res && res.commit_output)}
       ${gitSyncRenderOutputBlock(lang==='en'?'Push output':'Log push', res && res.push_output)}
     `;
 
   const primaryButton = isPull
-    ? `<button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en'?(pulled?'OK - reload latest portal':'OK - refresh portal'):(pulled?'OK - tải lại portal mới nhất':'OK - làm mới portal')}</button>`
+    ? `<button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en'?(pulled?'OK - reload latest portal':'OK - refresh portal'):(pulled?'OK - táº£i láº¡i portal má»›i nháº¥t':'OK - lÃ m má»›i portal')}</button>`
     : '';
 
   const modal = document.createElement('div');
@@ -4365,14 +4365,14 @@ function openGitSyncReportModal(kind, res){
           <div class="git-sync-modal-kicker">${escapeHtml(kicker)}</div>
           <h3>${escapeHtml(title)}</h3>
         </div>
-        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">✕</button>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">âœ•</button>
       </div>
       <div class="git-sync-modal-body">
         <div class="git-sync-summary-grid">${summaryCards}</div>
         ${bodySections}
       </div>
       <div class="modal-actions git-sync-modal-actions">
-        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'Đóng'}</button>
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'ÄÃ³ng'}</button>
         ${primaryButton}
       </div>
     </div>`;
@@ -4382,7 +4382,7 @@ function openGitSyncReportModal(kind, res){
 
 async function adminReloadLatestPortal(){
   closeGitSyncModal();
-  showToast(lang==='en' ? 'Refreshing portal with cache-busting…' : 'Đang nạp lại portal với cache-busting…', 2200);
+  showToast(lang==='en' ? 'Refreshing portal with cache-bustingâ€¦' : 'Äang náº¡p láº¡i portal vá»›i cache-bustingâ€¦', 2200);
   try{
     await apiCall('admin_clear_site_cache', {}, 'POST', 15000);
   }catch(e){}
@@ -4416,21 +4416,21 @@ async function adminSaveAll(){
   try{
     const resRole = await saveRolePermsToServer();
     if(!(resRole && resRole.ok)){
-      showToast((resRole && resRole.error) ? ('⚠ '+resRole.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
+      showToast((resRole && resRole.error) ? ('âš  '+resRole.error) : (lang==='en'?'âš  Save failed':'âš  LÆ°u tháº¥t báº¡i'));
       return;
     }
     const resDocs = await saveDocVisibilityToServer();
     if(!(resDocs && resDocs.ok)){
-      showToast((resDocs && resDocs.error) ? ('⚠ '+resDocs.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
+      showToast((resDocs && resDocs.error) ? ('âš  '+resDocs.error) : (lang==='en'?'âš  Save failed':'âš  LÆ°u tháº¥t báº¡i'));
       return;
     }
   }catch(e){
-    showToast(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại');
+    showToast(lang==='en'?'âš  Save failed':'âš  LÆ°u tháº¥t báº¡i');
     return;
   }
 
   adminUnsaved = false;
-  showToast(lang==='en'?'✅ All changes saved successfully':'✅ Đã lưu tất cả thay đổi thành công');
+  showToast(lang==='en'?'âœ… All changes saved successfully':'âœ… ÄÃ£ lÆ°u táº¥t cáº£ thay Ä‘á»•i thÃ nh cÃ´ng');
   renderAdmin();
 }
 
@@ -4456,10 +4456,10 @@ function gitRepoFormatTime(value){
 }
 
 function gitRepoCommitHeadline(commit){
-  if(!commit || typeof commit !== 'object') return '—';
+  if(!commit || typeof commit !== 'object') return 'â€”';
   const hash = String(commit.short_hash || commit.hash || '').trim();
   const subject = String(commit.subject || '').trim();
-  if(!hash && !subject) return '—';
+  if(!hash && !subject) return 'â€”';
   return `${hash}${subject ? ` ${subject}` : ''}`.trim();
 }
 
@@ -4467,48 +4467,48 @@ function gitRepoCommitMeta(commit){
   if(!commit || typeof commit !== 'object') return '';
   const author = String(commit.author_name || '').trim();
   const committedAt = gitRepoFormatTime(commit.committed_at);
-  return [author, committedAt].filter(Boolean).join(' • ');
+  return [author, committedAt].filter(Boolean).join(' â€¢ ');
 }
 
 function gitRepoRelativeState(status){
-  if(!status) return {label:'—', tone:'neutral'};
+  if(!status) return {label:'â€”', tone:'neutral'};
   const ahead = Number(status.ahead_count || 0);
   const behind = Number(status.behind_count || 0);
   if(ahead > 0 && behind > 0){
     return {
-      label: lang==='en' ? `Diverged (+${ahead} / -${behind})` : `Phân kỳ (+${ahead} / -${behind})`,
+      label: lang==='en' ? `Diverged (+${ahead} / -${behind})` : `PhÃ¢n ká»³ (+${ahead} / -${behind})`,
       tone: 'warn'
     };
   }
   if(behind > 0){
     return {
-      label: lang==='en' ? `Behind ${behind}` : `Chậm ${behind} commit`,
+      label: lang==='en' ? `Behind ${behind}` : `Cháº­m ${behind} commit`,
       tone: 'info'
     };
   }
   if(ahead > 0){
     return {
-      label: lang==='en' ? `Ahead ${ahead}` : `Đi trước ${ahead} commit`,
+      label: lang==='en' ? `Ahead ${ahead}` : `Äi trÆ°á»›c ${ahead} commit`,
       tone: 'good'
     };
   }
   return {
-    label: lang==='en' ? 'Up to date' : 'Đã đồng bộ',
+    label: lang==='en' ? 'Up to date' : 'ÄÃ£ Ä‘á»“ng bá»™',
     tone: 'good'
   };
 }
 
 function gitRepoWorkingTreeState(status){
-  if(!status) return {label:'—', tone:'neutral'};
+  if(!status) return {label:'â€”', tone:'neutral'};
   const dirtyCount = Number(status.meaningful_dirty_count || 0);
   if(dirtyCount > 0){
     return {
-      label: lang==='en' ? `${dirtyCount} local change(s)` : `${dirtyCount} thay đổi local`,
+      label: lang==='en' ? `${dirtyCount} local change(s)` : `${dirtyCount} thay Ä‘á»•i local`,
       tone: 'warn'
     };
   }
   return {
-    label: lang==='en' ? 'Working tree clean' : 'Working tree sạch',
+    label: lang==='en' ? 'Working tree clean' : 'Working tree sáº¡ch',
     tone: 'good'
   };
 }
@@ -4570,27 +4570,27 @@ function adminGitPushErrorMessage(res){
   if(error === 'staged_changes_present'){
     return lang==='en'
       ? 'There are staged meaningful changes on the server already. Review them before using Git sync.'
-      : 'Server đang có thay đổi đã stage sẵn. Hãy commit hoặc unstage trong Terminal trước khi dùng nút đồng bộ Git.';
+      : 'Server Ä‘ang cÃ³ thay Ä‘á»•i Ä‘Ã£ stage sáºµn. HÃ£y commit hoáº·c unstage trong Terminal trÆ°á»›c khi dÃ¹ng nÃºt Ä‘á»“ng bá»™ Git.';
   }
   if(error === 'exec_unavailable'){
     return lang==='en'
       ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
-      : 'Hosting đang chặn PHP exec nên portal không thể chạy lệnh git.';
+      : 'Hosting Ä‘ang cháº·n PHP exec nÃªn portal khÃ´ng thá»ƒ cháº¡y lá»‡nh git.';
   }
   if(error === 'git_push_failed'){
     return lang==='en'
       ? 'Git push failed. Please verify the server can push to GitHub with SSH key or token.'
-      : 'Git push thất bại. Hãy kiểm tra server đã cấu hình SSH key hoặc token để đẩy lên GitHub chưa.';
+      : 'Git push tháº¥t báº¡i. HÃ£y kiá»ƒm tra server Ä‘Ã£ cáº¥u hÃ¬nh SSH key hoáº·c token Ä‘á»ƒ Ä‘áº©y lÃªn GitHub chÆ°a.';
   }
   if(error === 'not_a_git_repo' || error === 'repo_not_found'){
     return lang==='en'
       ? 'The portal root on this server is not available as a git repository.'
-      : 'Thư mục portal trên server này không sẵn sàng như một repo git.';
+      : 'ThÆ° má»¥c portal trÃªn server nÃ y khÃ´ng sáºµn sÃ ng nhÆ° má»™t repo git.';
   }
   if(error === 'git_sync_failed' && detail){
     return detail;
   }
-  return detail || (lang==='en' ? 'Git sync failed' : 'Đồng bộ Git thất bại');
+  return detail || (lang==='en' ? 'Git sync failed' : 'Äá»“ng bá»™ Git tháº¥t báº¡i');
 }
 
 function adminGitPullErrorMessage(res){
@@ -4599,24 +4599,24 @@ function adminGitPullErrorMessage(res){
   if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
     return lang==='en'
       ? 'The cPanel repository still has meaningful local changes after runtime auto-clean. Review them before pulling from Git.'
-      : 'Repo trên cPanel vẫn còn thay đổi local. Hãy commit hoặc bỏ các thay đổi đó trong Terminal trước khi pull từ Git.';
+      : 'Repo trÃªn cPanel váº«n cÃ²n thay Ä‘á»•i local. HÃ£y commit hoáº·c bá» cÃ¡c thay Ä‘á»•i Ä‘Ã³ trong Terminal trÆ°á»›c khi pull tá»« Git.';
   }
   if(error === 'exec_unavailable'){
     return lang==='en'
       ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
-      : 'Hosting đang chặn PHP exec nên portal không thể chạy lệnh git.';
+      : 'Hosting Ä‘ang cháº·n PHP exec nÃªn portal khÃ´ng thá»ƒ cháº¡y lá»‡nh git.';
   }
   if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
     return lang==='en'
       ? 'Git pull failed. Please verify the cPanel server can access the remote repository.'
-      : 'Git pull thất bại. Hãy kiểm tra server cPanel có quyền truy cập remote repository.';
+      : 'Git pull tháº¥t báº¡i. HÃ£y kiá»ƒm tra server cPanel cÃ³ quyá»n truy cáº­p remote repository.';
   }
   if(error === 'not_a_git_repo' || error === 'repo_not_found'){
     return lang==='en'
       ? 'The portal root on this server is not available as a git repository.'
-      : 'Thư mục portal trên server này không sẵn sàng như một repo git.';
+      : 'ThÆ° má»¥c portal trÃªn server nÃ y khÃ´ng sáºµn sÃ ng nhÆ° má»™t repo git.';
   }
-  return detail || (lang==='en' ? 'Git pull failed' : 'Git pull thất bại');
+  return detail || (lang==='en' ? 'Git pull failed' : 'Git pull tháº¥t báº¡i');
 }
 
 function adminGitExtractDetailPaths(detail){
@@ -4647,35 +4647,35 @@ function adminGitErrorGuidance(kind, res){
   if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
     return lang==='en'
       ? 'Review the listed files first. If those edits are valid, use Push to Git or commit them in Terminal. If they are wrong or temporary, discard them before pulling.'
-      : 'Hãy rà soát các file đang được liệt kê. Nếu đó là thay đổi hợp lệ, dùng Push to Git hoặc commit trong Terminal. Nếu là thay đổi tạm/sai, hãy bỏ chúng trước khi pull.';
+      : 'HÃ£y rÃ  soÃ¡t cÃ¡c file Ä‘ang Ä‘Æ°á»£c liá»‡t kÃª. Náº¿u Ä‘Ã³ lÃ  thay Ä‘á»•i há»£p lá»‡, dÃ¹ng Push to Git hoáº·c commit trong Terminal. Náº¿u lÃ  thay Ä‘á»•i táº¡m/sai, hÃ£y bá» chÃºng trÆ°á»›c khi pull.';
   }
   if(error === 'git_push_failed'){
     return lang==='en'
       ? 'The server could not push to GitHub. Check SSH access, remote URL, and whether origin/main has newer commits that require fetch/rebase first.'
-      : 'Server không thể đẩy lên GitHub. Hãy kiểm tra SSH, remote URL và xem origin/main có commit mới hơn cần fetch/rebase trước hay không.';
+      : 'Server khÃ´ng thá»ƒ Ä‘áº©y lÃªn GitHub. HÃ£y kiá»ƒm tra SSH, remote URL vÃ  xem origin/main cÃ³ commit má»›i hÆ¡n cáº§n fetch/rebase trÆ°á»›c hay khÃ´ng.';
   }
   if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
     return lang==='en'
       ? 'The server could not fetch or pull from the remote. Verify network access, SSH key, and remote branch state.'
-      : 'Server không thể fetch hoặc pull từ remote. Hãy kiểm tra kết nối mạng, SSH key và trạng thái nhánh remote.';
+      : 'Server khÃ´ng thá»ƒ fetch hoáº·c pull tá»« remote. HÃ£y kiá»ƒm tra káº¿t ná»‘i máº¡ng, SSH key vÃ  tráº¡ng thÃ¡i nhÃ¡nh remote.';
   }
   if(error === 'git_add_failed'){
     return lang==='en'
       ? 'Git could not stage one or more paths. This usually means the path no longer exists or was renamed. Rescan the document index, then try again.'
-      : 'Git không thể stage một hoặc nhiều đường dẫn. Trường hợp này thường do file đã đổi tên hoặc không còn tồn tại. Hãy quét lại danh mục tài liệu rồi thử lại.';
+      : 'Git khÃ´ng thá»ƒ stage má»™t hoáº·c nhiá»u Ä‘Æ°á»ng dáº«n. TrÆ°á»ng há»£p nÃ y thÆ°á»ng do file Ä‘Ã£ Ä‘á»•i tÃªn hoáº·c khÃ´ng cÃ²n tá»“n táº¡i. HÃ£y quÃ©t láº¡i danh má»¥c tÃ i liá»‡u rá»“i thá»­ láº¡i.';
   }
   if(error === 'exec_unavailable'){
     return lang==='en'
       ? 'Hosting is blocking PHP exec, so portal buttons cannot run git commands. Terminal or hosting configuration is required.'
-      : 'Hosting đang chặn PHP exec nên các nút trên portal không thể chạy lệnh git. Cần dùng Terminal hoặc mở cấu hình hosting.';
+      : 'Hosting Ä‘ang cháº·n PHP exec nÃªn cÃ¡c nÃºt trÃªn portal khÃ´ng thá»ƒ cháº¡y lá»‡nh git. Cáº§n dÃ¹ng Terminal hoáº·c má»Ÿ cáº¥u hÃ¬nh hosting.';
   }
   return kind === 'pull'
     ? (lang==='en'
       ? 'Review the raw server detail below to decide whether this is a repository state issue, a remote access issue, or a path mismatch.'
-      : 'Hãy xem log chi tiết bên dưới để xác định đây là lỗi trạng thái repo, lỗi truy cập remote hay lỗi không khớp đường dẫn.')
+      : 'HÃ£y xem log chi tiáº¿t bÃªn dÆ°á»›i Ä‘á»ƒ xÃ¡c Ä‘á»‹nh Ä‘Ã¢y lÃ  lá»—i tráº¡ng thÃ¡i repo, lá»—i truy cáº­p remote hay lá»—i khÃ´ng khá»›p Ä‘Æ°á»ng dáº«n.')
     : (lang==='en'
       ? 'Review the raw server detail below to decide whether this is a staging issue, a commit issue, or a GitHub push issue.'
-      : 'Hãy xem log chi tiết bên dưới để xác định đây là lỗi stage, lỗi commit hay lỗi đẩy lên GitHub.');
+      : 'HÃ£y xem log chi tiáº¿t bÃªn dÆ°á»›i Ä‘á»ƒ xÃ¡c Ä‘á»‹nh Ä‘Ã¢y lÃ  lá»—i stage, lá»—i commit hay lá»—i Ä‘áº©y lÃªn GitHub.');
 }
 
 function openGitSyncErrorModal(kind, res){
@@ -4686,8 +4686,8 @@ function openGitSyncErrorModal(kind, res){
   const errorCode = String((res && res.error) || (isPull ? 'git_pull_failed' : 'git_sync_failed')).trim();
   const paths = adminGitExtractDetailPaths(detail);
   const title = isPull
-    ? (lang==='en' ? 'Pull Failed' : 'Pull thất bại')
-    : (lang==='en' ? 'Push Failed' : 'Push thất bại');
+    ? (lang==='en' ? 'Pull Failed' : 'Pull tháº¥t báº¡i')
+    : (lang==='en' ? 'Push Failed' : 'Push tháº¥t báº¡i');
   const summary = isPull ? adminGitPullErrorMessage(res) : adminGitPushErrorMessage(res);
   const modal = document.createElement('div');
   modal.id = 'git-sync-modal';
@@ -4699,31 +4699,31 @@ function openGitSyncErrorModal(kind, res){
           <div class="git-sync-modal-kicker">${escapeHtml(isPull ? 'GitHub -> Portal' : 'Portal -> GitHub')}</div>
           <h3>${escapeHtml(title)}</h3>
         </div>
-        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">✕</button>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">âœ•</button>
       </div>
       <div class="git-sync-modal-body">
         <div class="git-sync-summary-grid git-sync-summary-grid--compact">
-          ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch)}
-          ${gitSyncRenderSummaryCard(lang==='en'?'Error code':'Mã lỗi', errorCode || '—')}
-          ${gitSyncRenderSummaryCard(lang==='en'?'Paths found':'Path nhận diện', String(paths.length))}
-          ${gitSyncRenderSummaryCard(lang==='en'?'Time':'Thời gian', String((res && res.server_time) || '—'))}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'NhÃ¡nh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Error code':'MÃ£ lá»—i', errorCode || 'â€”')}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Paths found':'Path nháº­n diá»‡n', String(paths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Time':'Thá»i gian', String((res && res.server_time) || 'â€”'))}
         </div>
         <section class="git-sync-section">
-          <div class="git-sync-section-title">${lang==='en'?'Readable summary':'Tóm tắt dễ hiểu'}</div>
+          <div class="git-sync-section-title">${lang==='en'?'Readable summary':'TÃ³m táº¯t dá»… hiá»ƒu'}</div>
           <div class="git-sync-callout is-error">${escapeHtml(summary)}</div>
         </section>
         <section class="git-sync-section">
-          <div class="git-sync-section-title">${lang==='en'?'Recommended handling':'Hướng xử lý đề nghị'}</div>
+          <div class="git-sync-section-title">${lang==='en'?'Recommended handling':'HÆ°á»›ng xá»­ lÃ½ Ä‘á» nghá»‹'}</div>
           <div class="git-sync-callout">${escapeHtml(adminGitErrorGuidance(kind, res))}</div>
         </section>
         <section class="git-sync-section">
-          <div class="git-sync-section-title">${lang==='en'?'Detected paths from server detail':'Các path nhận diện từ log server'}</div>
-          ${gitSyncRenderSimpleFileTable(paths.map(path=>({status:'PATH', path})), lang==='en'?'No specific path could be extracted from the server detail.':'Không trích xuất được path cụ thể nào từ log server.')}
+          <div class="git-sync-section-title">${lang==='en'?'Detected paths from server detail':'CÃ¡c path nháº­n diá»‡n tá»« log server'}</div>
+          ${gitSyncRenderSimpleFileTable(paths.map(path=>({status:'PATH', path})), lang==='en'?'No specific path could be extracted from the server detail.':'KhÃ´ng trÃ­ch xuáº¥t Ä‘Æ°á»£c path cá»¥ thá»ƒ nÃ o tá»« log server.')}
         </section>
-        ${gitSyncRenderOutputBlock(lang==='en'?'Raw server detail':'Chi tiết lỗi gốc từ server', detail || errorCode)}
+        ${gitSyncRenderOutputBlock(lang==='en'?'Raw server detail':'Chi tiáº¿t lá»—i gá»‘c tá»« server', detail || errorCode)}
       </div>
       <div class="modal-actions git-sync-modal-actions">
-        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'Đóng'}</button>
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'ÄÃ³ng'}</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -4734,7 +4734,7 @@ async function adminSyncDocsToGit(){
   if(!isAdmin() || isGitSyncBusy()) return;
   const msg = lang==='en'
     ? 'Push allowed document changes from this cPanel server to Git now? Runtime files such as sessions and rate limits will be ignored.'
-    : 'Đẩy ngay các thay đổi tài liệu được cho phép từ server cPanel này lên Git? Các file runtime như sessions và rate limit sẽ bị bỏ qua.';
+    : 'Äáº©y ngay cÃ¡c thay Ä‘á»•i tÃ i liá»‡u Ä‘Æ°á»£c cho phÃ©p tá»« server cPanel nÃ y lÃªn Git? CÃ¡c file runtime nhÆ° sessions vÃ  rate limit sáº½ bá»‹ bá» qua.';
   if(!confirm(msg)) return;
 
   gitSyncBusyMode = 'push';
@@ -4762,7 +4762,7 @@ async function adminPullPortalFromGit(){
   if(!isAdmin() || isGitSyncBusy()) return;
   const msg = lang==='en'
     ? 'Pull the latest commit from Git into this cPanel portal now? The system will auto-clean runtime noise, try to pre-sync meaningful server-side document changes, then run fast-forward update.'
-    : 'Kéo commit mới nhất từ Git xuống portal trên cPanel ngay bây giờ? Hệ thống sẽ tự dọn runtime noise, thử pre-sync thay đổi meaningful trên server, rồi mới fast-forward cập nhật.';
+    : 'KÃ©o commit má»›i nháº¥t tá»« Git xuá»‘ng portal trÃªn cPanel ngay bÃ¢y giá»? Há»‡ thá»‘ng sáº½ tá»± dá»n runtime noise, thá»­ pre-sync thay Ä‘á»•i meaningful trÃªn server, rá»“i má»›i fast-forward cáº­p nháº­t.';
   if(!confirm(msg)) return;
 
   gitSyncBusyMode = 'pull';
@@ -4796,13 +4796,13 @@ function renderAdminSyncPanel(){
     <section class="admin-sync-strip">
       <div class="admin-sync-head">
         <div class="admin-sync-title-wrap">
-          <div class="admin-sync-kicker">${lang==='en'?'Sync Control':'Điều khiển đồng bộ'}</div>
-          <h3>${lang==='en'?'Portal Data Synchronization':'Đồng bộ dữ liệu portal'}</h3>
-          <p>${lang==='en'?'Use Pull to auto-clean runtime noise, pre-sync meaningful portal-side changes when needed, and update cPanel from Git. Use Push when you want to explicitly publish meaningful server-side changes back to GitHub.':'Dùng Pull để tự dọn runtime, pre-sync các thay đổi meaningful trên portal khi cần, rồi cập nhật cPanel từ Git. Dùng Push khi muốn chủ động xuất bản các thay đổi meaningful trên server lên GitHub.'}</p>
+          <div class="admin-sync-kicker">${lang==='en'?'Sync Control':'Äiá»u khiá»ƒn Ä‘á»“ng bá»™'}</div>
+          <h3>${lang==='en'?'Portal Data Synchronization':'Äá»“ng bá»™ dá»¯ liá»‡u portal'}</h3>
+          <p>${lang==='en'?'Use Pull to auto-clean runtime noise, pre-sync meaningful portal-side changes when needed, and update cPanel from Git. Use Push when you want to explicitly publish meaningful server-side changes back to GitHub.':'DÃ¹ng Pull Ä‘á»ƒ tá»± dá»n runtime, pre-sync cÃ¡c thay Ä‘á»•i meaningful trÃªn portal khi cáº§n, rá»“i cáº­p nháº­t cPanel tá»« Git. DÃ¹ng Push khi muá»‘n chá»§ Ä‘á»™ng xuáº¥t báº£n cÃ¡c thay Ä‘á»•i meaningful trÃªn server lÃªn GitHub.'}</p>
         </div>
-        <button class="admin-sync-mini" onclick="rescanDocs().then(n=>{showToast('🔄 Scanned: '+n+' docs');renderAdmin()})">
+        <button class="admin-sync-mini" onclick="rescanDocs().then(n=>{showToast('ðŸ”„ Scanned: '+n+' docs');renderAdmin()})">
           <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
-          <span>${lang==='en'?'Rescan folders':'Quét lại thư mục'}</span>
+          <span>${lang==='en'?'Rescan folders':'QuÃ©t láº¡i thÆ° má»¥c'}</span>
         </button>
       </div>
       <div class="admin-sync-grid">
@@ -4811,20 +4811,20 @@ function renderAdminSyncPanel(){
           <span class="admin-sync-icon">${adminGitSyncIcon('pull')}</span>
           <span class="admin-sync-copy">
             <span class="admin-sync-label">${lang==='en'?'Pull To Portal':'Pull to Portal'}</span>
-            <span class="admin-sync-desc">${lang==='en'?'Bring the latest committed version from Git into this live cPanel portal.':'Kéo phiên bản đã commit mới nhất từ Git xuống portal đang chạy trên cPanel.'}</span>
-            <span class="admin-sync-note">${lang==='en'?'Auto-cleans runtime noise, pre-syncs meaningful server changes when possible, then fast-forwards from Git.':'Tự dọn runtime, pre-sync thay đổi meaningful trên server khi có thể, sau đó fast-forward từ Git.'}</span>
+            <span class="admin-sync-desc">${lang==='en'?'Bring the latest committed version from Git into this live cPanel portal.':'KÃ©o phiÃªn báº£n Ä‘Ã£ commit má»›i nháº¥t tá»« Git xuá»‘ng portal Ä‘ang cháº¡y trÃªn cPanel.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Auto-cleans runtime noise, pre-syncs meaningful server changes when possible, then fast-forwards from Git.':'Tá»± dá»n runtime, pre-sync thay Ä‘á»•i meaningful trÃªn server khi cÃ³ thá»ƒ, sau Ä‘Ã³ fast-forward tá»« Git.'}</span>
           </span>
-          <span class="admin-sync-arrow">${pullBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Update portal':'Cập nhật portal')}</span>
+          <span class="admin-sync-arrow">${pullBusy ? (lang==='en'?'Running...':'Äang cháº¡y...') : (lang==='en'?'Update portal':'Cáº­p nháº­t portal')}</span>
         </button>
         <button class="admin-sync-card is-push ${pushBusy?'is-busy':''}" onclick="adminSyncDocsToGit()" ${(pushBusy || disablePush)?'disabled':''}>
           <span class="admin-sync-badge">Portal -> GitHub</span>
           <span class="admin-sync-icon">${adminGitSyncIcon('push')}</span>
           <span class="admin-sync-copy">
             <span class="admin-sync-label">${lang==='en'?'Push To Git':'Push to Git'}</span>
-            <span class="admin-sync-desc">${lang==='en'?'Commit meaningful repository changes from cPanel and publish them back to GitHub.':'Commit các thay đổi meaningful trong repo từ cPanel và đẩy ngược trở lại GitHub.'}</span>
-            <span class="admin-sync-note">${lang==='en'?'Ignores runtime files such as sessions, rate limits, scan cache, and local user config noise.':'Bỏ qua file runtime như sessions, rate limits, scan cache và nhiễu do cấu hình user cục bộ.'}</span>
+            <span class="admin-sync-desc">${lang==='en'?'Commit meaningful repository changes from cPanel and publish them back to GitHub.':'Commit cÃ¡c thay Ä‘á»•i meaningful trong repo tá»« cPanel vÃ  Ä‘áº©y ngÆ°á»£c trá»Ÿ láº¡i GitHub.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Ignores runtime files such as sessions, rate limits, scan cache, and local user config noise.':'Bá» qua file runtime nhÆ° sessions, rate limits, scan cache vÃ  nhiá»…u do cáº¥u hÃ¬nh user cá»¥c bá»™.'}</span>
           </span>
-          <span class="admin-sync-arrow">${pushBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Publish changes':'Xuất bản thay đổi')}</span>
+          <span class="admin-sync-arrow">${pushBusy ? (lang==='en'?'Running...':'Äang cháº¡y...') : (lang==='en'?'Publish changes':'Xuáº¥t báº£n thay Ä‘á»•i')}</span>
         </button>
       </div>
     </section>`;
@@ -5350,27 +5350,27 @@ function renderAdmin(){
     <h2 style="font-size:18px;font-weight:700;margin-bottom:16px">${T('admin_panel')}</h2>
     <div class="admin-stat-row">
       <div class="admin-stat"><div class="val">${USERS.length}</div><div class="lbl">${T('admin_total_users')}</div></div>
-      <div class="admin-stat"><div class="val">${DEPARTMENTS.length}</div><div class="lbl">${lang==='en'?'Departments':'Phòng ban'}</div></div>
+      <div class="admin-stat"><div class="val">${DEPARTMENTS.length}</div><div class="lbl">${lang==='en'?'Departments':'PhÃ²ng ban'}</div></div>
       <div class="admin-stat"><div class="val">${Object.keys(ROLES).length}</div><div class="lbl">${T('admin_total_roles')}</div></div>
-      <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">● LIVE</span></div></div>
+      <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">â— LIVE</span></div></div>
       <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
     </div>
     <div class="admin-tabs-v2">
-      <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">${T('admin_users')}</span><span class="tab-badge">${USERS.length}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()"><span class="admin-tab-icon">🏢</span><span class="admin-tab-label">${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='roles'?'active':''}" onclick="adminTab='roles';renderAdmin()"><span class="admin-tab-icon">🛡</span><span class="admin-tab-label">${T('admin_roles')}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='orgchart'?'active':''}" onclick="adminTab='orgchart';renderAdmin()"><span class="admin-tab-icon">🏗</span><span class="admin-tab-label">${lang==='en'?'Org Chart':'Sơ đồ tổ chức'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()"><span class="admin-tab-icon">🔐</span><span class="admin-tab-label">${T('admin_perms')}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}><span class="admin-tab-icon">📊</span><span class="admin-tab-label">${lang==='en'?'Activity Log':'Kiểm soát hành vi'}</span><span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()"><span class="admin-tab-icon">📄</span><span class="admin-tab-label">${T('admin_effective_docs')}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()"><span class="admin-tab-icon">🔄</span><span class="admin-tab-label">${lang==='en'?'Version Control':'Điều khiển phiên bản'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()"><span class="admin-tab-icon">🧭</span><span class="admin-tab-label">${lang==='en'?'Portal display':'Hiển thị portal'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()"><span class="admin-tab-icon">📋</span><span class="admin-tab-label">${lang==='en'?'Retention':'Lưu giữ'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()"><span class="admin-tab-icon">🧾</span><span class="admin-tab-label">${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()"><span class="admin-tab-icon">🗄</span><span class="admin-tab-label">${lang==='en'?'Data sources':'Nguồn dữ liệu'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()"><span class="admin-tab-icon">ðŸ‘¥</span><span class="admin-tab-label">${T('admin_users')}</span><span class="tab-badge">${USERS.length}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()"><span class="admin-tab-icon">ðŸ¢</span><span class="admin-tab-label">${lang==='en'?'Dept & Titles':'PhÃ²ng ban & Chá»©c danh'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='roles'?'active':''}" onclick="adminTab='roles';renderAdmin()"><span class="admin-tab-icon">ðŸ›¡</span><span class="admin-tab-label">${T('admin_roles')}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='orgchart'?'active':''}" onclick="adminTab='orgchart';renderAdmin()"><span class="admin-tab-icon">ðŸ—</span><span class="admin-tab-label">${lang==='en'?'Org Chart':'SÆ¡ Ä‘á»“ tá»• chá»©c'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()"><span class="admin-tab-icon">ðŸ”</span><span class="admin-tab-label">${T('admin_perms')}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}><span class="admin-tab-icon">ðŸ“Š</span><span class="admin-tab-label">${lang==='en'?'Activity Log':'Kiá»ƒm soÃ¡t hÃ nh vi'}</span><span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()"><span class="admin-tab-icon">ðŸ“„</span><span class="admin-tab-label">${T('admin_effective_docs')}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()"><span class="admin-tab-icon">ðŸ”„</span><span class="admin-tab-label">${lang==='en'?'Version Control':'Äiá»u khiá»ƒn phiÃªn báº£n'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()"><span class="admin-tab-icon">ðŸ§­</span><span class="admin-tab-label">${lang==='en'?'Portal display':'Hiá»ƒn thá»‹ portal'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()"><span class="admin-tab-icon">ðŸ“‹</span><span class="admin-tab-label">${lang==='en'?'Retention':'LÆ°u giá»¯'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()"><span class="admin-tab-icon">ðŸ§¾</span><span class="admin-tab-label">${lang==='en'?'Manual runtime':'Nháº­p tay váº­n hÃ nh'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()"><span class="admin-tab-icon">ðŸ—„</span><span class="admin-tab-label">${lang==='en'?'Data sources':'Nguá»“n dá»¯ liá»‡u'}</span></button>
       <button class="admin-tab-v2 ${adminTab==='metadata_studio'?'active':''}" onclick="adminTab='metadata_studio';renderAdmin()"><span class="admin-tab-label">API &amp; DB Studio</span></button>
-      <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()"><span class="admin-tab-icon">🔑</span><span class="admin-tab-label">${lang==='en'?'MFA Security':'Bảo mật MFA'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">${lang==='en'?'Appearance':'Giao diện'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()"><span class="admin-tab-icon">ðŸ”‘</span><span class="admin-tab-label">${lang==='en'?'MFA Security':'Báº£o máº­t MFA'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()"><span class="admin-tab-icon">ðŸŽ¨</span><span class="admin-tab-label">${lang==='en'?'Appearance':'Giao diá»‡n'}</span></button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
   if(adminTab==='version_control' && !gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
@@ -5396,7 +5396,7 @@ function renderAdmin(){
   if(adminTab==='appearance') renderAdminAppearance();
 }
 
-/* ── Admin: Appearance Settings — Enterprise Theme Editor v2 ─────────────── */
+/* â”€â”€ Admin: Appearance Settings â€” Enterprise Theme Editor v2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 var _appSubTab = 'overview';
 
 function renderAdminMetadataStudio(){
@@ -5441,7 +5441,7 @@ function renderAdminMetadataStudio(){
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
-  var expectedVersion = '20260405l';
+  var expectedVersion = '20260405m';
   /* Delegate to external file if loaded, otherwise fallback inline */
   if(typeof window._renderAdminAppearanceFull === 'function' && window._renderAdminAppearanceFullVersion === expectedVersion){
     window._renderAdminAppearanceFull(el, _appSubTab, lang);
@@ -5474,11 +5474,11 @@ function renderAdminAppearance(){
 function renderAdminMfa(){
   const el=document.getElementById('admin-content');
   if(!el) return;
-  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-3)">Đang tải cài đặt MFA...</div>';
+  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-3)">Äang táº£i cÃ i Ä‘áº·t MFA...</div>';
 
   apiCall('admin_mfa_settings_get',{},'GET').then(function(res){
     if(!res||!res.ok){
-      el.innerHTML='<div style="color:var(--red);padding:20px">Lỗi tải MFA settings: '+(res?res.error:'unknown')+'</div>';
+      el.innerHTML='<div style="color:var(--red);padding:20px">Lá»—i táº£i MFA settings: '+(res?res.error:'unknown')+'</div>';
       return;
     }
     const d=res;
@@ -5488,38 +5488,38 @@ function renderAdminMfa(){
     const total=d.total_users||0;
 
     let html='<div style="margin-bottom:24px">';
-    html+='<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">'+(lang==='en'?'MFA Security Settings':'Cài đặt bảo mật MFA')+'</h3>';
+    html+='<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">'+(lang==='en'?'MFA Security Settings':'CÃ i Ä‘áº·t báº£o máº­t MFA')+'</h3>';
 
     // Global toggle
     html+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px">';
-    html+='<label style="font-weight:600;flex:1">'+(lang==='en'?'Require MFA for all users':'Yêu cầu MFA cho tất cả người dùng')+'</label>';
-    html+='<button id="mfa-toggle-btn" style="padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;color:#fff;background:'+(requireMfa?'var(--green)':'var(--red)')+'">'+(requireMfa?(lang==='en'?'ON — Required':'BẬT — Bắt buộc'):(lang==='en'?'OFF — Not required':'TẮT — Không bắt buộc'))+'</button>';
+    html+='<label style="font-weight:600;flex:1">'+(lang==='en'?'Require MFA for all users':'YÃªu cáº§u MFA cho táº¥t cáº£ ngÆ°á»i dÃ¹ng')+'</label>';
+    html+='<button id="mfa-toggle-btn" style="padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;color:#fff;background:'+(requireMfa?'var(--green)':'var(--red)')+'">'+(requireMfa?(lang==='en'?'ON â€” Required':'Báº¬T â€” Báº¯t buá»™c'):(lang==='en'?'OFF â€” Not required':'Táº®T â€” KhÃ´ng báº¯t buá»™c'))+'</button>';
     html+='</div>';
 
     // Stats
     html+='<div style="display:flex;gap:16px;margin-bottom:20px">';
-    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700">'+total+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Total users':'Tổng người dùng')+'</div></div>';
-    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--green)">'+enrolled+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'MFA enrolled':'Đã đăng ký MFA')+'</div></div>';
-    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:'+(requireMfa?'var(--red)':'var(--text-3)')+'">'+(total-enrolled)+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Not enrolled':'Chưa đăng ký')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700">'+total+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Total users':'Tá»•ng ngÆ°á»i dÃ¹ng')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--green)">'+enrolled+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'MFA enrolled':'ÄÃ£ Ä‘Äƒng kÃ½ MFA')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:'+(requireMfa?'var(--red)':'var(--text-3)')+'">'+(total-enrolled)+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Not enrolled':'ChÆ°a Ä‘Äƒng kÃ½')+'</div></div>';
     html+='</div>';
 
     // User table
-    html+='<h4 style="font-size:14px;font-weight:600;margin-bottom:8px">'+(lang==='en'?'Per-User MFA Status':'Trạng thái MFA theo người dùng')+'</h4>';
+    html+='<h4 style="font-size:14px;font-weight:600;margin-bottom:8px">'+(lang==='en'?'Per-User MFA Status':'Tráº¡ng thÃ¡i MFA theo ngÆ°á»i dÃ¹ng')+'</h4>';
     html+='<table style="width:100%;border-collapse:collapse;font-size:13px">';
-    html+='<thead><tr style="background:var(--bg-surface-alt,var(--bg));border-bottom:1px solid var(--border)"><th style="padding:8px;text-align:left">'+(lang==='en'?'User':'Người dùng')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Name':'Họ tên')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Role':'Vai trò')+'</th><th style="padding:8px;text-align:center">MFA</th><th style="padding:8px;text-align:center">'+(lang==='en'?'Actions':'Thao tác')+'</th></tr></thead><tbody>';
+    html+='<thead><tr style="background:var(--bg-surface-alt,var(--bg));border-bottom:1px solid var(--border)"><th style="padding:8px;text-align:left">'+(lang==='en'?'User':'NgÆ°á»i dÃ¹ng')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Name':'Há» tÃªn')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Role':'Vai trÃ²')+'</th><th style="padding:8px;text-align:center">MFA</th><th style="padding:8px;text-align:center">'+(lang==='en'?'Actions':'Thao tÃ¡c')+'</th></tr></thead><tbody>';
 
     users.forEach(function(u){
       html+='<tr style="border-bottom:1px solid var(--border)">';
       html+='<td style="padding:8px;font-weight:600">'+String(u.username||'')+'</td>';
       html+='<td style="padding:8px">'+String(u.name||'')+'</td>';
       html+='<td style="padding:8px"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border)">'+String(u.role||'')+'</span></td>';
-      html+='<td style="padding:8px;text-align:center">'+(u.mfa_enabled?'<span style="color:var(--green);font-weight:700">✓ '+('BẬT')+'</span>':'<span style="color:var(--text-3)">✗ '+('TẮT')+'</span>')+'</td>';
+      html+='<td style="padding:8px;text-align:center">'+(u.mfa_enabled?'<span style="color:var(--green);font-weight:700">âœ“ '+('Báº¬T')+'</span>':'<span style="color:var(--text-3)">âœ— '+('Táº®T')+'</span>')+'</td>';
       html+='<td style="padding:8px;text-align:center">';
       if(u.mfa_enabled){
-        html+='<button data-mfa-reset="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">'+(lang==='en'?'Reset':'Đặt lại')+'</button> ';
-        html+='<button data-mfa-disable="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid color-mix(in srgb, var(--red) 30%, var(--border));border-radius:4px;cursor:pointer;font-size:11px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));color:var(--red)">'+(lang==='en'?'Disable':'Tắt')+'</button>';
+        html+='<button data-mfa-reset="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">'+(lang==='en'?'Reset':'Äáº·t láº¡i')+'</button> ';
+        html+='<button data-mfa-disable="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid color-mix(in srgb, var(--red) 30%, var(--border));border-radius:4px;cursor:pointer;font-size:11px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));color:var(--red)">'+(lang==='en'?'Disable':'Táº¯t')+'</button>';
       } else {
-        html+='<span style="color:var(--text-3);font-size:11px">'+(lang==='en'?'Will enroll on login':'Sẽ đăng ký khi đăng nhập')+'</span>';
+        html+='<span style="color:var(--text-3);font-size:11px">'+(lang==='en'?'Will enroll on login':'Sáº½ Ä‘Äƒng kÃ½ khi Ä‘Äƒng nháº­p')+'</span>';
       }
       html+='</td></tr>';
     });
@@ -5532,14 +5532,14 @@ function renderAdminMfa(){
       var newVal=!requireMfa;
       apiCall('admin_mfa_settings_save',{require_mfa:newVal}).then(function(r){
         if(r&&r.ok){ renderAdminMfa(); }
-        else { alert('Lỗi: '+(r?r.error:'unknown')); }
+        else { alert('Lá»—i: '+(r?r.error:'unknown')); }
       });
     });
 
     el.querySelectorAll('[data-mfa-reset]').forEach(function(btn){
       btn.addEventListener('click',function(){
         var username=this.getAttribute('data-mfa-reset');
-        if(!confirm((lang==='en'?'Reset MFA for ':'Đặt lại MFA cho ')+username+'?')) return;
+        if(!confirm((lang==='en'?'Reset MFA for ':'Äáº·t láº¡i MFA cho ')+username+'?')) return;
         apiCall('admin_mfa_settings_save',{reset_user:username}).then(function(r){
           if(r&&r.ok) renderAdminMfa();
         });
@@ -5549,7 +5549,7 @@ function renderAdminMfa(){
     el.querySelectorAll('[data-mfa-disable]').forEach(function(btn){
       btn.addEventListener('click',function(){
         var username=this.getAttribute('data-mfa-disable');
-        if(!confirm((lang==='en'?'Disable MFA for ':'Tắt MFA cho ')+username+'?')) return;
+        if(!confirm((lang==='en'?'Disable MFA for ':'Táº¯t MFA cho ')+username+'?')) return;
         apiCall('admin_mfa_settings_save',{disable_user:username}).then(function(r){
           if(r&&r.ok) renderAdminMfa();
         });
@@ -5573,13 +5573,13 @@ function renderAdminPortalDisplay(){
   const extRows = (draft.extensions.known || []).map(ext => {
     const checked = enabledExt.has(ext) ? 'checked' : '';
     const typeLabel = ext === 'html'
-      ? (lang==='en' ? 'Inline page' : 'Trang HTML hiển thị trực tiếp')
-      : (lang==='en' ? 'Controlled download / file stream' : 'Tệp được quản lý và tải qua portal');
+      ? (lang==='en' ? 'Inline page' : 'Trang HTML hiá»ƒn thá»‹ trá»±c tiáº¿p')
+      : (lang==='en' ? 'Controlled download / file stream' : 'Tá»‡p Ä‘Æ°á»£c quáº£n lÃ½ vÃ  táº£i qua portal');
     const sourceLabel = customExt.has(ext)
-      ? (lang==='en' ? 'Custom' : 'Tự thêm')
-      : (lang==='en' ? 'Built-in' : 'Mặc định');
+      ? (lang==='en' ? 'Custom' : 'Tá»± thÃªm')
+      : (lang==='en' ? 'Built-in' : 'Máº·c Ä‘á»‹nh');
     const removeBtn = customExt.has(ext)
-      ? `<button class="btn-admin secondary portal-display-mini-btn" onclick="removePortalDisplayCustomExtension('${ext}')">${lang==='en'?'Remove':'Xóa'}</button>`
+      ? `<button class="btn-admin secondary portal-display-mini-btn" onclick="removePortalDisplayCustomExtension('${ext}')">${lang==='en'?'Remove':'XÃ³a'}</button>`
       : `<span class="portal-display-chip is-static">${sourceLabel}</span>`;
     return `<div class="portal-display-row">
       <label class="portal-display-check">
@@ -5601,7 +5601,7 @@ function renderAdminPortalDisplay(){
     const checked = visible ? 'checked' : '';
     const disabled = item.locked ? 'disabled' : '';
     const note = item.locked
-      ? (lang==='en' ? 'Always visible for admin access' : 'Luôn hiện để bảo toàn đường vào trang quản trị')
+      ? (lang==='en' ? 'Always visible for admin access' : 'LuÃ´n hiá»‡n Ä‘á»ƒ báº£o toÃ n Ä‘Æ°á»ng vÃ o trang quáº£n trá»‹')
       : '';
     return `<label class="portal-display-option">
       <input type="checkbox" ${checked} ${disabled} onchange="setPortalDisplayCoreItemVisible('${item.id}', this.checked)">
@@ -5627,7 +5627,7 @@ function renderAdminPortalDisplay(){
         <input type="checkbox" ${checked} onchange="setPortalDisplaySectionVisible('${section.id}', this.checked)">
         <span class="portal-display-option-copy">
           <b>${section.label}</b>
-          <small>${lang==='en'?'Show or hide this whole group in the left sidebar.':'Bật hoặc ẩn cả nhóm này trên thanh bên trái.'}</small>
+          <small>${lang==='en'?'Show or hide this whole group in the left sidebar.':'Báº­t hoáº·c áº©n cáº£ nhÃ³m nÃ y trÃªn thanh bÃªn trÃ¡i.'}</small>
         </span>
       </label>
       <div class="portal-display-option-grid">${categories}</div>
@@ -5638,12 +5638,12 @@ function renderAdminPortalDisplay(){
     <div class="portal-display-admin">
       <div class="portal-display-hero">
         <div>
-          <div class="portal-display-kicker">${lang==='en'?'Portal display control':'Điều khiển hiển thị portal'}</div>
-          <h3>${lang==='en'?'Choose what the portal shows':'Chọn những gì portal được hiển thị'}</h3>
+          <div class="portal-display-kicker">${lang==='en'?'Portal display control':'Äiá»u khiá»ƒn hiá»ƒn thá»‹ portal'}</div>
+          <h3>${lang==='en'?'Choose what the portal shows':'Chá»n nhá»¯ng gÃ¬ portal Ä‘Æ°á»£c hiá»ƒn thá»‹'}</h3>
           <p>${lang==='en'
             ? 'Control which file extensions are indexed on the portal, add extra extensions when needed, and decide which left-sidebar items remain visible to users.'
-            : 'Quản lý các đuôi file được index trên portal, thêm đuôi mới khi cần, và chọn các mục nào ở thanh bên trái sẽ xuất hiện với người dùng.'}</p>
-          ${isLoadingConfig ? `<div class="portal-display-loading-note">${lang==='en'?'Loading saved configuration from server...':'Đang tải cấu hình hiển thị đã lưu từ server...'}</div>` : ''}
+            : 'Quáº£n lÃ½ cÃ¡c Ä‘uÃ´i file Ä‘Æ°á»£c index trÃªn portal, thÃªm Ä‘uÃ´i má»›i khi cáº§n, vÃ  chá»n cÃ¡c má»¥c nÃ o á»Ÿ thanh bÃªn trÃ¡i sáº½ xuáº¥t hiá»‡n vá»›i ngÆ°á»i dÃ¹ng.'}</p>
+          ${isLoadingConfig ? `<div class="portal-display-loading-note">${lang==='en'?'Loading saved configuration from server...':'Äang táº£i cáº¥u hÃ¬nh hiá»ƒn thá»‹ Ä‘Ã£ lÆ°u tá»« server...'}</div>` : ''}
         </div>
       </div>
 
@@ -5651,48 +5651,48 @@ function renderAdminPortalDisplay(){
         <section class="portal-display-card">
           <div class="portal-display-card-head">
             <div>
-              <h4>${lang==='en'?'Displayed file extensions':'Đuôi file hiển thị'}</h4>
+              <h4>${lang==='en'?'Displayed file extensions':'ÄuÃ´i file hiá»ƒn thá»‹'}</h4>
               <p>${lang==='en'
                 ? 'Only enabled extensions are scanned from server folders and shown on the portal. Non-HTML extensions open through controlled download mode.'
-                : 'Chỉ các đuôi file đang bật mới được scan từ thư mục server và hiển thị lên portal. Các đuôi không phải HTML sẽ mở qua chế độ tải tệp được kiểm soát.'}</p>
+                : 'Chá»‰ cÃ¡c Ä‘uÃ´i file Ä‘ang báº­t má»›i Ä‘Æ°á»£c scan tá»« thÆ° má»¥c server vÃ  hiá»ƒn thá»‹ lÃªn portal. CÃ¡c Ä‘uÃ´i khÃ´ng pháº£i HTML sáº½ má»Ÿ qua cháº¿ Ä‘á»™ táº£i tá»‡p Ä‘Æ°á»£c kiá»ƒm soÃ¡t.'}</p>
             </div>
           </div>
           <div class="portal-display-add-row">
-            <input id="portal-display-new-ext" class="portal-display-input" placeholder="${lang==='en'?'Add extension, e.g. dwg or msg':'Thêm đuôi file, ví dụ dwg hoặc msg'}">
-            <button class="btn-admin primary" onclick="addPortalDisplayCustomExtension()">${lang==='en'?'Add extension':'Thêm đuôi file'}</button>
+            <input id="portal-display-new-ext" class="portal-display-input" placeholder="${lang==='en'?'Add extension, e.g. dwg or msg':'ThÃªm Ä‘uÃ´i file, vÃ­ dá»¥ dwg hoáº·c msg'}">
+            <button class="btn-admin primary" onclick="addPortalDisplayCustomExtension()">${lang==='en'?'Add extension':'ThÃªm Ä‘uÃ´i file'}</button>
           </div>
-          <div class="portal-display-list">${extRows || `<div class="portal-display-empty">${lang==='en'?'No extensions configured.':'Chưa có đuôi file nào được cấu hình.'}</div>`}</div>
+          <div class="portal-display-list">${extRows || `<div class="portal-display-empty">${lang==='en'?'No extensions configured.':'ChÆ°a cÃ³ Ä‘uÃ´i file nÃ o Ä‘Æ°á»£c cáº¥u hÃ¬nh.'}</div>`}</div>
         </section>
 
         <section class="portal-display-card">
           <div class="portal-display-card-head">
             <div>
-              <h4>${lang==='en'?'Left sidebar visibility':'Hiển thị thanh bên trái'}</h4>
+              <h4>${lang==='en'?'Left sidebar visibility':'Hiá»ƒn thá»‹ thanh bÃªn trÃ¡i'}</h4>
               <p>${lang==='en'
                 ? 'Choose which fixed portal entries and category groups should appear in the left navigation.'
-                : 'Chọn các mục cố định và các nhóm tài liệu nào sẽ xuất hiện ở thanh điều hướng bên trái.'}</p>
+                : 'Chá»n cÃ¡c má»¥c cá»‘ Ä‘á»‹nh vÃ  cÃ¡c nhÃ³m tÃ i liá»‡u nÃ o sáº½ xuáº¥t hiá»‡n á»Ÿ thanh Ä‘iá»u hÆ°á»›ng bÃªn trÃ¡i.'}</p>
             </div>
           </div>
-          <div class="portal-display-subtitle">${lang==='en'?'Core portal items':'Mục lõi của portal'}</div>
+          <div class="portal-display-subtitle">${lang==='en'?'Core portal items':'Má»¥c lÃµi cá»§a portal'}</div>
           <div class="portal-display-option-grid">${coreRows}</div>
-          <div class="portal-display-subtitle" style="margin-top:16px">${lang==='en'?'Document groups and categories':'Nhóm tài liệu và chuyên mục'}</div>
+          <div class="portal-display-subtitle" style="margin-top:16px">${lang==='en'?'Document groups and categories':'NhÃ³m tÃ i liá»‡u vÃ  chuyÃªn má»¥c'}</div>
           <div class="portal-display-section-stack">${sectionRows}</div>
         </section>
       </div>
 
       <div class="admin-save-bar" id="portal-display-save-bar" style="${portalDisplayConfigDirty?'display:flex':'display:none'}">
         <span class="save-hint">${portalDisplayConfigDirty
-          ? `<b>⚠ ${lang==='en'?'Unsaved portal display changes':'Có thay đổi hiển thị portal chưa lưu'}</b>`
-          : (lang==='en'?'Adjust the display configuration, then click Save':'Điều chỉnh cấu hình hiển thị rồi nhấn Lưu')}</span>
-        <button class="btn-admin secondary" onclick="resetPortalDisplayConfigDraft()">↩ ${lang==='en'?'Reset draft':'Khôi phục bản nháp'}</button>
-        <button class="btn-admin primary" onclick="savePortalDisplayConfig()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+          ? `<b>âš  ${lang==='en'?'Unsaved portal display changes':'CÃ³ thay Ä‘á»•i hiá»ƒn thá»‹ portal chÆ°a lÆ°u'}</b>`
+          : (lang==='en'?'Adjust the display configuration, then click Save':'Äiá»u chá»‰nh cáº¥u hÃ¬nh hiá»ƒn thá»‹ rá»“i nháº¥n LÆ°u')}</span>
+        <button class="btn-admin secondary" onclick="resetPortalDisplayConfigDraft()">â†© ${lang==='en'?'Reset draft':'KhÃ´i phá»¥c báº£n nhÃ¡p'}</button>
+        <button class="btn-admin primary" onclick="savePortalDisplayConfig()" style="padding:8px 24px;font-size:13px">ðŸ’¾ ${lang==='en'?'SAVE':'LÆ¯U'}</button>
       </div>
     </div>`;
 }
 
 function adminFormatRuntimeStamp(value){
   const raw = String(value || '').trim();
-  if(!raw) return lang==='en' ? 'Not available' : 'Chưa có dữ liệu';
+  if(!raw) return lang==='en' ? 'Not available' : 'ChÆ°a cÃ³ dá»¯ liá»‡u';
   try{
     const dt = new Date(raw);
     if(isNaN(dt.getTime())) return raw;
@@ -5720,7 +5720,7 @@ function adminManualRuntimeRecentRows(hierarchy){
     rows.push({
       type:'SO',
       id:String(so.so_number || ''),
-      title:[so.customer_name || so.customer_id || '', so.customer_po ? ('PO ' + so.customer_po) : ''].filter(Boolean).join(' · '),
+      title:[so.customer_name || so.customer_id || '', so.customer_po ? ('PO ' + so.customer_po) : ''].filter(Boolean).join(' Â· '),
       status:String(so.status || ''),
       updated_at:String(so.updated_at || so.created_at || '')
     });
@@ -5736,7 +5736,7 @@ function adminManualRuntimeRecentRows(hierarchy){
         rows.push({
           type:'WO',
           id:String(wo.wo_number || ''),
-          title:['OP' + String(wo.operation_number || '-'), wo.operation_desc || '', wo.machine_id || ''].filter(Boolean).join(' · '),
+          title:['OP' + String(wo.operation_number || '-'), wo.operation_desc || '', wo.machine_id || ''].filter(Boolean).join(' Â· '),
           status:String(wo.status || ''),
           updated_at:String(wo.updated_at || wo.created_at || '')
         });
@@ -5763,7 +5763,7 @@ async function loadAdminManualRuntimeState(options={}){
     adminManualRuntimeState.lastCreated = adminManualRuntimeRecentRows(adminManualRuntimeState.hierarchy)[0] || null;
     adminManualRuntimeState.loaded = true;
   }catch(e){
-    adminManualRuntimeState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load manual runtime data.' : 'Không tải được dữ liệu vận hành thủ công.');
+    adminManualRuntimeState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load manual runtime data.' : 'KhÃ´ng táº£i Ä‘Æ°á»£c dá»¯ liá»‡u váº­n hÃ nh thá»§ cÃ´ng.');
   }finally{
     adminManualRuntimeState.loading = false;
     if(currentPage === 'admin' && adminTab === 'manual_runtime') renderAdminManualRuntime();
@@ -5775,7 +5775,7 @@ function adminOpenMasterEntity(entity){
     window._mdOpenControl(entity);
     return;
   }
-  showToast(lang==='en' ? '⚠ Master Data Control is not ready.' : '⚠ Chưa mở được màn hình Dữ liệu nền.');
+  showToast(lang==='en' ? 'âš  Master Data Control is not ready.' : 'âš  ChÆ°a má»Ÿ Ä‘Æ°á»£c mÃ n hÃ¬nh Dá»¯ liá»‡u ná»n.');
 }
 
 function adminOpenOrderManualCreate(type){
@@ -5792,7 +5792,7 @@ function adminOpenOrderManualCreate(type){
       setTimeout(tryOpen, 180);
       return;
     }
-    showToast(lang==='en' ? '⚠ Could not open the order create form.' : '⚠ Không mở được biểu mẫu tạo đơn.');
+    showToast(lang==='en' ? 'âš  Could not open the order create form.' : 'âš  KhÃ´ng má»Ÿ Ä‘Æ°á»£c biá»ƒu máº«u táº¡o Ä‘Æ¡n.');
   })();
 }
 
@@ -5809,7 +5809,7 @@ function renderAdminManualRuntime(){
   }
 
   if(adminManualRuntimeState.loading && !adminManualRuntimeState.loaded){
-    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading manual runtime workspace...':'Đang tải module nhập tay vận hành...'}</div>`;
+    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading manual runtime workspace...':'Äang táº£i module nháº­p tay váº­n hÃ nh...'}</div>`;
     return;
   }
 
@@ -5818,16 +5818,16 @@ function renderAdminManualRuntime(){
   const orderCounts = adminManualRuntimeCounts(hierarchy);
   const recentRows = adminManualRuntimeRecentRows(hierarchy);
   const checklist = [
-    { label:lang==='en'?'Customers':'Khách hàng', count:(master.customers || []).length, entity:'customers' },
+    { label:lang==='en'?'Customers':'KhÃ¡ch hÃ ng', count:(master.customers || []).length, entity:'customers' },
     { label:'Part Number', count:(master.parts || []).length, entity:'parts' },
     { label:'Revision', count:(master.revisions || []).length, entity:'revisions' },
     { label:'Work center', count:(master.work_centers || []).length, entity:'work_centers' },
-    { label:lang==='en'?'Machines':'Máy', count:(master.machines || []).length, entity:'machines' },
-    { label:lang==='en'?'Operators':'Người vận hành', count:(master.operators || []).length, entity:'operators' }
+    { label:lang==='en'?'Machines':'MÃ¡y', count:(master.machines || []).length, entity:'machines' },
+    { label:lang==='en'?'Operators':'NgÆ°á»i váº­n hÃ nh', count:(master.operators || []).length, entity:'operators' }
   ];
   const missing = checklist.filter(item => Number(item.count || 0) === 0);
   const stats = [
-    { label:lang==='en'?'Customers':'Khách hàng', value:(master.customers || []).length },
+    { label:lang==='en'?'Customers':'KhÃ¡ch hÃ ng', value:(master.customers || []).length },
     { label:'Part Number', value:(master.parts || []).length },
     { label:'Revision', value:(master.revisions || []).length },
     { label:'SO', value:orderCounts.so },
@@ -5840,16 +5840,16 @@ function renderAdminManualRuntime(){
       <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--brand-2) 6%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 48%,color-mix(in srgb, var(--amber) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
         <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
           <div style="max-width:760px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual runtime mode':'Chế độ vận hành nhập tay'}</div>
-            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Operate while Epicor and CNC are offline':'Vẫn vận hành được khi Epicor và CNC chưa kết nối'}</h3>
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual runtime mode':'Cháº¿ Ä‘á»™ váº­n hÃ nh nháº­p tay'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Operate while Epicor and CNC are offline':'Váº«n váº­n hÃ nh Ä‘Æ°á»£c khi Epicor vÃ  CNC chÆ°a káº¿t ná»‘i'}</h3>
             <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
               ? 'Use this area to seed master data, create SO / JO / WO manually, and keep the internal workflow moving before ERP and machine connectors are ready.'
-              : 'Dùng khu vực này để seed dữ liệu nền, tạo SO / JO / WO bằng tay, và giữ workflow nội bộ vận hành trước khi ERP và kết nối máy sẵn sàng.'}</p>
+              : 'DÃ¹ng khu vá»±c nÃ y Ä‘á»ƒ seed dá»¯ liá»‡u ná»n, táº¡o SO / JO / WO báº±ng tay, vÃ  giá»¯ workflow ná»™i bá»™ váº­n hÃ nh trÆ°á»›c khi ERP vÃ  káº¿t ná»‘i mÃ¡y sáºµn sÃ ng.'}</p>
             <div style="margin-top:12px;font-size:13px;color:#486581">${lang==='en'
               ? 'The order create forms now accept manual SO / JO / WO numbers. Leave the field blank if you still want automatic numbering.'
-              : 'Biểu mẫu tạo đơn hiện đã cho phép nhập số SO / JO / WO thủ công. Nếu để trống, hệ thống vẫn tự sinh mã như trước.'}</div>
+              : 'Biá»ƒu máº«u táº¡o Ä‘Æ¡n hiá»‡n Ä‘Ã£ cho phÃ©p nháº­p sá»‘ SO / JO / WO thá»§ cÃ´ng. Náº¿u Ä‘á»ƒ trá»‘ng, há»‡ thá»‘ng váº«n tá»± sinh mÃ£ nhÆ° trÆ°á»›c.'}</div>
           </div>
-          <button class="btn-admin secondary" onclick="loadAdminManualRuntimeState({force:true})">⟳ ${lang==='en'?'Refresh':'Làm mới'}</button>
+          <button class="btn-admin secondary" onclick="loadAdminManualRuntimeState({force:true})">âŸ³ ${lang==='en'?'Refresh':'LÃ m má»›i'}</button>
         </div>
       </section>
 
@@ -5866,16 +5866,16 @@ function renderAdminManualRuntime(){
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Seed minimum master data':'Seed dữ liệu nền tối thiểu'}</div>
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Seed minimum master data':'Seed dá»¯ liá»‡u ná»n tá»‘i thiá»ƒu'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
             ? 'Create the reference set first so lookup fields in the order forms work without Epicor.'
-            : 'Tạo bộ dữ liệu tham chiếu trước để các trường lookup trong form đơn hàng hoạt động ngay cả khi chưa có Epicor.'}</p>
+            : 'Táº¡o bá»™ dá»¯ liá»‡u tham chiáº¿u trÆ°á»›c Ä‘á»ƒ cÃ¡c trÆ°á»ng lookup trong form Ä‘Æ¡n hÃ ng hoáº¡t Ä‘á»™ng ngay cáº£ khi chÆ°a cÃ³ Epicor.'}</p>
           <div style="display:grid;gap:10px">
             ${checklist.map(item => `
               <button type="button" onclick="adminOpenMasterEntity('${item.entity}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? 'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))' : 'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))'};border:1px solid ${item.count > 0 ? 'color-mix(in srgb, var(--green) 28%, var(--border))' : 'color-mix(in srgb, var(--amber) 28%, var(--border))'};cursor:pointer;text-align:left">
                 <span>
                   <strong style="display:block;color:#102a43">${escapeHtml(item.label)}</strong>
-                  <small style="color:#52667a">${item.count > 0 ? (lang==='en'?'Available':'Đã có dữ liệu') : (lang==='en'?'Missing baseline':'Đang thiếu dữ liệu nền')}</small>
+                  <small style="color:#52667a">${item.count > 0 ? (lang==='en'?'Available':'ÄÃ£ cÃ³ dá»¯ liá»‡u') : (lang==='en'?'Missing baseline':'Äang thiáº¿u dá»¯ liá»‡u ná»n')}</small>
                 </span>
                 <strong style="font-size:20px;color:#102a43">${escapeHtml(String(item.count))}</strong>
               </button>
@@ -5884,43 +5884,43 @@ function renderAdminManualRuntime(){
         </article>
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Manual order input':'Nhập tay SO / JO / WO'}</div>
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Manual order input':'Nháº­p tay SO / JO / WO'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
             ? 'Open the governed order forms directly from Admin so operations can start before Epicor inbound is connected.'
-            : 'Mở trực tiếp các form đơn hàng có kiểm soát từ Admin để vận hành có thể bắt đầu trước khi Epicor inbound được kết nối.'}</p>
+            : 'Má»Ÿ trá»±c tiáº¿p cÃ¡c form Ä‘Æ¡n hÃ ng cÃ³ kiá»ƒm soÃ¡t tá»« Admin Ä‘á»ƒ váº­n hÃ nh cÃ³ thá»ƒ báº¯t Ä‘áº§u trÆ°á»›c khi Epicor inbound Ä‘Æ°á»£c káº¿t ná»‘i.'}</p>
           <div style="display:grid;gap:10px">
             <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('so')">+ SO</button>
             <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('jo')">+ JO</button>
             <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('wo')">+ WO</button>
-            <button class="btn-admin secondary" onclick="adminOpenOrderWorkspace()">${lang==='en'?'Open Order Management':'Mở Quản lý đơn hàng'}</button>
+            <button class="btn-admin secondary" onclick="adminOpenOrderWorkspace()">${lang==='en'?'Open Order Management':'Má»Ÿ Quáº£n lÃ½ Ä‘Æ¡n hÃ ng'}</button>
           </div>
           <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px dashed var(--border);color:var(--text-secondary,#475569);font-size:13px;line-height:1.6">
             ${lang==='en'
               ? 'Suggested sequence: Customer -> Part Number -> Revision -> Work center / Machine / Operator -> SO -> JO -> WO.'
-              : 'Trình tự gợi ý: Khách hàng -> Part Number -> Revision -> Work center / Máy / Người vận hành -> SO -> JO -> WO.'}
+              : 'TrÃ¬nh tá»± gá»£i Ã½: KhÃ¡ch hÃ ng -> Part Number -> Revision -> Work center / MÃ¡y / NgÆ°á»i váº­n hÃ nh -> SO -> JO -> WO.'}
           </div>
         </article>
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Current readiness':'Độ sẵn sàng hiện tại'}</div>
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Current readiness':'Äá»™ sáºµn sÃ ng hiá»‡n táº¡i'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${missing.length
             ? (lang==='en'
               ? ('Still missing baseline data for: ' + missing.map(item => item.label).join(', ') + '.')
-              : ('Hiện vẫn đang thiếu dữ liệu nền cho: ' + missing.map(item => item.label).join(', ') + '.'))
+              : ('Hiá»‡n váº«n Ä‘ang thiáº¿u dá»¯ liá»‡u ná»n cho: ' + missing.map(item => item.label).join(', ') + '.'))
             : (lang==='en'
               ? 'The minimum baseline is already in place. You can start creating SO / JO / WO manually now.'
-              : 'Bộ dữ liệu nền tối thiểu đã sẵn sàng. Bạn có thể bắt đầu tạo SO / JO / WO thủ công ngay bây giờ.')}
+              : 'Bá»™ dá»¯ liá»‡u ná»n tá»‘i thiá»ƒu Ä‘Ã£ sáºµn sÃ ng. Báº¡n cÃ³ thá»ƒ báº¯t Ä‘áº§u táº¡o SO / JO / WO thá»§ cÃ´ng ngay bÃ¢y giá».')}
           </p>
           <div style="display:grid;gap:10px">
             <div style="padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);color:var(--text-secondary,#334e68);line-height:1.6">
               ${lang==='en'
                 ? 'Manual mode keeps the workflow alive: users create orders, operators update progress manually, and evidence still links to WO as usual.'
-                : 'Chế độ thủ công vẫn giữ workflow sống: người dùng tạo đơn, người vận hành cập nhật tiến độ bằng tay, và hồ sơ chứng cứ vẫn liên kết về WO như bình thường.'}
+                : 'Cháº¿ Ä‘á»™ thá»§ cÃ´ng váº«n giá»¯ workflow sá»‘ng: ngÆ°á»i dÃ¹ng táº¡o Ä‘Æ¡n, ngÆ°á»i váº­n hÃ nh cáº­p nháº­t tiáº¿n Ä‘á»™ báº±ng tay, vÃ  há»“ sÆ¡ chá»©ng cá»© váº«n liÃªn káº¿t vá» WO nhÆ° bÃ¬nh thÆ°á»ng.'}
             </div>
             <div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber);line-height:1.6">
               ${lang==='en'
                 ? 'Security note: secrets for database and external connectors stay on the server, not in editable frontend fields.'
-                : 'Lưu ý an toàn: secret cho database và kết nối ngoài vẫn nằm ở server, không đặt trong các ô frontend có thể sửa.'}
+                : 'LÆ°u Ã½ an toÃ n: secret cho database vÃ  káº¿t ná»‘i ngoÃ i váº«n náº±m á»Ÿ server, khÃ´ng Ä‘áº·t trong cÃ¡c Ã´ frontend cÃ³ thá»ƒ sá»­a.'}
             </div>
           </div>
         </article>
@@ -5929,22 +5929,22 @@ function renderAdminManualRuntime(){
       <section style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
           <div>
-            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Recent records':'Bản ghi gần nhất'}</div>
+            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Recent records':'Báº£n ghi gáº§n nháº¥t'}</div>
             <div style="margin-top:6px;color:#52667a">${lang==='en'
               ? 'Quickly verify that manual data is being created in the expected order.'
-              : 'Kiểm tra nhanh xem dữ liệu nhập tay đã được tạo đúng trình tự mong muốn hay chưa.'}</div>
+              : 'Kiá»ƒm tra nhanh xem dá»¯ liá»‡u nháº­p tay Ä‘Ã£ Ä‘Æ°á»£c táº¡o Ä‘Ãºng trÃ¬nh tá»± mong muá»‘n hay chÆ°a.'}</div>
           </div>
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Last event':'Lần cập nhật gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp(adminManualRuntimeState.lastCreated && adminManualRuntimeState.lastCreated.updated_at))}</div>
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Last event':'Láº§n cáº­p nháº­t gáº§n nháº¥t'}: ${escapeHtml(adminFormatRuntimeStamp(adminManualRuntimeState.lastCreated && adminManualRuntimeState.lastCreated.updated_at))}</div>
         </div>
         <div style="margin-top:14px;overflow:auto">
           <table class="admin-table" style="width:100%;font-size:12px">
             <thead>
               <tr style="background:var(--bg-surface-alt,#f8fafc)">
-                <th style="padding:10px;text-align:left">${lang==='en'?'Type':'Loại'}</th>
-                <th style="padding:10px;text-align:left">${lang==='en'?'Number':'Mã'}</th>
-                <th style="padding:10px;text-align:left">${lang==='en'?'Description':'Mô tả'}</th>
-                <th style="padding:10px;text-align:left">${lang==='en'?'Status':'Trạng thái'}</th>
-                <th style="padding:10px;text-align:left">${lang==='en'?'Updated':'Cập nhật'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Type':'Loáº¡i'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Number':'MÃ£'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Description':'MÃ´ táº£'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Status':'Tráº¡ng thÃ¡i'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Updated':'Cáº­p nháº­t'}</th>
               </tr>
             </thead>
             <tbody>
@@ -5956,7 +5956,7 @@ function renderAdminManualRuntime(){
                   <td style="padding:10px">${escapeHtml(row.status || '-')}</td>
                   <td style="padding:10px;color:#52667a">${escapeHtml(adminFormatRuntimeStamp(row.updated_at))}</td>
                 </tr>
-              `).join('') : `<tr><td colspan="5" style="padding:14px;color:var(--text-secondary)">${lang==='en'?'No SO / JO / WO records yet.':'Chưa có SO / JO / WO nào được tạo.'}</td></tr>`}
+              `).join('') : `<tr><td colspan="5" style="padding:14px;color:var(--text-secondary)">${lang==='en'?'No SO / JO / WO records yet.':'ChÆ°a cÃ³ SO / JO / WO nÃ o Ä‘Æ°á»£c táº¡o.'}</td></tr>`}
             </tbody>
           </table>
         </div>
@@ -6018,7 +6018,7 @@ async function loadAdminDataSourceState(options={}){
     }
     adminDataSourceState.loaded = true;
   }catch(e){
-    adminDataSourceState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load data source configuration.' : 'Không tải được cấu hình nguồn dữ liệu.');
+    adminDataSourceState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load data source configuration.' : 'KhÃ´ng táº£i Ä‘Æ°á»£c cáº¥u hÃ¬nh nguá»“n dá»¯ liá»‡u.');
   }finally{
     adminDataSourceState.loading = false;
     if(currentPage === 'admin' && adminTab === 'data_sources') renderAdminDataSources();
@@ -6042,11 +6042,11 @@ async function saveAdminDataSourceConfig(){
     }
     adminDataSourceDirty(false);
     await loadAdminDataSourceState({force:true, forceDraftSync:true});
-    showToast(lang==='en' ? '✅ Data source configuration saved.' : '✅ Đã lưu cấu hình nguồn dữ liệu.');
+    showToast(lang==='en' ? 'âœ… Data source configuration saved.' : 'âœ… ÄÃ£ lÆ°u cáº¥u hÃ¬nh nguá»“n dá»¯ liá»‡u.');
   }catch(e){
     adminDataSourceState.loading = false;
     renderAdminDataSources();
-    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'Save failed.' : 'Lưu cấu hình thất bại.')));
+    showToast('âš  ' + ((e && e.message) ? e.message : (lang==='en' ? 'Save failed.' : 'LÆ°u cáº¥u hÃ¬nh tháº¥t báº¡i.')));
   }
 }
 
@@ -6059,7 +6059,7 @@ function renderAdminDataSources(){
   }
 
   if(adminDataSourceState.loading && !adminDataSourceState.loaded){
-    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading data source diagnostics...':'Đang tải chẩn đoán nguồn dữ liệu...'}</div>`;
+    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading data source diagnostics...':'Äang táº£i cháº©n Ä‘oÃ¡n nguá»“n dá»¯ liá»‡u...'}</div>`;
     return;
   }
 
@@ -6082,13 +6082,13 @@ function renderAdminDataSources(){
       <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--amber) 7%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 55%,color-mix(in srgb, var(--purple) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
         <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start">
           <div style="max-width:760px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c2d12">${lang==='en'?'Data source and database control':'Nguồn dữ liệu và Database'}</div>
-            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Inspect and tune the runtime data layer from frontend':'Kiểm tra và chỉnh lớp dữ liệu runtime ngay trên frontend'}</h3>
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c2d12">${lang==='en'?'Data source and database control':'Nguá»“n dá»¯ liá»‡u vÃ  Database'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Inspect and tune the runtime data layer from frontend':'Kiá»ƒm tra vÃ  chá»‰nh lá»›p dá»¯ liá»‡u runtime ngay trÃªn frontend'}</h3>
             <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
               ? 'This panel exposes the active JSON / PostgreSQL runtime mode, shadow-sync health, and the connection profile you can safely adjust without touching server code.'
-              : 'Panel này hiển thị chế độ runtime JSON / PostgreSQL đang hoạt động, sức khỏe shadow-sync, và bộ cấu hình kết nối mà bạn có thể chỉnh an toàn mà không cần sửa code server.'}</p>
+              : 'Panel nÃ y hiá»ƒn thá»‹ cháº¿ Ä‘á»™ runtime JSON / PostgreSQL Ä‘ang hoáº¡t Ä‘á»™ng, sá»©c khá»e shadow-sync, vÃ  bá»™ cáº¥u hÃ¬nh káº¿t ná»‘i mÃ  báº¡n cÃ³ thá»ƒ chá»‰nh an toÃ n mÃ  khÃ´ng cáº§n sá»­a code server.'}</p>
           </div>
-          <button class="btn-admin secondary" onclick="loadAdminDataSourceState({force:true,forceDraftSync:true})">⟳ ${lang==='en'?'Refresh diagnostics':'Làm mới chẩn đoán'}</button>
+          <button class="btn-admin secondary" onclick="loadAdminDataSourceState({force:true,forceDraftSync:true})">âŸ³ ${lang==='en'?'Refresh diagnostics':'LÃ m má»›i cháº©n Ä‘oÃ¡n'}</button>
         </div>
       </section>
 
@@ -6096,33 +6096,33 @@ function renderAdminDataSources(){
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Runtime mode':'Chế độ runtime'}</div>
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Runtime mode':'Cháº¿ Ä‘á»™ runtime'}</div>
           <div id="admin-data-source-mode-preview" style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(adminDataSourceModePreview(draft))}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Applied to new requests immediately':'Áp dụng ngay cho các request mới'}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Applied to new requests immediately':'Ãp dá»¥ng ngay cho cÃ¡c request má»›i'}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
           <div style="font-size:12px;color:#486581">PostgreSQL</div>
-          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${runtimeMode.postgres_reachable ? '#0f766e' : '#b45309'}">${runtimeMode.postgres_reachable ? (lang==='en'?'Reachable':'Kết nối được') : (draft.use_postgres ? (lang==='en'?'Unavailable':'Chưa kết nối') : 'JSON')}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.postgres_error || (lang==='en'?'No PostgreSQL error reported':'Không có lỗi PostgreSQL được báo'))}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${runtimeMode.postgres_reachable ? '#0f766e' : '#b45309'}">${runtimeMode.postgres_reachable ? (lang==='en'?'Reachable':'Káº¿t ná»‘i Ä‘Æ°á»£c') : (draft.use_postgres ? (lang==='en'?'Unavailable':'ChÆ°a káº¿t ná»‘i') : 'JSON')}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.postgres_error || (lang==='en'?'No PostgreSQL error reported':'KhÃ´ng cÃ³ lá»—i PostgreSQL Ä‘Æ°á»£c bÃ¡o'))}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lá»—i shadow-sync'}</div>
           <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'JSON fallback reads':'LÆ°á»£t fallback vá» JSON'}: ${escapeHtml(String(fallbackReads))}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Connector alerts':'Cảnh báo connector'}</div>
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Connector alerts':'Cáº£nh bÃ¡o connector'}</div>
           <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(connectorFailures))}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'WO launch blockers':'WO bị chặn'}: ${escapeHtml(String(launchBlockers))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'WO launch blockers':'WO bá»‹ cháº·n'}: ${escapeHtml(String(launchBlockers))}</div>
         </div>
       </section>
 
       <section style="display:grid;grid-template-columns:minmax(340px,1.25fr) minmax(280px,.95fr);gap:16px">
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'PostgreSQL runtime profile':'Hồ sơ runtime PostgreSQL'}</div>
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'PostgreSQL runtime profile':'Há»“ sÆ¡ runtime PostgreSQL'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
             ? 'Switch between JSON-only, shadow-write, PostgreSQL-primary, and PostgreSQL-only here. Passwords remain on the server and are not exposed in frontend.'
-            : 'Chuyển giữa JSON-only, shadow-write, PostgreSQL-primary và PostgreSQL-only ngay tại đây. Mật khẩu vẫn được giữ ở server và không lộ ra frontend.'}</p>
+            : 'Chuyá»ƒn giá»¯a JSON-only, shadow-write, PostgreSQL-primary vÃ  PostgreSQL-only ngay táº¡i Ä‘Ã¢y. Máº­t kháº©u váº«n Ä‘Æ°á»£c giá»¯ á»Ÿ server vÃ  khÃ´ng lá»™ ra frontend.'}</p>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
             <label style="display:grid;gap:6px">
               <span style="font-size:12px;color:#486581">Host</span>
@@ -6137,7 +6137,7 @@ function renderAdminDataSources(){
               <input class="sj-input" value="${escapeHtml(String(draft.database || ''))}" oninput="adminDataSourceSetField('database', this.value)">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Username':'Tài khoản'}</span>
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Username':'TÃ i khoáº£n'}</span>
               <input class="sj-input" value="${escapeHtml(String(draft.username || ''))}" oninput="adminDataSourceSetField('username', this.value)">
             </label>
             <label style="display:grid;gap:6px">
@@ -6151,7 +6151,7 @@ function renderAdminDataSources(){
               </select>
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Connect timeout (s)':'Timeout kết nối (giây)'}</span>
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Connect timeout (s)':'Timeout káº¿t ná»‘i (giÃ¢y)'}</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.connect_timeout || 5))}" oninput="adminDataSourceSetField('connect_timeout', Number(this.value || 0))">
             </label>
             <label style="display:grid;gap:6px">
@@ -6159,18 +6159,18 @@ function renderAdminDataSources(){
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.statement_timeout || 30000))}" oninput="adminDataSourceSetField('statement_timeout', Number(this.value || 0))">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry count':'Số lần retry khi đọc'}</span>
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry count':'Sá»‘ láº§n retry khi Ä‘á»c'}</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_count || 3))}" oninput="adminDataSourceSetField('read_retry_count', Number(this.value || 0))">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry delay (ms)':'Độ trễ retry khi đọc (ms)'}</span>
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry delay (ms)':'Äá»™ trá»… retry khi Ä‘á»c (ms)'}</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_delay_ms || 150))}" oninput="adminDataSourceSetField('read_retry_delay_ms', Number(this.value || 0))">
             </label>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px">
             <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
               <input type="checkbox" ${draft.use_postgres ? 'checked' : ''} onchange="adminDataSourceSetField('use_postgres', this.checked)">
-              <span><strong>use_postgres</strong><br><small>${lang==='en'?'Enable PostgreSQL path':'Bật đường đọc/ghi PostgreSQL'}</small></span>
+              <span><strong>use_postgres</strong><br><small>${lang==='en'?'Enable PostgreSQL path':'Báº­t Ä‘Æ°á»ng Ä‘á»c/ghi PostgreSQL'}</small></span>
             </label>
             <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
               <input type="checkbox" ${draft.shadow_write ? 'checked' : ''} onchange="adminDataSourceSetField('shadow_write', this.checked)">
@@ -6178,50 +6178,50 @@ function renderAdminDataSources(){
             </label>
             <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
               <input type="checkbox" ${draft.json_fallback ? 'checked' : ''} onchange="adminDataSourceSetField('json_fallback', this.checked)">
-              <span><strong>json_fallback</strong><br><small>${lang==='en'?'Fallback to JSON if PostgreSQL read fails':'Fallback về JSON nếu đọc PostgreSQL lỗi'}</small></span>
+              <span><strong>json_fallback</strong><br><small>${lang==='en'?'Fallback to JSON if PostgreSQL read fails':'Fallback vá» JSON náº¿u Ä‘á»c PostgreSQL lá»—i'}</small></span>
             </label>
           </div>
           <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber);line-height:1.6;font-size:13px">
             ${lang==='en'
               ? 'Frontend edits only non-secret parameters. Database passwords and external connector tokens remain in server environment variables.'
-              : 'Frontend chỉ chỉnh các tham số không chứa bí mật. Mật khẩu database và token kết nối ngoài vẫn nằm trong biến môi trường của server.'}
+              : 'Frontend chá»‰ chá»‰nh cÃ¡c tham sá»‘ khÃ´ng chá»©a bÃ­ máº­t. Máº­t kháº©u database vÃ  token káº¿t ná»‘i ngoÃ i váº«n náº±m trong biáº¿n mÃ´i trÆ°á»ng cá»§a server.'}
           </div>
         </article>
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px;display:grid;gap:12px">
           <div>
-            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Integration diagnostics':'Chẩn đoán tích hợp'}</div>
+            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Integration diagnostics':'Cháº©n Ä‘oÃ¡n tÃ­ch há»£p'}</div>
             <p style="margin:8px 0 0;color:#52667a;line-height:1.6">${lang==='en'
               ? 'Use these cards to judge whether manual mode is still necessary or whether Epicor / CNC links are healthy enough to rely on.'
-              : 'Dùng các thẻ này để đánh giá xem có còn cần chế độ nhập tay hay không, hoặc Epicor / CNC đã đủ khỏe để dựa vào kết nối hay chưa.'}</p>
+              : 'DÃ¹ng cÃ¡c tháº» nÃ y Ä‘á»ƒ Ä‘Ã¡nh giÃ¡ xem cÃ³ cÃ²n cáº§n cháº¿ Ä‘á»™ nháº­p tay hay khÃ´ng, hoáº·c Epicor / CNC Ä‘Ã£ Ä‘á»§ khá»e Ä‘á»ƒ dá»±a vÃ o káº¿t ná»‘i hay chÆ°a.'}</p>
           </div>
 
           <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
             <div style="font-size:12px;color:#486581">Epicor</div>
-            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${epicorHealth.configured ? (lang==='en'?'Configured':'Đã cấu hình') : (lang==='en'?'Not configured':'Chưa cấu hình')}</div>
-            <div style="margin-top:6px;font-size:13px;color:#52667a">${epicorHealth.dry_run ? (lang==='en'?'Dry-run is active while transport is incomplete.':'Đang ở chế độ dry-run khi transport chưa cấu hình đủ.') : (lang==='en'?'Live transport is active.':'Transport thực đang hoạt động.')}</div>
-            <div style="margin-top:8px;font-size:12px;color:#52667a">${lang==='en'?'Company':'Company'}: ${escapeHtml(String(epicorHealth.company || '-'))} · Plant: ${escapeHtml(String(epicorHealth.plant || '-'))}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${epicorHealth.configured ? (lang==='en'?'Configured':'ÄÃ£ cáº¥u hÃ¬nh') : (lang==='en'?'Not configured':'ChÆ°a cáº¥u hÃ¬nh')}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${epicorHealth.dry_run ? (lang==='en'?'Dry-run is active while transport is incomplete.':'Äang á»Ÿ cháº¿ Ä‘á»™ dry-run khi transport chÆ°a cáº¥u hÃ¬nh Ä‘á»§.') : (lang==='en'?'Live transport is active.':'Transport thá»±c Ä‘ang hoáº¡t Ä‘á»™ng.')}</div>
+            <div style="margin-top:8px;font-size:12px;color:#52667a">${lang==='en'?'Company':'Company'}: ${escapeHtml(String(epicorHealth.company || '-'))} Â· Plant: ${escapeHtml(String(epicorHealth.plant || '-'))}</div>
           </div>
 
           <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
-            <div style="font-size:12px;color:#486581">${lang==='en'?'CNC connectors':'Kết nối CNC'}</div>
-            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(connectorKpis.connectors_healthy || 0))}/${escapeHtml(String(connectorKpis.connectors_total || 0))} ${lang==='en'?'healthy':'ổn định'}</div>
-            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'Manual bridges':'Manual bridge'}: ${escapeHtml(String(connectorKpis.manual_bridges || 0))} · ${lang==='en'?'Stale links':'Link stale'}: ${escapeHtml(String(connectorKpis.connectors_stale || 0))}</div>
+            <div style="font-size:12px;color:#486581">${lang==='en'?'CNC connectors':'Káº¿t ná»‘i CNC'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(connectorKpis.connectors_healthy || 0))}/${escapeHtml(String(connectorKpis.connectors_total || 0))} ${lang==='en'?'healthy':'á»•n Ä‘á»‹nh'}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'Manual bridges':'Manual bridge'}: ${escapeHtml(String(connectorKpis.manual_bridges || 0))} Â· ${lang==='en'?'Stale links':'Link stale'}: ${escapeHtml(String(connectorKpis.connectors_stale || 0))}</div>
           </div>
 
           <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
-            <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow observability':'Quan sát shadow'}</div>
-            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lỗi'}</div>
-            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
-            <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Last config update':'Lần lưu cấu hình gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp((cfgRes.override_meta || {}).updated || ''))}</div>
+            <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow observability':'Quan sÃ¡t shadow'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lá»—i'}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'JSON fallback reads':'LÆ°á»£t fallback vá» JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+            <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Last config update':'Láº§n lÆ°u cáº¥u hÃ¬nh gáº§n nháº¥t'}: ${escapeHtml(adminFormatRuntimeStamp((cfgRes.override_meta || {}).updated || ''))}</div>
           </div>
         </article>
       </section>
 
       <div class="admin-save-bar" id="admin-data-source-save-bar" style="${adminDataSourceState.dirty ? 'display:flex' : 'display:none'}">
-        <span class="save-hint"><b>⚠ ${lang==='en'?'Unsaved data source changes':'Có thay đổi nguồn dữ liệu chưa lưu'}</b></span>
-        <button class="btn-admin secondary" onclick="adminDataSourceResetDraft()">${lang==='en'?'Reset draft':'Khôi phục bản nháp'}</button>
-        <button class="btn-admin primary" onclick="saveAdminDataSourceConfig()">${adminDataSourceState.loading ? (lang==='en'?'Saving...':'Đang lưu...') : (lang==='en'?'Save configuration':'Lưu cấu hình')}</button>
+        <span class="save-hint"><b>âš  ${lang==='en'?'Unsaved data source changes':'CÃ³ thay Ä‘á»•i nguá»“n dá»¯ liá»‡u chÆ°a lÆ°u'}</b></span>
+        <button class="btn-admin secondary" onclick="adminDataSourceResetDraft()">${lang==='en'?'Reset draft':'KhÃ´i phá»¥c báº£n nhÃ¡p'}</button>
+        <button class="btn-admin primary" onclick="saveAdminDataSourceConfig()">${adminDataSourceState.loading ? (lang==='en'?'Saving...':'Äang lÆ°u...') : (lang==='en'?'Save configuration':'LÆ°u cáº¥u hÃ¬nh')}</button>
       </div>
     </div>`;
 }
@@ -6235,7 +6235,7 @@ function renderAdminUsers(){
   
   const viewToggle = `<div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg-surface,#fff)">
     <button onclick="adminUserViewMode='cards';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;cursor:pointer;background:${adminUserViewMode==='cards'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='cards'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="Card view">&#9638;</button>
-    <button onclick="adminUserViewMode='list';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;border-left:1px solid var(--border);cursor:pointer;background:${adminUserViewMode==='list'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='list'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="List view">☰</button>
+    <button onclick="adminUserViewMode='list';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;border-left:1px solid var(--border);cursor:pointer;background:${adminUserViewMode==='list'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='list'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="List view">â˜°</button>
   </div>`;
 
   let usersHtml = '';
@@ -6244,12 +6244,12 @@ function renderAdminUsers(){
       <thead><tr style="background:var(--bg-surface-alt,#f8fafc)">
         <th style="padding:8px 10px;text-align:left;font-size:11px">#</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Status':'TT'}</th>
-        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Name':'Họ tên'}</th>
+        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Name':'Há» tÃªn'}</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px">Username</th>
-        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Department':'Phòng ban'}</th>
-        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Title':'Chức danh'}</th>
-        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Role':'Vai trò'}</th>
-        <th style="padding:8px 10px;text-align:center;font-size:11px">${lang==='en'?'Actions':'Thao tác'}</th>
+        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Department':'PhÃ²ng ban'}</th>
+        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Title':'Chá»©c danh'}</th>
+        <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Role':'Vai trÃ²'}</th>
+        <th style="padding:8px 10px;text-align:center;font-size:11px">${lang==='en'?'Actions':'Thao tÃ¡c'}</th>
       </tr></thead>
       <tbody>
       ${USERS.map((u,idx) => {
@@ -6257,17 +6257,17 @@ function renderAdminUsers(){
         const dept = deptMap[u.dept];
         return `<tr class="user-list-row" data-name="${escapeHtml((u.name||'').toLowerCase())}" data-dept="${escapeHtml(u.dept||'')}" style="border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent);${u.active===false?'opacity:.5;background:color-mix(in srgb, var(--red) 8%, var(--bg-surface,#fff))':''}">
           <td style="padding:6px 10px;color:var(--text-3)">${idx+1}</td>
-          <td style="padding:6px 10px">${u.active!==false?'🟢':'🔴'}</td>
+          <td style="padding:6px 10px">${u.active!==false?'ðŸŸ¢':'ðŸ”´'}</td>
           <td style="padding:6px 10px;font-weight:600">${escapeHtml(u.name)}</td>
           <td style="padding:6px 10px;font-family:var(--mono);font-size:11px;color:var(--text-3)">@${escapeHtml(u.username)}</td>
           <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${dept?dept.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${dept?dept.color:'var(--text-secondary,#666)'}">${u.dept}${dept?' '+(lang==='en'?dept.labelEn:dept.label):''}</span></td>
           <td style="padding:6px 10px;font-size:11px">${escapeHtml(u.title)}</td>
           <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${r?r.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${r?r.color:'var(--text-secondary,#666)'}">${r?r.icon:''} ${r?r.label:u.role}</span></td>
           <td style="padding:6px 10px;text-align:center;white-space:nowrap">
-            <button onclick="showUserModal('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">✏</button>
-            <button onclick="editUserPerms('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">🔐</button>
-            <button onclick="toggleUserActive('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">${u.active!==false?'⏸':'▶'}</button>
-            <button onclick="deleteUserConfirm('${u.id}')" class="btn-admin danger sm" style="padding:3px 8px;font-size:10px">🗑</button>
+            <button onclick="showUserModal('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">âœ</button>
+            <button onclick="editUserPerms('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">ðŸ”</button>
+            <button onclick="toggleUserActive('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">${u.active!==false?'â¸':'â–¶'}</button>
+            <button onclick="deleteUserConfirm('${u.id}')" class="btn-admin danger sm" style="padding:3px 8px;font-size:10px">ðŸ—‘</button>
           </td>
         </tr>`;
       }).join('')}
@@ -6285,19 +6285,19 @@ function renderAdminUsers(){
             <div class="uc-avatar" style="background:${colorBg}">${initials}</div>
             <div class="uc-info">
               <div class="uc-name">${escapeHtml(u.name)}</div>
-              <div class="uc-title">${escapeHtml(u.title)} · @${escapeHtml(u.username)}</div>
+              <div class="uc-title">${escapeHtml(u.title)} Â· @${escapeHtml(u.username)}</div>
             </div>
-            <span style="font-size:18px">${u.active!==false?'🟢':'🔴'}</span>
+            <span style="font-size:18px">${u.active!==false?'ðŸŸ¢':'ðŸ”´'}</span>
           </div>
           <div class="uc-meta">
             <span class="tag" style="background:${colorBg}15;color:${colorBg}">${r?r.icon:''} ${r?r.label:u.role}</span>
             <span class="tag" style="background:${dept?dept.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${dept?dept.color:'var(--text-secondary,#666)'}">${u.dept} ${dept?(lang==='en'?dept.labelEn:dept.label):''}</span>
           </div>
           <div class="uc-actions">
-            <button onclick="showUserModal('${u.id}')">✏ ${T('admin_edit')}</button>
-            <button onclick="editUserPerms('${u.id}')">🔐 Quyền</button>
-            <button class="danger" onclick="toggleUserActive('${u.id}')">${u.active!==false?'⏸ Khóa':'▶ Mở'}</button>
-            <button class="danger" onclick="deleteUserConfirm('${u.id}')">🗑</button>
+            <button onclick="showUserModal('${u.id}')">âœ ${T('admin_edit')}</button>
+            <button onclick="editUserPerms('${u.id}')">ðŸ” Quyá»n</button>
+            <button class="danger" onclick="toggleUserActive('${u.id}')">${u.active!==false?'â¸ KhÃ³a':'â–¶ Má»Ÿ'}</button>
+            <button class="danger" onclick="deleteUserConfirm('${u.id}')">ðŸ—‘</button>
           </div>
         </div>`;
       }).join('')}
@@ -6306,17 +6306,17 @@ function renderAdminUsers(){
 
   el.innerHTML = `
     <div class="admin-toolbar">
-      <input type="text" placeholder="${lang==='en'?'Search users...':'Tìm người dùng...'}" oninput="filterAdminUserCards(this.value)" id="admin-user-search">
+      <input type="text" placeholder="${lang==='en'?'Search users...':'TÃ¬m ngÆ°á»i dÃ¹ng...'}" oninput="filterAdminUserCards(this.value)" id="admin-user-search">
       <select id="admin-user-dept-filter" onchange="filterAdminUserCards(document.getElementById('admin-user-search').value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:140px;background:var(--bg-surface,#fff);color:var(--text-primary)">
-        <option value="">${lang==='en'?'All departments':'Tất cả phòng ban'}</option>
-        ${DEPARTMENTS.map(d=>`<option value="${d.code}">${d.code} — ${lang==='en'?d.labelEn:d.label}</option>`).join('')}
+        <option value="">${lang==='en'?'All departments':'Táº¥t cáº£ phÃ²ng ban'}</option>
+        ${DEPARTMENTS.map(d=>`<option value="${d.code}">${d.code} â€” ${lang==='en'?d.labelEn:d.label}</option>`).join('')}
       </select>
       ${viewToggle}
       <button class="btn-admin primary" onclick="showUserModal()">+ ${T('admin_add_user')}</button>
       ${canExportUsersData() ? `
-      <button class="btn-admin secondary" onclick="exportUsersExcel()" title="${lang==='en'?'Export to Excel':'Xuất Excel'}">📥 Excel</button>
-      <label class="btn-admin secondary" style="cursor:pointer" title="${lang==='en'?'Import from Excel':'Nhập từ Excel'}">
-        📤 ${lang==='en'?'Import':'Nhập'}
+      <button class="btn-admin secondary" onclick="exportUsersExcel()" title="${lang==='en'?'Export to Excel':'Xuáº¥t Excel'}">ðŸ“¥ Excel</button>
+      <label class="btn-admin secondary" style="cursor:pointer" title="${lang==='en'?'Import from Excel':'Nháº­p tá»« Excel'}">
+        ðŸ“¤ ${lang==='en'?'Import':'Nháº­p'}
         <input type="file" accept=".xlsx,.xls,.csv" onchange="importUsersExcel(this)" style="display:none">
       </label>
       ` : ''}
@@ -6340,16 +6340,16 @@ function filterAdminUserCards(q){
   });
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // EXCEL EXPORT / IMPORT USERS
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function exportUsersExcel(){
   if(!canExportUsersData()){
-    showToast('🔒 '+(lang==='en'?'No permission to export user data':'Không có quyền xuất dữ liệu người dùng'));
+    showToast('ðŸ”’ '+(lang==='en'?'No permission to export user data':'KhÃ´ng cÃ³ quyá»n xuáº¥t dá»¯ liá»‡u ngÆ°á»i dÃ¹ng'));
     return;
   }
   // Build CSV with BOM for Excel compatibility (Vietnamese)
-  const headers = ['ID','Username','Password','Họ tên / Name','CCCD / Citizen ID','Số ĐT / Phone','Email cá nhân / Personal Email','Phòng ban / Dept','Chức danh / Title','Vai trò / Role','Role Key','Trạng thái / Status','MFA'];
+  const headers = ['ID','Username','Password','Há» tÃªn / Name','CCCD / Citizen ID','Sá»‘ ÄT / Phone','Email cÃ¡ nhÃ¢n / Personal Email','PhÃ²ng ban / Dept','Chá»©c danh / Title','Vai trÃ² / Role','Role Key','Tráº¡ng thÃ¡i / Status','MFA'];
   let csv = headers.join(',') + '\n';
   USERS.forEach(u=>{
     const roleDef = ROLES[u.role] || {};
@@ -6375,12 +6375,12 @@ function exportUsersExcel(){
   a.download = 'HESEM_Users_'+new Date().toISOString().slice(0,10)+'.csv';
   document.body.appendChild(a); a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
-  showToast('✅ '+(lang==='en'?'Exported '+USERS.length+' users':'Đã xuất '+USERS.length+' người dùng'));
+  showToast('âœ… '+(lang==='en'?'Exported '+USERS.length+' users':'ÄÃ£ xuáº¥t '+USERS.length+' ngÆ°á»i dÃ¹ng'));
 }
 
 function importUsersExcel(input){
   if(!canExportUsersData()){
-    showToast('🔒 '+(lang==='en'?'No permission to import user data':'Không có quyền nhập dữ liệu người dùng'));
+    showToast('ðŸ”’ '+(lang==='en'?'No permission to import user data':'KhÃ´ng cÃ³ quyá»n nháº­p dá»¯ liá»‡u ngÆ°á»i dÃ¹ng'));
     input.value='';
     return;
   }
@@ -6397,7 +6397,7 @@ function importUsersExcel(input){
       // Parse CSV
       const lines = text.split(/\r?\n/).filter(l=>l.trim());
       if(lines.length < 2){
-        showToast('⚠ '+(lang==='en'?'File is empty or has no data rows':'File trống hoặc không có dữ liệu'));
+        showToast('âš  '+(lang==='en'?'File is empty or has no data rows':'File trá»‘ng hoáº·c khÃ´ng cÃ³ dá»¯ liá»‡u'));
         return;
       }
       
@@ -6409,22 +6409,22 @@ function importUsersExcel(input){
       const colMap = {};
       headers.forEach((h,i)=>{
         const hl = h.toLowerCase().trim();
-        if(hl.includes('username') || hl === 'tài khoản') colMap.username = i;
-        else if(hl.includes('password') || hl.includes('mật khẩu')) colMap.password = i;
-        else if(hl.includes('họ tên') || hl.includes('name') || hl === 'full name') colMap.name = i;
-        else if(hl.includes('cccd') || hl.includes('citizen') || hl.includes('cmnd') || hl.includes('căn cước')) colMap.cccd = i;
-        else if(hl.includes('số đt') || hl.includes('phone') || hl.includes('điện thoại') || hl.includes('sdt')) colMap.phone = i;
-        else if(hl.includes('email cá nhân') || hl.includes('personal email') || hl.includes('personal_email')) colMap.personal_email = i;
-        else if(hl.includes('phòng ban') || hl.includes('dept')) colMap.dept = i;
-        else if(hl.includes('chức danh') || hl.includes('title')) colMap.title = i;
-        else if(hl.includes('role key') || hl === 'vai trò key') colMap.role = i;
-        else if((hl.includes('vai trò') || hl.includes('role')) && !colMap.role) colMap.roleLabel = i;
+        if(hl.includes('username') || hl === 'tÃ i khoáº£n') colMap.username = i;
+        else if(hl.includes('password') || hl.includes('máº­t kháº©u')) colMap.password = i;
+        else if(hl.includes('há» tÃªn') || hl.includes('name') || hl === 'full name') colMap.name = i;
+        else if(hl.includes('cccd') || hl.includes('citizen') || hl.includes('cmnd') || hl.includes('cÄƒn cÆ°á»›c')) colMap.cccd = i;
+        else if(hl.includes('sá»‘ Ä‘t') || hl.includes('phone') || hl.includes('Ä‘iá»‡n thoáº¡i') || hl.includes('sdt')) colMap.phone = i;
+        else if(hl.includes('email cÃ¡ nhÃ¢n') || hl.includes('personal email') || hl.includes('personal_email')) colMap.personal_email = i;
+        else if(hl.includes('phÃ²ng ban') || hl.includes('dept')) colMap.dept = i;
+        else if(hl.includes('chá»©c danh') || hl.includes('title')) colMap.title = i;
+        else if(hl.includes('role key') || hl === 'vai trÃ² key') colMap.role = i;
+        else if((hl.includes('vai trÃ²') || hl.includes('role')) && !colMap.role) colMap.roleLabel = i;
         else if(hl.includes('email') && !colMap.personal_email) colMap.email = i;
-        else if(hl.includes('trạng thái') || hl.includes('status')) colMap.status = i;
+        else if(hl.includes('tráº¡ng thÃ¡i') || hl.includes('status')) colMap.status = i;
       });
       
       if(!colMap.username && colMap.name === undefined){
-        showToast('⚠ '+(lang==='en'?'Cannot find Username or Name column':'Không tìm thấy cột Username hoặc Họ tên'));
+        showToast('âš  '+(lang==='en'?'Cannot find Username or Name column':'KhÃ´ng tÃ¬m tháº¥y cá»™t Username hoáº·c Há» tÃªn'));
         return;
       }
       
@@ -6486,15 +6486,15 @@ function importUsersExcel(input){
         imported++;
       }
       
-      showToast('✅ '+(lang==='en'
+      showToast('âœ… '+(lang==='en'
         ?`Imported ${imported} users${skipped?' ('+skipped+' skipped)':''}`
-        :`Đã nhập ${imported} người dùng${skipped?' ('+skipped+' bỏ qua)':''}`));
+        :`ÄÃ£ nháº­p ${imported} ngÆ°á»i dÃ¹ng${skipped?' ('+skipped+' bá» qua)':''}`));
       
       markUnsaved();
       renderAdmin();
     }catch(err){
       console.error('Import error:', err);
-      showToast('⚠ '+(lang==='en'?'Import failed: ':'Nhập thất bại: ')+err.message);
+      showToast('âš  '+(lang==='en'?'Import failed: ':'Nháº­p tháº¥t báº¡i: ')+err.message);
     }
   };
   reader.readAsText(file, 'UTF-8');
@@ -6533,18 +6533,18 @@ async function deleteUserConfirm(userId){
   modal.innerHTML=`
     <div class="modal" style="max-width:480px">
       <div class="modal-header">
-        <div class="modal-title">${lang==='en'?'Remove user':'Xóa người dùng'}: ${escapeHtml(u.name)}</div>
-        <button class="icon-btn" onclick="closeModal()" aria-label="Close">✕</button>
+        <div class="modal-title">${lang==='en'?'Remove user':'XÃ³a ngÆ°á»i dÃ¹ng'}: ${escapeHtml(u.name)}</div>
+        <button class="icon-btn" onclick="closeModal()" aria-label="Close">âœ•</button>
       </div>
       <div class="modal-body" style="padding:20px 24px;display:flex;flex-direction:column;gap:12px">
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">@${escapeHtml(u.username)} · ${escapeHtml(u.dept)} · ${escapeHtml(u.title)}</div>
+        <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">@${escapeHtml(u.username)} Â· ${escapeHtml(u.dept)} Â· ${escapeHtml(u.title)}</div>
         <button onclick="doSoftDeleteUser('${u.id}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:10px;cursor:pointer;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='color-mix(in srgb, var(--amber) 28%, var(--border))'">
-          <span style="font-size:22px">⏸</span>
-          <div><div style="font-size:13px;font-weight:700;color:var(--amber)">${lang==='en'?'Deactivate (Soft delete)':'Vô hiệu hóa (Xóa mềm)'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--amber) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'User becomes inactive but data is preserved. Can be reactivated later.':'Người dùng bị khóa nhưng dữ liệu được giữ lại. Có thể kích hoạt lại sau.'}</div></div>
+          <span style="font-size:22px">â¸</span>
+          <div><div style="font-size:13px;font-weight:700;color:var(--amber)">${lang==='en'?'Deactivate (Soft delete)':'VÃ´ hiá»‡u hÃ³a (XÃ³a má»m)'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--amber) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'User becomes inactive but data is preserved. Can be reactivated later.':'NgÆ°á»i dÃ¹ng bá»‹ khÃ³a nhÆ°ng dá»¯ liá»‡u Ä‘Æ°á»£c giá»¯ láº¡i. CÃ³ thá»ƒ kÃ­ch hoáº¡t láº¡i sau.'}</div></div>
         </button>
         <button onclick="doHardDeleteUser('${u.id}','${escapeHtml(u.username)}','${escapeHtml(u.name)}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid color-mix(in srgb, var(--red) 28%, var(--border));border-radius:10px;cursor:pointer;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='color-mix(in srgb, var(--red) 28%, var(--border))'">
-          <span style="font-size:22px">🗑</span>
-          <div><div style="font-size:13px;font-weight:700;color:var(--red)">${lang==='en'?'Delete permanently':'Xóa hoàn toàn'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--red) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'Completely removes the user from the system. This action cannot be undone.':'Xóa hoàn toàn người dùng khỏi hệ thống. Hành động này không thể hoàn tác.'}</div></div>
+          <span style="font-size:22px">ðŸ—‘</span>
+          <div><div style="font-size:13px;font-weight:700;color:var(--red)">${lang==='en'?'Delete permanently':'XÃ³a hoÃ n toÃ n'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--red) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'Completely removes the user from the system. This action cannot be undone.':'XÃ³a hoÃ n toÃ n ngÆ°á»i dÃ¹ng khá»i há»‡ thá»‘ng. HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c.'}</div></div>
         </button>
       </div>
     </div>`;
@@ -6562,7 +6562,7 @@ async function doSoftDeleteUser(userId){
       role: u.role||'employee', active: false
     });
     if(res && res.ok){
-      showToast(lang==='en'?'✅ Deactivated':'✅ Đã vô hiệu hóa');
+      showToast(lang==='en'?'âœ… Deactivated':'âœ… ÄÃ£ vÃ´ hiá»‡u hÃ³a');
       await loadUsersFromServerIfAdmin();
       renderAdmin();
     } else {
@@ -6572,16 +6572,16 @@ async function doSoftDeleteUser(userId){
 }
 
 async function doHardDeleteUser(userId,username,name){
-  if(!confirm((lang==='en'?'⚠ PERMANENTLY DELETE ':'⚠ XÓA VĨNH VIỄN ')+name+'?\n\n'+(lang==='en'?'This will completely remove the user from the database. This action CANNOT be undone!':'Điều này sẽ xóa hoàn toàn người dùng khỏi cơ sở dữ liệu. Hành động này KHÔNG THỂ hoàn tác!'))) return;
+  if(!confirm((lang==='en'?'âš  PERMANENTLY DELETE ':'âš  XÃ“A VÄ¨NH VIá»„N ')+name+'?\n\n'+(lang==='en'?'This will completely remove the user from the database. This action CANNOT be undone!':'Äiá»u nÃ y sáº½ xÃ³a hoÃ n toÃ n ngÆ°á»i dÃ¹ng khá»i cÆ¡ sá»Ÿ dá»¯ liá»‡u. HÃ nh Ä‘á»™ng nÃ y KHÃ”NG THá»‚ hoÃ n tÃ¡c!'))) return;
   closeModal();
   try{
     const res = await apiCall('admin_user_delete', { username: username });
     if(res && res.ok){
-      showToast(lang==='en'?'✅ User permanently deleted':'✅ Đã xóa hoàn toàn người dùng');
+      showToast(lang==='en'?'âœ… User permanently deleted':'âœ… ÄÃ£ xÃ³a hoÃ n toÃ n ngÆ°á»i dÃ¹ng');
       await loadUsersFromServerIfAdmin();
       renderAdmin();
     } else {
-      const errMsg = res&&res.error==='cannot_delete_self' ? (lang==='en'?'Cannot delete yourself':'Không thể xóa chính mình') : ((res&&res.error)?res.error:'error');
+      const errMsg = res&&res.error==='cannot_delete_self' ? (lang==='en'?'Cannot delete yourself':'KhÃ´ng thá»ƒ xÃ³a chÃ­nh mÃ¬nh') : ((res&&res.error)?res.error:'error');
       showToast('\u26A0 '+errMsg);
     }
   }catch(e){ showToast('\u26A0 Server error'); }
@@ -6591,7 +6591,7 @@ function showUserModal(userId){
   const isEdit = !!userId;
   const u0 = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:''};
   if(isEdit && !u0){
-    showToast(lang==='en'?'⚠ User not found':'⚠ Không tìm thấy người dùng');
+    showToast(lang==='en'?'âš  User not found':'âš  KhÃ´ng tÃ¬m tháº¥y ngÆ°á»i dÃ¹ng');
     return;
   }
 
@@ -6603,7 +6603,7 @@ function showUserModal(userId){
   const roleKeys = Object.keys(ROLES||{});
   const roleOptions = roleKeys.map(k=>`<option value="${k}" ${String(u0.role)===String(k)?'selected':''}>${escapeHtml((ROLES[k]?.icon||'')+' '+(ROLES[k]?.label||k))}</option>`).join('');
   
-  const deptOptions = DEPARTMENTS.map(d=>`<option value="${d.code}" ${u0.dept===d.code?'selected':''}>${d.code} — ${lang==='en'?d.labelEn:d.label}</option>`).join('');
+  const deptOptions = DEPARTMENTS.map(d=>`<option value="${d.code}" ${u0.dept===d.code?'selected':''}>${d.code} â€” ${lang==='en'?d.labelEn:d.label}</option>`).join('');
   
   const scopedTitles = titlesForDept(u0.dept)||[];
   const titleOptions = scopedTitles.map(t=>`<option value="${escapeHtml(t)}" ${u0.title===t?'selected':''}>${escapeHtml(t)}</option>`).join('');
@@ -6614,102 +6614,102 @@ function showUserModal(userId){
   modal.innerHTML=`
     <div class="modal" style="max-width:760px">
       <div class="modal-header">
-        <div class="modal-title">${lang==='en'?(isEdit?'Edit user':'Create user'):(isEdit?'Sửa người dùng':'Tạo người dùng')}</div>
-        <button class="icon-btn" onclick="closeModal()" aria-label="Close">✕</button>
+        <div class="modal-title">${lang==='en'?(isEdit?'Edit user':'Create user'):(isEdit?'Sá»­a ngÆ°á»i dÃ¹ng':'Táº¡o ngÆ°á»i dÃ¹ng')}</div>
+        <button class="icon-btn" onclick="closeModal()" aria-label="Close">âœ•</button>
       </div>
 
       <div class="modal-body">
         <div class="modal-grid-2">
           <div class="modal-field">
-            <label>${lang==='en'?'Full name':'Họ tên'}</label>
-            <input id="um-name" type="text" value="${escapeHtml(u0.name||'')}" placeholder="${lang==='en'?'Full name':'Họ tên'}">
+            <label>${lang==='en'?'Full name':'Há» tÃªn'}</label>
+            <input id="um-name" type="text" value="${escapeHtml(u0.name||'')}" placeholder="${lang==='en'?'Full name':'Há» tÃªn'}">
           </div>
 
           <div class="modal-field">
-            <label>${lang==='en'?'Username':'Tên đăng nhập'}</label>
+            <label>${lang==='en'?'Username':'TÃªn Ä‘Äƒng nháº­p'}</label>
             <input id="um-username" type="text" value="${escapeHtml(u0.username||'')}" ${isEdit?'':''}  placeholder="ten.ho">
-            ${isEdit?'<div class="help-text" style="color:#d97706;font-size:10px">'+( lang==='en'?'⚠ Changing username will create a new account':'⚠ Đổi username sẽ tạo tài khoản mới')+'</div>':''}
+            ${isEdit?'<div class="help-text" style="color:#d97706;font-size:10px">'+( lang==='en'?'âš  Changing username will create a new account':'âš  Äá»•i username sáº½ táº¡o tÃ i khoáº£n má»›i')+'</div>':''}
           </div>
         </div>
 
         <div class="modal-grid-2">
           <div class="modal-field">
-            <label>${lang==='en'?'Department':'Phòng ban'} ▾</label>
+            <label>${lang==='en'?'Department':'PhÃ²ng ban'} â–¾</label>
             <select id="um-dept" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px">
-              <option value="">— ${lang==='en'?'Select department':'Chọn phòng ban'} —</option>
+              <option value="">â€” ${lang==='en'?'Select department':'Chá»n phÃ²ng ban'} â€”</option>
               ${deptOptions}
             </select>
           </div>
 
           <div class="modal-field">
-            <label>${lang==='en'?'Title':'Chức danh'} ▾</label>
+            <label>${lang==='en'?'Title':'Chá»©c danh'} â–¾</label>
             <select id="um-title" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px">
-              <option value="">— ${lang==='en'?'Select title':'Chọn chức danh'} —</option>
+              <option value="">â€” ${lang==='en'?'Select title':'Chá»n chá»©c danh'} â€”</option>
               ${titleOptions}
             </select>
-            ${!TITLES.includes(u0.title||'') && u0.title ? '<div class="help-text" style="font-size:10px;color:#d97706">⚠ "'+escapeHtml(u0.title)+'" '+( lang==='en'?'not in standard list — will be kept':'không có trong danh sách — sẽ được giữ lại')+'</div>':''}
+            ${!TITLES.includes(u0.title||'') && u0.title ? '<div class="help-text" style="font-size:10px;color:#d97706">âš  "'+escapeHtml(u0.title)+'" '+( lang==='en'?'not in standard list â€” will be kept':'khÃ´ng cÃ³ trong danh sÃ¡ch â€” sáº½ Ä‘Æ°á»£c giá»¯ láº¡i')+'</div>':''}
           </div>
         </div>
 
         <div class="modal-grid-2">
           <div class="modal-field">
-            <label>${lang==='en'?'Role':'Vai trò'} ▾</label>
+            <label>${lang==='en'?'Role':'Vai trÃ²'} â–¾</label>
             <select id="um-role">${roleOptions}</select>
           </div>
 
           <div class="modal-field">
-            <label>${lang==='en'?'Status':'Trạng thái'}</label>
+            <label>${lang==='en'?'Status':'Tráº¡ng thÃ¡i'}</label>
             <select id="um-active">
-              <option value="1" ${u0.active!==false?'selected':''}>${lang==='en'?'Active':'Hoạt động'}</option>
-              <option value="0" ${u0.active===false?'selected':''}>${lang==='en'?'Inactive':'Khóa'}</option>
+              <option value="1" ${u0.active!==false?'selected':''}>${lang==='en'?'Active':'Hoáº¡t Ä‘á»™ng'}</option>
+              <option value="0" ${u0.active===false?'selected':''}>${lang==='en'?'Inactive':'KhÃ³a'}</option>
             </select>
           </div>
         </div>
 
         <div style="border-top:1px solid var(--border-light,#e2e8f0);margin:14px 0;padding-top:14px">
-          <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px">📋 ${lang==='en'?'Personal Information':'Thông tin cá nhân'}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px">ðŸ“‹ ${lang==='en'?'Personal Information':'ThÃ´ng tin cÃ¡ nhÃ¢n'}</div>
           <div class="modal-grid-2">
             <div class="modal-field">
-              <label>${lang==='en'?'Citizen ID (CCCD)':'Số CCCD / CMND'}</label>
+              <label>${lang==='en'?'Citizen ID (CCCD)':'Sá»‘ CCCD / CMND'}</label>
               <input id="um-cccd" type="text" value="${escapeHtml(u0.cccd||'')}" placeholder="${lang==='en'?'e.g. 079123456789':'VD: 079123456789'}" maxlength="12">
             </div>
             <div class="modal-field">
-              <label>${lang==='en'?'Phone number':'Số điện thoại'}</label>
+              <label>${lang==='en'?'Phone number':'Sá»‘ Ä‘iá»‡n thoáº¡i'}</label>
               <input id="um-phone" type="tel" value="${escapeHtml(u0.phone||'')}" placeholder="${lang==='en'?'e.g. 0901234567':'VD: 0901234567'}">
             </div>
           </div>
           <div class="modal-field">
-            <label>${lang==='en'?'Personal email':'Email cá nhân'}</label>
+            <label>${lang==='en'?'Personal email':'Email cÃ¡ nhÃ¢n'}</label>
             <input id="um-personal-email" type="email" value="${escapeHtml(u0.personal_email||'')}" placeholder="name@gmail.com">
           </div>
         </div>
 
         <div class="modal-field">
-          <label>${lang==='en'?'Password':'Mật khẩu'}</label>
+          <label>${lang==='en'?'Password':'Máº­t kháº©u'}</label>
           <input id="um-password" type="text" autocomplete="new-password"
-            placeholder="${lang==='en'?'Set a new password (leave blank to keep unchanged)':'Tạo mật khẩu mới (để trống nếu không đổi)'}">
+            placeholder="${lang==='en'?'Set a new password (leave blank to keep unchanged)':'Táº¡o máº­t kháº©u má»›i (Ä‘á»ƒ trá»‘ng náº¿u khÃ´ng Ä‘á»•i)'}">
           <div class="help-text">
             ${lang==='en'
               ?'Reset will generate a temporary password and clear 2FA enrollment.'
-              :'Reset sẽ tạo mật khẩu tạm thời và xoá đăng ký 2FA.'}
+              :'Reset sáº½ táº¡o máº­t kháº©u táº¡m thá»i vÃ  xoÃ¡ Ä‘Äƒng kÃ½ 2FA.'}
           </div>
 
           <div id="um-tempwrap" style="display:none;margin-top:10px;padding:10px;border:1px solid var(--ln2);border-radius:12px;background:#f9fbff">
-            <div style="font-weight:700;margin-bottom:6px">${lang==='en'?'Temporary password':'Mật khẩu tạm thời'}</div>
+            <div style="font-weight:700;margin-bottom:6px">${lang==='en'?'Temporary password':'Máº­t kháº©u táº¡m thá»i'}</div>
             <div id="um-temppw" style="font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></div>
           </div>
         </div>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
           ${isEdit ? `<button class="btn-admin" onclick="resetPasswordFromModal('${escapeHtml(u0.username||'')}')">${lang==='en'?'Reset password':'Reset password'}</button>` : ''}
-          <button class="btn-admin" onclick="copyLoginInfoFromModal()">${lang==='en'?'Copy login info':'Copy thông tin đăng nhập'}</button>
-          <button class="btn-admin" onclick="downloadLoginInfoFromModal()">${lang==='en'?'Download .txt':'Tải .txt'}</button>
+          <button class="btn-admin" onclick="copyLoginInfoFromModal()">${lang==='en'?'Copy login info':'Copy thÃ´ng tin Ä‘Äƒng nháº­p'}</button>
+          <button class="btn-admin" onclick="downloadLoginInfoFromModal()">${lang==='en'?'Download .txt':'Táº£i .txt'}</button>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="saveUserFromModal(${isEdit?`'${escapeHtml(u0.id)}'`:"''"})">${lang==='en'?'Save':'Lưu'}</button>
+        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin primary" onclick="saveUserFromModal(${isEdit?`'${escapeHtml(u0.id)}'`:"''"})">${lang==='en'?'Save':'LÆ°u'}</button>
       </div>
     </div>
   `;
@@ -6729,7 +6729,7 @@ function showUserModal(userId){
     const prev = titleSel ? titleSel.value : '';
     const list = (dept && titlesForDept(dept) && titlesForDept(dept).length) ? titlesForDept(dept) : [];
     if(!titleSel) return;
-    titleSel.innerHTML = '<option value="">-- Chọn chức danh --</option>' + list.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    titleSel.innerHTML = '<option value="">-- Chá»n chá»©c danh --</option>' + list.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
     // Restore if still valid
     if(prev && list.includes(prev)) titleSel.value = prev;
     else titleSel.value = '';
@@ -6768,11 +6768,11 @@ async function saveUserFromModal(userId){
     const personal_email = String(document.getElementById('um-personal-email')?.value||'').trim();
 
     if(!username){
-      showToast(lang==='en'?'⚠ Username is required':'⚠ Username là bắt buộc');
+      showToast(lang==='en'?'âš  Username is required':'âš  Username lÃ  báº¯t buá»™c');
       return;
     }
     if(!name){
-      showToast(lang==='en'?'⚠ Full name is required':'⚠ Họ tên là bắt buộc');
+      showToast(lang==='en'?'âš  Full name is required':'âš  Há» tÃªn lÃ  báº¯t buá»™c');
       return;
     }
 
@@ -6791,7 +6791,7 @@ async function saveUserFromModal(userId){
           wrap.style.display = 'block';
         }
       }
-      showToast(lang==='en'?'✅ Saved':'✅ Đã lưu');
+      showToast(lang==='en'?'âœ… Saved':'âœ… ÄÃ£ lÆ°u');
       closeModal();
       await loadUsersFromServerIfAdmin();
       renderAdminUsers();
@@ -6825,7 +6825,7 @@ async function resetPasswordFromModal(username){
       const pw = document.getElementById('um-password');
       if(pw) pw.value = temp;
 
-      showToast(lang==='en'?'✅ Password reset':'✅ Đã reset password');
+      showToast(lang==='en'?'âœ… Password reset':'âœ… ÄÃ£ reset password');
     }else{
       const msg = (res && (res.message || res.error)) ? (': ' + (res.message || res.error)) : '';
       showToast((lang==='en'?'\u26A0 Server error':'\u26A0 L\u1ed7i server') + msg);
@@ -6846,7 +6846,7 @@ function composeLoginInfo(username, password){
   const link = getPortalLoginUrl();
   return (lang==='en'
     ? `HESEM QMS Login\n\nLink: ${link}\nUsername: ${username}\nPassword: ${password}\n`
-    : `Thông tin đăng nhập HESEM QMS\n\nLink: ${link}\nTài khoản: ${username}\nMật khẩu: ${password}\n`);
+    : `ThÃ´ng tin Ä‘Äƒng nháº­p HESEM QMS\n\nLink: ${link}\nTÃ i khoáº£n: ${username}\nMáº­t kháº©u: ${password}\n`);
 }
 
 async function copyLoginInfoFromModal(){
@@ -6857,16 +6857,16 @@ async function copyLoginInfoFromModal(){
     const password = passwordInput || temp;
 
     if(!username || !password){
-      showToast(lang==='en'?'⚠ Please set/reset a password first':'⚠ Hãy đặt/reset password trước');
+      showToast(lang==='en'?'âš  Please set/reset a password first':'âš  HÃ£y Ä‘áº·t/reset password trÆ°á»›c');
       return;
     }
 
     const info = composeLoginInfo(username, password);
     await navigator.clipboard.writeText(info);
-    showToast(lang==='en'?'✅ Copied':'✅ Đã copy');
+    showToast(lang==='en'?'âœ… Copied':'âœ… ÄÃ£ copy');
   }catch(e){
     console.error(e);
-    showToast(lang==='en'?'⚠ Cannot copy':'⚠ Không copy được');
+    showToast(lang==='en'?'âš  Cannot copy':'âš  KhÃ´ng copy Ä‘Æ°á»£c');
   }
 }
 
@@ -6877,7 +6877,7 @@ function downloadLoginInfoFromModal(){
   const password = passwordInput || temp;
 
   if(!username || !password){
-    showToast(lang==='en'?'⚠ Please set/reset a password first':'⚠ Hãy đặt/reset password trước');
+    showToast(lang==='en'?'âš  Please set/reset a password first':'âš  HÃ£y Ä‘áº·t/reset password trÆ°á»›c');
     return;
   }
 
@@ -6906,13 +6906,13 @@ function saveUser(existingId){
   const title=document.getElementById('mu-title').value.trim();
   const role=document.getElementById('mu-role').value;
   const dept=document.getElementById('mu-dept').value;
-  if(!name||!username){alert(lang==='en'?'Name and username required':'Cần nhập tên và username');return;}
+  if(!name||!username){alert(lang==='en'?'Name and username required':'Cáº§n nháº­p tÃªn vÃ  username');return;}
   if(existingId){
     const u=USERS.find(x=>String(x.id)===String(existingId));
     if(u){Object.assign(u,{name,username,pin,title,role,dept});}
   } else {
     const newId='U'+String(USERS.length+1).padStart(3,'0');
-    USERS.push({id:newId,name,username,pin,role,dept,title,avatar:'🧑',active:true});
+    USERS.push({id:newId,name,username,pin,role,dept,title,avatar:'ðŸ§‘',active:true});
   }
   saveUsersToStorage();
   closeModal();
@@ -6936,7 +6936,7 @@ async function toggleUserActive(userId){
     });
 
     if(res && res.ok){
-      showToast(lang==='en'?'✅ Updated':'✅ Đã cập nhật');
+      showToast(lang==='en'?'âœ… Updated':'âœ… ÄÃ£ cáº­p nháº­t');
       await loadUsersFromServerIfAdmin();
       renderAdmin();
     }else{
@@ -6952,7 +6952,7 @@ async function lockUser(userId){
   const u = USERS.find(x=>String(x.id)===String(userId));
   if(!u) return;
   if(u.active===false){
-    showToast(lang==='en'?'ℹ️ Already inactive':'ℹ️ Đã bị khóa');
+    showToast(lang==='en'?'â„¹ï¸ Already inactive':'â„¹ï¸ ÄÃ£ bá»‹ khÃ³a');
     return;
   }
   try{
@@ -6965,7 +6965,7 @@ async function lockUser(userId){
       active: false
     });
     if(res && res.ok){
-      showToast(lang==='en'?'✅ Locked':'✅ Đã khóa');
+      showToast(lang==='en'?'âœ… Locked':'âœ… ÄÃ£ khÃ³a');
       await loadUsersFromServerIfAdmin();
       renderAdmin();
     }else{
@@ -7017,19 +7017,19 @@ function editUserPerms(userId){
   });
   
   modal.innerHTML=`<div class="modal" style="width:640px;max-height:85vh">
-    <h3>🔐 ${lang==='en'?'Permissions for':'Phân quyền cho'}: ${u.name}</h3>
+    <h3>ðŸ” ${lang==='en'?'Permissions for':'PhÃ¢n quyá»n cho'}: ${u.name}</h3>
     <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">
-      ${lang==='en'?'Role':'Vai trò'}: <b>${ROLES[u.role]?ROLES[u.role].label:u.role}</b> |
-      ${lang==='en'?'Base access':'Quyền mặc định'}: <b>${roleDocs==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,u.role)).length}</b>/${DOCS.length} |
-      ${lang==='en'?'Check/uncheck to override role defaults':'Đánh dấu/bỏ đánh dấu để ghi đè quyền mặc định'}
+      ${lang==='en'?'Role':'Vai trÃ²'}: <b>${ROLES[u.role]?ROLES[u.role].label:u.role}</b> |
+      ${lang==='en'?'Base access':'Quyá»n máº·c Ä‘á»‹nh'}: <b>${roleDocs==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,u.role)).length}</b>/${DOCS.length} |
+      ${lang==='en'?'Check/uncheck to override role defaults':'ÄÃ¡nh dáº¥u/bá» Ä‘Ã¡nh dáº¥u Ä‘á»ƒ ghi Ä‘Ã¨ quyá»n máº·c Ä‘á»‹nh'}
     </div>
     <div style="max-height:55vh;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:8px 12px;background:var(--bg-surface,#fff)">
       ${catHtml}
     </div>
     <div class="modal-actions">
-      <button class="btn-admin danger" onclick="resetUserPerms('${u.id}')">↩ Reset</button>
-      <button class="btn-admin secondary" onclick="closeModal()">✕ ${T('admin_cancel')}</button>
-      <button class="btn-admin primary" onclick="closeModal();renderAdmin()">✓ OK</button>
+      <button class="btn-admin danger" onclick="resetUserPerms('${u.id}')">â†© Reset</button>
+      <button class="btn-admin secondary" onclick="closeModal()">âœ• ${T('admin_cancel')}</button>
+      <button class="btn-admin primary" onclick="closeModal();renderAdmin()">âœ“ OK</button>
     </div>
   </div>`;
   document.body.appendChild(modal);
@@ -7105,7 +7105,7 @@ function renderAdminPerms(){
           catHtml+=`<div class="perm-doc-row">
             <label>
               ${isFullAccess
-                ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+                ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">âœ“</span>'
                 : '<input type="checkbox" data-doc="'+d.code+'" '+(has?'checked':'')+' onchange="toggleRoleDoc(this,\''+adminEditRole+'\')">'}
               <span class="doc-code">${d.code}</span>
               ${d.title.substring(0,55)}${d.title.length>55?'...':''}
@@ -7119,7 +7119,7 @@ function renderAdminPerms(){
         catHtml+=`<div class="perm-doc-row">
           <label>
             ${isFullAccess
-              ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+              ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">âœ“</span>'
               : '<input type="checkbox" data-doc="'+d.code+'" '+(has?'checked':'')+' onchange="toggleRoleDoc(this,\''+adminEditRole+'\')">'}
             <span class="doc-code">${d.code}</span>
             ${d.title.substring(0,55)}${d.title.length>55?'...':''}
@@ -7132,7 +7132,7 @@ function renderAdminPerms(){
   el.innerHTML=`
     <div class="perm-grid">
       <div class="pg-sidebar">
-        <div style="padding:8px 12px;font-size:10px;font-weight:700;color:var(--text-3);border-bottom:1px solid var(--border)">${lang==='en'?'SELECT ROLE':'CHỌN VAI TRÒ'}</div>
+        <div style="padding:8px 12px;font-size:10px;font-weight:700;color:var(--text-3);border-bottom:1px solid var(--border)">${lang==='en'?'SELECT ROLE':'CHá»ŒN VAI TRÃ’'}</div>
         ${roleEntries.map(([k,v])=>{
           const cnt=ROLE_DOCS[k]==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,k)).length;
           return `<div class="pg-role-item ${adminEditRole===k?'active':''}" onclick="adminEditRole='${k}';renderAdminPerms()">
@@ -7145,16 +7145,16 @@ function renderAdminPerms(){
         <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:${r?r.color:'#333'}">${r?r.icon:''} ${r?r.label:adminEditRole}</div>
         <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">
           ${isFullAccess
-            ?'<span style="color:#16a34a;font-weight:700">✅ FULL ACCESS — '+(lang==='en'?'All':'Tất cả')+' '+DOCS.length+' '+(lang==='en'?'documents':'tài liệu')+'</span>'
-            :'<span>'+(lang==='en'?'Access':'Quyền')+': <b>'+DOCS.filter(d=>docMatchesRole(d.code,adminEditRole)).length+'</b>/'+DOCS.length+' '+(lang==='en'?'documents — check/uncheck to modify':'tài liệu — đánh dấu để thay đổi')+'</span>'}
+            ?'<span style="color:#16a34a;font-weight:700">âœ… FULL ACCESS â€” '+(lang==='en'?'All':'Táº¥t cáº£')+' '+DOCS.length+' '+(lang==='en'?'documents':'tÃ i liá»‡u')+'</span>'
+            :'<span>'+(lang==='en'?'Access':'Quyá»n')+': <b>'+DOCS.filter(d=>docMatchesRole(d.code,adminEditRole)).length+'</b>/'+DOCS.length+' '+(lang==='en'?'documents â€” check/uncheck to modify':'tÃ i liá»‡u â€” Ä‘Ã¡nh dáº¥u Ä‘á»ƒ thay Ä‘á»•i')+'</span>'}
         </div>
         ${catHtml}
       </div>
     </div>
     <div class="admin-save-bar" id="admin-save-bar">
-      <span class="save-hint">${adminUnsaved?'<b>⚠ '+(lang==='en'?'Unsaved changes':'Có thay đổi chưa lưu')+'</b>':lang==='en'?'Edit permissions then click Save':'Chỉnh phân quyền rồi nhấn Lưu'}</span>
-      <button class="btn-admin secondary" onclick="sessionStorage.removeItem('hesem_role_docs');location.reload()">↩ Reset</button>
-      <button class="btn-admin primary" onclick="adminSaveAll()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+      <span class="save-hint">${adminUnsaved?'<b>âš  '+(lang==='en'?'Unsaved changes':'CÃ³ thay Ä‘á»•i chÆ°a lÆ°u')+'</b>':lang==='en'?'Edit permissions then click Save':'Chá»‰nh phÃ¢n quyá»n rá»“i nháº¥n LÆ°u'}</span>
+      <button class="btn-admin secondary" onclick="sessionStorage.removeItem('hesem_role_docs');location.reload()">â†© Reset</button>
+      <button class="btn-admin primary" onclick="adminSaveAll()" style="padding:8px 24px;font-size:13px">ðŸ’¾ ${lang==='en'?'SAVE':'LÆ¯U'}</button>
     </div>`;
 }
 
@@ -7211,9 +7211,9 @@ function toggleCatPerms(cb, catId, role){
 function saveRoleDocsToStorage(){try{sessionStorage.setItem('hesem_role_docs',JSON.stringify(ROLE_DOCS));}catch(e){}}
 function loadRoleDocsFromStorage(){try{const s=sessionStorage.getItem('hesem_role_docs');if(s){const loaded=JSON.parse(s);if(loaded&&typeof loaded==='object')Object.assign(ROLE_DOCS,loaded);}}catch(e){}}
 
-// ═══════════════════════════════════════════════════
-// DOM HELPER: el(tag, attrs, children) — lightweight DOM builder
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// DOM HELPER: el(tag, attrs, children) â€” lightweight DOM builder
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function el(tag, attrs, children) {
   const node = document.createElement(tag);
   if (attrs) {
@@ -7237,22 +7237,22 @@ function el(tag, attrs, children) {
 }
 Object.defineProperty(window, 'adminPanel', { get: function() { return document.getElementById('admin-content'); } });
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ADMIN TAB: DEPARTMENTS & TITLES
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderAdminDeptTitle(){
   adminPanel.innerHTML='';
   const totalTitles = Object.values(DEPT_TITLES||{}).reduce((n,list)=>n+(Array.isArray(list)?list.length:0),0);
   const card=el('div',{class:'card'},[]);
   const header=el('div',{style:'display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;'},[
     el('div',{},[
-      el('div',{style:'font-weight:800;font-size:16px;line-height:1.2;'},'Phòng ban → Chức danh (JD Tree)'),
-      el('div',{class:'muted',style:'margin-top:4px;'},'Một cửa sổ duy nhất mô phỏng đúng cấu trúc thư mục JD. Chức danh nằm bên trong phòng ban; khi sửa người dùng, danh sách chức danh sẽ tự lọc theo phòng ban và ô Vai trò sẽ tự nhận theo chức danh.')
+      el('div',{style:'font-weight:800;font-size:16px;line-height:1.2;'},'PhÃ²ng ban â†’ Chá»©c danh (JD Tree)'),
+      el('div',{class:'muted',style:'margin-top:4px;'},'Má»™t cá»­a sá»• duy nháº¥t mÃ´ phá»ng Ä‘Ãºng cáº¥u trÃºc thÆ° má»¥c JD. Chá»©c danh náº±m bÃªn trong phÃ²ng ban; khi sá»­a ngÆ°á»i dÃ¹ng, danh sÃ¡ch chá»©c danh sáº½ tá»± lá»c theo phÃ²ng ban vÃ  Ã´ Vai trÃ² sáº½ tá»± nháº­n theo chá»©c danh.')
     ]),
     el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;align-items:center;'},[
-      el('div',{class:'muted',style:'font-size:12px;'},`${DEPARTMENTS.length} phòng ban • ${totalTitles} chức danh`),
+      el('div',{class:'muted',style:'font-size:12px;'},`${DEPARTMENTS.length} phÃ²ng ban â€¢ ${totalTitles} chá»©c danh`),
       el('button',{class:'btn',onclick:()=>{
-        if(!confirm('Reset Phòng ban & Chức danh theo SSOT (mặc định)?'))return;
+        if(!confirm('Reset PhÃ²ng ban & Chá»©c danh theo SSOT (máº·c Ä‘á»‹nh)?'))return;
         DEPARTMENTS=JSON.parse(JSON.stringify(DEFAULT_DEPARTMENTS));
         DEPT_TITLES=JSON.parse(JSON.stringify(DEFAULT_DEPT_TITLES));
         syncTitlesFromDept();
@@ -7260,17 +7260,17 @@ function renderAdminDeptTitle(){
         renderAdminDeptTitle();
       }},'Reset theo JD SSOT'),
       el('button',{class:'btn',onclick:()=>{
-        const code=(prompt('Mã phòng ban (VD: ENG, PRO, QA, ...):','')||'').trim().toUpperCase();
+        const code=(prompt('MÃ£ phÃ²ng ban (VD: ENG, PRO, QA, ...):','')||'').trim().toUpperCase();
         if(!code)return;
-        if(DEPARTMENTS.some(d=>d.code===code)){alert('Mã phòng ban đã tồn tại.');return;}
-        const label=(prompt('Tên phòng ban (VN):','')||'').trim();
+        if(DEPARTMENTS.some(d=>d.code===code)){alert('MÃ£ phÃ²ng ban Ä‘Ã£ tá»“n táº¡i.');return;}
+        const label=(prompt('TÃªn phÃ²ng ban (VN):','')||'').trim();
         if(!label)return;
-        const labelEn=(prompt('Tên phòng ban (EN):','')||'').trim()||label;
+        const labelEn=(prompt('TÃªn phÃ²ng ban (EN):','')||'').trim()||label;
         DEPARTMENTS.push({code,label,labelEn,color:'#94a3b8'});
         DEPT_TITLES[code]=DEPT_TITLES[code]||[];
         syncTitlesFromDept();saveDepartments();saveDeptTitles();saveTitles();
         renderAdminDeptTitle();
-      }},'Thêm phòng ban')
+      }},'ThÃªm phÃ²ng ban')
     ])
   ]);
 
@@ -7283,48 +7283,48 @@ function renderAdminDeptTitle(){
     const folder=el('details',{open:true,class:'fm-folder',style:`border:1px solid color-mix(in srgb, ${d.color} 24%, var(--border));background:var(--bg-surface,#fff);border-radius:12px;overflow:hidden;`},[]);
     const summary=el('summary',{style:'list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc));'},[
       el('div',{style:'display:flex;align-items:center;gap:10px;'},[
-        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${d.color}18;border:1px solid color-mix(in srgb, ${d.color} 28%, var(--border));display:flex;align-items:center;justify-content:center;font-size:18px;color:${d.color};`},'📁'),
+        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${d.color}18;border:1px solid color-mix(in srgb, ${d.color} 28%, var(--border));display:flex;align-items:center;justify-content:center;font-size:18px;color:${d.color};`},'ðŸ“'),
         el('div',{},[
-          el('div',{style:'font-weight:800;'},`${d.code} — ${d.label}`),
-          el('div',{class:'muted',style:'margin-top:2px;font-size:11px;'},`${titles.length} chức danh • ${usersInDept} người dùng`)
+          el('div',{style:'font-weight:800;'},`${d.code} â€” ${d.label}`),
+          el('div',{class:'muted',style:'margin-top:2px;font-size:11px;'},`${titles.length} chá»©c danh â€¢ ${usersInDept} ngÆ°á»i dÃ¹ng`)
         ])
       ]),
       el('div',{style:'display:flex;gap:6px;flex-wrap:wrap;align-items:center;'},[
         el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-          const t=(prompt(`Thêm chức danh cho ${d.code}:`,'')||'').trim();
+          const t=(prompt(`ThÃªm chá»©c danh cho ${d.code}:`,'')||'').trim();
           if(!t)return;
           DEPT_TITLES[d.code]=DEPT_TITLES[d.code]||[];
-          if(DEPT_TITLES[d.code].includes(t)){alert('Chức danh đã tồn tại trong phòng ban này.');return;}
+          if(DEPT_TITLES[d.code].includes(t)){alert('Chá»©c danh Ä‘Ã£ tá»“n táº¡i trong phÃ²ng ban nÃ y.');return;}
           DEPT_TITLES[d.code].push(t);
           syncTitlesFromDept();saveDeptTitles();saveTitles();
           renderAdminDeptTitle();
-        }},'Thêm chức danh'),
+        }},'ThÃªm chá»©c danh'),
         el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-          const nl=(prompt(`Đổi tên phòng ban ${d.code}:`,d.label)||'').trim();
+          const nl=(prompt(`Äá»•i tÃªn phÃ²ng ban ${d.code}:`,d.label)||'').trim();
           if(!nl)return;
           d.label=nl; saveDepartments(); renderAdminDeptTitle();
-        }},'Sửa'),
+        }},'Sá»­a'),
         el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-          if(!confirm(`Xóa phòng ban ${d.code}? (Người dùng thuộc phòng ban này sẽ bị xóa mapping phòng ban/chức danh)`))return;
+          if(!confirm(`XÃ³a phÃ²ng ban ${d.code}? (NgÆ°á»i dÃ¹ng thuá»™c phÃ²ng ban nÃ y sáº½ bá»‹ xÃ³a mapping phÃ²ng ban/chá»©c danh)`))return;
           DEPARTMENTS=DEPARTMENTS.filter(x=>x.code!==d.code);
           delete DEPT_TITLES[d.code];
           USERS.forEach(u=>{if(u.dept===d.code){u.dept='';u.title='';}});
           syncTitlesFromDept();saveDepartments();saveDeptTitles();saveTitles();
           renderAdminDeptTitle(); renderAdminUsers();
-        }},'Xóa')
+        }},'XÃ³a')
       ])
     ]);
     folder.appendChild(summary);
 
     const list=el('div',{style:'padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;background:var(--bg-surface,#fff);'},[]);
     if(!titles.length){
-      list.appendChild(el('div',{class:'muted',style:'padding:8px 10px;'},'Chưa có chức danh trong phòng ban này.'));
+      list.appendChild(el('div',{class:'muted',style:'padding:8px 10px;'},'ChÆ°a cÃ³ chá»©c danh trong phÃ²ng ban nÃ y.'));
     }else{
       titles.forEach(t=>{
         const count = USERS.filter(u=>u.dept===d.code && u.title===t).length;
         const row=el('div',{class:'fm-file-row',style:'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border,var(--ln));border-radius:10px;background:var(--bg-surface-alt,#f8fafc);'},[
           el('div',{style:'display:flex;align-items:center;gap:10px;min-width:0;'},[
-            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));border-radius:8px;font-size:15px;'},'📄'),
+            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));border-radius:8px;font-size:15px;'},'ðŸ“„'),
             el('div',{style:'min-width:0;'},[
               el('div',{style:'font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'},t),
               el('div',{class:'muted',style:'font-size:11px;margin-top:1px;'},`${d.code}/${t}`)
@@ -7333,18 +7333,18 @@ function renderAdminDeptTitle(){
           el('div',{style:'display:flex;align-items:center;gap:6px;flex-wrap:wrap;'},[
             el('span',{style:'font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2);border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));'},`${count} user`+(count===1?'':'s')),
             el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-              const nt=(prompt('Đổi tên chức danh:',t)||'').trim();
+              const nt=(prompt('Äá»•i tÃªn chá»©c danh:',t)||'').trim();
               if(!nt||nt===t)return;
               DEPT_TITLES[d.code]=DEPT_TITLES[d.code].map(x=>x===t?nt:x);
               USERS.forEach(u=>{if(u.dept===d.code && u.title===t)u.title=nt;});
               syncTitlesFromDept();saveDeptTitles();saveTitles(); renderAdminDeptTitle(); renderAdminUsers();
-            }},'Sửa'),
+            }},'Sá»­a'),
             el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-              if(!confirm(`Xóa chức danh "${t}" khỏi ${d.code}?`))return;
+              if(!confirm(`XÃ³a chá»©c danh "${t}" khá»i ${d.code}?`))return;
               DEPT_TITLES[d.code]=DEPT_TITLES[d.code].filter(x=>x!==t);
               USERS.forEach(u=>{if(u.dept===d.code && u.title===t)u.title='';});
               syncTitlesFromDept();saveDeptTitles();saveTitles(); renderAdminDeptTitle(); renderAdminUsers();
-            }},'Xóa')
+            }},'XÃ³a')
           ])
         ]);
         list.appendChild(row);
@@ -7364,18 +7364,18 @@ function addDept(){
   const code = (document.getElementById('new-dept-code').value||'').trim().toUpperCase();
   const label = (document.getElementById('new-dept-label').value||'').trim();
   const color = document.getElementById('new-dept-color').value||'#1565c0';
-  if(!code||!label){showToast('⚠ Nhập mã và tên phòng ban');return;}
-  if(DEPARTMENTS.find(d=>d.code===code)){showToast('⚠ Mã đã tồn tại');return;}
+  if(!code||!label){showToast('âš  Nháº­p mÃ£ vÃ  tÃªn phÃ²ng ban');return;}
+  if(DEPARTMENTS.find(d=>d.code===code)){showToast('âš  MÃ£ Ä‘Ã£ tá»“n táº¡i');return;}
   DEPARTMENTS.push({code, label, labelEn:label, color});
   saveDepartments();
-  showToast('✅ Đã thêm phòng ban '+code);
+  showToast('âœ… ÄÃ£ thÃªm phÃ²ng ban '+code);
   renderAdminDeptTitle();
 }
 
 function editDept(idx){
   const d = DEPARTMENTS[idx];
   if(!d) return;
-  const newLabel = prompt((lang==='en'?'Edit name for ':'Sửa tên cho ')+d.code+':', lang==='en'?d.labelEn:d.label);
+  const newLabel = prompt((lang==='en'?'Edit name for ':'Sá»­a tÃªn cho ')+d.code+':', lang==='en'?d.labelEn:d.label);
   if(newLabel !== null && newLabel.trim()){
     d.label = newLabel.trim();
     d.labelEn = newLabel.trim();
@@ -7389,29 +7389,29 @@ function deleteDept(idx){
   if(!d) return;
   const usersInDept = USERS.filter(u=>u.dept===d.code).length;
   if(usersInDept > 0){
-    showToast('⚠ '+d.code+' '+(lang==='en'?'has':'có')+' '+usersInDept+' '+(lang==='en'?'users — reassign first':'người dùng — hãy chuyển trước'));
+    showToast('âš  '+d.code+' '+(lang==='en'?'has':'cÃ³')+' '+usersInDept+' '+(lang==='en'?'users â€” reassign first':'ngÆ°á»i dÃ¹ng â€” hÃ£y chuyá»ƒn trÆ°á»›c'));
     return;
   }
-  if(!confirm((lang==='en'?'Delete department ':'Xóa phòng ban ')+d.code+'?')) return;
+  if(!confirm((lang==='en'?'Delete department ':'XÃ³a phÃ²ng ban ')+d.code+'?')) return;
   DEPARTMENTS.splice(idx,1);
   saveDepartments();
-  showToast('✅ Đã xóa');
+  showToast('âœ… ÄÃ£ xÃ³a');
   renderAdminDeptTitle();
 }
 
 function addTitle(){
   const name = (document.getElementById('new-title-name').value||'').trim();
-  if(!name){showToast('⚠ Nhập chức danh');return;}
-  if(TITLES.includes(name)){showToast('⚠ Đã tồn tại');return;}
+  if(!name){showToast('âš  Nháº­p chá»©c danh');return;}
+  if(TITLES.includes(name)){showToast('âš  ÄÃ£ tá»“n táº¡i');return;}
   TITLES.push(name);
   saveTitles();
-  showToast('✅ Đã thêm: '+name);
+  showToast('âœ… ÄÃ£ thÃªm: '+name);
   renderAdminDeptTitle();
 }
 
 function editTitle(idx){
   const old = TITLES[idx];
-  const newName = prompt((lang==='en'?'Edit title':'Sửa chức danh')+':', old);
+  const newName = prompt((lang==='en'?'Edit title':'Sá»­a chá»©c danh')+':', old);
   if(newName !== null && newName.trim() && newName.trim() !== old){
     TITLES[idx] = newName.trim();
     saveTitles();
@@ -7421,15 +7421,15 @@ function editTitle(idx){
 
 function deleteTitle(idx){
   const t = TITLES[idx];
-  if(!confirm((lang==='en'?'Delete title: ':'Xóa chức danh: ')+t+'?')) return;
+  if(!confirm((lang==='en'?'Delete title: ':'XÃ³a chá»©c danh: ')+t+'?')) return;
   TITLES.splice(idx,1);
   saveTitles();
   renderAdminDeptTitle();
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ADMIN TAB: ORG CHART
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderAdminOrgChart(){
   const el = document.getElementById('admin-content');
   
@@ -7450,10 +7450,10 @@ function renderAdminOrgChart(){
   
   levels.forEach((lv,li)=>{
     const users = levelGroups[lv];
-    const levelLabel = lv==='0' ? 'Ban Giám Đốc' : lv==='1' ? 'Quản lý cấp cao' : lv==='2' ? 'Trưởng phòng' : lv==='3' ? 'Chuyên viên / Nhân viên' : lv==='4' ? 'Nhân viên' : 'Thực tập';
+    const levelLabel = lv==='0' ? 'Ban GiÃ¡m Äá»‘c' : lv==='1' ? 'Quáº£n lÃ½ cáº¥p cao' : lv==='2' ? 'TrÆ°á»Ÿng phÃ²ng' : lv==='3' ? 'ChuyÃªn viÃªn / NhÃ¢n viÃªn' : lv==='4' ? 'NhÃ¢n viÃªn' : 'Thá»±c táº­p';
     
     chartHtml += `<div style="margin-bottom:8px">
-      <div style="font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">Level ${lv} — ${levelLabel}</div>
+      <div style="font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">Level ${lv} â€” ${levelLabel}</div>
       <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:4px">`;
     
     // Group users by dept within this level
@@ -7469,7 +7469,7 @@ function renderAdminOrgChart(){
       dUsers.forEach(u=>{
         const r = ROLES[u.role];
         chartHtml += `<div class="org-node" style="border-color:${borderColor}" title="${escapeHtml(u.username)}">
-          <div style="font-size:16px">${r?r.icon:'👤'}</div>
+          <div style="font-size:16px">${r?r.icon:'ðŸ‘¤'}</div>
           <div class="on-name">${escapeHtml(u.name)}</div>
           <div class="on-title">${escapeHtml(u.title)}</div>
           <div class="on-dept" style="background:${borderColor}15;color:${borderColor}">${escapeHtml(u.dept)}</div>
@@ -7491,16 +7491,16 @@ function renderAdminOrgChart(){
   
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization Chart':'Sơ đồ Tổ chức Công ty'}</h3>
+      <h3 style="font-size:14px;font-weight:700;margin:0">ðŸ— ${lang==='en'?'Organization Chart':'SÆ¡ Ä‘á»“ Tá»• chá»©c CÃ´ng ty'}</h3>
       <div style="display:flex;gap:8px">
-        <button class="btn-admin secondary" onclick="exportOrgChartSVG()">📥 ${lang==='en'?'Export SVG':'Xuất SVG'}</button>
-        <button class="btn-admin secondary" onclick="window.print()">🖨 ${lang==='en'?'Print':'In'}</button>
+        <button class="btn-admin secondary" onclick="exportOrgChartSVG()">ðŸ“¥ ${lang==='en'?'Export SVG':'Xuáº¥t SVG'}</button>
+        <button class="btn-admin secondary" onclick="window.print()">ðŸ–¨ ${lang==='en'?'Print':'In'}</button>
       </div>
     </div>
     <div style="font-size:11px;color:var(--text-3);margin-bottom:16px">
       ${lang==='en'
         ?'Auto-generated from user database. Grouped by role level and department.'
-        :'Tự động tạo từ cơ sở dữ liệu người dùng. Nhóm theo cấp vai trò và phòng ban.'}
+        :'Tá»± Ä‘á»™ng táº¡o tá»« cÆ¡ sá»Ÿ dá»¯ liá»‡u ngÆ°á»i dÃ¹ng. NhÃ³m theo cáº¥p vai trÃ² vÃ  phÃ²ng ban.'}
     </div>
     <div style="border:1px solid var(--border);border-radius:10px;overflow:auto;background:var(--bg-surface-alt,#fafbfc);max-height:600px">
       ${chartHtml}
@@ -7508,24 +7508,24 @@ function renderAdminOrgChart(){
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
       ${DEPARTMENTS.map(d=>`<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:6px;background:${d.color}10;color:${d.color};border:1px solid ${d.color}30">
         <span style="width:8px;height:8px;border-radius:50%;background:${d.color}"></span>
-        ${d.code} — ${lang==='en'?d.labelEn:d.label}
+        ${d.code} â€” ${lang==='en'?d.labelEn:d.label}
       </span>`).join('')}
     </div>`;
 }
 
 function exportOrgChartSVG(){
-  showToast(lang==='en'?'💡 Use Print (Ctrl+P) to save as PDF':'💡 Dùng In (Ctrl+P) để lưu PDF');
+  showToast(lang==='en'?'ðŸ’¡ Use Print (Ctrl+P) to save as PDF':'ðŸ’¡ DÃ¹ng In (Ctrl+P) Ä‘á»ƒ lÆ°u PDF');
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ADMIN TAB: ACTIVITY LOG (User Behavior)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderAdminActivity(){
   const el = document.getElementById('admin-content');
   
   // Permission check
   if(!canViewActivityLog()){
-    el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-3)">⛔ '+(lang==='en'?'You do not have permission to view this tab. Contact the General Manager (EXE-01).':'Bạn không có quyền xem tab này. Liên hệ General Manager (EXE-01).')+'</div>';
+    el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-3)">â›” '+(lang==='en'?'You do not have permission to view this tab. Contact the General Manager (EXE-01).':'Báº¡n khÃ´ng cÃ³ quyá»n xem tab nÃ y. LiÃªn há»‡ General Manager (EXE-01).')+'</div>';
     return;
   }
   
@@ -7536,28 +7536,28 @@ function renderAdminActivity(){
   
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'User Activity Monitor':'Kiểm soát Hành vi Người dùng'}</h3>
+      <h3 style="font-size:14px;font-weight:700;margin:0">ðŸ“Š ${lang==='en'?'User Activity Monitor':'Kiá»ƒm soÃ¡t HÃ nh vi NgÆ°á»i dÃ¹ng'}</h3>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn-admin secondary" onclick="document.getElementById('ds-panel').style.display=document.getElementById('ds-panel').style.display==='none'?'':'none'">⚙️ ${lang==='en'?'Settings':'Cài đặt'}</button>
+        <button class="btn-admin secondary" onclick="document.getElementById('ds-panel').style.display=document.getElementById('ds-panel').style.display==='none'?'':'none'">âš™ï¸ ${lang==='en'?'Settings':'CÃ i Ä‘áº·t'}</button>
       <div style="display:flex;gap:8px;align-items:center">
         <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">
-          <option value="">${lang==='en'?'All users':'Tất cả'}</option>
+          <option value="">${lang==='en'?'All users':'Táº¥t cáº£'}</option>
           ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('')}
         </select>
-        <button class="btn-admin secondary" onclick="exportActivityCSV()">📥 CSV</button>
-        <button class="btn-admin danger" onclick="clearActivityLog()">🗑 ${lang==='en'?'Clear':'Xóa log'}</button>
+        <button class="btn-admin secondary" onclick="exportActivityCSV()">ðŸ“¥ CSV</button>
+        <button class="btn-admin danger" onclick="clearActivityLog()">ðŸ—‘ ${lang==='en'?'Clear':'XÃ³a log'}</button>
       </div>
     </div>
     <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
-      <div style="padding:12px 16px;font-weight:700;font-size:13px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border)">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
+      <div style="padding:12px 16px;font-weight:700;font-size:13px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border)">âš™ï¸ ${lang==='en'?'Data Collection Settings':'CÃ i Ä‘áº·t Thu tháº­p Dá»¯ liá»‡u'}</div>
       ${(function(){
         const items=[
-          {k:'collect_gps',i:'📍',v:'Tọa độ GPS',e:'GPS',dv:'Nếu tắt, người dùng không cần cho phép vị trí khi đăng nhập.',de:'If OFF, users skip location permission on login.'},
-          {k:'collect_ip',i:'🌐',v:'Địa chỉ IP',e:'IP Address',dv:'Ghi nhận IP công khai.',de:'Record public IP.'},
-          {k:'collect_device',i:'📱',v:'Thiết bị',e:'Device',dv:'User-Agent, OS, trình duyệt, màn hình.',de:'User-Agent, OS, browser, screen.'},
-          {k:'collect_navigation',i:'📄',v:'Lịch sử trang',e:'Navigation',dv:'Ghi lại trang truy cập, thời điểm, thời lượng.',de:'Track page views with timestamps.'},
-          {k:'collect_connection',i:'📶',v:'Kết nối',e:'Network',dv:'Loại kết nối, múi giờ.',de:'Connection type, timezone.'},
-          {k:'require_consent',i:'📋',v:'Yêu cầu đồng ý',e:'Consent',dv:'Nếu tắt, đăng nhập không cần đồng ý điều khoản.',de:'If OFF, login skips consent dialog.'},
+          {k:'collect_gps',i:'ðŸ“',v:'Tá»a Ä‘á»™ GPS',e:'GPS',dv:'Náº¿u táº¯t, ngÆ°á»i dÃ¹ng khÃ´ng cáº§n cho phÃ©p vá»‹ trÃ­ khi Ä‘Äƒng nháº­p.',de:'If OFF, users skip location permission on login.'},
+          {k:'collect_ip',i:'ðŸŒ',v:'Äá»‹a chá»‰ IP',e:'IP Address',dv:'Ghi nháº­n IP cÃ´ng khai.',de:'Record public IP.'},
+          {k:'collect_device',i:'ðŸ“±',v:'Thiáº¿t bá»‹',e:'Device',dv:'User-Agent, OS, trÃ¬nh duyá»‡t, mÃ n hÃ¬nh.',de:'User-Agent, OS, browser, screen.'},
+          {k:'collect_navigation',i:'ðŸ“„',v:'Lá»‹ch sá»­ trang',e:'Navigation',dv:'Ghi láº¡i trang truy cáº­p, thá»i Ä‘iá»ƒm, thá»i lÆ°á»£ng.',de:'Track page views with timestamps.'},
+          {k:'collect_connection',i:'ðŸ“¶',v:'Káº¿t ná»‘i',e:'Network',dv:'Loáº¡i káº¿t ná»‘i, mÃºi giá».',de:'Connection type, timezone.'},
+          {k:'require_consent',i:'ðŸ“‹',v:'YÃªu cáº§u Ä‘á»“ng Ã½',e:'Consent',dv:'Náº¿u táº¯t, Ä‘Äƒng nháº­p khÃ´ng cáº§n Ä‘á»“ng Ã½ Ä‘iá»u khoáº£n.',de:'If OFF, login skips consent dialog.'},
         ];
         const src = DATA_SETTINGS_DRAFT || DATA_SETTINGS;
         return items.map(it=>{
@@ -7575,20 +7575,20 @@ function renderAdminActivity(){
         }).join('');
       })()}
       <div id="ds-action-bar" style="display:${DATA_SETTINGS_DRAFT?'flex':'none'};padding:10px 14px;gap:8px;justify-content:flex-end;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border-top:1px solid color-mix(in srgb, var(--amber) 28%, var(--border))">
-        <button class="btn-admin secondary" onclick="cancelDataSettingsDraft()" style="padding:6px 16px;font-size:12px">↩ ${lang==='en'?'Cancel':'Hủy'}</button>
-        <button class="btn-admin primary" onclick="saveDataSettingsDraft()" style="padding:6px 16px;font-size:12px">💾 ${lang==='en'?'Save':'Lưu'}</button>
+        <button class="btn-admin secondary" onclick="cancelDataSettingsDraft()" style="padding:6px 16px;font-size:12px">â†© ${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin primary" onclick="saveDataSettingsDraft()" style="padding:6px 16px;font-size:12px">ðŸ’¾ ${lang==='en'?'Save':'LÆ°u'}</button>
       </div>
-      <div style="padding:10px 14px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--brand-2)">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
+      <div style="padding:10px 14px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--brand-2)">ðŸ’¡ ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Báº­t/táº¯t tÃ¹y chá»n rá»“i nháº¥n LÆ°u. Thay Ä‘á»•i cÃ³ hiá»‡u lá»±c tá»« láº§n Ä‘Äƒng nháº­p káº¿.'}</div>
     </div>
     <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
-      🛡 <b>${lang==='en'?'Security Audit Log':'Nhật ký Kiểm toán Bảo mật'}:</b> 
+      ðŸ›¡ <b>${lang==='en'?'Security Audit Log':'Nháº­t kÃ½ Kiá»ƒm toÃ¡n Báº£o máº­t'}:</b> 
       ${lang==='en'
         ?'Records session data: login time, IP, GPS coordinates, device fingerprint, detailed page-by-page navigation with exact timestamps and viewing duration.'
-        :'Ghi nhận dữ liệu phiên: thời gian đăng nhập, IP, tọa độ GPS, vân tay thiết bị, điều hướng chi tiết từng trang với thời điểm chính xác và thời lượng xem.'}
+        :'Ghi nháº­n dá»¯ liá»‡u phiÃªn: thá»i gian Ä‘Äƒng nháº­p, IP, tá»a Ä‘á»™ GPS, vÃ¢n tay thiáº¿t bá»‹, Ä‘iá»u hÆ°á»›ng chi tiáº¿t tá»«ng trang vá»›i thá»i Ä‘iá»ƒm chÃ­nh xÃ¡c vÃ  thá»i lÆ°á»£ng xem.'}
     </div>
     <div id="activity-sessions-list" style="max-height:550px;overflow-y:auto">
       ${logs.length === 0 
-        ? '<div style="text-align:center;padding:40px;color:var(--text-3)">'+( lang==='en'?'No activity recorded yet':'Chưa có hoạt động nào được ghi')+'</div>'
+        ? '<div style="text-align:center;padding:40px;color:var(--text-3)">'+( lang==='en'?'No activity recorded yet':'ChÆ°a cÃ³ hoáº¡t Ä‘á»™ng nÃ o Ä‘Æ°á»£c ghi')+'</div>'
         : logs.map((s,si)=>{
           const loginDate = new Date(s.login_time);
           const dateStr = loginDate.toLocaleDateString('vi-VN') + ' ' + loginDate.toLocaleTimeString('vi-VN');
@@ -7600,47 +7600,47 @@ function renderAdminActivity(){
                 <span style="font-weight:700;font-size:12px;color:var(--text)">${escapeHtml(s.name||s.user)}</span>
                 <span style="font-family:var(--mono);font-size:10px;color:var(--text-3)">@${escapeHtml(s.user)}</span>
                 <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2)">${escapeHtml(s.role||'')}</span>
-                <span style="font-size:10px;color:var(--text-2)">🕐 ${dateStr}</span>
+                <span style="font-size:10px;color:var(--text-2)">ðŸ• ${dateStr}</span>
               </div>
-              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('▾')?'▴ Thu gọn':'▾ Chi tiết'">
-                ▾ ${lang==='en'?'Detail':'Chi tiết'}
+              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('â–¾')?'â–´ Thu gá»n':'â–¾ Chi tiáº¿t'">
+                â–¾ ${lang==='en'?'Detail':'Chi tiáº¿t'}
               </button>
             </div>
             <!-- Summary row -->
             <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:var(--bg-surface-alt,#f8fafc);border-radius:6px">
-              <span>🌐 <b>IP:</b> ${escapeHtml(s.ip||'—')}</span>
-              <span>📍 <b>GPS:</b> ${escapeHtml(s.location||'—')} ${s.location_accuracy&&s.location_accuracy!=='—'?'(±'+escapeHtml(s.location_accuracy)+')':''}</span>
-              <span>📱 <b>${lang==='en'?'Device':'Thiết bị'}:</b> ${escapeHtml(s.device_short||s.platform||'—')}</span>
-              <span>🖥 <b>${lang==='en'?'Screen':'Màn hình'}:</b> ${escapeHtml(s.screen||'—')}</span>
-              <span>🔲 <b>Viewport:</b> ${escapeHtml(s.viewport||'—')}</span>
-              <span>🌍 <b>TZ:</b> ${escapeHtml(s.timezone||'—')}</span>
-              <span>📶 <b>Net:</b> ${escapeHtml(s.connection_type||'—')}</span>
-              <span>📄 <b>${totalPages}</b> ${lang==='en'?'pages':'trang'} · <b>${formatDuration(totalTime)}</b></span>
+              <span>ðŸŒ <b>IP:</b> ${escapeHtml(s.ip||'â€”')}</span>
+              <span>ðŸ“ <b>GPS:</b> ${escapeHtml(s.location||'â€”')} ${s.location_accuracy&&s.location_accuracy!=='â€”'?'(Â±'+escapeHtml(s.location_accuracy)+')':''}</span>
+              <span>ðŸ“± <b>${lang==='en'?'Device':'Thiáº¿t bá»‹'}:</b> ${escapeHtml(s.device_short||s.platform||'â€”')}</span>
+              <span>ðŸ–¥ <b>${lang==='en'?'Screen':'MÃ n hÃ¬nh'}:</b> ${escapeHtml(s.screen||'â€”')}</span>
+              <span>ðŸ”² <b>Viewport:</b> ${escapeHtml(s.viewport||'â€”')}</span>
+              <span>ðŸŒ <b>TZ:</b> ${escapeHtml(s.timezone||'â€”')}</span>
+              <span>ðŸ“¶ <b>Net:</b> ${escapeHtml(s.connection_type||'â€”')}</span>
+              <span>ðŸ“„ <b>${totalPages}</b> ${lang==='en'?'pages':'trang'} Â· <b>${formatDuration(totalTime)}</b></span>
             </div>
             <!-- Detailed page-by-page log (hidden by default) -->
             <div class="al-detail" style="display:none">
               <div style="font-size:10px;font-weight:700;margin:8px 0 6px;color:var(--text-2);border-bottom:1px solid var(--border);padding-bottom:4px">
-                📋 ${lang==='en'?'Page-by-page navigation log':'Nhật ký điều hướng từng trang'} (${totalPages} ${lang==='en'?'entries':'mục'})
+                ðŸ“‹ ${lang==='en'?'Page-by-page navigation log':'Nháº­t kÃ½ Ä‘iá»u hÆ°á»›ng tá»«ng trang'} (${totalPages} ${lang==='en'?'entries':'má»¥c'})
               </div>
               <table style="width:100%;border-collapse:collapse;font-size:10px">
                 <thead><tr style="background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff))">
                   <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">#</th>
-                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Page / Document':'Trang / Tài liệu'}</th>
-                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Started viewing':'Bắt đầu xem'}</th>
-                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Left at':'Rời lúc'}</th>
-                  <th style="text-align:right;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Duration':'Thời lượng'}</th>
+                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Page / Document':'Trang / TÃ i liá»‡u'}</th>
+                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Started viewing':'Báº¯t Ä‘áº§u xem'}</th>
+                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Left at':'Rá»i lÃºc'}</th>
+                  <th style="text-align:right;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Duration':'Thá»i lÆ°á»£ng'}</th>
                 </tr></thead>
                 <tbody>
                 ${(s.pages||[]).map((p,pi)=>{
                   const entered = new Date(p.entered_at);
                   const enteredStr = entered.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-                  const leftStr = p.left_at ? new Date(p.left_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
+                  const leftStr = p.left_at ? new Date(p.left_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'â€”';
                   const isDoc = (p.page_id||p.page||'').startsWith('doc/');
                   const durColor = (p.duration_sec||0) > 300 ? '#dc2626' : (p.duration_sec||0) > 60 ? '#d97706' : '#16a34a';
                   return `<tr style="border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent)">
                     <td style="padding:3px 8px;color:var(--text-3)">${pi+1}</td>
                     <td style="padding:3px 8px">
-                      ${isDoc?'📄':'📁'} <b>${escapeHtml(p.page_title||p.page_id||p.page||'—')}</b>
+                      ${isDoc?'ðŸ“„':'ðŸ“'} <b>${escapeHtml(p.page_title||p.page_id||p.page||'â€”')}</b>
                       <span style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-left:4px">${escapeHtml(p.page_id||p.page||'')}</span>
                     </td>
                     <td style="padding:3px 8px;font-family:var(--mono)">${enteredStr}</td>
@@ -7651,8 +7651,8 @@ function renderAdminActivity(){
                 </tbody>
               </table>
               <div style="margin-top:8px;font-size:9px;color:var(--text-3);padding:6px 8px;background:var(--bg-surface-alt,#f8fafc);border-radius:4px">
-                <b>Full User-Agent:</b> ${escapeHtml(s.device||'—')}<br>
-                <b>Language:</b> ${escapeHtml(s.language||'—')} · <b>Cookies:</b> ${s.cookies_enabled?'Yes':'No'} · <b>Online:</b> ${s.online?'Yes':'No'}
+                <b>Full User-Agent:</b> ${escapeHtml(s.device||'â€”')}<br>
+                <b>Language:</b> ${escapeHtml(s.language||'â€”')} Â· <b>Cookies:</b> ${s.cookies_enabled?'Yes':'No'} Â· <b>Online:</b> ${s.online?'Yes':'No'}
               </div>
             </div>
           </div>`;
@@ -7691,20 +7691,20 @@ function exportActivityCSV(){
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
-  showToast('✅ '+(lang==='en'?'Exported':'Đã xuất'));
+  showToast('âœ… '+(lang==='en'?'Exported':'ÄÃ£ xuáº¥t'));
 }
 
 function clearActivityLog(){
-  if(!confirm(lang==='en'?'Clear all activity log?':'Xóa toàn bộ log hoạt động?')) return;
+  if(!confirm(lang==='en'?'Clear all activity log?':'XÃ³a toÃ n bá»™ log hoáº¡t Ä‘á»™ng?')) return;
   ACTIVITY_LOG.length = 0;
   saveActivityLog();
-  showToast('✅ '+(lang==='en'?'Cleared':'Đã xóa'));
+  showToast('âœ… '+(lang==='en'?'Cleared':'ÄÃ£ xÃ³a'));
   renderAdminActivity();
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ADMIN TAB: ROLES (original, kept)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderAdminRoles(){
   const el=document.getElementById('admin-content');
   const roleOpts=Object.entries(ROLES).map(([k,v])=>'<option value="'+k+'">'+v.icon+' '+v.label+'</option>').join('');
@@ -7712,14 +7712,14 @@ function renderAdminRoles(){
     <div style="overflow-x:auto">
       <table class="admin-table">
         <thead><tr>
-          <th></th><th>${lang==='en'?'Role':'Vai trò'}</th><th>Level</th>
-          <th>${lang==='en'?'Edit':'Sửa'}</th>
-          <th>${lang==='en'?'Create':'Tạo mới'}</th>
-          <th>${lang==='en'?'Approve':'Duyệt'}</th><th>Admin</th>
-          <th title="${lang==='en'?'Can view Activity Log tab':'Xem được tab Kiểm soát hành vi'}">👁 ${lang==='en'?'Activity':'Hành vi'}</th>
-          <th title="${lang==='en'?'Can export/import user Excel':'Xuất/nhập Excel người dùng'}">📥 Excel</th>
-          <th>${lang==='en'?'Documents':'Tài liệu'}</th>
-          <th>${lang==='en'?'Members':'Thành viên'}</th>
+          <th></th><th>${lang==='en'?'Role':'Vai trÃ²'}</th><th>Level</th>
+          <th>${lang==='en'?'Edit':'Sá»­a'}</th>
+          <th>${lang==='en'?'Create':'Táº¡o má»›i'}</th>
+          <th>${lang==='en'?'Approve':'Duyá»‡t'}</th><th>Admin</th>
+          <th title="${lang==='en'?'Can view Activity Log tab':'Xem Ä‘Æ°á»£c tab Kiá»ƒm soÃ¡t hÃ nh vi'}">ðŸ‘ ${lang==='en'?'Activity':'HÃ nh vi'}</th>
+          <th title="${lang==='en'?'Can export/import user Excel':'Xuáº¥t/nháº­p Excel ngÆ°á»i dÃ¹ng'}">ðŸ“¥ Excel</th>
+          <th>${lang==='en'?'Documents':'TÃ i liá»‡u'}</th>
+          <th>${lang==='en'?'Members':'ThÃ nh viÃªn'}</th>
         </tr></thead>
         <tbody>
           ${Object.entries(ROLES).map(([k,v])=>{
@@ -7746,10 +7746,10 @@ function renderAdminRoles(){
                 <input type="checkbox" ${v.admin?'checked':''} onchange="ROLES['${k}'].admin=this.checked;markUnsaved();renderAdminRoles()">
               </td>
               <td style="text-align:center">
-                <input type="checkbox" ${v.canViewActivity?'checked':''} onchange="ROLES['${k}'].canViewActivity=this.checked;markUnsaved();renderAdminRoles()" title="${lang==='en'?'Allow this role to view Activity Log':'Cho phép vai trò này xem Kiểm soát hành vi'}">
+                <input type="checkbox" ${v.canViewActivity?'checked':''} onchange="ROLES['${k}'].canViewActivity=this.checked;markUnsaved();renderAdminRoles()" title="${lang==='en'?'Allow this role to view Activity Log':'Cho phÃ©p vai trÃ² nÃ y xem Kiá»ƒm soÃ¡t hÃ nh vi'}">
               </td>
               <td style="text-align:center">
-                <input type="checkbox" ${v.canExportUsers?'checked':''} onchange="ROLES['${k}'].canExportUsers=this.checked;markUnsaved();renderAdminRoles()" title="${lang==='en'?'Allow this role to export/import user Excel':'Cho phép vai trò này xuất/nhập Excel người dùng'}">
+                <input type="checkbox" ${v.canExportUsers?'checked':''} onchange="ROLES['${k}'].canExportUsers=this.checked;markUnsaved();renderAdminRoles()" title="${lang==='en'?'Allow this role to export/import user Excel':'Cho phÃ©p vai trÃ² nÃ y xuáº¥t/nháº­p Excel ngÆ°á»i dÃ¹ng'}">
               </td>
               <td>
                 <div style="display:flex;align-items:center;gap:6px">
@@ -7762,7 +7762,7 @@ function renderAdminRoles(){
               <td style="min-width:160px">
                 ${roleUsers.length>0
                   ? roleUsers.map(u=>'<div style="font-size:10px;padding:2px 0"><span style="color:var(--text-3)">'+u.id+'</span> '+u.name+'</div>').join('')
-                  : '<span style="font-size:10px;color:var(--text-3);font-style:italic">'+(lang==='en'?'No members':'Chưa có')+'</span>'}
+                  : '<span style="font-size:10px;color:var(--text-3);font-style:italic">'+(lang==='en'?'No members':'ChÆ°a cÃ³')+'</span>'}
               </td>
             </tr>`;
           }).join('')}
@@ -7770,22 +7770,22 @@ function renderAdminRoles(){
       </table>
     </div>
     <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
-      <h3 style="font-size:13px;font-weight:700;margin-bottom:10px">${lang==='en'?'Reassign User Role':'Thay đổi vai trò người dùng'}</h3>
+      <h3 style="font-size:13px;font-weight:700;margin-bottom:10px">${lang==='en'?'Reassign User Role':'Thay Ä‘á»•i vai trÃ² ngÆ°á»i dÃ¹ng'}</h3>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <select id="role-reassign-user" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           ${USERS.filter(u=>u.active).map(u=>'<option value="'+u.id+'">'+u.name+' ('+u.role+')</option>').join('')}
         </select>
-        <span style="font-size:11px;color:var(--text-3)">→</span>
+        <span style="font-size:11px;color:var(--text-3)">â†’</span>
         <select id="role-reassign-role" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           ${roleOpts}
         </select>
-        <button class="btn-admin primary" onclick="reassignUserRole()">${lang==='en'?'Apply':'Áp dụng'}</button>
+        <button class="btn-admin primary" onclick="reassignUserRole()">${lang==='en'?'Apply':'Ãp dá»¥ng'}</button>
       </div>
     </div>
     <div class="admin-save-bar">
-      <span class="save-hint">${adminUnsaved?'<b>⚠ '+(lang==='en'?'Unsaved changes':'Có thay đổi chưa lưu')+'</b>':lang==='en'?'Make changes then click Save':'Thay đổi rồi nhấn Lưu'}</span>
-      <button class="btn-admin secondary" onclick="sessionStorage.clear();location.reload()">↩ Reset All</button>
-      <button class="btn-admin primary" onclick="adminSaveAll()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+      <span class="save-hint">${adminUnsaved?'<b>âš  '+(lang==='en'?'Unsaved changes':'CÃ³ thay Ä‘á»•i chÆ°a lÆ°u')+'</b>':lang==='en'?'Make changes then click Save':'Thay Ä‘á»•i rá»“i nháº¥n LÆ°u'}</span>
+      <button class="btn-admin secondary" onclick="sessionStorage.clear();location.reload()">â†© Reset All</button>
+      <button class="btn-admin primary" onclick="adminSaveAll()" style="padding:8px 24px;font-size:13px">ðŸ’¾ ${lang==='en'?'SAVE':'LÆ¯U'}</button>
     </div>`;
 }
 
@@ -7798,10 +7798,11 @@ function reassignUserRole(){
     u.title=ROLES[newRole]?ROLES[newRole].label:newRole;
     saveUsersToStorage();
     markUnsaved();
-    showToast(lang==='en'?'✅ Role changed for '+u.name:'✅ Đã đổi vai trò cho '+u.name);
+    showToast(lang==='en'?'âœ… Role changed for '+u.name:'âœ… ÄÃ£ Ä‘á»•i vai trÃ² cho '+u.name);
     renderAdminRoles();
   }
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+

@@ -28,9 +28,17 @@ class RegistryController extends BaseController
     /**
      * @return void
      */
+    private function requireRegistryReadAccess(array $user): void
+    {
+        $this->requireAnyPermission($user, ['studio.registry.read', 'studio.registry.write']);
+    }
+
+    /**
+     * @return void
+     */
     private function requireRegistryWriteAccess(array $user): void
     {
-        $this->requireAnyRole($user, array_merge(admin_roles(), ['qms_engineer', 'quality_manager']));
+        $this->requireAnyPermission($user, ['studio.registry.write']);
     }
 
     private function registryDir(): string
@@ -46,7 +54,8 @@ class RegistryController extends BaseController
      */
     public function getDataFields(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         $api = $this->query('api');
 
         try {
@@ -75,7 +84,8 @@ class RegistryController extends BaseController
      */
     public function getApiParams(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         $api = $this->query('api');
 
         try {
@@ -100,7 +110,8 @@ class RegistryController extends BaseController
      */
     public function getFieldTypes(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('field-types');
             $this->success(['data' => $data, 'field_types' => $data]);
@@ -116,7 +127,8 @@ class RegistryController extends BaseController
      */
     public function getStatusOptions(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         $key = $this->query('key');
 
         try {
@@ -144,7 +156,8 @@ class RegistryController extends BaseController
      */
     public function getComputedFormulas(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('computed-formulas');
             $this->success(['data' => $data, 'formulas' => $data]);
@@ -159,7 +172,8 @@ class RegistryController extends BaseController
      */
     public function getValidationRules(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('validation-rules');
             $this->success(['data' => $data, 'rules' => $data]);
@@ -174,7 +188,8 @@ class RegistryController extends BaseController
      */
     public function getWorkflowLibrary(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('workflow-library');
             $this->success(['data' => $data, 'workflow_library' => $data]);
@@ -189,7 +204,8 @@ class RegistryController extends BaseController
      */
     public function getDomainFieldPacks(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('domain-field-packs');
             $this->success(['data' => $data, 'domain_field_packs' => $data]);
@@ -204,7 +220,8 @@ class RegistryController extends BaseController
      */
     public function getRelationMap(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('relation-map');
             $this->success(['data' => $data, 'relation_map' => $data]);
@@ -219,7 +236,8 @@ class RegistryController extends BaseController
      */
     public function getEndpointCatalog(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('endpoint-catalog');
             $this->success(['data' => $data, 'endpoint_catalog' => $data]);
@@ -234,7 +252,8 @@ class RegistryController extends BaseController
      */
     public function getIotConnectors(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $data = $this->registry()->raw('iot-connectors');
             $this->success(['data' => $data, 'connectors' => $data]);
@@ -249,7 +268,8 @@ class RegistryController extends BaseController
      */
     public function getFull(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireRegistryReadAccess($user);
         try {
             $registry = $this->registry();
             $data = [

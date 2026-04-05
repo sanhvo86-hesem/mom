@@ -17,6 +17,7 @@ use Throwable;
 class GenericCrudController extends BaseController
 {
     private ?GenericCrudService $service = null;
+    private ?array $endpointCatalog = null;
 
     private function service(): GenericCrudService
     {
@@ -51,6 +52,17 @@ class GenericCrudController extends BaseController
     private function requireGenericWriteAccess(array $user): void
     {
         $this->requireAnyRole($user, $this->writeRoles());
+    }
+
+    private function endpointCatalog(): array
+    {
+        if ($this->endpointCatalog === null) {
+            $path = $this->dataDir . '/registry/endpoint-catalog.json';
+            $payload = $this->readJsonFile($path) ?? [];
+            $this->endpointCatalog = is_array($payload['endpoints'] ?? null) ? $payload['endpoints'] : [];
+        }
+
+        return $this->endpointCatalog;
     }
 
     /**
@@ -423,12 +435,60 @@ class GenericCrudController extends BaseController
         return array_values(array_filter(array_map(static fn($role): string => migrate_role(strtolower(trim((string)$role))), $roles)));
     }
 
+    /**
+     * @param array<string, mixed> $ctx
+     * @return array<int, string>
+     */
+    private function runtimePermissionKeys(array $ctx): array
+    {
+        $action = strtolower($ctx['domain'] . '.' . $ctx['table'] . '.' . $ctx['kind']);
+        $endpoint = $this->endpointCatalog()[$action] ?? null;
+        $keys = array_values(array_filter(array_map(
+            static fn($value): string => strtolower(trim((string)$value)),
+            is_array($endpoint['security']['permission_keys'] ?? null) ? $endpoint['security']['permission_keys'] : []
+        ), static fn(string $value): bool => $value !== ''));
+
+        if ($keys !== []) {
+            return array_values(array_unique($keys));
+        }
+
+        return [
+            in_array($ctx['kind'], ['list', 'detail'], true)
+                ? strtolower($ctx['domain'] . '.' . $ctx['table'] . '.read')
+                : strtolower($ctx['domain'] . '.' . $ctx['table'] . '.' . $ctx['kind']),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     */
+    private function enforceRuntimePermission(array $user, array $ctx): void
+    {
+        if (user_is_admin($user)) {
+            return;
+        }
+
+        $permissions = $this->runtimePermissionKeys($ctx);
+        if ($this->hasAnyPermission($user, $permissions)) {
+            return;
+        }
+
+        if ($this->permissionMatrixManages($permissions)) {
+            $this->error('forbidden', 403);
+        }
+
+        if (!in_array($ctx['kind'], ['list', 'detail'], true)) {
+            $this->requireGenericWriteAccess($user);
+        }
+    }
+
     public function listRecords(): never
     {
         $user = $this->requireAuth();
 
         try {
             $ctx = $this->resolveContext('list', false, $user);
+            $this->enforceRuntimePermission($user, $ctx);
             $result = $this->service()->list($ctx['domain'], $ctx['table'], $_GET, $ctx['scope']);
             $this->success([
                 'records' => $result['records'],
@@ -457,6 +517,7 @@ class GenericCrudController extends BaseController
         try {
             $user = $this->requireAuth();
             $ctx = $this->resolveContext('detail', true, $user);
+            $this->enforceRuntimePermission($user, $ctx);
             $record = $this->service()->detail($ctx['domain'], $ctx['table'], $ctx['identity'], $ctx['scope']);
             if ($record === null) {
                 $this->error('not_found', 404);
@@ -484,11 +545,11 @@ class GenericCrudController extends BaseController
     public function createRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireGenericWriteAccess($user);
         $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('create', false, $user);
+            $this->enforceRuntimePermission($user, $ctx);
             $body = $this->jsonBody();
             $payload = is_array($body['data'] ?? null) ? (array)$body['data'] : $body;
             unset($payload['domain'], $payload['table'], $payload['action']);
@@ -521,11 +582,11 @@ class GenericCrudController extends BaseController
     public function updateRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireGenericWriteAccess($user);
         $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('update', true, $user);
+            $this->enforceRuntimePermission($user, $ctx);
             $body = $this->jsonBody();
             $payload = is_array($body['data'] ?? null) ? (array)$body['data'] : $body;
             unset($payload['domain'], $payload['table'], $payload['action'], $payload['id'], $payload['identity'], $payload['row_version'], $payload['expected_row_version'], $payload['version'], $payload['expectedVersion'], $payload['scope']);
@@ -566,11 +627,11 @@ class GenericCrudController extends BaseController
     public function deleteRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireGenericWriteAccess($user);
         $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('delete', true, $user);
+            $this->enforceRuntimePermission($user, $ctx);
             $record = $this->service()->delete($ctx['domain'], $ctx['table'], $ctx['identity'], $ctx['scope'], $ctx['expected_row_version']);
             $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
             $this->success([
@@ -594,11 +655,11 @@ class GenericCrudController extends BaseController
     public function transitionRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireGenericWriteAccess($user);
         $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('transition', true, $user);
+            $this->enforceRuntimePermission($user, $ctx);
             $body = $this->jsonBody();
             $toStatus = trim((string)($body['to'] ?? $body['status'] ?? $body['toStatus'] ?? $body['to_status'] ?? ''));
             if ($toStatus === '') {
