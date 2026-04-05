@@ -2,17 +2,17 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-05T11:58:08.953Z"
+    "generatedAt": "2026-04-05T13:32:59.374Z"
   },
   "coverage": {
-    "router_actions": 2800,
-    "field_registry_actions": 2863,
-    "field_definitions": 38507,
+    "router_actions": 2862,
+    "field_registry_actions": 2866,
+    "field_definitions": 38595,
     "unique_field_keys": 4014,
     "status_sets": 536,
     "workflow_count": 425,
     "relation_edges": 2440,
-    "validation_rules": 24784,
+    "validation_rules": 27794,
     "formula_count": 960,
     "domain_pack_count": 3168,
     "scalar_record_endpoints": 2762
@@ -20,11 +20,11 @@
   "assets": {
     "data-fields-index.json": {
       "kind": "field-registry-index",
-      "records": 2863
+      "records": 2866
     },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
-      "records": 2800
+      "records": 2862
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
@@ -48,7 +48,7 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 24784
+      "records": 27794
     },
     "computed-formulas.json": {
       "kind": "formula-library",

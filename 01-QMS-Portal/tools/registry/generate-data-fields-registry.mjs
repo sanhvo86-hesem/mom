@@ -175,33 +175,46 @@ const SYSTEM_MANAGED_FIELDS = new Set([
   'source_system',
 ]);
 
+function primaryKeyFields(table) {
+  const raw = Array.isArray(table.primaryKey) ? table.primaryKey : [table.primaryKey];
+  return raw
+    .map((value) => String(value || '').trim())
+    .filter((value) => value && table.columns[value]);
+}
+
+function primaryKeyMeta(table) {
+  const fields = primaryKeyFields(table);
+  if (fields.length === 1) return { mode: 'scalar', fields, key: fields[0] };
+  if (fields.length > 1) return { mode: 'composite', fields, key: null };
+  return { mode: 'missing', fields: [], key: null };
+}
+
 function primaryKeyName(table) {
-  const primaryKey = Array.isArray(table.primaryKey) ? table.primaryKey[0] : table.primaryKey;
-  return typeof primaryKey === 'string' && primaryKey.trim() ? primaryKey.trim() : '';
+  return primaryKeyMeta(table).key || '';
 }
 
 function hasPrimaryKey(table) {
-  return primaryKeyName(table) !== '';
+  return primaryKeyMeta(table).mode !== 'missing';
 }
 
 function writeColumnsFor(table, kind) {
-  const primaryKey = primaryKeyName(table);
+  const primaryKeys = new Set(primaryKeyFields(table));
   return Object.keys(table.columns).filter((columnName) => {
     const column = table.columns[columnName];
     if (!column || column.generated) return false;
     if (SYSTEM_MANAGED_FIELDS.has(columnName)) return false;
-    if (kind === 'update' && columnName === primaryKey) return false;
+    if (kind === 'update' && primaryKeys.has(columnName)) return false;
     if (kind === 'update' && table.statusColumn && columnName === table.statusColumn) return false;
-    if (kind === 'create' && columnName === primaryKey && column.default) return false;
+    if (kind === 'create' && primaryKeys.has(columnName) && column.default) return false;
     return true;
   });
 }
 
 function deleteFieldsFor(table) {
-  const primaryKey = primaryKeyName(table);
-  if (!primaryKey) return [];
+  const primaryKeys = primaryKeyFields(table);
+  if (!primaryKeys.length) return [];
   return [
-    dbField(table.tableName, primaryKey, table, 'detail'),
+    ...primaryKeys.map((primaryKey) => dbField(table.tableName, primaryKey, table, 'detail')),
     { key: 'confirm_delete', label: 'Xác nhận xóa', labelEn: 'Confirm Delete', type: 'boolean', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: {} },
     { key: 'delete_reason', label: 'Lý do xóa', labelEn: 'Delete Reason', type: 'textarea', required: false, filterable: false, sortable: false, group: 'general', source: 'param', constraints: { maxLength: 2000 } },
   ];
@@ -355,6 +368,7 @@ for (const [tableName, table] of Object.entries(tables)) {
   const createCols = writeColumnsFor(table, 'create');
   const updateCols = writeColumnsFor(table, 'update');
   const primaryKey = primaryKeyName(table);
+  const primaryKeys = primaryKeyFields(table);
   generated[`${table.domain}.${tableName}.list`] = ensureMin(`${table.domain}.${tableName}.list`, listCols.map((c) => dbField(tableName, c, table, 'list')));
   if (hasPrimaryKey(table)) {
     generated[`${table.domain}.${tableName}.detail`] = ensureMin(`${table.domain}.${tableName}.detail`, Object.keys(table.columns).map((c) => dbField(tableName, c, table, 'detail')));
@@ -362,8 +376,8 @@ for (const [tableName, table] of Object.entries(tables)) {
     generated[`${table.domain}.${tableName}.delete`] = ensureMin(`${table.domain}.${tableName}.delete`, deleteFieldsFor(table));
   }
   generated[`${table.domain}.${tableName}.create`] = ensureMin(`${table.domain}.${tableName}.create`, createCols.map((c) => dbField(tableName, c, table, 'create')));
-  if (primaryKey && table.statusColumn && table.statusSet) generated[`${table.domain}.${tableName}.transition`] = ensureMin(`${table.domain}.${tableName}.transition`, [
-    dbField(tableName, primaryKey, table, 'detail'),
+  if (primaryKeys.length && table.statusColumn && table.statusSet) generated[`${table.domain}.${tableName}.transition`] = ensureMin(`${table.domain}.${tableName}.transition`, [
+    ...primaryKeys.map((key) => dbField(tableName, key, table, 'detail')),
     dbField(tableName, table.statusColumn, table, 'detail'),
     { key: 'to_status', label: 'Trạng thái đích', labelEn: 'Target Status', type: 'select', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { enumRef: table.statusSet } },
     { key: 'transition_note', label: 'Ghi chú chuyển trạng thái', labelEn: 'Transition Note', type: 'textarea', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { maxLength: 2000 } },

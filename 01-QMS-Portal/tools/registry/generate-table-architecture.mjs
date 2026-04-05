@@ -1754,6 +1754,23 @@ function normalizeIdentifier(identifier) {
   return identifier.replace(/"/g, '').split('.').at(-1);
 }
 
+function splitIdentifierList(value) {
+  return splitTopLevel(String(value || ''))
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function resolveConstraintColumn(table, expression) {
+  const direct = normalizeIdentifier(String(expression || '').trim());
+  if (table.columns.has(direct)) return direct;
+  const matches = Array.from(String(expression || '').matchAll(/[A-Za-z_][A-Za-z0-9_]*/g))
+    .map((match) => normalizeIdentifier(match[0]));
+  for (const candidate of matches) {
+    if (table.columns.has(candidate)) return candidate;
+  }
+  return direct;
+}
+
 function ensureTable(tables, tableName, migration) {
   if (!tables.has(tableName)) {
     tables.set(tableName, {
@@ -1831,7 +1848,7 @@ function parseColumnDefinition(entry) {
     references: referencesMatch
       ? {
           table: normalizeIdentifier(referencesMatch[1]),
-          columns: referencesMatch[2].split(',').map((part) => normalizeIdentifier(part.trim())),
+          columns: splitIdentifierList(referencesMatch[2]).map((part) => normalizeIdentifier(part)),
         }
       : null,
     checkValues: parseCheckValues(rest, name),
@@ -1842,7 +1859,7 @@ function parseConstraint(table, entry) {
   const normalized = entry.replace(/\s+/g, ' ').trim();
   const primaryMatch = normalized.match(/PRIMARY KEY\s*\(([^)]+)\)/i);
   if (primaryMatch) {
-    table.primaryKey = primaryMatch[1].split(',').map((part) => normalizeIdentifier(part.trim()));
+    table.primaryKey = splitIdentifierList(primaryMatch[1]).map((part) => resolveConstraintColumn(table, part));
     for (const pkColumn of table.primaryKey) {
       const column = table.columns.get(pkColumn);
       if (column) column.pk = true;
@@ -1850,14 +1867,14 @@ function parseConstraint(table, entry) {
   }
   const uniqueMatch = normalized.match(/UNIQUE\s*\(([^)]+)\)/i);
   if (uniqueMatch) {
-    table.uniqueGroups.push(uniqueMatch[1].split(',').map((part) => normalizeIdentifier(part.trim())));
+    table.uniqueGroups.push(splitIdentifierList(uniqueMatch[1]).map((part) => resolveConstraintColumn(table, part)));
   }
   const foreignMatch = normalized.match(/FOREIGN KEY\s*\(([^)]+)\)\s*REFERENCES\s+("?[\w.]+"?)\s*\(([^)]+)\)/i);
   if (foreignMatch) {
     table.foreignKeys.push({
-      columns: foreignMatch[1].split(',').map((part) => normalizeIdentifier(part.trim())),
+      columns: splitIdentifierList(foreignMatch[1]).map((part) => resolveConstraintColumn(table, part)),
       referencesTable: normalizeIdentifier(foreignMatch[2]),
-      referencesColumns: foreignMatch[3].split(',').map((part) => normalizeIdentifier(part.trim())),
+      referencesColumns: splitIdentifierList(foreignMatch[3]).map((part) => normalizeIdentifier(part)),
     });
   }
 }
@@ -1914,7 +1931,7 @@ function parseAlterTableStatement(stmt, tables, migration) {
   const masked = maskSingleQuotedLiterals(stmt);
   const match = masked.match(/ALTER\s+TABLE\s+(?:ONLY\s+)?("?[\w.]+"?)/i);
   if (!match) return false;
-  if (!/\bADD\s+(?:COLUMN|CONSTRAINT)\b/i.test(masked)) return true;
+  if (!/\bADD\s+(?:COLUMN|CONSTRAINT|PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY)\b/i.test(masked)) return true;
   const tableName = normalizeIdentifier(match[1]);
   const table = ensureTable(tables, tableName, migration);
   const actionText = stmt.slice(match.index + match[0].length).trim();

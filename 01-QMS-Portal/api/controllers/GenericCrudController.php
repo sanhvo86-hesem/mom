@@ -50,9 +50,97 @@ class GenericCrudController extends BaseController
     }
 
     /**
-     * @return array{domain:string, table:string, kind:string, id:string}
+     * @param array<string, mixed> $tableMeta
+     * @return array{mode:string, fields:array<int, string>, key:?string}
      */
-    private function resolveContext(string $expectedKind, bool $needsId = false): array
+    private function primaryKeyMeta(array $tableMeta): array
+    {
+        $columns = array_keys((array)($tableMeta['columns'] ?? []));
+        $raw = $tableMeta['primaryKey'] ?? null;
+        $values = is_array($raw) ? $raw : [$raw];
+        $fields = [];
+
+        foreach ($values as $value) {
+            $candidate = trim((string)$value);
+            if ($candidate !== '' && in_array($candidate, $columns, true) && !in_array($candidate, $fields, true)) {
+                $fields[] = $candidate;
+                continue;
+            }
+            if (preg_match_all('/[A-Za-z_][A-Za-z0-9_]*/', $candidate, $matches) !== false) {
+                foreach ((array)($matches[0] ?? []) as $token) {
+                    $token = trim((string)$token);
+                    if ($token !== '' && in_array($token, $columns, true) && !in_array($token, $fields, true)) {
+                        $fields[] = $token;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (count($fields) === 1) {
+            return ['mode' => 'scalar', 'fields' => $fields, 'key' => $fields[0]];
+        }
+        if ($fields !== []) {
+            return ['mode' => 'composite', 'fields' => $fields, 'key' => null];
+        }
+        return ['mode' => 'missing', 'fields' => [], 'key' => null];
+    }
+
+    /**
+     * @param array<string, mixed> $tableMeta
+     * @param array<string, mixed> $body
+     * @return array<string, mixed>
+     */
+    private function resolveIdentity(array $tableMeta, array $body): array
+    {
+        $pk = $this->primaryKeyMeta($tableMeta);
+        if ($pk['mode'] === 'missing' || $pk['fields'] === []) {
+            throw new RuntimeException('Table does not define a primary key');
+        }
+
+        $identityBody = is_array($body['identity'] ?? null) ? (array)$body['identity'] : [];
+        $identity = [];
+        foreach ($pk['fields'] as $field) {
+            $provided = false;
+            $value = $this->query($field);
+            if ($value !== null) {
+                $provided = true;
+            }
+            if (!$provided && array_key_exists($field, $body)) {
+                $value = $body[$field];
+                $provided = true;
+            }
+            if (!$provided && array_key_exists($field, $identityBody)) {
+                $value = $identityBody[$field];
+                $provided = true;
+            }
+            if ($pk['mode'] === 'scalar' && !$provided) {
+                $value = $this->query('id');
+                if ($value !== null) {
+                    $provided = true;
+                }
+                if (!$provided && array_key_exists('id', $body)) {
+                    $value = $body['id'];
+                    $provided = true;
+                }
+                if (!$provided && array_key_exists('id', $identityBody)) {
+                    $value = $identityBody['id'];
+                    $provided = true;
+                }
+            }
+            if (!$provided) {
+                throw new RuntimeException("Missing record identity field: {$field}");
+            }
+            $identity[$field] = $value;
+        }
+
+        return $identity;
+    }
+
+    /**
+     * @return array{domain:string, table:string, kind:string, id:string, identity:array<string, mixed>}
+     */
+    private function resolveContext(string $expectedKind, bool $needsIdentity = false): array
     {
         $domain = trim((string)($this->query('domain') ?? ''));
         $table = trim((string)($this->query('table') ?? ''));
@@ -72,26 +160,15 @@ class GenericCrudController extends BaseController
         if ($domain === '' || $table === '') {
             throw new RuntimeException('Missing domain/table context');
         }
-        if ($needsId && $id === '') {
-            $body = $this->jsonBody();
-            $id = trim((string)($body['id'] ?? ''));
-            if ($id === '') {
-                try {
-                    $tableMeta = $this->service()->resolveTable($domain, $table);
-                    $primaryKey = $tableMeta['primaryKey'] ?? null;
-                    if (is_array($primaryKey)) {
-                        $primaryKey = $primaryKey[0] ?? null;
-                    }
-                    if (is_string($primaryKey) && $primaryKey !== '') {
-                        $id = trim((string)($body[$primaryKey] ?? ''));
-                    }
-                } catch (Throwable) {
-                    // Keep the original missing-id failure path.
-                }
+        $body = $needsIdentity ? $this->jsonBody() : [];
+        $identity = [];
+        if ($needsIdentity) {
+            $tableMeta = $this->service()->resolveTable($domain, $table);
+            $identity = $this->resolveIdentity($tableMeta, is_array($body) ? $body : []);
+            $pk = $this->primaryKeyMeta($tableMeta);
+            if ($pk['mode'] === 'scalar' && $pk['key']) {
+                $id = trim((string)($identity[$pk['key']] ?? ''));
             }
-        }
-        if ($needsId && $id === '') {
-            throw new RuntimeException('Missing record id');
         }
 
         return [
@@ -99,6 +176,7 @@ class GenericCrudController extends BaseController
             'table' => $table,
             'kind' => $kind,
             'id' => $id,
+            'identity' => $identity,
         ];
     }
 
@@ -127,6 +205,8 @@ class GenericCrudController extends BaseController
                 'domain' => $result['domain'],
                 'table' => $result['table'],
                 'primaryKey' => $result['primaryKey'],
+                'primaryKeyFields' => $result['primaryKeyFields'],
+                'recordAddressing' => $result['recordAddressing'],
             ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -140,7 +220,7 @@ class GenericCrudController extends BaseController
 
         try {
             $ctx = $this->resolveContext('detail', true);
-            $record = $this->service()->detail($ctx['domain'], $ctx['table'], $ctx['id']);
+            $record = $this->service()->detail($ctx['domain'], $ctx['table'], $ctx['identity']);
             if ($record === null) {
                 $this->error('not_found', 404);
             }
@@ -150,6 +230,7 @@ class GenericCrudController extends BaseController
                 'domain' => $ctx['domain'],
                 'table' => $ctx['table'],
                 'id' => $ctx['id'],
+                'identity' => $ctx['identity'],
             ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -192,16 +273,19 @@ class GenericCrudController extends BaseController
             $ctx = $this->resolveContext('update', true);
             $body = $this->jsonBody();
             $payload = is_array($body['data'] ?? null) ? (array)$body['data'] : $body;
-            unset($payload['domain'], $payload['table'], $payload['action'], $payload['id']);
+            unset($payload['domain'], $payload['table'], $payload['action'], $payload['id'], $payload['identity']);
+            foreach (array_keys($ctx['identity']) as $identityField) {
+                unset($payload[$identityField]);
+            }
             $record = $this->service()->update(
                 $ctx['domain'],
                 $ctx['table'],
-                $ctx['id'],
+                $ctx['identity'],
                 $payload,
                 (string)($user['username'] ?? 'system')
             );
-            $this->auditLog('generic_crud_update', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id']], (string)($user['username'] ?? ''));
-            $this->success(['record' => $record, 'domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id']]);
+            $this->auditLog('generic_crud_update', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
+            $this->success(['record' => $record, 'domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('generic_update_failed', 400, $e->getMessage());
@@ -216,9 +300,9 @@ class GenericCrudController extends BaseController
 
         try {
             $ctx = $this->resolveContext('delete', true);
-            $record = $this->service()->delete($ctx['domain'], $ctx['table'], $ctx['id']);
-            $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id']], (string)($user['username'] ?? ''));
-            $this->success(['record' => $record, 'domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id']]);
+            $record = $this->service()->delete($ctx['domain'], $ctx['table'], $ctx['identity']);
+            $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
+            $this->success(['record' => $record, 'domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('generic_delete_failed', 400, $e->getMessage());
@@ -241,13 +325,13 @@ class GenericCrudController extends BaseController
             $record = $this->service()->transition(
                 $ctx['domain'],
                 $ctx['table'],
-                $ctx['id'],
+                $ctx['identity'],
                 $toStatus,
                 (string)($user['username'] ?? 'system'),
                 $this->currentRoles($user)
             );
-            $this->auditLog('generic_crud_transition', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'to' => $toStatus], (string)($user['username'] ?? ''));
-            $this->success(['record' => $record, 'domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id']]);
+            $this->auditLog('generic_crud_transition', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity'], 'to' => $toStatus], (string)($user['username'] ?? ''));
+            $this->success(['record' => $record, 'domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('generic_transition_failed', 400, $e->getMessage());

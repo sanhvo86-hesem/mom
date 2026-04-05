@@ -500,4 +500,19 @@ try {
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Dashboard guard returned wrong error.');
 }
 
+// Registry runtime assets must keep composite-identity CRUD contracts available.
+$endpointCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/endpoint-catalog.json'), true);
+$endpointMap = is_array($endpointCatalog['endpoints'] ?? null) ? $endpointCatalog['endpoints'] : [];
+$telemetryDetail = $endpointMap['mes_execution.mes_machine_telemetry.detail'] ?? null;
+$bomDetail = $endpointMap['master_data.bill_of_materials.detail'] ?? null;
+smoke_assert(is_array($telemetryDetail), 'Composite telemetry detail endpoint missing from endpoint catalog.');
+smoke_assert(($telemetryDetail['record_addressing'] ?? null) === 'composite', 'Telemetry detail endpoint must advertise composite addressing.');
+smoke_assert(($telemetryDetail['request']['identity_fields'] ?? null) === ['equipment_id', 'ts'], 'Telemetry detail endpoint identity fields mismatch.');
+smoke_assert(is_array($bomDetail), 'Composite BOM detail endpoint missing from endpoint catalog.');
+smoke_assert(($bomDetail['request']['identity_fields'] ?? null) === ['bom_id', 'bom_revision'], 'BOM detail endpoint identity fields mismatch.');
+
+$qualityReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/registry-quality-report.json'), true);
+smoke_assert(($qualityReport['all_passed'] ?? null) === true, 'Registry quality report must stay green after composite CRUD generation.');
+smoke_assert((int)($qualityReport['summary']['missing_primary_key_tables'] ?? -1) === 0, 'Registry quality report still reports missing primary-key tables.');
+
 echo "backend smoke tests passed\n";

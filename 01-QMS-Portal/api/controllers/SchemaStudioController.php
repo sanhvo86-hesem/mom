@@ -292,6 +292,61 @@ class SchemaStudioController extends BaseController
         }));
     }
 
+    private function tableColumnMetadata(PDO $pdo, string $schema, string $table): array
+    {
+        $stmt = $pdo->prepare("
+            SELECT
+                column_name,
+                data_type,
+                udt_name,
+                is_nullable,
+                column_default,
+                ordinal_position,
+                character_maximum_length,
+                numeric_precision,
+                numeric_scale,
+                is_identity,
+                is_generated
+            FROM information_schema.columns
+            WHERE table_schema = :schema
+              AND table_name = :table
+            ORDER BY ordinal_position
+        ");
+        $stmt->execute([
+            ':schema' => $schema,
+            ':table' => $table,
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    private function normalizeRowInputValue($value, array $column)
+    {
+        $dataType = strtolower((string)($column['data_type'] ?? 'text'));
+
+        if (is_array($value) || is_object($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
+        if (is_bool($value) || is_int($value) || is_float($value) || $value === null) {
+            return $value;
+        }
+
+        $stringValue = is_scalar($value) ? (string)$value : '';
+
+        if ($dataType === 'boolean') {
+            $lower = strtolower(trim($stringValue));
+            if (in_array($lower, ['1', 'true', 't', 'yes', 'y', 'on'], true)) {
+                return true;
+            }
+            if (in_array($lower, ['0', 'false', 'f', 'no', 'n', 'off'], true)) {
+                return false;
+            }
+        }
+
+        return $stringValue;
+    }
+
     private function sampleValueForColumn(string $columnName, string $dataType, int $index)
     {
         $name = strtolower($columnName);
@@ -922,17 +977,8 @@ class SchemaStudioController extends BaseController
 
         try {
             $pdo = $this->db();
-            $colStmt = $pdo->prepare("
-                SELECT column_name, data_type
-                FROM information_schema.columns
-                WHERE table_schema = :schema AND table_name = :table
-                ORDER BY ordinal_position
-            ");
-            $colStmt->execute([
-                ':schema' => $schema,
-                ':table' => $table,
-            ]);
-            $columns = $colStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            $columns = $this->tableColumnMetadata($pdo, $schema, $table);
+            $primaryKeyColumns = $this->primaryKeyColumns($pdo, $schema, $table);
 
             if (!$columns) {
                 $this->success([
@@ -941,6 +987,7 @@ class SchemaStudioController extends BaseController
                     'table' => $table,
                     'columns' => [],
                     'rows' => [],
+                    'primaryKeyColumns' => [],
                     'totalRows' => 0,
                     'offset' => $offset,
                     'hasMore' => false,
@@ -951,7 +998,6 @@ class SchemaStudioController extends BaseController
             $countSql = 'SELECT COUNT(*) FROM ' . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table);
             $totalRows = (int)$pdo->query($countSql)->fetchColumn();
             $orderBy = '';
-            $primaryKeyColumns = $this->primaryKeyColumns($pdo, $schema, $table);
             if ($primaryKeyColumns !== []) {
                 $orderBy = ' ORDER BY ' . implode(', ', array_map(function (string $column): string {
                     return $this->quoteIdentifier($column);
@@ -974,6 +1020,7 @@ class SchemaStudioController extends BaseController
                 'table' => $table,
                 'columns' => $columns,
                 'rows' => $rows,
+                'primaryKeyColumns' => $primaryKeyColumns,
                 'rowCount' => count($rows),
                 'actualRowCount' => $actualRowCount,
                 'totalRows' => $totalRows,
@@ -991,6 +1038,7 @@ class SchemaStudioController extends BaseController
                     'table' => $table,
                     'columns' => $columns,
                     'rows' => [$this->buildSampleRow($columns)],
+                    'primaryKeyColumns' => [],
                     'rowCount' => 1,
                     'actualRowCount' => 0,
                     'totalRows' => 0,
@@ -1007,11 +1055,152 @@ class SchemaStudioController extends BaseController
                 'table' => $table,
                 'columns' => $columns,
                 'rows' => [],
+                'primaryKeyColumns' => [],
                 'totalRows' => 0,
                 'offset' => $offset,
                 'hasMore' => false,
                 'message' => 'preview_unavailable',
             ]);
+        }
+    }
+
+    public function saveTableRow(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $schema = $this->safeIdentifier((string)($body['schema'] ?? 'public'), 'public');
+        $table = $this->safeIdentifier((string)($body['table'] ?? ''), '');
+        $mode = strtolower((string)($body['mode'] ?? 'insert'));
+        $row = is_array($body['row'] ?? null) ? $body['row'] : [];
+        $original = is_array($body['original'] ?? null) ? $body['original'] : [];
+
+        if ($table === '') {
+            $this->error('missing_table', 400);
+        }
+
+        try {
+            $pdo = $this->db();
+            $columns = $this->tableColumnMetadata($pdo, $schema, $table);
+            $primaryKeyColumns = $this->primaryKeyColumns($pdo, $schema, $table);
+            $columnMap = [];
+            $insertColumns = [];
+            $insertParams = [];
+            $insertValues = [];
+            $updateAssignments = [];
+            $updateParams = [];
+            $whereClauses = [];
+            $rowResult = [];
+
+            if (!$columns) {
+                $this->error('table_not_found', 404);
+            }
+
+            foreach ($columns as $column) {
+                $columnName = (string)($column['column_name'] ?? '');
+                if ($columnName !== '') {
+                    $columnMap[$columnName] = $column;
+                }
+            }
+
+            if ($mode === 'update' && $primaryKeyColumns === []) {
+                $this->error('table_has_no_primary_key', 400, 'Editing existing rows requires a primary key');
+            }
+
+            if ($mode === 'update') {
+                foreach ($primaryKeyColumns as $pkColumn) {
+                    if (!array_key_exists($pkColumn, $original) && !array_key_exists($pkColumn, $row)) {
+                        $this->error('missing_primary_key_value', 400, 'Missing primary key value for row update');
+                    }
+                    $whereParam = ':where_' . $pkColumn;
+                    $whereClauses[] = $this->quoteIdentifier($pkColumn) . ' IS NOT DISTINCT FROM ' . $whereParam;
+                    $updateParams[$whereParam] = $this->normalizeRowInputValue($original[$pkColumn] ?? $row[$pkColumn] ?? null, $columnMap[$pkColumn] ?? []);
+                }
+
+                foreach ($row as $columnName => $value) {
+                    if (!isset($columnMap[$columnName]) || in_array($columnName, $primaryKeyColumns, true)) {
+                        continue;
+                    }
+                    $paramName = ':set_' . $columnName;
+                    $updateAssignments[] = $this->quoteIdentifier((string)$columnName) . ' = ' . $paramName;
+                    $updateParams[$paramName] = $this->normalizeRowInputValue($value, $columnMap[$columnName]);
+                }
+
+                if ($updateAssignments === []) {
+                    $this->error('no_row_changes', 400, 'No editable changes found for this row');
+                }
+
+                $sql = 'UPDATE '
+                    . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table)
+                    . ' SET ' . implode(', ', $updateAssignments)
+                    . ' WHERE ' . implode(' AND ', $whereClauses)
+                    . ' RETURNING *';
+
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($updateParams);
+                $rowResult = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            } else {
+                foreach ($row as $columnName => $value) {
+                    if (!isset($columnMap[$columnName])) {
+                        continue;
+                    }
+
+                    $column = $columnMap[$columnName];
+                    $isGenerated = strtoupper((string)($column['is_generated'] ?? 'NEVER')) !== 'NEVER';
+                    $isIdentity = strtoupper((string)($column['is_identity'] ?? 'NO')) === 'YES';
+
+                    if ($isGenerated) {
+                        continue;
+                    }
+                    if ($isIdentity && ($value === '' || $value === null)) {
+                        continue;
+                    }
+                    if ($value === '' && (($column['column_default'] ?? null) !== null) && !in_array($columnName, $primaryKeyColumns, true)) {
+                        continue;
+                    }
+
+                    $insertColumns[] = $this->quoteIdentifier((string)$columnName);
+                    $paramName = ':ins_' . $columnName;
+                    $insertValues[] = $paramName;
+                    $insertParams[$paramName] = $this->normalizeRowInputValue($value, $column);
+                }
+
+                if ($insertColumns === []) {
+                    $sql = 'INSERT INTO '
+                        . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table)
+                        . ' DEFAULT VALUES RETURNING *';
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute();
+                } else {
+                    $sql = 'INSERT INTO '
+                        . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table)
+                        . ' (' . implode(', ', $insertColumns) . ') VALUES (' . implode(', ', $insertValues) . ') RETURNING *';
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute($insertParams);
+                }
+                $rowResult = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            }
+
+            $this->auditLog('schema_studio_table_row_save', [
+                'schema' => $schema,
+                'table' => $table,
+                'mode' => $mode,
+            ], (string)($user['username'] ?? ''));
+
+            $this->success([
+                'saved' => true,
+                'mode' => $mode,
+                'schema' => $schema,
+                'table' => $table,
+                'row' => $rowResult,
+                'primaryKeyColumns' => $primaryKeyColumns,
+                'columns' => $columns,
+            ]);
+        } catch (Throwable $e) {
+            error_log('[SchemaStudio] saveTableRow failed: ' . $e->getMessage());
+            $this->error('row_save_failed', 500, $e->getMessage());
         }
     }
 

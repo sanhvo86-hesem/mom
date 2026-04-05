@@ -53,31 +53,51 @@ function loadDataFields() {
 }
 
 function primaryKeyMeta(table) {
-  const raw = table?.primaryKey;
-  if (Array.isArray(raw)) {
-    const fields = raw.map((item) => String(item || '').trim()).filter(Boolean);
-    if (fields.length === 1) {
-      return { mode: 'scalar', fields, key: fields[0] };
-    }
-    return { mode: fields.length ? 'composite' : 'missing', fields, key: null };
+  const columnNames = Object.keys(table?.columns || {});
+  const resolveField = (value) => {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    if (columnNames.includes(raw)) return raw;
+    const tokens = Array.from(raw.matchAll(/[A-Za-z_][A-Za-z0-9_]*/g)).map((match) => String(match[0] || '').trim());
+    return tokens.find((token) => columnNames.includes(token)) || '';
+  };
+  const raw = Array.isArray(table?.primaryKey) ? table.primaryKey : [table?.primaryKey];
+  const fields = Array.from(new Set(raw.map(resolveField).filter(Boolean)));
+  if (fields.length === 1) {
+    return { mode: 'scalar', fields, key: fields[0] };
   }
-  const key = String(raw || '').trim();
-  if (!key) {
-    return { mode: 'missing', fields: [], key: null };
-  }
-  return { mode: 'scalar', fields: [key], key };
+  return { mode: fields.length ? 'composite' : 'missing', fields, key: null };
 }
 
 function supportedEndpointKinds(table) {
   const pk = primaryKeyMeta(table);
   const kinds = ['list', 'create'];
-  if (pk.mode === 'scalar') {
+  if (pk.mode !== 'missing') {
     kinds.push('detail', 'update', 'delete');
     if (table?.statusColumn) {
       kinds.push('transition');
     }
   }
   return kinds;
+}
+
+function externalIdentityFields(pk) {
+  return pk.mode === 'scalar' ? ['id'] : pk.fields;
+}
+
+function identityFieldMap(pk) {
+  if (pk.mode === 'scalar' && pk.key) {
+    return { id: pk.key, [pk.key]: pk.key };
+  }
+  return Object.fromEntries(pk.fields.map((field) => [field, field]));
+}
+
+function identityQueryParams(pk) {
+  return ['domain', 'table', ...externalIdentityFields(pk)];
+}
+
+function identityPathSegment(pk) {
+  return externalIdentityFields(pk).map((field) => `{${field}}`).join('/');
 }
 
 function supportedEndpointSet(table) {
@@ -113,11 +133,14 @@ function transitionTargets(statusOptions, statusSet) {
 
 function requestContract(kind, table, fields, statusOptions) {
   const pk = primaryKeyMeta(table);
+  const identityFields = externalIdentityFields(pk);
+  const canonicalIdentityFields = pk.fields;
+  const identityMap = identityFieldMap(pk);
   const filterParams = kind === 'list' ? filterableFieldKeys(fields) : [];
   const transitionStatusTargets = transitionTargets(statusOptions, String(table?.statusSet || ''));
   const paramFields = uniqueFields((fields || []).filter((field) => field?.source === 'param').map(trimFieldForPack)).map((field) => field.key);
   const editableDbFields = uniqueFields((fields || []).filter((field) => field?.dbColumn && !isSystemManagedFieldKey(field.key)).map(trimFieldForPack))
-    .filter((field) => !(kind === 'update' && field.key === pk.key))
+    .filter((field) => !(kind === 'update' && canonicalIdentityFields.includes(field.key)))
     .filter((field) => !(kind === 'update' && field.key === String(table?.statusColumn || '')));
 
   if (kind === 'list') {
@@ -133,22 +156,26 @@ function requestContract(kind, table, fields, statusOptions) {
 
   if (kind === 'detail') {
     return {
-      query_params: ['domain', 'table', 'id'],
+      query_params: identityQueryParams(pk),
       filter_params: [],
       body_fields: [],
       required_body_fields: [],
-      identity_fields: pk.mode === 'scalar' ? ['id'] : [],
+      identity_fields: identityFields,
+      canonical_identity_fields: canonicalIdentityFields,
+      identity_field_map: identityMap,
       body_mode: 'none',
     };
   }
 
   if (kind === 'delete') {
     return {
-      query_params: ['domain', 'table', 'id'],
+      query_params: identityQueryParams(pk),
       filter_params: [],
-      body_fields: uniqueFields([{ key: 'id' }, ...paramFields.map((key) => ({ key }))]).map((field) => field.key),
-      required_body_fields: ['id', ...(paramFields.includes('confirm_delete') ? ['confirm_delete'] : [])],
-      identity_fields: pk.mode === 'scalar' ? ['id'] : [],
+      body_fields: uniqueFields([...identityFields.map((key) => ({ key })), ...paramFields.map((key) => ({ key }))]).map((field) => field.key),
+      required_body_fields: [...identityFields, ...(paramFields.includes('confirm_delete') ? ['confirm_delete'] : [])],
+      identity_fields: identityFields,
+      canonical_identity_fields: canonicalIdentityFields,
+      identity_field_map: identityMap,
       body_mode: 'root',
     };
   }
@@ -162,40 +189,47 @@ function requestContract(kind, table, fields, statusOptions) {
       ...paramFields.map((key) => ({ key })),
     ]).map((field) => field.key);
     return {
-      query_params: ['domain', 'table', 'id'],
+      query_params: identityQueryParams(pk),
       filter_params: [],
-      body_fields: uniqueFields([{ key: 'id' }, ...transitionAliases.map((key) => ({ key }))]).map((field) => field.key),
-      required_body_fields: ['id'],
+      body_fields: uniqueFields([...identityFields.map((key) => ({ key })), ...transitionAliases.map((key) => ({ key }))]).map((field) => field.key),
+      required_body_fields: identityFields,
       required_any_of: [['to_status', 'to', 'status', 'toStatus']],
       accepted_body_aliases: { target_status: ['to_status', 'to', 'status', 'toStatus'] },
       canonical_body_fields: { target_status: paramFields.includes('to_status') ? 'to_status' : 'to' },
-      identity_fields: pk.mode === 'scalar' ? ['id'] : [],
+      identity_fields: identityFields,
+      canonical_identity_fields: canonicalIdentityFields,
+      identity_field_map: identityMap,
       body_mode: 'root',
       transition_status_values: transitionStatusTargets,
     };
   }
 
   const dbFields = editableDbFields.map((field) => field.key);
-  const requiredBodyFields = kind === 'update' ? ['id'] : editableDbFields.filter((field) => field.required).map((field) => field.key);
+  const requiredBodyFields = kind === 'update' ? identityFields : editableDbFields.filter((field) => field.required).map((field) => field.key);
 
   return {
-    query_params: kind === 'update' ? ['domain', 'table', 'id'] : [],
+    query_params: kind === 'update' ? identityQueryParams(pk) : [],
     filter_params: [],
-    body_fields: kind === 'update' ? ['id', ...dbFields] : dbFields,
+    body_fields: kind === 'update' ? [...identityFields, ...dbFields] : dbFields,
     required_body_fields: requiredBodyFields,
-    identity_fields: kind === 'update' && pk.mode === 'scalar' ? ['id'] : [],
+    identity_fields: kind === 'update' ? identityFields : [],
+    canonical_identity_fields: kind === 'update' ? canonicalIdentityFields : [],
+    identity_field_map: kind === 'update' ? identityMap : {},
     body_mode: 'root_or_data_wrapper',
   };
 }
 
 function responseContract(kind, table, fields) {
+  const pk = primaryKeyMeta(table);
   return {
     collection_key: kind === 'list' ? 'records' : null,
     record_key: kind === 'list' ? null : 'record',
     response_fields: fields.map((field) => field.key),
     paginated: kind === 'list',
     pagination_fields: kind === 'list' ? ['total', 'offset', 'limit', 'has_more'] : [],
-    primary_key: primaryKeyMeta(table).key,
+    primary_key: pk.key,
+    primary_key_fields: pk.fields,
+    record_addressing: pk.mode,
   };
 }
 
@@ -376,8 +410,8 @@ function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, wor
       path: kind === 'list' || kind === 'create'
         ? `/api/runtime/${domain}/${tableName}`
         : (kind === 'transition'
-          ? `/api/runtime/${domain}/${tableName}/{id}/transition`
-          : `/api/runtime/${domain}/${tableName}/{id}`),
+          ? `/api/runtime/${domain}/${tableName}/${identityPathSegment(pk)}/transition`
+          : `/api/runtime/${domain}/${tableName}/${identityPathSegment(pk)}`),
       controller: 'GenericCrudController',
       handler: meta.handler,
       source: 'table-registry+data-fields',
@@ -627,7 +661,8 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
   const contractIssues = [];
   const workflowAlignmentIssues = [];
   const scalarPkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode === 'scalar');
-  const nonScalarPkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode !== 'scalar');
+  const compositePkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode === 'composite');
+  const missingPkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode === 'missing');
 
   for (const tableName of tableNames) {
     const table = tableRegistry.tables[tableName];
@@ -664,17 +699,28 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       }
     }
 
-    if (pk.mode !== 'scalar') {
+    if (pk.mode === 'missing') {
       continue;
     }
+
+    const expectedIdentityFields = externalIdentityFields(pk);
 
     ['detail', 'update', 'delete'].forEach((kind) => {
       const endpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.${kind}`];
       if (!endpoint) return;
       const identityFields = endpoint.request?.identity_fields || [];
       const queryParams = endpoint.request?.query_params || [];
-      if (!identityFields.includes('id') || !queryParams.includes('id')) {
-        contractIssues.push(`${domain}.${tableName}.${kind}:missing_id_contract`);
+      if (expectedIdentityFields.some((field) => !identityFields.includes(field))) {
+        contractIssues.push(`${domain}.${tableName}.${kind}:missing_identity_fields`);
+      }
+      if (expectedIdentityFields.some((field) => !queryParams.includes(field))) {
+        contractIssues.push(`${domain}.${tableName}.${kind}:missing_identity_query`);
+      }
+      if (['update', 'delete'].includes(kind)) {
+        const bodyFields = endpoint.request?.body_fields || [];
+        if (expectedIdentityFields.some((field) => !bodyFields.includes(field))) {
+          contractIssues.push(`${domain}.${tableName}.${kind}:missing_identity_body`);
+        }
       }
     });
 
@@ -693,6 +739,8 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       const targets = transitionEndpoint?.capabilities?.transition_targets || [];
       if (!transitionEndpoint || !targets.length) {
         contractIssues.push(`${domain}.${tableName}.transition:missing_targets`);
+      } else if (expectedIdentityFields.some((field) => !(transitionEndpoint.request?.identity_fields || []).includes(field))) {
+        contractIssues.push(`${domain}.${tableName}.transition:missing_identity_fields`);
       }
     }
 
@@ -712,7 +760,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'workflow_coverage', passed: workflowCoverage.length === tableNames.length, actual: workflowCoverage.length, target: tableNames.length },
     { id: 'status_coverage', passed: statusCoverage.length === statusTables.length, actual: statusCoverage.length, target: statusTables.length },
     { id: 'scalar_pk_tables', passed: scalarPkTables.length >= (tableNames.length - 32), actual: scalarPkTables.length, target: tableNames.length - 32 },
-    { id: 'frontend_scalar_record_readiness', passed: nonScalarPkTables.length === 0, actual: nonScalarPkTables.length, target: 0 },
+    { id: 'frontend_record_readiness', passed: missingPkTables.length === 0, actual: missingPkTables.length, target: 0 },
     { id: 'no_unsupported_record_endpoints', passed: unsupportedRecordEndpoints.length === 0, actual: unsupportedRecordEndpoints.length, target: 0 },
     { id: 'endpoint_contract_readiness', passed: contractIssues.length === 0, actual: contractIssues.length, target: 0 },
     { id: 'workflow_status_alignment', passed: workflowAlignmentIssues.length === 0, actual: workflowAlignmentIssues.length, target: 0 },
@@ -740,14 +788,20 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       formula_count: formulaKeys.length,
       formula_reference_count: formulaReferenceCount,
       field_context_count: fieldContextCount,
-      non_scalar_pk_tables: nonScalarPkTables.length,
+      composite_pk_tables: compositePkTables.length,
+      missing_primary_key_tables: missingPkTables.length,
       unsupported_record_endpoints: unsupportedRecordEndpoints.length,
       contract_issues: contractIssues.length,
       workflow_alignment_issues: workflowAlignmentIssues.length,
     },
     checks,
     warnings: {
-      non_scalar_pk_tables: nonScalarPkTables.slice(0, 40).map((tableName) => ({
+      composite_pk_tables: compositePkTables.slice(0, 40).map((tableName) => ({
+        table: tableName,
+        primary_key_mode: primaryKeyMeta(tableRegistry.tables[tableName]).mode,
+        primary_key_fields: primaryKeyMeta(tableRegistry.tables[tableName]).fields,
+      })),
+      missing_primary_key_tables: missingPkTables.slice(0, 40).map((tableName) => ({
         table: tableName,
         primary_key_mode: primaryKeyMeta(tableRegistry.tables[tableName]).mode,
         primary_key_fields: primaryKeyMeta(tableRegistry.tables[tableName]).fields,

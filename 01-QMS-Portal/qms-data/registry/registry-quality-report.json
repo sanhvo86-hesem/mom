@@ -2,19 +2,20 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-05T11:58:08.953Z"
+    "generatedAt": "2026-04-05T13:32:59.374Z"
   },
   "summary": {
-    "endpoint_count": 2800,
+    "endpoint_count": 2862,
     "pack_count": 3168,
     "relation_edge_count": 2440,
     "workflow_count": 425,
     "status_set_count": 536,
-    "validation_rule_count": 24784,
+    "validation_rule_count": 27794,
     "formula_count": 960,
     "formula_reference_count": 960,
-    "field_context_count": 38507,
-    "non_scalar_pk_tables": 19,
+    "field_context_count": 38595,
+    "composite_pk_tables": 19,
+    "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0
@@ -63,9 +64,9 @@
       "target": 496
     },
     {
-      "id": "frontend_scalar_record_readiness",
-      "passed": false,
-      "actual": 19,
+      "id": "frontend_record_readiness",
+      "passed": true,
+      "actual": 0,
       "target": 0
     },
     {
@@ -107,7 +108,7 @@
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 24784,
+      "actual": 27794,
       "target": 5000
     },
     {
@@ -124,7 +125,7 @@
     }
   ],
   "warnings": {
-    "non_scalar_pk_tables": [
+    "composite_pk_tables": [
       {
         "table": "audit_events",
         "primary_key_mode": "composite",
@@ -199,8 +200,11 @@
       },
       {
         "table": "mes_machine_telemetry",
-        "primary_key_mode": "missing",
-        "primary_key_fields": []
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "equipment_id",
+          "ts"
+        ]
       },
       {
         "table": "mes_oee_loss_events",
@@ -217,8 +221,7 @@
           "kpi_date",
           "dimension_type",
           "dimension_id",
-          "COALESCE(shift_code",
-          "'ALL'"
+          "shift_code"
         ]
       },
       {
@@ -278,9 +281,10 @@
         ]
       }
     ],
+    "missing_primary_key_tables": [],
     "unsupported_record_endpoints": [],
     "contract_issues": [],
     "workflow_alignment_issues": []
   },
-  "all_passed": false
+  "all_passed": true
 }

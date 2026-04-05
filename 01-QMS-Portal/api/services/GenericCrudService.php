@@ -292,19 +292,23 @@ class GenericCrudService
             'limit' => $limit,
             'table' => $tableName,
             'domain' => $domain,
-            'primaryKey' => $this->primaryKey($table),
+            'primaryKey' => $this->primaryKeyMeta($table)['mode'] === 'scalar'
+                ? $this->primaryKeyMeta($table)['key']
+                : $this->primaryKeyMeta($table)['fields'],
+            'primaryKeyFields' => $this->primaryKeyMeta($table)['fields'],
+            'recordAddressing' => $this->primaryKeyMeta($table)['mode'],
         ];
     }
 
     /**
      * @return array<string, mixed>|null
      */
-    public function detail(string $domain, string $tableName, string $id): ?array
+    public function detail(string $domain, string $tableName, array $identity): ?array
     {
         $table = $this->resolveTable($domain, $tableName);
-        $pk = $this->primaryKey($table);
-        $sql = 'SELECT * FROM ' . $this->q($tableName) . ' WHERE ' . $this->q($pk) . ' = :id LIMIT 1';
-        $row = $this->db->queryOne($sql, [':id' => $id]);
+        $where = $this->identityWhereClause($table, $identity, 'detail');
+        $sql = 'SELECT * FROM ' . $this->q($tableName) . ' WHERE ' . $where['sql'] . ' LIMIT 1';
+        $row = $this->db->queryOne($sql, $where['params']);
         return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
 
@@ -348,10 +352,10 @@ class GenericCrudService
      * @param array<string, mixed> $payload
      * @return array<string, mixed>
      */
-    public function update(string $domain, string $tableName, string $id, array $payload, string $userId = 'system'): array
+    public function update(string $domain, string $tableName, array $identity, array $payload, string $userId = 'system'): array
     {
         $table = $this->resolveTable($domain, $tableName);
-        $existing = $this->detail($domain, $tableName, $id);
+        $existing = $this->detail($domain, $tableName, $identity);
         if ($existing === null) {
             throw new RuntimeException('Record not found');
         }
@@ -365,17 +369,17 @@ class GenericCrudService
         }
 
         $sets = [];
-        $params = [':id' => $id];
+        $where = $this->identityWhereClause($table, $identity, 'update');
+        $params = $where['params'];
         foreach ($data as $column => $value) {
             $param = ':u_' . $column;
             $sets[] = $this->q($column) . ' = ' . $param;
             $params[$param] = $value;
         }
 
-        $pk = $this->primaryKey($table);
         $sql = 'UPDATE ' . $this->q($tableName)
             . ' SET ' . implode(', ', $sets)
-            . ' WHERE ' . $this->q($pk) . ' = :id RETURNING *';
+            . ' WHERE ' . $where['sql'] . ' RETURNING *';
 
         $row = $this->db->insertReturning($sql, $params);
         if (!is_array($row)) {
@@ -388,13 +392,13 @@ class GenericCrudService
     /**
      * @return array<string, mixed>
      */
-    public function delete(string $domain, string $tableName, string $id): array
+    public function delete(string $domain, string $tableName, array $identity): array
     {
         $table = $this->resolveTable($domain, $tableName);
-        $pk = $this->primaryKey($table);
+        $where = $this->identityWhereClause($table, $identity, 'delete');
         $sql = 'DELETE FROM ' . $this->q($tableName)
-            . ' WHERE ' . $this->q($pk) . ' = :id RETURNING *';
-        $row = $this->db->insertReturning($sql, [':id' => $id]);
+            . ' WHERE ' . $where['sql'] . ' RETURNING *';
+        $row = $this->db->insertReturning($sql, $where['params']);
         if (!is_array($row)) {
             throw new RuntimeException('Record not found');
         }
@@ -405,7 +409,7 @@ class GenericCrudService
      * @param array<int, string> $userRoles
      * @return array<string, mixed>
      */
-    public function transition(string $domain, string $tableName, string $id, string $toStatus, string $userId, array $userRoles = []): array
+    public function transition(string $domain, string $tableName, array $identity, string $toStatus, string $userId, array $userRoles = []): array
     {
         $table = $this->resolveTable($domain, $tableName);
         $statusColumn = trim((string)($table['statusColumn'] ?? ''));
@@ -413,7 +417,7 @@ class GenericCrudService
             throw new RuntimeException("Table {$tableName} does not define a status column");
         }
 
-        $existing = $this->detail($domain, $tableName, $id);
+        $existing = $this->detail($domain, $tableName, $identity);
         if ($existing === null) {
             throw new RuntimeException('Record not found');
         }
@@ -422,7 +426,9 @@ class GenericCrudService
         $this->assertValidStatus($table, $toStatus);
         $this->assertAllowedTransition($table, $currentStatus, $toStatus, $userRoles);
         $data = $this->applyAuditColumns($table, [$statusColumn => $toStatus], $userId, false);
-        $params = [':id' => $id, ':status' => $toStatus];
+        $where = $this->identityWhereClause($table, $identity, 'transition');
+        $params = $where['params'];
+        $params[':status'] = $toStatus;
         $sets = [$this->q($statusColumn) . ' = :status'];
 
         foreach ($data as $column => $value) {
@@ -434,10 +440,9 @@ class GenericCrudService
             $params[$param] = $value;
         }
 
-        $pk = $this->primaryKey($table);
         $sql = 'UPDATE ' . $this->q($tableName)
             . ' SET ' . implode(', ', $sets)
-            . ' WHERE ' . $this->q($pk) . ' = :id RETURNING *';
+            . ' WHERE ' . $where['sql'] . ' RETURNING *';
         $row = $this->db->insertReturning($sql, $params);
         if (!is_array($row)) {
             throw new RuntimeException('Transition did not return a record');
@@ -454,7 +459,7 @@ class GenericCrudService
     private function filterWritableColumns(array $table, array $payload, bool $isUpdate): array
     {
         $columns = (array)($table['columns'] ?? []);
-        $pk = $this->primaryKey($table);
+        $primaryKeys = array_flip($this->primaryKeyMeta($table)['fields']);
         $statusColumn = (string)($table['statusColumn'] ?? '');
         $result = [];
 
@@ -466,7 +471,7 @@ class GenericCrudService
             $column = $columns[$key];
             $hasDefault = isset($column['default']) && $column['default'] !== null && $column['default'] !== '';
             $isAudit = in_array($key, ['created_at', 'updated_at', 'created_by', 'updated_by'], true);
-            $isPk = ($key === $pk);
+            $isPk = isset($primaryKeys[$key]);
             $isGenerated = (bool)($column['generated'] ?? false);
             $isStatusManaged = $isUpdate && $statusColumn !== '' && $key === $statusColumn;
 
@@ -517,18 +522,16 @@ class GenericCrudService
     private function validatePayload(string $domain, string $tableName, array $table, array $data, string $kind): void
     {
         $columns = (array)($table['columns'] ?? []);
-        $pk = $this->primaryKey($table);
 
         if ($kind === 'create') {
             foreach ($columns as $columnName => $columnMeta) {
                 if (!is_array($columnMeta)) {
                     continue;
                 }
-                $isPk = $columnName === $pk;
                 $hasDefault = isset($columnMeta['default']) && $columnMeta['default'] !== null && $columnMeta['default'] !== '';
                 $required = (bool)($columnMeta['required'] ?? false);
                 $generated = (bool)($columnMeta['generated'] ?? false);
-                if ($required && !$isPk && !$generated && !$hasDefault && !array_key_exists($columnName, $data)) {
+                if ($required && !$generated && !$hasDefault && !array_key_exists($columnName, $data)) {
                     throw new RuntimeException("Missing required field: {$columnName}");
                 }
             }
@@ -614,9 +617,9 @@ class GenericCrudService
             }
         }
 
-        $primaryKey = $table['primaryKey'] ?? null;
-        if (is_string($primaryKey) && trim($primaryKey) !== '') {
-            return $this->assertIdentifier(trim($primaryKey), 'primary key');
+        $primaryKeyFields = $this->primaryKeyMeta($table)['fields'];
+        if ($primaryKeyFields !== []) {
+            return $this->assertIdentifier((string)$primaryKeyFields[0], 'primary key');
         }
 
         if ($columns !== []) {
@@ -629,21 +632,101 @@ class GenericCrudService
     /**
      * @param array<string, mixed> $table
      */
-    private function primaryKey(array $table): string
+    private function primaryKeyMeta(array $table): array
     {
-        $pk = $table['primaryKey'] ?? null;
-        if (is_array($pk)) {
-            $keys = array_values(array_filter(array_map(static fn($value): string => trim((string)$value), $pk), static fn(string $value): bool => $value !== ''));
-            if (count($keys) !== 1) {
-                throw new RuntimeException('Composite or missing primary key is not supported by GenericCrudService');
+        $columns = array_keys((array)($table['columns'] ?? []));
+        $raw = $table['primaryKey'] ?? null;
+        $values = is_array($raw) ? $raw : [$raw];
+        $fields = [];
+
+        foreach ($values as $value) {
+            $field = $this->resolveKeyField((string)$value, $columns);
+            if ($field === '' || in_array($field, $fields, true)) {
+                continue;
             }
-            $pk = $keys[0];
+            $fields[] = $field;
         }
-        $pk = is_string($pk) ? trim($pk) : '';
-        if ($pk === '') {
+
+        if (count($fields) === 1) {
+            return ['mode' => 'scalar', 'fields' => $fields, 'key' => $fields[0]];
+        }
+        if ($fields !== []) {
+            return ['mode' => 'composite', 'fields' => $fields, 'key' => null];
+        }
+
+        return ['mode' => 'missing', 'fields' => [], 'key' => null];
+    }
+
+    /**
+     * @param array<int, string> $columns
+     */
+    private function resolveKeyField(string $value, array $columns): string
+    {
+        $candidate = trim($value);
+        if ($candidate === '') {
+            return '';
+        }
+        if (in_array($candidate, $columns, true)) {
+            return $this->assertIdentifier($candidate, 'primary key');
+        }
+        if (preg_match_all('/[A-Za-z_][A-Za-z0-9_]*/', $candidate, $matches) === 1 || !empty($matches[0])) {
+            foreach ((array)($matches[0] ?? []) as $token) {
+                $token = trim((string)$token);
+                if ($token !== '' && in_array($token, $columns, true)) {
+                    return $this->assertIdentifier($token, 'primary key');
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * @param array<string, mixed> $identity
+     * @return array{sql:string, params:array<string, mixed>, identity:array<string, mixed>}
+     */
+    private function identityWhereClause(array $table, array $identity, string $prefix): array
+    {
+        $pk = $this->primaryKeyMeta($table);
+        if ($pk['mode'] === 'missing' || $pk['fields'] === []) {
             throw new RuntimeException('Table does not define a primary key');
         }
-        return $this->assertIdentifier($pk, 'primary key');
+
+        $normalized = [];
+        foreach ($pk['fields'] as $index => $field) {
+            $value = $identity[$field] ?? null;
+            if ($pk['mode'] === 'scalar' && $value === null && array_key_exists('id', $identity)) {
+                $value = $identity['id'];
+            }
+            if ($value === null && !array_key_exists($field, $identity) && !($pk['mode'] === 'scalar' && array_key_exists('id', $identity))) {
+                throw new RuntimeException("Missing record identity field: {$field}");
+            }
+            $column = (array)(($table['columns'] ?? [])[$field] ?? []);
+            if ($value === '' && !((bool)($column['required'] ?? false))) {
+                $value = null;
+            }
+            if ($value !== null && (is_array($value) || is_object($value))) {
+                throw new RuntimeException("Invalid record identity field: {$field}");
+            }
+            $normalized[$field] = $value;
+        }
+
+        $clauses = [];
+        $params = [];
+        foreach ($normalized as $field => $value) {
+            if ($value === null) {
+                $clauses[] = $this->q($field) . ' IS NULL';
+                continue;
+            }
+            $param = ':' . $prefix . '_' . count($params);
+            $clauses[] = $this->q($field) . ' = ' . $param;
+            $params[$param] = $value;
+        }
+
+        return [
+            'sql' => implode(' AND ', $clauses),
+            'params' => $params,
+            'identity' => $normalized,
+        ];
     }
 
     /**

@@ -2045,7 +2045,8 @@ function _registryHealthSummary(){
     fieldRegistryActions: coverage.field_registry_actions || 0,
     checkCount: checks.length,
     passedChecks: passedChecks,
-    nonScalarPkTables: summary.non_scalar_pk_tables || 0,
+    compositePkTables: summary.composite_pk_tables || 0,
+    missingPrimaryKeyTables: summary.missing_primary_key_tables || 0,
     unsupportedRecordEndpoints: summary.unsupported_record_endpoints || 0,
     contractIssues: summary.contract_issues || 0,
     workflowAlignmentIssues: summary.workflow_alignment_issues || 0
@@ -2059,7 +2060,7 @@ function _renderRegistryHealthNotice(){
   var issueCount;
   var h = '';
   if(!info.available || state.registries.loading || state.registries.error) return '';
-  issueCount = (info.nonScalarPkTables || 0) + (info.unsupportedRecordEndpoints || 0) + (info.contractIssues || 0) + (info.workflowAlignmentIssues || 0);
+  issueCount = (info.missingPrimaryKeyTables || 0) + (info.unsupportedRecordEndpoints || 0) + (info.contractIssues || 0) + (info.workflowAlignmentIssues || 0);
   h += '<div style="padding:var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--text-secondary);background:'+background+';border:1px solid '+statusTone+';border-radius:var(--radius-md)">';
   h += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">'+_esc(info.ok ? _t('Registry da pass quality gate cho builder.','Registry passed the builder quality gate.') : _t('Registry can duoc ra soat them truoc khi build.','Registry needs more review before building.'))+'</div>';
   if(info.checkCount){
@@ -2067,8 +2068,11 @@ function _renderRegistryHealthNotice(){
   }
   h += '<div>'+_esc(info.endpointCount + ' endpoints / ' + info.packCount + ' packs / ' + info.relationCount + ' relations')+'</div>';
   h += '<div>'+_esc(info.workflowCount + ' workflows / ' + info.statusCount + ' status sets / ' + info.fieldRegistryActions + ' field schemas')+'</div>';
-  if(info.nonScalarPkTables){
-    h += '<div>'+_esc(_t('Bang can CRUD dac thu (composite/missing PK): ','Tables needing special CRUD handling (composite/missing PK): ') + info.nonScalarPkTables)+'</div>';
+  if(info.compositePkTables){
+    h += '<div>'+_esc(_t('Bang composite PK da co contract rieng: ','Composite-PK tables use dedicated identity contracts: ') + info.compositePkTables)+'</div>';
+  }
+  if(info.missingPrimaryKeyTables){
+    h += '<div>'+_esc(_t('Bang con thieu PK/identity: ','Tables still missing PK/identity: ') + info.missingPrimaryKeyTables)+'</div>';
   }
   if(issueCount){
     h += '<div>'+_esc(_t('Can xu ly them: ','Needs follow-up: ') + issueCount)+'</div>';
@@ -3089,6 +3093,7 @@ function _guessTransitionApi(entity, workflowId){
       if(itemEntity === entity) value += 20;
       if(itemKind === 'transition') value += 10;
       if(String((item && item.record_addressing) || '') === 'scalar') value += 5;
+      if(String((item && item.record_addressing) || '') === 'composite') value += 4;
       if(workflowId && itemWorkflowId === workflowId) value += 3;
       if(/\/transition$/i.test(itemPath)) value += 1;
       return value;
