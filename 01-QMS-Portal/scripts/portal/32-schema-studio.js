@@ -7640,6 +7640,335 @@ TableDialog.render = function(){
   this.focusActiveControl();
 };
 
+Browser.setView = function(view){
+  var nextView = (view === 'tables' || view === 'workflow') ? view : 'domains';
+  if(STORE.browser.view === nextView){
+    if(refs.toolbar) renderToolbar(refs.toolbar);
+    if(refs.browser) Browser.render();
+    return;
+  }
+  STORE.browser.view = nextView;
+  if(nextView !== 'domains'){
+    STORE.browser.domainSplitManual = false;
+    if(refs.browser){
+      refs.browser.classList.remove('has-domain-split');
+      refs.browser.classList.remove('has-manual-split');
+      refs.browser.style.removeProperty('--ss-domain-top');
+    }
+  }
+  saveUiPrefs();
+  if(refs.toolbar) renderToolbar(refs.toolbar);
+  if(refs.browser) Browser.render();
+};
+
+Browser.buildWorkflowStages = function(tables){
+  var tableMap = {};
+  var downstream = {};
+  var indegree = {};
+  var ids = [];
+  var stages = [];
+  var queued = {};
+  var visited = {};
+  var leftovers;
+  function sortIds(list){
+    return list.slice().sort(function(a, b){
+      var ta = tableMap[a];
+      var tb = tableMap[b];
+      var domainCompare;
+      if(!ta || !tb) return String(a).localeCompare(String(b));
+      domainCompare = formatDomainLabel(ta.domain || 'default').localeCompare(formatDomainLabel(tb.domain || 'default'));
+      if(domainCompare !== 0) return domainCompare;
+      return String(ta.name || '').localeCompare(String(tb.name || ''));
+    });
+  }
+  (tables || []).forEach(function(tbl){
+    if(!tbl || !tbl.id) return;
+    tableMap[tbl.id] = tbl;
+    downstream[tbl.id] = [];
+    indegree[tbl.id] = 0;
+    ids.push(tbl.id);
+  });
+  ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){
+    var upstreamId = rel && rel.to_table_id;
+    var dependentId = rel && rel.from_table_id;
+    if(!upstreamId || !dependentId || !tableMap[upstreamId] || !tableMap[dependentId] || upstreamId === dependentId){
+      return;
+    }
+    if(downstream[upstreamId].indexOf(dependentId) >= 0) return;
+    downstream[upstreamId].push(dependentId);
+    indegree[dependentId] += 1;
+  });
+  var current = sortIds(ids.filter(function(id){ return indegree[id] === 0; }));
+  while(current.length){
+    var next = [];
+    stages.push({
+      kind: 'flow',
+      label: _t('Bước ' + (stages.length + 1), 'Stage ' + (stages.length + 1)),
+      tables: current.map(function(id){ return tableMap[id]; }).filter(Boolean)
+    });
+    current.forEach(function(id){
+      visited[id] = true;
+      (downstream[id] || []).forEach(function(childId){
+        indegree[childId] = Math.max(0, (indegree[childId] || 0) - 1);
+        if(indegree[childId] === 0 && !visited[childId] && !queued[childId]){
+          queued[childId] = true;
+          next.push(childId);
+        }
+      });
+    });
+    current = sortIds(next);
+    queued = {};
+  }
+  leftovers = sortIds(ids.filter(function(id){ return !visited[id]; }));
+  if(leftovers.length){
+    while(leftovers.length){
+      stages.push({
+        kind: 'cycle',
+        label: _t('Liên kết vòng', 'Cyclic links'),
+        tables: leftovers.splice(0, 10).map(function(id){ return tableMap[id]; }).filter(Boolean)
+      });
+    }
+  }
+  return stages;
+};
+
+Browser.startDomainSplit = function(ev){
+  var browserEl = refs.browser;
+  var rect;
+  function cleanup(persist){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    Browser._activeSplitCleanup = null;
+    if(persist) saveUiPrefs();
+  }
+  function clampRatio(value){
+    return Math.max(0.22, Math.min(0.44, value));
+  }
+  function onMove(moveEv){
+    var ratio;
+    if(!browserEl) return;
+    ratio = clampRatio((moveEv.clientY - rect.top) / Math.max(rect.height, 1));
+    STORE.browser.domainSplit = ratio;
+    STORE.browser.domainSplitManual = true;
+    browserEl.classList.add('has-domain-split');
+    browserEl.classList.add('has-manual-split');
+    browserEl.style.setProperty('--ss-domain-top', Math.round(ratio * 100) + '%');
+  }
+  function onUp(){
+    cleanup(true);
+    Browser.render();
+  }
+  if(!browserEl || STORE.browser.view !== 'domains'){
+    return;
+  }
+  ev.preventDefault();
+  rect = browserEl.getBoundingClientRect();
+  if(Browser._activeSplitCleanup){
+    Browser._activeSplitCleanup(false);
+  }
+  onMove(ev);
+  Browser._activeSplitCleanup = cleanup;
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+};
+
+Browser.adjustDomainSplit = function(nextRatio){
+  STORE.browser.domainSplit = Math.max(0.22, Math.min(0.44, Number(nextRatio) || 0.34));
+  STORE.browser.domainSplitManual = true;
+  saveUiPrefs();
+  Browser.render();
+};
+
+Browser.onDomainSplitKeydown = function(ev){
+  var ratio = Number(STORE.browser.domainSplit || 0.34);
+  if(ev.key === 'ArrowUp'){
+    ev.preventDefault();
+    Browser.adjustDomainSplit(ratio - 0.03);
+    return;
+  }
+  if(ev.key === 'ArrowDown'){
+    ev.preventDefault();
+    Browser.adjustDomainSplit(ratio + 0.03);
+    return;
+  }
+  if(ev.key === 'Home'){
+    ev.preventDefault();
+    Browser.adjustDomainSplit(0.22);
+    return;
+  }
+  if(ev.key === 'End'){
+    ev.preventDefault();
+    Browser.adjustDomainSplit(0.44);
+  }
+};
+
+Browser.render = function(){
+  var tables;
+  var filtered;
+  var allGroups;
+  var filteredGroups;
+  var domains;
+  var filter;
+  var filterActive;
+  var stats;
+  var sortedTables;
+  var selectedTableMap = {};
+  var relatedCountMap = {};
+  var searchMeta;
+  var domainCandidates;
+  var activeDomain;
+  var activeDomainTables;
+  var activeHidden;
+  var activeIsolated;
+  var activeDomainColor;
+  var workflowStages;
+  var workflowHtml;
+  function renderTableItem(tbl, useFlat){
+    var active = !!selectedTableMap[tbl.id];
+    var hidden = Browser.isDomainHidden(tbl.domain || 'default');
+    var domainColor = DOMAIN_COLORS[tbl.domain || 'default'] || DOMAIN_COLORS.default;
+    var fkCount = relatedCountMap[tbl.id] || 0;
+    return '<div class="ss-table-item' + (useFlat ? ' ss-table-item-flat' : '') + (active ? ' active' : '') + (hidden ? ' is-hidden' : '') + '" tabindex="0" role="button" aria-label="' + _esc(_t('Mở bảng ', 'Open table ') + tbl.name) + '" onclick="Browser.selectTable(\'' + _esc(tbl.id) + '\')" ondblclick="Browser.focusTable(\'' + _esc(tbl.id) + '\')" onkeydown="Browser.onTableItemKeydown(event,\'' + _esc(tbl.id) + '\')" title="' + _esc(tbl.name) + '"><span class="ss-tbl-item-name">' + _esc(tbl.name) + '</span>' + (useFlat ? '<span class="ss-browser-table-domain"><span class="ss-domain-chip-dot" style="background:' + _esc(domainColor) + '"></span>' + _esc(formatDomainLabel(tbl.domain || 'default')) + '</span>' : '') + (fkCount ? '<span class="ss-tbl-badge">' + String(fkCount) + ' FK</span>' : '') + '</div>';
+  }
+  if(!refs.browser) return;
+  refs.browser.classList.toggle('is-domain-view', STORE.browser.view === 'domains' && !!STORE.browser.open);
+  refs.browser.classList.toggle('is-table-view', STORE.browser.view === 'tables' && !!STORE.browser.open);
+  refs.browser.classList.toggle('is-workflow-view', STORE.browser.view === 'workflow' && !!STORE.browser.open);
+  if(STORE.browser.view === 'domains' && STORE.browser.open){
+    refs.browser.classList.add('has-domain-split');
+    if(STORE.browser.domainSplitManual && Number(STORE.browser.domainSplit || 0.5) <= 0.44){
+      refs.browser.style.setProperty('--ss-domain-top', Math.round((STORE.browser.domainSplit || 0.5) * 100) + '%');
+      refs.browser.classList.add('has-manual-split');
+    } else {
+      STORE.browser.domainSplitManual = false;
+      refs.browser.classList.remove('has-manual-split');
+      refs.browser.style.removeProperty('--ss-domain-top');
+    }
+  } else {
+    refs.browser.classList.remove('has-domain-split');
+    refs.browser.classList.remove('has-manual-split');
+    refs.browser.style.removeProperty('--ss-domain-top');
+  }
+  tables = Browser.getAllTables();
+  filtered = Browser.getVisibleTables();
+  allGroups = Browser.groupTables(tables);
+  filteredGroups = Browser.groupTables(filtered);
+  domains = Object.keys(allGroups).sort(function(a, b){
+    return formatDomainLabel(a).localeCompare(formatDomainLabel(b));
+  });
+  filter = String(STORE.browser.filter || '').trim();
+  filterActive = !!filter;
+  stats = Browser.getDomainStats();
+  Browser.getSelectedTables().forEach(function(tbl){
+    selectedTableMap[tbl.id] = true;
+  });
+  ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){
+    relatedCountMap[rel.from_table_id] = (relatedCountMap[rel.from_table_id] || 0) + 1;
+    relatedCountMap[rel.to_table_id] = (relatedCountMap[rel.to_table_id] || 0) + 1;
+  });
+  sortedTables = filtered.slice().sort(function(a, b){
+    var aSelected = selectedTableMap[a.id] ? 0 : 1;
+    var bSelected = selectedTableMap[b.id] ? 0 : 1;
+    var domainCompare;
+    if(aSelected !== bSelected) return aSelected - bSelected;
+    domainCompare = formatDomainLabel(a.domain || 'default').localeCompare(formatDomainLabel(b.domain || 'default'));
+    if(domainCompare !== 0) return domainCompare;
+    return String(a.name || '').localeCompare(String(b.name || ''));
+  });
+  domainCandidates = domains.filter(function(domain){
+    return !filterActive || ((filteredGroups[domain] || []).length > 0);
+  });
+  activeDomain = Browser.resolveActiveDomain(allGroups, filteredGroups, filterActive);
+  STORE.browser.activeDomain = activeDomain;
+  activeDomainTables = activeDomain ? (filterActive ? (filteredGroups[activeDomain] || []) : (allGroups[activeDomain] || [])) : [];
+  activeHidden = !!(activeDomain && Browser.isDomainHidden(activeDomain));
+  activeIsolated = !!(activeDomain && STORE.browser.isolatedDomain === activeDomain);
+  activeDomainColor = activeDomain ? (DOMAIN_COLORS[activeDomain] || DOMAIN_COLORS.default) : DOMAIN_COLORS.default;
+  workflowStages = STORE.browser.view === 'workflow' ? Browser.buildWorkflowStages(sortedTables) : [];
+  workflowHtml = workflowStages.length
+    ? '<div class="ss-workflow-groups">' + workflowStages.map(function(stage, stageIndex){
+        var stageMeta = String((stage.tables || []).length) + ' ' + _esc(_t('bảng', 'tables')) + (stage.kind === 'flow' ? ' · ' + _esc(_t('từ nguồn đến phụ thuộc', 'upstream to dependent')) : ' · ' + _esc(_t('cần rà soát vòng phụ thuộc', 'review cyclic dependencies')));
+        return '<section class="ss-workflow-group' + (stage.kind === 'cycle' ? ' is-cycle' : '') + '"><div class="ss-workflow-group-head"><div class="ss-workflow-group-title">' + _esc(stage.label) + '</div><div class="ss-workflow-group-meta">' + stageMeta + '</div></div><div class="ss-workflow-table-list">' + (stage.tables || []).map(function(tbl){ return renderTableItem(tbl, true); }).join('') + '</div></section>';
+      }).join('') + '</div>'
+    : '<div class="ss-empty-state"><div>' + _esc(_t('Chưa đủ quan hệ để dựng workflow', 'Not enough relationships to build a workflow view')) + '</div></div>';
+  searchMeta = filterActive
+    ? _t('Đang hiển thị ' + filtered.length + ' bảng khớp', 'Showing ' + filtered.length + ' matching table(s)')
+    : (STORE.browser.view === 'tables'
+      ? _t('Nhấp để chọn, nhấp đúp để đưa bảng vào giữa màn hình', 'Click to select, double-click to focus a table')
+      : STORE.browser.view === 'workflow'
+        ? _t('Nhóm bảng theo luồng phụ thuộc để xem upstream → downstream', 'Grouped by dependency flow to inspect upstream → downstream')
+        : _t('Chọn domain ở trên để xem bảng của domain đó', 'Select a domain above to see that domain tables'));
+  if(!STORE.browser.open){
+    refs.browser.classList.remove('is-domain-view');
+    refs.browser.classList.remove('is-table-view');
+    refs.browser.classList.remove('is-workflow-view');
+    refs.browser.innerHTML = [
+      '<div class="ss-browser-collapsed-shell">',
+        '<button class="ss-browser-rail-btn" type="button" onclick="Browser.toggleOpen(true)" title="' + _esc(_t('Mở trình duyệt schema (B)', 'Open schema browser (B)')) + '" aria-label="' + _esc(_t('Mở trình duyệt schema', 'Open schema browser')) + '">&#9654;</button>',
+        '<button class="ss-browser-rail-btn" type="button" onclick="Browser.setView(\'domains\'); Browser.toggleOpen(true)" title="' + _esc(_t('Quản lý theo domain', 'Manage by domain')) + '" aria-label="' + _esc(_t('Quản lý theo domain', 'Manage by domain')) + '">◎</button>',
+        '<button class="ss-browser-rail-btn" type="button" onclick="Browser.setView(\'tables\'); Browser.toggleOpen(true)" title="' + _esc(_t('Quản lý theo bảng', 'Manage by table')) + '" aria-label="' + _esc(_t('Quản lý theo bảng', 'Manage by table')) + '">≣</button>',
+        '<button class="ss-browser-rail-btn" type="button" onclick="Browser.setView(\'workflow\'); Browser.toggleOpen(true)" title="' + _esc(_t('Quản lý theo workflow', 'Manage by workflow')) + '" aria-label="' + _esc(_t('Quản lý theo workflow', 'Manage by workflow')) + '">⇄</button>',
+        '<div class="ss-browser-rail-stats"><strong>' + String(stats.visibleTables) + '</strong><span>' + _esc(_t('đang hiện', 'visible')) + '</span></div>',
+      '</div>'
+    ].join('');
+    renderHeaderStatus();
+    return;
+  }
+  refs.browser.innerHTML = [
+    '<div class="ss-browser-search-wrap">',
+      '<input class="hm-input ss-browser-search" placeholder="' + _esc(_t('Tìm bảng, cột hoặc domain...', 'Search tables, columns, or domains...')) + '" value="' + _esc(STORE.browser.filter) + '" oninput="Browser.onFilter(this.value)" />',
+      (STORE.browser.view === 'domains'
+        ? '<div class="ss-domain-chip-strip">' + domainCandidates.map(function(domain){
+            var totalCount = (filterActive ? (filteredGroups[domain] || []) : (allGroups[domain] || [])).length;
+            var hidden = Browser.isDomainHidden(domain);
+            var active = STORE.browser.activeDomain === domain;
+            return '<button class="ss-domain-chip' + (hidden ? ' is-hidden' : '') + (active ? ' active' : '') + '" type="button" onclick="Browser.setActiveDomain(\'' + _esc(domain) + '\')" title="' + _esc(_t('Chọn domain này', 'Select this domain')) + '"><span class="ss-domain-chip-dot" style="background:' + _esc(DOMAIN_COLORS[domain] || DOMAIN_COLORS.default) + '"></span><span class="ss-domain-chip-label">' + _esc(formatDomainLabel(domain)) + '</span><strong>' + String(totalCount) + '</strong></button>';
+          }).join('') + '</div>'
+        : ''),
+      '<div class="ss-browser-search-meta">' + _esc(searchMeta) + '</div>',
+    '</div>',
+    (STORE.browser.view === 'domains'
+      ? '<div class="ss-browser-splitter" onmousedown="Browser.startDomainSplit(event)" onkeydown="Browser.onDomainSplitKeydown(event)" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="24" aria-valuemax="44" aria-valuenow="' + String(Math.round((STORE.browser.domainSplit || 0.34) * 100)) + '" aria-label="' + _esc(_t('Điều chỉnh chiều cao giữa domain và bảng', 'Resize domain and table panes')) + '"><span class="ss-browser-splitter-handle"></span></div>'
+      : ''),
+    '<div class="ss-browser-list">' + (STORE.browser.view === 'tables'
+      ? (sortedTables.length
+          ? '<div class="ss-browser-flat-list">' + sortedTables.map(function(tbl){ return renderTableItem(tbl, true); }).join('') + '</div>'
+          : '<div class="ss-empty-state"><div>' + _esc(_t('Không có bảng nào khớp bộ lọc hiện tại', 'No tables match the current filter')) + '</div></div>')
+      : STORE.browser.view === 'workflow'
+        ? workflowHtml
+        : (activeDomain
+            ? '<div class="ss-domain-focus-card' + (activeHidden ? ' is-hidden' : '') + '" data-domain="' + _esc(activeDomain) + '"><div class="ss-domain-focus-head" style="border-left:3px solid ' + _esc(activeDomainColor) + '"><span class="ss-domain-name">' + _esc(formatDomainLabel(activeDomain)) + '</span>' + (activeHidden ? '<span class="ss-domain-state">' + _esc(_t('Ẩn', 'Hidden')) + '</span>' : '') + '<div class="ss-domain-actions"><button class="ss-domain-action" type="button" onclick="Browser.isolateDomain(\'' + _esc(activeDomain) + '\', event)" title="' + _esc(activeIsolated ? _t('Bỏ chế độ chỉ xem domain này', 'Clear isolated view') : _t('Chỉ hiện domain này', 'Show only this domain')) + '">' + _esc(activeIsolated ? _t('Tất cả', 'All') : _t('Chỉ', 'Only')) + '</button><button class="ss-domain-action" type="button" onclick="Browser.toggleDomainVisibility(\'' + _esc(activeDomain) + '\', event)" title="' + _esc(activeHidden ? _t('Hiện lại domain này', 'Show this domain again') : _t('Ẩn domain này khỏi canvas', 'Hide this domain from canvas')) + '">' + _esc(activeHidden ? _t('Hiện', 'Show') : _t('Ẩn', 'Hide')) + '</button></div><span class="ss-domain-count">' + String(activeDomainTables.length) + '</span></div>' + (activeHidden
+                ? '<div class="ss-domain-hidden-note">' + _esc(_t('Domain này đang ẩn khỏi canvas, minimap và relation', 'This domain is hidden from canvas, minimap, and relations')) + '</div>'
+                : (activeDomainTables.length
+                    ? '<div class="ss-domain-tables">' + activeDomainTables.map(function(tbl){ return renderTableItem(tbl, false); }).join('') + '</div>'
+                    : '<div class="ss-empty-state"><div>' + _esc(_t('Không có bảng nào trong domain này', 'No tables in this domain')) + '</div></div>')) + '</div>'
+            : '<div class="ss-empty-state"><div>' + _esc(_t('Chọn một domain để xem danh sách bảng', 'Select a domain to view its tables')) + '</div></div>')) + '</div>'
+  ].join('');
+  renderHeaderStatus();
+};
+
+renderToolbar = function(container){
+  if(!container) return;
+  container.innerHTML = [
+    '<div class="ss-toolbar-left"><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-panel-btn ss-toolbar-icon-btn' + (STORE.browser.open ? '' : ' is-collapsed') + '" onclick="Browser.toggleOpen()" title="' + _esc(_t('Ẩn/hiện trình duyệt schema (B)', 'Toggle schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn hoặc hiện trình duyệt schema', 'Toggle schema browser')) + '"><span class="ss-toolbar-panel-icon">' + (STORE.browser.open ? '&#9666;' : '&#9656;') + '</span></button><select class="ss-schema-select" id="ss-schema-select" onchange="SchemaLib.onSelectChange(this.value)"></select></div>',
+    '<div class="ss-toolbar-center"><div class="ss-mode-tabs"><button class="ss-mode-tab' + (STORE.mode === 'canvas' ? ' active' : '') + '" onclick="switchMode(\'canvas\')">' + _esc(_t('Sơ đồ', 'Canvas')) + '</button><button class="ss-mode-tab' + (STORE.mode === 'code' ? ' active' : '') + '" onclick="switchMode(\'code\')">' + _esc(_t('Mã', 'Code')) + '</button><button class="ss-mode-tab' + (STORE.mode === 'validate' ? ' active' : '') + '" onclick="Validator.run()">' + _esc(_t('Kiểm tra', 'Validate')) + '</button><button class="ss-mode-tab" onclick="MigGen.renderPreview()">' + _esc(_t('Di trú', 'Migration')) + '</button></div><div class="ss-toolbar-view-tabs"><button class="ss-mode-tab ss-browser-view-tab' + (STORE.browser.view === 'domains' ? ' active' : '') + '" onclick="Browser.setView(\'domains\')">' + _esc(_t('Theo domain', 'By domain')) + '</button><button class="ss-mode-tab ss-browser-view-tab' + (STORE.browser.view === 'tables' ? ' active' : '') + '" onclick="Browser.setView(\'tables\')">' + _esc(_t('Theo bảng', 'By table')) + '</button><button class="ss-mode-tab ss-browser-view-tab' + (STORE.browser.view === 'workflow' ? ' active' : '') + '" onclick="Browser.setView(\'workflow\')">' + _esc(_t('Theo workflow', 'By workflow')) + '</button></div></div>',
+    '<div class="ss-toolbar-right"><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-icon-btn" onclick="Layout.auto(\'compact-visible\')" title="' + _esc(_t('Nén phần đang hiện để tiết kiệm không gian', 'Compact visible view')) + '" aria-label="' + _esc(_t('Nén phần đang hiện', 'Compact visible view')) + '">' + toolbarIconSvg('compact') + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-icon-btn" onclick="Browser.focusNeighborhood()" title="' + _esc(_t('Tập trung vùng lân cận của bảng đang chọn', 'Focus selected table neighborhood')) + '" aria-label="' + _esc(_t('Tập trung vùng lân cận', 'Focus selected table neighborhood')) + '">' + toolbarIconSvg('focus') + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Canvas.zoomReset()">' + _esc(_t('Đặt lại', 'Reset')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="CmdPalette.open()">Ctrl+K</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Importer.openModal()">' + _esc(_t('Nhập', 'Import')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="MigGen.setBaseline()">' + _esc(_t('Mốc gốc', 'Baseline')) + '</button><button class="hm-btn hm-btn-secondary ss-btn-sm" onclick="SchemaLib.save()">' + _esc(_t('Lưu', 'Save')) + '</button><button class="hm-btn hm-btn-primary ss-btn-sm" onclick="CodePanel.open(\'sql\')">SQL</button></div>'
+  ].join('');
+  SchemaLib.renderSelector();
+  renderHeaderStatus();
+};
+
+CmdPalette.COMMANDS = CmdPalette.COMMANDS.filter(function(cmd){
+  return !(cmd && cmd.category === 'view' && cmd.label_en === 'Switch to workflow view');
+});
+CmdPalette.COMMANDS.push({
+  icon:'⇄',
+  label:'Xem theo workflow',
+  label_en:'Switch to workflow view',
+  category:'view',
+  action:function(){ Browser.setView('workflow'); }
+});
+
 window.STORE = STORE;
 window.Canvas = Canvas;
 window.EdgeLayer = EdgeLayer;
@@ -7659,7 +7988,7 @@ window.TableDialog = TableDialog;
 window.Diagnostics = Diagnostics;
 window.switchMode = switchMode;
 window.SchemaStudio = {
-  buildId:'20260405ab',
+  buildId:'20260405ac',
   init:init,
   destroy:destroy,
   getDiagnostics:function(){ return Diagnostics.snapshot(); },

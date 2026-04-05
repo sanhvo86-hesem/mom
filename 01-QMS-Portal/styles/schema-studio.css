@@ -2673,6 +2673,109 @@
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
+.ss-browser.has-domain-split.is-domain-view {
+  grid-template-rows: min-content 10px minmax(0, 1fr);
+  row-gap: 0;
+}
+
+.ss-browser.has-domain-split.is-domain-view.has-manual-split {
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 34%)) 10px minmax(0, 1fr);
+}
+
+.ss-browser.is-domain-view .ss-browser-search-wrap {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.ss-browser.is-domain-view .ss-domain-chip-strip {
+  flex: none;
+  max-height: clamp(104px, 16vh, 156px);
+  overflow: auto;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.ss-browser.is-domain-view .ss-browser-search-meta {
+  margin: 0;
+  padding: 0;
+}
+
+.ss-browser.is-domain-view .ss-browser-list {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.ss-browser.is-domain-view .ss-domain-focus-card {
+  height: 100%;
+  margin-top: 0;
+}
+
+.ss-browser-splitter {
+  height: 10px;
+  margin: 0;
+}
+
+.ss-browser-splitter-handle {
+  width: 72px;
+}
+
+.ss-browser.is-workflow-view .ss-browser-search-wrap {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 10px;
+  align-content: start;
+}
+
+.ss-workflow-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ss-workflow-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.ss-workflow-group.is-cycle {
+  border-color: rgba(255, 180, 0, 0.35);
+  background: rgba(255, 180, 0, 0.06);
+}
+
+.ss-workflow-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ss-workflow-group-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.ss-workflow-group-meta {
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: right;
+}
+
+.ss-workflow-table-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
 /* Final Schema Studio runtime overrides */
 .ss-modal-overlay.is-table-dialog-fullscreen {
   padding: 0;
