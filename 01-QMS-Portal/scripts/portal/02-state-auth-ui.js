@@ -1306,6 +1306,87 @@ function teardownCurrentPageModule(){
   }catch(_teardownErr){}
 }
 
+function resolvePortalScriptUrl(fragment){
+  var src = './scripts/portal/' + fragment;
+  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405s';
+}
+
+function renderModuleBuilderStatus(container, mode, detail){
+  var title = mode === 'loading'
+    ? (lang==='en' ? 'Loading Module Builder...' : 'Đang nạp Module Builder...')
+    : 'Module Builder';
+  var body = mode === 'loading'
+    ? (lang==='en'
+        ? 'Please wait while the builder runtime is reloaded.'
+        : 'Vui lòng chờ trong khi hệ thống nạp lại runtime của builder.')
+    : (lang==='en'
+        ? 'The builder could not be loaded automatically. Please reload once.'
+        : 'Không thể nạp Module Builder tự động. Vui lòng tải lại một lần.');
+  var extra = '';
+  if(detail){
+    extra = '<div style="margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(220,38,38,0.18);background:rgba(220,38,38,0.06);color:#991b1b;font-size:12px;word-break:break-word">' + String(detail).replace(/[&<>]/g, function(ch){
+      return ch === '&' ? '&amp;' : (ch === '<' ? '&lt;' : '&gt;');
+    }) + '</div>';
+  }
+  container.innerHTML =
+    '<div style="max-width:760px;margin:32px auto;padding:24px;border-radius:20px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-sm)">' +
+      '<div style="font-size:22px;font-weight:700;margin-bottom:8px">' + title + '</div>' +
+      '<div style="color:var(--text-secondary);line-height:1.6">' + body + '</div>' +
+      extra +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">' +
+        '<button class="hm-btn hm-btn-primary" onclick="navigateTo(\'module-builder\', undefined, true)">' + (lang==='en' ? 'Retry builder' : 'Thử nạp lại builder') + '</button>' +
+        '<button class="hm-btn hm-btn-secondary" onclick="window.location.reload()">' + (lang==='en' ? 'Reload page' : 'Tải lại trang') + '</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function ensurePortalRenderer(fragment, globalName, forceReload){
+  return new Promise(function(resolve, reject){
+    var script;
+    if(!forceReload && typeof window[globalName] === 'function'){
+      resolve(window[globalName]);
+      return;
+    }
+    script = document.createElement('script');
+    script.charset = 'UTF-8';
+    script.src = resolvePortalScriptUrl(fragment) + '&portal_reload=' + Date.now();
+    script.onload = function(){
+      if(typeof window[globalName] === 'function'){
+        resolve(window[globalName]);
+      } else {
+        reject(new Error(globalName + '_missing'));
+      }
+    };
+    script.onerror = function(){
+      reject(new Error('script_load_failed'));
+    };
+    document.body.appendChild(script);
+  });
+}
+
+function renderModuleBuilderPage(){
+  var mbp = document.getElementById('page-module-builder');
+  if(!mbp) return;
+  try{
+    if(typeof window._renderModuleBuilder !== 'function'){
+      throw new Error('renderer_missing');
+    }
+    window._renderModuleBuilder(mbp);
+    return;
+  }catch(_builderErr){
+    renderModuleBuilderStatus(mbp, 'loading', _builderErr && _builderErr.message ? _builderErr.message : '');
+  }
+  ensurePortalRenderer('31-module-builder.js', '_renderModuleBuilder', true).then(function(renderer){
+    try{
+      renderer(mbp);
+    }catch(retryErr){
+      renderModuleBuilderStatus(mbp, 'error', retryErr && retryErr.message ? retryErr.message : '');
+    }
+  }).catch(function(loadErr){
+    renderModuleBuilderStatus(mbp, 'error', loadErr && loadErr.message ? loadErr.message : '');
+  });
+}
+
 function navigateTo(page, filter, bypassGuard){
   if(!bypassGuard && typeof window._ecBeforePortalNavigate === 'function'){
     try{
@@ -1325,10 +1406,12 @@ function navigateTo(page, filter, bypassGuard){
   
   // Track page view for activity log
   const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng','schema-studio':'Schema Studio'};
+  pageTitles['module-builder'] = 'Module Builder';
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
   const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   titles['template-demo'] = 'Master Module Template';
+  titles['module-builder'] = 'Module Builder';
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
@@ -1367,7 +1450,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='continuous-improvement' && typeof window._renderContinuousImprovement==='function'){ var cip=document.getElementById('page-continuous-improvement'); if(cip) window._renderContinuousImprovement(cip); }
   if(page==='energy-dashboard' && typeof window._renderEnergyDashboard==='function'){ var edp=document.getElementById('page-energy-dashboard'); if(edp) window._renderEnergyDashboard(edp); }
   if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
-  if(page==='module-builder' && typeof window._renderModuleBuilder==='function'){ var mbp=document.getElementById('page-module-builder'); if(mbp) window._renderModuleBuilder(mbp); }
+  if(page==='module-builder'){ renderModuleBuilderPage(); }
   if(page==='schema-studio' && typeof window._renderSchemaStudio==='function'){ var ssp=document.getElementById('page-schema-studio'); if(ssp) window._renderSchemaStudio(ssp); }
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   

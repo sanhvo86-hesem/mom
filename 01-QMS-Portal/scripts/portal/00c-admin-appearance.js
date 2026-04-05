@@ -239,6 +239,418 @@ function sect(title, content, open){
     +'</details>';
 }
 
+function previewBox(title, body, note){
+  return '<div style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary)">'+esc(title||'Preview')+'</div>'
+    + (note ? '<div style="font-size:10px;color:var(--text-tertiary)">'+esc(note)+'</div>' : '')
+    + '</div>'
+    + body
+    + '</div>';
+}
+
+function previewSwatch(label, bg, color, border){
+  return '<div style="min-width:120px;flex:1;padding:10px 12px;border-radius:var(--radius-md);background:'+bg+';color:'+(color||'var(--text-primary)')+';border:'+(border||'1px solid var(--border)')+'">'
+    + '<div style="font-size:10px;opacity:.72">'+esc(label)+'</div>'
+    + '<div style="font-size:13px;font-weight:700;margin-top:4px">Aa 123</div>'
+    + '</div>';
+}
+
+function previewScaleRow(label, varName, sample){
+  return '<div style="display:flex;align-items:baseline;gap:12px;padding:6px 0;border-bottom:1px dashed var(--border)">'
+    + '<span style="min-width:100px;font-size:11px;color:var(--text-tertiary)">'+esc(label)+'</span>'
+    + '<span style="font-size:var('+varName+');font-weight:600;color:var(--text-primary)">'+esc(sample)+'</span>'
+    + '</div>';
+}
+
+function previewTypographyFamily(){
+  return previewBox('Preview typography',
+    '<div style="display:grid;gap:8px">'
+    + '<div style="font-family:var(--font-display,var(--font));font-weight:var(--font-display-weight,700);font-size:28px;line-height:var(--leading-tight,1.25);color:var(--text-primary)">Display / Hero Aa 123</div>'
+    + '<div style="font-family:var(--font-heading,var(--font));font-weight:var(--font-heading-weight,600);font-size:20px;line-height:var(--leading-tight,1.25);color:var(--text-primary)">Heading sample</div>'
+    + '<div style="font-family:var(--font-body,var(--font));font-weight:var(--font-body-weight,400);font-size:14px;line-height:var(--leading-normal,1.5);color:var(--text-secondary)">Body copy shows how paragraph text, secondary text and reading rhythm look in the current theme.</div>'
+    + '<div style="font-family:var(--font-label,var(--font));font-weight:var(--font-label-weight,600);letter-spacing:var(--label-letter-spacing,0);text-transform:var(--label-transform,uppercase);font-size:11px;color:var(--text-tertiary)">quality gate label</div>'
+    + '<div style="font-family:var(--font-mono,var(--mono));font-size:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 10px;color:var(--text-primary)">SELECT * FROM audit_log WHERE status = \'LIVE\';</div>'
+    + '</div>'
+  );
+}
+
+function previewFontScale(){
+  return previewBox('Preview scale',
+    '<div style="display:grid;gap:0">'
+    + previewScaleRow('XS', '--text-xs', 'Caption / badge text')
+    + previewScaleRow('SM', '--text-sm', 'Secondary body copy')
+    + previewScaleRow('Base', '--text-base', 'Primary body copy')
+    + previewScaleRow('MD', '--text-md', 'Section title')
+    + previewScaleRow('LG', '--text-lg', 'Card title')
+    + previewScaleRow('XL', '--text-xl', 'Page heading')
+    + previewScaleRow('2XL', '--text-2xl', '42 KPI')
+    + previewScaleRow('3XL', '--text-3xl', '128 Hero stat')
+    + '</div>'
+  );
+}
+
+function previewLineHeight(){
+  function block(title, lh){
+    return '<div style="flex:1;min-width:180px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'
+      + '<div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">'+esc(title)+'</div>'
+      + '<div style="font-size:13px;line-height:'+lh+';color:var(--text-primary)">Quality documentation should stay readable even in dense screens, mobile forms and dashboard summaries.</div>'
+      + '</div>';
+  }
+  return previewBox('Preview line height',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + block('Tight', 'var(--leading-tight,1.25)')
+    + block('Normal', 'var(--leading-normal,1.5)')
+    + block('Relaxed', 'var(--leading-relaxed,1.75)')
+    + '</div>'
+  );
+}
+
+function previewLabelTransform(){
+  return previewBox('Preview labels',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    + '<span class="hm-label" style="margin:0">Quality Gate</span>'
+    + '<span class="hm-label" style="margin:0">Shopfloor Status</span>'
+    + '<span class="hm-badge hm-badge-review">Review</span>'
+    + '<span class="hm-badge hm-badge-approved">Approved</span>'
+    + '</div>'
+  );
+}
+
+function previewBrandColors(){
+  return previewBox('Preview brand',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + previewSwatch('Primary', 'var(--brand-2)', 'var(--text-inverse)', '1px solid transparent')
+    + previewSwatch('Brand', 'var(--brand)', 'var(--text-inverse)', '1px solid transparent')
+    + previewSwatch('Darkest', 'var(--brand-dark)', 'var(--text-inverse)', '1px solid transparent')
+    + previewSwatch('Accent', 'var(--accent)', '#111827', '1px solid transparent')
+    + '</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
+    + '<button class="hm-btn hm-btn-primary">Primary CTA</button>'
+    + '<button class="hm-btn hm-btn-secondary" style="border-color:var(--brand-2);color:var(--brand-2)">Secondary</button>'
+    + '</div>'
+  );
+}
+
+function previewStatusColors(){
+  return previewBox('Preview status',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + '<span class="hm-badge" style="background:var(--green-light);color:#fff">Success</span>'
+    + '<span class="hm-badge" style="background:var(--red-light);color:#fff">Error</span>'
+    + '<span class="hm-badge" style="background:var(--amber-light);color:#111827">Warning</span>'
+    + '<span class="hm-badge" style="background:var(--blue-light);color:#fff">Info</span>'
+    + '<span class="hm-badge" style="background:var(--purple-light);color:#fff">Review</span>'
+    + '<span class="hm-badge" style="background:var(--cyan-light);color:#083344">Planned</span>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
+    + '<span class="hm-badge" style="background:var(--green-dark);color:#0f172a">Dark success</span>'
+    + '<span class="hm-badge" style="background:var(--red-dark);color:#0f172a">Dark error</span>'
+    + '<span class="hm-badge" style="background:var(--amber-dark);color:#0f172a">Dark warning</span>'
+    + '<span class="hm-badge" style="background:var(--blue-dark);color:#0f172a">Dark info</span>'
+    + '</div>'
+  );
+}
+
+function previewSurfaceStack(mode){
+  var page = 'var(--bg-page-'+mode+')';
+  var surface = 'var(--bg-surface-'+mode+')';
+  var alt = 'var(--bg-surface-alt-'+mode+')';
+  var text = 'var(--text-primary-'+mode+')';
+  var muted = mode === 'light' ? 'var(--text-secondary-light)' : 'var(--text-secondary-dark)';
+  var border = mode === 'light' ? 'var(--border-light)' : 'var(--border-dark)';
+  return previewBox('Preview '+mode+' surfaces',
+    '<div style="padding:12px;border-radius:var(--radius-lg);background:'+page+';border:1px solid '+border+'">'
+    + '<div style="padding:12px;border-radius:var(--radius-md);background:'+surface+';border:1px solid '+border+';color:'+text+'">'
+    + '<div style="font-size:13px;font-weight:700">Surface</div>'
+    + '<div style="font-size:12px;color:'+muted+';margin-top:4px">Nested layers show page, surface and alternate surface.</div>'
+    + '<div style="margin-top:10px;padding:10px;border-radius:var(--radius-md);background:'+alt+';border:1px solid '+border+'">Surface Alt</div>'
+    + '</div>'
+    + '</div>'
+  );
+}
+
+function previewTextColors(mode){
+  var bg = mode === 'light' ? 'var(--bg-surface-light)' : 'var(--bg-surface-dark)';
+  var primary = mode === 'light' ? 'var(--text-primary-light)' : 'var(--text-primary-dark)';
+  var secondary = mode === 'light' ? 'var(--text-secondary-light)' : 'var(--text-secondary-dark)';
+  var tertiary = mode === 'light' ? 'var(--text-tertiary-light)' : 'var(--text-tertiary-dark)';
+  var link = mode === 'light' ? 'var(--text-link-light)' : 'var(--text-link-dark)';
+  var inverse = mode === 'light' ? 'var(--text-inverse-light)' : 'var(--text-inverse-dark)';
+  return previewBox('Preview '+mode+' text',
+    '<div style="padding:12px;border-radius:var(--radius-lg);background:'+bg+';border:1px solid var(--border)">'
+    + '<div style="color:'+primary+';font-weight:700">Primary text</div>'
+    + '<div style="color:'+secondary+';margin-top:4px">Secondary text explains context and metadata.</div>'
+    + '<div style="color:'+tertiary+';margin-top:4px">Muted text for helper or support content.</div>'
+    + '<div style="color:'+link+';margin-top:6px;font-weight:600">Link / action text</div>'
+    + '<div style="margin-top:10px;padding:8px 10px;border-radius:var(--radius-md);background:'+primary+';color:'+inverse+'">Inverse text sample</div>'
+    + '</div>'
+  );
+}
+
+function previewBorderColors(){
+  return previewBox('Preview borders',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + previewSwatch('Border', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-light)')
+    + previewSwatch('Focus', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-focus-light)')
+    + previewSwatch('Error', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-error-light)')
+    + previewSwatch('Success', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-success-light)')
+    + '</div>'
+  );
+}
+
+function previewDensityControls(){
+  return previewBox('Preview control sizing',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    + '<button class="hm-btn hm-btn-primary">Default</button>'
+    + '<button class="hm-btn hm-btn-sm hm-btn-secondary">Small</button>'
+    + '<button class="hm-btn hm-btn-lg hm-btn-secondary">Large</button>'
+    + '<input class="hm-input" value="Input sizing" style="max-width:180px">'
+    + '<span class="hm-badge hm-badge-review"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6"></circle></svg>Badge</span>'
+    + '</div>'
+  );
+}
+
+function previewTableDensity(){
+  return previewBox('Preview table',
+    '<table class="hm-table"><thead><tr><th>Code</th><th>Status</th><th>Owner</th></tr></thead><tbody>'
+    + '<tr><td>WI-201</td><td><span class="hm-badge hm-badge-approved">Live</span></td><td>QA</td></tr>'
+    + '<tr><td>SOP-604</td><td><span class="hm-badge hm-badge-review">Review</span></td><td>Ops</td></tr>'
+    + '</tbody></table>'
+  );
+}
+
+function previewRadiusScale(){
+  return previewBox('Preview radius',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-surface)">SM</div>'
+    + '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">MD</div>'
+    + '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)">LG</div>'
+    + '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-xl);background:var(--bg-surface)">XL</div>'
+    + '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-2xl);background:var(--bg-surface)">2XL</div>'
+    + '</div>'
+  );
+}
+
+function previewSpacingScale(){
+  return previewBox('Preview spacing',
+    '<div style="display:grid;gap:var(--space-4);background:var(--bg-surface);padding:var(--space-4);border:1px solid var(--border);border-radius:var(--radius-lg)">'
+    + '<div style="display:flex;gap:var(--space-2)"><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--brand-2)"></div><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--brand-light)"></div></div>'
+    + '<div style="display:flex;gap:var(--space-3)"><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--green)"></div><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--amber)"></div><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--red)"></div></div>'
+    + '</div>'
+  );
+}
+
+function previewLayoutDimensions(){
+  return previewBox('Preview layout dimensions',
+    '<div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-page)">'
+    + '<div style="display:flex;height:140px">'
+    + '<div style="width:min(140px,calc(var(--sidebar-w,260px) / 2));background:var(--brand);color:#fff;padding:12px">Sidebar</div>'
+    + '<div style="flex:1;background:var(--bg-surface)">'
+    + '<div style="height:min(52px,var(--header-h,52px));background:var(--bg-surface-alt);border-bottom:1px solid var(--border);padding:0 12px;display:flex;align-items:center">Header</div>'
+    + '<div style="padding:12px">'
+    + '<div style="max-width:min(100%,calc(var(--content-max-w,1400px) / 3));padding:10px 12px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt)">Content max width</div>'
+    + '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'
+    + '<div style="width:min(100%,calc(var(--modal-max-w,800px) / 3));padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-modal)">Modal max</div>'
+    + '<div style="width:min(100%,calc(var(--modal-sm-max-w,480px) / 2));padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-modal)">Modal sm</div>'
+    + '</div>'
+    + '</div></div></div></div>'
+  );
+}
+
+function previewMotion(){
+  return previewBox('Preview motion', '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-primary">Hover me</button><button class="hm-btn hm-btn-secondary">Focus me</button><div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface);transition:transform var(--transition-spring),box-shadow var(--transition-spring);cursor:pointer" onmouseenter="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'var(--shadow-lg)\'" onmouseleave="this.style.transform=\'none\';this.style.boxShadow=\'none\'">Card motion</div></div>', 'Hover the card to inspect timing');
+}
+
+function previewFocus(){
+  return previewBox('Preview focus ring', '<div style="display:flex;gap:8px;flex-wrap:wrap"><input class="hm-input" placeholder="Tab into me" style="max-width:220px"><button class="hm-btn hm-btn-primary">Focusable button</button></div>', 'Use Tab to see focus styles');
+}
+
+function previewSelection(){
+  return previewBox('Preview selection', '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary)">Drag to select this sentence and verify selection background and selection text color.</div>');
+}
+
+function previewCaret(){
+  return previewBox('Preview caret', '<textarea class="hm-input hm-textarea" style="max-width:100%" rows="3">Place cursor here to inspect caret color.</textarea>');
+}
+
+function previewPlaceholder(){
+  return previewBox('Preview placeholder', '<input class="hm-input" placeholder="Placeholder preview" style="max-width:220px">');
+}
+
+function previewDisabled(){
+  return previewBox('Preview disabled state', '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-primary" disabled>Disabled button</button><input class="hm-input" disabled value="Disabled input" style="max-width:180px"></div>');
+}
+
+function previewScrollbar(){
+  var lines = Array(10).fill('<div style="padding:6px 0;border-bottom:1px dashed var(--border)">Scrollable preview content</div>').join('');
+  return previewBox('Preview scrollbar', '<div style="max-height:110px;overflow:auto;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'+lines+'</div>');
+}
+
+function previewBackdrop(){
+  return previewBox('Preview backdrop',
+    '<div style="position:relative;height:120px;overflow:hidden;border-radius:var(--radius-lg);background:linear-gradient(135deg,var(--brand-light) 0%,var(--accent-light) 100%)">'
+    + '<div style="position:absolute;inset:0;background:rgba(15,23,42,var(--overlay-opacity,0.4));backdrop-filter:blur(var(--backdrop-blur,0px))"></div>'
+    + '<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:180px;padding:12px 14px;border:1px solid rgba(255,255,255,.25);border-radius:var(--radius-lg);background:rgba(255,255,255,.16);color:#fff;font-weight:700;text-align:center">Overlay preview</div>'
+    + '</div>'
+  );
+}
+
+function previewButtons(){
+  return previewBox('Preview button', '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-primary">Primary</button><button class="hm-btn hm-btn-secondary">Secondary</button><button class="hm-btn hm-btn-ghost">Ghost</button><button class="hm-btn hm-btn-danger">Danger</button></div>');
+}
+
+function previewTable(){
+  return previewBox('Preview table', '<table class="hm-table"><thead><tr><th>Code</th><th>Owner</th><th>Status</th></tr></thead><tbody><tr><td>ANNEX-120</td><td>QA</td><td><span class="hm-badge hm-badge-approved">Live</span></td></tr><tr><td>WI-519</td><td>MES</td><td><span class="hm-badge hm-badge-review">Review</span></td></tr></tbody></table>');
+}
+
+function previewCard(){
+  return previewBox('Preview card',
+    '<div style="border:var(--card-border-width,1px) solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface);overflow:hidden">'
+    + '<div style="padding:var(--card-header-padding-v,12px) 16px;background:var(--card-header-bg,transparent);border-bottom:1px solid var(--border);font-weight:700;color:var(--text-primary)">Card header</div>'
+    + '<div style="padding:var(--card-body-padding,16px);color:var(--text-secondary)">Body preview for card padding, header background and border width.</div>'
+    + '</div>'
+  );
+}
+
+function previewBadges(){
+  return previewBox('Preview badge', '<div style="display:flex;gap:8px;flex-wrap:wrap"><span class="hm-badge hm-badge-approved">Approved</span><span class="hm-badge hm-badge-review">Review</span><span class="hm-badge hm-badge-planned">Planned</span><span class="hm-badge hm-badge-cancelled">Rejected</span></div>');
+}
+
+function previewInputs(){
+  return previewBox('Preview input', '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px"><input class="hm-input" placeholder="Text input"><select class="hm-input hm-select"><option>Select option</option></select><textarea class="hm-input hm-textarea" rows="3" placeholder="Textarea preview"></textarea></div>');
+}
+
+function previewTabs(){
+  return previewBox('Preview tab', '<div class="hm-tabs" style="margin-bottom:0"><button class="hm-tab active">Overview</button><button class="hm-tab">Runtime</button><button class="hm-tab">History</button></div>');
+}
+
+function previewModal(){
+  return previewBox('Preview modal',
+    '<div style="display:flex;justify-content:center;padding:8px 0">'
+    + '<div class="hm-form-modal" style="position:static;max-height:none;box-shadow:var(--shadow-lg);margin:0">'
+    + '<div class="hm-form-modal-header"><h3>Modal title</h3><button class="hm-btn hm-btn-ghost hm-btn-sm">Close</button></div>'
+    + '<div style="color:var(--text-secondary)">Preview body for modal radius, padding and header spacing.</div>'
+    + '<div class="hm-form-modal-actions"><button class="hm-btn hm-btn-secondary">Cancel</button><button class="hm-btn hm-btn-primary">Confirm</button></div>'
+    + '</div></div>'
+  );
+}
+
+function previewFlow(){
+  return previewBox('Preview flow',
+    '<div style="display:flex;align-items:center;justify-content:center;gap:18px;padding:10px 0">'
+    + '<div style="padding:var(--flow-node-padding,12px);border:var(--flow-node-border-w,2px) solid var(--flow-node-border-color,var(--border));border-radius:var(--flow-node-radius,8px);background:var(--flow-node-bg,var(--bg-surface));font-size:13px;font-weight:700;color:var(--text-primary)">Source</div>'
+    + '<div style="position:relative;width:110px;height:max(2px,var(--flow-connector-width,2px));background:var(--flow-connector-color,var(--border))"><span style="position:absolute;right:-1px;top:50%;width:0;height:0;border-top:calc(var(--flow-arrow-size,8px) / 2) solid transparent;border-bottom:calc(var(--flow-arrow-size,8px) / 2) solid transparent;border-left:var(--flow-arrow-size,8px) solid var(--flow-connector-color,var(--border));transform:translateY(-50%)"></span></div>'
+    + '<div style="padding:var(--flow-node-padding,12px);border:var(--flow-node-border-w,2px) solid var(--flow-node-border-color,var(--border));border-radius:var(--flow-node-radius,8px);background:var(--flow-node-bg,var(--bg-surface));font-size:13px;font-weight:700;color:var(--text-primary)">Target</div>'
+    + '</div>'
+  );
+}
+
+function previewIsoBox(){
+  return previewBox('Preview ISO box',
+    '<div style="border:var(--iso-box-border-w,1px) solid var(--border);border-radius:var(--iso-box-radius,8px);background:var(--iso-box-bg,var(--bg-surface));overflow:hidden">'
+    + '<div style="padding:var(--iso-box-header-padding,10px 14px);background:var(--iso-box-header-bg,var(--bg-surface-alt));font-size:var(--iso-box-font-size,13px);font-weight:700;color:var(--text-primary)">ISO Header</div>'
+    + '<div style="padding:var(--iso-box-body-padding,14px);font-size:var(--iso-box-font-size,13px);color:var(--text-secondary)">Document body preview with configurable box background, radius and padding.</div>'
+    + '</div>'
+  );
+}
+
+function previewIsoNote(){
+  return previewBox('Preview ISO note',
+    '<div style="display:flex;gap:10px;align-items:flex-start;padding:var(--iso-note-padding,10px 14px);border:1px solid var(--iso-note-border-color,#fcd34d);border-left:var(--iso-note-border-left-w,4px) solid var(--iso-note-border-left-color,#f59e0b);border-radius:var(--iso-note-radius,6px);background:var(--iso-note-bg,#fffbeb);font-size:var(--iso-note-font-size,13px);color:#713f12">'
+    + '<div style="font-size:var(--iso-note-icon-size,16px);line-height:1">!</div>'
+    + '<div><strong style="display:block;margin-bottom:4px">Attention note</strong><span>Use this preview to inspect callout spacing, icon size and emphasis.</span></div>'
+    + '</div>'
+  );
+}
+
+function previewKpi(){
+  return previewBox('Preview KPI',
+    '<div class="hm-kpi-row" style="margin-bottom:0">'
+    + '<div class="hm-kpi-card" style="display:grid;gap:8px;justify-items:center">'
+    + '<div style="font-size:var(--kpi-icon-size,24px);line-height:1">📈</div>'
+    + '<div class="hm-kpi-value">128</div>'
+    + '<div class="hm-kpi-label">Cycle Time</div>'
+    + '<div class="hm-kpi-trend hm-kpi-trend-up">+4.6% this week</div>'
+    + '</div>'
+    + '</div>'
+  );
+}
+
+function previewTooltip(){
+  return previewBox('Preview tooltip',
+    '<div style="display:flex;justify-content:center;padding:18px 0">'
+    + '<div style="position:relative;display:inline-flex">'
+    + '<button class="hm-btn hm-btn-secondary">Trigger</button>'
+    + '<div style="position:absolute;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%);background:var(--tooltip-bg,#0f172a);color:var(--tooltip-color,#fff);padding:var(--tooltip-padding-y,6px) var(--tooltip-padding-x,10px);border-radius:var(--tooltip-radius,6px);font-size:var(--tooltip-font-size,11px);max-width:var(--tooltip-max-width,280px);white-space:nowrap">Tooltip preview</div>'
+    + '</div></div>'
+  );
+}
+
+function previewDropdown(){
+  return previewBox('Preview dropdown',
+    '<div style="max-width:240px;border:1px solid var(--border);border-radius:var(--dropdown-radius,8px);background:var(--dropdown-bg,var(--bg-surface));box-shadow:var(--dropdown-shadow,var(--shadow-lg));overflow:hidden">'
+    + '<div style="padding:var(--dropdown-item-padding,8px 12px);font-size:var(--dropdown-item-font-size,13px);color:var(--text-primary)">Overview</div>'
+    + '<div style="padding:var(--dropdown-item-padding,8px 12px);font-size:var(--dropdown-item-font-size,13px);background:var(--dropdown-item-hover-bg,var(--bg-hover));color:var(--text-primary)">Active / hover item</div>'
+    + '<div style="padding:var(--dropdown-item-padding,8px 12px);font-size:var(--dropdown-item-font-size,13px);color:var(--text-primary)">History</div>'
+    + '</div>'
+  );
+}
+
+function previewNav(){
+  return previewBox('Preview navigation',
+    '<div style="max-width:260px;padding:10px;border-radius:var(--radius-lg);background:var(--brand);display:grid;gap:6px">'
+    + '<button type="button" class="nav-item active"><span class="icon">🏠</span><span>Dashboard</span></button>'
+    + '<button type="button" class="nav-item"><span class="icon">📋</span><span>Dispatch</span><span class="badge">12</span></button>'
+    + '<button type="button" class="nav-item"><span class="icon">📊</span><span>Reports</span></button>'
+    + '</div>'
+  );
+}
+
+function previewPagination(){
+  return previewBox('Preview pagination',
+    '<div class="at-page-controls" style="margin-top:0">'
+    + '<button type="button" class="at-page-btn">&laquo;</button>'
+    + '<button type="button" class="at-page-btn">&lsaquo;</button>'
+    + '<button type="button" class="at-page-btn at-page-active">2</button>'
+    + '<button type="button" class="at-page-btn">3</button>'
+    + '<button type="button" class="at-page-btn">4</button>'
+    + '<button type="button" class="at-page-btn">&rsaquo;</button>'
+    + '</div>'
+  );
+}
+
+function previewProgress(){
+  return previewBox('Preview progress', '<div style="display:grid;gap:10px"><div class="hm-progress"><div class="hm-progress-fill hm-progress-blue" style="width:68%"></div></div><div class="hm-progress"><div class="hm-progress-fill hm-progress-green" style="width:42%"></div></div></div>');
+}
+
+function previewEmpty(){
+  return previewBox('Preview empty state', '<div class="hm-empty" style="padding:22px 18px"><div class="hm-empty-icon">📭</div><div class="hm-empty-title">No records found</div><div>Filters are active. Adjust them to load more data.</div></div>');
+}
+
+function previewField(){
+  return previewBox('Preview field',
+    '<div style="display:grid;gap:var(--field-group-gap,24px)">'
+    + '<div style="display:grid;gap:var(--field-gap,16px)">'
+    + '<label class="hm-label">Document owner</label>'
+    + '<input class="hm-input" placeholder="Enter owner name">'
+    + '<div class="hm-field-error" style="margin-top:0">Helper / validation text preview</div>'
+    + '</div>'
+    + '</div>'
+  );
+}
+
+function previewBreadcrumb(){
+  return previewBox('Preview breadcrumb',
+    '<div class="fm-breadcrumb" style="padding:0">'
+    + '<span class="bc-seg">Home</span>'
+    + '<span class="bc-sep">›</span>'
+    + '<span class="bc-seg">Admin</span>'
+    + '<span class="bc-sep">›</span>'
+    + '<span class="bc-cur">Appearance</span>'
+    + '</div>'
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════════════════ */
 /* ── RENDER MAIN ────────────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
@@ -404,6 +816,7 @@ function renderTypography(){
     + fontSelect(T('label'), '--font-label', 'typography.label.family', "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif")
     + slider(T('label')+' '+T('fontWeight'), '--font-label-weight', 'typography.label.weight', 100, 900, 600, '', 100)
     + fontSelect(T('mono'), '--font-mono', 'typography.mono.family', "'JetBrains Mono', 'Fira Code', monospace", true)
+    + previewTypographyFamily()
   , true);
 
   h += sect('📏 '+T('fontSize'),
@@ -415,12 +828,14 @@ function renderTypography(){
     + slider('Page heading (--text-xl)', '--text-xl', 'fontScale.xl', 18, 28, 20, 'px')
     + slider('KPI value (--text-2xl)', '--text-2xl', 'fontScale.2xl', 20, 36, 24, 'px')
     + slider('Hero number (--text-3xl)', '--text-3xl', 'fontScale.3xl', 24, 48, 32, 'px')
+    + previewFontScale()
   , true);
 
   h += sect('↕️ '+T('lineHeight'),
     slider('Tight', '--leading-tight', 'lineHeight.tight', 1.0, 1.5, 1.25, '', 0.05)
     + slider('Normal', '--leading-normal', 'lineHeight.normal', 1.2, 1.8, 1.5, '', 0.05)
     + slider('Relaxed', '--leading-relaxed', 'lineHeight.relaxed', 1.4, 2.2, 1.75, '', 0.05)
+    + previewLineHeight()
   , false);
 
   h += sect('🏷️ '+T('letterSpacing')+' & '+T('textTransform'),
@@ -431,6 +846,7 @@ function renderTypography(){
       {value:'uppercase',label:T('uppercase')},
       {value:'capitalize',label:T('capitalize')}
     ], cfg('typography.label.transform')||'uppercase', "_hmSet('--label-transform','typography.label.transform',this.value)")
+    + previewLabelTransform()
   , false);
 
   return h;
@@ -451,6 +867,7 @@ function renderColors(){
     + colorPick('Accent', '--accent', 'brand.accent', '#f9a825')
     + colorPick('Accent Light', '--accent-light', 'brand.accentLight', '#fdd835')
     + colorPick('Sidebar', '--bg-sidebar-light', 'brand.sidebarBg', '#0c2d48')
+    + previewBrandColors()
   , true);
 
   h += sect('🚦 '+T('status')+' (Light + Dark)',
@@ -470,6 +887,7 @@ function renderColors(){
     + colorPick('Purple', '--purple-dark', 'statusColorsDark.purple', '#a78bfa')
     + colorPick('Cyan', '--cyan-dark', 'statusColorsDark.cyan', '#22d3ee')
     +'</div></div>'
+    + previewStatusColors()
   , false);
 
   h += sect('☀️ '+T('surfacesLight'),
@@ -479,6 +897,7 @@ function renderColors(){
     + colorPick('Header', '--bg-header-light', 'colorsLight.bgHeader', '#ffffff')
     + colorPick('Modal', '--bg-modal-light', 'colorsLight.bgModal', '#ffffff')
     + colorPick('Hover', '--bg-hover-light', 'colorsLight.bgHover', '#f8fafc')
+    + previewSurfaceStack('light')
   , false);
 
   h += sect('🌙 '+T('surfacesDark'),
@@ -489,6 +908,7 @@ function renderColors(){
     + colorPick('Modal Dark', '--bg-modal-dark', 'colorsDark.bgModal', '#1e293b')
     + colorPick('Hover Dark', '--bg-hover-dark', 'colorsDark.bgHover', '#263348')
     + colorPick('Sidebar Dark', '--bg-sidebar-dark', 'colorsDark.sidebarBg', '#0a1628')
+    + previewSurfaceStack('dark')
   , false);
 
   h += sect('📝 '+T('textLight'),
@@ -497,6 +917,7 @@ function renderColors(){
     + colorPick('Muted', '--text-tertiary-light', 'colorsLight.textTertiary', '#94a3b8')
     + colorPick('Link', '--text-link-light', 'colorsLight.textLink', '#1565c0')
     + colorPick('Inverse', '--text-inverse-light', 'colorsLight.textInverse', '#ffffff')
+    + previewTextColors('light')
   , false);
 
   h += sect('📝 '+T('textDark'),
@@ -505,6 +926,7 @@ function renderColors(){
     + colorPick('Muted Dark', '--text-tertiary-dark', 'colorsDark.textTertiary', '#64748b')
     + colorPick('Inverse Dark', '--text-inverse-dark', 'colorsDark.textInverse', '#0f172a')
     + colorPick('Link Dark', '--text-link-dark', 'colorsDark.textLink', '#60a5fa')
+    + previewTextColors('dark')
   , false);
 
   h += sect('🔲 '+T('borders'),
@@ -518,6 +940,7 @@ function renderColors(){
     + colorPick('Focus Dark', '--border-focus-dark', 'colorsDark.borderFocus', '#60a5fa')
     + colorPick('Error Dark', '--border-error-dark', 'colorsDark.borderError', '#f87171')
     + colorPick('Success Dark', '--border-success-dark', 'colorsDark.borderSuccess', '#22c55e')
+    + previewBorderColors()
   , false);
 
   return h;
@@ -538,6 +961,7 @@ function renderLayout(){
     + slider('Gap', '--hds-control-gap', 'density.controlGap', 2, 12, 6, 'px')
     + slider('Icon sm', '--hds-icon-sm', 'density.iconSm', 10, 20, 14, 'px')
     + slider('Icon md', '--hds-icon-md', 'density.iconMd', 12, 24, 16, 'px')
+    + previewDensityControls()
   , false);
 
   h += sect('📋 '+T('tableDetail'),
@@ -546,6 +970,7 @@ function renderLayout(){
     + slider('Cell padding Y', '--hds-table-cell-py', 'density.tableCellPy', 2, 16, 8, 'px')
     + slider('Header font', '--hds-table-head-font', 'density.tableHeadFont', 9, 14, 11, 'px')
     + slider('Body font', '--hds-table-body-font', 'density.tableBodyFont', 10, 16, 13, 'px')
+    + previewTableDensity()
   , false);
 
   h += sect('🔲 '+T('radiusScale'),
@@ -554,6 +979,7 @@ function renderLayout(){
     + slider('Radius lg (cards)', '--radius-lg', 'radius.lg', 0, 20, 8, 'px')
     + slider('Radius xl (sections)', '--radius-xl', 'radius.xl', 0, 24, 12, 'px')
     + slider('Radius 2xl (modals)', '--radius-2xl', 'radius.2xl', 0, 32, 16, 'px')
+    + previewRadiusScale()
   , false);
 
   h += sect('↔️ '+T('spacingScale'),
@@ -565,6 +991,7 @@ function renderLayout(){
     + slider('space-6', '--space-6', 'spacing.6', 16, 40, 24, 'px')
     + slider('space-8', '--space-8', 'spacing.8', 20, 52, 32, 'px')
     + slider('space-10', '--space-10', 'spacing.10', 28, 64, 40, 'px')
+    + previewSpacingScale()
   , false);
 
   h += sect('📐 '+T('layoutDim'),
@@ -574,6 +1001,7 @@ function renderLayout(){
     + slider('Content max-width', '--content-max-w', 'layout.contentMaxW', 960, 2400, 1400, 'px')
     + slider('Modal max-width', '--modal-max-w', 'layout.modalMaxW', 480, 1400, 800, 'px')
     + slider('Modal small max-width', '--modal-sm-max-w', 'layout.modalSmMaxW', 280, 720, 480, 'px')
+    + previewLayoutDimensions()
   , false);
 
   h += sect('📊 '+T('zIndex')+' (read-only)',
@@ -597,29 +1025,35 @@ function renderEffects(){
     + slider('Normal', '--transition-normal', 'effects.motionNormal', 50, 500, 150, 'ms')
     + slider('Slow', '--transition-slow', 'effects.motionSlow', 100, 800, 250, 'ms')
     + slider('Spring', '--transition-spring', 'effects.motionSpring', 100, 1000, 300, 'ms')
+    + previewMotion()
   , true);
 
   h += sect('🔵 '+T('focusRing'),
     slider('Width', '--focus-ring-width', 'effects.focusRingWidth', 1, 5, 3, 'px')
     + colorPick('Color', '--focus-ring-color', 'effects.focusRingColor', 'rgba(21,101,192,0.12)')
     + slider('Offset', '--focus-ring-offset', 'effects.focusRingOffset', 0, 4, 0, 'px')
+    + previewFocus()
   , false);
 
   h += sect('🖊️ '+T('selectionColor'),
     colorPick('Selection BG', '--selection-bg', 'effects.selectionBg', '#3b82f6')
     + colorPick('Selection Text', '--selection-color', 'effects.selectionColor', '#ffffff')
+    + previewSelection()
   , false);
 
   h += sect('✏️ '+T('caretColor'),
     colorPick('Caret', '--caret-color', 'effects.caretColor', '#1565c0')
+    + previewCaret()
   , false);
 
   h += sect('💬 '+T('placeholder'),
     colorPick('Placeholder color', '--placeholder-color', 'effects.placeholderColor', '#94a3b8')
+    + previewPlaceholder()
   , false);
 
   h += sect('🚫 '+T('disabledState'),
     slider('Opacity', '--disabled-opacity', 'effects.disabledOpacity', 0.2, 0.8, 0.5, '', 0.05)
+    + previewDisabled()
   , false);
 
   h += sect('📜 '+T('scrollbar'),
@@ -627,11 +1061,13 @@ function renderEffects(){
     + colorPick('Track', '--scrollbar-track', 'effects.scrollbarTrack', '#f1f5f9')
     + colorPick('Thumb', '--scrollbar-thumb', 'effects.scrollbarThumb', '#cbd5e1')
     + slider('Thumb radius', '--scrollbar-radius', 'effects.scrollbarRadius', 0, 8, 4, 'px')
+    + previewScrollbar()
   , false);
 
   h += sect('🌫️ '+T('backdrop'),
     slider('Backdrop blur', '--backdrop-blur', 'effects.backdropBlur', 0, 20, 0, 'px')
     + slider('Overlay opacity', '--overlay-opacity', 'effects.overlayOpacity', 0, 1, 0.4, '', 0.05)
+    + previewBackdrop()
   , false);
 
   return h;
@@ -652,6 +1088,7 @@ function renderComponents(){
     + slider(T('letterSpacing'), '--btn-letter-spacing', 'components.btn.letterSpacing', 0, 0.15, 0, 'em', 0.01)
     + slider(T('borderWidth'), '--btn-border-width', 'components.btn.borderWidth', 0, 3, 1, 'px')
     + slider(T('minWidth'), '--btn-min-width', 'components.btn.minWidth', 0, 120, 0, 'px')
+    + previewButtons()
   , true);
 
   /* TABLE */
@@ -662,6 +1099,7 @@ function renderComponents(){
     + colorPick(T('stripeBg'), '--table-row-stripe', 'components.table.stripeBg', 'transparent')
     + colorPick(T('stripeAltBg'), '--table-row-stripe-alt', 'components.table.stripeAltBg', 'rgba(0,0,0,0.02)')
     + slider(T('borderWidth'), '--table-border-width', 'components.table.borderWidth', 0, 3, 1, 'px')
+    + previewTable()
   , false);
 
   /* CARD */
@@ -670,6 +1108,7 @@ function renderComponents(){
     + colorPick(T('headerBg'), '--card-header-bg', 'components.card.headerBg', 'transparent')
     + slider(T('headerPadding'), '--card-header-padding-v', 'components.card.headerPadding', 8, 24, 12, 'px')
     + slider(T('bodyPadding'), '--card-body-padding', 'components.card.bodyPadding', 8, 32, 16, 'px')
+    + previewCard()
   , false);
 
   /* BADGE */
@@ -678,6 +1117,7 @@ function renderComponents(){
     + slider(T('letterSpacing'), '--badge-letter-spacing', 'components.badge.letterSpacing', 0, 0.15, 0, 'em', 0.01)
     + slider(T('borderWidth'), '--badge-border-width', 'components.badge.borderWidth', 0, 2, 0, 'px')
     + slider(T('minWidth'), '--badge-min-width', 'components.badge.minWidth', 0, 60, 0, 'px')
+    + previewBadges()
   , false);
 
   /* INPUT */
@@ -685,6 +1125,7 @@ function renderComponents(){
     slider(T('borderWidth'), '--input-border-width', 'components.input.borderWidth', 1, 3, 1, 'px')
     + slider(T('paddingY'), '--input-padding-y', 'components.input.paddingY', 0, 8, 0, 'px')
     + colorPick('Input BG', '--input-bg', 'components.input.bg', '#ffffff')
+    + previewInputs()
   , false);
 
   /* TAB */
@@ -697,6 +1138,7 @@ function renderComponents(){
     + slider(T('gap'), '--tab-gap', 'components.tab.gap', 0, 12, 4, 'px')
     + slider('Border radius', '--tab-radius', 'components.tab.radius', 0, 28, 14, 'px')
     + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#1565c0')
+    + previewTabs()
   , false);
 
   /* MODAL */
@@ -704,6 +1146,7 @@ function renderComponents(){
     slider('Border radius', '--modal-border-radius', 'components.modal.radius', 0, 32, 16, 'px')
     + slider(T('bodyPadding'), '--modal-padding', 'components.modal.padding', 12, 40, 24, 'px')
     + slider(T('headerPadding'), '--modal-header-padding-v', 'components.modal.headerPadding', 8, 24, 16, 'px')
+    + previewModal()
   , false);
 
   /* FLOWCHART */
@@ -716,6 +1159,7 @@ function renderComponents(){
     + colorPick(T('connectorColor'), '--flow-connector-color', 'components.flow.connectorColor', '#94a3b8')
     + slider(T('connectorWidth'), '--flow-connector-width', 'components.flow.connectorWidth', 1, 4, 2, 'px')
     + slider(T('arrowSize'), '--flow-arrow-size', 'components.flow.arrowSize', 4, 16, 8, 'px')
+    + previewFlow()
   , false);
 
   /* ISO BOX */
@@ -727,6 +1171,7 @@ function renderComponents(){
     + slider(T('headerPadding'), '--iso-box-header-padding', 'components.isoBox.headerPadding', 6, 20, 10, 'px')
     + slider(T('bodyPadding'), '--iso-box-body-padding', 'components.isoBox.bodyPadding', 8, 24, 14, 'px')
     + slider('Font size', '--iso-box-font-size', 'components.isoBox.fontSize', 11, 16, 13, 'px')
+    + previewIsoBox()
   , false);
 
   /* ISO NOTE */
@@ -739,6 +1184,7 @@ function renderComponents(){
     + slider(T('bodyPadding'), '--iso-note-padding', 'components.isoNote.padding', 6, 20, 10, 'px')
     + slider('Font size', '--iso-note-font-size', 'components.isoNote.fontSize', 11, 16, 13, 'px')
     + slider('Icon size', '--iso-note-icon-size', 'components.isoNote.iconSize', 12, 24, 16, 'px')
+    + previewIsoNote()
   , false);
 
   /* KPI CARD */
@@ -746,6 +1192,7 @@ function renderComponents(){
     slider(T('borderWidth'), '--kpi-border-width', 'components.kpi.borderWidth', 0, 3, 1, 'px')
     + slider('Icon size', '--kpi-icon-size', 'components.kpi.iconSize', 16, 40, 24, 'px')
     + slider('Trend font', '--kpi-trend-font-size', 'components.kpi.trendFontSize', 9, 14, 11, 'px')
+    + previewKpi()
   , false);
 
   /* TOOLTIP */
@@ -757,6 +1204,7 @@ function renderComponents(){
     + slider('Border radius', '--tooltip-radius', 'components.tooltip.radius', 0, 12, 6, 'px')
     + slider('Font size', '--tooltip-font-size', 'components.tooltip.fontSize', 10, 14, 11, 'px')
     + slider('Max width', '--tooltip-max-width', 'components.tooltip.maxWidth', 160, 400, 280, 'px')
+    + previewTooltip()
   , false);
 
   /* DROPDOWN */
@@ -765,6 +1213,7 @@ function renderComponents(){
     + slider('Item padding', '--dropdown-item-padding', 'components.dropdown.itemPadding', 4, 16, 8, 'px')
     + slider('Item font', '--dropdown-item-font-size', 'components.dropdown.itemFontSize', 11, 16, 13, 'px')
     + colorPick('Hover BG', '--dropdown-item-hover-bg', 'components.dropdown.hoverBg', '#f8fafc')
+    + previewDropdown()
   , false);
 
   /* NAV ITEM */
@@ -774,6 +1223,7 @@ function renderComponents(){
     + slider('Icon size', '--nav-item-icon-size', 'components.nav.iconSize', 12, 24, 16, 'px')
     + slider(T('gap'), '--nav-item-gap', 'components.nav.gap', 4, 16, 10, 'px')
     + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 16, 8, 'px')
+    + previewNav()
   , false);
 
   /* PAGINATION */
@@ -782,6 +1232,7 @@ function renderComponents(){
     + slider('Border radius', '--pagination-btn-radius', 'components.pagination.radius', 0, 12, 6, 'px')
     + slider('Font size', '--pagination-font-size', 'components.pagination.fontSize', 11, 16, 13, 'px')
     + slider(T('gap'), '--pagination-gap', 'components.pagination.gap', 2, 8, 4, 'px')
+    + previewPagination()
   , false);
 
   /* PROGRESS BAR */
@@ -789,6 +1240,7 @@ function renderComponents(){
     slider('Height', '--progress-height', 'components.progress.height', 4, 16, 8, 'px')
     + slider('Border radius', '--progress-radius', 'components.progress.radius', 0, 16, 9999, 'px')
     + colorPick('Track BG', '--progress-bg', 'components.progress.bg', '#e2e8f0')
+    + previewProgress()
   , false);
 
   /* EMPTY STATE */
@@ -797,6 +1249,7 @@ function renderComponents(){
     + slider('Icon opacity', '--empty-icon-opacity', 'components.empty.iconOpacity', 0.1, 0.8, 0.4, '', 0.05)
     + slider('Title font', '--empty-title-font-size', 'components.empty.titleFontSize', 14, 20, 16, 'px')
     + slider('Desc font', '--empty-desc-font-size', 'components.empty.descFontSize', 12, 16, 13, 'px')
+    + previewEmpty()
   , false);
 
   /* FORM FIELD */
@@ -805,6 +1258,7 @@ function renderComponents(){
     + slider('Label gap', '--field-label-gap', 'components.field.labelGap', 2, 8, 4, 'px')
     + slider('Group gap', '--field-group-gap', 'components.field.groupGap', 12, 40, 24, 'px')
     + slider('Helper font', '--field-helper-font-size', 'components.field.helperFontSize', 10, 14, 11, 'px')
+    + previewField()
   , false);
 
   /* BREADCRUMB */
@@ -813,6 +1267,7 @@ function renderComponents(){
     + slider(T('gap'), '--breadcrumb-gap', 'components.breadcrumb.gap', 2, 12, 6, 'px')
     + colorPick('Color', '--breadcrumb-color', 'components.breadcrumb.color', '#94a3b8')
     + colorPick('Active', '--breadcrumb-active-color', 'components.breadcrumb.activeColor', '#1e293b')
+    + previewBreadcrumb()
   , false);
 
   return h;
@@ -874,7 +1329,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405d';
+window._renderAdminAppearanceFullVersion = '20260405e';
 window._renderAdminAppearanceFull = render;
 
 })();
