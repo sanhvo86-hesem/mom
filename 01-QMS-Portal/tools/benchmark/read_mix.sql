@@ -1,5 +1,5 @@
-\setrandom scenario_idx 1 5000
-\setrandom page_offset 0 4950
+\set scenario_idx random(1, 5000)
+\set page_offset random(0, 4950)
 
 SELECT
     aps_scenario_id,

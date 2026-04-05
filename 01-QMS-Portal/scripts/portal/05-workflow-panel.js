@@ -376,6 +376,39 @@ function getRetentionNote(catId){
 
 
 
+function workflowDocStatusClass(status){
+  const raw=String(status||'').toLowerCase();
+  if(raw==='review') return 'in_review';
+  if(raw==='pending') return 'pending_approval';
+  return raw.replace(/[^a-z0-9_-]/g,'_') || 'obsolete';
+}
+
+function workflowStatusText(status, extraClass){
+  const cls=workflowDocStatusClass(status);
+  return `<span class="wf-status-text ${cls}${extraClass?' '+extraClass:''}">${statusLabel(status)}</span>`;
+}
+
+function workflowStatusChip(status, extraClass){
+  const cls=workflowDocStatusClass(status);
+  return `<span class="wf-status-chip ${cls}${extraClass?' '+extraClass:''}">${statusLabel(status)}</span>`;
+}
+
+function workflowUpdateTypeBadge(updateType, compact){
+  if(!updateType) return '';
+  const tone=String(updateType||'').toLowerCase()==='major'?'major':'minor';
+  const label=compact ? (tone==='major'?'MAJ':'MIN') : tone.toUpperCase();
+  return `<span class="wf-update-badge ${tone}${compact?' compact':''}">${label}</span>`;
+}
+
+function toggleVersionHistoryPanel(header){
+  if(!header) return;
+  const body=header.nextElementSibling;
+  const toggle=header.querySelector('.vh-toggle');
+  if(!body || !toggle) return;
+  const open=body.classList.toggle('open');
+  toggle.textContent=(open?'▲ ':'▼ ')+(lang==='en'?'Collapse':'Thu gọn');
+}
+
 function renderAdminEffectiveDocs(){
   const el=document.getElementById('admin-content');
   if(!el)return;

@@ -1,4 +1,4 @@
-\setrandom scenario_idx 1 20
+\set scenario_idx random(1, 20)
 
 WITH picked AS (
     SELECT
