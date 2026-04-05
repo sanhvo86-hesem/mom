@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "4.0",
-    "generatedAt": "2026-04-05T13:32:52.565Z",
+    "generatedAt": "2026-04-05T14:44:32.532Z",
     "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
     "sourceEndpointCount": 3,
     "generatedEndpointCount": 2866,
@@ -183,7 +183,7 @@
     ]
   },
   "split": true,
-  "lineCount": 592849,
+  "lineCount": 606975,
   "parts": [
     {
       "file": "data-fields-part1.json",

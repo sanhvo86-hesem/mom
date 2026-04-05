@@ -573,6 +573,7 @@ $router->actions([
     'schema_studio_validate'        => [SchemaStudioController::class, 'validateSchema'],
     'schema_studio_apply_migration' => [SchemaStudioController::class, 'applyMigration'],
     'schema_studio_table_preview'   => [SchemaStudioController::class, 'previewTableData'],
+    'schema_studio_table_row_save'  => [SchemaStudioController::class, 'saveTableRow'],
     'schema_studio_export'          => [SchemaStudioController::class, 'export'],
 ]);
 

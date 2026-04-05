@@ -178,7 +178,7 @@ class AuthController extends BaseController
                     $this->error('invalid_code', 401);
                 }
 
-                set_authenticated_session($username);
+                set_authenticated_session($username, $user);
                 $this->updateLastLogin($user, $username);
 
                 $this->json([
@@ -228,7 +228,7 @@ class AuthController extends BaseController
         }
 
         // No MFA required
-        set_authenticated_session($username);
+        set_authenticated_session($username, $user);
         $this->updateLastLogin($user, $username);
 
         $this->json([
@@ -309,7 +309,7 @@ class AuthController extends BaseController
             $this->error('invalid_code', 401);
         }
 
-        set_authenticated_session($username);
+        set_authenticated_session($username, $user);
         $this->updateLastLogin($user, $username);
 
         $this->json([
@@ -370,7 +370,7 @@ class AuthController extends BaseController
         update_user($this->store, $user);
         $this->saveUsersStore();
 
-        set_authenticated_session($username);
+        set_authenticated_session($username, $user);
 
         $this->json([
             'ok'         => true,

@@ -131,6 +131,38 @@ function transitionTargets(statusOptions, statusSet) {
     .filter(Boolean);
 }
 
+function orgScopeFields(table) {
+  return ['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id']
+    .filter((field) => table?.columns?.[field]);
+}
+
+function hasOptimisticConcurrency(table) {
+  return !!table?.columns?.row_version;
+}
+
+function optimisticConcurrencyContract(table, required = false) {
+  const enabled = hasOptimisticConcurrency(table);
+  return {
+    enabled,
+    required: enabled ? required : false,
+    mode: enabled ? 'optimistic' : null,
+    field: enabled ? 'row_version' : null,
+    accepted_headers: enabled ? ['If-Match', 'X-Row-Version'] : [],
+    accepted_query_params: enabled ? ['expected_row_version', 'row_version', 'version'] : [],
+    accepted_body_fields: enabled ? ['expected_row_version', 'row_version', 'version', 'expectedVersion', 'etag'] : [],
+  };
+}
+
+function scopeContract(table, kind) {
+  const fields = orgScopeFields(table);
+  return {
+    fields,
+    enforced_if_available: fields.length > 0,
+    auto_populated_on_create: kind === 'create' && fields.length > 0,
+    mutable_for_privileged_only: ['create', 'update'].includes(kind) && fields.length > 0,
+  };
+}
+
 function requestContract(kind, table, fields, statusOptions) {
   const pk = primaryKeyMeta(table);
   const identityFields = externalIdentityFields(pk);
@@ -142,6 +174,8 @@ function requestContract(kind, table, fields, statusOptions) {
   const editableDbFields = uniqueFields((fields || []).filter((field) => field?.dbColumn && !isSystemManagedFieldKey(field.key)).map(trimFieldForPack))
     .filter((field) => !(kind === 'update' && canonicalIdentityFields.includes(field.key)))
     .filter((field) => !(kind === 'update' && field.key === String(table?.statusColumn || '')));
+  const concurrency = optimisticConcurrencyContract(table, ['update', 'delete', 'transition'].includes(kind));
+  const scope = scopeContract(table, kind);
 
   if (kind === 'list') {
     return {
@@ -151,6 +185,8 @@ function requestContract(kind, table, fields, statusOptions) {
       required_body_fields: [],
       identity_fields: [],
       body_mode: 'none',
+      optimistic_concurrency: optimisticConcurrencyContract(table, false),
+      org_scope: scope,
     };
   }
 
@@ -164,6 +200,8 @@ function requestContract(kind, table, fields, statusOptions) {
       canonical_identity_fields: canonicalIdentityFields,
       identity_field_map: identityMap,
       body_mode: 'none',
+      optimistic_concurrency: optimisticConcurrencyContract(table, false),
+      org_scope: scope,
     };
   }
 
@@ -177,6 +215,8 @@ function requestContract(kind, table, fields, statusOptions) {
       canonical_identity_fields: canonicalIdentityFields,
       identity_field_map: identityMap,
       body_mode: 'root',
+      optimistic_concurrency: concurrency,
+      org_scope: scope,
     };
   }
 
@@ -201,6 +241,8 @@ function requestContract(kind, table, fields, statusOptions) {
       identity_field_map: identityMap,
       body_mode: 'root',
       transition_status_values: transitionStatusTargets,
+      optimistic_concurrency: concurrency,
+      org_scope: scope,
     };
   }
 
@@ -216,6 +258,8 @@ function requestContract(kind, table, fields, statusOptions) {
     canonical_identity_fields: kind === 'update' ? canonicalIdentityFields : [],
     identity_field_map: kind === 'update' ? identityMap : {},
     body_mode: 'root_or_data_wrapper',
+    optimistic_concurrency: kind === 'update' ? concurrency : optimisticConcurrencyContract(table, false),
+    org_scope: scope,
   };
 }
 
@@ -230,6 +274,11 @@ function responseContract(kind, table, fields) {
     primary_key: pk.key,
     primary_key_fields: pk.fields,
     record_addressing: pk.mode,
+    optimistic_concurrency: {
+      enabled: hasOptimisticConcurrency(table),
+      field: hasOptimisticConcurrency(table) ? 'row_version' : null,
+    },
+    org_scope_fields: orgScopeFields(table),
   };
 }
 
@@ -663,6 +712,10 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
   const scalarPkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode === 'scalar');
   const compositePkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode === 'composite');
   const missingPkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode === 'missing');
+  const rowVersionTables = tableNames.filter((tableName) => hasOptimisticConcurrency(tableRegistry.tables[tableName]));
+  const orgScopedTables = tableNames.filter((tableName) => orgScopeFields(tableRegistry.tables[tableName]).length > 0);
+  const optimisticConcurrencyIssues = [];
+  const orgScopeContractIssues = [];
 
   for (const tableName of tableNames) {
     const table = tableRegistry.tables[tableName];
@@ -744,6 +797,48 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       }
     }
 
+    if (hasOptimisticConcurrency(table)) {
+      for (const kind of ['detail', 'create', 'update', 'delete', 'transition']) {
+        if (!supportedKinds.has(kind)) continue;
+        const endpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.${kind}`];
+        if (!endpoint) continue;
+        const responseConcurrency = endpoint.response?.optimistic_concurrency || {};
+        if (!responseConcurrency.enabled || responseConcurrency.field !== 'row_version') {
+          optimisticConcurrencyIssues.push(`${domain}.${tableName}.${kind}:missing_response_concurrency`);
+        }
+      }
+
+      for (const kind of ['update', 'delete', 'transition']) {
+        if (!supportedKinds.has(kind)) continue;
+        const endpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.${kind}`];
+        if (!endpoint) continue;
+        const requestConcurrency = endpoint.request?.optimistic_concurrency || {};
+        if (!requestConcurrency.enabled || requestConcurrency.field !== 'row_version') {
+          optimisticConcurrencyIssues.push(`${domain}.${tableName}.${kind}:missing_request_concurrency`);
+        }
+        if (requestConcurrency.required !== true) {
+          optimisticConcurrencyIssues.push(`${domain}.${tableName}.${kind}:missing_required_concurrency`);
+        }
+      }
+    }
+
+    const expectedScopeFields = orgScopeFields(table);
+    if (expectedScopeFields.length > 0) {
+      for (const kind of supportedKinds) {
+        const endpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.${kind}`];
+        if (!endpoint) continue;
+
+        const requestScopeFields = endpoint.request?.org_scope?.fields || [];
+        const responseScopeFields = endpoint.response?.org_scope_fields || [];
+        if (expectedScopeFields.some((field) => !requestScopeFields.includes(field))) {
+          orgScopeContractIssues.push(`${domain}.${tableName}.${kind}:missing_request_scope_fields`);
+        }
+        if (expectedScopeFields.some((field) => !responseScopeFields.includes(field))) {
+          orgScopeContractIssues.push(`${domain}.${tableName}.${kind}:missing_response_scope_fields`);
+        }
+      }
+    }
+
     for (const kind of supportedEndpointKinds(table)) {
       const endpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.${kind}`];
       if (endpoint && (!Array.isArray(endpoint.security?.permission_keys) || !endpoint.security.permission_keys.length)) {
@@ -751,6 +846,8 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       }
     }
   }
+
+  contractIssues.push(...optimisticConcurrencyIssues, ...orgScopeContractIssues);
 
   const checks = [
     { id: 'tables_have_fields', passed: tableFieldCoverage.length === tableNames.length, actual: tableFieldCoverage.length, target: tableNames.length },
@@ -760,6 +857,8 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'workflow_coverage', passed: workflowCoverage.length === tableNames.length, actual: workflowCoverage.length, target: tableNames.length },
     { id: 'status_coverage', passed: statusCoverage.length === statusTables.length, actual: statusCoverage.length, target: statusTables.length },
     { id: 'scalar_pk_tables', passed: scalarPkTables.length >= (tableNames.length - 32), actual: scalarPkTables.length, target: tableNames.length - 32 },
+    { id: 'optimistic_concurrency_contracts', passed: optimisticConcurrencyIssues.length === 0, actual: optimisticConcurrencyIssues.length, target: 0 },
+    { id: 'org_scope_contracts', passed: orgScopeContractIssues.length === 0, actual: orgScopeContractIssues.length, target: 0 },
     { id: 'frontend_record_readiness', passed: missingPkTables.length === 0, actual: missingPkTables.length, target: 0 },
     { id: 'no_unsupported_record_endpoints', passed: unsupportedRecordEndpoints.length === 0, actual: unsupportedRecordEndpoints.length, target: 0 },
     { id: 'endpoint_contract_readiness', passed: contractIssues.length === 0, actual: contractIssues.length, target: 0 },
@@ -788,14 +887,26 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       formula_count: formulaKeys.length,
       formula_reference_count: formulaReferenceCount,
       field_context_count: fieldContextCount,
+      row_version_tables: rowVersionTables.length,
+      org_scoped_tables: orgScopedTables.length,
       composite_pk_tables: compositePkTables.length,
       missing_primary_key_tables: missingPkTables.length,
       unsupported_record_endpoints: unsupportedRecordEndpoints.length,
+      optimistic_concurrency_issues: optimisticConcurrencyIssues.length,
+      org_scope_contract_issues: orgScopeContractIssues.length,
       contract_issues: contractIssues.length,
       workflow_alignment_issues: workflowAlignmentIssues.length,
     },
     checks,
     warnings: {
+      row_version_tables: rowVersionTables.slice(0, 60).map((tableName) => ({
+        table: tableName,
+        concurrency_field: 'row_version',
+      })),
+      org_scoped_tables: orgScopedTables.slice(0, 60).map((tableName) => ({
+        table: tableName,
+        scope_fields: orgScopeFields(tableRegistry.tables[tableName]),
+      })),
       composite_pk_tables: compositePkTables.slice(0, 40).map((tableName) => ({
         table: tableName,
         primary_key_mode: primaryKeyMeta(tableRegistry.tables[tableName]).mode,
@@ -807,6 +918,8 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
         primary_key_fields: primaryKeyMeta(tableRegistry.tables[tableName]).fields,
       })),
       unsupported_record_endpoints: unsupportedRecordEndpoints.slice(0, 30),
+      optimistic_concurrency_issues: optimisticConcurrencyIssues.slice(0, 60),
+      org_scope_contract_issues: orgScopeContractIssues.slice(0, 60),
       contract_issues: contractIssues.slice(0, 40),
       workflow_alignment_issues: workflowAlignmentIssues.slice(0, 40),
     },

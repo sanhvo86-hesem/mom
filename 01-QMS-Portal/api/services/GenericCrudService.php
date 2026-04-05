@@ -221,7 +221,7 @@ class GenericCrudService
      * @param array<string, mixed> $query
      * @return array<string, mixed>
      */
-    public function list(string $domain, string $tableName, array $query = []): array
+    public function list(string $domain, string $tableName, array $query = [], array $scope = []): array
     {
         $table = $this->resolveTable($domain, $tableName);
         $where = [];
@@ -249,11 +249,17 @@ class GenericCrudService
             $params[':status'] = $status;
         }
 
+        $scopeWhere = $this->scopeWhereClause($table, $scope, 'scope');
+        if ($scopeWhere['sql'] !== '') {
+            $where[] = $scopeWhere['sql'];
+            $params = array_merge($params, $scopeWhere['params']);
+        }
+
         foreach ($query as $key => $value) {
             if (!is_scalar($value) || $value === '' || $value === null) {
                 continue;
             }
-            if (in_array($key, ['search', 'q', 'status', 'sort', 'direction', 'limit', 'offset', 'action', 'domain', 'table', 'id'], true)) {
+            if (in_array($key, ['search', 'q', 'status', 'sort', 'direction', 'limit', 'offset', 'action', 'domain', 'table', 'id', 'cursor', 'scope', 'row_version', 'expected_row_version', 'version'], true)) {
                 continue;
             }
             if (!in_array($key, $columns, true)) {
@@ -292,21 +298,27 @@ class GenericCrudService
             'limit' => $limit,
             'table' => $tableName,
             'domain' => $domain,
+            'appliedScope' => $scopeWhere['scope'],
             'primaryKey' => $this->primaryKeyMeta($table)['mode'] === 'scalar'
                 ? $this->primaryKeyMeta($table)['key']
                 : $this->primaryKeyMeta($table)['fields'],
             'primaryKeyFields' => $this->primaryKeyMeta($table)['fields'],
             'recordAddressing' => $this->primaryKeyMeta($table)['mode'],
+            'concurrencyField' => array_key_exists('row_version', (array)($table['columns'] ?? [])) ? 'row_version' : null,
+            'optimisticConcurrency' => array_key_exists('row_version', (array)($table['columns'] ?? [])),
         ];
     }
 
     /**
      * @return array<string, mixed>|null
      */
-    public function detail(string $domain, string $tableName, array $identity): ?array
+    public function detail(string $domain, string $tableName, array $identity, array $scope = []): ?array
     {
         $table = $this->resolveTable($domain, $tableName);
-        $where = $this->identityWhereClause($table, $identity, 'detail');
+        $where = $this->combineWhereClauses(
+            $this->identityWhereClause($table, $identity, 'detail'),
+            $this->scopeWhereClause($table, $scope, 'detail_scope')
+        );
         $sql = 'SELECT * FROM ' . $this->q($tableName) . ' WHERE ' . $where['sql'] . ' LIMIT 1';
         $row = $this->db->queryOne($sql, $where['params']);
         return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
@@ -316,10 +328,10 @@ class GenericCrudService
      * @param array<string, mixed> $payload
      * @return array<string, mixed>
      */
-    public function create(string $domain, string $tableName, array $payload, string $userId = 'system'): array
+    public function create(string $domain, string $tableName, array $payload, string $userId = 'system', array $scope = []): array
     {
         $table = $this->resolveTable($domain, $tableName);
-        $data = $this->filterWritableColumns($table, $payload, false);
+        $data = $this->filterWritableColumns($table, $this->applyScopeColumns($table, $payload, $scope), false);
         $this->validatePayload($domain, $tableName, $table, $data, 'create');
         $data = $this->applyAuditColumns($table, $data, $userId, true);
 
@@ -352,15 +364,15 @@ class GenericCrudService
      * @param array<string, mixed> $payload
      * @return array<string, mixed>
      */
-    public function update(string $domain, string $tableName, array $identity, array $payload, string $userId = 'system'): array
+    public function update(string $domain, string $tableName, array $identity, array $payload, string $userId = 'system', array $scope = [], ?int $expectedVersion = null): array
     {
         $table = $this->resolveTable($domain, $tableName);
-        $existing = $this->detail($domain, $tableName, $identity);
+        $existing = $this->detail($domain, $tableName, $identity, $scope);
         if ($existing === null) {
-            throw new RuntimeException('Record not found');
+            throw new RecordNotFoundException('Record not found');
         }
 
-        $data = $this->filterWritableColumns($table, $payload, true);
+        $data = $this->filterWritableColumns($table, $this->applyScopeColumns($table, $payload, $scope), true);
         $this->validatePayload($domain, $tableName, $table, $data, 'update');
         $data = $this->applyAuditColumns($table, $data, $userId, false);
 
@@ -369,7 +381,11 @@ class GenericCrudService
         }
 
         $sets = [];
-        $where = $this->identityWhereClause($table, $identity, 'update');
+        $where = $this->combineWhereClauses(
+            $this->identityWhereClause($table, $identity, 'update'),
+            $this->scopeWhereClause($table, $scope, 'update_scope'),
+            $this->versionWhereClause($table, $expectedVersion, 'update_version')
+        );
         $params = $where['params'];
         foreach ($data as $column => $value) {
             $param = ':u_' . $column;
@@ -383,7 +399,7 @@ class GenericCrudService
 
         $row = $this->db->insertReturning($sql, $params);
         if (!is_array($row)) {
-            throw new RuntimeException('Update did not return a record');
+            $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Update');
         }
 
         return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
@@ -392,15 +408,19 @@ class GenericCrudService
     /**
      * @return array<string, mixed>
      */
-    public function delete(string $domain, string $tableName, array $identity): array
+    public function delete(string $domain, string $tableName, array $identity, array $scope = [], ?int $expectedVersion = null): array
     {
         $table = $this->resolveTable($domain, $tableName);
-        $where = $this->identityWhereClause($table, $identity, 'delete');
+        $where = $this->combineWhereClauses(
+            $this->identityWhereClause($table, $identity, 'delete'),
+            $this->scopeWhereClause($table, $scope, 'delete_scope'),
+            $this->versionWhereClause($table, $expectedVersion, 'delete_version')
+        );
         $sql = 'DELETE FROM ' . $this->q($tableName)
             . ' WHERE ' . $where['sql'] . ' RETURNING *';
         $row = $this->db->insertReturning($sql, $where['params']);
         if (!is_array($row)) {
-            throw new RuntimeException('Record not found');
+            $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Delete');
         }
         return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
@@ -409,7 +429,7 @@ class GenericCrudService
      * @param array<int, string> $userRoles
      * @return array<string, mixed>
      */
-    public function transition(string $domain, string $tableName, array $identity, string $toStatus, string $userId, array $userRoles = []): array
+    public function transition(string $domain, string $tableName, array $identity, string $toStatus, string $userId, array $userRoles = [], array $scope = [], ?int $expectedVersion = null): array
     {
         $table = $this->resolveTable($domain, $tableName);
         $statusColumn = trim((string)($table['statusColumn'] ?? ''));
@@ -417,16 +437,20 @@ class GenericCrudService
             throw new RuntimeException("Table {$tableName} does not define a status column");
         }
 
-        $existing = $this->detail($domain, $tableName, $identity);
+        $existing = $this->detail($domain, $tableName, $identity, $scope);
         if ($existing === null) {
-            throw new RuntimeException('Record not found');
+            throw new RecordNotFoundException('Record not found');
         }
 
         $currentStatus = (string)($existing[$statusColumn] ?? '');
         $this->assertValidStatus($table, $toStatus);
         $this->assertAllowedTransition($table, $currentStatus, $toStatus, $userRoles);
         $data = $this->applyAuditColumns($table, [$statusColumn => $toStatus], $userId, false);
-        $where = $this->identityWhereClause($table, $identity, 'transition');
+        $where = $this->combineWhereClauses(
+            $this->identityWhereClause($table, $identity, 'transition'),
+            $this->scopeWhereClause($table, $scope, 'transition_scope'),
+            $this->versionWhereClause($table, $expectedVersion, 'transition_version')
+        );
         $params = $where['params'];
         $params[':status'] = $toStatus;
         $sets = [$this->q($statusColumn) . ' = :status'];
@@ -445,7 +469,7 @@ class GenericCrudService
             . ' WHERE ' . $where['sql'] . ' RETURNING *';
         $row = $this->db->insertReturning($sql, $params);
         if (!is_array($row)) {
-            throw new RuntimeException('Transition did not return a record');
+            $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Transition');
         }
 
         return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
@@ -503,13 +527,19 @@ class GenericCrudService
             $data['created_at'] = $now;
         }
         if ($isCreate && array_key_exists('created_by', $columns) && !isset($data['created_by'])) {
-            $data['created_by'] = $userId;
+            $createdBy = $this->auditActorValue((array)$columns['created_by'], $userId);
+            if ($createdBy !== null) {
+                $data['created_by'] = $createdBy;
+            }
         }
         if (array_key_exists('updated_at', $columns)) {
             $data['updated_at'] = $now;
         }
         if (array_key_exists('updated_by', $columns)) {
-            $data['updated_by'] = $userId;
+            $updatedBy = $this->auditActorValue((array)$columns['updated_by'], $userId);
+            if ($updatedBy !== null) {
+                $data['updated_by'] = $updatedBy;
+            }
         }
 
         return $data;
@@ -727,6 +757,156 @@ class GenericCrudService
             'params' => $params,
             'identity' => $normalized,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @param array<string, mixed> $scope
+     * @return array{sql:string, params:array<string, mixed>, scope:array<string, mixed>}
+     */
+    private function scopeWhereClause(array $table, array $scope, string $prefix): array
+    {
+        $columns = (array)($table['columns'] ?? []);
+        $normalized = [];
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            if (!array_key_exists($field, $columns) || !array_key_exists($field, $scope)) {
+                continue;
+            }
+            $value = $scope[$field];
+            if (!is_scalar($value) || trim((string)$value) === '') {
+                continue;
+            }
+            $normalized[$field] = (string)$value;
+        }
+
+        $clauses = [];
+        $params = [];
+        foreach ($normalized as $field => $value) {
+            $param = ':' . $prefix . '_' . count($params);
+            $clauses[] = $this->q($field) . ' = ' . $param;
+            $params[$param] = $value;
+        }
+
+        return [
+            'sql' => implode(' AND ', $clauses),
+            'params' => $params,
+            'scope' => $normalized,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @return array{sql:string, params:array<string, mixed>}
+     */
+    private function versionWhereClause(array $table, ?int $expectedVersion, string $prefix): array
+    {
+        $columns = (array)($table['columns'] ?? []);
+        if ($expectedVersion === null || !array_key_exists('row_version', $columns)) {
+            return ['sql' => '', 'params' => []];
+        }
+
+        return [
+            'sql' => $this->q('row_version') . ' = :' . $prefix,
+            'params' => [':' . $prefix => $expectedVersion],
+        ];
+    }
+
+    /**
+     * @param array<int, array{sql:string, params:array<string, mixed>}> $clauses
+     * @return array{sql:string, params:array<string, mixed>}
+     */
+    private function combineWhereClauses(array ...$clauses): array
+    {
+        $sqlParts = [];
+        $params = [];
+        foreach ($clauses as $clause) {
+            $sql = trim((string)($clause['sql'] ?? ''));
+            if ($sql === '') {
+                continue;
+            }
+            $sqlParts[] = '(' . $sql . ')';
+            $params = array_merge($params, (array)($clause['params'] ?? []));
+        }
+
+        return [
+            'sql' => implode(' AND ', $sqlParts),
+            'params' => $params,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $scope
+     * @return array<string, mixed>
+     */
+    private function applyScopeColumns(array $table, array $data, array $scope): array
+    {
+        $columns = (array)($table['columns'] ?? []);
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            if (!array_key_exists($field, $columns) || array_key_exists($field, $data) || !array_key_exists($field, $scope)) {
+                continue;
+            }
+            $value = $scope[$field];
+            if (!is_scalar($value) || trim((string)$value) === '') {
+                continue;
+            }
+            $data[$field] = (string)$value;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $column
+     */
+    private function auditActorValue(array $column, string $actor): string|int|float|bool|null
+    {
+        $trimmed = trim($actor);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $type = strtoupper((string)($column['type'] ?? ''));
+        if (str_contains($type, 'UUID') && !$this->isUuid($trimmed)) {
+            return null;
+        }
+
+        return $trimmed;
+    }
+
+    private function isUuid(string $value): bool
+    {
+        return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1;
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @param array<string, mixed> $identity
+     * @param array<string, mixed> $scope
+     */
+    private function assertMutationResult(string $tableName, array $table, array $identity, array $scope, ?int $expectedVersion, string $verb): never
+    {
+        $where = $this->combineWhereClauses(
+            $this->identityWhereClause($table, $identity, 'verify'),
+            $this->scopeWhereClause($table, $scope, 'verify_scope')
+        );
+
+        $existing = $this->db->queryOne(
+            'SELECT * FROM ' . $this->q($tableName) . ' WHERE ' . $where['sql'] . ' LIMIT 1',
+            $where['params']
+        );
+
+        if (is_array($existing) && $expectedVersion !== null && array_key_exists('row_version', $existing)) {
+            throw new RecordConflictException(sprintf(
+                '%s rejected due to stale row_version. Expected %d, current %d.',
+                $verb,
+                $expectedVersion,
+                (int)$existing['row_version']
+            ));
+        }
+
+        throw new RecordNotFoundException('Record not found');
     }
 
     /**

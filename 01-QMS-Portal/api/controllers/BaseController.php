@@ -125,6 +125,38 @@ abstract class BaseController
     }
 
     /**
+     * Get a request header value by case-insensitive name.
+     *
+     * @param string $name Header name.
+     * @return string|null
+     */
+    protected function requestHeader(string $name): ?string
+    {
+        $target = strtolower(trim($name));
+        if ($target === '') {
+            return null;
+        }
+
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            if (is_array($headers)) {
+                foreach ($headers as $headerName => $value) {
+                    if (strtolower(trim((string)$headerName)) === $target) {
+                        return is_scalar($value) ? (string)$value : null;
+                    }
+                }
+            }
+        }
+
+        $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+        if (isset($_SERVER[$serverKey]) && is_scalar($_SERVER[$serverKey])) {
+            return (string)$_SERVER[$serverKey];
+        }
+
+        return null;
+    }
+
+    /**
      * Get the HTTP request method (uppercase).
      *
      * @return string

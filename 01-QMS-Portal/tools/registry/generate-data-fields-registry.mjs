@@ -215,9 +215,26 @@ function deleteFieldsFor(table) {
   if (!primaryKeys.length) return [];
   return [
     ...primaryKeys.map((primaryKey) => dbField(table.tableName, primaryKey, table, 'detail')),
+    ...concurrencyParamFieldsFor(table),
     { key: 'confirm_delete', label: 'Xác nhận xóa', labelEn: 'Confirm Delete', type: 'boolean', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: {} },
     { key: 'delete_reason', label: 'Lý do xóa', labelEn: 'Delete Reason', type: 'textarea', required: false, filterable: false, sortable: false, group: 'general', source: 'param', constraints: { maxLength: 2000 } },
   ];
+}
+
+function concurrencyParamFieldsFor(table) {
+  if (!table.columns.row_version) return [];
+  return [{
+    key: 'row_version',
+    label: 'Phiên bản bản ghi',
+    labelEn: 'Record Version',
+    type: 'number',
+    required: true,
+    filterable: false,
+    sortable: false,
+    group: 'status',
+    source: 'param',
+    constraints: { min: 0 },
+  }];
 }
 
 function dbField(tableName, columnName, table, kind) {
@@ -372,12 +389,16 @@ for (const [tableName, table] of Object.entries(tables)) {
   generated[`${table.domain}.${tableName}.list`] = ensureMin(`${table.domain}.${tableName}.list`, listCols.map((c) => dbField(tableName, c, table, 'list')));
   if (hasPrimaryKey(table)) {
     generated[`${table.domain}.${tableName}.detail`] = ensureMin(`${table.domain}.${tableName}.detail`, Object.keys(table.columns).map((c) => dbField(tableName, c, table, 'detail')));
-    generated[`${table.domain}.${tableName}.update`] = ensureMin(`${table.domain}.${tableName}.update`, updateCols.map((c) => dbField(tableName, c, table, 'update')));
+    generated[`${table.domain}.${tableName}.update`] = ensureMin(`${table.domain}.${tableName}.update`, [
+      ...updateCols.map((c) => dbField(tableName, c, table, 'update')),
+      ...concurrencyParamFieldsFor(table),
+    ]);
     generated[`${table.domain}.${tableName}.delete`] = ensureMin(`${table.domain}.${tableName}.delete`, deleteFieldsFor(table));
   }
   generated[`${table.domain}.${tableName}.create`] = ensureMin(`${table.domain}.${tableName}.create`, createCols.map((c) => dbField(tableName, c, table, 'create')));
   if (primaryKeys.length && table.statusColumn && table.statusSet) generated[`${table.domain}.${tableName}.transition`] = ensureMin(`${table.domain}.${tableName}.transition`, [
     ...primaryKeys.map((key) => dbField(tableName, key, table, 'detail')),
+    ...concurrencyParamFieldsFor(table),
     dbField(tableName, table.statusColumn, table, 'detail'),
     { key: 'to_status', label: 'Trạng thái đích', labelEn: 'Target Status', type: 'select', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { enumRef: table.statusSet } },
     { key: 'transition_note', label: 'Ghi chú chuyển trạng thái', labelEn: 'Transition Note', type: 'textarea', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { maxLength: 2000 } },

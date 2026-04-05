@@ -62,7 +62,20 @@ class UserController extends BaseController
 
         if ($existing) {
             // Update existing user
-            $allowed = ['name', 'role', 'dept', 'title', 'phone', 'personal_email', 'cccd', 'active'];
+            $allowed = [
+                'name',
+                'role',
+                'dept',
+                'title',
+                'phone',
+                'personal_email',
+                'cccd',
+                'active',
+                'org_company_code',
+                'org_legal_entity_code',
+                'org_plant_id',
+                'org_site_id',
+            ];
             foreach ($allowed as $key) {
                 if (array_key_exists($key, $data)) {
                     $existing[$key] = $data[$key];
@@ -98,6 +111,10 @@ class UserController extends BaseController
                 'personal_email' => (string)($data['personal_email'] ?? ''),
                 'cccd'          => (string)($data['cccd'] ?? ''),
                 'active'        => (bool)($data['active'] ?? true),
+                'org_company_code' => (string)($data['org_company_code'] ?? ''),
+                'org_legal_entity_code' => (string)($data['org_legal_entity_code'] ?? ''),
+                'org_plant_id'  => (string)($data['org_plant_id'] ?? ''),
+                'org_site_id'   => (string)($data['org_site_id'] ?? ''),
                 'password_hash' => password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]),
                 'mfa'           => ['enabled' => false],
                 'created_at'    => $this->nowIso(),

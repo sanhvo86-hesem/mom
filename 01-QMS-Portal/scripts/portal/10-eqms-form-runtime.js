@@ -1608,18 +1608,18 @@ function showEqmsSignatureFallback(block){
       style.textContent = [
         '.eqms-signature-fallback{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center}',
         '.eqms-signature-fallback__backdrop{position:absolute;inset:0;background:rgba(15,23,42,.58);backdrop-filter:blur(4px)}',
-        '.eqms-signature-fallback__modal{position:relative;width:min(520px,94vw);background:#fff;border-radius:18px;box-shadow:0 24px 64px rgba(15,23,42,.28);overflow:hidden}',
-        '.eqms-signature-fallback__head{display:flex;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid #e2e8f0}',
-        '.eqms-signature-fallback__head strong{display:block;font-size:18px;color:#0f172a}',
-        '.eqms-signature-fallback__head p{margin:6px 0 0;color:#64748b;line-height:1.5}',
-        '.eqms-signature-fallback__close{width:36px;height:36px;border:none;border-radius:12px;background:#f8fafc;font-size:22px;cursor:pointer}',
-        '.eqms-signature-fallback__body{display:grid;gap:12px;padding:20px}',
-        '.eqms-signature-fallback__body label{display:grid;gap:6px;color:#334155;font-weight:700;font-size:13px}',
-        '.eqms-signature-fallback__body input,.eqms-signature-fallback__body textarea{border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;font:inherit;color:#0f172a;background:#fff}',
-        '.eqms-signature-fallback__actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 20px;border-top:1px solid #e2e8f0;background:#f8fafc}',
-        '.eqms-signature-fallback__actions button{min-width:132px;padding:10px 14px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer}',
-        '.eqms-signature-fallback__actions .primary{background:#1565c0;border-color:#1565c0;color:#fff}',
-        '.eqms-signature-fallback__error{color:#b91c1c;font-size:12px;font-weight:700}'
+        '.eqms-signature-fallback__modal{position:relative;width:min(520px,94vw);background:var(--bg-surface,#fff);border:var(--modal-border-width,1px) solid var(--border,#e2e8f0);border-radius:var(--modal-border-radius,18px);box-shadow:var(--shadow-xl,0 24px 64px rgba(15,23,42,.28));overflow:hidden;color:var(--text-primary,#0f172a)}',
+        '.eqms-signature-fallback__head{display:flex;justify-content:space-between;gap:16px;padding:var(--modal-header-padding-v,16px) var(--modal-padding,20px);border-bottom:1px solid var(--border,#e2e8f0)}',
+        '.eqms-signature-fallback__head strong{display:block;font-size:18px;color:var(--text-primary,#0f172a)}',
+        '.eqms-signature-fallback__head p{margin:6px 0 0;color:var(--text-secondary,#64748b);line-height:1.5}',
+        '.eqms-signature-fallback__close{width:36px;height:36px;border:var(--btn-border-width,1px) solid var(--border,#e2e8f0);border-radius:var(--hds-control-radius,12px);background:var(--bg-surface-alt,#f8fafc);color:var(--text-primary,#0f172a);font-size:22px;cursor:pointer}',
+        '.eqms-signature-fallback__body{display:grid;gap:12px;padding:var(--modal-padding,20px)}',
+        '.eqms-signature-fallback__body label{display:grid;gap:6px;color:var(--text-secondary,#334155);font-weight:700;font-size:13px}',
+        '.eqms-signature-fallback__body input,.eqms-signature-fallback__body textarea{border:var(--input-border-width,1px) solid var(--border,#cbd5e1);border-radius:var(--hds-control-radius,12px);padding:calc(var(--input-padding-y,0px) + 10px) var(--hds-control-px,12px);font:inherit;color:var(--text-primary,#0f172a);background:var(--input-bg,var(--bg-surface,#fff))}',
+        '.eqms-signature-fallback__actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 20px;border-top:1px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f8fafc)}',
+        '.eqms-signature-fallback__actions button{min-width:132px;min-height:var(--hds-control-h,36px);padding:var(--btn-padding-y,0px) var(--btn-padding-x,14px);border-radius:var(--hds-control-radius,12px);border:var(--btn-border-width,1px) solid var(--border,#cbd5e1);background:var(--bg-surface,#fff);color:var(--text-primary,#0f172a);font-weight:700;cursor:pointer}',
+        '.eqms-signature-fallback__actions .primary{background:var(--brand-2,#1565c0);border-color:var(--brand-2,#1565c0);color:var(--text-inverse,#fff)}',
+        '.eqms-signature-fallback__error{color:var(--red,#b91c1c);font-size:12px;font-weight:700}'
       ].join('');
       document.head.appendChild(style);
     }

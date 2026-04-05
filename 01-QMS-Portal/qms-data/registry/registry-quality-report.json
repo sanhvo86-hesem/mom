@@ -2,7 +2,7 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-05T13:32:59.374Z"
+    "generatedAt": "2026-04-05T14:44:32.568Z"
   },
   "summary": {
     "endpoint_count": 2862,
@@ -14,9 +14,13 @@
     "formula_count": 960,
     "formula_reference_count": 960,
     "field_context_count": 38595,
+    "row_version_tables": 408,
+    "org_scoped_tables": 408,
     "composite_pk_tables": 19,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
+    "optimistic_concurrency_issues": 0,
+    "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0
   },
@@ -62,6 +66,18 @@
       "passed": true,
       "actual": 509,
       "target": 496
+    },
+    {
+      "id": "optimistic_concurrency_contracts",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "org_scope_contracts",
+      "passed": true,
+      "actual": 0,
+      "target": 0
     },
     {
       "id": "frontend_record_readiness",
@@ -125,6 +141,790 @@
     }
   ],
   "warnings": {
+    "row_version_tables": [
+      {
+        "table": "ap_ar_invoices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "approved_supplier_list",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "apqp_gate_reviews",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "apqp_projects",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_capacity_buckets",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_constraint_resources",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_demand_forecasts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_material_availability",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_planning_horizons",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_planning_scenarios",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_schedule_blocks",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_schedule_conflicts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_setup_matrices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit_actions",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit_findings",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audits",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bill_of_materials",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bom_components",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "calibration_grr_studies",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "calibration_oot_investigations",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "calibration_records",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "capa_effectiveness_checks",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "capa_records",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "certificates",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "cnc_program_approvals",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "cnc_programs",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_contract_amendments",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_contracts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_credit_profiles",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_customer_scorecards",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_incoterms_profiles",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_order_promises",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_payment_terms_profiles",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_price_lists",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_rebate_accruals",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_rebate_programs",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "comments",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "commercial_accounts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "compliance_records",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "concessions",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "contamination_checks",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "control_plan_characteristics",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "control_plans",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "copq_ledger",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "cost_elements",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_accounts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_activities",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_campaigns",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_contacts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_customer_touchpoints",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_forecasts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_leads",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_opportunities",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_quotes_pipeline",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "customer_complaints",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "customer_sites",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "customers",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "demand_classifications",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "demand_history_buckets",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "departments",
+        "concurrency_field": "row_version"
+      }
+    ],
+    "org_scoped_tables": [
+      {
+        "table": "ap_ar_invoices",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "approved_supplier_list",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "apqp_gate_reviews",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "apqp_projects",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_capacity_buckets",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_constraint_resources",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_demand_forecasts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_material_availability",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_planning_horizons",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_planning_scenarios",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_schedule_blocks",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_schedule_conflicts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_setup_matrices",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit_actions",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit_findings",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audits",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bill_of_materials",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bom_components",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "calibration_grr_studies",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "calibration_oot_investigations",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "calibration_records",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "capa_effectiveness_checks",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "capa_records",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "certificates",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "cnc_program_approvals",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "cnc_programs",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_contract_amendments",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_contracts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_credit_profiles",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_customer_scorecards",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_incoterms_profiles",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_order_promises",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_payment_terms_profiles",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_price_lists",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_rebate_accruals",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_rebate_programs",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "comments",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "commercial_accounts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "compliance_records",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "concessions",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "contamination_checks",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "control_plan_characteristics",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "control_plans",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "copq_ledger",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "cost_elements",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_accounts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_activities",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_campaigns",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_contacts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_customer_touchpoints",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_forecasts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_leads",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_opportunities",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_quotes_pipeline",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "customer_complaints",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "customer_sites",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "customers",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "demand_classifications",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "demand_history_buckets",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "departments",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      }
+    ],
     "composite_pk_tables": [
       {
         "table": "audit_events",
@@ -283,6 +1083,8 @@
     ],
     "missing_primary_key_tables": [],
     "unsupported_record_endpoints": [],
+    "optimistic_concurrency_issues": [],
+    "org_scope_contract_issues": [],
     "contract_issues": [],
     "workflow_alignment_issues": []
   },

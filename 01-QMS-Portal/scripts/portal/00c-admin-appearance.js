@@ -1,6 +1,6 @@
-/* ============================================================================
-   HESEM QMS — Admin Appearance Editor v2.0
-   Enterprise-grade theme editor with 6 sub-tabs, 150+ controls.
+﻿/* ============================================================================
+   HESEM QMS â€” Admin Appearance Editor v2.0
+   Enterprise-grade theme editor with 8 sub-tabs, 150+ controls.
    Loaded on-demand when admin navigates to Appearance tab.
    ============================================================================ */
 (function(){
@@ -10,7 +10,7 @@ var _subTab = 'overview';
 
 function T(k){
   var en={
-    overview:'Overview',typography:'Typography',colors:'Colors',layout:'Layout & Sizing',effects:'Effects',advanced:'Advanced',
+    overview:'Overview',typography:'Typography',colors:'Colors',layout:'Layout & Sizing',effects:'Effects',governance:'Governance',advanced:'Advanced',
     presets:'Quick Presets',livePreview:'Live Component Preview',
     compact:'Compact',default:'Default',comfortable:'Comfortable',custom:'Custom',
     light:'Light',dark:'Dark',auto:'Auto (OS)',schedule:'Scheduled',
@@ -49,49 +49,49 @@ function T(k){
     letterSpacing:'Letter Spacing',textTransform:'Text Transform',
     none:'None',uppercase:'UPPERCASE',capitalize:'Capitalize',
     darkFrom:'Dark mode from',darkTo:'to',
-    liveHint:'Live preview — changes apply instantly'
+    liveHint:'Live preview â€” changes apply instantly'
   };
   var vi={
-    overview:'Tổng quan',typography:'Kiểu chữ',colors:'Màu sắc',layout:'Bố cục',effects:'Hiệu ứng',advanced:'Nâng cao',
-    presets:'Thiết lập nhanh',livePreview:'Xem trước thành phần',
-    compact:'Gọn',default:'Mặc định',comfortable:'Thoải mái',custom:'Tùy chỉnh',
-    light:'Sáng',dark:'Tối',auto:'Tự động (OS)',schedule:'Hẹn giờ',
-    sharp:'Sắc nét',rounded:'Bo tròn',pill:'Viên thuốc',
-    normal:'Bình thường',reduced:'Giảm',off:'Tắt',
-    saveOrg:'Lưu cho tổ chức',reset:'Đặt lại tất cả',saved:'Đã lưu cài đặt',resetDone:'Đã đặt lại mặc định',
-    fontFamily:'Phông chữ',fontWeight:'Độ đậm',fontSize:'Cỡ chữ',lineHeight:'Chiều cao dòng',
-    display:'Hiển thị / Hero',heading:'Tiêu đề',body:'Văn bản',label:'Nhãn / Caption',mono:'Mã nguồn',
-    brand:'Màu thương hiệu',status:'Màu trạng thái',gray:'Thang xám',surfacesLight:'Bề mặt (Sáng)',surfacesDark:'Bề mặt (Tối)',
-    textLight:'Văn bản (Sáng)',textDark:'Văn bản (Tối)',borders:'Viền',
-    densityDetail:'Kích thước control',tableDetail:'Mật độ bảng',cardBadge:'Thẻ & Huy hiệu',radiusScale:'Thang bo góc',
-    spacingScale:'Thang khoảng cách',layoutDim:'Kích thước bố cục',zIndex:'Thang Z-Index',
-    motion:'Chuyển động',shadows:'Bóng đổ',focusRing:'Viền focus',selectionColor:'Vùng chọn văn bản',
-    caretColor:'Con trỏ nhập',placeholder:'Chữ gợi ý',disabledState:'Trạng thái vô hiệu',scrollbar:'Thanh cuộn',
-    backdrop:'Lớp phủ & Mờ nền',skeleton:'Hiệu ứng tải',
-    themePresets:'Bộ giao diện có sẵn',customCSS:'CSS tùy chỉnh',wcag:'Kiểm tra tương phản WCAG',
-    printTheme:'Giao diện in',highContrast:'Tương phản cao',coreStandard:'Tiêu chuẩn lõi',
-    components:'Thành phần',
-    btnSettings:'Nút bấm',tableSettings:'Bảng dữ liệu',cardSettings:'Thẻ',badgeSettings:'Huy hiệu',
-    inputSettings:'Ô nhập',tabSettings:'Tab',modalSettings:'Hộp thoại',
-    flowSettings:'Lưu đồ',isoBox:'Hộp tài liệu ISO',isoNote:'Ghi chú ISO',
-    kpiSettings:'Thẻ KPI',tooltipSettings:'Chú thích nổi',dropdownSettings:'Menu thả',
-    navSettings:'Mục điều hướng',paginationSettings:'Phân trang',
-    emptySettings:'Trạng thái rỗng',progressSettings:'Thanh tiến độ',
-    fieldSettings:'Trường biểu mẫu',breadcrumbSettings:'Đường dẫn',
-    paddingY:'Đệm dọc',paddingX:'Đệm ngang',gap:'Khoảng cách',fontWeight:'Độ đậm chữ',
-    letterSpacing:'Giãn chữ',textTransform:'Kiểu chữ hoa',
-    borderWidth:'Độ dày viền',minWidth:'Chiều rộng tối thiểu',headerBg:'Nền tiêu đề',
-    stripeBg:'Nền sọc',stripeAltBg:'Nền sọc xen kẽ',borderStyle:'Kiểu viền',
-    bodyShadow:'Bóng đổ',headerPadding:'Đệm tiêu đề',bodyPadding:'Đệm nội dung',
-    nodeBg:'Nền node',nodeBorder:'Viền node',nodeRadius:'Bo góc node',nodePadding:'Đệm node',
-    connectorColor:'Màu đường nối',connectorWidth:'Độ dày đường nối',arrowSize:'Cỡ mũi tên',
-    boxBg:'Nền hộp',boxBorder:'Viền hộp',boxHeaderBg:'Nền tiêu đề hộp',
-    noteBg:'Nền ghi chú',noteBorder:'Viền ghi chú',noteBorderLeft:'Viền trái',
-    importExport:'Nhập / Xuất',
-    letterSpacing:'Giãn chữ',textTransform:'Kiểu chữ hoa',
-    none:'Không',uppercase:'IN HOA',capitalize:'Viết Hoa Đầu',
-    darkFrom:'Chế độ tối từ',darkTo:'đến',
-    liveHint:'Xem trước trực tiếp — thay đổi áp dụng ngay lập tức'
+    overview:'Tá»•ng quan',typography:'Kiá»ƒu chá»¯',colors:'MÃ u sáº¯c',layout:'Bá»‘ cá»¥c',effects:'Hiá»‡u á»©ng',governance:'Quan tri tuan thu',advanced:'NÃ¢ng cao',
+    presets:'Thiáº¿t láº­p nhanh',livePreview:'Xem trÆ°á»›c thÃ nh pháº§n',
+    compact:'Gá»n',default:'Máº·c Ä‘á»‹nh',comfortable:'Thoáº£i mÃ¡i',custom:'TÃ¹y chá»‰nh',
+    light:'SÃ¡ng',dark:'Tá»‘i',auto:'Tá»± Ä‘á»™ng (OS)',schedule:'Háº¹n giá»',
+    sharp:'Sáº¯c nÃ©t',rounded:'Bo trÃ²n',pill:'ViÃªn thuá»‘c',
+    normal:'BÃ¬nh thÆ°á»ng',reduced:'Giáº£m',off:'Táº¯t',
+    saveOrg:'LÆ°u cho tá»• chá»©c',reset:'Äáº·t láº¡i táº¥t cáº£',saved:'ÄÃ£ lÆ°u cÃ i Ä‘áº·t',resetDone:'ÄÃ£ Ä‘áº·t láº¡i máº·c Ä‘á»‹nh',
+    fontFamily:'PhÃ´ng chá»¯',fontWeight:'Äá»™ Ä‘áº­m',fontSize:'Cá»¡ chá»¯',lineHeight:'Chiá»u cao dÃ²ng',
+    display:'Hiá»ƒn thá»‹ / Hero',heading:'TiÃªu Ä‘á»',body:'VÄƒn báº£n',label:'NhÃ£n / Caption',mono:'MÃ£ nguá»“n',
+    brand:'MÃ u thÆ°Æ¡ng hiá»‡u',status:'MÃ u tráº¡ng thÃ¡i',gray:'Thang xÃ¡m',surfacesLight:'Bá» máº·t (SÃ¡ng)',surfacesDark:'Bá» máº·t (Tá»‘i)',
+    textLight:'VÄƒn báº£n (SÃ¡ng)',textDark:'VÄƒn báº£n (Tá»‘i)',borders:'Viá»n',
+    densityDetail:'KÃ­ch thÆ°á»›c control',tableDetail:'Máº­t Ä‘á»™ báº£ng',cardBadge:'Tháº» & Huy hiá»‡u',radiusScale:'Thang bo gÃ³c',
+    spacingScale:'Thang khoáº£ng cÃ¡ch',layoutDim:'KÃ­ch thÆ°á»›c bá»‘ cá»¥c',zIndex:'Thang Z-Index',
+    motion:'Chuyá»ƒn Ä‘á»™ng',shadows:'BÃ³ng Ä‘á»•',focusRing:'Viá»n focus',selectionColor:'VÃ¹ng chá»n vÄƒn báº£n',
+    caretColor:'Con trá» nháº­p',placeholder:'Chá»¯ gá»£i Ã½',disabledState:'Tráº¡ng thÃ¡i vÃ´ hiá»‡u',scrollbar:'Thanh cuá»™n',
+    backdrop:'Lá»›p phá»§ & Má» ná»n',skeleton:'Hiá»‡u á»©ng táº£i',
+    themePresets:'Bá»™ giao diá»‡n cÃ³ sáºµn',customCSS:'CSS tÃ¹y chá»‰nh',wcag:'Kiá»ƒm tra tÆ°Æ¡ng pháº£n WCAG',
+    printTheme:'Giao diá»‡n in',highContrast:'TÆ°Æ¡ng pháº£n cao',coreStandard:'TiÃªu chuáº©n lÃµi',
+    components:'ThÃ nh pháº§n',
+    btnSettings:'NÃºt báº¥m',tableSettings:'Báº£ng dá»¯ liá»‡u',cardSettings:'Tháº»',badgeSettings:'Huy hiá»‡u',
+    inputSettings:'Ã” nháº­p',tabSettings:'Tab',modalSettings:'Há»™p thoáº¡i',
+    flowSettings:'LÆ°u Ä‘á»“',isoBox:'Há»™p tÃ i liá»‡u ISO',isoNote:'Ghi chÃº ISO',
+    kpiSettings:'Tháº» KPI',tooltipSettings:'ChÃº thÃ­ch ná»•i',dropdownSettings:'Menu tháº£',
+    navSettings:'Má»¥c Ä‘iá»u hÆ°á»›ng',paginationSettings:'PhÃ¢n trang',
+    emptySettings:'Tráº¡ng thÃ¡i rá»—ng',progressSettings:'Thanh tiáº¿n Ä‘á»™',
+    fieldSettings:'TrÆ°á»ng biá»ƒu máº«u',breadcrumbSettings:'ÄÆ°á»ng dáº«n',
+    paddingY:'Äá»‡m dá»c',paddingX:'Äá»‡m ngang',gap:'Khoáº£ng cÃ¡ch',fontWeight:'Äá»™ Ä‘áº­m chá»¯',
+    letterSpacing:'GiÃ£n chá»¯',textTransform:'Kiá»ƒu chá»¯ hoa',
+    borderWidth:'Äá»™ dÃ y viá»n',minWidth:'Chiá»u rá»™ng tá»‘i thiá»ƒu',headerBg:'Ná»n tiÃªu Ä‘á»',
+    stripeBg:'Ná»n sá»c',stripeAltBg:'Ná»n sá»c xen káº½',borderStyle:'Kiá»ƒu viá»n',
+    bodyShadow:'BÃ³ng Ä‘á»•',headerPadding:'Äá»‡m tiÃªu Ä‘á»',bodyPadding:'Äá»‡m ná»™i dung',
+    nodeBg:'Ná»n node',nodeBorder:'Viá»n node',nodeRadius:'Bo gÃ³c node',nodePadding:'Äá»‡m node',
+    connectorColor:'MÃ u Ä‘Æ°á»ng ná»‘i',connectorWidth:'Äá»™ dÃ y Ä‘Æ°á»ng ná»‘i',arrowSize:'Cá»¡ mÅ©i tÃªn',
+    boxBg:'Ná»n há»™p',boxBorder:'Viá»n há»™p',boxHeaderBg:'Ná»n tiÃªu Ä‘á» há»™p',
+    noteBg:'Ná»n ghi chÃº',noteBorder:'Viá»n ghi chÃº',noteBorderLeft:'Viá»n trÃ¡i',
+    importExport:'Nháº­p / Xuáº¥t',
+    letterSpacing:'GiÃ£n chá»¯',textTransform:'Kiá»ƒu chá»¯ hoa',
+    none:'KhÃ´ng',uppercase:'IN HOA',capitalize:'Viáº¿t Hoa Äáº§u',
+    darkFrom:'Cháº¿ Ä‘á»™ tá»‘i tá»«',darkTo:'Ä‘áº¿n',
+    liveHint:'Xem trÆ°á»›c trá»±c tiáº¿p â€” thay Ä‘á»•i Ã¡p dá»¥ng ngay láº­p tá»©c'
   };
   return (typeof lang!=='undefined'&&lang==='en') ? (en[k]||k) : (vi[k]||k);
 }
@@ -106,7 +106,7 @@ function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? pars
 
 /**
  * _hmSet: Apply CSS variable instantly AND persist to localStorage.
- * This is the CORE function — every control must call this, not setVar alone.
+ * This is the CORE function â€” every control must call this, not setVar alone.
  */
 window._hmSet = function(cssVar, path, value){
   HmTheme.setVar(cssVar, value);          /* instant CSS update */
@@ -119,14 +119,14 @@ window._hmSetWithUnit = function(cssVar, path, value, unit){
   window._hmSet(cssVar, path, applied);
 };
 
-/* ── Helper: slider + number input ──────────────────────────────────────── */
+/* â”€â”€ Helper: slider + number input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function slider(label, cssVar, path, min, max, def, unit, step){
   var val = cfgNum(path, def);
   step = step || 1;
   var u = unit || 'px';
   var sid = 'adm_s_'+path.replace(/\./g,'_');
   var nid = 'adm_n_'+path.replace(/\./g,'_');
-  /* For unitless values like opacity, ratio — don't append unit */
+  /* For unitless values like opacity, ratio â€” don't append unit */
   var unitArg = '\'' + String(u).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\'';
   return '<div class="adm-control-row" data-control="slider" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
     +'<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>'
@@ -140,7 +140,7 @@ function slider(label, cssVar, path, min, max, def, unit, step){
     +'</div>';
 }
 
-/* ── Helper: color picker + hex ─────────────────────────────────────────── */
+/* â”€â”€ Helper: color picker + hex â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function colorPick(label, cssVar, path, def){
   var val = cfg(path) || def || '#000000';
   var cid = 'adm_cp_'+path.replace(/\./g,'_');
@@ -156,7 +156,7 @@ function colorPick(label, cssVar, path, def){
     +'</div>';
 }
 
-/* ── Helper: text input ─────────────────────────────────────────────────── */
+/* â”€â”€ Helper: text input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function textInput(label, cssVar, path, def, placeholder){
   var val = cfg(path) || def || '';
   return '<div class="adm-control-row" data-control="text" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
@@ -211,14 +211,14 @@ function fontSelect(label, cssVar, path, def, isMono){
     if(selected) matched = true;
     h += '<option value="'+esc(o.value)+'" '+selected+' style="font-family:'+o.value+'">'+esc(o.label)+'</option>';
   });
-  h += '<option value="__custom__" '+(matched?'':'selected')+'>--- Tùy chỉnh / Custom ---</option>';
+  h += '<option value="__custom__" '+(matched?'':'selected')+'>--- TÃ¹y chá»‰nh / Custom ---</option>';
   h += '</select></div>';
-  h += '<input type="text" id="'+tid+'" data-role="text" value="'+esc(val)+'" oninput="_hmSet(\''+cssVar+'\',\''+path+'\',this.value)" placeholder="Nhập font stack tùy ý..." style="display:'+(matched?'none':'block')+';width:100%;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-left:150px">';
+  h += '<input type="text" id="'+tid+'" data-role="text" value="'+esc(val)+'" oninput="_hmSet(\''+cssVar+'\',\''+path+'\',this.value)" placeholder="Nháº­p font stack tÃ¹y Ã½..." style="display:'+(matched?'none':'block')+';width:100%;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-left:150px">';
   h += '</div>';
   return h;
 }
 
-/* ── Helper: radio group ────────────────────────────────────────────────── */
+/* â”€â”€ Helper: radio group â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function radioRow(name, options, current, onChange){
   var h = '<div class="adm-control-row" data-control="radio" data-name="'+esc(name)+'" style="display:flex;gap:6px;flex-wrap:wrap">';
   options.forEach(function(o){
@@ -235,7 +235,7 @@ function radioRow(name, options, current, onChange){
   return h + '</div>';
 }
 
-/* ── Helper: section (collapsible) ──────────────────────────────────────── */
+/* â”€â”€ Helper: section (collapsible) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function statusChip(kind, label){
   var map = {
     full: {
@@ -721,7 +721,7 @@ function previewInputs(){
 function previewTabs(){
   return previewBox('Preview tab',
     '<div style="display:grid;gap:10px">'
-    + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">Users</span><span class="tab-badge">20</span></button><button type="button" class="admin-tab-v2 active"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">Appearance</span></button><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">🌐</span><span class="admin-tab-label">Portal</span></button></div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">ðŸ‘¥</span><span class="admin-tab-label">Users</span><span class="tab-badge">20</span></button><button type="button" class="admin-tab-v2 active"><span class="admin-tab-icon">ðŸŽ¨</span><span class="admin-tab-label">Appearance</span></button><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">ðŸŒ</span><span class="admin-tab-label">Portal</span></button></div>'
     + '<div class="hm-tabs" style="margin-bottom:0"><button class="hm-tab active">Overview</button><button class="hm-tab">Runtime</button><button class="hm-tab">History</button></div>'
     + '</div>',
     'Admin tabs expose radius, padding, gap and active indicator without hover.'
@@ -771,7 +771,7 @@ function previewKpi(){
   return previewBox('Preview KPI',
     '<div class="hm-kpi-row" style="margin-bottom:0">'
     + '<div class="hm-kpi-card" style="display:grid;gap:8px;justify-items:center">'
-    + '<div style="font-size:var(--kpi-icon-size,24px);line-height:1">📈</div>'
+    + '<div style="font-size:var(--kpi-icon-size,24px);line-height:1">ðŸ“ˆ</div>'
     + '<div class="hm-kpi-value">128</div>'
     + '<div class="hm-kpi-label">Cycle Time</div>'
     + '<div class="hm-kpi-trend hm-kpi-trend-up">+4.6% this week</div>'
@@ -803,9 +803,9 @@ function previewDropdown(){
 function previewNav(){
   return previewBox('Preview navigation',
     '<div style="max-width:260px;padding:10px;border-radius:var(--radius-lg);background:var(--brand);display:grid;gap:6px">'
-    + '<button type="button" class="nav-item active"><span class="icon">🏠</span><span>Dashboard</span></button>'
-    + '<button type="button" class="nav-item"><span class="icon">📋</span><span>Dispatch</span><span class="badge">12</span></button>'
-    + '<button type="button" class="nav-item"><span class="icon">📊</span><span>Reports</span></button>'
+    + '<button type="button" class="nav-item active"><span class="icon">ðŸ </span><span>Dashboard</span></button>'
+    + '<button type="button" class="nav-item"><span class="icon">ðŸ“‹</span><span>Dispatch</span><span class="badge">12</span></button>'
+    + '<button type="button" class="nav-item"><span class="icon">ðŸ“Š</span><span>Reports</span></button>'
     + '</div>'
   );
 }
@@ -828,7 +828,7 @@ function previewProgress(){
 }
 
 function previewEmpty(){
-  return previewBox('Preview empty state', '<div class="hm-empty" style="padding:22px 18px"><div class="hm-empty-icon">📭</div><div class="hm-empty-title">No records found</div><div>Filters are active. Adjust them to load more data.</div></div>');
+  return previewBox('Preview empty state', '<div class="hm-empty" style="padding:22px 18px"><div class="hm-empty-icon">ðŸ“­</div><div class="hm-empty-title">No records found</div><div>Filters are active. Adjust them to load more data.</div></div>');
 }
 
 function previewField(){
@@ -847,37 +847,38 @@ function previewBreadcrumb(){
   return previewBox('Preview breadcrumb',
     '<div class="fm-breadcrumb" style="padding:0">'
     + '<span class="bc-seg">Home</span>'
-    + '<span class="bc-sep">›</span>'
+    + '<span class="bc-sep">â€º</span>'
     + '<span class="bc-seg">Admin</span>'
-    + '<span class="bc-sep">›</span>'
+    + '<span class="bc-sep">â€º</span>'
     + '<span class="bc-cur">Appearance</span>'
     + '</div>'
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── RENDER MAIN ────────────────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ RENDER MAIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 function render(el, subTab, currentLang){
   _subTab = subTab || _subTab;
 
   var tabs = [
-    {key:'overview', icon:'🎛️', label:T('overview')},
-    {key:'typography', icon:'🔤', label:T('typography')},
-    {key:'colors', icon:'🎨', label:T('colors')},
-    {key:'layout', icon:'📐', label:T('layout')},
-    {key:'effects', icon:'✨', label:T('effects')},
-    {key:'components', icon:'🧱', label:T('components')},
-    {key:'advanced', icon:'🧩', label:T('advanced')}
+    {key:'overview', icon:'ðŸŽ›ï¸', label:T('overview')},
+    {key:'typography', icon:'ðŸ”¤', label:T('typography')},
+    {key:'colors', icon:'ðŸŽ¨', label:T('colors')},
+    {key:'layout', icon:'ðŸ“', label:T('layout')},
+    {key:'effects', icon:'âœ¨', label:T('effects')},
+    {key:'components', icon:'ðŸ§±', label:T('components')},
+    {key:'governance', icon:'ðŸ›¡ï¸', label:T('governance')},
+    {key:'advanced', icon:'ðŸ§©', label:T('advanced')}
   ];
 
   var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
 
   /* Title */
   h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
-  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">🎨 '+(typeof lang!=='undefined'&&lang==='en'?'System Appearance':'Giao diện hệ thống')+'</h3>';
-  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--blue-bg,rgba(37,99,235,0.08));border:1px solid var(--blue,#2563eb);border-radius:6px;font-size:11px;color:var(--blue,#2563eb)">💡 '+T('liveHint')+'</div></div>';
+  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">ðŸŽ¨ '+(typeof lang!=='undefined'&&lang==='en'?'System Appearance':'Giao diá»‡n há»‡ thá»‘ng')+'</h3>';
+  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--blue-bg,rgba(37,99,235,0.08));border:1px solid var(--blue,#2563eb);border-radius:6px;font-size:11px;color:var(--blue,#2563eb)">ðŸ’¡ '+T('liveHint')+'</div></div>';
   h += '</div>';
 
   /* Sub-tab bar */
@@ -896,6 +897,7 @@ function render(el, subTab, currentLang){
     case 'layout': h += renderLayout(); break;
     case 'effects': h += renderEffects(); break;
     case 'components': h += renderComponents(); break;
+    case 'governance': h += renderGovernance(); break;
     case 'advanced': h += renderAdvanced(); break;
     default: h += renderOverview();
   }
@@ -910,7 +912,7 @@ function render(el, subTab, currentLang){
   el.innerHTML = h;
 }
 
-/* ── Save all ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Save all â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 window._saveAllAppearance = function(){
   var cfg = HmTheme.getFullConfig();
   HmTheme.saveAdminConfig(cfg, function(ok){
@@ -918,34 +920,34 @@ window._saveAllAppearance = function(){
   });
 };
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 1: OVERVIEW ────────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 1: OVERVIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderOverview(){
   var cur = HmTheme.getAll();
   var h = '';
 
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px">'
     + infoCard(
-      L('Áp dụng hệ thống', 'System-wide coverage'),
-      L('Màu sắc, typography, density, motion và các token core như button, input, badge, tab, table, modal, tooltip, dropdown, nav, pagination, progress, empty, field, breadcrumb đang có mapping runtime và consumer rõ trong portal.', 'Colors, typography, density, motion, and core tokens such as button, input, badge, tab, table, modal, tooltip, dropdown, nav, pagination, progress, empty, field, and breadcrumb currently have runtime mapping plus visible consumers in the portal.'),
+      L('Ãp dá»¥ng há»‡ thá»‘ng', 'System-wide coverage'),
+      L('MÃ u sáº¯c, typography, density, motion vÃ  cÃ¡c token core nhÆ° button, input, badge, tab, table, modal, tooltip, dropdown, nav, pagination, progress, empty, field, breadcrumb Ä‘ang cÃ³ mapping runtime vÃ  consumer rÃµ trong portal.', 'Colors, typography, density, motion, and core tokens such as button, input, badge, tab, table, modal, tooltip, dropdown, nav, pagination, progress, empty, field, and breadcrumb currently have runtime mapping plus visible consumers in the portal.'),
       'full'
     )
     + infoCard(
-      L('Áp dụng một phần', 'Partial coverage'),
-      L('Layout dimensions hiện tác động tốt tới sidebar, header, modal; riêng content max-width mới được kiểm soát trong preview/admin shell vì portal vẫn còn nhiều module max-width riêng.', 'Layout dimensions already affect sidebar, header, and modal sizing well; content max-width is still limited to preview/admin shell coverage because many portal modules keep their own max-width rules.'),
+      L('Ãp dá»¥ng má»™t pháº§n', 'Partial coverage'),
+      L('Layout dimensions hiá»‡n tÃ¡c Ä‘á»™ng tá»‘t tá»›i sidebar, header, modal; riÃªng content max-width má»›i Ä‘Æ°á»£c kiá»ƒm soÃ¡t trong preview/admin shell vÃ¬ portal váº«n cÃ²n nhiá»u module max-width riÃªng.', 'Layout dimensions already affect sidebar, header, and modal sizing well; content max-width is still limited to preview/admin shell coverage because many portal modules keep their own max-width rules.'),
       'partial'
     )
     + infoCard(
-      L('Preview / cần adoption', 'Preview / needs adoption'),
-      L('Card header, flow, ISO box, ISO note và KPI icon đã có token, preview và runtime var, nhưng cần module dùng hm-* / selector chung để hệ thống tuân đồng đều hơn.', 'Card header, flow, ISO box, ISO note, and KPI icon already have tokens, previews, and runtime vars, but modules still need shared hm-* / selector adoption before the system becomes uniformly compliant.'),
+      L('Preview / cáº§n adoption', 'Preview / needs adoption'),
+      L('Card header, flow, ISO box, ISO note vÃ  KPI icon Ä‘Ã£ cÃ³ token, preview vÃ  runtime var, nhÆ°ng cáº§n module dÃ¹ng hm-* / selector chung Ä‘á»ƒ há»‡ thá»‘ng tuÃ¢n Ä‘á»“ng Ä‘á»u hÆ¡n.', 'Card header, flow, ISO box, ISO note, and KPI icon already have tokens, previews, and runtime vars, but modules still need shared hm-* / selector adoption before the system becomes uniformly compliant.'),
       'preview'
     )
     + '</div>';
 
   /* Quick sizing for tabs instead of density presets */
-  h += sect(T('presets')+' — '+T('overview'),
-    '<div style="margin-bottom:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('tabSettings')+' sizing</strong><div style="margin-top:6px;font-size:11px;line-height:1.5;color:var(--text-tertiary)">Áp dụng cho hàng tab admin và các tab dùng token chung. Nút Small / Default / Large bên dưới là preview của button, không phải tab.</div></div>'
+  h += sect(T('presets')+' â€” '+T('overview'),
+    '<div style="margin-bottom:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('tabSettings')+' sizing</strong><div style="margin-top:6px;font-size:11px;line-height:1.5;color:var(--text-tertiary)">Ãp dá»¥ng cho hÃ ng tab admin vÃ  cÃ¡c tab dÃ¹ng token chung. NÃºt Small / Default / Large bÃªn dÆ°á»›i lÃ  preview cá»§a button, khÃ´ng pháº£i tab.</div></div>'
     + slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 0, 20, 8, 'px')
     + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 0, 32, 16, 'px')
     + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 8, 18, 11, 'px')
@@ -953,9 +955,9 @@ function renderOverview(){
     + '<div class="hm-appearance-preview" data-preview-title="Preview tab admin" style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
     +   '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">Preview tab admin</div>'
     +   '<div class="admin-tabs-v2" style="margin-bottom:0">'
-    +     '<button type="button" class="admin-tab-v2"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">Người dùng</span><span class="tab-badge">20</span></button>'
-    +     '<button type="button" class="admin-tab-v2 active"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">Giao diện</span></button>'
-    +     '<button type="button" class="admin-tab-v2"><span class="admin-tab-icon">🧭</span><span class="admin-tab-label">Hiển thị portal</span></button>'
+    +     '<button type="button" class="admin-tab-v2"><span class="admin-tab-icon">ðŸ‘¥</span><span class="admin-tab-label">NgÆ°á»i dÃ¹ng</span><span class="tab-badge">20</span></button>'
+    +     '<button type="button" class="admin-tab-v2 active"><span class="admin-tab-icon">ðŸŽ¨</span><span class="admin-tab-label">Giao diá»‡n</span></button>'
+    +     '<button type="button" class="admin-tab-v2"><span class="admin-tab-icon">ðŸ§­</span><span class="admin-tab-label">Hiá»ƒn thá»‹ portal</span></button>'
     +   '</div>'
     +   '<style>@keyframes hmOverviewPulse{0%{transform:translateX(0)}100%{transform:translateX(16px)}}</style>'
     +   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px">'
@@ -979,10 +981,10 @@ function renderOverview(){
     + '</div>'
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('colors')+'</strong></div>'
     + radioRow('adm_colorMode', [
-      {value:'light',icon:'☀️',label:T('light')},
-      {value:'dark',icon:'🌙',label:T('dark')},
-      {value:'auto',icon:'💻',label:T('auto')},
-      {value:'schedule',icon:'🕐',label:T('schedule')}
+      {value:'light',icon:'â˜€ï¸',label:T('light')},
+      {value:'dark',icon:'ðŸŒ™',label:T('dark')},
+      {value:'auto',icon:'ðŸ’»',label:T('auto')},
+      {value:'schedule',icon:'ðŸ•',label:T('schedule')}
     ], cur.colorMode, "HmTheme.set('colorMode',this.value);renderAdminAppearance()")
     + (cur.colorMode==='schedule' ? '<div style="display:flex;gap:8px;align-items:center;margin-top:8px"><span style="font-size:12px">'+T('darkFrom')+'</span>'
       +'<input type="time" value="'+(cfg('colorSchedule.darkFrom')||'18:00')+'" onchange="HmTheme.setDeep(\'colorSchedule.darkFrom\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
@@ -991,22 +993,22 @@ function renderOverview(){
       +'</div>' : '')
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('radiusScale')+'</strong></div>'
     + radioRow('adm_radius', [
-      {value:'sharp',icon:'◻️',label:T('sharp')},
-      {value:'rounded',icon:'◼️',label:T('rounded')},
-      {value:'pill',icon:'💊',label:T('pill')},
-      {value:'custom',icon:'✏️',label:T('custom')}
+      {value:'sharp',icon:'â—»ï¸',label:T('sharp')},
+      {value:'rounded',icon:'â—¼ï¸',label:T('rounded')},
+      {value:'pill',icon:'ðŸ’Š',label:T('pill')},
+      {value:'custom',icon:'âœï¸',label:T('custom')}
     ], cur.radius, "HmTheme.set('radius',this.value);renderAdminAppearance()")
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('motion')+'</strong></div>'
     + radioRow('adm_motion', [
-      {value:'normal',icon:'✨',label:T('normal')},
-      {value:'reduced',icon:'🐢',label:T('reduced')},
-      {value:'off',icon:'⏹️',label:T('off')},
-      {value:'custom',icon:'✏️',label:T('custom')}
+      {value:'normal',icon:'âœ¨',label:T('normal')},
+      {value:'reduced',icon:'ðŸ¢',label:T('reduced')},
+      {value:'off',icon:'â¹ï¸',label:T('off')},
+      {value:'custom',icon:'âœï¸',label:T('custom')}
     ], cur.motion, "HmTheme.set('motion',this.value);renderAdminAppearance()")
-  , true, statusChip('admin', L('UI admin đã dùng token tab chung', 'Admin UI now consumes shared tab tokens')) + statusChip('full', L('Áp dụng tức thời', 'Live runtime apply')));
+  , true, statusChip('admin', L('UI admin Ä‘Ã£ dÃ¹ng token tab chung', 'Admin UI now consumes shared tab tokens')) + statusChip('full', L('Ãp dá»¥ng tá»©c thá»i', 'Live runtime apply')));
 
   /* Live preview */
-  h += sect('👁 '+T('livePreview'),
+  h += sect('ðŸ‘ '+T('livePreview'),
     '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start">'
     +'<button class="hm-btn hm-btn-sm hm-btn-primary">Small</button>'
     +'<button class="hm-btn hm-btn-primary">Default</button>'
@@ -1036,18 +1038,18 @@ function renderOverview(){
     +'<div class="hm-kpi-value" style="color:var(--green)">98%</div><div class="hm-kpi-label">PASS RATE</div></div>'
     +'</div>'
     +'<div style="margin-top:12px"><div class="hm-progress" style="width:100%"><div class="hm-progress-fill hm-progress-blue" style="width:68%"></div></div></div>'
-  , true, statusChip('full', L('Khối preview tổng hợp', 'Combined preview block')));
+  , true, statusChip('full', L('Khá»‘i preview tá»•ng há»£p', 'Combined preview block')));
 
   return h;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 2: TYPOGRAPHY ──────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 2: TYPOGRAPHY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderTypography(){
   var h = '';
 
-  h += sect('📝 '+T('fontFamily'),
+  h += sect('ðŸ“ '+T('fontFamily'),
     fontSelect(T('display'), '--font-display', 'typography.display.family', "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif")
     + slider(T('display')+' '+T('fontWeight'), '--font-display-weight', 'typography.display.weight', 100, 900, 700, '', 100)
     + fontSelect(T('heading'), '--font-heading', 'typography.heading.family', "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif")
@@ -1060,10 +1062,10 @@ function renderTypography(){
     + previewTypographyFamily()
   , true);
 
-  h += sect('📏 '+T('fontSize'),
+  h += sect('ðŸ“ '+T('fontSize'),
     slider('Caption / Badge (--text-xs)', '--text-xs', 'fontScale.xs', 8, 14, 11, 'px')
-    + slider('Body nhỏ (--text-sm)', '--text-sm', 'fontScale.sm', 10, 16, 13, 'px')
-    + slider('Văn bản chính (--text-base)', '--text-base', 'fontScale.base', 12, 18, 14, 'px')
+    + slider('Body nhá» (--text-sm)', '--text-sm', 'fontScale.sm', 10, 16, 13, 'px')
+    + slider('VÄƒn báº£n chÃ­nh (--text-base)', '--text-base', 'fontScale.base', 12, 18, 14, 'px')
     + slider('Section title (--text-md)', '--text-md', 'fontScale.md', 14, 20, 16, 'px')
     + slider('Card title (--text-lg)', '--text-lg', 'fontScale.lg', 16, 24, 18, 'px')
     + slider('Page heading (--text-xl)', '--text-xl', 'fontScale.xl', 18, 28, 20, 'px')
@@ -1072,14 +1074,14 @@ function renderTypography(){
     + previewFontScale()
   , true);
 
-  h += sect('↕️ '+T('lineHeight'),
+  h += sect('â†•ï¸ '+T('lineHeight'),
     slider('Tight', '--leading-tight', 'lineHeight.tight', 1.0, 1.5, 1.25, '', 0.05)
     + slider('Normal', '--leading-normal', 'lineHeight.normal', 1.2, 1.8, 1.5, '', 0.05)
     + slider('Relaxed', '--leading-relaxed', 'lineHeight.relaxed', 1.4, 2.2, 1.75, '', 0.05)
     + previewLineHeight()
   , false);
 
-  h += sect('🏷️ '+T('letterSpacing')+' & '+T('textTransform'),
+  h += sect('ðŸ·ï¸ '+T('letterSpacing')+' & '+T('textTransform'),
     slider(T('letterSpacing'), '--label-letter-spacing', 'typography.label.spacing', 0, 0.2, 0.05, 'em', 0.01)
     + '<div style="margin-top:8px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('textTransform')+'</strong></div>'
     + radioRow('adm_label_transform', [
@@ -1093,14 +1095,14 @@ function renderTypography(){
   return h;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 3: COLORS ──────────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 3: COLORS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderColors(){
   var h = '';
   var ac = HmTheme.getAdminConfig();
 
-  h += sect('🏢 '+T('brand'),
+  h += sect('ðŸ¢ '+T('brand'),
     colorPick('Primary', '--brand-2', 'brand.primary', '#1565c0')
     + colorPick('Light', '--brand-light', 'brand.light', '#1e88e5')
     + colorPick('Dark', '--brand', 'brand.dark', '#0c2d48')
@@ -1111,7 +1113,7 @@ function renderColors(){
     + previewBrandColors()
   , true);
 
-  h += sect('🚦 '+T('status')+' (Light + Dark)',
+  h += sect('ðŸš¦ '+T('status')+' (Light + Dark)',
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
     +'<div><strong style="font-size:11px;color:var(--text-secondary)">LIGHT</strong>'
     + colorPick('Success', '--green-light', 'statusColors.success', '#16a34a')
@@ -1131,7 +1133,7 @@ function renderColors(){
     + previewStatusColors()
   , false);
 
-  h += sect('☀️ '+T('surfacesLight'),
+  h += sect('â˜€ï¸ '+T('surfacesLight'),
     colorPick('Page BG', '--bg-page-light', 'colorsLight.bgPage', '#f8fafc')
     + colorPick('Surface', '--bg-surface-light', 'colorsLight.bgSurface', '#ffffff')
     + colorPick('Surface Alt', '--bg-surface-alt-light', 'colorsLight.bgSurfaceAlt', '#f1f5f9')
@@ -1141,7 +1143,7 @@ function renderColors(){
     + previewSurfaceStack('light')
   , false);
 
-  h += sect('🌙 '+T('surfacesDark'),
+  h += sect('ðŸŒ™ '+T('surfacesDark'),
     colorPick('Page BG Dark', '--bg-page-dark', 'colorsDark.bgPage', '#0f172a')
     + colorPick('Surface Dark', '--bg-surface-dark', 'colorsDark.bgSurface', '#1e293b')
     + colorPick('Surface Alt Dark', '--bg-surface-alt-dark', 'colorsDark.bgSurfaceAlt', '#162032')
@@ -1152,7 +1154,7 @@ function renderColors(){
     + previewSurfaceStack('dark')
   , false);
 
-  h += sect('📝 '+T('textLight'),
+  h += sect('ðŸ“ '+T('textLight'),
     colorPick('Primary', '--text-primary-light', 'colorsLight.textPrimary', '#1e293b')
     + colorPick('Secondary', '--text-secondary-light', 'colorsLight.textSecondary', '#64748b')
     + colorPick('Muted', '--text-tertiary-light', 'colorsLight.textTertiary', '#94a3b8')
@@ -1161,7 +1163,7 @@ function renderColors(){
     + previewTextColors('light')
   , false);
 
-  h += sect('📝 '+T('textDark'),
+  h += sect('ðŸ“ '+T('textDark'),
     colorPick('Primary Dark', '--text-primary-dark', 'colorsDark.textPrimary', '#f1f5f9')
     + colorPick('Secondary Dark', '--text-secondary-dark', 'colorsDark.textSecondary', '#94a3b8')
     + colorPick('Muted Dark', '--text-tertiary-dark', 'colorsDark.textTertiary', '#64748b')
@@ -1170,7 +1172,7 @@ function renderColors(){
     + previewTextColors('dark')
   , false);
 
-  h += sect('🔲 '+T('borders'),
+  h += sect('ðŸ”² '+T('borders'),
     '<strong style="font-size:11px">Light</strong>'
     + colorPick('Border', '--border-light', 'colorsLight.border', '#e2e8f0')
     + colorPick('Focus', '--border-focus-light', 'colorsLight.borderFocus', '#1565c0')
@@ -1187,20 +1189,20 @@ function renderColors(){
   return h;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 4: LAYOUT ──────────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 4: LAYOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderLayout(){
   var h = '';
 
   h += sectionLead(
-    L('Layout controls đã được tách theo phạm vi ảnh hưởng', 'Layout controls are now grouped by impact scope'),
-    L('Density, radius và spacing đang chi phối shared token khá tốt. Riêng layout dimensions cần đọc kỹ badge phạm vi áp dụng vì hệ thống vẫn còn một số module max-width riêng và dialog legacy.', 'Density, radius, and spacing already drive shared tokens well. Layout dimensions need closer attention to their scope badges because the system still includes some module-specific max-width rules and legacy dialogs.'),
+    L('Layout controls Ä‘Ã£ Ä‘Æ°á»£c tÃ¡ch theo pháº¡m vi áº£nh hÆ°á»Ÿng', 'Layout controls are now grouped by impact scope'),
+    L('Density, radius vÃ  spacing Ä‘ang chi phá»‘i shared token khÃ¡ tá»‘t. RiÃªng layout dimensions cáº§n Ä‘á»c ká»¹ badge pháº¡m vi Ã¡p dá»¥ng vÃ¬ há»‡ thá»‘ng váº«n cÃ²n má»™t sá»‘ module max-width riÃªng vÃ  dialog legacy.', 'Density, radius, and spacing already drive shared tokens well. Layout dimensions need closer attention to their scope badges because the system still includes some module-specific max-width rules and legacy dialogs.'),
     statusChip('full', L('Density / radius / spacing', 'Density / radius / spacing'))
-    + statusChip('partial', L('Layout dimensions còn mixed', 'Layout dimensions still mixed'))
+    + statusChip('partial', L('Layout dimensions cÃ²n mixed', 'Layout dimensions still mixed'))
   );
 
-  h += sect('📏 '+T('densityDetail'),
+  h += sect('ðŸ“ '+T('densityDetail'),
     slider('Control height', '--hds-control-h', 'density.controlH', 24, 48, 32, 'px')
     + slider('Control height sm', '--hds-control-h-sm', 'density.controlHSm', 20, 40, 28, 'px')
     + slider('Control height lg', '--hds-control-h-lg', 'density.controlHLg', 32, 56, 40, 'px')
@@ -1210,18 +1212,18 @@ function renderLayout(){
     + slider('Icon sm', '--hds-icon-sm', 'density.iconSm', 10, 20, 14, 'px')
     + slider('Icon md', '--hds-icon-md', 'density.iconMd', 12, 24, 16, 'px')
     + previewDensityControls()
-  , false, statusChip('full', L('Áp dụng rộng', 'System-wide')));
+  , false, statusChip('full', L('Ãp dá»¥ng rá»™ng', 'System-wide')));
 
-  h += sect('📋 '+T('tableDetail'),
+  h += sect('ðŸ“‹ '+T('tableDetail'),
     slider('Row height', '--hds-table-row-h', 'density.tableRowH', 28, 56, 40, 'px')
     + slider('Cell padding X', '--hds-table-cell-px', 'density.tableCellPx', 4, 20, 12, 'px')
     + slider('Cell padding Y', '--hds-table-cell-py', 'density.tableCellPy', 2, 16, 8, 'px')
     + slider('Header font', '--hds-table-head-font', 'density.tableHeadFont', 9, 14, 11, 'px')
     + slider('Body font', '--hds-table-body-font', 'density.tableBodyFont', 10, 16, 13, 'px')
     + previewTableDensity()
-  , false, statusChip('full', L('Bảng shared token', 'Shared tables')));
+  , false, statusChip('full', L('Báº£ng shared token', 'Shared tables')));
 
-  h += sect('🔲 '+T('radiusScale'),
+  h += sect('ðŸ”² '+T('radiusScale'),
     slider('Radius sm', '--radius-sm', 'radius.sm', 0, 12, 4, 'px')
     + slider('Radius md (controls)', '--radius-md', 'radius.md', 0, 16, 6, 'px')
     + slider('Radius lg (cards)', '--radius-lg', 'radius.lg', 0, 20, 8, 'px')
@@ -1230,7 +1232,7 @@ function renderLayout(){
     + previewRadiusScale()
   , false, statusChip('full', L('Shared radius', 'Shared radius')));
 
-  h += sect('↔️ '+T('spacingScale'),
+  h += sect('â†”ï¸ '+T('spacingScale'),
     slider('space-1', '--space-1', 'spacing.1', 1, 8, 4, 'px')
     + slider('space-2', '--space-2', 'spacing.2', 4, 16, 8, 'px')
     + slider('space-3', '--space-3', 'spacing.3', 6, 20, 12, 'px')
@@ -1242,7 +1244,7 @@ function renderLayout(){
     + previewSpacingScale()
   , false, statusChip('full', L('Shared spacing', 'Shared spacing')));
 
-  h += sect('📐 '+T('layoutDim'),
+  h += sect('ðŸ“ '+T('layoutDim'),
     slider('Sidebar width', '--sidebar-w', 'layout.sidebarW', 180, 360, 260, 'px')
     + slider('Sidebar collapsed', '--sidebar-w-collapsed', 'layout.sidebarCollapsed', 40, 80, 56, 'px')
     + slider('Header height', '--header-h', 'layout.headerH', 36, 72, 52, 'px')
@@ -1250,25 +1252,25 @@ function renderLayout(){
     + slider('Modal max-width', '--modal-max-w', 'layout.modalMaxW', 480, 1400, 800, 'px')
     + slider('Modal small max-width', '--modal-sm-max-w', 'layout.modalSmMaxW', 280, 720, 480, 'px')
     + previewLayoutDimensions()
-  , false, statusChip('partial', L('Sidebar / header / modal tốt', 'Sidebar / header / modal strong')) + statusChip('preview', L('Content max width còn giới hạn', 'Content max width still limited')));
+  , false, statusChip('partial', L('Sidebar / header / modal tá»‘t', 'Sidebar / header / modal strong')) + statusChip('preview', L('Content max width cÃ²n giá»›i háº¡n', 'Content max width still limited')));
 
-  h += sect('📊 '+T('zIndex')+' (read-only)',
+  h += sect('ðŸ“Š '+T('zIndex')+' (read-only)',
     '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border)">Layer</th><th style="text-align:right;padding:4px 8px;border-bottom:1px solid var(--border)">Value</th></tr></thead><tbody>'
     +[['Base',1],['Dropdown',100],['Sticky',200],['Sidebar',300],['Header',400],['Overlay',1200],['Modal',1300],['Toast',1400],['Tooltip',1500]]
     .map(function(r){return '<tr><td style="padding:3px 8px;border-bottom:1px solid var(--border)">'+r[0]+'</td><td style="text-align:right;padding:3px 8px;border-bottom:1px solid var(--border);font-family:var(--font-mono)">'+r[1]+'</td></tr>';}).join('')
     +'</tbody></table>'
-  , false, statusChip('admin', L('Thông tin tham chiếu', 'Reference only')));
+  , false, statusChip('admin', L('ThÃ´ng tin tham chiáº¿u', 'Reference only')));
 
   return h;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 5: EFFECTS ─────────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 5: EFFECTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderEffects(){
   var h = '';
 
-  h += sect('⚡ '+T('motion'),
+  h += sect('âš¡ '+T('motion'),
     slider('Fast', '--transition-fast', 'effects.motionFast', 0, 300, 100, 'ms')
     + slider('Normal', '--transition-normal', 'effects.motionNormal', 50, 500, 150, 'ms')
     + slider('Slow', '--transition-slow', 'effects.motionSlow', 100, 800, 250, 'ms')
@@ -1276,35 +1278,35 @@ function renderEffects(){
     + previewMotion()
   , true);
 
-  h += sect('🔵 '+T('focusRing'),
+  h += sect('ðŸ”µ '+T('focusRing'),
     slider('Width', '--focus-ring-width', 'effects.focusRingWidth', 1, 5, 3, 'px')
     + colorPick('Color', '--focus-ring-color', 'effects.focusRingColor', 'rgba(21,101,192,0.12)')
     + slider('Offset', '--focus-ring-offset', 'effects.focusRingOffset', 0, 4, 0, 'px')
     + previewFocus()
   , false);
 
-  h += sect('🖊️ '+T('selectionColor'),
+  h += sect('ðŸ–Šï¸ '+T('selectionColor'),
     colorPick('Selection BG', '--selection-bg', 'effects.selectionBg', '#3b82f6')
     + colorPick('Selection Text', '--selection-color', 'effects.selectionColor', '#ffffff')
     + previewSelection()
   , false);
 
-  h += sect('✏️ '+T('caretColor'),
+  h += sect('âœï¸ '+T('caretColor'),
     colorPick('Caret', '--caret-color', 'effects.caretColor', '#1565c0')
     + previewCaret()
   , false);
 
-  h += sect('💬 '+T('placeholder'),
+  h += sect('ðŸ’¬ '+T('placeholder'),
     colorPick('Placeholder color', '--placeholder-color', 'effects.placeholderColor', '#94a3b8')
     + previewPlaceholder()
   , false);
 
-  h += sect('🚫 '+T('disabledState'),
+  h += sect('ðŸš« '+T('disabledState'),
     slider('Opacity', '--disabled-opacity', 'effects.disabledOpacity', 0.2, 0.8, 0.5, '', 0.05)
     + previewDisabled()
   , false);
 
-  h += sect('📜 '+T('scrollbar'),
+  h += sect('ðŸ“œ '+T('scrollbar'),
     slider('Width', '--scrollbar-width', 'effects.scrollbarWidth', 4, 12, 8, 'px')
     + colorPick('Track', '--scrollbar-track', 'effects.scrollbarTrack', '#f1f5f9')
     + colorPick('Thumb', '--scrollbar-thumb', 'effects.scrollbarThumb', '#cbd5e1')
@@ -1312,7 +1314,7 @@ function renderEffects(){
     + previewScrollbar()
   , false);
 
-  h += sect('🌫️ '+T('backdrop'),
+  h += sect('ðŸŒ«ï¸ '+T('backdrop'),
     slider('Backdrop blur', '--backdrop-blur', 'effects.backdropBlur', 0, 20, 0, 'px')
     + slider('Overlay opacity', '--overlay-opacity', 'effects.overlayOpacity', 0, 1, 0.4, '', 0.05)
     + previewBackdrop()
@@ -1321,23 +1323,23 @@ function renderEffects(){
   return h;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 6: COMPONENTS ──────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 6: COMPONENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderComponents(){
   var h = '';
 
   h += sectionLead(
     L('Core controls', 'Core controls'),
-    L('Nhóm này nên là nơi chỉnh thường xuyên nhất vì ảnh hưởng trực tiếp tới hành vi nút, input, tab và điều hướng dùng shared token trong portal.', 'This is the group you should tune most often because it directly affects buttons, inputs, tabs, and navigation that already use shared tokens across the portal.'),
-    statusChip('full', L('Ưu tiên cao', 'High priority')) + statusChip('full', L('Áp dụng rộng', 'System-wide'))
+    L('NhÃ³m nÃ y nÃªn lÃ  nÆ¡i chá»‰nh thÆ°á»ng xuyÃªn nháº¥t vÃ¬ áº£nh hÆ°á»Ÿng trá»±c tiáº¿p tá»›i hÃ nh vi nÃºt, input, tab vÃ  Ä‘iá»u hÆ°á»›ng dÃ¹ng shared token trong portal.', 'This is the group you should tune most often because it directly affects buttons, inputs, tabs, and navigation that already use shared tokens across the portal.'),
+    statusChip('full', L('Æ¯u tiÃªn cao', 'High priority')) + statusChip('full', L('Ãp dá»¥ng rá»™ng', 'System-wide'))
   );
 
   /* BUTTON */
-  h += sect('🔘 '+T('btnSettings'),
+  h += sect('ðŸ”˜ '+T('btnSettings'),
     slider(T('paddingY'), '--btn-padding-y', 'components.btn.paddingY', 0, 12, 0, 'px')
     + slider(T('paddingX'), '--btn-padding-x', 'components.btn.paddingX', 4, 24, 10, 'px')
-    + slider(T('gap')+' (icon↔text)', '--btn-gap', 'components.btn.gap', 2, 12, 6, 'px')
+    + slider(T('gap')+' (iconâ†”text)', '--btn-gap', 'components.btn.gap', 2, 12, 6, 'px')
     + slider(T('fontWeight'), '--btn-font-weight', 'components.btn.fontWeight', 400, 800, 600, '', 100)
     + slider(T('letterSpacing'), '--btn-letter-spacing', 'components.btn.letterSpacing', 0, 0.15, 0, 'em', 0.01)
     + slider(T('borderWidth'), '--btn-border-width', 'components.btn.borderWidth', 0, 3, 1, 'px')
@@ -1346,7 +1348,7 @@ function renderComponents(){
   , true, statusChip('full', L('Shared button', 'Shared button')));
 
   /* INPUT */
-  h += sect('📝 '+T('inputSettings'),
+  h += sect('ðŸ“ '+T('inputSettings'),
     slider(T('borderWidth'), '--input-border-width', 'components.input.borderWidth', 1, 3, 1, 'px')
     + slider(T('paddingY'), '--input-padding-y', 'components.input.paddingY', 0, 8, 0, 'px')
     + colorPick('Input BG', '--input-bg', 'components.input.bg', '#ffffff')
@@ -1354,7 +1356,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared input', 'Shared input')));
 
   /* BADGE */
-  h += sect('🏷️ '+T('badgeSettings'),
+  h += sect('ðŸ·ï¸ '+T('badgeSettings'),
     slider(T('fontWeight'), '--badge-font-weight', 'components.badge.fontWeight', 400, 800, 600, '', 100)
     + slider(T('letterSpacing'), '--badge-letter-spacing', 'components.badge.letterSpacing', 0, 0.15, 0, 'em', 0.01)
     + slider(T('borderWidth'), '--badge-border-width', 'components.badge.borderWidth', 0, 2, 0, 'px')
@@ -1363,7 +1365,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared badge', 'Shared badge')));
 
   /* TAB */
-  h += sect('📑 '+T('tabSettings'),
+  h += sect('ðŸ“‘ '+T('tabSettings'),
     slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 0, 20, 8, 'px')
     + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 0, 32, 16, 'px')
     + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 8, 18, 11, 'px')
@@ -1373,10 +1375,10 @@ function renderComponents(){
     + slider('Border radius', '--tab-radius', 'components.tab.radius', 0, 28, 14, 'px')
     + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#1565c0')
     + previewTabs()
-  , false, statusChip('full', L('Shared tab', 'Shared tab')) + statusChip('admin', L('Panel này tự dùng lại', 'This panel self-consumes it')));
+  , false, statusChip('full', L('Shared tab', 'Shared tab')) + statusChip('admin', L('Panel nÃ y tá»± dÃ¹ng láº¡i', 'This panel self-consumes it')));
 
   /* TOOLTIP */
-  h += sect('💬 '+T('tooltipSettings'),
+  h += sect('ðŸ’¬ '+T('tooltipSettings'),
     colorPick('BG', '--tooltip-bg', 'components.tooltip.bg', '#0f172a')
     + colorPick('Color', '--tooltip-color', 'components.tooltip.color', '#ffffff')
     + slider(T('paddingY'), '--tooltip-padding-y', 'components.tooltip.paddingY', 4, 12, 6, 'px')
@@ -1388,7 +1390,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared tooltip', 'Shared tooltip')));
 
   /* DROPDOWN */
-  h += sect('📋 '+T('dropdownSettings'),
+  h += sect('ðŸ“‹ '+T('dropdownSettings'),
     slider('Border radius', '--dropdown-radius', 'components.dropdown.radius', 0, 16, 8, 'px')
     + slider('Item padding', '--dropdown-item-padding', 'components.dropdown.itemPadding', 4, 16, 8, 'px')
     + slider('Item font', '--dropdown-item-font-size', 'components.dropdown.itemFontSize', 11, 16, 13, 'px')
@@ -1397,7 +1399,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared dropdown', 'Shared dropdown')));
 
   /* NAV ITEM */
-  h += sect('🧭 '+T('navSettings'),
+  h += sect('ðŸ§­ '+T('navSettings'),
     slider('Height', '--nav-item-height', 'components.nav.height', 28, 48, 36, 'px')
     + slider('Font size', '--nav-item-font-size', 'components.nav.fontSize', 11, 16, 13, 'px')
     + slider('Icon size', '--nav-item-icon-size', 'components.nav.iconSize', 12, 24, 16, 'px')
@@ -1407,7 +1409,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared nav item', 'Shared nav item')));
 
   /* PAGINATION */
-  h += sect('📄 '+T('paginationSettings'),
+  h += sect('ðŸ“„ '+T('paginationSettings'),
     slider('Button size', '--pagination-btn-size', 'components.pagination.btnSize', 24, 44, 32, 'px')
     + slider('Border radius', '--pagination-btn-radius', 'components.pagination.radius', 0, 12, 6, 'px')
     + slider('Font size', '--pagination-font-size', 'components.pagination.fontSize', 11, 16, 13, 'px')
@@ -1417,12 +1419,12 @@ function renderComponents(){
 
   h += sectionLead(
     L('Surfaces & data density', 'Surfaces & data density'),
-    L('Nhóm này chi phối bảng, card, modal, field, progress và empty state. Card body đang tuân thủ tốt, còn phần card header mới dừng ở token + preview chứ chưa phủ rộng ra nhiều module legacy.', 'This group governs tables, cards, modals, fields, progress, and empty states. Card body already follows tokens well, while card header is still tokenized mainly in preview and not yet widely adopted in legacy modules.'),
-    statusChip('full', L('Đa số đã áp dụng', 'Mostly applied')) + statusChip('partial', L('Card header cần mở rộng', 'Card header needs wider adoption'))
+    L('NhÃ³m nÃ y chi phá»‘i báº£ng, card, modal, field, progress vÃ  empty state. Card body Ä‘ang tuÃ¢n thá»§ tá»‘t, cÃ²n pháº§n card header má»›i dá»«ng á»Ÿ token + preview chá»© chÆ°a phá»§ rá»™ng ra nhiá»u module legacy.', 'This group governs tables, cards, modals, fields, progress, and empty states. Card body already follows tokens well, while card header is still tokenized mainly in preview and not yet widely adopted in legacy modules.'),
+    statusChip('full', L('Äa sá»‘ Ä‘Ã£ Ã¡p dá»¥ng', 'Mostly applied')) + statusChip('partial', L('Card header cáº§n má»Ÿ rá»™ng', 'Card header needs wider adoption'))
   );
 
   /* TABLE */
-  h += sect('📊 '+T('tableSettings'),
+  h += sect('ðŸ“Š '+T('tableSettings'),
     colorPick(T('headerBg'), '--table-header-bg', 'components.table.headerBg', '#f1f5f9')
     + slider(T('fontWeight')+' header', '--table-header-font-weight', 'components.table.headerFontWeight', 400, 800, 600, '', 100)
     + slider(T('letterSpacing')+' header', '--table-header-letter-spacing', 'components.table.headerLetterSpacing', 0, 0.15, 0.05, 'em', 0.01)
@@ -1433,16 +1435,16 @@ function renderComponents(){
   , false, statusChip('full', L('Shared table', 'Shared table')));
 
   /* CARD */
-  h += sect('🃏 '+T('cardSettings'),
+  h += sect('ðŸƒ '+T('cardSettings'),
     slider(T('borderWidth'), '--card-border-width', 'components.card.borderWidth', 0, 3, 1, 'px')
     + colorPick(T('headerBg'), '--card-header-bg', 'components.card.headerBg', 'transparent')
     + slider(T('headerPadding'), '--card-header-padding-v', 'components.card.headerPadding', 8, 24, 12, 'px')
     + slider(T('bodyPadding'), '--card-body-padding', 'components.card.bodyPadding', 8, 32, 16, 'px')
     + previewCard()
-  , false, statusChip('partial', L('Card body đã áp dụng', 'Card body applied')) + statusChip('preview', L('Card header còn hạn chế', 'Card header still limited')));
+  , false, statusChip('partial', L('Card body Ä‘Ã£ Ã¡p dá»¥ng', 'Card body applied')) + statusChip('preview', L('Card header cÃ²n háº¡n cháº¿', 'Card header still limited')));
 
   /* MODAL */
-  h += sect('🪟 '+T('modalSettings'),
+  h += sect('ðŸªŸ '+T('modalSettings'),
     slider('Border radius', '--modal-border-radius', 'components.modal.radius', 0, 32, 16, 'px')
     + slider(T('bodyPadding'), '--modal-padding', 'components.modal.padding', 12, 40, 24, 'px')
     + slider(T('headerPadding'), '--modal-header-padding-v', 'components.modal.headerPadding', 8, 24, 16, 'px')
@@ -1450,7 +1452,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared modal', 'Shared modal')));
 
   /* PROGRESS BAR */
-  h += sect('📏 '+T('progressSettings'),
+  h += sect('ðŸ“ '+T('progressSettings'),
     slider('Height', '--progress-height', 'components.progress.height', 4, 16, 8, 'px')
     + slider('Border radius', '--progress-radius', 'components.progress.radius', 0, 16, 9999, 'px')
     + colorPick('Track BG', '--progress-bg', 'components.progress.bg', '#e2e8f0')
@@ -1458,7 +1460,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared progress', 'Shared progress')));
 
   /* EMPTY STATE */
-  h += sect('📭 '+T('emptySettings'),
+  h += sect('ðŸ“­ '+T('emptySettings'),
     slider('Icon size', '--empty-icon-size', 'components.empty.iconSize', 24, 80, 48, 'px')
     + slider('Icon opacity', '--empty-icon-opacity', 'components.empty.iconOpacity', 0.1, 0.8, 0.4, '', 0.05)
     + slider('Title font', '--empty-title-font-size', 'components.empty.titleFontSize', 14, 20, 16, 'px')
@@ -1467,7 +1469,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared empty state', 'Shared empty state')));
 
   /* FORM FIELD */
-  h += sect('📝 '+T('fieldSettings'),
+  h += sect('ðŸ“ '+T('fieldSettings'),
     slider('Field gap', '--field-gap', 'components.field.gap', 8, 28, 16, 'px')
     + slider('Label gap', '--field-label-gap', 'components.field.labelGap', 2, 8, 4, 'px')
     + slider('Group gap', '--field-group-gap', 'components.field.groupGap', 12, 40, 24, 'px')
@@ -1476,7 +1478,7 @@ function renderComponents(){
   , false, statusChip('full', L('Shared form field', 'Shared form field')));
 
   /* BREADCRUMB */
-  h += sect('🔗 '+T('breadcrumbSettings'),
+  h += sect('ðŸ”— '+T('breadcrumbSettings'),
     slider('Font size', '--breadcrumb-font-size', 'components.breadcrumb.fontSize', 11, 16, 13, 'px')
     + slider(T('gap'), '--breadcrumb-gap', 'components.breadcrumb.gap', 2, 12, 6, 'px')
     + colorPick('Color', '--breadcrumb-color', 'components.breadcrumb.color', '#94a3b8')
@@ -1486,12 +1488,12 @@ function renderComponents(){
 
   h += sectionLead(
     L('Specialized governed patterns', 'Specialized governed patterns'),
-    L('Flow, ISO box, ISO note và KPI icon đã được token hóa và preview để kiểm tra nhanh ngay trong admin. Tuy nhiên ngoài portal chúng mới chỉ sẵn sàng cho adoption, chưa phải nhóm đã phủ rộng như button hay table.', 'Flow, ISO box, ISO note, and KPI icon are already tokenized and previewable for quick admin testing. Outside the portal they are still adoption-ready patterns rather than broadly deployed shared controls like buttons or tables.'),
-    statusChip('preview', L('Preview-led', 'Preview-led')) + statusChip('partial', L('Cần module dùng hm-*', 'Needs modules to adopt hm-*'))
+    L('Flow, ISO box, ISO note vÃ  KPI icon Ä‘Ã£ Ä‘Æ°á»£c token hÃ³a vÃ  preview Ä‘á»ƒ kiá»ƒm tra nhanh ngay trong admin. Tuy nhiÃªn ngoÃ i portal chÃºng má»›i chá»‰ sáºµn sÃ ng cho adoption, chÆ°a pháº£i nhÃ³m Ä‘Ã£ phá»§ rá»™ng nhÆ° button hay table.', 'Flow, ISO box, ISO note, and KPI icon are already tokenized and previewable for quick admin testing. Outside the portal they are still adoption-ready patterns rather than broadly deployed shared controls like buttons or tables.'),
+    statusChip('preview', L('Preview-led', 'Preview-led')) + statusChip('partial', L('Cáº§n module dÃ¹ng hm-*', 'Needs modules to adopt hm-*'))
   );
 
   /* FLOWCHART */
-  h += sect('🔀 '+T('flowSettings'),
+  h += sect('ðŸ”€ '+T('flowSettings'),
     colorPick(T('nodeBg'), '--flow-node-bg', 'components.flow.nodeBg', '#ffffff')
     + slider(T('nodeBorder'), '--flow-node-border-w', 'components.flow.nodeBorderW', 1, 4, 2, 'px')
     + colorPick(T('nodeBorder')+' color', '--flow-node-border-color', 'components.flow.nodeBorderColor', '#e2e8f0')
@@ -1504,7 +1506,7 @@ function renderComponents(){
   , false, statusChip('preview', L('Preview + runtime var', 'Preview + runtime var')));
 
   /* ISO BOX */
-  h += sect('📋 '+T('isoBox'),
+  h += sect('ðŸ“‹ '+T('isoBox'),
     colorPick(T('boxBg'), '--iso-box-bg', 'components.isoBox.bg', '#ffffff')
     + slider(T('borderWidth'), '--iso-box-border-w', 'components.isoBox.borderW', 1, 3, 1, 'px')
     + slider('Border radius', '--iso-box-radius', 'components.isoBox.radius', 0, 16, 8, 'px')
@@ -1516,7 +1518,7 @@ function renderComponents(){
   , false, statusChip('preview', L('Preview + shared token ready', 'Preview + shared token ready')));
 
   /* ISO NOTE */
-  h += sect('📝 '+T('isoNote'),
+  h += sect('ðŸ“ '+T('isoNote'),
     colorPick(T('noteBg'), '--iso-note-bg', 'components.isoNote.bg', '#fffbeb')
     + colorPick(T('noteBorder'), '--iso-note-border-color', 'components.isoNote.borderColor', '#fcd34d')
     + colorPick(T('noteBorderLeft'), '--iso-note-border-left-color', 'components.isoNote.borderLeftColor', '#f59e0b')
@@ -1529,36 +1531,193 @@ function renderComponents(){
   , false, statusChip('preview', L('Preview + shared token ready', 'Preview + shared token ready')));
 
   /* KPI CARD */
-  h += sect('📊 '+T('kpiSettings'),
+  h += sect('ðŸ“Š '+T('kpiSettings'),
     slider(T('borderWidth'), '--kpi-border-width', 'components.kpi.borderWidth', 0, 3, 1, 'px')
     + slider('Icon size', '--kpi-icon-size', 'components.kpi.iconSize', 16, 40, 24, 'px')
     + slider('Trend font', '--kpi-trend-font-size', 'components.kpi.trendFontSize', 9, 14, 11, 'px')
     + previewKpi()
-  , false, statusChip('preview', L('Icon size còn cần adoption', 'Icon size still needs adoption')));
+  , false, statusChip('preview', L('Icon size cÃ²n cáº§n adoption', 'Icon size still needs adoption')));
 
   return h;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 7: ADVANCED ────────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 7: GOVERNANCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+function renderGovernance(){
+  var h = '';
+  var modules = [
+    {
+      area: L('Document browser, search, dictionary, matrix', 'Document browser, search, dictionary, matrix'),
+      status: statusChip('full', L('Bridged', 'Bridged')),
+      note: L('Portal shell da doc token chung cho input, table, button, badge, card va breadcrumb.', 'Portal shell now consumes shared tokens for input, table, button, badge, card, and breadcrumb.')
+    },
+    {
+      area: L('Evidence Control / Online Forms', 'Evidence Control / Online Forms'),
+      status: statusChip('full', L('Bridge alias active', 'Bridge alias active')),
+      note: L('He ec-* da duoc bridge ve token chung de light, dark, density va component sizing di cung mot duong.', 'The ec-* layer is now bridged back to shared tokens so light, dark, density, and component sizing run through one path.')
+    },
+    {
+      area: L('eQMS runtime', 'eQMS runtime'),
+      status: statusChip('full', L('Bridge alias active', 'Bridge alias active')),
+      note: L('Eqms input, button, table, section, progress va fallback signature da tro lai contract chung.', 'eQMS inputs, buttons, tables, sections, progress, and signature fallback now map back to the shared contract.')
+    },
+    {
+      area: L('Evidence Vault', 'Evidence Vault'),
+      status: statusChip('full', L('External stylesheet + bridge', 'External stylesheet + bridge')),
+      note: L('Khong con duoc phep dua vao JS inject chrome; shell nay phai doc stylesheet va token chung.', 'The module may no longer rely on JS-injected chrome; it must read its shell from stylesheet + shared tokens.')
+    },
+    {
+      area: L('Compliance Reports', 'Compliance Reports'),
+      status: statusChip('full', L('External stylesheet + bridge', 'External stylesheet + bridge')),
+      note: L('Report tabs, KPI, forms, tables, progress va evidence checklist da di qua stylesheet token hoa.', 'Report tabs, KPI, forms, tables, progress, and evidence checklist now flow through a tokenized stylesheet.')
+    },
+    {
+      area: L('Schema Studio data views', 'Schema Studio data views'),
+      status: statusChip('full', L('Table tokenized', 'Table tokenized')),
+      note: L('Bang du lieu va control chinh da nghe table/input density thay vi giu padding rieng.', 'Data tables and primary controls now respect shared table/input density instead of keeping private padding.')
+    },
+    {
+      area: L('Admin docs, retention, version history', 'Admin docs, retention, version history'),
+      status: statusChip('partial', L('Legacy cleanup tiep tuc', 'Legacy cleanup continues')),
+      note: L('Da duoc chinh mot phan, nhung van con mot so render inline can refactor tiep. Tu gio khong module moi nao duoc copy pattern nay.', 'This area has been improved, but some inline legacy rendering remains. No new module is allowed to copy that pattern.')
+    }
+  ];
+
+  h += sectionLead(
+    L('Governance contract for the world-class document platform', 'Governance contract for the world-class document platform'),
+    L('Tab Giao dien tu nay la nguon su that duy nhat cho token, component contract va quy tac tuan thu. Module moi cua ERP, MES, eQMS phai an theo lop nay ngay tu dau, khong duoc tu xay mot design system rieng.', 'From now on, the Appearance tab is the single source of truth for tokens, component contracts, and compliance rules. New ERP, MES, and eQMS modules must plug into this layer from day one and may not create a separate design system.'),
+    statusChip('admin', L('New-build baseline', 'New-build baseline')) + statusChip('full', L('No guessing allowed', 'No guessing allowed'))
+  );
+
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px">'
+    + infoCard(
+      L('Authority model', 'Authority model'),
+      L('Admin Appearance -> Theme runtime -> Shared tokens -> Approved bridge aliases -> Module UI. Moi lop sau phai doc lop truoc, khong duoc di nguoc.', 'Admin Appearance -> Theme runtime -> Shared tokens -> Approved bridge aliases -> Module UI. Each lower layer must read from the previous one, never bypass it.'),
+      'full'
+    )
+    + infoCard(
+      L('World-class baseline', 'World-class baseline'),
+      L('Chuan moi dua tren dossier world-class trong docs/design-system-standard-2026.md, tong hop Carbon, Atlassian, SLDS, Material 3, Polaris va he enterprise data-heavy.', 'The new baseline follows the world-class dossier in docs/design-system-standard-2026.md, synthesizing Carbon, Atlassian, SLDS, Material 3, Polaris, and other data-heavy enterprise systems.'),
+      'full'
+    )
+    + infoCard(
+      L('Extension policy', 'Extension policy'),
+      L('Chi them option moi vao Admin Appearance khi no la token dung duoc cho nhieu module, co preview ro, co consumer that, va co tai lieu governance di kem.', 'Add a new Admin Appearance option only when it is a reusable token across multiple modules, has a clear preview, a real consumer, and matching governance documentation.'),
+      'preview'
+    )
+    + '</div>';
+
+  h += sect(
+    'Operating model',
+    '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+      + '<thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Layer</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Owner</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Rule</th>'
+      + '</tr></thead><tbody>'
+      + '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">Admin Appearance</td><td style="padding:8px;border-bottom:1px solid var(--border)">Design authority</td><td style="padding:8px;border-bottom:1px solid var(--border)">Defines tokens, previews, compliance notes, and adoption intent.</td></tr>'
+      + '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">Theme runtime</td><td style="padding:8px;border-bottom:1px solid var(--border)">Platform core</td><td style="padding:8px;border-bottom:1px solid var(--border)">Maps config to CSS variables. No module may write competing root values.</td></tr>'
+      + '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">Shared components</td><td style="padding:8px;border-bottom:1px solid var(--border)">Platform core</td><td style="padding:8px;border-bottom:1px solid var(--border)">hm-* classes and token consumers are the preferred default for every new screen.</td></tr>'
+      + '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">Bridge aliases</td><td style="padding:8px;border-bottom:1px solid var(--border)">Module owner</td><td style="padding:8px;border-bottom:1px solid var(--border)">Allowed only to translate legacy module vars back to shared tokens, never the other way around.</td></tr>'
+      + '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">Module UI</td><td style="padding:8px;border-bottom:1px solid var(--border)">Feature team</td><td style="padding:8px;border-bottom:1px solid var(--border)">May choose layout and information architecture, but not private color, spacing, or control rules.</td></tr>'
+      + '</tbody></table>',
+    true,
+    statusChip('full', L('Mandatory for all new modules', 'Mandatory for all new modules'))
+  );
+
+  h += sect(
+    'Non-negotiable rules',
+    '<ol style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--text-secondary)">'
+      + '<li>Never hardcode presentation values when a shared token exists. That includes color, spacing, radius, border width, shadow, typography, and motion.</li>'
+      + '<li>No JS-generated stylesheet may define the visual shell of a module when a real stylesheet can do it. Runtime injection is allowed only for emergency fallback or data-driven geometry.</li>'
+      + '<li>No module-local design system is allowed unless it is only an alias layer back to shared tokens.</li>'
+      + '<li>Inline style is allowed only for computed geometry or truly per-record data, not for reusable visual design decisions.</li>'
+      + '<li>Every control must pass light, dark, auto, and scheduled theme without private overrides.</li>'
+      + '<li>Every control must respond to density and sizing tokens where applicable: button, input, table, card, tab, modal, tooltip, dropdown, pagination, progress, field, and breadcrumb.</li>'
+      + '<li>Every module must expose focus-visible, hover, active, disabled, selected, and empty states through the shared token system.</li>'
+      + '<li>Any new specialized pattern must ship with four things on day one: token names, admin preview, at least one real consumer, and written governance notes.</li>'
+      + '<li>Code review must reject any new UI that forces teammates to guess which value controls it from Admin Appearance.</li>'
+      + '</ol>',
+    true,
+    statusChip('full', L('Review gate', 'Review gate')) + statusChip('admin', L('Reject on violation', 'Reject on violation'))
+  );
+
+  h += sect(
+    'Document system compliance matrix',
+    '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+      + '<thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Area</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Status</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Notes</th>'
+      + '</tr></thead><tbody>'
+      + modules.map(function(row){
+          return '<tr>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top;font-weight:700;color:var(--text-primary)">'+esc(row.area)+'</td>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top">'+row.status+'</td>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text-secondary);line-height:1.6">'+esc(row.note)+'</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>',
+    true,
+    statusChip('full', L('Live governance snapshot', 'Live governance snapshot'))
+  );
+
+  h += sect(
+    'Release gate for every new module',
+    '<ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--text-secondary)">'
+      + '<li>Use shared hm-* components first. If bridging legacy selectors, document the alias and keep it thin.</li>'
+      + '<li>Show a preview in Admin Appearance if the module introduces a new governed pattern.</li>'
+      + '<li>Demonstrate that changing Admin Appearance visibly changes the real module, not only the preview.</li>'
+      + '<li>Ship with zero orphan tokens: every new token must have both a preview and a real consumer.</li>'
+      + '<li>Ship with zero hidden floors: density or padding set to 0 must not be blocked by native min-height, line-height, or legacy hardcoded padding.</li>'
+      + '<li>Pass WCAG AA for core text pairs and keep touch targets safe on mobile.</li>'
+      + '</ul>',
+    false,
+    statusChip('full', L('Definition of done', 'Definition of done'))
+  );
+
+  h += sect(
+    'Reference dossier',
+    '<div style="display:grid;gap:10px">'
+      + infoCard(
+          'docs/design-system-standard-2026.md',
+          L('Dossier baseline tong hop chuan enterprise hien dai, la nen de chot typography, spacing, sizing va component contract.', 'Baseline dossier synthesizing modern enterprise standards for typography, spacing, sizing, and component contracts.'),
+          'full'
+        )
+      + infoCard(
+          'docs/document-graphics-governance-2026-04-05.md',
+          L('Tai lieu governance moi cho he tai lieu: quy tac bat buoc, compliance matrix, release gate va quy trinh mo rong Admin Appearance.', 'New governance document for the document platform: mandatory rules, compliance matrix, release gates, and the process for extending Admin Appearance.'),
+          'full'
+        )
+      + '</div>',
+    false,
+    statusChip('full', L('Use in onboarding and review', 'Use in onboarding and review'))
+  );
+
+  return h;
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* â”€â”€ SUB-TAB 8: ADVANCED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderAdvanced(){
   var h = '';
 
-  h += sect('📤 '+T('importExport'),
+  h += sect('ðŸ“¤ '+T('importExport'),
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=HmTheme.exportTheme();var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-theme.json\';a.click()})()">📥 Export JSON</button>'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){if(HmTheme.importTheme(r.result)){renderAdminAppearance();if(typeof showToast===\'function\')showToast(\'Theme imported\',\'success\')}};r.readAsText(i.files[0])};i.click()})()">📤 Import JSON</button>'
+    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=HmTheme.exportTheme();var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-theme.json\';a.click()})()">ðŸ“¥ Export JSON</button>'
+    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){if(HmTheme.importTheme(r.result)){renderAdminAppearance();if(typeof showToast===\'function\')showToast(\'Theme imported\',\'success\')}};r.readAsText(i.files[0])};i.click()})()">ðŸ“¤ Import JSON</button>'
     +'</div>'
   , true);
 
-  h += sect('🖊️ '+T('customCSS'),
+  h += sect('ðŸ–Šï¸ '+T('customCSS'),
     '<textarea id="adm_custom_css" style="width:100%;min-height:120px;font-family:var(--font-mono);font-size:12px;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt,#f8fafc);color:var(--text-primary);resize:vertical"'
     +' oninput="HmTheme.setDeep(\'advanced.customCSS\',this.value)">'+(cfg('advanced.customCSS')||'')+'</textarea>'
     +'<div style="font-size:10px;color:var(--text-tertiary);margin-top:4px">CSS injected LAST with highest priority. Use sparingly.</div>'
   , false);
 
-  h += sect('♿ WCAG '+T('wcag'),
+  h += sect('â™¿ WCAG '+T('wcag'),
     (function(){
       var pairs = [
         ['Text Primary vs Surface', cfg('colorsLight.textPrimary')||'#1e293b', cfg('colorsLight.bgSurface')||'#ffffff'],
@@ -1573,17 +1732,17 @@ function renderAdvanced(){
         var pass = ratio >= 4.5;
         out += '<tr><td style="padding:4px;border-bottom:1px solid var(--border)">'+p[0]+'</td>';
         out += '<td style="text-align:right;padding:4px;border-bottom:1px solid var(--border);font-family:var(--font-mono)">'+ratio.toFixed(1)+':1</td>';
-        out += '<td style="text-align:center;padding:4px;border-bottom:1px solid var(--border)">'+(pass?'✅':'❌')+'</td></tr>';
+        out += '<td style="text-align:center;padding:4px;border-bottom:1px solid var(--border)">'+(pass?'âœ…':'âŒ')+'</td></tr>';
       });
       return out + '</table>';
     })()
   , false);
 
-  h += sect('⚠️ '+T('coreStandard'),
+  h += sect('âš ï¸ '+T('coreStandard'),
     '<div style="padding:12px;background:var(--amber-bg,rgba(217,119,6,0.08));border:1px solid var(--amber,#d97706);border-radius:8px;font-size:12px;line-height:1.6">'
-    +'<strong>⚠️ CORE STANDARD — CẤM HARDCODE</strong><br>'
-    +'Tất cả thuộc tính đồ họa PHẢI dùng CSS variables.<br>'
-    +'Admin điều khiển qua tab này. Vi phạm = code review REJECT.<br>'
+    +'<strong>âš ï¸ CORE STANDARD â€” Cáº¤M HARDCODE</strong><br>'
+    +'Táº¥t cáº£ thuá»™c tÃ­nh Ä‘á»“ há»a PHáº¢I dÃ¹ng CSS variables.<br>'
+    +'Admin Ä‘iá»u khiá»ƒn qua tab nÃ y. Vi pháº¡m = code review REJECT.<br>'
     +'<code style="font-size:11px;background:var(--bg-surface-alt);padding:2px 6px;border-radius:3px">var(--brand-2)</code> '
     +'<code style="font-size:11px;background:var(--bg-surface-alt);padding:2px 6px;border-radius:3px">var(--text-primary)</code> '
     +'<code style="font-size:11px;background:var(--bg-surface-alt);padding:2px 6px;border-radius:3px">var(--hds-control-h)</code> '
@@ -1594,8 +1753,9 @@ function renderAdvanced(){
   return h;
 }
 
-/* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405k';
+/* â”€â”€ Expose â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+window._renderAdminAppearanceFullVersion = '20260405l';
 window._renderAdminAppearanceFull = render;
 
 })();
+

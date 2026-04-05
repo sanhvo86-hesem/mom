@@ -7969,6 +7969,610 @@ CmdPalette.COMMANDS.push({
   action:function(){ Browser.setView('workflow'); }
 });
 
+TableDialog.createDataViewState = function(draft, overrides){
+  return Object.assign({
+    loading: false,
+    loadingMore: false,
+    fetchingAll: false,
+    available: false,
+    columns: [],
+    rows: [],
+    rowCount: 0,
+    actualRowCount: 0,
+    loadedRows: 0,
+    totalRows: 0,
+    limit: 100,
+    offset: 0,
+    hasMore: false,
+    schema: (draft && draft.schema) || 'public',
+    table: (draft && draft.name) || '',
+    message: '',
+    syntheticSample: false,
+    syntheticSource: '',
+    previewStatus: 'idle',
+    primaryKeyColumns: [],
+    selectedRowIndex: -1,
+    editorMode: '',
+    editorRow: null,
+    originalRow: null,
+    editorDirty: false,
+    savingRow: false,
+    saveError: '',
+    pendingSelectionRow: null
+  }, overrides || {});
+};
+
+TableDialog.dataColumnKey = function(column){
+  return String((column && (column.column_name || column.name)) || '');
+};
+
+TableDialog.dataColumnType = function(column){
+  return String((column && (column.udt_name || column.data_type || column.type)) || '').toLowerCase();
+};
+
+TableDialog.dataColumnNullable = function(column){
+  var nullable = String((column && column.is_nullable) || '').toUpperCase();
+  if(nullable){
+    return nullable === 'YES';
+  }
+  return !!(column && column.nullable);
+};
+
+TableDialog.isGeneratedDataColumn = function(column){
+  return String((column && column.is_generated) || 'NEVER').toUpperCase() !== 'NEVER';
+};
+
+TableDialog.isIdentityDataColumn = function(column){
+  return String((column && column.is_identity) || 'NO').toUpperCase() === 'YES';
+};
+
+TableDialog.isBooleanDataColumn = function(column){
+  var type = this.dataColumnType(column);
+  return type === 'bool' || type === 'boolean';
+};
+
+TableDialog.isJsonDataColumn = function(column){
+  var type = this.dataColumnType(column);
+  return type === 'json' || type === 'jsonb';
+};
+
+TableDialog.isNumericDataColumn = function(column){
+  var type = this.dataColumnType(column);
+  return ['int2','int4','int8','integer','smallint','bigint','numeric','decimal','float4','float8','real','double precision','serial','bigserial','money'].indexOf(type) >= 0;
+};
+
+TableDialog.isTemporalDataColumn = function(column){
+  var type = this.dataColumnType(column);
+  return ['date','timestamp','timestamptz','timestamp without time zone','timestamp with time zone','time','timetz'].indexOf(type) >= 0;
+};
+
+TableDialog.isTextAreaDataColumn = function(column){
+  var type = this.dataColumnType(column);
+  return this.isJsonDataColumn(column) || type === 'text' || type === 'xml';
+};
+
+TableDialog.parseDefaultLiteral = function(column){
+  var raw = String((column && column.column_default) || '').trim();
+  var unwrapped;
+  if(!raw) return '';
+  if(/^(nextval|gen_random_uuid|uuid_generate_v4|uuidv7|now|current_timestamp)\s*\(/i.test(raw)){
+    return '';
+  }
+  raw = raw.replace(/::[\w\s\[\]\."]+$/g, '');
+  if(/^'(.*)'$/s.test(raw)){
+    unwrapped = raw.slice(1, -1).replace(/''/g, '\'');
+    return unwrapped;
+  }
+  if(/^true$/i.test(raw)) return true;
+  if(/^false$/i.test(raw)) return false;
+  if(/^null$/i.test(raw)) return null;
+  if(/^-?\d+(?:\.\d+)?$/.test(raw)) return raw;
+  return '';
+};
+
+TableDialog.buildEmptyDataRow = function(columns){
+  var row = {};
+  var self = this;
+  (columns || []).forEach(function(column){
+    var key = self.dataColumnKey(column);
+    var defaultValue;
+    if(!key || self.isGeneratedDataColumn(column)) return;
+    defaultValue = self.parseDefaultLiteral(column);
+    if(defaultValue === '' && self.isBooleanDataColumn(column) && !self.dataColumnNullable(column)){
+      defaultValue = false;
+    }
+    row[key] = defaultValue;
+  });
+  return row;
+};
+
+TableDialog.cloneRowForEditor = function(row, columns){
+  var next = {};
+  var self = this;
+  (columns || []).forEach(function(column){
+    var key = self.dataColumnKey(column);
+    if(!key) return;
+    next[key] = row && Object.prototype.hasOwnProperty.call(row, key) ? _clone(row[key]) : '';
+  });
+  return next;
+};
+
+TableDialog.canInsertDataRows = function(dataView){
+  return !!(dataView && dataView.available && (dataView.columns || []).length && dataView.syntheticSource !== 'draft');
+};
+
+TableDialog.canUpdateDataRows = function(dataView){
+  return !!(this.canInsertDataRows(dataView) && !dataView.syntheticSample && (dataView.rows || []).length && (dataView.primaryKeyColumns || []).length);
+};
+
+TableDialog.findDataRowIndex = function(rows, targetRow, primaryKeyColumns){
+  var index = -1;
+  if(!targetRow || !(rows || []).length) return -1;
+  if((primaryKeyColumns || []).length){
+    rows.some(function(row, rowIndex){
+      var matched = primaryKeyColumns.every(function(columnName){
+        return String(row && row[columnName]) === String(targetRow && targetRow[columnName]);
+      });
+      if(matched){
+        index = rowIndex;
+      }
+      return matched;
+    });
+    return index;
+  }
+  rows.some(function(row, rowIndex){
+    if(JSON.stringify(row) === JSON.stringify(targetRow)){
+      index = rowIndex;
+      return true;
+    }
+    return false;
+  });
+  return index;
+};
+
+TableDialog.ensureDataEditorState = function(dataView){
+  var row;
+  var matchedIndex;
+  if(!dataView) return;
+  if(typeof dataView.selectedRowIndex !== 'number') dataView.selectedRowIndex = -1;
+  if(typeof dataView.editorMode !== 'string') dataView.editorMode = '';
+  if(typeof dataView.editorDirty !== 'boolean') dataView.editorDirty = false;
+  if(typeof dataView.savingRow !== 'boolean') dataView.savingRow = false;
+  if(typeof dataView.saveError !== 'string') dataView.saveError = '';
+  if(!Array.isArray(dataView.primaryKeyColumns)) dataView.primaryKeyColumns = [];
+  if(dataView.pendingSelectionRow){
+    matchedIndex = this.findDataRowIndex(dataView.rows || [], dataView.pendingSelectionRow, dataView.primaryKeyColumns || []);
+    if(matchedIndex >= 0){
+      row = (dataView.rows || [])[matchedIndex];
+      dataView.selectedRowIndex = matchedIndex;
+      dataView.editorMode = 'update';
+      dataView.originalRow = this.cloneRowForEditor(row, dataView.columns || []);
+      dataView.editorRow = this.cloneRowForEditor(row, dataView.columns || []);
+      dataView.editorDirty = false;
+    }
+    dataView.pendingSelectionRow = null;
+  }
+  if(dataView.editorMode === 'insert' && !dataView.editorRow){
+    dataView.editorRow = this.buildEmptyDataRow(dataView.columns || []);
+  }
+  if(dataView.editorMode === 'update'){
+    if(dataView.selectedRowIndex < 0 || !(dataView.rows || [])[dataView.selectedRowIndex] || dataView.syntheticSample){
+      dataView.editorMode = '';
+      dataView.selectedRowIndex = -1;
+      dataView.editorRow = null;
+      dataView.originalRow = null;
+      dataView.editorDirty = false;
+    } else if(!dataView.editorDirty){
+      row = (dataView.rows || [])[dataView.selectedRowIndex];
+      dataView.originalRow = this.cloneRowForEditor(row, dataView.columns || []);
+      dataView.editorRow = this.cloneRowForEditor(row, dataView.columns || []);
+    }
+  }
+};
+
+TableDialog.selectDataRow = function(index){
+  var dataView = this.dataView;
+  var numericIndex = Number(index);
+  var row;
+  if(!dataView || !this.canUpdateDataRows(dataView)) return;
+  if(!Number.isFinite(numericIndex) || numericIndex < 0 || numericIndex >= (dataView.rows || []).length) return;
+  row = (dataView.rows || [])[numericIndex];
+  dataView.selectedRowIndex = numericIndex;
+  dataView.editorMode = 'update';
+  dataView.originalRow = this.cloneRowForEditor(row, dataView.columns || []);
+  dataView.editorRow = this.cloneRowForEditor(row, dataView.columns || []);
+  dataView.editorDirty = false;
+  dataView.saveError = '';
+  this.render();
+};
+
+TableDialog.startNewDataRow = function(){
+  var dataView = this.dataView;
+  if(!this.canInsertDataRows(dataView)) return;
+  dataView.selectedRowIndex = -1;
+  dataView.editorMode = 'insert';
+  dataView.originalRow = {};
+  dataView.editorRow = this.buildEmptyDataRow(dataView.columns || []);
+  dataView.editorDirty = false;
+  dataView.saveError = '';
+  this.render();
+};
+
+TableDialog.cancelDataEditor = function(){
+  var dataView = this.dataView;
+  if(!dataView) return;
+  if(dataView.editorMode === 'update' && dataView.selectedRowIndex >= 0 && (dataView.rows || [])[dataView.selectedRowIndex]){
+    dataView.editorRow = this.cloneRowForEditor((dataView.rows || [])[dataView.selectedRowIndex], dataView.columns || []);
+    dataView.originalRow = this.cloneRowForEditor((dataView.rows || [])[dataView.selectedRowIndex], dataView.columns || []);
+    dataView.editorDirty = false;
+    dataView.saveError = '';
+  } else {
+    dataView.editorMode = '';
+    dataView.selectedRowIndex = -1;
+    dataView.editorRow = null;
+    dataView.originalRow = null;
+    dataView.editorDirty = false;
+    dataView.saveError = '';
+  }
+  this.render();
+};
+
+TableDialog.updateDataEditorField = function(columnName, value){
+  var dataView = this.dataView;
+  if(!dataView || !dataView.editorRow) return;
+  if(value === '__NULL__'){
+    dataView.editorRow[columnName] = null;
+  } else if(value === '__TRUE__'){
+    dataView.editorRow[columnName] = true;
+  } else if(value === '__FALSE__'){
+    dataView.editorRow[columnName] = false;
+  } else {
+    dataView.editorRow[columnName] = value;
+  }
+  dataView.editorDirty = true;
+  dataView.saveError = '';
+};
+
+TableDialog.toggleDataEditorNull = function(columnName, checked){
+  var dataView = this.dataView;
+  if(!dataView || !dataView.editorRow) return;
+  if(checked){
+    dataView.editorRow[columnName] = null;
+  } else if(dataView.editorRow[columnName] == null){
+    dataView.editorRow[columnName] = '';
+  }
+  dataView.editorDirty = true;
+  dataView.saveError = '';
+  this.render();
+};
+
+TableDialog.coerceEditorValue = function(column, value, mode){
+  var type = this.dataColumnType(column);
+  var textValue;
+  if(value === null || typeof value === 'boolean'){
+    return value;
+  }
+  if(typeof value === 'number'){
+    return String(value);
+  }
+  textValue = String(value == null ? '' : value);
+  if(textValue === ''){
+    if(mode === 'insert' && (column && column.column_default) && !this.isGeneratedDataColumn(column)){
+      return '';
+    }
+    if(this.dataColumnNullable(column) && (this.isNumericDataColumn(column) || this.isTemporalDataColumn(column) || this.isJsonDataColumn(column) || type === 'uuid' || type === 'inet')){
+      return null;
+    }
+    return textValue;
+  }
+  if(this.isBooleanDataColumn(column)){
+    return /^(true|t|1|yes|y|on)$/i.test(textValue) ? true : false;
+  }
+  if(this.isJsonDataColumn(column)){
+    try{
+      return JSON.parse(textValue);
+    }catch(err){
+      throw new Error(_t('JSON không hợp lệ ở cột ', 'Invalid JSON in column ') + this.dataColumnKey(column));
+    }
+  }
+  return textValue;
+};
+
+TableDialog.serializeEditorRow = function(dataView){
+  var payload = {};
+  var mode = dataView && dataView.editorMode === 'update' ? 'update' : 'insert';
+  var self = this;
+  (dataView.columns || []).forEach(function(column){
+    var key = self.dataColumnKey(column);
+    var value;
+    if(!key || self.isGeneratedDataColumn(column)) return;
+    if(mode === 'update' && (dataView.primaryKeyColumns || []).indexOf(key) >= 0){
+      return;
+    }
+    value = dataView.editorRow && Object.prototype.hasOwnProperty.call(dataView.editorRow, key) ? dataView.editorRow[key] : '';
+    payload[key] = self.coerceEditorValue(column, value, mode);
+  });
+  return payload;
+};
+
+TableDialog.renderDataEditorField = function(column){
+  var dataView = this.dataView || {};
+  var key = this.dataColumnKey(column);
+  var value = dataView.editorRow && Object.prototype.hasOwnProperty.call(dataView.editorRow, key) ? dataView.editorRow[key] : '';
+  var readOnly = this.isGeneratedDataColumn(column) || (dataView.editorMode === 'update' && (dataView.primaryKeyColumns || []).indexOf(key) >= 0);
+  var allowNull = this.dataColumnNullable(column);
+  var isNull = value === null;
+  var hint = this.dataColumnType(column);
+  var controlHtml = '';
+  if(this.isBooleanDataColumn(column)){
+    controlHtml = '<select class="hm-input" onchange="TableDialog.updateDataEditorField(\'' + key + '\', this.value)"' + (readOnly ? ' disabled' : '') + '>'
+      + (allowNull ? '<option value="__NULL__"' + (isNull ? ' selected' : '') + '>NULL</option>' : '')
+      + '<option value="__TRUE__"' + (value === true ? ' selected' : '') + '>true</option>'
+      + '<option value="__FALSE__"' + (value === false || value === '' ? ' selected' : '') + '>false</option>'
+      + '</select>';
+  } else if(this.isTextAreaDataColumn(column)){
+    controlHtml = '<textarea class="hm-input ss-table-data-editor-textarea" oninput="TableDialog.updateDataEditorField(\'' + key + '\', this.value)"' + (readOnly || isNull ? ' disabled' : '') + '>' + _esc(isNull ? '' : String(value == null ? '' : value)) + '</textarea>';
+  } else {
+    controlHtml = '<input class="hm-input" type="text"' + (this.isNumericDataColumn(column) ? ' inputmode="decimal"' : '') + ' value="' + _esc(isNull ? '' : String(value == null ? '' : value)) + '" oninput="TableDialog.updateDataEditorField(\'' + key + '\', this.value)"' + (readOnly || isNull ? ' readonly' : '') + ' />';
+  }
+  return [
+    '<div class="ss-table-data-editor-field' + (readOnly ? ' is-readonly' : '') + '">',
+      '<div class="ss-table-data-editor-label-row"><label class="ss-table-data-editor-label">' + _esc(key) + '</label><span class="ss-table-data-editor-type">' + _esc(hint) + '</span></div>',
+      controlHtml,
+      (allowNull && !this.isBooleanDataColumn(column) && !readOnly ? '<label class="ss-table-data-editor-null"><input type="checkbox" onchange="TableDialog.toggleDataEditorNull(\'' + key + '\', this.checked)"' + (isNull ? ' checked' : '') + '>NULL</label>' : ''),
+    '</div>'
+  ].join('');
+};
+
+TableDialog.renderDataEditor = function(dataView){
+  var canInsert = this.canInsertDataRows(dataView);
+  var canUpdate = this.canUpdateDataRows(dataView);
+  var hasEditor = !!dataView.editorMode && !!dataView.editorRow;
+  var title = hasEditor
+    ? (dataView.editorMode === 'insert' ? _t('Tạo dòng mới', 'New row') : _t('Chỉnh sửa dòng đã chọn', 'Edit selected row'))
+    : _t('Trình sửa bản ghi', 'Record editor');
+  var subtitle = !canInsert
+    ? _t('Chỉ cho phép chỉnh dữ liệu khi bảng thật tồn tại trong database hiện tại.', 'Editing is available only when the real table exists in the current database.')
+    : (!canUpdate && (dataView.rows || []).length
+      ? _t('Bảng này chưa nhận diện được khóa chính nên chỉ hỗ trợ thêm dòng mới.', 'This table has no detected primary key, so only inserting new rows is enabled.')
+      : (dataView.syntheticSample && !dataView.actualRowCount
+        ? _t('Bảng chưa có dữ liệu thật. Hãy tạo dòng đầu tiên bên dưới.', 'This table has no real rows yet. Create the first row below.')
+        : _t('Chọn một dòng trong lưới để sửa, hoặc thêm dòng mới.', 'Select a row in the grid to edit it, or create a new row.')));
+  return [
+    '<aside class="ss-table-data-editor">',
+      '<div class="ss-table-data-editor-head">',
+        '<div><div class="ss-table-data-editor-title">' + _esc(title) + '</div><div class="ss-field-hint">' + _esc(subtitle) + '</div></div>',
+        '<div class="ss-table-data-editor-actions">',
+          '<button type="button" class="hm-btn hm-btn-secondary ss-btn-xs" onclick="TableDialog.startNewDataRow()"' + (canInsert ? '' : ' disabled') + '>' + _esc(_t('+ Thêm dòng mới', '+ New row')) + '</button>',
+          '<button type="button" class="hm-btn hm-btn-primary ss-btn-xs" onclick="TableDialog.saveDataEditorRow()"' + (hasEditor && !dataView.savingRow && (dataView.editorMode === 'insert' || canUpdate) ? '' : ' disabled') + '>' + _esc(dataView.savingRow ? _t('Đang lưu...', 'Saving...') : _t('Lưu dòng', 'Save row')) + '</button>',
+          '<button type="button" class="hm-btn hm-btn-ghost ss-btn-xs" onclick="TableDialog.cancelDataEditor()"' + (hasEditor ? '' : ' disabled') + '>' + _esc(_t('Hủy', 'Cancel')) + '</button>',
+        '</div>',
+      '</div>',
+      (dataView.saveError ? '<div class="ss-table-data-editor-error">' + _esc(dataView.saveError) + '</div>' : ''),
+      (hasEditor
+        ? '<div class="ss-table-data-editor-form">' + (dataView.columns || []).map(function(column){ return TableDialog.renderDataEditorField(column); }).join('') + '</div>'
+        : '<div class="ss-table-data-editor-empty">' + _esc(_t('Chưa có bản ghi nào được chọn để chỉnh sửa.', 'No record is currently selected for editing.')) + '</div>'),
+    '</aside>'
+  ].join('');
+};
+
+TableDialog.dataGridHtml = function(data){
+  var payload = data || {};
+  var rowOffset = Number(payload.offset) || 0;
+  var canSelectRows = this.canUpdateDataRows(payload);
+  if(payload.loading){
+    return '<div class="ss-table-dialog-empty">' + _esc(_t('Đang tải dữ liệu bảng...', 'Loading table data...')) + '</div>';
+  }
+  if(!payload.available){
+    return '<div class="ss-table-dialog-empty">' + _esc(payload.message || _t('Chưa lấy được dữ liệu của bảng này từ database hiện tại', 'Could not load table data from the current database')) + '</div>';
+  }
+  if(!(payload.columns || []).length){
+    return '<div class="ss-table-dialog-empty">' + _esc(_t('Không có cột nào để hiển thị', 'No columns to display')) + '</div>';
+  }
+  return [
+    '<div class="ss-table-dialog-data-wrap" tabindex="0">',
+      '<table class="ss-table-dialog-data-table">',
+        '<thead><tr><th class="ss-table-dialog-rownum">#</th>',
+          (payload.columns || []).map(function(col){
+            return '<th>' + _esc(TableDialog.dataColumnKey(col)) + '</th>';
+          }).join(''),
+        '</tr></thead>',
+        '<tbody>',
+          (payload.rows || []).length ? (payload.rows || []).map(function(row, rowIndex){
+            var absoluteIndex = rowOffset + rowIndex + 1;
+            var isSelected = Number(payload.selectedRowIndex) === rowIndex && payload.editorMode === 'update';
+            return '<tr class="' + (isSelected ? 'is-selected' : '') + (canSelectRows ? ' is-clickable' : '') + '"' + (canSelectRows ? ' onclick="TableDialog.selectDataRow(' + String(rowIndex) + ')"' : '') + '><td class="ss-table-dialog-rownum">' + String(absoluteIndex) + '</td>' + (payload.columns || []).map(function(col){
+              var key = TableDialog.dataColumnKey(col);
+              var value = row && Object.prototype.hasOwnProperty.call(row, key) ? row[key] : '';
+              if(value == null) value = '';
+              if(typeof value === 'object'){
+                value = JSON.stringify(value);
+              }
+              return '<td title="' + _esc(String(value)) + '">' + _esc(String(value)) + '</td>';
+            }).join('') + '</tr>';
+          }).join('')
+          : '<tr><td colspan="' + String(((payload.columns || []).length || 1) + 1) + '">' + _esc(_t('Bảng này hiện chưa có dòng dữ liệu nào. Hãy thêm dòng đầu tiên.', 'This table currently has no rows. Create the first one.')) + '</td></tr>',
+        '</tbody>',
+      '</table>',
+    '</div>'
+  ].join('');
+};
+
+TableDialog.saveDataEditorRow = function(){
+  var dataView = this.dataView;
+  var draft = this.collectForm() || this.ensureDraft();
+  var self = this;
+  var mode;
+  var payload;
+  if(!dataView || !dataView.editorRow || !draft) return Promise.resolve(null);
+  if(!this.canInsertDataRows(dataView)){
+    dataView.saveError = _t('Bảng này chưa sẵn sàng để ghi dữ liệu thật vào database.', 'This table is not ready for live database writes yet.');
+    this.render();
+    return Promise.resolve(null);
+  }
+  mode = dataView.editorMode === 'update' ? 'update' : 'insert';
+  if(mode === 'update' && !this.canUpdateDataRows(dataView)){
+    dataView.saveError = _t('Bảng này chưa có khóa chính để cập nhật dòng hiện hữu.', 'This table has no primary key for updating existing rows.');
+    this.render();
+    return Promise.resolve(null);
+  }
+  try{
+    payload = this.serializeEditorRow(dataView);
+  }catch(err){
+    dataView.saveError = err && err.message ? err.message : _t('Không thể chuẩn hóa dữ liệu dòng hiện tại.', 'Could not normalize the current row.');
+    this.render();
+    return Promise.resolve(null);
+  }
+  dataView.savingRow = true;
+  dataView.saveError = '';
+  this.render();
+  return _api('schema_studio_table_row_save', {
+    schema: draft.schema || 'public',
+    table: draft.name,
+    mode: mode,
+    row: payload,
+    original: mode === 'update' ? (dataView.originalRow || {}) : {}
+  }, 'POST').then(function(res){
+    var savedRow = res && res.row ? res.row : {};
+    var nextIndex = dataView.selectedRowIndex;
+    dataView.savingRow = false;
+    dataView.primaryKeyColumns = (res && res.primaryKeyColumns) || dataView.primaryKeyColumns || [];
+    if(mode === 'insert'){
+      if(dataView.syntheticSample && !dataView.actualRowCount){
+        dataView.rows = [savedRow];
+      } else {
+        dataView.rows = [savedRow].concat(dataView.rows || []);
+        nextIndex = 0;
+      }
+      dataView.syntheticSample = false;
+      dataView.syntheticSource = '';
+      dataView.actualRowCount = Math.max(1, (Number(dataView.actualRowCount) || 0) + 1);
+      dataView.totalRows = Math.max(1, (Number(dataView.totalRows) || 0) + 1);
+      dataView.loadedRows = Math.max((dataView.rows || []).length, Number(dataView.loadedRows) || 0);
+      dataView.selectedRowIndex = nextIndex < 0 ? 0 : nextIndex;
+    } else {
+      if(nextIndex >= 0 && (dataView.rows || [])[nextIndex]){
+        dataView.rows[nextIndex] = savedRow;
+      } else {
+        nextIndex = self.findDataRowIndex(dataView.rows || [], savedRow, dataView.primaryKeyColumns || []);
+        if(nextIndex >= 0 && (dataView.rows || [])[nextIndex]){
+          dataView.rows[nextIndex] = savedRow;
+          dataView.selectedRowIndex = nextIndex;
+        }
+      }
+    }
+    dataView.rowCount = (dataView.rows || []).length;
+    dataView.editorMode = 'update';
+    dataView.originalRow = self.cloneRowForEditor(savedRow, dataView.columns || []);
+    dataView.editorRow = self.cloneRowForEditor(savedRow, dataView.columns || []);
+    dataView.editorDirty = false;
+    toast(mode === 'insert' ? _t('Đã thêm dòng dữ liệu mới', 'New row inserted') : _t('Đã cập nhật dòng dữ liệu', 'Row updated'), 'success');
+    self.render();
+    return res;
+  }).catch(function(err){
+    dataView.savingRow = false;
+    dataView.saveError = err && err.message ? err.message : _t('Không thể lưu dòng dữ liệu này.', 'Could not save this row.');
+    self.render();
+    return null;
+  });
+};
+
+TableDialog.renderDataTab = function(draft){
+  var dataView = this.dataView || this.createDataViewState(draft, {});
+  var shownRows;
+  var totalRows;
+  var totalRowsLabel;
+  this.ensureDataEditorState(dataView);
+  shownRows = (dataView.rows || []).length;
+  totalRows = Math.max(0, Number(dataView.totalRows) || 0);
+  totalRowsLabel = dataView.syntheticSample
+    ? _t('0 dòng thật', '0 real rows')
+    : String(totalRows) + ' ' + _t('dòng thật', 'real rows');
+  return [
+    '<div class="ss-table-dialog-section ss-table-data-panel">',
+      '<div class="ss-table-dialog-section-head">',
+        '<div>',
+          '<div class="ss-table-dialog-section-title">' + _esc(_t('Dữ liệu bảng', 'Table data')) + '</div>',
+          '<div class="ss-field-hint">' + _esc(this.dataHint(dataView)) + '</div>',
+        '</div>',
+        '<div class="ss-table-dialog-inline-actions">',
+          '<span class="ss-field-hint">' + String((dataView.columns || []).length) + ' ' + _esc(_t('field', 'fields')) + '</span>',
+          '<button type="button" class="hm-btn hm-btn-secondary ss-btn-xs ss-table-data-action-primary" onclick="TableDialog.refreshDataView()">' + _esc(_t('Làm mới', 'Refresh')) + '</button>',
+          '<button type="button" class="hm-btn hm-btn-secondary ss-btn-xs" onclick="TableDialog.loadMoreDataView()"' + (dataView.hasMore && !dataView.loadingMore && !dataView.fetchingAll ? '' : ' disabled') + '>' + _esc(dataView.loadingMore ? _t('Đang tải...', 'Loading...') : _t('Tải thêm', 'Load more')) + '</button>',
+          '<button type="button" class="hm-btn hm-btn-secondary ss-btn-xs" onclick="TableDialog.loadAllDataView()"' + (dataView.hasMore && !dataView.fetchingAll ? '' : ' disabled') + '>' + _esc(dataView.fetchingAll ? _t('Đang tải toàn bộ...', 'Loading all...') : _t('Tải toàn bộ', 'Load all')) + '</button>',
+        '</div>',
+      '</div>',
+      '<div class="ss-table-data-toolbar">',
+        '<div class="ss-table-data-meta">',
+          '<span class="ss-table-data-pill">' + _esc(_t('Giới hạn / lần tải', 'Batch size')) + ': ' + String(Number(dataView.limit) || 100) + '</span>',
+          '<span class="ss-table-data-pill">' + _esc(_t('Số dòng đang hiển thị', 'Rows shown')) + ': ' + String(shownRows) + '</span>',
+          '<span class="ss-table-data-pill">' + _esc(_t('Số field', 'Field count')) + ': ' + String((dataView.columns || []).length) + '</span>',
+          '<span class="ss-table-data-pill">' + _esc(totalRowsLabel) + '</span>',
+          (dataView.syntheticSample ? '<span class="ss-table-data-pill is-sample">' + _esc(_t('1 dòng mẫu', '1 sample row')) + '</span>' : ''),
+        '</div>',
+        '<div class="ss-table-data-nav">',
+          '<div class="ss-table-data-page">' + _esc(dataView.syntheticSample ? _t('Dữ liệu mẫu', 'Sample data') : _t('Đã tải ' + shownRows + ' / ' + totalRows + ' dòng', 'Loaded ' + shownRows + ' / ' + totalRows + ' rows')) + '</div>',
+          '<div class="ss-table-data-nav-actions">',
+            '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm' + ((Number(dataView.offset) || 0) > 0 && !dataView.loading ? '' : ' is-disabled') + '" onclick="TableDialog.loadDataView(' + String(Number(dataView.limit) || 100) + ',' + String(Math.max(0, (Number(dataView.offset) || 0) - (Number(dataView.limit) || 100))) + ',false)"' + (((Number(dataView.offset) || 0) > 0 && !dataView.loading) ? '' : ' disabled') + '>' + _esc(_t('Trang trước', 'Previous')) + '</button>',
+            '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm' + (dataView.hasMore && !dataView.loadingMore && !dataView.fetchingAll ? '' : ' is-disabled') + '" onclick="TableDialog.loadMoreDataView()"' + (dataView.hasMore && !dataView.loadingMore && !dataView.fetchingAll ? '' : ' disabled') + '>' + _esc(_t('Trang sau', 'Next')) + '</button>',
+          '</div>',
+        '</div>',
+      '</div>',
+      '<div class="ss-table-data-layout">',
+        '<div class="ss-table-data-grid-pane">' + this.dataGridHtml(dataView) + '</div>',
+        this.renderDataEditor(dataView),
+      '</div>',
+    '</div>'
+  ].join('');
+};
+
+Browser.startDomainSplit = function(ev){
+  var browserEl = refs.browser;
+  var rect;
+  function cleanup(persist){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    Browser._activeSplitCleanup = null;
+    if(persist) saveUiPrefs();
+  }
+  function clampRatio(value){
+    return Math.max(0.18, Math.min(0.42, value));
+  }
+  function onMove(moveEv){
+    var ratio;
+    if(!browserEl) return;
+    ratio = clampRatio((moveEv.clientY - rect.top) / Math.max(rect.height, 1));
+    STORE.browser.domainSplit = ratio;
+    STORE.browser.domainSplitManual = true;
+    browserEl.classList.add('has-domain-split');
+    browserEl.classList.add('has-manual-split');
+    browserEl.style.setProperty('--ss-domain-top', Math.round(ratio * 100) + '%');
+  }
+  function onUp(){
+    cleanup(true);
+    Browser.render();
+  }
+  if(!browserEl || STORE.browser.view !== 'domains'){
+    return;
+  }
+  ev.preventDefault();
+  rect = browserEl.getBoundingClientRect();
+  if(Browser._activeSplitCleanup){
+    Browser._activeSplitCleanup(false);
+  }
+  onMove(ev);
+  Browser._activeSplitCleanup = cleanup;
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+};
+
+Browser.adjustDomainSplit = function(nextRatio){
+  STORE.browser.domainSplit = Math.max(0.18, Math.min(0.42, Number(nextRatio) || 0.28));
+  STORE.browser.domainSplitManual = true;
+  saveUiPrefs();
+  Browser.render();
+};
+
 window.STORE = STORE;
 window.Canvas = Canvas;
 window.EdgeLayer = EdgeLayer;
@@ -7988,7 +8592,7 @@ window.TableDialog = TableDialog;
 window.Diagnostics = Diagnostics;
 window.switchMode = switchMode;
 window.SchemaStudio = {
-  buildId:'20260405ac',
+  buildId:'20260405ah',
   init:init,
   destroy:destroy,
   getDiagnostics:function(){ return Diagnostics.snapshot(); },

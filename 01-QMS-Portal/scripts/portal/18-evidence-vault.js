@@ -1,4 +1,4 @@
-/* ===================================================================
+﻿/* ===================================================================
    18-evidence-vault.js
    HESEM QMS Portal - Evidence Vault
    Secure evidence storage with chain-of-custody, hash verification,
@@ -8,7 +8,7 @@
 (function(){
 'use strict';
 
-/* ── helpers ──────────────────────────────────────────── */
+/* â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function _esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(v==null?'':v))); return d.innerHTML; }
 function _api(action, payload, method){
@@ -20,37 +20,41 @@ function _fmtDate(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTim
 function _fmtDateTime(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):_fmtDate(v)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function _fmtSize(bytes){ if(!bytes) return '-'; if(bytes<1024) return bytes+' B'; if(bytes<1048576) return (bytes/1024).toFixed(1)+' KB'; return (bytes/1048576).toFixed(1)+' MB'; }
 
-/* ── constants ────────────────────────────────────────── */
+/* â”€â”€ constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 var STYLE_ID = 'ev-styles';
+function _hasExternalStylesheet(hrefPart){
+  try{ return !!document.querySelector('link[rel="stylesheet"][href*="'+hrefPart+'"]'); }
+  catch(_){ return false; }
+}
 var TABS = [
-  { key:'browse',    vi:'Duyệt',        en:'Browse' },
-  { key:'upload',    vi:'Tải lên',       en:'Upload' },
-  { key:'detail',    vi:'Chi tiết',      en:'Detail' },
-  { key:'search',    vi:'Tìm kiếm',     en:'Search' },
-  { key:'integrity', vi:'Toàn vẹn',      en:'Integrity' }
+  { key:'browse',    vi:'Duyá»‡t',        en:'Browse' },
+  { key:'upload',    vi:'Táº£i lÃªn',       en:'Upload' },
+  { key:'detail',    vi:'Chi tiáº¿t',      en:'Detail' },
+  { key:'search',    vi:'TÃ¬m kiáº¿m',     en:'Search' },
+  { key:'integrity', vi:'ToÃ n váº¹n',      en:'Integrity' }
 ];
 
 var EV_TYPES = {
-  photo:       { vi:'Ảnh',          en:'Photo',        icon:'\ud83d\udcf7' },
+  photo:       { vi:'áº¢nh',          en:'Photo',        icon:'\ud83d\udcf7' },
   video:       { vi:'Video',        en:'Video',        icon:'\ud83c\udfac' },
-  document:    { vi:'Tài liệu',     en:'Document',     icon:'\ud83d\udcc4' },
-  measurement: { vi:'Đo lường',     en:'Measurement',  icon:'\ud83d\udccf' },
-  machine_log: { vi:'Log máy',      en:'Machine Log',  icon:'\ud83d\udda5\ufe0f' },
-  cert:        { vi:'Chứng chỉ',    en:'Certificate',  icon:'\ud83d\udee1\ufe0f' }
+  document:    { vi:'TÃ i liá»‡u',     en:'Document',     icon:'\ud83d\udcc4' },
+  measurement: { vi:'Äo lÆ°á»ng',     en:'Measurement',  icon:'\ud83d\udccf' },
+  machine_log: { vi:'Log mÃ¡y',      en:'Machine Log',  icon:'\ud83d\udda5\ufe0f' },
+  cert:        { vi:'Chá»©ng chá»‰',    en:'Certificate',  icon:'\ud83d\udee1\ufe0f' }
 };
 
 var CUSTODY_ACTIONS = {
-  uploaded:  { vi:'Đã tải lên',     en:'Uploaded',     color:'#3b82f6' },
-  viewed:    { vi:'Đã xem',        en:'Viewed',       color:'#8b5cf6' },
-  linked:    { vi:'Đã liên kết',    en:'Linked',       color:'#f59e0b' },
-  verified:  { vi:'Đã xác minh',    en:'Verified',     color:'#22c55e' },
-  modified:  { vi:'Đã sửa',        en:'Modified',     color:'#ef4444' },
-  downloaded:{ vi:'Đã tải xuống',   en:'Downloaded',   color:'#06b6d4' }
+  uploaded:  { vi:'ÄÃ£ táº£i lÃªn',     en:'Uploaded',     color:'var(--blue,#2563eb)' },
+  viewed:    { vi:'ÄÃ£ xem',        en:'Viewed',       color:'var(--purple,#8b5cf6)' },
+  linked:    { vi:'ÄÃ£ liÃªn káº¿t',    en:'Linked',       color:'var(--amber,#f59e0b)' },
+  verified:  { vi:'ÄÃ£ xÃ¡c minh',    en:'Verified',     color:'var(--green,#22c55e)' },
+  modified:  { vi:'ÄÃ£ sá»­a',        en:'Modified',     color:'var(--red,#ef4444)' },
+  downloaded:{ vi:'ÄÃ£ táº£i xuá»‘ng',   en:'Downloaded',   color:'var(--cyan,#06b6d4)' }
 };
 
 var ALLOWED_TYPES = ['image/jpeg','image/png','image/gif','image/webp','application/pdf','video/mp4','video/quicktime','text/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-excel','text/plain','application/json'];
 
-/* ── state ────────────────────────────────────────────── */
+/* â”€â”€ state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 var state = {
   container: null,
   activeTab: 'browse',
@@ -69,8 +73,9 @@ var state = {
   verifyProgress: 0
 };
 
-/* ── CSS injection ────────────────────────────────────── */
+/* â”€â”€ CSS injection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _ensureStyles(){
+  if(_hasExternalStylesheet('styles/evidence-vault.css') || _hasExternalStylesheet('evidence-vault.css')) return;
   if(document.getElementById(STYLE_ID)) return;
   var s=document.createElement('style'); s.id=STYLE_ID;
   s.textContent=[
@@ -95,7 +100,7 @@ function _ensureStyles(){
     '.ev-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
     '.ev-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
     '.ev-btn-secondary:hover{background:#e2e8f0}',
-    '.ev-btn-success{background:#22c55e;color:#fff}',
+    '.ev-btn-success{background:var(--green,#22c55e);color:#fff}',
     '.ev-btn-success:hover{background:#16a34a}',
     '.ev-dropzone{border:2px dashed var(--border,#d1d5db);border-radius:12px;padding:40px;text-align:center;transition:border-color .15s,background .15s;cursor:pointer}',
     '.ev-dropzone.drag-over{border-color:var(--brand,#1565c0);background:rgba(21,101,192,.04)}',
@@ -135,20 +140,20 @@ function _ensureStyles(){
   document.head.appendChild(s);
 }
 
-/* ── type helpers ─────────────────────────────────────── */
+/* â”€â”€ type helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _typeIcon(type){
   var m=EV_TYPES[type];
   return m?m.icon:'\ud83d\udcc4';
 }
 function _typeBadge(type){
   var m=EV_TYPES[type]||{vi:type,en:type,icon:'\ud83d\udcc4'};
-  return '<span class="ev-badge" style="background:var(--brand,#1565c0)">'+m.icon+' '+_esc(_t(m.vi,m.en))+'</span>';
+  return '<span class="ev-badge" style="background:var(--ev-primary,var(--brand-2,#1565c0))">'+m.icon+' '+_esc(_t(m.vi,m.en))+'</span>';
 }
 
-/* ── tab: browse ──────────────────────────────────────── */
+/* â”€â”€ tab: browse â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderBrowseTab(){
   var html=_renderFilters();
-  if(!state.evidence.length) return html+'<div class="ev-empty">'+_t('Chưa có bằng chứng','No evidence found')+'</div>';
+  if(!state.evidence.length) return html+'<div class="ev-empty">'+_t('ChÆ°a cÃ³ báº±ng chá»©ng','No evidence found')+'</div>';
 
   html+='<div class="ev-grid">';
   state.evidence.forEach(function(item){
@@ -176,75 +181,75 @@ function _renderBrowseTab(){
 function _renderFilters(){
   var f=state.filters;
   var html='<div class="ev-filters">';
-  html+='<select data-filter="type"><option value="all">'+_t('Tất cả loại','All Types')+'</option>';
+  html+='<select data-filter="type"><option value="all">'+_t('Táº¥t cáº£ loáº¡i','All Types')+'</option>';
   Object.keys(EV_TYPES).forEach(function(k){var m=EV_TYPES[k]; html+='<option value="'+k+'"'+(f.type===k?' selected':'')+'>'+m.icon+' '+_esc(_t(m.vi,m.en))+'</option>';});
   html+='</select>';
-  html+='<input type="date" data-filter="dateFrom" value="'+_esc(f.dateFrom)+'" title="'+_t('Từ ngày','From')+'">';
-  html+='<input type="date" data-filter="dateTo" value="'+_esc(f.dateTo)+'" title="'+_t('Đến ngày','To')+'">';
-  html+='<input type="text" data-filter="linkedTo" placeholder="'+_t('Liên kết (NCR, SO...)','Linked to (NCR, SO...)')+'" value="'+_esc(f.linkedTo)+'" style="width:180px">';
+  html+='<input type="date" data-filter="dateFrom" value="'+_esc(f.dateFrom)+'" title="'+_t('Tá»« ngÃ y','From')+'">';
+  html+='<input type="date" data-filter="dateTo" value="'+_esc(f.dateTo)+'" title="'+_t('Äáº¿n ngÃ y','To')+'">';
+  html+='<input type="text" data-filter="linkedTo" placeholder="'+_t('LiÃªn káº¿t (NCR, SO...)','Linked to (NCR, SO...)')+'" value="'+_esc(f.linkedTo)+'" style="width:180px">';
   html+='</div>';
   return html;
 }
 
-/* ── tab: upload ──────────────────────────────────────── */
+/* â”€â”€ tab: upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderUploadTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Tải bằng chứng lên','Upload Evidence')+'</h3>';
+  var html='<h3 style="margin:0 0 16px">'+_t('Táº£i báº±ng chá»©ng lÃªn','Upload Evidence')+'</h3>';
 
   html+='<div class="ev-dropzone" id="ev-dropzone">'
     +'<div class="ev-dropzone-icon">\ud83d\udce4</div>'
-    +'<div class="ev-dropzone-text">'+_t('Kéo thả file vào đây hoặc nhấp để chọn','Drag & drop files here or click to browse')+'</div>'
-    +'<div class="ev-dropzone-hint">'+_t('Hỗ trợ: ảnh, PDF, video, CSV, Excel','Supported: images, PDF, video, CSV, Excel')+'</div>'
+    +'<div class="ev-dropzone-text">'+_t('KÃ©o tháº£ file vÃ o Ä‘Ã¢y hoáº·c nháº¥p Ä‘á»ƒ chá»n','Drag & drop files here or click to browse')+'</div>'
+    +'<div class="ev-dropzone-hint">'+_t('Há»— trá»£: áº£nh, PDF, video, CSV, Excel','Supported: images, PDF, video, CSV, Excel')+'</div>'
     +'<input type="file" id="ev-file-input" style="display:none" multiple accept="'+ALLOWED_TYPES.join(',')+'">'
   +'</div>';
 
   if(state.uploading){
-    html+='<div style="margin-top:16px;text-align:center;color:var(--text-secondary)">'+_t('Đang tải lên...','Uploading...')+'</div>';
+    html+='<div style="margin-top:16px;text-align:center;color:var(--text-secondary)">'+_t('Äang táº£i lÃªn...','Uploading...')+'</div>';
   }
 
-  html+='<div class="ev-detail" style="margin-top:20px"><h4 style="margin:0 0 12px">'+_t('Thông tin bổ sung','Metadata')+'</h4>'
+  html+='<div class="ev-detail" style="margin-top:20px"><h4 style="margin:0 0 12px">'+_t('ThÃ´ng tin bá»• sung','Metadata')+'</h4>'
     +'<div class="ev-form">'
-      +'<div><label>'+_t('Tiêu đề','Title')+'</label><input type="text" id="ev-f-title"></div>'
-      +'<div><label>'+_t('Loại','Type')+'</label><select id="ev-f-type">';
+      +'<div><label>'+_t('TiÃªu Ä‘á»','Title')+'</label><input type="text" id="ev-f-title"></div>'
+      +'<div><label>'+_t('Loáº¡i','Type')+'</label><select id="ev-f-type">';
   Object.keys(EV_TYPES).forEach(function(k){var m=EV_TYPES[k]; html+='<option value="'+k+'">'+m.icon+' '+_esc(_t(m.vi,m.en))+'</option>';});
   html+='</select></div>'
     +'<div><label>'+_t('Tags','Tags')+'</label><input type="text" id="ev-f-tags" placeholder="'+_t('tag1, tag2...','tag1, tag2...')+'"></div>'
-    +'<div><label>'+_t('Liên kết','Linked To')+'</label><input type="text" id="ev-f-linked" placeholder="'+_t('NCR-001, SO-123...','NCR-001, SO-123...')+'"></div>'
-    +'<div style="grid-column:1/-1"><label>'+_t('Mô tả','Description')+'</label><textarea id="ev-f-desc"></textarea></div>'
+    +'<div><label>'+_t('LiÃªn káº¿t','Linked To')+'</label><input type="text" id="ev-f-linked" placeholder="'+_t('NCR-001, SO-123...','NCR-001, SO-123...')+'"></div>'
+    +'<div style="grid-column:1/-1"><label>'+_t('MÃ´ táº£','Description')+'</label><textarea id="ev-f-desc"></textarea></div>'
   +'</div>'
-  +'<div style="margin-top:12px"><button class="ev-btn ev-btn-primary" data-action="submit-upload">'+_t('Tải lên','Upload')+'</button></div>'
+  +'<div style="margin-top:12px"><button class="ev-btn ev-btn-primary" data-action="submit-upload">'+_t('Táº£i lÃªn','Upload')+'</button></div>'
   +'</div>';
   return html;
 }
 
-/* ── tab: detail ──────────────────────────────────────── */
+/* â”€â”€ tab: detail â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderDetailTab(){
   var item=state.selectedItem;
-  if(!item) return '<div class="ev-empty">'+_t('Chọn một bằng chứng để xem chi tiết','Select evidence to view details')+'</div>';
+  if(!item) return '<div class="ev-empty">'+_t('Chá»n má»™t báº±ng chá»©ng Ä‘á»ƒ xem chi tiáº¿t','Select evidence to view details')+'</div>';
 
   var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
     +'<h3 style="margin:0">'+_esc(item.title||item.filename||'-')+'</h3>'
-    +'<button class="ev-btn ev-btn-secondary" data-action="back-browse">'+_t('Quay lại','Back')+'</button>'
+    +'<button class="ev-btn ev-btn-secondary" data-action="back-browse">'+_t('Quay láº¡i','Back')+'</button>'
   +'</div>';
 
   /* preview */
   html+='<div class="ev-detail">';
   if(item.type==='photo'&&item.url){
-    html+='<div style="text-align:center;margin-bottom:16px"><img src="'+_esc(item.url)+'" style="max-width:100%;max-height:400px;border-radius:8px;border:1px solid var(--border,#e2e8f0)" alt="'+_esc(item.title)+'"></div>';
+    html+='<div style="text-align:center;margin-bottom:16px"><img src="'+_esc(item.url)+'" style="max-width:100%;max-height:400px;border-radius:var(--radius-lg,8px);border:var(--card-border-width,1px) solid var(--border,#e2e8f0)" alt="'+_esc(item.title)+'"></div>';
   } else {
     html+='<div style="text-align:center;padding:40px;font-size:4rem;opacity:.3">'+_typeIcon(item.type)+'</div>';
   }
 
   html+='<div class="ev-detail-grid">'
-    +'<div><div class="ev-detail-label">'+_t('Loại','Type')+'</div>'+_typeBadge(item.type)+'</div>'
-    +'<div><div class="ev-detail-label">'+_t('Kích thước','Size')+'</div>'+_esc(_fmtSize(item.file_size))+'</div>'
-    +'<div><div class="ev-detail-label">'+_t('Ngày tạo','Created')+'</div>'+_fmtDateTime(item.created_at)+'</div>'
-    +'<div><div class="ev-detail-label">'+_t('Người tạo','Created By')+'</div>'+_esc(item.created_by||'-')+'</div>'
-    +'<div><div class="ev-detail-label">'+_t('Tên file','Filename')+'</div>'+_esc(item.filename||'-')+'</div>'
+    +'<div><div class="ev-detail-label">'+_t('Loáº¡i','Type')+'</div>'+_typeBadge(item.type)+'</div>'
+    +'<div><div class="ev-detail-label">'+_t('KÃ­ch thÆ°á»›c','Size')+'</div>'+_esc(_fmtSize(item.file_size))+'</div>'
+    +'<div><div class="ev-detail-label">'+_t('NgÃ y táº¡o','Created')+'</div>'+_fmtDateTime(item.created_at)+'</div>'
+    +'<div><div class="ev-detail-label">'+_t('NgÆ°á»i táº¡o','Created By')+'</div>'+_esc(item.created_by||'-')+'</div>'
+    +'<div><div class="ev-detail-label">'+_t('TÃªn file','Filename')+'</div>'+_esc(item.filename||'-')+'</div>'
     +'<div><div class="ev-detail-label">'+_t('Hash SHA-256','SHA-256 Hash')+'</div><span style="font-family:monospace;font-size:.6875rem;word-break:break-all">'+_esc(item.hash||'-')+'</span></div>'
   +'</div>';
 
   if(item.description){
-    html+='<div style="margin-top:12px"><div class="ev-detail-label">'+_t('Mô tả','Description')+'</div>'+_esc(item.description)+'</div>';
+    html+='<div style="margin-top:12px"><div class="ev-detail-label">'+_t('MÃ´ táº£','Description')+'</div>'+_esc(item.description)+'</div>';
   }
 
   /* tags */
@@ -258,23 +263,23 @@ function _renderDetailTab(){
   /* linked entities */
   var linked=item.linked_entities||[];
   if(linked.length){
-    html+='<div style="margin-top:12px"><div class="ev-detail-label">'+_t('Liên kết','Linked Entities')+'</div><div class="ev-linked-tags">';
+    html+='<div style="margin-top:12px"><div class="ev-detail-label">'+_t('LiÃªn káº¿t','Linked Entities')+'</div><div class="ev-linked-tags">';
     linked.forEach(function(le){ html+='<span class="ev-linked-tag">'+_esc(le.type||'')+': '+_esc(le.id||le.label||'')+'</span>'; });
     html+='</div></div>';
   }
   html+='</div>';
 
   /* chain of custody */
-  html+='<div class="ev-detail"><h4 style="margin:0 0 12px">'+_t('Chuỗi lưu giữ','Chain of Custody')+'</h4>';
+  html+='<div class="ev-detail"><h4 style="margin:0 0 12px">'+_t('Chuá»—i lÆ°u giá»¯','Chain of Custody')+'</h4>';
   var custody=state.custody;
   if(!custody.length){
-    html+='<div class="ev-empty">'+_t('Chưa có dữ liệu','No custody data')+'</div>';
+    html+='<div class="ev-empty">'+_t('ChÆ°a cÃ³ dá»¯ liá»‡u','No custody data')+'</div>';
   } else {
     html+='<div class="ev-timeline">';
     custody.forEach(function(entry){
-      var act=CUSTODY_ACTIONS[entry.action]||{vi:entry.action,en:entry.action,color:'#64748b'};
+      var act=CUSTODY_ACTIONS[entry.action]||{vi:entry.action,en:entry.action,color:'var(--text-secondary,#64748b)'};
       html+='<div class="ev-timeline-item" style="border-left-color:'+act.color+'">'
-        +'<div style="position:absolute;left:-22px;top:14px;width:10px;height:10px;border-radius:50%;background:'+act.color+';border:2px solid #fff"></div>'
+        +'<div style="position:absolute;left:-22px;top:14px;width:10px;height:10px;border-radius:50%;background:'+act.color+';border:2px solid var(--bg-surface,#fff)"></div>'
         +'<div style="display:flex;justify-content:space-between;align-items:center">'
           +'<strong>'+_esc(_t(act.vi,act.en))+'</strong>'
           +'<span style="font-size:.6875rem;color:var(--text-secondary)">'+_fmtDateTime(entry.timestamp)+'</span>'
@@ -287,24 +292,24 @@ function _renderDetailTab(){
   html+='</div>';
 
   /* link new entity */
-  html+='<div class="ev-detail"><h4 style="margin:0 0 10px">'+_t('Liên kết thêm','Link to Entity')+'</h4>'
+  html+='<div class="ev-detail"><h4 style="margin:0 0 10px">'+_t('LiÃªn káº¿t thÃªm','Link to Entity')+'</h4>'
     +'<div style="display:flex;gap:8px;align-items:center">'
-      +'<input type="text" id="ev-link-entity" placeholder="'+_t('VD: NCR-001, SO-456','e.g. NCR-001, SO-456')+'" style="flex:1;padding:8px 10px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:.8125rem">'
-      +'<button class="ev-btn ev-btn-primary" data-action="link-entity" data-id="'+_esc(item.id)+'">'+_t('Liên kết','Link')+'</button>'
+      +'<input type="text" id="ev-link-entity" placeholder="'+_t('VD: NCR-001, SO-456','e.g. NCR-001, SO-456')+'" style="flex:1;min-height:0;height:auto;padding:var(--input-padding-y,0px) var(--hds-control-px,10px);border:var(--input-border-width,1px) solid var(--border,#d1d5db);border-radius:var(--hds-control-radius,var(--radius-md,6px));font-size:var(--hds-control-font,13px);background:var(--input-bg,var(--bg-surface,#fff));color:var(--text-primary,#0f172a)">'
+      +'<button class="ev-btn ev-btn-primary" data-action="link-entity" data-id="'+_esc(item.id)+'">'+_t('LiÃªn káº¿t','Link')+'</button>'
     +'</div></div>';
   return html;
 }
 
-/* ── tab: search ──────────────────────────────────────── */
+/* â”€â”€ tab: search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderSearchTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Tìm kiếm bằng chứng','Search Evidence')+'</h3>';
+  var html='<h3 style="margin:0 0 16px">'+_t('TÃ¬m kiáº¿m báº±ng chá»©ng','Search Evidence')+'</h3>';
   html+='<div style="display:flex;gap:8px;margin-bottom:16px">'
-    +'<input type="text" id="ev-search-input" placeholder="'+_t('Nhập từ khóa...','Enter keywords...')+'" value="'+_esc(state.searchQuery)+'" style="flex:1;padding:10px 12px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:.875rem">'
-    +'<button class="ev-btn ev-btn-primary" data-action="do-search">'+_t('Tìm','Search')+'</button>'
+    +'<input type="text" id="ev-search-input" placeholder="'+_t('Nháº­p tá»« khÃ³a...','Enter keywords...')+'" value="'+_esc(state.searchQuery)+'" style="flex:1;min-height:0;height:auto;padding:var(--input-padding-y,0px) var(--hds-control-px,12px);border:var(--input-border-width,1px) solid var(--border,#d1d5db);border-radius:var(--hds-control-radius,var(--radius-md,6px));font-size:var(--hds-control-font,14px);background:var(--input-bg,var(--bg-surface,#fff));color:var(--text-primary,#0f172a)">'
+    +'<button class="ev-btn ev-btn-primary" data-action="do-search">'+_t('TÃ¬m','Search')+'</button>'
   +'</div>';
 
   if(!state.searchResults.length&&state.searchQuery){
-    html+='<div class="ev-empty">'+_t('Không tìm thấy kết quả','No results found')+'</div>';
+    html+='<div class="ev-empty">'+_t('KhÃ´ng tÃ¬m tháº¥y káº¿t quáº£','No results found')+'</div>';
   } else {
     state.searchResults.forEach(function(item){
       var snippet=item.snippet||item.description||'';
@@ -328,16 +333,16 @@ function _renderSearchTab(){
   return html;
 }
 
-/* ── tab: integrity ───────────────────────────────────── */
+/* â”€â”€ tab: integrity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderIntegrityTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Xác minh toàn vẹn','Integrity Verification')+'</h3>';
+  var html='<h3 style="margin:0 0 16px">'+_t('XÃ¡c minh toÃ n váº¹n','Integrity Verification')+'</h3>';
   html+='<div class="ev-detail">'
-    +'<p style="font-size:.8125rem;color:var(--text-secondary)">'+_t('Kiểm tra chuỗi hash để xác minh toàn vẹn dữ liệu. Mỗi bằng chứng có SHA-256 hash và liên kết theo chuỗi.','Verify the hash chain to ensure data integrity. Each evidence item has a SHA-256 hash linked in sequence.')+'</p>'
-    +'<button class="ev-btn ev-btn-primary" data-action="verify-chain"'+(state.verifying?' disabled':'')+'>'+_t('Bắt đầu xác minh','Start Verification')+'</button>'
+    +'<p style="font-size:.8125rem;color:var(--text-secondary)">'+_t('Kiá»ƒm tra chuá»—i hash Ä‘á»ƒ xÃ¡c minh toÃ n váº¹n dá»¯ liá»‡u. Má»—i báº±ng chá»©ng cÃ³ SHA-256 hash vÃ  liÃªn káº¿t theo chuá»—i.','Verify the hash chain to ensure data integrity. Each evidence item has a SHA-256 hash linked in sequence.')+'</p>'
+    +'<button class="ev-btn ev-btn-primary" data-action="verify-chain"'+(state.verifying?' disabled':'')+'>'+_t('Báº¯t Ä‘áº§u xÃ¡c minh','Start Verification')+'</button>'
   +'</div>';
 
   if(state.verifying){
-    html+='<div class="ev-detail"><h4 style="margin:0 0 8px">'+_t('Đang xác minh...','Verifying...')+'</h4>'
+    html+='<div class="ev-detail"><h4 style="margin:0 0 8px">'+_t('Äang xÃ¡c minh...','Verifying...')+'</h4>'
       +'<div class="ev-progress"><div class="ev-progress-fill" style="width:'+state.verifyProgress+'%"></div></div>'
       +'<div style="text-align:center;font-size:.8125rem;color:var(--text-secondary)">'+state.verifyProgress+'%</div>'
     +'</div>';
@@ -346,7 +351,7 @@ function _renderIntegrityTab(){
   if(state.chainValid!==null){
     var chains=state.chainValid;
     if(Array.isArray(chains)&&chains.length){
-      html+='<div class="ev-detail"><h4 style="margin:0 0 12px">'+_t('Kết quả','Results')+'</h4>';
+      html+='<div class="ev-detail"><h4 style="margin:0 0 12px">'+_t('Káº¿t quáº£','Results')+'</h4>';
       var allValid=true;
       html+='<div class="ev-chain">';
       chains.forEach(function(link, idx){
@@ -357,42 +362,42 @@ function _renderIntegrityTab(){
           +'<span style="font-weight:700;width:30px">#'+(idx+1)+'</span>'
           +'<span style="flex:1">'+_esc(link.title||link.id||'-')+'</span>'
           +'<span class="ev-chain-hash" title="'+_esc(link.hash||'')+'">'+_esc((link.hash||'').substring(0,16))+'...</span>'
-          +'<span style="font-weight:700;color:'+(valid?'#22c55e':'#ef4444')+'">'+(valid?'\u2713':'\u2717')+'</span>'
+          +'<span style="font-weight:700;color:'+(valid?'var(--green,#22c55e)':'var(--red,#ef4444)')+'">'+(valid?'\u2713':'\u2717')+'</span>'
         +'</div>';
       });
       html+='</div>';
-      html+='<div style="margin-top:12px;padding:12px;border-radius:8px;font-weight:700;text-align:center;'+(allValid?'background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0':'background:#fef2f2;color:#dc2626;border:1px solid #fecaca')+'">'
+      html+='<div style="margin-top:12px;padding:12px;border-radius:var(--radius-lg,8px);font-weight:700;text-align:center;'+(allValid?'background:color-mix(in srgb, var(--green,#22c55e) 10%, var(--bg-surface,#fff));color:color-mix(in srgb, var(--green,#22c55e) 82%, #000);border:1px solid color-mix(in srgb, var(--green,#22c55e) 26%, var(--border,#e2e8f0))':'background:color-mix(in srgb, var(--red,#ef4444) 10%, var(--bg-surface,#fff));color:color-mix(in srgb, var(--red,#ef4444) 82%, #000);border:1px solid color-mix(in srgb, var(--red,#ef4444) 26%, var(--border,#e2e8f0))')+'">'
         +(allValid?_t('Chuoi hash HOP LE - Toan ven du lieu duoc dam bao','Hash chain VALID - Data integrity verified'):_t('Chuoi hash KHONG HOP LE - Phat hien thay doi trai phep','Hash chain INVALID - Tampering detected'))
       +'</div>';
       html+='</div>';
     } else if(chains===true){
-      html+='<div class="ev-detail" style="background:#f0fdf4;border-color:#bbf7d0;text-align:center;padding:24px">'
+      html+='<div class="ev-detail" style="background:color-mix(in srgb, var(--green,#22c55e) 10%, var(--bg-surface,#fff));border-color:color-mix(in srgb, var(--green,#22c55e) 26%, var(--border,#e2e8f0));text-align:center;padding:24px">'
         +'<div style="font-size:2rem;margin-bottom:8px">\u2705</div>'
-        +'<div style="font-weight:800;color:#16a34a">'+_t('Toan ven duoc xac minh','Integrity Verified')+'</div>'
+        +'<div style="font-weight:800;color:color-mix(in srgb, var(--green,#22c55e) 82%, #000)">'+_t('Toan ven duoc xac minh','Integrity Verified')+'</div>'
       +'</div>';
     } else {
-      html+='<div class="ev-detail" style="background:#fef2f2;border-color:#fecaca;text-align:center;padding:24px">'
+      html+='<div class="ev-detail" style="background:color-mix(in srgb, var(--red,#ef4444) 10%, var(--bg-surface,#fff));border-color:color-mix(in srgb, var(--red,#ef4444) 26%, var(--border,#e2e8f0));text-align:center;padding:24px">'
         +'<div style="font-size:2rem;margin-bottom:8px">\u274c</div>'
-        +'<div style="font-weight:800;color:#dc2626">'+_t('Phat hien van de toan ven','Integrity Issue Detected')+'</div>'
+        +'<div style="font-weight:800;color:color-mix(in srgb, var(--red,#ef4444) 82%, #000)">'+_t('Phat hien van de toan ven','Integrity Issue Detected')+'</div>'
       +'</div>';
     }
   }
   return html;
 }
 
-/* ── paging ───────────────────────────────────────────── */
+/* â”€â”€ paging â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderPaging(){
   var p=state.pagination;
   var page=Math.floor(p.offset/p.limit)+1;
   var pages=Math.max(1,Math.ceil(p.total/p.limit));
   return '<div class="ev-paging">'
-    +'<button data-action="page-prev"'+(page<=1?' disabled':'')+'>'+_t('Trước','Prev')+'</button>'
+    +'<button data-action="page-prev"'+(page<=1?' disabled':'')+'>'+_t('TrÆ°á»›c','Prev')+'</button>'
     +'<span>'+page+' / '+pages+' ('+p.total+')</span>'
     +'<button data-action="page-next"'+(page>=pages?' disabled':'')+'>'+_t('Sau','Next')+'</button>'
   +'</div>';
 }
 
-/* ── data loading ─────────────────────────────────────── */
+/* â”€â”€ data loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _loadEvidence(){
   state.loading=true; _paint();
   var p=Object.assign({}, state.filters, {offset:state.pagination.offset, limit:state.pagination.limit});
@@ -403,7 +408,7 @@ function _loadEvidence(){
       state.pagination.total=r.total||0;
     }
     _paint();
-  }).catch(function(){ state.loading=false; _toast(_t('Lỗi kết nối','Connection error'),'error'); _paint(); });
+  }).catch(function(){ state.loading=false; _toast(_t('Lá»—i káº¿t ná»‘i','Connection error'),'error'); _paint(); });
 }
 
 function _loadDetail(id){
@@ -413,10 +418,10 @@ function _loadDetail(id){
       state.custody=r.custody||[];
       state.activeTab='detail';
     } else {
-      _toast(_t('Không tìm thấy','Not found'),'error');
+      _toast(_t('KhÃ´ng tÃ¬m tháº¥y','Not found'),'error');
     }
     _paint();
-  }).catch(function(){ _toast(_t('Lỗi kết nối','Connection error'),'error'); });
+  }).catch(function(){ _toast(_t('Lá»—i káº¿t ná»‘i','Connection error'),'error'); });
 }
 
 function _doSearch(){
@@ -441,7 +446,7 @@ function _doUpload(files){
   for(var i=0;i<files.length;i++){
     var file=files[i];
     if(ALLOWED_TYPES.indexOf(file.type)<0){
-      _toast(_t('Loại file không hỗ trợ: ','Unsupported file type: ')+file.name,'error');
+      _toast(_t('Loáº¡i file khÃ´ng há»— trá»£: ','Unsupported file type: ')+file.name,'error');
       continue;
     }
     formData.append('files[]', file);
@@ -459,14 +464,14 @@ function _doUpload(files){
   fetch(url,{method:'POST',credentials:'include',headers:headers,body:formData}).then(function(r){return r.json();}).then(function(r){
     state.uploading=false;
     if(r&&r.ok){
-      _toast(_t('Tải lên thành công','Upload successful'),'success');
+      _toast(_t('Táº£i lÃªn thÃ nh cÃ´ng','Upload successful'),'success');
       state.activeTab='browse';
       _loadEvidence();
     } else {
-      _toast(r&&r.message?r.message:_t('Lỗi tải lên','Upload failed'),'error');
+      _toast(r&&r.message?r.message:_t('Lá»—i táº£i lÃªn','Upload failed'),'error');
       _paint();
     }
-  }).catch(function(){ state.uploading=false; _toast(_t('Lỗi kết nối','Connection error'),'error'); _paint(); });
+  }).catch(function(){ state.uploading=false; _toast(_t('Lá»—i káº¿t ná»‘i','Connection error'),'error'); _paint(); });
 }
 
 function _verifyChain(){
@@ -490,12 +495,12 @@ function _verifyChain(){
     clearInterval(progress);
     state.verifying=false;
     state.chainValid=false;
-    _toast(_t('Lỗi xác minh','Verification error'),'error');
+    _toast(_t('Lá»—i xÃ¡c minh','Verification error'),'error');
     _paint();
   });
 }
 
-/* ── main paint ───────────────────────────────────────── */
+/* â”€â”€ main paint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _paint(){
   if(!state.container) return;
   var html='<div class="ev">';
@@ -505,7 +510,7 @@ function _paint(){
   });
   html+='</div>';
   if(state.loading&&state.activeTab!=='integrity'){
-    html+='<div class="ev-empty">'+_t('Đang tải...','Loading...')+'</div>';
+    html+='<div class="ev-empty">'+_t('Äang táº£i...','Loading...')+'</div>';
   } else {
     switch(state.activeTab){
       case 'browse':    html+=_renderBrowseTab(); break;
@@ -520,7 +525,7 @@ function _paint(){
   _bindDropzone();
 }
 
-/* ── dropzone binding ─────────────────────────────────── */
+/* â”€â”€ dropzone binding â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _bindDropzone(){
   var dz=state.container.querySelector('#ev-dropzone');
   var fi=state.container.querySelector('#ev-file-input');
@@ -537,7 +542,7 @@ function _bindDropzone(){
   });
 }
 
-/* ── event delegation ─────────────────────────────────── */
+/* â”€â”€ event delegation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _bind(){
   state.container.addEventListener('click', function(e){
     var t=e.target.closest('[data-action]');
@@ -565,7 +570,7 @@ function _bind(){
         if(fi&&fi.files&&fi.files.length){
           _doUpload(fi.files);
         } else {
-          _toast(_t('Chưa chọn file','No file selected'),'error');
+          _toast(_t('ChÆ°a chá»n file','No file selected'),'error');
         }
         break;
       case 'do-search':
@@ -579,11 +584,11 @@ function _bind(){
       case 'link-entity':
         var eId=t.getAttribute('data-id');
         var entityVal=(state.container.querySelector('#ev-link-entity')||{}).value||'';
-        if(!entityVal){ _toast(_t('Nhập entity','Enter entity'),'error'); break; }
+        if(!entityVal){ _toast(_t('Nháº­p entity','Enter entity'),'error'); break; }
         _api('evidence_link',{id:eId,entity:entityVal}).then(function(r){
-          if(r&&r.ok){_toast(_t('Đã liên kết','Linked'),'success');_loadDetail(eId);}
-          else {_toast(_t('Lỗi','Error'),'error');}
-        }).catch(function(){_toast(_t('Lỗi kết nối','Connection error'),'error');});
+          if(r&&r.ok){_toast(_t('ÄÃ£ liÃªn káº¿t','Linked'),'success');_loadDetail(eId);}
+          else {_toast(_t('Lá»—i','Error'),'error');}
+        }).catch(function(){_toast(_t('Lá»—i káº¿t ná»‘i','Connection error'),'error');});
         break;
       case 'page-prev':
         state.pagination.offset=Math.max(0,state.pagination.offset-state.pagination.limit);
@@ -612,7 +617,7 @@ function _bind(){
   });
 }
 
-/* ── entry point ──────────────────────────────────────── */
+/* â”€â”€ entry point â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function render(container){
   _ensureStyles();
   state.container=container;
@@ -630,3 +635,4 @@ function render(container){
 window._renderEvidenceVault = render;
 
 })();
+

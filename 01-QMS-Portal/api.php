@@ -11344,8 +11344,22 @@ function clear_auth_session_state(): void {
     $_SESSION['enroll_user'],
     $_SESSION['enroll_secret'],
     $_SESSION['enroll_started'],
-    $_SESSION['last_active']
+    $_SESSION['last_active'],
+    $_SESSION['user_scope'],
+    $_SESSION['org_scope']
   );
+}
+
+function extract_user_scope(array $user): array {
+  $scope = [];
+  foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+    $value = $user[$field] ?? null;
+    if (!is_scalar($value)) continue;
+    $text = trim((string)$value);
+    if ($text === '') continue;
+    $scope[$field] = $text;
+  }
+  return $scope;
 }
 
 function set_preauth_session(string $username): void {
@@ -11357,13 +11371,18 @@ function set_preauth_session(string $username): void {
   $_SESSION['mfa_ok'] = false;
 }
 
-function set_authenticated_session(string $username): void {
+function set_authenticated_session(string $username, array $user = []): void {
   if (session_status() !== PHP_SESSION_ACTIVE) session_init();
   session_regenerate_id(true);
   clear_auth_session_state();
   $_SESSION['user'] = strtolower(trim($username));
   $_SESSION['mfa_ok'] = true;
   $_SESSION['last_active'] = time();
+  $scope = extract_user_scope($user);
+  if ($scope !== []) {
+    $_SESSION['user_scope'] = $scope;
+    $_SESSION['org_scope'] = $scope;
+  }
 }
 
 function destroy_auth_session(): void {
@@ -12502,6 +12521,10 @@ function sanitize_user_for_client(array $user): array {
     'cccd'     => (string)($user['cccd'] ?? ''),
     'phone'    => (string)($user['phone'] ?? ''),
     'personal_email' => (string)($user['personal_email'] ?? ''),
+    'org_company_code' => (string)($user['org_company_code'] ?? ''),
+    'org_legal_entity_code' => (string)($user['org_legal_entity_code'] ?? ''),
+    'org_plant_id' => (string)($user['org_plant_id'] ?? ''),
+    'org_site_id' => (string)($user['org_site_id'] ?? ''),
     'mfa'      => ['enabled' => (bool)(($user['mfa']['enabled'] ?? false))],
     'updated_at' => (string)($user['updated_at'] ?? ''),
     'created_at' => (string)($user['created_at'] ?? ''),
@@ -14883,6 +14906,10 @@ case 'doc_save_draft': {
     $cccd = trim((string)($data['cccd'] ?? ''));
     $phone = trim((string)($data['phone'] ?? ''));
     $personal_email = trim((string)($data['personal_email'] ?? ''));
+    $orgCompanyCode = trim((string)($data['org_company_code'] ?? ''));
+    $orgLegalEntityCode = trim((string)($data['org_legal_entity_code'] ?? ''));
+    $orgPlantId = trim((string)($data['org_plant_id'] ?? ''));
+    $orgSiteId = trim((string)($data['org_site_id'] ?? ''));
 
     $passwordProvided = isset($data['password']) && trim((string)$data['password']) !== '';
     $plainPassword = $passwordProvided ? (string)$data['password'] : null;
@@ -14906,6 +14933,10 @@ case 'doc_save_draft': {
         $users[$i]['cccd'] = $cccd;
         $users[$i]['phone'] = $phone;
         $users[$i]['personal_email'] = $personal_email;
+        $users[$i]['org_company_code'] = $orgCompanyCode;
+        $users[$i]['org_legal_entity_code'] = $orgLegalEntityCode;
+        $users[$i]['org_plant_id'] = $orgPlantId;
+        $users[$i]['org_site_id'] = $orgSiteId;
         $users[$i]['updated_at'] = now_iso();
 
         if ($passwordProvided) {
@@ -14935,6 +14966,10 @@ case 'doc_save_draft': {
         'cccd' => $cccd,
         'phone' => $phone,
         'personal_email' => $personal_email,
+        'org_company_code' => $orgCompanyCode,
+        'org_legal_entity_code' => $orgLegalEntityCode,
+        'org_plant_id' => $orgPlantId,
+        'org_site_id' => $orgSiteId,
         'mfa' => ['enabled' => false],
         'created_at' => now_iso(),
         'updated_at' => now_iso(),
@@ -15065,7 +15100,7 @@ case 'auth_login': {
 
     // When system MFA is globally disabled, skip MFA entirely — just log in
     if (!$requireMfa) {
-      set_authenticated_session($username);
+      set_authenticated_session($username, $user);
       $user['last_login'] = now_iso();
       $user['updated_at'] = now_iso();
       update_user($store, $user);
@@ -15087,7 +15122,7 @@ case 'auth_login': {
       api_json(['ok' => false, 'error' => 'invalid_code'], 401);
     }
 
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
 
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
@@ -15144,7 +15179,7 @@ case 'auth_login': {
     }
 
     // No MFA required
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
     update_user($store, $user);
@@ -15205,7 +15240,7 @@ if ($username === '') {
 
     if (!totp_verify($secretB32, $code, 1, 30, 6)) api_json(['ok' => false, 'error' => 'invalid_code'], 401);
 
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
 
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
@@ -15261,7 +15296,7 @@ if ($username === '') {
       api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
     }
 
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
 
     api_json([
       'ok' => true,

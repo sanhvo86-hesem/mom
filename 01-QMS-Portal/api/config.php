@@ -41,7 +41,7 @@ return [
             'http://127.0.0.1:5173',
         ]),
         'allowed_methods' => $envList('QMS_API_ALLOWED_METHODS', ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
-        'allowed_headers' => $envList('QMS_API_ALLOWED_HEADERS', ['Content-Type', 'X-CSRF-Token', 'X-Requested-With', 'Authorization']),
+        'allowed_headers' => $envList('QMS_API_ALLOWED_HEADERS', ['Content-Type', 'X-CSRF-Token', 'X-Requested-With', 'Authorization', 'If-Match', 'X-Row-Version']),
         'max_age' => max(0, (int)(getenv('QMS_API_CORS_MAX_AGE') ?: 86400)),
         'allow_credentials' => $envBool('QMS_API_ALLOW_CREDENTIALS', true),
     ],

@@ -1,4 +1,4 @@
-/* ===================================================================
+﻿/* ===================================================================
    23-compliance-reports.js
    HESEM QMS Portal - Compliance Report Generation
    Management review, customer quality, supplier review, COPQ analysis,
@@ -8,7 +8,7 @@
 (function(){
 'use strict';
 
-/* ── helpers ──────────────────────────────────────────── */
+/* â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function _esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(v==null?'':v))); return d.innerHTML; }
 function _api(action, payload, method){
@@ -21,15 +21,19 @@ function _fmtDateTime(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.ge
 function _fmtCurrency(v){ if(v==null) return '-'; return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(v); }
 function _pct(v){ return (v==null?0:v).toFixed(1)+'%'; }
 
-/* ── constants ────────────────────────────────────────── */
+/* â”€â”€ constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 var STYLE_ID = 'cr-styles';
+function _hasExternalStylesheet(hrefPart){
+  try{ return !!document.querySelector('link[rel="stylesheet"][href*="'+hrefPart+'"]'); }
+  catch(_){ return false; }
+}
 var TABS = [
-  { key:'dashboard',   vi:'Tổng quan',        en:'Dashboard' },
-  { key:'mgmt_review', vi:'Xem xét lãnh đạo', en:'Management Review' },
-  { key:'customer',    vi:'Báo cáo KH',       en:'Customer Report' },
-  { key:'supplier',    vi:'Đánh giá NCC',     en:'Supplier Review' },
+  { key:'dashboard',   vi:'Tá»•ng quan',        en:'Dashboard' },
+  { key:'mgmt_review', vi:'Xem xÃ©t lÃ£nh Ä‘áº¡o', en:'Management Review' },
+  { key:'customer',    vi:'BÃ¡o cÃ¡o KH',       en:'Customer Report' },
+  { key:'supplier',    vi:'ÄÃ¡nh giÃ¡ NCC',     en:'Supplier Review' },
   { key:'copq',        vi:'COPQ',             en:'COPQ Analysis' },
-  { key:'evidence',    vi:'Gói chứng cứ',     en:'Evidence Package' }
+  { key:'evidence',    vi:'GÃ³i chá»©ng cá»©',     en:'Evidence Package' }
 ];
 
 var REPORT_ICONS = {
@@ -42,21 +46,21 @@ var REPORT_ICONS = {
 };
 
 var COPQ_COLORS = {
-  prevention:       '#22c55e',
-  appraisal:        '#3b82f6',
-  internal_failure: '#f59e0b',
-  external_failure: '#ef4444'
+  prevention:       'var(--green,#22c55e)',
+  appraisal:        'var(--blue,#3b82f6)',
+  internal_failure: 'var(--amber,#f59e0b)',
+  external_failure: 'var(--red,#ef4444)'
 };
 
-/* EVIDENCE_STATUS — đọc từ HmRegistry → 'evidence_status' */
+/* EVIDENCE_STATUS â€” Ä‘á»c tá»« HmRegistry â†’ 'evidence_status' */
 var EVIDENCE_STATUS = (function(){
   var map = {};
   if(window.HmRegistry){ HmRegistry.statusSet('evidence_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color,icon:o.icon||''}; }); }
-  if(!Object.keys(map).length){ map = {present:{vi:'Đạt',en:'Present',color:'#22c55e',icon:'✅'},missing:{vi:'Thiếu',en:'Missing',color:'#ef4444',icon:'❌'},pending:{vi:'Chờ',en:'Pending',color:'#f59e0b',icon:'⏳'}}; }
+  if(!Object.keys(map).length){ map = {present:{vi:'Äáº¡t',en:'Present',color:'var(--green,#22c55e)',icon:'âœ…'},missing:{vi:'Thiáº¿u',en:'Missing',color:'var(--red,#ef4444)',icon:'âŒ'},pending:{vi:'Chá»',en:'Pending',color:'var(--amber,#f59e0b)',icon:'â³'}}; }
   return map;
 })();
 
-/* ── state ────────────────────────────────────────────── */
+/* â”€â”€ state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 var state = {
   container: null,
   activeTab: 'dashboard',
@@ -82,8 +86,9 @@ function _currentQuarter(){
   return d.getFullYear()+'-Q'+q;
 }
 
-/* ── CSS injection ────────────────────────────────────── */
+/* â”€â”€ CSS injection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _ensureStyles(){
+  if(_hasExternalStylesheet('styles/compliance-reports.css') || _hasExternalStylesheet('compliance-reports.css')) return;
   if(document.getElementById(STYLE_ID)) return;
   var s=document.createElement('style'); s.id=STYLE_ID;
   s.textContent=[
@@ -115,7 +120,7 @@ function _ensureStyles(){
     '.cr-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
     '.cr-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
     '.cr-btn-secondary:hover{background:#e2e8f0}',
-    '.cr-btn-success{background:#22c55e;color:#fff}',
+    '.cr-btn-success{background:var(--green,#22c55e);color:#fff}',
     '.cr-btn-success:hover{background:#16a34a}',
     '.cr-btn:disabled{opacity:.5;cursor:not-allowed}',
     '.cr-section{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:20px;margin-bottom:16px}',
@@ -161,16 +166,16 @@ function _ensureStyles(){
   document.head.appendChild(s);
 }
 
-/* ── badge / KPI helpers ─────────────────────────────── */
+/* â”€â”€ badge / KPI helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _kpiCard(label, value, color){
   return '<div class="cr-kpi"><div class="cr-kpi-label">'+_esc(label)+'</div><div class="cr-kpi-value" style="color:'+(color||'inherit')+'">'+_esc(value)+'</div></div>';
 }
 
 function _statusBadge(text, color){
-  return '<span class="cr-badge" style="background:'+(color||'#64748b')+'">'+_esc(text)+'</span>';
+  return '<span class="cr-badge" style="background:'+(color||'var(--text-secondary,#64748b)')+'">'+_esc(text)+'</span>';
 }
 
-/* ── CSS bar chart ───────────────────────────────────── */
+/* â”€â”€ CSS bar chart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _barChart(items, maxVal, colorFn){
   if(!items||!items.length) return '<div class="cr-empty">'+_t('Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u','No data')+'</div>';
   if(!maxVal){ maxVal=0; items.forEach(function(it){ if(it.value>maxVal) maxVal=it.value; }); }
@@ -189,7 +194,7 @@ function _barChart(items, maxVal, colorFn){
   return html;
 }
 
-/* ── stacked bar (COPQ categories) ───────────────────── */
+/* â”€â”€ stacked bar (COPQ categories) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _stackedBar(segments, total){
   if(!total) return '';
   var html='<div class="cr-stacked-row">';
@@ -202,7 +207,7 @@ function _stackedBar(segments, total){
   return html;
 }
 
-/* ── trend chart (12-month vertical bars) ────────────── */
+/* â”€â”€ trend chart (12-month vertical bars) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _trendChart(months){
   if(!months||!months.length) return '<div class="cr-empty">'+_t('Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u','No data')+'</div>';
   var maxVal=0;
@@ -228,21 +233,21 @@ function _trendChart(months){
   return html;
 }
 
-/* ── completeness ring (SVG donut) ───────────────────── */
+/* â”€â”€ completeness ring (SVG donut) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _completenessRing(pct){
   var r=34, circ=2*Math.PI*r;
   var fill=circ*(pct/100);
-  var color=pct>=100?'#22c55e':pct>=70?'#f59e0b':'#ef4444';
+  var color=pct>=100?'var(--green,#22c55e)':pct>=70?'var(--amber,#f59e0b)':'var(--red,#ef4444)';
   return '<div class="cr-completeness-ring">'
     +'<svg width="80" height="80" viewBox="0 0 80 80">'
-    +'<circle cx="40" cy="40" r="'+r+'" fill="none" stroke="#e2e8f0" stroke-width="6"/>'
+    +'<circle cx="40" cy="40" r="'+r+'" fill="none" stroke="var(--border,#e2e8f0)" stroke-width="6"/>'
     +'<circle cx="40" cy="40" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="6" stroke-dasharray="'+fill.toFixed(1)+' '+(circ-fill).toFixed(1)+'" stroke-linecap="round"/>'
     +'</svg>'
     +'<div class="cr-completeness-pct" style="color:'+color+'">'+Math.round(pct)+'%</div>'
     +'</div>';
 }
 
-/* ── period selector HTML ────────────────────────────── */
+/* â”€â”€ period selector HTML â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _periodSelector(){
   var y=new Date().getFullYear();
   var opts='';
@@ -255,7 +260,7 @@ function _periodSelector(){
   return '<select data-filter="period">'+opts+'</select>';
 }
 
-/* ── TABS ─────────────────────────────────────────────── */
+/* â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderTabs(){
   var html='<div class="cr-tabs">';
   TABS.forEach(function(tab){
@@ -265,7 +270,7 @@ function _renderTabs(){
   return html;
 }
 
-/* ── TAB: Dashboard ──────────────────────────────────── */
+/* â”€â”€ TAB: Dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderDashboardTab(){
   var html='';
 
@@ -323,7 +328,7 @@ function _renderDashboardTab(){
   return html;
 }
 
-/* ── TAB: Management Review ──────────────────────────── */
+/* â”€â”€ TAB: Management Review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderMgmtReviewTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -343,12 +348,12 @@ function _renderMgmtReviewTab(){
 
   // KPI cards
   html+='<div class="cr-kpis">';
-  html+=_kpiCard('OTD',_pct(kpi.OTD),kpi.OTD>=95?'#22c55e':'#ef4444');
-  html+=_kpiCard('FPY',_pct(kpi.FPY),kpi.FPY>=98?'#22c55e':'#f59e0b');
-  html+=_kpiCard('COPQ',_fmtCurrency(kpi.COPQ),'#ef4444');
-  html+=_kpiCard('OEE',_pct(kpi.OEE),kpi.OEE>=85?'#22c55e':'#f59e0b');
-  html+=_kpiCard(_t('T\u1ef7 l\u1ec7 ph\u1ebf','Scrap Rate'),_pct(kpi.SCRAP_RATE),kpi.SCRAP_RATE<=2?'#22c55e':'#ef4444');
-  html+=_kpiCard(_t('\u0110\u00f3ng CAPA','CAPA Closure'),_pct(kpi.CAPA_CLOSURE),kpi.CAPA_CLOSURE>=90?'#22c55e':'#f59e0b');
+  html+=_kpiCard('OTD',_pct(kpi.OTD),kpi.OTD>=95?'var(--green,#22c55e)':'var(--red,#ef4444)');
+  html+=_kpiCard('FPY',_pct(kpi.FPY),kpi.FPY>=98?'var(--green,#22c55e)':'var(--amber,#f59e0b)');
+  html+=_kpiCard('COPQ',_fmtCurrency(kpi.COPQ),'var(--red,#ef4444)');
+  html+=_kpiCard('OEE',_pct(kpi.OEE),kpi.OEE>=85?'var(--green,#22c55e)':'var(--amber,#f59e0b)');
+  html+=_kpiCard(_t('T\u1ef7 l\u1ec7 ph\u1ebf','Scrap Rate'),_pct(kpi.SCRAP_RATE),kpi.SCRAP_RATE<=2?'var(--green,#22c55e)':'var(--red,#ef4444)');
+  html+=_kpiCard(_t('\u0110\u00f3ng CAPA','CAPA Closure'),_pct(kpi.CAPA_CLOSURE),kpi.CAPA_CLOSURE>=90?'var(--green,#22c55e)':'var(--amber,#f59e0b)');
   html+='</div>';
 
   // NCR trend
@@ -369,7 +374,7 @@ function _renderMgmtReviewTab(){
   var suppList=sec.supplier_performance||[];
   html+='<div class="cr-section"><h3>'+_t('Hi\u1ec7u su\u1ea5t NCC','Supplier Performance')+'</h3>';
   if(suppList.length>0){
-    var barItems=suppList.map(function(s){ return {label:s.vendor_name||s.vendor_id,value:s.overall_score||0,color:s.overall_score>=80?'#22c55e':s.overall_score>=60?'#f59e0b':'#ef4444'}; });
+    var barItems=suppList.map(function(s){ return {label:s.vendor_name||s.vendor_id,value:s.overall_score||0,color:s.overall_score>=80?'var(--green,#22c55e)':s.overall_score>=60?'var(--amber,#f59e0b)':'var(--red,#ef4444)'}; });
     html+=_barChart(barItems,100);
   } else {
     html+='<div class="cr-empty">'+_t('Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u','No data')+'</div>';
@@ -393,7 +398,7 @@ function _renderMgmtReviewTab(){
   return html;
 }
 
-/* ── TAB: Customer Report ────────────────────────────── */
+/* â”€â”€ TAB: Customer Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderCustomerTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -415,9 +420,9 @@ function _renderCustomerTab(){
   var qm=sec.quality_metrics||{};
   var dp=sec.delivery_performance||{};
   html+='<div class="cr-kpis">';
-  html+=_kpiCard('PPM',String(qm.ppm||0),qm.ppm<=500?'#22c55e':'#ef4444');
-  html+=_kpiCard('FPY',_pct(qm.fpy_pct),'#3b82f6');
-  html+=_kpiCard('OTD',_pct(dp.otd_pct),dp.otd_pct>=95?'#22c55e':'#ef4444');
+  html+=_kpiCard('PPM',String(qm.ppm||0),qm.ppm<=500?'var(--green,#22c55e)':'var(--red,#ef4444)');
+  html+=_kpiCard('FPY',_pct(qm.fpy_pct),'var(--blue,#3b82f6)');
+  html+=_kpiCard('OTD',_pct(dp.otd_pct),dp.otd_pct>=95?'var(--green,#22c55e)':'var(--red,#ef4444)');
   html+='</div>';
 
   // CAPA status
@@ -446,15 +451,15 @@ function _renderCustomerTab(){
   var fai=sec.fai_status||{};
   html+='<div class="cr-section"><h3>'+_t('Tr\u1ea1ng th\u00e1i FAI','FAI Status')+'</h3>';
   html+='<div style="display:flex;gap:20px">';
-  html+=_kpiCard(_t('T\u1ed5ng','Total'),String(fai.total||0),'#475569');
-  html+=_kpiCard(_t('\u0110\u00e3 duy\u1ec7t','Approved'),String(fai.approved||0),'#22c55e');
-  html+=_kpiCard(_t('Ch\u1edd','Pending'),String(fai.pending||0),'#f59e0b');
+  html+=_kpiCard(_t('T\u1ed5ng','Total'),String(fai.total||0),'var(--text-secondary,#475569)');
+  html+=_kpiCard(_t('\u0110\u00e3 duy\u1ec7t','Approved'),String(fai.approved||0),'var(--green,#22c55e)');
+  html+=_kpiCard(_t('Ch\u1edd','Pending'),String(fai.pending||0),'var(--amber,#f59e0b)');
   html+='</div></div>';
 
   return html;
 }
 
-/* ── TAB: Supplier Review ────────────────────────────── */
+/* â”€â”€ TAB: Supplier Review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderSupplierTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -476,7 +481,7 @@ function _renderSupplierTab(){
   var trend=sec.scorecard_trend||[];
   html+='<div class="cr-section"><h3>'+_t('Xu h\u01b0\u1edbng \u0111i\u1ec3m s\u1ed1','Scorecard Trend')+'</h3>';
   if(trend.length>0){
-    var barItems=trend.map(function(t){ return {label:t.period||t.date||'-',value:t.score||t.overall||0,color:t.score>=80?'#22c55e':t.score>=60?'#f59e0b':'#ef4444'}; });
+    var barItems=trend.map(function(t){ return {label:t.period||t.date||'-',value:t.score||t.overall||0,color:t.score>=80?'var(--green,#22c55e)':t.score>=60?'var(--amber,#f59e0b)':'var(--red,#ef4444)'}; });
     html+=_barChart(barItems,100);
   } else {
     html+='<div class="cr-empty">'+_t('Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u','No data')+'</div>';
@@ -504,12 +509,12 @@ function _renderSupplierTab(){
     var passCount=0,failCount=0;
     incoming.forEach(function(i){ if(i.result==='pass'||i.status==='pass') passCount++; else failCount++; });
     html+='<div style="display:flex;gap:16px;margin-bottom:12px">';
-    html+=_kpiCard(_t('\u0110\u1ea1t','Pass'),String(passCount),'#22c55e');
-    html+=_kpiCard(_t('Kh\u00f4ng \u0111\u1ea1t','Fail'),String(failCount),'#ef4444');
+    html+=_kpiCard(_t('\u0110\u1ea1t','Pass'),String(passCount),'var(--green,#22c55e)');
+    html+=_kpiCard(_t('Kh\u00f4ng \u0111\u1ea1t','Fail'),String(failCount),'var(--red,#ef4444)');
     html+='</div>';
     html+='<table class="cr-table"><thead><tr><th>PO</th><th>'+_t('Ng\u00e0y','Date')+'</th><th>'+_t('K\u1ebft qu\u1ea3','Result')+'</th></tr></thead><tbody>';
     incoming.slice(0,10).forEach(function(i){
-      var color=i.result==='pass'||i.status==='pass'?'#22c55e':'#ef4444';
+      var color=i.result==='pass'||i.status==='pass'?'var(--green,#22c55e)':'var(--red,#ef4444)';
       html+='<tr><td>'+_esc(i.po_number||i.lot||'-')+'</td><td>'+_fmtDate(i.date)+'</td><td>'+_statusBadge(i.result||i.status||'-',color)+'</td></tr>';
     });
     html+='</tbody></table>';
@@ -533,7 +538,7 @@ function _renderSupplierTab(){
   return html;
 }
 
-/* ── TAB: COPQ Analysis ──────────────────────────────── */
+/* â”€â”€ TAB: COPQ Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderCopqTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -552,11 +557,11 @@ function _renderCopqTab(){
 
   // Total COPQ
   html+='<div class="cr-kpis">';
-  html+=_kpiCard(_t('T\u1ed5ng COPQ','Total COPQ'),_fmtCurrency(sec.total_copq||0),'#ef4444');
-  html+=_kpiCard(_t('Ph\u00f2ng ng\u1eeba','Prevention'),_pct((sec.prevention||{}).pct),'#22c55e');
-  html+=_kpiCard(_t('\u0110\u00e1nh gi\u00e1','Appraisal'),_pct((sec.appraisal||{}).pct),'#3b82f6');
-  html+=_kpiCard(_t('L\u1ed7i n\u1ed9i b\u1ed9','Internal'),_pct((sec.internal_failure||{}).pct),'#f59e0b');
-  html+=_kpiCard(_t('L\u1ed7i b\u00ean ngo\u00e0i','External'),_pct((sec.external_failure||{}).pct),'#ef4444');
+  html+=_kpiCard(_t('T\u1ed5ng COPQ','Total COPQ'),_fmtCurrency(sec.total_copq||0),'var(--red,#ef4444)');
+  html+=_kpiCard(_t('Ph\u00f2ng ng\u1eeba','Prevention'),_pct((sec.prevention||{}).pct),'var(--green,#22c55e)');
+  html+=_kpiCard(_t('\u0110\u00e1nh gi\u00e1','Appraisal'),_pct((sec.appraisal||{}).pct),'var(--blue,#3b82f6)');
+  html+=_kpiCard(_t('L\u1ed7i n\u1ed9i b\u1ed9','Internal'),_pct((sec.internal_failure||{}).pct),'var(--amber,#f59e0b)');
+  html+=_kpiCard(_t('L\u1ed7i b\u00ean ngo\u00e0i','External'),_pct((sec.external_failure||{}).pct),'var(--red,#ef4444)');
   html+='</div>';
 
   // Stacked bar
@@ -583,7 +588,7 @@ function _renderCopqTab(){
   if(byDefect.length>0){
     html+='<div class="cr-section"><h3>'+_t('Pareto theo lo\u1ea1i l\u1ed7i','Pareto by Defect Type')+'</h3>';
     var maxCost=byDefect[0]?byDefect[0].cost:1;
-    var barItems=byDefect.map(function(d){ return {label:d.label,value:d.cost,display:_fmtCurrency(d.cost),color:'#ef4444'}; });
+    var barItems=byDefect.map(function(d){ return {label:d.label,value:d.cost,display:_fmtCurrency(d.cost),color:'var(--red,#ef4444)'}; });
     html+=_barChart(barItems,maxCost);
     html+='</div>';
   }
@@ -592,7 +597,7 @@ function _renderCopqTab(){
   if(byMachine.length>0){
     html+='<div class="cr-section"><h3>'+_t('Pareto theo m\u00e1y','Pareto by Machine')+'</h3>';
     var mMax=byMachine[0]?byMachine[0].cost:1;
-    var mItems=byMachine.map(function(d){ return {label:d.label,value:d.cost,display:_fmtCurrency(d.cost),color:'#f59e0b'}; });
+    var mItems=byMachine.map(function(d){ return {label:d.label,value:d.cost,display:_fmtCurrency(d.cost),color:'var(--amber,#f59e0b)'}; });
     html+=_barChart(mItems,mMax);
     html+='</div>';
   }
@@ -624,7 +629,7 @@ function _renderCopqTab(){
   return html;
 }
 
-/* ── TAB: Evidence Package ───────────────────────────── */
+/* â”€â”€ TAB: Evidence Package â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _renderEvidenceTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -653,9 +658,9 @@ function _renderEvidenceTab(){
   html+='<div>'+_esc(totalPres)+' / '+_esc(totalReq)+' '+_t('lo\u1ea1i ch\u1ee9ng c\u1ee9','evidence types')+'</div>';
   html+='<div style="margin-top:4px;font-size:.8125rem">'+_esc(summary.total_items||0)+' '+_t('t\u00e0i li\u1ec7u','documents')+'</div>';
   if(d.complete){
-    html+='<div style="margin-top:8px;color:#22c55e;font-weight:700">'+_t('\u0110\u1ea7y \u0111\u1ee7 - s\u1eb5n s\u00e0ng giao','Complete - ready to ship')+'</div>';
+    html+='<div style="margin-top:8px;color:var(--green,#22c55e);font-weight:700">'+_t('\u0110\u1ea7y \u0111\u1ee7 - s\u1eb5n s\u00e0ng giao','Complete - ready to ship')+'</div>';
   } else {
-    html+='<div style="margin-top:8px;color:#ef4444;font-weight:700">'+_t('Thi\u1ebfu ch\u1ee9ng c\u1ee9','Missing evidence')+'</div>';
+    html+='<div style="margin-top:8px;color:var(--red,#ef4444);font-weight:700">'+_t('Thi\u1ebfu ch\u1ee9ng c\u1ee9','Missing evidence')+'</div>';
   }
   html+='</div></div></div>';
 
@@ -673,7 +678,7 @@ function _renderEvidenceTab(){
     var secItems=items.filter(function(it){ return it.type===key; });
     var icon=isMissing?'\u274c':'\u2705';
     var statusText=isMissing?_t('Thi\u1ebfu','Missing'):_t('\u0110\u1ea1t','Present')+' ('+secItems.length+')';
-    var statusColor=isMissing?'#ef4444':'#22c55e';
+    var statusColor=isMissing?'var(--red,#ef4444)':'var(--green,#22c55e)';
 
     html+='<li>';
     html+='<div class="cr-check-icon">'+icon+'</div>';
@@ -693,7 +698,7 @@ function _renderEvidenceTab(){
   return html;
 }
 
-/* ── paint ────────────────────────────────────────────── */
+/* â”€â”€ paint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _paint(){
   if(!state.container) return;
   var html='<div class="cr">';
@@ -714,7 +719,7 @@ function _paint(){
   state.container.innerHTML=html;
 }
 
-/* ── data loading ─────────────────────────────────────── */
+/* â”€â”€ data loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _loadData(){
   // Load report types from config
   _api('compliance_report_list',{},'POST').then(function(res){
@@ -756,7 +761,7 @@ function _generate(action, payload, targetKey){
   });
 }
 
-/* ── tab routing from report type cards ──────────────── */
+/* â”€â”€ tab routing from report type cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 var REPORT_TAB_MAP = {
   management_review: 'mgmt_review',
   customer_quality:  'customer',
@@ -766,7 +771,7 @@ var REPORT_TAB_MAP = {
   evidence_package:  'evidence'
 };
 
-/* ── event binding ────────────────────────────────────── */
+/* â”€â”€ event binding â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function _bind(){
   state.container.addEventListener('click', function(e){
     var el=e.target.closest('[data-tab]');
@@ -832,7 +837,7 @@ function _bind(){
   });
 }
 
-/* ── entry point ──────────────────────────────────────── */
+/* â”€â”€ entry point â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function render(container){
   _ensureStyles();
   state.container=container;
@@ -851,3 +856,4 @@ function render(container){
 window._renderComplianceReports = render;
 
 })();
+

@@ -215,6 +215,24 @@ try {
 $resolvedForm = require_existing_online_form('FRM-131');
 smoke_assert(($resolvedForm['code'] ?? null) === 'FRM-131', 'Legacy form helper did not resolve existing form fixture.');
 
+// Authenticated sessions should preserve org scope when the user record provides it.
+smoke_reset_request_state();
+set_authenticated_session('scoped-user', [
+    'org_company_code' => 'HESEM',
+    'org_legal_entity_code' => 'VN01',
+    'org_plant_id' => 'PLANT01',
+    'org_site_id' => 'SITE01',
+]);
+smoke_assert(($_SESSION['user_scope']['org_company_code'] ?? null) === 'HESEM', 'Authenticated session did not retain user scope.');
+smoke_assert(($_SESSION['org_scope']['org_site_id'] ?? null) === 'SITE01', 'Authenticated session did not retain org scope mirror.');
+smoke_assert((sanitize_user_for_client([
+    'username' => 'scoped-user',
+    'org_company_code' => 'HESEM',
+    'org_legal_entity_code' => 'VN01',
+    'org_plant_id' => 'PLANT01',
+    'org_site_id' => 'SITE01',
+])['org_plant_id'] ?? null) === 'PLANT01', 'Sanitized user payload did not expose org scope fields.');
+
 // Customer portal administration must not be exposed to arbitrary internal users.
 $portalStore = [
     'settings' => ['require_mfa' => false],
@@ -505,14 +523,21 @@ $endpointCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/r
 $endpointMap = is_array($endpointCatalog['endpoints'] ?? null) ? $endpointCatalog['endpoints'] : [];
 $telemetryDetail = $endpointMap['mes_execution.mes_machine_telemetry.detail'] ?? null;
 $bomDetail = $endpointMap['master_data.bill_of_materials.detail'] ?? null;
+$scenarioUpdate = $endpointMap['advanced_planning.aps_planning_scenarios.update'] ?? null;
 smoke_assert(is_array($telemetryDetail), 'Composite telemetry detail endpoint missing from endpoint catalog.');
 smoke_assert(($telemetryDetail['record_addressing'] ?? null) === 'composite', 'Telemetry detail endpoint must advertise composite addressing.');
 smoke_assert(($telemetryDetail['request']['identity_fields'] ?? null) === ['equipment_id', 'ts'], 'Telemetry detail endpoint identity fields mismatch.');
 smoke_assert(is_array($bomDetail), 'Composite BOM detail endpoint missing from endpoint catalog.');
 smoke_assert(($bomDetail['request']['identity_fields'] ?? null) === ['bom_id', 'bom_revision'], 'BOM detail endpoint identity fields mismatch.');
+smoke_assert(is_array($scenarioUpdate), 'APS planning scenario update endpoint missing from endpoint catalog.');
+smoke_assert((bool)($scenarioUpdate['request']['optimistic_concurrency']['required'] ?? false) === true, 'APS update endpoint must require optimistic concurrency.');
+smoke_assert(($scenarioUpdate['request']['org_scope']['fields'] ?? null) === ['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'], 'APS update endpoint scope fields mismatch.');
+smoke_assert((bool)($scenarioUpdate['response']['optimistic_concurrency']['enabled'] ?? false) === true, 'APS update response must advertise row_version concurrency.');
 
 $qualityReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/registry-quality-report.json'), true);
 smoke_assert(($qualityReport['all_passed'] ?? null) === true, 'Registry quality report must stay green after composite CRUD generation.');
 smoke_assert((int)($qualityReport['summary']['missing_primary_key_tables'] ?? -1) === 0, 'Registry quality report still reports missing primary-key tables.');
+smoke_assert((int)($qualityReport['summary']['optimistic_concurrency_issues'] ?? -1) === 0, 'Registry quality report still reports optimistic concurrency contract gaps.');
+smoke_assert((int)($qualityReport['summary']['org_scope_contract_issues'] ?? -1) === 0, 'Registry quality report still reports org-scope contract gaps.');
 
 echo "backend smoke tests passed\n";
