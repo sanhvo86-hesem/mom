@@ -519,6 +519,15 @@ class GenericCrudController extends BaseController
      */
     private function enforceRuntimePermission(array $user, array $ctx): void
     {
+        $permissions = $this->runtimePermissionKeys($ctx);
+        $policyRoles = $this->runtimeAccessRoles($ctx);
+
+        if ($policyRoles === []) {
+            $this->error('forbidden', 403, 'Operation disabled by runtime access policy', [
+                'permission_keys' => $permissions,
+            ]);
+        }
+
         if (user_is_admin($user)) {
             return;
         }
@@ -527,13 +536,11 @@ class GenericCrudController extends BaseController
             $this->error('forbidden', 403);
         }
 
-        $permissions = $this->runtimePermissionKeys($ctx);
         if ($this->userPermissionMatrixConfigured($user)) {
             $this->requireAnyPermission($user, $permissions, false);
             return;
         }
 
-        $policyRoles = $this->runtimeAccessRoles($ctx);
         if ($policyRoles !== null) {
             if (in_array('authenticated', $policyRoles, true)) {
                 return;

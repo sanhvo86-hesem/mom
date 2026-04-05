@@ -578,6 +578,18 @@ $rolePermFile = QMS_TEST_DATA_DIR . '/config/role_permissions.json';
 smoke_assert(permission_matrix_manages_permission('quality_management.capa_records.create', $rolePermFile), 'Permission matrix must manage generic quality write permissions.');
 smoke_assert(user_has_any_permission(['role' => 'qms_engineer'], 'quality_management.capa_records.create', $rolePermFile), 'QMS engineer should retain quality domain generic write permission.');
 smoke_assert(!user_has_any_permission(['role' => 'finance_manager'], 'quality_management.capa_records.create', $rolePermFile), 'Finance manager must not receive quality domain generic write permission.');
+smoke_assert(user_permission_matrix_configured(['role' => 'quality_engineer'], $rolePermFile), 'Quality engineer should now be governed directly by the permission matrix.');
+smoke_assert(user_has_any_permission(['role' => 'quality_engineer'], 'quality_management.capa_records.update', $rolePermFile), 'Quality engineer should retain quality update permission through the matrix.');
+smoke_assert(user_permission_matrix_configured(['role' => 'shift_leader'], $rolePermFile), 'Shift leader should now be governed directly by the permission matrix.');
+smoke_assert(user_has_any_permission(['role' => 'shift_leader'], 'advanced_planning.aps_planning_scenarios.read', $rolePermFile), 'Shift leader should receive planning read permission through the matrix.');
+smoke_assert(!user_has_any_permission(['role' => 'shift_leader'], 'advanced_planning.aps_planning_scenarios.update', $rolePermFile), 'Shift leader must not inherit planning mutation permission.');
+smoke_assert(user_permission_matrix_configured(['role' => 'buyer'], $rolePermFile), 'Buyer should now be governed directly by the permission matrix.');
+smoke_assert(user_has_any_permission(['role' => 'buyer'], 'purchasing.purchase_orders.read', $rolePermFile), 'Buyer should receive purchasing read permission through the matrix.');
+smoke_assert(!user_has_any_permission(['role' => 'buyer'], 'purchasing.purchase_orders.update', $rolePermFile), 'Buyer must not inherit purchasing mutation permission.');
+smoke_assert(user_permission_matrix_configured(['role' => 'internal_auditor'], $rolePermFile), 'Internal auditor should be marked as managed even without generic CRUD grants.');
+smoke_assert(!user_has_any_permission(['role' => 'internal_auditor'], 'audit_risk.audit_programs.read', $rolePermFile), 'Internal auditor should not inherit generic CRUD access by fallback.');
+smoke_assert(user_permission_matrix_configured(['role' => 'deburr_team_lead'], $rolePermFile), 'Deburr team lead should be marked as managed even without generic CRUD grants.');
+smoke_assert(!user_has_any_permission(['role' => 'deburr_team_lead'], 'production.work_orders.read', $rolePermFile), 'Deburr team lead should not inherit generic production CRUD access by fallback.');
 smoke_assert(!user_has_any_permission(['role' => 'qms_engineer'], 'master_data_governance.org_companies.read', $rolePermFile), 'QMS engineer must not inherit generic governance-table access.');
 smoke_assert(!user_has_any_permission(['role' => 'qms_engineer'], 'forms_system.form_definitions.read', $rolePermFile), 'QMS engineer must not inherit generic forms-system access.');
 smoke_assert(!user_has_any_permission(['role' => 'finance_manager'], 'finance.ap_ar_invoices.delete', $rolePermFile), 'Finance manager must not inherit generic delete permission.');
@@ -607,6 +619,25 @@ try {
 } catch (ExitException $e) {
     smoke_assert($e->getStatusCode() === 200, 'Permission matrix read returned wrong status for admin role.');
     smoke_assert(is_array($e->getPayload()['perms'] ?? null), 'Permission matrix read payload missing perms array.');
+}
+
+$adminGenericCrudController = (new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($permissionAdminStore);
+$genericPermissionGuard = new ReflectionMethod($adminGenericCrudController, 'enforceRuntimePermission');
+$genericPermissionGuard->setAccessible(true);
+try {
+    $genericPermissionGuard->invoke($adminGenericCrudController, ['role' => 'qa_manager'], [
+        'domain' => 'core_system',
+        'table' => 'audit_events',
+        'kind' => 'delete',
+        'tableMeta' => [
+            'domain' => 'core_system',
+            'supportTable' => false,
+        ],
+    ]);
+    throw new RuntimeException('Runtime policy kill-switch allowed admin delete on audit_events.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Runtime policy kill-switch returned wrong status for admin delete.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Runtime policy kill-switch returned wrong error for admin delete.');
 }
 
 // Generic runtime write access must be denied when the permission matrix covers the action but the role does not.

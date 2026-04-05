@@ -512,6 +512,22 @@ function default_role_permissions(): array {
       'denies' => array_values(array_unique(array_merge($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains))),
     ]);
   };
+  $scopedRole = static function (array $permissions, bool $canCreateDocs = false) use ($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains): array {
+    return sanitize_role_permission_row([
+      'canCreateDocs' => $canCreateDocs,
+      'permissions' => array_values(array_unique($permissions)),
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains))),
+    ]);
+  };
+  $domainReadRole = static function (array $domains, bool $canCreateDocs = false) use ($scopedRole): array {
+    return $scopedRole(array_map(static fn(string $domain): string => $domain . '.*.read', $domains), $canCreateDocs);
+  };
+  $domainWriteRole = static function (array $domains, bool $canCreateDocs = false) use ($scopedRole): array {
+    return $scopedRole(array_map(static fn(string $domain): string => $domain . '.*', $domains), $canCreateDocs);
+  };
+  $noGenericCrudRole = static function (bool $canCreateDocs = false) use ($scopedRole): array {
+    return $scopedRole([], $canCreateDocs);
+  };
   return [
     'ceo' => sanitize_role_permission_row([
       'canCreateDocs' => true,
@@ -548,6 +564,21 @@ function default_role_permissions(): array {
       ],
       'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
     ]),
+    'quality_engineer' => $domainWriteRole([
+      'audit_risk',
+      'calibration_equipment',
+      'quality_lab',
+      'quality_management',
+      'supplier_relationship',
+    ]),
+    'qc_inspector' => $domainWriteRole([
+      'audit_risk',
+      'calibration_equipment',
+      'quality_lab',
+      'quality_management',
+      'supplier_relationship',
+    ]),
+    'internal_auditor' => $noGenericCrudRole(),
     'qms_engineer' => sanitize_role_permission_row([
       'canCreateDocs' => true,
       'permissions' => [
@@ -572,6 +603,44 @@ function default_role_permissions(): array {
       'canCreateDocs' => false,
       'permissions' => ['schema_studio.*'],
       'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
+    ]),
+    'shift_leader' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+    ]),
+    'setup_technician' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+    ]),
+    'cnc_operator' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+    ]),
+    'deburr_team_lead' => $noGenericCrudRole(),
+    'deburr_technician' => $noGenericCrudRole(),
+    'maintenance_technician' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
     ]),
     'production_manager' => $businessRole([
       'advanced_planning.*',
@@ -598,6 +667,8 @@ function default_role_permissions(): array {
       'production.*.update',
       'production.*.transition',
     ]),
+    'cleaning_packaging_supervisor' => $noGenericCrudRole(),
+    'cleaning_packaging_technician' => $noGenericCrudRole(),
     'engineering_manager' => $businessRole([
       'cnc_programs.*',
       'fmea_apqp.*',
@@ -612,6 +683,32 @@ function default_role_permissions(): array {
       'plm_change_control.*',
       'tooling_lifecycle.*',
     ]),
+    'process_engineer' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+      'cnc_programs',
+      'fmea_apqp',
+      'mfg_engineering',
+      'plm_change_control',
+    ]),
+    'cam_nc_programmer' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+      'cnc_programs',
+      'fmea_apqp',
+      'mfg_engineering',
+      'plm_change_control',
+    ]),
     'supply_chain_manager' => $businessRole([
       'inventory.*',
       'outsource_execution.*',
@@ -621,6 +718,46 @@ function default_role_permissions(): array {
       'traceability_serialization.*',
       'transportation.*',
       'warehouse_management.*',
+    ]),
+    'buyer' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
+    ]),
+    'warehouse_clerk' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
+    ]),
+    'tool_storekeeper' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
+    ]),
+    'logistics_coordinator' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
     ]),
     'finance_manager' => $businessRole([
       'commercial_contracts.*',
@@ -641,6 +778,17 @@ function default_role_permissions(): array {
       'hcm_workforce.*',
       'training_hr.*',
     ], true),
+    'ehs_specialist' => $noGenericCrudRole(),
+    'estimator' => $domainWriteRole([
+      'commercial_contracts',
+    ]),
+    'customer_service' => $domainWriteRole([
+      'commercial_contracts',
+    ]),
+    'sales_manager' => $domainWriteRole([
+      'commercial_contracts',
+    ]),
+    'epicor_admin' => $noGenericCrudRole(),
     'production_director' => $businessRole([
       'advanced_planning.*',
       'demand_supply_planning.*',
