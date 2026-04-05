@@ -616,15 +616,29 @@ foreach ($tableRegistry as $tableName => $tableMeta) {
     }
 
     $prefix = $domain . '.' . $safeTable;
+    $primaryKey = $tableMeta['primaryKey'] ?? null;
+    $scalarPrimaryKey = false;
+    if (is_string($primaryKey) && trim($primaryKey) !== '') {
+        $scalarPrimaryKey = true;
+    } elseif (is_array($primaryKey)) {
+        $pkFields = array_values(array_filter(array_map(static fn($value): string => trim((string)$value), $primaryKey), static fn(string $value): bool => $value !== ''));
+        $scalarPrimaryKey = count($pkFields) === 1;
+    }
+
     $router->actions([
         $prefix . '.list'   => [GenericCrudController::class, 'listRecords'],
-        $prefix . '.detail' => [GenericCrudController::class, 'getDetail'],
         $prefix . '.create' => [GenericCrudController::class, 'createRecord'],
-        $prefix . '.update' => [GenericCrudController::class, 'updateRecord'],
-        $prefix . '.delete' => [GenericCrudController::class, 'deleteRecord'],
     ]);
 
-    if (!empty($tableMeta['statusColumn'])) {
+    if ($scalarPrimaryKey) {
+        $router->actions([
+            $prefix . '.detail' => [GenericCrudController::class, 'getDetail'],
+            $prefix . '.update' => [GenericCrudController::class, 'updateRecord'],
+            $prefix . '.delete' => [GenericCrudController::class, 'deleteRecord'],
+        ]);
+    }
+
+    if ($scalarPrimaryKey && !empty($tableMeta['statusColumn'])) {
         $router->action($prefix . '.transition', GenericCrudController::class, 'transitionRecord');
     }
 }

@@ -10,6 +10,17 @@ def load_json(path):
         return json.load(f)
 
 
+def load_optional_json(path, default=None):
+    if default is None:
+        default = {}
+    if not os.path.exists(path):
+        return default
+    try:
+        return load_json(path)
+    except Exception:
+        return default
+
+
 def load_data_fields_registry(path):
     data = load_json(path)
     if not isinstance(data, dict):
@@ -126,6 +137,12 @@ for key, fields in data_fields.items():
         endpoint_fields[key] = eps
 
 workflows = load_workflow_registry("01-QMS-Portal/qms-data/registry/workflow-library.json")
+manifest = load_optional_json("01-QMS-Portal/qms-data/registry/registry-manifest.json")
+quality_report = load_optional_json("01-QMS-Portal/qms-data/registry/registry-quality-report.json")
+manifest_coverage = manifest.get('coverage', {}) if isinstance(manifest, dict) else {}
+quality_summary = quality_report.get('summary', {}) if isinstance(quality_report, dict) else {}
+quality_checks = quality_report.get('checks', []) if isinstance(quality_report, dict) else []
+failed_quality_checks = [check for check in quality_checks if isinstance(check, dict) and not check.get('passed')]
 
 wf_entities = {}
 for wfkey, wf in workflows.items():
@@ -237,7 +254,19 @@ print("COMPLETE SCHEMA-FIELD-WORKFLOW AUDIT")
 print("=" * 70)
 
 print(f"\nDATABASE: {len(tables)} tables, {sum(len(t['columns']) for t in tables.values())} columns")
-print(f"REGISTRY: {len(all_field_keys)} unique field keys, {len(endpoint_fields)} endpoints")
+print(f"REGISTRY: {len(all_field_keys)} unique field keys, {len(endpoint_fields)} field-registry actions")
+if manifest_coverage or quality_summary:
+    print(
+        "RUNTIME: "
+        f"{manifest_coverage.get('router_actions', quality_summary.get('endpoint_count', 0))} router actions, "
+        f"{manifest_coverage.get('domain_pack_count', quality_summary.get('pack_count', 0))} packs, "
+        f"{manifest_coverage.get('relation_edges', quality_summary.get('relation_edge_count', 0))} relations"
+    )
+    print(
+        "QUALITY: "
+        f"{'PASS' if quality_report.get('all_passed') else 'WARN'} "
+        f"({len(quality_checks) - len(failed_quality_checks)}/{len(quality_checks)} checks passed)"
+    )
 print(f"WORKFLOWS: {len(wf_entities)} workflow definitions")
 
 print(f"\n--- FIELD-COLUMN LINKAGE ---")
@@ -298,7 +327,11 @@ audit = {
     'tables': len(tables),
     'columns': sum(len(t['columns']) for t in tables.values()),
     'field_keys': len(all_field_keys),
+    'field_registry_actions': len(endpoint_fields),
     'matched': len(matched_fields),
+    'runtime_manifest': manifest_coverage,
+    'quality_summary': quality_summary,
+    'quality_failed_checks': failed_quality_checks,
     'missing_field_defs': missing_field_defs,
     'orphan_fields': {k: sorted(list(v)) for k, v in classified.items()},
     'field_source_conflicts': source_conflicts,

@@ -7,6 +7,17 @@ const __dirname = path.dirname(__filename);
 const portalRoot = path.resolve(__dirname, '..', '..');
 const registryDir = path.join(portalRoot, 'qms-data', 'registry');
 const generatedAt = new Date().toISOString();
+const SYSTEM_MANAGED_FIELDS = new Set([
+  'created_at',
+  'updated_at',
+  'created_by',
+  'updated_by',
+  'recorded_at',
+  'row_version',
+  'payload_schema_version',
+  'source_record_id',
+  'source_system',
+]);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -36,7 +47,174 @@ function loadDataFields() {
       merged[key] = value;
     }
   }
+  delete merged.parts;
+  delete merged.split;
   return merged;
+}
+
+function primaryKeyMeta(table) {
+  const raw = table?.primaryKey;
+  if (Array.isArray(raw)) {
+    const fields = raw.map((item) => String(item || '').trim()).filter(Boolean);
+    if (fields.length === 1) {
+      return { mode: 'scalar', fields, key: fields[0] };
+    }
+    return { mode: fields.length ? 'composite' : 'missing', fields, key: null };
+  }
+  const key = String(raw || '').trim();
+  if (!key) {
+    return { mode: 'missing', fields: [], key: null };
+  }
+  return { mode: 'scalar', fields: [key], key };
+}
+
+function supportedEndpointKinds(table) {
+  const pk = primaryKeyMeta(table);
+  const kinds = ['list', 'create'];
+  if (pk.mode === 'scalar') {
+    kinds.push('detail', 'update', 'delete');
+    if (table?.statusColumn) {
+      kinds.push('transition');
+    }
+  }
+  return kinds;
+}
+
+function supportedEndpointSet(table) {
+  return new Set(supportedEndpointKinds(table));
+}
+
+function isSystemManagedFieldKey(fieldKey) {
+  return SYSTEM_MANAGED_FIELDS.has(String(fieldKey || '').trim());
+}
+
+function filterableFieldKeys(fields) {
+  return uniqueFields((fields || []).filter((field) => field && field.filterable).map(trimFieldForPack))
+    .map((field) => field.key);
+}
+
+function sortableFieldKeys(fields) {
+  return uniqueFields((fields || []).filter((field) => field && field.sortable).map(trimFieldForPack))
+    .map((field) => field.key);
+}
+
+function searchableFieldKeys(fields) {
+  return uniqueFields((fields || []).filter((field) => (
+    field && /identification|general|status/.test(String(field.group || ''))
+  )).map(trimFieldForPack))
+    .map((field) => field.key);
+}
+
+function transitionTargets(statusOptions, statusSet) {
+  return (statusOptions?.[statusSet]?.options || [])
+    .map((option) => String(option?.value || '').trim())
+    .filter(Boolean);
+}
+
+function requestContract(kind, table, fields, statusOptions) {
+  const pk = primaryKeyMeta(table);
+  const filterParams = kind === 'list' ? filterableFieldKeys(fields) : [];
+  const transitionStatusTargets = transitionTargets(statusOptions, String(table?.statusSet || ''));
+  const paramFields = uniqueFields((fields || []).filter((field) => field?.source === 'param').map(trimFieldForPack)).map((field) => field.key);
+  const editableDbFields = uniqueFields((fields || []).filter((field) => field?.dbColumn && !isSystemManagedFieldKey(field.key)).map(trimFieldForPack))
+    .filter((field) => !(kind === 'update' && field.key === pk.key))
+    .filter((field) => !(kind === 'update' && field.key === String(table?.statusColumn || '')));
+
+  if (kind === 'list') {
+    return {
+      query_params: ['domain', 'table', 'search', 'q', 'sort', 'direction', 'limit', 'offset', ...(table?.statusColumn ? ['status'] : [])],
+      filter_params: filterParams,
+      body_fields: [],
+      required_body_fields: [],
+      identity_fields: [],
+      body_mode: 'none',
+    };
+  }
+
+  if (kind === 'detail') {
+    return {
+      query_params: ['domain', 'table', 'id'],
+      filter_params: [],
+      body_fields: [],
+      required_body_fields: [],
+      identity_fields: pk.mode === 'scalar' ? ['id'] : [],
+      body_mode: 'none',
+    };
+  }
+
+  if (kind === 'delete') {
+    return {
+      query_params: ['domain', 'table', 'id'],
+      filter_params: [],
+      body_fields: uniqueFields([{ key: 'id' }, ...paramFields.map((key) => ({ key }))]).map((field) => field.key),
+      required_body_fields: ['id', ...(paramFields.includes('confirm_delete') ? ['confirm_delete'] : [])],
+      identity_fields: pk.mode === 'scalar' ? ['id'] : [],
+      body_mode: 'root',
+    };
+  }
+
+  if (kind === 'transition') {
+    const transitionAliases = uniqueFields([
+      { key: 'to_status' },
+      { key: 'to' },
+      { key: 'status' },
+      { key: 'toStatus' },
+      ...paramFields.map((key) => ({ key })),
+    ]).map((field) => field.key);
+    return {
+      query_params: ['domain', 'table', 'id'],
+      filter_params: [],
+      body_fields: uniqueFields([{ key: 'id' }, ...transitionAliases.map((key) => ({ key }))]).map((field) => field.key),
+      required_body_fields: ['id'],
+      required_any_of: [['to_status', 'to', 'status', 'toStatus']],
+      accepted_body_aliases: { target_status: ['to_status', 'to', 'status', 'toStatus'] },
+      canonical_body_fields: { target_status: paramFields.includes('to_status') ? 'to_status' : 'to' },
+      identity_fields: pk.mode === 'scalar' ? ['id'] : [],
+      body_mode: 'root',
+      transition_status_values: transitionStatusTargets,
+    };
+  }
+
+  const dbFields = editableDbFields.map((field) => field.key);
+  const requiredBodyFields = kind === 'update' ? ['id'] : editableDbFields.filter((field) => field.required).map((field) => field.key);
+
+  return {
+    query_params: kind === 'update' ? ['domain', 'table', 'id'] : [],
+    filter_params: [],
+    body_fields: kind === 'update' ? ['id', ...dbFields] : dbFields,
+    required_body_fields: requiredBodyFields,
+    identity_fields: kind === 'update' && pk.mode === 'scalar' ? ['id'] : [],
+    body_mode: 'root_or_data_wrapper',
+  };
+}
+
+function responseContract(kind, table, fields) {
+  return {
+    collection_key: kind === 'list' ? 'records' : null,
+    record_key: kind === 'list' ? null : 'record',
+    response_fields: fields.map((field) => field.key),
+    paginated: kind === 'list',
+    pagination_fields: kind === 'list' ? ['total', 'offset', 'limit', 'has_more'] : [],
+    primary_key: primaryKeyMeta(table).key,
+  };
+}
+
+function workflowContract(tableName, table, workflowLibrary) {
+  const workflowMap = workflowLibrary?.workflows || workflowLibrary || {};
+  const workflow = workflowMap[String(table?.workflowId || '')] || null;
+  const isWorkflowOwner = !workflow?.primaryTable || workflow.primaryTable === tableName;
+
+  return {
+    workflow_id: table?.workflowId || null,
+    state_field: table?.statusColumn || null,
+    status_set: table?.statusSet || null,
+    workflow_state_field: workflow?.stateField || null,
+    workflow_status_set: workflow?.statusSet || null,
+    workflow_primary_table: workflow?.primaryTable || null,
+    table_is_workflow_owner: isWorkflowOwner,
+    status_set_aligned: !workflow || !workflow.statusSet || !isWorkflowOwner || workflow.statusSet === table?.statusSet,
+    state_field_aligned: !workflow || !workflow.stateField || !isWorkflowOwner || workflow.stateField === table?.statusColumn,
+  };
 }
 
 function endpointKindMeta(kind) {
@@ -84,7 +262,65 @@ function endpointLabelEn(table, kind) {
   return labels[kind] || `${base} ${kind}`;
 }
 
-function trimFieldForPack(field) {
+function endpointLabelVi(table, kind) {
+  const base = table?.label || table?.labelEn || 'Ban ghi';
+  const labels = {
+    list: `Danh sach ${base}`,
+    detail: `Chi tiet ${base}`,
+    create: `Tao ${base}`,
+    update: `Cap nhat ${base}`,
+    delete: `Xoa ${base}`,
+    transition: `Chuyen trang thai ${base}`,
+  };
+  return labels[kind] || `${base} ${kind}`;
+}
+
+function displayFieldForTable(table) {
+  const columns = Object.keys(table?.columns || {});
+  const candidates = [
+    'display_name',
+    'full_name',
+    'name',
+    'title',
+    'code',
+    'number',
+    ...columns.filter((column) => /(?:^|_)name$/.test(column)),
+    ...columns.filter((column) => /(?:^|_)title$/.test(column)),
+    ...columns.filter((column) => /(?:^|_)code$/.test(column)),
+    ...columns.filter((column) => /(?:^|_)number$/.test(column)),
+  ];
+  return candidates.find((column) => columns.includes(column)) || columns[0] || null;
+}
+
+function lookupMetaForField(tableRegistry, field) {
+  const tableName = String(field?.dbTable || '').trim();
+  const columnName = String(field?.dbColumn || '').trim();
+  const columnMeta = tableRegistry?.tables?.[tableName]?.columns?.[columnName];
+  const reference = String(columnMeta?.references || '').trim();
+  if (!tableName || !columnName || !reference.includes('.')) {
+    return {};
+  }
+
+  const [refTable, refColumn] = reference.split('.');
+  const targetTable = tableRegistry?.tables?.[refTable] || {};
+  const targetDomain = String(targetTable?.domain || '').trim();
+  const displayField = displayFieldForTable(targetTable);
+
+  return {
+    relationRef: `${tableName}.${columnName}->${refTable}.${refColumn}`,
+    optionsRef: targetDomain ? `${targetDomain}.${refTable}.list` : null,
+    lookup: {
+      entity: refTable,
+      domain: targetDomain || null,
+      endpoint: targetDomain ? `${targetDomain}.${refTable}.list` : null,
+      labelField: displayField,
+      valueField: refColumn || null,
+      searchFields: displayField ? [displayField] : [],
+    },
+  };
+}
+
+function trimFieldForPack(field, tableRegistry = null) {
   return {
     key: field.key,
     label: field.label,
@@ -98,6 +334,7 @@ function trimFieldForPack(field) {
     dbTable: field.dbTable || null,
     dbColumn: field.dbColumn || null,
     constraints: field.constraints || {},
+    ...lookupMetaForField(tableRegistry, field),
   };
 }
 
@@ -111,7 +348,7 @@ function uniqueFields(fields) {
   });
 }
 
-function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields) {
+function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, workflowLibrary, statusOptions) {
   const endpoints = {};
   const domains = domainArchitecture.domains || {};
   for (const [action, fields] of Object.entries(dataFields)) {
@@ -122,43 +359,53 @@ function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields) {
     const table = tableRegistry.tables?.[tableName];
     const domainMeta = domains[domain] || tableRegistry.domains?.[domain] || {};
     if (!table) continue;
+    if (!supportedEndpointSet(table).has(kind)) continue;
     const meta = endpointKindMeta(kind);
-    const primaryKey = Array.isArray(table.primaryKey) ? table.primaryKey[0] : table.primaryKey;
+    const pk = primaryKeyMeta(table);
     const requiresCsrf = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(meta.method);
+    const listFields = uniqueFields((dataFields[`${domain}.${tableName}.list`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
+    const detailFields = uniqueFields((dataFields[`${domain}.${tableName}.detail`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
+    const contract = requestContract(kind, table, fields, statusOptions);
     endpoints[action] = {
       action,
-      label: endpointLabel(table, kind),
+      label: endpointLabelVi(table, kind),
       labelEn: endpointLabelEn(table, kind),
       module: domainMeta.label || domain,
       moduleEn: domainMeta.labelEn || domainMeta.label || domain,
       method: meta.method,
+      path: kind === 'list' || kind === 'create'
+        ? `/api/runtime/${domain}/${tableName}`
+        : (kind === 'transition'
+          ? `/api/runtime/${domain}/${tableName}/{id}/transition`
+          : `/api/runtime/${domain}/${tableName}/{id}`),
       controller: 'GenericCrudController',
       handler: meta.handler,
       source: 'table-registry+data-fields',
       kind: meta.kind,
       domain,
       entity: tableName,
-      primary_key: primaryKey || null,
+      primary_key: pk.key,
+      record_addressing: pk.mode,
+      primary_key_fields: pk.fields,
       field_count: fields.length,
       field_packs: [`${tableName}_header`, `${tableName}_list_columns`, `${tableName}_filters`, `${tableName}_create_form`, `${tableName}_search`],
       status_refs: table.statusSet ? [table.statusSet] : [],
+      workflow: workflowContract(tableName, table, workflowLibrary),
       security: {
         auth_required: true,
         csrf_required: requiresCsrf,
         admin_only: false,
-        permission_keys: [],
+        permission_keys: [kind === 'list' || kind === 'detail' ? `${domain}.${tableName}.read` : `${domain}.${tableName}.${kind}`],
         dynamic_permission: true,
       },
-      request: {
-        query_params: meta.method === 'GET' ? ['domain', 'table'] : [],
-        body_fields: meta.method === 'GET' ? [] : fields.filter((field) => field.dbColumn).map((field) => field.key),
-        required_body_fields: meta.method === 'GET' ? [] : fields.filter((field) => field.required).map((field) => field.key),
+      capabilities: {
+        searchable_fields: kind === 'list' ? searchableFieldKeys(listFields) : [],
+        sortable_fields: kind === 'list' ? sortableFieldKeys(listFields) : [],
+        filterable_fields: kind === 'list' ? filterableFieldKeys(listFields) : [],
+        transition_targets: kind === 'transition' ? contract.transition_status_values || [] : [],
       },
-      response: {
-        collection_key: kind === 'list' ? 'records' : null,
-        response_fields: fields.map((field) => field.key),
-        paginated: kind === 'list',
-      },
+      request: contract,
+      response: responseContract(kind, table, ['create', 'update', 'delete', 'transition'].includes(kind) && detailFields.length ? detailFields : fields),
     };
   }
 
@@ -177,11 +424,11 @@ function buildDomainFieldPacks(tableRegistry, dataFields) {
   const packs = {};
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
     const prefix = `${table.domain}.${tableName}`;
-    const listFields = uniqueFields((dataFields[`${prefix}.list`] || []).map(trimFieldForPack));
-    const detailFields = uniqueFields((dataFields[`${prefix}.detail`] || []).map(trimFieldForPack));
-    const createFields = uniqueFields((dataFields[`${prefix}.create`] || []).map(trimFieldForPack));
-    const updateFields = uniqueFields((dataFields[`${prefix}.update`] || []).map(trimFieldForPack));
-    const transitionFields = uniqueFields((dataFields[`${prefix}.transition`] || []).map(trimFieldForPack));
+    const listFields = uniqueFields((dataFields[`${prefix}.list`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
+    const detailFields = uniqueFields((dataFields[`${prefix}.detail`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
+    const createFields = uniqueFields((dataFields[`${prefix}.create`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
+    const updateFields = uniqueFields((dataFields[`${prefix}.update`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
+    const transitionFields = uniqueFields((dataFields[`${prefix}.transition`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
 
     packs[`${tableName}_header`] = detailFields.slice(0, 12);
     packs[`${tableName}_list_columns`] = listFields.slice(0, 16);
@@ -207,14 +454,28 @@ function buildRelationMap(tableRegistry) {
   const edges = [];
 
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
-    const primaryKey = Array.isArray(table.primaryKey) ? table.primaryKey[0] : table.primaryKey;
+    const pk = primaryKeyMeta(table);
+    const columns = table.columns || {};
+    const jsonColumns = Object.entries(columns).filter(([, meta]) => /JSONB?/i.test(String(meta?.type || '')));
+    const governanceFields = ['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id', 'source_system', 'source_record_id', 'row_version', 'payload_schema_version'];
+    const missingGovernance = governanceFields.filter((field) => !columns[field]);
     entities[tableName] = {
       entity: tableName,
       label: table.label,
       labelEn: table.labelEn,
-      primaryKey: primaryKey || null,
+      primaryKey: pk.key,
+      recordAddressing: pk.mode,
+      primaryKeyFields: pk.fields,
       domain: table.domain,
-      fields: Object.keys(table.columns || {}),
+      fields: Object.keys(columns),
+      statusField: table.statusColumn || null,
+      statusSet: table.statusSet || null,
+      workflowId: table.workflowId || null,
+      supportTable: !!table.supportTable,
+      jsonbFieldCount: jsonColumns.length,
+      jsonbFields: jsonColumns.map(([field]) => field),
+      governanceComplete: missingGovernance.length === 0,
+      governanceMissing: missingGovernance,
       digitalThread: !!(table.digitalThread && ((table.digitalThread.upstream || []).length || (table.digitalThread.downstream || []).length)),
     };
 
@@ -222,13 +483,27 @@ function buildRelationMap(tableRegistry) {
       const [targetTable, targetField] = String(fk.references || '').split('.');
       if (!targetTable || !targetField) continue;
       const targetMeta = tableRegistry.tables?.[targetTable] || {};
+      const targetDisplayField = displayFieldForTable(targetMeta);
+      const sourceColumnMeta = columns?.[fk.column] || {};
       edges.push({
+        id: `rel_${tableName}_${String(fk.column || '').replace(/[^a-z0-9_]+/gi, '_')}_${targetTable}_${targetField}`.toLowerCase(),
         from: { entity: tableName, field: fk.column },
         to: { entity: targetTable, field: targetField },
         type: 'many_to_one',
+        cardinality: 'many_to_one',
+        constraintName: fk.name || fk.constraintName || `fk_${tableName}_${fk.column}`,
+        nullable: !sourceColumnMeta.required,
         label: `${table.label} → ${targetMeta.label || targetTable}`,
         labelEn: `${table.labelEn} → ${targetMeta.labelEn || targetTable}`,
         domain: `${table.domain} -> ${targetMeta.domain || 'unknown'}`,
+        fromDomain: table.domain,
+        toDomain: targetMeta.domain || null,
+        sourceColumn: fk.column,
+        targetColumn: targetField,
+        lookupEntity: targetTable,
+        lookupEndpoint: targetMeta.domain ? `${targetMeta.domain}.${targetTable}.list` : null,
+        displayField: targetDisplayField,
+        valueField: targetField,
         digitalThread: true,
         cascadeActions: [],
       });
@@ -248,14 +523,16 @@ function buildRelationMap(tableRegistry) {
   };
 }
 
-function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, dataFields) {
+function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields) {
   const endpointCount = Object.keys(endpointCatalog.endpoints || {}).length;
   const packCount = Object.keys(packs.packs || {}).length;
   const relationCount = (relationMap.edges || relationMap.relations || []).length;
   const workflowCount = Object.keys(workflowLibrary.workflows || workflowLibrary).filter((key) => key !== '_meta').length;
   const statusCount = Object.keys(statusOptions).filter((key) => key !== '_meta').length;
+  const fieldTypeCount = Object.keys(fieldTypes).filter((key) => key !== '_meta').length;
   const ruleCount = (validationRules.rules || validationRules).length;
   const formulaCount = Object.keys(formulas).filter((key) => key !== '_meta').length;
+  const fieldRegistryActionCount = Object.keys(dataFields).filter((key) => key !== '_meta' && Array.isArray(dataFields[key])).length;
   const uniqueFieldKeys = new Set();
   let fieldDefinitions = 0;
 
@@ -275,7 +552,7 @@ function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, val
     },
     coverage: {
       router_actions: endpointCount,
-      field_registry_actions: endpointCount,
+      field_registry_actions: fieldRegistryActionCount,
       field_definitions: fieldDefinitions,
       unique_field_keys: uniqueFieldKeys.size,
       status_sets: statusCount,
@@ -284,11 +561,18 @@ function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, val
       validation_rules: ruleCount,
       formula_count: formulaCount,
       domain_pack_count: packCount,
+      scalar_record_endpoints: Object.values(endpointCatalog.endpoints || {}).filter((endpoint) => endpoint.record_addressing === 'scalar').length,
     },
     assets: {
+      'data-fields-index.json': { kind: 'field-registry-index', records: fieldRegistryActionCount },
       'endpoint-catalog.json': { kind: 'endpoint-catalog', records: endpointCount },
       'domain-field-packs.json': { kind: 'pack-library', records: packCount },
       'relation-map.json': { kind: 'relation-map', records: relationCount },
+      'workflow-library.json': { kind: 'workflow-library', records: workflowCount },
+      'status-options.json': { kind: 'status-library', records: statusCount },
+      'field-types.json': { kind: 'field-types', records: fieldTypeCount },
+      'validation-rules.json': { kind: 'validation-rules', records: ruleCount },
+      'computed-formulas.json': { kind: 'formula-library', records: formulaCount },
       'registry-manifest.json': { kind: 'manifest', records: 1 },
       'registry-quality-report.json': { kind: 'quality-report', records: 1 },
     },
@@ -308,7 +592,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
 
   const tableFieldCoverage = tableNames.filter((tableName) => {
     const domain = tableRegistry.tables[tableName].domain;
-    return ['list', 'detail', 'create', 'update'].every((kind) => Array.isArray(dataFields[`${domain}.${tableName}.${kind}`]));
+    return supportedEndpointKinds(tableRegistry.tables[tableName]).every((kind) => Array.isArray(dataFields[`${domain}.${tableName}.${kind}`]));
   });
 
   const tablePackCoverage = tableNames.filter((tableName) =>
@@ -317,10 +601,9 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
 
   const tableEndpointCoverage = tableNames.filter((tableName) => {
     const domain = tableRegistry.tables[tableName].domain;
-    return endpointKeys.includes(`${domain}.${tableName}.list`)
-      && endpointKeys.includes(`${domain}.${tableName}.detail`)
-      && endpointKeys.includes(`${domain}.${tableName}.create`)
-      && endpointKeys.includes(`${domain}.${tableName}.update`);
+    return supportedEndpointKinds(tableRegistry.tables[tableName]).every((kind) =>
+      endpointKeys.includes(`${domain}.${tableName}.${kind}`)
+    );
   });
 
   const fkCount = tableNames.reduce((sum, tableName) => sum + (tableRegistry.tables[tableName].foreignKeys || []).length, 0);
@@ -340,6 +623,86 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     workflowKeys.some((workflowId) => (workflowMap[workflowId]?.domain || '') === domain)
   );
   const formulaReferenceCount = formulaKeys.filter((formulaId) => Array.isArray(formulas[formulaId]?.referencedBy) && formulas[formulaId].referencedBy.length > 0).length;
+  const unsupportedRecordEndpoints = [];
+  const contractIssues = [];
+  const workflowAlignmentIssues = [];
+  const scalarPkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode === 'scalar');
+  const nonScalarPkTables = tableNames.filter((tableName) => primaryKeyMeta(tableRegistry.tables[tableName]).mode !== 'scalar');
+
+  for (const tableName of tableNames) {
+    const table = tableRegistry.tables[tableName];
+    const domain = table.domain;
+    const supportedKinds = new Set(supportedEndpointKinds(table));
+    const pk = primaryKeyMeta(table);
+
+    ['detail', 'update', 'delete', 'transition'].forEach((kind) => {
+      if (!supportedKinds.has(kind) && endpointKeys.includes(`${domain}.${tableName}.${kind}`)) {
+        unsupportedRecordEndpoints.push(`${domain}.${tableName}.${kind}`);
+      }
+    });
+
+    if (table.workflowId) {
+      const workflow = workflowMap[table.workflowId];
+      const isWorkflowOwner = !workflow?.primaryTable || workflow.primaryTable === tableName;
+      if (workflow && isWorkflowOwner && table.statusSet && workflow.statusSet && workflow.statusSet !== table.statusSet) {
+        workflowAlignmentIssues.push({
+          table: tableName,
+          workflowId: table.workflowId,
+          issue: 'status_set_mismatch',
+          tableStatusSet: table.statusSet,
+          workflowStatusSet: workflow.statusSet,
+        });
+      }
+      if (workflow && isWorkflowOwner && table.statusColumn && workflow.stateField && workflow.stateField !== table.statusColumn) {
+        workflowAlignmentIssues.push({
+          table: tableName,
+          workflowId: table.workflowId,
+          issue: 'state_field_mismatch',
+          tableStateField: table.statusColumn,
+          workflowStateField: workflow.stateField,
+        });
+      }
+    }
+
+    if (pk.mode !== 'scalar') {
+      continue;
+    }
+
+    ['detail', 'update', 'delete'].forEach((kind) => {
+      const endpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.${kind}`];
+      if (!endpoint) return;
+      const identityFields = endpoint.request?.identity_fields || [];
+      const queryParams = endpoint.request?.query_params || [];
+      if (!identityFields.includes('id') || !queryParams.includes('id')) {
+        contractIssues.push(`${domain}.${tableName}.${kind}:missing_id_contract`);
+      }
+    });
+
+    const listEndpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.list`];
+    if (listEndpoint) {
+      const queryParams = new Set(listEndpoint.request?.query_params || []);
+      ['search', 'q', 'sort', 'direction', 'limit', 'offset'].forEach((key) => {
+        if (!queryParams.has(key)) {
+          contractIssues.push(`${domain}.${tableName}.list:missing_${key}`);
+        }
+      });
+    }
+
+    if (table.statusColumn) {
+      const transitionEndpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.transition`];
+      const targets = transitionEndpoint?.capabilities?.transition_targets || [];
+      if (!transitionEndpoint || !targets.length) {
+        contractIssues.push(`${domain}.${tableName}.transition:missing_targets`);
+      }
+    }
+
+    for (const kind of supportedEndpointKinds(table)) {
+      const endpoint = endpointCatalog.endpoints?.[`${domain}.${tableName}.${kind}`];
+      if (endpoint && (!Array.isArray(endpoint.security?.permission_keys) || !endpoint.security.permission_keys.length)) {
+        contractIssues.push(`${domain}.${tableName}.${kind}:missing_permissions`);
+      }
+    }
+  }
 
   const checks = [
     { id: 'tables_have_fields', passed: tableFieldCoverage.length === tableNames.length, actual: tableFieldCoverage.length, target: tableNames.length },
@@ -348,6 +711,11 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'fk_edges_covered', passed: relationEdges.length === fkCount, actual: relationEdges.length, target: fkCount },
     { id: 'workflow_coverage', passed: workflowCoverage.length === tableNames.length, actual: workflowCoverage.length, target: tableNames.length },
     { id: 'status_coverage', passed: statusCoverage.length === statusTables.length, actual: statusCoverage.length, target: statusTables.length },
+    { id: 'scalar_pk_tables', passed: scalarPkTables.length >= (tableNames.length - 32), actual: scalarPkTables.length, target: tableNames.length - 32 },
+    { id: 'frontend_scalar_record_readiness', passed: nonScalarPkTables.length === 0, actual: nonScalarPkTables.length, target: 0 },
+    { id: 'no_unsupported_record_endpoints', passed: unsupportedRecordEndpoints.length === 0, actual: unsupportedRecordEndpoints.length, target: 0 },
+    { id: 'endpoint_contract_readiness', passed: contractIssues.length === 0, actual: contractIssues.length, target: 0 },
+    { id: 'workflow_status_alignment', passed: workflowAlignmentIssues.length === 0, actual: workflowAlignmentIssues.length, target: 0 },
     { id: 'workflow_count_target', passed: workflowKeys.length >= 60, actual: workflowKeys.length, target: 60 },
     { id: 'domain_workflow_target', passed: domainWorkflowCoverage.length === Object.keys(tableRegistry.domains || {}).length, actual: domainWorkflowCoverage.length, target: Object.keys(tableRegistry.domains || {}).length },
     { id: 'status_set_target', passed: statusKeys.length >= 180, actual: statusKeys.length, target: 180 },
@@ -372,8 +740,22 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       formula_count: formulaKeys.length,
       formula_reference_count: formulaReferenceCount,
       field_context_count: fieldContextCount,
+      non_scalar_pk_tables: nonScalarPkTables.length,
+      unsupported_record_endpoints: unsupportedRecordEndpoints.length,
+      contract_issues: contractIssues.length,
+      workflow_alignment_issues: workflowAlignmentIssues.length,
     },
     checks,
+    warnings: {
+      non_scalar_pk_tables: nonScalarPkTables.slice(0, 40).map((tableName) => ({
+        table: tableName,
+        primary_key_mode: primaryKeyMeta(tableRegistry.tables[tableName]).mode,
+        primary_key_fields: primaryKeyMeta(tableRegistry.tables[tableName]).fields,
+      })),
+      unsupported_record_endpoints: unsupportedRecordEndpoints.slice(0, 30),
+      contract_issues: contractIssues.slice(0, 40),
+      workflow_alignment_issues: workflowAlignmentIssues.slice(0, 40),
+    },
     all_passed: checks.every((check) => check.passed),
   };
 }
@@ -386,11 +768,12 @@ function main() {
   const validationRules = readJson(path.join(registryDir, 'validation-rules.json'));
   const formulas = readJson(path.join(registryDir, 'computed-formulas.json'));
   const statusOptions = readJson(path.join(registryDir, 'status-options.json'));
+  const fieldTypes = readJson(path.join(registryDir, 'field-types.json'));
 
-  const endpointCatalog = buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields);
+  const endpointCatalog = buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, workflowLibrary, statusOptions);
   const packs = buildDomainFieldPacks(tableRegistry, dataFields);
   const relationMap = buildRelationMap(tableRegistry);
-  const manifest = buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, dataFields);
+  const manifest = buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields);
   const qualityReport = buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions);
 
   writeJson(path.join(registryDir, 'endpoint-catalog.json'), endpointCatalog);

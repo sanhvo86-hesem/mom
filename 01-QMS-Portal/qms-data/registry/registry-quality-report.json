@@ -2,18 +2,22 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-04T11:03:30.954Z"
+    "generatedAt": "2026-04-05T11:58:08.953Z"
   },
   "summary": {
-    "endpoint_count": 2334,
+    "endpoint_count": 2800,
     "pack_count": 3168,
     "relation_edge_count": 2440,
     "workflow_count": 425,
     "status_set_count": 536,
-    "validation_rule_count": 24776,
+    "validation_rule_count": 24784,
     "formula_count": 960,
     "formula_reference_count": 960,
-    "field_context_count": 40589
+    "field_context_count": 38507,
+    "non_scalar_pk_tables": 19,
+    "unsupported_record_endpoints": 0,
+    "contract_issues": 0,
+    "workflow_alignment_issues": 0
   },
   "checks": [
     {
@@ -53,6 +57,36 @@
       "target": 222
     },
     {
+      "id": "scalar_pk_tables",
+      "passed": true,
+      "actual": 509,
+      "target": 496
+    },
+    {
+      "id": "frontend_scalar_record_readiness",
+      "passed": false,
+      "actual": 19,
+      "target": 0
+    },
+    {
+      "id": "no_unsupported_record_endpoints",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "endpoint_contract_readiness",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "workflow_status_alignment",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
       "id": "workflow_count_target",
       "passed": true,
       "actual": 425,
@@ -73,7 +107,7 @@
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 24776,
+      "actual": 24784,
       "target": 5000
     },
     {
@@ -89,5 +123,164 @@
       "target": 960
     }
   ],
-  "all_passed": true
+  "warnings": {
+    "non_scalar_pk_tables": [
+      {
+        "table": "audit_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "recorded_at"
+        ]
+      },
+      {
+        "table": "bill_of_materials",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "bom_id",
+          "bom_revision"
+        ]
+      },
+      {
+        "table": "form_schemas",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "form_code",
+          "version"
+        ]
+      },
+      {
+        "table": "labor_transactions",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "labor_txn_id",
+          "recorded_at"
+        ]
+      },
+      {
+        "table": "mes_cycle_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "cycle_id",
+          "cycle_end_time"
+        ]
+      },
+      {
+        "table": "mes_downtime_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "downtime_id",
+          "start_time"
+        ]
+      },
+      {
+        "table": "mes_inline_measurements",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "measurement_id",
+          "measured_at"
+        ]
+      },
+      {
+        "table": "mes_machine_alarms",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "alarm_id",
+          "alarm_time"
+        ]
+      },
+      {
+        "table": "mes_machine_state_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "event_time"
+        ]
+      },
+      {
+        "table": "mes_machine_telemetry",
+        "primary_key_mode": "missing",
+        "primary_key_fields": []
+      },
+      {
+        "table": "mes_oee_loss_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "loss_id",
+          "loss_time"
+        ]
+      },
+      {
+        "table": "mes_production_kpi_daily",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "kpi_date",
+          "dimension_type",
+          "dimension_id",
+          "COALESCE(shift_code",
+          "'ALL'"
+        ]
+      },
+      {
+        "table": "mes_program_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "event_time"
+        ]
+      },
+      {
+        "table": "mes_spc_violations",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "violation_id",
+          "detected_at"
+        ]
+      },
+      {
+        "table": "mes_tool_life_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "event_time"
+        ]
+      },
+      {
+        "table": "mes_wip_movements",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "movement_id",
+          "moved_at"
+        ]
+      },
+      {
+        "table": "record_counters",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "record_type",
+          "fiscal_year"
+        ]
+      },
+      {
+        "table": "routings",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "routing_id",
+          "routing_revision"
+        ]
+      },
+      {
+        "table": "user_roles",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "user_id",
+          "role_id"
+        ]
+      }
+    ],
+    "unsupported_record_endpoints": [],
+    "contract_issues": [],
+    "workflow_alignment_issues": []
+  },
+  "all_passed": false
 }

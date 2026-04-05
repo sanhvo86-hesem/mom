@@ -52,6 +52,172 @@ class GenericCrudService
     }
 
     /**
+     * @return array<int, array{
+     *   key:string,
+     *   sourceField:string,
+     *   targetTable:string,
+     *   targetKey:string,
+     *   targetField:string
+     * }>
+     */
+    private function joinFieldSpecs(string $domain, string $tableName, string $kind): array
+    {
+        $table = $this->tables[$tableName] ?? [];
+        $fieldDefs = (array)($this->registry->fields($domain . '.' . $tableName . '.' . $kind) ?? []);
+        $foreignKeys = (array)($table['foreignKeys'] ?? []);
+        $specs = [];
+
+        foreach ($fieldDefs as $field) {
+            if (!is_array($field) || ($field['source'] ?? '') !== 'join') {
+                continue;
+            }
+
+            $outputKey = trim((string)($field['key'] ?? ''));
+            $sourceField = trim((string)($field['joinVia'] ?? ''));
+            $targetTable = trim((string)($field['dbTable'] ?? ''));
+            $targetField = trim((string)($field['dbColumn'] ?? ''));
+            if ($outputKey === '' || $sourceField === '' || $targetTable === '' || $targetField === '') {
+                continue;
+            }
+
+            $targetKey = '';
+            foreach ($foreignKeys as $foreignKey) {
+                if (!is_array($foreignKey) || trim((string)($foreignKey['column'] ?? '')) !== $sourceField) {
+                    continue;
+                }
+
+                $reference = trim((string)($foreignKey['references'] ?? ''));
+                if ($reference === '' || strpos($reference, '.') === false) {
+                    continue;
+                }
+
+                [$refTable, $refColumn] = explode('.', $reference, 2);
+                if ($refTable === $targetTable && $refColumn !== '') {
+                    $targetKey = trim((string)$refColumn);
+                    break;
+                }
+            }
+
+            if ($targetKey === '') {
+                continue;
+            }
+
+            $specs[] = [
+                'key' => $outputKey,
+                'sourceField' => $sourceField,
+                'targetTable' => $targetTable,
+                'targetKey' => $targetKey,
+                'targetField' => $targetField,
+            ];
+        }
+
+        return $specs;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function augmentRowsWithJoinFields(string $domain, string $tableName, string $kind, array $rows): array
+    {
+        if ($rows === []) {
+            return $rows;
+        }
+
+        $specs = $this->joinFieldSpecs($domain, $tableName, $kind);
+        if ($specs === []) {
+            return $rows;
+        }
+
+        $groups = [];
+        foreach ($specs as $spec) {
+            $groupKey = $spec['sourceField'] . '|' . $spec['targetTable'] . '|' . $spec['targetKey'];
+            if (!isset($groups[$groupKey])) {
+                $groups[$groupKey] = [
+                    'sourceField' => $spec['sourceField'],
+                    'targetTable' => $spec['targetTable'],
+                    'targetKey' => $spec['targetKey'],
+                    'targetFields' => [],
+                ];
+            }
+            $groups[$groupKey]['targetFields'][$spec['key']] = $spec['targetField'];
+        }
+
+        foreach ($groups as $group) {
+            $values = [];
+            foreach ($rows as $row) {
+                $value = $row[$group['sourceField']] ?? null;
+                if (!is_scalar($value) || $value === '') {
+                    continue;
+                }
+                $values[(string)$value] = $value;
+            }
+
+            if ($values === []) {
+                continue;
+            }
+
+            $params = [];
+            $placeholders = [];
+            $index = 0;
+            foreach ($values as $value) {
+                $param = ':j_' . $index;
+                $params[$param] = $value;
+                $placeholders[] = $param;
+                $index += 1;
+            }
+
+            $selectColumns = [$this->q($group['targetKey'])];
+            foreach (array_unique(array_values($group['targetFields'])) as $targetField) {
+                $selectColumns[] = $this->q($targetField);
+            }
+
+            $sql = 'SELECT ' . implode(', ', $selectColumns)
+                . ' FROM ' . $this->q($group['targetTable'])
+                . ' WHERE ' . $this->q($group['targetKey']) . ' IN (' . implode(', ', $placeholders) . ')';
+            $lookupRows = $this->db->query($sql, $params);
+            $lookup = [];
+            foreach ($lookupRows as $lookupRow) {
+                if (!is_array($lookupRow) || !array_key_exists($group['targetKey'], $lookupRow)) {
+                    continue;
+                }
+                $lookup[(string)$lookupRow[$group['targetKey']]] = $lookupRow;
+            }
+
+            foreach ($rows as &$row) {
+                $sourceValue = $row[$group['sourceField']] ?? null;
+                if (!is_scalar($sourceValue)) {
+                    continue;
+                }
+                $joined = $lookup[(string)$sourceValue] ?? null;
+                if (!is_array($joined)) {
+                    continue;
+                }
+                foreach ($group['targetFields'] as $outputKey => $targetField) {
+                    $row[$outputKey] = $joined[$targetField] ?? null;
+                }
+            }
+            unset($row);
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<string, mixed>|null $row
+     * @return array<string, mixed>|null
+     */
+    private function augmentRowWithJoinFields(string $domain, string $tableName, string $kind, ?array $row): ?array
+    {
+        if ($row === null) {
+            return null;
+        }
+
+        $rows = $this->augmentRowsWithJoinFields($domain, $tableName, $kind, [$row]);
+        return $rows[0] ?? $row;
+    }
+
+    /**
      * @param array<string, mixed> $query
      * @return array<string, mixed>
      */
@@ -115,6 +281,7 @@ class GenericCrudService
         $countSql = 'SELECT COUNT(*) AS total FROM ' . $tableSql . $whereSql;
 
         $rows = $this->db->query($listSql, $params);
+        $rows = $this->augmentRowsWithJoinFields($domain, $tableName, 'list', $rows);
         $countRow = $this->db->queryOne($countSql, $params);
         $total = (int)($countRow['total'] ?? 0);
 
@@ -137,7 +304,8 @@ class GenericCrudService
         $table = $this->resolveTable($domain, $tableName);
         $pk = $this->primaryKey($table);
         $sql = 'SELECT * FROM ' . $this->q($tableName) . ' WHERE ' . $this->q($pk) . ' = :id LIMIT 1';
-        return $this->db->queryOne($sql, [':id' => $id]);
+        $row = $this->db->queryOne($sql, [':id' => $id]);
+        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
 
     /**
@@ -173,7 +341,7 @@ class GenericCrudService
             throw new RuntimeException('Insert did not return a record');
         }
 
-        return $row;
+        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
 
     /**
@@ -214,7 +382,7 @@ class GenericCrudService
             throw new RuntimeException('Update did not return a record');
         }
 
-        return $row;
+        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
 
     /**
@@ -230,7 +398,7 @@ class GenericCrudService
         if (!is_array($row)) {
             throw new RuntimeException('Record not found');
         }
-        return $row;
+        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
 
     /**
@@ -275,7 +443,7 @@ class GenericCrudService
             throw new RuntimeException('Transition did not return a record');
         }
 
-        return $row;
+        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
 
     /**
@@ -440,13 +608,22 @@ class GenericCrudService
     private function defaultSortColumn(array $table): string
     {
         $columns = array_keys((array)($table['columns'] ?? []));
-        foreach (['updated_at', 'created_at', 'effective_date', 'event_time'] as $candidate) {
+        foreach (['updated_at', 'created_at', 'effective_date', 'event_time', 'recorded_at', 'measured_at', 'detected_at', 'alarm_time', 'start_time', 'ts'] as $candidate) {
             if (in_array($candidate, $columns, true)) {
                 return $candidate;
             }
         }
 
-        return $this->primaryKey($table);
+        $primaryKey = $table['primaryKey'] ?? null;
+        if (is_string($primaryKey) && trim($primaryKey) !== '') {
+            return $this->assertIdentifier(trim($primaryKey), 'primary key');
+        }
+
+        if ($columns !== []) {
+            return $this->assertIdentifier((string)$columns[0], 'sort column');
+        }
+
+        throw new RuntimeException('Table does not define a sortable column');
     }
 
     /**
@@ -456,7 +633,11 @@ class GenericCrudService
     {
         $pk = $table['primaryKey'] ?? null;
         if (is_array($pk)) {
-            $pk = reset($pk);
+            $keys = array_values(array_filter(array_map(static fn($value): string => trim((string)$value), $pk), static fn(string $value): bool => $value !== ''));
+            if (count($keys) !== 1) {
+                throw new RuntimeException('Composite or missing primary key is not supported by GenericCrudService');
+            }
+            $pk = $keys[0];
         }
         $pk = is_string($pk) ? trim($pk) : '';
         if ($pk === '') {

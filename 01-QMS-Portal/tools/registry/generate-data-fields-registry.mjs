@@ -46,9 +46,43 @@ function humanize(key) { return englishLabelFromKey(key); }
 function viLabel(key) {
   return vietnameseLabelFromKeyV2(key);
 }
-function fieldType(key, uiType, kind, statusColumn) {
+function fieldType(key, dbType, uiType, kind, statusColumn, statusSet) {
   const k = toSnakeCase(key);
+  const type = String(dbType || '').trim().toLowerCase();
   if ((k === statusColumn || k.endsWith('_status')) && ['list', 'detail'].includes(kind)) return 'badge';
+  if ((k === statusColumn || k.endsWith('_status')) && statusSet) return 'select';
+  if (/jsonb?(?:\[\])?$/.test(type)) return 'json';
+  if (/^bool(?:ean)?$/.test(type)) return 'boolean';
+  if (/timestamp|timestamptz/.test(type)) return 'datetime';
+  if (/^date$/.test(type)) return 'date';
+  if (/^time(?: with(?:out)? time zone)?$/.test(type)) return 'datetime';
+  if (/uuid|char|varchar|text|citext/.test(type)) {
+    if (uiType === 'select' || uiType === 'reference') return 'select';
+    if (uiType === 'textarea') return 'textarea';
+    if (uiType === 'json') return 'json';
+    if (uiType === 'date') return 'date';
+    if (uiType === 'datetime') return 'datetime';
+    if (uiType === 'currency') return 'currency';
+    if (uiType === 'percentage') return 'percentage';
+    if (uiType === 'file') return 'file';
+    if (uiType === 'boolean') return 'boolean';
+    if (['number', 'duration', 'temperature', 'weight', 'pressure'].includes(uiType)) return 'number';
+    if (/notes|description|message|summary|detail|reason|comment/.test(k)) return 'textarea';
+    if (/json|metadata|trend|breakdown/.test(k)) return 'json';
+    if (/flag|required|enabled|active|logged_in|initialized|expired/.test(k)) return 'boolean';
+    return 'string';
+  }
+  if (/numeric|decimal|real|double precision|money/.test(type)) {
+    if (/pct|percent|ratio|rate|yield|score|confidence/.test(k)) return 'percentage';
+    if (/cost|price|amount|value|revenue|budget/.test(k)) return 'currency';
+    return 'number';
+  }
+  if (/smallint|integer|bigint|serial|bigserial/.test(type)) {
+    if (/pct|percent|ratio|rate|yield|score|confidence/.test(k)) return 'percentage';
+    if (/cost|price|amount|value|revenue|budget/.test(k)) return 'currency';
+    return 'number';
+  }
+  if (/\[\]$/.test(type)) return 'json';
   if (uiType === 'select' || uiType === 'reference') return 'select';
   if (uiType === 'textarea') return 'textarea';
   if (uiType === 'json') return 'json';
@@ -129,6 +163,49 @@ const orphanJoined = context.orphanResolution.orphan_fields.joined.fields.filter
 const orphanParams = context.orphanResolution.orphan_fields.api_param.fields.filter(keepSyntheticField);
 const columnIndex = new Map();
 for (const [tableName, table] of Object.entries(tables)) for (const [columnName, column] of Object.entries(table.columns)) { if (!columnIndex.has(columnName)) columnIndex.set(columnName, []); columnIndex.get(columnName).push({ tableName, column }); }
+const SYSTEM_MANAGED_FIELDS = new Set([
+  'created_at',
+  'updated_at',
+  'created_by',
+  'updated_by',
+  'recorded_at',
+  'row_version',
+  'payload_schema_version',
+  'source_record_id',
+  'source_system',
+]);
+
+function primaryKeyName(table) {
+  const primaryKey = Array.isArray(table.primaryKey) ? table.primaryKey[0] : table.primaryKey;
+  return typeof primaryKey === 'string' && primaryKey.trim() ? primaryKey.trim() : '';
+}
+
+function hasPrimaryKey(table) {
+  return primaryKeyName(table) !== '';
+}
+
+function writeColumnsFor(table, kind) {
+  const primaryKey = primaryKeyName(table);
+  return Object.keys(table.columns).filter((columnName) => {
+    const column = table.columns[columnName];
+    if (!column || column.generated) return false;
+    if (SYSTEM_MANAGED_FIELDS.has(columnName)) return false;
+    if (kind === 'update' && columnName === primaryKey) return false;
+    if (kind === 'update' && table.statusColumn && columnName === table.statusColumn) return false;
+    if (kind === 'create' && columnName === primaryKey && column.default) return false;
+    return true;
+  });
+}
+
+function deleteFieldsFor(table) {
+  const primaryKey = primaryKeyName(table);
+  if (!primaryKey) return [];
+  return [
+    dbField(table.tableName, primaryKey, table, 'detail'),
+    { key: 'confirm_delete', label: 'Xác nhận xóa', labelEn: 'Confirm Delete', type: 'boolean', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: {} },
+    { key: 'delete_reason', label: 'Lý do xóa', labelEn: 'Delete Reason', type: 'textarea', required: false, filterable: false, sortable: false, group: 'general', source: 'param', constraints: { maxLength: 2000 } },
+  ];
+}
 
 function dbField(tableName, columnName, table, kind) {
   const column = table.columns[columnName];
@@ -136,10 +213,10 @@ function dbField(tableName, columnName, table, kind) {
     key: columnName,
     label: isVietnamese(column.label) ? column.label : viLabel(columnName),
     labelEn: column.labelEn || humanize(columnName),
-    type: fieldType(columnName, column.uiType, kind, table.statusColumn),
+    type: fieldType(columnName, column.type, column.uiType, kind, table.statusColumn, table.statusSet),
     required: ['create', 'update'].includes(kind) ? Boolean(column.required && !column.default) : Boolean(column.required),
-    filterable: ['list', 'detail'].includes(kind) && !['json', 'file', 'textarea'].includes(fieldType(columnName, column.uiType, kind, table.statusColumn)),
-    sortable: ['list', 'detail'].includes(kind) && !['json', 'file', 'textarea'].includes(fieldType(columnName, column.uiType, kind, table.statusColumn)),
+    filterable: ['list', 'detail'].includes(kind) && !['json', 'file', 'textarea'].includes(fieldType(columnName, column.type, column.uiType, kind, table.statusColumn, table.statusSet)),
+    sortable: ['list', 'detail'].includes(kind) && !['json', 'file', 'textarea'].includes(fieldType(columnName, column.type, column.uiType, kind, table.statusColumn, table.statusSet)),
     group: fieldGroup(columnName, tableName, 'db_column'),
     source: 'db_column',
     dbColumn: columnName,
@@ -226,7 +303,7 @@ function joinField(tableName, fk, targetName, targetTable, kind) {
     key,
     label: viLabel(key),
     labelEn: humanize(key),
-    type: fieldType(displayColumn, targetTable.columns[displayColumn].uiType, kind, targetTable.statusColumn),
+    type: fieldType(displayColumn, targetTable.columns[displayColumn].type, targetTable.columns[displayColumn].uiType, kind, targetTable.statusColumn, targetTable.statusSet),
     required: false,
     filterable: ['list', 'detail'].includes(kind),
     sortable: ['list', 'detail'].includes(kind),
@@ -270,32 +347,38 @@ function resolveJoined(entry) {
 
 const generated = {};
 for (const [tableName, table] of Object.entries(tables)) {
+  table.tableName = tableName;
   const listCols = Object.keys(table.columns).sort((a, b) => {
     const score = (c) => (c === table.statusColumn ? 0 : /name|title|code|number/.test(c) ? 1 : /date|time|qty|amount|cost|value/.test(c) ? 2 : table.columns[c].uiType === 'json' ? 9 : 5);
     return score(a) - score(b) || a.localeCompare(b);
   }).filter((c) => !(table.columns[c].uiType === 'json' || table.columns[c].uiType === 'textarea')).slice(0, 12);
-  const writeCols = Object.keys(table.columns).filter((c) => !(table.columns[c].generated || ['created_at', 'updated_at', 'created_by', 'updated_by'].includes(c) || (table.columns[c].pk && table.columns[c].default)));
+  const createCols = writeColumnsFor(table, 'create');
+  const updateCols = writeColumnsFor(table, 'update');
+  const primaryKey = primaryKeyName(table);
   generated[`${table.domain}.${tableName}.list`] = ensureMin(`${table.domain}.${tableName}.list`, listCols.map((c) => dbField(tableName, c, table, 'list')));
-  generated[`${table.domain}.${tableName}.detail`] = ensureMin(`${table.domain}.${tableName}.detail`, Object.keys(table.columns).map((c) => dbField(tableName, c, table, 'detail')));
-  generated[`${table.domain}.${tableName}.create`] = ensureMin(`${table.domain}.${tableName}.create`, writeCols.map((c) => dbField(tableName, c, table, 'create')));
-  generated[`${table.domain}.${tableName}.update`] = ensureMin(`${table.domain}.${tableName}.update`, writeCols.map((c) => dbField(tableName, c, table, 'update')));
-  if (table.statusColumn && table.statusSet) generated[`${table.domain}.${tableName}.transition`] = ensureMin(`${table.domain}.${tableName}.transition`, [
-    dbField(tableName, Array.isArray(table.primaryKey) ? table.primaryKey[0] : table.primaryKey, table, 'detail'),
+  if (hasPrimaryKey(table)) {
+    generated[`${table.domain}.${tableName}.detail`] = ensureMin(`${table.domain}.${tableName}.detail`, Object.keys(table.columns).map((c) => dbField(tableName, c, table, 'detail')));
+    generated[`${table.domain}.${tableName}.update`] = ensureMin(`${table.domain}.${tableName}.update`, updateCols.map((c) => dbField(tableName, c, table, 'update')));
+    generated[`${table.domain}.${tableName}.delete`] = ensureMin(`${table.domain}.${tableName}.delete`, deleteFieldsFor(table));
+  }
+  generated[`${table.domain}.${tableName}.create`] = ensureMin(`${table.domain}.${tableName}.create`, createCols.map((c) => dbField(tableName, c, table, 'create')));
+  if (primaryKey && table.statusColumn && table.statusSet) generated[`${table.domain}.${tableName}.transition`] = ensureMin(`${table.domain}.${tableName}.transition`, [
+    dbField(tableName, primaryKey, table, 'detail'),
     dbField(tableName, table.statusColumn, table, 'detail'),
-    { key: 'next_status', label: 'Tráº¡ng thÃ¡i káº¿ tiáº¿p', labelEn: 'Next Status', type: 'select', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { enumRef: table.statusSet } },
-    { key: 'transition_note', label: 'Ghi chÃº chuyá»ƒn tráº¡ng thÃ¡i', labelEn: 'Transition Note', type: 'textarea', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { maxLength: 2000 } },
+    { key: 'to_status', label: 'Trạng thái đích', labelEn: 'Target Status', type: 'select', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { enumRef: table.statusSet } },
+    { key: 'transition_note', label: 'Ghi chú chuyển trạng thái', labelEn: 'Transition Note', type: 'textarea', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { maxLength: 2000 } },
   ]);
   for (const fk of table.foreignKeys) {
     const targetName = String(fk.references).split('.')[0];
     const targetTable = tables[targetName];
     if (!targetTable) continue;
     const listJoin = joinField(tableName, fk, targetName, targetTable, 'list');
-    const detailJoin = joinField(tableName, fk, targetName, targetTable, 'detail');
+    const detailJoin = hasPrimaryKey(table) ? joinField(tableName, fk, targetName, targetTable, 'detail') : null;
     if (listJoin) generated[`${table.domain}.${tableName}.list`].push(listJoin);
-    if (detailJoin) generated[`${table.domain}.${tableName}.detail`].push(detailJoin);
+    if (detailJoin && generated[`${table.domain}.${tableName}.detail`]) generated[`${table.domain}.${tableName}.detail`].push(detailJoin);
   }
   generated[`${table.domain}.${tableName}.list`] = uniqueFields(generated[`${table.domain}.${tableName}.list`]);
-  generated[`${table.domain}.${tableName}.detail`] = uniqueFields(generated[`${table.domain}.${tableName}.detail`]);
+  if (generated[`${table.domain}.${tableName}.detail`]) generated[`${table.domain}.${tableName}.detail`] = uniqueFields(generated[`${table.domain}.${tableName}.detail`]);
 }
 
 const reservedKeys = new Set();
@@ -306,10 +389,10 @@ for (const fields of Object.values(generated)) {
 }
 const filterSyntheticCollisions = (entries) => entries.filter((entry) => !reservedKeys.has(entry.key));
 
-generated['registry_support.computed.metrics'] = ensureMin('registry_support.computed.metrics', filterSyntheticCollisions(orphanComputed).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, false), constraints: {} })));
-generated['registry_support.aggregate.metrics'] = ensureMin('registry_support.aggregate.metrics', filterSyntheticCollisions(orphanAggregate).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, true), constraints: {} })));
+generated['registry_support.computed.metrics'] = ensureMin('registry_support.computed.metrics', filterSyntheticCollisions(orphanComputed).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, '', 'string', 'detail', null, null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, false), constraints: {} })));
+generated['registry_support.aggregate.metrics'] = ensureMin('registry_support.aggregate.metrics', filterSyntheticCollisions(orphanAggregate).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, '', 'string', 'detail', null, null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, true), constraints: {} })));
 generated['registry_support.join.fields'] = ensureMin('registry_support.join.fields', filterSyntheticCollisions(orphanJoined).map((e) => { const r = resolveJoined(e); return { key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: 'string', required: false, filterable: true, sortable: true, group: fieldGroup(e.key, r.dbTable, 'join'), source: 'join', dbTable: r.dbTable, dbColumn: r.dbColumn, joinVia: e.joinVia || null, constraints: {} }; }));
-generated['platform.runtime.params'] = ensureMin('platform.runtime.params', filterSyntheticCollisions(orphanParams).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: false, group: fieldGroup(e.key, '', 'param'), source: 'param', constraints: {} })));
+generated['platform.runtime.params'] = ensureMin('platform.runtime.params', filterSyntheticCollisions(orphanParams).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, '', 'string', 'detail', null, null), required: false, filterable: false, sortable: false, group: fieldGroup(e.key, '', 'param'), source: 'param', constraints: {} })));
 
 const endpointKeys = Object.keys(generated);
 const uniqueKeys = new Set();
@@ -331,11 +414,17 @@ for (const [endpointKey, fields] of Object.entries(generated)) {
     if (!field.dbTable && !['computed', 'join', 'param'].includes(field.source)) throw new Error(`Field ${field.key} missing dbTable/source`);
   }
 }
-for (const [tableName, table] of Object.entries(tables)) for (const columnName of Object.keys(table.columns)) if (!coveredPairs.has(`${tableName}.${columnName}`)) throw new Error(`Missing coverage for ${tableName}.${columnName}`);
+for (const [tableName, table] of Object.entries(tables)) {
+  for (const columnName of Object.keys(table.columns)) {
+    if (SYSTEM_MANAGED_FIELDS.has(columnName)) continue;
+    if (!coveredPairs.has(`${tableName}.${columnName}`)) throw new Error(`Missing coverage for ${tableName}.${columnName}`);
+  }
+}
 const registryColumnNames = new Set(Object.values(tables).flatMap((table) => Object.keys(table.columns)));
 for (const columns of Object.values(context.baselineColumns)) {
   for (const columnName of columns) {
     if (!registryColumnNames.has(columnName)) continue;
+    if (SYSTEM_MANAGED_FIELDS.has(columnName)) continue;
     if (!coveredNames.has(columnName)) throw new Error(`Baseline column ${columnName} missing field def`);
   }
 }

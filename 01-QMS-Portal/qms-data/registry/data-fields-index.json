@@ -1,13 +1,13 @@
 {
   "_meta": {
     "version": "4.0",
-    "generatedAt": "2026-04-04T11:03:25.080Z",
+    "generatedAt": "2026-04-05T08:21:20.056Z",
     "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
     "sourceEndpointCount": 3,
-    "generatedEndpointCount": 2338,
-    "uniqueFieldKeys": 4012,
+    "generatedEndpointCount": 2863,
+    "uniqueFieldKeys": 4014,
     "uniqueDbColumnNamesCovered": 3701,
-    "totalDbTableColumnsCovered": 10339,
+    "totalDbTableColumnsCovered": 10335,
     "baselineUniqueColumnCoverage": 3701,
     "migrationCount": 70,
     "researchReferences": [
@@ -183,11 +183,11 @@
     ]
   },
   "split": true,
-  "lineCount": 626259,
+  "lineCount": 591413,
   "parts": [
     {
       "file": "data-fields-part1.json",
-      "endpointCount": 1344,
+      "endpointCount": 1640,
       "domains": [
         "core_system",
         "document_control",
@@ -218,7 +218,7 @@
     },
     {
       "file": "data-fields-part2.json",
-      "endpointCount": 994,
+      "endpointCount": 1223,
       "domains": [
         "tooling_lifecycle",
         "demand_supply_planning",

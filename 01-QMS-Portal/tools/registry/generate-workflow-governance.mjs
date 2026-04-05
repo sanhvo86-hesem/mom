@@ -506,6 +506,26 @@ function workflowNameEn(table) {
   return `${table.labelEn || titleCase(table.tableName)} Workflow`;
 }
 
+function persistedStatesForTable(primaryTable, statusSets) {
+  return primaryTable.statusColumn && statusSets[primaryTable.statusSet]
+    ? defaultStatesForTable(primaryTable, statusSets)
+    : [];
+}
+
+function stableWorkflowName(table) {
+  return `${table.label} - Luong xu ly`;
+}
+
+function lifecycleModeForTable(primaryTable, statusSets) {
+  if (!(primaryTable.statusColumn && primaryTable.statusSet && statusSets[primaryTable.statusSet])) {
+    return 'stateless';
+  }
+  if (primaryTable.statusSet === 'digital_thread_status') {
+    return 'generic_status_only';
+  }
+  return 'persisted';
+}
+
 function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
   const existing = normalizeWorkflowMap(existingRaw);
   const statusSets = normalizeStatusSets(statusOptionsRaw);
@@ -523,8 +543,14 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
   for (const [workflowId, tables] of groups.entries()) {
     const existingWorkflow = existing[workflowId] || null;
     const primaryTable = tables.find((table) => table.statusColumn) || tables[0];
-    const states = existingWorkflow?.states?.length ? clone(existingWorkflow.states) : defaultStatesForTable(primaryTable, statusSets);
-    const transitions = existingWorkflow?.transitions?.length ? clone(existingWorkflow.transitions) : buildTransitionsFromStates(states, primaryTable.domain);
+    const lifecycleMode = lifecycleModeForTable(primaryTable, statusSets);
+    const hasPersistedLifecycle = lifecycleMode === 'persisted';
+    const states = hasPersistedLifecycle
+      ? (existingWorkflow?.states?.length ? clone(existingWorkflow.states) : persistedStatesForTable(primaryTable, statusSets))
+      : [];
+    const transitions = hasPersistedLifecycle
+      ? (existingWorkflow?.transitions?.length ? clone(existingWorkflow.transitions) : buildTransitionsFromStates(states, primaryTable.domain))
+      : [];
     const relatedTables = Array.from(new Set([
       ...tables.map((table) => table.tableName),
       ...primaryTable.foreignKeys.map((fk) => String(fk.references || '').split('.')[0]).filter(Boolean),
@@ -532,13 +558,15 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
       ...(primaryTable.digitalThread?.downstream || []),
     ]));
 
-    const sla = existingWorkflow?.sla || Object.fromEntries(
-      transitions.map((transition) => [`${transition.from}_to_${transition.to}`, { hours: /(approved|closed|completed|posted|delivered)/.test(transition.to) ? 72 : 24, escalateTo: rolesForDomain(primaryTable.domain)[0] }]),
-    );
+    const sla = hasPersistedLifecycle
+      ? (existingWorkflow?.sla || Object.fromEntries(
+        transitions.map((transition) => [`${transition.from}_to_${transition.to}`, { hours: /(approved|closed|completed|posted|delivered)/.test(transition.to) ? 72 : 24, escalateTo: rolesForDomain(primaryTable.domain)[0] }]),
+      ))
+      : {};
 
     workflows[workflowId] = {
       workflowId,
-      name: existingWorkflow?.name || workflowName(primaryTable),
+      name: existingWorkflow?.name || stableWorkflowName(primaryTable),
       nameEn: existingWorkflow?.nameEn || workflowNameEn(primaryTable),
       entity: existingWorkflow?.entity || primaryTable.tableName,
       domain: primaryTable.domain,
@@ -547,6 +575,7 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
       relatedTables,
       stateField: primaryTable.statusColumn || '',
       statusSet: primaryTable.statusSet || '',
+      lifecycleMode,
       states,
       transitions,
       sla,

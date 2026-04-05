@@ -75,6 +75,20 @@ class GenericCrudController extends BaseController
         if ($needsId && $id === '') {
             $body = $this->jsonBody();
             $id = trim((string)($body['id'] ?? ''));
+            if ($id === '') {
+                try {
+                    $tableMeta = $this->service()->resolveTable($domain, $table);
+                    $primaryKey = $tableMeta['primaryKey'] ?? null;
+                    if (is_array($primaryKey)) {
+                        $primaryKey = $primaryKey[0] ?? null;
+                    }
+                    if (is_string($primaryKey) && $primaryKey !== '') {
+                        $id = trim((string)($body[$primaryKey] ?? ''));
+                    }
+                } catch (Throwable) {
+                    // Keep the original missing-id failure path.
+                }
+            }
         }
         if ($needsId && $id === '') {
             throw new RuntimeException('Missing record id');
@@ -220,7 +234,7 @@ class GenericCrudController extends BaseController
         try {
             $ctx = $this->resolveContext('transition', true);
             $body = $this->jsonBody();
-            $toStatus = trim((string)($body['to'] ?? $body['status'] ?? $body['toStatus'] ?? ''));
+            $toStatus = trim((string)($body['to'] ?? $body['status'] ?? $body['toStatus'] ?? $body['to_status'] ?? ''));
             if ($toStatus === '') {
                 $this->error('missing_status', 400);
             }

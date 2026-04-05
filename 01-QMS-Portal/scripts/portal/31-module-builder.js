@@ -147,13 +147,17 @@ var state = {
     dataFieldsIndexLoading: null,
     dataFieldPartTexts: {},
     dataFieldPartLoading: {},
+    failedLoads: {},
+    criticalMissing: [],
     computedFormulas: {},
     iotConnectors: {},
     validationRules: {},
     workflows: {},
     domainPacks: {},
     relationMap: {},
-    endpointCatalog: {}
+    endpointCatalog: {},
+    manifest: null,
+    qualityReport: null
   }
 };
 
@@ -1938,9 +1942,11 @@ function _ensureRegistriesLoaded(force){
       state.registries.statusOptions    = HR.raw('status-options') || {};
       state.registries.computedFormulas = HR.raw('computed-formulas') || {};
       state.registries.iotConnectors    = HR.raw('iot-connectors') || (BE.IOT_CONNECTORS || {});
+      state.registries.manifest         = HR.raw('registry-manifest') || null;
+      state.registries.qualityReport    = HR.raw('registry-quality-report') || null;
 
       // Lazy-load remaining registries via HmRegistry preload
-      var remaining = 5;
+      var remaining = 7;
       function _onLazy(){ remaining--; if(remaining <= 0){ _finishRegistryLoad(); } }
 
       HR.preload('validation-rules', function(d){ state.registries.validationRules = d || {}; _onLazy(); });
@@ -1948,6 +1954,8 @@ function _ensureRegistriesLoaded(force){
       HR.preload('domain-field-packs', function(d){ state.registries.domainPacks = d || {}; _onLazy(); });
       HR.preload('relation-map', function(d){ state.registries.relationMap = d || {}; _onLazy(); });
       HR.preload('endpoint-catalog', function(d){ state.registries.endpointCatalog = d || {}; _onLazy(); });
+      HR.preload('registry-manifest', function(d){ state.registries.manifest = d || null; _onLazy(); });
+      HR.preload('registry-quality-report', function(d){ state.registries.qualityReport = d || null; _onLazy(); });
     });
     return;
   }
@@ -1966,7 +1974,9 @@ function _ensureRegistriesLoaded(force){
     _loadRegistry('workflow-library', 'workflows'),
     _loadRegistry('domain-field-packs', 'domainPacks'),
     _loadRegistry('relation-map', 'relationMap'),
-    _loadRegistry('endpoint-catalog', 'endpointCatalog')
+    _loadRegistry('endpoint-catalog', 'endpointCatalog'),
+    _loadRegistry('registry-manifest', 'manifest'),
+    _loadRegistry('registry-quality-report', 'qualityReport')
   ]).then(function(){
     _finishRegistryLoad();
   }).catch(function(){
@@ -1978,9 +1988,23 @@ function _ensureRegistriesLoaded(force){
 }
 
 function _finishRegistryLoad(){
+  var criticalKeys = ['workflows','domainPacks','relationMap','endpointCatalog','manifest','qualityReport'];
+  var failedKeys = Object.keys(state.registries.failedLoads || {});
+  var missingCritical = criticalKeys.filter(function(key){
+    var value = state.registries[key];
+    if(Array.isArray(value)) return value.length === 0;
+    if(value && typeof value === 'object') return Object.keys(value).length === 0;
+    return !value;
+  });
   state.registries.loading = false;
   state.registries.loadingMessage = '';
   state.registries.loaded = true;
+  state.registries.criticalMissing = missingCritical;
+  if(missingCritical.length){
+    state.registries.error = _t('Builder dang o che do fallback, thieu registry: ','Builder is in fallback mode, missing registries: ') + missingCritical.join(', ');
+  } else if(!state.registries.error && failedKeys.length){
+    state.registries.error = _t('Mot so registry khong nap duoc, builder dang fallback mot phan.','Some registries could not be loaded and builder is using a partial fallback.');
+  }
   _applyEndpointCatalog();
   if(state.container) _paint();
 }
@@ -1999,6 +2023,61 @@ function _applyEndpointCatalog(){
   if(!items.length) return;
   BE.API_CATALOG = items;
   if(window.HmBlockEngine) window.HmBlockEngine.API_CATALOG = items;
+}
+
+function _registryHealthSummary(){
+  var manifest = state.registries.manifest || {};
+  var quality = state.registries.qualityReport || {};
+  var coverage = manifest.coverage || {};
+  var summary = quality.summary || {};
+  var checks = Array.isArray(quality.checks) ? quality.checks : [];
+  var passedChecks = checks.filter(function(check){ return check && check.passed; }).length;
+  var generatedAt = (manifest._meta && manifest._meta.generatedAt) || (quality._meta && quality._meta.generatedAt) || '';
+  return {
+    available: !!(Object.keys(manifest).length || Object.keys(quality).length),
+    ok: quality.all_passed !== false,
+    generatedAt: generatedAt,
+    endpointCount: summary.endpoint_count || coverage.router_actions || 0,
+    packCount: summary.pack_count || coverage.domain_pack_count || 0,
+    relationCount: summary.relation_edge_count || coverage.relation_edges || 0,
+    workflowCount: summary.workflow_count || coverage.workflow_count || 0,
+    statusCount: summary.status_set_count || coverage.status_sets || 0,
+    fieldRegistryActions: coverage.field_registry_actions || 0,
+    checkCount: checks.length,
+    passedChecks: passedChecks,
+    nonScalarPkTables: summary.non_scalar_pk_tables || 0,
+    unsupportedRecordEndpoints: summary.unsupported_record_endpoints || 0,
+    contractIssues: summary.contract_issues || 0,
+    workflowAlignmentIssues: summary.workflow_alignment_issues || 0
+  };
+}
+
+function _renderRegistryHealthNotice(){
+  var info = _registryHealthSummary();
+  var statusTone = info.ok ? 'var(--green)' : 'var(--amber)';
+  var background = info.ok ? 'rgba(22,163,74,0.10)' : 'var(--amber-bg)';
+  var issueCount;
+  var h = '';
+  if(!info.available || state.registries.loading || state.registries.error) return '';
+  issueCount = (info.nonScalarPkTables || 0) + (info.unsupportedRecordEndpoints || 0) + (info.contractIssues || 0) + (info.workflowAlignmentIssues || 0);
+  h += '<div style="padding:var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--text-secondary);background:'+background+';border:1px solid '+statusTone+';border-radius:var(--radius-md)">';
+  h += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">'+_esc(info.ok ? _t('Registry da pass quality gate cho builder.','Registry passed the builder quality gate.') : _t('Registry can duoc ra soat them truoc khi build.','Registry needs more review before building.'))+'</div>';
+  if(info.checkCount){
+    h += '<div>'+_esc(_t('Checks dat: ','Checks passed: ') + info.passedChecks + '/' + info.checkCount)+'</div>';
+  }
+  h += '<div>'+_esc(info.endpointCount + ' endpoints / ' + info.packCount + ' packs / ' + info.relationCount + ' relations')+'</div>';
+  h += '<div>'+_esc(info.workflowCount + ' workflows / ' + info.statusCount + ' status sets / ' + info.fieldRegistryActions + ' field schemas')+'</div>';
+  if(info.nonScalarPkTables){
+    h += '<div>'+_esc(_t('Bang can CRUD dac thu (composite/missing PK): ','Tables needing special CRUD handling (composite/missing PK): ') + info.nonScalarPkTables)+'</div>';
+  }
+  if(issueCount){
+    h += '<div>'+_esc(_t('Can xu ly them: ','Needs follow-up: ') + issueCount)+'</div>';
+  }
+  if(info.generatedAt){
+    h += '<div>'+_esc(_t('Generated: ','Generated: ') + info.generatedAt)+'</div>';
+  }
+  h += '</div>';
+  return h;
 }
 
 function _getApiCatalogOptions(){
@@ -2063,11 +2142,15 @@ function _isPendingApiSelectionCurrent(path, token){
 
 function _loadRegistry(file, key){
   var fallback = key === 'iotConnectors' ? (BE.IOT_CONNECTORS||{}) : {};
-  return _fetchJsonWithFallback(_registryPaths(file), 0).catch(function(){
-    return fallback;
-  }).then(function(data){
+  return _fetchJsonWithFallback(_registryPaths(file), 0).then(function(data){
+    if(state.registries.failedLoads && state.registries.failedLoads[key]) delete state.registries.failedLoads[key];
     state.registries[key] = data || {};
     return data;
+  }).catch(function(){
+    if(!state.registries.failedLoads) state.registries.failedLoads = {};
+    state.registries.failedLoads[key] = file;
+    state.registries[key] = fallback;
+    return fallback;
   });
 }
 
@@ -2993,14 +3076,42 @@ function _buildAutoKpisFromRegistry(entity, api){
   });
 }
 
-function _guessTransitionApi(entity){
+function _guessTransitionApi(entity, workflowId){
   var aliases = _aliasCandidatesForEntity(entity);
-  var catalog = BE.API_CATALOG || [];
+  var catalog = (BE.API_CATALOG || []).slice();
+  catalog.sort(function(a, b){
+    function score(item){
+      var value = 0;
+      var itemEntity = String((item && item.entity) || '');
+      var itemKind = String((item && item.kind) || '').toLowerCase();
+      var itemPath = String((item && item.path) || '');
+      var itemWorkflowId = String((((item && item.workflow) || {}).workflow_id) || item.workflowId || '');
+      if(itemEntity === entity) value += 20;
+      if(itemKind === 'transition') value += 10;
+      if(String((item && item.record_addressing) || '') === 'scalar') value += 5;
+      if(workflowId && itemWorkflowId === workflowId) value += 3;
+      if(/\/transition$/i.test(itemPath)) value += 1;
+      return value;
+    }
+    return score(b) - score(a);
+  });
   var matched = '';
   catalog.forEach(function(item){
+    var kind = String((item && item.kind) || '').toLowerCase();
     var action = String(item.action || '');
     var actionText = _normalizeSearchText(action);
+    var itemEntity = String((item && item.entity) || '');
+    var itemPath = String((item && item.path) || '');
+    var itemWorkflowId = String((((item && item.workflow) || {}).workflow_id) || item.workflowId || '');
     if(matched) return;
+    if(kind === 'transition' && (itemEntity === entity || aliases.indexOf(itemEntity) >= 0 || (workflowId && itemWorkflowId === workflowId))){
+      matched = action;
+      return;
+    }
+    if(/\/transition$/i.test(itemPath) && (itemEntity === entity || aliases.indexOf(itemEntity) >= 0)){
+      matched = action;
+      return;
+    }
     if(actionText.indexOf('transition') < 0) return;
     aliases.forEach(function(alias){
       if(!matched && actionText.indexOf(_normalizeSearchText(alias).replace(/_/g, '')) >= 0){
@@ -3032,10 +3143,11 @@ function _applyWorkflowRegistryToDraft(draft, workflowId){
   if(!workflow || !draft) return 0;
   if(!draft.config) draft.config = {};
   if(!draft.config.workflow) draft.config.workflow = {};
-  entity = workflow.entity || _inferEntityFromApi(_getByPath(draft, 'config.dataSource.api'));
+  entity = workflow.primaryTable || workflow.entity || _inferEntityFromApi(_getByPath(draft, 'config.dataSource.api'));
   draft.config.workflow.workflowId = workflowId;
   draft.config.workflow.entity = entity || '';
-  draft.config.workflow.stateField = draft.config.workflow.stateField || 'status';
+  draft.config.workflow.stateField = workflow.stateField || draft.config.workflow.stateField || 'status';
+  draft.config.workflow.statusSet = workflow.statusSet || draft.config.workflow.statusSet || '';
   draft.config.workflow.states = _clone(workflow.states || []);
   draft.config.workflow.transitions = (workflow.transitions || []).map(function(transition){
     return {
@@ -3044,7 +3156,7 @@ function _applyWorkflowRegistryToDraft(draft, workflowId){
       label: { vi: transition.label || transition.trigger || transition.to, en: transition.labelEn || transition.label || transition.trigger || transition.to },
       icon: _guessTransitionIcon(transition),
       variant: _guessTransitionVariant(transition),
-      endpoint: _guessTransitionApi(entity),
+      endpoint: _guessTransitionApi(entity, workflowId),
       method: 'POST',
       guards: _clone(transition.guards || []),
       actions: _clone(transition.actions || [])
@@ -3622,7 +3734,11 @@ function _ensureBuilderState(){
   if(!state.registries.dataFieldParts) state.registries.dataFieldParts = {};
   if(!state.registries.dataFieldPartTexts) state.registries.dataFieldPartTexts = {};
   if(!state.registries.dataFieldPartLoading) state.registries.dataFieldPartLoading = {};
+  if(!state.registries.failedLoads) state.registries.failedLoads = {};
+  if(!Array.isArray(state.registries.criticalMissing)) state.registries.criticalMissing = [];
   if(state.registries.loadingMessage === undefined) state.registries.loadingMessage = '';
+  if(state.registries.manifest === undefined) state.registries.manifest = null;
+  if(state.registries.qualityReport === undefined) state.registries.qualityReport = null;
 }
 
 function _ensureBuilderStyles(){
@@ -5259,6 +5375,8 @@ _renderBuilderLegacyA = function(){
     h += '<button class="mb-tab-pill" data-action="remove-tab">'+_t('🗑 Xóa tab hiện tại', '🗑 Remove active tab')+'</button>';
   }
   h += '</div>';
+  h += _renderRegistryHealthNotice();
+
   if(activeTab){
     if(relationSuggestions.length || configuredLinks.length){
       h += '<div class="mb-link-banner">';

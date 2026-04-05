@@ -2,24 +2,29 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-04T11:03:30.954Z"
+    "generatedAt": "2026-04-05T11:58:08.953Z"
   },
   "coverage": {
-    "router_actions": 2334,
-    "field_registry_actions": 2334,
-    "field_definitions": 40589,
-    "unique_field_keys": 4012,
+    "router_actions": 2800,
+    "field_registry_actions": 2863,
+    "field_definitions": 38507,
+    "unique_field_keys": 4014,
     "status_sets": 536,
     "workflow_count": 425,
     "relation_edges": 2440,
-    "validation_rules": 24776,
+    "validation_rules": 24784,
     "formula_count": 960,
-    "domain_pack_count": 3168
+    "domain_pack_count": 3168,
+    "scalar_record_endpoints": 2762
   },
   "assets": {
+    "data-fields-index.json": {
+      "kind": "field-registry-index",
+      "records": 2863
+    },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
-      "records": 2334
+      "records": 2800
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
@@ -28,6 +33,26 @@
     "relation-map.json": {
       "kind": "relation-map",
       "records": 2440
+    },
+    "workflow-library.json": {
+      "kind": "workflow-library",
+      "records": 425
+    },
+    "status-options.json": {
+      "kind": "status-library",
+      "records": 536
+    },
+    "field-types.json": {
+      "kind": "field-types",
+      "records": 25
+    },
+    "validation-rules.json": {
+      "kind": "validation-rules",
+      "records": 24784
+    },
+    "computed-formulas.json": {
+      "kind": "formula-library",
+      "records": 960
     },
     "registry-manifest.json": {
       "kind": "manifest",
