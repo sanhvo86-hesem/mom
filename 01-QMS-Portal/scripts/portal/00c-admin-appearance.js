@@ -311,11 +311,19 @@ function renderOverview(){
 
   /* Quick sizing for tabs instead of density presets */
   h += sect(T('presets')+' — '+T('overview'),
-    '<div style="margin-bottom:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('tabSettings')+' sizing</strong></div>'
-    + slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 4, 20, 8, 'px')
-    + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 8, 32, 16, 'px')
-    + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 10, 18, 11, 'px')
-    + slider('Border radius', '--tab-radius', 'components.tab.radius', 6, 28, 14, 'px')
+    '<div style="margin-bottom:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('tabSettings')+' sizing</strong><div style="margin-top:6px;font-size:11px;line-height:1.5;color:var(--text-tertiary)">Áp dụng cho hàng tab admin và các tab dùng token chung. Nút Small / Default / Large bên dưới là preview của button, không phải tab.</div></div>'
+    + slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 0, 20, 8, 'px')
+    + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 0, 32, 16, 'px')
+    + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 8, 18, 11, 'px')
+    + slider('Border radius', '--tab-radius', 'components.tab.radius', 0, 28, 14, 'px')
+    + '<div style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
+    +   '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">Preview tab admin</div>'
+    +   '<div class="admin-tabs-v2" style="margin-bottom:0">'
+    +     '<button type="button" class="admin-tab-v2">👥 Người dùng <span class="tab-badge">20</span></button>'
+    +     '<button type="button" class="admin-tab-v2 active">🎨 Giao diện</button>'
+    +     '<button type="button" class="admin-tab-v2">🧭 Hiển thị portal</button>'
+    +   '</div>'
+    + '</div>'
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('colors')+'</strong></div>'
     + radioRow('adm_colorMode', [
       {value:'light',icon:'☀️',label:T('light')},
@@ -681,13 +689,13 @@ function renderComponents(){
 
   /* TAB */
   h += sect('📑 '+T('tabSettings'),
-    slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 4, 20, 8, 'px')
-    + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 8, 32, 16, 'px')
-    + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 10, 18, 11, 'px')
+    slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 0, 20, 8, 'px')
+    + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 0, 32, 16, 'px')
+    + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 8, 18, 11, 'px')
     + slider(T('borderWidth')+' indicator', '--tab-border-width', 'components.tab.borderWidth', 1, 4, 2, 'px')
     + slider(T('fontWeight'), '--tab-font-weight', 'components.tab.fontWeight', 400, 800, 600, '', 100)
     + slider(T('gap'), '--tab-gap', 'components.tab.gap', 0, 12, 4, 'px')
-    + slider('Border radius', '--tab-radius', 'components.tab.radius', 6, 28, 14, 'px')
+    + slider('Border radius', '--tab-radius', 'components.tab.radius', 0, 28, 14, 'px')
     + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#1565c0')
   , false);
 
@@ -866,7 +874,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405c';
+window._renderAdminAppearanceFullVersion = '20260405d';
 window._renderAdminAppearanceFull = render;
 
 })();
