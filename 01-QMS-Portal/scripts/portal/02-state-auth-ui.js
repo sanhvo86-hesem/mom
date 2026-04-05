@@ -5356,21 +5356,21 @@ function renderAdmin(){
       <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
     </div>
     <div class="admin-tabs-v2">
-      <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()">👥 ${T('admin_users')} <span class="tab-badge">${USERS.length}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()">🏢 ${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</button>
-      <button class="admin-tab-v2 ${adminTab==='roles'?'active':''}" onclick="adminTab='roles';renderAdmin()">🛡 ${T('admin_roles')}</button>
-      <button class="admin-tab-v2 ${adminTab==='orgchart'?'active':''}" onclick="adminTab='orgchart';renderAdmin()">🏗 ${lang==='en'?'Org Chart':'Sơ đồ tổ chức'}</button>
-      <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()">🔐 ${T('admin_perms')}</button>
-      <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}>📊 ${lang==='en'?'Activity Log':'Kiểm soát hành vi'} <span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()">📄 ${T('admin_effective_docs')}</button>
-      <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()">🔄 ${lang==='en'?'Version Control':'Điều khiển phiên bản'}</button>
-      <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()">🧭 ${lang==='en'?'Portal display':'Hiển thị portal'}</button>
-      <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()">📋 ${lang==='en'?'Retention':'Lưu giữ'}</button>
-      <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()">🧾 ${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</button>
-      <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()">🗄 ${lang==='en'?'Data sources':'Nguồn dữ liệu'}</button>
-      <button class="admin-tab-v2 ${adminTab==='metadata_studio'?'active':''}" onclick="adminTab='metadata_studio';renderAdmin()">API &amp; DB Studio</button>
-      <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()">🔑 ${lang==='en'?'MFA Security':'Bảo mật MFA'}</button>
-      <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()">🎨 ${lang==='en'?'Appearance':'Giao diện'}</button>
+      <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">${T('admin_users')}</span><span class="tab-badge">${USERS.length}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()"><span class="admin-tab-icon">🏢</span><span class="admin-tab-label">${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='roles'?'active':''}" onclick="adminTab='roles';renderAdmin()"><span class="admin-tab-icon">🛡</span><span class="admin-tab-label">${T('admin_roles')}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='orgchart'?'active':''}" onclick="adminTab='orgchart';renderAdmin()"><span class="admin-tab-icon">🏗</span><span class="admin-tab-label">${lang==='en'?'Org Chart':'Sơ đồ tổ chức'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()"><span class="admin-tab-icon">🔐</span><span class="admin-tab-label">${T('admin_perms')}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}><span class="admin-tab-icon">📊</span><span class="admin-tab-label">${lang==='en'?'Activity Log':'Kiểm soát hành vi'}</span><span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()"><span class="admin-tab-icon">📄</span><span class="admin-tab-label">${T('admin_effective_docs')}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()"><span class="admin-tab-icon">🔄</span><span class="admin-tab-label">${lang==='en'?'Version Control':'Điều khiển phiên bản'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()"><span class="admin-tab-icon">🧭</span><span class="admin-tab-label">${lang==='en'?'Portal display':'Hiển thị portal'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()"><span class="admin-tab-icon">📋</span><span class="admin-tab-label">${lang==='en'?'Retention':'Lưu giữ'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()"><span class="admin-tab-icon">🧾</span><span class="admin-tab-label">${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()"><span class="admin-tab-icon">🗄</span><span class="admin-tab-label">${lang==='en'?'Data sources':'Nguồn dữ liệu'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='metadata_studio'?'active':''}" onclick="adminTab='metadata_studio';renderAdmin()"><span class="admin-tab-label">API &amp; DB Studio</span></button>
+      <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()"><span class="admin-tab-icon">🔑</span><span class="admin-tab-label">${lang==='en'?'MFA Security':'Bảo mật MFA'}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">${lang==='en'?'Appearance':'Giao diện'}</span></button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
   if(adminTab==='version_control' && !gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
@@ -5441,7 +5441,7 @@ function renderAdminMetadataStudio(){
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
-  var expectedVersion = '20260405i';
+  var expectedVersion = '20260405j';
   /* Delegate to external file if loaded, otherwise fallback inline */
   if(typeof window._renderAdminAppearanceFull === 'function' && window._renderAdminAppearanceFullVersion === expectedVersion){
     window._renderAdminAppearanceFull(el, _appSubTab, lang);

@@ -644,7 +644,7 @@ function previewInputs(){
 function previewTabs(){
   return previewBox('Preview tab',
     '<div style="display:grid;gap:10px">'
-    + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="admin-tab-v2"><span>👥</span><span>Users</span><span class="tab-badge">20</span></button><button type="button" class="admin-tab-v2 active"><span>🎨</span><span>Appearance</span></button><button type="button" class="admin-tab-v2"><span>🌐</span><span>Portal</span></button></div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">Users</span><span class="tab-badge">20</span></button><button type="button" class="admin-tab-v2 active"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">Appearance</span></button><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">🌐</span><span class="admin-tab-label">Portal</span></button></div>'
     + '<div class="hm-tabs" style="margin-bottom:0"><button class="hm-tab active">Overview</button><button class="hm-tab">Runtime</button><button class="hm-tab">History</button></div>'
     + '</div>',
     'Admin tabs expose radius, padding, gap and active indicator without hover.'
@@ -858,9 +858,9 @@ function renderOverview(){
     + '<div class="hm-appearance-preview" data-preview-title="Preview tab admin" style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
     +   '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">Preview tab admin</div>'
     +   '<div class="admin-tabs-v2" style="margin-bottom:0">'
-    +     '<button type="button" class="admin-tab-v2">👥 Người dùng <span class="tab-badge">20</span></button>'
-    +     '<button type="button" class="admin-tab-v2 active">🎨 Giao diện</button>'
-    +     '<button type="button" class="admin-tab-v2">🧭 Hiển thị portal</button>'
+    +     '<button type="button" class="admin-tab-v2"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">Người dùng</span><span class="tab-badge">20</span></button>'
+    +     '<button type="button" class="admin-tab-v2 active"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">Giao diện</span></button>'
+    +     '<button type="button" class="admin-tab-v2"><span class="admin-tab-icon">🧭</span><span class="admin-tab-label">Hiển thị portal</span></button>'
     +   '</div>'
     +   '<style>@keyframes hmOverviewPulse{0%{transform:translateX(0)}100%{transform:translateX(16px)}}</style>'
     +   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px">'
@@ -1475,7 +1475,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405i';
+window._renderAdminAppearanceFullVersion = '20260405j';
 window._renderAdminAppearanceFull = render;
 
 })();
