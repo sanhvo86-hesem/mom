@@ -803,7 +803,7 @@ class SchemaStudioController extends BaseController
         $schema = $this->safeIdentifier((string)($body['schema'] ?? 'public'), 'public');
         $table = $this->safeIdentifier((string)($body['table'] ?? ''), '');
         $limit = (int)($body['limit'] ?? 12);
-        $limit = max(1, min(25, $limit));
+        $limit = max(1, min(100, $limit));
 
         if ($table === '') {
             $this->error('missing_table', 400);
