@@ -309,14 +309,13 @@ function renderOverview(){
   var cur = HmTheme.getAll();
   var h = '';
 
-  /* Density presets */
+  /* Quick sizing for tabs instead of density presets */
   h += sect(T('presets')+' — '+T('overview'),
-    '<div style="margin-bottom:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('overview')+'</strong></div>'
-    + radioRow('adm_density', [
-      {value:'compact',icon:'📐',label:T('compact')},
-      {value:'default',icon:'⚖️',label:T('default')},
-      {value:'comfortable',icon:'🖐️',label:T('comfortable')}
-    ], cur.density, "HmTheme.set('density',this.value);renderAdminAppearance()")
+    '<div style="margin-bottom:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('tabSettings')+' sizing</strong></div>'
+    + slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 4, 20, 8, 'px')
+    + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 8, 32, 16, 'px')
+    + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 10, 18, 11, 'px')
+    + slider('Border radius', '--tab-radius', 'components.tab.radius', 6, 28, 14, 'px')
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('colors')+'</strong></div>'
     + radioRow('adm_colorMode', [
       {value:'light',icon:'☀️',label:T('light')},
@@ -682,9 +681,13 @@ function renderComponents(){
 
   /* TAB */
   h += sect('📑 '+T('tabSettings'),
-    slider(T('borderWidth')+' indicator', '--tab-border-width', 'components.tab.borderWidth', 1, 4, 2, 'px')
+    slider(T('paddingY'), '--hds-tab-py', 'components.tab.paddingY', 4, 20, 8, 'px')
+    + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 8, 32, 16, 'px')
+    + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 10, 18, 11, 'px')
+    + slider(T('borderWidth')+' indicator', '--tab-border-width', 'components.tab.borderWidth', 1, 4, 2, 'px')
     + slider(T('fontWeight'), '--tab-font-weight', 'components.tab.fontWeight', 400, 800, 600, '', 100)
     + slider(T('gap'), '--tab-gap', 'components.tab.gap', 0, 12, 4, 'px')
+    + slider('Border radius', '--tab-radius', 'components.tab.radius', 6, 28, 14, 'px')
     + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#1565c0')
   , false);
 

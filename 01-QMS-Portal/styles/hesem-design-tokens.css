@@ -389,8 +389,8 @@
   margin-bottom: var(--space-5);
 }
 .hm-tab {
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--text-sm);
+  padding: var(--hds-tab-py, var(--space-2)) var(--hds-tab-px, var(--space-4));
+  font-size: var(--hds-tab-font, var(--text-sm));
   font-weight: var(--tab-font-weight, var(--font-semibold));
   letter-spacing: var(--tab-letter-spacing, 0);
   color: var(--text-secondary);
@@ -405,7 +405,7 @@
   border-right: none;
   font-family: var(--font);
 }
-.hm-tab:hover { color: var(--tab-active-indicator, var(--brand-2)); background: var(--bg-hover); border-radius: var(--radius-md) var(--radius-md) 0 0; }
+.hm-tab:hover { color: var(--tab-active-indicator, var(--brand-2)); background: var(--bg-hover); border-radius: var(--tab-radius, var(--radius-md)) var(--tab-radius, var(--radius-md)) 0 0; }
 .hm-tab.active { color: var(--tab-active-indicator, var(--brand-2)); border-bottom-color: var(--tab-active-indicator, var(--brand-2)); }
 
 /* Core standard: in multi-tab dialogs/panels, the tab bar stays fixed and only the content area scrolls. */
@@ -724,8 +724,8 @@
 @media (max-width: 768px) {
   .hm-btn { height: 44px; font-size: var(--text-base); }
   .hm-input { height: 44px; font-size: var(--text-md); }
-  .hm-tabs { gap: 2px; }
-  .hm-tab { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); }
+  .hm-tabs { gap: var(--tab-gap, 2px); }
+  .hm-tab { padding: var(--hds-tab-py, var(--space-2)) var(--hds-tab-px, var(--space-3)); font-size: var(--hds-tab-font, var(--text-xs)); }
   .hm-kpi-row { gap: var(--space-2); }
   .hm-kpi-card { min-width: 100px; padding: var(--space-3); }
   .hm-kpi-value { font-size: var(--text-xl); }

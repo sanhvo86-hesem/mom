@@ -346,9 +346,13 @@ function _applyCustomVars(){
   _setVar('--input-bg', cfg, 'components.input.bg');
 
   /* Components — tabs */
+  _setVarPx('--hds-tab-py', cfg, 'components.tab.paddingY');
+  _setVarPx('--hds-tab-px', cfg, 'components.tab.paddingX');
+  _setVarPx('--hds-tab-font', cfg, 'components.tab.fontSize');
   _setVarPx('--tab-border-width', cfg, 'components.tab.borderWidth');
   _setVarNumber('--tab-font-weight', cfg, 'components.tab.fontWeight');
   _setVarPx('--tab-gap', cfg, 'components.tab.gap');
+  _setVarPx('--tab-radius', cfg, 'components.tab.radius');
   _setVar('--tab-active-indicator', cfg, 'components.tab.activeIndicator');
 
   /* Components — modal */
