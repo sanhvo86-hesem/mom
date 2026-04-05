@@ -289,7 +289,7 @@ function _api(action, payload, method){
     });
   }
   var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-  var csrf = window.csrfToken || (csrfMeta && csrfMeta.content) || '';
+  var csrf = (typeof csrfToken !== 'undefined' && csrfToken) || window.csrfToken || (csrfMeta && csrfMeta.content) || '';
   var headers = { 'Content-Type': 'application/json' };
   if(csrf) headers['X-CSRF-Token'] = csrf;
   return fetch(endpoint + qs.toString(), {
