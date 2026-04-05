@@ -253,6 +253,89 @@ class SchemaStudioController extends BaseController
         return '"' . str_replace('"', '""', $safe) . '"';
     }
 
+    private function buildSampleRow(array $columns): array
+    {
+        $row = [];
+        foreach ($columns as $index => $column) {
+            $name = (string)($column['column_name'] ?? '');
+            $type = (string)($column['data_type'] ?? '');
+            if ($name === '') {
+                continue;
+            }
+            $row[$name] = $this->sampleValueForColumn($name, $type, (int)$index);
+        }
+        return $row;
+    }
+
+    private function sampleValueForColumn(string $columnName, string $dataType, int $index)
+    {
+        $name = strtolower($columnName);
+        $type = strtolower($dataType);
+        $seq  = $index + 1;
+
+        if (strpos($name, 'email') !== false) {
+            return 'sample' . $seq . '@hesem.local';
+        }
+        if (strpos($name, 'phone') !== false) {
+            return '0900000' . str_pad((string)$seq, 3, '0', STR_PAD_LEFT);
+        }
+        if (strpos($name, 'code') !== false) {
+            return strtoupper(substr(preg_replace('/[^a-z0-9]+/i', '_', $columnName), 0, 12)) . '_' . str_pad((string)$seq, 3, '0', STR_PAD_LEFT);
+        }
+        if (strpos($name, 'name') !== false) {
+            return 'Mẫu ' . str_replace('_', ' ', $columnName) . ' ' . $seq;
+        }
+        if (strpos($name, 'status') !== false) {
+            return 'active';
+        }
+        if (strpos($name, 'description') !== false || strpos($name, 'comment') !== false || strpos($name, 'note') !== false) {
+            return 'Dữ liệu mẫu cho ' . $columnName;
+        }
+
+        switch ($type) {
+            case 'smallint':
+            case 'integer':
+            case 'bigint':
+                return $seq;
+            case 'numeric':
+            case 'decimal':
+            case 'real':
+            case 'double precision':
+            case 'money':
+                return number_format(100 + ($seq * 1.25), 2, '.', '');
+            case 'boolean':
+                return true;
+            case 'date':
+                return gmdate('Y-m-d');
+            case 'time without time zone':
+            case 'time with time zone':
+                return gmdate('H:i:s');
+            case 'timestamp without time zone':
+                return gmdate('Y-m-d H:i:s');
+            case 'timestamp with time zone':
+                return gmdate(DATE_ATOM);
+            case 'json':
+            case 'jsonb':
+                return [
+                    'sample' => true,
+                    'column' => $columnName,
+                    'index' => $seq,
+                ];
+            case 'uuid':
+                return sprintf(
+                    '00000000-0000-0000-0000-%012d',
+                    $seq
+                );
+            case 'array':
+                return ['sample_' . $seq];
+            default:
+                if (strpos($name, 'id') !== false) {
+                    return 'sample_' . $columnName . '_' . $seq;
+                }
+                return 'sample_' . $columnName . '_' . $seq;
+        }
+    }
+
     public function listDesigns(): never
     {
         $user = $this->requireAuth();
@@ -838,6 +921,13 @@ class SchemaStudioController extends BaseController
 
             $sql = 'SELECT * FROM ' . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table) . ' LIMIT ' . $limit;
             $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            $actualRowCount = count($rows);
+            $syntheticSample = false;
+
+            if ($actualRowCount === 0 && $columns) {
+                $rows = [$this->buildSampleRow($columns)];
+                $syntheticSample = true;
+            }
 
             $this->success([
                 'available' => true,
@@ -846,10 +936,26 @@ class SchemaStudioController extends BaseController
                 'columns' => $columns,
                 'rows' => $rows,
                 'rowCount' => count($rows),
+                'actualRowCount' => $actualRowCount,
+                'syntheticSample' => $syntheticSample,
                 'limit' => $limit,
             ]);
         } catch (Throwable $e) {
             error_log('[SchemaStudio] previewTableData failed: ' . $e->getMessage());
+            if ($columns) {
+                $this->success([
+                    'available' => true,
+                    'schema' => $schema,
+                    'table' => $table,
+                    'columns' => $columns,
+                    'rows' => [$this->buildSampleRow($columns)],
+                    'rowCount' => 1,
+                    'actualRowCount' => 0,
+                    'syntheticSample' => true,
+                    'limit' => $limit,
+                    'message' => 'preview_sample_only',
+                ]);
+            }
             $this->success([
                 'available' => false,
                 'schema' => $schema,
