@@ -1725,12 +1725,6 @@ var TableCard = {
     var tbl = findTable(tableId);
     if(!tbl) return;
     Canvas.selectTable(tableId);
-    if(tbl.canvas && tbl.canvas.collapsed){
-      tbl.canvas.collapsed = false;
-      TableCard.reRender(tableId);
-      EdgeLayer.updateEdgesForTable(tableId);
-      saveDraft();
-    }
     Inspector.open({ kind:'table', tableId:tableId });
     TableDialog.open(tableId);
   },
@@ -2608,13 +2602,7 @@ var TableDialog = {
     this._lastFocus = document.activeElement || null;
     this.currentTableId = tableId;
     this.draft = _clone(tbl);
-    this.preview = {
-      loading: true,
-      available: false,
-      columns: [],
-      rows: [],
-      message: ''
-    };
+    this.preview = null;
     this.render();
     if(this._escapeHandler){
       document.removeEventListener('keydown', this._escapeHandler);
@@ -2629,7 +2617,6 @@ var TableDialog = {
       var nameInput = document.getElementById('dlg-tbl-name');
       if(nameInput) nameInput.focus();
     }, 0);
-    this.loadPreview();
   },
 
   close: function(){
@@ -2678,6 +2665,15 @@ var TableDialog = {
       comment: '',
       foreign_key: null
     });
+    this.render();
+  },
+
+  removeColumn: function(index){
+    var draft = this.ensureDraft();
+    var normalizedIndex = Number(index);
+    if(!draft || !Array.isArray(draft.columns)) return;
+    if(!Number.isFinite(normalizedIndex) || normalizedIndex < 0 || normalizedIndex >= draft.columns.length) return;
+    draft.columns.splice(normalizedIndex, 1);
     this.render();
   },
 
