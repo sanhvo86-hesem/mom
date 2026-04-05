@@ -267,6 +267,31 @@ class SchemaStudioController extends BaseController
         return $row;
     }
 
+    private function primaryKeyColumns(PDO $pdo, string $schema, string $table): array
+    {
+        $stmt = $pdo->prepare("
+            SELECT kcu.column_name
+            FROM information_schema.table_constraints tc
+            INNER JOIN information_schema.key_column_usage kcu
+                ON tc.constraint_name = kcu.constraint_name
+               AND tc.table_schema = kcu.table_schema
+               AND tc.table_name = kcu.table_name
+            WHERE tc.constraint_type = 'PRIMARY KEY'
+              AND tc.table_schema = :schema
+              AND tc.table_name = :table
+            ORDER BY kcu.ordinal_position
+        ");
+        $stmt->execute([
+            ':schema' => $schema,
+            ':table' => $table,
+        ]);
+        return array_values(array_filter(array_map(static function ($row): string {
+            return trim((string)($row['column_name'] ?? ''));
+        }, $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []), static function (string $item): bool {
+            return $item !== '';
+        }));
+    }
+
     private function sampleValueForColumn(string $columnName, string $dataType, int $index)
     {
         $name = strtolower($columnName);
@@ -886,7 +911,8 @@ class SchemaStudioController extends BaseController
         $schema = $this->safeIdentifier((string)($body['schema'] ?? 'public'), 'public');
         $table = $this->safeIdentifier((string)($body['table'] ?? ''), '');
         $limit = (int)($body['limit'] ?? 12);
-        $limit = max(1, min(100, $limit));
+        $limit = max(1, min(500, $limit));
+        $offset = max(0, (int)($body['offset'] ?? 0));
 
         if ($table === '') {
             $this->error('missing_table', 400);
@@ -915,16 +941,29 @@ class SchemaStudioController extends BaseController
                     'table' => $table,
                     'columns' => [],
                     'rows' => [],
+                    'totalRows' => 0,
+                    'offset' => $offset,
+                    'hasMore' => false,
                     'message' => 'table_not_found',
                 ]);
             }
 
-            $sql = 'SELECT * FROM ' . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table) . ' LIMIT ' . $limit;
+            $countSql = 'SELECT COUNT(*) FROM ' . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table);
+            $totalRows = (int)$pdo->query($countSql)->fetchColumn();
+            $orderBy = '';
+            $primaryKeyColumns = $this->primaryKeyColumns($pdo, $schema, $table);
+            if ($primaryKeyColumns !== []) {
+                $orderBy = ' ORDER BY ' . implode(', ', array_map(function (string $column): string {
+                    return $this->quoteIdentifier($column);
+                }, $primaryKeyColumns));
+            }
+
+            $sql = 'SELECT * FROM ' . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table) . $orderBy . ' LIMIT ' . $limit . ' OFFSET ' . $offset;
             $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) ?: [];
             $actualRowCount = count($rows);
             $syntheticSample = false;
 
-            if ($actualRowCount === 0 && $columns) {
+            if ($totalRows === 0 && $columns) {
                 $rows = [$this->buildSampleRow($columns)];
                 $syntheticSample = true;
             }
@@ -937,8 +976,11 @@ class SchemaStudioController extends BaseController
                 'rows' => $rows,
                 'rowCount' => count($rows),
                 'actualRowCount' => $actualRowCount,
+                'totalRows' => $totalRows,
                 'syntheticSample' => $syntheticSample,
                 'limit' => $limit,
+                'offset' => $offset,
+                'hasMore' => !$syntheticSample && (($offset + $actualRowCount) < $totalRows),
             ]);
         } catch (Throwable $e) {
             error_log('[SchemaStudio] previewTableData failed: ' . $e->getMessage());
@@ -951,8 +993,11 @@ class SchemaStudioController extends BaseController
                     'rows' => [$this->buildSampleRow($columns)],
                     'rowCount' => 1,
                     'actualRowCount' => 0,
+                    'totalRows' => 0,
                     'syntheticSample' => true,
                     'limit' => $limit,
+                    'offset' => 0,
+                    'hasMore' => false,
                     'message' => 'preview_sample_only',
                 ]);
             }
@@ -962,6 +1007,9 @@ class SchemaStudioController extends BaseController
                 'table' => $table,
                 'columns' => $columns,
                 'rows' => [],
+                'totalRows' => 0,
+                'offset' => $offset,
+                'hasMore' => false,
                 'message' => 'preview_unavailable',
             ]);
         }

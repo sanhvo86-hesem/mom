@@ -2364,6 +2364,25 @@
   flex-wrap: wrap;
 }
 
+.ss-table-data-toolbar {
+  display: grid;
+  gap: 12px;
+}
+
+.ss-table-data-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ss-table-data-page {
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .ss-table-data-pill {
   display: inline-flex;
   align-items: center;
@@ -2443,4 +2462,401 @@
   background: color-mix(in srgb, var(--color-blue) 12%, var(--surface-2));
   color: var(--color-blue);
   font-weight: 600;
+}
+
+.ss-table-data-nav .is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ss-table-dialog-modal.is-fullscreen {
+  width: calc(100vw - 24px);
+  max-width: none;
+  height: calc(100vh - 24px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-modal-header,
+.ss-table-dialog-modal.is-fullscreen .ss-modal-footer {
+  flex: 0 0 auto;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-body {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-grid,
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-main {
+  min-height: 0;
+  height: 100%;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-main {
+  display: grid;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-section {
+  display: grid;
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+}
+
+.ss-table-data-panel {
+  grid-template-rows: auto auto 1fr;
+}
+
+.ss-table-dialog-data-wrap {
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+}
+
+.ss-table-dialog-data-table th,
+.ss-table-dialog-data-table td {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-table-dialog-data-table td {
+  white-space: nowrap;
+}
+
+.ss-browser.has-domain-split.is-domain-view {
+  display: grid;
+  grid-template-rows: auto 12px minmax(0, 1fr);
+}
+
+.ss-browser.has-domain-split.is-domain-view.has-manual-split {
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 42%)) 12px minmax(0, 1fr);
+}
+
+.ss-browser.is-domain-view .ss-browser-search-wrap {
+  min-height: 0;
+  overflow: auto;
+  border-bottom: 0;
+  padding-bottom: 8px;
+}
+
+.ss-browser.is-domain-view .ss-browser-list {
+  min-height: 0;
+  overflow: auto;
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.ss-browser.is-domain-view .ss-domain-focus-card {
+  min-height: 0;
+  height: 100%;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.ss-browser-splitter {
+  background: transparent !important;
+}
+
+.ss-browser-splitter::before {
+  display: none !important;
+}
+
+.ss-browser-splitter-handle {
+  width: 72px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 960px) {
+  .ss-table-dialog-modal.is-fullscreen {
+    width: calc(100vw - 12px);
+    height: calc(100vh - 12px);
+  }
+}
+
+.ss-modal-overlay.is-table-dialog-fullscreen {
+  padding: 0;
+  place-items: stretch;
+}
+
+.ss-modal-overlay.is-table-dialog-fullscreen .ss-table-dialog-modal.is-fullscreen {
+  width: 100vw;
+  max-width: none;
+  max-height: none;
+  height: 100vh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-body {
+  padding: 0;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-toolbar,
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-section {
+  padding-inline: 24px;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-section {
+  padding-bottom: 24px;
+}
+
+.ss-table-dialog-data-table .ss-table-dialog-rownum {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 52px;
+  width: 52px;
+  background: var(--surface);
+  text-align: right;
+  color: var(--text-3);
+}
+
+.ss-table-dialog-data-table thead .ss-table-dialog-rownum {
+  z-index: 4;
+}
+
+.ss-browser.has-domain-split.is-domain-view {
+  grid-template-rows: auto 10px minmax(0, 1fr);
+}
+
+.ss-browser.has-domain-split.is-domain-view.has-manual-split {
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 42%)) 10px minmax(0, 1fr);
+}
+
+.ss-browser.is-domain-view .ss-browser-search-wrap,
+.ss-browser.is-domain-view .ss-browser-list,
+.ss-browser.is-domain-view .ss-domain-focus-card {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.ss-browser.is-domain-view .ss-domain-focus-head {
+  background: transparent;
+  padding-top: 10px;
+}
+
+.ss-browser-splitter {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  background: transparent !important;
+}
+
+.ss-browser-splitter::before {
+  display: none !important;
+}
+
+.ss-browser-splitter-handle {
+  width: 76px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.26);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Final Schema Studio runtime overrides */
+.ss-modal-overlay.is-table-dialog-fullscreen {
+  padding: 0;
+  place-items: stretch;
+}
+
+.ss-modal-overlay.is-table-dialog-fullscreen .ss-table-dialog-modal.is-fullscreen {
+  width: 100vw;
+  max-width: none;
+  max-height: none;
+  height: 100vh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.ss-table-dialog-modal.is-fullscreen {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-modal-header,
+.ss-table-dialog-modal.is-fullscreen .ss-modal-footer {
+  flex: 0 0 auto;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-body {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-grid,
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-main,
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-section {
+  min-height: 0;
+  height: 100%;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-toolbar,
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-section {
+  padding-inline: 24px;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-section {
+  padding-bottom: 24px;
+}
+
+.ss-table-dialog-modal.is-fullscreen .ss-table-dialog-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.ss-table-data-panel {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 14px;
+}
+
+.ss-table-data-toolbar {
+  display: grid;
+  gap: 12px;
+}
+
+.ss-table-data-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ss-table-data-nav-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ss-table-data-page {
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ss-table-dialog-data-wrap {
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.ss-table-dialog-data-table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.ss-table-dialog-data-table th,
+.ss-table-dialog-data-table td {
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ss-table-dialog-data-table .ss-table-dialog-rownum {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 52px;
+  width: 52px;
+  background: var(--surface);
+  text-align: right;
+  color: var(--text-3);
+}
+
+.ss-table-dialog-data-table thead .ss-table-dialog-rownum {
+  z-index: 4;
+}
+
+.ss-browser.has-domain-split.is-domain-view {
+  display: grid;
+  grid-template-rows: auto 10px minmax(0, 1fr);
+}
+
+.ss-browser.has-domain-split.is-domain-view.has-manual-split {
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 42%)) 10px minmax(0, 1fr);
+}
+
+.ss-browser.is-domain-view .ss-browser-search-wrap,
+.ss-browser.is-domain-view .ss-browser-list,
+.ss-browser.is-domain-view .ss-domain-focus-card {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.ss-browser.is-domain-view .ss-browser-search-wrap {
+  min-height: 0;
+  overflow: auto;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.ss-browser.is-domain-view .ss-browser-list {
+  min-height: 0;
+  overflow: auto;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.ss-browser.is-domain-view .ss-domain-focus-card {
+  background: transparent;
+}
+
+.ss-browser.is-domain-view .ss-domain-focus-head {
+  background: transparent;
+  padding-top: 10px;
+  border-top: 0;
+}
+
+.ss-browser-splitter {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.ss-browser-splitter::before {
+  display: none !important;
+}
+
+.ss-browser-splitter-handle {
+  width: 76px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.26);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
