@@ -18,6 +18,7 @@ use HESEM\QMS\Api\Controllers\ExitException;
 use HESEM\QMS\Api\Controllers\FileController;
 use HESEM\QMS\Api\Controllers\FormController;
 use HESEM\QMS\Api\Controllers\EnergyController;
+use HESEM\QMS\Api\Controllers\GenericCrudController;
 use HESEM\QMS\Api\Controllers\KnowledgeController;
 use HESEM\QMS\Api\Controllers\LogisticsController;
 use HESEM\QMS\Api\Controllers\MobileController;
@@ -25,6 +26,7 @@ use HESEM\QMS\Api\Controllers\MasterDataController;
 use HESEM\QMS\Api\Controllers\ModuleSchemaController;
 use HESEM\QMS\Api\Controllers\ProductPassportController;
 use HESEM\QMS\Api\Controllers\RegistryController;
+use HESEM\QMS\Api\Controllers\SchemaStudioController;
 use HESEM\QMS\Api\Middleware\AuthMiddleware;
 use HESEM\QMS\Api\Middleware\CorsMiddleware;
 use HESEM\QMS\Api\Middleware\RateLimitMiddleware;
@@ -233,6 +235,40 @@ smoke_assert((sanitize_user_for_client([
     'org_site_id' => 'SITE01',
 ])['org_plant_id'] ?? null) === 'PLANT01', 'Sanitized user payload did not expose org scope fields.');
 
+$rolePermsFile = QMS_TEST_DATA_DIR . '/config/role_permissions.json';
+smoke_assert(user_permission_matrix_configured(['role' => 'finance_manager'], $rolePermsFile) === true, 'Finance manager should be governed by the permission matrix.');
+smoke_assert(user_has_any_permission(['role' => 'finance_manager'], ['finance.ap_ar_invoices.read'], $rolePermsFile) === true, 'Finance manager should have finance read permission.');
+smoke_assert(user_has_any_permission(['role' => 'finance_manager'], ['advanced_planning.aps_planning_scenarios.update'], $rolePermsFile) === false, 'Finance manager should not inherit planning write permission.');
+smoke_assert(user_has_any_permission(['role' => 'qms_engineer'], ['registry.read'], $rolePermsFile) === true, 'QMS engineer should have registry read permission.');
+smoke_assert(user_has_any_permission(['role' => 'production_planner'], ['advanced_planning.aps_planning_scenarios.update'], $rolePermsFile) === true, 'Production planner should retain APS write permission.');
+smoke_assert(user_has_any_permission(['role' => 'developer'], ['schema_studio.write'], $rolePermsFile) === true, 'Developer should retain Schema Studio write permission.');
+
+$genericPermissionStore = [
+    'settings' => ['require_mfa' => false],
+    'users' => [[
+        'username' => 'qms-runtime-user',
+        'name' => 'QMS Runtime',
+        'role' => 'qms_engineer',
+        'active' => true,
+    ]],
+];
+smoke_reset_request_state();
+$_SESSION['user'] = 'qms-runtime-user';
+$_SESSION['mfa_ok'] = true;
+$_SESSION['csrf'] = 'smoke-token';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SERVER['HTTP_X_CSRF_TOKEN'] = 'smoke-token';
+$_GET['domain'] = 'finance';
+$_GET['table'] = 'ap_ar_invoices';
+$genericCrudController = (new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($genericPermissionStore);
+try {
+    $genericCrudController->createRecord();
+    throw new RuntimeException('Generic CRUD create allowed a cross-domain write without permission.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Generic CRUD permission gate returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Generic CRUD permission gate returned wrong error.');
+}
+
 // Customer portal administration must not be exposed to arbitrary internal users.
 $portalStore = [
     'settings' => ['require_mfa' => false],
@@ -313,6 +349,42 @@ try {
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Registry guard returned wrong error.');
 }
 
+// Registry reads must now be limited to explicit metadata-governance permissions.
+$financeStore = [
+    'settings' => ['require_mfa' => false],
+    'users' => [[
+        'username' => 'finance-user',
+        'name' => 'Finance Manager',
+        'role' => 'finance_manager',
+        'org_company_code' => 'HESEM',
+        'org_legal_entity_code' => 'HESEM-VN',
+        'org_plant_id' => 'PLANT01',
+        'org_site_id' => 'SITE01',
+        'active' => true,
+    ]],
+];
+smoke_reset_request_state();
+$_SESSION['user'] = 'finance-user';
+$_SESSION['mfa_ok'] = true;
+$restrictedRegistryController = (new RegistryController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
+try {
+    $restrictedRegistryController->getIotConnectors();
+    throw new RuntimeException('Registry read allowed an unrelated office role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Registry read guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Registry read guard returned wrong error.');
+}
+
+$builderStore = [
+    'settings' => ['require_mfa' => false],
+    'users' => [[
+        'username' => 'builder-user',
+        'name' => 'QMS Engineer',
+        'role' => 'qms_engineer',
+        'active' => true,
+    ]],
+];
+
 // Module schema writes must be limited to platform-builder roles.
 smoke_reset_request_state();
 $_SESSION['user'] = 'operator-user';
@@ -324,6 +396,62 @@ try {
 } catch (ExitException $e) {
     smoke_assert($e->getStatusCode() === 403, 'Module schema guard returned wrong status.');
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Module schema guard returned wrong error.');
+}
+
+// Module schema reads must now be limited to explicit builder permissions.
+smoke_reset_request_state();
+$_SESSION['user'] = 'finance-user';
+$_SESSION['mfa_ok'] = true;
+$restrictedModuleSchemaController = (new ModuleSchemaController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
+try {
+    $restrictedModuleSchemaController->listSchemas();
+    throw new RuntimeException('Module schema list allowed an unrelated office role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Module schema read guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Module schema read guard returned wrong error.');
+}
+
+smoke_reset_request_state();
+$_SESSION['user'] = 'builder-user';
+$_SESSION['mfa_ok'] = true;
+$allowedModuleSchemaController = (new ModuleSchemaController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($builderStore);
+try {
+    $allowedModuleSchemaController->listSchemas();
+    throw new RuntimeException('Module schema list did not terminate through the response pipeline.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 200, 'Module schema read returned wrong status for builder role.');
+    smoke_assert(is_array($e->getPayload()['schemas'] ?? null), 'Module schema read payload missing schemas array.');
+}
+
+// Schema Studio must require explicit builder/governance permissions for both read and write surfaces.
+smoke_reset_request_state();
+$_SESSION['user'] = 'finance-user';
+$_SESSION['mfa_ok'] = true;
+$_SESSION['csrf'] = 'schema-smoke-token';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SERVER['HTTP_X_CSRF_TOKEN'] = 'schema-smoke-token';
+$restrictedSchemaStudioController = (new SchemaStudioController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
+try {
+    $restrictedSchemaStudioController->listDesigns();
+    throw new RuntimeException('Schema Studio list allowed an unrelated office role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Schema Studio read guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Schema Studio read guard returned wrong error.');
+}
+
+smoke_reset_request_state();
+$_SESSION['user'] = 'builder-user';
+$_SESSION['mfa_ok'] = true;
+$_SESSION['csrf'] = 'schema-smoke-token';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SERVER['HTTP_X_CSRF_TOKEN'] = 'schema-smoke-token';
+$allowedSchemaStudioController = (new SchemaStudioController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($builderStore);
+try {
+    $allowedSchemaStudioController->listDesigns();
+    throw new RuntimeException('Schema Studio list did not terminate through the response pipeline.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 200, 'Schema Studio read returned wrong status for builder role.');
+    smoke_assert(is_array($e->getPayload()['designs'] ?? null), 'Schema Studio read payload missing designs array.');
 }
 
 // AI scheduling write endpoints must be restricted to scheduling/quality roles.
@@ -393,15 +521,6 @@ try {
 }
 
 // Mobile shop-floor APIs must not be exposed to unrelated office roles.
-$financeStore = [
-    'settings' => ['require_mfa' => false],
-    'users' => [[
-        'username' => 'finance-user',
-        'name' => 'Finance Manager',
-        'role' => 'finance_manager',
-        'active' => true,
-    ]],
-];
 smoke_reset_request_state();
 $_SESSION['user'] = 'finance-user';
 $_SESSION['mfa_ok'] = true;
@@ -425,6 +544,43 @@ try {
 } catch (ExitException $e) {
     smoke_assert($e->getStatusCode() === 403, 'Master data guard returned wrong status.');
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Master data guard returned wrong error.');
+}
+
+$rolePermFile = QMS_TEST_DATA_DIR . '/config/role_permissions.json';
+smoke_assert(permission_matrix_manages_permission('quality_management.capa_records.create', $rolePermFile), 'Permission matrix must manage generic quality write permissions.');
+smoke_assert(user_has_any_permission(['role' => 'qms_engineer'], 'quality_management.capa_records.create', $rolePermFile), 'QMS engineer should retain quality domain generic write permission.');
+smoke_assert(!user_has_any_permission(['role' => 'finance_manager'], 'quality_management.capa_records.create', $rolePermFile), 'Finance manager must not receive quality domain generic write permission.');
+smoke_assert(user_has_any_permission(['role' => 'developer'], 'schema_studio.write', $rolePermFile), 'Developer must retain Schema Studio write permission.');
+smoke_assert(user_has_any_permission(['role' => 'qms_engineer'], 'schema_studio.write', $rolePermFile), 'QMS engineer must retain Schema Studio write permission.');
+
+// Generic runtime write access must be denied when the permission matrix covers the action but the role does not.
+smoke_reset_request_state();
+$_SESSION['user'] = 'finance-user';
+$_SESSION['mfa_ok'] = true;
+$_GET['domain'] = 'quality_management';
+$_GET['table'] = 'capa_records';
+$genericCrudController = (new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
+try {
+    $genericCrudController->createRecord();
+    throw new RuntimeException('Generic CRUD create allowed an unrelated finance role on a quality domain table.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Generic CRUD create guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Generic CRUD create guard returned wrong error.');
+}
+
+// Restricted governance tables must remain blocked for non-admin roles even on generic reads.
+smoke_reset_request_state();
+$_SESSION['user'] = 'finance-user';
+$_SESSION['mfa_ok'] = true;
+$_GET['domain'] = 'master_data_governance';
+$_GET['table'] = 'org_companies';
+$governanceCrudController = (new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
+try {
+    $governanceCrudController->listRecords();
+    throw new RuntimeException('Generic CRUD list exposed a restricted governance table to a finance role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Restricted governance list guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Restricted governance list guard returned wrong error.');
 }
 
 // Knowledge write actions must not be exposed to unrelated office roles.

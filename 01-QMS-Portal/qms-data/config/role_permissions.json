@@ -1,9 +1,29 @@
 {
     "ceo": {
-        "canCreateDocs": true
+        "canCreateDocs": true,
+        "allowAllPermissions": true,
+        "permissions": [
+            "*"
+        ]
     },
     "production_director": {
-        "canCreateDocs": true
+        "canCreateDocs": true,
+        "permissions": [
+            "*.read",
+            "advanced_planning.*",
+            "demand_supply_planning.*",
+            "mes_execution.*",
+            "mobile_operations.*",
+            "plant_maintenance.*",
+            "production.*",
+            "tooling_lifecycle.*"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "cnc_workshop_manager": {
         "canCreateDocs": false
@@ -24,7 +44,21 @@
         "canCreateDocs": false
     },
     "production_planner": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "advanced_planning.*",
+            "demand_supply_planning.*",
+            "production.*.read",
+            "production.*.update",
+            "production.*.transition"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "cleaning_packaging_supervisor": {
         "canCreateDocs": false
@@ -45,7 +79,32 @@
         "canCreateDocs": false
     },
     "qa_manager": {
-        "canCreateDocs": true
+        "canCreateDocs": true,
+        "allowAllPermissions": true,
+        "permissions": [
+            "*"
+        ]
+    },
+    "quality_manager": {
+        "canCreateDocs": true,
+        "permissions": [
+            "*.read",
+            "audit_risk.*",
+            "calibration_equipment.*",
+            "document_control.*",
+            "evidence_vault.*",
+            "fmea_apqp.*",
+            "forms_system.*",
+            "master_data_governance.*",
+            "module_schema.read",
+            "module_schema.write",
+            "quality_lab.*",
+            "quality_management.*",
+            "record_system.*",
+            "registry.read",
+            "registry.write",
+            "schema_studio.*"
+        ]
     },
     "quality_engineer": {
         "canCreateDocs": false
@@ -54,13 +113,48 @@
         "canCreateDocs": false
     },
     "qms_engineer": {
-        "canCreateDocs": true
+        "canCreateDocs": true,
+        "permissions": [
+            "*.read",
+            "audit_risk.*",
+            "calibration_equipment.*",
+            "document_control.*",
+            "evidence_vault.*",
+            "fmea_apqp.*",
+            "forms_system.*",
+            "master_data_governance.*",
+            "module_schema.read",
+            "module_schema.write",
+            "quality_lab.*",
+            "quality_management.*",
+            "record_system.*",
+            "registry.read",
+            "registry.write",
+            "schema_studio.*"
+        ]
     },
     "internal_auditor": {
         "canCreateDocs": false
     },
     "supply_chain_manager": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "inventory.*",
+            "outsource_execution.*",
+            "purchasing.*",
+            "shipping_compliance.*",
+            "supplier_relationship.*",
+            "traceability_serialization.*",
+            "transportation.*",
+            "warehouse_management.*"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "buyer": {
         "canCreateDocs": false
@@ -81,7 +175,20 @@
         "canCreateDocs": false
     },
     "finance_manager": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "commercial_contracts.*",
+            "finance.*",
+            "finance_extended.*",
+            "finance_treasury.*"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "gl_payroll_accountant": {
         "canCreateDocs": false
@@ -90,13 +197,70 @@
         "canCreateDocs": false
     },
     "hr_manager": {
-        "canCreateDocs": true
+        "canCreateDocs": true,
+        "permissions": [
+            "*.read",
+            "hcm_workforce.*",
+            "training_hr.*"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "ehs_specialist": {
         "canCreateDocs": false
     },
     "it_admin": {
-        "canCreateDocs": true
+        "canCreateDocs": true,
+        "allowAllPermissions": true,
+        "permissions": [
+            "*"
+        ]
+    },
+    "developer": {
+        "canCreateDocs": false,
+        "permissions": [
+            "schema_studio.*"
+        ]
+    },
+    "production_manager": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "advanced_planning.*",
+            "demand_supply_planning.*",
+            "mes_execution.*",
+            "mobile_operations.*",
+            "plant_maintenance.*",
+            "production.*",
+            "tooling_lifecycle.*"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
+    },
+    "engineering_manager": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "cnc_programs.*",
+            "fmea_apqp.*",
+            "master_data_governance.*",
+            "mfg_engineering.*",
+            "plm_change_control.*",
+            "tooling_lifecycle.*"
+        ],
+        "denies": [
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "epicor_admin": {
         "canCreateDocs": false

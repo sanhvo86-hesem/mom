@@ -30,7 +30,7 @@ class RegistryController extends BaseController
      */
     private function requireRegistryReadAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.registry.read', 'studio.registry.write']);
+        $this->requireAnyPermission($user, ['registry.read', 'registry.write']);
     }
 
     /**
@@ -38,7 +38,7 @@ class RegistryController extends BaseController
      */
     private function requireRegistryWriteAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.registry.write']);
+        $this->requireAnyPermission($user, ['registry.write']);
     }
 
     private function registryDir(): string

@@ -18,6 +18,7 @@ class GenericCrudController extends BaseController
 {
     private ?GenericCrudService $service = null;
     private ?array $endpointCatalog = null;
+    private ?array $runtimeAccessPolicy = null;
 
     private function service(): GenericCrudService
     {
@@ -63,6 +64,17 @@ class GenericCrudController extends BaseController
         }
 
         return $this->endpointCatalog;
+    }
+
+    private function runtimeAccessPolicy(): array
+    {
+        if ($this->runtimeAccessPolicy === null) {
+            $path = $this->dataDir . '/registry/runtime-access-policy.json';
+            $payload = $this->readJsonFile($path) ?? [];
+            $this->runtimeAccessPolicy = is_array($payload) ? $payload : [];
+        }
+
+        return $this->runtimeAccessPolicy;
     }
 
     /**
@@ -460,6 +472,49 @@ class GenericCrudController extends BaseController
     }
 
     /**
+     * @param array<int, string> $roles
+     * @return array<int, string>
+     */
+    private function normalizeRuntimePolicyRoles(array $roles): array
+    {
+        $normalized = [];
+        foreach ($roles as $role) {
+            $value = strtolower(trim((string)$role));
+            if ($value === '') {
+                continue;
+            }
+            $normalized[] = $value === 'authenticated' ? $value : migrate_role($value);
+        }
+
+        return array_values(array_unique(array_filter($normalized)));
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     * @return array<int, string>|null
+     */
+    private function runtimeAccessRoles(array $ctx): ?array
+    {
+        $policy = $this->runtimeAccessPolicy();
+        $kind = strtolower(trim((string)($ctx['kind'] ?? '')));
+        $table = strtolower(trim((string)($ctx['table'] ?? '')));
+        $domain = strtolower(trim((string)($ctx['domain'] ?? '')));
+
+        foreach ([
+            is_array($policy['tables'][$table] ?? null) ? $policy['tables'][$table] : null,
+            is_array($policy['domains'][$domain] ?? null) ? $policy['domains'][$domain] : null,
+            is_array($policy['defaults'] ?? null) ? $policy['defaults'] : null,
+        ] as $scope) {
+            if (!is_array($scope) || !array_key_exists($kind, $scope) || !is_array($scope[$kind])) {
+                continue;
+            }
+            return $this->normalizeRuntimePolicyRoles($scope[$kind]);
+        }
+
+        return null;
+    }
+
+    /**
      * @param array<string, mixed> $ctx
      */
     private function enforceRuntimePermission(array $user, array $ctx): void
@@ -468,18 +523,39 @@ class GenericCrudController extends BaseController
             return;
         }
 
-        $permissions = $this->runtimePermissionKeys($ctx);
-        if ($this->hasAnyPermission($user, $permissions)) {
-            return;
-        }
-
-        if ($this->permissionMatrixManages($permissions)) {
+        $restrictedDomains = ['core_system', 'system_infrastructure', 'forms_system', 'record_system', 'master_data_governance', 'customer_portal'];
+        $domain = (string)($ctx['tableMeta']['domain'] ?? $ctx['domain'] ?? '');
+        if ((bool)($ctx['tableMeta']['supportTable'] ?? false) || in_array($domain, $restrictedDomains, true)) {
             $this->error('forbidden', 403);
         }
 
-        if (!in_array($ctx['kind'], ['list', 'detail'], true)) {
-            $this->requireGenericWriteAccess($user);
+        $permissions = $this->runtimePermissionKeys($ctx);
+        if ($this->userPermissionMatrixConfigured($user)) {
+            $this->requireAnyPermission($user, $permissions, false);
+            return;
         }
+
+        $policyRoles = $this->runtimeAccessRoles($ctx);
+        if ($policyRoles !== null) {
+            if (in_array('authenticated', $policyRoles, true)) {
+                return;
+            }
+            if ($policyRoles !== [] && $this->userHasAnyRole($user, $policyRoles)) {
+                return;
+            }
+            $this->error('forbidden', 403, 'Denied by runtime access policy', [
+                'required_roles' => $policyRoles,
+                'permission_keys' => $permissions,
+            ]);
+        }
+
+        if (in_array($ctx['kind'], ['list', 'detail'], true)) {
+            return;
+        }
+
+        $this->error('forbidden', 403, 'No runtime permission rule matched this mutation', [
+            'permission_keys' => $permissions,
+        ]);
     }
 
     public function listRecords(): never
@@ -545,11 +621,11 @@ class GenericCrudController extends BaseController
     public function createRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('create', false, $user);
             $this->enforceRuntimePermission($user, $ctx);
+            $this->requireCsrf();
             $body = $this->jsonBody();
             $payload = is_array($body['data'] ?? null) ? (array)$body['data'] : $body;
             unset($payload['domain'], $payload['table'], $payload['action']);
@@ -582,11 +658,11 @@ class GenericCrudController extends BaseController
     public function updateRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('update', true, $user);
             $this->enforceRuntimePermission($user, $ctx);
+            $this->requireCsrf();
             $body = $this->jsonBody();
             $payload = is_array($body['data'] ?? null) ? (array)$body['data'] : $body;
             unset($payload['domain'], $payload['table'], $payload['action'], $payload['id'], $payload['identity'], $payload['row_version'], $payload['expected_row_version'], $payload['version'], $payload['expectedVersion'], $payload['scope']);
@@ -627,11 +703,11 @@ class GenericCrudController extends BaseController
     public function deleteRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('delete', true, $user);
             $this->enforceRuntimePermission($user, $ctx);
+            $this->requireCsrf();
             $record = $this->service()->delete($ctx['domain'], $ctx['table'], $ctx['identity'], $ctx['scope'], $ctx['expected_row_version']);
             $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
             $this->success([
@@ -655,11 +731,11 @@ class GenericCrudController extends BaseController
     public function transitionRecord(): never
     {
         $user = $this->requireAuth();
-        $this->requireCsrf();
 
         try {
             $ctx = $this->resolveContext('transition', true, $user);
             $this->enforceRuntimePermission($user, $ctx);
+            $this->requireCsrf();
             $body = $this->jsonBody();
             $toStatus = trim((string)($body['to'] ?? $body['status'] ?? $body['toStatus'] ?? $body['to_status'] ?? ''));
             if ($toStatus === '') {

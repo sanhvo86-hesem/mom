@@ -27,6 +27,182 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+const ROLE_GROUPS = {
+  admin: ['it_admin', 'ceo', 'qa_manager', 'quality_manager'],
+  quality_lead: ['qa_manager', 'quality_manager', 'qms_engineer'],
+  quality_ops: ['quality_engineer', 'qc_inspector'],
+  production_lead: ['production_director', 'production_manager', 'cnc_workshop_manager', 'production_planner'],
+  production_ops: ['shift_leader', 'cnc_operator', 'setup_technician', 'maintenance_technician'],
+  engineering_lead: ['engineering_manager', 'engineering_lead'],
+  engineering_ops: ['cam_nc_programmer', 'process_engineer'],
+  supply_lead: ['supply_chain_manager'],
+  supply_ops: ['buyer', 'warehouse_clerk', 'tool_storekeeper', 'logistics_coordinator'],
+  finance_lead: ['finance_manager', 'gl_payroll_accountant', 'ap_ar_accountant'],
+  hr_lead: ['hr_manager'],
+  commercial: ['estimator', 'sales_manager', 'customer_service'],
+};
+
+function expandRuntimeRoles(...groups) {
+  const roles = [];
+  for (const group of groups.flat()) {
+    if (!group) continue;
+    if (ROLE_GROUPS[group]) {
+      roles.push(...ROLE_GROUPS[group]);
+      continue;
+    }
+    roles.push(String(group));
+  }
+  return Array.from(new Set(roles.map((role) => String(role || '').trim()).filter(Boolean)));
+}
+
+function runtimeAccessTemplate(overrides = {}) {
+  return {
+    list: ['authenticated'],
+    detail: ['authenticated'],
+    create: expandRuntimeRoles('admin', 'quality_lead'),
+    update: expandRuntimeRoles('admin', 'quality_lead'),
+    transition: expandRuntimeRoles('admin', 'quality_lead'),
+    delete: expandRuntimeRoles('admin'),
+    ...overrides,
+  };
+}
+
+function runtimeAccessProfileForDomain(domain) {
+  const key = String(domain || '').trim().toLowerCase();
+  if (!key) {
+    return runtimeAccessTemplate();
+  }
+
+  if (['core_system', 'system_infrastructure', 'forms_system', 'record_system', 'master_data_governance', 'customer_portal'].includes(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'quality_lead'),
+      detail: expandRuntimeRoles('admin', 'quality_lead'),
+      create: expandRuntimeRoles('admin', 'quality_lead'),
+      update: expandRuntimeRoles('admin', 'quality_lead'),
+      transition: expandRuntimeRoles('admin', 'quality_lead'),
+    });
+  }
+
+  if (/^finance/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'finance_lead'),
+      detail: expandRuntimeRoles('admin', 'finance_lead'),
+      create: expandRuntimeRoles('admin', 'finance_lead'),
+      update: expandRuntimeRoles('admin', 'finance_lead'),
+      transition: expandRuntimeRoles('admin', 'finance_lead'),
+    });
+  }
+
+  if (/training|hr/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'hr_lead', 'quality_lead'),
+      detail: expandRuntimeRoles('admin', 'hr_lead', 'quality_lead'),
+      create: expandRuntimeRoles('admin', 'hr_lead', 'quality_lead'),
+      update: expandRuntimeRoles('admin', 'hr_lead', 'quality_lead'),
+      transition: expandRuntimeRoles('admin', 'hr_lead', 'quality_lead'),
+    });
+  }
+
+  if (/quality|audit|calibration|supplier_relationship|compliance/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'quality_lead', 'quality_ops', 'supply_lead'),
+      detail: expandRuntimeRoles('admin', 'quality_lead', 'quality_ops', 'supply_lead'),
+      create: expandRuntimeRoles('admin', 'quality_lead', 'quality_ops', 'supply_lead'),
+      update: expandRuntimeRoles('admin', 'quality_lead', 'quality_ops', 'supply_lead'),
+      transition: expandRuntimeRoles('admin', 'quality_lead', 'quality_ops', 'supply_lead'),
+    });
+  }
+
+  if (/planning|production|mes|dispatch|maintenance|tooling/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'production_lead', 'production_ops', 'engineering_lead', 'engineering_ops', 'quality_lead'),
+      detail: expandRuntimeRoles('admin', 'production_lead', 'production_ops', 'engineering_lead', 'engineering_ops', 'quality_lead'),
+      create: expandRuntimeRoles('admin', 'production_lead', 'engineering_lead', 'quality_lead'),
+      update: expandRuntimeRoles('admin', 'production_lead', 'engineering_lead', 'quality_lead'),
+      transition: expandRuntimeRoles('admin', 'production_lead', 'engineering_lead', 'quality_lead'),
+    });
+  }
+
+  if (/engineering|plm|fmea|apqp|master_data/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'engineering_lead', 'engineering_ops', 'quality_lead', 'production_lead'),
+      detail: expandRuntimeRoles('admin', 'engineering_lead', 'engineering_ops', 'quality_lead', 'production_lead'),
+      create: expandRuntimeRoles('admin', 'engineering_lead', 'quality_lead', 'production_lead'),
+      update: expandRuntimeRoles('admin', 'engineering_lead', 'quality_lead', 'production_lead'),
+      transition: expandRuntimeRoles('admin', 'engineering_lead', 'quality_lead', 'production_lead'),
+    });
+  }
+
+  if (/warehouse|inventory|supply|purchasing|shipping|transport|trade|logistics|outsource/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'supply_lead', 'supply_ops', 'quality_lead'),
+      detail: expandRuntimeRoles('admin', 'supply_lead', 'supply_ops', 'quality_lead'),
+      create: expandRuntimeRoles('admin', 'supply_lead', 'quality_lead'),
+      update: expandRuntimeRoles('admin', 'supply_lead', 'quality_lead'),
+      transition: expandRuntimeRoles('admin', 'supply_lead', 'quality_lead'),
+    });
+  }
+
+  if (/commercial|crm|quote|order|customer/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'commercial', 'finance_lead', 'production_lead'),
+      detail: expandRuntimeRoles('admin', 'commercial', 'finance_lead', 'production_lead'),
+      create: expandRuntimeRoles('admin', 'commercial', 'finance_lead', 'production_lead'),
+      update: expandRuntimeRoles('admin', 'commercial', 'finance_lead', 'production_lead'),
+      transition: expandRuntimeRoles('admin', 'commercial', 'finance_lead', 'production_lead'),
+    });
+  }
+
+  return runtimeAccessTemplate();
+}
+
+function runtimeAccessProfileForTable(tableName, table) {
+  const key = String(tableName || '').trim().toLowerCase();
+  if (!key) {
+    return null;
+  }
+
+  if (['users', 'roles', 'user_roles'].includes(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin'),
+      detail: expandRuntimeRoles('admin'),
+      create: expandRuntimeRoles('admin'),
+      update: expandRuntimeRoles('admin'),
+      transition: expandRuntimeRoles('admin'),
+    });
+  }
+
+  if (key === 'audit_events') {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'quality_lead'),
+      detail: expandRuntimeRoles('admin', 'quality_lead'),
+      create: [],
+      update: [],
+      transition: [],
+      delete: [],
+    });
+  }
+
+  if (/^workflow_/.test(key)) {
+    return runtimeAccessTemplate({
+      list: expandRuntimeRoles('admin', 'quality_lead'),
+      detail: expandRuntimeRoles('admin', 'quality_lead'),
+      create: expandRuntimeRoles('admin'),
+      update: expandRuntimeRoles('admin'),
+      transition: [],
+      delete: [],
+    });
+  }
+
+  if (table?.supportTable) {
+    return runtimeAccessTemplate({
+      delete: [],
+    });
+  }
+
+  return null;
+}
+
 function toArrayMap(value) {
   if (Array.isArray(value)) return value;
   if (value && typeof value === 'object') return Object.values(value);
@@ -503,6 +679,41 @@ function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, wor
   };
 }
 
+function buildRuntimeAccessPolicy(tableRegistry, domainArchitecture) {
+  const domainKeys = new Set(Object.keys(domainArchitecture.domains || {}));
+  for (const table of Object.values(tableRegistry.tables || {})) {
+    if (table?.domain) {
+      domainKeys.add(String(table.domain));
+    }
+  }
+
+  const domains = {};
+  for (const domain of Array.from(domainKeys).sort()) {
+    domains[domain] = runtimeAccessProfileForDomain(domain);
+  }
+
+  const tables = {};
+  for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
+    const override = runtimeAccessProfileForTable(tableName, table);
+    if (override) {
+      tables[tableName] = override;
+    }
+  }
+
+  return {
+    _meta: {
+      version: '1.0',
+      generatedAt,
+      description: 'Runtime access policy generated from domain architecture and table-registry defaults.',
+      domainPolicyCount: Object.keys(domains).length,
+      tableOverrideCount: Object.keys(tables).length,
+    },
+    defaults: runtimeAccessTemplate(),
+    domains,
+    tables,
+  };
+}
+
 function buildDomainFieldPacks(tableRegistry, dataFields) {
   const packs = {};
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
@@ -649,6 +860,7 @@ function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, val
     assets: {
       'data-fields-index.json': { kind: 'field-registry-index', records: fieldRegistryActionCount },
       'endpoint-catalog.json': { kind: 'endpoint-catalog', records: endpointCount },
+      'runtime-access-policy.json': { kind: 'runtime-access-policy', records: 1 },
       'domain-field-packs.json': { kind: 'pack-library', records: packCount },
       'relation-map.json': { kind: 'relation-map', records: relationCount },
       'workflow-library.json': { kind: 'workflow-library', records: workflowCount },
@@ -938,12 +1150,14 @@ function main() {
   const fieldTypes = readJson(path.join(registryDir, 'field-types.json'));
 
   const endpointCatalog = buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, workflowLibrary, statusOptions);
+  const runtimeAccessPolicy = buildRuntimeAccessPolicy(tableRegistry, domainArchitecture);
   const packs = buildDomainFieldPacks(tableRegistry, dataFields);
   const relationMap = buildRelationMap(tableRegistry);
   const manifest = buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields);
   const qualityReport = buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions);
 
   writeJson(path.join(registryDir, 'endpoint-catalog.json'), endpointCatalog);
+  writeJson(path.join(registryDir, 'runtime-access-policy.json'), runtimeAccessPolicy);
   writeJson(path.join(registryDir, 'domain-field-packs.json'), packs);
   writeJson(path.join(registryDir, 'relation-map.json'), relationMap);
   writeJson(path.join(registryDir, 'registry-manifest.json'), manifest);
@@ -951,6 +1165,7 @@ function main() {
 
   console.log(JSON.stringify({
     endpointCount: Object.keys(endpointCatalog.endpoints).length,
+    runtimePolicyDomains: Object.keys(runtimeAccessPolicy.domains || {}).length,
     packCount: Object.keys(packs.packs).length,
     relationCount: relationMap.edges.length,
     qualityChecksPassed: qualityReport.all_passed,

@@ -385,6 +385,11 @@ abstract class BaseController
         return permission_matrix_manages_permission($permissions, $this->confDir . '/role_permissions.json');
     }
 
+    protected function userPermissionMatrixConfigured(array $user): bool
+    {
+        return user_permission_matrix_configured($user, $this->confDir . '/role_permissions.json');
+    }
+
     /**
      * @param array<int, string> $permissions
      */

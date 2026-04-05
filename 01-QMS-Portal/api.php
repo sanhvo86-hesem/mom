@@ -484,9 +484,14 @@ function sanitize_role_permission_row(array $row): array {
     $clean['permissions'] = $patterns;
   }
 
+  $denies = normalize_permission_value_list($row['denies'] ?? null);
+  if ($denies !== []) {
+    $clean['denies'] = $denies;
+  }
+
   foreach ($row as $key => $value) {
     $permissionKey = trim((string)$key);
-    if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants'], true)) {
+    if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
       continue;
     }
     if (!is_bool($value)) continue;
@@ -497,6 +502,15 @@ function sanitize_role_permission_row(array $row): array {
 }
 
 function default_role_permissions(): array {
+  $nonDestructive = ['*.delete'];
+  $restrictedMetadata = ['master_data_governance.*', 'module_schema.*', 'registry.*', 'schema_studio.*'];
+  $businessRole = static function (array $permissions, bool $canCreateDocs = false) use ($nonDestructive, $restrictedMetadata): array {
+    return sanitize_role_permission_row([
+      'canCreateDocs' => $canCreateDocs,
+      'permissions' => array_values(array_unique(array_merge(['*.read'], $permissions))),
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $restrictedMetadata))),
+    ]);
+  };
   return [
     'ceo' => sanitize_role_permission_row([
       'canCreateDocs' => true,
@@ -515,8 +529,23 @@ function default_role_permissions(): array {
     ]),
     'quality_manager' => sanitize_role_permission_row([
       'canCreateDocs' => true,
-      'allowAllPermissions' => true,
-      'permissions' => ['*'],
+      'permissions' => [
+        '*.read',
+        'audit_risk.*',
+        'calibration_equipment.*',
+        'document_control.*',
+        'evidence_vault.*',
+        'fmea_apqp.*',
+        'module_schema.read',
+        'module_schema.write',
+        'quality_lab.*',
+        'quality_management.*',
+        'registry.read',
+        'registry.write',
+        'supplier_relationship.*',
+        'schema_studio.*',
+      ],
+      'denies' => $nonDestructive,
     ]),
     'qms_engineer' => sanitize_role_permission_row([
       'canCreateDocs' => true,
@@ -527,107 +556,166 @@ function default_role_permissions(): array {
         'document_control.*',
         'evidence_vault.*',
         'fmea_apqp.*',
-        'forms_system.*',
-        'master_data_governance.*',
+        'module_schema.read',
+        'module_schema.write',
         'quality_lab.*',
         'quality_management.*',
-        'record_system.*',
-        'schema_studio.read',
-        'schema_studio.write',
+        'registry.read',
+        'registry.write',
+        'supplier_relationship.*',
+        'schema_studio.*',
       ],
+      'denies' => $nonDestructive,
     ]),
     'developer' => sanitize_role_permission_row([
       'canCreateDocs' => false,
-      'permissions' => ['schema_studio.read', 'schema_studio.write'],
+      'permissions' => ['schema_studio.*'],
+      'denies' => $nonDestructive,
     ]),
-    'production_manager' => sanitize_role_permission_row([
-      'canCreateDocs' => false,
-      'permissions' => [
-        '*.read',
-        'advanced_planning.*',
-        'demand_supply_planning.*',
-        'mes_execution.*',
-        'mobile_operations.*',
-        'plant_maintenance.*',
-        'production.*',
-        'tooling_lifecycle.*',
-      ],
+    'production_manager' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'mes_execution.*',
+      'mobile_operations.*',
+      'plant_maintenance.*',
+      'production.*',
+      'tooling_lifecycle.*',
     ]),
-    'production_planner' => sanitize_role_permission_row([
-      'canCreateDocs' => false,
-      'permissions' => [
-        '*.read',
-        'advanced_planning.*',
-        'demand_supply_planning.*',
-        'production.*.read',
-        'production.*.update',
-        'production.*.transition',
-      ],
+    'cnc_workshop_manager' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'mes_execution.*',
+      'mobile_operations.*',
+      'plant_maintenance.*',
+      'production.*',
+      'tooling_lifecycle.*',
     ]),
-    'engineering_manager' => sanitize_role_permission_row([
-      'canCreateDocs' => false,
-      'permissions' => [
-        '*.read',
-        'cnc_programs.*',
-        'fmea_apqp.*',
-        'master_data_governance.*',
-        'mfg_engineering.*',
-        'plm_change_control.*',
-        'tooling_lifecycle.*',
-      ],
+    'production_planner' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'production.*.read',
+      'production.*.update',
+      'production.*.transition',
     ]),
-    'supply_chain_manager' => sanitize_role_permission_row([
-      'canCreateDocs' => false,
-      'permissions' => [
-        '*.read',
-        'inventory.*',
-        'outsource_execution.*',
-        'purchasing.*',
-        'shipping_compliance.*',
-        'supplier_relationship.*',
-        'traceability_serialization.*',
-        'transportation.*',
-        'warehouse_management.*',
-      ],
+    'engineering_manager' => $businessRole([
+      'cnc_programs.*',
+      'fmea_apqp.*',
+      'mfg_engineering.*',
+      'plm_change_control.*',
+      'tooling_lifecycle.*',
     ]),
-    'finance_manager' => sanitize_role_permission_row([
-      'canCreateDocs' => false,
-      'permissions' => [
-        '*.read',
-        'commercial_contracts.*',
-        'finance.*',
-        'finance_extended.*',
-        'finance_treasury.*',
-      ],
+    'engineering_lead' => $businessRole([
+      'cnc_programs.*',
+      'fmea_apqp.*',
+      'mfg_engineering.*',
+      'plm_change_control.*',
+      'tooling_lifecycle.*',
     ]),
-    'hr_manager' => sanitize_role_permission_row([
-      'canCreateDocs' => true,
-      'permissions' => [
-        '*.read',
-        'hcm_workforce.*',
-        'training_hr.*',
-      ],
+    'supply_chain_manager' => $businessRole([
+      'inventory.*',
+      'outsource_execution.*',
+      'purchasing.*',
+      'shipping_compliance.*',
+      'supplier_relationship.*',
+      'traceability_serialization.*',
+      'transportation.*',
+      'warehouse_management.*',
     ]),
-    'production_director' => sanitize_role_permission_row([
-      'canCreateDocs' => true,
-      'permissions' => [
-        '*.read',
-        'advanced_planning.*',
-        'demand_supply_planning.*',
-        'mes_execution.*',
-        'mobile_operations.*',
-        'plant_maintenance.*',
-        'production.*',
-        'tooling_lifecycle.*',
-      ],
+    'finance_manager' => $businessRole([
+      'commercial_contracts.*',
+      'finance.*',
+      'finance_extended.*',
+      'finance_treasury.*',
     ]),
+    'gl_payroll_accountant' => $businessRole([
+      'finance.*',
+      'finance_extended.*.read',
+      'finance_treasury.*.read',
+    ]),
+    'ap_ar_accountant' => $businessRole([
+      'finance.*',
+      'finance_extended.*.read',
+    ]),
+    'hr_manager' => $businessRole([
+      'hcm_workforce.*',
+      'training_hr.*',
+    ], true),
+    'production_director' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'mes_execution.*',
+      'mobile_operations.*',
+      'plant_maintenance.*',
+      'production.*',
+      'tooling_lifecycle.*',
+    ], true),
   ];
 }
 
+function merge_role_permission_row(array $base, array $override): array {
+  $merged = $base;
+
+  if (array_key_exists('canCreateDocs', $override)) {
+    $merged['canCreateDocs'] = (bool)$override['canCreateDocs'];
+  }
+
+  if (!empty($base['allowAllPermissions']) || !empty($override['allowAllPermissions'])) {
+    $merged['allowAllPermissions'] = true;
+  } else {
+    unset($merged['allowAllPermissions']);
+  }
+
+  $mergedPermissions = array_values(array_unique(array_merge(
+    normalize_permission_value_list($base['permissions'] ?? null),
+    normalize_permission_value_list($override['permissions'] ?? null),
+    normalize_permission_value_list($override['permission_keys'] ?? null),
+    normalize_permission_value_list($override['grants'] ?? null)
+  )));
+  if ($mergedPermissions !== []) {
+    $merged['permissions'] = $mergedPermissions;
+  } else {
+    unset($merged['permissions']);
+  }
+
+  $mergedDenies = array_values(array_unique(array_merge(
+    normalize_permission_value_list($base['denies'] ?? null),
+    normalize_permission_value_list($override['denies'] ?? null)
+  )));
+  if ($mergedDenies !== []) {
+    $merged['denies'] = $mergedDenies;
+  } else {
+    unset($merged['denies']);
+  }
+
+  foreach ($override as $key => $value) {
+    $permissionKey = trim((string)$key);
+    if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
+      continue;
+    }
+    if (!is_bool($value)) {
+      continue;
+    }
+    $merged[$permissionKey] = $value;
+  }
+
+  return sanitize_role_permission_row($merged);
+}
+
 function load_role_permissions(string $file): array {
+  $defaults = default_role_permissions();
   $j = read_json_file($file);
-  if (is_array($j)) return $j;
-  return default_role_permissions();
+  if (!is_array($j)) return $defaults;
+
+  $merged = $defaults;
+  foreach ($j as $role => $entry) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    if ($normalizedRole === '' || !is_array($entry)) {
+      continue;
+    }
+    $merged[$normalizedRole] = merge_role_permission_row($defaults[$normalizedRole] ?? [], $entry);
+  }
+
+  return $merged;
 }
 
 function save_role_permissions(string $file, array $perms): void {
@@ -734,6 +822,33 @@ function permission_matrix_manages_permission($permissions, string $file): bool 
           return true;
         }
       }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * @param string|array<int, string> $permissions
+ */
+function user_permission_matrix_configured(array $user, string $file): bool {
+  $perms = load_role_permissions($file);
+  $userRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+
+  foreach ($userRoles as $role) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    if ($normalizedRole === '') {
+      continue;
+    }
+    $entry = $perms[$normalizedRole] ?? null;
+    if (!is_array($entry)) {
+      continue;
+    }
+    if (!empty($entry['allowAllPermissions'])) {
+      return true;
+    }
+    if (role_permission_grants($entry) !== [] || role_permission_denies($entry) !== []) {
+      return true;
     }
   }
 
@@ -13007,12 +13122,16 @@ switch ($action) {
     $in = $data['perms'] ?? null;
     if (!is_array($in)) api_json(['ok' => false, 'error' => 'invalid_perms'], 400);
 
-    $clean = [];
+    $clean = load_role_permissions($ROLE_PERMS_FILE);
+    if (!is_array($clean)) {
+      $clean = [];
+    }
     foreach ($in as $role => $v) {
       $roleKey = (string)$role;
       if ($roleKey === '') continue;
       $row = is_array($v) ? $v : [];
-      $clean[$roleKey] = sanitize_role_permission_row($row);
+      $existing = is_array($clean[$roleKey] ?? null) ? $clean[$roleKey] : [];
+      $clean[$roleKey] = merge_role_permission_row($existing, $row);
     }
     // Ensure defaults always exist (safety)
     foreach (default_role_permissions() as $k => $v) {

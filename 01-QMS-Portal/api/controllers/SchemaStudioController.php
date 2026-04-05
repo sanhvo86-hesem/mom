@@ -37,27 +37,32 @@ class SchemaStudioController extends BaseController
 
     private function requireReadAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.schema.read', 'studio.schema.write']);
+        $this->requireAnyPermission($user, ['schema_studio.read', 'schema_studio.write']);
     }
 
     private function requireWriteAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.schema.write']);
+        $this->requireAnyPermission($user, ['schema_studio.write']);
+    }
+
+    private function requireDatabaseAccess(array $user): void
+    {
+        $this->requireAnyRole($user, array_merge(admin_roles(), ['developer', 'it_admin']));
     }
 
     private function requireMigrationAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.schema.migrate', 'studio.schema.write']);
+        $this->requireAnyPermission($user, ['schema_studio.migrate', 'schema_studio.write']);
     }
 
     private function requireExportAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.schema.export', 'studio.schema.read', 'studio.schema.write']);
+        $this->requireAnyPermission($user, ['schema_studio.export', 'schema_studio.read', 'schema_studio.write']);
     }
 
     private function requireDataWriteAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.schema.data_write', 'studio.schema.write']);
+        $this->requireAnyPermission($user, ['schema_studio.data_write', 'schema_studio.write']);
     }
 
     private function safeId(string $value, string $fallback = 'schema_studio'): string

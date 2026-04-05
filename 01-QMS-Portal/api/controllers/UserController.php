@@ -260,12 +260,17 @@ class UserController extends BaseController
         $in   = $data['perms'] ?? null;
         if (!is_array($in)) $this->error('invalid_perms', 400);
 
-        $clean = [];
+        $rolePermsFile = $this->confDir . '/role_permissions.json';
+        $clean = load_role_permissions($rolePermsFile);
+        if (!is_array($clean)) {
+            $clean = [];
+        }
         foreach ($in as $role => $v) {
             $roleKey = (string)$role;
             if ($roleKey === '') continue;
             $row = is_array($v) ? $v : [];
-            $clean[$roleKey] = sanitize_role_permission_row($row);
+            $existing = is_array($clean[$roleKey] ?? null) ? $clean[$roleKey] : [];
+            $clean[$roleKey] = merge_role_permission_row($existing, $row);
         }
 
         // Ensure defaults always exist
@@ -273,7 +278,6 @@ class UserController extends BaseController
             if (!isset($clean[$k])) $clean[$k] = $v;
         }
 
-        $rolePermsFile = $this->confDir . '/role_permissions.json';
         save_role_permissions($rolePermsFile, $clean);
 
         $this->auditLog('admin_role_perms_save');

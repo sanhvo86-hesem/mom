@@ -29,7 +29,7 @@ class ModuleSchemaController extends BaseController
      */
     private function requireSchemaReadAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.module.read', 'studio.module.write']);
+        $this->requireAnyPermission($user, ['module_schema.read', 'module_schema.write']);
     }
 
     /**
@@ -39,7 +39,7 @@ class ModuleSchemaController extends BaseController
      */
     private function requireSchemaWriteAccess(array $user): void
     {
-        $this->requireAnyPermission($user, ['studio.module.write']);
+        $this->requireAnyPermission($user, ['module_schema.write']);
     }
 
     private function schemaDir(): string

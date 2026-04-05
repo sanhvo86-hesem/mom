@@ -5441,7 +5441,7 @@ function renderAdminMetadataStudio(){
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
-  var expectedVersion = '20260405m';
+  var expectedVersion = '20260405n';
   /* Delegate to external file if loaded, otherwise fallback inline */
   if(typeof window._renderAdminAppearanceFull === 'function' && window._renderAdminAppearanceFullVersion === expectedVersion){
     window._renderAdminAppearanceFull(el, _appSubTab, lang);
@@ -5456,19 +5456,48 @@ function renderAdminAppearance(){
     window._renderAdminAppearanceFull = null;
     window._renderAdminAppearanceFullVersion = null;
   }
-  /* Fallback: load external script then render */
-  var script = document.createElement('script');
-  script.id = 'hm-admin-appearance-script';
-  script.src = 'scripts/portal/00c-admin-appearance.js?v=' + expectedVersion;
-  script.onload = function(){
+  var scriptUrl = 'scripts/portal/00c-admin-appearance.js?v=' + expectedVersion;
+  var renderLoaded = function(){
     if(typeof window._renderAdminAppearanceFull === 'function'){
       window._renderAdminAppearanceFull(el, _appSubTab, lang);
     }
   };
-  script.onerror = function(){
+  var renderError = function(){
     el.innerHTML = '<div class="hm-empty">Failed to load appearance editor. Check 00c-admin-appearance.js</div>';
   };
-  document.head.appendChild(script);
+  var loadViaScriptTag = function(){
+    var script = document.createElement('script');
+    script.id = 'hm-admin-appearance-script';
+    script.charset = 'UTF-8';
+    script.src = scriptUrl;
+    script.onload = renderLoaded;
+    script.onerror = renderError;
+    document.head.appendChild(script);
+  };
+  var loadViaUtf8Decode = function(){
+    if(!(window.fetch && window.TextDecoder)){
+      loadViaScriptTag();
+      return;
+    }
+    fetch(scriptUrl, { cache:'no-store' })
+      .then(function(res){
+        if(!res.ok) throw new Error('appearance_fetch_failed');
+        return res.arrayBuffer();
+      })
+      .then(function(buf){
+        var source = new TextDecoder('utf-8').decode(buf);
+        var script = document.createElement('script');
+        script.id = 'hm-admin-appearance-script';
+        script.charset = 'UTF-8';
+        script.text = source + '\n//# sourceURL=' + scriptUrl;
+        document.head.appendChild(script);
+        renderLoaded();
+      })
+      .catch(function(){
+        loadViaScriptTag();
+      });
+  };
+  loadViaUtf8Decode();
 }
 
 function renderAdminMfa(){
