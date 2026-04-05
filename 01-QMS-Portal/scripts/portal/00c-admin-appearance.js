@@ -123,7 +123,7 @@ function slider(label, cssVar, path, min, max, def, unit, step){
   var sid = 'adm_s_'+path.replace(/\./g,'_');
   var nid = 'adm_n_'+path.replace(/\./g,'_');
   /* For unitless values like opacity, ratio — don't append unit */
-  var unitArg = JSON.stringify(u);
+  var unitArg = '\'' + String(u).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\'';
   return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
     +'<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>'
     +'<input type="range" id="'+sid+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
@@ -866,7 +866,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405b';
+window._renderAdminAppearanceFullVersion = '20260405c';
 window._renderAdminAppearanceFull = render;
 
 })();
