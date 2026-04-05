@@ -1308,7 +1308,7 @@ function teardownCurrentPageModule(){
 
 function resolvePortalScriptUrl(fragment){
   var src = './scripts/portal/' + fragment;
-  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405s';
+  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405t';
 }
 
 function renderModuleBuilderStatus(container, mode, detail){
