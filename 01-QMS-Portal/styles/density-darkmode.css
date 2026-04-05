@@ -108,13 +108,13 @@
    COMPONENT REWIRE — Use --hds-* density tokens
    These override the hardcoded sizes in hesem-design-tokens.css
    ============================================================================ */
-.hm-btn        { height: var(--hds-control-h); padding: 0 var(--hds-control-px); font-size: var(--hds-control-font); gap: var(--hds-control-gap); border-radius: var(--hds-control-radius); }
-.hm-btn-sm     { height: var(--hds-control-h-sm); padding: 0 var(--hds-control-px-sm); font-size: var(--hds-control-font-sm); }
-.hm-btn-lg     { height: var(--hds-control-h-lg); padding: 0 var(--hds-control-px-lg); font-size: var(--hds-control-font-lg); }
+.hm-btn        { min-height: var(--hds-control-h); height: auto; padding: var(--btn-padding-y, 0px) var(--btn-padding-x, var(--hds-control-px)); font-size: var(--hds-control-font); gap: var(--btn-gap, var(--hds-control-gap)); border-radius: var(--hds-control-radius); border-width: var(--btn-border-width, 1px); font-weight: var(--btn-font-weight, 600); letter-spacing: var(--btn-letter-spacing, 0); text-transform: var(--btn-text-transform, none); min-width: var(--btn-min-width, 0px); }
+.hm-btn-sm     { min-height: var(--hds-control-h-sm); height: auto; padding: var(--btn-padding-y, 0px) calc(var(--btn-padding-x, var(--hds-control-px-sm)) * 0.75); font-size: var(--hds-control-font-sm); }
+.hm-btn-lg     { min-height: var(--hds-control-h-lg); height: auto; padding: var(--btn-padding-y, 0px) calc(var(--btn-padding-x, var(--hds-control-px-lg)) * 1.5); font-size: var(--hds-control-font-lg); }
 
 .hm-input,
-.hm-select     { height: var(--hds-control-h); padding: 0 var(--hds-control-px); font-size: var(--hds-control-font); border-radius: var(--hds-control-radius); }
-.hm-input-lg   { height: var(--hds-control-h-lg); padding: 0 var(--hds-control-px-lg); font-size: var(--hds-control-font-lg); }
+.hm-select     { min-height: var(--hds-control-h); height: auto; padding: var(--input-padding-y, 0px) var(--hds-control-px); font-size: var(--hds-control-font); border-radius: var(--hds-control-radius); border-width: var(--input-border-width, 1px); background: var(--input-bg, var(--bg-surface)); }
+.hm-input-lg   { min-height: var(--hds-control-h-lg); height: auto; padding: var(--input-padding-y, 0px) var(--hds-control-px-lg); font-size: var(--hds-control-font-lg); }
 
 .hm-card       { padding: var(--hds-card-pad); border-radius: var(--hds-card-radius); }
 .hm-badge      { padding: var(--hds-badge-py) var(--hds-badge-px); font-size: var(--hds-badge-font); }

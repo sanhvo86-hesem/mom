@@ -1308,7 +1308,7 @@ function teardownCurrentPageModule(){
 
 function resolvePortalScriptUrl(fragment){
   var src = './scripts/portal/' + fragment;
-  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405v';
+  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405w';
 }
 
 function renderModuleBuilderStatus(container, mode, detail){
@@ -5441,7 +5441,7 @@ function renderAdminMetadataStudio(){
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
-  var expectedVersion = '20260405g';
+  var expectedVersion = '20260405i';
   /* Delegate to external file if loaded, otherwise fallback inline */
   if(typeof window._renderAdminAppearanceFull === 'function' && window._renderAdminAppearanceFullVersion === expectedVersion){
     window._renderAdminAppearanceFull(el, _appSubTab, lang);

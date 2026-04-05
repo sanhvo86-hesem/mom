@@ -124,12 +124,12 @@ function slider(label, cssVar, path, min, max, def, unit, step){
   var nid = 'adm_n_'+path.replace(/\./g,'_');
   /* For unitless values like opacity, ratio — don't append unit */
   var unitArg = '\'' + String(u).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\'';
-  return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+  return '<div class="adm-control-row" data-control="slider" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
     +'<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>'
-    +'<input type="range" id="'+sid+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
+    +'<input type="range" id="'+sid+'" data-role="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
     +' oninput="document.getElementById(\''+nid+'\').value=this.value;_hmSetWithUnit(\''+cssVar+'\',\''+path+'\',this.value,'+unitArg+')"'
     +' style="flex:1;accent-color:var(--brand-2)">'
-    +'<input type="number" id="'+nid+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
+    +'<input type="number" id="'+nid+'" data-role="number" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
     +' oninput="document.getElementById(\''+sid+'\').value=this.value;_hmSetWithUnit(\''+cssVar+'\',\''+path+'\',this.value,'+unitArg+')"'
     +' style="width:64px;height:28px;text-align:center;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;font-family:var(--font-mono)">'
     +'<span style="font-size:11px;color:var(--text-tertiary);min-width:24px">'+u+'</span>'
@@ -141,11 +141,11 @@ function colorPick(label, cssVar, path, def){
   var val = cfg(path) || def || '#000000';
   var cid = 'adm_cp_'+path.replace(/\./g,'_');
   var hid = 'adm_hp_'+path.replace(/\./g,'_');
-  return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-    +'<input type="color" id="'+cid+'" value="'+esc(val)+'"'
+  return '<div class="adm-control-row" data-control="color" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<input type="color" id="'+cid+'" data-role="color" value="'+esc(val)+'"'
     +' oninput="document.getElementById(\''+hid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' style="width:32px;height:28px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px">'
-    +'<input type="text" id="'+hid+'" value="'+esc(val)+'"'
+    +'<input type="text" id="'+hid+'" data-role="text" value="'+esc(val)+'"'
     +' oninput="document.getElementById(\''+cid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' style="width:80px;height:28px;padding:0 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono);font-size:11px">'
     +'<span style="font-size:11px;color:var(--text-secondary)">'+esc(label)+'</span>'
@@ -155,9 +155,9 @@ function colorPick(label, cssVar, path, def){
 /* ── Helper: text input ─────────────────────────────────────────────────── */
 function textInput(label, cssVar, path, def, placeholder){
   var val = cfg(path) || def || '';
-  return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+  return '<div class="adm-control-row" data-control="text" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
     +'<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>'
-    +'<input type="text" value="'+esc(val)+'"'
+    +'<input type="text" data-role="text" value="'+esc(val)+'"'
     +' oninput="_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' placeholder="'+(placeholder||'')+'"'
     +' style="flex:1;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px">'
@@ -197,10 +197,10 @@ function fontSelect(label, cssVar, path, def, isMono){
   var sid = 'adm_fs_'+path.replace(/\./g,'_');
   var tid = 'adm_ft_'+path.replace(/\./g,'_');
 
-  var h = '<div style="margin-bottom:10px">';
+  var h = '<div class="adm-control-row" data-control="font" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="margin-bottom:10px">';
   h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">';
   h += '<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>';
-  h += '<select id="'+sid+'" onchange="var v=this.value;if(v===\'__custom__\'){document.getElementById(\''+tid+'\').style.display=\'block\';}else{document.getElementById(\''+tid+'\').style.display=\'none\';_hmSet(\''+cssVar+'\',\''+path+'\',v);}" style="flex:1;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;background:var(--bg-surface)">';
+  h += '<select id="'+sid+'" data-role="select" onchange="var v=this.value;if(v===\'__custom__\'){document.getElementById(\''+tid+'\').style.display=\'block\';}else{document.getElementById(\''+tid+'\').style.display=\'none\';_hmSet(\''+cssVar+'\',\''+path+'\',v);}" style="flex:1;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;background:var(--bg-surface)">';
   var matched = false;
   options.forEach(function(o){
     var selected = val === o.value ? 'selected' : '';
@@ -209,14 +209,14 @@ function fontSelect(label, cssVar, path, def, isMono){
   });
   h += '<option value="__custom__" '+(matched?'':'selected')+'>--- Tùy chỉnh / Custom ---</option>';
   h += '</select></div>';
-  h += '<input type="text" id="'+tid+'" value="'+esc(val)+'" oninput="_hmSet(\''+cssVar+'\',\''+path+'\',this.value)" placeholder="Nhập font stack tùy ý..." style="display:'+(matched?'none':'block')+';width:100%;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-left:150px">';
+  h += '<input type="text" id="'+tid+'" data-role="text" value="'+esc(val)+'" oninput="_hmSet(\''+cssVar+'\',\''+path+'\',this.value)" placeholder="Nhập font stack tùy ý..." style="display:'+(matched?'none':'block')+';width:100%;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-left:150px">';
   h += '</div>';
   return h;
 }
 
 /* ── Helper: radio group ────────────────────────────────────────────────── */
 function radioRow(name, options, current, onChange){
-  var h = '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+  var h = '<div class="adm-control-row" data-control="radio" data-name="'+esc(name)+'" style="display:flex;gap:6px;flex-wrap:wrap">';
   options.forEach(function(o){
     var checked = current===o.value ? 'checked' : '';
     h += '<label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:2px solid '
@@ -240,7 +240,7 @@ function sect(title, content, open){
 }
 
 function previewBox(title, body, note){
-  return '<div style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
+  return '<div class="hm-appearance-preview" data-preview-title="'+esc(title||'Preview')+'" style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">'
     + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary)">'+esc(title||'Preview')+'</div>'
     + (note ? '<div style="font-size:10px;color:var(--text-tertiary)">'+esc(note)+'</div>' : '')
@@ -322,12 +322,26 @@ function previewBrandColors(){
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'
     + previewSwatch('Primary', 'var(--brand-2)', 'var(--text-inverse)', '1px solid transparent')
     + previewSwatch('Brand', 'var(--brand)', 'var(--text-inverse)', '1px solid transparent')
+    + previewSwatch('Brand Light', 'var(--brand-light)', 'var(--text-inverse)', '1px solid transparent')
     + previewSwatch('Darkest', 'var(--brand-dark)', 'var(--text-inverse)', '1px solid transparent')
     + previewSwatch('Accent', 'var(--accent)', '#111827', '1px solid transparent')
+    + previewSwatch('Accent Light', 'var(--accent-light)', '#111827', '1px solid transparent')
     + '</div>'
     + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
     + '<button class="hm-btn hm-btn-primary">Primary CTA</button>'
     + '<button class="hm-btn hm-btn-secondary" style="border-color:var(--brand-2);color:var(--brand-2)">Secondary</button>'
+    + '</div>'
+    + '<div style="margin-top:10px;max-width:280px;border:1px solid color-mix(in srgb, var(--brand-2) 18%, transparent);border-radius:var(--radius-lg);overflow:hidden;display:grid;grid-template-columns:84px 1fr;background:var(--bg-surface)">'
+    + '<div style="background:var(--bg-sidebar-light,var(--brand-dark));padding:10px 8px;display:grid;gap:6px;color:#fff">'
+    + '<div style="font-size:10px;font-weight:700;opacity:.78">Sidebar</div>'
+    + '<div style="padding:6px 8px;border-radius:8px;background:color-mix(in srgb, var(--brand-light) 28%, transparent);font-size:11px">Dashboard</div>'
+    + '<div style="padding:6px 8px;border-radius:8px;background:color-mix(in srgb, var(--accent-light) 22%, transparent);font-size:11px;color:var(--accent)">Studio</div>'
+    + '</div>'
+    + '<div style="padding:10px 12px;background:linear-gradient(135deg,color-mix(in srgb, var(--bg-surface) 90%, var(--brand-2) 10%) 0%, color-mix(in srgb, var(--bg-surface) 92%, var(--accent-light) 8%) 100%)">'
+    + '<div style="font-size:10px;font-weight:700;color:var(--text-secondary)">Portal Hero</div>'
+    + '<div style="margin-top:6px;font-size:13px;font-weight:700;color:var(--text-primary)">Brand + accent interplay</div>'
+    + '<div style="margin-top:6px;font-size:11px;color:var(--text-secondary)">This block shows primary, light brand, accent light and sidebar background together.</div>'
+    + '</div>'
     + '</div>'
   );
 }
@@ -347,6 +361,8 @@ function previewStatusColors(){
     + '<span class="hm-badge" style="background:var(--red-dark);color:#0f172a">Dark error</span>'
     + '<span class="hm-badge" style="background:var(--amber-dark);color:#0f172a">Dark warning</span>'
     + '<span class="hm-badge" style="background:var(--blue-dark);color:#0f172a">Dark info</span>'
+    + '<span class="hm-badge" style="background:var(--purple-dark);color:#0f172a">Dark review</span>'
+    + '<span class="hm-badge" style="background:var(--cyan-dark);color:#0f172a">Dark planned</span>'
     + '</div>'
   );
 }
@@ -355,15 +371,31 @@ function previewSurfaceStack(mode){
   var page = 'var(--bg-page-'+mode+')';
   var surface = 'var(--bg-surface-'+mode+')';
   var alt = 'var(--bg-surface-alt-'+mode+')';
+  var header = 'var(--bg-header-'+mode+')';
+  var modal = 'var(--bg-modal-'+mode+')';
+  var hover = 'var(--bg-hover-'+mode+')';
+  var sidebar = mode === 'light' ? 'var(--bg-sidebar-light)' : 'var(--bg-sidebar-dark)';
   var text = 'var(--text-primary-'+mode+')';
   var muted = mode === 'light' ? 'var(--text-secondary-light)' : 'var(--text-secondary-dark)';
   var border = mode === 'light' ? 'var(--border-light)' : 'var(--border-dark)';
   return previewBox('Preview '+mode+' surfaces',
     '<div style="padding:12px;border-radius:var(--radius-lg);background:'+page+';border:1px solid '+border+'">'
-    + '<div style="padding:12px;border-radius:var(--radius-md);background:'+surface+';border:1px solid '+border+';color:'+text+'">'
+    + '<div style="display:grid;grid-template-columns:minmax(84px,104px) 1fr;gap:10px;align-items:stretch">'
+    + '<div style="padding:10px;border-radius:var(--radius-md);background:'+sidebar+';border:1px solid '+border+';color:var(--text-inverse-'+mode+')">'
+    + '<div style="font-size:10px;font-weight:700;opacity:.8">Sidebar</div>'
+    + '<div style="margin-top:8px;padding:6px 8px;border-radius:8px;background:color-mix(in srgb, '+hover+' 92%, transparent)">Active nav</div>'
+    + '</div>'
+    + '<div style="padding:0;border-radius:var(--radius-md);background:'+surface+';border:1px solid '+border+';color:'+text+';overflow:hidden">'
+    + '<div style="padding:10px 12px;background:'+header+';border-bottom:1px solid '+border+';font-size:12px;font-weight:700">Header surface</div>'
+    + '<div style="padding:12px">'
     + '<div style="font-size:13px;font-weight:700">Surface</div>'
-    + '<div style="font-size:12px;color:'+muted+';margin-top:4px">Nested layers show page, surface and alternate surface.</div>'
-    + '<div style="margin-top:10px;padding:10px;border-radius:var(--radius-md);background:'+alt+';border:1px solid '+border+'">Surface Alt</div>'
+    + '<div style="font-size:12px;color:'+muted+';margin-top:4px">Nested layers show page, header, modal, hover and alternate surface.</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px">'
+    + '<div style="padding:10px;border-radius:var(--radius-md);background:'+alt+';border:1px solid '+border+'">Surface Alt</div>'
+    + '<div style="padding:10px;border-radius:var(--radius-md);background:'+modal+';border:1px solid '+border+'">Modal</div>'
+    + '<div style="padding:10px;border-radius:var(--radius-md);background:'+hover+';border:1px dashed '+border+'">Hover layer</div>'
+    + '</div>'
+    + '</div></div>'
     + '</div>'
     + '</div>'
   );
@@ -389,23 +421,47 @@ function previewTextColors(mode){
 
 function previewBorderColors(){
   return previewBox('Preview borders',
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    + previewSwatch('Border', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-light)')
-    + previewSwatch('Focus', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-focus-light)')
-    + previewSwatch('Error', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-error-light)')
-    + previewSwatch('Success', 'var(--bg-surface)', 'var(--text-primary)', '2px solid var(--border-success-light)')
+    '<div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Light</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + previewSwatch('Border', 'var(--bg-surface-light)', 'var(--text-primary-light)', '2px solid var(--border-light)')
+    + previewSwatch('Focus', 'var(--bg-surface-light)', 'var(--text-primary-light)', '2px solid var(--border-focus-light)')
+    + previewSwatch('Error', 'var(--bg-surface-light)', 'var(--text-primary-light)', '2px solid var(--border-error-light)')
+    + previewSwatch('Success', 'var(--bg-surface-light)', 'var(--text-primary-light)', '2px solid var(--border-success-light)')
+    + '</div>'
+    + '<div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin:12px 0 8px">Dark</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + previewSwatch('Border', 'var(--bg-surface-dark)', 'var(--text-primary-dark)', '2px solid var(--border-dark)')
+    + previewSwatch('Focus', 'var(--bg-surface-dark)', 'var(--text-primary-dark)', '2px solid var(--border-focus-dark)')
+    + previewSwatch('Error', 'var(--bg-surface-dark)', 'var(--text-primary-dark)', '2px solid var(--border-error-dark)')
+    + previewSwatch('Success', 'var(--bg-surface-dark)', 'var(--text-primary-dark)', '2px solid var(--border-success-dark)')
     + '</div>'
   );
 }
 
 function previewDensityControls(){
   return previewBox('Preview control sizing',
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
-    + '<button class="hm-btn hm-btn-primary">Default</button>'
+    '<div style="display:grid;gap:10px">'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
     + '<button class="hm-btn hm-btn-sm hm-btn-secondary">Small</button>'
+    + '<button class="hm-btn hm-btn-primary">Default</button>'
     + '<button class="hm-btn hm-btn-lg hm-btn-secondary">Large</button>'
     + '<input class="hm-input" value="Input sizing" style="max-width:180px">'
-    + '<span class="hm-badge hm-badge-review"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6"></circle></svg>Badge</span>'
+    + '<span class="hm-badge hm-badge-review"><i style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:currentColor;color:#fff">i</i>Badge</span>'
+    + '</div>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+    + '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'
+    + '<span style="font-size:var(--hds-icon-sm);width:var(--hds-icon-sm);height:var(--hds-icon-sm);display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:var(--brand-2);color:#fff">S</span>'
+    + '<span style="font-size:11px;color:var(--text-secondary)">Icon sm</span>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'
+    + '<span style="font-size:var(--hds-icon-md);width:var(--hds-icon-md);height:var(--hds-icon-md);display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:var(--green);color:#fff">M</span>'
+    + '<span style="font-size:11px;color:var(--text-secondary)">Icon md</span>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'
+    + '<span style="font-size:var(--hds-icon-lg);width:var(--hds-icon-lg);height:var(--hds-icon-lg);display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:var(--amber);color:#111827">L</span>'
+    + '<span style="font-size:11px;color:var(--text-secondary)">Icon lg</span>'
+    + '</div>'
+    + '</div>'
     + '</div>'
   );
 }
@@ -432,10 +488,26 @@ function previewRadiusScale(){
 }
 
 function previewSpacingScale(){
+  function gapSample(token, value){
+    return '<div style="display:grid;gap:6px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-secondary)"><span>'+token+'</span><span>'+value+'</span></div>'
+      + '<div style="display:flex;align-items:center">'
+      + '<div style="width:22px;height:22px;border-radius:var(--radius-md);background:var(--brand-2)"></div>'
+      + '<div style="width:'+value+';min-width:'+value+';height:6px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 28%, transparent);margin:0 4px"></div>'
+      + '<div style="width:22px;height:22px;border-radius:var(--radius-md);background:var(--brand-light)"></div>'
+      + '</div>'
+      + '</div>';
+  }
   return previewBox('Preview spacing',
-    '<div style="display:grid;gap:var(--space-4);background:var(--bg-surface);padding:var(--space-4);border:1px solid var(--border);border-radius:var(--radius-lg)">'
-    + '<div style="display:flex;gap:var(--space-2)"><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--brand-2)"></div><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--brand-light)"></div></div>'
-    + '<div style="display:flex;gap:var(--space-3)"><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--green)"></div><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--amber)"></div><div style="width:34px;height:34px;border-radius:var(--radius-md);background:var(--red)"></div></div>'
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;background:var(--bg-surface);padding:var(--space-4);border:1px solid var(--border);border-radius:var(--radius-lg)">'
+    + gapSample('space-1', 'var(--space-1)')
+    + gapSample('space-2', 'var(--space-2)')
+    + gapSample('space-3', 'var(--space-3)')
+    + gapSample('space-4', 'var(--space-4)')
+    + gapSample('space-5', 'var(--space-5)')
+    + gapSample('space-6', 'var(--space-6)')
+    + gapSample('space-8', 'var(--space-8)')
+    + gapSample('space-10', 'var(--space-10)')
     + '</div>'
   );
 }
@@ -443,12 +515,15 @@ function previewSpacingScale(){
 function previewLayoutDimensions(){
   return previewBox('Preview layout dimensions',
     '<div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-page)">'
-    + '<div style="display:flex;height:140px">'
-    + '<div style="width:min(140px,calc(var(--sidebar-w,260px) / 2));background:var(--brand);color:#fff;padding:12px">Sidebar</div>'
+    + '<div style="display:flex;height:180px">'
+    + '<div style="display:grid;grid-template-columns:min(132px,calc(var(--sidebar-w,260px) / 2.2)) min(54px,calc(var(--sidebar-w-collapsed,72px) / 1.2));gap:6px;padding:10px;background:var(--bg-page);border-right:1px solid var(--border)">'
+    + '<div style="background:var(--brand);color:#fff;padding:12px;border-radius:var(--radius-md)">Sidebar</div>'
+    + '<div style="background:color-mix(in srgb, var(--brand) 78%, #fff 22%);color:#fff;padding:12px 6px;border-radius:var(--radius-md);text-align:center">Mini</div>'
+    + '</div>'
     + '<div style="flex:1;background:var(--bg-surface)">'
-    + '<div style="height:min(52px,var(--header-h,52px));background:var(--bg-surface-alt);border-bottom:1px solid var(--border);padding:0 12px;display:flex;align-items:center">Header</div>'
+    + '<div style="height:var(--header-h,52px);max-height:70px;background:var(--bg-header,var(--bg-surface-alt));border-bottom:1px solid var(--border);padding:0 12px;display:flex;align-items:center">Header</div>'
     + '<div style="padding:12px">'
-    + '<div style="max-width:min(100%,calc(var(--content-max-w,1400px) / 3));padding:10px 12px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt)">Content max width</div>'
+    + '<div style="max-width:min(100%,calc(var(--content-max-w,1400px) / 2.7));padding:10px 12px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt)">Content max width</div>'
     + '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'
     + '<div style="width:min(100%,calc(var(--modal-max-w,800px) / 3));padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-modal)">Modal max</div>'
     + '<div style="width:min(100%,calc(var(--modal-sm-max-w,480px) / 2));padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-modal)">Modal sm</div>'
@@ -458,15 +533,38 @@ function previewLayoutDimensions(){
 }
 
 function previewMotion(){
-  return previewBox('Preview motion', '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-primary">Hover me</button><button class="hm-btn hm-btn-secondary">Focus me</button><div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface);transition:transform var(--transition-spring),box-shadow var(--transition-spring);cursor:pointer" onmouseenter="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'var(--shadow-lg)\'" onmouseleave="this.style.transform=\'none\';this.style.boxShadow=\'none\'">Card motion</div></div>', 'Hover the card to inspect timing');
+  return previewBox('Preview motion',
+    '<style>@keyframes hmAppearancePulse{0%{transform:translateX(0)}100%{transform:translateX(18px)}}</style>'
+    + '<div style="display:grid;gap:10px">'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">'
+    + '<div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)"><div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Fast</div><div style="width:22px;height:22px;border-radius:999px;background:var(--brand-2);animation:hmAppearancePulse var(--transition-fast) ease-in-out infinite alternate"></div></div>'
+    + '<div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)"><div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Normal</div><div style="width:22px;height:22px;border-radius:999px;background:var(--green);animation:hmAppearancePulse var(--transition-normal) ease-in-out infinite alternate"></div></div>'
+    + '<div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)"><div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Slow</div><div style="width:22px;height:22px;border-radius:999px;background:var(--amber);animation:hmAppearancePulse var(--transition-slow) ease-in-out infinite alternate"></div></div>'
+    + '</div>'
+    + '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface);transition:transform var(--transition-spring),box-shadow var(--transition-spring);cursor:pointer" onmouseenter="this.style.transform=\'translateY(-4px)\';this.style.boxShadow=\'var(--shadow-lg)\'" onmouseleave="this.style.transform=\'none\';this.style.boxShadow=\'none\'">Spring timing stays available on hover, while the animated dots above give you an always-on speed preview.</div>'
+    + '</div>',
+    'Animated dots update live with fast, normal and slow motion values.'
+  );
 }
 
 function previewFocus(){
-  return previewBox('Preview focus ring', '<div style="display:flex;gap:8px;flex-wrap:wrap"><input class="hm-input" placeholder="Tab into me" style="max-width:220px"><button class="hm-btn hm-btn-primary">Focusable button</button></div>', 'Use Tab to see focus styles');
+  return previewBox('Preview focus ring',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    + '<div style="padding:10px 14px;border-radius:var(--radius-md);background:var(--bg-surface);box-shadow:0 0 0 var(--focus-ring-width,3px) var(--focus-ring-color,rgba(21,101,192,0.12));outline:1px dashed color-mix(in srgb, var(--focus-ring-color,rgba(21,101,192,0.12)) 72%, #000 8%);outline-offset:var(--focus-ring-offset,0px)">Static ring sample</div>'
+    + '<input class="hm-input" placeholder="Tab into me" style="max-width:220px">'
+    + '<button class="hm-btn hm-btn-primary">Focusable button</button>'
+    + '</div>',
+    'The left sample mirrors width, color and offset immediately.'
+  );
 }
 
 function previewSelection(){
-  return previewBox('Preview selection', '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary)">Drag to select this sentence and verify selection background and selection text color.</div>');
+  return previewBox('Preview selection',
+    '<div style="display:grid;gap:8px">'
+    + '<div style="display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border-radius:var(--radius-md);background:var(--selection-bg);color:var(--selection-color);font-weight:700;width:max-content">Selection preview chip</div>'
+    + '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary)">Drag to select this sentence and verify browser text selection colors too.</div>'
+    + '</div>'
+  );
 }
 
 function previewCaret(){
@@ -474,16 +572,39 @@ function previewCaret(){
 }
 
 function previewPlaceholder(){
-  return previewBox('Preview placeholder', '<input class="hm-input" placeholder="Placeholder preview" style="max-width:220px">');
+  return previewBox('Preview placeholder',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    + '<input class="hm-input" placeholder="Placeholder preview" style="max-width:220px">'
+    + '<div style="padding:10px 12px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--placeholder-color)">Placeholder label sample</div>'
+    + '</div>'
+  );
 }
 
 function previewDisabled(){
-  return previewBox('Preview disabled state', '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-primary" disabled>Disabled button</button><input class="hm-input" disabled value="Disabled input" style="max-width:180px"></div>');
+  return previewBox('Preview disabled state',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    + '<div style="opacity:var(--disabled-opacity);display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    + '<button class="hm-btn hm-btn-primary" disabled>Disabled button</button>'
+    + '<input class="hm-input" disabled value="Disabled input" style="max-width:180px">'
+    + '</div>'
+    + '<div style="padding:10px 12px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--bg-surface);opacity:var(--disabled-opacity)">Opacity mirror</div>'
+    + '</div>'
+  );
 }
 
 function previewScrollbar(){
   var lines = Array(10).fill('<div style="padding:6px 0;border-bottom:1px dashed var(--border)">Scrollable preview content</div>').join('');
-  return previewBox('Preview scrollbar', '<div style="max-height:110px;overflow:auto;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'+lines+'</div>');
+  return previewBox('Preview scrollbar',
+    '<div style="display:grid;gap:10px">'
+    + '<div style="display:flex;align-items:center;gap:10px">'
+    + '<div style="width:120px;height:var(--scrollbar-width);border-radius:var(--scrollbar-radius);background:var(--scrollbar-track);position:relative;overflow:hidden">'
+    + '<div style="width:42%;height:100%;border-radius:var(--scrollbar-radius);background:var(--scrollbar-thumb)"></div>'
+    + '</div>'
+    + '<span style="font-size:11px;color:var(--text-secondary)">Track + thumb mirror</span>'
+    + '</div>'
+    + '<div style="max-height:110px;overflow:auto;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'+lines+'</div>'
+    + '</div>'
+  );
 }
 
 function previewBackdrop(){
@@ -521,7 +642,13 @@ function previewInputs(){
 }
 
 function previewTabs(){
-  return previewBox('Preview tab', '<div class="hm-tabs" style="margin-bottom:0"><button class="hm-tab active">Overview</button><button class="hm-tab">Runtime</button><button class="hm-tab">History</button></div>');
+  return previewBox('Preview tab',
+    '<div style="display:grid;gap:10px">'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="admin-tab-v2"><span>👥</span><span>Users</span><span class="tab-badge">20</span></button><button type="button" class="admin-tab-v2 active"><span>🎨</span><span>Appearance</span></button><button type="button" class="admin-tab-v2"><span>🌐</span><span>Portal</span></button></div>'
+    + '<div class="hm-tabs" style="margin-bottom:0"><button class="hm-tab active">Overview</button><button class="hm-tab">Runtime</button><button class="hm-tab">History</button></div>'
+    + '</div>',
+    'Admin tabs expose radius, padding, gap and active indicator without hover.'
+  );
 }
 
 function previewModal(){
@@ -728,12 +855,31 @@ function renderOverview(){
     + slider(T('paddingX'), '--hds-tab-px', 'components.tab.paddingX', 0, 32, 16, 'px')
     + slider(T('fontSize'), '--hds-tab-font', 'components.tab.fontSize', 8, 18, 11, 'px')
     + slider('Border radius', '--tab-radius', 'components.tab.radius', 0, 28, 14, 'px')
-    + '<div style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
+    + '<div class="hm-appearance-preview" data-preview-title="Preview tab admin" style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
     +   '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">Preview tab admin</div>'
     +   '<div class="admin-tabs-v2" style="margin-bottom:0">'
     +     '<button type="button" class="admin-tab-v2">👥 Người dùng <span class="tab-badge">20</span></button>'
     +     '<button type="button" class="admin-tab-v2 active">🎨 Giao diện</button>'
     +     '<button type="button" class="admin-tab-v2">🧭 Hiển thị portal</button>'
+    +   '</div>'
+    +   '<style>@keyframes hmOverviewPulse{0%{transform:translateX(0)}100%{transform:translateX(16px)}}</style>'
+    +   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px">'
+    +     '<div style="padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)">'
+    +       '<div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Radius mirror</div>'
+    +       '<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">'
+    +         '<div style="width:52px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-surface-alt)"></div>'
+    +         '<div style="width:52px;height:36px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt)"></div>'
+    +         '<div style="width:52px;height:44px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt)"></div>'
+    +       '</div>'
+    +     '</div>'
+    +     '<div style="padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)">'
+    +       '<div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Motion mirror</div>'
+    +       '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">'
+    +         '<div style="padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt)"><div style="width:18px;height:18px;border-radius:999px;background:var(--brand-2);animation:hmOverviewPulse var(--transition-fast) ease-in-out infinite alternate"></div></div>'
+    +         '<div style="padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt)"><div style="width:18px;height:18px;border-radius:999px;background:var(--green);animation:hmOverviewPulse var(--transition-normal) ease-in-out infinite alternate"></div></div>'
+    +         '<div style="padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt)"><div style="width:18px;height:18px;border-radius:999px;background:var(--amber);animation:hmOverviewPulse var(--transition-slow) ease-in-out infinite alternate"></div></div>'
+    +       '</div>'
+    +     '</div>'
     +   '</div>'
     + '</div>'
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('colors')+'</strong></div>'
@@ -1329,7 +1475,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405e';
+window._renderAdminAppearanceFullVersion = '20260405i';
 window._renderAdminAppearanceFull = render;
 
 })();
