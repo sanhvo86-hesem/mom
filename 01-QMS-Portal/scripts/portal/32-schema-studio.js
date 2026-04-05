@@ -6086,6 +6086,7 @@ window.TableDialog = TableDialog;
 window.Diagnostics = Diagnostics;
 window.switchMode = switchMode;
 window.SchemaStudio = {
+  buildId:'20260405x',
   init:init,
   destroy:destroy,
   getDiagnostics:function(){ return Diagnostics.snapshot(); },

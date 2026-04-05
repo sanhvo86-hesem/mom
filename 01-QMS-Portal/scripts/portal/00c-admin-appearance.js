@@ -96,6 +96,10 @@ function T(k){
   return (typeof lang!=='undefined'&&lang==='en') ? (en[k]||k) : (vi[k]||k);
 }
 
+function L(vi, en){
+  return (typeof lang!=='undefined'&&lang==='en') ? (en || vi) : vi;
+}
+
 function esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(v==null?'':String(v))); return d.innerHTML; }
 function cfg(path){ return window.HmTheme ? (HmTheme.getDeep(path) || '') : ''; }
 function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? parseFloat(v) : def; }
@@ -232,9 +236,82 @@ function radioRow(name, options, current, onChange){
 }
 
 /* ── Helper: section (collapsible) ──────────────────────────────────────── */
-function sect(title, content, open){
+function statusChip(kind, label){
+  var map = {
+    full: {
+      bg: 'rgba(22,163,74,0.12)',
+      border: 'rgba(22,163,74,0.28)',
+      color: 'var(--green,#15803d)'
+    },
+    partial: {
+      bg: 'rgba(245,158,11,0.12)',
+      border: 'rgba(245,158,11,0.28)',
+      color: 'var(--amber,#d97706)'
+    },
+    preview: {
+      bg: 'rgba(37,99,235,0.12)',
+      border: 'rgba(37,99,235,0.24)',
+      color: 'var(--blue,#2563eb)'
+    },
+    admin: {
+      bg: 'rgba(124,58,237,0.12)',
+      border: 'rgba(124,58,237,0.24)',
+      color: 'var(--purple,#7c3aed)'
+    }
+  };
+  var tone = map[kind] || map.preview;
+  return '<span style="display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;background:'+tone.bg+';border:1px solid '+tone.border+';color:'+tone.color+';font-size:10px;font-weight:800;letter-spacing:.03em;line-height:1;white-space:nowrap">'+esc(label)+'</span>';
+}
+
+function infoCard(title, body, kind){
+  var tone = {
+    full: {
+      bg: 'rgba(22,163,74,0.08)',
+      border: 'rgba(22,163,74,0.24)',
+      title: 'var(--green,#15803d)'
+    },
+    partial: {
+      bg: 'rgba(245,158,11,0.08)',
+      border: 'rgba(245,158,11,0.24)',
+      title: 'var(--amber,#d97706)'
+    },
+    preview: {
+      bg: 'rgba(37,99,235,0.08)',
+      border: 'rgba(37,99,235,0.22)',
+      title: 'var(--blue,#2563eb)'
+    },
+    neutral: {
+      bg: 'var(--bg-surface-alt,var(--bg-hover))',
+      border: 'var(--border)',
+      title: 'var(--text-primary)'
+    }
+  }[kind || 'neutral'];
+  return '<div style="padding:12px 14px;border-radius:var(--radius-lg);background:'+tone.bg+';border:1px solid '+tone.border+'">'
+    + '<div style="font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:'+tone.title+'">'+esc(title)+'</div>'
+    + '<div style="margin-top:6px;font-size:12px;line-height:1.65;color:var(--text-secondary)">'+esc(body)+'</div>'
+    + '</div>';
+}
+
+function sectionLead(title, body, chips){
+  return '<div style="margin:0 0 14px;padding:12px 14px;border:1px dashed var(--border);border-radius:var(--radius-lg);background:var(--bg-surface-alt,var(--bg-hover))">'
+    + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">'
+    + '<div style="min-width:0">'
+    + '<div style="font-size:12px;font-weight:800;color:var(--text-primary)">'+esc(title)+'</div>'
+    + '<div style="margin-top:4px;font-size:11px;line-height:1.65;color:var(--text-secondary)">'+esc(body)+'</div>'
+    + '</div>'
+    + (chips ? '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+chips+'</div>' : '')
+    + '</div>'
+    + '</div>';
+}
+
+function sect(title, content, open, metaHtml){
   return '<details style="margin-bottom:16px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface);overflow:hidden"'+(open?' open':'')+'>'
-    +'<summary style="padding:12px 16px;font-weight:600;font-size:13px;cursor:pointer;background:var(--bg-surface-alt,var(--bg-hover));user-select:none">'+title+'</summary>'
+    +'<summary style="padding:12px 16px;font-weight:600;font-size:13px;cursor:pointer;background:var(--bg-surface-alt,var(--bg-hover));user-select:none">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">'
+    +'<span>'+title+'</span>'
+    +(metaHtml?'<span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+metaHtml+'</span>':'')
+    +'</div>'
+    +'</summary>'
     +'<div style="padding:14px 16px">'+content+'</div>'
     +'</details>';
 }
@@ -795,19 +872,19 @@ function render(el, subTab, currentLang){
     {key:'advanced', icon:'🧩', label:T('advanced')}
   ];
 
-  var h = '<div style="max-width:900px;margin:0 auto">';
+  var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
 
   /* Title */
-  h += '<div style="margin-bottom:16px"><h3 style="margin:0;font-size:18px;font-weight:700">🎨 '+(typeof lang!=='undefined'&&lang==='en'?'System Appearance':'Giao diện hệ thống')+'</h3>';
+  h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
+  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">🎨 '+(typeof lang!=='undefined'&&lang==='en'?'System Appearance':'Giao diện hệ thống')+'</h3>';
   h += '<div style="margin-top:6px;padding:5px 10px;background:var(--blue-bg,rgba(37,99,235,0.08));border:1px solid var(--blue,#2563eb);border-radius:6px;font-size:11px;color:var(--blue,#2563eb)">💡 '+T('liveHint')+'</div></div>';
+  h += '</div>';
 
   /* Sub-tab bar */
-  h += '<div style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid var(--border);margin-bottom:16px">';
+  h += '<div class="hm-tabs" style="margin-bottom:16px">';
   tabs.forEach(function(t){
     var active = _subTab===t.key;
-    h += '<button style="padding:8px 14px;font-size:12px;font-weight:600;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid '
-      +(active?'var(--brand-2)':'transparent')+';margin-bottom:-2px;color:'+(active?'var(--brand-2)':'var(--text-secondary)')
-      +'" onclick="_appSubTab=\''+t.key+'\';renderAdminAppearance()">'+t.icon+' '+esc(t.label)+'</button>';
+    h += '<button type="button" class="hm-tab'+(active?' active':'')+'" onclick="_appSubTab=\''+t.key+'\';renderAdminAppearance()"><span class="hm-tab-icon">'+t.icon+'</span><span class="hm-tab-label">'+esc(t.label)+'</span></button>';
   });
   h += '</div>';
 
@@ -847,6 +924,24 @@ window._saveAllAppearance = function(){
 function renderOverview(){
   var cur = HmTheme.getAll();
   var h = '';
+
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px">'
+    + infoCard(
+      L('Áp dụng hệ thống', 'System-wide coverage'),
+      L('Màu sắc, typography, density, motion và các token core như button, input, badge, tab, table, modal, tooltip, dropdown, nav, pagination, progress, empty, field, breadcrumb đang có mapping runtime và consumer rõ trong portal.', 'Colors, typography, density, motion, and core tokens such as button, input, badge, tab, table, modal, tooltip, dropdown, nav, pagination, progress, empty, field, and breadcrumb currently have runtime mapping plus visible consumers in the portal.'),
+      'full'
+    )
+    + infoCard(
+      L('Áp dụng một phần', 'Partial coverage'),
+      L('Layout dimensions hiện tác động tốt tới sidebar, header, modal; riêng content max-width mới được kiểm soát trong preview/admin shell vì portal vẫn còn nhiều module max-width riêng.', 'Layout dimensions already affect sidebar, header, and modal sizing well; content max-width is still limited to preview/admin shell coverage because many portal modules keep their own max-width rules.'),
+      'partial'
+    )
+    + infoCard(
+      L('Preview / cần adoption', 'Preview / needs adoption'),
+      L('Card header, flow, ISO box, ISO note và KPI icon đã có token, preview và runtime var, nhưng cần module dùng hm-* / selector chung để hệ thống tuân đồng đều hơn.', 'Card header, flow, ISO box, ISO note, and KPI icon already have tokens, previews, and runtime vars, but modules still need shared hm-* / selector adoption before the system becomes uniformly compliant.'),
+      'preview'
+    )
+    + '</div>';
 
   /* Quick sizing for tabs instead of density presets */
   h += sect(T('presets')+' — '+T('overview'),
@@ -908,7 +1003,7 @@ function renderOverview(){
       {value:'off',icon:'⏹️',label:T('off')},
       {value:'custom',icon:'✏️',label:T('custom')}
     ], cur.motion, "HmTheme.set('motion',this.value);renderAdminAppearance()")
-  , true);
+  , true, statusChip('admin', L('UI admin đã dùng token tab chung', 'Admin UI now consumes shared tab tokens')) + statusChip('full', L('Áp dụng tức thời', 'Live runtime apply')));
 
   /* Live preview */
   h += sect('👁 '+T('livePreview'),
@@ -941,7 +1036,7 @@ function renderOverview(){
     +'<div class="hm-kpi-value" style="color:var(--green)">98%</div><div class="hm-kpi-label">PASS RATE</div></div>'
     +'</div>'
     +'<div style="margin-top:12px"><div class="hm-progress" style="width:100%"><div class="hm-progress-fill hm-progress-blue" style="width:68%"></div></div></div>'
-  , true);
+  , true, statusChip('full', L('Khối preview tổng hợp', 'Combined preview block')));
 
   return h;
 }
@@ -1098,6 +1193,13 @@ function renderColors(){
 function renderLayout(){
   var h = '';
 
+  h += sectionLead(
+    L('Layout controls đã được tách theo phạm vi ảnh hưởng', 'Layout controls are now grouped by impact scope'),
+    L('Density, radius và spacing đang chi phối shared token khá tốt. Riêng layout dimensions cần đọc kỹ badge phạm vi áp dụng vì hệ thống vẫn còn một số module max-width riêng và dialog legacy.', 'Density, radius, and spacing already drive shared tokens well. Layout dimensions need closer attention to their scope badges because the system still includes some module-specific max-width rules and legacy dialogs.'),
+    statusChip('full', L('Density / radius / spacing', 'Density / radius / spacing'))
+    + statusChip('partial', L('Layout dimensions còn mixed', 'Layout dimensions still mixed'))
+  );
+
   h += sect('📏 '+T('densityDetail'),
     slider('Control height', '--hds-control-h', 'density.controlH', 24, 48, 32, 'px')
     + slider('Control height sm', '--hds-control-h-sm', 'density.controlHSm', 20, 40, 28, 'px')
@@ -1108,7 +1210,7 @@ function renderLayout(){
     + slider('Icon sm', '--hds-icon-sm', 'density.iconSm', 10, 20, 14, 'px')
     + slider('Icon md', '--hds-icon-md', 'density.iconMd', 12, 24, 16, 'px')
     + previewDensityControls()
-  , false);
+  , false, statusChip('full', L('Áp dụng rộng', 'System-wide')));
 
   h += sect('📋 '+T('tableDetail'),
     slider('Row height', '--hds-table-row-h', 'density.tableRowH', 28, 56, 40, 'px')
@@ -1117,7 +1219,7 @@ function renderLayout(){
     + slider('Header font', '--hds-table-head-font', 'density.tableHeadFont', 9, 14, 11, 'px')
     + slider('Body font', '--hds-table-body-font', 'density.tableBodyFont', 10, 16, 13, 'px')
     + previewTableDensity()
-  , false);
+  , false, statusChip('full', L('Bảng shared token', 'Shared tables')));
 
   h += sect('🔲 '+T('radiusScale'),
     slider('Radius sm', '--radius-sm', 'radius.sm', 0, 12, 4, 'px')
@@ -1126,7 +1228,7 @@ function renderLayout(){
     + slider('Radius xl (sections)', '--radius-xl', 'radius.xl', 0, 24, 12, 'px')
     + slider('Radius 2xl (modals)', '--radius-2xl', 'radius.2xl', 0, 32, 16, 'px')
     + previewRadiusScale()
-  , false);
+  , false, statusChip('full', L('Shared radius', 'Shared radius')));
 
   h += sect('↔️ '+T('spacingScale'),
     slider('space-1', '--space-1', 'spacing.1', 1, 8, 4, 'px')
@@ -1138,7 +1240,7 @@ function renderLayout(){
     + slider('space-8', '--space-8', 'spacing.8', 20, 52, 32, 'px')
     + slider('space-10', '--space-10', 'spacing.10', 28, 64, 40, 'px')
     + previewSpacingScale()
-  , false);
+  , false, statusChip('full', L('Shared spacing', 'Shared spacing')));
 
   h += sect('📐 '+T('layoutDim'),
     slider('Sidebar width', '--sidebar-w', 'layout.sidebarW', 180, 360, 260, 'px')
@@ -1148,14 +1250,14 @@ function renderLayout(){
     + slider('Modal max-width', '--modal-max-w', 'layout.modalMaxW', 480, 1400, 800, 'px')
     + slider('Modal small max-width', '--modal-sm-max-w', 'layout.modalSmMaxW', 280, 720, 480, 'px')
     + previewLayoutDimensions()
-  , false);
+  , false, statusChip('partial', L('Sidebar / header / modal tốt', 'Sidebar / header / modal strong')) + statusChip('preview', L('Content max width còn giới hạn', 'Content max width still limited')));
 
   h += sect('📊 '+T('zIndex')+' (read-only)',
     '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border)">Layer</th><th style="text-align:right;padding:4px 8px;border-bottom:1px solid var(--border)">Value</th></tr></thead><tbody>'
     +[['Base',1],['Dropdown',100],['Sticky',200],['Sidebar',300],['Header',400],['Overlay',1200],['Modal',1300],['Toast',1400],['Tooltip',1500]]
     .map(function(r){return '<tr><td style="padding:3px 8px;border-bottom:1px solid var(--border)">'+r[0]+'</td><td style="text-align:right;padding:3px 8px;border-bottom:1px solid var(--border);font-family:var(--font-mono)">'+r[1]+'</td></tr>';}).join('')
     +'</tbody></table>'
-  , false);
+  , false, statusChip('admin', L('Thông tin tham chiếu', 'Reference only')));
 
   return h;
 }
@@ -1225,6 +1327,12 @@ function renderEffects(){
 function renderComponents(){
   var h = '';
 
+  h += sectionLead(
+    L('Core controls', 'Core controls'),
+    L('Nhóm này nên là nơi chỉnh thường xuyên nhất vì ảnh hưởng trực tiếp tới hành vi nút, input, tab và điều hướng dùng shared token trong portal.', 'This is the group you should tune most often because it directly affects buttons, inputs, tabs, and navigation that already use shared tokens across the portal.'),
+    statusChip('full', L('Ưu tiên cao', 'High priority')) + statusChip('full', L('Áp dụng rộng', 'System-wide'))
+  );
+
   /* BUTTON */
   h += sect('🔘 '+T('btnSettings'),
     slider(T('paddingY'), '--btn-padding-y', 'components.btn.paddingY', 0, 12, 0, 'px')
@@ -1235,27 +1343,15 @@ function renderComponents(){
     + slider(T('borderWidth'), '--btn-border-width', 'components.btn.borderWidth', 0, 3, 1, 'px')
     + slider(T('minWidth'), '--btn-min-width', 'components.btn.minWidth', 0, 120, 0, 'px')
     + previewButtons()
-  , true);
+  , true, statusChip('full', L('Shared button', 'Shared button')));
 
-  /* TABLE */
-  h += sect('📊 '+T('tableSettings'),
-    colorPick(T('headerBg'), '--table-header-bg', 'components.table.headerBg', '#f1f5f9')
-    + slider(T('fontWeight')+' header', '--table-header-font-weight', 'components.table.headerFontWeight', 400, 800, 600, '', 100)
-    + slider(T('letterSpacing')+' header', '--table-header-letter-spacing', 'components.table.headerLetterSpacing', 0, 0.15, 0.05, 'em', 0.01)
-    + colorPick(T('stripeBg'), '--table-row-stripe', 'components.table.stripeBg', 'transparent')
-    + colorPick(T('stripeAltBg'), '--table-row-stripe-alt', 'components.table.stripeAltBg', 'rgba(0,0,0,0.02)')
-    + slider(T('borderWidth'), '--table-border-width', 'components.table.borderWidth', 0, 3, 1, 'px')
-    + previewTable()
-  , false);
-
-  /* CARD */
-  h += sect('🃏 '+T('cardSettings'),
-    slider(T('borderWidth'), '--card-border-width', 'components.card.borderWidth', 0, 3, 1, 'px')
-    + colorPick(T('headerBg'), '--card-header-bg', 'components.card.headerBg', 'transparent')
-    + slider(T('headerPadding'), '--card-header-padding-v', 'components.card.headerPadding', 8, 24, 12, 'px')
-    + slider(T('bodyPadding'), '--card-body-padding', 'components.card.bodyPadding', 8, 32, 16, 'px')
-    + previewCard()
-  , false);
+  /* INPUT */
+  h += sect('📝 '+T('inputSettings'),
+    slider(T('borderWidth'), '--input-border-width', 'components.input.borderWidth', 1, 3, 1, 'px')
+    + slider(T('paddingY'), '--input-padding-y', 'components.input.paddingY', 0, 8, 0, 'px')
+    + colorPick('Input BG', '--input-bg', 'components.input.bg', '#ffffff')
+    + previewInputs()
+  , false, statusChip('full', L('Shared input', 'Shared input')));
 
   /* BADGE */
   h += sect('🏷️ '+T('badgeSettings'),
@@ -1264,15 +1360,7 @@ function renderComponents(){
     + slider(T('borderWidth'), '--badge-border-width', 'components.badge.borderWidth', 0, 2, 0, 'px')
     + slider(T('minWidth'), '--badge-min-width', 'components.badge.minWidth', 0, 60, 0, 'px')
     + previewBadges()
-  , false);
-
-  /* INPUT */
-  h += sect('📝 '+T('inputSettings'),
-    slider(T('borderWidth'), '--input-border-width', 'components.input.borderWidth', 1, 3, 1, 'px')
-    + slider(T('paddingY'), '--input-padding-y', 'components.input.paddingY', 0, 8, 0, 'px')
-    + colorPick('Input BG', '--input-bg', 'components.input.bg', '#ffffff')
-    + previewInputs()
-  , false);
+  , false, statusChip('full', L('Shared badge', 'Shared badge')));
 
   /* TAB */
   h += sect('📑 '+T('tabSettings'),
@@ -1285,7 +1373,73 @@ function renderComponents(){
     + slider('Border radius', '--tab-radius', 'components.tab.radius', 0, 28, 14, 'px')
     + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#1565c0')
     + previewTabs()
-  , false);
+  , false, statusChip('full', L('Shared tab', 'Shared tab')) + statusChip('admin', L('Panel này tự dùng lại', 'This panel self-consumes it')));
+
+  /* TOOLTIP */
+  h += sect('💬 '+T('tooltipSettings'),
+    colorPick('BG', '--tooltip-bg', 'components.tooltip.bg', '#0f172a')
+    + colorPick('Color', '--tooltip-color', 'components.tooltip.color', '#ffffff')
+    + slider(T('paddingY'), '--tooltip-padding-y', 'components.tooltip.paddingY', 4, 12, 6, 'px')
+    + slider(T('paddingX'), '--tooltip-padding-x', 'components.tooltip.paddingX', 6, 16, 10, 'px')
+    + slider('Border radius', '--tooltip-radius', 'components.tooltip.radius', 0, 12, 6, 'px')
+    + slider('Font size', '--tooltip-font-size', 'components.tooltip.fontSize', 10, 14, 11, 'px')
+    + slider('Max width', '--tooltip-max-width', 'components.tooltip.maxWidth', 160, 400, 280, 'px')
+    + previewTooltip()
+  , false, statusChip('full', L('Shared tooltip', 'Shared tooltip')));
+
+  /* DROPDOWN */
+  h += sect('📋 '+T('dropdownSettings'),
+    slider('Border radius', '--dropdown-radius', 'components.dropdown.radius', 0, 16, 8, 'px')
+    + slider('Item padding', '--dropdown-item-padding', 'components.dropdown.itemPadding', 4, 16, 8, 'px')
+    + slider('Item font', '--dropdown-item-font-size', 'components.dropdown.itemFontSize', 11, 16, 13, 'px')
+    + colorPick('Hover BG', '--dropdown-item-hover-bg', 'components.dropdown.hoverBg', '#f8fafc')
+    + previewDropdown()
+  , false, statusChip('full', L('Shared dropdown', 'Shared dropdown')));
+
+  /* NAV ITEM */
+  h += sect('🧭 '+T('navSettings'),
+    slider('Height', '--nav-item-height', 'components.nav.height', 28, 48, 36, 'px')
+    + slider('Font size', '--nav-item-font-size', 'components.nav.fontSize', 11, 16, 13, 'px')
+    + slider('Icon size', '--nav-item-icon-size', 'components.nav.iconSize', 12, 24, 16, 'px')
+    + slider(T('gap'), '--nav-item-gap', 'components.nav.gap', 4, 16, 10, 'px')
+    + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 16, 8, 'px')
+    + previewNav()
+  , false, statusChip('full', L('Shared nav item', 'Shared nav item')));
+
+  /* PAGINATION */
+  h += sect('📄 '+T('paginationSettings'),
+    slider('Button size', '--pagination-btn-size', 'components.pagination.btnSize', 24, 44, 32, 'px')
+    + slider('Border radius', '--pagination-btn-radius', 'components.pagination.radius', 0, 12, 6, 'px')
+    + slider('Font size', '--pagination-font-size', 'components.pagination.fontSize', 11, 16, 13, 'px')
+    + slider(T('gap'), '--pagination-gap', 'components.pagination.gap', 2, 8, 4, 'px')
+    + previewPagination()
+  , false, statusChip('full', L('Shared pagination', 'Shared pagination')));
+
+  h += sectionLead(
+    L('Surfaces & data density', 'Surfaces & data density'),
+    L('Nhóm này chi phối bảng, card, modal, field, progress và empty state. Card body đang tuân thủ tốt, còn phần card header mới dừng ở token + preview chứ chưa phủ rộng ra nhiều module legacy.', 'This group governs tables, cards, modals, fields, progress, and empty states. Card body already follows tokens well, while card header is still tokenized mainly in preview and not yet widely adopted in legacy modules.'),
+    statusChip('full', L('Đa số đã áp dụng', 'Mostly applied')) + statusChip('partial', L('Card header cần mở rộng', 'Card header needs wider adoption'))
+  );
+
+  /* TABLE */
+  h += sect('📊 '+T('tableSettings'),
+    colorPick(T('headerBg'), '--table-header-bg', 'components.table.headerBg', '#f1f5f9')
+    + slider(T('fontWeight')+' header', '--table-header-font-weight', 'components.table.headerFontWeight', 400, 800, 600, '', 100)
+    + slider(T('letterSpacing')+' header', '--table-header-letter-spacing', 'components.table.headerLetterSpacing', 0, 0.15, 0.05, 'em', 0.01)
+    + colorPick(T('stripeBg'), '--table-row-stripe', 'components.table.stripeBg', 'transparent')
+    + colorPick(T('stripeAltBg'), '--table-row-stripe-alt', 'components.table.stripeAltBg', 'rgba(0,0,0,0.02)')
+    + slider(T('borderWidth'), '--table-border-width', 'components.table.borderWidth', 0, 3, 1, 'px')
+    + previewTable()
+  , false, statusChip('full', L('Shared table', 'Shared table')));
+
+  /* CARD */
+  h += sect('🃏 '+T('cardSettings'),
+    slider(T('borderWidth'), '--card-border-width', 'components.card.borderWidth', 0, 3, 1, 'px')
+    + colorPick(T('headerBg'), '--card-header-bg', 'components.card.headerBg', 'transparent')
+    + slider(T('headerPadding'), '--card-header-padding-v', 'components.card.headerPadding', 8, 24, 12, 'px')
+    + slider(T('bodyPadding'), '--card-body-padding', 'components.card.bodyPadding', 8, 32, 16, 'px')
+    + previewCard()
+  , false, statusChip('partial', L('Card body đã áp dụng', 'Card body applied')) + statusChip('preview', L('Card header còn hạn chế', 'Card header still limited')));
 
   /* MODAL */
   h += sect('🪟 '+T('modalSettings'),
@@ -1293,7 +1447,48 @@ function renderComponents(){
     + slider(T('bodyPadding'), '--modal-padding', 'components.modal.padding', 12, 40, 24, 'px')
     + slider(T('headerPadding'), '--modal-header-padding-v', 'components.modal.headerPadding', 8, 24, 16, 'px')
     + previewModal()
-  , false);
+  , false, statusChip('full', L('Shared modal', 'Shared modal')));
+
+  /* PROGRESS BAR */
+  h += sect('📏 '+T('progressSettings'),
+    slider('Height', '--progress-height', 'components.progress.height', 4, 16, 8, 'px')
+    + slider('Border radius', '--progress-radius', 'components.progress.radius', 0, 16, 9999, 'px')
+    + colorPick('Track BG', '--progress-bg', 'components.progress.bg', '#e2e8f0')
+    + previewProgress()
+  , false, statusChip('full', L('Shared progress', 'Shared progress')));
+
+  /* EMPTY STATE */
+  h += sect('📭 '+T('emptySettings'),
+    slider('Icon size', '--empty-icon-size', 'components.empty.iconSize', 24, 80, 48, 'px')
+    + slider('Icon opacity', '--empty-icon-opacity', 'components.empty.iconOpacity', 0.1, 0.8, 0.4, '', 0.05)
+    + slider('Title font', '--empty-title-font-size', 'components.empty.titleFontSize', 14, 20, 16, 'px')
+    + slider('Desc font', '--empty-desc-font-size', 'components.empty.descFontSize', 12, 16, 13, 'px')
+    + previewEmpty()
+  , false, statusChip('full', L('Shared empty state', 'Shared empty state')));
+
+  /* FORM FIELD */
+  h += sect('📝 '+T('fieldSettings'),
+    slider('Field gap', '--field-gap', 'components.field.gap', 8, 28, 16, 'px')
+    + slider('Label gap', '--field-label-gap', 'components.field.labelGap', 2, 8, 4, 'px')
+    + slider('Group gap', '--field-group-gap', 'components.field.groupGap', 12, 40, 24, 'px')
+    + slider('Helper font', '--field-helper-font-size', 'components.field.helperFontSize', 10, 14, 11, 'px')
+    + previewField()
+  , false, statusChip('full', L('Shared form field', 'Shared form field')));
+
+  /* BREADCRUMB */
+  h += sect('🔗 '+T('breadcrumbSettings'),
+    slider('Font size', '--breadcrumb-font-size', 'components.breadcrumb.fontSize', 11, 16, 13, 'px')
+    + slider(T('gap'), '--breadcrumb-gap', 'components.breadcrumb.gap', 2, 12, 6, 'px')
+    + colorPick('Color', '--breadcrumb-color', 'components.breadcrumb.color', '#94a3b8')
+    + colorPick('Active', '--breadcrumb-active-color', 'components.breadcrumb.activeColor', '#1e293b')
+    + previewBreadcrumb()
+  , false, statusChip('full', L('Shared breadcrumb', 'Shared breadcrumb')));
+
+  h += sectionLead(
+    L('Specialized governed patterns', 'Specialized governed patterns'),
+    L('Flow, ISO box, ISO note và KPI icon đã được token hóa và preview để kiểm tra nhanh ngay trong admin. Tuy nhiên ngoài portal chúng mới chỉ sẵn sàng cho adoption, chưa phải nhóm đã phủ rộng như button hay table.', 'Flow, ISO box, ISO note, and KPI icon are already tokenized and previewable for quick admin testing. Outside the portal they are still adoption-ready patterns rather than broadly deployed shared controls like buttons or tables.'),
+    statusChip('preview', L('Preview-led', 'Preview-led')) + statusChip('partial', L('Cần module dùng hm-*', 'Needs modules to adopt hm-*'))
+  );
 
   /* FLOWCHART */
   h += sect('🔀 '+T('flowSettings'),
@@ -1306,7 +1501,7 @@ function renderComponents(){
     + slider(T('connectorWidth'), '--flow-connector-width', 'components.flow.connectorWidth', 1, 4, 2, 'px')
     + slider(T('arrowSize'), '--flow-arrow-size', 'components.flow.arrowSize', 4, 16, 8, 'px')
     + previewFlow()
-  , false);
+  , false, statusChip('preview', L('Preview + runtime var', 'Preview + runtime var')));
 
   /* ISO BOX */
   h += sect('📋 '+T('isoBox'),
@@ -1318,7 +1513,7 @@ function renderComponents(){
     + slider(T('bodyPadding'), '--iso-box-body-padding', 'components.isoBox.bodyPadding', 8, 24, 14, 'px')
     + slider('Font size', '--iso-box-font-size', 'components.isoBox.fontSize', 11, 16, 13, 'px')
     + previewIsoBox()
-  , false);
+  , false, statusChip('preview', L('Preview + shared token ready', 'Preview + shared token ready')));
 
   /* ISO NOTE */
   h += sect('📝 '+T('isoNote'),
@@ -1331,7 +1526,7 @@ function renderComponents(){
     + slider('Font size', '--iso-note-font-size', 'components.isoNote.fontSize', 11, 16, 13, 'px')
     + slider('Icon size', '--iso-note-icon-size', 'components.isoNote.iconSize', 12, 24, 16, 'px')
     + previewIsoNote()
-  , false);
+  , false, statusChip('preview', L('Preview + shared token ready', 'Preview + shared token ready')));
 
   /* KPI CARD */
   h += sect('📊 '+T('kpiSettings'),
@@ -1339,82 +1534,7 @@ function renderComponents(){
     + slider('Icon size', '--kpi-icon-size', 'components.kpi.iconSize', 16, 40, 24, 'px')
     + slider('Trend font', '--kpi-trend-font-size', 'components.kpi.trendFontSize', 9, 14, 11, 'px')
     + previewKpi()
-  , false);
-
-  /* TOOLTIP */
-  h += sect('💬 '+T('tooltipSettings'),
-    colorPick('BG', '--tooltip-bg', 'components.tooltip.bg', '#0f172a')
-    + colorPick('Color', '--tooltip-color', 'components.tooltip.color', '#ffffff')
-    + slider(T('paddingY'), '--tooltip-padding-y', 'components.tooltip.paddingY', 4, 12, 6, 'px')
-    + slider(T('paddingX'), '--tooltip-padding-x', 'components.tooltip.paddingX', 6, 16, 10, 'px')
-    + slider('Border radius', '--tooltip-radius', 'components.tooltip.radius', 0, 12, 6, 'px')
-    + slider('Font size', '--tooltip-font-size', 'components.tooltip.fontSize', 10, 14, 11, 'px')
-    + slider('Max width', '--tooltip-max-width', 'components.tooltip.maxWidth', 160, 400, 280, 'px')
-    + previewTooltip()
-  , false);
-
-  /* DROPDOWN */
-  h += sect('📋 '+T('dropdownSettings'),
-    slider('Border radius', '--dropdown-radius', 'components.dropdown.radius', 0, 16, 8, 'px')
-    + slider('Item padding', '--dropdown-item-padding', 'components.dropdown.itemPadding', 4, 16, 8, 'px')
-    + slider('Item font', '--dropdown-item-font-size', 'components.dropdown.itemFontSize', 11, 16, 13, 'px')
-    + colorPick('Hover BG', '--dropdown-item-hover-bg', 'components.dropdown.hoverBg', '#f8fafc')
-    + previewDropdown()
-  , false);
-
-  /* NAV ITEM */
-  h += sect('🧭 '+T('navSettings'),
-    slider('Height', '--nav-item-height', 'components.nav.height', 28, 48, 36, 'px')
-    + slider('Font size', '--nav-item-font-size', 'components.nav.fontSize', 11, 16, 13, 'px')
-    + slider('Icon size', '--nav-item-icon-size', 'components.nav.iconSize', 12, 24, 16, 'px')
-    + slider(T('gap'), '--nav-item-gap', 'components.nav.gap', 4, 16, 10, 'px')
-    + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 16, 8, 'px')
-    + previewNav()
-  , false);
-
-  /* PAGINATION */
-  h += sect('📄 '+T('paginationSettings'),
-    slider('Button size', '--pagination-btn-size', 'components.pagination.btnSize', 24, 44, 32, 'px')
-    + slider('Border radius', '--pagination-btn-radius', 'components.pagination.radius', 0, 12, 6, 'px')
-    + slider('Font size', '--pagination-font-size', 'components.pagination.fontSize', 11, 16, 13, 'px')
-    + slider(T('gap'), '--pagination-gap', 'components.pagination.gap', 2, 8, 4, 'px')
-    + previewPagination()
-  , false);
-
-  /* PROGRESS BAR */
-  h += sect('📏 '+T('progressSettings'),
-    slider('Height', '--progress-height', 'components.progress.height', 4, 16, 8, 'px')
-    + slider('Border radius', '--progress-radius', 'components.progress.radius', 0, 16, 9999, 'px')
-    + colorPick('Track BG', '--progress-bg', 'components.progress.bg', '#e2e8f0')
-    + previewProgress()
-  , false);
-
-  /* EMPTY STATE */
-  h += sect('📭 '+T('emptySettings'),
-    slider('Icon size', '--empty-icon-size', 'components.empty.iconSize', 24, 80, 48, 'px')
-    + slider('Icon opacity', '--empty-icon-opacity', 'components.empty.iconOpacity', 0.1, 0.8, 0.4, '', 0.05)
-    + slider('Title font', '--empty-title-font-size', 'components.empty.titleFontSize', 14, 20, 16, 'px')
-    + slider('Desc font', '--empty-desc-font-size', 'components.empty.descFontSize', 12, 16, 13, 'px')
-    + previewEmpty()
-  , false);
-
-  /* FORM FIELD */
-  h += sect('📝 '+T('fieldSettings'),
-    slider('Field gap', '--field-gap', 'components.field.gap', 8, 28, 16, 'px')
-    + slider('Label gap', '--field-label-gap', 'components.field.labelGap', 2, 8, 4, 'px')
-    + slider('Group gap', '--field-group-gap', 'components.field.groupGap', 12, 40, 24, 'px')
-    + slider('Helper font', '--field-helper-font-size', 'components.field.helperFontSize', 10, 14, 11, 'px')
-    + previewField()
-  , false);
-
-  /* BREADCRUMB */
-  h += sect('🔗 '+T('breadcrumbSettings'),
-    slider('Font size', '--breadcrumb-font-size', 'components.breadcrumb.fontSize', 11, 16, 13, 'px')
-    + slider(T('gap'), '--breadcrumb-gap', 'components.breadcrumb.gap', 2, 12, 6, 'px')
-    + colorPick('Color', '--breadcrumb-color', 'components.breadcrumb.color', '#94a3b8')
-    + colorPick('Active', '--breadcrumb-active-color', 'components.breadcrumb.activeColor', '#1e293b')
-    + previewBreadcrumb()
-  , false);
+  , false, statusChip('preview', L('Icon size còn cần adoption', 'Icon size still needs adoption')));
 
   return h;
 }
@@ -1475,7 +1595,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405j';
+window._renderAdminAppearanceFullVersion = '20260405k';
 window._renderAdminAppearanceFull = render;
 
 })();
