@@ -162,6 +162,31 @@ The AI must read these local files before proposing anything:
 - [077_canonical_inventory_cost_traceability.sql](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/database/migrations/077_canonical_inventory_cost_traceability.sql)
 - [078_canonical_eqms_compliance_backbone.sql](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/database/migrations/078_canonical_eqms_compliance_backbone.sql)
 
+## Mandatory live metrics import block
+
+Before any synthesis, the AI must import one normalized `Live Metrics Block` from local artifacts and place it near the start of the output.
+
+The `Live Metrics Block` must include at least:
+
+- `generated_at` for each source artifact used for counts
+- `endpoint_count`
+- `pack_count`
+- `workflow_count`
+- `workflow_engine_bridge_ready`
+- `workflow_engine_bridge_blocked`
+- `frontend_ready_entities`
+- `frontend_partial_entities`
+- `publishability_ready`
+- `missing_field_defs`
+- `orphan_tables`
+- `canonical_onboarding_gap_count` if provable
+
+Rules:
+
+- all later counts in the output must reference this block
+- if any narrative count conflicts with the live metrics block, the live metrics block wins
+- stale counts from older documents must be called out explicitly as stale
+
 ## Official references the AI must prioritize
 
 Use official or primary references only. When web access is available, refresh exact links on the execution date and record the lookup date.
@@ -330,6 +355,76 @@ The architecture review must explicitly cover:
 - observability, benchmark readiness, and rollout risk
 - contract versioning, deprecation, and extension policy
 
+## Mandatory architecture closure for the first promotable slice
+
+Prompt 01 must not stop at a broad platform blueprint.
+It must define exactly one `First Promotable Slice`.
+
+The first slice definition must include:
+
+- slice name
+- why this slice goes first
+- included bounded contexts
+- included canonical aggregates
+- included canonical tables
+- included API families
+- included event families
+- included metadata families
+- included projection families
+- included workflow bridge targets
+- excluded capabilities
+- required upstream phase gates
+- exact exit criteria for handing the slice to Prompt 02
+
+If more than one slice is proposed, the AI must still name one primary slice and mark the rest as later waves.
+
+## Mandatory frontend semantic metadata depth
+
+Prompt 01 must specify frontend-generation semantics beyond structural metadata.
+
+At minimum it must define:
+
+- record type or lifecycle variant model
+- section and layout variants
+- field visibility predicates
+- field editability predicates
+- lookup and picker policy
+- related-list policy by relationship type
+- list preset and default filter policy
+- board semantics including grouping, lane ordering, WIP semantics, and allowed actions
+- timeline event taxonomy and ordering rules
+- search facet and ranking policy
+
+## Mandatory security and policy architecture
+
+Prompt 01 must explicitly define:
+
+- policy decision point and policy enforcement point boundaries
+- subject attributes
+- object attributes
+- action attributes
+- environment attributes
+- service-to-service identity policy
+- field redaction policy
+- delegation and substitution policy
+- break-glass policy
+
+## Mandatory regulated validation architecture
+
+Prompt 01 must explicitly define the validation and controlled-change architecture for regulated capability.
+
+At minimum it must cover:
+
+- requirement to risk traceability
+- validation package ownership
+- requirement to design traceability
+- design to verification traceability
+- release evidence expectations
+- controlled configuration baseline
+- training impact linkage
+- change-control linkage
+- audit evidence retention expectation
+
 ## Non-negotiable architecture rules
 
 - The canonical write model is the only future business truth.
@@ -372,28 +467,34 @@ The architecture review must explicitly cover:
 The output must include:
 
 1. Executive decision
-2. Research ledger
-3. Source hierarchy and contradiction log
-4. Evidence matrix
-5. Coverage matrix
-6. Facts-vs-inference register
-7. Canonical enterprise vocabulary and naming rules
-8. Bounded context map and dependency rules
-9. Aggregate and invariant catalog
-10. ERP backbone completeness matrix
-11. MES execution depth matrix
-12. Regulated-record invariant matrix
-13. Architecture blueprint
-14. Canonical layer model
-15. Core platform services
-16. Data, event, and metadata contract architecture
-17. Versioning, deprecation, and extension policy
-18. Frontend contract requirements
-19. Build sequence and phase gates
-20. Negative scope, risks, and open questions
-21. Prompt 01 Final Package for Prompt 04
-22. Cross-Bundle Sync Requests for Prompt 04
-23. Six-Reviewer Review Synthesis
+2. Live Metrics Block
+3. Research ledger
+4. Source hierarchy and contradiction log
+5. Evidence matrix
+6. Coverage matrix
+7. Facts-vs-inference register
+8. Canonical enterprise vocabulary and naming rules
+9. Bounded context map and dependency rules
+10. Aggregate and invariant catalog
+11. Command-Event-Invariant Catalog for the first promotable slice
+12. ERP backbone completeness matrix
+13. MES execution depth matrix
+14. Regulated-record invariant matrix
+15. Security and Policy Architecture
+16. Regulated Validation Architecture
+17. Architecture blueprint
+18. Canonical layer model
+19. Core platform services
+20. Data, event, and metadata contract architecture
+21. Frontend semantic metadata contract
+22. First Promotable Slice definition
+23. Versioning, deprecation, and extension policy
+24. Frontend contract requirements
+25. Build sequence and phase gates
+26. Negative scope, risks, and open questions
+27. Prompt 01 Final Package for Prompt 04
+28. Cross-Bundle Sync Requests for Prompt 04
+29. Six-Reviewer Review Synthesis
 
 ## Integrated execution playbook
 
@@ -420,6 +521,11 @@ Before final output, the AI must verify all of these:
 - ERP backbone completeness matrix is complete or explicitly blocked
 - MES execution depth matrix is complete or explicitly blocked
 - regulated-record invariant matrix is complete or explicitly blocked
+- live metrics block exists and all major counts align to it or stale counts are explicitly rejected
+- one exact first promotable slice is defined with included tables, contracts, projections, workflow bridge target, and exit criteria
+- security and policy architecture is explicit
+- frontend semantic metadata depth is explicit
+- regulated validation architecture is explicit
 - production-version or release-selection logic is explicit
 - projection freshness class, owner, lag budget, rebuild, and stale-read behavior are explicit
 - versioning, deprecation, and extension policy are explicit
@@ -560,30 +666,36 @@ Mandatory coverage:
 Required deliverables:
 
 1. Executive Decision
-2. Research Ledger
-3. Source Hierarchy and Contradiction Log
-4. Evidence Matrix
-5. Coverage Matrix
-6. Facts-vs-Inference Register
-7. Canonical Vocabulary and Naming Rules
-8. Bounded Context Map and Dependency Rules
-9. Aggregate and Invariant Catalog
-10. ERP Backbone Completeness Matrix
-11. MES Execution Depth Matrix
-12. Regulated-Record Invariant Matrix
-13. Architecture Blueprint
-14. Canonical Layer Model
-15. Core Platform Services
-16. Data, Event, and Metadata Contract Architecture
-17. Versioning, Deprecation, and Extension Policy
-18. Frontend Contract Requirements
-19. Build Sequence and Phase Gates
-20. Negative Scope, Risks, and Open Questions
-21. Execution Playbook Trace
-22. Prompt QA Checklist Result
-23. Prompt 01 Final Package for Prompt 04
-24. Cross-Bundle Sync Requests for Prompt 04
-25. Six-Reviewer Review Synthesis
+2. Live Metrics Block
+3. Research Ledger
+4. Source Hierarchy and Contradiction Log
+5. Evidence Matrix
+6. Coverage Matrix
+7. Facts-vs-Inference Register
+8. Canonical Vocabulary and Naming Rules
+9. Bounded Context Map and Dependency Rules
+10. Aggregate and Invariant Catalog
+11. Command-Event-Invariant Catalog for the First Promotable Slice
+12. ERP Backbone Completeness Matrix
+13. MES Execution Depth Matrix
+14. Regulated-Record Invariant Matrix
+15. Security and Policy Architecture
+16. Regulated Validation Architecture
+17. Architecture Blueprint
+18. Canonical Layer Model
+19. Core Platform Services
+20. Data, Event, and Metadata Contract Architecture
+21. Frontend Semantic Metadata Contract
+22. First Promotable Slice Definition
+23. Versioning, Deprecation, and Extension Policy
+24. Frontend Contract Requirements
+25. Build Sequence and Phase Gates
+26. Negative Scope, Risks, and Open Questions
+27. Execution Playbook Trace
+28. Prompt QA Checklist Result
+29. Prompt 01 Final Package for Prompt 04
+30. Cross-Bundle Sync Requests for Prompt 04
+31. Six-Reviewer Review Synthesis
 
 Output requirements:
 

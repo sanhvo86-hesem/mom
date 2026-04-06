@@ -148,6 +148,29 @@ The AI must read these local files before auditing:
 - [module-builder-world-class-prompts.md](C:/Users/TEST4/qms.hesem.com.vn/core-standards/prompts/module-builder-world-class-prompts.md)
 - any generated OpenAPI specs, JSON Schemas, AsyncAPI specs, registry reports, workflow definitions, migration reports, benchmark reports, test reports, runbooks, and observability artifacts relevant to the current state
 
+## Mandatory live metrics import block
+
+Before any audit synthesis, the AI must import one normalized `Live Metrics Block` from local artifacts and place it near the start of the output.
+
+The `Live Metrics Block` must include at least:
+
+- `generated_at` for each source artifact used for counts
+- `workflow_engine_bridge_ready`
+- `workflow_engine_bridge_blocked`
+- `frontend_ready_entities`
+- `frontend_partial_entities`
+- `publishability_ready`
+- `missing_field_defs`
+- `orphan_tables`
+- `canonical_onboarding_gap_count` if provable
+- any benchmark counts cited later in the audit
+
+Rules:
+
+- all later counts in the audit must reference this block
+- stale narrative counts must be flagged as stale
+- if the live metrics block cannot be built, the audit must downgrade confidence and say so explicitly
+
 ## Official references the AI must prioritize
 
 Use official or primary references only.
@@ -314,25 +337,54 @@ Representative scenarios should include:
 - NCR or CAPA investigation timeline
 - end-of-period or end-of-day posting pressure
 
+## Mandatory weighted blocker scoreboard
+
+The audit must publish a `Weighted Blocker Scoreboard`.
+
+Each blocker row must include:
+
+- blocker name
+- severity
+- scope affected
+- evidence strength
+- whether it blocks frontend generation, production rollout, or both
+- recommended owner prompt
+- closure criteria
+
+## Mandatory first-slice audit decision
+
+If Prompt 01 or Prompt 02 names a first slice, Prompt 03 must audit that slice separately from the whole program.
+
+The audit must state:
+
+- whether the first slice is well chosen
+- whether the slice has enough contract depth
+- whether the slice has enough governance depth
+- whether the slice benchmark charter is credible
+- whether the slice should proceed, pause, shrink, or change
+
 ## Required deliverables
 
 The output must include:
 
 1. Audit Verdict
-2. Evidence Ledger
-3. Coverage Matrix
-4. Facts-vs-Inference Register
-5. Findings by Severity
-6. Frontend-Readiness Gaps
-7. Production Benchmark and Live-Traffic Model
-8. Observability and Forensics Review
-9. Compliance and Governance Gaps
-10. Required Remediation Roadmap
-11. Closure Criteria and Re-audit Triggers
-12. Decision (`GO`, `REVIEW REQUIRED`, or `NO-GO`)
-13. Prompt 03 Final Package for Prompt 04
-14. Cross-Bundle Sync Requests for Prompt 04
-15. Six-Reviewer Review Synthesis
+2. Live Metrics Block
+3. Evidence Ledger
+4. Coverage Matrix
+5. Facts-vs-Inference Register
+6. Findings by Severity
+7. Weighted Blocker Scoreboard
+8. Frontend-Readiness Gaps
+9. Production Benchmark and Live-Traffic Model
+10. Observability and Forensics Review
+11. Compliance and Governance Gaps
+12. First-Slice Audit Decision
+13. Required Remediation Roadmap
+14. Closure Criteria and Re-audit Triggers
+15. Decision (`GO`, `REVIEW REQUIRED`, or `NO-GO`)
+16. Prompt 03 Final Package for Prompt 04
+17. Cross-Bundle Sync Requests for Prompt 04
+18. Six-Reviewer Review Synthesis
 
 ## Integrated execution playbook
 
@@ -354,8 +406,11 @@ Before final output, the AI must verify all of these:
 
 - findings are based on reviewed evidence, not intuition
 - frontend-readiness and production-readiness are assessed separately
+- live metrics block exists and all major counts align to it or stale counts are explicitly rejected
 - benchmark model includes load shape, concurrency, p50/p95/p99, conflict rate, and thresholds
 - every critical finding has severity, impact, evidence, remediation, and closure criteria
+- weighted blocker scoreboard exists
+- first-slice audit decision exists when a first slice was proposed upstream
 - missing evidence is called out explicitly instead of folded into findings
 - all no-go checks were evaluated
 - regulated invariants were challenged explicitly
@@ -412,6 +467,8 @@ You must distinguish:
 
 If evidence is missing, fail closed.
 
+Near the start of the output, publish a Live Metrics Block using current local artifact counts and explicitly reject stale narrative counts.
+
 You must audit at least these areas:
 
 - canonical model integrity
@@ -438,6 +495,8 @@ For every finding provide:
 - closure criteria
 - whether it blocks frontend generation, production rollout, or both
 
+If Prompt 01 or Prompt 02 proposes a first slice, publish a separate first-slice audit decision instead of only a whole-program verdict.
+
 You must include a benchmark and traffic model that covers:
 
 - dataset size
@@ -454,6 +513,8 @@ You must include a benchmark and traffic model that covers:
 - rebuild or backfill load
 - pass or fail thresholds
 - hotspot tables, indexes, and queries
+
+You must also publish a weighted blocker scoreboard that makes it obvious what blocks frontend generation, what blocks production rollout, and what only blocks later phases.
 
 You must include an observability review that covers:
 

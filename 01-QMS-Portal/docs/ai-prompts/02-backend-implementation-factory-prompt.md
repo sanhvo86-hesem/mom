@@ -159,6 +159,29 @@ The AI must read these local files before proposing or writing code:
 - [077_canonical_inventory_cost_traceability.sql](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/database/migrations/077_canonical_inventory_cost_traceability.sql)
 - [078_canonical_eqms_compliance_backbone.sql](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/database/migrations/078_canonical_eqms_compliance_backbone.sql)
 
+## Mandatory live metrics import block
+
+Before any implementation synthesis, the AI must import one normalized `Live Metrics Block` from local artifacts and place it near the start of the output.
+
+The `Live Metrics Block` must include at least:
+
+- `generated_at` for each source artifact used for counts
+- `workflow_engine_bridge_ready`
+- `workflow_engine_bridge_blocked`
+- `frontend_ready_entities`
+- `frontend_partial_entities`
+- `publishability_ready`
+- `missing_field_defs`
+- `orphan_tables`
+- `canonical_onboarding_gap_count` if provable
+- any additional blocker counts used later in the output
+
+Rules:
+
+- all later counts in the output must reference this block
+- implementation backlog rows must point back to one blocker in this block
+- stale counts from older documents must be called out explicitly as stale
+
 ## Official references the AI must prioritize
 
 Use official or primary references only.
@@ -275,6 +298,84 @@ For every bounded context or capability, explicitly cover:
 - observability and benchmark hooks
 - tests, rollout gate, negative scope, and blocked scope
 
+## Mandatory first delivery slice
+
+Prompt 02 must define exactly one `First Delivery Slice`.
+
+The first delivery slice must include:
+
+- slice name
+- included bounded contexts
+- included aggregates
+- included canonical tables
+- included routes
+- included schemas
+- included events
+- included projections
+- included metadata packs
+- included workflow bridge target
+- excluded scope
+- exact build order
+- exact release gate for the slice
+
+## Mandatory implementation artifact manifest
+
+Prompt 02 must publish an artifact manifest for the first delivery slice.
+
+The manifest must include:
+
+- migrations to create or update
+- services to implement or modify
+- routes to publish or change
+- OpenAPI or JSON Schema files to publish or update
+- AsyncAPI or event contract files to publish or update
+- registry or metadata artifacts to emit or regenerate
+- tests to add
+- benchmark hooks to add
+- observability instrumentation to add
+
+## Mandatory command-event-invariant catalog
+
+For every selected aggregate in the first delivery slice, Prompt 02 must define:
+
+- aggregate name
+- commands
+- validations
+- forbidden transitions
+- emitted events
+- idempotency rule
+- concurrency rule
+- projection consumers
+- audit or governed envelope implications
+
+## Mandatory policy architecture
+
+Prompt 02 must define the implementation-ready policy model for the first delivery slice:
+
+- subject attributes
+- object attributes
+- action attributes
+- environment attributes
+- PDP and PEP boundaries
+- service identity rules
+- delegation and substitution behavior
+- field redaction or masking behavior
+
+## Mandatory benchmark charter and proof matrix
+
+Prompt 02 must define the implementation-facing benchmark and proof matrix for the first delivery slice:
+
+- dataset scale
+- traffic mix
+- concurrency profile
+- required p50, p95, and p99 targets
+- lag budgets
+- rebuild thresholds
+- route overlap target
+- soak duration
+- failure budget
+- pass or fail cut lines
+
 ## Non-negotiable implementation rules
 
 - Every public API must be defined in OpenAPI 3.1 and JSON Schema 2020-12.
@@ -312,21 +413,27 @@ For every bounded context or capability, explicitly cover:
 
 The output must include:
 
-1. Research Ledger
-2. Dependency Map
-3. Data Layer Design
-4. Command and Workflow Design
-5. API Contract Design
-6. Event and Integration Design
-7. Metadata Contract Design
-8. Projection Design
-9. Security and Governance Design
-10. Observability and Benchmark Hooks
-11. Test Strategy and Rollout Gate
-12. Negative Scope and Blocked Scope
-13. Prompt 02 Final Package for Prompt 04
-14. Cross-Bundle Sync Requests for Prompt 04
-15. Six-Reviewer Review Synthesis
+1. Live Metrics Block
+2. Research Ledger
+3. Dependency Map
+4. First Delivery Slice
+5. Implementation Artifact Manifest
+6. Command-Event-Invariant Catalog
+7. Data Layer Design
+8. Command and Workflow Design
+9. API Contract Design
+10. Event and Integration Design
+11. Metadata Contract Design
+12. Projection Design
+13. Security and Governance Design
+14. Policy Architecture
+15. Benchmark Charter and Proof Matrix
+16. Observability and Benchmark Hooks
+17. Test Strategy and Rollout Gate
+18. Negative Scope and Blocked Scope
+19. Prompt 02 Final Package for Prompt 04
+20. Cross-Bundle Sync Requests for Prompt 04
+21. Six-Reviewer Review Synthesis
 
 ## Integrated execution playbook
 
@@ -350,6 +457,12 @@ Before final output, the AI must verify all of these:
 - OIDC, RBAC, and ABAC ordering is explicit
 - idempotency and optimistic concurrency behavior are explicit
 - outbox, inbox, replay, ordering, and poison-message handling are explicit where async behavior exists
+- live metrics block exists and all major counts align to it or stale counts are explicitly rejected
+- one exact first delivery slice is defined
+- artifact manifest is explicit enough to assign to build teams without guessing
+- command-event-invariant catalog exists for selected aggregates
+- policy architecture is explicit
+- benchmark charter and proof matrix are explicit
 - projection freshness class, owner, lag budget, rebuild, and stale-read behavior are explicit
 - production-version or release-selection logic is explicit where execution depends on engineering definition
 - released snapshots are used for execution truth
@@ -441,23 +554,29 @@ Non-negotiable rules:
 
 For every bounded context or capability, provide:
 
-1. Research Ledger
-2. Dependency Map
-3. Data Layer Design
-4. Command and Workflow Design
-5. API Contract Design
-6. Event and Integration Design
-7. Metadata Contract Design
-8. Projection Design
-9. Security and Governance Design
-10. Observability and Benchmark Hooks
-11. Test Strategy and Rollout Gate
-12. Negative Scope and Blocked Scope
-13. Execution Playbook Trace
-14. Prompt QA Checklist Result
-15. Prompt 02 Final Package for Prompt 04
-16. Cross-Bundle Sync Requests for Prompt 04
-17. Six-Reviewer Review Synthesis
+1. Live Metrics Block
+2. Research Ledger
+3. Dependency Map
+4. First Delivery Slice
+5. Implementation Artifact Manifest
+6. Command-Event-Invariant Catalog
+7. Data Layer Design
+8. Command and Workflow Design
+9. API Contract Design
+10. Event and Integration Design
+11. Metadata Contract Design
+12. Projection Design
+13. Security and Governance Design
+14. Policy Architecture
+15. Benchmark Charter and Proof Matrix
+16. Observability and Benchmark Hooks
+17. Test Strategy and Rollout Gate
+18. Negative Scope and Blocked Scope
+19. Execution Playbook Trace
+20. Prompt QA Checklist Result
+21. Prompt 02 Final Package for Prompt 04
+22. Cross-Bundle Sync Requests for Prompt 04
+23. Six-Reviewer Review Synthesis
 
 Output requirements:
 

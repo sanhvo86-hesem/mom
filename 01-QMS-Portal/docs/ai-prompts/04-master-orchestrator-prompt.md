@@ -66,6 +66,28 @@ The AI must read these local files before orchestrating:
 - [34-module-builder-architecture.md](C:/Users/TEST4/qms.hesem.com.vn/core-standards/34-module-builder-architecture.md)
 - [module-builder-world-class-prompts.md](C:/Users/TEST4/qms.hesem.com.vn/core-standards/prompts/module-builder-world-class-prompts.md)
 
+## Mandatory live metrics reconciliation block
+
+Before any orchestration decision, Prompt 04 must build one normalized `Live Metrics Reconciliation Block`.
+
+The block must include at least:
+
+- `generated_at` for each source artifact used for counts
+- `workflow_engine_bridge_ready`
+- `workflow_engine_bridge_blocked`
+- `frontend_ready_entities`
+- `frontend_partial_entities`
+- `publishability_ready`
+- `missing_field_defs`
+- `orphan_tables`
+- `canonical_onboarding_gap_count` if provable
+
+Rules:
+
+- all later counts in the orchestration output must reference this block
+- stale counts from older narratives must be flagged as stale
+- if bundles disagree with this block, Prompt 04 must name the disagreement and choose the live block
+
 ## Language and localization rule
 
 The orchestrated backend program is English-only:
@@ -228,6 +250,40 @@ Every phase must maintain:
 - a cross-phase dependency map
 - a facts-vs-inference register
 - a phase exit checklist with explicit pass or fail items
+- a weighted blocker scoreboard
+
+## Mandatory single next promotable slice decision
+
+Prompt 04 must not stop with only a general next loop recommendation.
+It must name exactly one `Next Promotable Slice` for the next program loop.
+
+The decision must include:
+
+- slice name
+- why it is first
+- owning prompt for the next loop
+- included bounded contexts
+- included canonical tables
+- included contract families
+- included projections
+- included workflow bridge target
+- exact blockers that must close before promotion
+- exact evidence needed for the next gate
+
+## Mandatory weighted blocker scoreboard
+
+Prompt 04 must publish one weighted blocker scoreboard for the whole program.
+
+Each row must include:
+
+- blocker name
+- severity
+- owning prompt
+- affected phase
+- affected slice
+- evidence strength
+- whether it blocks frontend generation, production rollout, or both
+- exact closure criteria
 
 ## Program phase order
 
@@ -388,10 +444,13 @@ Before any phase receives `GO`, the orchestrator must verify all of these:
 
 - the right specialist prompt was used for the current objective
 - research ledger, evidence matrix, contradiction log, and coverage matrix exist
+- live metrics reconciliation block exists and all major counts align to it or stale counts are explicitly rejected
 - facts, inferences, assumptions, and gaps are separated
 - multi-agent outputs were reconciled instead of copied through
 - phase exit checklist items are concrete and measurable
 - blocked dependencies are explicit
+- one exact next promotable slice is named
+- weighted blocker scoreboard exists
 - ERP, MES, eQMS, platform, and frontend-contract impacts were considered
 - any regulated or governed change triggered re-audit
 - the decision is supported by evidence strong enough for the claimed gate
@@ -467,6 +526,8 @@ If sub-agents or delegation are available:
 - require each agent to return evidence, contradictions, and explicit recommendations
 - reconcile all outputs into one evidence-based decision
 
+You must also name exactly one next promotable slice and one owning prompt for the next loop.
+
 Maintain these shared work products across all phases:
 
 - research ledger
@@ -477,6 +538,8 @@ Maintain these shared work products across all phases:
 - risk register
 - cross-phase dependency map
 - facts-vs-inference register
+- live metrics reconciliation block
+- weighted blocker scoreboard
 
 Program phase order:
 
