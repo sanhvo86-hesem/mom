@@ -4,7 +4,9 @@
 
 Paste the full contents of this file into a fresh GPT Codex section and press Enter with no additional text.
 Do not add any preface, explanation, or wrapper message.
-After the first run starts, use only `Continue` to advance to the next sub-prompt inside Prompt 03.
+After the first run starts, execute all planned Prompt 03 sub-prompts sequentially in the same run until the file is complete.
+Do not stop between sub-prompts unless blocked by missing evidence, tool failure, or hard response limits.
+If an extra message is needed only because of hard system limits, resume from the last unfinished step automatically. `Continue` is optional, not required.
 Do not switch to Prompt 01, Prompt 02, or Prompt 04 from this section.
 
 ## Purpose
@@ -56,7 +58,8 @@ If the backend mixes Vietnamese into canonical identifiers or technical contract
 
 Assume this prompt may be pasted alone into one AI session or one AI section.
 Do not assume hidden memory from earlier runs.
-Rebuild context from the supplied artifacts and any available implementation or architecture packages, then run as a dynamic audit bundle with one sub-prompt per response.
+Rebuild context from the supplied artifacts and any available implementation or architecture packages, then run as a dynamic audit bundle that executes all sub-prompts sequentially in one run until the final package is complete.
+Keep step logs concise so token budget is spent on evidence, findings, and closure quality instead of repetitive narration.
 
 ## Parallel bundle mode
 
@@ -71,6 +74,7 @@ Every Prompt 03 sub-prompt must be reviewed from 6 distinct reviewer roles befor
 If the environment supports real sub-agents, run these 6 reviewers in parallel.
 If you are running in GPT Codex or any single-thread GPT environment without real sub-agent tooling, emulate the same 6 reviewers sequentially as 6 explicit passes before synthesizing the step result.
 Never claim or imply that real agents were used unless the environment actually provided agent tooling and you explicitly used it.
+Default assumption: real sub-agents are not available unless the environment visibly exposes and uses agent tooling in this run.
 
 Reviewer roles:
 
@@ -120,14 +124,25 @@ Each step must also record:
 - what Prompt 04 must reconcile at program level
 - what the 6 reviewer roles changed in this step
 
-## Manual continue protocol
+## Auto-complete execution protocol
 
-If there is no prior Prompt 03 sub-prompt output in the conversation, start by building the step plan and executing `Step 1`.
-If the user replies only with `Continue`, run exactly the next planned Prompt 03 sub-prompt.
+If there is no prior Prompt 03 sub-prompt output in the conversation, start by building the step plan and execute all planned Prompt 03 steps sequentially.
+Do not wait for `Continue` between Prompt 03 sub-prompts.
 After the final planned sub-prompt, stop Prompt 03 and instruct that this file is complete.
 Do not jump to Prompt 01, Prompt 02, or Prompt 04 automatically from this file.
-Do not pre-run the next sub-prompt in the same response.
+Do not stop early after `Step 1` or any intermediate step unless blocked by missing evidence, tool failure, or hard response limits.
 If the AI must change the number of remaining sub-prompts, it must explain why and publish an updated step plan before continuing.
+
+## Latest upstream package selection rule
+
+When Prompt 03 audits Prompt 01 or Prompt 02 outputs, it must select the latest completed final package for each prompt based on:
+
+1. explicit generation timestamp inside the file when available
+2. otherwise the newest filename date stamp
+3. otherwise the newest filesystem modified time
+
+The audit must list the exact upstream files selected.
+If multiple upstream bundles disagree, Prompt 03 must say which one was chosen and why.
 
 ## Required local documents to read first
 
@@ -431,7 +446,7 @@ You are the world-class backend auditor and hardening lead for a canonical-first
 
 Your job is to challenge the design and implementation as if this system were preparing for real production use at enterprise scale.
 
-Assume this file runs as a dynamic sequential bundle inside one AI section and may run in parallel with Prompt 01 and Prompt 02 in other sections. On the first run, create the step plan and execute only the current step. If the user later says only `Continue`, execute only the next planned step in this file. Focus only on audit quality in this bundle. Do not start orchestration decisions beyond the required handoff.
+Assume this file runs as a dynamic sequential bundle inside one AI section and may run in parallel with Prompt 01 and Prompt 02 in other sections. On the first run, create the step plan and execute all planned steps sequentially in the same run until the final package is complete. Do not wait for `Continue` between steps unless hard system limits interrupt the run. Focus only on audit quality in this bundle. Do not start orchestration decisions beyond the required handoff.
 
 For every step, run 6 reviewer roles before closing the step:
 
@@ -445,6 +460,7 @@ For every step, run 6 reviewer roles before closing the step:
 If real sub-agents are available, run them in parallel.
 If you are running in GPT Codex or any single-thread GPT environment without real sub-agent tooling, emulate the same 6 reviewers sequentially and then reconcile them explicitly.
 Never claim or imply that real agents were used unless the environment actually provided agent tooling and you explicitly used it.
+Default assumption: real sub-agents are not available unless the environment visibly exposes and uses agent tooling in this run.
 
 You must not provide a shallow summary. You must first perform deep evidence collection and benchmark the system against official standards and official platform references before you synthesize findings.
 
@@ -466,6 +482,7 @@ You must distinguish:
 - missing evidence
 
 If evidence is missing, fail closed.
+When Prompt 01 or Prompt 02 final packages exist, you must explicitly select the latest completed file for each prompt and name them in the audit output before evaluating them.
 
 Near the start of the output, publish a Live Metrics Block using current local artifact counts and explicitly reject stale narrative counts.
 

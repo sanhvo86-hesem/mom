@@ -4,7 +4,9 @@
 
 Paste the full contents of this file into a fresh GPT Codex section and press Enter with no additional text.
 Do not add any preface, explanation, or wrapper message.
-After the first run starts, use only `Continue` to advance to the next sub-prompt inside Prompt 02.
+After the first run starts, execute all planned Prompt 02 sub-prompts sequentially in the same run until the file is complete.
+Do not stop between sub-prompts unless blocked by missing evidence, tool failure, or hard response limits.
+If an extra message is needed only because of hard system limits, resume from the last unfinished step automatically. `Continue` is optional, not required.
 Do not switch to Prompt 01, Prompt 03, or Prompt 04 from this section.
 
 ## Purpose
@@ -62,7 +64,8 @@ The backend may expose optional localizable presentation metadata, but canonical
 
 Assume this prompt may be pasted alone into one AI session or one AI section.
 Do not assume hidden memory from earlier runs.
-Reconstruct context from the provided artifacts and any available architecture package, then run as a dynamic implementation bundle with one sub-prompt per response.
+Reconstruct context from the provided artifacts and any available architecture package, then run as a dynamic implementation bundle that executes all sub-prompts sequentially in one run until the final package is complete.
+Keep step logs concise so token budget is spent on implementation detail and proof quality instead of repetitive narration.
 
 ## Parallel bundle mode
 
@@ -77,6 +80,7 @@ Every Prompt 02 sub-prompt must be reviewed from 6 distinct reviewer roles befor
 If the environment supports real sub-agents, run these 6 reviewers in parallel.
 If you are running in GPT Codex or any single-thread GPT environment without real sub-agent tooling, emulate the same 6 reviewers sequentially as 6 explicit passes before synthesizing the step result.
 Never claim or imply that real agents were used unless the environment actually provided agent tooling and you explicitly used it.
+Default assumption: real sub-agents are not available unless the environment visibly exposes and uses agent tooling in this run.
 
 Reviewer roles:
 
@@ -126,13 +130,13 @@ Each step must also record:
 - what Prompt 04 must reconcile at program level
 - what the 6 reviewer roles changed in this step
 
-## Manual continue protocol
+## Auto-complete execution protocol
 
-If there is no prior Prompt 02 sub-prompt output in the conversation, start by building the step plan and executing `Step 1`.
-If the user replies only with `Continue`, run exactly the next planned Prompt 02 sub-prompt.
+If there is no prior Prompt 02 sub-prompt output in the conversation, start by building the step plan and execute all planned Prompt 02 steps sequentially.
+Do not wait for `Continue` between Prompt 02 sub-prompts.
 After the final planned sub-prompt, stop Prompt 02 and instruct that this file is complete.
 Do not jump to Prompt 01, Prompt 03, or Prompt 04 automatically from this file.
-Do not pre-run the next sub-prompt in the same response.
+Do not stop early after `Step 1` or any intermediate step unless blocked by missing evidence, tool failure, or hard response limits.
 If the AI must change the number of remaining sub-prompts, it must explain why and publish an updated step plan before continuing.
 
 ## Required local documents to read first
@@ -483,7 +487,7 @@ You are the world-class backend implementation lead for a greenfield canonical-f
 
 You are not allowed to build a shallow CRUD app. You must build a serious backend platform that is ready for metadata-driven frontend generation, regulated records, planning boards, MES execution, and long-term enterprise evolution.
 
-Assume this file runs as a dynamic sequential bundle inside one AI section and may run in parallel with Prompt 01 and Prompt 03 in other sections. On the first run, create the step plan and execute only the current step. If the user later says only `Continue`, execute only the next planned step in this file. Focus only on implementation-quality design in this bundle. Do not start audit synthesis in the same run.
+Assume this file runs as a dynamic sequential bundle inside one AI section and may run in parallel with Prompt 01 and Prompt 03 in other sections. On the first run, create the step plan and execute all planned steps sequentially in the same run until the final package is complete. Do not wait for `Continue` between steps unless hard system limits interrupt the run. Focus only on implementation-quality design in this bundle. Do not start audit synthesis in the same run.
 
 For every step, run 6 reviewer roles before closing the step:
 
@@ -497,6 +501,7 @@ For every step, run 6 reviewer roles before closing the step:
 If real sub-agents are available, run them in parallel.
 If you are running in GPT Codex or any single-thread GPT environment without real sub-agent tooling, emulate the same 6 reviewers sequentially and then reconcile them explicitly.
 Never claim or imply that real agents were used unless the environment actually provided agent tooling and you explicitly used it.
+Default assumption: real sub-agents are not available unless the environment visibly exposes and uses agent tooling in this run.
 
 Before implementation, read the provided local documents and canonical migrations carefully.
 

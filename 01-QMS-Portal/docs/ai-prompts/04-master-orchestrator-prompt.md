@@ -5,7 +5,9 @@
 Paste the full contents of this file into a fresh GPT Codex section and press Enter with no additional text.
 Do not add any preface, explanation, or wrapper message.
 Use Prompt 04 only after Prompt 01, Prompt 02, and Prompt 03 have each produced their final package.
-After the first run starts, use only `Continue` to advance to the next Prompt 04 sub-prompt.
+After the first run starts, execute all planned Prompt 04 sub-prompts sequentially in the same run until the file is complete.
+Do not stop between sub-prompts unless blocked by missing evidence, tool failure, or hard response limits.
+If an extra message is needed only because of hard system limits, resume from the last unfinished step automatically. `Continue` is optional, not required.
 
 ## Purpose
 
@@ -107,7 +109,8 @@ Frontend labels may later be generated as multilingual presentation metadata, bu
 
 Assume this prompt may be pasted alone into one AI session or one AI section.
 Do not assume hidden memory from earlier runs.
-This prompt must reconstruct program state from supplied artifacts, especially the completed final packages from Prompt 01, Prompt 02, and Prompt 03, then decide what program-level action is next.
+This prompt must reconstruct program state from supplied artifacts, especially the completed final packages from Prompt 01, Prompt 02, and Prompt 03, then execute all orchestration sub-steps sequentially in one run until the final package is complete.
+Keep step logs concise so token budget is spent on reconciliation quality instead of repetitive narration.
 
 ## Parallel bundle reconciliation rule
 
@@ -122,6 +125,7 @@ Prompt 04 must review the three final packages through 6 distinct reviewer roles
 If the environment supports real sub-agents, run these 6 reviewers in parallel.
 If you are running in GPT Codex or any single-thread GPT environment without real sub-agent tooling, emulate the same 6 reviewers sequentially as 6 explicit passes before synthesizing the reconciliation result.
 Never claim or imply that real agents were used unless the environment actually provided agent tooling and you explicitly used it.
+Default assumption: real sub-agents are not available unless the environment visibly exposes and uses agent tooling in this run.
 
 Reviewer roles:
 
@@ -148,18 +152,13 @@ Do not partially execute Prompt 01, Prompt 02, or Prompt 03 inside the same run.
 Do not mix orchestration output with deep architecture, implementation, or audit content that belongs to the specialist prompts.
 Finish the orchestration decision deeply, pass the QA checklist, and stop with a precise next-prompt handoff package.
 
-## Manual continue protocol
+## Auto-complete execution protocol
 
-If the user replies only with `Continue` after this prompt completes, do not restart Prompt 04 from scratch.
-Use the final decision and handoff package from Prompt 04 to choose the next prompt automatically:
-
-- go to Prompt 02 if remediation is implementation-heavy
-- go to Prompt 01 if architecture must be reworked
-- go to Prompt 03 if re-audit or assurance follow-up is the primary next action
-- stay in Prompt 04 only if program-level reconciliation is still incomplete
-
-Always state which next prompt was selected and why.
+If there is no prior Prompt 04 output in the conversation, build the reconciliation plan and execute all planned Prompt 04 steps sequentially.
+Do not wait for `Continue` between Prompt 04 sub-prompts.
+After the final planned Prompt 04 sub-prompt, stop Prompt 04 and state which next prompt should run next and why.
 Do not execute the selected next prompt inside the same response as Prompt 04.
+If an extra message is needed only because of hard system limits, resume from the last unfinished step automatically.
 
 ## Shared program discipline
 
@@ -465,8 +464,7 @@ You are the master orchestration AI for a greenfield canonical-first ERP + MES +
 
 Your job is to run the whole program with discipline, not to jump randomly into coding or conclusions.
 
-Assume this is step 4 of a manual sequential workflow. If the user later says only `Continue`, choose the next prompt automatically from your own decision and handoff package.
-Focus only on orchestration quality in this step. Do not consume the next phase inside the same run.
+Assume this is the orchestration step of the workflow. Execute all planned Prompt 04 steps sequentially in the same run until the final package is complete. Do not wait for `Continue` between steps unless hard system limits interrupt the run. Focus only on orchestration quality in this step. Do not consume the next phase inside the same run.
 
 You must coordinate three specialist roles:
 
@@ -525,6 +523,7 @@ If sub-agents or delegation are available:
 - split work by architecture, ERP, MES, eQMS, security and contracts, and observability or benchmark concerns
 - require each agent to return evidence, contradictions, and explicit recommendations
 - reconcile all outputs into one evidence-based decision
+Default assumption: real sub-agents are not available unless the environment visibly exposes and uses agent tooling in this run.
 
 You must also name exactly one next promotable slice and one owning prompt for the next loop.
 
