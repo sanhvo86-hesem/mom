@@ -139,10 +139,17 @@ for key, fields in data_fields.items():
 workflows = load_workflow_registry("01-QMS-Portal/qms-data/registry/workflow-library.json")
 manifest = load_optional_json("01-QMS-Portal/qms-data/registry/registry-manifest.json")
 quality_report = load_optional_json("01-QMS-Portal/qms-data/registry/registry-quality-report.json")
+frontend_foundation = load_optional_json("01-QMS-Portal/qms-data/registry/frontend-foundation-catalog.json")
 manifest_coverage = manifest.get('coverage', {}) if isinstance(manifest, dict) else {}
 quality_summary = quality_report.get('summary', {}) if isinstance(quality_report, dict) else {}
 quality_checks = quality_report.get('checks', []) if isinstance(quality_report, dict) else []
 failed_quality_checks = [check for check in quality_checks if isinstance(check, dict) and not check.get('passed')]
+frontend_summary = frontend_foundation.get('summary', {}) if isinstance(frontend_foundation, dict) else {}
+frontend_entities = frontend_foundation.get('entities', {}) if isinstance(frontend_foundation, dict) else {}
+frontend_blocked = {
+    key: value for key, value in frontend_entities.items()
+    if isinstance(value, dict) and ((value.get('readiness') or {}).get('verdict') == 'blocked')
+}
 
 wf_entities = {}
 for wfkey, wf in workflows.items():
@@ -267,6 +274,14 @@ if manifest_coverage or quality_summary:
         f"{'PASS' if quality_report.get('all_passed') else 'WARN'} "
         f"({len(quality_checks) - len(failed_quality_checks)}/{len(quality_checks)} checks passed)"
     )
+if frontend_summary:
+    print(
+        "FRONTEND FOUNDATION: "
+        f"{frontend_summary.get('entity_count', 0)} entities, "
+        f"{frontend_summary.get('ready_entities', 0)} ready, "
+        f"{frontend_summary.get('partial_entities', 0)} partial, "
+        f"{frontend_summary.get('blocked_entities', 0)} blocked"
+    )
 print(f"WORKFLOWS: {len(wf_entities)} workflow definitions")
 
 print(f"\n--- FIELD-COLUMN LINKAGE ---")
@@ -314,6 +329,13 @@ if source_conflicts:
     for field_key in sorted(source_conflicts)[:40]:
         print(f"  {field_key}: {source_conflicts[field_key]}")
 
+if frontend_blocked:
+    print(f"\n--- FRONTEND FOUNDATION BLOCKERS ({len(frontend_blocked)}) ---")
+    print("These entities still lack backend contracts needed for world-class frontend experiences.")
+    for key in sorted(frontend_blocked)[:40]:
+        readiness = frontend_blocked[key].get('readiness') or {}
+        print(f"  {key} | score={readiness.get('score')} | blockers={readiness.get('blockers', [])[:5]}")
+
 # Genuine orphan fields detail
 print(f"\n--- GENUINE ORPHAN FIELDS ({len(classified['genuine'])}) ---")
 print("These fields exist in data-fields.json but have NO matching DB column.")
@@ -332,6 +354,15 @@ audit = {
     'runtime_manifest': manifest_coverage,
     'quality_summary': quality_summary,
     'quality_failed_checks': failed_quality_checks,
+    'frontend_foundation_summary': frontend_summary,
+    'frontend_foundation_blocked': {
+        key: {
+            'score': (value.get('readiness') or {}).get('score'),
+            'blockers': (value.get('readiness') or {}).get('blockers', []),
+            'profile': value.get('profile'),
+        }
+        for key, value in frontend_blocked.items()
+    },
     'missing_field_defs': missing_field_defs,
     'orphan_fields': {k: sorted(list(v)) for k, v in classified.items()},
     'field_source_conflicts': source_conflicts,

@@ -824,12 +824,16 @@ try {
 $endpointCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/endpoint-catalog.json'), true);
 $endpointMap = is_array($endpointCatalog['endpoints'] ?? null) ? $endpointCatalog['endpoints'] : [];
 $runtimeAccessPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/runtime-access-policy.json'), true);
+$frontendFoundation = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/frontend-foundation-catalog.json'), true);
+$frontendEntityMap = is_array($frontendFoundation['entities'] ?? null) ? $frontendFoundation['entities'] : [];
 $telemetryDetail = $endpointMap['mes_execution.mes_machine_telemetry.detail'] ?? null;
 $bomDetail = $endpointMap['master_data.bill_of_materials.detail'] ?? null;
 $scenarioUpdate = $endpointMap['advanced_planning.aps_planning_scenarios.update'] ?? null;
 $scenarioTransition = $endpointMap['advanced_planning.aps_planning_scenarios.transition'] ?? null;
 $capaTransition = $endpointMap['quality_management.capa_records.transition'] ?? null;
 $capaDelete = $endpointMap['quality_management.capa_records.delete'] ?? null;
+$capaFoundation = $frontendEntityMap['quality_management.capa_records'] ?? null;
+$apsFoundation = $frontendEntityMap['advanced_planning.aps_planning_scenarios'] ?? null;
 [$persistedTransitionCount, $genericTransitionCount] = [0, 0];
 smoke_assert(is_array($telemetryDetail), 'Composite telemetry detail endpoint missing from endpoint catalog.');
 smoke_assert(($telemetryDetail['record_addressing'] ?? null) === 'composite', 'Telemetry detail endpoint must advertise composite addressing.');
@@ -853,6 +857,16 @@ smoke_assert(($capaTransition['workflow']['runtime']['runtime_error_code'] ?? nu
 smoke_assert(is_array($capaDelete), 'CAPA delete endpoint missing from endpoint catalog.');
 smoke_assert(($capaDelete['capabilities']['deletion']['mode'] ?? null) === 'archive_only', 'CAPA delete must advertise governed archive-only delete mode.');
 smoke_assert((bool)($capaDelete['capabilities']['deletion']['hard_delete_allowed'] ?? true) === false, 'CAPA delete must not advertise hard-delete capability.');
+smoke_assert(is_array($frontendFoundation), 'Frontend foundation registry asset missing.');
+smoke_assert((int)($frontendFoundation['summary']['entity_count'] ?? 0) > 0, 'Frontend foundation summary must advertise entity coverage.');
+smoke_assert(is_array($capaFoundation), 'CAPA frontend foundation contract missing.');
+smoke_assert(($capaFoundation['profile'] ?? null) === 'governed_case', 'CAPA frontend foundation must classify the entity as a governed case.');
+smoke_assert(($capaFoundation['capabilities']['workflow']['state'] ?? null) === 'blocked', 'CAPA frontend foundation must keep workflow UI blocked until the engine bridge is ready.');
+smoke_assert(in_array('workflow_engine_bridge_blocked', (array)($capaFoundation['capabilities']['workflow']['blockers'] ?? []), true), 'CAPA frontend foundation must surface workflow bridge blocking.');
+smoke_assert(is_array($apsFoundation), 'APS planning scenario frontend foundation contract missing.');
+smoke_assert(($apsFoundation['profile'] ?? null) === 'planning_console', 'APS planning scenario frontend foundation must classify the entity as a planning console.');
+smoke_assert(($apsFoundation['capabilities']['planning_board']['state'] ?? null) !== 'not_applicable', 'APS planning scenario must advertise planning-board capability coverage.');
+smoke_assert(is_array($apsFoundation['detail_layout']['sections'] ?? null), 'APS planning scenario must expose detail sections for future frontend composition.');
 foreach ($endpointMap as $action => $endpoint) {
     if (!is_array($endpoint) || ($endpoint['kind'] ?? null) !== 'transition') {
         continue;
@@ -889,5 +903,7 @@ smoke_assert((int)($qualityReport['summary']['transition_runtime_warnings'] ?? 0
 smoke_assert((int)($qualityReport['summary']['workflow_engine_bridge_blocked'] ?? 0) > 0, 'Registry quality report must surface blocked workflow-engine bridges.');
 smoke_assert(is_array($qualityReport['warnings']['workflow_engine_bridge'] ?? null), 'Registry quality report must include workflow-engine bridge blockers.');
 smoke_assert((int)($qualityReport['summary']['archive_only_tables'] ?? 0) > 0, 'Registry quality report must surface archive-only table governance.');
+smoke_assert((int)($qualityReport['summary']['frontend_foundation_entities'] ?? 0) > 0, 'Registry quality report must include frontend foundation coverage.');
+smoke_assert(is_array($qualityReport['warnings']['frontend_foundation'] ?? null), 'Registry quality report must include frontend foundation blocker summaries.');
 
 echo "backend smoke tests passed\n";

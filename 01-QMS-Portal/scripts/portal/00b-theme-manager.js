@@ -319,6 +319,10 @@ function _applyCustomVars(){
   _setVarEm('--btn-letter-spacing', cfg, 'components.btn.letterSpacing');
   _setVarPx('--btn-border-width', cfg, 'components.btn.borderWidth');
   _setVarPx('--btn-min-width', cfg, 'components.btn.minWidth');
+  _setVarNumber('--ui-icon-leading-scale', cfg, 'components.icon.leadingScale');
+  _setVarPx('--ui-icon-leading-edge-trim', cfg, 'components.icon.leadingEdgeTrim');
+  _setVarNumber('--ui-icon-only-scale', cfg, 'components.icon.onlyScale');
+  _setVarPx('--ui-icon-only-inset', cfg, 'components.icon.onlyInset');
 
   /* Components — table */
   _setVar('--table-header-bg', cfg, 'components.table.headerBg');

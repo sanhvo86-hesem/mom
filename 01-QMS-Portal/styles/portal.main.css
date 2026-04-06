@@ -94,7 +94,7 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 .nav-item{display:flex;align-items:center;gap:var(--nav-item-gap,10px);min-height:var(--nav-item-height,36px);padding:0 10px;border-radius:var(--nav-item-radius,8px);color:rgba(255,255,255,.6);font-size:var(--nav-item-font-size,13px);line-height:1;transition:all .15s;width:100%;text-align:left;white-space:nowrap;overflow:hidden}
 .nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
 .nav-item.active{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
-.nav-item .icon{width:var(--nav-item-icon-size,var(--hds-icon-md,16px));min-width:var(--nav-item-icon-size,var(--hds-icon-md,16px));text-align:center;flex-shrink:0;font-size:var(--nav-item-icon-size,var(--hds-icon-md,16px));line-height:1}
+.nav-item .icon{width:calc(var(--nav-item-icon-size,var(--hds-icon-md,16px)) * var(--ui-icon-leading-scale,1.12));min-width:calc(var(--nav-item-icon-size,var(--hds-icon-md,16px)) * var(--ui-icon-leading-scale,1.12));text-align:center;flex-shrink:0;font-size:calc(var(--nav-item-icon-size,var(--hds-icon-md,16px)) * var(--ui-icon-leading-scale,1.12));line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .nav-item .badge{margin-left:auto;font-size:10px;background:rgba(255,255,255,.12);padding:1px 7px;border-radius:10px;flex-shrink:0}
 .collapsed .nav-item span:not(.icon){display:none}
 .collapsed .nav-item .badge{display:none}
@@ -672,7 +672,8 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 .admin-tab-v2.active:hover{color:var(--text-inverse,#fff);border-color:var(--brand-2,#1565c0);background:linear-gradient(135deg,color-mix(in srgb, var(--brand-2,#1565c0) 88%, #000 12%) 0%, var(--brand-light,#3b82f6) 100%)}
 .admin-tab-v2 .admin-tab-icon,.admin-tab-v2 .admin-tab-label,.admin-tab-v2 .tab-badge{line-height:1}
 .admin-tab-v2 .admin-tab-icon,.admin-tab-v2 .admin-tab-label{display:inline-flex;align-items:center}
-.admin-tab-v2 .admin-tab-icon{flex:0 0 auto}
+.admin-tab-v2 .admin-tab-icon{flex:0 0 auto;inline-size:calc(1em * var(--ui-icon-leading-scale,1.12));block-size:calc(1em * var(--ui-icon-leading-scale,1.12));font-size:calc(1em * var(--ui-icon-leading-scale,1.12));justify-content:center}
+.admin-tab-v2:has(.admin-tab-icon):has(.admin-tab-label){padding-inline-start:max(0px, calc(var(--hds-tab-px,16px) - var(--ui-icon-leading-edge-trim,2px)))}
 .admin-tab-v2 .tab-badge{background:color-mix(in srgb, var(--brand-2,#1565c0) 12%, var(--bg-surface,#fff));color:var(--brand-2,#1565c0);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700}
 .admin-tab-v2.active .tab-badge{background:rgba(255,255,255,.2);color:#fff}
 

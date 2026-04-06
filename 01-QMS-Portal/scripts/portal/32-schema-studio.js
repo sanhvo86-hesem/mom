@@ -727,7 +727,7 @@ function applyUiPrefs(prefs){
       STORE.browser.activeDomain = prefs.browser.activeDomain;
     }
     if(typeof prefs.browser.domainSplit === 'number' && isFinite(prefs.browser.domainSplit)){
-      STORE.browser.domainSplit = Math.max(0.26, Math.min(0.7, prefs.browser.domainSplit));
+      STORE.browser.domainSplit = Math.max(0.25, Math.min(0.75, prefs.browser.domainSplit));
     }
     if(typeof prefs.browser.domainSplitManual === 'boolean'){
       STORE.browser.domainSplitManual = prefs.browser.domainSplitManual;
@@ -5351,7 +5351,7 @@ Browser.render = function(){
   refs.browser.classList.toggle('is-domain-view', STORE.browser.view === 'domains' && !!STORE.browser.open);
   refs.browser.classList.toggle('is-table-view', STORE.browser.view === 'tables' && !!STORE.browser.open);
   if(STORE.browser.view === 'domains'){
-    refs.browser.style.setProperty('--ss-domain-top', Math.round((STORE.browser.domainSplit || 0.42) * 100) + '%');
+    refs.browser.style.setProperty('--ss-domain-top', Math.round((STORE.browser.domainSplit || 0.5) * 100) + '%');
   } else {
     refs.browser.style.removeProperty('--ss-domain-top');
   }
@@ -7742,7 +7742,7 @@ Browser.startDomainSplit = function(ev){
     if(persist) saveUiPrefs();
   }
   function clampRatio(value){
-    return Math.max(0.22, Math.min(0.44, value));
+    return Math.max(0.25, Math.min(0.75, value));
   }
   function onMove(moveEv){
     var ratio;
@@ -7773,14 +7773,14 @@ Browser.startDomainSplit = function(ev){
 };
 
 Browser.adjustDomainSplit = function(nextRatio){
-  STORE.browser.domainSplit = Math.max(0.22, Math.min(0.44, Number(nextRatio) || 0.34));
+  STORE.browser.domainSplit = Math.max(0.25, Math.min(0.75, Number(nextRatio) || 0.5));
   STORE.browser.domainSplitManual = true;
   saveUiPrefs();
   Browser.render();
 };
 
 Browser.onDomainSplitKeydown = function(ev){
-  var ratio = Number(STORE.browser.domainSplit || 0.34);
+  var ratio = Number(STORE.browser.domainSplit || 0.5);
   if(ev.key === 'ArrowUp'){
     ev.preventDefault();
     Browser.adjustDomainSplit(ratio - 0.03);
@@ -7793,12 +7793,12 @@ Browser.onDomainSplitKeydown = function(ev){
   }
   if(ev.key === 'Home'){
     ev.preventDefault();
-    Browser.adjustDomainSplit(0.22);
+    Browser.adjustDomainSplit(0.25);
     return;
   }
   if(ev.key === 'End'){
     ev.preventDefault();
-    Browser.adjustDomainSplit(0.44);
+    Browser.adjustDomainSplit(0.75);
   }
 };
 
@@ -7836,7 +7836,7 @@ Browser.render = function(){
   refs.browser.classList.toggle('is-workflow-view', STORE.browser.view === 'workflow' && !!STORE.browser.open);
   if(STORE.browser.view === 'domains' && STORE.browser.open){
     refs.browser.classList.add('has-domain-split');
-    if(STORE.browser.domainSplitManual && Number(STORE.browser.domainSplit || 0.5) <= 0.44){
+    if(STORE.browser.domainSplitManual){
       refs.browser.style.setProperty('--ss-domain-top', Math.round((STORE.browser.domainSplit || 0.5) * 100) + '%');
       refs.browser.classList.add('has-manual-split');
     } else {
@@ -7928,7 +7928,7 @@ Browser.render = function(){
       '<div class="ss-browser-search-meta">' + _esc(searchMeta) + '</div>',
     '</div>',
     (STORE.browser.view === 'domains'
-      ? '<div class="ss-browser-splitter" onmousedown="Browser.startDomainSplit(event)" onkeydown="Browser.onDomainSplitKeydown(event)" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="24" aria-valuemax="44" aria-valuenow="' + String(Math.round((STORE.browser.domainSplit || 0.34) * 100)) + '" aria-label="' + _esc(_t('Điều chỉnh chiều cao giữa domain và bảng', 'Resize domain and table panes')) + '"><span class="ss-browser-splitter-handle"></span></div>'
+      ? '<div class="ss-browser-splitter" onmousedown="Browser.startDomainSplit(event)" onkeydown="Browser.onDomainSplitKeydown(event)" role="separator" tabindex="0" aria-orientation="horizontal" aria-valuemin="25" aria-valuemax="75" aria-valuenow="' + String(Math.round((STORE.browser.domainSplit || 0.5) * 100)) + '" aria-label="' + _esc(_t('Điều chỉnh chiều cao giữa domain và bảng', 'Resize domain and table panes')) + '"><span class="ss-browser-splitter-handle"></span></div>'
       : ''),
     '<div class="ss-browser-list">' + (STORE.browser.view === 'tables'
       ? (sortedTables.length
@@ -8536,7 +8536,7 @@ Browser.startDomainSplit = function(ev){
     if(persist) saveUiPrefs();
   }
   function clampRatio(value){
-    return Math.max(0.18, Math.min(0.42, value));
+    return Math.max(0.25, Math.min(0.75, value));
   }
   function onMove(moveEv){
     var ratio;
@@ -8567,7 +8567,7 @@ Browser.startDomainSplit = function(ev){
 };
 
 Browser.adjustDomainSplit = function(nextRatio){
-  STORE.browser.domainSplit = Math.max(0.18, Math.min(0.42, Number(nextRatio) || 0.28));
+  STORE.browser.domainSplit = Math.max(0.25, Math.min(0.75, Number(nextRatio) || 0.5));
   STORE.browser.domainSplitManual = true;
   saveUiPrefs();
   Browser.render();

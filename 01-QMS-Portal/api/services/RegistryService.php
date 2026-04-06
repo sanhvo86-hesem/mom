@@ -514,6 +514,44 @@ class RegistryService
         return is_array($runtime) ? $runtime : [];
     }
 
+    /**
+     * Get the frontend foundation catalog or a single entity contract.
+     *
+     * @return array<string, mixed>
+     */
+    public function frontendFoundation(?string $entityKey = null): array
+    {
+        $catalog = $this->load('frontend-foundation-catalog');
+        if (!is_array($catalog)) {
+            return [];
+        }
+
+        if ($entityKey === null || trim($entityKey) === '') {
+            return $catalog;
+        }
+
+        $entities = $catalog['entities'] ?? [];
+        if (!is_array($entities)) {
+            return [];
+        }
+
+        $normalized = strtolower(trim($entityKey));
+        $contract = $entities[$normalized] ?? null;
+
+        return is_array($contract) ? $contract : [];
+    }
+
+    /**
+     * Get the frontend foundation contract for a specific table.
+     *
+     * @return array<string, mixed>
+     */
+    public function frontendFoundationEntity(string $domain, string $tableName): array
+    {
+        $entityKey = strtolower(trim($domain)) . '.' . strtolower(trim($tableName));
+        return $this->frontendFoundation($entityKey);
+    }
+
     /* ── Domain Packs API ─────────────────────────────────────────────── */
 
     /**

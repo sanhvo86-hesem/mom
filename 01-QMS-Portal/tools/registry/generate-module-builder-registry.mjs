@@ -932,11 +932,11 @@ function frontendProfile(tableName, table) {
   if ((/mes|production|maintenance|tooling|quality_lab/.test(domain) || /work_order|job_order|machine|dispatch|inspection_lot/.test(key)) && hasOperatorSignals) {
     return 'operator_console';
   }
-  if (/document|record|evidence|training/.test(domain) || /document|record|evidence|passport|certificate|revision/.test(key)) {
-    return 'document_record';
-  }
   if (table?.workflowId || /quality|audit|calibration|supplier_relationship|trade_compliance|compliance/.test(domain)) {
     return 'governed_case';
+  }
+  if (/document|record|evidence|training/.test(domain) || /document|record|evidence|passport|certificate|revision/.test(key)) {
+    return 'document_record';
   }
   if (/master_data/.test(domain) || /^org_|^item|^bom_|^routing_/.test(key)) {
     return 'master_data';
@@ -2132,13 +2132,15 @@ function main() {
   const runtimeAccessPolicy = buildRuntimeAccessPolicy(tableRegistry, domainArchitecture);
   const packs = buildDomainFieldPacks(tableRegistry, dataFields);
   const relationMap = buildRelationMap(tableRegistry);
-  const manifest = buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields);
-  const qualityReport = buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions);
+  const frontendFoundation = buildFrontendFoundationCatalog(tableRegistry, dataFields, endpointCatalog, relationMap, formulas);
+  const manifest = buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields, frontendFoundation);
+  const qualityReport = buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, frontendFoundation);
 
   writeJson(path.join(registryDir, 'endpoint-catalog.json'), endpointCatalog);
   writeJson(path.join(registryDir, 'runtime-access-policy.json'), runtimeAccessPolicy);
   writeJson(path.join(registryDir, 'domain-field-packs.json'), packs);
   writeJson(path.join(registryDir, 'relation-map.json'), relationMap);
+  writeJson(path.join(registryDir, 'frontend-foundation-catalog.json'), frontendFoundation);
   writeJson(path.join(registryDir, 'registry-manifest.json'), manifest);
   writeJson(path.join(registryDir, 'registry-quality-report.json'), qualityReport);
 
@@ -2147,6 +2149,7 @@ function main() {
     runtimePolicyDomains: Object.keys(runtimeAccessPolicy.domains || {}).length,
     packCount: Object.keys(packs.packs).length,
     relationCount: relationMap.edges.length,
+    frontendFoundationEntities: Object.keys(frontendFoundation.entities || {}).length,
     qualityChecksPassed: qualityReport.all_passed,
   }, null, 2));
 }

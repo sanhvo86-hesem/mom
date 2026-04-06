@@ -31,6 +31,17 @@
       "ready": 0,
       "blocked": 115,
       "unneeded": 413
+    },
+    "frontend_foundation": {
+      "entity_count": 528,
+      "ready_entities": 40,
+      "partial_entities": 488,
+      "blocked_entities": 0,
+      "workflow_ready_entities": 122,
+      "related_ready_entities": 513,
+      "analytics_ready_entities": 479,
+      "planning_console_entities": 28,
+      "operator_console_entities": 48
     }
   },
   "quality_summary": {
@@ -63,9 +74,25 @@
       "generic_status_only": 122,
       "persisted": 115,
       "unknown": 0
-    }
+    },
+    "frontend_foundation_entities": 528,
+    "frontend_ready_entities": 40,
+    "frontend_partial_entities": 488,
+    "frontend_blocked_entities": 0
   },
   "quality_failed_checks": [],
+  "frontend_foundation_summary": {
+    "entity_count": 528,
+    "ready_entities": 40,
+    "partial_entities": 488,
+    "blocked_entities": 0,
+    "workflow_ready_entities": 122,
+    "related_ready_entities": 513,
+    "analytics_ready_entities": 479,
+    "planning_console_entities": 28,
+    "operator_console_entities": 48
+  },
+  "frontend_foundation_blocked": {},
   "missing_field_defs": [
     "acted_at",
     "acted_by_party_id",

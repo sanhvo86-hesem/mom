@@ -2,7 +2,7 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-05T17:30:57.436Z"
+    "generatedAt": "2026-04-06T00:44:55.155Z"
   },
   "summary": {
     "endpoint_count": 2862,
@@ -34,7 +34,11 @@
       "generic_status_only": 122,
       "persisted": 115,
       "unknown": 0
-    }
+    },
+    "frontend_foundation_entities": 528,
+    "frontend_ready_entities": 40,
+    "frontend_partial_entities": 488,
+    "frontend_blocked_entities": 0
   },
   "checks": [
     {
@@ -96,6 +100,12 @@
       "passed": true,
       "actual": 0,
       "target": 0
+    },
+    {
+      "id": "frontend_foundation_coverage",
+      "passed": true,
+      "actual": 528,
+      "target": 528
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -2221,7 +2231,8 @@
         "mode": "archive_only",
         "governance_level": "governed"
       }
-    ]
+    ],
+    "frontend_foundation": []
   },
   "all_passed": true
 }

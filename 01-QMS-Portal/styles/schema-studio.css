@@ -2672,6 +2672,77 @@
   background: rgba(255, 255, 255, 0.26);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
+/* Final domain split lock: keep the top pane edge attached to the splitter. */
+.ss-browser.has-domain-split.is-domain-view {
+  display: grid !important;
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr) !important;
+  align-items: stretch;
+  row-gap: 0;
+}
+
+.ss-browser.has-domain-split.is-domain-view > .ss-browser-search-wrap {
+  grid-row: 1;
+  min-height: 0;
+  height: 100%;
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-content: stretch;
+  gap: 10px;
+  overflow: hidden;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  position: relative;
+  border-bottom: 0 !important;
+}
+
+.ss-browser.has-domain-split.is-domain-view > .ss-browser-search-wrap::after {
+  content: "";
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+.ss-browser.has-domain-split.is-domain-view > .ss-browser-search-wrap > .ss-domain-chip-strip {
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+  align-content: start;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.ss-browser.has-domain-split.is-domain-view > .ss-browser-search-wrap > .ss-browser-search-meta {
+  align-self: end;
+  margin: 0;
+}
+
+.ss-browser.has-domain-split.is-domain-view > .ss-browser-splitter {
+  grid-row: 2;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 10px;
+  margin: 0;
+}
+
+.ss-browser.has-domain-split.is-domain-view > .ss-browser-list {
+  grid-row: 3;
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.ss-browser.has-domain-split.is-domain-view > .ss-browser-list > .ss-domain-focus-card {
+  min-height: 100%;
+}
 
 .ss-browser.has-domain-split.is-domain-view {
   display: grid;
@@ -2863,16 +2934,20 @@
 
 .ss-browser.is-domain-view .ss-browser-search-wrap {
   display: grid;
-  grid-template-rows: auto auto auto;
-  align-content: start;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-content: stretch;
   gap: 10px;
-  padding-bottom: 4px;
+  padding-bottom: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .ss-browser.is-domain-view .ss-domain-chip-strip {
   flex: none;
-  max-height: clamp(104px, 16vh, 156px);
+  max-height: none;
+  min-height: 0;
   overflow: auto;
+  align-content: start;
   padding-bottom: 0;
   margin-bottom: 0;
 }
@@ -3100,7 +3175,7 @@
 
 .ss-browser.is-domain-view .ss-browser-search-wrap {
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   padding-bottom: 0;
   margin-bottom: 0;
 }

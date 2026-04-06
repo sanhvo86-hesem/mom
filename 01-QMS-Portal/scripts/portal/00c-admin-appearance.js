@@ -694,7 +694,24 @@ function previewBackdrop(){
 }
 
 function previewButtons(){
-  return previewBox('Preview button', '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-primary">Primary</button><button class="hm-btn hm-btn-secondary">Secondary</button><button class="hm-btn hm-btn-ghost">Ghost</button><button class="hm-btn hm-btn-danger">Danger</button></div>');
+  return previewBox(
+    'Preview button',
+    '<div style="display:grid;gap:10px">'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + '<button class="hm-btn hm-btn-primary"><span class="hm-btn-icon">🚀</span><span class="hm-btn-label">Primary</span></button>'
+    + '<button class="hm-btn hm-btn-secondary"><span class="hm-btn-icon">📄</span><span class="hm-btn-label">Secondary</span></button>'
+    + '<button class="hm-btn hm-btn-ghost"><span class="hm-btn-icon">🧭</span><span class="hm-btn-label">Ghost</span></button>'
+    + '<button class="hm-btn hm-btn-danger"><span class="hm-btn-icon">⚠️</span><span class="hm-btn-label">Danger</span></button>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + '<button class="hm-btn hm-btn-primary hm-btn-icon-only" aria-label="Save"><span class="hm-btn-icon">💾</span></button>'
+    + '<button class="hm-btn hm-btn-secondary hm-btn-icon-only" aria-label="Search"><span class="hm-btn-icon">🔍</span></button>'
+    + '<button class="hm-btn hm-btn-ghost hm-btn-icon-only" aria-label="Layout"><span class="hm-btn-icon">↔</span></button>'
+    + '<button class="hm-btn hm-btn-danger hm-btn-icon-only" aria-label="Delete"><span class="hm-btn-icon">🗑</span></button>'
+    + '</div>'
+    + '</div>',
+    'Use these samples to tune icon-leading vs icon-only rhythm before applying the same rule system-wide.'
+  );
 }
 
 function previewTable(){
@@ -722,7 +739,7 @@ function previewTabs(){
   return previewBox('Preview tab',
     '<div style="display:grid;gap:10px">'
     + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">Users</span><span class="tab-badge">20</span></button><button type="button" class="admin-tab-v2 active"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">Appearance</span></button><button type="button" class="admin-tab-v2"><span class="admin-tab-icon">🌐</span><span class="admin-tab-label">Portal</span></button></div>'
-    + '<div class="hm-tabs" style="margin-bottom:0"><button class="hm-tab active">Overview</button><button class="hm-tab">Runtime</button><button class="hm-tab">History</button></div>'
+    + '<div class="hm-tabs" style="margin-bottom:0"><button class="hm-tab active"><span class="hm-tab-icon">📊</span><span class="hm-tab-label">Overview</span></button><button class="hm-tab"><span class="hm-tab-icon">⚙️</span><span class="hm-tab-label">Runtime</span></button><button class="hm-tab"><span class="hm-tab-icon">🕘</span><span class="hm-tab-label">History</span></button></div>'
     + '</div>',
     'Admin tabs expose radius, padding, gap and active indicator without hover.'
   );
@@ -1340,6 +1357,10 @@ function renderComponents(){
     slider(T('paddingY'), '--btn-padding-y', 'components.btn.paddingY', 0, 12, 0, 'px')
     + slider(T('paddingX'), '--btn-padding-x', 'components.btn.paddingX', 4, 24, 10, 'px')
     + slider(T('gap')+' (icon↔text)', '--btn-gap', 'components.btn.gap', 2, 12, 6, 'px')
+    + slider(L('Tỷ lệ icon kèm chữ', 'Leading icon scale'), '--ui-icon-leading-scale', 'components.icon.leadingScale', 0.9, 1.5, 1.12, '', 0.05)
+    + slider(L('Trim biên icon kèm chữ', 'Leading icon edge trim'), '--ui-icon-leading-edge-trim', 'components.icon.leadingEdgeTrim', 0, 8, 2, 'px')
+    + slider(L('Tỷ lệ icon-only', 'Icon-only scale'), '--ui-icon-only-scale', 'components.icon.onlyScale', 1, 2.2, 1.4, '', 0.05)
+    + slider(L('Inset icon-only', 'Icon-only inset'), '--ui-icon-only-inset', 'components.icon.onlyInset', 0, 8, 2, 'px')
     + slider(T('fontWeight'), '--btn-font-weight', 'components.btn.fontWeight', 400, 800, 600, '', 100)
     + slider(T('letterSpacing'), '--btn-letter-spacing', 'components.btn.letterSpacing', 0, 0.15, 0, 'em', 0.01)
     + slider(T('borderWidth'), '--btn-border-width', 'components.btn.borderWidth', 0, 3, 1, 'px')
@@ -1754,7 +1775,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260405n';
+window._renderAdminAppearanceFullVersion = '20260406a';
 window._renderAdminAppearanceFull = render;
 
 })();

@@ -156,6 +156,7 @@ var state = {
     domainPacks: {},
     relationMap: {},
     endpointCatalog: {},
+    frontendFoundation: {},
     manifest: null,
     qualityReport: null
   }
@@ -1942,11 +1943,12 @@ function _ensureRegistriesLoaded(force){
       state.registries.statusOptions    = HR.raw('status-options') || {};
       state.registries.computedFormulas = HR.raw('computed-formulas') || {};
       state.registries.iotConnectors    = HR.raw('iot-connectors') || (BE.IOT_CONNECTORS || {});
+      state.registries.frontendFoundation = HR.raw('frontend-foundation-catalog') || {};
       state.registries.manifest         = HR.raw('registry-manifest') || null;
       state.registries.qualityReport    = HR.raw('registry-quality-report') || null;
 
       // Lazy-load remaining registries via HmRegistry preload
-      var remaining = 7;
+      var remaining = 8;
       function _onLazy(){ remaining--; if(remaining <= 0){ _finishRegistryLoad(); } }
 
       HR.preload('validation-rules', function(d){ state.registries.validationRules = d || {}; _onLazy(); });
@@ -1954,6 +1956,7 @@ function _ensureRegistriesLoaded(force){
       HR.preload('domain-field-packs', function(d){ state.registries.domainPacks = d || {}; _onLazy(); });
       HR.preload('relation-map', function(d){ state.registries.relationMap = d || {}; _onLazy(); });
       HR.preload('endpoint-catalog', function(d){ state.registries.endpointCatalog = d || {}; _onLazy(); });
+      HR.preload('frontend-foundation-catalog', function(d){ state.registries.frontendFoundation = d || {}; _onLazy(); });
       HR.preload('registry-manifest', function(d){ state.registries.manifest = d || null; _onLazy(); });
       HR.preload('registry-quality-report', function(d){ state.registries.qualityReport = d || null; _onLazy(); });
     });
@@ -1975,6 +1978,7 @@ function _ensureRegistriesLoaded(force){
     _loadRegistry('domain-field-packs', 'domainPacks'),
     _loadRegistry('relation-map', 'relationMap'),
     _loadRegistry('endpoint-catalog', 'endpointCatalog'),
+    _loadRegistry('frontend-foundation-catalog', 'frontendFoundation'),
     _loadRegistry('registry-manifest', 'manifest'),
     _loadRegistry('registry-quality-report', 'qualityReport')
   ]).then(function(){
@@ -1988,7 +1992,7 @@ function _ensureRegistriesLoaded(force){
 }
 
 function _finishRegistryLoad(){
-  var criticalKeys = ['workflows','domainPacks','relationMap','endpointCatalog','manifest','qualityReport'];
+  var criticalKeys = ['workflows','domainPacks','relationMap','endpointCatalog','frontendFoundation','manifest','qualityReport'];
   var failedKeys = Object.keys(state.registries.failedLoads || {});
   var missingCritical = criticalKeys.filter(function(key){
     var value = state.registries[key];
@@ -2018,6 +2022,30 @@ function _endpointCatalogItems(){
   });
 }
 
+function _frontendFoundationMap(){
+  var raw = state.registries.frontendFoundation || {};
+  return raw.entities || raw;
+}
+
+function _frontendFoundationForApi(api){
+  var endpoint = _endpointCatalogItems().filter(function(item){
+    return String((item && (item.action || item.value || item.key || '')) || '') === String(api || '');
+  })[0] || null;
+  var domain = endpoint && endpoint.domain ? endpoint.domain : '';
+  var entity = endpoint && endpoint.entity ? endpoint.entity : '';
+  var key;
+  if((!domain || !entity) && api){
+    var parts = String(api).split('.');
+    if(parts.length >= 2){
+      domain = domain || parts[0];
+      entity = entity || parts[1];
+    }
+  }
+  key = [domain, entity].filter(Boolean).join('.');
+  if(!key) return null;
+  return _frontendFoundationMap()[key] || null;
+}
+
 function _applyEndpointCatalog(){
   var items = _endpointCatalogItems();
   if(!items.length) return;
@@ -2030,6 +2058,7 @@ function _registryHealthSummary(){
   var quality = state.registries.qualityReport || {};
   var coverage = manifest.coverage || {};
   var summary = quality.summary || {};
+  var foundation = coverage.frontend_foundation || {};
   var checks = Array.isArray(quality.checks) ? quality.checks : [];
   var passedChecks = checks.filter(function(check){ return check && check.passed; }).length;
   var generatedAt = (manifest._meta && manifest._meta.generatedAt) || (quality._meta && quality._meta.generatedAt) || '';
@@ -2049,7 +2078,11 @@ function _registryHealthSummary(){
     missingPrimaryKeyTables: summary.missing_primary_key_tables || 0,
     unsupportedRecordEndpoints: summary.unsupported_record_endpoints || 0,
     contractIssues: summary.contract_issues || 0,
-    workflowAlignmentIssues: summary.workflow_alignment_issues || 0
+    workflowAlignmentIssues: summary.workflow_alignment_issues || 0,
+    frontendEntities: summary.frontend_foundation_entities || foundation.entity_count || 0,
+    frontendReadyEntities: summary.frontend_ready_entities || foundation.ready_entities || 0,
+    frontendPartialEntities: summary.frontend_partial_entities || foundation.partial_entities || 0,
+    frontendBlockedEntities: summary.frontend_blocked_entities || foundation.blocked_entities || 0
   };
 }
 
@@ -2068,6 +2101,9 @@ function _renderRegistryHealthNotice(){
   }
   h += '<div>'+_esc(info.endpointCount + ' endpoints / ' + info.packCount + ' packs / ' + info.relationCount + ' relations')+'</div>';
   h += '<div>'+_esc(info.workflowCount + ' workflows / ' + info.statusCount + ' status sets / ' + info.fieldRegistryActions + ' field schemas')+'</div>';
+  if(info.frontendEntities){
+    h += '<div>'+_esc(_t('Nen tang frontend: ','Frontend foundation: ') + info.frontendReadyEntities + '/' + info.frontendEntities + ' ' + _t('ready, ','ready, ') + info.frontendPartialEntities + ' ' + _t('partial, ','partial, ') + info.frontendBlockedEntities + ' ' + _t('blocked', 'blocked'))+'</div>';
+  }
   if(info.compositePkTables){
     h += '<div>'+_esc(_t('Bang composite PK da co contract rieng: ','Composite-PK tables use dedicated identity contracts: ') + info.compositePkTables)+'</div>';
   }
@@ -3080,6 +3116,45 @@ function _buildAutoKpisFromRegistry(entity, api){
   });
 }
 
+function _applyRecordDetailFromFoundation(draft, foundation){
+  var detail;
+  var semantic;
+  var layout;
+  var readiness;
+  if(!draft || !draft.config || !foundation) return 0;
+  draft.config.detail = draft.config.detail || {};
+  detail = draft.config.detail;
+  semantic = foundation.semantic_slots || {};
+  layout = foundation.detail_layout || {};
+  readiness = foundation.readiness || {};
+  if(semantic.title_field) detail.titleField = semantic.title_field;
+  if(semantic.subtitle_field) detail.subtitleField = semantic.subtitle_field;
+  if(semantic.status_field) detail.statusField = semantic.status_field;
+  if(semantic.owner_field) detail.ownerField = semantic.owner_field;
+  if(semantic.updated_at_field) detail.updatedAtField = semantic.updated_at_field;
+  detail.sections = (layout.sections || []).map(function(section){
+    return {
+      key: section.key || '',
+      label: _clone(section.label || { vi: section.key || 'Section', en: section.key || 'Section' }),
+      fieldKeys: _clone(section.field_keys || [])
+    };
+  });
+  detail.quickViews = _clone(layout.quick_view_refs || []);
+  detail.relatedLists = _clone(layout.related_lists || []);
+  detail.capabilityProfile = foundation.profile || '';
+  detail.recommendedPatterns = _clone(foundation.recommended_patterns || []);
+  detail.readiness = {
+    verdict: readiness.verdict || 'partial',
+    score: readiness.score || 0,
+    blockers: _clone(readiness.blockers || []),
+    warnings: _clone(readiness.warnings || [])
+  };
+  draft.config.actions = draft.config.actions || {};
+  draft.config.actions.endpoints = _clone(foundation.actions || {});
+  draft.config.dataSource.entityKey = foundation.entity_key || draft.config.dataSource.entityKey || '';
+  return detail.sections.length;
+}
+
 function _guessTransitionApi(entity, workflowId){
   var aliases = _aliasCandidatesForEntity(entity);
   var catalog = (BE.API_CATALOG || []).slice();
@@ -3195,13 +3270,19 @@ function _applyWorkflowRegistryToDraft(draft, workflowId){
 function _autoPopulateDraftFromApi(draft, api){
   var fields = _getRegistryFieldsForApi(api);
   var entity = _inferEntityFromApi(api);
+  var foundation = _frontendFoundationForApi(api);
   var count = 0;
   var noun = '';
-  if(!draft || !draft.config || !api || !fields.length) return null;
+  if(!draft || !draft.config || !api) return null;
   draft.config.dataSource = draft.config.dataSource || {};
   draft.config.dataSource.api = api;
   draft.config.entity = entity || draft.config.entity || '';
-  if(draft.type === 'data-table'){
+  if(draft.type === 'record-detail'){
+    count = _applyRecordDetailFromFoundation(draft, foundation);
+    noun = _t('section', 'sections');
+  } else if(!fields.length){
+    return null;
+  } else if(draft.type === 'data-table'){
     draft.config.columns = _buildAutoColumnsFromRegistry(api, fields, entity);
     count = draft.config.columns.length;
     noun = _t('cột', 'columns');
@@ -3778,7 +3859,7 @@ function _ensureBuilderStyles(){
   css += '.mb-panel-title strong{display:flex;align-items:center;gap:8px;min-width:0;font-size:15px;line-height:1.25;color:var(--text-primary)}';
   css += '.mb-panel-title strong span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}';
   css += '.mb-panel-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}';
-  css += '.mb-panel-header>.hm-btn.hm-btn-sm,.mb-panel-actions>.hm-btn.hm-btn-sm{width:28px;height:28px;min-height:28px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;flex:0 0 auto;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
+  css += '.mb-panel-header>.hm-btn.hm-btn-sm,.mb-panel-actions>.hm-btn.hm-btn-sm{width:max(28px, calc((10px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));height:max(28px, calc((10px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));min-height:max(28px, calc((10px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:calc(10px * var(--ui-icon-only-scale,1.4));line-height:1;flex:0 0 auto;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
   css += '.mb-panel-body{padding:14px 16px;overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}';
   css += '.mb-panel-body--tabbed{padding:0;overflow:hidden}';
   css += '.mb-panel-tabbar{padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))}';
@@ -3811,7 +3892,7 @@ function _ensureBuilderStyles(){
   css += '.mb-block-name{font-weight:700;color:var(--text-primary);font-size:14px}';
   css += '.mb-block-type{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}';
   css += '.mb-block-tools{display:flex;gap:6px;align-items:center;flex:0 0 auto}';
-  css += '.mb-block-tools .hm-btn.hm-btn-sm{width:30px;height:30px;min-height:30px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;line-height:1;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
+  css += '.mb-block-tools .hm-btn.hm-btn-sm{width:max(30px, calc((11px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));height:max(30px, calc((11px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));min-height:max(30px, calc((11px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:calc(11px * var(--ui-icon-only-scale,1.4));line-height:1;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
   css += '.mb-block-body{padding:0 14px 14px}';
   css += '.mb-drop-above:before,.mb-drop-below:after{content:\"\";position:absolute;left:10px;right:10px;height:2px;background:var(--brand-2);border-radius:999px}';
   css += '.mb-drop-above:before{top:0}';
@@ -3888,11 +3969,11 @@ function _ensureBuilderStyles(){
   css += '.mb-prop-section-count{font-size:11px;color:var(--text-tertiary);margin-top:3px}';
   css += '.mb-prop-section-body{padding:0 14px 14px}';
   css += '.mb-icon-btn{width:30px;height:30px;min-height:30px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}';
-  css += '.mb-icon-glyph{font-size:12px;line-height:1}';
+  css += '.mb-icon-glyph{font-size:calc(9px * var(--ui-icon-only-scale,1.4));line-height:1}';
   css += '.mb-icon-only-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:0 !important;line-height:1;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
   css += '.mb-icon-only-glyph{display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;font-style:normal;font-weight:700}';
-  css += '.mb-setup-module-actions [data-action=\"delete-module\"]{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px;font-size:17px;line-height:1;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
-  css += '.mb-setup-module-actions [data-action=\"delete-module\"] .mb-icon-only-glyph{width:18px;height:18px;font-size:16px}';
+  css += '.mb-setup-module-actions [data-action=\"delete-module\"]{width:max(32px, calc((12px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));height:max(32px, calc((12px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));min-height:max(32px, calc((12px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 8px));padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:calc(12px * var(--ui-icon-only-scale,1.4));line-height:1;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
+  css += '.mb-setup-module-actions [data-action=\"delete-module\"] .mb-icon-only-glyph{width:calc(12px * var(--ui-icon-only-scale,1.4));height:calc(12px * var(--ui-icon-only-scale,1.4));font-size:calc(12px * var(--ui-icon-only-scale,1.4))}';
   css += '.mb-toggle-control{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer}';
   css += '.mb-toggle-control input{width:16px;height:16px;margin:0;accent-color:var(--brand-2);flex:0 0 auto}';
   css += '.mb-toggle-text{font-size:12px;color:var(--text-secondary);font-weight:600;line-height:1}';
@@ -3919,12 +4000,12 @@ function _ensureBuilderStyles(){
   css += '.mb-builder-hero-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-self:flex-start;align-items:flex-start}';
   css += '.mb-hero-commandbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}';
   css += '.mb-hero-action,.mb-hero-select{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:48px;min-height:48px;padding:0;border:1px solid rgba(255,255,255,0.14);border-radius:14px;background:rgba(255,255,255,0.1);color:#fff;transition:background .12s,border-color .12s,color .12s;overflow:hidden;box-shadow:none;contain:layout paint style;flex:0 0 auto;-webkit-tap-highlight-color:transparent}';
-  css += '.mb-hero-action{cursor:pointer;width:46px;min-width:46px;min-height:46px;flex-basis:46px}';
+  css += '.mb-hero-action{cursor:pointer;width:max(46px, calc((18px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 10px));min-width:max(46px, calc((18px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 10px));min-height:max(46px, calc((18px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 10px));flex-basis:max(46px, calc((18px * var(--ui-icon-only-scale,1.4)) + (var(--ui-icon-only-inset,2px) * 2) + 10px))}';
   css += '.mb-hero-action:hover,.mb-hero-action:focus-visible,.mb-hero-select:hover,.mb-hero-select:focus-within{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.24);box-shadow:none;z-index:auto}';
   css += '.mb-hero-action.is-active,.mb-hero-select.is-active{background:#fff;color:var(--brand);border-color:#fff}';
   css += '.mb-hero-action.is-primary{background:var(--green);border-color:rgba(255,255,255,0.2)}';
-  css += '.mb-hero-action-icon{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;line-height:1;font-size:18px;font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
-  css += '.mb-hero-action-icon svg{width:24px;height:24px;display:block;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}';
+  css += '.mb-hero-action-icon{width:calc(18px * var(--ui-icon-only-scale,1.4));height:calc(18px * var(--ui-icon-only-scale,1.4));display:inline-flex;align-items:center;justify-content:center;flex:0 0 calc(18px * var(--ui-icon-only-scale,1.4));line-height:1;font-size:calc(14px * var(--ui-icon-only-scale,1.4));font-family:Segoe UI Symbol,Segoe UI Emoji,Arial,sans-serif}';
+  css += '.mb-hero-action-icon svg{width:100%;height:100%;display:block;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}';
   css += '.mb-hero-action-label{display:none !important}';
   css += '.mb-hero-action-badge{position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.16);font-size:11px;font-weight:700;line-height:1}';
   css += '.mb-hero-action.is-active .mb-hero-action-badge{background:rgba(37,99,235,0.14);color:var(--brand)}';
