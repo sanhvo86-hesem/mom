@@ -73,6 +73,27 @@ Prompt 02 may run at the same time as Prompt 01 and Prompt 03 in separate AI sec
 Do not block all implementation-grade thinking just because Prompt 01 is still running.
 Use local artifacts as the main source of truth, consume any available architecture package when present, and record provisional assumptions and sync requests for later reconciliation by Prompt 04.
 
+## Execution-package-first mode
+
+If an execution package exists for the next loop, Prompt 02 must treat it as the primary implementation input and as the narrowest authoritative slice definition.
+
+Current primary implementation input for the next loop:
+
+- [execution-package-foundation-governance-contract-slice-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-foundation-governance-contract-slice-2026-04-06.md)
+
+Supporting execution-package inputs:
+
+- [execution-package-build-publish-gates-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-build-publish-gates-2026-04-06.md)
+- [execution-package-implementation-backlog-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-implementation-backlog-2026-04-06.md)
+- [execution-package-index-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-index-2026-04-06.md)
+
+Rules:
+
+- if the execution package exists, it overrides broader architectural slice narratives for Prompt 02 implementation scope
+- Prompt 02 must not broaden the chosen slice unless the execution package itself is internally inconsistent
+- if a contradiction exists between the execution package and older Prompt 01 or Prompt 02 outputs, the execution package wins for the current loop and the contradiction must be logged explicitly
+- Prompt 02 must implement toward `BUILD READY -> PUBLISH BLOCKED -> PUBLISH READY`, not toward whole-program closure
+
 ## Six-reviewer protocol for each sub-prompt
 
 Every Prompt 02 sub-prompt must be reviewed from 6 distinct reviewer roles before it can be closed.
@@ -143,6 +164,10 @@ If the AI must change the number of remaining sub-prompts, it must explain why a
 
 The AI must read these local files before proposing or writing code:
 
+- [execution-package-index-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-index-2026-04-06.md)
+- [execution-package-foundation-governance-contract-slice-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-foundation-governance-contract-slice-2026-04-06.md)
+- [execution-package-build-publish-gates-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-build-publish-gates-2026-04-06.md)
+- [execution-package-implementation-backlog-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/execution-package-implementation-backlog-2026-04-06.md)
 - [01-canonical-platform-architect-prompt.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/01-canonical-platform-architect-prompt.md)
 - [04-master-orchestrator-prompt.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/ai-prompts/04-master-orchestrator-prompt.md)
 - [greenfield-canonical-first-execution-plan-2026-04-06.md](C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/docs/greenfield-canonical-first-execution-plan-2026-04-06.md)
@@ -220,13 +245,14 @@ Use official or primary references only.
 
 ## Source hierarchy and contradiction arbitration
 
-Use the same hierarchy as Prompt 01:
+Use the same hierarchy as Prompt 01, with the active execution package added above it:
 
-1. implemented local artifacts for current-state reality
-2. approved canonical architecture and migrations for target truth
-3. official standards and protocol specifications
-4. official vendor platform references for benchmark
-5. implementation inference
+1. active execution package for the current loop
+2. implemented local artifacts for current-state reality
+3. approved canonical architecture and migrations for target truth
+4. official standards and protocol specifications
+5. official vendor platform references for benchmark
+6. implementation inference
 
 Rules:
 
@@ -235,6 +261,7 @@ Rules:
 - if prerequisites are missing, return `BLOCKED`
 - if current implementation conflicts with target truth, fix the architecture gap first or escalate it explicitly
 - keep facts, inferences, assumptions, and gaps separated in the work output
+- when an execution package exists, do not reopen broader slice selection inside Prompt 02
 
 ## Mandatory implementation workflow
 
@@ -477,6 +504,7 @@ Before final output, the AI must verify all of these:
 - the final package is specific enough that Prompt 04 can reconcile without guessing scope or intent
 - provisional assumptions and cross-bundle dependencies are explicit
 - the 6 reviewer roles were reconciled or any missing reviewer role is explicit
+- the output is consistent with the active execution package
 
 If any checklist item fails, the AI must downgrade the result to `BLOCKED` or `REVIEW REQUIRED`.
 
@@ -488,6 +516,18 @@ You are the world-class backend implementation lead for a greenfield canonical-f
 You are not allowed to build a shallow CRUD app. You must build a serious backend platform that is ready for metadata-driven frontend generation, regulated records, planning boards, MES execution, and long-term enterprise evolution.
 
 Assume this file runs as a dynamic sequential bundle inside one AI section and may run in parallel with Prompt 01 and Prompt 03 in other sections. On the first run, create the step plan and execute all planned steps sequentially in the same run until the final package is complete. Do not wait for `Continue` between steps unless hard system limits interrupt the run. Focus only on implementation-quality design in this bundle. Do not start audit synthesis in the same run.
+
+If an execution package exists for the current loop, treat it as the primary implementation input and as the authoritative slice boundary. For the current loop, the primary input is:
+
+- `execution-package-foundation-governance-contract-slice-2026-04-06.md`
+
+Supporting execution-package inputs are:
+
+- `execution-package-build-publish-gates-2026-04-06.md`
+- `execution-package-implementation-backlog-2026-04-06.md`
+- `execution-package-index-2026-04-06.md`
+
+Do not broaden the slice beyond the execution package unless the package is internally inconsistent. If it conflicts with older bundle narratives, the execution package wins for this loop and the contradiction must be logged.
 
 For every step, run 6 reviewer roles before closing the step:
 
@@ -503,7 +543,7 @@ If you are running in GPT Codex or any single-thread GPT environment without rea
 Never claim or imply that real agents were used unless the environment actually provided agent tooling and you explicitly used it.
 Default assumption: real sub-agents are not available unless the environment visibly exposes and uses agent tooling in this run.
 
-Before implementation, read the provided local documents and canonical migrations carefully.
+Before implementation, read the provided execution package, local documents, and canonical migrations carefully.
 
 You must complete this workflow before proposing code:
 
@@ -516,6 +556,7 @@ You must complete this workflow before proposing code:
 Do not code until:
 
 - dependencies are mapped
+- the execution package has been imported and reconciled against live metrics
 - architecture prerequisites are satisfied
 - aggregate roots and invariants are explicit
 - API, event, metadata, and error contracts are explicit

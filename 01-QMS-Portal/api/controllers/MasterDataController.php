@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HESEM\QMS\Api\Controllers;
 
 use HESEM\QMS\Services\MasterDataService;
+use HESEM\QMS\Services\FoundationGovernanceService;
 use Throwable;
 
 /**
@@ -14,6 +15,7 @@ use Throwable;
 class MasterDataController extends BaseController
 {
     private ?MasterDataService $mdService = null;
+    private ?FoundationGovernanceService $fgService = null;
 
     private function mdService(): MasterDataService
     {
@@ -21,6 +23,14 @@ class MasterDataController extends BaseController
             $this->mdService = new MasterDataService($this->dataDir, $this->rootDir);
         }
         return $this->mdService;
+    }
+
+    private function fgService(): FoundationGovernanceService
+    {
+        if ($this->fgService === null) {
+            $this->fgService = new FoundationGovernanceService($this->data);
+        }
+        return $this->fgService;
     }
 
     private function userId(array $user): string
@@ -600,5 +610,189 @@ class MasterDataController extends BaseController
             $this->rethrowResponse($e);
             $this->error('holiday_save_failed', 500, $e->getMessage());
         }
+    }
+
+    // ══ Canonical Foundation Governance Contract Slice ═══════════════════
+
+    /**
+     * Emit an RFC 9457 problem detail from this controller.
+     */
+    private function sliceProblem(string $type, string $title, int $status, ?string $detail = null): never
+    {
+        $body = ['type' => $type, 'title' => $title, 'status' => $status];
+        if ($detail !== null) {
+            $body['detail'] = $detail;
+        }
+        throw ExitException::json($body, $status, ['Content-Type' => 'application/problem+json']);
+    }
+
+    /**
+     * Emit a canonical slice success envelope.
+     */
+    private function sliceSuccess(array $payload, int $code = 200): never
+    {
+        throw ExitException::json($payload, $code, ['Content-Type' => 'application/json']);
+    }
+
+    // ── Public: GET /api/v1/foundation/organizations ──────────────────────
+
+    public function listFoundationOrganizations(): never
+    {
+        $this->requireAuth();
+
+        try {
+            $result = $this->fgService()->listOrganizations([
+                'limit'                => $this->query('limit'),
+                'cursor'               => $this->query('cursor'),
+                'organizationType'     => $this->query('organizationType'),
+                'parentOrganizationId' => $this->query('parentOrganizationId'),
+                'statusCode'           => $this->query('statusCode'),
+                'search'               => $this->query('search'),
+            ]);
+            $this->sliceSuccess($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Invalid request', 400, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    // ── Public: GET /api/v1/foundation/parties ────────────────────────────
+
+    public function listFoundationParties(): never
+    {
+        $this->requireAuth();
+
+        try {
+            $result = $this->fgService()->listParties([
+                'limit'      => $this->query('limit'),
+                'cursor'     => $this->query('cursor'),
+                'partyType'  => $this->query('partyType'),
+                'roleCode'   => $this->query('roleCode'),
+                'statusCode' => $this->query('statusCode'),
+                'search'     => $this->query('search'),
+            ]);
+            $this->sliceSuccess($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Invalid request', 400, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    // ── Public: GET /api/v1/foundation/calendars ──────────────────────────
+
+    public function listFoundationCalendars(): never
+    {
+        $this->requireAuth();
+
+        try {
+            $result = $this->fgService()->listCalendars([
+                'limit'        => $this->query('limit'),
+                'cursor'       => $this->query('cursor'),
+                'statusCode'   => $this->query('statusCode'),
+                'baseTimezone' => $this->query('baseTimezone'),
+                'search'       => $this->query('search'),
+            ]);
+            $this->sliceSuccess($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Invalid request', 400, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    // ── Internal commands (Router action keys) ────────────────────────────
+    // Fail-closed: these commands validate auth/CSRF but return 501 because
+    // canonical DB writes are not yet implemented for this slice.
+
+    private function commandNotImplemented(string $commandName): never
+    {
+        $this->sliceProblem(
+            'urn:qms:problem:capability-blocked',
+            'Command not yet implemented',
+            501,
+            "Internal command '{$commandName}' is registered but canonical persistence is not yet implemented."
+        );
+    }
+
+    public function registerOrganizationNode(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('registerOrganizationNode');
+    }
+
+    public function amendOrganizationNode(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('amendOrganizationNode');
+    }
+
+    public function reparentOrganizationNode(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('reparentOrganizationNode');
+    }
+
+    public function deactivateOrganizationNode(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('deactivateOrganizationNode');
+    }
+
+    public function registerParty(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('registerParty');
+    }
+
+    public function amendPartyIdentity(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('amendPartyIdentity');
+    }
+
+    public function assignPartyRole(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('assignPartyRole');
+    }
+
+    public function registerPartySite(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('registerPartySite');
+    }
+
+    public function registerPartyContact(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('registerPartyContact');
+    }
+
+    public function registerCalendar(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('registerCalendar');
+    }
+
+    public function registerShiftEntry(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $this->commandNotImplemented('registerShift');
     }
 }

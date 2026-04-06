@@ -127,6 +127,7 @@ use HESEM\QMS\Api\Controllers\GenericCrudController;
 use HESEM\QMS\Api\Controllers\ModuleSchemaController;
 use HESEM\QMS\Api\Controllers\SchemaStudioController;
 use HESEM\QMS\Api\Controllers\RegistryController;
+use HESEM\QMS\Api\Controllers\ApprovalGroupController;
 use HESEM\QMS\Database\DataLayer;
 
 // â”€â”€ Bootstrap DataLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -596,6 +597,23 @@ $router->actions([
     'admin_design_config_save'   => [AdminController::class, 'saveDesignConfig'],
 ]);
 
+// ── Foundation Governance Contract Slice: Internal Action Keys ──────────────
+
+$router->actions([
+    'registerOrganizationNode'  => [MasterDataController::class, 'registerOrganizationNode'],
+    'amendOrganizationNode'     => [MasterDataController::class, 'amendOrganizationNode'],
+    'reparentOrganizationNode'  => [MasterDataController::class, 'reparentOrganizationNode'],
+    'deactivateOrganizationNode'=> [MasterDataController::class, 'deactivateOrganizationNode'],
+    'registerParty'             => [MasterDataController::class, 'registerParty'],
+    'amendPartyIdentity'        => [MasterDataController::class, 'amendPartyIdentity'],
+    'assignPartyRole'           => [MasterDataController::class, 'assignPartyRole'],
+    'registerPartySite'         => [MasterDataController::class, 'registerPartySite'],
+    'registerPartyContact'      => [MasterDataController::class, 'registerPartyContact'],
+    'registerCalendar'          => [MasterDataController::class, 'registerCalendar'],
+    'registerShift'             => [MasterDataController::class, 'registerShiftEntry'],
+    'requestApproval'           => [ApprovalGroupController::class, 'requestApproval'],
+]);
+
 // Registry-backed generic CRUD
 $tableRegistryPath = $DATA_DIR . '/registry/table-registry.json';
 $tableRegistry = [];
@@ -791,6 +809,24 @@ $router->post('/api/runtime/{domain}/{table}', GenericCrudController::class, 'cr
 $router->put('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'updateRecord');
 $router->delete('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'deleteRecord');
 $router->post('/api/runtime/{domain}/{table}/{id}/transition', GenericCrudController::class, 'transitionRecord');
+
+// ── Foundation Governance Contract Slice: Public REST Routes ────────────────
+
+// Foundation read-through
+$router->get('/api/v1/foundation/organizations', MasterDataController::class, 'listFoundationOrganizations');
+$router->get('/api/v1/foundation/parties', MasterDataController::class, 'listFoundationParties');
+$router->get('/api/v1/foundation/calendars', MasterDataController::class, 'listFoundationCalendars');
+
+// Governance approval-group
+$router->get('/api/v1/governance/approval-groups', ApprovalGroupController::class, 'listApprovalGroups');
+$router->get('/api/v1/governance/approval-groups/{approvalGroupId}', ApprovalGroupController::class, 'getApprovalGroup');
+$router->post('/api/v1/governance/approval-groups/{approvalGroupId}:decide', ApprovalGroupController::class, 'decideApprovalGroup');
+$router->get('/api/v1/governance/approval-groups/{approvalGroupId}/timeline', ApprovalGroupController::class, 'listApprovalGroupTimeline');
+$router->get('/api/v1/governance/approval-groups/{approvalGroupId}/attachments', EvidenceController::class, 'listApprovalGroupAttachments');
+
+// Governance attachments
+$router->get('/api/v1/governance/attachments/{attachmentId}', EvidenceController::class, 'getGovernanceAttachment');
+$router->post('/api/v1/governance/attachments', EvidenceController::class, 'createGovernanceAttachment');
 
 // Folders
 $router->get('/api/folders', FileController::class, 'scanFolders');

@@ -63,14 +63,50 @@ final class EvidenceVaultService
     /**
      * Store a new evidence record in the vault.
      *
-     * Computes SHA-256 of the file content, extends the hash chain, and saves.
+     * Accepts either (file, metadata, userId) from controller upload,
+     * or (evidence, userId) for direct programmatic use.
      *
-     * @param array  $evidence Evidence data (must include 'file_hash' or 'content').
-     * @param string $userId   Storing user.
+     * @param array       $fileOrEvidence  File upload array or evidence data.
+     * @param array|string $metadataOrUser Metadata array (when file upload) or userId string (legacy).
+     * @param string|null  $userId         User ID (when file upload).
      * @return array Created evidence record with chain metadata.
      */
-    public function store(array $evidence, string $userId): array
+    public function store(array $fileOrEvidence, array|string $metadataOrUser = '', ?string $userId = null): array
     {
+        // Normalize the multi-signature call into (evidence, userId)
+        if (is_array($metadataOrUser)) {
+            // Called as store($file, $metadata, $userId) from controller
+            $file = $fileOrEvidence;
+            $metadata = $metadataOrUser;
+            $actorId = $userId ?? 'unknown';
+
+            $tmpPath = $file['tmp_name'] ?? '';
+            $originalName = $file['name'] ?? 'unknown';
+            $fileHash = is_file($tmpPath) ? hash_file('sha256', $tmpPath) : hash('sha256', $originalName . $this->nowIso());
+
+            $uploadDir = $this->dataDir . '/uploads/evidence';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0775, true);
+            }
+            $storedName = $this->generateUuidV4() . '_' . basename($originalName);
+            $storedPath = $uploadDir . '/' . $storedName;
+            if (is_file($tmpPath)) {
+                @move_uploaded_file($tmpPath, $storedPath);
+            }
+
+            $evidence = array_merge($metadata, [
+                'filename'    => $originalName,
+                'file_hash'   => $fileHash,
+                'stored_path' => $storedPath,
+                'mime_type'   => $file['type'] ?? 'application/octet-stream',
+                'file_size'   => $file['size'] ?? 0,
+            ]);
+        } else {
+            // Called as store($evidence, $userId) — legacy/programmatic path
+            $evidence = $fileOrEvidence;
+            $actorId = is_string($metadataOrUser) ? $metadataOrUser : ($userId ?? 'unknown');
+        }
+
         $vault = $this->loadVault();
         $now   = $this->nowIso();
 
@@ -96,7 +132,7 @@ final class EvidenceVaultService
             'file_hash'      => $fileHash,
             'chain_hash'     => $chainHash,
             'chain_sequence' => $chainSequence,
-            'stored_by'      => $userId,
+            'stored_by'      => $actorId,
             'stored_at'      => $now,
             'created_at'     => $now,
         ]);
@@ -214,9 +250,27 @@ final class EvidenceVaultService
 
     /**
      * Link evidence to an entity (e.g., WO, SO, NCR).
+     *
+     * Accepts either (evidenceId, entityType, entityId, userId) for programmatic use,
+     * or (evidenceId, recordId, recordType, userId, note) from the controller.
+     *
+     * @return array|null The created link record, or null if already exists.
      */
-    public function link(string $evidenceId, string $entityType, string $entityId, string $userId): void
+    public function link(string $evidenceId, string $entityTypeOrRecordId, string $entityIdOrRecordType, string $userId, ?string $note = null): ?array
     {
+        // Normalize: if 5th arg ($note) is provided, the caller used the controller
+        // signature link($evidenceId, $recordId, $recordType, $userId, $note).
+        // The controller sends (evidenceId, recordId, recordType, userId, note)
+        // so entityTypeOrRecordId = recordId and entityIdOrRecordType = recordType.
+        // We swap to match internal semantics.
+        if ($note !== null) {
+            $entityType = $entityIdOrRecordType;
+            $entityId   = $entityTypeOrRecordId;
+        } else {
+            $entityType = $entityTypeOrRecordId;
+            $entityId   = $entityIdOrRecordType;
+        }
+
         $links = $this->loadLinks();
 
         // Check for duplicate
@@ -225,20 +279,24 @@ final class EvidenceVaultService
                 && ($link['evidence_id'] ?? '') === $evidenceId
                 && ($link['entity_type'] ?? '') === $entityType
                 && ($link['entity_id'] ?? '') === $entityId) {
-                return; // Already linked
+                return null; // Already linked
             }
         }
 
-        $links[] = [
+        $linkRecord = [
             'link_id'      => $this->generateUuidV4(),
             'evidence_id'  => $evidenceId,
             'entity_type'  => $entityType,
             'entity_id'    => $entityId,
             'linked_at'    => $this->nowIso(),
             'linked_by'    => $userId,
+            'note'         => $note,
         ];
 
+        $links[] = $linkRecord;
         $this->saveLinks($links);
+
+        return $linkRecord;
     }
 
     /**
@@ -350,6 +408,122 @@ final class EvidenceVaultService
         usort($result, fn(array $a, array $b) => strcmp($b['timestamp'] ?? '', $a['timestamp'] ?? ''));
 
         return $result;
+    }
+
+    // ── Governance attachment helpers ──────────────────────────────────────
+
+    /**
+     * List attachments for a governed entity (e.g., approval_group) from the DB.
+     *
+     * @return list<array>
+     */
+    public function listGovernanceAttachments(string $entityName, string $entityId, object $db): array
+    {
+        try {
+            $stmt = $db->prepare(
+                "SELECT attachment_id, entity_name, entity_id, file_name, content_type,
+                        file_size_bytes, checksum_sha256, uploaded_by_party_id, created_at,
+                        updated_at, row_version, evidence_chain_hash
+                 FROM attachment
+                 WHERE entity_name = :en AND entity_id = :eid
+                 ORDER BY created_at DESC, attachment_id DESC"
+            );
+            $stmt->execute([':en' => $entityName, ':eid' => $entityId]);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get a single governance attachment by ID from the DB.
+     *
+     * @return array|null
+     */
+    public function getGovernanceAttachment(string $attachmentId, object $db): ?array
+    {
+        try {
+            $stmt = $db->prepare(
+                "SELECT attachment_id, entity_name, entity_id, file_name, content_type,
+                        file_size_bytes, checksum_sha256, uploaded_by_party_id, created_at,
+                        updated_at, row_version, evidence_chain_hash
+                 FROM attachment
+                 WHERE attachment_id = :aid"
+            );
+            $stmt->execute([':aid' => $attachmentId]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return is_array($row) ? $row : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Create a governance attachment record in the DB.
+     *
+     * @return array The created attachment row.
+     */
+    public function createGovernanceAttachment(array $file, string $approvalGroupId, string $uploadedByPartyId, object $db, ?string $commentText = null, ?string $documentTypeCode = null): array
+    {
+        $originalName = $file['name'] ?? 'unknown';
+        $tmpPath = $file['tmp_name'] ?? '';
+        $contentType = $file['type'] ?? 'application/octet-stream';
+        $fileSize = $file['size'] ?? 0;
+
+        $checksum = is_file($tmpPath) ? hash_file('sha256', $tmpPath) : hash('sha256', $originalName . $this->nowIso());
+
+        $uploadDir = $this->dataDir . '/uploads/evidence';
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0775, true);
+        }
+        $storedName = $this->generateUuidV4() . '_' . basename($originalName);
+        $storedPath = $uploadDir . '/' . $storedName;
+        if (is_file($tmpPath)) {
+            @move_uploaded_file($tmpPath, $storedPath);
+        }
+
+        $attachmentId = $this->generateUuidV4();
+
+        try {
+            $stmt = $db->prepare(
+                "INSERT INTO attachment (attachment_id, entity_name, entity_id, file_name, storage_uri,
+                                        checksum_sha256, content_type, file_size_bytes, uploaded_by_party_id)
+                 VALUES (:aid, 'approval_group', :eid, :fn, :uri, :cs, :ct, :fs, :up)"
+            );
+            $stmt->execute([
+                ':aid' => $attachmentId,
+                ':eid' => $approvalGroupId,
+                ':fn'  => $originalName,
+                ':uri' => $storedPath,
+                ':cs'  => $checksum,
+                ':ct'  => $contentType,
+                ':fs'  => $fileSize,
+                ':up'  => $uploadedByPartyId,
+            ]);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Failed to create attachment: ' . $e->getMessage());
+        }
+
+        return $this->getGovernanceAttachment($attachmentId, $db) ?? [
+            'attachment_id' => $attachmentId,
+            'entity_name'   => 'approval_group',
+            'entity_id'     => $approvalGroupId,
+            'file_name'     => $originalName,
+        ];
+    }
+
+    /**
+     * Compute a strong ETag for an attachment row.
+     */
+    public function computeAttachmentETag(array $row): string
+    {
+        $canonical = json_encode([
+            'attachment_id'    => $row['attachment_id'] ?? '',
+            'checksum_sha256'  => $row['checksum_sha256'] ?? '',
+            'row_version'      => (int)($row['row_version'] ?? 1),
+            'updated_at'       => $row['updated_at'] ?? '',
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return '"' . hash('sha256', $canonical) . '"';
     }
 
     /**

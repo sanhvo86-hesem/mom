@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: "3.1.1"
 info:
   title: HESEM QMS Portal API
   description: |
@@ -99,6 +99,14 @@ tags:
     description: |
       QMS glossary / terminology management.
       Tu dien thuat ngu QMS.
+  - name: Foundation
+    description: |
+      Master-data slices -- organizations, parties, calendars.
+      Du lieu nen tang -- to chuc, ben lien quan, lich.
+  - name: Governance
+    description: |
+      Approval workflows, decision tracking, attachments, and timeline.
+      Quy trinh phe duyet, theo doi quyet dinh, dinh kem, va dong thoi gian.
 
 paths:
   # ═══════════════════════════════════════════════════════════════════════════
@@ -2304,6 +2312,459 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # FOUNDATION
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/v1/foundation/organizations:
+    get:
+      operationId: listFoundationOrganizations
+      tags: [Foundation]
+      summary: List organizations
+      description: |
+        Returns a cursor-paginated list of organizations visible to the current user.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Maximum number of items to return.
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Opaque cursor for forward pagination.
+        - name: sort
+          in: query
+          schema:
+            type: string
+          description: Sort clause (e.g. "name:asc").
+      responses:
+        '200':
+          description: Organization list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/foundation/parties:
+    get:
+      operationId: listFoundationParties
+      tags: [Foundation]
+      summary: List parties
+      description: |
+        Returns a cursor-paginated list of parties (contacts, suppliers, customers) visible to the current user.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Maximum number of items to return.
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Opaque cursor for forward pagination.
+        - name: sort
+          in: query
+          schema:
+            type: string
+          description: Sort clause (e.g. "name:asc").
+      responses:
+        '200':
+          description: Party list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartyConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/foundation/calendars:
+    get:
+      operationId: listFoundationCalendars
+      tags: [Foundation]
+      summary: List calendars
+      description: |
+        Returns a cursor-paginated list of calendars visible to the current user.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Maximum number of items to return.
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Opaque cursor for forward pagination.
+        - name: sort
+          in: query
+          schema:
+            type: string
+          description: Sort clause (e.g. "name:asc").
+      responses:
+        '200':
+          description: Calendar list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # GOVERNANCE
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/v1/governance/approval-groups:
+    get:
+      operationId: listApprovalGroups
+      tags: [Governance]
+      summary: List approval groups
+      description: |
+        Returns a cursor-paginated list of approval groups visible to the current user.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Maximum number of items to return.
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Opaque cursor for forward pagination.
+        - name: sort
+          in: query
+          schema:
+            type: string
+          description: Sort clause (e.g. "created_at:desc").
+      responses:
+        '200':
+          description: Approval group list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalGroupConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/governance/approval-groups/{approvalGroupId}:
+    get:
+      operationId: getApprovalGroup
+      tags: [Governance]
+      summary: Get a single approval group
+      description: |
+        Returns the full detail of an approval group, including current state and participants.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: approvalGroupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the approval group.
+      responses:
+        '200':
+          description: Approval group detail.
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Entity tag for conditional requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalGroupEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/governance/approval-groups/{approvalGroupId}:decide:
+    post:
+      operationId: decideApprovalGroup
+      tags: [Governance]
+      summary: Submit a decision on an approval group
+      description: |
+        Submit an approve, reject, or request-changes decision on an approval group.
+        Requires the If-Match header with the current ETag to prevent lost updates.
+
+        **Workflow Bridge Status: BLOCKED.**
+        This route is currently fail-closed. The approval workflow engine bridge
+        is not yet ready. All decision attempts will receive a `409` response with
+        problem type `urn:qms:problem:bridge-not-ready` until the bridge is
+        implemented and validated. Read operations (list, detail, timeline) are
+        unaffected.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: approvalGroupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the approval group.
+        - name: If-Match
+          in: header
+          required: true
+          schema:
+            type: string
+          description: ETag value from the last GET of the approval group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecideApprovalGroupRequest'
+      responses:
+        '200':
+          description: Decision recorded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalDecisionResultEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+
+  /api/v1/governance/approval-groups/{approvalGroupId}/timeline:
+    get:
+      operationId: listApprovalGroupTimeline
+      tags: [Governance]
+      summary: List timeline events for an approval group
+      description: |
+        Returns a cursor-paginated list of timeline events (decisions, comments, state changes)
+        for the specified approval group.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: approvalGroupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the approval group.
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Maximum number of items to return.
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Opaque cursor for forward pagination.
+      responses:
+        '200':
+          description: Timeline event list.
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Entity tag for the timeline state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalTimelineConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/governance/approval-groups/{approvalGroupId}/attachments:
+    get:
+      operationId: listApprovalGroupAttachments
+      tags: [Governance]
+      summary: List attachments for an approval group
+      description: |
+        Returns a cursor-paginated list of attachments associated with the specified approval group.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: approvalGroupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the approval group.
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Maximum number of items to return.
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Opaque cursor for forward pagination.
+      responses:
+        '200':
+          description: Attachment list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/governance/attachments/{attachmentId}:
+    get:
+      operationId: getGovernanceAttachment
+      tags: [Governance]
+      summary: Get a single governance attachment
+      description: |
+        Returns the detail of a governance attachment by its ID.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: attachmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the attachment.
+      responses:
+        '200':
+          description: Attachment detail.
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Entity tag for conditional requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/governance/attachments:
+    post:
+      operationId: createGovernanceAttachment
+      tags: [Governance]
+      summary: Upload a new governance attachment
+      description: |
+        Upload a file as a governance attachment using multipart/form-data.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to upload.
+                approvalGroupId:
+                  type: string
+                  format: uuid
+                  description: Optional approval group to associate the attachment with.
+                description:
+                  type: string
+                  description: Optional description of the attachment.
+      responses:
+        '201':
+          description: Attachment created.
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Entity tag for the new resource.
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: URL of the newly created attachment resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPONENTS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -2314,7 +2775,12 @@ components:
       type: apiKey
       in: cookie
       name: PHPSESSID
-      description: PHP session cookie obtained after successful login.
+      description: Session-authenticated portal user.
+    csrfHeader:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: Required together with sessionCookie on every state-changing slice operation.
 
   parameters:
     CsrfHeader:
@@ -2787,6 +3253,447 @@ components:
           type: boolean
           default: true
 
+    # ── Pagination ──
+
+    CursorPageInfo:
+      type: object
+      description: Cursor-based pagination metadata.
+      required: [limit, hasNextPage, hasPreviousPage]
+      properties:
+        limit:
+          type: integer
+          description: Maximum items per page.
+        hasNextPage:
+          type: boolean
+          description: Whether more items exist after the last item in this page.
+        hasPreviousPage:
+          type: boolean
+          description: Whether more items exist before the first item in this page.
+        startCursor:
+          type: string
+          nullable: true
+          description: Cursor pointing to the first item in this page.
+        endCursor:
+          type: string
+          nullable: true
+          description: Cursor pointing to the last item in this page.
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortClause'
+          description: Active sort order applied to the result set.
+
+    SortClause:
+      type: object
+      required: [field, direction]
+      properties:
+        field:
+          type: string
+          description: Field name being sorted on.
+        direction:
+          type: string
+          enum: [asc, desc]
+          description: Sort direction.
+
+    # ── RFC 9457 Problem Detail ──
+
+    ProblemDetail:
+      type: object
+      description: RFC 9457 Problem Details for HTTP APIs.
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI reference identifying the problem type.
+          example: "https://qms.hesem.com.vn/problems/validation-error"
+        title:
+          type: string
+          description: Short human-readable summary of the problem type.
+          example: "Validation Error"
+        status:
+          type: integer
+          description: HTTP status code.
+          example: 422
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+        instance:
+          type: string
+          format: uri
+          description: URI reference identifying the specific occurrence.
+        code:
+          type: string
+          description: Machine-readable error code.
+        trace_id:
+          type: string
+          description: Distributed trace identifier for correlation.
+        current_etag:
+          type: string
+          description: Current ETag value when a concurrency conflict occurs.
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: JSON pointer or field name.
+              message:
+                type: string
+                description: Validation error message.
+              code:
+                type: string
+                description: Machine-readable validation error code.
+          description: Detailed validation errors for 422 responses.
+
+    # ── Foundation Items ──
+
+    OrganizationItem:
+      type: object
+      description: A single organization record.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+        type:
+          type: string
+          description: Organization type (e.g. internal, supplier, customer).
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PartyItem:
+      type: object
+      description: A single party record (contact, supplier, customer).
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        role:
+          type: string
+        organizationId:
+          type: string
+          format: uuid
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CalendarItem:
+      type: object
+      description: A single calendar record.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        timezone:
+          type: string
+          description: IANA timezone identifier.
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ── Governance Items ──
+
+    ApprovalGroupItem:
+      type: object
+      description: Summary of an approval group for list views.
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          description: Current workflow status.
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ApprovalGroupDetail:
+      type: object
+      description: Full detail of an approval group.
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          description: Current workflow status.
+        participants:
+          type: array
+          items:
+            type: object
+            properties:
+              userId:
+                type: string
+              name:
+                type: string
+              role:
+                type: string
+              decision:
+                type: string
+                nullable: true
+              decidedAt:
+                type: string
+                format: date-time
+                nullable: true
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ApprovalDecisionResult:
+      type: object
+      description: Result of a decision action on an approval group.
+      properties:
+        approvalGroupId:
+          type: string
+          format: uuid
+        decisionCode:
+          type: string
+          enum: [approve, reject, request_changes]
+        newStatus:
+          type: string
+          description: Updated status after the decision.
+        decidedBy:
+          type: string
+        decidedAt:
+          type: string
+          format: date-time
+
+    TimelineEvent:
+      type: object
+      description: A single timeline event in an approval group.
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+          description: Type of event (decision, comment, status_change, attachment_added).
+        actor:
+          type: string
+          description: Username or ID of the person who performed the action.
+        summary:
+          type: string
+          description: Human-readable summary of the event.
+        detail:
+          type: object
+          additionalProperties: true
+          description: Event-specific payload.
+        occurredAt:
+          type: string
+          format: date-time
+
+    AttachmentItem:
+      type: object
+      description: Summary of an attachment for list views.
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+        uploadedBy:
+          type: string
+        uploadedAt:
+          type: string
+          format: date-time
+
+    AttachmentDetail:
+      type: object
+      description: Full detail of an attachment.
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+        description:
+          type: string
+        approvalGroupId:
+          type: string
+          format: uuid
+          nullable: true
+        downloadUrl:
+          type: string
+          format: uri
+        uploadedBy:
+          type: string
+        uploadedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ── Connection Wrappers (cursor-paginated lists) ──
+
+    OrganizationConnection:
+      type: object
+      required: [data, pageInfo]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationItem'
+        pageInfo:
+          $ref: '#/components/schemas/CursorPageInfo'
+
+    PartyConnection:
+      type: object
+      required: [data, pageInfo]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartyItem'
+        pageInfo:
+          $ref: '#/components/schemas/CursorPageInfo'
+
+    CalendarConnection:
+      type: object
+      required: [data, pageInfo]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarItem'
+        pageInfo:
+          $ref: '#/components/schemas/CursorPageInfo'
+
+    ApprovalGroupConnection:
+      type: object
+      required: [data, pageInfo]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalGroupItem'
+        pageInfo:
+          $ref: '#/components/schemas/CursorPageInfo'
+
+    ApprovalTimelineConnection:
+      type: object
+      required: [data, pageInfo]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimelineEvent'
+        pageInfo:
+          $ref: '#/components/schemas/CursorPageInfo'
+
+    AttachmentConnection:
+      type: object
+      required: [data, pageInfo]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentItem'
+        pageInfo:
+          $ref: '#/components/schemas/CursorPageInfo'
+
+    # ── Envelope Wrappers (single-object detail) ──
+
+    ApprovalGroupEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ApprovalGroupDetail'
+
+    ApprovalDecisionResultEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ApprovalDecisionResult'
+
+    AttachmentEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AttachmentDetail'
+
+    # ── Governance Requests ──
+
+    DecideApprovalGroupRequest:
+      type: object
+      required: [decisionCode]
+      properties:
+        decisionCode:
+          type: string
+          enum: [approve, reject, request_changes]
+          description: The decision to submit.
+        commentText:
+          type: string
+          description: Optional comment accompanying the decision.
+        reasonCode:
+          type: string
+          description: Optional machine-readable reason code.
+        electronicSignatureId:
+          type: string
+          format: uuid
+          description: Optional electronic signature reference for regulatory traceability.
+
   responses:
     SuccessOnly:
       description: Generic success.
@@ -2859,6 +3766,71 @@ components:
             ok: false
             error: "server_error"
             server_time: "2025-06-01T08:00:00+00:00"
+
+    # ── RFC 9457 ProblemDetail error responses ──
+
+    BadRequestProblem:
+      description: Bad request -- the request body or parameters are invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    UnauthorizedProblem:
+      description: Authentication required or session expired.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    ForbiddenProblem:
+      description: Insufficient permissions for this operation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    Conflict:
+      description: Conflict -- the resource state has changed since last read.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    PreconditionFailed:
+      description: Precondition failed -- the If-Match ETag does not match the current resource version.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    UnsupportedMediaType:
+      description: Unsupported media type -- the request Content-Type is not accepted.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    UnprocessableEntity:
+      description: Unprocessable entity -- the request is syntactically valid but semantically incorrect.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
+    PreconditionRequired:
+      description: Precondition required -- a conditional header (e.g. If-Match) is mandatory for this request.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
 
 security:
   - sessionCookie: []

@@ -97,6 +97,29 @@ class DataLayer
     }
 
     /**
+     * Get the underlying database Connection, or null when in JSON_ONLY mode.
+     *
+     * @return Connection|null
+     */
+    public function getConnection(): ?Connection
+    {
+        if ($this->mode === self::MODE_JSON_ONLY) {
+            return null;
+        }
+        return $this->db ?? null;
+    }
+
+    /**
+     * Get the qms-data directory path.
+     *
+     * @return string
+     */
+    public function getDataDir(): string
+    {
+        return $this->dataDir;
+    }
+
+    /**
      * Return a runtime summary of the active storage mode and PostgreSQL reachability.
      *
      * This is safe to call from JSON_ONLY mode and useful for runtime observability.

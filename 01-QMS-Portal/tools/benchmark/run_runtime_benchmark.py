@@ -19,6 +19,9 @@ TABLE_REGISTRY_PATH = PORTAL_ROOT / "qms-data" / "registry" / "table-registry.js
 BENCH_SCHEMA_PATH = SCRIPT_DIR / "benchmark_schema.sql"
 SEED_PATH = SCRIPT_DIR / "seed_runtime_benchmark.sql"
 READ_MIX_PATH = SCRIPT_DIR / "read_mix.sql"
+FG_READ_MIX_PATH = SCRIPT_DIR / "foundation_governance_contract_read_mix.sql"
+FG_BENCH_SCHEMA_PATH = SCRIPT_DIR / "fg_benchmark_schema.sql"
+FG_BENCH_SEED_PATH = SCRIPT_DIR / "fg_benchmark_seed.sql"
 OPTIMISTIC_HOT_UPDATE_PATH = SCRIPT_DIR / "optimistic_hot_update.sql"
 UNSAFE_HOT_UPDATE_PATH = SCRIPT_DIR / "unsafe_hot_update.sql"
 ODOO_CONF_PATH = Path(r"D:\ODOO\server\odoo.conf")
@@ -303,6 +306,13 @@ def main() -> int:
     optimistic_attempts = int(optimistic_bench.get("transactions_processed", 0))
     unsafe_attempts = int(unsafe_bench.get("transactions_processed", 0))
 
+    fg_read_bench = None
+    if FG_READ_MIX_PATH.is_file() and FG_BENCH_SCHEMA_PATH.is_file() and FG_BENCH_SEED_PATH.is_file():
+        # Load the canonical foundation-governance benchmark schema and seed
+        for fg_file in [FG_BENCH_SCHEMA_PATH, FG_BENCH_SEED_PATH]:
+            run_psql(config, BENCH_DB, file_path=fg_file)
+        fg_read_bench = run_pgbench(config, BENCH_DB, FG_READ_MIX_PATH, clients=12, jobs=4, duration=30)
+
     report["pgbench"] = {
         "read_mix": read_bench,
         "optimistic_hot_update": {
@@ -322,6 +332,9 @@ def main() -> int:
             else 0.0,
         },
     }
+
+    if fg_read_bench is not None:
+        report["pgbench"]["foundation_governance_read_mix"] = fg_read_bench
 
     report["finished_at"] = datetime.now(timezone.utc).isoformat()
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
