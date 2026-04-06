@@ -18,6 +18,49 @@ const SYSTEM_MANAGED_FIELDS = new Set([
   'source_record_id',
   'source_system',
 ]);
+const DELETE_GOVERNED_DOMAINS = new Set([
+  'audit_risk',
+  'calibration_equipment',
+  'customer_portal',
+  'document_control',
+  'evidence_vault',
+  'forms_system',
+  'master_data_governance',
+  'quality_lab',
+  'quality_management',
+  'record_system',
+  'shipping_compliance',
+  'supplier_relationship',
+  'trade_compliance',
+]);
+const WORKFLOW_ENGINE_MODELS = Object.freeze({
+  DOC: ['draft', 'in_review', 'approved', 'released', 'obsolete'],
+  NCR: ['open', 'containment', 'segregated', 'investigation', 'mrb_review', 'disposition', 'rework_in_progress', 'reinspection', 'closed', 'voided'],
+  CAPA: ['initiated', 'containment', 'root_cause', 'action_plan', 'implementation', 'verification', 'effectiveness_30d', 'effectiveness_60d', 'effectiveness_90d', 'closed', 'closed_ineffective'],
+  FAI: ['triggered', 'planning', 'form1_part_accountability', 'form2_material_process', 'form3_characteristics', 'review', 'conditional_approval', 'approved', 'closed'],
+  CAL: ['scheduled', 'overdue', 'in_progress', 'as_found_pass', 'as_found_fail', 'oot_investigation', 'impact_assessment', 'adjustment', 'as_left_verification', 'certified', 'condemned'],
+  AUD: ['planned', 'in_progress', 'reporting', 'follow_up', 'closed'],
+  TRN: ['scheduled', 'in_progress', 'assessment', 'certified'],
+  ECR: ['submitted', 'review', 'approved', 'implemented', 'verified'],
+  SCAR: ['issued', 'response_due', 'response_received', 'verification', 'closed'],
+  RISK: ['identified', 'assessed', 'mitigated', 'monitored', 'closed'],
+  IMP: ['proposed', 'approved', 'pdca_do', 'pdca_check', 'pdca_act', 'closed'],
+  MR: ['scheduled', 'in_progress', 'minutes_drafted', 'approved'],
+});
+const EXPLICIT_WORKFLOW_ENGINE_BRIDGES = Object.freeze({
+  wf_capa: { record_type: 'CAPA', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_document_change_control: { record_type: 'DOC', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_ncr: { record_type: 'NCR', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_calibration_control: { record_type: 'CAL', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_calibration_record: { record_type: 'CAL', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_audit: { record_type: 'AUD', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_training_qualification: { record_type: 'TRN', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_engineering_change_request: { record_type: 'ECR', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_scar_record: { record_type: 'SCAR', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_fai: { record_type: 'FAI', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_management_review: { record_type: 'MR', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_improvement_project: { record_type: 'IMP', identity_candidates: ['record_id', 'source_record_id'] },
+});
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -316,6 +359,75 @@ function hasOptimisticConcurrency(table) {
   return !!table?.columns?.row_version;
 }
 
+function hasColumn(table, field) {
+  return !!table?.columns?.[field];
+}
+
+function workflowStateIds(workflow) {
+  const states = Array.isArray(workflow?.states) ? workflow.states : [];
+  return states
+    .map((state) => {
+      if (typeof state === 'string') return state.trim().toLowerCase();
+      if (state && typeof state === 'object') return String(state.id || '').trim().toLowerCase();
+      return '';
+    })
+    .filter(Boolean);
+}
+
+function workflowEngineBridgeContract(tableName, table, workflow) {
+  const workflowId = String(table?.workflowId || '').trim();
+  const bridgeSpec = EXPLICIT_WORKFLOW_ENGINE_BRIDGES[workflowId] || null;
+  const recordType = String(bridgeSpec?.record_type || '').trim().toUpperCase();
+  const engineStates = Array.isArray(WORKFLOW_ENGINE_MODELS[recordType]) ? WORKFLOW_ENGINE_MODELS[recordType] : [];
+  const registryStates = workflowStateIds(workflow);
+  const sharedStates = registryStates.filter((state) => engineStates.includes(state));
+  const missingEngineStates = registryStates.filter((state) => !engineStates.includes(state));
+  const missingRegistryStates = engineStates.filter((state) => !registryStates.includes(state));
+  const identityCandidates = Array.isArray(bridgeSpec?.identity_candidates)
+    ? bridgeSpec.identity_candidates.filter(Boolean)
+    : ['record_id', 'source_record_id'];
+  const identityField = identityCandidates.find((field) => hasColumn(table, field)) || null;
+  const exactStateAlignment = registryStates.length > 0
+    && missingEngineStates.length === 0
+    && missingRegistryStates.length === 0;
+  const stateAlignmentRatio = registryStates.length > 0
+    ? Number((sharedStates.length / registryStates.length).toFixed(3))
+    : 0;
+  const blockReasons = [];
+
+  if (!bridgeSpec) blockReasons.push('missing_explicit_record_type_mapping');
+  if (!identityField) blockReasons.push('missing_engine_record_identity');
+  if (registryStates.length === 0) blockReasons.push('missing_registry_states');
+  if (engineStates.length === 0) blockReasons.push('missing_engine_state_model');
+  if (registryStates.length > 0 && engineStates.length > 0 && !exactStateAlignment) {
+    blockReasons.push('state_model_mismatch');
+  }
+
+  return {
+    table: tableName,
+    workflow_id: workflowId || null,
+    configured: Boolean(bridgeSpec),
+    ready: Boolean(bridgeSpec && identityField && exactStateAlignment),
+    record_type: recordType || null,
+    identity_field: identityField,
+    identity_candidates: identityCandidates,
+    registry_states: registryStates,
+    engine_states: engineStates,
+    shared_states: sharedStates,
+    missing_engine_states: missingEngineStates,
+    missing_registry_states: missingRegistryStates,
+    state_alignment_ratio: stateAlignmentRatio,
+    exact_state_alignment: exactStateAlignment,
+    state_map: exactStateAlignment
+      ? Object.fromEntries(registryStates.map((state) => [state, state]))
+      : {},
+    block_reasons: blockReasons,
+    advisory: blockReasons.length
+      ? 'Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions.'
+      : 'Persisted workflow is aligned for workflow-engine execution.',
+  };
+}
+
 function optimisticConcurrencyContract(table, required = false) {
   const enabled = hasOptimisticConcurrency(table);
   return {
@@ -339,7 +451,140 @@ function scopeContract(table, kind) {
   };
 }
 
-function requestContract(kind, table, fields, statusOptions) {
+function workflowRuntimeContract(tableName, table, workflowLibrary) {
+  const workflowMap = workflowLibrary?.workflows || workflowLibrary || {};
+  const workflow = workflowMap[String(table?.workflowId || '')] || null;
+  const lifecycleMode = String(
+    workflow?.lifecycleMode || (table?.statusColumn ? 'generic_status_only' : 'stateless')
+  ).trim().toLowerCase();
+  const transitions = Array.isArray(workflow?.transitions)
+    ? workflow.transitions.filter((transition) => transition && typeof transition === 'object')
+    : [];
+  const transitionCount = transitions.length;
+  const hasRoleGuards = transitions.some((transition) =>
+    Array.isArray(transition.guards) && transition.guards.some((guard) => guard && guard.type === 'role')
+  );
+  const hasActions = transitions.some((transition) =>
+    Array.isArray(transition.actions) && transition.actions.length > 0
+  );
+  const engineBridge = lifecycleMode === 'persisted'
+    ? workflowEngineBridgeContract(tableName, table, workflow)
+    : {
+      configured: false,
+      ready: false,
+      record_type: null,
+      identity_field: null,
+      identity_candidates: [],
+      registry_states: [],
+      engine_states: [],
+      shared_states: [],
+      missing_engine_states: [],
+      missing_registry_states: [],
+      state_alignment_ratio: 0,
+      exact_state_alignment: false,
+      state_map: {},
+      block_reasons: [],
+      advisory: '',
+    };
+  const genericRuntimeSafe = lifecycleMode !== 'persisted';
+  const engineBridgeRequired = lifecycleMode === 'persisted' && transitionCount > 0;
+  const engineBridgeBlocked = lifecycleMode === 'persisted' && !engineBridge.ready;
+
+  return {
+    table: tableName,
+    lifecycle_mode: lifecycleMode,
+    execution_mode: lifecycleMode === 'persisted'
+      ? (engineBridge.ready ? 'workflow_engine' : 'workflow_engine_required')
+      : (lifecycleMode === 'generic_status_only' ? 'generic_status_only' : 'stateless'),
+    transition_count: transitionCount,
+    has_role_guards: hasRoleGuards,
+    has_actions: hasActions,
+    generic_runtime_safe: genericRuntimeSafe,
+    builder_auto_bind_transition_endpoint: genericRuntimeSafe && !engineBridgeBlocked,
+    engine_bridge_required: engineBridgeRequired,
+    engine_bridge_blocked: engineBridgeBlocked,
+    engine_bridge: engineBridge,
+    generic_transition_policy: lifecycleMode === 'generic_status_only'
+      ? 'allow_any_valid_status_value'
+      : (lifecycleMode === 'persisted' ? 'registry_transition_map' : 'not_applicable'),
+    advisory: engineBridgeBlocked
+      ? engineBridge.advisory
+      : (engineBridgeRequired
+        ? 'Persisted workflow carries explicit transitions and should be bridged to a dedicated workflow engine before production rollout.'
+        : ''),
+    transition_execution_guard: engineBridgeBlocked
+      ? 'deny_generic_runtime_until_bridge_ready'
+      : (lifecycleMode === 'persisted' ? 'workflow_engine' : 'allow_generic_runtime'),
+    frontend_transition_affordance: engineBridgeBlocked
+      ? 'builder_sync_only'
+      : (lifecycleMode === 'persisted' ? 'workflow_engine' : 'generic_runtime'),
+    runtime_error_code: engineBridgeBlocked ? 'workflow_engine_required' : null,
+    runtime_error_status: engineBridgeBlocked ? 409 : null,
+    runtime_error_detail: engineBridgeBlocked
+      ? 'Persisted workflow transitions are blocked in generic runtime until the workflow-engine bridge is explicitly aligned.'
+      : '',
+  };
+}
+
+function deleteContract(tableName, table) {
+  if (table?.supportTable) {
+    return {
+      mode: 'hard_delete',
+      governance_level: 'support',
+      hard_delete_allowed: true,
+      soft_delete_fields: [],
+      frontend_affordance: 'danger_delete',
+      runtime_enforced: false,
+      advisory: '',
+    };
+  }
+
+  const softDeleteFields = ['deleted_at', 'is_deleted', 'archived_at'].filter((field) => hasColumn(table, field));
+  if (softDeleteFields.length > 0) {
+    return {
+      mode: 'soft_delete',
+      governance_level: 'governed',
+      hard_delete_allowed: false,
+      soft_delete_fields: softDeleteFields,
+      frontend_affordance: 'archive',
+      runtime_enforced: true,
+      advisory: 'Delete requests should map to a soft-delete update using the available lifecycle columns.',
+    };
+  }
+
+  const normalizedTable = String(tableName || '').trim().toLowerCase();
+  const normalizedDomain = String(table?.domain || '').trim().toLowerCase();
+  const archiveOnly = Boolean(
+    table?.workflowId
+    || table?.statusColumn
+    || DELETE_GOVERNED_DOMAINS.has(normalizedDomain)
+    || /(audit|evidence|document|record|retention|allocation|certificate|passport|training|complaint|shipment|invoice|order|supplier|customer|workflow)/.test(normalizedTable)
+  );
+
+  if (archiveOnly) {
+    return {
+      mode: 'archive_only',
+      governance_level: 'governed',
+      hard_delete_allowed: false,
+      soft_delete_fields: [],
+      frontend_affordance: 'archive',
+      runtime_enforced: true,
+      advisory: 'Hard delete should be blocked; route users through archive, retention, or governed disposal flows instead.',
+    };
+  }
+
+  return {
+    mode: 'hard_delete',
+    governance_level: 'standard',
+    hard_delete_allowed: true,
+    soft_delete_fields: [],
+    frontend_affordance: 'danger_delete',
+    runtime_enforced: false,
+    advisory: '',
+  };
+}
+
+function requestContract(kind, tableName, table, fields, statusOptions) {
   const pk = primaryKeyMeta(table);
   const identityFields = externalIdentityFields(pk);
   const canonicalIdentityFields = pk.fields;
@@ -352,6 +597,7 @@ function requestContract(kind, table, fields, statusOptions) {
     .filter((field) => !(kind === 'update' && field.key === String(table?.statusColumn || '')));
   const concurrency = optimisticConcurrencyContract(table, ['update', 'delete', 'transition'].includes(kind));
   const scope = scopeContract(table, kind);
+  const deletion = deleteContract(tableName, table);
 
   if (kind === 'list') {
     return {
@@ -393,6 +639,7 @@ function requestContract(kind, table, fields, statusOptions) {
       body_mode: 'root',
       optimistic_concurrency: concurrency,
       org_scope: scope,
+      deletion,
     };
   }
 
@@ -436,11 +683,13 @@ function requestContract(kind, table, fields, statusOptions) {
     body_mode: 'root_or_data_wrapper',
     optimistic_concurrency: kind === 'update' ? concurrency : optimisticConcurrencyContract(table, false),
     org_scope: scope,
+    deletion: kind === 'delete' ? deletion : undefined,
   };
 }
 
-function responseContract(kind, table, fields) {
+function responseContract(kind, tableName, table, fields) {
   const pk = primaryKeyMeta(table);
+  const deletion = deleteContract(tableName, table);
   return {
     collection_key: kind === 'list' ? 'records' : null,
     record_key: kind === 'list' ? null : 'record',
@@ -455,6 +704,7 @@ function responseContract(kind, table, fields) {
       field: hasOptimisticConcurrency(table) ? 'row_version' : null,
     },
     org_scope_fields: orgScopeFields(table),
+    deletion,
   };
 }
 
@@ -462,6 +712,7 @@ function workflowContract(tableName, table, workflowLibrary) {
   const workflowMap = workflowLibrary?.workflows || workflowLibrary || {};
   const workflow = workflowMap[String(table?.workflowId || '')] || null;
   const isWorkflowOwner = !workflow?.primaryTable || workflow.primaryTable === tableName;
+  const runtime = workflowRuntimeContract(tableName, table, workflowLibrary);
 
   return {
     workflow_id: table?.workflowId || null,
@@ -473,6 +724,8 @@ function workflowContract(tableName, table, workflowLibrary) {
     table_is_workflow_owner: isWorkflowOwner,
     status_set_aligned: !workflow || !workflow.statusSet || !isWorkflowOwner || workflow.statusSet === table?.statusSet,
     state_field_aligned: !workflow || !workflow.stateField || !isWorkflowOwner || workflow.stateField === table?.statusColumn,
+    lifecycle_mode: runtime.lifecycle_mode,
+    runtime,
   };
 }
 
@@ -624,7 +877,9 @@ function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, wor
     const requiresCsrf = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(meta.method);
     const listFields = uniqueFields((dataFields[`${domain}.${tableName}.list`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
     const detailFields = uniqueFields((dataFields[`${domain}.${tableName}.detail`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
-    const contract = requestContract(kind, table, fields, statusOptions);
+    const workflow = workflowContract(tableName, table, workflowLibrary);
+    const deletion = deleteContract(tableName, table);
+    const contract = requestContract(kind, tableName, table, fields, statusOptions);
     endpoints[action] = {
       action,
       label: endpointLabelVi(table, kind),
@@ -649,7 +904,7 @@ function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, wor
       field_count: fields.length,
       field_packs: [`${tableName}_header`, `${tableName}_list_columns`, `${tableName}_filters`, `${tableName}_create_form`, `${tableName}_search`],
       status_refs: table.statusSet ? [table.statusSet] : [],
-      workflow: workflowContract(tableName, table, workflowLibrary),
+      workflow,
       security: {
         auth_required: true,
         csrf_required: requiresCsrf,
@@ -662,9 +917,11 @@ function buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, wor
         sortable_fields: kind === 'list' ? sortableFieldKeys(listFields) : [],
         filterable_fields: kind === 'list' ? filterableFieldKeys(listFields) : [],
         transition_targets: kind === 'transition' ? contract.transition_status_values || [] : [],
+        workflow_runtime: workflow.runtime,
+        deletion,
       },
       request: contract,
-      response: responseContract(kind, table, ['create', 'update', 'delete', 'transition'].includes(kind) && detailFields.length ? detailFields : fields),
+      response: responseContract(kind, tableName, table, ['create', 'update', 'delete', 'transition'].includes(kind) && detailFields.length ? detailFields : fields),
     };
   }
 
@@ -827,6 +1084,9 @@ function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, val
   const ruleCount = (validationRules.rules || validationRules).length;
   const formulaCount = Object.keys(formulas).filter((key) => key !== '_meta').length;
   const fieldRegistryActionCount = Object.keys(dataFields).filter((key) => key !== '_meta' && Array.isArray(dataFields[key])).length;
+  const workflowRuntimeModes = { stateless: 0, generic_status_only: 0, persisted: 0, unknown: 0 };
+  const deletionModes = { hard_delete: 0, soft_delete: 0, archive_only: 0 };
+  const engineBridgeCounts = { ready: 0, blocked: 0, unneeded: 0 };
   const uniqueFieldKeys = new Set();
   let fieldDefinitions = 0;
 
@@ -835,6 +1095,33 @@ function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, val
     for (const field of fields) {
       fieldDefinitions += 1;
       if (field && field.key) uniqueFieldKeys.add(field.key);
+    }
+  }
+
+  for (const endpoint of Object.values(endpointCatalog.endpoints || {})) {
+    if (endpoint?.kind === 'list') {
+      const workflowMode = String(endpoint?.workflow?.lifecycle_mode || 'unknown');
+      if (workflowRuntimeModes[workflowMode] != null) {
+        workflowRuntimeModes[workflowMode] += 1;
+      } else {
+        workflowRuntimeModes.unknown += 1;
+      }
+
+      const deletionMode = String(endpoint?.capabilities?.deletion?.mode || 'hard_delete');
+      if (deletionModes[deletionMode] != null) {
+        deletionModes[deletionMode] += 1;
+      }
+
+      const workflowRuntime = endpoint?.capabilities?.workflow_runtime || endpoint?.workflow?.runtime || {};
+      if (workflowRuntime?.lifecycle_mode === 'persisted') {
+        if (workflowRuntime?.engine_bridge?.ready) {
+          engineBridgeCounts.ready += 1;
+        } else {
+          engineBridgeCounts.blocked += 1;
+        }
+      } else {
+        engineBridgeCounts.unneeded += 1;
+      }
     }
   }
 
@@ -856,6 +1143,9 @@ function buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, val
       formula_count: formulaCount,
       domain_pack_count: packCount,
       scalar_record_endpoints: Object.values(endpointCatalog.endpoints || {}).filter((endpoint) => endpoint.record_addressing === 'scalar').length,
+      workflow_runtime_modes: workflowRuntimeModes,
+      deletion_modes: deletionModes,
+      workflow_engine_bridge: engineBridgeCounts,
     },
     assets: {
       'data-fields-index.json': { kind: 'field-registry-index', records: fieldRegistryActionCount },
@@ -928,12 +1218,28 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
   const orgScopedTables = tableNames.filter((tableName) => orgScopeFields(tableRegistry.tables[tableName]).length > 0);
   const optimisticConcurrencyIssues = [];
   const orgScopeContractIssues = [];
+  const transitionRuntimeWarnings = [];
+  const workflowEngineBridgeWarnings = [];
+  const deleteGovernanceWarnings = [];
+  const workflowLifecycleModes = { stateless: 0, generic_status_only: 0, persisted: 0, unknown: 0 };
+  const deletionModes = { hard_delete: 0, soft_delete: 0, archive_only: 0 };
+  const workflowEngineBridgeCounts = { ready: 0, blocked: 0 };
 
   for (const tableName of tableNames) {
     const table = tableRegistry.tables[tableName];
     const domain = table.domain;
     const supportedKinds = new Set(supportedEndpointKinds(table));
     const pk = primaryKeyMeta(table);
+    const workflowMeta = workflowRuntimeContract(tableName, table, workflowLibrary);
+    const deletionMeta = deleteContract(tableName, table);
+    if (workflowLifecycleModes[workflowMeta.lifecycle_mode] != null) {
+      workflowLifecycleModes[workflowMeta.lifecycle_mode] += 1;
+    } else {
+      workflowLifecycleModes.unknown += 1;
+    }
+    if (deletionModes[deletionMeta.mode] != null) {
+      deletionModes[deletionMeta.mode] += 1;
+    }
 
     ['detail', 'update', 'delete', 'transition'].forEach((kind) => {
       if (!supportedKinds.has(kind) && endpointKeys.includes(`${domain}.${tableName}.${kind}`)) {
@@ -962,6 +1268,42 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
           workflowStateField: workflow.stateField,
         });
       }
+    }
+
+    if (workflowMeta.engine_bridge_required) {
+      transitionRuntimeWarnings.push({
+        table: tableName,
+        workflowId: table.workflowId,
+        lifecycle_mode: workflowMeta.lifecycle_mode,
+        execution_mode: workflowMeta.execution_mode,
+        warning: 'Persisted workflow currently exceeds the guarantees of plain generic status updates.',
+      });
+    }
+
+    if (workflowMeta.lifecycle_mode === 'persisted') {
+      if (workflowMeta.engine_bridge?.ready) {
+        workflowEngineBridgeCounts.ready += 1;
+      } else {
+        workflowEngineBridgeCounts.blocked += 1;
+        workflowEngineBridgeWarnings.push({
+          table: tableName,
+          workflowId: table.workflowId,
+          record_type: workflowMeta.engine_bridge?.record_type || null,
+          identity_field: workflowMeta.engine_bridge?.identity_field || null,
+          state_alignment_ratio: workflowMeta.engine_bridge?.state_alignment_ratio ?? 0,
+          block_reasons: workflowMeta.engine_bridge?.block_reasons || [],
+          advisory: workflowMeta.engine_bridge?.advisory || workflowMeta.advisory || '',
+        });
+      }
+    }
+
+    if (deletionMeta.mode === 'archive_only') {
+      deleteGovernanceWarnings.push({
+        table: tableName,
+        domain,
+        mode: deletionMeta.mode,
+        governance_level: deletionMeta.governance_level,
+      });
     }
 
     if (pk.mode === 'missing') {
@@ -1108,6 +1450,13 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       org_scope_contract_issues: orgScopeContractIssues.length,
       contract_issues: contractIssues.length,
       workflow_alignment_issues: workflowAlignmentIssues.length,
+      transition_runtime_warnings: transitionRuntimeWarnings.length,
+      workflow_engine_bridge_ready: workflowEngineBridgeCounts.ready,
+      workflow_engine_bridge_blocked: workflowEngineBridgeCounts.blocked,
+      archive_only_tables: deletionModes.archive_only,
+      soft_delete_tables: deletionModes.soft_delete,
+      hard_delete_tables: deletionModes.hard_delete,
+      workflow_lifecycle_modes: workflowLifecycleModes,
     },
     checks,
     warnings: {
@@ -1134,6 +1483,9 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       org_scope_contract_issues: orgScopeContractIssues.slice(0, 60),
       contract_issues: contractIssues.slice(0, 40),
       workflow_alignment_issues: workflowAlignmentIssues.slice(0, 40),
+      transition_runtime_warnings: transitionRuntimeWarnings.slice(0, 40),
+      workflow_engine_bridge: workflowEngineBridgeWarnings.slice(0, 40),
+      delete_governance: deleteGovernanceWarnings.slice(0, 60),
     },
     all_passed: checks.every((check) => check.passed),
   };

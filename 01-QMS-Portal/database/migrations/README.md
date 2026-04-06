@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains ordered PostgreSQL migration files that compose the full HESEM QMS Portal database schema. The migration set now spans `001` through `068`, and the current world-class manufacturing expansion brings the stack to roughly `518` tables across ERP, QMS, MES, APS, PLM, WMS, HCM, CRM, TMS, trade, SRM, tooling, EHS, service, and analytics domains.
+This directory contains ordered PostgreSQL migration files that compose the full HESEM QMS Portal database schema. The migration set now spans `001` through `078`, and the current world-class manufacturing expansion brings the stack to roughly `518` operational tables plus a new canonical `ERP + MES + eQMS` backbone across ERP, QMS, MES, APS, PLM, WMS, HCM, CRM, TMS, trade, SRM, tooling, EHS, service, and analytics domains.
 
 ## Prerequisites
 
@@ -50,6 +50,8 @@ This directory contains ordered PostgreSQL migration files that compose the full
 | `046`-`055` | Plant maintenance, APS, PLM, HCM, WMS, multi-currency/trade, project system, CRM, TMS, BI/DWH |
 | `056`-`060` | SRM, tooling lifecycle, S&OP, service/warranty, treasury/assets |
 | `061`-`068` | Quality lab/compliance, EHS/ESG, manufacturing engineering, MDM, pricing/contracts, traceability, outsource execution, advanced trade compliance |
+| `069`-`071` | Lean manufacturing uplift, enterprise governance uplift, and MES identity hardening |
+| `072`-`078` | Canonical ERP + MES + eQMS 7-layer backbone: foundation, master data, engineering, planning, MES execution, inventory/traceability, and eQMS compliance |
 
 ## Running Migrations
 
@@ -91,11 +93,11 @@ done
 
 ## Rolling Back
 
-Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (`068` first, then `067`, and so on).
+Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (`078` first, then `077`, and so on).
 
 ## Notes
 
-- All migrations use `BEGIN;` / `COMMIT;` for transactional safety
+- The canonical wave `072` through `078` uses `BEGIN;` / `COMMIT;` for transactional safety. Older one-off hotfix migrations may remain single-statement and idempotent by design.
 - Each migration is independently runnable given its dependencies are met
 - The `020_indexes.sql` file creates all indexes; if running tables and indexes together, you can skip the inline index creation in table files (they are duplicated in 020 for the split-file approach)
 - Partitioned tables (audit_events, inventory_transactions, labor_transactions) include partition definitions in their respective migration files

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace HESEM\QMS\Api\Services;
 
 use HESEM\QMS\Database\Connection;
+use HESEM\QMS\Services\WorkflowEngine;
 use RuntimeException;
 
 /**
@@ -16,14 +17,33 @@ use RuntimeException;
  */
 class GenericCrudService
 {
+    private const DELETE_GOVERNED_DOMAINS = [
+        'audit_risk',
+        'calibration_equipment',
+        'customer_portal',
+        'document_control',
+        'evidence_vault',
+        'forms_system',
+        'master_data_governance',
+        'quality_lab',
+        'quality_management',
+        'record_system',
+        'shipping_compliance',
+        'supplier_relationship',
+        'trade_compliance',
+    ];
+
     private Connection $db;
     private RegistryService $registry;
+    private string $dataDir;
+    private ?WorkflowEngine $workflowEngine = null;
 
     /** @var array<string, array<string, mixed>> */
     private array $tables = [];
 
     public function __construct(string $dataDir)
     {
+        $this->dataDir = $dataDir;
         $portalRoot = dirname(__DIR__, 2);
         $config = (array)(require $portalRoot . '/database/config.php');
         $this->db = Connection::getInstance($config);
@@ -279,10 +299,19 @@ class GenericCrudService
         $direction = strtolower(trim((string)($query['direction'] ?? 'desc'))) === 'asc' ? 'ASC' : 'DESC';
         $offset = max(0, (int)($query['offset'] ?? 0));
         $limit = min(500, max(1, (int)($query['limit'] ?? 100)));
+        $primaryKey = $this->primaryKeyMeta($table);
+        $projection = $this->listProjectionColumns($domain, $tableName, $table, $sort);
+        $orderBy = [$this->q($sort) . ' ' . $direction];
+        foreach ((array)($primaryKey['fields'] ?? []) as $pkField) {
+            if ($pkField === '' || $pkField === $sort) {
+                continue;
+            }
+            $orderBy[] = $this->q($pkField) . ' ' . $direction;
+        }
 
         $tableSql = $this->q($tableName);
-        $listSql = 'SELECT * FROM ' . $tableSql . $whereSql
-            . ' ORDER BY ' . $this->q($sort) . ' ' . $direction
+        $listSql = 'SELECT ' . implode(', ', array_map([$this, 'q'], $projection)) . ' FROM ' . $tableSql . $whereSql
+            . ' ORDER BY ' . implode(', ', $orderBy)
             . ' LIMIT ' . $limit . ' OFFSET ' . $offset;
         $countSql = 'SELECT COUNT(*) AS total FROM ' . $tableSql . $whereSql;
 
@@ -299,11 +328,11 @@ class GenericCrudService
             'table' => $tableName,
             'domain' => $domain,
             'appliedScope' => $scopeWhere['scope'],
-            'primaryKey' => $this->primaryKeyMeta($table)['mode'] === 'scalar'
-                ? $this->primaryKeyMeta($table)['key']
-                : $this->primaryKeyMeta($table)['fields'],
-            'primaryKeyFields' => $this->primaryKeyMeta($table)['fields'],
-            'recordAddressing' => $this->primaryKeyMeta($table)['mode'],
+            'primaryKey' => $primaryKey['mode'] === 'scalar'
+                ? $primaryKey['key']
+                : $primaryKey['fields'],
+            'primaryKeyFields' => $primaryKey['fields'],
+            'recordAddressing' => $primaryKey['mode'],
             'concurrencyField' => array_key_exists('row_version', (array)($table['columns'] ?? [])) ? 'row_version' : null,
             'optimisticConcurrency' => array_key_exists('row_version', (array)($table['columns'] ?? [])),
         ];
@@ -408,14 +437,54 @@ class GenericCrudService
     /**
      * @return array<string, mixed>
      */
-    public function delete(string $domain, string $tableName, array $identity, array $scope = [], ?int $expectedVersion = null): array
+    public function delete(string $domain, string $tableName, array $identity, array $scope = [], ?int $expectedVersion = null, string $userId = ''): array
     {
         $table = $this->resolveTable($domain, $tableName);
+        $deleteContract = $this->deleteContract($tableName, $table);
         $where = $this->combineWhereClauses(
             $this->identityWhereClause($table, $identity, 'delete'),
             $this->scopeWhereClause($table, $scope, 'delete_scope'),
             $this->versionWhereClause($table, $expectedVersion, 'delete_version')
         );
+
+        if (($deleteContract['mode'] ?? '') === 'archive_only') {
+            throw new RuntimeException((string)($deleteContract['message'] ?? 'Hard delete disabled for governed records'));
+        }
+
+        if (($deleteContract['mode'] ?? '') === 'soft_delete') {
+            $data = [];
+            $columns = (array)($table['columns'] ?? []);
+            $now = gmdate('c');
+
+            if (array_key_exists('deleted_at', $columns)) {
+                $data['deleted_at'] = $now;
+            }
+            if (array_key_exists('archived_at', $columns)) {
+                $data['archived_at'] = $now;
+            }
+            if (array_key_exists('is_deleted', $columns)) {
+                $data['is_deleted'] = true;
+            }
+
+            $data = $this->applyAuditColumns($table, $data, $userId, false);
+            $params = $where['params'];
+            $sets = [];
+            foreach ($data as $column => $value) {
+                $param = ':d_' . $column;
+                $sets[] = $this->q($column) . ' = ' . $param;
+                $params[$param] = $value;
+            }
+
+            $sql = 'UPDATE ' . $this->q($tableName)
+                . ' SET ' . implode(', ', $sets)
+                . ' WHERE ' . $where['sql'] . ' RETURNING *';
+            $row = $this->db->insertReturning($sql, $params);
+            if (!is_array($row)) {
+                $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Delete');
+            }
+            return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+        }
+
         $sql = 'DELETE FROM ' . $this->q($tableName)
             . ' WHERE ' . $where['sql'] . ' RETURNING *';
         $row = $this->db->insertReturning($sql, $where['params']);
@@ -425,6 +494,118 @@ class GenericCrudService
         return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
     }
 
+    private function workflowEngine(): WorkflowEngine
+    {
+        if ($this->workflowEngine === null) {
+            $this->workflowEngine = new WorkflowEngine($this->dataDir, $this->db);
+        }
+
+        return $this->workflowEngine;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function transitionRuntimeContract(string $domain, string $tableName): array
+    {
+        return $this->registry->transitionRuntime($domain, $tableName);
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @return array<string, mixed>
+     */
+    private function assertTransitionRuntimeSupported(string $domain, string $tableName, array $table): array
+    {
+        $runtime = $this->transitionRuntimeContract($domain, $tableName);
+        $lifecycleMode = strtolower(trim((string)($runtime['lifecycle_mode'] ?? '')));
+        if ($lifecycleMode !== 'persisted') {
+            return $runtime;
+        }
+
+        $bridge = is_array($runtime['engine_bridge'] ?? null) ? $runtime['engine_bridge'] : [];
+        if (($bridge['ready'] ?? false) === true) {
+            return $runtime;
+        }
+
+        $workflowId = trim((string)($table['workflowId'] ?? ''));
+        $reasons = array_values(array_filter(array_map(
+            static fn($reason): string => trim((string)$reason),
+            is_array($bridge['block_reasons'] ?? null) ? $bridge['block_reasons'] : []
+        )));
+        $reasonText = $reasons !== [] ? ' [' . implode(', ', $reasons) . ']' : '';
+        $detail = trim((string)($bridge['advisory'] ?? $runtime['runtime_error_detail'] ?? $runtime['advisory'] ?? ''));
+        $message = "Persisted workflow {$workflowId} cannot run through generic status updates{$reasonText}.";
+        if ($detail !== '') {
+            $message .= ' ' . $detail;
+        }
+        $message .= ' Use the dedicated workflow-engine bridge before enabling production transitions.';
+
+        throw new WorkflowBridgeRequiredException($message);
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @param array<string, mixed> $existing
+     * @param array<string, mixed> $identity
+     * @param array<string, mixed> $scope
+     * @param array<string, mixed> $runtime
+     * @return array<string, mixed>
+     */
+    private function transitionViaWorkflowEngine(string $domain, string $tableName, array $table, array $existing, array $identity, string $statusColumn, string $toStatus, string $userId, array $scope, ?int $expectedVersion, array $runtime): array
+    {
+        $bridge = is_array($runtime['engine_bridge'] ?? null) ? $runtime['engine_bridge'] : [];
+        $identityField = trim((string)($bridge['identity_field'] ?? ''));
+        $recordId = $identityField !== '' && array_key_exists($identityField, $existing) && is_scalar($existing[$identityField])
+            ? trim((string)$existing[$identityField])
+            : '';
+        if ($recordId === '') {
+            throw new WorkflowBridgeRequiredException('Workflow-engine bridge is configured, but no engine record identity could be resolved for this record.');
+        }
+
+        $stateMap = is_array($bridge['state_map'] ?? null) ? $bridge['state_map'] : [];
+        $engineTargetState = trim((string)($stateMap[$toStatus] ?? $toStatus));
+        if ($engineTargetState === '') {
+            throw new WorkflowBridgeRequiredException('Workflow-engine bridge is configured, but the requested target state is not mapped for engine execution.');
+        }
+
+        $data = $this->applyAuditColumns($table, [$statusColumn => $toStatus], $userId, false);
+        $where = $this->combineWhereClauses(
+            $this->identityWhereClause($table, $identity, 'transition'),
+            $this->scopeWhereClause($table, $scope, 'transition_scope'),
+            $this->versionWhereClause($table, $expectedVersion, 'transition_version')
+        );
+        $params = $where['params'];
+        $params[':status'] = $toStatus;
+        $sets = [$this->q($statusColumn) . ' = :status'];
+
+        foreach ($data as $column => $value) {
+            if ($column === $statusColumn) {
+                continue;
+            }
+            $param = ':t_' . $column;
+            $sets[] = $this->q($column) . ' = ' . $param;
+            $params[$param] = $value;
+        }
+
+        return $this->db->transactional(function () use ($domain, $tableName, $table, $recordId, $engineTargetState, $userId, $params, $sets, $where, $identity, $scope, $expectedVersion): array {
+            $result = $this->workflowEngine()->transition($recordId, $engineTargetState, $userId);
+            if (!$result->success) {
+                throw new RuntimeException((string)($result->error ?? 'Workflow engine transition failed'));
+            }
+
+            $sql = 'UPDATE ' . $this->q($tableName)
+                . ' SET ' . implode(', ', $sets)
+                . ' WHERE ' . $where['sql'] . ' RETURNING *';
+            $row = $this->db->insertReturning($sql, $params);
+            if (!is_array($row)) {
+                $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Transition');
+            }
+
+            return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+        });
+    }
+
     /**
      * @param array<int, string> $userRoles
      * @return array<string, mixed>
@@ -432,6 +613,7 @@ class GenericCrudService
     public function transition(string $domain, string $tableName, array $identity, string $toStatus, string $userId, array $userRoles = [], array $scope = [], ?int $expectedVersion = null): array
     {
         $table = $this->resolveTable($domain, $tableName);
+        $runtime = $this->assertTransitionRuntimeSupported($domain, $tableName, $table);
         $statusColumn = trim((string)($table['statusColumn'] ?? ''));
         if ($statusColumn === '') {
             throw new RuntimeException("Table {$tableName} does not define a status column");
@@ -445,6 +627,22 @@ class GenericCrudService
         $currentStatus = (string)($existing[$statusColumn] ?? '');
         $this->assertValidStatus($table, $toStatus);
         $this->assertAllowedTransition($table, $currentStatus, $toStatus, $userRoles);
+        if (strtolower(trim((string)($runtime['lifecycle_mode'] ?? ''))) === 'persisted') {
+            return $this->transitionViaWorkflowEngine(
+                $domain,
+                $tableName,
+                $table,
+                $existing,
+                $identity,
+                $statusColumn,
+                $toStatus,
+                $userId,
+                $scope,
+                $expectedVersion,
+                $runtime
+            );
+        }
+
         $data = $this->applyAuditColumns($table, [$statusColumn => $toStatus], $userId, false);
         $where = $this->combineWhereClauses(
             $this->identityWhereClause($table, $identity, 'transition'),
@@ -633,6 +831,52 @@ class GenericCrudService
         }
 
         return array_slice(array_values(array_unique(array_merge($preferred, $fallback))), 0, 10);
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @return array<int, string>
+     */
+    private function listProjectionColumns(string $domain, string $tableName, array $table, string $sort): array
+    {
+        $selected = [];
+        $columns = (array)($table['columns'] ?? []);
+        $fieldDefs = (array)($this->registry->fields($domain . '.' . $tableName . '.list') ?? []);
+        $primaryKey = $this->primaryKeyMeta($table);
+        $add = function (string $column) use (&$selected, $columns): void {
+            if ($column === '' || !array_key_exists($column, $columns) || in_array($column, $selected, true)) {
+                return;
+            }
+            $selected[] = $column;
+        };
+
+        foreach ((array)($primaryKey['fields'] ?? []) as $field) {
+            $add((string)$field);
+        }
+        $add($sort);
+        $add((string)($table['statusColumn'] ?? ''));
+        $add('row_version');
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            $add($field);
+        }
+
+        foreach ($fieldDefs as $field) {
+            if (!is_array($field) || ($field['source'] ?? '') !== 'db_column') {
+                continue;
+            }
+            if (($field['dbTable'] ?? $tableName) !== $tableName) {
+                continue;
+            }
+            $add((string)($field['dbColumn'] ?? ''));
+        }
+
+        foreach ($this->joinFieldSpecs($domain, $tableName, 'list') as $spec) {
+            if (is_array($spec) && isset($spec['sourceField'])) {
+                $add((string)$spec['sourceField']);
+            }
+        }
+
+        return $selected !== [] ? $selected : array_keys($columns);
     }
 
     /**
@@ -943,29 +1187,52 @@ class GenericCrudService
         if (!is_array($workflow)) {
             return;
         }
+        $check = $this->registry->canTransition($workflowId, $fromStatus, $toStatus, $userRoles);
+        if (($check['allowed'] ?? false) !== true) {
+            $reason = trim((string)($check['reason'] ?? ''));
+            throw new RuntimeException($reason !== '' ? $reason : "Transition {$fromStatus} -> {$toStatus} is not allowed");
+        }
+    }
 
-        $transitions = (array)($workflow['transitions'] ?? []);
-        foreach ($transitions as $transition) {
-            if (!is_array($transition)) {
-                continue;
-            }
-            if (($transition['from'] ?? '') !== $fromStatus || ($transition['to'] ?? '') !== $toStatus) {
-                continue;
-            }
-
-            foreach ((array)($transition['guards'] ?? []) as $guard) {
-                if (!is_array($guard) || ($guard['type'] ?? '') !== 'role') {
-                    continue;
-                }
-                $roles = array_map('strval', (array)($guard['roles'] ?? []));
-                if ($roles !== [] && array_intersect($roles, $userRoles) === []) {
-                    throw new RuntimeException('Transition blocked by role guard');
-                }
-            }
-            return;
+    /**
+     * @param array<string, mixed> $table
+     * @return array{mode:string, message:string}
+     */
+    private function deleteContract(string $tableName, array $table): array
+    {
+        if ((bool)($table['supportTable'] ?? false)) {
+            return [
+                'mode' => 'hard_delete',
+                'message' => '',
+            ];
         }
 
-        throw new RuntimeException("Transition {$fromStatus} -> {$toStatus} is not allowed");
+        $columns = (array)($table['columns'] ?? []);
+        if (array_key_exists('deleted_at', $columns) || array_key_exists('is_deleted', $columns) || array_key_exists('archived_at', $columns)) {
+            return [
+                'mode' => 'soft_delete',
+                'message' => '',
+            ];
+        }
+
+        $normalizedTable = strtolower(trim($tableName));
+        $normalizedDomain = strtolower(trim((string)($table['domain'] ?? '')));
+        $archiveOnly = trim((string)($table['workflowId'] ?? '')) !== ''
+            || trim((string)($table['statusColumn'] ?? '')) !== ''
+            || in_array($normalizedDomain, self::DELETE_GOVERNED_DOMAINS, true)
+            || preg_match('/audit|evidence|document|record|retention|allocation|certificate|passport|training|complaint|shipment|invoice|order|supplier|customer|workflow/', $normalizedTable) === 1;
+
+        if ($archiveOnly) {
+            return [
+                'mode' => 'archive_only',
+                'message' => 'Hard delete disabled for governed records. Use archive, retention, or governed disposal flows instead.',
+            ];
+        }
+
+        return [
+            'mode' => 'hard_delete',
+            'message' => '',
+        ];
     }
 
     private function assertIdentifier(string $value, string $label): string

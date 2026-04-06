@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/bootstrap.php';
 
-ini_set('memory_limit', '512M');
+ini_set('memory_limit', '1024M');
 
 use HESEM\QMS\Api\Controllers\AuthController;
 use HESEM\QMS\Api\Controllers\AiSchedulingController;
@@ -34,6 +34,8 @@ use HESEM\QMS\Api\Middleware\AuthMiddleware;
 use HESEM\QMS\Api\Middleware\CorsMiddleware;
 use HESEM\QMS\Api\Middleware\RateLimitMiddleware;
 use HESEM\QMS\Api\Router;
+use HESEM\QMS\Api\Services\GenericCrudService;
+use HESEM\QMS\Api\Services\WorkflowBridgeRequiredException;
 use HESEM\QMS\Database\DataLayer;
 
 function smoke_reset_request_state(): void
@@ -640,6 +642,49 @@ try {
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Runtime policy kill-switch returned wrong error for admin delete.');
 }
 
+$workflowBridgeFailureHandler = new ReflectionMethod($adminGenericCrudController, 'handleCrudFailure');
+$workflowBridgeFailureHandler->setAccessible(true);
+try {
+    $workflowBridgeFailureHandler->invoke($adminGenericCrudController, new WorkflowBridgeRequiredException('workflow engine required'), 'generic_transition_failed');
+    throw new RuntimeException('Workflow bridge failure did not terminate through the response pipeline.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 409, 'Workflow bridge failure must return conflict status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'workflow_engine_required', 'Workflow bridge failure must return workflow_engine_required.');
+}
+
+$genericCrudService = new GenericCrudService(QMS_TEST_DATA_DIR);
+$workflowRuntimeGuard = new ReflectionMethod($genericCrudService, 'assertTransitionRuntimeSupported');
+$workflowRuntimeGuard->setAccessible(true);
+try {
+    $workflowRuntimeGuard->invoke($genericCrudService, 'quality_management', 'capa_records', [
+        'workflowId' => 'wf_capa',
+        'statusColumn' => 'capa_status',
+        'columns' => [
+            'record_id' => [],
+            'source_record_id' => [],
+            'capa_status' => [],
+        ],
+    ]);
+    throw new RuntimeException('Persisted workflow runtime guard allowed generic CAPA transition without a ready bridge.');
+} catch (WorkflowBridgeRequiredException $e) {
+    smoke_assert(str_contains($e->getMessage(), 'workflow-engine bridge'), 'Workflow runtime guard must explain that a workflow-engine bridge is required.');
+}
+$filterWritableColumns = new ReflectionMethod($genericCrudService, 'filterWritableColumns');
+$filterWritableColumns->setAccessible(true);
+$filteredPersistedUpdate = $filterWritableColumns->invoke($genericCrudService, [
+    'statusColumn' => 'capa_status',
+    'columns' => [
+        'capa_status' => ['type' => 'varchar'],
+        'title' => ['type' => 'varchar'],
+    ],
+    'primaryKey' => 'capa_id',
+], [
+    'capa_status' => 'closed',
+    'title' => 'Retain me',
+], true);
+smoke_assert(!array_key_exists('capa_status', (array)$filteredPersistedUpdate), 'Generic update payload filtering must strip managed status fields.');
+smoke_assert(($filteredPersistedUpdate['title'] ?? null) === 'Retain me', 'Generic update payload filtering must preserve non-status writable fields.');
+
 // Generic runtime write access must be denied when the permission matrix covers the action but the role does not.
 smoke_reset_request_state();
 $_SESSION['user'] = 'finance-user';
@@ -782,6 +827,10 @@ $runtimeAccessPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR .
 $telemetryDetail = $endpointMap['mes_execution.mes_machine_telemetry.detail'] ?? null;
 $bomDetail = $endpointMap['master_data.bill_of_materials.detail'] ?? null;
 $scenarioUpdate = $endpointMap['advanced_planning.aps_planning_scenarios.update'] ?? null;
+$scenarioTransition = $endpointMap['advanced_planning.aps_planning_scenarios.transition'] ?? null;
+$capaTransition = $endpointMap['quality_management.capa_records.transition'] ?? null;
+$capaDelete = $endpointMap['quality_management.capa_records.delete'] ?? null;
+[$persistedTransitionCount, $genericTransitionCount] = [0, 0];
 smoke_assert(is_array($telemetryDetail), 'Composite telemetry detail endpoint missing from endpoint catalog.');
 smoke_assert(($telemetryDetail['record_addressing'] ?? null) === 'composite', 'Telemetry detail endpoint must advertise composite addressing.');
 smoke_assert(($telemetryDetail['request']['identity_fields'] ?? null) === ['equipment_id', 'ts'], 'Telemetry detail endpoint identity fields mismatch.');
@@ -791,6 +840,39 @@ smoke_assert(is_array($scenarioUpdate), 'APS planning scenario update endpoint m
 smoke_assert((bool)($scenarioUpdate['request']['optimistic_concurrency']['required'] ?? false) === true, 'APS update endpoint must require optimistic concurrency.');
 smoke_assert(($scenarioUpdate['request']['org_scope']['fields'] ?? null) === ['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'], 'APS update endpoint scope fields mismatch.');
 smoke_assert((bool)($scenarioUpdate['response']['optimistic_concurrency']['enabled'] ?? false) === true, 'APS update response must advertise row_version concurrency.');
+smoke_assert(is_array($scenarioTransition), 'APS planning scenario transition endpoint missing from endpoint catalog.');
+smoke_assert(($scenarioTransition['workflow']['lifecycle_mode'] ?? null) === 'generic_status_only', 'APS planning scenario transition must advertise generic status workflow mode.');
+smoke_assert((bool)($scenarioTransition['workflow']['runtime']['generic_runtime_safe'] ?? false) === true, 'APS planning scenario transition must remain generic-runtime safe.');
+smoke_assert(is_array($capaTransition), 'CAPA transition endpoint missing from endpoint catalog.');
+smoke_assert(($capaTransition['workflow']['lifecycle_mode'] ?? null) === 'persisted', 'CAPA transition must advertise persisted workflow mode.');
+smoke_assert((bool)($capaTransition['workflow']['runtime']['engine_bridge_required'] ?? false) === true, 'CAPA transition must advertise workflow-engine bridge requirement.');
+smoke_assert((bool)($capaTransition['workflow']['runtime']['engine_bridge_blocked'] ?? false) === true, 'CAPA transition must advertise generic-runtime blocking until the workflow engine bridge is ready.');
+smoke_assert((bool)($capaTransition['workflow']['runtime']['engine_bridge']['ready'] ?? true) === false, 'CAPA transition must not advertise a ready workflow-engine bridge when state models are misaligned.');
+smoke_assert(in_array('state_model_mismatch', (array)($capaTransition['workflow']['runtime']['engine_bridge']['block_reasons'] ?? []), true), 'CAPA transition must surface state-model mismatch as a bridge blocker.');
+smoke_assert(($capaTransition['workflow']['runtime']['runtime_error_code'] ?? null) === 'workflow_engine_required', 'CAPA transition must advertise the workflow-engine-required runtime error code.');
+smoke_assert(is_array($capaDelete), 'CAPA delete endpoint missing from endpoint catalog.');
+smoke_assert(($capaDelete['capabilities']['deletion']['mode'] ?? null) === 'archive_only', 'CAPA delete must advertise governed archive-only delete mode.');
+smoke_assert((bool)($capaDelete['capabilities']['deletion']['hard_delete_allowed'] ?? true) === false, 'CAPA delete must not advertise hard-delete capability.');
+foreach ($endpointMap as $action => $endpoint) {
+    if (!is_array($endpoint) || ($endpoint['kind'] ?? null) !== 'transition') {
+        continue;
+    }
+    $runtime = (array)($endpoint['capabilities']['workflow_runtime'] ?? []);
+    $mode = (string)($runtime['lifecycle_mode'] ?? '');
+    if ($mode === 'persisted') {
+        $persistedTransitionCount += 1;
+        smoke_assert((bool)($runtime['engine_bridge_required'] ?? false) === true, "Persisted transition {$action} must require a workflow-engine bridge.");
+        smoke_assert((bool)($runtime['generic_runtime_safe'] ?? true) === false, "Persisted transition {$action} must not be marked generic-runtime safe.");
+        smoke_assert((bool)($runtime['builder_auto_bind_transition_endpoint'] ?? true) === false, "Persisted transition {$action} must not auto-bind a generic transition endpoint.");
+        smoke_assert((string)($runtime['transition_execution_guard'] ?? '') === 'deny_generic_runtime_until_bridge_ready', "Persisted transition {$action} must advertise the generic-runtime deny guard.");
+    } elseif ($mode === 'generic_status_only') {
+        $genericTransitionCount += 1;
+        smoke_assert((bool)($runtime['generic_runtime_safe'] ?? false) === true, "Generic-status transition {$action} must remain generic-runtime safe.");
+        smoke_assert((bool)($runtime['builder_auto_bind_transition_endpoint'] ?? false) === true, "Generic-status transition {$action} must remain builder auto-bindable.");
+    }
+}
+smoke_assert($persistedTransitionCount > 0, 'Endpoint catalog must retain persisted transition endpoints for invariant checks.');
+smoke_assert($genericTransitionCount > 0, 'Endpoint catalog must retain generic-status transition endpoints for invariant checks.');
 smoke_assert(is_array($runtimeAccessPolicy), 'Runtime access policy registry asset missing.');
 smoke_assert(in_array('production_planner', (array)($runtimeAccessPolicy['domains']['advanced_planning']['update'] ?? []), true), 'Advanced planning runtime policy must allow production planners to mutate APS records.');
 smoke_assert(in_array('qa_manager', (array)($runtimeAccessPolicy['domains']['master_data_governance']['list'] ?? []), true), 'Restricted runtime policy must retain admin-grade governance access.');
@@ -803,5 +885,9 @@ smoke_assert(($qualityReport['all_passed'] ?? null) === true, 'Registry quality 
 smoke_assert((int)($qualityReport['summary']['missing_primary_key_tables'] ?? -1) === 0, 'Registry quality report still reports missing primary-key tables.');
 smoke_assert((int)($qualityReport['summary']['optimistic_concurrency_issues'] ?? -1) === 0, 'Registry quality report still reports optimistic concurrency contract gaps.');
 smoke_assert((int)($qualityReport['summary']['org_scope_contract_issues'] ?? -1) === 0, 'Registry quality report still reports org-scope contract gaps.');
+smoke_assert((int)($qualityReport['summary']['transition_runtime_warnings'] ?? 0) > 0, 'Registry quality report must surface persisted workflow runtime warnings.');
+smoke_assert((int)($qualityReport['summary']['workflow_engine_bridge_blocked'] ?? 0) > 0, 'Registry quality report must surface blocked workflow-engine bridges.');
+smoke_assert(is_array($qualityReport['warnings']['workflow_engine_bridge'] ?? null), 'Registry quality report must include workflow-engine bridge blockers.');
+smoke_assert((int)($qualityReport['summary']['archive_only_tables'] ?? 0) > 0, 'Registry quality report must surface archive-only table governance.');
 
 echo "backend smoke tests passed\n";

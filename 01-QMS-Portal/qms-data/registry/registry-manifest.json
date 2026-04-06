@@ -2,7 +2,7 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-05T16:06:39.042Z"
+    "generatedAt": "2026-04-05T17:30:57.436Z"
   },
   "coverage": {
     "router_actions": 2862,
@@ -15,7 +15,23 @@
     "validation_rules": 27794,
     "formula_count": 960,
     "domain_pack_count": 3168,
-    "scalar_record_endpoints": 2762
+    "scalar_record_endpoints": 2762,
+    "workflow_runtime_modes": {
+      "stateless": 291,
+      "generic_status_only": 122,
+      "persisted": 115,
+      "unknown": 0
+    },
+    "deletion_modes": {
+      "hard_delete": 100,
+      "soft_delete": 0,
+      "archive_only": 428
+    },
+    "workflow_engine_bridge": {
+      "ready": 0,
+      "blocked": 115,
+      "unneeded": 413
+    }
   },
   "assets": {
     "data-fields-index.json": {

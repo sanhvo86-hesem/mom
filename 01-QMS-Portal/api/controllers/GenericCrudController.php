@@ -8,6 +8,7 @@ use HESEM\QMS\Api\Services\MissingScopeContextException;
 use HESEM\QMS\Api\Services\PreconditionRequiredException;
 use HESEM\QMS\Api\Services\RecordConflictException;
 use HESEM\QMS\Api\Services\RecordNotFoundException;
+use HESEM\QMS\Api\Services\WorkflowBridgeRequiredException;
 use RuntimeException;
 use Throwable;
 
@@ -376,6 +377,9 @@ class GenericCrudController extends BaseController
         if ($e instanceof RecordNotFoundException) {
             $this->error('not_found', 404, $e->getMessage());
         }
+        if ($e instanceof WorkflowBridgeRequiredException) {
+            $this->error('workflow_engine_required', 409, $e->getMessage());
+        }
 
         $this->rethrowResponse($e);
         $this->error($fallbackError, 400, $e->getMessage());
@@ -713,7 +717,14 @@ class GenericCrudController extends BaseController
             $ctx = $this->resolveContext('delete', true, $user);
             $this->enforceRuntimePermission($user, $ctx);
             $this->requireCsrf();
-            $record = $this->service()->delete($ctx['domain'], $ctx['table'], $ctx['identity'], $ctx['scope'], $ctx['expected_row_version']);
+            $record = $this->service()->delete(
+                $ctx['domain'],
+                $ctx['table'],
+                $ctx['identity'],
+                $ctx['scope'],
+                $ctx['expected_row_version'],
+                (string)($user['username'] ?? 'system')
+            );
             $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
             $this->success([
                 'record' => $record,

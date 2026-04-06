@@ -463,8 +463,11 @@ HESEM should enforce these patterns:
 This architecture pack is accompanied by:
 
 - `database/canonical-erp-mes-eqms-7-layer-blueprint.sql`
+- `docs/canonical-erp-mes-eqms-7-layer-schema-map-2026-04-05.md`
 - `qms-data/schema-studio/designs/canonical_erp_mes_eqms_7layer_core.json`
 
 The SQL blueprint defines the core backbone DDL.
+
+The schema map translates the architecture into source-of-truth, snapshot, event, ledger, and compliance responsibilities.
 
 The Schema Studio design provides a canonical visual core slice for review and iteration.

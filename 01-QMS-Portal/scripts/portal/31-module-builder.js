@@ -3145,14 +3145,24 @@ function _guessTransitionIcon(transition){
 function _applyWorkflowRegistryToDraft(draft, workflowId){
   var workflow = _getWorkflowRegistryMap()[workflowId];
   var entity;
+  var lifecycleMode;
+  var canAutoBindTransition;
+  var transitionEndpoint;
   if(!workflow || !draft) return 0;
   if(!draft.config) draft.config = {};
   if(!draft.config.workflow) draft.config.workflow = {};
   entity = workflow.primaryTable || workflow.entity || _inferEntityFromApi(_getByPath(draft, 'config.dataSource.api'));
+  lifecycleMode = String(workflow.lifecycleMode || '').toLowerCase();
+  canAutoBindTransition = lifecycleMode !== 'persisted';
+  transitionEndpoint = canAutoBindTransition ? _guessTransitionApi(entity, workflowId) : '';
   draft.config.workflow.workflowId = workflowId;
   draft.config.workflow.entity = entity || '';
   draft.config.workflow.stateField = workflow.stateField || draft.config.workflow.stateField || 'status';
   draft.config.workflow.statusSet = workflow.statusSet || draft.config.workflow.statusSet || '';
+  draft.config.workflow.lifecycleMode = workflow.lifecycleMode || '';
+  draft.config.workflow.genericRuntimeSafe = canAutoBindTransition;
+  draft.config.workflow.runtimeBridgeRequired = !canAutoBindTransition && !!(workflow.transitions || []).length;
+  draft.config.workflow.transitionExecutionGuard = canAutoBindTransition ? 'generic_runtime' : 'workflow_engine_required';
   draft.config.workflow.states = _clone(workflow.states || []);
   draft.config.workflow.transitions = (workflow.transitions || []).map(function(transition){
     return {
@@ -3161,7 +3171,7 @@ function _applyWorkflowRegistryToDraft(draft, workflowId){
       label: { vi: transition.label || transition.trigger || transition.to, en: transition.labelEn || transition.label || transition.trigger || transition.to },
       icon: _guessTransitionIcon(transition),
       variant: _guessTransitionVariant(transition),
-      endpoint: _guessTransitionApi(entity, workflowId),
+      endpoint: transitionEndpoint,
       method: 'POST',
       guards: _clone(transition.guards || []),
       actions: _clone(transition.actions || [])
@@ -3556,11 +3566,15 @@ function _renderWorkflowRegistrySummary(draft){
   var workflowId = _getByPath(draft, 'config.workflow.workflowId');
   var workflow = _getWorkflowRegistryMap()[workflowId] || {};
   var transitions = _getByPath(draft, 'config.workflow.transitions') || [];
+  var lifecycleMode = String(workflow.lifecycleMode || '').toLowerCase();
   var h = '';
   h += '<div class="mb-helper-note">'+_t('Chọn workflow để builder tự tạo button chuyển trạng thái, guards, SLA và digital thread metadata.', 'Choose a workflow so the builder can auto-create transition buttons, guards, SLA, and digital thread metadata.')+'</div>';
   if(!workflowId){
     h += '<div class="mb-field-hint">'+_t('Chưa chọn workflow. Block vẫn có thể cấu hình tay danh sách transition.', 'No workflow selected yet. You can still configure transitions manually.')+'</div>';
     return h;
+  }
+  if(lifecycleMode === 'persisted'){
+    h += '<div class="mb-field-hint">'+_t('Workflow này thuộc loại persisted. Builder sẽ đồng bộ states/guards/SLA nhưng không tự gắn generic transition endpoint để tránh gọi sai runtime trước khi có workflow-engine bridge.', 'This workflow is persisted. The builder will sync states/guards/SLA, but it will not auto-bind a generic transition endpoint until a workflow-engine bridge exists.')+'</div>';
   }
   h += '<div class="mb-choice-list">';
   h += '<div class="mb-choice-card"><div><strong>'+_esc(workflow.name || workflow.nameEn || workflowId)+'</strong><div class="mb-pack-meta">'+_esc(workflow.entity || '')+'</div></div><div class="mb-pack-meta">'+transitions.length+' '+_t('transition', 'transitions')+'</div></div>';
