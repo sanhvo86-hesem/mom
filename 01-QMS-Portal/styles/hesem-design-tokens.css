@@ -706,6 +706,15 @@
 .hm-gantt-today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--red); opacity: 0.7; border-radius: 999px; }
 
 .hm-record-detail { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--field-group-gap, var(--space-3)); }
+.hm-record-detail-header { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: var(--space-3); align-items: flex-start; padding: var(--space-4); border: var(--card-border-width, 1px) solid rgba(37, 99, 235, 0.16); border-radius: var(--radius-xl); background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(37,99,235,0.05)); }
+.hm-record-detail-copy { display: grid; gap: var(--space-1); min-width: 0; }
+.hm-record-detail-title { font-size: var(--text-lg); font-weight: var(--font-bold); color: var(--text-primary); }
+.hm-record-detail-subtitle { font-size: var(--text-sm); color: var(--text-secondary); }
+.hm-record-detail-meta { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: flex-end; }
+.hm-record-detail-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--gray-100); color: var(--text-primary); font-size: var(--text-xs); font-weight: var(--font-semibold); }
+.hm-record-detail-section { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--field-group-gap, var(--space-3)); padding-top: var(--space-2); border-top: 1px solid rgba(148, 163, 184, 0.18); }
+.hm-record-detail-section:first-of-type { border-top: none; padding-top: 0; }
+.hm-record-detail-section-title { grid-column: 1 / -1; font-size: var(--text-xs); font-weight: var(--font-semibold); color: var(--text-secondary); text-transform: var(--label-transform, uppercase); letter-spacing: var(--label-letter-spacing, 0.05em); }
 .hm-record-field { border: var(--card-border-width, 1px) solid var(--border); border-radius: var(--radius-lg); padding: var(--card-body-padding, var(--space-3)); background: var(--bg-surface); }
 .hm-record-field-half { grid-column: span 6; }
 .hm-record-field-third { grid-column: span 4; }

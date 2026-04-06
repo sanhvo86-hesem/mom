@@ -34,8 +34,8 @@
     },
     "frontend_foundation": {
       "entity_count": 528,
-      "ready_entities": 40,
-      "partial_entities": 488,
+      "ready_entities": 330,
+      "partial_entities": 198,
       "blocked_entities": 0,
       "workflow_ready_entities": 122,
       "related_ready_entities": 513,
@@ -76,21 +76,60 @@
       "unknown": 0
     },
     "frontend_foundation_entities": 528,
-    "frontend_ready_entities": 40,
-    "frontend_partial_entities": 488,
-    "frontend_blocked_entities": 0
+    "frontend_ready_entities": 330,
+    "frontend_partial_entities": 198,
+    "frontend_blocked_entities": 0,
+    "attachment_contract_entities": 521,
+    "comment_contract_entities": 521,
+    "activity_contract_entities": 411,
+    "publishability_ready": false,
+    "publishability_review_required_entities": 198
   },
   "quality_failed_checks": [],
+  "publishability": {
+    "ready": false,
+    "status": "review_required",
+    "review_required": true,
+    "failed_checks": [
+      {
+        "id": "frontend_entities_publishable",
+        "passed": false,
+        "actual": 198,
+        "target": 0
+      },
+      {
+        "id": "workflow_engine_bridges_ready",
+        "passed": false,
+        "actual": 115,
+        "target": 0
+      }
+    ],
+    "blocking_counts": {
+      "frontend_partial_entities": 198,
+      "frontend_blocked_entities": 0,
+      "workflow_engine_bridge_blocked": 115,
+      "unsupported_record_endpoints": 0,
+      "contract_issues": 0
+    },
+    "recommended_next_actions": [
+      "Promote partial frontend foundation entities into publishable contracts.",
+      "Bridge persisted workflows into the workflow engine before exposing transition UX.",
+      "Resolve remaining record endpoint/runtime contract gaps before publishing modules."
+    ]
+  },
   "frontend_foundation_summary": {
     "entity_count": 528,
-    "ready_entities": 40,
-    "partial_entities": 488,
+    "ready_entities": 330,
+    "partial_entities": 198,
     "blocked_entities": 0,
     "workflow_ready_entities": 122,
     "related_ready_entities": 513,
     "analytics_ready_entities": 479,
     "planning_console_entities": 28,
-    "operator_console_entities": 48
+    "operator_console_entities": 48,
+    "attachment_contract_entities": 521,
+    "comment_contract_entities": 521,
+    "activity_contract_entities": 411
   },
   "frontend_foundation_blocked": {},
   "missing_field_defs": [

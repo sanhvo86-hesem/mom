@@ -1079,6 +1079,112 @@ function relationNeighborhood(tableName, tableRegistry, relationMap) {
   return { outgoing, incoming };
 }
 
+function metadataFieldNames(table, fields = []) {
+  return uniqueStrings([
+    ...Object.keys(table?.columns || {}),
+    ...fieldKeys(fields),
+  ]);
+}
+
+function supportEntityMeta(entityName, fallbackDomain, endpointCatalog, tableRegistry) {
+  const table = tableRegistry?.tables?.[entityName];
+  const domain = String(table?.domain || fallbackDomain || '').trim();
+  if (!table || !domain) return null;
+  const prefix = `${domain}.${entityName}`;
+  const pk = primaryKeyMeta(table);
+  const listEndpoint = endpointCatalog?.endpoints?.[`${prefix}.list`] || null;
+  if (!listEndpoint) return null;
+  return {
+    entity: entityName,
+    domain,
+    table,
+    primary_key: pk,
+    fields: metadataFieldNames(table),
+    list_endpoint: listEndpoint,
+    detail_endpoint: endpointCatalog?.endpoints?.[`${prefix}.detail`] || null,
+    create_endpoint: endpointCatalog?.endpoints?.[`${prefix}.create`] || null,
+    update_endpoint: endpointCatalog?.endpoints?.[`${prefix}.update`] || null,
+  };
+}
+
+function interactionBindingsForSubject(tableName, table, allFields, support) {
+  if (!support) return [];
+  const bindings = [];
+  const subjectFields = metadataFieldNames(table, allFields);
+  const pk = primaryKeyMeta(table);
+
+  if (pk.mode === 'scalar' && pk.key && support.fields.includes('entity_id') && support.fields.includes('entity_type')) {
+    bindings.push({
+      mode: 'entity_ref',
+      subject_identity_field: pk.key,
+      filters: [
+        { support_field: 'entity_id', subject_field: pk.key, operator: 'eq' },
+        { support_field: 'entity_type', constant: tableName, operator: 'eq' },
+      ],
+    });
+  }
+
+  const recordBindingField = ['record_id', 'source_record_id'].find((field) => subjectFields.includes(field)) || null;
+  if (recordBindingField && support.fields.includes('source_record_id')) {
+    bindings.push({
+      mode: 'source_record_ref',
+      subject_identity_field: recordBindingField,
+      filters: [
+        { support_field: 'source_record_id', subject_field: recordBindingField, operator: 'eq' },
+      ],
+    });
+  }
+
+  return bindings;
+}
+
+function interactionContractForSubject(kind, tableName, table, allFields, endpointCatalog, tableRegistry) {
+  const supportMap = {
+    attachments: ['file_attachments', 'system_infrastructure'],
+    comments: ['comments', 'system_infrastructure'],
+    activities: ['crm_activities', 'crm'],
+  };
+  const [entityName, fallbackDomain] = supportMap[kind] || [];
+  const support = supportEntityMeta(entityName, fallbackDomain, endpointCatalog, tableRegistry);
+  if (!support) return null;
+  const bindings = interactionBindingsForSubject(tableName, table, allFields, support);
+  if (!bindings.length) return null;
+  const filterableFields = support.list_endpoint?.capabilities?.filterable_fields || [];
+  const preferredFields = [
+    'entity_id',
+    'entity_type',
+    'source_record_id',
+    'created_at',
+    'updated_at',
+    'uploaded_at',
+    'scheduled_at',
+    'completed_at',
+    'activity_status',
+    'parent_id',
+    'uploaded_by_full_name',
+    'author_full_name',
+    'owner_full_name',
+  ];
+  const timelineField = ['uploaded_at', 'created_at', 'updated_at', 'scheduled_at', 'completed_at'].find((field) => support.fields.includes(field)) || null;
+  return {
+    kind,
+    entity: support.entity,
+    domain: support.domain,
+    primary_key_fields: support.primary_key.fields,
+    list_endpoint: support.list_endpoint?.action || null,
+    detail_endpoint: support.detail_endpoint?.action || null,
+    create_endpoint: support.create_endpoint?.action || null,
+    update_endpoint: support.update_endpoint?.action || null,
+    binding_modes: bindings.map((binding) => binding.mode),
+    default_binding_mode: bindings[0]?.mode || null,
+    bindings,
+    filterable_fields: preferredFields.filter((field) => filterableFields.includes(field)),
+    timeline_field: timelineField,
+    status_field: support.fields.includes('activity_status') ? 'activity_status' : null,
+    threaded: support.fields.includes('parent_id'),
+  };
+}
+
 function frontendFoundationContract(tableName, table, dataFields, endpointCatalog, relationMap, tableRegistry, formulas) {
   const prefix = `${table.domain}.${tableName}`;
   const listFields = uniqueFields((dataFields[`${prefix}.list`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
@@ -1095,6 +1201,9 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   const deleteEndpoint = endpointCatalog.endpoints?.[`${prefix}.delete`] || null;
   const workflowRuntime = transitionEndpoint?.workflow?.runtime || listEndpoint?.workflow?.runtime || {};
   const relations = relationNeighborhood(tableName, tableRegistry, relationMap);
+  const attachmentContract = interactionContractForSubject('attachments', tableName, table, allFields, endpointCatalog, tableRegistry);
+  const commentContract = interactionContractForSubject('comments', tableName, table, allFields, endpointCatalog, tableRegistry);
+  const activityContract = interactionContractForSubject('activities', tableName, table, allFields, endpointCatalog, tableRegistry);
   const titleField = findFieldKey(allFields, table, [
     displayFieldForTable(table),
     'record_number',
@@ -1226,8 +1335,8 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
     /^attachment_/,
     /^document_/,
     /^file_/,
-  ]) || relations.incoming.some((relation) => /(attachment|document|file|evidence|record)/.test(String(relation.entity || '').toLowerCase()));
-  const collaborationSignal = relations.incoming.some((relation) => /(comment|note|activity|task|message|approval)/.test(String(relation.entity || '').toLowerCase()));
+  ]) || relations.incoming.some((relation) => /(attachment|document|file|evidence|record)/.test(String(relation.entity || '').toLowerCase())) || Boolean(attachmentContract);
+  const collaborationSignal = relations.incoming.some((relation) => /(comment|note|activity|task|message|approval)/.test(String(relation.entity || '').toLowerCase())) || Boolean(commentContract || activityContract);
   const formulaCount = formulaCountForDomain(formulas, table.domain, profile);
   const sections = detailSections(detailFields);
   const detailBlockers = [];
@@ -1241,6 +1350,46 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   const analyticsBlockers = [];
   const planningBlockers = [];
   const operatorBlockers = [];
+  const timelineSources = [];
+
+  if (createdAtField) {
+    timelineSources.push({
+      kind: 'record_created',
+      subject_field: createdAtField,
+      endpoint: detailEndpoint?.action || null,
+    });
+  }
+  if (updatedAtField && updatedAtField !== createdAtField) {
+    timelineSources.push({
+      kind: 'record_updated',
+      subject_field: updatedAtField,
+      endpoint: detailEndpoint?.action || null,
+    });
+  }
+  if (commentContract) {
+    timelineSources.push({
+      kind: 'comments',
+      endpoint: commentContract.list_endpoint,
+      timestamp_field: commentContract.timeline_field,
+      binding_mode: commentContract.default_binding_mode,
+    });
+  }
+  if (activityContract) {
+    timelineSources.push({
+      kind: 'activities',
+      endpoint: activityContract.list_endpoint,
+      timestamp_field: activityContract.timeline_field,
+      binding_mode: activityContract.default_binding_mode,
+    });
+  }
+  if (attachmentContract) {
+    timelineSources.push({
+      kind: 'attachments',
+      endpoint: attachmentContract.list_endpoint,
+      timestamp_field: attachmentContract.timeline_field,
+      binding_mode: attachmentContract.default_binding_mode,
+    });
+  }
 
   if (!detailEndpoint) detailBlockers.push('missing_detail_endpoint');
   if (!titleField) detailBlockers.push('missing_title_field');
@@ -1308,19 +1457,23 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
       quick_view_refs: relations.outgoing,
       relation_count: relations.incoming.length + relations.outgoing.length,
     }),
-    timeline: capabilityContract(Boolean(table?.workflowId || createdAtField || updatedAtField), timelineBlockers.length === 0, timelineBlockers, {
+    timeline: capabilityContract(Boolean(table?.workflowId || createdAtField || updatedAtField || timelineSources.length), timelineBlockers.length === 0, timelineBlockers, {
       created_at_field: createdAtField,
       updated_at_field: updatedAtField,
       audit_ready: Boolean(createdAtField && updatedAtField && table?.workflowId),
-      activity_ready: collaborationSignal,
-    }, Boolean(createdAtField || updatedAtField)),
+      activity_ready: Boolean(commentContract || activityContract || collaborationSignal),
+      sources: timelineSources,
+    }, Boolean(createdAtField || updatedAtField || timelineSources.length)),
     attachments: capabilityContract(['governed_case', 'document_record', 'transactional_record', 'operator_console'].includes(profile), attachmentBlockers.length === 0, attachmentBlockers, {
       signal_fields: uniqueStrings(fieldKeys(allFields).filter((field) => /(attachment|document|file|evidence)/.test(String(field || '').toLowerCase()))).slice(0, 8),
       related_entities: relations.incoming.filter((relation) => /(attachment|document|file|evidence|record)/.test(String(relation.entity || '').toLowerCase())),
+      contract: attachmentContract,
     }),
     collaboration: capabilityContract(Boolean(table?.workflowId || ownerField || collaborationSignal), collaborationBlockers.length === 0, collaborationBlockers, {
       owner_field: ownerField,
       activity_entities: relations.incoming.filter((relation) => /(comment|note|activity|task|message|approval)/.test(String(relation.entity || '').toLowerCase())),
+      comment_contract: commentContract,
+      activity_contract: activityContract,
     }, Boolean(ownerField || collaborationSignal)),
     analytics: capabilityContract(['governed_case', 'transactional_record', 'planning_console', 'operator_console'].includes(profile), formulaCount > 0 && analyticsBlockers.length === 0, analyticsBlockers, {
       formula_count: formulaCount,
@@ -1406,6 +1559,12 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
       quick_view_refs: relations.outgoing,
       related_lists: relations.incoming,
     },
+    interaction_contracts: {
+      attachments: attachmentContract,
+      comments: commentContract,
+      activities: activityContract,
+      timeline_sources: timelineSources,
+    },
     capabilities,
     readiness: {
       score,
@@ -1430,6 +1589,9 @@ function buildFrontendFoundationCatalog(tableRegistry, dataFields, endpointCatal
     analytics_ready_entities: 0,
     planning_console_entities: 0,
     operator_console_entities: 0,
+    attachment_contract_entities: 0,
+    comment_contract_entities: 0,
+    activity_contract_entities: 0,
   };
 
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
@@ -1444,6 +1606,9 @@ function buildFrontendFoundationCatalog(tableRegistry, dataFields, endpointCatal
     if (contract.capabilities.analytics.state === 'ready') summary.analytics_ready_entities += 1;
     if (contract.profile === 'planning_console') summary.planning_console_entities += 1;
     if (contract.profile === 'operator_console') summary.operator_console_entities += 1;
+    if (contract.interaction_contracts?.attachments?.list_endpoint) summary.attachment_contract_entities += 1;
+    if (contract.interaction_contracts?.comments?.list_endpoint) summary.comment_contract_entities += 1;
+    if (contract.interaction_contracts?.activities?.list_endpoint) summary.activity_contract_entities += 1;
   }
 
   return {
@@ -1839,6 +2004,9 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
   const frontendReadyEntities = frontendContracts.filter((entity) => entity?.readiness?.verdict === 'ready');
   const frontendPartialEntities = frontendContracts.filter((entity) => entity?.readiness?.verdict === 'partial');
   const frontendBlockedEntities = frontendContracts.filter((entity) => entity?.readiness?.verdict === 'blocked');
+  const attachmentContractEntities = frontendContracts.filter((entity) => entity?.interaction_contracts?.attachments?.list_endpoint);
+  const commentContractEntities = frontendContracts.filter((entity) => entity?.interaction_contracts?.comments?.list_endpoint);
+  const activityContractEntities = frontendContracts.filter((entity) => entity?.interaction_contracts?.activities?.list_endpoint);
   const frontendFoundationWarnings = frontendBlockedEntities.slice(0, 60).map((entity) => ({
     entity_key: entity?.entity_key || '',
     profile: entity?.profile || '',
@@ -2047,11 +2215,36 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'formula_reference_target', passed: formulaReferenceCount === formulaKeys.length, actual: formulaReferenceCount, target: formulaKeys.length },
   ];
 
+  const publishabilityChecks = [
+    {
+      id: 'frontend_entities_publishable',
+      passed: frontendPartialEntities.length === 0 && frontendBlockedEntities.length === 0,
+      actual: frontendPartialEntities.length + frontendBlockedEntities.length,
+      target: 0,
+    },
+    {
+      id: 'workflow_engine_bridges_ready',
+      passed: workflowEngineBridgeCounts.blocked === 0,
+      actual: workflowEngineBridgeCounts.blocked,
+      target: 0,
+    },
+    {
+      id: 'record_endpoint_contracts_clean',
+      passed: unsupportedRecordEndpoints.length === 0 && contractIssues.length === 0,
+      actual: unsupportedRecordEndpoints.length + contractIssues.length,
+      target: 0,
+    },
+  ];
+  const integrityPassed = checks.every((check) => check.passed);
+  const publishabilityReady = publishabilityChecks.every((check) => check.passed);
+
   return {
     _meta: {
       version: '5.0',
       description: 'Internal quality report for registry-backed Module Builder assets.',
       generatedAt,
+      integrity_gate: 'all_passed',
+      publishability_gate: 'publishability.ready',
     },
     summary: {
       endpoint_count: endpointKeys.length,
@@ -2083,6 +2276,29 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       frontend_ready_entities: frontendReadyEntities.length,
       frontend_partial_entities: frontendPartialEntities.length,
       frontend_blocked_entities: frontendBlockedEntities.length,
+      attachment_contract_entities: attachmentContractEntities.length,
+      comment_contract_entities: commentContractEntities.length,
+      activity_contract_entities: activityContractEntities.length,
+      publishability_ready: publishabilityReady,
+      publishability_review_required_entities: frontendPartialEntities.length + frontendBlockedEntities.length,
+    },
+    publishability: {
+      ready: publishabilityReady,
+      status: publishabilityReady ? 'ready' : 'review_required',
+      review_required: !publishabilityReady,
+      failed_checks: publishabilityChecks.filter((check) => !check.passed),
+      blocking_counts: {
+        frontend_partial_entities: frontendPartialEntities.length,
+        frontend_blocked_entities: frontendBlockedEntities.length,
+        workflow_engine_bridge_blocked: workflowEngineBridgeCounts.blocked,
+        unsupported_record_endpoints: unsupportedRecordEndpoints.length,
+        contract_issues: contractIssues.length,
+      },
+      recommended_next_actions: publishabilityReady ? [] : [
+        'Promote partial frontend foundation entities into publishable contracts.',
+        'Bridge persisted workflows into the workflow engine before exposing transition UX.',
+        'Resolve remaining record endpoint/runtime contract gaps before publishing modules.',
+      ],
     },
     checks,
     warnings: {
@@ -2114,7 +2330,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       delete_governance: deleteGovernanceWarnings.slice(0, 60),
       frontend_foundation: frontendFoundationWarnings,
     },
-    all_passed: checks.every((check) => check.passed),
+    all_passed: integrityPassed,
   };
 }
 

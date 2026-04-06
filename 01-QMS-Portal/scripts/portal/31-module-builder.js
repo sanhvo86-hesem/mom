@@ -156,6 +156,7 @@ var state = {
     domainPacks: {},
     relationMap: {},
     endpointCatalog: {},
+    runtimeAccessPolicy: null,
     frontendFoundation: {},
     manifest: null,
     qualityReport: null
@@ -1944,11 +1945,12 @@ function _ensureRegistriesLoaded(force){
       state.registries.computedFormulas = HR.raw('computed-formulas') || {};
       state.registries.iotConnectors    = HR.raw('iot-connectors') || (BE.IOT_CONNECTORS || {});
       state.registries.frontendFoundation = HR.raw('frontend-foundation-catalog') || {};
+      state.registries.runtimeAccessPolicy = HR.raw('runtime-access-policy') || null;
       state.registries.manifest         = HR.raw('registry-manifest') || null;
       state.registries.qualityReport    = HR.raw('registry-quality-report') || null;
 
       // Lazy-load remaining registries via HmRegistry preload
-      var remaining = 8;
+      var remaining = 9;
       function _onLazy(){ remaining--; if(remaining <= 0){ _finishRegistryLoad(); } }
 
       HR.preload('validation-rules', function(d){ state.registries.validationRules = d || {}; _onLazy(); });
@@ -1956,6 +1958,7 @@ function _ensureRegistriesLoaded(force){
       HR.preload('domain-field-packs', function(d){ state.registries.domainPacks = d || {}; _onLazy(); });
       HR.preload('relation-map', function(d){ state.registries.relationMap = d || {}; _onLazy(); });
       HR.preload('endpoint-catalog', function(d){ state.registries.endpointCatalog = d || {}; _onLazy(); });
+      HR.preload('runtime-access-policy', function(d){ state.registries.runtimeAccessPolicy = d || null; _onLazy(); });
       HR.preload('frontend-foundation-catalog', function(d){ state.registries.frontendFoundation = d || {}; _onLazy(); });
       HR.preload('registry-manifest', function(d){ state.registries.manifest = d || null; _onLazy(); });
       HR.preload('registry-quality-report', function(d){ state.registries.qualityReport = d || null; _onLazy(); });
@@ -1978,6 +1981,7 @@ function _ensureRegistriesLoaded(force){
     _loadRegistry('domain-field-packs', 'domainPacks'),
     _loadRegistry('relation-map', 'relationMap'),
     _loadRegistry('endpoint-catalog', 'endpointCatalog'),
+    _loadRegistry('runtime-access-policy', 'runtimeAccessPolicy'),
     _loadRegistry('frontend-foundation-catalog', 'frontendFoundation'),
     _loadRegistry('registry-manifest', 'manifest'),
     _loadRegistry('registry-quality-report', 'qualityReport')
@@ -1992,7 +1996,7 @@ function _ensureRegistriesLoaded(force){
 }
 
 function _finishRegistryLoad(){
-  var criticalKeys = ['workflows','domainPacks','relationMap','endpointCatalog','frontendFoundation','manifest','qualityReport'];
+  var criticalKeys = ['workflows','domainPacks','relationMap','endpointCatalog','runtimeAccessPolicy','frontendFoundation','manifest','qualityReport'];
   var failedKeys = Object.keys(state.registries.failedLoads || {});
   var missingCritical = criticalKeys.filter(function(key){
     var value = state.registries[key];
@@ -2046,6 +2050,122 @@ function _frontendFoundationForApi(api){
   return _frontendFoundationMap()[key] || null;
 }
 
+function _endpointDefinition(action){
+  var raw = state.registries.endpointCatalog || {};
+  var endpoints = raw.endpoints || raw;
+  if(endpoints && !Array.isArray(endpoints) && endpoints[action]) return endpoints[action];
+  return _endpointCatalogItems().filter(function(item){
+    return String((item && (item.action || item.value || item.key || '')) || '') === String(action || '');
+  })[0] || null;
+}
+
+function _runtimeAccessPolicyCatalog(){
+  return state.registries.runtimeAccessPolicy || {};
+}
+
+function _runtimeAccessPolicyForEntity(entityKey){
+  var normalized = String(entityKey || '').toLowerCase();
+  var parts = normalized.split('.');
+  var domain = parts[0] || '';
+  var table = parts.slice(1).join('.');
+  var policy = _runtimeAccessPolicyCatalog();
+  var defaults = policy.defaults || {};
+  var domainPolicy = ((policy.domains || {})[domain]) || {};
+  var tablePolicy = ((policy.tables || {})[table]) || {};
+  var actions = {};
+  ['list','detail','create','update','transition','delete'].forEach(function(kind){
+    var roles = null;
+    var source = 'default';
+    if(Array.isArray(tablePolicy[kind])){
+      roles = tablePolicy[kind];
+      source = 'table';
+    } else if(Array.isArray(domainPolicy[kind])){
+      roles = domainPolicy[kind];
+      source = 'domain';
+    } else if(Array.isArray(defaults[kind])){
+      roles = defaults[kind];
+      source = 'default';
+    }
+    actions[kind] = {
+      roles: _clone(Array.isArray(roles) ? roles : []),
+      source: source,
+      explicitlyDenied: Array.isArray(roles) && !roles.length
+    };
+  });
+  return {
+    entityKey: normalized,
+    domain: domain,
+    table: table,
+    actions: actions
+  };
+}
+
+function _actionAccessPolicyForEntity(entityKey, actionMap){
+  var runtimePolicy = _runtimeAccessPolicyForEntity(entityKey);
+  var access = {};
+  Object.keys(actionMap || {}).forEach(function(kind){
+    var action = actionMap[kind];
+    var endpoint = _endpointDefinition(action);
+    var policy = runtimePolicy.actions[kind] || { roles: [], source: 'default', explicitlyDenied: false };
+    access[kind] = {
+      action: action || '',
+      method: endpoint && endpoint.method ? endpoint.method : '',
+      path: endpoint && endpoint.path ? endpoint.path : '',
+      permissionKeys: _clone(endpoint && endpoint.security && endpoint.security.permission_keys || []),
+      roles: _clone(policy.roles || []),
+      policySource: policy.source || 'default',
+      explicitlyDenied: !!policy.explicitlyDenied
+    };
+  });
+  return access;
+}
+
+function _detailFieldKeysFromSection(section){
+  var keys = [];
+  if(section && Array.isArray(section.fieldKeys) && section.fieldKeys.length){
+    keys = section.fieldKeys;
+  } else if(section && Array.isArray(section.field_keys) && section.field_keys.length){
+    keys = section.field_keys;
+  } else if(section && typeof section.fieldsCsv === 'string'){
+    keys = String(section.fieldsCsv).split(',');
+  }
+  return keys.map(function(key){
+    return String(key || '').replace(/^\s+|\s+$/g, '');
+  }).filter(Boolean);
+}
+
+function _buildRecordDetailRuntimeFields(detail, semantic){
+  var fields = [];
+  var seen = {};
+  function addField(key, label, type, span){
+    var normalized = String(key || '').replace(/^\s+|\s+$/g, '');
+    if(!normalized || seen[normalized]) return;
+    seen[normalized] = true;
+    fields.push({
+      key: normalized,
+      label: {
+        vi: label || _humanizeKey(normalized),
+        en: label || _humanizeKey(normalized)
+      },
+      type: type || 'string',
+      span: span || 'half'
+    });
+  }
+  if(semantic.title_field) addField(semantic.title_field, _t('Tiêu đề', 'Title'), 'string', 'full');
+  if(semantic.subtitle_field) addField(semantic.subtitle_field, _t('Phụ đề', 'Subtitle'), 'string', 'full');
+  if(semantic.status_field) addField(semantic.status_field, _t('Trạng thái', 'Status'), 'badge', 'half');
+  if(semantic.owner_field) addField(semantic.owner_field, _t('Phụ trách', 'Owner'), 'string', 'half');
+  if(semantic.updated_at_field) addField(semantic.updated_at_field, _t('Cập nhật', 'Updated'), 'datetime', 'half');
+  (detail.sections || []).forEach(function(section){
+    _detailFieldKeysFromSection(section).forEach(function(key){
+      var lower = String(key || '').toLowerCase();
+      var type = lower.indexOf('status') >= 0 ? 'badge' : ((lower.indexOf('date') >= 0 || lower.indexOf('time') >= 0) ? 'datetime' : 'string');
+      addField(key, null, type, 'half');
+    });
+  });
+  return fields;
+}
+
 function _applyEndpointCatalog(){
   var items = _endpointCatalogItems();
   if(!items.length) return;
@@ -2056,15 +2176,25 @@ function _applyEndpointCatalog(){
 function _registryHealthSummary(){
   var manifest = state.registries.manifest || {};
   var quality = state.registries.qualityReport || {};
+  var publishability = quality.publishability || {};
   var coverage = manifest.coverage || {};
   var summary = quality.summary || {};
   var foundation = coverage.frontend_foundation || {};
   var checks = Array.isArray(quality.checks) ? quality.checks : [];
   var passedChecks = checks.filter(function(check){ return check && check.passed; }).length;
   var generatedAt = (manifest._meta && manifest._meta.generatedAt) || (quality._meta && quality._meta.generatedAt) || '';
+  var publishabilityFailedChecks = Array.isArray(publishability.failed_checks) ? publishability.failed_checks.length : 0;
+  var integrityOk = quality.all_passed !== false;
+  var publishableReady = publishability.ready;
+  if(publishableReady == null){
+    publishableReady = integrityOk && (summary.frontend_partial_entities || 0) === 0 && (summary.frontend_blocked_entities || 0) === 0 && (summary.workflow_engine_bridge_blocked || 0) === 0;
+  }
   return {
     available: !!(Object.keys(manifest).length || Object.keys(quality).length),
-    ok: quality.all_passed !== false,
+    ok: !!publishableReady,
+    integrityOk: integrityOk,
+    publishableReady: !!publishableReady,
+    publishabilityStatus: publishability.status || (publishableReady ? 'ready' : 'review_required'),
     generatedAt: generatedAt,
     endpointCount: summary.endpoint_count || coverage.router_actions || 0,
     packCount: summary.pack_count || coverage.domain_pack_count || 0,
@@ -2079,31 +2209,43 @@ function _registryHealthSummary(){
     unsupportedRecordEndpoints: summary.unsupported_record_endpoints || 0,
     contractIssues: summary.contract_issues || 0,
     workflowAlignmentIssues: summary.workflow_alignment_issues || 0,
+    workflowBridgeBlocked: summary.workflow_engine_bridge_blocked || 0,
+    runtimePolicyLoaded: !!state.registries.runtimeAccessPolicy,
     frontendEntities: summary.frontend_foundation_entities || foundation.entity_count || 0,
     frontendReadyEntities: summary.frontend_ready_entities || foundation.ready_entities || 0,
     frontendPartialEntities: summary.frontend_partial_entities || foundation.partial_entities || 0,
-    frontendBlockedEntities: summary.frontend_blocked_entities || foundation.blocked_entities || 0
+    frontendBlockedEntities: summary.frontend_blocked_entities || foundation.blocked_entities || 0,
+    publishabilityFailedChecks: publishabilityFailedChecks
   };
 }
 
 function _renderRegistryHealthNotice(){
   var info = _registryHealthSummary();
-  var statusTone = info.ok ? 'var(--green)' : 'var(--amber)';
-  var background = info.ok ? 'rgba(22,163,74,0.10)' : 'var(--amber-bg)';
+  var statusTone = info.publishableReady ? 'var(--green)' : (info.integrityOk ? 'var(--amber)' : 'var(--red)');
+  var background = info.publishableReady ? 'rgba(22,163,74,0.10)' : (info.integrityOk ? 'var(--amber-bg)' : 'rgba(220,38,38,0.10)');
   var issueCount;
+  var reviewCount;
   var h = '';
   if(!info.available || state.registries.loading || state.registries.error) return '';
   issueCount = (info.missingPrimaryKeyTables || 0) + (info.unsupportedRecordEndpoints || 0) + (info.contractIssues || 0) + (info.workflowAlignmentIssues || 0);
+  reviewCount = (info.frontendPartialEntities || 0) + (info.frontendBlockedEntities || 0) + (info.workflowBridgeBlocked || 0) + (info.publishabilityFailedChecks || 0);
   h += '<div style="padding:var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--text-secondary);background:'+background+';border:1px solid '+statusTone+';border-radius:var(--radius-md)">';
-  h += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">'+_esc(info.ok ? _t('Registry da pass quality gate cho builder.','Registry passed the builder quality gate.') : _t('Registry can duoc ra soat them truoc khi build.','Registry needs more review before building.'))+'</div>';
+  if(info.publishableReady){
+    h += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">'+_esc(_t('Registry integrity và frontend publishability đã sẵn sàng.','Registry integrity and frontend publishability are ready.'))+'</div>';
+  } else if(info.integrityOk){
+    h += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">'+_esc(_t('Registry integrity đã pass, nhưng frontend publishability vẫn cần review.','Registry integrity passed, but frontend publishability still needs review.'))+'</div>';
+  } else {
+    h += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">'+_esc(_t('Registry còn lỗi kỹ thuật, cần rà soát thêm trước khi build.','Registry still has technical issues and needs more review before building.'))+'</div>';
+  }
   if(info.checkCount){
-    h += '<div>'+_esc(_t('Checks dat: ','Checks passed: ') + info.passedChecks + '/' + info.checkCount)+'</div>';
+    h += '<div>'+_esc(_t('Integrity checks đạt: ','Integrity checks passed: ') + info.passedChecks + '/' + info.checkCount)+'</div>';
   }
   h += '<div>'+_esc(info.endpointCount + ' endpoints / ' + info.packCount + ' packs / ' + info.relationCount + ' relations')+'</div>';
   h += '<div>'+_esc(info.workflowCount + ' workflows / ' + info.statusCount + ' status sets / ' + info.fieldRegistryActions + ' field schemas')+'</div>';
   if(info.frontendEntities){
     h += '<div>'+_esc(_t('Nen tang frontend: ','Frontend foundation: ') + info.frontendReadyEntities + '/' + info.frontendEntities + ' ' + _t('ready, ','ready, ') + info.frontendPartialEntities + ' ' + _t('partial, ','partial, ') + info.frontendBlockedEntities + ' ' + _t('blocked', 'blocked'))+'</div>';
   }
+  h += '<div>'+_esc(_t('Workflow bridge bị chặn: ','Blocked workflow bridges: ') + (info.workflowBridgeBlocked || 0) + ' · ' + _t('ACL registry: ','ACL registry: ') + (info.runtimePolicyLoaded ? _t('đã nạp','loaded') : _t('thiếu','missing')))+'</div>';
   if(info.compositePkTables){
     h += '<div>'+_esc(_t('Bang composite PK da co contract rieng: ','Composite-PK tables use dedicated identity contracts: ') + info.compositePkTables)+'</div>';
   }
@@ -2111,7 +2253,10 @@ function _renderRegistryHealthNotice(){
     h += '<div>'+_esc(_t('Bang con thieu PK/identity: ','Tables still missing PK/identity: ') + info.missingPrimaryKeyTables)+'</div>';
   }
   if(issueCount){
-    h += '<div>'+_esc(_t('Can xu ly them: ','Needs follow-up: ') + issueCount)+'</div>';
+    h += '<div>'+_esc(_t('Can xu ly loi integrity: ','Integrity follow-up needed: ') + issueCount)+'</div>';
+  }
+  if(reviewCount && info.integrityOk){
+    h += '<div>'+_esc(_t('Can review them ve publishability/runtime: ','Publishability/runtime review needed: ') + reviewCount)+'</div>';
   }
   if(info.generatedAt){
     h += '<div>'+_esc(_t('Generated: ','Generated: ') + info.generatedAt)+'</div>';
@@ -3118,10 +3263,14 @@ function _buildAutoKpisFromRegistry(entity, api){
 
 function _applyRecordDetailFromFoundation(draft, foundation){
   var detail;
+  var interactions;
   var semantic;
   var layout;
   var readiness;
+  var entityKey;
+  var accessPolicy;
   if(!draft || !draft.config || !foundation) return 0;
+  draft.config.dataSource = draft.config.dataSource || {};
   draft.config.detail = draft.config.detail || {};
   detail = draft.config.detail;
   semantic = foundation.semantic_slots || {};
@@ -3136,11 +3285,21 @@ function _applyRecordDetailFromFoundation(draft, foundation){
     return {
       key: section.key || '',
       label: _clone(section.label || { vi: section.key || 'Section', en: section.key || 'Section' }),
-      fieldKeys: _clone(section.field_keys || [])
+      fieldKeys: _clone(section.field_keys || []),
+      fieldsCsv: _clone((section.field_keys || []).join(','))
     };
   });
   detail.quickViews = _clone(layout.quick_view_refs || []);
   detail.relatedLists = _clone(layout.related_lists || []);
+  interactions = foundation.interaction_contracts || {};
+  entityKey = foundation.entity_key || draft.config.dataSource.entityKey || '';
+  accessPolicy = _actionAccessPolicyForEntity(entityKey, foundation.actions || {});
+  detail.interactions = _clone(interactions);
+  detail.timelineSources = _clone(interactions.timeline_sources || []);
+  detail.attachmentsContract = _clone(interactions.attachments || null);
+  detail.commentsContract = _clone(interactions.comments || null);
+  detail.activitiesContract = _clone(interactions.activities || null);
+  detail.accessPolicy = _clone(accessPolicy);
   detail.capabilityProfile = foundation.profile || '';
   detail.recommendedPatterns = _clone(foundation.recommended_patterns || []);
   detail.readiness = {
@@ -3151,7 +3310,10 @@ function _applyRecordDetailFromFoundation(draft, foundation){
   };
   draft.config.actions = draft.config.actions || {};
   draft.config.actions.endpoints = _clone(foundation.actions || {});
+  draft.config.actions.accessPolicy = _clone(accessPolicy);
+  draft.config.actions.runtimePolicy = _clone(_runtimeAccessPolicyForEntity(entityKey));
   draft.config.dataSource.entityKey = foundation.entity_key || draft.config.dataSource.entityKey || '';
+  draft.config.fields = _buildRecordDetailRuntimeFields(detail, semantic);
   return detail.sections.length;
 }
 
@@ -3837,6 +3999,7 @@ function _ensureBuilderState(){
   if(!state.registries.failedLoads) state.registries.failedLoads = {};
   if(!Array.isArray(state.registries.criticalMissing)) state.registries.criticalMissing = [];
   if(state.registries.loadingMessage === undefined) state.registries.loadingMessage = '';
+  if(state.registries.runtimeAccessPolicy === undefined) state.registries.runtimeAccessPolicy = null;
   if(state.registries.manifest === undefined) state.registries.manifest = null;
   if(state.registries.qualityReport === undefined) state.registries.qualityReport = null;
 }

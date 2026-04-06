@@ -8684,6 +8684,88 @@ function _handleFormSubmit(container, moduleId, formEl){
   });
 }
 
+function _recordDetailFieldKeys(section){
+  var keys = [];
+  if(section && Array.isArray(section.fieldKeys) && section.fieldKeys.length){
+    keys = section.fieldKeys;
+  } else if(section && Array.isArray(section.field_keys) && section.field_keys.length){
+    keys = section.field_keys;
+  } else if(section && typeof section.fieldsCsv === 'string'){
+    keys = String(section.fieldsCsv).split(',');
+  }
+  return keys.map(function(key){
+    return String(key || '').replace(/^\s+|\s+$/g, '');
+  }).filter(Boolean);
+}
+
+function _recordDetailRuntimeFields(config){
+  var detail = config && config.detail ? config.detail : {};
+  var fields = Array.isArray(config && config.fields) ? config.fields.slice() : [];
+  var map = {};
+  function addField(field){
+    if(!field || !field.key || map[field.key]) return;
+    map[field.key] = field;
+    fields.push(field);
+  }
+  if(fields.length) return fields;
+  [
+    { key: detail.titleField, label:_t('Tiêu đề', 'Title'), type:'string', span:'full' },
+    { key: detail.subtitleField, label:_t('Phụ đề', 'Subtitle'), type:'string', span:'full' },
+    { key: detail.statusField, label:_t('Trạng thái', 'Status'), type:'badge', span:'half' },
+    { key: detail.ownerField, label:_t('Phụ trách', 'Owner'), type:'string', span:'half' },
+    { key: detail.updatedAtField, label:_t('Cập nhật', 'Updated'), type:'datetime', span:'half' },
+    { key: detail.heroImageField, label:_t('Ảnh đại diện', 'Hero image'), type:'string', span:'full' }
+  ].forEach(function(item){
+    if(!item.key) return;
+    addField({
+      key: item.key,
+      label: { vi:item.label, en:item.label },
+      type: item.type,
+      span: item.span
+    });
+  });
+  (detail.sections || []).forEach(function(section){
+    _recordDetailFieldKeys(section).forEach(function(key){
+      var lower = String(key || '').toLowerCase();
+      addField({
+        key: key,
+        label: { vi:_humanizeKey(key), en:_humanizeKey(key) },
+        type: lower.indexOf('status') >= 0 ? 'badge' : ((lower.indexOf('date') >= 0 || lower.indexOf('time') >= 0) ? 'datetime' : 'string'),
+        span: 'half'
+      });
+    });
+  });
+  return fields;
+}
+
+function _recordDetailSections(config){
+  var detail = config && config.detail ? config.detail : {};
+  var sections = Array.isArray(detail.sections) ? detail.sections : [];
+  var fields = _recordDetailRuntimeFields(config);
+  var fieldMap = {};
+  var summaryKeys = {};
+  fields.forEach(function(field){ fieldMap[field.key] = field; });
+  [detail.titleField, detail.subtitleField, detail.statusField, detail.ownerField, detail.updatedAtField, detail.heroImageField].forEach(function(key){
+    if(key) summaryKeys[key] = true;
+  });
+  if(!sections.length){
+    return [{
+      key: 'details',
+      label: { vi:'Thông tin chi tiết', en:'Details' },
+      fields: fields.filter(function(field){ return !summaryKeys[field.key]; })
+    }];
+  }
+  return sections.map(function(section, index){
+    return {
+      key: section.key || ('section_' + index),
+      label: section.label || { vi:_humanizeKey(section.key || ('section_' + index)), en:_humanizeKey(section.key || ('section_' + index)) },
+      fields: _recordDetailFieldKeys(section).map(function(key){
+        return fieldMap[key] || { key:key, label:{ vi:_humanizeKey(key), en:_humanizeKey(key) }, type:'string', span:'half' };
+      }).filter(Boolean)
+    };
+  }).filter(function(section){ return section.fields.length; });
+}
+
 /**
  * Render a record detail view with inline-edit support.
  * @param {Object} config
@@ -8694,17 +8776,37 @@ function _handleFormSubmit(container, moduleId, formEl){
  */
 function renderRecordDetail(config, data, state, blockId){
   var record = _detailRecord(data);
-  var fields = config.fields || [];
+  var detailCfg = config && config.detail ? config.detail : {};
+  var fields = _recordDetailRuntimeFields(config || {});
+  var sections = _recordDetailSections(config || {});
   var moduleId = _chartModuleId(state);
   var ms = getModuleState(moduleId);
   var detailState = ms.detailStates[blockId] || { editing:'' };
   var html = '';
+  var statusValue;
+  var ownerValue;
+  var updatedValue;
   if(state && state.loading && state.loading[blockId]){
     return '<div class="hm-skeleton"><div class="hm-skeleton-line"></div><div class="hm-skeleton-line"></div><div class="hm-skeleton-line hm-skeleton-short"></div></div>';
   }
   if(!record) return _chartEmpty(_t('Không tìm thấy bản ghi', 'Record not found'));
+  statusValue = detailCfg.statusField ? record[detailCfg.statusField] : null;
+  ownerValue = detailCfg.ownerField ? record[detailCfg.ownerField] : null;
+  updatedValue = detailCfg.updatedAtField ? record[detailCfg.updatedAtField] : null;
   html += '<div class="hm-record-detail" data-block-id="'+_esc(blockId || '')+'">';
-  fields.forEach(function(field){
+  if(detailCfg.titleField || detailCfg.subtitleField || detailCfg.statusField || detailCfg.ownerField || detailCfg.updatedAtField){
+    html += '<div class="hm-record-detail-header">';
+    html += '<div class="hm-record-detail-copy">';
+    if(detailCfg.titleField) html += '<div class="hm-record-detail-title">'+_esc(record[detailCfg.titleField] == null ? '' : String(record[detailCfg.titleField]))+'</div>';
+    if(detailCfg.subtitleField) html += '<div class="hm-record-detail-subtitle">'+_esc(record[detailCfg.subtitleField] == null ? '' : String(record[detailCfg.subtitleField]))+'</div>';
+    html += '</div>';
+    html += '<div class="hm-record-detail-meta">';
+    if(statusValue != null && statusValue !== '') html += '<span class="hm-record-detail-chip">'+_esc(String(statusValue))+'</span>';
+    if(ownerValue != null && ownerValue !== '') html += '<span class="hm-record-detail-chip">'+_esc(String(ownerValue))+'</span>';
+    if(updatedValue != null && updatedValue !== '') html += '<span class="hm-record-detail-chip">'+_esc(_chartDateLabel(updatedValue))+'</span>';
+    html += '</div></div>';
+  }
+  function renderField(field){
     var key = field.key;
     var label = _chartText(field, key, key);
     var value = record[key];
@@ -8713,10 +8815,19 @@ function renderRecordDetail(config, data, state, blockId){
     if(editing){
       html += '<input type="'+(field.type === 'number' || field.type === 'currency' ? 'number' : (field.type === 'date' ? 'date' : 'text'))+'" class="hm-input" data-action="hm-detail-input" data-block-id="'+_esc(blockId || '')+'" data-field="'+_esc(key)+'" value="'+_esc(value == null ? '' : String(value))+'">';
     } else {
-      html += '<button type="button" class="hm-record-value" data-action="hm-detail-edit" data-block-id="'+_esc(blockId || '')+'" data-field="'+_esc(key)+'">'+_esc(field.type === 'currency' ? _chartFormatValue(value, 'currency') : field.type === 'date' ? _chartDateLabel(value) : value == null ? '' : String(value))+'</button>';
+      html += '<button type="button" class="hm-record-value" data-action="hm-detail-edit" data-block-id="'+_esc(blockId || '')+'" data-field="'+_esc(key)+'">'+_esc(field.type === 'currency' ? _chartFormatValue(value, 'currency') : (field.type === 'date' || field.type === 'datetime') ? _chartDateLabel(value) : value == null ? '' : String(value))+'</button>';
     }
     html += '</div>';
+  }
+  sections.forEach(function(section){
+    html += '<section class="hm-record-detail-section">';
+    html += '<div class="hm-record-detail-section-title">'+_esc(_chartText(section.label, section.key || 'section', section.key || 'section'))+'</div>';
+    (section.fields || []).forEach(renderField);
+    html += '</section>';
   });
+  if(!sections.length){
+    fields.forEach(renderField);
+  }
   html += '</div>';
   return html;
 }

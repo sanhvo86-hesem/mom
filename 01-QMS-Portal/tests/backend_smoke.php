@@ -905,5 +905,27 @@ smoke_assert(is_array($qualityReport['warnings']['workflow_engine_bridge'] ?? nu
 smoke_assert((int)($qualityReport['summary']['archive_only_tables'] ?? 0) > 0, 'Registry quality report must surface archive-only table governance.');
 smoke_assert((int)($qualityReport['summary']['frontend_foundation_entities'] ?? 0) > 0, 'Registry quality report must include frontend foundation coverage.');
 smoke_assert(is_array($qualityReport['warnings']['frontend_foundation'] ?? null), 'Registry quality report must include frontend foundation blocker summaries.');
+smoke_assert((int)($qualityReport['summary']['attachment_contract_entities'] ?? 0) > 0, 'Registry quality report must surface generated attachment contracts.');
+smoke_assert((int)($qualityReport['summary']['comment_contract_entities'] ?? 0) > 0, 'Registry quality report must surface generated comment contracts.');
+smoke_assert((int)($qualityReport['summary']['activity_contract_entities'] ?? 0) > 0, 'Registry quality report must surface generated activity contracts.');
+smoke_assert(is_array($qualityReport['publishability'] ?? null), 'Registry quality report must include publishability metadata.');
+smoke_assert(($qualityReport['publishability']['ready'] ?? true) === false, 'Registry publishability must remain review-required while partial entities and blocked workflow bridges still exist.');
+smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'review_required', 'Registry publishability status must surface review-required state.');
+smoke_assert((int)($qualityReport['summary']['publishability_review_required_entities'] ?? 0) > 0, 'Registry quality report must count publishability review-required entities.');
+
+$moduleBuilderSource = (string)file_get_contents(QMS_TEST_BASE_DIR . '/scripts/portal/31-module-builder.js');
+$blockEngineSource = (string)file_get_contents(QMS_TEST_BASE_DIR . '/scripts/portal/00-block-engine.js');
+smoke_assert(strpos($moduleBuilderSource, 'runtime-access-policy') !== false, 'Module Builder must load runtime-access-policy metadata.');
+smoke_assert(strpos($moduleBuilderSource, 'publishability') !== false, 'Module Builder must surface publishability metadata instead of relying on a green-only quality gate.');
+smoke_assert(strpos($blockEngineSource, '_recordDetailRuntimeFields') !== false, 'Block engine must synthesize record-detail runtime fields from config.detail.');
+smoke_assert(strpos($blockEngineSource, 'hm-record-detail-header') !== false, 'Block engine record-detail renderer must consume summary metadata from config.detail.');
+
+$frontendFoundation = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/frontend-foundation-catalog.json'), true);
+$documentDistributionFoundation = (array)($frontendFoundation['entities']['document_control.document_distribution'] ?? []);
+smoke_assert(($documentDistributionFoundation['interaction_contracts']['attachments']['list_endpoint'] ?? null) === 'system_infrastructure.file_attachments.list', 'Document distribution must inherit the generic attachment list contract.');
+smoke_assert(($documentDistributionFoundation['interaction_contracts']['comments']['list_endpoint'] ?? null) === 'system_infrastructure.comments.list', 'Document distribution must inherit the generic comment list contract.');
+smoke_assert(($documentDistributionFoundation['interaction_contracts']['activities']['list_endpoint'] ?? null) === 'crm.crm_activities.list', 'Document distribution must inherit the generic activity list contract when source_record_id is available.');
+smoke_assert(in_array('attachments', array_column((array)($documentDistributionFoundation['interaction_contracts']['timeline_sources'] ?? []), 'kind'), true), 'Document distribution timeline must include attachment events once interaction contracts exist.');
+smoke_assert(in_array('comments', array_column((array)($documentDistributionFoundation['interaction_contracts']['timeline_sources'] ?? []), 'kind'), true), 'Document distribution timeline must include comment events once interaction contracts exist.');
 
 echo "backend smoke tests passed\n";

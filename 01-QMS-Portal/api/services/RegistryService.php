@@ -552,6 +552,46 @@ class RegistryService
         return $this->frontendFoundation($entityKey);
     }
 
+    /**
+     * Get the runtime access policy, optionally narrowed to a domain or table.
+     *
+     * @return array<string, mixed>
+     */
+    public function runtimeAccessPolicy(?string $domain = null, ?string $tableName = null): array
+    {
+        $policy = $this->load('runtime-access-policy');
+        if (!is_array($policy)) {
+            return [];
+        }
+
+        if ($tableName !== null && trim($tableName) !== '') {
+            $tables = $policy['tables'] ?? [];
+            $normalized = strtolower(trim($tableName));
+            $override = $tables[$normalized] ?? null;
+            return is_array($override) ? $override : [];
+        }
+
+        if ($domain !== null && trim($domain) !== '') {
+            $domains = $policy['domains'] ?? [];
+            $normalized = strtolower(trim($domain));
+            $domainPolicy = $domains[$normalized] ?? null;
+            return is_array($domainPolicy) ? $domainPolicy : [];
+        }
+
+        return $policy;
+    }
+
+    /**
+     * Get the registry quality report including publishability metadata.
+     *
+     * @return array<string, mixed>
+     */
+    public function qualityReport(): array
+    {
+        $report = $this->load('registry-quality-report');
+        return is_array($report) ? $report : [];
+    }
+
     /* ── Domain Packs API ─────────────────────────────────────────────── */
 
     /**

@@ -144,6 +144,7 @@ manifest_coverage = manifest.get('coverage', {}) if isinstance(manifest, dict) e
 quality_summary = quality_report.get('summary', {}) if isinstance(quality_report, dict) else {}
 quality_checks = quality_report.get('checks', []) if isinstance(quality_report, dict) else []
 failed_quality_checks = [check for check in quality_checks if isinstance(check, dict) and not check.get('passed')]
+publishability = quality_report.get('publishability', {}) if isinstance(quality_report, dict) else {}
 frontend_summary = frontend_foundation.get('summary', {}) if isinstance(frontend_foundation, dict) else {}
 frontend_entities = frontend_foundation.get('entities', {}) if isinstance(frontend_foundation, dict) else {}
 frontend_blocked = {
@@ -274,6 +275,14 @@ if manifest_coverage or quality_summary:
         f"{'PASS' if quality_report.get('all_passed') else 'WARN'} "
         f"({len(quality_checks) - len(failed_quality_checks)}/{len(quality_checks)} checks passed)"
     )
+if publishability:
+    print(
+        "PUBLISHABILITY: "
+        f"{'READY' if publishability.get('ready') else 'REVIEW_REQUIRED'} "
+        f"(partial={quality_summary.get('frontend_partial_entities', 0)}, "
+        f"blocked={quality_summary.get('frontend_blocked_entities', 0)}, "
+        f"workflow_bridge_blocked={quality_summary.get('workflow_engine_bridge_blocked', 0)})"
+    )
 if frontend_summary:
     print(
         "FRONTEND FOUNDATION: "
@@ -354,6 +363,7 @@ audit = {
     'runtime_manifest': manifest_coverage,
     'quality_summary': quality_summary,
     'quality_failed_checks': failed_quality_checks,
+    'publishability': publishability,
     'frontend_foundation_summary': frontend_summary,
     'frontend_foundation_blocked': {
         key: {
