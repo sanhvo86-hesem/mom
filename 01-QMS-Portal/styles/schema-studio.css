@@ -1902,7 +1902,7 @@
 
 .ss-browser.is-domain-view {
   display: grid;
-  grid-template-rows: minmax(150px, var(--ss-domain-top, 42%)) 12px minmax(150px, 1fr);
+  grid-template-rows: minmax(150px, var(--ss-domain-top, 50%)) 12px minmax(150px, 1fr);
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap,
@@ -2538,11 +2538,11 @@
 
 .ss-browser.has-domain-split.is-domain-view {
   display: grid;
-  grid-template-rows: auto 12px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 12px minmax(0, 1fr);
 }
 
 .ss-browser.has-domain-split.is-domain-view.has-manual-split {
-  grid-template-rows: minmax(148px, var(--ss-domain-top, 42%)) 12px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 12px minmax(0, 1fr);
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap {
@@ -2635,11 +2635,11 @@
 }
 
 .ss-browser.has-domain-split.is-domain-view {
-  grid-template-rows: auto 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
 }
 
 .ss-browser.has-domain-split.is-domain-view.has-manual-split {
-  grid-template-rows: minmax(148px, var(--ss-domain-top, 42%)) 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap,
@@ -2675,12 +2675,12 @@
 
 .ss-browser.has-domain-split.is-domain-view {
   display: grid;
-  grid-template-rows: fit-content(192px) 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
   row-gap: 0;
 }
 
 .ss-browser.has-domain-split.is-domain-view.has-manual-split {
-  grid-template-rows: minmax(132px, var(--ss-domain-top, 28%)) 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap {
@@ -2853,12 +2853,12 @@
 }
 
 .ss-browser.has-domain-split.is-domain-view {
-  grid-template-rows: min-content 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
   row-gap: 0;
 }
 
 .ss-browser.has-domain-split.is-domain-view.has-manual-split {
-  grid-template-rows: minmax(148px, var(--ss-domain-top, 34%)) 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap {
@@ -3084,11 +3084,11 @@
 
 .ss-browser.has-domain-split.is-domain-view {
   display: grid;
-  grid-template-rows: auto 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
 }
 
 .ss-browser.has-domain-split.is-domain-view.has-manual-split {
-  grid-template-rows: minmax(148px, var(--ss-domain-top, 42%)) 10px minmax(0, 1fr);
+  grid-template-rows: minmax(148px, var(--ss-domain-top, 50%)) 10px minmax(0, 1fr);
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap,
