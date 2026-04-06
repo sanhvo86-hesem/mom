@@ -142,10 +142,10 @@
         "btn": {
             "paddingX": "8px",
             "gap": "2px",
-            "paddingY": "1px",
+            "paddingY": "2px",
             "borderWidth": "1px",
             "minWidth": "12px",
-            "letterSpacing": "0em"
+            "letterSpacing": "0.02em"
         },
         "tab": {
             "paddingY": "6px",
@@ -178,7 +178,7 @@
         "icon": {
             "onlyScale": "1.5px",
             "leadingEdgeTrim": "8px",
-            "leadingScale": "1.5px",
+            "leadingScale": "1.25px",
             "onlyInset": "1px"
         },
         "pagination": {
@@ -192,7 +192,7 @@
     "_meta": {
         "version": "2.0",
         "description": "Admin-configurable design system.",
-        "updatedAt": "2026-04-06T07:40:25+07:00",
+        "updatedAt": "2026-04-06T11:05:30+07:00",
         "updatedBy": "sanh.vo"
     }
 }
