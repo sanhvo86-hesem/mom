@@ -2,16 +2,16 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-07T14:38:11.802Z",
+    "generatedAt": "2026-04-07T14:51:51.303Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "c4774bed-3928-4a1a-b200-0d339e8d4c78"
+    "publication_run_id": "0b987d57-e143-47f7-96c8-815033baec67"
   },
   "summary": {
     "endpoint_count": 2865,
-    "pack_count": 3282,
+    "pack_count": 3768,
     "relation_edge_count": 2440,
     "workflow_count": 425,
     "status_set_count": 536,
@@ -19,36 +19,36 @@
     "formula_count": 960,
     "formula_reference_count": 960,
     "field_context_count": 39672,
-    "row_version_tables": 547,
-    "org_scoped_tables": 547,
+    "row_version_tables": 628,
+    "org_scoped_tables": 628,
     "composite_pk_tables": 19,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
     "optimistic_concurrency_issues": 0,
     "org_scope_contract_issues": 0,
-    "contract_issues": 16,
+    "contract_issues": 24,
     "workflow_alignment_issues": 0,
     "transition_runtime_warnings": 115,
     "workflow_engine_bridge_ready": 116,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 444,
+    "archive_only_tables": 474,
     "soft_delete_tables": 0,
-    "hard_delete_tables": 103,
+    "hard_delete_tables": 154,
     "workflow_lifecycle_modes": {
-      "stateless": 294,
-      "generic_status_only": 138,
+      "stateless": 367,
+      "generic_status_only": 146,
       "persisted": 115,
       "unknown": 0
     },
-    "frontend_foundation_entities": 552,
+    "frontend_foundation_entities": 633,
     "frontend_ready_entities": 533,
-    "frontend_partial_entities": 0,
-    "frontend_blocked_entities": 19,
-    "attachment_contract_entities": 547,
-    "comment_contract_entities": 547,
-    "activity_contract_entities": 547,
+    "frontend_partial_entities": 3,
+    "frontend_blocked_entities": 97,
+    "attachment_contract_entities": 628,
+    "comment_contract_entities": 628,
+    "activity_contract_entities": 628,
     "publishability_ready": false,
-    "publishability_review_required_entities": 19
+    "publishability_review_required_entities": 100
   },
   "publishability": {
     "ready": false,
@@ -58,22 +58,22 @@
       {
         "id": "frontend_entities_publishable",
         "passed": false,
-        "actual": 19,
+        "actual": 100,
         "target": 0
       },
       {
         "id": "record_endpoint_contracts_clean",
         "passed": false,
-        "actual": 16,
+        "actual": 24,
         "target": 0
       }
     ],
     "blocking_counts": {
-      "frontend_partial_entities": 0,
-      "frontend_blocked_entities": 19,
+      "frontend_partial_entities": 3,
+      "frontend_blocked_entities": 97,
       "workflow_engine_bridge_blocked": 0,
       "unsupported_record_endpoints": 0,
-      "contract_issues": 16
+      "contract_issues": 24
     },
     "recommended_next_actions": [
       "Promote partial frontend foundation entities into publishable contracts.",
@@ -86,19 +86,19 @@
       "id": "tables_have_fields",
       "passed": false,
       "actual": 528,
-      "target": 547
+      "target": 628
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": false,
       "actual": 528,
-      "target": 547
+      "target": 628
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 547,
-      "target": 547
+      "actual": 628,
+      "target": 628
     },
     {
       "id": "fk_edges_covered",
@@ -110,19 +110,19 @@
       "id": "workflow_coverage",
       "passed": false,
       "actual": 528,
-      "target": 547
+      "target": 628
     },
     {
       "id": "status_coverage",
       "passed": false,
       "actual": 222,
-      "target": 238
+      "target": 246
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 528,
-      "target": 515
+      "actual": 609,
+      "target": 596
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -145,8 +145,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 547,
-      "target": 547
+      "actual": 628,
+      "target": 628
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -157,7 +157,7 @@
     {
       "id": "endpoint_contract_readiness",
       "passed": false,
-      "actual": 16,
+      "actual": 24,
       "target": 0
     },
     {
@@ -1164,7 +1164,15 @@
       "foundation_governance.calendar.transition:missing_targets",
       "foundation_governance.shift.transition:missing_targets",
       "foundation_governance.status_code.transition:missing_targets",
-      "foundation_governance.approval.transition:missing_targets"
+      "foundation_governance.approval.transition:missing_targets",
+      "master_data.item_revision.transition:missing_targets",
+      "mfg_engineering.bom.transition:missing_targets",
+      "sales.sales_order.transition:missing_targets",
+      "purchasing.purchase_order.transition:missing_targets",
+      "document_control.document.transition:missing_targets",
+      "audit_risk.audit.transition:missing_targets",
+      "training_hr.training_record.transition:missing_targets",
+      "supplier_relationship.supplier_quality_case.transition:missing_targets"
     ],
     "workflow_alignment_issues": [],
     "transition_runtime_warnings": [
@@ -2049,6 +2057,560 @@
       },
       {
         "entity_key": "foundation_governance.attachment",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.lot_policy",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.serial_policy",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.shelf_life_policy",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.item",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.item_class",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.item_revision",
+        "profile": "document_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 52
+      },
+      {
+        "entity_key": "master_data.item_variant",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.item_site",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.item_attr",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "master_data.item_spec",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.bom",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "mfg_engineering.bom_version",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.bom_line",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.bom_substitute",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.work_definition",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.work_definition_version",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.operation",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.operation_resource",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.operation_material",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.operation_output",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mfg_engineering.work_instruction",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "demand_supply_planning.demand",
+        "profile": "planning_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_planning_time_axis",
+          "missing_planning_status_dimension"
+        ],
+        "score": 43
+      },
+      {
+        "entity_key": "demand_supply_planning.forecast",
+        "profile": "planning_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_planning_status_dimension"
+        ],
+        "score": 43
+      },
+      {
+        "entity_key": "sales.sales_order",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "sales.sales_order_line",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "purchasing.purchase_order_line",
+        "profile": "transactional_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 50
+      },
+      {
+        "entity_key": "demand_supply_planning.mrp_signal",
+        "profile": "planning_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_planning_status_dimension"
+        ],
+        "score": 43
+      },
+      {
+        "entity_key": "demand_supply_planning.planned_supply",
+        "profile": "planning_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_planning_time_axis",
+          "missing_planning_status_dimension"
+        ],
+        "score": 43
+      },
+      {
+        "entity_key": "demand_supply_planning.allocation",
+        "profile": "planning_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_planning_time_axis",
+          "missing_planning_status_dimension"
+        ],
+        "score": 43
+      },
+      {
+        "entity_key": "demand_supply_planning.pegging",
+        "profile": "planning_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_planning_time_axis",
+          "missing_planning_status_dimension"
+        ],
+        "score": 43
+      },
+      {
+        "entity_key": "production.production_order",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "production.production_order_bom_snapshot",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "production.production_order_route_snapshot",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "mes_execution.work_order",
+        "profile": "operator_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 52
+      },
+      {
+        "entity_key": "mes_execution.job",
+        "profile": "operator_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_operation_context"
+        ],
+        "score": 46
+      },
+      {
+        "entity_key": "mes_execution.track_in",
+        "profile": "operator_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_operation_context",
+          "missing_execution_status"
+        ],
+        "score": 46
+      },
+      {
+        "entity_key": "mes_execution.track_out",
+        "profile": "operator_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_operation_context",
+          "missing_execution_status"
+        ],
+        "score": 46
+      },
+      {
+        "entity_key": "mes_execution.pause_resume",
+        "profile": "operator_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_operation_context",
+          "missing_execution_status"
+        ],
+        "score": 46
+      },
+      {
+        "entity_key": "mes_execution.dispatch_queue",
+        "profile": "operator_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_operation_context",
+          "missing_execution_status"
+        ],
+        "score": 46
+      },
+      {
+        "entity_key": "mes_execution.job_event",
+        "profile": "operator_console",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields",
+          "missing_operation_context",
+          "missing_execution_status"
+        ],
+        "score": 46
+      },
+      {
+        "entity_key": "mes_execution.machine_event",
         "profile": "business_record",
         "blockers": [
           "missing_list_endpoint",

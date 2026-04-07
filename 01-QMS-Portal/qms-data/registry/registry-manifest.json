@@ -2,10 +2,10 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-07T14:38:11.802Z",
+    "generatedAt": "2026-04-07T14:51:51.303Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "c4774bed-3928-4a1a-b200-0d339e8d4c78"
+    "publication_run_id": "0b987d57-e143-47f7-96c8-815033baec67"
   },
   "coverage": {
     "router_actions": 2865,
@@ -17,7 +17,7 @@
     "relation_edges": 2440,
     "validation_rules": 27794,
     "formula_count": 960,
-    "domain_pack_count": 3282,
+    "domain_pack_count": 3768,
     "scalar_record_endpoints": 2765,
     "workflow_runtime_modes": {
       "stateless": 291,
@@ -36,15 +36,15 @@
       "unneeded": 415
     },
     "frontend_foundation": {
-      "entity_count": 552,
+      "entity_count": 633,
       "ready_entities": 533,
-      "partial_entities": 0,
-      "blocked_entities": 19,
-      "workflow_ready_entities": 239,
+      "partial_entities": 3,
+      "blocked_entities": 97,
+      "workflow_ready_entities": 247,
       "related_ready_entities": 513,
-      "analytics_ready_entities": 483,
-      "planning_console_entities": 28,
-      "operator_console_entities": 48
+      "analytics_ready_entities": 526,
+      "planning_console_entities": 34,
+      "operator_console_entities": 62
     }
   },
   "assets": {
@@ -62,7 +62,7 @@
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 3282
+      "records": 3768
     },
     "relation-map.json": {
       "kind": "relation-map",
@@ -70,7 +70,7 @@
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
-      "records": 552
+      "records": 633
     },
     "workflow-library.json": {
       "kind": "workflow-library",

@@ -1,17 +1,21 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T14:38:14.293Z",
-    "publication_run_id": "c4774bed-3928-4a1a-b200-0d339e8d4c78",
+    "generatedAt": "2026-04-07T14:51:54.009Z",
+    "publication_run_id": "0b987d57-e143-47f7-96c8-815033baec67",
     "generator_name": "canonical_publication_orchestrator",
     "source_catalog": "qms-data/registry/frontend-foundation-catalog.json"
   },
   "summary": {
-    "total_entities": 552,
+    "total_entities": 633,
     "ready": 533,
-    "partial": 0,
-    "blocked": 19,
-    "partial_by_reason": {},
-    "closure_modes": {}
+    "partial": 3,
+    "blocked": 97,
+    "partial_by_reason": {
+      "unknown_gap": 3
+    },
+    "closure_modes": {
+      "manual_domain_decision": 3
+    }
   },
   "entities": {
     "foundation_governance.org_enterprise": {
@@ -305,6 +309,1335 @@
     "foundation_governance.attachment": {
       "verdict": "blocked",
       "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.lot_policy": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.serial_policy": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.shelf_life_policy": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.item": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.item_class": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.item_revision": {
+      "verdict": "blocked",
+      "score": 52,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.item_variant": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.item_site": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.item_attr": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "master_data.item_spec": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.bom": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.bom_version": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.bom_line": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.bom_substitute": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.work_definition": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.work_definition_version": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.operation": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.operation_resource": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.operation_material": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.operation_output": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mfg_engineering.work_instruction": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "demand_supply_planning.demand": {
+      "verdict": "blocked",
+      "score": 43,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_planning_time_axis",
+        "missing_planning_status_dimension"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "demand_supply_planning.forecast": {
+      "verdict": "blocked",
+      "score": 43,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_planning_status_dimension"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "sales.sales_order": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "sales.sales_order_line": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "purchasing.purchase_order": {
+      "verdict": "partial",
+      "score": 55,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "unknown_gap",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P2",
+      "blocker_summary": "Unclassified blocker: missing_list_endpoint; Unclassified blocker: insufficient_list_fields; Unclassified blocker: missing_detail_endpoint; Unclassified blocker: missing_detail_sections; Unclassified blocker: missing_form_mutation_endpoints; Unclassified blocker: missing_editable_fields"
+    },
+    "purchasing.purchase_order_line": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "demand_supply_planning.mrp_signal": {
+      "verdict": "blocked",
+      "score": 43,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_planning_status_dimension"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "demand_supply_planning.planned_supply": {
+      "verdict": "blocked",
+      "score": 43,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_planning_time_axis",
+        "missing_planning_status_dimension"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "demand_supply_planning.allocation": {
+      "verdict": "blocked",
+      "score": 43,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_planning_time_axis",
+        "missing_planning_status_dimension"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "demand_supply_planning.pegging": {
+      "verdict": "blocked",
+      "score": 43,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_planning_time_axis",
+        "missing_planning_status_dimension"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "production.production_order": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "production.production_order_bom_snapshot": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "production.production_order_route_snapshot": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.work_order": {
+      "verdict": "blocked",
+      "score": 52,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.job": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.track_in": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.track_out": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.pause_resume": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.dispatch_queue": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.job_event": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.machine_event": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.downtime_event": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.alarm_event": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.process_param_capture": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.labor_capture": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.tool_usage": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.material_consumption": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.production_completion": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.scrap": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context",
+        "missing_execution_status"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "mes_execution.rework": {
+      "verdict": "blocked",
+      "score": 46,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields",
+        "missing_operation_context"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "traceability_serialization.genealogy_link": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "traceability_serialization.lot": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "traceability_serialization.serial": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "inventory.container": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "inventory.inventory_ledger": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "inventory.inventory_balance_snapshot": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "inventory.location_balance": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "finance.cost_ledger": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "finance.wip_ledger": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.inspection_plan": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.inspection_characteristic": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.inspection_lot": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.inspection_result": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.quality_order": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.quality_case_link": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.nonconformance": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.deviation": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.capa": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "quality_management.complaint": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "document_control.document": {
+      "verdict": "blocked",
+      "score": 52,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "document_control.document_revision": {
+      "verdict": "blocked",
+      "score": 47,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "plm_change_control.change_control": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "audit_risk.audit_program": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "audit_risk.audit": {
+      "verdict": "partial",
+      "score": 55,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "unknown_gap",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P2",
+      "blocker_summary": "Unclassified blocker: missing_list_endpoint; Unclassified blocker: insufficient_list_fields; Unclassified blocker: missing_detail_endpoint; Unclassified blocker: missing_detail_sections; Unclassified blocker: missing_form_mutation_endpoints; Unclassified blocker: missing_editable_fields"
+    },
+    "audit_risk.finding": {
+      "verdict": "blocked",
+      "score": 50,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "training_hr.competency": {
+      "verdict": "blocked",
+      "score": 47,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "training_hr.training_matrix": {
+      "verdict": "blocked",
+      "score": 47,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "training_hr.training_record": {
+      "verdict": "blocked",
+      "score": 52,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "supplier_relationship.supplier_quality_case": {
+      "verdict": "partial",
+      "score": 55,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "unknown_gap",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P2",
+      "blocker_summary": "Unclassified blocker: missing_list_endpoint; Unclassified blocker: insufficient_list_fields; Unclassified blocker: missing_detail_endpoint; Unclassified blocker: missing_detail_sections; Unclassified blocker: missing_form_mutation_endpoints; Unclassified blocker: missing_editable_fields"
+    },
+    "audit_risk.audit_trail": {
+      "verdict": "blocked",
+      "score": 50,
       "blockers": [
         "missing_list_endpoint",
         "insufficient_list_fields",
