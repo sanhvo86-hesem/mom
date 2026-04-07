@@ -1,26 +1,26 @@
 {
-  "publication_run_id": "63816d02-addf-44cc-84ca-fe343d3518f2",
-  "generatedAt": "2026-04-07T04:31:38.777Z",
-  "source_commit": "4ea0e45a",
+  "publication_run_id": "04d19d49-c63d-4fb8-8525-07a3aba2f65f",
+  "generatedAt": "2026-04-07T04:49:09.065Z",
+  "source_commit": "8fcb199a",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "5163d967d9ac1fbcc2b4b89efc64dde957264372bb2bb61486b8d6f40aecab8f",
-    "frontend-foundation-catalog.json": "fe8e942345f10f2e8d29cf95efaef05722e897e510352464f74b7d9c2877074d",
-    "registry-manifest.json": "2d577ea68a1870e135ba3b7d31f0f3f31e1292285934f01e37076c7e54d1ca45",
-    "registry-quality-report.json": "02e05c85a54ff999e69aca95db0e6eb914c834c1626641fef1f8776e6ce6c466",
-    "domain-field-packs.json": "e2fb246618ffa51d02709f0b4e3edffdaa823c0a698c8cb7880c24c7881a50a2",
+    "endpoint-catalog.json": "d0d18a0c19911f28364ab32fce831838777b62616b5ebd024422febc0770dec8",
+    "frontend-foundation-catalog.json": "45faebc4910cd34367b198c48dcb1d13fef462773dd0e775e0d5f3037f7e0398",
+    "registry-manifest.json": "37659d627a5cf0540b1a8e56ac89a6bcf2096369398f4aad7fa9171f31b82946",
+    "registry-quality-report.json": "4c82ed2f849e46f1a2f71a7b8a2c21a532a25bd9c4f1eba825c7ecc2348f0880",
+    "domain-field-packs.json": "84bd2d029c3186c2e35e66da2d1e5b0d07ac81a05fe4567937cbc1be9271a600",
     "data-fields-part2.json": "61b73b0d47034449b103fc52abc22b58cf0fdd01e17da37a194a303c992cde72",
-    "wave-gap-ledger.json": "c9d0d4ae52d9a176787999d7d8eb048f2aebc15f435c31cc028cc93dbde52b44"
+    "wave-gap-ledger.json": "a2540a172cc7659ab0d9cc3fb4e0d73617798ea88dd20f91bc824c2f8494458f"
   },
   "summary_counts": {
-    "ready": 425,
-    "partial": 108,
+    "ready": 461,
+    "partial": 72,
     "blocked": 0,
-    "wf_ready": 218,
-    "bridge_ready": 104,
-    "bridge_blocked": 11,
+    "wf_ready": 223,
+    "bridge_ready": 109,
+    "bridge_blocked": 6,
     "endpoints": 2872
   },
   "invariant_checks": [
@@ -32,17 +32,17 @@
     {
       "name": "frontend_entity_counts_consistent",
       "status": "PASS",
-      "detail": "summary.entity_count=533 vs actual=533; ready=425/425; partial=108/108; blocked=0/0"
+      "detail": "summary.entity_count=533 vs actual=533; ready=461/461; partial=72/72; blocked=0/0"
     },
     {
       "name": "bridge_counts_consistent",
       "status": "PASS",
-      "detail": "qr: ready=104, blocked=11; manifest: ready=104, blocked=11"
+      "detail": "qr: ready=109, blocked=6; manifest: ready=109, blocked=6"
     },
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['125236b7-2b71-4e39-9520-5f23d29c74b2']"
+      "detail": "distinct_run_ids=['355e5ad4-912c-4bce-92a8-5d7a25a79c57']"
     },
     {
       "name": "approval_group_not_split_truth",

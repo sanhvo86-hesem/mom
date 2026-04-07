@@ -2,11 +2,11 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-07T04:31:36.434Z",
+    "generatedAt": "2026-04-07T04:49:06.711Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
-    "publication_run_id": "125236b7-2b71-4e39-9520-5f23d29c74b2"
+    "publication_run_id": "355e5ad4-912c-4bce-92a8-5d7a25a79c57"
   },
   "summary": {
     "endpoint_count": 2862,
@@ -28,8 +28,8 @@
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
     "transition_runtime_warnings": 115,
-    "workflow_engine_bridge_ready": 104,
-    "workflow_engine_bridge_blocked": 11,
+    "workflow_engine_bridge_ready": 109,
+    "workflow_engine_bridge_blocked": 6,
     "archive_only_tables": 428,
     "soft_delete_tables": 0,
     "hard_delete_tables": 100,
@@ -40,14 +40,14 @@
       "unknown": 0
     },
     "frontend_foundation_entities": 533,
-    "frontend_ready_entities": 425,
-    "frontend_partial_entities": 108,
+    "frontend_ready_entities": 461,
+    "frontend_partial_entities": 72,
     "frontend_blocked_entities": 0,
     "attachment_contract_entities": 521,
     "comment_contract_entities": 521,
     "activity_contract_entities": 411,
     "publishability_ready": false,
-    "publishability_review_required_entities": 108
+    "publishability_review_required_entities": 72
   },
   "publishability": {
     "ready": false,
@@ -57,20 +57,20 @@
       {
         "id": "frontend_entities_publishable",
         "passed": false,
-        "actual": 108,
+        "actual": 72,
         "target": 0
       },
       {
         "id": "workflow_engine_bridges_ready",
         "passed": false,
-        "actual": 12,
+        "actual": 7,
         "target": 0
       }
     ],
     "blocking_counts": {
-      "frontend_partial_entities": 108,
+      "frontend_partial_entities": 72,
       "frontend_blocked_entities": 0,
-      "workflow_engine_bridge_blocked": 12,
+      "workflow_engine_bridge_blocked": 7,
       "unsupported_record_endpoints": 0,
       "contract_issues": 0
     },
@@ -1196,7 +1196,7 @@
         "table": "capa_8d_steps",
         "workflowId": "wf_capa",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1287,7 +1287,7 @@
         "table": "dw_supplier_dim",
         "workflowId": "wf_dw_supplier_dim",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1433,17 +1433,6 @@
     ],
     "workflow_engine_bridge": [
       {
-        "table": "capa_8d_steps",
-        "workflowId": "wf_capa",
-        "record_type": "CAPA",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
         "table": "cnc_program_versions",
         "workflowId": "wf_cnc_program_approval",
         "record_type": "CNC_PROGRAM_APPROVAL",
@@ -1466,42 +1455,9 @@
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "dw_supplier_dim",
-        "workflowId": "wf_dw_supplier_dim",
-        "record_type": "DW_SUPPLIER_DIM",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
         "table": "incoming_inspection_results",
         "workflowId": "wf_receiving_inspection",
         "record_type": "RECEIVING_INSPECTION",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "integration_monitors",
-        "workflowId": "wf_integration_monitor",
-        "record_type": "INTEGRATION_MONITOR",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "job_operations",
-        "workflowId": "wf_job_order",
-        "record_type": "JOB_ORDER",
         "identity_field": null,
         "state_alignment_ratio": 1,
         "block_reasons": [
@@ -1535,17 +1491,6 @@
         "table": "quote_history",
         "workflowId": "wf_quote_lifecycle",
         "record_type": "QUOTE_LIFECYCLE",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "retention_policies",
-        "workflowId": "wf_retention_policy",
-        "record_type": "RETENTION_POLICY",
         "identity_field": null,
         "state_alignment_ratio": 1,
         "block_reasons": [

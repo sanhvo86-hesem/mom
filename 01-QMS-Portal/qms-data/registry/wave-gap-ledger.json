@@ -1,24 +1,22 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T04:31:38.762Z",
-    "publication_run_id": "125236b7-2b71-4e39-9520-5f23d29c74b2",
+    "generatedAt": "2026-04-07T04:49:09.052Z",
+    "publication_run_id": "355e5ad4-912c-4bce-92a8-5d7a25a79c57",
     "generator_name": "canonical_publication_orchestrator",
     "source_catalog": "qms-data/registry/frontend-foundation-catalog.json"
   },
   "summary": {
     "total_entities": 533,
-    "ready": 425,
-    "partial": 108,
+    "ready": 461,
+    "partial": 72,
     "blocked": 0,
     "partial_by_reason": {
-      "metadata_only_gap": 98,
-      "workflow_blocked": 5,
-      "field_pack_gap": 4,
-      "unknown_gap": 1
+      "metadata_only_gap": 68,
+      "field_pack_gap": 4
     },
     "closure_modes": {
-      "generator_automatable": 97,
-      "manual_domain_decision": 11
+      "generator_automatable": 62,
+      "manual_domain_decision": 10
     }
   },
   "entities": {
@@ -51,64 +49,59 @@
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "advanced_planning.aps_demand_forecasts": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning status dimension"
     },
     "advanced_planning.aps_kpi_snapshots": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "advanced_planning.aps_material_availability": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "advanced_planning.aps_pegging_links": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "advanced_planning.aps_planning_horizons": {
       "verdict": "partial",
@@ -125,24 +118,12 @@
       "verdict": "partial",
       "score": 88,
       "blockers": [
-        "missing_planning_time_axis",
-        "missing_resource_dimension"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot"
-    },
-    "advanced_planning.aps_schedule_conflicts": {
-      "verdict": "partial",
-      "score": 83,
-      "blockers": [
-        "missing_planning_status_dimension"
+        "missing_planning_time_axis"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
       "wave_assignment": "P2",
-      "blocker_summary": "Missing planning status dimension"
+      "blocker_summary": "Missing planning time axis dimension"
     },
     "advanced_planning.aps_setup_matrices": {
       "verdict": "partial",
@@ -155,39 +136,6 @@
       "closure_mode": "generator_automatable",
       "wave_assignment": "P2",
       "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
-    },
-    "audit_risk.audit_actions": {
-      "verdict": "partial",
-      "score": 91,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "master_data.bom_components": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "quality_management.capa_8d_steps": {
-      "verdict": "partial",
-      "score": 82,
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
     },
     "advanced_planning.capacity_snapshots": {
       "verdict": "partial",
@@ -239,37 +187,24 @@
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "demand_supply_planning.demand_history_buckets": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
-    },
-    "document_control.document_distribution": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "bi_datawarehouse.dw_machine_dim": {
       "verdict": "partial",
@@ -284,50 +219,6 @@
       "wave_assignment": "P1",
       "blocker_summary": "Missing operation context semantic slot; Missing traceability identity field in table registry; Missing execution status semantic slot"
     },
-    "bi_datawarehouse.dw_supplier_dim": {
-      "verdict": "partial",
-      "score": 82,
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    },
-    "bi_datawarehouse.dw_time_dim": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "training_hr.employee_certifications": {
-      "verdict": "partial",
-      "score": 91,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "shipping_compliance.export_licenses": {
-      "verdict": "partial",
-      "score": 91,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
     "quality_management.fai_characteristics": {
       "verdict": "partial",
       "score": 86,
@@ -339,51 +230,17 @@
       "wave_assignment": "P0",
       "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
     },
-    "system_infrastructure.file_attachments": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "forms_system.form_attachments": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "system_infrastructure.integration_monitors": {
-      "verdict": "partial",
-      "score": 82,
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    },
     "demand_supply_planning.inventory_buffer_profiles": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "inventory.inventory_locations": {
       "verdict": "partial",
@@ -395,17 +252,6 @@
       "closure_mode": "generator_automatable",
       "wave_assignment": "P0",
       "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "production.job_operations": {
-      "verdict": "partial",
-      "score": 85,
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
     },
     "calibration_equipment.maintenance_work_orders": {
       "verdict": "partial",
@@ -515,63 +361,27 @@
       "wave_assignment": "P1",
       "blocker_summary": "Missing operation context semantic slot"
     },
-    "mes_execution.mes_erp_inbound_queue": {
-      "verdict": "partial",
-      "score": 91,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
     "mes_execution.mes_fixture_assignments": {
       "verdict": "partial",
       "score": 82,
       "blockers": [
-        "missing_traceability_identity",
-        "missing_execution_status"
+        "missing_traceability_identity"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
       "wave_assignment": "P1",
-      "blocker_summary": "Missing traceability identity field in table registry; Missing execution status semantic slot"
-    },
-    "mes_execution.mes_genealogy_operations": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_execution_status"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing execution status semantic slot"
-    },
-    "mes_execution.mes_inline_measurements": {
-      "verdict": "partial",
-      "score": 82,
-      "blockers": [
-        "missing_record_timestamps",
-        "missing_execution_status"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at); Missing execution status semantic slot"
+      "blocker_summary": "Missing traceability identity field in table registry"
     },
     "mes_execution.mes_machine_alarms": {
       "verdict": "partial",
-      "score": 87,
+      "score": 91,
       "blockers": [
-        "missing_record_timestamps",
         "missing_operation_context"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at); Missing operation context semantic slot"
+      "wave_assignment": "P1",
+      "blocker_summary": "Missing operation context semantic slot"
     },
     "mes_execution.mes_machine_state_events": {
       "verdict": "partial",
@@ -660,17 +470,6 @@
       "wave_assignment": "P1",
       "blocker_summary": "Missing execution status semantic slot"
     },
-    "mes_execution.mes_operator_qualifications": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
     "mes_execution.mes_operator_sessions": {
       "verdict": "partial",
       "score": 86,
@@ -695,17 +494,6 @@
       "wave_assignment": "P1",
       "blocker_summary": "Missing operation context semantic slot; Missing execution status semantic slot"
     },
-    "mes_execution.mes_production_kpi_daily": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
     "mes_execution.mes_program_events": {
       "verdict": "partial",
       "score": 69,
@@ -723,40 +511,27 @@
     },
     "mes_execution.mes_spare_parts_consumption": {
       "verdict": "partial",
-      "score": 82,
+      "score": 86,
       "blockers": [
-        "missing_record_timestamps",
         "missing_operation_context",
         "missing_execution_status"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at); Missing operation context semantic slot; Missing execution status semantic slot"
-    },
-    "mes_execution.mes_spc_control_limits": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
+      "wave_assignment": "P1",
+      "blocker_summary": "Missing operation context semantic slot; Missing execution status semantic slot"
     },
     "mes_execution.mes_spc_violations": {
       "verdict": "partial",
-      "score": 82,
+      "score": 86,
       "blockers": [
-        "missing_record_timestamps",
         "missing_operation_context",
         "missing_execution_status"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at); Missing operation context semantic slot; Missing execution status semantic slot"
+      "wave_assignment": "P1",
+      "blocker_summary": "Missing operation context semantic slot; Missing execution status semantic slot"
     },
     "mes_execution.mes_tool_life_events": {
       "verdict": "partial",
@@ -784,53 +559,9 @@
       "wave_assignment": "P1",
       "blocker_summary": "Missing operation context semantic slot"
     },
-    "mes_execution.mes_wip_movements": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "advanced_planning.mrp_planned_orders": {
-      "verdict": "partial",
-      "score": 88,
-      "blockers": [
-        "missing_resource_dimension"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing resource dimension semantic slot"
-    },
     "system_infrastructure.naming_patterns": {
       "verdict": "partial",
       "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "quality_management.ncr_human_factors": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "sales.order_holds": {
-      "verdict": "partial",
-      "score": 91,
       "blockers": [
         "missing_record_timestamps"
       ],
@@ -933,61 +664,6 @@
       "wave_assignment": "P1",
       "blocker_summary": "Missing operation context semantic slot"
     },
-    "customer_portal.portal_document_access": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "customer_portal.portal_order_views": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "advanced_planning.production_schedule_slots": {
-      "verdict": "partial",
-      "score": 83,
-      "blockers": [
-        "missing_planning_status_dimension"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P2",
-      "blocker_summary": "Missing planning status dimension"
-    },
-    "project_management.project_milestones": {
-      "verdict": "partial",
-      "score": 91,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "project_management.project_resources": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
     "purchasing.purchase_order_lines": {
       "verdict": "partial",
       "score": 86,
@@ -1021,17 +697,6 @@
       "wave_assignment": "P0",
       "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
     },
-    "master_data_governance.retention_policies": {
-      "verdict": "partial",
-      "score": 82,
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    },
     "sales.sales_order_lines": {
       "verdict": "partial",
       "score": 86,
@@ -1047,13 +712,12 @@
       "verdict": "partial",
       "score": 83,
       "blockers": [
-        "missing_planning_time_axis",
-        "missing_planning_status_dimension"
+        "missing_planning_time_axis"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
       "wave_assignment": "P2",
-      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
+      "blocker_summary": "Missing planning time axis dimension"
     },
     "production.shift_assignments": {
       "verdict": "partial",
@@ -1101,102 +765,64 @@
       "wave_assignment": "P0",
       "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
     },
-    "training_hr.skills_matrix": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "demand_supply_planning.sop_action_items": {
-      "verdict": "partial",
-      "score": 88,
-      "blockers": [
-        "missing_resource_dimension"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing resource dimension semantic slot"
-    },
     "demand_supply_planning.sop_demand_consensus": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "demand_supply_planning.sop_inventory_policies": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning status dimension"
     },
     "demand_supply_planning.sop_meeting_cycles": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "demand_supply_planning.sop_plan_versions": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
-    },
-    "demand_supply_planning.sop_plans": {
-      "verdict": "partial",
-      "score": 88,
-      "blockers": [
-        "missing_resource_dimension"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing resource dimension semantic slot"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "demand_supply_planning.sop_scenario_assumptions": {
       "verdict": "partial",
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "demand_supply_planning.sop_supply_consensus": {
       "verdict": "partial",
@@ -1215,13 +841,12 @@
       "score": 83,
       "blockers": [
         "missing_planning_time_axis",
-        "missing_resource_dimension",
         "missing_planning_status_dimension"
       ],
       "reason_bucket": "metadata_only_gap",
       "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing planning time axis dimension; Missing resource dimension semantic slot; Missing planning status dimension"
+      "wave_assignment": "P2",
+      "blocker_summary": "Missing planning time axis dimension; Missing planning status dimension"
     },
     "tooling_lifecycle.tooling_calibration_links": {
       "verdict": "partial",
@@ -1236,53 +861,9 @@
       "wave_assignment": "P1",
       "blocker_summary": "Missing operation context semantic slot; Missing traceability identity field in table registry; Missing execution status semantic slot"
     },
-    "tooling_lifecycle.tooling_kits": {
-      "verdict": "partial",
-      "score": 91,
-      "blockers": [
-        "missing_station_or_resource_context"
-      ],
-      "reason_bucket": "unknown_gap",
-      "closure_mode": "manual_domain_decision",
-      "wave_assignment": "P2",
-      "blocker_summary": "Unclassified blocker: missing_station_or_resource_context"
-    },
-    "traceability_serialization.trace_label_print_jobs": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "core_system.user_roles": {
-      "verdict": "partial",
-      "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
     "system_infrastructure.variable_registry": {
       "verdict": "partial",
       "score": 86,
-      "blockers": [
-        "missing_record_timestamps"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P0",
-      "blocker_summary": "Missing record timestamp fields (created_at/updated_at)"
-    },
-    "system_infrastructure.workflow_step_data": {
-      "verdict": "partial",
-      "score": 80,
       "blockers": [
         "missing_record_timestamps"
       ],
