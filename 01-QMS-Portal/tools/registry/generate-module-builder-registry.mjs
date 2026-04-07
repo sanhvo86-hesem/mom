@@ -1159,7 +1159,8 @@ function formulaAliasesForDomain(domain, profile) {
   }
   if (/finance/.test(key)) aliases.push('finance');
   if (/warehouse|inventory|purchasing|shipping|transport|logistics/.test(key)) aliases.push('supply_chain', 'logistics');
-  if (/commercial|crm|quote|order|customer/.test(key)) aliases.push('commercial', 'sales');
+  if (/commercial|crm|quote|order|customer/.test(key)) aliases.push('commercial', 'sales', 'system');
+  if (/bi_|dw_/.test(key)) aliases.push('system');
   return uniqueStrings(aliases);
 }
 
