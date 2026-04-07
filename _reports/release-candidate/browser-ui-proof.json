@@ -1,0 +1,83 @@
+{
+  "release_candidate_run_id": "browser-ui-proof-20260407",
+  "generatedAt": "2026-04-07T09:19:54.074430+00:00",
+  "server": "PHP 8.2 built-in at 127.0.0.1:8080",
+  "auth": {
+    "user": "sanh.vo",
+    "role": "ceo",
+    "login": "PASS"
+  },
+  "flows_proven": [
+    {
+      "entity": "platform.gateway",
+      "page": "Gateway landing page",
+      "status": "PASS",
+      "evidence": "HESEM QMS Gateway loads, navigation to Portal works"
+    },
+    {
+      "entity": "platform.login",
+      "page": "Login form",
+      "status": "PASS",
+      "evidence": "Auth form renders, invalid credentials correctly rejected (invalid_credentials), valid login succeeds with session"
+    },
+    {
+      "entity": "platform.dashboard",
+      "page": "Main Dashboard",
+      "status": "PASS",
+      "evidence": "KPI cards (OTD, FPY, COPQ, NCR, IQC PASS, OEE, ENG FTR, ECN LEAD), G0-G7 gate flow, role-based quick access, document favorites"
+    },
+    {
+      "entity": "production.order_control_tower",
+      "page": "Order Control Tower",
+      "status": "PASS",
+      "evidence": "SO/JO/WO metrics, phase tracking (Thuong mai->Ky thuat->Lap lich->Thuc thi->Chat luong->Giao hang), MES Governance queue, +SO/+JO/+WO buttons"
+    },
+    {
+      "entity": "quality.exception_management",
+      "page": "Quality Exception Hub (NCR/CAPA/MRB)",
+      "status": "PASS",
+      "evidence": "Tabs (Tong quan, Tao moi, Bao cao 8D, MRB, COPQ, Xu huong), filters (loai, muc do, trang thai, date, bo phan), pagination"
+    },
+    {
+      "entity": "mes.control_center",
+      "page": "MES Control Center",
+      "status": "PASS",
+      "evidence": "Real-time status, machine states (1 running, 1 stopped), OEE 48.2%, MTConnect polling, Epicor integration buttons, tooling alerts, WO governance"
+    },
+    {
+      "entity": "evidence.vault",
+      "page": "Evidence Vault (Kho chung cu)",
+      "status": "PASS",
+      "evidence": "Tabs (Duyet, Tai len, Chi tiet, Tim kiem, Toan ven), type/date/link filters"
+    }
+  ],
+  "sidebar_modules_verified": [
+    "Dashboard",
+    "Tim kiem",
+    "Tu dien thuat ngu",
+    "Don hang",
+    "Phan cong san xuat",
+    "Xuong san xuat",
+    "Cong nhan di dong",
+    "Bao gia",
+    "Su khong phu hop",
+    "Chat luong NCC",
+    "FMEA & Control Plan",
+    "APQP/PPAP",
+    "AI Chat luong",
+    "Kiem soat chung cu",
+    "Kho chung cu",
+    "Bao cao",
+    "Cai tien lien tuc",
+    "Kho kien thuc",
+    "Chuong trinh CNC",
+    "Ho chieu san pham",
+    "Schema Studio",
+    "Nang luong",
+    "Trien khai",
+    "Cong khach hang"
+  ],
+  "total_modules_in_sidebar": 24,
+  "overall_status": "PASS",
+  "honest_note": "Browser proof executed against live PHP 8.2 server. All pages loaded from real backend. No manual patching required."
+}
