@@ -159,8 +159,7 @@ var state = {
     runtimeAccessPolicy: null,
     frontendFoundation: {},
     manifest: null,
-    qualityReport: null,
-    schemaStudioManifest: null
+    qualityReport: null
   }
 };
 
@@ -1963,7 +1962,6 @@ function _ensureRegistriesLoaded(force){
       HR.preload('frontend-foundation-catalog', function(d){ state.registries.frontendFoundation = d || {}; _onLazy(); });
       HR.preload('registry-manifest', function(d){ state.registries.manifest = d || null; _onLazy(); });
       HR.preload('registry-quality-report', function(d){ state.registries.qualityReport = d || null; _onLazy(); });
-      HR.preload('schema-studio-enterprise-manifest', function(d){ state.registries.schemaStudioManifest = d || null; _onLazy(); });
     });
     return;
   }
@@ -1986,8 +1984,7 @@ function _ensureRegistriesLoaded(force){
     _loadRegistry('runtime-access-policy', 'runtimeAccessPolicy'),
     _loadRegistry('frontend-foundation-catalog', 'frontendFoundation'),
     _loadRegistry('registry-manifest', 'manifest'),
-    _loadRegistry('registry-quality-report', 'qualityReport'),
-    _loadRegistry('schema-studio-enterprise-manifest', 'schemaStudioManifest')
+    _loadRegistry('registry-quality-report', 'qualityReport')
   ]).then(function(){
     _finishRegistryLoad();
   }).catch(function(){
@@ -2179,12 +2176,10 @@ function _applyEndpointCatalog(){
 function _registryHealthSummary(){
   var manifest = state.registries.manifest || {};
   var quality = state.registries.qualityReport || {};
-  var schemaStudio = state.registries.schemaStudioManifest || {};
   var publishability = quality.publishability || {};
   var coverage = manifest.coverage || {};
   var summary = quality.summary || {};
   var foundation = coverage.frontend_foundation || {};
-  var schemaStudioSummary = schemaStudio.summary || {};
   var checks = Array.isArray(quality.checks) ? quality.checks : [];
   var passedChecks = checks.filter(function(check){ return check && check.passed; }).length;
   var generatedAt = (manifest._meta && manifest._meta.generatedAt) || (quality._meta && quality._meta.generatedAt) || '';
@@ -2220,81 +2215,7 @@ function _registryHealthSummary(){
     frontendReadyEntities: summary.frontend_ready_entities || foundation.ready_entities || 0,
     frontendPartialEntities: summary.frontend_partial_entities || foundation.partial_entities || 0,
     frontendBlockedEntities: summary.frontend_blocked_entities || foundation.blocked_entities || 0,
-    publishabilityFailedChecks: publishabilityFailedChecks,
-    schemaStudioProjectionCount: schemaStudioSummary.projectionCount || 0,
-    schemaStudioReleaseCount: schemaStudioSummary.releaseCount || 0,
-    schemaStudioPolicyCount: schemaStudioSummary.policyCount || 0,
-    schemaStudioCanonicalCoverage: schemaStudioSummary.canonicalCoveragePercent || 0,
-    schemaStudioCriticalGaps: schemaStudioSummary.criticalCanonicalGaps || 0,
-    schemaStudioVisualReadiness: schemaStudioSummary.visualReadinessScore || 0,
-    schemaStudioMetadataCompleteness: schemaStudioSummary.metadataCompletenessPercent || 0,
-    schemaStudioGraphDensity: schemaStudioSummary.graphDensityScore || 0,
-    schemaStudioWorkflowCoverage: schemaStudioSummary.workflowBindingCoveragePercent || 0,
-    schemaStudioOrphanRisk: schemaStudioSummary.orphanRelationRiskCount || 0,
-    schemaStudioHotspots: schemaStudioSummary.hotspotCount || 0,
-    schemaStudioGovernanceCoverage: schemaStudioSummary.governanceCoveragePercent || 0,
-    schemaStudioJourneyReadiness: schemaStudioSummary.journeyReadinessScore || 0,
-    schemaStudioDomainReadiness: schemaStudioSummary.domainReadinessScore || 0,
-    schemaStudioReleaseRadar: schemaStudioSummary.releaseRadarScore || 0,
-    schemaStudioBlockers: schemaStudioSummary.blockerCount || 0,
-    schemaStudioDomainCount: schemaStudioSummary.domainCount || 0,
-    schemaStudioLayerCount: schemaStudioSummary.layerCount || 0,
-    schemaStudioStoryboardCount: schemaStudioSummary.storyboardCount || 0,
-    schemaStudioPolicyCoverage: schemaStudioSummary.policyCoveragePercent || 0,
-    schemaStudioPerformancePosture: schemaStudioSummary.performancePostureScore || 0,
-    schemaStudioRegistrySync: schemaStudioSummary.registrySyncScore || 0,
-    schemaStudioComplianceReadiness: schemaStudioSummary.complianceReadinessScore || 0,
-    schemaStudioAICopilotReadiness: schemaStudioSummary.aiCopilotReadinessScore || 0,
-    schemaStudioExperienceScore: schemaStudioSummary.experienceScore || 0,
-    schemaStudioOperationsScore: schemaStudioSummary.operationsScore || 0,
-    schemaStudioPromotionReadiness: schemaStudioSummary.promotionReadinessScore || 0,
-    schemaStudioFirewallScore: schemaStudioSummary.firewallScore || 0,
-    schemaStudioObservabilityScore: schemaStudioSummary.observabilityScore || 0,
-    schemaStudioCommandCenterScore: schemaStudioSummary.commandCenterScore || 0,
-    schemaStudioPersonaCount: schemaStudioSummary.personaCount || 0,
-    schemaStudioPlaybookCount: schemaStudioSummary.playbookCount || 0,
-    schemaStudioReleaseLaneCount: schemaStudioSummary.releaseLaneCount || 0,
-    schemaStudioCopilotSuggestionCount: schemaStudioSummary.copilotSuggestionCount || 0,
-    schemaStudioFocusDeckCount: schemaStudioSummary.focusDeckCount || 0,
-    schemaStudioBranchCount: schemaStudioSummary.branchCount || 0,
-    schemaStudioEnvironmentCount: schemaStudioSummary.environmentCount || 0,
-    schemaStudioStageCount: schemaStudioSummary.stageCount || 0,
-    schemaStudioEventRailCount: schemaStudioSummary.eventRailCount || 0,
-    schemaStudioOrchestrationScore: schemaStudioSummary.orchestrationScore || 0,
-    schemaStudioNarrativeCoverage: schemaStudioSummary.narrativeCoverageScore || 0,
-    schemaStudioReviewWallScore: schemaStudioSummary.reviewWallScore || 0,
-    schemaStudioAtlasReadiness: schemaStudioSummary.atlasReadinessScore || 0,
-    schemaStudioLivePulseScore: schemaStudioSummary.livePulseScore || 0,
-    schemaStudioCollaborationReadiness: schemaStudioSummary.collaborationReadinessScore || 0,
-    schemaStudioVisualPolish: schemaStudioSummary.visualPolishScore || 0,
-    schemaStudioSceneCount: schemaStudioSummary.sceneCount || 0,
-    schemaStudioSpotlightCount: schemaStudioSummary.spotlightCount || 0,
-    schemaStudioReviewLaneCount: schemaStudioSummary.reviewLaneCount || 0,
-    schemaStudioAtlasCount: schemaStudioSummary.atlasCount || 0,
-    schemaStudioAtlasMeshScore: schemaStudioSummary.atlasMeshScore || 0,
-    schemaStudioPhysicalCoverage: schemaStudioSummary.physicalCoverageScore || 0,
-    schemaStudioReviewOpsScore: schemaStudioSummary.reviewOpsScore || 0,
-    schemaStudioExportSurfaceScore: schemaStudioSummary.exportSurfaceScore || 0,
-    schemaStudioInteroperabilityScore: schemaStudioSummary.interoperabilityScore || 0,
-    schemaStudioRoleModeScore: schemaStudioSummary.roleModeScore || 0,
-    schemaStudioTraceabilityAtlasScore: schemaStudioSummary.traceabilityAtlasScore || 0,
-    schemaStudioBeautySystemScore: schemaStudioSummary.beautySystemScore || 0,
-    schemaStudioObjectSurfaceCount: schemaStudioSummary.objectSurfaceCount || 0,
-    schemaStudioRoleModeCount: schemaStudioSummary.roleModeCount || 0,
-    schemaStudioReviewBoardCount: schemaStudioSummary.reviewBoardCount || 0,
-    schemaStudioExportBundleCount: schemaStudioSummary.exportBundleCount || 0,
-    schemaStudioVisualLanguageScore: schemaStudioSummary.visualLanguageScore || 0,
-    schemaStudioCardHierarchy: schemaStudioSummary.cardHierarchyScore || 0,
-    schemaStudioEdgeLegibility: schemaStudioSummary.edgeLegibilityScore || 0,
-    schemaStudioLaneReadability: schemaStudioSummary.laneReadabilityScore || 0,
-    schemaStudioAccessibilityScore: schemaStudioSummary.accessibilityScore || 0,
-    schemaStudioDensityDiscipline: schemaStudioSummary.densityDisciplineScore || 0,
-    schemaStudioCardModeCoverage: schemaStudioSummary.cardModeCoverageScore || 0,
-    schemaStudioVisualDirectorScore: schemaStudioSummary.visualDirectorScore || 0,
-    schemaStudioVisualLaneCount: schemaStudioSummary.laneCount || 0,
-    schemaStudioVisualModeCount: schemaStudioSummary.cardModeCount || 0,
-    schemaStudioEdgeLensCount: schemaStudioSummary.edgeLensCount || 0,
-    schemaStudioVisualQuickActionCount: schemaStudioSummary.quickActionCount || 0
+    publishabilityFailedChecks: publishabilityFailedChecks
   };
 }
 
@@ -2325,33 +2246,6 @@ function _renderRegistryHealthNotice(){
     h += '<div>'+_esc(_t('Nen tang frontend: ','Frontend foundation: ') + info.frontendReadyEntities + '/' + info.frontendEntities + ' ' + _t('ready, ','ready, ') + info.frontendPartialEntities + ' ' + _t('partial, ','partial, ') + info.frontendBlockedEntities + ' ' + _t('blocked', 'blocked'))+'</div>';
   }
   h += '<div>'+_esc(_t('Workflow bridge bị chặn: ','Blocked workflow bridges: ') + (info.workflowBridgeBlocked || 0) + ' · ' + _t('ACL registry: ','ACL registry: ') + (info.runtimePolicyLoaded ? _t('đã nạp','loaded') : _t('thiếu','missing')))+'</div>';
-  if(info.schemaStudioProjectionCount || info.schemaStudioReleaseCount || info.schemaStudioVisualReadiness || info.schemaStudioMetadataCompleteness){
-    h += '<div>'+_esc(_t('Schema Studio projections / releases / policy: ','Schema Studio projections / releases / policy: ') + info.schemaStudioProjectionCount + ' / ' + info.schemaStudioReleaseCount + ' / ' + info.schemaStudioPolicyCount)+'</div>';
-    h += '<div>'+_esc(_t('Canonical coverage / critical gaps: ','Canonical coverage / critical gaps: ') + info.schemaStudioCanonicalCoverage + '% / ' + info.schemaStudioCriticalGaps)+'</div>';
-    h += '<div>'+_esc(_t('Visual readiness / metadata completeness: ','Visual readiness / metadata completeness: ') + info.schemaStudioVisualReadiness + '% / ' + info.schemaStudioMetadataCompleteness + '%')+'</div>';
-    h += '<div>'+_esc(_t('Workflow coverage / graph density / orphan risk: ','Workflow coverage / graph density / orphan risk: ') + info.schemaStudioWorkflowCoverage + '% / ' + info.schemaStudioGraphDensity + ' / ' + info.schemaStudioOrphanRisk)+'</div>';
-    h += '<div>'+_esc(_t('Governance / journey / radar: ','Governance / journey / radar: ') + info.schemaStudioGovernanceCoverage + '% / ' + info.schemaStudioJourneyReadiness + '% / ' + info.schemaStudioReleaseRadar + '%')+'</div>';
-    h += '<div>'+_esc(_t('Domains / layers / storyboards / blockers: ','Domains / layers / storyboards / blockers: ') + info.schemaStudioDomainCount + ' / ' + info.schemaStudioLayerCount + ' / ' + info.schemaStudioStoryboardCount + ' / ' + info.schemaStudioBlockers)+'</div>';
-    h += '<div>'+_esc(_t('Schema Studio hotspots: ','Schema Studio hotspots: ') + info.schemaStudioHotspots + ' · ' + _t('Domain readiness: ','Domain readiness: ') + info.schemaStudioDomainReadiness + '%')+'</div>';
-    h += '<div>'+_esc(_t('Experience / compliance / performance: ','Experience / compliance / performance: ') + info.schemaStudioExperienceScore + '% / ' + info.schemaStudioComplianceReadiness + '% / ' + info.schemaStudioPerformancePosture + '%')+'</div>';
-    h += '<div>'+_esc(_t('Operations / promotion / firewall: ','Operations / promotion / firewall: ') + info.schemaStudioOperationsScore + '% / ' + info.schemaStudioPromotionReadiness + '% / ' + info.schemaStudioFirewallScore + '%')+'</div>';
-    h += '<div>'+_esc(_t('Observability / command center: ','Observability / command center: ') + info.schemaStudioObservabilityScore + '% / ' + info.schemaStudioCommandCenterScore + '%')+'</div>';
-    h += '<div>'+_esc(_t('Registry sync / AI / policy: ','Registry sync / AI / policy: ') + info.schemaStudioRegistrySync + '% / ' + info.schemaStudioAICopilotReadiness + '% / ' + info.schemaStudioPolicyCoverage + '%')+'</div>';
-    h += '<div>'+_esc(_t('Personas / playbooks / release lanes / copilots: ','Personas / playbooks / release lanes / copilots: ') + info.schemaStudioPersonaCount + ' / ' + info.schemaStudioPlaybookCount + ' / ' + info.schemaStudioReleaseLaneCount + ' / ' + info.schemaStudioCopilotSuggestionCount)+'</div>';
-    h += '<div>'+_esc(_t('Focus decks / branches / environments / stages: ','Focus decks / branches / environments / stages: ') + info.schemaStudioFocusDeckCount + ' / ' + info.schemaStudioBranchCount + ' / ' + info.schemaStudioEnvironmentCount + ' / ' + info.schemaStudioStageCount)+'</div>';
-    h += '<div>'+_esc(_t('Orchestration / narrative / review wall: ','Orchestration / narrative / review wall: ') + info.schemaStudioOrchestrationScore + '% / ' + info.schemaStudioNarrativeCoverage + '% / ' + info.schemaStudioReviewWallScore + '%')+'</div>';
-    h += '<div>'+_esc(_t('Atlas / live pulse / collaboration: ','Atlas / live pulse / collaboration: ') + info.schemaStudioAtlasReadiness + '% / ' + info.schemaStudioLivePulseScore + '% / ' + info.schemaStudioCollaborationReadiness + '%')+'</div>';
-    h += '<div>'+_esc(_t('Visual polish / scenes / spotlights / atlas packs: ','Visual polish / scenes / spotlights / atlas packs: ') + info.schemaStudioVisualPolish + '% / ' + info.schemaStudioSceneCount + ' / ' + info.schemaStudioSpotlightCount + ' / ' + info.schemaStudioAtlasCount)+'</div>';
-    h += '<div>'+_esc(_t('Command events / review lanes tracked: ','Command events / review lanes tracked: ') + info.schemaStudioEventRailCount + ' / ' + info.schemaStudioReviewLaneCount)+'</div>';
-    h += '<div>'+_esc(_t('Atlas mesh / physical coverage / review ops: ','Atlas mesh / physical coverage / review ops: ') + info.schemaStudioAtlasMeshScore + '% / ' + info.schemaStudioPhysicalCoverage + '% / ' + info.schemaStudioReviewOpsScore + '%')+'</div>';
-    h += '<div>'+_esc(_t('Export surface / interoperability / role modes: ','Export surface / interoperability / role modes: ') + info.schemaStudioExportSurfaceScore + '% / ' + info.schemaStudioInteroperabilityScore + '% / ' + info.schemaStudioRoleModeScore + '%')+'</div>';
-    h += '<div>'+_esc(_t('Traceability atlas / beauty system / object surfaces: ','Traceability atlas / beauty system / object surfaces: ') + info.schemaStudioTraceabilityAtlasScore + '% / ' + info.schemaStudioBeautySystemScore + '% / ' + info.schemaStudioObjectSurfaceCount)+'</div>';
-    h += '<div>'+_esc(_t('Role modes / review boards / export bundles: ','Role modes / review boards / export bundles: ') + info.schemaStudioRoleModeCount + ' / ' + info.schemaStudioReviewBoardCount + ' / ' + info.schemaStudioExportBundleCount)+'</div>';
-    h += '<div>'+_esc(_t('Visual language / card hierarchy / edge legibility: ','Visual language / card hierarchy / edge legibility: ') + info.schemaStudioVisualLanguageScore + '% / ' + info.schemaStudioCardHierarchy + '% / ' + info.schemaStudioEdgeLegibility + '%')+'</div>';
-    h += '<div>'+_esc(_t('Lane readability / accessibility / density discipline: ','Lane readability / accessibility / density discipline: ') + info.schemaStudioLaneReadability + '% / ' + info.schemaStudioAccessibilityScore + '% / ' + info.schemaStudioDensityDiscipline + '%')+'</div>';
-    h += '<div>'+_esc(_t('Card mode coverage / visual director: ','Card mode coverage / visual director: ') + info.schemaStudioCardModeCoverage + '% / ' + info.schemaStudioVisualDirectorScore + '%')+'</div>';
-    h += '<div>'+_esc(_t('Visual lanes / card modes / edge lenses / quick actions: ','Visual lanes / card modes / edge lenses / quick actions: ') + info.schemaStudioVisualLaneCount + ' / ' + info.schemaStudioVisualModeCount + ' / ' + info.schemaStudioEdgeLensCount + ' / ' + info.schemaStudioVisualQuickActionCount)+'</div>';
-  }
   if(info.compositePkTables){
     h += '<div>'+_esc(_t('Bang composite PK da co contract rieng: ','Composite-PK tables use dedicated identity contracts: ') + info.compositePkTables)+'</div>';
   }
@@ -4108,7 +4002,6 @@ function _ensureBuilderState(){
   if(state.registries.runtimeAccessPolicy === undefined) state.registries.runtimeAccessPolicy = null;
   if(state.registries.manifest === undefined) state.registries.manifest = null;
   if(state.registries.qualityReport === undefined) state.registries.qualityReport = null;
-  if(state.registries.schemaStudioManifest === undefined) state.registries.schemaStudioManifest = null;
 }
 
 function _ensureBuilderStyles(){
@@ -7149,6 +7042,9042 @@ _handleInput = function(e){
     if(target.getAttribute('data-trigger-repaint') === '1') _paint();
   }
 };
+
+
+/* ── MODULE BUILDER NEXTGEN EXPERIENCE PATCH (2026-04-07) ───────────────── */
+if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
+  window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__ = '2026-04-07';
+
+  state.showModuleStudio = !!state.showModuleStudio;
+  state.moduleStudioTab = state.moduleStudioTab || 'overview';
+  state.moduleStudioDraft = state.moduleStudioDraft || null;
+
+  function _ngNowIso(){
+    return new Date().toISOString();
+  }
+
+  function _ngCurrentUser(){
+    return (typeof currentUser !== 'undefined' && currentUser && currentUser.username) ? currentUser.username : ((state.schema && (state.schema.updatedBy || state.schema.createdBy)) || 'admin');
+  }
+
+  function _ngCsvToArray(text){
+    return String(text == null ? '' : text).split(/[\n,;]+/).map(function(item){
+      return item.replace(/^\s+|\s+$/g, '');
+    }).filter(function(item){ return !!item; });
+  }
+
+  function _ngArrayToCsv(list){
+    return (Array.isArray(list) ? list : []).join(', ');
+  }
+
+  function _ngTextToLines(text){
+    return String(text == null ? '' : text).split(/\r?\n/).map(function(item){
+      return item.replace(/^\s+|\s+$/g, '');
+    }).filter(function(item){ return !!item; });
+  }
+
+  function _ngLinesToText(list){
+    return (Array.isArray(list) ? list : []).join('\n');
+  }
+
+  function _ngCountBlocks(schema){
+    var total = 0;
+    (schema && schema.tabs ? schema.tabs : []).forEach(function(tab){
+      total += ((tab && tab.blocks) ? tab.blocks.length : 0);
+    });
+    return total;
+  }
+
+  function _ngEnsureModuleBuilderMetadata(schema){
+    if(!schema || typeof schema !== 'object') return schema;
+    if(!schema.title || typeof schema.title !== 'object') schema.title = { vi:'', en:'' };
+    if(!schema.subtitle || typeof schema.subtitle !== 'object') schema.subtitle = { vi:'', en:'' };
+    if(!Array.isArray(schema.roles)) schema.roles = [];
+    if(!Array.isArray(schema.tabs)) schema.tabs = [];
+    if(!schema.meta || typeof schema.meta !== 'object') schema.meta = {};
+    if(schema.meta.domain == null) schema.meta.domain = '';
+    if(schema.meta.boundedContext == null) schema.meta.boundedContext = '';
+    if(schema.meta.ownerTeam == null) schema.meta.ownerTeam = '';
+    if(schema.meta.processOwner == null) schema.meta.processOwner = '';
+    if(schema.meta.lifecycle == null) schema.meta.lifecycle = 'draft';
+    if(schema.meta.releaseChannel == null) schema.meta.releaseChannel = 'pilot';
+    if(schema.meta.criticality == null) schema.meta.criticality = 'standard';
+    if(schema.meta.featureFlag == null) schema.meta.featureFlag = '';
+    if(!Array.isArray(schema.meta.tags)) schema.meta.tags = [];
+    if(schema.meta.docsUrl == null) schema.meta.docsUrl = '';
+    if(schema.meta.supportGroup == null) schema.meta.supportGroup = '';
+
+    if(!schema.design || typeof schema.design !== 'object') schema.design = {};
+    if(schema.design.themePreset == null) schema.design.themePreset = 'hesem-enterprise';
+    if(schema.design.density == null) schema.design.density = 'comfortable';
+    if(schema.design.shellPreset == null) schema.design.shellPreset = 'operations-center';
+    if(schema.design.navigationMode == null) schema.design.navigationMode = 'workspace';
+    if(schema.design.defaultBreakpoint == null) schema.design.defaultBreakpoint = 'desktop';
+
+    if(!schema.publish || typeof schema.publish !== 'object') schema.publish = {};
+    if(schema.publish.environment == null) schema.publish.environment = 'staging';
+    if(schema.publish.mode == null) schema.publish.mode = 'controlled';
+    if(schema.publish.rolloutPct == null || isNaN(parseInt(schema.publish.rolloutPct, 10))) schema.publish.rolloutPct = 10;
+    if(schema.publish.requireSignoff == null) schema.publish.requireSignoff = true;
+    if(schema.publish.changeSummary == null) schema.publish.changeSummary = '';
+    if(schema.publish.releaseNote == null) schema.publish.releaseNote = '';
+    if(schema.publish.packageName == null) schema.publish.packageName = '';
+    if(schema.publish.lastPackageAt == null) schema.publish.lastPackageAt = '';
+    if(schema.publish.lastPackageBy == null) schema.publish.lastPackageBy = '';
+
+    if(!schema.qa || typeof schema.qa !== 'object') schema.qa = {};
+    if(schema.qa.testOwner == null) schema.qa.testOwner = '';
+    if(schema.qa.lastReviewedOn == null) schema.qa.lastReviewedOn = '';
+    if(!Array.isArray(schema.qa.smokeChecklist)) schema.qa.smokeChecklist = [];
+    if(!Array.isArray(schema.qa.criticalJourneys)) schema.qa.criticalJourneys = [];
+    if(!Array.isArray(schema.qa.acceptanceCriteria)) schema.qa.acceptanceCriteria = [];
+    if(schema.qa.readinessNotes == null) schema.qa.readinessNotes = '';
+
+    if(!schema.integration || typeof schema.integration !== 'object') schema.integration = {};
+    if(schema.integration.primaryEntity == null) schema.integration.primaryEntity = '';
+    if(!Array.isArray(schema.integration.sourceSystems)) schema.integration.sourceSystems = [];
+    if(!Array.isArray(schema.integration.digitalThread)) schema.integration.digitalThread = [];
+    if(schema.integration.defaultApiNamespace == null) schema.integration.defaultApiNamespace = '';
+
+    if(!schema.builderManifest || typeof schema.builderManifest !== 'object') schema.builderManifest = {};
+    if(schema.builderManifest.patchVersion == null) schema.builderManifest.patchVersion = '2026-04-07';
+    return schema;
+  }
+
+  function _ngModuleStudioDraftFromSchema(schema){
+    _ngEnsureModuleBuilderMetadata(schema || {});
+    return {
+      title: _clone((schema && schema.title) || { vi:'', en:'' }),
+      subtitle: _clone((schema && schema.subtitle) || { vi:'', en:'' }),
+      icon: (schema && schema.icon) || '',
+      route: (schema && schema.route) || '',
+      rolesCsv: _ngArrayToCsv((schema && schema.roles) || []),
+      meta: {
+        domain: (schema && schema.meta && schema.meta.domain) || '',
+        boundedContext: (schema && schema.meta && schema.meta.boundedContext) || '',
+        ownerTeam: (schema && schema.meta && schema.meta.ownerTeam) || '',
+        processOwner: (schema && schema.meta && schema.meta.processOwner) || '',
+        lifecycle: (schema && schema.meta && schema.meta.lifecycle) || 'draft',
+        releaseChannel: (schema && schema.meta && schema.meta.releaseChannel) || 'pilot',
+        criticality: (schema && schema.meta && schema.meta.criticality) || 'standard',
+        featureFlag: (schema && schema.meta && schema.meta.featureFlag) || '',
+        docsUrl: (schema && schema.meta && schema.meta.docsUrl) || '',
+        supportGroup: (schema && schema.meta && schema.meta.supportGroup) || '',
+        tagsCsv: _ngArrayToCsv((schema && schema.meta && schema.meta.tags) || [])
+      },
+      design: _clone((schema && schema.design) || {}),
+      publish: _clone((schema && schema.publish) || {}),
+      qa: {
+        testOwner: (schema && schema.qa && schema.qa.testOwner) || '',
+        lastReviewedOn: (schema && schema.qa && schema.qa.lastReviewedOn) || '',
+        smokeChecklistText: _ngLinesToText((schema && schema.qa && schema.qa.smokeChecklist) || []),
+        criticalJourneysText: _ngLinesToText((schema && schema.qa && schema.qa.criticalJourneys) || []),
+        acceptanceCriteriaText: _ngLinesToText((schema && schema.qa && schema.qa.acceptanceCriteria) || []),
+        readinessNotes: (schema && schema.qa && schema.qa.readinessNotes) || ''
+      },
+      integration: {
+        primaryEntity: (schema && schema.integration && schema.integration.primaryEntity) || '',
+        sourceSystemsCsv: _ngArrayToCsv((schema && schema.integration && schema.integration.sourceSystems) || []),
+        digitalThreadCsv: _ngArrayToCsv((schema && schema.integration && schema.integration.digitalThread) || []),
+        defaultApiNamespace: (schema && schema.integration && schema.integration.defaultApiNamespace) || ''
+      }
+    };
+  }
+
+  function _ngApplyModuleStudioDraft(schema, draft){
+    var rolloutValue;
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(!draft || typeof draft !== 'object') return schema;
+    schema.title = _clone(draft.title || schema.title || { vi:'', en:'' });
+    schema.subtitle = _clone(draft.subtitle || schema.subtitle || { vi:'', en:'' });
+    schema.icon = draft.icon == null ? (schema.icon || '') : String(draft.icon);
+    schema.route = draft.route == null ? (schema.route || '') : String(draft.route);
+    schema.roles = _ngCsvToArray(draft.rolesCsv);
+
+    schema.meta.domain = _getByPath(draft, 'meta.domain') || '';
+    schema.meta.boundedContext = _getByPath(draft, 'meta.boundedContext') || '';
+    schema.meta.ownerTeam = _getByPath(draft, 'meta.ownerTeam') || '';
+    schema.meta.processOwner = _getByPath(draft, 'meta.processOwner') || '';
+    schema.meta.lifecycle = _getByPath(draft, 'meta.lifecycle') || 'draft';
+    schema.meta.releaseChannel = _getByPath(draft, 'meta.releaseChannel') || 'pilot';
+    schema.meta.criticality = _getByPath(draft, 'meta.criticality') || 'standard';
+    schema.meta.featureFlag = _getByPath(draft, 'meta.featureFlag') || '';
+    schema.meta.docsUrl = _getByPath(draft, 'meta.docsUrl') || '';
+    schema.meta.supportGroup = _getByPath(draft, 'meta.supportGroup') || '';
+    schema.meta.tags = _ngCsvToArray(_getByPath(draft, 'meta.tagsCsv'));
+
+    schema.design.themePreset = _getByPath(draft, 'design.themePreset') || 'hesem-enterprise';
+    schema.design.density = _getByPath(draft, 'design.density') || 'comfortable';
+    schema.design.shellPreset = _getByPath(draft, 'design.shellPreset') || 'operations-center';
+    schema.design.navigationMode = _getByPath(draft, 'design.navigationMode') || 'workspace';
+    schema.design.defaultBreakpoint = _getByPath(draft, 'design.defaultBreakpoint') || 'desktop';
+
+    schema.publish.environment = _getByPath(draft, 'publish.environment') || 'staging';
+    schema.publish.mode = _getByPath(draft, 'publish.mode') || 'controlled';
+    rolloutValue = parseInt(_getByPath(draft, 'publish.rolloutPct'), 10);
+    schema.publish.rolloutPct = isNaN(rolloutValue) ? 10 : Math.max(0, Math.min(100, rolloutValue));
+    schema.publish.requireSignoff = _getByPath(draft, 'publish.requireSignoff') !== false;
+    schema.publish.changeSummary = _getByPath(draft, 'publish.changeSummary') || '';
+    schema.publish.releaseNote = _getByPath(draft, 'publish.releaseNote') || '';
+    schema.publish.packageName = _getByPath(draft, 'publish.packageName') || '';
+
+    schema.qa.testOwner = _getByPath(draft, 'qa.testOwner') || '';
+    schema.qa.lastReviewedOn = _getByPath(draft, 'qa.lastReviewedOn') || '';
+    schema.qa.smokeChecklist = _ngTextToLines(_getByPath(draft, 'qa.smokeChecklistText'));
+    schema.qa.criticalJourneys = _ngTextToLines(_getByPath(draft, 'qa.criticalJourneysText'));
+    schema.qa.acceptanceCriteria = _ngTextToLines(_getByPath(draft, 'qa.acceptanceCriteriaText'));
+    schema.qa.readinessNotes = _getByPath(draft, 'qa.readinessNotes') || '';
+
+    schema.integration.primaryEntity = _getByPath(draft, 'integration.primaryEntity') || '';
+    schema.integration.sourceSystems = _ngCsvToArray(_getByPath(draft, 'integration.sourceSystemsCsv'));
+    schema.integration.digitalThread = _ngCsvToArray(_getByPath(draft, 'integration.digitalThreadCsv'));
+    schema.integration.defaultApiNamespace = _getByPath(draft, 'integration.defaultApiNamespace') || '';
+
+    _ngSyncModuleBuilderManifest(schema);
+    return schema;
+  }
+
+  function _ngComputeModuleStudioReadiness(schema){
+    var blocks = _ngCountBlocks(schema);
+    var items = [
+      { key:'title.vi', label:_t('Tên module (VI)', 'Module title (VI)'), ok: !!(schema && schema.title && schema.title.vi) },
+      { key:'title.en', label:_t('Tên module (EN)', 'Module title (EN)'), ok: !!(schema && schema.title && schema.title.en) },
+      { key:'route', label:_t('Route', 'Route'), ok: !!(schema && schema.route) },
+      { key:'tabs', label:_t('Tab canvas', 'Canvas tabs'), ok: !!((schema && schema.tabs && schema.tabs.length) || 0) },
+      { key:'blocks', label:_t('Block canvas', 'Canvas blocks'), ok: blocks > 0 },
+      { key:'meta.domain', label:_t('Domain', 'Domain'), ok: !!(schema && schema.meta && schema.meta.domain) },
+      { key:'meta.boundedContext', label:_t('Bounded context', 'Bounded context'), ok: !!(schema && schema.meta && schema.meta.boundedContext) },
+      { key:'meta.ownerTeam', label:_t('Owner team', 'Owner team'), ok: !!(schema && schema.meta && schema.meta.ownerTeam) },
+      { key:'meta.processOwner', label:_t('Process owner', 'Process owner'), ok: !!(schema && schema.meta && schema.meta.processOwner) },
+      { key:'design.themePreset', label:_t('Theme preset', 'Theme preset'), ok: !!(schema && schema.design && schema.design.themePreset) },
+      { key:'qa.testOwner', label:_t('Test owner', 'Test owner'), ok: !!(schema && schema.qa && schema.qa.testOwner) },
+      { key:'qa.smokeChecklist', label:_t('Smoke checklist', 'Smoke checklist'), ok: !!((schema && schema.qa && schema.qa.smokeChecklist && schema.qa.smokeChecklist.length) || 0) },
+      { key:'publish.changeSummary', label:_t('Change summary', 'Change summary'), ok: !!(schema && schema.publish && (schema.publish.changeSummary || schema.publish.releaseNote)) },
+      { key:'integration.primaryEntity', label:_t('Primary entity', 'Primary entity'), ok: !!(schema && schema.integration && schema.integration.primaryEntity) }
+    ];
+    var completed = items.filter(function(item){ return item.ok; }).length;
+    var score = items.length ? Math.round((completed / items.length) * 100) : 0;
+    return {
+      score: score,
+      total: items.length,
+      completed: completed,
+      missing: items.filter(function(item){ return !item.ok; }).map(function(item){ return item.label; }),
+      blockCount: blocks,
+      tabCount: (schema && schema.tabs ? schema.tabs.length : 0),
+      lifecycle: (schema && schema.meta && schema.meta.lifecycle) || 'draft',
+      releaseChannel: (schema && schema.meta && schema.meta.releaseChannel) || 'pilot',
+      criticality: (schema && schema.meta && schema.meta.criticality) || 'standard'
+    };
+  }
+
+  function _ngSyncModuleBuilderManifest(schema){
+    var readiness;
+    _ngEnsureModuleBuilderMetadata(schema);
+    readiness = _ngComputeModuleStudioReadiness(schema);
+    schema.builderManifest.patchVersion = '2026-04-07';
+    schema.builderManifest.domain = schema.meta.domain || '';
+    schema.builderManifest.boundedContext = schema.meta.boundedContext || '';
+    schema.builderManifest.lifecycle = schema.meta.lifecycle || '';
+    schema.builderManifest.releaseChannel = schema.meta.releaseChannel || '';
+    schema.builderManifest.criticality = schema.meta.criticality || '';
+    schema.builderManifest.themePreset = schema.design.themePreset || '';
+    schema.builderManifest.navigationMode = schema.design.navigationMode || '';
+    schema.builderManifest.tabCount = (schema.tabs || []).length;
+    schema.builderManifest.blockCount = _ngCountBlocks(schema);
+    schema.builderManifest.readinessScore = readiness.score;
+    schema.builderManifest.updatedAt = _ngNowIso();
+    schema.builderManifest.updatedBy = _ngCurrentUser();
+    return schema.builderManifest;
+  }
+
+  function _ngEnsureModuleStudioDraft(){
+    if(!state.schema) return null;
+    _ngEnsureModuleBuilderMetadata(state.schema);
+    if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+    return state.moduleStudioDraft;
+  }
+
+  function _ngProjectedSchema(){
+    var projected = _clone(state.schema || {});
+    _ngEnsureModuleBuilderMetadata(projected);
+    if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(projected, state.moduleStudioDraft);
+    _ngSyncModuleBuilderManifest(projected);
+    return projected;
+  }
+
+  function _ngDownloadJson(filename, data){
+    var blob;
+    var url;
+    var link;
+    if(typeof document === 'undefined') return;
+    blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json;charset=utf-8' });
+    url = URL.createObjectURL(blob);
+    link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function _ngExportBuilderJson(){
+    var schema = _ngProjectedSchema();
+    var fileName = (schema.moduleId || 'module-builder') + '.builder.json';
+    _ngDownloadJson(fileName, schema);
+    if(BE.toast) BE.toast(_t('Đã xuất builder JSON', 'Exported builder JSON'), 'success');
+  }
+
+  function _ngExportRuntimeJson(){
+    var schema = _ngProjectedSchema();
+    var runtimeSchema = _compileRuntimeSchema(schema);
+    var fileName = (schema.moduleId || 'module-runtime') + '.runtime.json';
+    _ngDownloadJson(fileName, runtimeSchema);
+    if(BE.toast) BE.toast(_t('Đã xuất runtime JSON', 'Exported runtime JSON'), 'success');
+  }
+
+  function _ngDuplicateCurrentModule(){
+    var clone;
+    var now;
+    var suffix;
+    if(!state.schema) return;
+    clone = _ngProjectedSchema();
+    now = _ngNowIso();
+    suffix = Date.now().toString(36).slice(-4);
+    clone.moduleId = String(clone.moduleId || 'custom') + '-copy-' + suffix;
+    if(!clone.route){
+      clone.route = '/' + clone.moduleId;
+    } else if(clone.route.indexOf('-copy') < 0){
+      clone.route = String(clone.route).replace(/\/+$/g, '') + '-copy';
+    }
+    clone.title = clone.title || { vi:'', en:'' };
+    clone.title.vi = (clone.title.vi || clone.moduleId) + ' - Bản sao';
+    clone.title.en = (clone.title.en || clone.moduleId) + ' - Copy';
+    clone.version = 1;
+    clone.createdAt = now;
+    clone.updatedAt = now;
+    clone.createdBy = _ngCurrentUser();
+    clone.updatedBy = _ngCurrentUser();
+    _ngEnsureModuleBuilderMetadata(clone);
+    _ngSyncModuleBuilderManifest(clone);
+    state.schema = clone;
+    state.selectedBlock = null;
+    state.propsDraft = null;
+    state.propsTab = 'general';
+    state.activeTab = clone.tabs && clone.tabs.length ? clone.tabs[0].tabId : null;
+    state.showLibrary = false;
+    state.showModuleStudio = true;
+    state.moduleStudioTab = 'overview';
+    state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(clone);
+    _normalizeSchemaBlocks();
+    _saveBuilderSnapshotLocal();
+    _clearRuntimeModuleCache(clone.moduleId);
+    _resetUndoBaseline(_t('Nhân bản module', 'Duplicate module'));
+    _paint();
+    if(BE.toast) BE.toast(_t('Đã tạo bản sao module mới', 'Created a duplicated module copy'), 'success');
+  }
+
+  function _ngRenderStudioField(options){
+    var label = _t(options.labelVi || '', options.labelEn || options.labelVi || '');
+    var path = options.path || '';
+    var value = options.value;
+    var type = options.type || 'text';
+    var attrs = ' data-module-path="' + _esc(path) + '"' + (options.repaintOnChange ? ' data-module-repaint="1"' : '');
+    var h = '<div style="margin-bottom:var(--space-3)">';
+    h += '<label class="hm-label">' + _esc(label) + '</label>';
+    if(type === 'textarea'){
+      h += '<textarea class="hm-input hm-textarea" rows="' + _esc(options.rows || 4) + '"' + attrs + (options.placeholder ? ' placeholder="' + _esc(options.placeholder) + '"' : '') + '>' + _esc(value == null ? '' : String(value)) + '</textarea>';
+    } else if(type === 'select'){
+      h += '<select class="hm-input hm-select"' + attrs + '>';
+      (options.selectOptions || []).forEach(function(option){
+        var raw = _normalizeOption(option);
+        h += '<option value="' + _esc(raw.value) + '"' + (String(raw.value) === String(value == null ? '' : value) ? ' selected' : '') + '>' + _esc(raw.label) + '</option>';
+      });
+      h += '</select>';
+    } else if(type === 'toggle'){
+      h += '<label class="mb-toggle-control"><input type="checkbox"' + attrs + (value ? ' checked' : '') + '><span class="mb-toggle-text">' + _esc(_t('Bật', 'Enabled')) + '</span></label>';
+    } else if(type === 'number'){
+      h += '<input type="number" class="hm-input"' + attrs + ' value="' + _esc(value == null ? '' : String(value)) + '"' + (options.min != null ? ' min="' + _esc(options.min) + '"' : '') + (options.max != null ? ' max="' + _esc(options.max) + '"' : '') + (options.step != null ? ' step="' + _esc(options.step) + '"' : '') + '>';
+    } else if(type === 'date'){
+      h += '<input type="date" class="hm-input"' + attrs + ' value="' + _esc(value == null ? '' : String(value)) + '">';
+    } else {
+      h += '<input type="text" class="hm-input"' + attrs + ' value="' + _esc(value == null ? '' : String(value)) + '"' + (options.placeholder ? ' placeholder="' + _esc(options.placeholder) + '"' : '') + '>';
+    }
+    if(options.helpVi || options.helpEn){
+      h += '<div style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:4px">' + _esc(_t(options.helpVi || '', options.helpEn || options.helpVi || '')) + '</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function _ngRenderStudioTabButton(key, labelVi, labelEn, icon){
+    return '<button class="mb-tab-pill' + (state.moduleStudioTab === key ? ' is-active' : '') + '" data-action="module-studio-tab" data-tab="' + _esc(key) + '">' + _esc(icon || '•') + ' ' + _esc(_t(labelVi, labelEn)) + '</button>';
+  }
+
+  function _ngRenderReadinessSummary(readiness, schema){
+    var missing = (readiness.missing || []).slice(0, 4);
+    var h = '';
+    h += '<div class="mb-prop-section" style="margin-bottom:var(--space-3)">';
+    h += '<div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">' + _esc(_t('Builder readiness', 'Builder readiness')) + '</div><div class="mb-prop-section-count">' + _esc(readiness.completed) + '/' + _esc(readiness.total) + '</div></div></div>';
+    h += '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px">';
+    h += '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-page)"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase">' + _esc(_t('Readiness', 'Readiness')) + '</div><strong style="font-size:20px">' + _esc(readiness.score) + '%</strong></div>';
+    h += '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-page)"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase">' + _esc(_t('Canvas', 'Canvas')) + '</div><strong style="font-size:20px">' + _esc(readiness.blockCount) + ' / ' + _esc(readiness.tabCount) + '</strong><div style="font-size:11px;color:var(--text-tertiary)">' + _esc(_t('blocks / tabs', 'blocks / tabs')) + '</div></div>';
+    h += '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-page)"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase">' + _esc(_t('Lifecycle', 'Lifecycle')) + '</div><strong>' + _esc(readiness.lifecycle) + '</strong></div>';
+    h += '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-page)"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase">' + _esc(_t('Criticality', 'Criticality')) + '</div><strong>' + _esc(readiness.criticality) + '</strong></div>';
+    h += '</div>';
+    h += '<div style="font-size:12px;color:var(--text-secondary);margin-top:12px">' + _esc(_t('Manifest patch', 'Manifest patch')) + ': <strong>' + _esc((schema && schema.builderManifest && schema.builderManifest.patchVersion) || '2026-04-07') + '</strong></div>';
+    if(missing.length){
+      h += '<div style="margin-top:10px;font-size:12px;color:var(--text-secondary)"><strong>' + _esc(_t('Thiếu:', 'Missing:')) + '</strong> ' + _esc(missing.join(', ')) + (readiness.missing.length > missing.length ? '…' : '') + '</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function _ngRenderModuleStudioPanel(){
+    var schema = state.schema || {};
+    var draft = _ngEnsureModuleStudioDraft() || _ngModuleStudioDraftFromSchema(schema);
+    var projected = _clone(schema);
+    var h = '';
+    _ngEnsureModuleBuilderMetadata(projected);
+    _ngApplyModuleStudioDraft(projected, draft);
+    h += '<div class="mb-rail-panel">';
+    h += '<div class="mb-panel-header"><div class="mb-panel-title"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">' + _esc(_t('Module Studio', 'Module Studio')) + '</div><strong><span>🧭</span><span>' + _esc(_t('Governance & Publish Cockpit', 'Governance & Publish Cockpit')) + '</span></strong></div><div class="mb-panel-actions"><button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="close-module-studio" title="' + _esc(_t('Đóng Module Studio', 'Close Module Studio')) + '"><span class="mb-icon-glyph">&#10005;</span></button></div></div>';
+    h += '<div class="mb-panel-body">';
+    h += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="hm-btn hm-btn-primary" data-action="apply-module-studio">' + _esc(_t('Áp dụng metadata', 'Apply metadata')) + '</button><button class="hm-btn hm-btn-secondary" data-action="save-module">' + _esc(_t('Lưu module', 'Save module')) + '</button></div>';
+    h += _ngRenderReadinessSummary(_ngComputeModuleStudioReadiness(projected), projected);
+    h += '<div class="mb-tab-strip" style="margin-bottom:12px">';
+    h += _ngRenderStudioTabButton('overview', 'Tổng quan', 'Overview', '🧱');
+    h += _ngRenderStudioTabButton('governance', 'Governance', 'Governance', '🛡');
+    h += _ngRenderStudioTabButton('design', 'Design', 'Design', '🎨');
+    h += _ngRenderStudioTabButton('quality', 'Quality', 'Quality', '✅');
+    h += _ngRenderStudioTabButton('publish', 'Publish', 'Publish', '🚀');
+    h += '</div>';
+
+    if(state.moduleStudioTab === 'overview'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">' + _esc(_t('Module identity', 'Module identity')) + '</div><div class="mb-prop-section-count">' + _esc(projected.moduleId || '') + '</div></div></div>';
+      h += _ngRenderStudioField({ labelVi:'Tên module (VI)', labelEn:'Module title (VI)', path:'title.vi', value:_getByPath(draft, 'title.vi') });
+      h += _ngRenderStudioField({ labelVi:'Tên module (EN)', labelEn:'Module title (EN)', path:'title.en', value:_getByPath(draft, 'title.en') });
+      h += _ngRenderStudioField({ labelVi:'Mô tả ngắn (VI)', labelEn:'Subtitle (VI)', path:'subtitle.vi', value:_getByPath(draft, 'subtitle.vi') });
+      h += _ngRenderStudioField({ labelVi:'Mô tả ngắn (EN)', labelEn:'Subtitle (EN)', path:'subtitle.en', value:_getByPath(draft, 'subtitle.en') });
+      h += _ngRenderStudioField({ labelVi:'Icon', labelEn:'Icon', path:'icon', value:draft.icon, placeholder:'📦' });
+      h += _ngRenderStudioField({ labelVi:'Route', labelEn:'Route', path:'route', value:draft.route, placeholder:'/qms/example' });
+      h += _ngRenderStudioField({ labelVi:'Roles (CSV)', labelEn:'Roles (CSV)', path:'rolesCsv', value:draft.rolesCsv, placeholder:'ceo, it_admin, quality_manager', helpVi:'Phân tách bằng dấu phẩy', helpEn:'Comma separated' });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'governance'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">' + _esc(_t('Governance metadata', 'Governance metadata')) + '</div></div></div>';
+      h += _ngRenderStudioField({ labelVi:'Domain', labelEn:'Domain', path:'meta.domain', value:_getByPath(draft, 'meta.domain'), placeholder:'quality / production / maintenance' });
+      h += _ngRenderStudioField({ labelVi:'Bounded context', labelEn:'Bounded context', path:'meta.boundedContext', value:_getByPath(draft, 'meta.boundedContext'), placeholder:'document_control / quality_management' });
+      h += _ngRenderStudioField({ labelVi:'Owner team', labelEn:'Owner team', path:'meta.ownerTeam', value:_getByPath(draft, 'meta.ownerTeam') });
+      h += _ngRenderStudioField({ labelVi:'Process owner', labelEn:'Process owner', path:'meta.processOwner', value:_getByPath(draft, 'meta.processOwner') });
+      h += _ngRenderStudioField({ labelVi:'Lifecycle', labelEn:'Lifecycle', path:'meta.lifecycle', type:'select', value:_getByPath(draft, 'meta.lifecycle'), selectOptions:['draft','pilot','active','validated','deprecated'] });
+      h += _ngRenderStudioField({ labelVi:'Release channel', labelEn:'Release channel', path:'meta.releaseChannel', type:'select', value:_getByPath(draft, 'meta.releaseChannel'), selectOptions:['pilot','department','plant','enterprise','global'] });
+      h += _ngRenderStudioField({ labelVi:'Criticality', labelEn:'Criticality', path:'meta.criticality', type:'select', value:_getByPath(draft, 'meta.criticality'), selectOptions:['low','standard','high','critical','gxp'] });
+      h += _ngRenderStudioField({ labelVi:'Feature flag', labelEn:'Feature flag', path:'meta.featureFlag', value:_getByPath(draft, 'meta.featureFlag'), placeholder:'qms.module.document_control.v2' });
+      h += _ngRenderStudioField({ labelVi:'Tags (CSV)', labelEn:'Tags (CSV)', path:'meta.tagsCsv', value:_getByPath(draft, 'meta.tagsCsv'), placeholder:'eqms, audit, capa, fmea' });
+      h += _ngRenderStudioField({ labelVi:'Docs URL', labelEn:'Docs URL', path:'meta.docsUrl', value:_getByPath(draft, 'meta.docsUrl') });
+      h += _ngRenderStudioField({ labelVi:'Support group', labelEn:'Support group', path:'meta.supportGroup', value:_getByPath(draft, 'meta.supportGroup') });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'design'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">' + _esc(_t('Experience system', 'Experience system')) + '</div></div></div>';
+      h += _ngRenderStudioField({ labelVi:'Theme preset', labelEn:'Theme preset', path:'design.themePreset', type:'select', value:_getByPath(draft, 'design.themePreset'), selectOptions:['hesem-enterprise','hesem-executive','shopfloor-dark','quality-lab','maintenance-hub','warehouse-ops','clean-room'] });
+      h += _ngRenderStudioField({ labelVi:'Density', labelEn:'Density', path:'design.density', type:'select', value:_getByPath(draft, 'design.density'), selectOptions:['compact','comfortable','spacious'] });
+      h += _ngRenderStudioField({ labelVi:'Shell preset', labelEn:'Shell preset', path:'design.shellPreset', type:'select', value:_getByPath(draft, 'design.shellPreset'), selectOptions:['operations-center','workspace','cockpit','control-tower','kanban','document-center'] });
+      h += _ngRenderStudioField({ labelVi:'Navigation mode', labelEn:'Navigation mode', path:'design.navigationMode', type:'select', value:_getByPath(draft, 'design.navigationMode'), selectOptions:['workspace','process','split','focus'] });
+      h += _ngRenderStudioField({ labelVi:'Default breakpoint', labelEn:'Default breakpoint', path:'design.defaultBreakpoint', type:'select', value:_getByPath(draft, 'design.defaultBreakpoint'), selectOptions:['mobile','tablet','desktop','wide'] });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'quality'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">' + _esc(_t('QA & release readiness', 'QA & release readiness')) + '</div></div></div>';
+      h += _ngRenderStudioField({ labelVi:'Test owner', labelEn:'Test owner', path:'qa.testOwner', value:_getByPath(draft, 'qa.testOwner') });
+      h += _ngRenderStudioField({ labelVi:'Ngày review gần nhất', labelEn:'Last reviewed on', path:'qa.lastReviewedOn', type:'date', value:_getByPath(draft, 'qa.lastReviewedOn') });
+      h += _ngRenderStudioField({ labelVi:'Smoke checklist', labelEn:'Smoke checklist', path:'qa.smokeChecklistText', type:'textarea', rows:5, value:_getByPath(draft, 'qa.smokeChecklistText'), helpVi:'Mỗi dòng là một mục', helpEn:'One line per item' });
+      h += _ngRenderStudioField({ labelVi:'Critical journeys', labelEn:'Critical journeys', path:'qa.criticalJourneysText', type:'textarea', rows:5, value:_getByPath(draft, 'qa.criticalJourneysText'), helpVi:'Mỗi dòng là một luồng nghiệp vụ', helpEn:'One line per journey' });
+      h += _ngRenderStudioField({ labelVi:'Acceptance criteria', labelEn:'Acceptance criteria', path:'qa.acceptanceCriteriaText', type:'textarea', rows:5, value:_getByPath(draft, 'qa.acceptanceCriteriaText') });
+      h += _ngRenderStudioField({ labelVi:'Readiness notes', labelEn:'Readiness notes', path:'qa.readinessNotes', type:'textarea', rows:4, value:_getByPath(draft, 'qa.readinessNotes') });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'publish'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">' + _esc(_t('Publish & integration', 'Publish & integration')) + '</div></div></div>';
+      h += _ngRenderStudioField({ labelVi:'Environment', labelEn:'Environment', path:'publish.environment', type:'select', value:_getByPath(draft, 'publish.environment'), selectOptions:['dev','sit','uat','staging','production'] });
+      h += _ngRenderStudioField({ labelVi:'Publish mode', labelEn:'Publish mode', path:'publish.mode', type:'select', value:_getByPath(draft, 'publish.mode'), selectOptions:['draft','controlled','canary','blue-green','rolling','full'] });
+      h += _ngRenderStudioField({ labelVi:'Rollout %', labelEn:'Rollout %', path:'publish.rolloutPct', type:'number', min:0, max:100, step:1, value:_getByPath(draft, 'publish.rolloutPct') });
+      h += _ngRenderStudioField({ labelVi:'Require signoff', labelEn:'Require signoff', path:'publish.requireSignoff', type:'toggle', value:_getByPath(draft, 'publish.requireSignoff') !== false, repaintOnChange:true });
+      h += _ngRenderStudioField({ labelVi:'Change summary', labelEn:'Change summary', path:'publish.changeSummary', type:'textarea', rows:4, value:_getByPath(draft, 'publish.changeSummary') });
+      h += _ngRenderStudioField({ labelVi:'Release note', labelEn:'Release note', path:'publish.releaseNote', type:'textarea', rows:4, value:_getByPath(draft, 'publish.releaseNote') });
+      h += _ngRenderStudioField({ labelVi:'Primary entity', labelEn:'Primary entity', path:'integration.primaryEntity', value:_getByPath(draft, 'integration.primaryEntity'), placeholder:'document / ncr / capa / work_order' });
+      h += _ngRenderStudioField({ labelVi:'Source systems (CSV)', labelEn:'Source systems (CSV)', path:'integration.sourceSystemsCsv', value:_getByPath(draft, 'integration.sourceSystemsCsv'), placeholder:'erp, mes, scada, lims' });
+      h += _ngRenderStudioField({ labelVi:'Digital thread (CSV)', labelEn:'Digital thread (CSV)', path:'integration.digitalThreadCsv', value:_getByPath(draft, 'integration.digitalThreadCsv'), placeholder:'doc_control, training, ncr, capa' });
+      h += _ngRenderStudioField({ labelVi:'Default API namespace', labelEn:'Default API namespace', path:'integration.defaultApiNamespace', value:_getByPath(draft, 'integration.defaultApiNamespace'), placeholder:'qms.document_control' });
+      h += '</div>';
+    }
+
+    h += '</div></div>';
+    return h;
+  }
+
+  var _ngPrevRenderBuilder = _renderBuilder;
+  _renderBuilder = function(){
+    var schema = state.schema;
+    var activeTab;
+    var tree;
+    var roots;
+    var undoInfo;
+    var relationSuggestions;
+    var configuredLinks;
+    var h = '';
+    if(!schema) return '<div class="hm-empty">No schema</div>';
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(schema);
+    activeTab = _getActiveTab();
+    if(activeTab) _ensureTabLayout(activeTab);
+    tree = activeTab ? _buildTabTree(activeTab) : { roots: [] };
+    roots = tree.roots || [];
+    undoInfo = undoManager.getInfo();
+    relationSuggestions = activeTab ? _relationSuggestionsForTab(activeTab) : [];
+    configuredLinks = activeTab ? _configuredDigitalLinks(activeTab) : [];
+    h += '<div class="mb-builder-hero">';
+    h += '<div class="mb-builder-hero-main">';
+    h += '<div class="mb-builder-hero-copy"><div class="mb-builder-hero-kicker">MODULE BUILDER NEXTGEN</div><h1>' + _esc(schema.icon || '📦') + ' ' + _esc(_t(schema.title.vi, schema.title.en)) + '</h1></div>';
+    h += '</div>';
+    h += '<div class="mb-builder-hero-actions">';
+    if(activeTab) h += _renderCanvasToolbar(activeTab, true);
+    h += '<div class="mb-hero-commandbar">';
+    h += _renderHeroActionButton({ action:'undo-builder', labelVi:'Hoàn tác', labelEn:'Undo', icon:'↩', badge:(undoInfo.position > 0 ? undoInfo.position : 0) });
+    h += _renderHeroActionButton({ action:'redo-builder', labelVi:'Làm lại', labelEn:'Redo', icon:'↪', badge:(undoInfo.canRedo ? (undoInfo.depth - undoInfo.position - 1) : 0) });
+    h += _renderHeroActionButton({ action:'toggle-shortcuts', labelVi:'Phím tắt', labelEn:'Shortcuts', icon:'⌨' });
+    h += _renderHeroActionButton({ action:'open-module-studio', labelVi:'Module Studio', labelEn:'Module Studio', icon:'🧭', active:!!state.showModuleStudio });
+    h += _renderHeroActionButton({ action:'duplicate-module', labelVi:'Nhân bản module', labelEn:'Duplicate module', icon:'⧉' });
+    h += _renderHeroActionButton({ action:'export-builder-json', labelVi:'Xuất builder JSON', labelEn:'Export builder JSON', icon:'🗂' });
+    h += _renderHeroActionButton({ action:'export-runtime-json', labelVi:'Xuất runtime JSON', labelEn:'Export runtime JSON', icon:'⚙' });
+    h += _renderHeroActionButton({ action:'preview-module', labelVi:'Xem trước', labelEn:'Preview', icon:'◉' });
+    h += _renderHeroActionButton({ action:'save-module', labelVi:'Lưu module', labelEn:'Save module', icon:'💾', variant:'primary' });
+    h += _renderHeroActionButton({ action:'back-setup', labelVi:'Quay lại', labelEn:'Back', icon:'←' });
+    h += '</div></div>';
+    h += '</div>';
+    h += '<div class="mb-builder-shell">';
+    if(state.showTree) h += _renderWidgetTree();
+    h += '<div class="mb-main-panel">';
+    h += '<div class="mb-tab-strip">';
+    (schema.tabs || []).forEach(function(tab){
+      h += '<button class="mb-tab-pill' + (state.activeTab === tab.tabId ? ' is-active' : '') + '" data-action="switch-tab" data-tab="' + _esc(tab.tabId) + '">' + _esc(tab.icon || '📑') + ' ' + _esc(_t(tab.title.vi, tab.title.en)) + '</button>';
+    });
+    h += '<button class="mb-tab-pill" data-action="add-tab">+ ' + _t('Thêm tab', 'Add tab') + '</button>';
+    if(schema.tabs && schema.tabs.length > 1){
+      h += '<button class="mb-tab-pill" data-action="remove-tab">' + _t('🗑 Xóa tab hiện tại', '🗑 Remove active tab') + '</button>';
+    }
+    h += '</div>';
+    if(activeTab){
+      if(relationSuggestions.length || configuredLinks.length){
+        h += '<div class="mb-link-banner">';
+        h += '<div><strong>' + _t('Registry phát hiện digital thread giữa các block', 'Registry detected digital thread opportunities between blocks') + '</strong><div style="font-size:12px;color:var(--text-secondary)">' + _t('Gợi ý ' + relationSuggestions.length + ' liên kết mới và đang hiển thị ' + configuredLinks.length + ' liên kết đã cấu hình trên canvas hiện tại.', 'There are ' + relationSuggestions.length + ' suggested links and ' + configuredLinks.length + ' configured links on the current canvas.') + '</div></div>';
+        h += '<button class="hm-btn ' + (state.showDigitalThreadLinks ? 'hm-btn-primary' : 'hm-btn-ghost') + ' hm-btn-sm" data-action="toggle-digital-thread-links">' + _t('🔗 Hiện/Ẩn links', '🔗 Toggle links') + '</button>';
+        h += '</div>';
+      }
+      h += '<div class="mb-canvas-stage">';
+      h += '<div class="mb-canvas-root" data-drop-zone="1" data-drop-tab="' + _esc(activeTab.tabId) + '" data-drop-parent="" data-drop-slot="default" style="' + _layoutStyle(activeTab.layout) + '">';
+      if(!roots.length){
+        h += '<div class="mb-slot-empty">' + _t('Trang đang trống. Bấm mở thư viện hoặc kéo block vào canvas để bắt đầu.', 'This page is empty. Open the library or drag a block onto the canvas to start.') + '</div>';
+      }
+      roots.forEach(function(root){
+        h += _renderCanvasBlock(root, activeTab, tree, 0);
+      });
+      h += '<div class="mb-slot-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="open-library" data-tab="' + _esc(activeTab.tabId) + '" data-parent="" data-slot="default">+ ' + _t('Thêm block ở cuối canvas', 'Add block to canvas end') + '</button></div>';
+      h += '</div></div>';
+    }
+    h += '</div>';
+    if(state.showLibrary || state.selectedBlock || state.showModuleStudio){
+      h += '<div class="mb-right-rail">';
+      if(state.showModuleStudio) h += _ngRenderModuleStudioPanel();
+      if(state.showLibrary) h += _renderLibraryPanel();
+      if(state.selectedBlock) h += _renderPropertiesPanel();
+      h += '</div>';
+    }
+    h += '</div>';
+    h += _renderShortcutPopover();
+    h += _renderContextMenu();
+    if(state.packPicker) h += _renderPackPickerModal();
+    return h;
+  };
+
+  var _ngPrevHandleClick = _handleClick;
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      if(action === 'open-module-studio'){
+        if(state.schema){
+          _ngEnsureModuleBuilderMetadata(state.schema);
+          if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        }
+        state.showModuleStudio = !state.showModuleStudio;
+        if(state.showModuleStudio){
+          state.showLibrary = false;
+          state.selectedBlock = null;
+          state.propsDraft = null;
+          state.moduleStudioTab = state.moduleStudioTab || 'overview';
+        }
+        _paint();
+        return;
+      }
+      if(action === 'close-module-studio'){
+        state.showModuleStudio = false;
+        _paint();
+        return;
+      }
+      if(action === 'module-studio-tab'){
+        state.moduleStudioTab = btn.getAttribute('data-tab') || 'overview';
+        _paint();
+        return;
+      }
+      if(action === 'apply-module-studio'){
+        if(!state.schema) return;
+        if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        _mutateSchema(_t('Cập nhật metadata module', 'Update module metadata'), function(){
+          _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+          _ngSyncModuleBuilderManifest(state.schema);
+        });
+        if(BE.toast) BE.toast(_t('Đã áp dụng Module Studio vào schema', 'Applied Module Studio metadata to schema'), 'success');
+        return;
+      }
+      if(action === 'export-builder-json'){
+        _ngExportBuilderJson();
+        return;
+      }
+      if(action === 'export-runtime-json'){
+        _ngExportRuntimeJson();
+        return;
+      }
+      if(action === 'duplicate-module'){
+        _ngDuplicateCurrentModule();
+        return;
+      }
+      if(action === 'preview-module' && state.schema && state.moduleStudioDraft){
+        _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+        _ngSyncModuleBuilderManifest(state.schema);
+      }
+      if(['open-library','config-block','select-block'].indexOf(action) >= 0){
+        state.showModuleStudio = false;
+      }
+    }
+    return _ngPrevHandleClick(e);
+  };
+
+  var _ngPrevHandleInput = _handleInput;
+  _handleInput = function(e){
+    var target = e && e.target;
+    var path;
+    var fieldType;
+    if(target && target.hasAttribute && target.hasAttribute('data-module-path')){
+      if(!state.moduleStudioDraft && state.schema) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+      path = target.getAttribute('data-module-path');
+      fieldType = (target.getAttribute('type') || target.tagName || '').toLowerCase();
+      if(target.type === 'checkbox') _setByPath(state.moduleStudioDraft, path, !!target.checked);
+      else if(target.type === 'number') _setByPath(state.moduleStudioDraft, path, target.value === '' ? '' : (parseInt(target.value, 10) || 0));
+      else _setByPath(state.moduleStudioDraft, path, target.value);
+      if(target.getAttribute('data-module-repaint') === '1' || target.type === 'checkbox' || fieldType === 'select') _paint();
+      return;
+    }
+    return _ngPrevHandleInput(e);
+  };
+
+  var _ngPrevCreateBlankModule = _createBlankModule;
+  _createBlankModule = function(){
+    var result = _ngPrevCreateBlankModule();
+    if(state.schema){
+      _ngEnsureModuleBuilderMetadata(state.schema);
+      _ngSyncModuleBuilderManifest(state.schema);
+      state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+      state.showModuleStudio = true;
+      state.moduleStudioTab = 'overview';
+      _saveBuilderSnapshotLocal();
+    }
+    return result;
+  };
+
+  var _ngPrevOpenSavedModule = _openSavedModule;
+  _openSavedModule = function(moduleId){
+    return Promise.resolve(_ngPrevOpenSavedModule(moduleId)).then(function(resp){
+      if(state.schema){
+        _ngEnsureModuleBuilderMetadata(state.schema);
+        _ngSyncModuleBuilderManifest(state.schema);
+        state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        state.showModuleStudio = false;
+        state.moduleStudioTab = 'overview';
+        _saveBuilderSnapshotLocal();
+      }
+      return resp;
+    });
+  };
+
+  var _ngPrevSaveModule = _saveModule;
+  _saveModule = function(){
+    if(state.schema){
+      if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+      _ngSyncModuleBuilderManifest(state.schema);
+    }
+    return _ngPrevSaveModule();
+  };
+
+/* ── MODULE BUILDER ULTRA PATCH (2026-04-07 R2) ─────────────────────────── */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH__ = '2026-04-07-r2';
+
+  var _r2ThemeCards = [
+    { value:'hesem-enterprise', icon:'🏢', titleVi:'Enterprise Blue', titleEn:'Enterprise Blue', subtitleVi:'Điều hành đa domain, cân bằng nghiệp vụ + dashboard', subtitleEn:'Balanced multi-domain operations and dashboard shell' },
+    { value:'hesem-executive', icon:'👑', titleVi:'Executive Gold', titleEn:'Executive Gold', subtitleVi:'Boardroom, KPI và chiến lược điều hành', subtitleEn:'Boardroom-grade KPI and strategy cockpit' },
+    { value:'shopfloor-dark', icon:'🏭', titleVi:'Shopfloor Dark', titleEn:'Shopfloor Dark', subtitleVi:'Màn hình xưởng realtime, tương phản mạnh', subtitleEn:'Realtime shopfloor wallboard with strong contrast' },
+    { value:'quality-lab', icon:'🧪', titleVi:'Quality Lab', titleEn:'Quality Lab', subtitleVi:'QMS/LIMS sạch, rõ, nhiều dữ liệu', subtitleEn:'Clean, data-rich QMS/LIMS experience' },
+    { value:'maintenance-hub', icon:'🛠', titleVi:'Maintenance Hub', titleEn:'Maintenance Hub', subtitleVi:'CMMS/EAM, work orders, alerts', subtitleEn:'CMMS/EAM with work orders and alerts' },
+    { value:'warehouse-ops', icon:'📦', titleVi:'Warehouse Ops', titleEn:'Warehouse Ops', subtitleVi:'Logistics, handheld, barcode-friendly', subtitleEn:'Logistics and handheld-friendly operations' }
+  ];
+
+  var _r2ExperiencePresets = {
+    'operations-center': {
+      themePreset:'hesem-enterprise',
+      shellPreset:'operations-center',
+      navigationMode:'workspace',
+      density:'comfortable',
+      visualLanguage:'industrial-glass',
+      accentTone:'blue',
+      stageBackdrop:'mesh',
+      surfaceDepth:'elevated',
+      heroMood:'aurora',
+      chartStyle:'balanced',
+      motionPreset:'subtle'
+    },
+    'executive-board': {
+      themePreset:'hesem-executive',
+      shellPreset:'control-tower',
+      navigationMode:'split',
+      density:'comfortable',
+      visualLanguage:'executive-premium',
+      accentTone:'indigo',
+      stageBackdrop:'aurora',
+      surfaceDepth:'premium',
+      heroMood:'cinematic',
+      chartStyle:'executive',
+      motionPreset:'subtle'
+    },
+    'shopfloor-command': {
+      themePreset:'shopfloor-dark',
+      shellPreset:'cockpit',
+      navigationMode:'focus',
+      density:'compact',
+      visualLanguage:'dark-ops',
+      accentTone:'teal',
+      stageBackdrop:'grid',
+      surfaceDepth:'solid',
+      heroMood:'night-shift',
+      chartStyle:'realtime',
+      motionPreset:'none'
+    },
+    'quality-laboratory': {
+      themePreset:'quality-lab',
+      shellPreset:'document-center',
+      navigationMode:'workspace',
+      density:'comfortable',
+      visualLanguage:'precision-clean',
+      accentTone:'emerald',
+      stageBackdrop:'soft',
+      surfaceDepth:'outlined',
+      heroMood:'clear-day',
+      chartStyle:'balanced',
+      motionPreset:'subtle'
+    }
+  };
+
+  function _r2EnsureUltraState(){
+    if(state.showBuilderCockpit == null) state.showBuilderCockpit = true;
+    if(state.showDiagnosticsPanel == null) state.showDiagnosticsPanel = false;
+    if(state.focusMode == null) state.focusMode = false;
+    if(!state.viewportMode) state.viewportMode = (state.schema && state.schema.design && state.schema.design.defaultBreakpoint) || 'desktop';
+    if(!state.ultraIssueFilter) state.ultraIssueFilter = 'all';
+    if(!state.ultraDiagnosticsCache) state.ultraDiagnosticsCache = null;
+    if(!state.ultraMetricsCache) state.ultraMetricsCache = null;
+    if(!state.ultraProjectedSchema) state.ultraProjectedSchema = null;
+  }
+
+  function _r2Slug(value){
+    return String(value == null ? '' : value)
+      .replace(/['"`]/g, '')
+      .replace(/[_\s]+/g, '-')
+      .replace(/[^a-zA-Z0-9\-\/]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/\/-+/g, '/')
+      .replace(/-+\//g, '/')
+      .replace(/^[-\/]+|[-\/]+$/g, '')
+      .toLowerCase();
+  }
+
+  function _r2Humanize(value){
+    var text = String(value == null ? '' : value).replace(/[_\-\/]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if(!text) return _t('Module mới', 'New Module');
+    return text.split(' ').map(function(part){
+      return part ? part.charAt(0).toUpperCase() + part.slice(1) : '';
+    }).join(' ');
+  }
+
+  function _r2NormalizeRoute(route, fallback){
+    var text = String(route == null ? '' : route).trim();
+    var base = text || '/' + _r2Slug(fallback || 'module');
+    base = base.replace(/https?:\/\/[^/]+/ig, '');
+    base = base.replace(/\s+/g, '-');
+    base = base.replace(/\/+/g, '/');
+    if(base.charAt(0) !== '/') base = '/' + base;
+    base = '/' + _r2Slug(base.replace(/^\/+/, ''));
+    return base || '/module';
+  }
+
+  function _r2SafeFilename(value, ext){
+    var base = _r2Slug(value || 'module-builder') || 'module-builder';
+    return base + (ext || '');
+  }
+
+  function _r2ClampInt(value, min, max, fallback){
+    var num = parseInt(value, 10);
+    if(isNaN(num)) num = fallback;
+    if(min != null && num < min) num = min;
+    if(max != null && num > max) num = max;
+    return num;
+  }
+
+  function _r2CountBlocks(schema){
+    var total = 0;
+    (schema && schema.tabs || []).forEach(function(tab){
+      total += (tab && tab.blocks ? tab.blocks.length : 0);
+    });
+    return total;
+  }
+
+  function _r2BlockApiId(block){
+    return (block && (block.api || _getByPath(block, 'config.api') || _getByPath(block, 'config.dataSource.api') || _getByPath(block, 'config.query.api') || _getByPath(block, 'config.bindings.api'))) || '';
+  }
+
+  function _r2BlockWorkflowId(block){
+    return (block && (_getByPath(block, 'config.workflowId') || _getByPath(block, 'config.eventFlow.approvalWorkflow') || _getByPath(block, 'config.workflow.workflowId'))) || '';
+  }
+
+  function _r2BlockEventSteps(block){
+    var steps = _getByPath(block, 'config.eventFlow.steps');
+    return Array.isArray(steps) ? steps : [];
+  }
+
+  function _r2BlockDataMode(block){
+    if(_getByPath(block, 'config.stream.enabled')) return 'stream';
+    if(_getByPath(block, 'config.dataSource.mode')) return String(_getByPath(block, 'config.dataSource.mode'));
+    if(Array.isArray(_getByPath(block, 'config.dataPipeline.steps')) && _getByPath(block, 'config.dataPipeline.steps').length) return 'query-pipeline';
+    if(_r2BlockApiId(block)) return 'api';
+    return 'manual';
+  }
+
+  function _r2ResponsiveSummary(block){
+    var mobile = _getByPath(block, 'config.responsive.mobile.span');
+    var tablet = _getByPath(block, 'config.responsive.tablet.span');
+    var desktop = _getByPath(block, 'config.responsive.desktop.span');
+    var wide = _getByPath(block, 'config.responsive.wide.span');
+    var parts = [];
+    if(mobile != null) parts.push(String(mobile));
+    if(tablet != null) parts.push(String(tablet));
+    if(desktop != null) parts.push(String(desktop));
+    if(wide != null) parts.push(String(wide));
+    return parts.length ? parts.join(' / ') : '—';
+  }
+
+  function _r2HasVisibleBreakpoint(block){
+    var paths = ['config.responsive.mobile.hide','config.responsive.tablet.hide','config.responsive.desktop.hide','config.responsive.wide.hide'];
+    var visible = false;
+    paths.forEach(function(path){
+      if(_getByPath(block, path) !== true) visible = true;
+    });
+    return visible;
+  }
+
+  function _r2EnsureModuleId(schema){
+    if(!schema.moduleId) schema.moduleId = 'custom-' + Date.now().toString(36);
+    return schema.moduleId;
+  }
+
+  var _r2PrevEnsureMeta = _ngEnsureModuleBuilderMetadata;
+  _ngEnsureModuleBuilderMetadata = function(schema){
+    schema = _r2PrevEnsureMeta(schema);
+    if(!schema || typeof schema !== 'object') return schema;
+    if(!schema.design || typeof schema.design !== 'object') schema.design = {};
+    if(schema.design.visualLanguage == null) schema.design.visualLanguage = 'industrial-glass';
+    if(schema.design.accentTone == null) schema.design.accentTone = 'blue';
+    if(schema.design.stageBackdrop == null) schema.design.stageBackdrop = 'mesh';
+    if(schema.design.surfaceDepth == null) schema.design.surfaceDepth = 'elevated';
+    if(schema.design.heroMood == null) schema.design.heroMood = 'aurora';
+    if(schema.design.chartStyle == null) schema.design.chartStyle = 'balanced';
+    if(schema.design.iconStyle == null) schema.design.iconStyle = 'outlined';
+    if(schema.design.cardRadius == null) schema.design.cardRadius = 'xl';
+    if(schema.design.panelGlass == null) schema.design.panelGlass = true;
+    if(schema.design.breakpointStrategy == null) schema.design.breakpointStrategy = 'desktop-first';
+    if(!schema.cockpit || typeof schema.cockpit !== 'object') schema.cockpit = {};
+    if(schema.cockpit.viewPreset == null) schema.cockpit.viewPreset = 'cockpit';
+    if(!Array.isArray(schema.cockpit.pinnedKpis)) schema.cockpit.pinnedKpis = [];
+    if(schema.cockpit.highlightJourney == null) schema.cockpit.highlightJourney = '';
+    if(!schema.builderManifest || typeof schema.builderManifest !== 'object') schema.builderManifest = {};
+    if(!schema.builderManifest.diagnostics || typeof schema.builderManifest.diagnostics !== 'object'){
+      schema.builderManifest.diagnostics = { score:100, totalIssues:0, errors:0, warnings:0, infos:0 };
+    }
+    return schema;
+  };
+
+  var _r2PrevApplyDraft = _ngApplyModuleStudioDraft;
+  _ngApplyModuleStudioDraft = function(schema, draft){
+    schema = _r2PrevApplyDraft(schema, draft);
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(draft && draft.design){
+      schema.design.visualLanguage = draft.design.visualLanguage || schema.design.visualLanguage || 'industrial-glass';
+      schema.design.accentTone = draft.design.accentTone || schema.design.accentTone || 'blue';
+      schema.design.stageBackdrop = draft.design.stageBackdrop || schema.design.stageBackdrop || 'mesh';
+      schema.design.surfaceDepth = draft.design.surfaceDepth || schema.design.surfaceDepth || 'elevated';
+      schema.design.heroMood = draft.design.heroMood || schema.design.heroMood || 'aurora';
+      schema.design.chartStyle = draft.design.chartStyle || schema.design.chartStyle || 'balanced';
+      schema.design.iconStyle = draft.design.iconStyle || schema.design.iconStyle || 'outlined';
+      schema.design.cardRadius = draft.design.cardRadius || schema.design.cardRadius || 'xl';
+      schema.design.panelGlass = draft.design.panelGlass !== false;
+      schema.design.breakpointStrategy = draft.design.breakpointStrategy || schema.design.breakpointStrategy || 'desktop-first';
+    }
+    _r2EnsureModuleId(schema);
+    if(!schema.title) schema.title = { vi:'', en:'' };
+    if(!schema.title.vi) schema.title.vi = _r2Humanize(schema.moduleId);
+    if(!schema.title.en) schema.title.en = schema.title.vi;
+    schema.route = _r2NormalizeRoute(schema.route || (draft && draft.route) || '/' + schema.moduleId, schema.moduleId);
+    return schema;
+  };
+
+  function _r2CollectDiagnostics(schema){
+    var issues = [];
+    var counts = { error:0, warning:0, info:0 };
+    var blockMap = {};
+    var tabMap = {};
+    var seenTabIds = {};
+    var seenBlockIds = {};
+    var nowScore = 100;
+
+    function register(scopeTarget, item){
+      var store;
+      if(item.blockId){
+        store = blockMap[item.blockId] || { errors:0, warnings:0, infos:0, items:[] };
+        store.items.push(item);
+        if(item.severity === 'error') store.errors++;
+        else if(item.severity === 'warning') store.warnings++;
+        else store.infos++;
+        blockMap[item.blockId] = store;
+      }
+      if(item.tabId){
+        store = tabMap[item.tabId] || { errors:0, warnings:0, infos:0, items:[] };
+        store.items.push(item);
+        if(item.severity === 'error') store.errors++;
+        else if(item.severity === 'warning') store.warnings++;
+        else store.infos++;
+        tabMap[item.tabId] = store;
+      }
+    }
+
+    function addIssue(severity, scope, code, labelVi, labelEn, meta){
+      var item = {
+        id: code + '-' + String(issues.length + 1),
+        severity: severity,
+        scope: scope,
+        code: code,
+        label: _t(labelVi, labelEn),
+        labelVi: labelVi,
+        labelEn: labelEn,
+        path: meta && meta.path || '',
+        tabId: meta && meta.tabId || '',
+        blockId: meta && meta.blockId || '',
+        fixable: !!(meta && meta.fixable),
+        detail: meta && meta.detail || ''
+      };
+      issues.push(item);
+      counts[severity] = (counts[severity] || 0) + 1;
+      register(scope, item);
+    }
+
+    _ngEnsureModuleBuilderMetadata(schema || {});
+    schema = schema || {};
+
+    if(!schema.title || !schema.title.vi) addIssue('error', 'module', 'module-title-vi', 'Thiếu tên module tiếng Việt', 'Missing Vietnamese module title', { path:'title.vi', fixable:true });
+    if(!schema.title || !schema.title.en) addIssue('warning', 'module', 'module-title-en', 'Thiếu tên module tiếng Anh', 'Missing English module title', { path:'title.en', fixable:true });
+    if(!schema.route) addIssue('error', 'module', 'module-route', 'Thiếu route module', 'Missing module route', { path:'route', fixable:true });
+    else if(_r2NormalizeRoute(schema.route, schema.moduleId) !== schema.route) addIssue('warning', 'module', 'module-route-normalize', 'Route chưa chuẩn hóa dạng kebab-case', 'Route should be normalized to kebab-case', { path:'route', fixable:true, detail:schema.route });
+    if(!schema.meta || !schema.meta.domain) addIssue('warning', 'module', 'module-domain', 'Thiếu domain nghiệp vụ', 'Missing business domain', { path:'meta.domain', fixable:false });
+    if(!schema.meta || !schema.meta.ownerTeam) addIssue('info', 'module', 'module-owner-team', 'Chưa khai báo owner team', 'Owner team not declared', { path:'meta.ownerTeam', fixable:false });
+    if((schema.meta && /active|validated/i.test(schema.meta.lifecycle || '')) && (!schema.qa || !schema.qa.smokeChecklist || !schema.qa.smokeChecklist.length)){
+      addIssue('warning', 'module', 'module-smoke-checklist', 'Lifecycle đang active/validated nhưng thiếu smoke checklist', 'Active or validated lifecycle without smoke checklist', { path:'qa.smokeChecklist', fixable:false });
+    }
+    if(!Array.isArray(schema.tabs) || !schema.tabs.length){
+      addIssue('error', 'module', 'module-tabs', 'Module chưa có tab canvas nào', 'Module has no canvas tabs', { path:'tabs', fixable:true });
+    }
+
+    (schema.tabs || []).forEach(function(tab, tabIndex){
+      var tabTitle = tab && tab.title && (tab.title.vi || tab.title.en) || '';
+      var blocks = (tab && tab.blocks) || [];
+      if(!tab || typeof tab !== 'object'){
+        addIssue('error', 'tab', 'tab-invalid', 'Tab không hợp lệ trong schema', 'Invalid tab entry in schema', { tabId:'', fixable:false });
+        return;
+      }
+      if(!tab.tabId) addIssue('error', 'tab', 'tab-id-missing', 'Tab thiếu tabId', 'Tab is missing tabId', { tabId:'', path:'tabs['+tabIndex+'].tabId', fixable:true });
+      if(tab.tabId){
+        if(seenTabIds[tab.tabId]) addIssue('error', 'tab', 'tab-id-duplicate', 'Tab ID bị trùng', 'Duplicate tab ID detected', { tabId:tab.tabId, path:'tabs['+tabIndex+'].tabId', fixable:true });
+        seenTabIds[tab.tabId] = true;
+      }
+      if(!tab.title || !(tab.title.vi || tab.title.en)) addIssue('warning', 'tab', 'tab-title', 'Tab chưa có tiêu đề', 'Tab is missing title', { tabId:tab.tabId || '', path:'tabs['+tabIndex+'].title', fixable:true });
+      if(!blocks.length) addIssue('info', 'tab', 'tab-empty', 'Tab đang trống chưa có block', 'Tab has no blocks yet', { tabId:tab.tabId || '', fixable:false, detail:tabTitle });
+
+      blocks.forEach(function(block, blockIndex){
+        var blockId = block && (block.blockId || block.id) || '';
+        var mode;
+        if(!block || typeof block !== 'object'){
+          addIssue('error', 'block', 'block-invalid', 'Có block không hợp lệ trong schema', 'Invalid block entry in schema', { tabId:tab.tabId || '' });
+          return;
+        }
+        if(!blockId) addIssue('error', 'block', 'block-id-missing', 'Block thiếu blockId', 'Block is missing blockId', { tabId:tab.tabId || '', path:'tabs['+tabIndex+'].blocks['+blockIndex+'].blockId', fixable:true });
+        if(blockId){
+          if(seenBlockIds[blockId]) addIssue('error', 'block', 'block-id-duplicate', 'Block ID bị trùng', 'Duplicate block ID detected', { tabId:tab.tabId || '', blockId:blockId, fixable:true });
+          seenBlockIds[blockId] = true;
+        }
+        if(!block.type || !(BE.BLOCK_CATALOG || {})[block.type]) addIssue('error', 'block', 'block-type-unknown', 'Block dùng type chưa đăng ký trong catalog', 'Block type is not registered in the catalog', { tabId:tab.tabId || '', blockId:blockId, path:'tabs['+tabIndex+'].blocks['+blockIndex+'].type', fixable:false, detail:block.type || '' });
+        if(!block.title || !(block.title.vi || block.title.en)) addIssue('info', 'block', 'block-title', 'Block chưa có tiêu đề business-friendly', 'Block is missing business-friendly title', { tabId:tab.tabId || '', blockId:blockId, path:'tabs['+tabIndex+'].blocks['+blockIndex+'].title', fixable:true });
+        if(block.parentId && !blocks.some(function(item){ return item && (item.blockId || item.id) === block.parentId; })){
+          addIssue('error', 'block', 'block-orphan-parent', 'Block tham chiếu parentId không tồn tại', 'Block references missing parentId', { tabId:tab.tabId || '', blockId:blockId, path:'tabs['+tabIndex+'].blocks['+blockIndex+'].parentId', fixable:true });
+        }
+        if(block.order !== blockIndex + 1){
+          addIssue('info', 'block', 'block-order-sequence', 'Thứ tự block chưa được chuẩn hóa liên tục', 'Block order sequence should be normalized', { tabId:tab.tabId || '', blockId:blockId, path:'tabs['+tabIndex+'].blocks['+blockIndex+'].order', fixable:true });
+        }
+        ['mobile','tablet','desktop','wide'].forEach(function(bp){
+          var spanPath = 'config.responsive.' + bp + '.span';
+          var spanValue = _getByPath(block, spanPath);
+          if(spanValue != null && (isNaN(parseInt(spanValue, 10)) || parseInt(spanValue, 10) < 1 || parseInt(spanValue, 10) > 12)){
+            addIssue('error', 'block', 'block-span-' + bp, 'Responsive span ngoài khoảng 1..12', 'Responsive span is outside the valid 1..12 range', { tabId:tab.tabId || '', blockId:blockId, path:spanPath, fixable:true });
+          }
+        });
+        if(!_r2HasVisibleBreakpoint(block)){
+          addIssue('warning', 'block', 'block-hidden-all-breakpoints', 'Block đang ẩn trên tất cả breakpoint', 'Block is hidden on all breakpoints', { tabId:tab.tabId || '', blockId:blockId, fixable:true });
+        }
+        mode = _r2BlockDataMode(block);
+        if(mode === 'api' && !_r2BlockApiId(block)){
+          addIssue('warning', 'block', 'block-api-missing', 'Block dùng chế độ API nhưng chưa chọn API', 'Block is in API mode without a selected API', { tabId:tab.tabId || '', blockId:blockId, path:'api', fixable:false });
+        }
+        if(mode === 'stream'){
+          if(!_getByPath(block, 'config.stream.connector')) addIssue('error', 'block', 'block-stream-connector', 'Block stream chưa chọn connector', 'Streaming block is missing connector', { tabId:tab.tabId || '', blockId:blockId, path:'config.stream.connector', fixable:false });
+          if(!_getByPath(block, 'config.stream.topic')) addIssue('warning', 'block', 'block-stream-topic', 'Block stream chưa có topic/channel', 'Streaming block is missing topic/channel', { tabId:tab.tabId || '', blockId:blockId, path:'config.stream.topic', fixable:false });
+        }
+        if(Array.isArray(_getByPath(block, 'config.dataPipeline.joins'))){
+          (_getByPath(block, 'config.dataPipeline.joins') || []).forEach(function(join, joinIndex){
+            if(join && (!join.entity || !join.sourceField || !join.targetField)){
+              addIssue('warning', 'block', 'block-join-incomplete', 'Data join chưa đủ entity/source/target field', 'Data join is incomplete', { tabId:tab.tabId || '', blockId:blockId, path:'config.dataPipeline.joins['+joinIndex+']', fixable:false });
+            }
+          });
+        }
+        if(Array.isArray(_getByPath(block, 'config.dataPipeline.steps'))){
+          (_getByPath(block, 'config.dataPipeline.steps') || []).forEach(function(step, stepIndex){
+            if(step && String(step.operator || '') === 'custom' && !step.expression){
+              addIssue('warning', 'block', 'block-pipeline-expression', 'Pipeline step custom thiếu expression', 'Custom pipeline step is missing expression', { tabId:tab.tabId || '', blockId:blockId, path:'config.dataPipeline.steps['+stepIndex+'].expression', fixable:false });
+            }
+          });
+        }
+        _r2BlockEventSteps(block).forEach(function(step, stepIndex){
+          if(step && step.enabled !== false){
+            if(!step.trigger) addIssue('warning', 'block', 'block-flow-trigger', 'Action flow step thiếu trigger', 'Action flow step is missing trigger', { tabId:tab.tabId || '', blockId:blockId, path:'config.eventFlow.steps['+stepIndex+'].trigger', fixable:true });
+            if(!step.actionType) addIssue('warning', 'block', 'block-flow-action', 'Action flow step thiếu action type', 'Action flow step is missing action type', { tabId:tab.tabId || '', blockId:blockId, path:'config.eventFlow.steps['+stepIndex+'].actionType', fixable:true });
+            if(step.actionType === 'api-call' && !step.api) addIssue('warning', 'block', 'block-flow-api', 'Action flow API-call chưa chọn API', 'API-call action flow step is missing API', { tabId:tab.tabId || '', blockId:blockId, path:'config.eventFlow.steps['+stepIndex+'].api', fixable:false });
+            if(step.actionType === 'run-workflow' && !step.workflowId) addIssue('warning', 'block', 'block-flow-workflow', 'Action flow run-workflow chưa chọn workflow', 'Run-workflow action flow step is missing workflow', { tabId:tab.tabId || '', blockId:blockId, path:'config.eventFlow.steps['+stepIndex+'].workflowId', fixable:false });
+          }
+        });
+        if(_getByPath(block, 'config.eventFlow.requireApproval') && !_getByPath(block, 'config.eventFlow.approvalWorkflow')){
+          addIssue('error', 'block', 'block-approval-workflow', 'Block yêu cầu approval nhưng chưa chọn workflow', 'Block requires approval but has no approval workflow', { tabId:tab.tabId || '', blockId:blockId, path:'config.eventFlow.approvalWorkflow', fixable:false });
+        }
+      });
+    });
+
+    nowScore = 100 - (counts.error * 18 + counts.warning * 8 + counts.info * 3);
+    if(nowScore < 0) nowScore = 0;
+
+    return {
+      issues: issues,
+      counts: counts,
+      score: nowScore,
+      fixableCount: issues.filter(function(item){ return item.fixable; }).length,
+      blockMap: blockMap,
+      tabMap: tabMap
+    };
+  }
+
+  function _r2SyncDiagnosticsManifest(schema){
+    var diag = _r2CollectDiagnostics(schema);
+    _ngEnsureModuleBuilderMetadata(schema);
+    schema.builderManifest.patchVersion = '2026-04-07-r2';
+    schema.builderManifest.visualSystem = (schema.design.themePreset || '') + '/' + (schema.design.visualLanguage || '');
+    schema.builderManifest.viewportMode = state.viewportMode || schema.design.defaultBreakpoint || 'desktop';
+    schema.builderManifest.diagnostics = {
+      score: diag.score,
+      totalIssues: diag.issues.length,
+      errors: diag.counts.error,
+      warnings: diag.counts.warning,
+      infos: diag.counts.info,
+      fixable: diag.fixableCount,
+      updatedAt: _ngNowIso()
+    };
+    return diag;
+  }
+
+  var _r2PrevSyncManifest = _ngSyncModuleBuilderManifest;
+  _ngSyncModuleBuilderManifest = function(schema){
+    var manifest = _r2PrevSyncManifest(schema);
+    _r2SyncDiagnosticsManifest(schema);
+    return manifest;
+  };
+
+  function _r2SchemaMetrics(schema){
+    var metrics = {
+      tabs: (schema && schema.tabs ? schema.tabs.length : 0),
+      blocks: 0,
+      apiBlocks: 0,
+      streamBlocks: 0,
+      pipelineBlocks: 0,
+      actionSteps: 0,
+      workflowBlocks: 0,
+      containerBlocks: 0,
+      analyticsBlocks: 0,
+      maxDepth: 1
+    };
+    (schema && schema.tabs || []).forEach(function(tab){
+      var byId = {};
+      var depthCache = {};
+      (tab && tab.blocks || []).forEach(function(block){
+        if(!block) return;
+        metrics.blocks++;
+        byId[block.blockId || block.id] = block;
+        if(_r2BlockApiId(block)) metrics.apiBlocks++;
+        if(_r2BlockDataMode(block) === 'stream') metrics.streamBlocks++;
+        if(_r2BlockDataMode(block) === 'query-pipeline') metrics.pipelineBlocks++;
+        if(_r2BlockEventSteps(block).length) metrics.actionSteps += _r2BlockEventSteps(block).length;
+        if(_r2BlockWorkflowId(block)) metrics.workflowBlocks++;
+        if(_isContainerType(block.type)) metrics.containerBlocks++;
+        if(/chart|kpi|gauge|timeline|heatmap|analytics|board|metric/i.test(String(block.type || ''))) metrics.analyticsBlocks++;
+      });
+      function depthFor(block){
+        var id = block && (block.blockId || block.id);
+        var parentId;
+        if(!id) return 1;
+        if(depthCache[id]) return depthCache[id];
+        parentId = block.parentId || '';
+        if(!parentId || !byId[parentId]) return (depthCache[id] = 1);
+        depthCache[id] = 1 + depthFor(byId[parentId]);
+        return depthCache[id];
+      }
+      (tab && tab.blocks || []).forEach(function(block){
+        var d = depthFor(block);
+        if(d > metrics.maxDepth) metrics.maxDepth = d;
+      });
+    });
+    return metrics;
+  }
+
+  function _r2ApplyAutoFixes(schema){
+    var seenTabs = {};
+    var seenBlocks = {};
+    var defaultTabId;
+    _ngEnsureModuleBuilderMetadata(schema);
+    _r2EnsureModuleId(schema);
+    if(!schema.title) schema.title = { vi:'', en:'' };
+    if(!schema.title.vi) schema.title.vi = _r2Humanize(schema.moduleId);
+    if(!schema.title.en) schema.title.en = schema.title.vi;
+    schema.route = _r2NormalizeRoute(schema.route || '/' + schema.moduleId, schema.moduleId);
+    if(!Array.isArray(schema.tabs) || !schema.tabs.length){
+      defaultTabId = 'tab-' + Date.now().toString(36);
+      schema.tabs = [{
+        tabId: defaultTabId,
+        title: { vi:'Tổng quan', en:'Overview' },
+        icon: '📑',
+        blocks: []
+      }];
+    }
+    schema.tabs = schema.tabs.filter(function(tab){ return !!tab; });
+    schema.tabs.forEach(function(tab, tabIndex){
+      if(!tab.title || typeof tab.title !== 'object') tab.title = { vi:'', en:'' };
+      if(!tab.title.vi) tab.title.vi = _t('Tab ', 'Tab ') + (tabIndex + 1);
+      if(!tab.title.en) tab.title.en = tab.title.vi;
+      if(!tab.tabId || seenTabs[tab.tabId]){
+        tab.tabId = 'tab-' + (tabIndex + 1) + '-' + Date.now().toString(36).slice(-4);
+      }
+      seenTabs[tab.tabId] = true;
+      if(!Array.isArray(tab.blocks)) tab.blocks = [];
+      tab.blocks = tab.blocks.filter(function(block){ return !!block; });
+      tab.blocks.forEach(function(block, blockIndex){
+        if(!block.type) block.type = 'text';
+        if(!block.blockId || seenBlocks[block.blockId]){
+          block.blockId = 'blk-' + (blockIndex + 1) + '-' + Date.now().toString(36).slice(-4) + '-' + Math.random().toString(36).slice(2, 5);
+        }
+        seenBlocks[block.blockId] = true;
+        if(!block.title || typeof block.title !== 'object') block.title = { vi:'', en:'' };
+        if(!block.title.vi) block.title.vi = _getCatalogLabel(block.type) || ('Block ' + (blockIndex + 1));
+        if(!block.title.en) block.title.en = block.title.vi;
+        if(!_isObject(block.config)) block.config = {};
+        if(!_isObject(block.config.responsive)) block.config.responsive = {};
+        ['mobile','tablet','desktop','wide'].forEach(function(bp){
+          if(!_isObject(block.config.responsive[bp])) block.config.responsive[bp] = {};
+          if(block.config.responsive[bp].span != null){
+            block.config.responsive[bp].span = _r2ClampInt(block.config.responsive[bp].span, 1, 12, bp === 'mobile' ? 12 : 6);
+          }
+        });
+        if(!_r2HasVisibleBreakpoint(block)){
+          block.config.responsive.desktop = block.config.responsive.desktop || {};
+          block.config.responsive.desktop.hide = false;
+        }
+        block.order = blockIndex + 1;
+        if(block.parentId && !tab.blocks.some(function(item){ return item && (item.blockId || item.id) === block.parentId; })){
+          block.parentId = null;
+          block.slotKey = block.slotKey || 'content';
+        }
+        if(_getByPath(block, 'config.stream.enabled')){
+          _setByPath(block, 'config.stream.refreshMs', _r2ClampInt(_getByPath(block, 'config.stream.refreshMs'), 100, 60000, 1000));
+          _setByPath(block, 'config.stream.bufferSize', _r2ClampInt(_getByPath(block, 'config.stream.bufferSize'), 10, 5000, 200));
+        }
+        if(Array.isArray(_getByPath(block, 'config.eventFlow.steps'))){
+          _getByPath(block, 'config.eventFlow.steps').forEach(function(step){
+            if(!step) return;
+            if(step.enabled == null) step.enabled = true;
+            if(!step.trigger) step.trigger = 'click';
+            if(!step.actionType) step.actionType = 'navigate';
+          });
+        }
+      });
+    });
+    _ngSyncModuleBuilderManifest(schema);
+    return schema;
+  }
+
+  function _r2IssueTone(severity){
+    if(severity === 'error') return { label:_t('Lỗi', 'Error'), className:'is-error' };
+    if(severity === 'warning') return { label:_t('Cảnh báo', 'Warning'), className:'is-warning' };
+    return { label:_t('Thông tin', 'Info'), className:'is-info' };
+  }
+
+  function _r2RenderMetricCard(kickerVi, kickerEn, value, subVi, subEn, tone){
+    return '<div class="mb-ultra-metric '+_esc(tone || '')+'"><div class="mb-ultra-metric-kicker">'+_esc(_t(kickerVi, kickerEn))+'</div><div class="mb-ultra-metric-value">'+_esc(value)+'</div><div class="mb-ultra-metric-sub">'+_esc(_t(subVi || '', subEn || subVi || ''))+'</div></div>';
+  }
+
+  function _r2RenderViewportButton(value, icon, labelVi, labelEn){
+    return '<button class="mb-ultra-chip'+((state.viewportMode || 'desktop') === value ? ' is-active' : '')+'" data-action="set-viewport-mode" data-viewport="'+_esc(value)+'">'+_esc(icon)+' '+_esc(_t(labelVi, labelEn))+'</button>';
+  }
+
+  function _r2RenderIssueCard(issue){
+    var tone = _r2IssueTone(issue.severity);
+    var jump = issue.blockId ? '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="jump-to-issue-block" data-block="'+_esc(issue.blockId)+'">'+_esc(_t('Mở block', 'Open block'))+'</button>' : '';
+    var scopeText = issue.scope === 'module' ? _t('Module', 'Module') : (issue.scope === 'tab' ? _t('Tab', 'Tab') : _t('Block', 'Block'));
+    return '<div class="mb-ultra-issue '+tone.className+'">' +
+      '<div class="mb-ultra-issue-meta"><span class="mb-ultra-issue-tone '+tone.className+'">'+_esc(tone.label)+'</span><span class="mb-ultra-issue-scope">'+_esc(scopeText)+'</span></div>' +
+      '<div class="mb-ultra-issue-label">'+_esc(issue.label)+'</div>' +
+      (issue.detail ? '<div class="mb-ultra-issue-detail">'+_esc(issue.detail)+'</div>' : '') +
+      '<div class="mb-ultra-issue-actions">' +
+      (issue.fixable ? '<span class="mb-ultra-fixable">'+_esc(_t('Có thể auto-fix', 'Auto-fix available'))+'</span>' : '<span></span>') +
+      jump +
+      '</div>' +
+    '</div>';
+  }
+
+  function _r2RenderDiagnosticsList(diag, limit){
+    var filter = state.ultraIssueFilter || 'all';
+    var list = (diag && diag.issues ? diag.issues : []).filter(function(item){
+      return filter === 'all' ? true : item.severity === filter;
+    });
+    if(limit && list.length > limit) list = list.slice(0, limit);
+    if(!list.length){
+      return '<div class="mb-ultra-empty">'+_esc(_t('Không có issue nào theo bộ lọc hiện tại', 'No issues for the current filter'))+'</div>';
+    }
+    return list.map(_r2RenderIssueCard).join('');
+  }
+
+  function _r2RenderStudioChoiceCard(action, value, currentValue, icon, titleVi, titleEn, subVi, subEn){
+    return '<button class="mb-ultra-choice'+(String(currentValue || '') === String(value || '') ? ' is-active' : '')+'" data-action="'+_esc(action)+'" data-value="'+_esc(value)+'"><div class="mb-ultra-choice-icon">'+_esc(icon || '•')+'</div><div class="mb-ultra-choice-copy"><strong>'+_esc(_t(titleVi, titleEn))+'</strong><span>'+_esc(_t(subVi || '', subEn || subVi || ''))+'</span></div></button>';
+  }
+
+  function _r2RenderDesignGallery(draft){
+    var h = '<div class="mb-ultra-choice-grid">';
+    _r2ThemeCards.forEach(function(card){
+      h += _r2RenderStudioChoiceCard('studio-set-theme', card.value, _getByPath(draft, 'design.themePreset'), card.icon, card.titleVi, card.titleEn, card.subtitleVi, card.subtitleEn);
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r2RenderExperiencePresetBar(){
+    return '<div class="mb-ultra-preset-bar">' +
+      '<button class="mb-ultra-chip" data-action="apply-experience-preset" data-preset="operations-center">🏢 '+_esc(_t('Operations', 'Operations'))+'</button>' +
+      '<button class="mb-ultra-chip" data-action="apply-experience-preset" data-preset="executive-board">👑 '+_esc(_t('Executive', 'Executive'))+'</button>' +
+      '<button class="mb-ultra-chip" data-action="apply-experience-preset" data-preset="shopfloor-command">🏭 '+_esc(_t('Shopfloor', 'Shopfloor'))+'</button>' +
+      '<button class="mb-ultra-chip" data-action="apply-experience-preset" data-preset="quality-laboratory">🧪 '+_esc(_t('Quality', 'Quality'))+'</button>' +
+    '</div>';
+  }
+
+  function _r2RenderCockpitDock(projected, diag, metrics){
+    var activeTab = _getActiveTab();
+    var currentTheme = projected && projected.design ? projected.design.themePreset : 'hesem-enterprise';
+    var themeCard = _r2ThemeCards.filter(function(item){ return item.value === currentTheme; })[0] || _r2ThemeCards[0];
+    var h = '';
+    h += '<div class="mb-ultra-dock">';
+    h += '<div class="mb-ultra-metrics">';
+    h += _r2RenderMetricCard('Builder readiness', 'Builder readiness', (((projected && projected.builderManifest && projected.builderManifest.readinessScore) || 0) + '%'), 'Metadata + structure + release', 'Metadata + structure + release', 'is-brand');
+    h += _r2RenderMetricCard('Diagnostics', 'Diagnostics', diag.score + '%', diag.counts.error + ' ' + _t('lỗi', 'errors') + ' • ' + diag.counts.warning + ' ' + _t('cảnh báo', 'warnings'), diag.counts.error + ' errors • ' + diag.counts.warning + ' warnings', diag.counts.error ? 'is-danger' : (diag.counts.warning ? 'is-warning' : 'is-success'));
+    h += _r2RenderMetricCard('Canvas', 'Canvas', metrics.blocks + ' / ' + metrics.tabs, 'blocks / tabs', 'blocks / tabs', 'is-neutral');
+    h += _r2RenderMetricCard('Automation', 'Automation', metrics.actionSteps, metrics.workflowBlocks + ' ' + _t('workflow-aware blocks', 'workflow-aware blocks'), metrics.workflowBlocks + ' workflow-aware blocks', 'is-neutral');
+    h += _r2RenderMetricCard('Data fabric', 'Data fabric', metrics.apiBlocks + ' / ' + metrics.streamBlocks, _t('API / stream blocks', 'API / stream blocks'), 'API / stream blocks', 'is-neutral');
+    h += _r2RenderMetricCard('Depth', 'Depth', metrics.maxDepth, _t('max block nesting depth', 'max block nesting depth'), 'max block nesting depth', 'is-neutral');
+    h += '</div>';
+
+    h += '<div class="mb-ultra-toolbar">';
+    h += '<div class="mb-ultra-toolbar-group">';
+    h += _r2RenderViewportButton('mobile', '📱', 'Mobile', 'Mobile');
+    h += _r2RenderViewportButton('tablet', '💠', 'Tablet', 'Tablet');
+    h += _r2RenderViewportButton('desktop', '🖥', 'Desktop', 'Desktop');
+    h += _r2RenderViewportButton('wide', '🧭', 'Wide', 'Wide');
+    h += '</div>';
+    h += '<div class="mb-ultra-toolbar-group">';
+    h += '<button class="mb-ultra-chip'+(state.showBuilderCockpit ? ' is-active' : '')+'" data-action="toggle-builder-cockpit">🧠 '+_esc(_t('Cockpit', 'Cockpit'))+'</button>';
+    h += '<button class="mb-ultra-chip'+(state.showDiagnosticsPanel ? ' is-active' : '')+'" data-action="toggle-diagnostics-panel">🩺 '+_esc(_t('Diagnostics', 'Diagnostics'))+'</button>';
+    h += '<button class="mb-ultra-chip'+(state.focusMode ? ' is-active' : '')+'" data-action="toggle-focus-mode">🎬 '+_esc(_t('Focus', 'Focus'))+'</button>';
+    h += '<button class="mb-ultra-chip" data-action="auto-fix-builder">🛠 '+_esc(_t('Auto-fix', 'Auto-fix'))+'</button>';
+    h += '</div>';
+    h += '</div>';
+
+    if(state.showBuilderCockpit){
+      h += '<div class="mb-ultra-cockpit-grid">';
+      h += '<div class="mb-ultra-panel"><div class="mb-ultra-panel-head"><strong>'+_esc(_t('Theme & shell', 'Theme & shell'))+'</strong></div><div class="mb-ultra-theme-card"><div class="mb-ultra-theme-icon">'+_esc(themeCard.icon || '🎨')+'</div><div><div class="mb-ultra-theme-title">'+_esc(_t(themeCard.titleVi, themeCard.titleEn))+'</div><div class="mb-ultra-theme-sub">'+_esc(_t(themeCard.subtitleVi, themeCard.subtitleEn))+'</div><div class="mb-ultra-theme-meta">'+_esc((projected.design && projected.design.visualLanguage) || '')+' • '+_esc((projected.design && projected.design.surfaceDepth) || '')+' • '+_esc((projected.design && projected.design.stageBackdrop) || '')+'</div></div></div></div>';
+      h += '<div class="mb-ultra-panel"><div class="mb-ultra-panel-head"><strong>'+_esc(_t('Tab map', 'Tab map'))+'</strong></div><div class="mb-ultra-tab-map">';
+      (projected.tabs || []).forEach(function(tab){
+        var tabDiag = (diag.tabMap || {})[tab.tabId] || { errors:0, warnings:0, infos:0 };
+        h += '<button class="mb-ultra-tab-card'+(activeTab && activeTab.tabId === tab.tabId ? ' is-active' : '')+'" data-action="switch-tab" data-tab="'+_esc(tab.tabId)+'"><strong>'+_esc(tab.icon || '📑')+' '+_esc(_t(tab.title.vi, tab.title.en))+'</strong><span>'+_esc(String((tab.blocks || []).length))+' '+_esc(_t('blocks', 'blocks'))+'</span><small>'+_esc(tabDiag.errors)+'E • '+_esc(tabDiag.warnings)+'W</small></button>';
+      });
+      h += '</div></div>';
+      h += '<div class="mb-ultra-panel"><div class="mb-ultra-panel-head"><strong>'+_esc(_t('Top diagnostics', 'Top diagnostics'))+'</strong></div>' + _r2RenderDiagnosticsList(diag, 3) + '</div>';
+      h += '<div class="mb-ultra-panel"><div class="mb-ultra-panel-head"><strong>'+_esc(_t('Data & orchestration', 'Data & orchestration'))+'</strong></div><div class="mb-ultra-mini-stats">';
+      h += '<div><span>'+_esc(_t('API blocks', 'API blocks'))+'</span><strong>'+_esc(metrics.apiBlocks)+'</strong></div>';
+      h += '<div><span>'+_esc(_t('Pipelines', 'Pipelines'))+'</span><strong>'+_esc(metrics.pipelineBlocks)+'</strong></div>';
+      h += '<div><span>'+_esc(_t('Realtime', 'Realtime'))+'</span><strong>'+_esc(metrics.streamBlocks)+'</strong></div>';
+      h += '<div><span>'+_esc(_t('Analytics', 'Analytics'))+'</span><strong>'+_esc(metrics.analyticsBlocks)+'</strong></div>';
+      h += '</div></div>';
+      h += '</div>';
+    }
+
+    if(state.showDiagnosticsPanel){
+      h += '<div class="mb-ultra-panel"><div class="mb-ultra-panel-head"><strong>'+_esc(_t('Diagnostic board', 'Diagnostic board'))+'</strong><div class="mb-ultra-filterbar">' +
+        '<button class="mb-ultra-chip'+((state.ultraIssueFilter || 'all') === 'all' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="all">'+_esc(_t('Tất cả', 'All'))+'</button>' +
+        '<button class="mb-ultra-chip'+(state.ultraIssueFilter === 'error' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="error">'+_esc(_t('Lỗi', 'Errors'))+'</button>' +
+        '<button class="mb-ultra-chip'+(state.ultraIssueFilter === 'warning' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="warning">'+_esc(_t('Cảnh báo', 'Warnings'))+'</button>' +
+        '<button class="mb-ultra-chip'+(state.ultraIssueFilter === 'info' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="info">'+_esc(_t('Thông tin', 'Info'))+'</button>' +
+        '</div></div>' + _r2RenderDiagnosticsList(diag) + '</div>';
+    }
+
+    h += '</div>';
+    return h;
+  }
+
+  function _r2RenderBlockIntel(block){
+    var diag = state.ultraDiagnosticsCache || { blockMap:{} };
+    var blockDiag = (diag.blockMap || {})[block.blockId] || { errors:0, warnings:0, infos:0 };
+    var chips = [];
+    var apiId = _r2BlockApiId(block);
+    var mode = _r2BlockDataMode(block);
+    var flowSteps = _r2BlockEventSteps(block).length;
+    if(mode === 'stream') chips.push('<span class="mb-ultra-block-chip is-stream">⚡ '+_esc(_t('Stream', 'Stream'))+'</span>');
+    else if(mode === 'query-pipeline') chips.push('<span class="mb-ultra-block-chip is-pipeline">🧮 '+_esc(_t('Pipeline', 'Pipeline'))+'</span>');
+    else if(apiId) chips.push('<span class="mb-ultra-block-chip is-api">🔌 '+_esc(apiId)+'</span>');
+    else chips.push('<span class="mb-ultra-block-chip">📝 '+_esc(_t('Manual', 'Manual'))+'</span>');
+    if(flowSteps) chips.push('<span class="mb-ultra-block-chip is-flow">⚙ '+_esc(String(flowSteps))+' '+_esc(_t('steps', 'steps'))+'</span>');
+    if(_r2BlockWorkflowId(block)) chips.push('<span class="mb-ultra-block-chip">🗂 '+_esc(_r2BlockWorkflowId(block))+'</span>');
+    chips.push('<span class="mb-ultra-block-chip">📐 '+_esc(_r2ResponsiveSummary(block))+'</span>');
+    if(blockDiag.errors || blockDiag.warnings){
+      chips.push('<span class="mb-ultra-block-chip '+(blockDiag.errors ? 'is-error' : 'is-warning')+'">'+(blockDiag.errors ? '⛔ ' + blockDiag.errors : '⚠ ' + blockDiag.warnings)+'</span>');
+    }
+    return '<div class="mb-ultra-block-intel">'+chips.join('')+'</div>';
+  }
+
+  var _r2PrevRenderCanvasBlock = _renderCanvasBlock;
+  _renderCanvasBlock = function(block, tab, tree, depth){
+    var html = _r2PrevRenderCanvasBlock(block, tab, tree, depth);
+    var addClass = ' mb-block-card--ultra';
+    var blockDiag = state.ultraDiagnosticsCache && state.ultraDiagnosticsCache.blockMap ? state.ultraDiagnosticsCache.blockMap[block.blockId] : null;
+    if(blockDiag && blockDiag.errors) addClass += ' has-errors';
+    else if(blockDiag && blockDiag.warnings) addClass += ' has-warnings';
+    html = html.replace('class="mb-block-card', 'class="mb-block-card' + addClass);
+    html = html.replace('<div class="mb-block-body">', _r2RenderBlockIntel(block) + '<div class="mb-block-body">');
+    return html;
+  };
+
+  function _r2RenderModuleStudioPanel(){
+    var draft = _ngEnsureModuleStudioDraft();
+    var projected = _ngProjectedSchema();
+    var readiness = _ngComputeModuleStudioReadiness(projected);
+    var diag = _r2CollectDiagnostics(projected);
+    var metrics = _r2SchemaMetrics(projected);
+    var h = '';
+
+    if(!draft) return '';
+    h += '<div class="mb-rail-panel mb-ultra-studio">';
+    h += '<div class="mb-panel-header"><div class="mb-panel-title"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_esc(_t('Module Studio', 'Module Studio'))+'</div><strong><span>🧭</span><span>'+_esc(_t('Control plane', 'Control plane'))+'</span></strong></div><div class="mb-panel-actions"><button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="close-module-studio" title="'+_esc(_t('Đóng studio', 'Close studio'))+'"><span class="mb-icon-glyph">&#10005;</span></button></div></div>';
+    h += '<div class="mb-panel-body">';
+    h += _ngRenderReadinessSummary(readiness, projected);
+    h += '<div class="mb-ultra-studio-summary">';
+    h += _r2RenderMetricCard('Diagnostics', 'Diagnostics', diag.score + '%', diag.counts.error + 'E • ' + diag.counts.warning + 'W', diag.counts.error + 'E • ' + diag.counts.warning + 'W', diag.counts.error ? 'is-danger' : 'is-success');
+    h += _r2RenderMetricCard('Data fabric', 'Data fabric', metrics.apiBlocks + ' / ' + metrics.streamBlocks, 'api / stream', 'api / stream', 'is-neutral');
+    h += '</div>';
+
+    h += '<div class="mb-toolbar" style="padding:0 0 12px;border:0;background:none;flex-wrap:wrap">';
+    h += _ngRenderStudioTabButton('overview', 'Tổng quan', 'Overview', '🧱');
+    h += _ngRenderStudioTabButton('governance', 'Governance', 'Governance', '🛡');
+    h += _ngRenderStudioTabButton('design', 'Design', 'Design', '🎨');
+    h += _ngRenderStudioTabButton('quality', 'Quality', 'Quality', '✅');
+    h += _ngRenderStudioTabButton('publish', 'Publish', 'Publish', '🚀');
+    h += _ngRenderStudioTabButton('diagnostics', 'Diagnostics', 'Diagnostics', '🩺');
+    h += '</div>';
+
+    if(state.moduleStudioTab === 'overview'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">'+_esc(_t('Identity & navigation', 'Identity & navigation'))+'</div></div></div>';
+      h += _ngRenderStudioField({ labelVi:'Tên module (VI)', labelEn:'Module title (VI)', path:'title.vi', value:_getByPath(draft, 'title.vi') });
+      h += _ngRenderStudioField({ labelVi:'Tên module (EN)', labelEn:'Module title (EN)', path:'title.en', value:_getByPath(draft, 'title.en') });
+      h += _ngRenderStudioField({ labelVi:'Mô tả ngắn (VI)', labelEn:'Subtitle (VI)', path:'subtitle.vi', value:_getByPath(draft, 'subtitle.vi') });
+      h += _ngRenderStudioField({ labelVi:'Mô tả ngắn (EN)', labelEn:'Subtitle (EN)', path:'subtitle.en', value:_getByPath(draft, 'subtitle.en') });
+      h += _ngRenderStudioField({ labelVi:'Icon', labelEn:'Icon', path:'icon', value:draft.icon, placeholder:'📦' });
+      h += _ngRenderStudioField({ labelVi:'Route', labelEn:'Route', path:'route', value:draft.route, placeholder:'/qms/example' });
+      h += _ngRenderStudioField({ labelVi:'Roles (CSV)', labelEn:'Roles (CSV)', path:'rolesCsv', value:draft.rolesCsv, placeholder:'ceo, it_admin, quality_manager', helpVi:'Phân tách bằng dấu phẩy', helpEn:'Comma separated' });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'governance'){
+      h += '<div class="mb-prop-section">';
+      h += _ngRenderStudioField({ labelVi:'Domain', labelEn:'Domain', path:'meta.domain', value:_getByPath(draft, 'meta.domain'), placeholder:'quality / production / maintenance' });
+      h += _ngRenderStudioField({ labelVi:'Bounded context', labelEn:'Bounded context', path:'meta.boundedContext', value:_getByPath(draft, 'meta.boundedContext'), placeholder:'document_control / quality_management' });
+      h += _ngRenderStudioField({ labelVi:'Owner team', labelEn:'Owner team', path:'meta.ownerTeam', value:_getByPath(draft, 'meta.ownerTeam') });
+      h += _ngRenderStudioField({ labelVi:'Process owner', labelEn:'Process owner', path:'meta.processOwner', value:_getByPath(draft, 'meta.processOwner') });
+      h += _ngRenderStudioField({ labelVi:'Lifecycle', labelEn:'Lifecycle', path:'meta.lifecycle', type:'select', value:_getByPath(draft, 'meta.lifecycle'), selectOptions:['draft','pilot','active','validated','deprecated'] });
+      h += _ngRenderStudioField({ labelVi:'Release channel', labelEn:'Release channel', path:'meta.releaseChannel', type:'select', value:_getByPath(draft, 'meta.releaseChannel'), selectOptions:['pilot','department','plant','enterprise','global'] });
+      h += _ngRenderStudioField({ labelVi:'Criticality', labelEn:'Criticality', path:'meta.criticality', type:'select', value:_getByPath(draft, 'meta.criticality'), selectOptions:['low','standard','high','critical','gxp'] });
+      h += _ngRenderStudioField({ labelVi:'Feature flag', labelEn:'Feature flag', path:'meta.featureFlag', value:_getByPath(draft, 'meta.featureFlag'), placeholder:'qms.module.document_control.v2' });
+      h += _ngRenderStudioField({ labelVi:'Tags (CSV)', labelEn:'Tags (CSV)', path:'meta.tagsCsv', value:_getByPath(draft, 'meta.tagsCsv'), placeholder:'eqms, audit, capa, fmea' });
+      h += _ngRenderStudioField({ labelVi:'Docs URL', labelEn:'Docs URL', path:'meta.docsUrl', value:_getByPath(draft, 'meta.docsUrl') });
+      h += _ngRenderStudioField({ labelVi:'Support group', labelEn:'Support group', path:'meta.supportGroup', value:_getByPath(draft, 'meta.supportGroup') });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'design'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">'+_esc(_t('Experience presets', 'Experience presets'))+'</div><div class="mb-prop-section-count">'+_esc(_t('1-click mood + shell', '1-click mood + shell'))+'</div></div></div>';
+      h += _r2RenderExperiencePresetBar();
+      h += '</div>';
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">'+_esc(_t('Theme gallery', 'Theme gallery'))+'</div></div></div>';
+      h += _r2RenderDesignGallery(draft);
+      h += '</div>';
+      h += '<div class="mb-prop-section">';
+      h += _ngRenderStudioField({ labelVi:'Theme preset', labelEn:'Theme preset', path:'design.themePreset', type:'select', value:_getByPath(draft, 'design.themePreset'), selectOptions:_r2ThemeCards.map(function(card){ return { value:card.value, label:card.titleEn }; }) });
+      h += _ngRenderStudioField({ labelVi:'Visual language', labelEn:'Visual language', path:'design.visualLanguage', type:'select', value:_getByPath(draft, 'design.visualLanguage'), selectOptions:['industrial-glass','executive-premium','dark-ops','precision-clean','warehouse-neon'] });
+      h += _ngRenderStudioField({ labelVi:'Accent tone', labelEn:'Accent tone', path:'design.accentTone', type:'select', value:_getByPath(draft, 'design.accentTone'), selectOptions:['blue','indigo','emerald','amber','teal','rose'] });
+      h += _ngRenderStudioField({ labelVi:'Shell preset', labelEn:'Shell preset', path:'design.shellPreset', type:'select', value:_getByPath(draft, 'design.shellPreset'), selectOptions:['operations-center','workspace','cockpit','control-tower','kanban','document-center'] });
+      h += _ngRenderStudioField({ labelVi:'Navigation mode', labelEn:'Navigation mode', path:'design.navigationMode', type:'select', value:_getByPath(draft, 'design.navigationMode'), selectOptions:['workspace','process','split','focus'] });
+      h += _ngRenderStudioField({ labelVi:'Density', labelEn:'Density', path:'design.density', type:'select', value:_getByPath(draft, 'design.density'), selectOptions:['compact','comfortable','spacious'] });
+      h += _ngRenderStudioField({ labelVi:'Default breakpoint', labelEn:'Default breakpoint', path:'design.defaultBreakpoint', type:'select', value:_getByPath(draft, 'design.defaultBreakpoint'), selectOptions:['mobile','tablet','desktop','wide'] });
+      h += _ngRenderStudioField({ labelVi:'Stage backdrop', labelEn:'Stage backdrop', path:'design.stageBackdrop', type:'select', value:_getByPath(draft, 'design.stageBackdrop'), selectOptions:['mesh','aurora','grid','soft','noise'] });
+      h += _ngRenderStudioField({ labelVi:'Surface depth', labelEn:'Surface depth', path:'design.surfaceDepth', type:'select', value:_getByPath(draft, 'design.surfaceDepth'), selectOptions:['outlined','elevated','premium','solid'] });
+      h += _ngRenderStudioField({ labelVi:'Hero mood', labelEn:'Hero mood', path:'design.heroMood', type:'select', value:_getByPath(draft, 'design.heroMood'), selectOptions:['aurora','cinematic','night-shift','clear-day','focused'] });
+      h += _ngRenderStudioField({ labelVi:'Chart style', labelEn:'Chart style', path:'design.chartStyle', type:'select', value:_getByPath(draft, 'design.chartStyle'), selectOptions:['balanced','executive','realtime','clean-room'] });
+      h += _ngRenderStudioField({ labelVi:'Card radius', labelEn:'Card radius', path:'design.cardRadius', type:'select', value:_getByPath(draft, 'design.cardRadius'), selectOptions:['md','lg','xl'] });
+      h += _ngRenderStudioField({ labelVi:'Glass panels', labelEn:'Glass panels', path:'design.panelGlass', type:'toggle', value:_getByPath(draft, 'design.panelGlass') !== false, repaintOnChange:true });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'quality'){
+      h += '<div class="mb-prop-section">';
+      h += _ngRenderStudioField({ labelVi:'Test owner', labelEn:'Test owner', path:'qa.testOwner', value:_getByPath(draft, 'qa.testOwner') });
+      h += _ngRenderStudioField({ labelVi:'Ngày review gần nhất', labelEn:'Last reviewed on', path:'qa.lastReviewedOn', type:'date', value:_getByPath(draft, 'qa.lastReviewedOn') });
+      h += _ngRenderStudioField({ labelVi:'Smoke checklist', labelEn:'Smoke checklist', path:'qa.smokeChecklistText', type:'textarea', rows:5, value:_getByPath(draft, 'qa.smokeChecklistText'), helpVi:'Mỗi dòng là một mục', helpEn:'One line per item' });
+      h += _ngRenderStudioField({ labelVi:'Critical journeys', labelEn:'Critical journeys', path:'qa.criticalJourneysText', type:'textarea', rows:5, value:_getByPath(draft, 'qa.criticalJourneysText'), helpVi:'Mỗi dòng là một luồng nghiệp vụ', helpEn:'One line per journey' });
+      h += _ngRenderStudioField({ labelVi:'Acceptance criteria', labelEn:'Acceptance criteria', path:'qa.acceptanceCriteriaText', type:'textarea', rows:5, value:_getByPath(draft, 'qa.acceptanceCriteriaText') });
+      h += _ngRenderStudioField({ labelVi:'Readiness notes', labelEn:'Readiness notes', path:'qa.readinessNotes', type:'textarea', rows:4, value:_getByPath(draft, 'qa.readinessNotes') });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'publish'){
+      h += '<div class="mb-prop-section">';
+      h += _ngRenderStudioField({ labelVi:'Environment', labelEn:'Environment', path:'publish.environment', type:'select', value:_getByPath(draft, 'publish.environment'), selectOptions:['dev','sit','uat','staging','production'] });
+      h += _ngRenderStudioField({ labelVi:'Publish mode', labelEn:'Publish mode', path:'publish.mode', type:'select', value:_getByPath(draft, 'publish.mode'), selectOptions:['draft','controlled','canary','blue-green','rolling','full'] });
+      h += _ngRenderStudioField({ labelVi:'Rollout %', labelEn:'Rollout %', path:'publish.rolloutPct', type:'number', min:0, max:100, step:1, value:_getByPath(draft, 'publish.rolloutPct') });
+      h += _ngRenderStudioField({ labelVi:'Require signoff', labelEn:'Require signoff', path:'publish.requireSignoff', type:'toggle', value:_getByPath(draft, 'publish.requireSignoff') !== false, repaintOnChange:true });
+      h += _ngRenderStudioField({ labelVi:'Change summary', labelEn:'Change summary', path:'publish.changeSummary', type:'textarea', rows:4, value:_getByPath(draft, 'publish.changeSummary') });
+      h += _ngRenderStudioField({ labelVi:'Release note', labelEn:'Release note', path:'publish.releaseNote', type:'textarea', rows:4, value:_getByPath(draft, 'publish.releaseNote') });
+      h += _ngRenderStudioField({ labelVi:'Primary entity', labelEn:'Primary entity', path:'integration.primaryEntity', value:_getByPath(draft, 'integration.primaryEntity'), placeholder:'document / ncr / capa / work_order' });
+      h += _ngRenderStudioField({ labelVi:'Source systems (CSV)', labelEn:'Source systems (CSV)', path:'integration.sourceSystemsCsv', value:_getByPath(draft, 'integration.sourceSystemsCsv'), placeholder:'erp, mes, scada, lims' });
+      h += _ngRenderStudioField({ labelVi:'Digital thread (CSV)', labelEn:'Digital thread (CSV)', path:'integration.digitalThreadCsv', value:_getByPath(draft, 'integration.digitalThreadCsv'), placeholder:'doc_control, training, ncr, capa' });
+      h += _ngRenderStudioField({ labelVi:'Default API namespace', labelEn:'Default API namespace', path:'integration.defaultApiNamespace', value:_getByPath(draft, 'integration.defaultApiNamespace'), placeholder:'qms.document_control' });
+      h += '</div>';
+    }
+
+    if(state.moduleStudioTab === 'diagnostics'){
+      h += '<div class="mb-prop-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">'+_esc(_t('Diagnostic board', 'Diagnostic board'))+'</div><div class="mb-prop-section-count">'+_esc(diag.issues.length)+' '+_esc(_t('issues', 'issues'))+'</div></div></div>';
+      h += '<div class="mb-ultra-filterbar" style="margin-bottom:10px">';
+      h += '<button class="mb-ultra-chip'+((state.ultraIssueFilter || 'all') === 'all' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="all">'+_esc(_t('Tất cả', 'All'))+'</button>';
+      h += '<button class="mb-ultra-chip'+(state.ultraIssueFilter === 'error' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="error">'+_esc(_t('Lỗi', 'Errors'))+'</button>';
+      h += '<button class="mb-ultra-chip'+(state.ultraIssueFilter === 'warning' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="warning">'+_esc(_t('Cảnh báo', 'Warnings'))+'</button>';
+      h += '<button class="mb-ultra-chip'+(state.ultraIssueFilter === 'info' ? ' is-active' : '')+'" data-action="set-issue-filter" data-filter="info">'+_esc(_t('Thông tin', 'Info'))+'</button>';
+      h += '</div>';
+      h += '<div class="mb-ultra-inline-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="auto-fix-builder">🛠 '+_esc(_t('Auto-fix schema', 'Auto-fix schema'))+'</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="apply-module-studio">'+_esc(_t('Áp dụng metadata', 'Apply metadata'))+'</button></div>';
+      h += _r2RenderDiagnosticsList(diag);
+      h += '</div>';
+    }
+
+    h += '</div><div class="mb-panel-header" style="border-top:1px solid var(--border);border-bottom:0;background:#fff"><button class="hm-btn hm-btn-secondary" data-action="close-module-studio">'+_esc(_t('Đóng', 'Close'))+'</button><button class="hm-btn hm-btn-ghost" data-action="auto-fix-builder">🛠 '+_esc(_t('Auto-fix', 'Auto-fix'))+'</button><button class="hm-btn hm-btn-primary" data-action="apply-module-studio">'+_esc(_t('Áp dụng', 'Apply'))+'</button></div></div>';
+    return h;
+  }
+
+  _ngRenderModuleStudioPanel = _r2RenderModuleStudioPanel;
+
+  function _r2EnsureUltraStyles(){
+    var id = 'hm-module-builder-ultra-r2';
+    var style;
+    var css = '';
+    if(typeof document === 'undefined') return;
+    if(document.getElementById(id)) return;
+    style = document.createElement('style');
+    style.id = id;
+    css += '.mb-ultra-root{--ultra-accent:#2563eb;--ultra-accent-2:#14b8a6;--ultra-surface:rgba(255,255,255,.9);--ultra-panel:#ffffff;--ultra-text:#0f172a;display:grid;gap:16px}';
+    css += '.mb-ultra-root[data-theme="hesem-executive"]{--ultra-accent:#7c3aed;--ultra-accent-2:#f59e0b}';
+    css += '.mb-ultra-root[data-theme="shopfloor-dark"]{--ultra-accent:#06b6d4;--ultra-accent-2:#0f172a;--ultra-panel:#0f172a;--ultra-surface:rgba(15,23,42,.92);--ultra-text:#e2e8f0}';
+    css += '.mb-ultra-root[data-theme="quality-lab"]{--ultra-accent:#10b981;--ultra-accent-2:#2563eb}';
+    css += '.mb-ultra-root[data-theme="maintenance-hub"]{--ultra-accent:#ea580c;--ultra-accent-2:#2563eb}';
+    css += '.mb-ultra-root[data-theme="warehouse-ops"]{--ultra-accent:#0284c7;--ultra-accent-2:#14b8a6}';
+    css += '.mb-ultra-root .mb-builder-hero{background:linear-gradient(135deg,var(--ultra-accent) 0%,var(--ultra-accent-2) 100%);box-shadow:0 24px 60px rgba(15,23,42,.16)}';
+    css += '.mb-ultra-root .mb-right-rail .mb-rail-panel,.mb-ultra-root .mb-rail-panel{backdrop-filter:blur(12px)}';
+    css += '.mb-ultra-root .mb-canvas-stage{position:relative;overflow:hidden;border-radius:26px;box-shadow:0 24px 48px rgba(15,23,42,.08)}';
+    css += '.mb-ultra-root[data-backdrop="mesh"] .mb-canvas-stage{background-image:radial-gradient(circle at 15% 20%,rgba(37,99,235,.16),transparent 26%),radial-gradient(circle at 85% 12%,rgba(20,184,166,.14),transparent 24%),linear-gradient(180deg,rgba(248,250,252,.96),rgba(241,245,249,.96))}';
+    css += '.mb-ultra-root[data-backdrop="aurora"] .mb-canvas-stage{background-image:radial-gradient(circle at 20% 10%,rgba(124,58,237,.18),transparent 26%),radial-gradient(circle at 80% 20%,rgba(16,185,129,.15),transparent 24%),linear-gradient(180deg,rgba(255,255,255,.95),rgba(239,246,255,.96))}';
+    css += '.mb-ultra-root[data-backdrop="grid"] .mb-canvas-stage{background-image:linear-gradient(rgba(148,163,184,.12) 1px, transparent 1px),linear-gradient(90deg, rgba(148,163,184,.12) 1px, transparent 1px),linear-gradient(180deg,rgba(255,255,255,.94),rgba(248,250,252,.98));background-size:24px 24px,24px 24px,100% 100%}';
+    css += '.mb-ultra-root[data-backdrop="soft"] .mb-canvas-stage{background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(248,250,252,.98))}';
+    css += '.mb-ultra-root[data-backdrop="noise"] .mb-canvas-stage{background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(248,250,252,.98));position:relative}';
+    css += '.mb-ultra-root[data-viewport="mobile"] .mb-canvas-root{max-width:420px;margin:0 auto}';
+    css += '.mb-ultra-root[data-viewport="tablet"] .mb-canvas-root{max-width:820px;margin:0 auto}';
+    css += '.mb-ultra-root[data-viewport="desktop"] .mb-canvas-root{max-width:1260px;margin:0 auto}';
+    css += '.mb-ultra-root[data-viewport="wide"] .mb-canvas-root{max-width:1440px;margin:0 auto}';
+    css += '.mb-ultra-dock{display:grid;gap:12px}';
+    css += '.mb-ultra-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}';
+    css += '.mb-ultra-metric{padding:14px 16px;border-radius:18px;border:1px solid rgba(148,163,184,.22);background:rgba(255,255,255,.92);box-shadow:0 14px 34px rgba(15,23,42,.05);display:grid;gap:4px;min-height:96px}';
+    css += '.mb-ultra-metric-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary)}';
+    css += '.mb-ultra-metric-value{font-size:22px;font-weight:800;color:var(--text-primary)}';
+    css += '.mb-ultra-metric-sub{font-size:12px;color:var(--text-secondary)}';
+    css += '.mb-ultra-metric.is-danger{border-color:rgba(239,68,68,.24);background:linear-gradient(180deg,rgba(254,242,242,.95),#fff)}';
+    css += '.mb-ultra-metric.is-warning{border-color:rgba(245,158,11,.24);background:linear-gradient(180deg,rgba(255,251,235,.95),#fff)}';
+    css += '.mb-ultra-metric.is-success{border-color:rgba(16,185,129,.24);background:linear-gradient(180deg,rgba(236,253,245,.95),#fff)}';
+    css += '.mb-ultra-metric.is-brand{border-color:rgba(37,99,235,.24);background:linear-gradient(180deg,rgba(239,246,255,.95),#fff)}';
+    css += '.mb-ultra-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 2px}';
+    css += '.mb-ultra-toolbar-group,.mb-ultra-filterbar,.mb-ultra-inline-actions,.mb-ultra-preset-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}';
+    css += '.mb-ultra-chip{border:1px solid rgba(148,163,184,.24);background:rgba(255,255,255,.88);color:var(--text-primary);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 8px 18px rgba(15,23,42,.04)}';
+    css += '.mb-ultra-chip.is-active{background:linear-gradient(135deg,var(--ultra-accent),var(--ultra-accent-2));color:#fff;border-color:transparent}';
+    css += '.mb-ultra-cockpit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}';
+    css += '.mb-ultra-panel{padding:14px;border-radius:20px;background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.22);box-shadow:0 18px 34px rgba(15,23,42,.05);display:grid;gap:12px}';
+    css += '.mb-ultra-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px}';
+    css += '.mb-ultra-theme-card{display:flex;gap:12px;align-items:flex-start}';
+    css += '.mb-ultra-theme-icon{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--ultra-accent),var(--ultra-accent-2));display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 12px 24px rgba(15,23,42,.12)}';
+    css += '.mb-ultra-theme-title{font-weight:800;color:var(--text-primary)}';
+    css += '.mb-ultra-theme-sub,.mb-ultra-theme-meta{font-size:12px;color:var(--text-secondary);margin-top:4px}';
+    css += '.mb-ultra-tab-map{display:grid;gap:8px}';
+    css += '.mb-ultra-tab-card{border:1px solid rgba(148,163,184,.2);background:rgba(248,250,252,.9);border-radius:16px;padding:12px;text-align:left;display:grid;gap:4px;cursor:pointer}';
+    css += '.mb-ultra-tab-card.is-active{border-color:rgba(37,99,235,.36);background:rgba(239,246,255,.96)}';
+    css += '.mb-ultra-tab-card strong{font-size:13px;color:var(--text-primary)}';
+    css += '.mb-ultra-tab-card span,.mb-ultra-tab-card small{font-size:12px;color:var(--text-secondary)}';
+    css += '.mb-ultra-mini-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}';
+    css += '.mb-ultra-mini-stats div{padding:10px 12px;border-radius:16px;background:rgba(248,250,252,.96);display:grid;gap:4px}';
+    css += '.mb-ultra-mini-stats span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)}';
+    css += '.mb-ultra-mini-stats strong{font-size:20px;color:var(--text-primary)}';
+    css += '.mb-ultra-issue{padding:12px;border-radius:16px;background:rgba(248,250,252,.96);border:1px solid rgba(148,163,184,.16);display:grid;gap:8px;margin-top:8px}';
+    css += '.mb-ultra-issue.is-error{border-color:rgba(239,68,68,.24);background:linear-gradient(180deg,rgba(254,242,242,.94),rgba(255,255,255,.98))}';
+    css += '.mb-ultra-issue.is-warning{border-color:rgba(245,158,11,.24);background:linear-gradient(180deg,rgba(255,251,235,.94),rgba(255,255,255,.98))}';
+    css += '.mb-ultra-issue.is-info{border-color:rgba(37,99,235,.14);background:linear-gradient(180deg,rgba(239,246,255,.94),rgba(255,255,255,.98))}';
+    css += '.mb-ultra-issue-meta,.mb-ultra-issue-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}';
+    css += '.mb-ultra-issue-tone{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}';
+    css += '.mb-ultra-issue-tone.is-error{background:rgba(239,68,68,.12);color:#b91c1c}';
+    css += '.mb-ultra-issue-tone.is-warning{background:rgba(245,158,11,.12);color:#92400e}';
+    css += '.mb-ultra-issue-tone.is-info{background:rgba(37,99,235,.10);color:#1d4ed8}';
+    css += '.mb-ultra-issue-scope{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em}';
+    css += '.mb-ultra-issue-label{font-size:13px;font-weight:700;color:var(--text-primary)}';
+    css += '.mb-ultra-issue-detail{font-size:12px;color:var(--text-secondary);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}';
+    css += '.mb-ultra-fixable{font-size:11px;color:var(--text-tertiary)}';
+    css += '.mb-ultra-empty{padding:14px;border:1px dashed rgba(148,163,184,.32);border-radius:16px;color:var(--text-secondary);font-size:12px}';
+    css += '.mb-ultra-studio .mb-panel-body{background:linear-gradient(180deg,rgba(248,250,252,.85),rgba(255,255,255,.95))}';
+    css += '.mb-ultra-studio-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}';
+    css += '.mb-ultra-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}';
+    css += '.mb-ultra-choice{padding:12px;border-radius:18px;border:1px solid rgba(148,163,184,.22);background:rgba(255,255,255,.9);display:flex;gap:12px;align-items:flex-start;text-align:left;cursor:pointer;box-shadow:0 10px 22px rgba(15,23,42,.04)}';
+    css += '.mb-ultra-choice.is-active{border-color:rgba(37,99,235,.34);background:linear-gradient(180deg,rgba(239,246,255,.95),rgba(255,255,255,.98));box-shadow:0 16px 30px rgba(37,99,235,.10)}';
+    css += '.mb-ultra-choice-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--ultra-accent),var(--ultra-accent-2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 36px}';
+    css += '.mb-ultra-choice-copy{display:grid;gap:4px}';
+    css += '.mb-ultra-choice-copy strong{font-size:13px;color:var(--text-primary)}';
+    css += '.mb-ultra-choice-copy span{font-size:12px;color:var(--text-secondary)}';
+    css += '.mb-ultra-block-intel{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}';
+    css += '.mb-ultra-block-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:rgba(248,250,252,.96);border:1px solid rgba(148,163,184,.16);font-size:11px;font-weight:700;color:var(--text-secondary)}';
+    css += '.mb-ultra-block-chip.is-api{background:rgba(239,246,255,.96);color:#1d4ed8;border-color:rgba(37,99,235,.18)}';
+    css += '.mb-ultra-block-chip.is-stream{background:rgba(236,253,245,.96);color:#047857;border-color:rgba(16,185,129,.18)}';
+    css += '.mb-ultra-block-chip.is-pipeline{background:rgba(250,245,255,.96);color:#7e22ce;border-color:rgba(168,85,247,.20)}';
+    css += '.mb-ultra-block-chip.is-flow{background:rgba(255,251,235,.96);color:#92400e;border-color:rgba(245,158,11,.18)}';
+    css += '.mb-ultra-block-chip.is-error{background:rgba(254,242,242,.96);color:#b91c1c;border-color:rgba(239,68,68,.18)}';
+    css += '.mb-ultra-block-chip.is-warning{background:rgba(255,251,235,.96);color:#92400e;border-color:rgba(245,158,11,.18)}';
+    css += '.mb-block-card--ultra{box-shadow:0 18px 38px rgba(15,23,42,.06);border-color:rgba(148,163,184,.18)}';
+    css += '.mb-block-card--ultra.has-errors{border-color:rgba(239,68,68,.26)}';
+    css += '.mb-block-card--ultra.has-warnings{border-color:rgba(245,158,11,.26)}';
+    css += '@media (max-width: 1024px){.mb-ultra-choice-grid{grid-template-columns:1fr}.mb-ultra-studio-summary{grid-template-columns:1fr}.mb-ultra-toolbar{align-items:flex-start}}';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  var _r2PrevHandleClick = _handleClick;
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    var preset;
+    if(btn){
+      if(action === 'toggle-builder-cockpit'){
+        _r2EnsureUltraState();
+        state.showBuilderCockpit = !state.showBuilderCockpit;
+        _paint();
+        return;
+      }
+      if(action === 'toggle-diagnostics-panel'){
+        _r2EnsureUltraState();
+        state.showDiagnosticsPanel = !state.showDiagnosticsPanel;
+        _paint();
+        return;
+      }
+      if(action === 'set-issue-filter'){
+        state.ultraIssueFilter = btn.getAttribute('data-filter') || 'all';
+        _paint();
+        return;
+      }
+      if(action === 'set-viewport-mode'){
+        state.viewportMode = btn.getAttribute('data-viewport') || 'desktop';
+        _paint();
+        return;
+      }
+      if(action === 'studio-set-theme'){
+        _ngEnsureModuleStudioDraft();
+        _setByPath(state.moduleStudioDraft, 'design.themePreset', btn.getAttribute('data-value') || 'hesem-enterprise');
+        _paint();
+        return;
+      }
+      if(action === 'apply-experience-preset'){
+        preset = _r2ExperiencePresets[btn.getAttribute('data-preset') || ''];
+        _ngEnsureModuleStudioDraft();
+        if(preset){
+          Object.keys(preset).forEach(function(key){
+            _setByPath(state.moduleStudioDraft, 'design.' + key, preset[key]);
+          });
+          if(preset.defaultBreakpoint) state.viewportMode = preset.defaultBreakpoint;
+          _paint();
+          return;
+        }
+      }
+      if(action === 'auto-fix-builder'){
+        if(!state.schema) return;
+        _mutateSchema(_t('Auto-fix builder schema', 'Auto-fix builder schema'), function(){
+          if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+          _r2ApplyAutoFixes(state.schema);
+          state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+          state.viewportMode = (state.schema.design && state.schema.design.defaultBreakpoint) || state.viewportMode || 'desktop';
+        });
+        if(BE.toast) BE.toast(_t('Đã auto-fix các lỗi có thể sửa an toàn', 'Applied safe auto-fixes to the builder schema'), 'success');
+        return;
+      }
+      if(action === 'jump-to-issue-block'){
+        if(btn.getAttribute('data-block')){
+          state.showModuleStudio = false;
+          state.showLibrary = false;
+          _openBlockConfig(btn.getAttribute('data-block'));
+        }
+        return;
+      }
+      if(action === 'toggle-focus-mode'){
+        _r2EnsureUltraState();
+        if(!state.focusMode){
+          state._preFocusState = {
+            showTree: state.showTree,
+            showLibrary: state.showLibrary,
+            showModuleStudio: state.showModuleStudio,
+            selectedBlock: state.selectedBlock
+          };
+          state.focusMode = true;
+          state.showTree = false;
+          state.showLibrary = false;
+          state.showModuleStudio = false;
+          state.selectedBlock = null;
+          state.propsDraft = null;
+        } else {
+          state.focusMode = false;
+          if(state._preFocusState){
+            state.showTree = !!state._preFocusState.showTree;
+            state.showLibrary = !!state._preFocusState.showLibrary;
+            state.showModuleStudio = !!state._preFocusState.showModuleStudio;
+            state.selectedBlock = state._preFocusState.selectedBlock || null;
+          }
+        }
+        _paint();
+        return;
+      }
+    }
+    return _r2PrevHandleClick(e);
+  };
+
+  var _r2PrevHandleInput = _handleInput;
+  _handleInput = function(e){
+    var target = e && e.target;
+    var path = target && target.getAttribute ? target.getAttribute('data-module-path') : '';
+    if(path === 'design.defaultBreakpoint'){
+      state.viewportMode = target && target.value ? target.value : 'desktop';
+    }
+    return _r2PrevHandleInput(e);
+  };
+
+  function _r2PreflightSchema(schema, syncDraft){
+    if(!schema) return schema;
+    if(syncDraft && state.moduleStudioDraft) _ngApplyModuleStudioDraft(schema, state.moduleStudioDraft);
+    _ngEnsureModuleBuilderMetadata(schema);
+    _r2EnsureModuleId(schema);
+    if(!schema.title) schema.title = { vi:'', en:'' };
+    if(!schema.title.vi) schema.title.vi = _r2Humanize(schema.moduleId);
+    if(!schema.title.en) schema.title.en = schema.title.vi;
+    schema.route = _r2NormalizeRoute(schema.route || '/' + schema.moduleId, schema.moduleId);
+    _ngSyncModuleBuilderManifest(schema);
+    return schema;
+  }
+
+  var _r2PrevCreateBlankModule = _createBlankModule;
+  _createBlankModule = function(){
+    var result = _r2PrevCreateBlankModule();
+    if(state.schema){
+      _r2PreflightSchema(state.schema, true);
+      state.viewportMode = (state.schema.design && state.schema.design.defaultBreakpoint) || 'desktop';
+      state.showBuilderCockpit = true;
+      state.showDiagnosticsPanel = false;
+      state.ultraIssueFilter = 'all';
+    }
+    return result;
+  };
+
+  var _r2PrevOpenSavedModule = _openSavedModule;
+  _openSavedModule = function(moduleId){
+    return Promise.resolve(_r2PrevOpenSavedModule(moduleId)).then(function(resp){
+      if(state.schema){
+        _r2PreflightSchema(state.schema, false);
+        state.viewportMode = (state.schema.design && state.schema.design.defaultBreakpoint) || 'desktop';
+        state.showBuilderCockpit = true;
+        state.showDiagnosticsPanel = false;
+        state.ultraIssueFilter = 'all';
+      }
+      return resp;
+    });
+  };
+
+  var _r2PrevSaveModule = _saveModule;
+  _saveModule = function(){
+    if(state.schema){
+      _r2PreflightSchema(state.schema, true);
+    }
+    return _r2PrevSaveModule();
+  };
+
+  var _r2PrevExportBuilderJson = _ngExportBuilderJson;
+  _ngExportBuilderJson = function(){
+    if(state.schema) _r2PreflightSchema(state.schema, true);
+    return _r2PrevExportBuilderJson();
+  };
+
+  var _r2PrevExportRuntimeJson = _ngExportRuntimeJson;
+  _ngExportRuntimeJson = function(){
+    if(state.schema) _r2PreflightSchema(state.schema, true);
+    return _r2PrevExportRuntimeJson();
+  };
+
+  var _r2PrevDuplicateModule = _ngDuplicateCurrentModule;
+  _ngDuplicateCurrentModule = function(){
+    var result = _r2PrevDuplicateModule();
+    if(state.schema){
+      _r2PreflightSchema(state.schema, true);
+      state.viewportMode = (state.schema.design && state.schema.design.defaultBreakpoint) || state.viewportMode || 'desktop';
+      state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+    }
+    return result;
+  };
+
+  var _r2PrevRenderBuilder = _renderBuilder;
+  _renderBuilder = function(){
+    var html;
+    var projected;
+    var diag;
+    var metrics;
+    var theme;
+    var backdrop;
+    _r2EnsureUltraState();
+    if(state.schema){
+      projected = _ngProjectedSchema();
+      diag = _r2CollectDiagnostics(projected);
+      metrics = _r2SchemaMetrics(projected);
+      state.ultraProjectedSchema = projected;
+      state.ultraDiagnosticsCache = diag;
+      state.ultraMetricsCache = metrics;
+    }
+    _r2EnsureUltraStyles();
+    html = _r2PrevRenderBuilder();
+    if(!state.schema || !projected) return html;
+    theme = _getByPath(projected, 'design.themePreset') || 'hesem-enterprise';
+    backdrop = _getByPath(projected, 'design.stageBackdrop') || 'mesh';
+    html = html.replace('<div class="mb-builder-shell">', _r2RenderCockpitDock(projected, diag, metrics) + '<div class="mb-builder-shell">');
+    return '<div class="mb-ultra-root" data-theme="'+_esc(theme)+'" data-backdrop="'+_esc(backdrop)+'" data-viewport="'+_esc(state.viewportMode || _getByPath(projected, 'design.defaultBreakpoint') || 'desktop')+'">' + html + '</div>';
+  };
+}
+
+
+/* ── MODULE BUILDER ULTRA PATCH (2026-04-07 R3) ─────────────────────────── */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R3__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R3__ = '2026-04-07-r3';
+
+  var _r3Blueprints = [
+    {
+      key:'executive-control',
+      icon:'👑',
+      titleVi:'Executive Control Tower',
+      titleEn:'Executive Control Tower',
+      subtitleVi:'Điều hành end-to-end với boardroom KPI, risk và release pulse.',
+      subtitleEn:'End-to-end orchestration with boardroom KPI, risk and release pulse.',
+      patch:{
+        rolesCsv:'ceo,cxo,plant_manager',
+        meta:{ domain:'enterprise', boundedContext:'executive_control', criticality:'high', lifecycle:'pilot', releaseChannel:'enterprise' },
+        design:{ themePreset:'hesem-executive', shellPreset:'control-tower', navigationMode:'workspace', density:'comfortable', defaultBreakpoint:'wide', visualLanguage:'executive-premium', accentTone:'indigo', stageBackdrop:'aurora', surfaceDepth:'premium', heroMood:'cinematic', chartStyle:'executive', panelGlass:true, motionPreset:'cinematic', chromeLevel:'immersive', glancePriority:'kpi-first', operatorDistance:'desk', audiencePrimary:'executive', storyEyebrow:'EXECUTIVE', storyHeadline:'See revenue, risk and execution in one glance' },
+        publish:{ environment:'staging', mode:'controlled', rolloutPct:25, requireSignoff:true, changeSummary:'Enable executive control tower narrative and release governance.' },
+        integration:{ primaryEntity:'executive_kpi', sourceSystemsCsv:'erp,mes,qms,eqms', digitalThreadCsv:'sales_orders,work_orders,ncr,capa', defaultApiNamespace:'enterprise.control_tower', eventStreamsCsv:'kpi.alerts,workflow.deadline' },
+        qa:{ criticalJourneysText:'Review top KPI exceptions\nDrill into delayed work orders\nEscalate critical CAPA and audit risks', operatorWalkthroughText:'Open morning board\nScan KPI pulse\nEscalate red risks', auditEvidenceText:'KPI snapshot export\nRelease summary\nEscalation approvals' }
+      }
+    },
+    {
+      key:'quality-war-room',
+      icon:'🧪',
+      titleVi:'Quality War Room',
+      titleEn:'Quality War Room',
+      subtitleVi:'War room cho NCR, CAPA, audit, deviation và evidence chain.',
+      subtitleEn:'War room for NCR, CAPA, audit, deviation and evidence chain.',
+      patch:{
+        rolesCsv:'quality_manager,quality_engineer,auditor',
+        meta:{ domain:'quality', boundedContext:'quality_war_room', criticality:'critical', lifecycle:'pilot', releaseChannel:'plant' },
+        design:{ themePreset:'quality-lab', shellPreset:'operations-center', navigationMode:'workspace', density:'comfortable', defaultBreakpoint:'desktop', visualLanguage:'precision-clean', accentTone:'emerald', stageBackdrop:'soft', surfaceDepth:'elevated', heroMood:'focused', chartStyle:'clean-room', panelGlass:true, motionPreset:'guided', chromeLevel:'balanced', glancePriority:'evidence-first', operatorDistance:'desk', audiencePrimary:'quality', storyEyebrow:'QUALITY', storyHeadline:'Drive detection, containment and closure with evidence' },
+        publish:{ environment:'sit', mode:'controlled', rolloutPct:10, requireSignoff:true, changeSummary:'Enable quality war room flow, evidence and release governance.' },
+        integration:{ primaryEntity:'ncr_case', sourceSystemsCsv:'qms,eqms,erp,lims', digitalThreadCsv:'ncr,capa,audit,evidence,document_control', defaultApiNamespace:'quality.war_room', eventStreamsCsv:'quality.alerts,evidence.events' },
+        qa:{ criticalJourneysText:'Open NCR and launch containment\nReview CAPA readiness\nCollect evidence for audit closure', operatorWalkthroughText:'Scan new exceptions\nPrioritize red severity\nAssign containment owner', auditEvidenceText:'Chain of custody\nApproval records\nCAPA closure pack' }
+      }
+    },
+    {
+      key:'shopfloor-command',
+      icon:'🏭',
+      titleVi:'Shopfloor Command',
+      titleEn:'Shopfloor Command',
+      subtitleVi:'Shopfloor cockpit cho OEE, andon, downtime và action lane.',
+      subtitleEn:'Shopfloor cockpit for OEE, andon, downtime and action lane.',
+      patch:{
+        rolesCsv:'operator,shift_lead,production_manager',
+        meta:{ domain:'production', boundedContext:'shopfloor_command', criticality:'high', lifecycle:'pilot', releaseChannel:'plant' },
+        design:{ themePreset:'shopfloor-dark', shellPreset:'operations-center', navigationMode:'process', density:'compact', defaultBreakpoint:'wide', visualLanguage:'dark-ops', accentTone:'teal', stageBackdrop:'grid', surfaceDepth:'solid', heroMood:'night-shift', chartStyle:'realtime', panelGlass:false, motionPreset:'guided', chromeLevel:'immersive', glancePriority:'workflow-first', operatorDistance:'wallboard', audiencePrimary:'operator', storyEyebrow:'SHOPFLOOR', storyHeadline:'Operate the line with live signals, actions and escalation' },
+        publish:{ environment:'sit', mode:'pilot', rolloutPct:5, requireSignoff:true, changeSummary:'Enable shopfloor command center with wallboard guidance.' },
+        integration:{ primaryEntity:'work_order', sourceSystemsCsv:'mes,scada,erp', digitalThreadCsv:'dispatch,andon,downtime,maintenance', defaultApiNamespace:'production.shopfloor', eventStreamsCsv:'machine.state,andon.raise,downtime.event' },
+        qa:{ criticalJourneysText:'Watch OEE pulse\nReact to andon\nRecover downtime and reassign work', operatorWalkthroughText:'Scan line wallboard\nAcknowledge alarms\nOpen action lane', auditEvidenceText:'Downtime log\nShift summary\nAcknowledged andon events' }
+      }
+    },
+    {
+      key:'audit-evidence-hub',
+      icon:'🧾',
+      titleVi:'Audit Evidence Hub',
+      titleEn:'Audit Evidence Hub',
+      subtitleVi:'Trung tâm chuẩn bị audit với evidence vault, timeline và signoff.',
+      subtitleEn:'Audit prep hub with evidence vault, timeline and signoff.',
+      patch:{
+        rolesCsv:'auditor,quality_manager,document_controller',
+        meta:{ domain:'compliance', boundedContext:'audit_evidence_hub', criticality:'critical', lifecycle:'pilot', releaseChannel:'enterprise' },
+        design:{ themePreset:'quality-lab', shellPreset:'document-center', navigationMode:'focus', density:'comfortable', defaultBreakpoint:'desktop', visualLanguage:'precision-clean', accentTone:'blue', stageBackdrop:'mesh', surfaceDepth:'outlined', heroMood:'clear-day', chartStyle:'balanced', panelGlass:true, motionPreset:'subtle', chromeLevel:'minimal', glancePriority:'evidence-first', operatorDistance:'desk', audiencePrimary:'auditor', storyEyebrow:'AUDIT', storyHeadline:'Move from request to verified evidence with full traceability' },
+        publish:{ environment:'uat', mode:'controlled', rolloutPct:15, requireSignoff:true, changeSummary:'Enable audit evidence hub and signoff flow.' },
+        integration:{ primaryEntity:'audit_program', sourceSystemsCsv:'eqms,qms,dms', digitalThreadCsv:'audit,evidence,document_control,training', defaultApiNamespace:'compliance.audit', eventStreamsCsv:'evidence.review,audit.milestone' },
+        qa:{ criticalJourneysText:'Collect requested evidence\nValidate chain of custody\nComplete signoff package', operatorWalkthroughText:'Open request\nAttach verified records\nReview signoff state', auditEvidenceText:'Evidence list\nChain timeline\nApproval signatures' }
+      }
+    },
+    {
+      key:'warehouse-handheld',
+      icon:'📦',
+      titleVi:'Warehouse Handheld Ops',
+      titleEn:'Warehouse Handheld Ops',
+      subtitleVi:'Luồng handheld cho nhận hàng, pick-pack-ship và barcode actions.',
+      subtitleEn:'Handheld flow for receiving, pick-pack-ship and barcode actions.',
+      patch:{
+        rolesCsv:'warehouse_operator,warehouse_supervisor',
+        meta:{ domain:'warehouse', boundedContext:'warehouse_handheld_ops', criticality:'standard', lifecycle:'pilot', releaseChannel:'department' },
+        design:{ themePreset:'warehouse-ops', shellPreset:'workspace', navigationMode:'process', density:'compact', defaultBreakpoint:'tablet', visualLanguage:'warehouse-neon', accentTone:'teal', stageBackdrop:'noise', surfaceDepth:'solid', heroMood:'focused', chartStyle:'balanced', panelGlass:false, motionPreset:'guided', chromeLevel:'minimal', glancePriority:'workflow-first', operatorDistance:'arm-length', audiencePrimary:'operator', storyEyebrow:'WAREHOUSE', storyHeadline:'Keep receiving, picking and shipping in motion' },
+        publish:{ environment:'sit', mode:'pilot', rolloutPct:5, requireSignoff:false, changeSummary:'Enable warehouse handheld workflow and barcode-friendly shell.' },
+        integration:{ primaryEntity:'inventory_move', sourceSystemsCsv:'erp,wms,mes', digitalThreadCsv:'receiving,inventory,shipping', defaultApiNamespace:'warehouse.handheld', eventStreamsCsv:'inventory.move,barcode.scan' },
+        qa:{ criticalJourneysText:'Receive by barcode\nPick and confirm move\nShip and close queue', operatorWalkthroughText:'Open handheld queue\nScan barcode\nConfirm next task', auditEvidenceText:'Barcode history\nMove records\nShipment confirmation' }
+      }
+    }
+  ];
+
+  var _r3Personas = [
+    { key:'operator', icon:'🧑‍🏭', titleVi:'Operator', titleEn:'Operator', subtitleVi:'Touch-first, low cognitive load', subtitleEn:'Touch-first, low cognitive load', patch:{ rolesCsv:'operator,shift_lead', design:{ density:'compact', defaultBreakpoint:'tablet', navigationMode:'process', chromeLevel:'minimal', glancePriority:'workflow-first', operatorDistance:'arm-length', audiencePrimary:'operator', motionPreset:'guided' } } },
+    { key:'supervisor', icon:'🧭', titleVi:'Supervisor', titleEn:'Supervisor', subtitleVi:'Monitor KPI + queue + escalation', subtitleEn:'Monitor KPI + queue + escalation', patch:{ rolesCsv:'supervisor,team_lead', design:{ density:'comfortable', defaultBreakpoint:'desktop', navigationMode:'workspace', chromeLevel:'balanced', glancePriority:'balanced', operatorDistance:'desk', audiencePrimary:'supervisor', motionPreset:'subtle' } } },
+    { key:'quality', icon:'🧪', titleVi:'Quality Engineer', titleEn:'Quality Engineer', subtitleVi:'Evidence and deviation first', subtitleEn:'Evidence and deviation first', patch:{ rolesCsv:'quality_engineer,quality_manager', design:{ density:'comfortable', defaultBreakpoint:'desktop', navigationMode:'focus', chromeLevel:'balanced', glancePriority:'evidence-first', operatorDistance:'desk', audiencePrimary:'quality', motionPreset:'subtle' } } },
+    { key:'auditor', icon:'🧾', titleVi:'Auditor', titleEn:'Auditor', subtitleVi:'Traceability and signoff visibility', subtitleEn:'Traceability and signoff visibility', patch:{ rolesCsv:'auditor,document_controller', design:{ density:'comfortable', defaultBreakpoint:'desktop', navigationMode:'focus', chromeLevel:'minimal', glancePriority:'evidence-first', operatorDistance:'desk', audiencePrimary:'auditor', motionPreset:'none' } } },
+    { key:'executive', icon:'👑', titleVi:'Executive', titleEn:'Executive', subtitleVi:'KPI pulse and risk overview', subtitleEn:'KPI pulse and risk overview', patch:{ rolesCsv:'ceo,cxo,plant_manager', design:{ density:'comfortable', defaultBreakpoint:'wide', navigationMode:'workspace', chromeLevel:'immersive', glancePriority:'kpi-first', operatorDistance:'desk', audiencePrimary:'executive', motionPreset:'cinematic' } } }
+  ];
+
+  function _r3EnsureState(){
+    if(state.showSceneAtlas == null) state.showSceneAtlas = true;
+    if(state.showStoryBoard == null) state.showStoryBoard = false;
+    if(!state.r3DismissedRecs) state.r3DismissedRecs = {};
+    if(!state.r3DiagnosticsCache) state.r3DiagnosticsCache = null;
+    if(!state.r3AuraMetrics) state.r3AuraMetrics = null;
+    if(!state.r3Recommendations) state.r3Recommendations = [];
+  }
+
+  function _r3Clamp(value, min, max){
+    value = Number(value) || 0;
+    if(value < min) value = min;
+    if(value > max) value = max;
+    return value;
+  }
+
+  function _r3ModuleTitleText(schema){
+    var text = schema && schema.title && (schema.title.vi || schema.title.en);
+    if(text) return String(text);
+    text = schema && schema.moduleId ? String(schema.moduleId).replace(/[_\-/]+/g, ' ') : _t('Module', 'Module');
+    return text.replace(/\s+/g, ' ').trim();
+  }
+
+  function _r3SuggestPrimaryEntity(domain){
+    var key = String(domain || '').toLowerCase();
+    if(key === 'quality') return 'ncr_case';
+    if(key === 'production') return 'work_order';
+    if(key === 'warehouse') return 'inventory_move';
+    if(key === 'maintenance') return 'maintenance_work_order';
+    if(key === 'compliance') return 'audit_program';
+    if(key === 'documents') return 'document_record';
+    return 'business_record';
+  }
+
+  function _r3DefaultSubtitle(schema){
+    var title = _r3ModuleTitleText(schema);
+    return {
+      vi: 'Trung tâm điều hành cho ' + title.toLowerCase() + ' với trải nghiệm trực quan, kiểm soát và release rõ ràng.',
+      en: 'A control plane for ' + title + ' with clearer visual orchestration, governance and release readiness.'
+    };
+  }
+
+  function _r3DefaultStoryHeadline(schema){
+    var title = _r3ModuleTitleText(schema);
+    return _t('Làm chủ ' + title.toLowerCase() + ' trong một màn hình hành động rõ ràng', 'Command ' + title + ' in one clear action surface');
+  }
+
+  function _r3FindBlueprint(key){
+    var found = null;
+    _r3Blueprints.forEach(function(item){ if(item.key === key) found = item; });
+    return found;
+  }
+
+  function _r3FindPersona(key){
+    var found = null;
+    _r3Personas.forEach(function(item){ if(item.key === key) found = item; });
+    return found;
+  }
+
+  var _r3PrevEnsureMeta = _ngEnsureModuleBuilderMetadata;
+  _ngEnsureModuleBuilderMetadata = function(schema){
+    schema = _r3PrevEnsureMeta(schema);
+    if(!schema || typeof schema !== 'object') return schema;
+    if(!schema.design || typeof schema.design !== 'object') schema.design = {};
+    if(schema.design.motionPreset == null) schema.design.motionPreset = 'subtle';
+    if(schema.design.chromeLevel == null) schema.design.chromeLevel = 'balanced';
+    if(schema.design.glancePriority == null) schema.design.glancePriority = 'balanced';
+    if(schema.design.operatorDistance == null) schema.design.operatorDistance = 'desk';
+    if(schema.design.audiencePrimary == null) schema.design.audiencePrimary = 'cross-functional';
+    if(schema.design.storyEyebrow == null) schema.design.storyEyebrow = '';
+    if(schema.design.storyHeadline == null) schema.design.storyHeadline = '';
+    if(!schema.qa || typeof schema.qa !== 'object') schema.qa = {};
+    if(!Array.isArray(schema.qa.operatorWalkthrough)) schema.qa.operatorWalkthrough = [];
+    if(!Array.isArray(schema.qa.auditEvidence)) schema.qa.auditEvidence = [];
+    if(!schema.publish || typeof schema.publish !== 'object') schema.publish = {};
+    if(schema.publish.rollbackPlan == null) schema.publish.rollbackPlan = '';
+    if(!schema.integration || typeof schema.integration !== 'object') schema.integration = {};
+    if(!Array.isArray(schema.integration.eventStreams)) schema.integration.eventStreams = [];
+    return schema;
+  };
+
+  var _r3PrevDraftFromSchema = _ngModuleStudioDraftFromSchema;
+  _ngModuleStudioDraftFromSchema = function(schema){
+    var draft = _r3PrevDraftFromSchema(schema);
+    draft.design = draft.design || {};
+    draft.qa = draft.qa || {};
+    draft.publish = draft.publish || {};
+    draft.integration = draft.integration || {};
+    draft.design.motionPreset = _getByPath(schema, 'design.motionPreset') || draft.design.motionPreset || 'subtle';
+    draft.design.chromeLevel = _getByPath(schema, 'design.chromeLevel') || draft.design.chromeLevel || 'balanced';
+    draft.design.glancePriority = _getByPath(schema, 'design.glancePriority') || draft.design.glancePriority || 'balanced';
+    draft.design.operatorDistance = _getByPath(schema, 'design.operatorDistance') || draft.design.operatorDistance || 'desk';
+    draft.design.audiencePrimary = _getByPath(schema, 'design.audiencePrimary') || draft.design.audiencePrimary || 'cross-functional';
+    draft.design.storyEyebrow = _getByPath(schema, 'design.storyEyebrow') || draft.design.storyEyebrow || '';
+    draft.design.storyHeadline = _getByPath(schema, 'design.storyHeadline') || draft.design.storyHeadline || '';
+    draft.qa.operatorWalkthroughText = _ngLinesToText(_getByPath(schema, 'qa.operatorWalkthrough') || []);
+    draft.qa.auditEvidenceText = _ngLinesToText(_getByPath(schema, 'qa.auditEvidence') || []);
+    draft.publish.rollbackPlan = _getByPath(schema, 'publish.rollbackPlan') || '';
+    draft.integration.eventStreamsCsv = _ngArrayToCsv(_getByPath(schema, 'integration.eventStreams') || []);
+    return draft;
+  };
+
+  var _r3PrevApplyDraft = _ngApplyModuleStudioDraft;
+  _ngApplyModuleStudioDraft = function(schema, draft){
+    schema = _r3PrevApplyDraft(schema, draft);
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(draft && draft.design){
+      schema.design.motionPreset = _getByPath(draft, 'design.motionPreset') || schema.design.motionPreset || 'subtle';
+      schema.design.chromeLevel = _getByPath(draft, 'design.chromeLevel') || schema.design.chromeLevel || 'balanced';
+      schema.design.glancePriority = _getByPath(draft, 'design.glancePriority') || schema.design.glancePriority || 'balanced';
+      schema.design.operatorDistance = _getByPath(draft, 'design.operatorDistance') || schema.design.operatorDistance || 'desk';
+      schema.design.audiencePrimary = _getByPath(draft, 'design.audiencePrimary') || schema.design.audiencePrimary || 'cross-functional';
+      schema.design.storyEyebrow = _getByPath(draft, 'design.storyEyebrow') || schema.design.storyEyebrow || '';
+      schema.design.storyHeadline = _getByPath(draft, 'design.storyHeadline') || schema.design.storyHeadline || '';
+    }
+    if(draft && draft.qa){
+      schema.qa.operatorWalkthrough = _ngTextToLines(_getByPath(draft, 'qa.operatorWalkthroughText'));
+      schema.qa.auditEvidence = _ngTextToLines(_getByPath(draft, 'qa.auditEvidenceText'));
+    }
+    if(draft && draft.publish){
+      schema.publish.rollbackPlan = _getByPath(draft, 'publish.rollbackPlan') || '';
+    }
+    if(draft && draft.integration){
+      schema.integration.eventStreams = _ngCsvToArray(_getByPath(draft, 'integration.eventStreamsCsv'));
+    }
+    return schema;
+  };
+
+  function _r3IsKpiBlock(block){
+    var type = String(block && block.type || '');
+    return type === 'kpi-row' || type === 'metric-strip' || type.indexOf('kpi') >= 0 || type.indexOf('insight-') === 0;
+  }
+
+  function _r3IsChartBlock(block){
+    var type = String(block && block.type || '');
+    return type.indexOf('chart-') === 0 || type === 'quality-pareto' || type === 'quality-capability' || type === 'quality-spc-chart';
+  }
+
+  function _r3IsDataBlock(block){
+    var type = String(block && block.type || '');
+    return type.indexOf('data-') === 0 || /table|cards|timeline|detail|audit-log|record-detail/.test(type);
+  }
+
+  function _r3IsActionBlock(block){
+    var type = String(block && block.type || '');
+    return type.indexOf('action-') === 0 || type.indexOf('auto-') === 0;
+  }
+
+  function _r3IsFormBlock(block){
+    var type = String(block && block.type || '');
+    return type.indexOf('form-') === 0 || type === 'approval-form' || type.indexOf('quality-inspection') === 0;
+  }
+
+  function _r3TabSummary(tab){
+    var out = { blocks:0, roots:0, kpis:0, charts:0, data:0, actions:0, forms:0 };
+    (tab && tab.blocks || []).forEach(function(block){
+      out.blocks++;
+      if(!block || !block.parentId) out.roots++;
+      if(_r3IsKpiBlock(block)) out.kpis++;
+      if(_r3IsChartBlock(block)) out.charts++;
+      if(_r3IsDataBlock(block)) out.data++;
+      if(_r3IsActionBlock(block)) out.actions++;
+      if(_r3IsFormBlock(block)) out.forms++;
+    });
+    return out;
+  }
+
+  function _r3NewDiag(base){
+    var diag = base && base.issues ? _clone(base) : { issues:[], counts:{ error:0, warning:0, info:0 }, blockMap:{}, tabMap:{}, score:100 };
+    if(!diag.issues) diag.issues = [];
+    if(!diag.counts) diag.counts = { error:0, warning:0, info:0 };
+    if(!diag.blockMap) diag.blockMap = {};
+    if(!diag.tabMap) diag.tabMap = {};
+    return diag;
+  }
+
+  function _r3DiagExists(diag, code, blockId, tabId, path){
+    return (diag.issues || []).some(function(item){
+      return item && item.code === code && String(item.blockId || '') === String(blockId || '') && String(item.tabId || '') === String(tabId || '') && String(item.path || '') === String(path || '');
+    });
+  }
+
+  function _r3AddDiag(diag, severity, scope, code, labelVi, labelEn, meta){
+    if(_r3DiagExists(diag, code, meta && meta.blockId, meta && meta.tabId, meta && meta.path)) return;
+    diag.issues.push({
+      id: code + '-r3-' + String((diag.issues || []).length + 1),
+      severity: severity,
+      scope: scope,
+      code: code,
+      label: _t(labelVi, labelEn),
+      labelVi: labelVi,
+      labelEn: labelEn,
+      path: meta && meta.path || '',
+      tabId: meta && meta.tabId || '',
+      blockId: meta && meta.blockId || '',
+      fixable: !!(meta && meta.fixable),
+      detail: meta && meta.detail || ''
+    });
+  }
+
+  function _r3ReindexDiag(diag){
+    var counts = { error:0, warning:0, info:0 };
+    var blockMap = {};
+    var tabMap = {};
+    (diag.issues || []).forEach(function(item, index){
+      var sev = item && item.severity || 'info';
+      var key;
+      item.id = item.id || (item.code || 'issue') + '-r3-' + String(index + 1);
+      counts[sev] = (counts[sev] || 0) + 1;
+      if(item.blockId){
+        key = item.blockId;
+        if(!blockMap[key]) blockMap[key] = { errors:0, warnings:0, infos:0, items:[] };
+        blockMap[key].items.push(item);
+        if(sev === 'error') blockMap[key].errors++;
+        else if(sev === 'warning') blockMap[key].warnings++;
+        else blockMap[key].infos++;
+      }
+      if(item.tabId){
+        key = item.tabId;
+        if(!tabMap[key]) tabMap[key] = { errors:0, warnings:0, infos:0, items:[] };
+        tabMap[key].items.push(item);
+        if(sev === 'error') tabMap[key].errors++;
+        else if(sev === 'warning') tabMap[key].warnings++;
+        else tabMap[key].infos++;
+      }
+    });
+    diag.counts = counts;
+    diag.blockMap = blockMap;
+    diag.tabMap = tabMap;
+    diag.score = _r3Clamp(Math.round(100 - counts.error * 8 - counts.warning * 3 - counts.info * 1), 0, 100);
+    return diag;
+  }
+
+  function _r3CollectDiagnostics(schema, base){
+    var diag = _r3NewDiag(base);
+    _ngEnsureModuleBuilderMetadata(schema || {});
+    schema = schema || {};
+
+    if(!schema.subtitle || !(schema.subtitle.vi || schema.subtitle.en)){
+      _r3AddDiag(diag, 'info', 'module', 'module-subtitle-missing', 'Module chưa có subtitle mô tả bối cảnh', 'Module is missing contextual subtitle', { path:'subtitle', fixable:true });
+    }
+    if(!(schema.roles || []).length){
+      _r3AddDiag(diag, /active|validated/i.test((schema.meta && schema.meta.lifecycle) || '') ? 'warning' : 'info', 'module', 'module-roles-missing', 'Module chưa khai báo roles chính', 'Module is missing primary roles', { path:'roles', fixable:true });
+    }
+    if(/active|validated/i.test((schema.meta && schema.meta.lifecycle) || '') && !_getByPath(schema, 'meta.docsUrl')){
+      _r3AddDiag(diag, 'warning', 'module', 'module-docs-url', 'Lifecycle active/validated nhưng chưa có docs URL', 'Active or validated lifecycle without docs URL', { path:'meta.docsUrl', fixable:false });
+    }
+    if((schema.meta && /critical|gxp/i.test(schema.meta.criticality || '')) && _getByPath(schema, 'publish.requireSignoff') === false){
+      _r3AddDiag(diag, 'error', 'module', 'module-signoff-critical', 'Module critical/GxP phải bật require signoff', 'Critical or GxP modules must require signoff', { path:'publish.requireSignoff', fixable:true });
+    }
+    if(/production/i.test(_getByPath(schema, 'publish.environment') || '') && !((_getByPath(schema, 'publish.changeSummary') || '').trim() || (_getByPath(schema, 'publish.releaseNote') || '').trim())){
+      _r3AddDiag(diag, 'warning', 'module', 'module-production-release-note', 'Publish production nhưng chưa có change summary hoặc release note', 'Production publish is missing change summary or release note', { path:'publish.changeSummary', fixable:true });
+    }
+    if((_getByPath(schema, 'publish.mode') || '') !== 'draft' && !_getByPath(schema, 'publish.rollbackPlan')){
+      _r3AddDiag(diag, 'info', 'module', 'module-rollback-plan', 'Chưa mô tả rollback plan', 'Rollback plan is not described yet', { path:'publish.rollbackPlan', fixable:true });
+    }
+    if(!(_getByPath(schema, 'integration.primaryEntity') || '').trim()){
+      _r3AddDiag(diag, 'warning', 'module', 'module-primary-entity', 'Chưa khai báo primary entity cho digital thread', 'Primary entity for the digital thread is missing', { path:'integration.primaryEntity', fixable:true });
+    }
+    if(['quality','production','warehouse','compliance'].indexOf(String(_getByPath(schema, 'meta.domain') || '').toLowerCase()) >= 0 && !(_getByPath(schema, 'integration.digitalThread') || []).length){
+      _r3AddDiag(diag, 'warning', 'module', 'module-digital-thread', 'Domain vận hành nhưng chưa mô tả digital thread', 'Operational domain is missing digital thread links', { path:'integration.digitalThread', fixable:true });
+    }
+    if(!(_getByPath(schema, 'qa.operatorWalkthrough') || []).length){
+      _r3AddDiag(diag, 'info', 'module', 'module-operator-walkthrough', 'Chưa có operator walkthrough hoặc handoff checklist', 'Operator walkthrough or handoff checklist is missing', { path:'qa.operatorWalkthrough', fixable:true });
+    }
+
+    (schema.tabs || []).forEach(function(tab, tabIndex){
+      var summary = _r3TabSummary(tab);
+      if(summary.blocks > 14){
+        _r3AddDiag(diag, 'warning', 'tab', 'tab-density-high', 'Tab có quá nhiều block, nên tách hoặc gom nhóm lại', 'Tab has too many blocks and should be split or grouped', { tabId:tab.tabId || '', path:'tabs['+tabIndex+'].blocks', fixable:false, detail:String(summary.blocks) });
+      }
+      if(summary.roots > 7){
+        _r3AddDiag(diag, 'warning', 'tab', 'tab-top-level-clutter', 'Tab có quá nhiều block top-level, dễ gây rối mắt', 'Tab has too many top-level blocks, which can hurt scannability', { tabId:tab.tabId || '', fixable:false, detail:String(summary.roots) });
+      }
+      if(!summary.kpis && !summary.data && !summary.forms && !summary.actions){
+        _r3AddDiag(diag, 'info', 'tab', 'tab-low-utility', 'Tab chưa có KPI, dữ liệu, form hoặc action rõ ràng', 'Tab is missing clear KPI, data, form or action utility', { tabId:tab.tabId || '', fixable:false });
+      }
+
+      (tab.blocks || []).forEach(function(block, blockIndex){
+        var blockId = block && (block.blockId || block.id) || '';
+        var pathBase = 'tabs['+tabIndex+'].blocks['+blockIndex+']';
+        var caption = _getByPath(block, 'config.design.caption') || _getByPath(block, 'config.story.headline') || '';
+        if((_r3IsChartBlock(block) || _r3IsDataBlock(block)) && !caption){
+          _r3AddDiag(diag, 'info', 'block', 'block-caption-missing', 'Khối dữ liệu/biểu đồ chưa có caption kể chuyện', 'Data or chart block is missing narrative caption', { tabId:tab.tabId || '', blockId:blockId, path:pathBase + '.config.design.caption', fixable:true });
+        }
+        if((_r3IsChartBlock(block) || _r3IsDataBlock(block)) && !_getByPath(block, 'config.dataSource.emptyStateTitle') && !_getByPath(block, 'config.emptyStateTitle')){
+          _r3AddDiag(diag, 'info', 'block', 'block-empty-state-missing', 'Block chưa có empty state title', 'Block is missing empty state title', { tabId:tab.tabId || '', blockId:blockId, path:pathBase + '.config.dataSource.emptyStateTitle', fixable:true });
+        }
+        if(_r3IsFormBlock(block) && !_getByPath(block, 'config.eventFlow.successToast') && !_getByPath(block, 'config.events.successToast')){
+          _r3AddDiag(diag, 'info', 'block', 'block-form-toast', 'Form chưa có success toast rõ ràng', 'Form is missing a clear success toast', { tabId:tab.tabId || '', blockId:blockId, path:pathBase + '.config.eventFlow.successToast', fixable:true });
+        }
+        if(_r3IsActionBlock(block) && !_getByPath(block, 'config.accessibility.ariaLabel')){
+          _r3AddDiag(diag, 'info', 'block', 'block-aria-label', 'Block hành động chưa có ARIA label', 'Action block is missing ARIA label', { tabId:tab.tabId || '', blockId:blockId, path:pathBase + '.config.accessibility.ariaLabel', fixable:true });
+        }
+        if(block && block.title && block.title.vi && String(block.title.vi).length > 64){
+          _r3AddDiag(diag, 'info', 'block', 'block-title-too-long', 'Tiêu đề block quá dài, nên rút gọn để dễ lướt', 'Block title is too long and should be shortened for scannability', { tabId:tab.tabId || '', blockId:blockId, path:pathBase + '.title.vi', fixable:false });
+        }
+      });
+    });
+
+    return _r3ReindexDiag(diag);
+  }
+
+  function _r3ComputeAuraMetrics(schema, diag){
+    var tabs = (schema && schema.tabs) || [];
+    var blockCount = 0;
+    var denseTabs = 0;
+    var topRootsMax = 0;
+    var kpiBlocks = 0;
+    var chartBlocks = 0;
+    var dataBlocks = 0;
+    var actionBlocks = 0;
+    var formBlocks = 0;
+    var captionedBlocks = 0;
+    var designChecks;
+    var designOk;
+    var governanceOk = 0;
+    var storyOk = 0;
+    var operabilityOk = 0;
+    var releaseBase = 0;
+
+    tabs.forEach(function(tab){
+      var summary = _r3TabSummary(tab);
+      blockCount += summary.blocks;
+      kpiBlocks += summary.kpis;
+      chartBlocks += summary.charts;
+      dataBlocks += summary.data;
+      actionBlocks += summary.actions;
+      formBlocks += summary.forms;
+      if(summary.blocks > 14) denseTabs++;
+      if(summary.roots > topRootsMax) topRootsMax = summary.roots;
+      (tab.blocks || []).forEach(function(block){
+        if(_getByPath(block, 'config.design.caption') || _getByPath(block, 'config.story.headline')) captionedBlocks++;
+      });
+    });
+
+    designChecks = [
+      _getByPath(schema, 'design.themePreset'),
+      _getByPath(schema, 'design.visualLanguage'),
+      _getByPath(schema, 'design.accentTone'),
+      _getByPath(schema, 'design.shellPreset'),
+      _getByPath(schema, 'design.navigationMode'),
+      _getByPath(schema, 'design.defaultBreakpoint'),
+      _getByPath(schema, 'design.stageBackdrop'),
+      _getByPath(schema, 'design.surfaceDepth'),
+      _getByPath(schema, 'design.heroMood'),
+      _getByPath(schema, 'design.chartStyle'),
+      _getByPath(schema, 'design.motionPreset'),
+      _getByPath(schema, 'design.chromeLevel'),
+      _getByPath(schema, 'design.glancePriority'),
+      _getByPath(schema, 'design.operatorDistance'),
+      _getByPath(schema, 'design.audiencePrimary')
+    ];
+    designOk = designChecks.filter(function(item){ return !!item; }).length;
+
+    governanceOk += _getByPath(schema, 'meta.domain') ? 1 : 0;
+    governanceOk += _getByPath(schema, 'meta.ownerTeam') ? 1 : 0;
+    governanceOk += _getByPath(schema, 'meta.processOwner') ? 1 : 0;
+    governanceOk += _getByPath(schema, 'meta.releaseChannel') ? 1 : 0;
+    governanceOk += _getByPath(schema, 'meta.criticality') ? 1 : 0;
+    governanceOk += _getByPath(schema, 'integration.primaryEntity') ? 1 : 0;
+    governanceOk += ((_getByPath(schema, 'integration.digitalThread') || []).length) ? 1 : 0;
+    governanceOk += ((_getByPath(schema, 'roles') || []).length) ? 1 : 0;
+
+    storyOk += (schema.subtitle && (schema.subtitle.vi || schema.subtitle.en)) ? 1 : 0;
+    storyOk += _getByPath(schema, 'design.storyHeadline') ? 1 : 0;
+    storyOk += _getByPath(schema, 'design.storyEyebrow') ? 1 : 0;
+    storyOk += ((_getByPath(schema, 'qa.criticalJourneys') || []).length) ? 1 : 0;
+    storyOk += ((_getByPath(schema, 'qa.operatorWalkthrough') || []).length) ? 1 : 0;
+    storyOk += ((_getByPath(schema, 'qa.auditEvidence') || []).length) ? 1 : 0;
+    storyOk += captionedBlocks ? 1 : 0;
+
+    operabilityOk += _getByPath(schema, 'publish.requireSignoff') !== false ? 1 : 0;
+    operabilityOk += ((_getByPath(schema, 'qa.smokeChecklist') || []).length) ? 1 : 0;
+    operabilityOk += _getByPath(schema, 'qa.testOwner') ? 1 : 0;
+    operabilityOk += _getByPath(schema, 'publish.rollbackPlan') ? 1 : 0;
+    operabilityOk += _getByPath(schema, 'meta.supportGroup') ? 1 : 0;
+    operabilityOk += ((_getByPath(schema, 'integration.eventStreams') || []).length) ? 1 : 0;
+
+    releaseBase += _getByPath(schema, 'publish.requireSignoff') !== false ? 20 : 0;
+    releaseBase += (_getByPath(schema, 'publish.changeSummary') || _getByPath(schema, 'publish.releaseNote')) ? 20 : 0;
+    releaseBase += ((_getByPath(schema, 'qa.smokeChecklist') || []).length) ? 20 : 0;
+    releaseBase += _getByPath(schema, 'publish.rollbackPlan') ? 20 : 0;
+    releaseBase += _getByPath(schema, 'meta.docsUrl') ? 10 : 0;
+    releaseBase += _getByPath(schema, 'qa.testOwner') ? 10 : 0;
+    releaseBase -= diag.counts.error * 8 + diag.counts.warning * 2;
+
+    return {
+      experienceScore: _r3Clamp(Math.round(diag.score * 0.35 + (designOk / Math.max(designChecks.length, 1)) * 30 + (governanceOk / 8) * 20 + (storyOk / 7) * 15), 0, 100),
+      visualBalanceScore: _r3Clamp(Math.round(100 - denseTabs * 10 - Math.max(0, topRootsMax - 6) * 5 - Math.max(0, blockCount - (tabs.length * 12)) * 0.8), 0, 100),
+      operabilityScore: _r3Clamp(Math.round((operabilityOk / 6) * 100 - (diag.counts.error * 4 + diag.counts.warning * 1.5)), 0, 100),
+      releaseConfidence: _r3Clamp(Math.round(releaseBase), 0, 100),
+      storyScore: _r3Clamp(Math.round((storyOk / 7) * 100), 0, 100),
+      denseTabs: denseTabs,
+      topRootsMax: topRootsMax,
+      tabs: tabs.length,
+      blocks: blockCount,
+      kpiBlocks: kpiBlocks,
+      chartBlocks: chartBlocks,
+      dataBlocks: dataBlocks,
+      actionBlocks: actionBlocks,
+      formBlocks: formBlocks,
+      captionedBlocks: captionedBlocks
+    };
+  }
+
+  function _r3CollectRecommendations(schema, diag, aura){
+    var recs = [];
+    function push(key, tone, icon, titleVi, titleEn, bodyVi, bodyEn, action, labelVi, labelEn, extra){
+      if(state.r3DismissedRecs && state.r3DismissedRecs[key]) return;
+      recs.push({ key:key, tone:tone, icon:icon, titleVi:titleVi, titleEn:titleEn, bodyVi:bodyVi, bodyEn:bodyEn, action:action, labelVi:labelVi, labelEn:labelEn, extra:extra || {} });
+    }
+    if(diag.counts.error){
+      push('autofix', 'danger', '🛠', 'Ưu tiên xử lý lỗi cấu trúc', 'Prioritize structural fixes', 'Builder còn ' + diag.counts.error + ' lỗi cần fix trước khi publish.', 'The builder still has ' + diag.counts.error + ' errors to fix before publishing.', 'auto-fix-builder', 'Auto-fix builder', 'Auto-fix builder');
+    }
+    if(aura.visualBalanceScore < 72){
+      push('design-balance', 'warning', '🎨', 'Cân bằng lại bố cục và độ dày tab', 'Rebalance layout and tab density', 'Visual balance đang thấp. Mở Design Lab hoặc chia nhỏ tab/canvas.', 'Visual balance is low. Open the Design Lab or split dense tabs/canvases.', 'studio-jump-tab', 'Mở Design Lab', 'Open Design Lab', { tab:'design' });
+    }
+    if(aura.releaseConfidence < 75){
+      push('release-pulse', 'warning', '🚀', 'Tăng release confidence', 'Increase release confidence', 'Bổ sung release note, rollback plan và signoff trước khi rollout.', 'Add release notes, rollback plan and signoff before rollout.', 'studio-jump-tab', 'Mở Publish', 'Open Publish', { tab:'publish' });
+    }
+    if(aura.storyScore < 70){
+      push('storyline', 'info', '✍', 'Tạo storyline rõ hơn cho module', 'Create a clearer module storyline', 'Thêm subtitle, headline, walkthrough và caption để module dễ hiểu hơn.', 'Add subtitle, headline, walkthrough and captions so the module is easier to understand.', 'apply-r3-auto-enhance', 'Tạo narrative chuẩn', 'Generate narrative');
+    }
+    if(!(_getByPath(schema, 'integration.digitalThread') || []).length){
+      push('digital-thread', 'info', '🔗', 'Hoàn thiện digital thread', 'Complete the digital thread', 'Liên kết primary entity, source systems và digital thread để module vận hành xuyên suốt.', 'Link the primary entity, source systems and digital thread for end-to-end operations.', 'studio-jump-tab', 'Mở Publish', 'Open Publish', { tab:'publish' });
+    }
+    if(aura.experienceScore < 82){
+      push('blueprint', 'info', '🧭', 'Áp blueprint trải nghiệm chuyên biệt', 'Apply a specialized experience blueprint', 'Chọn blueprint phù hợp để tăng tốc shell, theme và operational narrative.', 'Choose a fitting blueprint to accelerate shell, theme and operational narrative.', 'apply-blueprint', 'Áp Quality War Room', 'Apply Quality War Room', { blueprint:String(_getByPath(schema, 'meta.domain') || '').toLowerCase() === 'production' ? 'shopfloor-command' : (String(_getByPath(schema, 'meta.domain') || '').toLowerCase() === 'quality' ? 'quality-war-room' : 'executive-control') });
+    }
+    return recs.slice(0, 6);
+  }
+
+  var _r3PrevSyncManifest = _ngSyncModuleBuilderManifest;
+  _ngSyncModuleBuilderManifest = function(schema){
+    var manifest = _r3PrevSyncManifest(schema);
+    var diag = _r3CollectDiagnostics(schema, state && state.r3DiagnosticsCache);
+    var aura = _r3ComputeAuraMetrics(schema, diag);
+    schema.builderManifest = schema.builderManifest || {};
+    schema.builderManifest.experienceScore = aura.experienceScore;
+    schema.builderManifest.visualBalanceScore = aura.visualBalanceScore;
+    schema.builderManifest.operabilityScore = aura.operabilityScore;
+    schema.builderManifest.releaseConfidence = aura.releaseConfidence;
+    schema.builderManifest.storyScore = aura.storyScore;
+    schema.builderManifest.denseTabs = aura.denseTabs;
+    schema.builderManifest.motionPreset = _getByPath(schema, 'design.motionPreset') || '';
+    schema.builderManifest.chromeLevel = _getByPath(schema, 'design.chromeLevel') || '';
+    return manifest;
+  };
+
+  function _r3ApplyPatchToDraft(draft, patch){
+    Object.keys(patch || {}).forEach(function(key){
+      var value = patch[key];
+      if(_isObject(value)){
+        if(!_isObject(draft[key])) draft[key] = {};
+        _mergeDeep(draft[key], value);
+      } else {
+        draft[key] = _clone(value);
+      }
+    });
+    return draft;
+  }
+
+  function _r3ApplyBlueprint(key){
+    var blueprint = _r3FindBlueprint(key);
+    var draft = _ngEnsureModuleStudioDraft();
+    if(!draft || !blueprint) return;
+    _r3ApplyPatchToDraft(draft, blueprint.patch || {});
+    if(!(_getByPath(draft, 'title.vi') || '').trim()) draft.title = { vi:blueprint.titleVi, en:blueprint.titleEn };
+    if(!(_getByPath(draft, 'subtitle.vi') || '').trim()) draft.subtitle = { vi:blueprint.subtitleVi, en:blueprint.subtitleEn };
+    state.showModuleStudio = true;
+    state.showLibrary = false;
+    state.selectedBlock = null;
+    state.propsDraft = null;
+    state.moduleStudioTab = 'design';
+    state.viewportMode = _getByPath(draft, 'design.defaultBreakpoint') || state.viewportMode || 'desktop';
+    if(BE.toast) BE.toast(_t('Đã áp blueprint ' + blueprint.titleVi, 'Applied blueprint ' + blueprint.titleEn), 'success');
+  }
+
+  function _r3ApplyPersona(key){
+    var persona = _r3FindPersona(key);
+    var draft = _ngEnsureModuleStudioDraft();
+    if(!draft || !persona) return;
+    _r3ApplyPatchToDraft(draft, persona.patch || {});
+    state.showModuleStudio = true;
+    state.showLibrary = false;
+    state.selectedBlock = null;
+    state.propsDraft = null;
+    state.moduleStudioTab = 'design';
+    state.viewportMode = _getByPath(draft, 'design.defaultBreakpoint') || state.viewportMode || 'desktop';
+    if(BE.toast) BE.toast(_t('Đã áp persona ' + persona.titleVi, 'Applied persona ' + persona.titleEn), 'success');
+  }
+
+  function _r3AutoEnhanceSchema(schema){
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(!schema.subtitle) schema.subtitle = { vi:'', en:'' };
+    if(!schema.subtitle.vi || !schema.subtitle.en){
+      var subtitle = _r3DefaultSubtitle(schema);
+      if(!schema.subtitle.vi) schema.subtitle.vi = subtitle.vi;
+      if(!schema.subtitle.en) schema.subtitle.en = subtitle.en;
+    }
+    if(!schema.design.storyEyebrow) schema.design.storyEyebrow = String(_getByPath(schema, 'meta.domain') || 'HESEM').toUpperCase();
+    if(!schema.design.storyHeadline) schema.design.storyHeadline = _r3DefaultStoryHeadline(schema);
+    if(!schema.integration.primaryEntity) schema.integration.primaryEntity = _r3SuggestPrimaryEntity(_getByPath(schema, 'meta.domain'));
+    if(!schema.publish.changeSummary) schema.publish.changeSummary = _t('Nâng cấp Ultra Round 3 cho module builder và trải nghiệm module.', 'Ultra Round 3 upgrade for the module builder and module experience.');
+    if(!schema.publish.releaseNote) schema.publish.releaseNote = _t('Bổ sung diagnostics sâu, design pulse, blueprint, storytelling và release controls.', 'Added deep diagnostics, design pulse, blueprints, storytelling and release controls.');
+    if((schema.meta && /critical|gxp/i.test(schema.meta.criticality || '')) && schema.publish.requireSignoff === false){
+      schema.publish.requireSignoff = true;
+    }
+    if(!schema.publish.rollbackPlan) schema.publish.rollbackPlan = _t('Khôi phục bản stable gần nhất, tắt feature flag và xác nhận smoke checklist sau rollback.', 'Restore the latest stable build, disable feature flag and re-run smoke checklist after rollback.');
+    if(!schema.integration.eventStreams || !schema.integration.eventStreams.length){
+      schema.integration.eventStreams = [String((_getByPath(schema, 'integration.primaryEntity') || 'module')) + '.updated', 'workflow.deadline'];
+    }
+    if(!schema.qa.operatorWalkthrough || !schema.qa.operatorWalkthrough.length){
+      schema.qa.operatorWalkthrough = (schema.tabs || []).slice(0, 4).map(function(tab, index){
+        return String(index + 1) + '. ' + _t('Mở tab', 'Open tab') + ' ' + _t((tab && tab.title && tab.title.vi) || '', (tab && tab.title && tab.title.en) || (tab && tab.title && tab.title.vi) || '') + ' ' + _t('và xác nhận luồng chính.', 'and verify the primary flow.');
+      }).filter(Boolean);
+      if(!schema.qa.operatorWalkthrough.length){
+        schema.qa.operatorWalkthrough = [_t('Mở module và xác nhận các vùng KPI, dữ liệu và action chính.', 'Open the module and verify the primary KPI, data and action zones.')];
+      }
+    }
+    if(!schema.qa.auditEvidence || !schema.qa.auditEvidence.length){
+      schema.qa.auditEvidence = [_t('Snapshot KPI trước và sau thay đổi', 'KPI snapshots before and after the change'), _t('Change summary + rollback plan', 'Change summary + rollback plan'), _t('Smoke checklist đã xác nhận', 'Validated smoke checklist')];
+    }
+    (schema.tabs || []).forEach(function(tab){
+      (tab.blocks || []).forEach(function(block){
+        var catalog = (BE.BLOCK_CATALOG || {})[block.type] || {};
+        if(!block.title || !(block.title.vi || block.title.en)){
+          block.title = { vi:catalog.label || block.type || _t('Block', 'Block'), en:catalog.labelEn || catalog.label || block.type || 'Block' };
+        }
+        if((_r3IsChartBlock(block) || _r3IsDataBlock(block)) && !_getByPath(block, 'config.dataSource.emptyStateTitle')){
+          _setByPath(block, 'config.dataSource.emptyStateTitle', _t('Chưa có dữ liệu', 'No data yet'));
+        }
+        if((_r3IsChartBlock(block) || _r3IsDataBlock(block)) && !_getByPath(block, 'config.dataSource.emptyStateNote')){
+          _setByPath(block, 'config.dataSource.emptyStateNote', _t('Kiểm tra bộ lọc, quyền xem dữ liệu hoặc nguồn đồng bộ.', 'Check filters, data access permissions or synchronization source.'));
+        }
+        if((_r3IsChartBlock(block) || _r3IsDataBlock(block)) && !_getByPath(block, 'config.design.caption')){
+          _setByPath(block, 'config.design.caption', _t('Khối này hỗ trợ quyết định nhanh hơn bằng ngữ cảnh rõ ràng.', 'This block supports faster decisions with clearer context.'));
+        }
+        if(_r3IsFormBlock(block) && !_getByPath(block, 'config.eventFlow.successToast')){
+          _setByPath(block, 'config.eventFlow.successToast', _t('Đã lưu biểu mẫu thành công', 'Form saved successfully'));
+        }
+        if(_r3IsFormBlock(block) && !_getByPath(block, 'config.eventFlow.errorToast')){
+          _setByPath(block, 'config.eventFlow.errorToast', _t('Không thể lưu biểu mẫu, vui lòng kiểm tra lại dữ liệu', 'Unable to save form, please review the data'));
+        }
+        if(_r3IsActionBlock(block) && !_getByPath(block, 'config.accessibility.ariaLabel')){
+          _setByPath(block, 'config.accessibility.ariaLabel', _t('Nhóm hành động cho ' + (block.title && (block.title.vi || block.title.en) || block.type), 'Action group for ' + (block.title && (block.title.en || block.title.vi) || block.type)));
+        }
+      });
+    });
+    _ngSyncModuleBuilderManifest(schema);
+    return schema;
+  }
+
+  function _r3Tone(score){
+    if(score >= 85) return 'success';
+    if(score >= 70) return 'warning';
+    return 'danger';
+  }
+
+  function _r3ScoreCard(icon, titleVi, titleEn, value, subVi, subEn, tone){
+    return '<div class="mb-r3-scorecard is-' + _esc(tone || 'neutral') + '"><div class="mb-r3-score-top"><span class="mb-r3-score-icon">' + _esc(icon || '◉') + '</span><span class="mb-r3-score-title">' + _esc(_t(titleVi, titleEn)) + '</span></div><strong>' + _esc(value) + '</strong><small>' + _esc(_t(subVi, subEn)) + '</small></div>';
+  }
+
+  function _r3Section(titleVi, titleEn, body, meta){
+    return '<div class="mb-prop-section mb-r3-section"><div class="mb-prop-section-head"><div class="mb-prop-section-meta"><div class="mb-prop-section-title">' + _esc(_t(titleVi, titleEn)) + '</div>' + (meta ? '<div class="mb-prop-section-count">' + meta + '</div>' : '') + '</div></div>' + body + '</div>';
+  }
+
+  function _r3RenderBlueprintCards(limit, compact){
+    var items = _r3Blueprints.slice(0, limit || _r3Blueprints.length);
+    var h = '<div class="mb-r3-blueprint-grid' + (compact ? ' is-compact' : '') + '">';
+    items.forEach(function(item){
+      h += '<button class="mb-r3-blueprint-card" data-action="apply-blueprint" data-blueprint="' + _esc(item.key) + '"><div class="mb-r3-blueprint-head"><span>' + _esc(item.icon) + '</span><strong>' + _esc(_t(item.titleVi, item.titleEn)) + '</strong></div><p>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</p><small>' + _esc(_t('Áp theme, shell, narrative và governance mặc định', 'Apply theme, shell, narrative and governance defaults')) + '</small></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r3RenderPersonaCards(){
+    var h = '<div class="mb-r3-persona-grid">';
+    _r3Personas.forEach(function(item){
+      h += '<button class="mb-r3-persona-card" data-action="apply-persona" data-persona="' + _esc(item.key) + '"><span class="mb-r3-persona-icon">' + _esc(item.icon) + '</span><strong>' + _esc(_t(item.titleVi, item.titleEn)) + '</strong><small>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</small></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r3RenderRecommendationCard(item){
+    var attrs = '';
+    if(item.extra && item.extra.tab) attrs += ' data-tab="' + _esc(item.extra.tab) + '"';
+    if(item.extra && item.extra.blueprint) attrs += ' data-blueprint="' + _esc(item.extra.blueprint) + '"';
+    return '<div class="mb-r3-rec-card is-' + _esc(item.tone || 'info') + '"><div class="mb-r3-rec-head"><span>' + _esc(item.icon || '💡') + '</span><strong>' + _esc(_t(item.titleVi, item.titleEn)) + '</strong></div><p>' + _esc(_t(item.bodyVi, item.bodyEn)) + '</p>' + (item.action ? '<div class="mb-r3-rec-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="' + _esc(item.action) + '"' + attrs + '>' + _esc(_t(item.labelVi, item.labelEn)) + '</button></div>' : '') + '</div>';
+  }
+
+  function _r3RenderRecommendations(recs, limit){
+    var list = (recs || []).slice(0, limit || (recs || []).length);
+    if(!list.length) return '<div class="mb-r3-empty">' + _esc(_t('Chưa có khuyến nghị nào thêm.', 'No additional recommendations right now.')) + '</div>';
+    return '<div class="mb-r3-rec-grid">' + list.map(_r3RenderRecommendationCard).join('') + '</div>';
+  }
+
+  function _r3RenderCanvasAtlas(projected, diag){
+    var h = '<div class="mb-r3-atlas-grid">';
+    (projected.tabs || []).forEach(function(tab){
+      var summary = _r3TabSummary(tab);
+      var tabDiag = (diag.tabMap || {})[tab.tabId] || { errors:0, warnings:0, infos:0 };
+      var density = Math.min(100, summary.blocks * 7);
+      h += '<button class="mb-r3-atlas-card" data-action="switch-tab" data-tab="' + _esc(tab.tabId) + '"><div class="mb-r3-atlas-head"><strong>' + _esc(tab.icon || '📑') + ' ' + _esc(_t(tab.title.vi, tab.title.en)) + '</strong><span>' + _esc(summary.blocks) + ' ' + _esc(_t('blocks', 'blocks')) + '</span></div><div class="mb-r3-atlas-meta"><span>' + _esc(summary.roots) + ' ' + _esc(_t('top-level', 'top-level')) + '</span><span>' + _esc(tabDiag.errors) + 'E • ' + _esc(tabDiag.warnings) + 'W</span></div><div class="mb-r3-meter"><span style="width:' + density + '%"></span></div><div class="mb-r3-atlas-tags"><span>' + _esc(summary.kpis) + ' KPI</span><span>' + _esc(summary.charts) + ' ' + _esc(_t('charts', 'charts')) + '</span><span>' + _esc(summary.actions) + ' ' + _esc(_t('actions', 'actions')) + '</span></div></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r3RenderStoryBoard(projected){
+    var journeys = (_getByPath(projected, 'qa.criticalJourneys') || []).slice(0, 4);
+    var walkthrough = (_getByPath(projected, 'qa.operatorWalkthrough') || []).slice(0, 4);
+    var evidence = (_getByPath(projected, 'qa.auditEvidence') || []).slice(0, 4);
+    var h = '<div class="mb-r3-story-grid">';
+    h += '<div class="mb-r3-story-card"><span class="mb-r3-story-kicker">' + _esc(_t('Narrative', 'Narrative')) + '</span><strong>' + _esc(_getByPath(projected, 'design.storyHeadline') || _r3DefaultStoryHeadline(projected)) + '</strong><p>' + _esc((projected.subtitle && (projected.subtitle.vi || projected.subtitle.en)) || _r3DefaultSubtitle(projected).vi) + '</p></div>';
+    h += '<div class="mb-r3-story-card"><span class="mb-r3-story-kicker">' + _esc(_t('Critical journeys', 'Critical journeys')) + '</span><ul>' + (journeys.length ? journeys.map(function(item){ return '<li>' + _esc(item) + '</li>'; }).join('') : '<li>' + _esc(_t('Chưa khai báo journey', 'Journey not declared yet')) + '</li>') + '</ul></div>';
+    h += '<div class="mb-r3-story-card"><span class="mb-r3-story-kicker">' + _esc(_t('Operator walkthrough', 'Operator walkthrough')) + '</span><ul>' + (walkthrough.length ? walkthrough.map(function(item){ return '<li>' + _esc(item) + '</li>'; }).join('') : '<li>' + _esc(_t('Chưa có handoff checklist', 'No handoff checklist yet')) + '</li>') + '</ul></div>';
+    h += '<div class="mb-r3-story-card"><span class="mb-r3-story-kicker">' + _esc(_t('Evidence pack', 'Evidence pack')) + '</span><ul>' + (evidence.length ? evidence.map(function(item){ return '<li>' + _esc(item) + '</li>'; }).join('') : '<li>' + _esc(_t('Chưa có evidence pack', 'Evidence pack not defined yet')) + '</li>') + '</ul></div>';
+    h += '</div>';
+    return h;
+  }
+
+  function _r3RenderReleasePulse(projected, aura){
+    var h = '<div class="mb-r3-mini-grid">';
+    h += _r3ScoreCard('🚀', 'Release confidence', 'Release confidence', aura.releaseConfidence + '%', 'signoff + rollback + smoke', 'signoff + rollback + smoke', _r3Tone(aura.releaseConfidence));
+    h += _r3ScoreCard('🧭', 'Operability', 'Operability', aura.operabilityScore + '%', 'owner + support + streams', 'owner + support + streams', _r3Tone(aura.operabilityScore));
+    h += '</div>';
+    h += '<div class="mb-r3-release-list"><div><strong>' + _esc(_t('Change summary', 'Change summary')) + '</strong><p>' + _esc(_getByPath(projected, 'publish.changeSummary') || _t('Chưa có change summary', 'Change summary not set yet')) + '</p></div><div><strong>' + _esc(_t('Rollback plan', 'Rollback plan')) + '</strong><p>' + _esc(_getByPath(projected, 'publish.rollbackPlan') || _t('Chưa mô tả rollback plan', 'Rollback plan not described yet')) + '</p></div></div>';
+    return h;
+  }
+
+  function _r3RenderDesignPulse(projected, aura){
+    var h = '<div class="mb-r3-mini-grid">';
+    h += _r3ScoreCard('🧠', 'Experience', 'Experience', aura.experienceScore + '%', 'theme + governance + story', 'theme + governance + story', _r3Tone(aura.experienceScore));
+    h += _r3ScoreCard('🎨', 'Visual balance', 'Visual balance', aura.visualBalanceScore + '%', 'density + roots + rhythm', 'density + roots + rhythm', _r3Tone(aura.visualBalanceScore));
+    h += _r3ScoreCard('✍', 'Story score', 'Story score', aura.storyScore + '%', 'subtitle + walkthrough + captions', 'subtitle + walkthrough + captions', _r3Tone(aura.storyScore));
+    h += '</div>';
+    h += '<div class="mb-r3-tag-row"><span>' + _esc(_getByPath(projected, 'design.themePreset') || '') + '</span><span>' + _esc(_getByPath(projected, 'design.motionPreset') || '') + '</span><span>' + _esc(_getByPath(projected, 'design.chromeLevel') || '') + '</span><span>' + _esc(_getByPath(projected, 'design.glancePriority') || '') + '</span><span>' + _esc(_getByPath(projected, 'design.operatorDistance') || '') + '</span></div>';
+    return h;
+  }
+
+  function _r3RenderSuperDock(projected, diag, aura, recs){
+    var h = '<div class="mb-r3-superdock">';
+    h += '<div class="mb-r3-aura-grid">';
+    h += _r3ScoreCard('🧠', 'Experience', 'Experience', aura.experienceScore + '%', 'theme + governance + story', 'theme + governance + story', _r3Tone(aura.experienceScore));
+    h += _r3ScoreCard('🎨', 'Visual balance', 'Visual balance', aura.visualBalanceScore + '%', 'density + roots + rhythm', 'density + roots + rhythm', _r3Tone(aura.visualBalanceScore));
+    h += _r3ScoreCard('🧭', 'Operability', 'Operability', aura.operabilityScore + '%', 'roles + runbook + streams', 'roles + runbook + streams', _r3Tone(aura.operabilityScore));
+    h += _r3ScoreCard('🚀', 'Release confidence', 'Release confidence', aura.releaseConfidence + '%', 'signoff + rollback + smoke', 'signoff + rollback + smoke', _r3Tone(aura.releaseConfidence));
+    h += '</div>';
+    h += '<div class="mb-r3-toolbar"><div class="mb-r3-toolbar-group"><button class="mb-r3-chip' + (state.showSceneAtlas ? ' is-active' : '') + '" data-action="toggle-scene-atlas">🗺 ' + _esc(_t('Canvas atlas', 'Canvas atlas')) + '</button><button class="mb-r3-chip' + (state.showStoryBoard ? ' is-active' : '') + '" data-action="toggle-story-board">🎬 ' + _esc(_t('Story board', 'Story board')) + '</button><button class="mb-r3-chip" data-action="studio-jump-tab" data-tab="design">🎨 ' + _esc(_t('Design Lab', 'Design Lab')) + '</button><button class="mb-r3-chip" data-action="studio-jump-tab" data-tab="publish">🚀 ' + _esc(_t('Publish', 'Publish')) + '</button><button class="mb-r3-chip" data-action="apply-r3-auto-enhance">⚡ ' + _esc(_t('Auto enhance', 'Auto enhance')) + '</button></div></div>';
+    h += '<div class="mb-r3-supergrid"><div class="mb-r3-panel"><div class="mb-r3-panel-head"><strong>' + _esc(_t('Blueprint gallery', 'Blueprint gallery')) + '</strong></div>' + _r3RenderBlueprintCards(3, true) + '</div><div class="mb-r3-panel"><div class="mb-r3-panel-head"><strong>' + _esc(_t('Smart recommendations', 'Smart recommendations')) + '</strong></div>' + _r3RenderRecommendations(recs, 3) + '</div></div>';
+    if(state.showSceneAtlas){
+      h += '<div class="mb-r3-panel"><div class="mb-r3-panel-head"><strong>' + _esc(_t('Canvas atlas', 'Canvas atlas')) + '</strong></div>' + _r3RenderCanvasAtlas(projected, diag) + '</div>';
+    }
+    if(state.showStoryBoard){
+      h += '<div class="mb-r3-panel"><div class="mb-r3-panel-head"><strong>' + _esc(_t('Story board', 'Story board')) + '</strong></div>' + _r3RenderStoryBoard(projected) + '</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function _r3EnhanceStudioHtml(html, projected, diag, aura, recs){
+    var draft = _ngEnsureModuleStudioDraft();
+    var extra = '';
+    if(!html || !draft || !projected) return html;
+    if(state.moduleStudioTab === 'overview'){
+      extra += _r3Section('Blueprint gallery', 'Blueprint gallery', _r3RenderBlueprintCards(5) + _r3RenderPersonaCards(), _esc(_t('1-click archetypes + personas', '1-click archetypes + personas')));
+      extra += _r3Section('Smart recommendations', 'Smart recommendations', _r3RenderRecommendations(recs, 4), _esc(String((recs || []).length) + ' ' + _t('gợi ý', 'recommendations')));
+    }
+    if(state.moduleStudioTab === 'design'){
+      extra += _r3Section('Design pulse', 'Design pulse', _r3RenderDesignPulse(projected, aura), _esc(_t('theme + rhythm + story', 'theme + rhythm + story')));
+      extra += _r3Section('Audience & motion', 'Audience & motion',
+        _ngRenderStudioField({ labelVi:'Motion preset', labelEn:'Motion preset', path:'design.motionPreset', type:'select', value:_getByPath(draft, 'design.motionPreset'), selectOptions:['none','subtle','guided','cinematic'] }) +
+        _ngRenderStudioField({ labelVi:'Chrome level', labelEn:'Chrome level', path:'design.chromeLevel', type:'select', value:_getByPath(draft, 'design.chromeLevel'), selectOptions:['minimal','balanced','immersive'] }) +
+        _ngRenderStudioField({ labelVi:'Glance priority', labelEn:'Glance priority', path:'design.glancePriority', type:'select', value:_getByPath(draft, 'design.glancePriority'), selectOptions:['balanced','kpi-first','workflow-first','evidence-first'] }) +
+        _ngRenderStudioField({ labelVi:'Operator distance', labelEn:'Operator distance', path:'design.operatorDistance', type:'select', value:_getByPath(draft, 'design.operatorDistance'), selectOptions:['desk','arm-length','wallboard'] }) +
+        _ngRenderStudioField({ labelVi:'Primary audience', labelEn:'Primary audience', path:'design.audiencePrimary', type:'select', value:_getByPath(draft, 'design.audiencePrimary'), selectOptions:['operator','supervisor','quality','auditor','executive','cross-functional'] }) +
+        _ngRenderStudioField({ labelVi:'Story eyebrow', labelEn:'Story eyebrow', path:'design.storyEyebrow', value:_getByPath(draft, 'design.storyEyebrow'), placeholder:'QUALITY / CONTROL TOWER' }) +
+        _ngRenderStudioField({ labelVi:'Story headline', labelEn:'Story headline', path:'design.storyHeadline', value:_getByPath(draft, 'design.storyHeadline'), placeholder:'See risk, KPI and workflow in one surface' })
+      );
+      extra += _r3Section('Blueprint gallery', 'Blueprint gallery', _r3RenderBlueprintCards(5, true));
+    }
+    if(state.moduleStudioTab === 'quality'){
+      extra += _r3Section('Journey board', 'Journey board', _r3RenderStoryBoard(projected), _esc(_t('critical flow + evidence', 'critical flow + evidence')));
+      extra += _r3Section('Walkthrough & evidence', 'Walkthrough & evidence',
+        _ngRenderStudioField({ labelVi:'Operator walkthrough', labelEn:'Operator walkthrough', path:'qa.operatorWalkthroughText', type:'textarea', rows:5, value:_getByPath(draft, 'qa.operatorWalkthroughText'), helpVi:'Mỗi dòng là một bước hoặc handoff.', helpEn:'One line per step or handoff.' }) +
+        _ngRenderStudioField({ labelVi:'Audit evidence pack', labelEn:'Audit evidence pack', path:'qa.auditEvidenceText', type:'textarea', rows:4, value:_getByPath(draft, 'qa.auditEvidenceText'), helpVi:'Mỗi dòng là một mục chứng cứ cần có.', helpEn:'One line per required evidence item.' })
+      );
+    }
+    if(state.moduleStudioTab === 'publish'){
+      extra += _r3Section('Release pulse', 'Release pulse', _r3RenderReleasePulse(projected, aura), _esc(_t('release confidence + rollback', 'release confidence + rollback')));
+      extra += _r3Section('Release controls', 'Release controls',
+        _ngRenderStudioField({ labelVi:'Rollback plan', labelEn:'Rollback plan', path:'publish.rollbackPlan', type:'textarea', rows:4, value:_getByPath(draft, 'publish.rollbackPlan') }) +
+        _ngRenderStudioField({ labelVi:'Event streams (CSV)', labelEn:'Event streams (CSV)', path:'integration.eventStreamsCsv', value:_getByPath(draft, 'integration.eventStreamsCsv'), placeholder:'workflow.deadline,machine.state,audit.event' })
+      );
+    }
+    if(state.moduleStudioTab === 'diagnostics'){
+      extra += _r3Section('Smart recommendations', 'Smart recommendations', _r3RenderRecommendations(recs, 6), _esc(_t('priority moves', 'priority moves')));
+      extra += _r3Section('Canvas atlas', 'Canvas atlas', _r3RenderCanvasAtlas(projected, diag), _esc(_t('tab density map', 'tab density map')));
+    }
+    if(!extra) return html;
+    return html.replace('<div class="mb-panel-body">', '<div class="mb-panel-body">' + extra);
+  }
+
+  function _r3RenderBlockAura(block){
+    var chips = [];
+    if(_r3IsKpiBlock(block)) chips.push('<span class="mb-r3-block-chip">👁 ' + _esc(_t('Glance', 'Glance')) + '</span>');
+    if(_r3IsChartBlock(block)) chips.push('<span class="mb-r3-block-chip">📈 ' + _esc(_t('Story', 'Story')) + '</span>');
+    if(_r3IsActionBlock(block)) chips.push('<span class="mb-r3-block-chip">⚙ ' + _esc(_t('Action', 'Action')) + '</span>');
+    if(_getByPath(block, 'config.design.caption') || _getByPath(block, 'config.story.headline')) chips.push('<span class="mb-r3-block-chip">✍ ' + _esc(_t('Narrative', 'Narrative')) + '</span>');
+    if(_getByPath(block, 'config.accessibility.touchTarget') === 'xl') chips.push('<span class="mb-r3-block-chip">🖐 ' + _esc(_t('Touch XL', 'Touch XL')) + '</span>');
+    if(!chips.length) return '';
+    return '<div class="mb-r3-block-aura">' + chips.join('') + '</div>';
+  }
+
+  function _r3EnsureStyles(){
+    var id = 'hm-module-builder-ultra-r3';
+    var style;
+    var css = '';
+    if(typeof document === 'undefined') return;
+    if(document.getElementById(id)) return;
+    style = document.createElement('style');
+    style.id = id;
+    css += '.mb-r3-shell{display:grid;gap:16px}';
+    css += '.mb-r3-shell .mb-ultra-root{position:relative}';
+    css += '.mb-r3-shell .mb-builder-shell{position:relative;z-index:1}';
+    css += '.mb-r3-superdock{display:grid;gap:12px;margin-top:-4px}';
+    css += '.mb-r3-aura-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}';
+    css += '.mb-r3-scorecard{border:1px solid rgba(148,163,184,.18);border-radius:18px;padding:14px 16px;background:rgba(255,255,255,.86);backdrop-filter:blur(8px);box-shadow:0 18px 30px rgba(15,23,42,.08)}';
+    css += '.mb-r3-scorecard strong{display:block;font-size:28px;line-height:1.1;margin:8px 0 4px;color:#0f172a}';
+    css += '.mb-r3-score-top{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:.08em}';
+    css += '.mb-r3-scorecard small{display:block;color:#64748b;font-size:12px}';
+    css += '.mb-r3-scorecard.is-success{border-color:rgba(16,185,129,.22)}';
+    css += '.mb-r3-scorecard.is-warning{border-color:rgba(245,158,11,.22)}';
+    css += '.mb-r3-scorecard.is-danger{border-color:rgba(239,68,68,.22)}';
+    css += '.mb-r3-toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}';
+    css += '.mb-r3-toolbar-group{display:flex;gap:8px;flex-wrap:wrap}';
+    css += '.mb-r3-chip{border:1px solid rgba(148,163,184,.2);background:rgba(255,255,255,.86);padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#0f172a;cursor:pointer;box-shadow:0 10px 24px rgba(15,23,42,.06)}';
+    css += '.mb-r3-chip.is-active{background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(14,165,233,.14));border-color:rgba(37,99,235,.25)}';
+    css += '.mb-r3-supergrid{display:grid;grid-template-columns:1.05fr .95fr;gap:12px}';
+    css += '.mb-r3-panel{border:1px solid rgba(148,163,184,.18);border-radius:22px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);box-shadow:0 18px 32px rgba(15,23,42,.08);padding:14px}';
+    css += '.mb-r3-panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}';
+    css += '.mb-r3-blueprint-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}';
+    css += '.mb-r3-blueprint-grid.is-compact{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}';
+    css += '.mb-r3-blueprint-card{border:1px solid rgba(148,163,184,.18);border-radius:18px;background:linear-gradient(180deg,rgba(248,250,252,.96),rgba(255,255,255,.98));padding:14px;text-align:left;cursor:pointer;transition:transform .16s ease, box-shadow .16s ease;border-color:rgba(99,102,241,.12)}';
+    css += '.mb-r3-blueprint-card:hover,.mb-r3-persona-card:hover,.mb-r3-atlas-card:hover{transform:translateY(-2px);box-shadow:0 16px 26px rgba(15,23,42,.08)}';
+    css += '.mb-r3-blueprint-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}';
+    css += '.mb-r3-blueprint-card p{margin:0 0 8px;color:#475569;font-size:13px;line-height:1.5}';
+    css += '.mb-r3-blueprint-card small{color:#64748b;font-size:12px}';
+    css += '.mb-r3-persona-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px}';
+    css += '.mb-r3-persona-card{display:flex;flex-direction:column;gap:6px;align-items:flex-start;border:1px solid rgba(148,163,184,.18);border-radius:16px;background:#fff;padding:12px;cursor:pointer;text-align:left}';
+    css += '.mb-r3-persona-icon{font-size:18px}';
+    css += '.mb-r3-persona-card small{color:#64748b;font-size:12px;line-height:1.45}';
+    css += '.mb-r3-rec-grid{display:grid;gap:10px}';
+    css += '.mb-r3-rec-card{border:1px solid rgba(148,163,184,.18);border-radius:18px;background:#fff;padding:14px}';
+    css += '.mb-r3-rec-card.is-warning{border-color:rgba(245,158,11,.18);background:linear-gradient(180deg,rgba(255,251,235,.95),#fff)}';
+    css += '.mb-r3-rec-card.is-danger{border-color:rgba(239,68,68,.18);background:linear-gradient(180deg,rgba(254,242,242,.95),#fff)}';
+    css += '.mb-r3-rec-card.is-info{border-color:rgba(37,99,235,.16);background:linear-gradient(180deg,rgba(239,246,255,.95),#fff)}';
+    css += '.mb-r3-rec-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}';
+    css += '.mb-r3-rec-card p{margin:0;color:#475569;font-size:13px;line-height:1.55}';
+    css += '.mb-r3-rec-actions{margin-top:10px}';
+    css += '.mb-r3-empty{font-size:13px;color:#64748b;padding:8px 0}';
+    css += '.mb-r3-atlas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}';
+    css += '.mb-r3-atlas-card{border:1px solid rgba(148,163,184,.18);border-radius:18px;background:#fff;padding:12px;text-align:left;cursor:pointer}';
+    css += '.mb-r3-atlas-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:13px}';
+    css += '.mb-r3-atlas-meta{display:flex;justify-content:space-between;gap:8px;color:#64748b;font-size:12px;margin-bottom:8px}';
+    css += '.mb-r3-meter{height:8px;border-radius:999px;background:#e2e8f0;overflow:hidden;margin-bottom:8px}';
+    css += '.mb-r3-meter span{display:block;height:8px;border-radius:999px;background:linear-gradient(90deg,#2563eb,#14b8a6)}';
+    css += '.mb-r3-atlas-tags{display:flex;gap:6px;flex-wrap:wrap}';
+    css += '.mb-r3-atlas-tags span,.mb-r3-tag-row span,.mb-r3-block-chip{font-size:11px;padding:5px 8px;border-radius:999px;background:#f8fafc;border:1px solid rgba(148,163,184,.14);color:#334155}';
+    css += '.mb-r3-tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}';
+    css += '.mb-r3-story-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}';
+    css += '.mb-r3-story-card{border:1px solid rgba(148,163,184,.18);border-radius:18px;background:#fff;padding:14px;min-height:120px}';
+    css += '.mb-r3-story-card p{margin:8px 0 0;color:#475569;font-size:13px;line-height:1.55}';
+    css += '.mb-r3-story-card ul{margin:8px 0 0 16px;padding:0;color:#475569;font-size:13px;line-height:1.55}';
+    css += '.mb-r3-story-kicker{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:8px}';
+    css += '.mb-r3-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}';
+    css += '.mb-r3-release-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}';
+    css += '.mb-r3-release-list > div{border:1px solid rgba(148,163,184,.16);border-radius:16px;padding:12px;background:#fff}';
+    css += '.mb-r3-release-list p{margin:6px 0 0;color:#475569;font-size:13px;line-height:1.55}';
+    css += '.mb-r3-block-aura{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}';
+    css += '.mb-r3-block-chip{background:rgba(255,255,255,.94)}';
+    css += '.mb-r3-section .mb-r3-blueprint-grid,.mb-r3-section .mb-r3-persona-grid,.mb-r3-section .mb-r3-rec-grid,.mb-r3-section .mb-r3-atlas-grid,.mb-r3-section .mb-r3-story-grid{margin-top:10px}';
+    css += '.mb-r3-shell .mb-right-rail{gap:12px}';
+    css += '.mb-r3-shell .mb-rail-panel{box-shadow:0 20px 36px rgba(15,23,42,.08)}';
+    css += '@media (max-width: 1180px){.mb-r3-supergrid,.mb-r3-story-grid,.mb-r3-release-list{grid-template-columns:1fr}.mb-r3-mini-grid{grid-template-columns:1fr 1fr}}';
+    css += '@media (max-width: 840px){.mb-r3-aura-grid,.mb-r3-mini-grid{grid-template-columns:1fr 1fr}.mb-r3-story-grid,.mb-r3-release-list,.mb-r3-supergrid{grid-template-columns:1fr}.mb-r3-toolbar{align-items:flex-start}}';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  var _r3PrevHandleClick = _handleClick;
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      if(action === 'apply-blueprint'){
+        _r3ApplyBlueprint(btn.getAttribute('data-blueprint') || '');
+        _paint();
+        return;
+      }
+      if(action === 'apply-persona'){
+        _r3ApplyPersona(btn.getAttribute('data-persona') || '');
+        _paint();
+        return;
+      }
+      if(action === 'studio-jump-tab'){
+        if(state.schema && !state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        state.showModuleStudio = true;
+        state.showLibrary = false;
+        state.selectedBlock = null;
+        state.propsDraft = null;
+        state.moduleStudioTab = btn.getAttribute('data-tab') || 'overview';
+        _paint();
+        return;
+      }
+      if(action === 'toggle-scene-atlas'){
+        _r3EnsureState();
+        state.showSceneAtlas = !state.showSceneAtlas;
+        _paint();
+        return;
+      }
+      if(action === 'toggle-story-board'){
+        _r3EnsureState();
+        state.showStoryBoard = !state.showStoryBoard;
+        _paint();
+        return;
+      }
+      if(action === 'apply-r3-auto-enhance'){
+        if(!state.schema) return;
+        _mutateSchema(_t('Ultra auto enhance module', 'Ultra auto enhance module'), function(){
+          if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+          _r3AutoEnhanceSchema(state.schema);
+          state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        });
+        if(BE.toast) BE.toast(_t('Đã auto-enhance module với narrative, release và block guidance.', 'Auto-enhanced the module with narrative, release and block guidance.'), 'success');
+        return;
+      }
+    }
+    return _r3PrevHandleClick(e);
+  };
+
+  var _r3PrevRenderCanvasBlock = _renderCanvasBlock;
+  _renderCanvasBlock = function(block, tab, tree, depth){
+    var html = _r3PrevRenderCanvasBlock(block, tab, tree, depth);
+    var aura = _r3RenderBlockAura(block);
+    if(aura) html = html.replace('<div class="mb-block-body">', aura + '<div class="mb-block-body">');
+    return html;
+  };
+
+  var _r3PrevRenderBuilder = _renderBuilder;
+  _renderBuilder = function(){
+    var html;
+    var projected;
+    var diag;
+    var aura;
+    var recs;
+    _r3EnsureState();
+    _r3EnsureStyles();
+    html = _r3PrevRenderBuilder();
+    if(!state.schema) return html;
+    projected = state.ultraProjectedSchema || _ngProjectedSchema();
+    diag = _r3CollectDiagnostics(projected, state.ultraDiagnosticsCache);
+    aura = _r3ComputeAuraMetrics(projected, diag);
+    recs = _r3CollectRecommendations(projected, diag, aura);
+    state.r3DiagnosticsCache = diag;
+    state.r3AuraMetrics = aura;
+    state.r3Recommendations = recs;
+    html = html.replace('<div class="mb-builder-shell">', _r3RenderSuperDock(projected, diag, aura, recs) + '<div class="mb-builder-shell">');
+    return '<div class="mb-r3-shell">' + html + '</div>';
+  };
+
+  var _r3PrevStudioPanel = _ngRenderModuleStudioPanel;
+  _ngRenderModuleStudioPanel = function(){
+    var html;
+    var projected;
+    var diag;
+    var aura;
+    var recs;
+    _r3EnsureState();
+    _r3EnsureStyles();
+    html = _r3PrevStudioPanel ? _r3PrevStudioPanel() : '';
+    if(!state.schema) return html;
+    projected = state.r3ProjectedSchema || state.ultraProjectedSchema || _ngProjectedSchema();
+    diag = _r3CollectDiagnostics(projected, state.r3DiagnosticsCache || state.ultraDiagnosticsCache);
+    aura = _r3ComputeAuraMetrics(projected, diag);
+    recs = _r3CollectRecommendations(projected, diag, aura);
+    state.r3DiagnosticsCache = diag;
+    state.r3AuraMetrics = aura;
+    state.r3Recommendations = recs;
+    return _r3EnhanceStudioHtml(html, projected, diag, aura, recs);
+  };
+
+
+/* ── MODULE BUILDER ULTIMATE PATCH (2026-04-07 R4) ─────────────────────── */
+if(!window.__HM_MODULE_BUILDER_ULTIMATE_PATCH__){
+  window.__HM_MODULE_BUILDER_ULTIMATE_PATCH__ = '2026-04-07-r4';
+
+  var _r4BeautyPresets = [
+    { key:'aurora-command', icon:'🌌', titleVi:'Aurora Command', titleEn:'Aurora Command', subtitleVi:'Chrome cinematic, aurora backdrop, executive pulse.', subtitleEn:'Cinematic chrome, aurora backdrop, executive pulse.', patch:{ design:{ themePreset:'hesem-executive', stageBackdrop:'aurora', heroMood:'cinematic', chromeLevel:'immersive', surfaceDepth:'premium', panelGlass:true, accentTone:'indigo', signalDensity:'focused', stageFrame:'glass', surfaceTexture:'aurora' } } },
+    { key:'precision-glass', icon:'🧊', titleVi:'Precision Glass', titleEn:'Precision Glass', subtitleVi:'QMS sạch, rõ, nhiều dữ liệu nhưng rất dễ đọc.', subtitleEn:'Clean, data-dense QMS style with high readability.', patch:{ design:{ themePreset:'quality-lab', stageBackdrop:'soft', heroMood:'focused', chromeLevel:'balanced', surfaceDepth:'elevated', panelGlass:true, accentTone:'emerald', signalDensity:'balanced', stageFrame:'frost', surfaceTexture:'soft-grid' } } },
+    { key:'night-ops', icon:'🌃', titleVi:'Night Ops', titleEn:'Night Ops', subtitleVi:'Wallboard tương phản mạnh cho shopfloor và maintenance.', subtitleEn:'High contrast wallboard for shopfloor and maintenance.', patch:{ design:{ themePreset:'shopfloor-dark', stageBackdrop:'grid', heroMood:'night-shift', chromeLevel:'immersive', surfaceDepth:'solid', panelGlass:false, accentTone:'teal', signalDensity:'high', stageFrame:'solid', contrastMode:'high' } } },
+    { key:'warehouse-handheld', icon:'📱', titleVi:'Warehouse Handheld', titleEn:'Warehouse Handheld', subtitleVi:'Touch lớn, nhịp nhanh, tập trung task-by-task.', subtitleEn:'Large touch, fast rhythm, task-by-task focus.', patch:{ design:{ themePreset:'warehouse-ops', stageBackdrop:'soft', heroMood:'clear-day', chromeLevel:'minimal', surfaceDepth:'outlined', panelGlass:false, accentTone:'amber', signalDensity:'focused', stageFrame:'compact' } } }
+  ];
+
+  var _r4BlueprintSeeds = {
+    'executive-control': [
+      { titleVi:'Tổng quan điều hành', titleEn:'Executive Overview', icon:'👑', layout:{ type:'grid', columns:3 }, templates:['tpl-r4-story-hero','tpl-r4-control-tower-kpi','tpl-r4-release-pulse'] },
+      { titleVi:'Review release', titleEn:'Release Review', icon:'🚀', layout:{ type:'stack', columns:1 }, templates:['tpl-r4-review-matrix'] }
+    ],
+    'quality-war-room': [
+      { titleVi:'War room', titleEn:'War Room', icon:'🧪', layout:{ type:'grid', columns:2 }, templates:['tpl-r4-story-hero','tpl-r4-war-room-readiness','tpl-r4-command-lane'] },
+      { titleVi:'Evidence', titleEn:'Evidence', icon:'🧾', layout:{ type:'stack', columns:1 }, templates:['tpl-r4-evidence-stage','tpl-r4-review-matrix'] }
+    ],
+    'shopfloor-command': [
+      { titleVi:'Command', titleEn:'Command', icon:'🏭', layout:{ type:'grid', columns:2 }, templates:['tpl-r4-story-hero','tpl-r4-live-signal-wall','tpl-r4-command-lane'] },
+      { titleVi:'Response', titleEn:'Response', icon:'⚡', layout:{ type:'stack', columns:1 }, templates:['tpl-r4-release-pulse'] }
+    ],
+    'audit-evidence-hub': [
+      { titleVi:'Evidence Hub', titleEn:'Evidence Hub', icon:'🧾', layout:{ type:'grid', columns:2 }, templates:['tpl-r4-story-hero','tpl-r4-evidence-stage','tpl-r4-review-matrix'] },
+      { titleVi:'Release', titleEn:'Release', icon:'🚀', layout:{ type:'stack', columns:1 }, templates:['tpl-r4-release-pulse'] }
+    ],
+    'warehouse-handheld': [
+      { titleVi:'Warehouse', titleEn:'Warehouse', icon:'📦', layout:{ type:'grid', columns:1 }, templates:['tpl-r4-story-hero','tpl-r4-warehouse-wave','tpl-r4-command-lane'] },
+      { titleVi:'Handover', titleEn:'Handover', icon:'🔄', layout:{ type:'stack', columns:1 }, templates:['tpl-r4-handoff-board'] }
+    ],
+    'maintenance-response': [
+      { titleVi:'Maintenance', titleEn:'Maintenance', icon:'🛠', layout:{ type:'grid', columns:2 }, templates:['tpl-r4-story-hero','tpl-r4-machine-signal','tpl-r4-command-lane'] },
+      { titleVi:'Response', titleEn:'Response', icon:'🚨', layout:{ type:'stack', columns:1 }, templates:['tpl-r4-maintenance-response','tpl-r4-release-pulse'] }
+    ]
+  };
+
+  function _r4HasBlueprint(key){
+    return !!_r3FindBlueprint(key);
+  }
+
+  if(Array.isArray(_r3Blueprints)){
+    if(!_r4HasBlueprint('audit-evidence-hub')){
+      _r3Blueprints.push({
+        key:'audit-evidence-hub',
+        icon:'🧾',
+        titleVi:'Audit Evidence Hub',
+        titleEn:'Audit Evidence Hub',
+        subtitleVi:'Chuỗi chứng cứ, signoff và readiness trong một hub rõ ràng.',
+        subtitleEn:'Evidence chain, signoff and readiness in one clear hub.',
+        patch:{
+          rolesCsv:'auditor,quality_manager,document_controller',
+          meta:{ domain:'compliance', boundedContext:'audit_evidence_hub', criticality:'critical', lifecycle:'pilot', releaseChannel:'quality' },
+          design:{ themePreset:'quality-lab', shellPreset:'document-center', navigationMode:'focus', density:'comfortable', defaultBreakpoint:'desktop', visualLanguage:'precision-clean', accentTone:'emerald', stageBackdrop:'soft', surfaceDepth:'elevated', heroMood:'focused', chartStyle:'clean-room', panelGlass:true, motionPreset:'subtle', chromeLevel:'balanced', glancePriority:'evidence-first', operatorDistance:'desk', audiencePrimary:'auditor', storyEyebrow:'EVIDENCE', storyHeadline:'Prove compliance with a traceable evidence chain' },
+          publish:{ environment:'sit', mode:'controlled', rolloutPct:10, requireSignoff:true, changeSummary:'Enable evidence hub, review matrix and release pulse.' },
+          integration:{ primaryEntity:'audit_event', sourceSystemsCsv:'qms,eqms,dms', digitalThreadCsv:'audit,evidence,approval,training', defaultApiNamespace:'compliance.evidence', eventStreamsCsv:'audit.evidence,approval.signoff' },
+          qa:{ criticalJourneysText:'Open evidence gap\nVerify chain of custody\nComplete signoff for audit closure', operatorWalkthroughText:'Open audit hub\nReview missing evidence\nEscalate signoff blockers', auditEvidenceText:'Audit log\nEvidence package\nSignoff records' }
+        }
+      });
+    }
+    if(!_r4HasBlueprint('warehouse-handheld')){
+      _r3Blueprints.push({
+        key:'warehouse-handheld',
+        icon:'📱',
+        titleVi:'Warehouse Handheld',
+        titleEn:'Warehouse Handheld',
+        subtitleVi:'Tác nghiệp kho nhanh, chạm lớn, quét mã và handoff rõ ràng.',
+        subtitleEn:'Fast warehouse work with large touch, scan intent and clear handoffs.',
+        patch:{
+          rolesCsv:'warehouse_operator,warehouse_lead',
+          meta:{ domain:'warehouse', boundedContext:'warehouse_handheld', criticality:'high', lifecycle:'pilot', releaseChannel:'logistics' },
+          design:{ themePreset:'warehouse-ops', shellPreset:'operations-center', navigationMode:'process', density:'compact', defaultBreakpoint:'tablet', visualLanguage:'precision-clean', accentTone:'amber', stageBackdrop:'soft', surfaceDepth:'outlined', heroMood:'clear-day', chartStyle:'balanced', panelGlass:false, motionPreset:'guided', chromeLevel:'minimal', glancePriority:'workflow-first', operatorDistance:'arm-length', audiencePrimary:'operator', storyEyebrow:'WAREHOUSE', storyHeadline:'Execute waves, scans and handoffs without friction' },
+          publish:{ environment:'sit', mode:'pilot', rolloutPct:5, requireSignoff:true, changeSummary:'Enable warehouse handheld wave execution and handoff flow.' },
+          integration:{ primaryEntity:'inventory_move', sourceSystemsCsv:'wms,erp,barcode', digitalThreadCsv:'wave,pick,pack,ship', defaultApiNamespace:'warehouse.handheld', eventStreamsCsv:'warehouse.wave,inventory.move' },
+          qa:{ criticalJourneysText:'Release wave\nScan task\nConfirm handoff to packing', operatorWalkthroughText:'Open wave queue\nScan pallet\nConfirm handoff', auditEvidenceText:'Wave completion log\nScan trace\nHandoff signature' }
+        }
+      });
+    }
+    if(!_r4HasBlueprint('maintenance-response')){
+      _r3Blueprints.push({
+        key:'maintenance-response',
+        icon:'🛠',
+        titleVi:'Maintenance Response',
+        titleEn:'Maintenance Response',
+        subtitleVi:'Nhìn tín hiệu tài sản và điều phối phản ứng bảo trì trong một view.',
+        subtitleEn:'See asset signals and coordinate maintenance response in one view.',
+        patch:{
+          rolesCsv:'maintenance_engineer,maintenance_manager,shift_lead',
+          meta:{ domain:'maintenance', boundedContext:'maintenance_response', criticality:'high', lifecycle:'pilot', releaseChannel:'plant' },
+          design:{ themePreset:'maintenance-hub', shellPreset:'operations-center', navigationMode:'workspace', density:'comfortable', defaultBreakpoint:'wide', visualLanguage:'dark-ops', accentTone:'teal', stageBackdrop:'grid', surfaceDepth:'solid', heroMood:'night-shift', chartStyle:'realtime', panelGlass:false, motionPreset:'guided', chromeLevel:'immersive', glancePriority:'workflow-first', operatorDistance:'desk', audiencePrimary:'supervisor', storyEyebrow:'MAINTENANCE', storyHeadline:'Detect risk, dispatch response and prove closure fast' },
+          publish:{ environment:'sit', mode:'controlled', rolloutPct:10, requireSignoff:true, changeSummary:'Enable maintenance response queue and asset signal wall.' },
+          integration:{ primaryEntity:'maintenance_work_order', sourceSystemsCsv:'cmms,mes,scada', digitalThreadCsv:'asset,work_order,spare_parts', defaultApiNamespace:'maintenance.response', eventStreamsCsv:'asset.signal,maintenance.ticket' },
+          qa:{ criticalJourneysText:'Detect asset risk\nDispatch response\nClose work order with evidence', operatorWalkthroughText:'Review asset signal\nAssign responder\nConfirm closure', auditEvidenceText:'Response queue export\nAsset state log\nClosure signature' }
+        }
+      });
+    }
+  }
+
+  if(Array.isArray(_r3Personas)){
+    function _r4HasPersona(key){ return !!_r3FindPersona(key); }
+    if(!_r4HasPersona('planner')){
+      _r3Personas.push({ key:'planner', icon:'📐', titleVi:'Planner', titleEn:'Planner', subtitleVi:'Schedule, capacity and release focus', subtitleEn:'Schedule, capacity and release focus', patch:{ rolesCsv:'planner,production_scheduler', design:{ density:'comfortable', defaultBreakpoint:'desktop', navigationMode:'workspace', chromeLevel:'balanced', glancePriority:'workflow-first', operatorDistance:'desk', audiencePrimary:'cross-functional', motionPreset:'subtle' } } });
+    }
+    if(!_r4HasPersona('warehouse')){
+      _r3Personas.push({ key:'warehouse', icon:'📱', titleVi:'Warehouse Operator', titleEn:'Warehouse Operator', subtitleVi:'Large touch and barcode-first execution', subtitleEn:'Large touch and barcode-first execution', patch:{ rolesCsv:'warehouse_operator,warehouse_lead', design:{ density:'compact', defaultBreakpoint:'tablet', navigationMode:'process', chromeLevel:'minimal', glancePriority:'workflow-first', operatorDistance:'arm-length', audiencePrimary:'operator', motionPreset:'guided' } } });
+    }
+    if(!_r4HasPersona('maintenance')){
+      _r3Personas.push({ key:'maintenance', icon:'🛠', titleVi:'Maintenance Lead', titleEn:'Maintenance Lead', subtitleVi:'Signals, queues and dispatch urgency', subtitleEn:'Signals, queues and dispatch urgency', patch:{ rolesCsv:'maintenance_engineer,maintenance_manager', design:{ density:'comfortable', defaultBreakpoint:'wide', navigationMode:'workspace', chromeLevel:'immersive', glancePriority:'workflow-first', operatorDistance:'desk', audiencePrimary:'supervisor', motionPreset:'guided' } } });
+    }
+  }
+
+  function _r4EnsureState(){
+    if(state.showFlowMesh == null) state.showFlowMesh = true;
+    if(state.showBeautyLab == null) state.showBeautyLab = false;
+    if(!state.r4PrimeMetrics) state.r4PrimeMetrics = null;
+    if(!state.r4FlowMeshCache) state.r4FlowMeshCache = null;
+  }
+
+  function _r4Csv(value){
+    if(Array.isArray(value)) return value.filter(Boolean);
+    return String(value == null ? '' : value).split(',').map(function(item){ return item.trim(); }).filter(Boolean);
+  }
+
+  function _r4ModuleDomain(schema){
+    return String(_getByPath(schema, 'meta.domain') || '').toLowerCase();
+  }
+
+  function _r2BlockApiId(block){
+    return (block && (block.api || _getByPath(block, 'config.api') || _getByPath(block, 'config.dataSource.api') || _getByPath(block, 'config.query.api') || _getByPath(block, 'config.bindings.api'))) || '';
+  }
+
+  function _r2BlockWorkflowId(block){
+    return (block && (_getByPath(block, 'config.workflowId') || _getByPath(block, 'config.eventFlow.approvalWorkflow') || _getByPath(block, 'config.workflow.workflowId'))) || '';
+  }
+
+  function _r2BlockDataMode(block){
+    if(_getByPath(block, 'config.stream.connector') || _getByPath(block, 'config.stream.enabled')) return 'stream';
+    if(_getByPath(block, 'config.dataSource.mode')) return String(_getByPath(block, 'config.dataSource.mode'));
+    if(Array.isArray(_getByPath(block, 'config.dataPipeline.steps')) && _getByPath(block, 'config.dataPipeline.steps').length) return 'query-pipeline';
+    if(_r2BlockApiId(block)) return 'api';
+    return 'manual';
+  }
+
+
+  function _r4DefaultBlueprintKey(schema){
+    var domain = _r4ModuleDomain(schema);
+    if(domain === 'quality') return 'quality-war-room';
+    if(domain === 'production') return 'shopfloor-command';
+    if(domain === 'warehouse') return 'warehouse-handheld';
+    if(domain === 'maintenance') return 'maintenance-response';
+    if(domain === 'compliance' || domain === 'audit') return 'audit-evidence-hub';
+    return 'executive-control';
+  }
+
+  var _r4PrevEnsureMeta = _ngEnsureModuleBuilderMetadata;
+  _ngEnsureModuleBuilderMetadata = function(schema){
+    schema = _r4PrevEnsureMeta(schema);
+    if(!schema || typeof schema !== 'object') return schema;
+    if(!schema.design || typeof schema.design !== 'object') schema.design = {};
+    if(!schema.qa || typeof schema.qa !== 'object') schema.qa = {};
+    if(!schema.collaboration || typeof schema.collaboration !== 'object') schema.collaboration = {};
+    if(!schema.integration || typeof schema.integration !== 'object') schema.integration = {};
+    if(schema.design.signalDensity == null) schema.design.signalDensity = 'balanced';
+    if(schema.design.stageFrame == null) schema.design.stageFrame = 'glass';
+    if(schema.design.surfaceTexture == null) schema.design.surfaceTexture = 'soft-grid';
+    if(schema.design.contrastMode == null) schema.design.contrastMode = 'balanced';
+    if(schema.qa.reviewCadence == null) schema.qa.reviewCadence = 'weekly';
+    if(!Array.isArray(schema.collaboration.signoffRoles)) schema.collaboration.signoffRoles = [];
+    if(!Array.isArray(schema.integration.liveSignals)) schema.integration.liveSignals = [];
+    return schema;
+  };
+
+  var _r4PrevDraftFromSchema = _ngModuleStudioDraftFromSchema;
+  _ngModuleStudioDraftFromSchema = function(schema){
+    var draft = _r4PrevDraftFromSchema(schema);
+    if(!draft.collaboration || typeof draft.collaboration !== 'object') draft.collaboration = {};
+    if(!draft.integration || typeof draft.integration !== 'object') draft.integration = {};
+    if(!draft.qa || typeof draft.qa !== 'object') draft.qa = {};
+    if(!draft.design || typeof draft.design !== 'object') draft.design = {};
+    draft.collaboration.signoffRolesCsv = (_getByPath(schema, 'collaboration.signoffRoles') || []).join(', ');
+    draft.integration.liveSignalsCsv = (_getByPath(schema, 'integration.liveSignals') || []).join(', ');
+    if(draft.qa.reviewCadence == null) draft.qa.reviewCadence = _getByPath(schema, 'qa.reviewCadence') || 'weekly';
+    if(draft.design.signalDensity == null) draft.design.signalDensity = _getByPath(schema, 'design.signalDensity') || 'balanced';
+    if(draft.design.stageFrame == null) draft.design.stageFrame = _getByPath(schema, 'design.stageFrame') || 'glass';
+    if(draft.design.surfaceTexture == null) draft.design.surfaceTexture = _getByPath(schema, 'design.surfaceTexture') || 'soft-grid';
+    if(draft.design.contrastMode == null) draft.design.contrastMode = _getByPath(schema, 'design.contrastMode') || 'balanced';
+    return draft;
+  };
+
+  var _r4PrevApplyDraft = _ngApplyModuleStudioDraft;
+  _ngApplyModuleStudioDraft = function(schema, draft){
+    schema = _r4PrevApplyDraft(schema, draft);
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(draft){
+      schema.collaboration.signoffRoles = _r4Csv(_getByPath(draft, 'collaboration.signoffRolesCsv'));
+      schema.integration.liveSignals = _r4Csv(_getByPath(draft, 'integration.liveSignalsCsv'));
+      if(_getByPath(draft, 'qa.reviewCadence')) schema.qa.reviewCadence = _getByPath(draft, 'qa.reviewCadence');
+      if(_getByPath(draft, 'design.signalDensity')) schema.design.signalDensity = _getByPath(draft, 'design.signalDensity');
+      if(_getByPath(draft, 'design.stageFrame')) schema.design.stageFrame = _getByPath(draft, 'design.stageFrame');
+      if(_getByPath(draft, 'design.surfaceTexture')) schema.design.surfaceTexture = _getByPath(draft, 'design.surfaceTexture');
+      if(_getByPath(draft, 'design.contrastMode')) schema.design.contrastMode = _getByPath(draft, 'design.contrastMode');
+    }
+    return schema;
+  };
+
+  function _r4CountBlocks(schema){
+    var total = 0;
+    (schema && schema.tabs || []).forEach(function(tab){ total += ((tab && tab.blocks) || []).length; });
+    return total;
+  }
+
+  function _r4IsSparseModule(schema){
+    return _r4CountBlocks(schema) <= 4;
+  }
+
+  function _r4GenericTabTitle(text){
+    var v = String(text || '').toLowerCase();
+    return ['overview','list','create','details','summary','tổng quan','danh sách','tạo mới','chi tiết'].indexOf(v) >= 0;
+  }
+
+  function _r4EnsureTabSeed(schema, index, seed){
+    var tab = (schema.tabs || [])[index];
+    if(!tab){
+      tab = {
+        tabId:'tab-' + (index + 1) + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5),
+        icon:seed.icon || '📑',
+        title:{ vi:seed.titleVi, en:seed.titleEn },
+        blocks:[],
+        layout:_clone(seed.layout || { type:'grid', columns:2 })
+      };
+      if(!Array.isArray(schema.tabs)) schema.tabs = [];
+      schema.tabs.push(tab);
+    }
+    if(!tab.title || _r4GenericTabTitle(tab.title.vi || tab.title.en || '')){
+      tab.title = { vi:seed.titleVi, en:seed.titleEn };
+    }
+    if(!tab.icon) tab.icon = seed.icon || '📑';
+    _ensureTabLayout(tab);
+    if(seed.layout){
+      tab.layout.type = seed.layout.type || tab.layout.type;
+      if(seed.layout.columns != null) tab.layout.columns = seed.layout.columns;
+    }
+    return tab;
+  }
+
+  function _r4ApplyTemplateSeed(tab, templateKey){
+    var tpl = (BE.BLOCK_TEMPLATES || {})[templateKey];
+    var block;
+    if(!tpl || !tab) return;
+    if((tab.blocks || []).some(function(item){ return _getByPath(item, 'config.__r4TemplateKey') === templateKey; })) return;
+    block = _createBlockScaffold(tpl.type, tpl.config);
+    block.title = _clone(tpl.title || block.title);
+    _setByPath(block, 'config.__r4TemplateKey', templateKey);
+    _setByPath(block, 'config.story.heroBadge', _getByPath(block, 'config.story.heroBadge') || '');
+    block.order = (tab.blocks || []).length + 1;
+    if(!Array.isArray(tab.blocks)) tab.blocks = [];
+    tab.blocks.push(block);
+  }
+
+  function _r4SeedBlueprint(schema, blueprintKey){
+    var seeds = _r4BlueprintSeeds[blueprintKey] || [];
+    if(!_r4IsSparseModule(schema)) return false;
+    (seeds || []).forEach(function(seed, index){
+      var tab = _r4EnsureTabSeed(schema, index, seed);
+      if(!Array.isArray(tab.blocks)) tab.blocks = [];
+      if(tab.blocks.length === 0){
+        (seed.templates || []).forEach(function(key){ _r4ApplyTemplateSeed(tab, key); });
+      }
+      (tab.blocks || []).forEach(function(block, i){ block.order = i + 1; });
+    });
+    if(schema.tabs && schema.tabs.length && !state.activeTab) state.activeTab = schema.tabs[0].tabId;
+    return true;
+  }
+
+  function _r4ApplyBeautyPreset(key){
+    var preset = null;
+    var draft = _ngEnsureModuleStudioDraft();
+    _r4BeautyPresets.forEach(function(item){ if(item.key === key) preset = item; });
+    if(!draft || !preset) return;
+    _r3ApplyPatchToDraft(draft, preset.patch || {});
+    state.showModuleStudio = true;
+    state.showLibrary = false;
+    state.selectedBlock = null;
+    state.propsDraft = null;
+    state.moduleStudioTab = 'design';
+    state.viewportMode = _getByPath(draft, 'design.defaultBreakpoint') || state.viewportMode || 'desktop';
+    if(BE.toast) BE.toast(_t('Đã áp beauty preset ' + preset.titleVi, 'Applied beauty preset ' + preset.titleEn), 'success');
+  }
+
+  var _r4PrevApplyBlueprint = _r3ApplyBlueprint;
+  _r3ApplyBlueprint = function(key){
+    var blueprint = _r3FindBlueprint(key);
+    _r4PrevApplyBlueprint(key);
+    if(!state.schema || !blueprint) return;
+    _mutateSchema(_t('Áp blueprint round 4', 'Apply round 4 blueprint'), function(){
+      if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+      _r4SeedBlueprint(state.schema, key);
+      state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+      _ngSyncModuleBuilderManifest(state.schema);
+    });
+  };
+
+  var _r4PrevAutoEnhanceSchema = _r3AutoEnhanceSchema;
+  _r3AutoEnhanceSchema = function(schema){
+    var domain;
+    _r4PrevAutoEnhanceSchema(schema);
+    _ngEnsureModuleBuilderMetadata(schema);
+    domain = _r4ModuleDomain(schema);
+    if(!schema.design.stageFrame) schema.design.stageFrame = (domain === 'production' || domain === 'maintenance') ? 'solid' : 'glass';
+    if(!schema.design.surfaceTexture) schema.design.surfaceTexture = (domain === 'production' || domain === 'maintenance') ? 'grid' : 'soft-grid';
+    if(!schema.design.contrastMode) schema.design.contrastMode = (domain === 'production') ? 'high' : 'balanced';
+    if(!schema.design.signalDensity) schema.design.signalDensity = (domain === 'warehouse' || domain === 'production') ? 'focused' : 'balanced';
+    if(!schema.collaboration.signoffRoles.length){
+      schema.collaboration.signoffRoles = _r4Csv(_getByPath(schema, 'roles') || []);
+    }
+    if(!schema.integration.liveSignals.length){
+      schema.integration.liveSignals = (_getByPath(schema, 'integration.eventStreams') || []).slice(0, 4);
+      if(!schema.integration.liveSignals.length && (domain === 'production' || domain === 'maintenance' || domain === 'warehouse')){
+        schema.integration.liveSignals = ['machine.state','workflow.deadline','audit.event'];
+      }
+    }
+    if(!_getByPath(schema, 'qa.reviewCadence')) schema.qa.reviewCadence = 'weekly';
+    if(_r4IsSparseModule(schema)){
+      _r4SeedBlueprint(schema, _r4DefaultBlueprintKey(schema));
+    }
+    (schema.tabs || []).forEach(function(tab){
+      (tab.blocks || []).forEach(function(block){
+        var type = String(block.type || '').toLowerCase();
+        var titleVi = block && block.title && (block.title.vi || block.title.en) || type;
+        if(!_getByPath(block, 'config.story.sceneRole')){
+          _setByPath(block, 'config.story.sceneRole', _r3IsActionBlock(block) ? 'act' : (_r3IsFormBlock(block) ? 'decide' : (_r3IsChartBlock(block) ? 'analyze' : (_r3IsDataBlock(block) ? 'observe' : 'review'))));
+        }
+        if(!_getByPath(block, 'config.story.sceneTitle')){
+          _setByPath(block, 'config.story.sceneTitle', titleVi);
+        }
+        if(!_getByPath(block, 'config.story.callToAction') && _r3IsActionBlock(block)){
+          _setByPath(block, 'config.story.callToAction', _t('Xử lý ngay', 'Act now'));
+        }
+        if(!_getByPath(block, 'config.observability.signalClass')){
+          _setByPath(block, 'config.observability.signalClass', _r3IsActionBlock(block) ? 'command' : (_r3IsFormBlock(block) ? 'release' : (_r3IsChartBlock(block) ? 'warning' : (_r3IsDataBlock(block) ? 'status' : 'status'))));
+        }
+        if(!_getByPath(block, 'config.accessibility.operatorDistance')){
+          _setByPath(block, 'config.accessibility.operatorDistance', _getByPath(schema, 'design.operatorDistance') || 'desk');
+        }
+        if(!_getByPath(block, 'config.accessibility.touchTarget') && (_getByPath(schema, 'design.audiencePrimary') === 'operator' || domain === 'warehouse')){
+          _setByPath(block, 'config.accessibility.touchTarget', 'xl');
+        }
+        if(!_getByPath(block, 'config.operatorMode.mode')){
+          _setByPath(block, 'config.operatorMode.mode', domain === 'warehouse' ? 'handheld' : ((domain === 'production' || domain === 'maintenance') ? 'focus' : 'default'));
+        }
+        if(!_getByPath(block, 'config.operatorMode.confirmationStyle') && _r3IsActionBlock(block)){
+          _setByPath(block, 'config.operatorMode.confirmationStyle', domain === 'warehouse' ? 'scan' : 'toast');
+        }
+        if(!_getByPath(block, 'config.collaboration.reviewMode') && (_r3IsFormBlock(block) || _r3IsActionBlock(block))){
+          _setByPath(block, 'config.collaboration.reviewMode', (domain === 'quality' || domain === 'compliance') ? 'mandatory' : 'optional');
+        }
+        if(!_getByPath(block, 'config.design.caption')){
+          _setByPath(block, 'config.design.caption', _t('Khối này giúp nhóm nhìn tín hiệu và ra quyết định nhanh hơn.', 'This block helps the team see the signal and decide faster.'));
+        }
+        if(type === 'data-table' && !_getByPath(block, 'config.pageSize') && !_getByPath(block, 'config.dataSource.pageSize')){
+          _setByPath(block, 'config.pageSize', domain === 'warehouse' ? 10 : 20);
+        }
+      });
+    });
+    _ngSyncModuleBuilderManifest(schema);
+    return schema;
+  };
+
+  var _r4PrevCollectDiagnostics = _r3CollectDiagnostics;
+  _r3CollectDiagnostics = function(schema, cached){
+    var diag = _r4PrevCollectDiagnostics(schema, cached);
+    var domain = _r4ModuleDomain(schema);
+    var storyBlocks = 0;
+    var signalBlocks = 0;
+    (schema && schema.tabs || []).forEach(function(tab, tabIndex){
+      (tab.blocks || []).forEach(function(block, blockIndex){
+        if(_getByPath(block, 'config.story.sceneRole')) storyBlocks++;
+        if(_getByPath(block, 'config.observability.signalClass')) signalBlocks++;
+        if((_r3IsActionBlock(block) || _r3IsFormBlock(block)) && !_getByPath(block, 'config.collaboration.reviewMode')){
+          _r3AddDiag(diag, 'info', 'block', 'block-review-mode', 'Block thao tác chưa có review mode', 'Action block is missing review mode', { tabId:tab.tabId || '', blockId:(block.blockId || block.id || ''), path:'tabs['+tabIndex+'].blocks['+blockIndex+'].config.collaboration.reviewMode', fixable:true });
+        }
+      });
+    });
+    if(!storyBlocks){
+      _r3AddDiag(diag, 'info', 'module', 'module-scene-role', 'Chưa có story scene role cho block nào', 'No block has a story scene role yet', { path:'tabs[].blocks[].config.story.sceneRole', fixable:true });
+    }
+    if((domain === 'production' || domain === 'maintenance' || domain === 'warehouse' || domain === 'quality') && !signalBlocks){
+      _r3AddDiag(diag, 'warning', 'module', 'module-signal-class', 'Module vận hành nhưng chưa có signal class trên block', 'Operational module is missing signal classes on blocks', { path:'tabs[].blocks[].config.observability.signalClass', fixable:true });
+    }
+    if((domain === 'production' || domain === 'maintenance' || domain === 'warehouse') && !(_getByPath(schema, 'integration.liveSignals') || []).length){
+      _r3AddDiag(diag, 'warning', 'module', 'module-live-signals', 'Module vận hành nhưng chưa khai báo live signals', 'Operational module is missing declared live signals', { path:'integration.liveSignals', fixable:true });
+    }
+    if(!_getByPath(schema, 'qa.reviewCadence')){
+      _r3AddDiag(diag, 'info', 'module', 'module-review-cadence', 'Chưa khai báo review cadence', 'Review cadence is not defined', { path:'qa.reviewCadence', fixable:true });
+    }
+    if(!_getByPath(schema, 'design.signalDensity')){
+      _r3AddDiag(diag, 'info', 'module', 'module-signal-density', 'Chưa cấu hình signal density', 'Signal density is not configured', { path:'design.signalDensity', fixable:true });
+    }
+    if(!_getByPath(schema, 'design.stageFrame')){
+      _r3AddDiag(diag, 'info', 'module', 'module-stage-frame', 'Chưa cấu hình stage frame', 'Stage frame is not configured', { path:'design.stageFrame', fixable:true });
+    }
+    return _r3ReindexDiag(diag);
+  };
+
+  function _r4ComputePrimeMetrics(schema, diag, aura){
+    var signalBlocks = 0;
+    var collaborationBlocks = 0;
+    var storyBlocks = 0;
+    var operatorBlocks = 0;
+    var captioned = 0;
+    var flowNodes = 0;
+    var flowEdges = 0;
+    (schema && schema.tabs || []).forEach(function(tab){
+      (tab.blocks || []).forEach(function(block){
+        flowNodes++;
+        if(_getByPath(block, 'config.story.sceneRole')) storyBlocks++;
+        if(_getByPath(block, 'config.observability.signalClass')) signalBlocks++;
+        if(_getByPath(block, 'config.collaboration.reviewMode') || _getByPath(block, 'config.collaboration.evidenceRequired')) collaborationBlocks++;
+        if(_getByPath(block, 'config.operatorMode.mode')) operatorBlocks++;
+        if(_getByPath(block, 'config.design.caption')) captioned++;
+        if(_r2BlockApiId(block)) flowEdges++;
+        if(_r2BlockWorkflowId(block)) flowEdges++;
+        if(_getByPath(block, 'config.stream.connector')) flowEdges++;
+      });
+    });
+    return {
+      signalCoverage: _r3Clamp(Math.round((signalBlocks * 18) + ((_getByPath(schema, 'integration.liveSignals') || []).length * 12) + (aura.operabilityScore * 0.25)), 0, 100),
+      collaborationReadiness: _r3Clamp(Math.round(((_getByPath(schema, 'collaboration.signoffRoles') || []).length * 14) + (collaborationBlocks * 10) + ((_getByPath(schema, 'publish.requireSignoff') !== false ? 18 : 0)) + ((_getByPath(schema, 'qa.reviewCadence') ? 14 : 0)) - diag.counts.error * 4), 0, 100),
+      designCraft: _r3Clamp(Math.round((aura.visualBalanceScore * 0.45) + (aura.storyScore * 0.25) + ((_getByPath(schema, 'design.signalDensity') ? 10 : 0)) + ((_getByPath(schema, 'design.stageFrame') ? 10 : 0)) + ((_getByPath(schema, 'design.contrastMode') ? 10 : 0))), 0, 100),
+      flowNodes: flowNodes,
+      flowEdges: flowEdges,
+      storyBlocks: storyBlocks,
+      operatorBlocks: operatorBlocks,
+      captionedBlocks: captioned
+    };
+  }
+
+  function _r4BlockGlyph(block){
+    if(_r3IsKpiBlock(block)) return '◉';
+    if(_r3IsChartBlock(block)) return '📈';
+    if(_r3IsFormBlock(block)) return '📝';
+    if(_r3IsActionBlock(block)) return '⚙';
+    if(_r3IsDataBlock(block)) return '▦';
+    return '⬢';
+  }
+
+  function _r4FindBlockLocation(blockId){
+    var found = null;
+    (state.schema && state.schema.tabs || []).forEach(function(tab){
+      (tab.blocks || []).forEach(function(block){
+        if((block.blockId || block.id) === blockId){
+          found = { tab:tab, block:block };
+        }
+      });
+    });
+    return found;
+  }
+
+  function _r4BuildFlowMesh(schema){
+    var lanes = [];
+    var nodes = 0;
+    var edges = 0;
+    (schema && schema.tabs || []).forEach(function(tab){
+      var lane = { tabId:tab.tabId, titleVi:(tab.title && tab.title.vi) || '', titleEn:(tab.title && tab.title.en) || '', icon:tab.icon || '📑', nodes:[] };
+      (tab.blocks || []).forEach(function(block){
+        var services = [];
+        var api = _r2BlockApiId(block);
+        var wf = _r2BlockWorkflowId(block);
+        var stream = _getByPath(block, 'config.stream.connector');
+        var signal = _getByPath(block, 'config.observability.signalClass');
+        if(api) services.push({ kind:'api', label:api });
+        if(wf) services.push({ kind:'workflow', label:wf });
+        if(stream) services.push({ kind:'stream', label:stream });
+        if(signal) services.push({ kind:'signal', label:signal });
+        nodes++;
+        edges += services.length;
+        lane.nodes.push({
+          blockId:block.blockId || block.id || '',
+          glyph:_r4BlockGlyph(block),
+          title:_t((block.title && block.title.vi) || block.type, (block.title && block.title.en) || (block.title && block.title.vi) || block.type),
+          type:block.type || '',
+          role:_getByPath(block, 'config.story.sceneRole') || '',
+          services:services
+        });
+      });
+      lanes.push(lane);
+    });
+    return { lanes:lanes, nodes:nodes, edges:edges };
+  }
+
+  function _r4PrimeCard(icon, titleVi, titleEn, value, metaVi, metaEn, tone){
+    return '<div class="mb-r4-prime-card is-' + _esc(tone || 'neutral') + '"><div class="mb-r4-prime-head"><span>' + _esc(icon || '◉') + '</span><strong>' + _esc(_t(titleVi, titleEn)) + '</strong></div><div class="mb-r4-prime-value">' + _esc(value) + '</div><small>' + _esc(_t(metaVi, metaEn)) + '</small></div>';
+  }
+
+  function _r4Tone(score){
+    if(score >= 85) return 'success';
+    if(score >= 70) return 'warning';
+    return 'danger';
+  }
+
+  function _r4RenderFlowMesh(mesh){
+    var h = '<div class="mb-r4-mesh">';
+    (mesh.lanes || []).forEach(function(lane){
+      h += '<div class="mb-r4-lane"><div class="mb-r4-lane-head"><strong>' + _esc(lane.icon || '📑') + ' ' + _esc(_t(lane.titleVi, lane.titleEn)) + '</strong><span>' + _esc((lane.nodes || []).length) + ' ' + _esc(_t('nodes', 'nodes')) + '</span></div><div class="mb-r4-lane-track">';
+      if(!(lane.nodes || []).length){
+        h += '<div class="mb-r4-lane-empty">' + _esc(_t('Tab chưa có node nào', 'No nodes in this tab yet')) + '</div>';
+      }
+      (lane.nodes || []).forEach(function(node){
+        h += '<div class="mb-r4-node"><button class="mb-r4-node-main" data-action="jump-flow-block" data-block="' + _esc(node.blockId) + '"><span class="mb-r4-node-glyph">' + _esc(node.glyph) + '</span><div class="mb-r4-node-copy"><strong>' + _esc(node.title) + '</strong><small>' + _esc(node.type) + (node.role ? ' • ' + _esc(node.role) : '') + '</small></div></button>';
+        if((node.services || []).length){
+          h += '<div class="mb-r4-node-services">' + node.services.map(function(service){
+            return '<span class="mb-r4-service is-' + _esc(service.kind) + '">' + _esc(service.label) + '</span>';
+          }).join('') + '</div>';
+        }
+        h += '</div>';
+      });
+      h += '</div></div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r4RenderBeautyPresets(compact){
+    var h = '<div class="mb-r4-beauty-grid' + (compact ? ' is-compact' : '') + '">';
+    _r4BeautyPresets.forEach(function(item){
+      h += '<button class="mb-r4-beauty-card" data-action="apply-r4-beauty" data-beauty="' + _esc(item.key) + '"><div class="mb-r4-beauty-head"><span>' + _esc(item.icon) + '</span><strong>' + _esc(_t(item.titleVi, item.titleEn)) + '</strong></div><p>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</p></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r4RenderCommandDeck(projected, diag, aura, prime, recs){
+    var flow = state.r4FlowMeshCache || _r4BuildFlowMesh(projected);
+    var h = '<div class="mb-r4-deck">';
+    h += '<div class="mb-r4-prime-grid">';
+    h += _r4PrimeCard('📡', 'Signal coverage', 'Signal coverage', prime.signalCoverage + '%', 'live signals + observability', 'live signals + observability', _r4Tone(prime.signalCoverage));
+    h += _r4PrimeCard('🤝', 'Collaboration', 'Collaboration', prime.collaborationReadiness + '%', 'signoff + cadence + review', 'signoff + cadence + review', _r4Tone(prime.collaborationReadiness));
+    h += _r4PrimeCard('✨', 'Design craft', 'Design craft', prime.designCraft + '%', 'frame + contrast + story', 'frame + contrast + story', _r4Tone(prime.designCraft));
+    h += _r4PrimeCard('🕸', 'Flow mesh', 'Flow mesh', String(prime.flowNodes) + ' / ' + String(prime.flowEdges), 'nodes / edges', 'nodes / edges', 'neutral');
+    h += '</div>';
+    h += '<div class="mb-r4-commandbar"><div class="mb-r4-command-group"><button class="mb-r4-pill' + (state.showFlowMesh ? ' is-active' : '') + '" data-action="toggle-flow-mesh">🕸 ' + _esc(_t('Flow mesh', 'Flow mesh')) + '</button><button class="mb-r4-pill' + (state.showBeautyLab ? ' is-active' : '') + '" data-action="toggle-beauty-lab">✨ ' + _esc(_t('Beauty lab', 'Beauty lab')) + '</button><button class="mb-r4-pill" data-action="apply-r4-ultimate-enhance">🚀 ' + _esc(_t('Ultimate enhance', 'Ultimate enhance')) + '</button><button class="mb-r4-pill" data-action="apply-blueprint" data-blueprint="' + _esc(_r4DefaultBlueprintKey(projected)) + '">🧭 ' + _esc(_t('Seed blueprint', 'Seed blueprint')) + '</button></div></div>';
+    h += '<div class="mb-r4-command-grid"><div class="mb-r4-panel"><div class="mb-r4-panel-head"><strong>' + _esc(_t('Expanded blueprints', 'Expanded blueprints')) + '</strong></div>' + _r3RenderBlueprintCards(6, true) + '</div><div class="mb-r4-panel"><div class="mb-r4-panel-head"><strong>' + _esc(_t('Role lenses', 'Role lenses')) + '</strong></div>' + _r3RenderPersonaCards() + '</div></div>';
+    if(state.showFlowMesh){
+      h += '<div class="mb-r4-panel"><div class="mb-r4-panel-head"><strong>' + _esc(_t('Flow mesh', 'Flow mesh')) + '</strong><span>' + _esc(flow.nodes) + ' ' + _esc(_t('nodes', 'nodes')) + ' • ' + _esc(flow.edges) + ' ' + _esc(_t('edges', 'edges')) + '</span></div>' + _r4RenderFlowMesh(flow) + '</div>';
+    }
+    if(state.showBeautyLab){
+      h += '<div class="mb-r4-panel"><div class="mb-r4-panel-head"><strong>' + _esc(_t('Beauty lab', 'Beauty lab')) + '</strong></div>' + _r4RenderBeautyPresets() + '<div class="mb-r4-inline-note">' + _esc(_t('Áp nhanh preset cho chrome, backdrop, contrast, frame và signal density.', 'Quick-apply presets for chrome, backdrop, contrast, frame and signal density.')) + '</div></div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function _r4EnhanceStudioHtml(html, projected, diag, aura, prime, recs){
+    var draft = _ngEnsureModuleStudioDraft();
+    var extra = '';
+    if(!html || !draft || !projected) return html;
+    if(state.moduleStudioTab === 'design'){
+      extra += _r3Section('Beauty lab', 'Beauty lab',
+        _r4RenderBeautyPresets(true) +
+        _ngRenderStudioField({ labelVi:'Signal density', labelEn:'Signal density', path:'design.signalDensity', type:'select', value:_getByPath(draft, 'design.signalDensity'), selectOptions:['focused','balanced','high'] }) +
+        _ngRenderStudioField({ labelVi:'Stage frame', labelEn:'Stage frame', path:'design.stageFrame', type:'select', value:_getByPath(draft, 'design.stageFrame'), selectOptions:['glass','frost','solid','compact'] }) +
+        _ngRenderStudioField({ labelVi:'Surface texture', labelEn:'Surface texture', path:'design.surfaceTexture', type:'select', value:_getByPath(draft, 'design.surfaceTexture'), selectOptions:['soft-grid','aurora','grid','linen'] }) +
+        _ngRenderStudioField({ labelVi:'Contrast mode', labelEn:'Contrast mode', path:'design.contrastMode', type:'select', value:_getByPath(draft, 'design.contrastMode'), selectOptions:['balanced','high','soft'] }),
+        _esc(_t('chrome + backdrop + rhythm', 'chrome + backdrop + rhythm'))
+      );
+    }
+    if(state.moduleStudioTab === 'quality'){
+      extra += _r3Section('Collaboration ops', 'Collaboration ops',
+        _ngRenderStudioField({ labelVi:'Review cadence', labelEn:'Review cadence', path:'qa.reviewCadence', type:'select', value:_getByPath(draft, 'qa.reviewCadence'), selectOptions:['daily','weekly','per-release','monthly'] }) +
+        _ngRenderStudioField({ labelVi:'Signoff roles (CSV)', labelEn:'Signoff roles (CSV)', path:'collaboration.signoffRolesCsv', value:_getByPath(draft, 'collaboration.signoffRolesCsv'), placeholder:'quality_manager,plant_head,it_admin' }) +
+        _ngRenderStudioField({ labelVi:'Live signals (CSV)', labelEn:'Live signals (CSV)', path:'integration.liveSignalsCsv', value:_getByPath(draft, 'integration.liveSignalsCsv'), placeholder:'machine.state,workflow.deadline,audit.event' }),
+        _esc(_t('cadence + signoff + live signals', 'cadence + signoff + live signals'))
+      );
+    }
+    if(state.moduleStudioTab === 'publish'){
+      extra += _r3Section('Prime metrics', 'Prime metrics',
+        '<div class="mb-r4-prime-grid">' +
+        _r4PrimeCard('📡', 'Signal coverage', 'Signal coverage', prime.signalCoverage + '%', 'live signals + observability', 'live signals + observability', _r4Tone(prime.signalCoverage)) +
+        _r4PrimeCard('🤝', 'Collaboration', 'Collaboration', prime.collaborationReadiness + '%', 'signoff + cadence + review', 'signoff + cadence + review', _r4Tone(prime.collaborationReadiness)) +
+        _r4PrimeCard('✨', 'Design craft', 'Design craft', prime.designCraft + '%', 'frame + contrast + story', 'frame + contrast + story', _r4Tone(prime.designCraft)) +
+        '</div>',
+        _esc(_t('world-class readiness', 'world-class readiness'))
+      );
+    }
+    if(state.moduleStudioTab === 'diagnostics'){
+      extra += _r3Section('Flow mesh', 'Flow mesh', _r4RenderFlowMesh(state.r4FlowMeshCache || _r4BuildFlowMesh(projected)), _esc(_t('tab → block → service', 'tab → block → service')));
+    }
+    if(!extra) return html;
+    return html.replace('<div class="mb-panel-body">', '<div class="mb-panel-body">' + extra);
+  }
+
+  function _r4RenderBlockPrime(block){
+    var chips = [];
+    if(_getByPath(block, 'config.story.sceneRole')) chips.push('<span class="mb-r4-block-chip">🎬 ' + _esc(_getByPath(block, 'config.story.sceneRole')) + '</span>');
+    if(_getByPath(block, 'config.observability.signalClass')) chips.push('<span class="mb-r4-block-chip">📡 ' + _esc(_getByPath(block, 'config.observability.signalClass')) + '</span>');
+    if(_getByPath(block, 'config.collaboration.reviewMode')) chips.push('<span class="mb-r4-block-chip">🤝 ' + _esc(_getByPath(block, 'config.collaboration.reviewMode')) + '</span>');
+    if(_getByPath(block, 'config.operatorMode.mode')) chips.push('<span class="mb-r4-block-chip">🖐 ' + _esc(_getByPath(block, 'config.operatorMode.mode')) + '</span>');
+    if(!chips.length) return '';
+    return '<div class="mb-r4-block-prime">' + chips.join('') + '</div>';
+  }
+
+  function _r4EnsureStyles(){
+    var id = 'hm-module-builder-ultimate-r4';
+    var style;
+    var css = '';
+    if(typeof document === 'undefined') return;
+    if(document.getElementById(id)) return;
+    style = document.createElement('style');
+    style.id = id;
+    css += '.mb-r4-shell{position:relative;display:grid;gap:14px}';
+    css += '.mb-r4-shell .mb-r3-shell,.mb-r4-shell .mb-ultra-root{position:relative}';
+    css += '.mb-r4-shell .mb-ultra-root:before{content:"";position:absolute;left:0;right:0;top:-42px;height:220px;border-radius:32px;background:radial-gradient(circle at 20% 20%,rgba(99,102,241,.16),transparent 38%),radial-gradient(circle at 80% 10%,rgba(14,165,233,.14),transparent 34%),radial-gradient(circle at 50% 100%,rgba(16,185,129,.10),transparent 36%);pointer-events:none;filter:blur(8px);z-index:0}';
+    css += '.mb-r4-deck{display:grid;gap:12px}';
+    css += '.mb-r4-prime-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}';
+    css += '.mb-r4-prime-card{border:1px solid rgba(148,163,184,.18);border-radius:20px;padding:14px;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(248,250,252,.92));box-shadow:0 20px 36px rgba(15,23,42,.08);backdrop-filter:blur(10px)}';
+    css += '.mb-r4-prime-card.is-success{border-color:rgba(16,185,129,.22)}';
+    css += '.mb-r4-prime-card.is-warning{border-color:rgba(245,158,11,.22)}';
+    css += '.mb-r4-prime-card.is-danger{border-color:rgba(239,68,68,.22)}';
+    css += '.mb-r4-prime-head{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}';
+    css += '.mb-r4-prime-value{font-size:28px;font-weight:800;color:#0f172a;line-height:1.1}';
+    css += '.mb-r4-prime-card small{display:block;color:#64748b;font-size:12px;margin-top:4px}';
+    css += '.mb-r4-commandbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}';
+    css += '.mb-r4-command-group{display:flex;gap:8px;flex-wrap:wrap}';
+    css += '.mb-r4-pill{border:1px solid rgba(99,102,241,.16);background:rgba(255,255,255,.92);padding:9px 13px;border-radius:999px;font-size:12px;font-weight:800;color:#0f172a;cursor:pointer;box-shadow:0 14px 26px rgba(15,23,42,.06)}';
+    css += '.mb-r4-pill.is-active{background:linear-gradient(135deg,rgba(79,70,229,.12),rgba(14,165,233,.12));border-color:rgba(79,70,229,.24)}';
+    css += '.mb-r4-command-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}';
+    css += '.mb-r4-panel{border:1px solid rgba(148,163,184,.18);border-radius:22px;padding:14px;background:rgba(255,255,255,.92);box-shadow:0 18px 34px rgba(15,23,42,.08);backdrop-filter:blur(10px)}';
+    css += '.mb-r4-panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}';
+    css += '.mb-r4-beauty-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}';
+    css += '.mb-r4-beauty-grid.is-compact{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}';
+    css += '.mb-r4-beauty-card{border:1px solid rgba(99,102,241,.18);border-radius:18px;padding:14px;background:linear-gradient(180deg,rgba(248,250,252,.98),rgba(255,255,255,.96));text-align:left;cursor:pointer}';
+    css += '.mb-r4-beauty-card:hover,.mb-r4-node-main:hover{transform:translateY(-1px)}';
+    css += '.mb-r4-beauty-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}';
+    css += '.mb-r4-beauty-card p{margin:0;color:#475569;font-size:13px;line-height:1.55}';
+    css += '.mb-r4-inline-note{margin-top:10px;color:#64748b;font-size:12px;line-height:1.5}';
+    css += '.mb-r4-mesh{display:grid;gap:12px}';
+    css += '.mb-r4-lane{border:1px solid rgba(148,163,184,.14);border-radius:18px;padding:12px;background:linear-gradient(180deg,rgba(248,250,252,.92),rgba(255,255,255,.98))}';
+    css += '.mb-r4-lane-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;color:#334155}';
+    css += '.mb-r4-lane-track{display:grid;gap:10px}';
+    css += '.mb-r4-node{display:grid;gap:8px}';
+    css += '.mb-r4-node-main{display:flex;align-items:flex-start;gap:10px;width:100%;padding:12px;border:1px solid rgba(148,163,184,.16);border-radius:16px;background:#fff;text-align:left;cursor:pointer;box-shadow:0 10px 20px rgba(15,23,42,.04)}';
+    css += '.mb-r4-node-glyph{font-size:18px;line-height:1.2}';
+    css += '.mb-r4-node-copy{display:grid;gap:4px}';
+    css += '.mb-r4-node-copy strong{font-size:13px;color:#0f172a}';
+    css += '.mb-r4-node-copy small{font-size:12px;color:#64748b}';
+    css += '.mb-r4-node-services{display:flex;gap:6px;flex-wrap:wrap;padding-left:8px}';
+    css += '.mb-r4-service,.mb-r4-block-chip{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#f8fafc;border:1px solid rgba(148,163,184,.14);color:#334155}';
+    css += '.mb-r4-service.is-api{background:rgba(239,246,255,.98);color:#1d4ed8;border-color:rgba(37,99,235,.18)}';
+    css += '.mb-r4-service.is-workflow{background:rgba(250,245,255,.98);color:#7e22ce;border-color:rgba(168,85,247,.2)}';
+    css += '.mb-r4-service.is-stream{background:rgba(236,253,245,.98);color:#047857;border-color:rgba(16,185,129,.18)}';
+    css += '.mb-r4-service.is-signal{background:rgba(255,251,235,.98);color:#92400e;border-color:rgba(245,158,11,.18)}';
+    css += '.mb-r4-lane-empty{padding:10px 12px;border:1px dashed rgba(148,163,184,.26);border-radius:14px;color:#64748b;font-size:12px}';
+    css += '.mb-r4-block-prime{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}';
+    css += '@media (max-width: 1080px){.mb-r4-command-grid{grid-template-columns:1fr}.mb-r4-prime-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+    css += '@media (max-width: 760px){.mb-r4-prime-grid,.mb-r4-beauty-grid{grid-template-columns:1fr}}';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  var _r4PrevHandleClick = _handleClick;
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    var loc;
+    if(btn){
+      if(action === 'toggle-flow-mesh'){
+        _r4EnsureState();
+        state.showFlowMesh = !state.showFlowMesh;
+        _paint();
+        return;
+      }
+      if(action === 'toggle-beauty-lab'){
+        _r4EnsureState();
+        state.showBeautyLab = !state.showBeautyLab;
+        _paint();
+        return;
+      }
+      if(action === 'apply-r4-beauty'){
+        _r4ApplyBeautyPreset(btn.getAttribute('data-beauty') || '');
+        _paint();
+        return;
+      }
+      if(action === 'apply-r4-ultimate-enhance'){
+        if(!state.schema) return;
+        _mutateSchema(_t('Ultimate enhance module', 'Ultimate enhance module'), function(){
+          if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+          _r3AutoEnhanceSchema(state.schema);
+          state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        });
+        if(BE.toast) BE.toast(_t('Đã áp ultimate enhance cho module, flow, signal và collaboration.', 'Applied ultimate enhance for module, flow, signal and collaboration.'), 'success');
+        return;
+      }
+      if(action === 'jump-flow-block'){
+        loc = _r4FindBlockLocation(btn.getAttribute('data-block') || '');
+        if(loc && loc.tab && loc.block){
+          state.activeTab = loc.tab.tabId;
+          state.showModuleStudio = false;
+          state.showLibrary = false;
+          _openBlockConfig(loc.block.blockId || loc.block.id);
+        }
+        return;
+      }
+    }
+    return _r4PrevHandleClick(e);
+  };
+
+  var _r4PrevRenderCanvasBlock = _renderCanvasBlock;
+  _renderCanvasBlock = function(block, tab, tree, depth){
+    var html = _r4PrevRenderCanvasBlock(block, tab, tree, depth);
+    var prime = _r4RenderBlockPrime(block);
+    if(prime) html = html.replace('<div class="mb-block-body">', prime + '<div class="mb-block-body">');
+    return html;
+  };
+
+  var _r4PrevSyncManifest = _ngSyncModuleBuilderManifest;
+  _ngSyncModuleBuilderManifest = function(schema){
+    var manifest = _r4PrevSyncManifest(schema);
+    var diag = _r3CollectDiagnostics(schema, state && (state.r3DiagnosticsCache || state.ultraDiagnosticsCache));
+    var aura = _r3ComputeAuraMetrics(schema, diag);
+    var prime = _r4ComputePrimeMetrics(schema, diag, aura);
+    schema.builderManifest = schema.builderManifest || {};
+    schema.builderManifest.signalCoverage = prime.signalCoverage;
+    schema.builderManifest.collaborationReadiness = prime.collaborationReadiness;
+    schema.builderManifest.designCraft = prime.designCraft;
+    schema.builderManifest.flowNodes = prime.flowNodes;
+    schema.builderManifest.flowEdges = prime.flowEdges;
+    return manifest;
+  };
+
+  var _r4PrevRenderBuilder = _renderBuilder;
+  _renderBuilder = function(){
+    var html;
+    var projected;
+    var diag;
+    var aura;
+    var prime;
+    var recs;
+    _r4EnsureState();
+    _r4EnsureStyles();
+    html = _r4PrevRenderBuilder();
+    if(!state.schema) return html;
+    projected = state.r3ProjectedSchema || state.ultraProjectedSchema || _ngProjectedSchema();
+    diag = _r3CollectDiagnostics(projected, state.r3DiagnosticsCache || state.ultraDiagnosticsCache);
+    aura = state.r3AuraMetrics || _r3ComputeAuraMetrics(projected, diag);
+    prime = _r4ComputePrimeMetrics(projected, diag, aura);
+    recs = state.r3Recommendations || _r3CollectRecommendations(projected, diag, aura);
+    state.r4PrimeMetrics = prime;
+    state.r4FlowMeshCache = _r4BuildFlowMesh(projected);
+    html = html.replace('<div class="mb-builder-shell">', _r4RenderCommandDeck(projected, diag, aura, prime, recs) + '<div class="mb-builder-shell">');
+    return '<div class="mb-r4-shell">' + html + '</div>';
+  };
+
+  var _r4PrevStudioPanel = _ngRenderModuleStudioPanel;
+  _ngRenderModuleStudioPanel = function(){
+    var html;
+    var projected;
+    var diag;
+    var aura;
+    var recs;
+    var prime;
+    _r4EnsureState();
+    _r4EnsureStyles();
+    html = _r4PrevStudioPanel ? _r4PrevStudioPanel() : '';
+    if(!state.schema) return html;
+    projected = state.r3ProjectedSchema || state.ultraProjectedSchema || _ngProjectedSchema();
+    diag = _r3CollectDiagnostics(projected, state.r3DiagnosticsCache || state.ultraDiagnosticsCache);
+    aura = _r3ComputeAuraMetrics(projected, diag);
+    recs = state.r3Recommendations || _r3CollectRecommendations(projected, diag, aura);
+    prime = _r4ComputePrimeMetrics(projected, diag, aura);
+    state.r4PrimeMetrics = prime;
+    state.r4FlowMeshCache = _r4BuildFlowMesh(projected);
+    return _r4EnhanceStudioHtml(html, projected, diag, aura, prime, recs);
+  };
+
+/* ── MODULE BUILDER SUPREME PATCH (2026-04-07 R5) ───────────────────────── */
+if(!window.__HM_MODULE_BUILDER_SUPREME_PATCH__){
+  window.__HM_MODULE_BUILDER_SUPREME_PATCH__ = '2026-04-07-r5';
+
+  var _r5MotionPresets = [
+    { key:'kinetic-glass', icon:'🫧', titleVi:'Kinetic Glass', titleEn:'Kinetic Glass', subtitleVi:'Glass premium, ánh sáng mềm, chuyển động sang.', subtitleEn:'Premium glass, soft glow and elegant motion.', patch:{ design:{ motionPreset:'cinematic', motionTempo:'balanced', depthMode:'immersive', glowMode:'soft', entryFx:'slide-up', hoverFx:'glow', alertFx:'signal-ring', panelGlass:true, chromeLevel:'immersive', stageBackdrop:'aurora' } } },
+    { key:'precision-flow', icon:'🧭', titleVi:'Precision Flow', titleEn:'Precision Flow', subtitleVi:'Rõ nhịp workflow, tối ưu board nhiều tín hiệu.', subtitleEn:'Clear workflow rhythm for signal-dense boards.', patch:{ design:{ motionPreset:'guided', motionTempo:'balanced', depthMode:'layered', glowMode:'soft', entryFx:'fade', hoverFx:'lift', alertFx:'pulse', panelGlass:true, chromeLevel:'balanced', stageBackdrop:'soft' } } },
+    { key:'night-ops', icon:'🌃', titleVi:'Night Ops Motion', titleEn:'Night Ops Motion', subtitleVi:'Wallboard mạnh, nhịp nhanh, cảnh báo rõ.', subtitleEn:'Bold wallboard motion with clear alerts.', patch:{ design:{ motionPreset:'guided', motionTempo:'fast', depthMode:'immersive', glowMode:'medium', entryFx:'signal-rise', hoverFx:'outline', alertFx:'signal-ring', panelGlass:false, chromeLevel:'immersive', stageBackdrop:'grid' } } },
+    { key:'handheld-fast', icon:'📱', titleVi:'Handheld Fast', titleEn:'Handheld Fast', subtitleVi:'Tối giản cho thao tác barcode/touch tốc độ cao.', subtitleEn:'Fast minimal motion for barcode and touch flows.', patch:{ design:{ motionPreset:'guided', motionTempo:'fast', depthMode:'flat', glowMode:'soft', entryFx:'slide-up', hoverFx:'outline', alertFx:'pulse', panelGlass:false, chromeLevel:'minimal', stageBackdrop:'soft' } } }
+  ];
+
+  function _r5HasBlueprint(key){ return typeof _r3FindBlueprint === 'function' ? !!_r3FindBlueprint(key) : false; }
+  function _r5HasPersona(key){ return typeof _r3FindPersona === 'function' ? !!_r3FindPersona(key) : false; }
+  function _r5Csv(value){ return _ngArrayToCsv(Array.isArray(value) ? value : []); }
+  function _r5Lines(value){ return _ngLinesToText(Array.isArray(value) ? value : []); }
+  function _r5Trim(value){ return String(value == null ? '' : value).trim(); }
+  function _r5Slug(value){ return _r5Trim(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+  function _r5Text(value, fallback){ value = _r5Trim(value); return value || String(fallback == null ? '' : fallback); }
+  function _r5PromptExcerpt(text, limit){ text = String(text || ''); return text.length > (limit || 520) ? text.slice(0, limit || 520) + '…' : text; }
+  function _r5Cap(value){ value = String(value == null ? '' : value); return value ? value.charAt(0).toUpperCase() + value.slice(1) : value; }
+  function _r5Unique(list){
+    var out = [];
+    (list || []).forEach(function(item){ if(item != null && String(item).trim() && out.indexOf(String(item).trim()) < 0) out.push(String(item).trim()); });
+    return out;
+  }
+
+  function _r5DefaultReleaseStrategy(schema){
+    var criticality = String(_getByPath(schema, 'meta.criticality') || '').toLowerCase();
+    var domain = String(_getByPath(schema, 'meta.domain') || '').toLowerCase();
+    if(/critical|gxp/.test(criticality)) return 'ring';
+    if(domain === 'warehouse' || domain === 'production' || domain === 'maintenance') return 'wave';
+    return 'manual';
+  }
+
+  function _r5DefaultGatePolicy(schema){
+    var criticality = String(_getByPath(schema, 'meta.criticality') || '').toLowerCase();
+    if(/critical|gxp/.test(criticality)) return 'strict';
+    if(/high/.test(criticality)) return 'standard';
+    return 'light';
+  }
+
+  function _r5VersionFromLifecycle(schema){
+    var lifecycle = String(_getByPath(schema, 'meta.lifecycle') || '').toLowerCase();
+    if(/validated|active|production/.test(lifecycle)) return '1.0.0';
+    if(/pilot|uat/.test(lifecycle)) return '0.9.0-beta';
+    return '0.1.0-alpha';
+  }
+
+  function _r5ModuleKey(schema){
+    return _r5Slug(_getByPath(schema, 'moduleId') || _getByPath(schema, 'route') || _r3ModuleTitleText(schema) || 'module');
+  }
+
+  function _r5DefaultPackageId(schema){
+    var domain = _r5Slug(_getByPath(schema, 'meta.domain') || 'workspace') || 'workspace';
+    return 'hesem.' + domain + '.' + (_r5ModuleKey(schema) || 'module');
+  }
+
+  function _r5DefaultAiGoal(schema){
+    var title = _r3ModuleTitleText(schema);
+    var domain = _r5Text(_getByPath(schema, 'meta.domain'), 'operations');
+    return 'Upgrade ' + title + ' into a ' + domain + ' control plane with stronger flow, governance and visual clarity.';
+  }
+
+  function _r5DefaultAiGuardrails(schema){
+    var roles = (_getByPath(schema, 'roles') || []).slice(0, 4).join(', ');
+    var criticality = _getByPath(schema, 'meta.criticality') || 'standard';
+    return 'Keep domain integrity, preserve business semantics, avoid destructive schema changes, respect signoff and evidence expectations, and optimize for ' + (roles || 'cross-functional users') + ' under ' + criticality + ' criticality.';
+  }
+
+  function _r5EnsureState(){
+    if(state.showR5Constellation == null) state.showR5Constellation = true;
+    if(state.showR5Publish == null) state.showR5Publish = true;
+    if(state.showR5Package == null) state.showR5Package = false;
+    if(state.showR5Ai == null) state.showR5Ai = false;
+    if(state.showR5Motion == null) state.showR5Motion = false;
+    if(!state.r5ConstellationCache) state.r5ConstellationCache = null;
+    if(!state.r5SupremeMetrics) state.r5SupremeMetrics = null;
+  }
+
+  if(Array.isArray(_r3Blueprints)){
+    if(!_r5HasBlueprint('release-governance-center')){
+      _r3Blueprints.push({
+        key:'release-governance-center',
+        icon:'🚀',
+        titleVi:'Release Governance Center',
+        titleEn:'Release Governance Center',
+        subtitleVi:'Điều hành package, gate, rollout và rollback trong một cockpit.',
+        subtitleEn:'Operate package, gates, rollout and rollback from one cockpit.',
+        patch:{
+          rolesCsv:'release_manager,qa_manager,it_admin,process_owner',
+          meta:{ domain:'platform', boundedContext:'release_governance_center', criticality:'critical', lifecycle:'pilot', releaseChannel:'enterprise' },
+          design:{ themePreset:'hesem-executive', shellPreset:'control-tower', navigationMode:'workspace', density:'comfortable', defaultBreakpoint:'wide', visualLanguage:'executive-premium', accentTone:'violet', stageBackdrop:'aurora', surfaceDepth:'premium', heroMood:'cinematic', chartStyle:'executive', panelGlass:true, motionPreset:'cinematic', chromeLevel:'immersive', glancePriority:'balanced', operatorDistance:'desk', audiencePrimary:'executive', storyEyebrow:'RELEASE', storyHeadline:'Control version, gates and rollback with absolute clarity' },
+          publish:{ environment:'uat', mode:'controlled', rolloutPct:15, requireSignoff:true, changeSummary:'Enable release governance cockpit with package and gate visibility.' },
+          integration:{ primaryEntity:'release_package', sourceSystemsCsv:'erp,mes,qms,eqms,iam', digitalThreadCsv:'release,approval,evidence,rollback,notification', defaultApiNamespace:'platform.release', eventStreamsCsv:'release.approval,release.deploy,release.rollback' },
+          qa:{ criticalJourneysText:'Review gate state and signoff\nStart rollout by ring/wave\nVerify rollback playbook and evidence', operatorWalkthroughText:'Open publish cockpit\nReview blockers\nApprove and release the next wave', auditEvidenceText:'Gate matrix\nApproval log\nRollback verification evidence' }
+        }
+      });
+    }
+    if(!_r5HasBlueprint('supplier-quality-radar')){
+      _r3Blueprints.push({
+        key:'supplier-quality-radar',
+        icon:'🌐',
+        titleVi:'Supplier Quality Radar',
+        titleEn:'Supplier Quality Radar',
+        subtitleVi:'Theo dõi chất lượng NCC, evidence và corrective flow cực rõ.',
+        subtitleEn:'Track supplier quality, evidence and corrective flow with clarity.',
+        patch:{
+          rolesCsv:'supplier_quality,quality_manager,procurement',
+          meta:{ domain:'quality', boundedContext:'supplier_quality_radar', criticality:'high', lifecycle:'pilot', releaseChannel:'enterprise' },
+          design:{ themePreset:'quality-lab', shellPreset:'document-center', navigationMode:'workspace', density:'comfortable', defaultBreakpoint:'desktop', visualLanguage:'precision-clean', accentTone:'cyan', stageBackdrop:'soft', surfaceDepth:'elevated', heroMood:'focused', chartStyle:'clean-room', panelGlass:true, motionPreset:'guided', chromeLevel:'balanced', glancePriority:'evidence-first', operatorDistance:'desk', audiencePrimary:'quality', storyEyebrow:'SUPPLIER', storyHeadline:'See supplier risk, evidence and closure in one radar' },
+          publish:{ environment:'sit', mode:'controlled', rolloutPct:10, requireSignoff:true, changeSummary:'Enable supplier quality radar with evidence and response flow.' },
+          integration:{ primaryEntity:'supplier_case', sourceSystemsCsv:'erp,qms,eqms,srm', digitalThreadCsv:'supplier,audit,complaint,capa,evidence', defaultApiNamespace:'quality.supplier', eventStreamsCsv:'supplier.alert,evidence.review' },
+          qa:{ criticalJourneysText:'Open supplier deviation\nReview evidence quality\nLaunch corrective action and signoff', operatorWalkthroughText:'Scan supplier case queue\nInspect evidence\nEscalate if gate is blocked', auditEvidenceText:'Supplier complaint pack\nCorrective action signoff\nEvidence chain' }
+        }
+      });
+    }
+    if(!_r5HasBlueprint('planning-orchestrator')){
+      _r3Blueprints.push({
+        key:'planning-orchestrator',
+        icon:'📐',
+        titleVi:'Planning Orchestrator',
+        titleEn:'Planning Orchestrator',
+        subtitleVi:'Điều phối năng lực, release và handoff trong một view trực quan.',
+        subtitleEn:'Coordinate capacity, release and handoffs in one visual surface.',
+        patch:{
+          rolesCsv:'planner,production_manager,scheduler',
+          meta:{ domain:'planning', boundedContext:'planning_orchestrator', criticality:'high', lifecycle:'pilot', releaseChannel:'plant' },
+          design:{ themePreset:'hesem-enterprise', shellPreset:'operations-center', navigationMode:'process', density:'comfortable', defaultBreakpoint:'wide', visualLanguage:'executive-clean', accentTone:'indigo', stageBackdrop:'mesh', surfaceDepth:'elevated', heroMood:'clear-day', chartStyle:'balanced', panelGlass:true, motionPreset:'guided', chromeLevel:'balanced', glancePriority:'workflow-first', operatorDistance:'desk', audiencePrimary:'supervisor', storyEyebrow:'PLANNING', storyHeadline:'Coordinate plan, release and execution without blind spots' },
+          publish:{ environment:'sit', mode:'pilot', rolloutPct:10, requireSignoff:true, changeSummary:'Enable planning orchestrator with flow and release cues.' },
+          integration:{ primaryEntity:'plan_item', sourceSystemsCsv:'erp,aps,mes,qms', digitalThreadCsv:'plan,dispatch,capacity,release', defaultApiNamespace:'planning.control', eventStreamsCsv:'plan.change,dispatch.status' },
+          qa:{ criticalJourneysText:'Review capacity exceptions\nRebalance a blocked lane\nRelease the next plan wave', operatorWalkthroughText:'Open planning cockpit\nIdentify bottlenecks\nPush next release decision', auditEvidenceText:'Capacity review\nPlan release approval\nDispatch adjustment log' }
+        }
+      });
+    }
+  }
+
+  if(Array.isArray(_r3Personas)){
+    if(!_r5HasPersona('release-manager')){
+      _r3Personas.push({ key:'release-manager', icon:'🚀', titleVi:'Release Manager', titleEn:'Release Manager', subtitleVi:'Gate, package và rollback first', subtitleEn:'Gate, package and rollback first', patch:{ rolesCsv:'release_manager,qa_manager,it_admin', design:{ density:'comfortable', defaultBreakpoint:'desktop', navigationMode:'workspace', chromeLevel:'immersive', glancePriority:'balanced', operatorDistance:'desk', audiencePrimary:'executive', motionPreset:'cinematic' } } });
+    }
+    if(!_r5HasPersona('supplier-quality')){
+      _r3Personas.push({ key:'supplier-quality', icon:'🌐', titleVi:'Supplier Quality', titleEn:'Supplier Quality', subtitleVi:'Supplier risk and evidence visibility', subtitleEn:'Supplier risk and evidence visibility', patch:{ rolesCsv:'supplier_quality,procurement,quality_manager', design:{ density:'comfortable', defaultBreakpoint:'desktop', navigationMode:'focus', chromeLevel:'balanced', glancePriority:'evidence-first', operatorDistance:'desk', audiencePrimary:'quality', motionPreset:'guided' } } });
+    }
+  }
+
+  var _r5PrevEnsureMeta = _ngEnsureModuleBuilderMetadata;
+  _ngEnsureModuleBuilderMetadata = function(schema){
+    schema = _r5PrevEnsureMeta(schema);
+    if(!schema || typeof schema !== 'object') return schema;
+    if(!schema.design || typeof schema.design !== 'object') schema.design = {};
+    if(schema.design.motionTempo == null) schema.design.motionTempo = 'balanced';
+    if(schema.design.depthMode == null) schema.design.depthMode = 'layered';
+    if(schema.design.glowMode == null) schema.design.glowMode = 'soft';
+    if(schema.design.entryFx == null) schema.design.entryFx = 'fade';
+    if(schema.design.hoverFx == null) schema.design.hoverFx = 'lift';
+    if(schema.design.alertFx == null) schema.design.alertFx = 'pulse';
+    if(schema.design.reduceMotionRespect == null) schema.design.reduceMotionRespect = true;
+
+    if(!schema.publish || typeof schema.publish !== 'object') schema.publish = {};
+    if(schema.publish.versionTag == null) schema.publish.versionTag = '';
+    if(schema.publish.releaseStrategy == null) schema.publish.releaseStrategy = _r5DefaultReleaseStrategy(schema);
+    if(schema.publish.approvalBoard == null) schema.publish.approvalBoard = '';
+    if(schema.publish.rollbackOwner == null) schema.publish.rollbackOwner = '';
+    if(schema.publish.gatePolicy == null) schema.publish.gatePolicy = _r5DefaultGatePolicy(schema);
+    if(schema.publish.releaseWindow == null) schema.publish.releaseWindow = '';
+    if(schema.publish.channel == null) schema.publish.channel = _getByPath(schema, 'meta.releaseChannel') || '';
+    if(schema.publish.riskRating == null) schema.publish.riskRating = 'medium';
+
+    if(!schema.marketplace || typeof schema.marketplace !== 'object') schema.marketplace = {};
+    if(schema.marketplace.packageId == null) schema.marketplace.packageId = '';
+    if(schema.marketplace.packageVersion == null) schema.marketplace.packageVersion = '';
+    if(schema.marketplace.visibility == null) schema.marketplace.visibility = 'private';
+    if(schema.marketplace.channel == null) schema.marketplace.channel = 'internal';
+    if(schema.marketplace.category == null) schema.marketplace.category = '';
+    if(schema.marketplace.audienceTag == null) schema.marketplace.audienceTag = '';
+    if(!Array.isArray(schema.marketplace.compatibility)) schema.marketplace.compatibility = [];
+    if(!Array.isArray(schema.marketplace.dependencies)) schema.marketplace.dependencies = [];
+    if(schema.marketplace.changelog == null) schema.marketplace.changelog = '';
+
+    if(!schema.ai || typeof schema.ai !== 'object') schema.ai = {};
+    if(schema.ai.goal == null) schema.ai.goal = '';
+    if(schema.ai.persona == null) schema.ai.persona = '';
+    if(schema.ai.guardrails == null) schema.ai.guardrails = '';
+    if(schema.ai.promptSeed == null) schema.ai.promptSeed = '';
+    if(schema.ai.suggestionMode == null) schema.ai.suggestionMode = 'guided';
+    return schema;
+  };
+
+  var _r5PrevDraftFromSchema = _ngModuleStudioDraftFromSchema;
+  _ngModuleStudioDraftFromSchema = function(schema){
+    var draft = _r5PrevDraftFromSchema(schema);
+    _ngEnsureModuleBuilderMetadata(schema || {});
+    draft.publish = draft.publish || {};
+    draft.publish.versionTag = (schema && schema.publish && schema.publish.versionTag) || draft.publish.versionTag || '';
+    draft.publish.releaseStrategy = (schema && schema.publish && schema.publish.releaseStrategy) || draft.publish.releaseStrategy || _r5DefaultReleaseStrategy(schema);
+    draft.publish.approvalBoard = (schema && schema.publish && schema.publish.approvalBoard) || '';
+    draft.publish.rollbackOwner = (schema && schema.publish && schema.publish.rollbackOwner) || '';
+    draft.publish.gatePolicy = (schema && schema.publish && schema.publish.gatePolicy) || _r5DefaultGatePolicy(schema);
+    draft.publish.releaseWindow = (schema && schema.publish && schema.publish.releaseWindow) || '';
+    draft.publish.channel = (schema && schema.publish && schema.publish.channel) || '';
+    draft.publish.riskRating = (schema && schema.publish && schema.publish.riskRating) || 'medium';
+    draft.marketplace = {
+      packageId: (schema && schema.marketplace && schema.marketplace.packageId) || '',
+      packageVersion: (schema && schema.marketplace && schema.marketplace.packageVersion) || '',
+      visibility: (schema && schema.marketplace && schema.marketplace.visibility) || 'private',
+      channel: (schema && schema.marketplace && schema.marketplace.channel) || 'internal',
+      category: (schema && schema.marketplace && schema.marketplace.category) || '',
+      audienceTag: (schema && schema.marketplace && schema.marketplace.audienceTag) || '',
+      compatibilityCsv: _r5Csv(schema && schema.marketplace && schema.marketplace.compatibility),
+      dependenciesCsv: _r5Csv(schema && schema.marketplace && schema.marketplace.dependencies),
+      changelog: (schema && schema.marketplace && schema.marketplace.changelog) || ''
+    };
+    draft.ai = {
+      goal: (schema && schema.ai && schema.ai.goal) || '',
+      persona: (schema && schema.ai && schema.ai.persona) || '',
+      suggestionMode: (schema && schema.ai && schema.ai.suggestionMode) || 'guided',
+      guardrailsText: (schema && schema.ai && schema.ai.guardrails) || '',
+      promptSeed: (schema && schema.ai && schema.ai.promptSeed) || ''
+    };
+    return draft;
+  };
+
+  var _r5PrevApplyDraft = _ngApplyModuleStudioDraft;
+  _ngApplyModuleStudioDraft = function(schema, draft){
+    schema = _r5PrevApplyDraft(schema, draft);
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(!draft || typeof draft !== 'object') return schema;
+
+    schema.design.motionTempo = _getByPath(draft, 'design.motionTempo') || schema.design.motionTempo || 'balanced';
+    schema.design.depthMode = _getByPath(draft, 'design.depthMode') || schema.design.depthMode || 'layered';
+    schema.design.glowMode = _getByPath(draft, 'design.glowMode') || schema.design.glowMode || 'soft';
+    schema.design.entryFx = _getByPath(draft, 'design.entryFx') || schema.design.entryFx || 'fade';
+    schema.design.hoverFx = _getByPath(draft, 'design.hoverFx') || schema.design.hoverFx || 'lift';
+    schema.design.alertFx = _getByPath(draft, 'design.alertFx') || schema.design.alertFx || 'pulse';
+    schema.design.reduceMotionRespect = _getByPath(draft, 'design.reduceMotionRespect') !== false;
+
+    schema.publish.versionTag = _getByPath(draft, 'publish.versionTag') || '';
+    schema.publish.releaseStrategy = _getByPath(draft, 'publish.releaseStrategy') || _r5DefaultReleaseStrategy(schema);
+    schema.publish.approvalBoard = _getByPath(draft, 'publish.approvalBoard') || '';
+    schema.publish.rollbackOwner = _getByPath(draft, 'publish.rollbackOwner') || '';
+    schema.publish.gatePolicy = _getByPath(draft, 'publish.gatePolicy') || _r5DefaultGatePolicy(schema);
+    schema.publish.releaseWindow = _getByPath(draft, 'publish.releaseWindow') || '';
+    schema.publish.channel = _getByPath(draft, 'publish.channel') || '';
+    schema.publish.riskRating = _getByPath(draft, 'publish.riskRating') || 'medium';
+
+    schema.marketplace.packageId = _getByPath(draft, 'marketplace.packageId') || '';
+    schema.marketplace.packageVersion = _getByPath(draft, 'marketplace.packageVersion') || '';
+    schema.marketplace.visibility = _getByPath(draft, 'marketplace.visibility') || 'private';
+    schema.marketplace.channel = _getByPath(draft, 'marketplace.channel') || 'internal';
+    schema.marketplace.category = _getByPath(draft, 'marketplace.category') || '';
+    schema.marketplace.audienceTag = _getByPath(draft, 'marketplace.audienceTag') || '';
+    schema.marketplace.compatibility = _ngCsvToArray(_getByPath(draft, 'marketplace.compatibilityCsv'));
+    schema.marketplace.dependencies = _ngCsvToArray(_getByPath(draft, 'marketplace.dependenciesCsv'));
+    schema.marketplace.changelog = _getByPath(draft, 'marketplace.changelog') || '';
+
+    schema.ai.goal = _getByPath(draft, 'ai.goal') || '';
+    schema.ai.persona = _getByPath(draft, 'ai.persona') || '';
+    schema.ai.suggestionMode = _getByPath(draft, 'ai.suggestionMode') || 'guided';
+    schema.ai.guardrails = _getByPath(draft, 'ai.guardrailsText') || '';
+    schema.ai.promptSeed = _getByPath(draft, 'ai.promptSeed') || '';
+    return schema;
+  };
+
+  function _r5DownloadText(filename, text){
+    var blob;
+    var url;
+    var link;
+    if(typeof document === 'undefined' || typeof Blob === 'undefined' || !window.URL || typeof window.URL.createObjectURL !== 'function') return;
+    blob = new Blob([String(text || '')], { type:'text/plain;charset=utf-8' });
+    url = window.URL.createObjectURL(blob);
+    link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    if(document.body && document.body.appendChild) document.body.appendChild(link);
+    if(typeof link.click === 'function') link.click();
+    if(document.body && document.body.removeChild) document.body.removeChild(link);
+    setTimeout(function(){ try{ window.URL.revokeObjectURL(url); }catch(err){} }, 1000);
+  }
+
+  function _r5ApplyMotionPreset(key){
+    var preset = null;
+    if(!state.schema) return;
+    if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+    _r5MotionPresets.forEach(function(item){ if(item.key === key) preset = item; });
+    if(!preset) return;
+    Object.keys((preset.patch && preset.patch.design) || {}).forEach(function(name){
+      _setByPath(state.moduleStudioDraft, 'design.' + name, preset.patch.design[name]);
+    });
+    state.moduleStudioTab = 'design';
+  }
+
+  function _r5BlockNodeRole(block){
+    if(_getByPath(block, 'config.flowGraph.nodeRole')) return _getByPath(block, 'config.flowGraph.nodeRole');
+    if(_r3IsActionBlock(block)) return 'action';
+    if(_r3IsFormBlock(block)) return 'handoff';
+    if(_r3IsChartBlock(block)) return 'decision';
+    if(_r3IsDataBlock(block)) return 'signal';
+    return 'proof';
+  }
+
+  function _r5BlockLane(block){
+    if(_getByPath(block, 'config.flowGraph.swimlane')) return _getByPath(block, 'config.flowGraph.swimlane');
+    var role = _r5BlockNodeRole(block);
+    if(role === 'entry') return 'entry';
+    if(role === 'signal' || role === 'service') return 'observe';
+    if(role === 'decision' || role === 'review') return 'review';
+    if(role === 'action') return 'act';
+    if(role === 'handoff') return 'handoff';
+    return 'prove';
+  }
+
+  function _r5EnhanceBlocks(schema){
+    (schema.tabs || []).forEach(function(tab){
+      (tab.blocks || []).forEach(function(block){
+        if(!block) return;
+        if(!_isObject(block.config)) block.config = {};
+        if(!_isObject(block.config.flowGraph)) block.config.flowGraph = {};
+        if(!_isObject(block.config.motionSystem)) block.config.motionSystem = {};
+        if(!_isObject(block.config.publishOps)) block.config.publishOps = {};
+        if(!_isObject(block.config.packageOps)) block.config.packageOps = {};
+        if(!_isObject(block.config.ai)) block.config.ai = {};
+        if(!_isObject(block.config.workflowStudio)) block.config.workflowStudio = {};
+
+        if(!block.config.flowGraph.nodeRole) block.config.flowGraph.nodeRole = _r5BlockNodeRole(block);
+        if(!block.config.flowGraph.swimlane) block.config.flowGraph.swimlane = _r5BlockLane(block);
+        if(!block.config.workflowStudio.mode) block.config.workflowStudio.mode = _r3IsActionBlock(block) ? 'queue' : (_r3IsChartBlock(block) ? 'storyboard' : 'observe');
+        if(!block.config.motionSystem.preset && _getByPath(schema, 'design.motionPreset')) block.config.motionSystem.preset = _getByPath(schema, 'design.motionPreset');
+        if(!block.config.publishOps.versionTag && _getByPath(schema, 'publish.versionTag')) block.config.publishOps.versionTag = _getByPath(schema, 'publish.versionTag');
+        if(!block.config.publishOps.gatePolicy && _getByPath(schema, 'publish.gatePolicy')) block.config.publishOps.gatePolicy = _getByPath(schema, 'publish.gatePolicy');
+        if(!block.config.packageOps.packageId && _getByPath(schema, 'marketplace.packageId')) block.config.packageOps.packageId = _getByPath(schema, 'marketplace.packageId');
+        if(!block.config.ai.goal && _getByPath(schema, 'ai.goal')) block.config.ai.goal = _getByPath(schema, 'ai.goal');
+      });
+    });
+  }
+
+  function _r5GenerateUpgradePrompt(schema, supreme){
+    var lines = [];
+    var tabs = (schema && schema.tabs) || [];
+    supreme = supreme || {};
+    lines.push('ROLE');
+    lines.push('You are a world-class ERP/MES/QMS/EQMS solution architect, manufacturing operations strategist, UX director, workflow engineer, release manager, package platform owner, and low-code builder expert.');
+    lines.push('Target model: GPT Pro.');
+    lines.push('');
+    lines.push('CONTEXT');
+    lines.push('Upgrade the HESEM module below into a premium command surface without breaking route, domain semantics or integration intent.');
+    lines.push('Module title: ' + _r3ModuleTitleText(schema));
+    lines.push('Module ID: ' + _r5Text(_getByPath(schema, 'moduleId'), 'custom-module'));
+    lines.push('Route: ' + _r5Text(_getByPath(schema, 'route'), '/custom/module'));
+    lines.push('Domain: ' + _r5Text(_getByPath(schema, 'meta.domain'), 'operations'));
+    lines.push('Lifecycle: ' + _r5Text(_getByPath(schema, 'meta.lifecycle'), 'draft'));
+    lines.push('Criticality: ' + _r5Text(_getByPath(schema, 'meta.criticality'), 'standard'));
+    lines.push('Roles: ' + (_getByPath(schema, 'roles') || []).join(', '));
+    lines.push('Publish environment: ' + _r5Text(_getByPath(schema, 'publish.environment'), 'sit'));
+    lines.push('Package ID: ' + _r5Text(_getByPath(schema, 'marketplace.packageId'), _r5DefaultPackageId(schema)));
+    lines.push('Version tag: ' + _r5Text(_getByPath(schema, 'publish.versionTag'), _r5VersionFromLifecycle(schema)));
+    lines.push('');
+    lines.push('CURRENT QUALITY SIGNALS');
+    lines.push('Motion craft: ' + _r5Text(supreme.motionCraft, 0) + '%');
+    lines.push('Governance circuit: ' + _r5Text(supreme.governanceCircuit, 0) + '%');
+    lines.push('Package readiness: ' + _r5Text(supreme.packageReadiness, 0) + '%');
+    lines.push('AI coverage: ' + _r5Text(supreme.aiCoverage, 0) + '%');
+    lines.push('Constellation: ' + _r5Text(supreme.constellationNodes, 0) + ' nodes / ' + _r5Text(supreme.constellationEdges, 0) + ' edges');
+    lines.push('');
+    lines.push('TAB INVENTORY');
+    tabs.forEach(function(tab, index){
+      var summary = _r3TabSummary(tab || {});
+      lines.push((index + 1) + '. ' + _t((tab.title && tab.title.vi) || 'Tab', (tab.title && tab.title.en) || (tab.title && tab.title.vi) || 'Tab') + ' — blocks:' + summary.blocks + ', roots:' + summary.roots + ', kpi:' + summary.kpis + ', chart:' + summary.charts + ', data:' + summary.data + ', forms:' + summary.forms + ', actions:' + summary.actions);
+    });
+    lines.push('');
+    lines.push('OBJECTIVES');
+    lines.push('1. Make the module visually premium, calm, highly legible and role-aware.');
+    lines.push('2. Strengthen workflow storytelling, handoff visibility, operator guidance and decision clarity.');
+    lines.push('3. Add publish governance, semantic versioning, release gates, rollback confidence and package reuse discipline.');
+    lines.push('4. Improve diagnostics, AI briefing, accessibility, observability and enterprise readiness.');
+    lines.push('5. Preserve current business meaning, route structure, core data contracts and existing module identity.');
+    lines.push('');
+    lines.push('HARD CONSTRAINTS');
+    lines.push('- Do not rename the module route unless absolutely necessary.');
+    lines.push('- Do not delete business-critical blocks without replacing them with stronger equivalents.');
+    lines.push('- Keep the code patch additive and safe for overwrite into the existing portal scripts.');
+    lines.push('- Output production-usable code, not pseudo-code.');
+    lines.push('- Prefer improvements that fit ERP/MES/QMS/EQMS and industrial operations reality.');
+    lines.push('');
+    lines.push('REQUIRED DELIVERABLES');
+    lines.push('- Updated JS files with exact patches.');
+    lines.push('- Short release notes explaining what changed.');
+    lines.push('- Any schema or manifest additions required for the new features.');
+    lines.push('');
+    lines.push('AI SEED');
+    lines.push(_r5Text(_getByPath(schema, 'ai.goal'), _r5DefaultAiGoal(schema)));
+    lines.push(_r5Text(_getByPath(schema, 'ai.guardrails'), _r5DefaultAiGuardrails(schema)));
+    if(_getByPath(schema, 'ai.promptSeed')){
+      lines.push('');
+      lines.push('MODULE-SPECIFIC EXTRA SEED');
+      lines.push(String(_getByPath(schema, 'ai.promptSeed')));
+    }
+    return lines.join('\n');
+  }
+
+  function _r5SupremeEnhanceSchema(schema){
+    var defaultPrompt;
+    _ngEnsureModuleBuilderMetadata(schema);
+    if(typeof _r3AutoEnhanceSchema === 'function') _r3AutoEnhanceSchema(schema);
+    if(typeof _r4AutoPolishSchema === 'function') _r4AutoPolishSchema(schema, typeof _r4SuggestPack === 'function' ? _r4SuggestPack(schema) : 'executive-control');
+
+    if(!schema.publish.versionTag) schema.publish.versionTag = _r5VersionFromLifecycle(schema);
+    if(!schema.publish.releaseStrategy) schema.publish.releaseStrategy = _r5DefaultReleaseStrategy(schema);
+    if(!schema.publish.gatePolicy) schema.publish.gatePolicy = _r5DefaultGatePolicy(schema);
+    if(!schema.publish.approvalBoard) schema.publish.approvalBoard = _r5Text(_getByPath(schema, 'meta.ownerTeam'), _getByPath(schema, 'meta.processOwner') || 'release_board');
+    if(!schema.publish.rollbackOwner) schema.publish.rollbackOwner = _r5Text(_getByPath(schema, 'meta.supportGroup'), _getByPath(schema, 'meta.ownerTeam') || 'platform_ops');
+    if(!schema.publish.releaseWindow) schema.publish.releaseWindow = 'Fri 19:00-21:00 ICT';
+    if(!schema.publish.channel) schema.publish.channel = _r5Text(_getByPath(schema, 'meta.releaseChannel'), 'pilot');
+    if(!schema.publish.riskRating) schema.publish.riskRating = /critical|gxp/i.test(_getByPath(schema, 'meta.criticality') || '') ? 'high' : 'medium';
+
+    if(!schema.marketplace.packageId) schema.marketplace.packageId = _r5DefaultPackageId(schema);
+    if(!schema.marketplace.packageVersion) schema.marketplace.packageVersion = schema.publish.versionTag || _r5VersionFromLifecycle(schema);
+    if(!schema.marketplace.visibility) schema.marketplace.visibility = /active|validated/i.test(_getByPath(schema, 'meta.lifecycle') || '') ? 'enterprise' : 'team';
+    if(!schema.marketplace.channel) schema.marketplace.channel = _r5Text(schema.publish.channel, 'internal');
+    if(!schema.marketplace.category) schema.marketplace.category = _r5Text(_getByPath(schema, 'meta.domain'), 'operations');
+    if(!schema.marketplace.audienceTag) schema.marketplace.audienceTag = _r5Text(_getByPath(schema, 'design.audiencePrimary'), 'cross-functional');
+    if(!(schema.marketplace.compatibility || []).length) schema.marketplace.compatibility = _r5Unique((_getByPath(schema, 'integration.sourceSystems') || []).concat(['erp','mes','qms','eqms'])).slice(0, 6);
+    if(!(schema.marketplace.dependencies || []).length) schema.marketplace.dependencies = _r5Unique((_getByPath(schema, 'integration.digitalThread') || []).concat([_getByPath(schema, 'integration.primaryEntity') || 'workflow'])).slice(0, 6);
+    if(!schema.marketplace.changelog) schema.marketplace.changelog = (schema.publish.versionTag || _r5VersionFromLifecycle(schema)) + ' - Supreme Round 5 cockpit, workflow constellation, motion lab, publish control and package deck.';
+
+    if(!schema.ai.goal) schema.ai.goal = _r5DefaultAiGoal(schema);
+    if(!schema.ai.persona) schema.ai.persona = _r5Text(_getByPath(schema, 'design.audiencePrimary'), 'cross-functional');
+    if(!schema.ai.guardrails) schema.ai.guardrails = _r5DefaultAiGuardrails(schema);
+    if(!schema.ai.suggestionMode) schema.ai.suggestionMode = 'guided';
+
+    if(!schema.qa.testOwner) schema.qa.testOwner = _r5Text(_getByPath(schema, 'meta.ownerTeam'), _getByPath(schema, 'meta.processOwner') || 'qa_owner');
+    if(!(schema.qa.smokeChecklist || []).length) schema.qa.smokeChecklist = ['Open module and load each tab', 'Verify critical actions and response states', 'Confirm publish summary, version and rollback cues', 'Validate accessibility labels and empty states'];
+    if(!(schema.qa.criticalJourneys || []).length) schema.qa.criticalJourneys = ['Review key signals and blockers', 'Execute the main operator or reviewer path', 'Confirm publish governance and version trace'];
+    if(!(schema.qa.operatorWalkthrough || []).length) schema.qa.operatorWalkthrough = ['Open command surface', 'Inspect top signals', 'Act on the next safe step', 'Verify release or evidence outcome'];
+    if(!(schema.qa.auditEvidence || []).length) schema.qa.auditEvidence = ['Release gate snapshot', 'Critical path screenshots', 'Smoke test record', 'Version trace export'];
+
+    _r5EnhanceBlocks(schema);
+    defaultPrompt = _r5GenerateUpgradePrompt(schema, _r5ComputeSupremeMetrics(schema, _r3CollectDiagnostics(schema), _r3ComputeAuraMetrics(schema, _r3CollectDiagnostics(schema)), _r4ComputePrimeMetrics ? _r4ComputePrimeMetrics(schema, _r3CollectDiagnostics(schema), _r3ComputeAuraMetrics(schema, _r3CollectDiagnostics(schema))) : {}));
+    if(!schema.ai.promptSeed) schema.ai.promptSeed = defaultPrompt;
+    _ngSyncModuleBuilderManifest(schema);
+    return schema;
+  }
+
+  function _r5BuildConstellation(schema){
+    var nodes = [];
+    var edges = [];
+    var nodeMap = {};
+    var laneLabels = [
+      { key:'module', title:'Module', x:40 },
+      { key:'tabs', title:'Tabs', x:220 },
+      { key:'blocks', title:'Blocks', x:460 },
+      { key:'services', title:'Services', x:760 },
+      { key:'governance', title:'Governance', x:1030 }
+    ];
+    var serviceMap = {};
+    var serviceIndex = 0;
+    var blockCursor = 0;
+    var moduleId = 'module:' + (_r5ModuleKey(schema) || 'module');
+
+    function addNode(node){
+      if(!node || !node.id || nodeMap[node.id]) return nodeMap[node.id] || node;
+      node.w = node.w || 170;
+      node.h = node.h || 58;
+      nodeMap[node.id] = node;
+      nodes.push(node);
+      return node;
+    }
+
+    function addEdge(from, to, tone){
+      if(!from || !to) return;
+      edges.push({ from:from, to:to, tone:tone || 'neutral' });
+    }
+
+    function ensureService(kind, label){
+      var key = kind + ':' + label;
+      var slot;
+      if(serviceMap[key]) return serviceMap[key];
+      slot = addNode({
+        id:'service:' + key,
+        kind:'service',
+        label:label,
+        sub:kind,
+        icon: kind === 'api' ? '🔌' : (kind === 'workflow' ? '🧠' : (kind === 'event' ? '📡' : (kind === 'package' ? '📦' : '🔗'))),
+        x:760,
+        y:70 + (serviceIndex * 72),
+        w:220,
+        h:54
+      });
+      serviceMap[key] = slot;
+      serviceIndex++;
+      return slot;
+    }
+
+    addNode({ id:moduleId, kind:'module', label:_r3ModuleTitleText(schema), sub:_r5Text(_getByPath(schema, 'meta.domain'), 'module'), icon:schema.icon || '📦', x:40, y:80, w:160, h:72 });
+
+    (schema.tabs || []).forEach(function(tab, tabIndex){
+      var tabNodeId = 'tab:' + (tab.tabId || ('tab-' + tabIndex));
+      var tabY = 60 + (tabIndex * 160);
+      addNode({ id:tabNodeId, kind:'tab', label:_t((tab.title && tab.title.vi) || 'Tab', (tab.title && tab.title.en) || (tab.title && tab.title.vi) || 'Tab'), sub:tab.tabId || '', icon:tab.icon || '📑', x:220, y:tabY, w:190, h:58, action:'jump-r5-tab', tabId:tab.tabId || '' });
+      addEdge(moduleId, tabNodeId, 'primary');
+      (tab.blocks || []).forEach(function(block, blockIndex){
+        var blockId = block.blockId || block.id || ('block-' + tabIndex + '-' + blockIndex);
+        var blockNodeId = 'block:' + blockId;
+        var role = _r5BlockNodeRole(block);
+        var services = [];
+        var api = _r2BlockApiId(block);
+        var wf = _r2BlockWorkflowId(block);
+        var stream = _getByPath(block, 'config.stream.connector') || _getByPath(block, 'config.observability.alertChannel');
+        var pack = _getByPath(block, 'config.packageOps.packageId') || _getByPath(block, 'config.packageOps.packageKey');
+        var contract = _getByPath(block, 'config.flowGraph.dataContract');
+        var alias = _getByPath(block, 'config.workflowStudio.serviceAlias');
+        var blockY = tabY + 76 + ((blockIndex % 4) * 66) + (Math.floor(blockCursor / 8) * 14);
+        addNode({ id:blockNodeId, kind:'block', label:_t((block.title && block.title.vi) || block.type || 'Block', (block.title && block.title.en) || (block.title && block.title.vi) || block.type || 'Block'), sub:(block.type || '') + (role ? ' • ' + role : ''), icon:_r4BlockGlyph(block), x:460, y:blockY, w:230, h:56, action:'jump-r5-block', blockId:blockId, tabId:tab.tabId || '' });
+        addEdge(tabNodeId, blockNodeId, 'neutral');
+        if(api) services.push({ kind:'api', label:api });
+        if(wf) services.push({ kind:'workflow', label:wf });
+        if(stream) services.push({ kind:'event', label:stream });
+        if(pack) services.push({ kind:'package', label:pack });
+        if(contract) services.push({ kind:'contract', label:contract });
+        if(alias) services.push({ kind:'workflow', label:alias });
+        services.slice(0, 3).forEach(function(service){
+          var target = ensureService(service.kind, service.label);
+          addEdge(blockNodeId, target.id, service.kind === 'package' ? 'package' : (service.kind === 'event' ? 'signal' : 'service'));
+        });
+        blockCursor++;
+      });
+    });
+
+    addNode({ id:'gov:publish', kind:'governance', label:_r5Text(_getByPath(schema, 'publish.versionTag'), 'No version'), sub:_r5Text(_getByPath(schema, 'publish.releaseStrategy'), 'manual') + ' • ' + _r5Text(_getByPath(schema, 'publish.gatePolicy'), 'light'), icon:'🚀', x:1030, y:80, w:210, h:56 });
+    addNode({ id:'gov:package', kind:'governance', label:_r5Text(_getByPath(schema, 'marketplace.packageId'), 'No package ID'), sub:_r5Text(_getByPath(schema, 'marketplace.packageVersion'), '0.0.0') + ' • ' + _r5Text(_getByPath(schema, 'marketplace.visibility'), 'private'), icon:'📦', x:1030, y:170, w:210, h:56 });
+    addNode({ id:'gov:ai', kind:'governance', label:_r5Text(_getByPath(schema, 'ai.persona'), 'No persona'), sub:_r5Text(_getByPath(schema, 'ai.suggestionMode'), 'guided') + ' • AI brief', icon:'🧠', x:1030, y:260, w:210, h:56 });
+    addEdge(moduleId, 'gov:publish', 'primary');
+    addEdge(moduleId, 'gov:package', 'package');
+    addEdge(moduleId, 'gov:ai', 'signal');
+
+    return {
+      width:1260,
+      height:Math.max(420, (serviceIndex * 72) + 120, ((schema.tabs || []).length * 160) + 180),
+      lanes:laneLabels,
+      nodes:nodes,
+      edges:edges,
+      nodeMap:nodeMap
+    };
+  }
+
+  function _r5EdgePath(a, b){
+    var x1 = (a.x || 0) + (a.w || 0);
+    var y1 = (a.y || 0) + Math.round((a.h || 0) / 2);
+    var x2 = b.x || 0;
+    var y2 = (b.y || 0) + Math.round((b.h || 0) / 2);
+    var cx1 = x1 + 54;
+    var cx2 = x2 - 54;
+    return 'M' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + y1 + ', ' + cx2 + ' ' + y2 + ', ' + x2 + ' ' + y2;
+  }
+
+  function _r5RenderConstellation(model){
+    var h = '';
+    h += '<div class="mb-r5-canvas" style="height:' + _esc(model.height) + 'px">';
+    h += '<div class="mb-r5-lanes">';
+    (model.lanes || []).forEach(function(lane){
+      h += '<span class="mb-r5-lane-label" style="left:' + _esc(lane.x) + 'px">' + _esc(lane.title) + '</span>';
+    });
+    h += '</div>';
+    h += '<svg class="mb-r5-svg" viewBox="0 0 ' + _esc(model.width) + ' ' + _esc(model.height) + '" preserveAspectRatio="xMidYMin slice">';
+    (model.edges || []).forEach(function(edge){
+      var from = model.nodeMap[edge.from];
+      var to = model.nodeMap[edge.to];
+      if(!from || !to) return;
+      h += '<path class="mb-r5-edge is-' + _esc(edge.tone || 'neutral') + '" d="' + _esc(_r5EdgePath(from, to)) + '"></path>';
+    });
+    h += '</svg>';
+    (model.nodes || []).forEach(function(node){
+      var tag = node.action ? 'button' : 'div';
+      h += '<' + tag + ' class="mb-r5-node is-' + _esc(node.kind || 'neutral') + '" style="left:' + _esc(node.x) + 'px;top:' + _esc(node.y) + 'px;width:' + _esc(node.w) + 'px;height:' + _esc(node.h) + 'px"';
+      if(node.action) h += ' data-action="' + _esc(node.action) + '"' + (node.blockId ? ' data-block="' + _esc(node.blockId) + '"' : '') + (node.tabId ? ' data-tab="' + _esc(node.tabId) + '"' : '');
+      h += '><span class="mb-r5-node-icon">' + _esc(node.icon || '◉') + '</span><span class="mb-r5-node-copy"><strong>' + _esc(node.label) + '</strong><small>' + _esc(node.sub || '') + '</small></span></' + tag + '>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r5ChecklistItem(label, ok, detail){
+    return '<div class="mb-r5-check ' + (ok ? 'is-ok' : 'is-miss') + '"><span>' + (ok ? '✔' : '•') + '</span><div><strong>' + _esc(label) + '</strong>' + (detail ? '<small>' + _esc(detail) + '</small>' : '') + '</div></div>';
+  }
+
+  function _r5ComputeSupremeMetrics(schema, diag, aura, prime){
+    var design = _getByPath(schema, 'design') || {};
+    var publish = _getByPath(schema, 'publish') || {};
+    var marketplace = _getByPath(schema, 'marketplace') || {};
+    var ai = _getByPath(schema, 'ai') || {};
+    var motionChecks = 0;
+    var governanceChecks = 0;
+    var packageChecks = 0;
+    var aiChecks = 0;
+    var constellation = _r5BuildConstellation(schema);
+
+    ['motionPreset','motionTempo','depthMode','glowMode','entryFx','hoverFx','alertFx'].forEach(function(key){ if(design[key]) motionChecks++; });
+    ['versionTag','releaseStrategy','gatePolicy','approvalBoard','rollbackOwner','releaseWindow','channel'].forEach(function(key){ if(publish[key]) governanceChecks++; });
+    if(publish.requireSignoff !== false) governanceChecks++;
+    if((_getByPath(schema, 'qa.smokeChecklist') || []).length) governanceChecks++;
+    if((_getByPath(schema, 'qa.criticalJourneys') || []).length) governanceChecks++;
+
+    ['packageId','packageVersion','visibility','channel','category','audienceTag'].forEach(function(key){ if(marketplace[key]) packageChecks++; });
+    if((marketplace.compatibility || []).length) packageChecks++;
+    if((marketplace.dependencies || []).length) packageChecks++;
+
+    ['goal','persona','guardrails','promptSeed'].forEach(function(key){ if(ai[key]) aiChecks++; });
+
+    return {
+      motionCraft: _r3Clamp(Math.round((motionChecks / 7) * 100 - (diag.counts.error * 4) - (diag.counts.warning * 2) + (((prime && prime.designCraft) || 0) * 0.18)), 0, 100),
+      governanceCircuit: _r3Clamp(Math.round((governanceChecks / 10) * 100 - (diag.counts.error * 5) + (((aura && aura.releaseConfidence) || 0) * 0.22)), 0, 100),
+      packageReadiness: _r3Clamp(Math.round((packageChecks / 8) * 100 + (((prime && prime.collaborationReadiness) || 0) * 0.08)), 0, 100),
+      aiCoverage: _r3Clamp(Math.round((aiChecks / 4) * 100), 0, 100),
+      constellationNodes: (constellation.nodes || []).length,
+      constellationEdges: (constellation.edges || []).length,
+      constellation: constellation
+    };
+  }
+
+  function _r5MetricCard(icon, titleVi, titleEn, value, metaVi, metaEn, tone){
+    return '<div class="mb-r5-metric is-' + _esc(tone || 'neutral') + '"><div class="mb-r5-metric-head"><span>' + _esc(icon || '◉') + '</span><strong>' + _esc(_t(titleVi, titleEn)) + '</strong></div><div class="mb-r5-metric-value">' + _esc(value) + '</div><small>' + _esc(_t(metaVi, metaEn)) + '</small></div>';
+  }
+
+  function _r5Tone(score){
+    if(score >= 86) return 'success';
+    if(score >= 70) return 'warning';
+    return 'danger';
+  }
+
+  function _r5RenderMotionPresets(compact){
+    var h = '<div class="mb-r5-motion-grid' + (compact ? ' is-compact' : '') + '">';
+    _r5MotionPresets.forEach(function(item){
+      h += '<button class="mb-r5-motion-card" data-action="apply-r5-motion" data-motion="' + _esc(item.key) + '"><div class="mb-r5-motion-head"><span>' + _esc(item.icon) + '</span><strong>' + _esc(_t(item.titleVi, item.titleEn)) + '</strong></div><p>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</p></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r5RenderPublishControl(schema, supreme){
+    var publish = _getByPath(schema, 'publish') || {};
+    var checks = '';
+    checks += _r5ChecklistItem(_t('Version tag', 'Version tag'), !!publish.versionTag, publish.versionTag || _t('missing', 'missing'));
+    checks += _r5ChecklistItem(_t('Change summary', 'Change summary'), !!(publish.changeSummary || publish.releaseNote), publish.changeSummary || publish.releaseNote || '');
+    checks += _r5ChecklistItem(_t('Signoff', 'Signoff'), publish.requireSignoff !== false, publish.requireSignoff === false ? _t('disabled', 'disabled') : _t('required', 'required'));
+    checks += _r5ChecklistItem(_t('Approval board', 'Approval board'), !!publish.approvalBoard, publish.approvalBoard || '');
+    checks += _r5ChecklistItem(_t('Rollback owner', 'Rollback owner'), !!publish.rollbackOwner, publish.rollbackOwner || '');
+    checks += _r5ChecklistItem(_t('Rollback plan', 'Rollback plan'), !!publish.rollbackPlan, publish.rollbackPlan || '');
+    checks += _r5ChecklistItem(_t('Smoke checklist', 'Smoke checklist'), !!((_getByPath(schema, 'qa.smokeChecklist') || []).length), String((_getByPath(schema, 'qa.smokeChecklist') || []).length) + ' ' + _t('items', 'items'));
+    checks += _r5ChecklistItem(_t('Docs URL', 'Docs URL'), !!_getByPath(schema, 'meta.docsUrl'), _getByPath(schema, 'meta.docsUrl') || '');
+    return '<div class="mb-r5-panel"><div class="mb-r5-panel-head"><strong>' + _esc(_t('Publish control', 'Publish control')) + '</strong><span>' + _esc(supreme.governanceCircuit) + '%</span></div><div class="mb-r5-mini-grid">' +
+      _r5MetricCard('🚀','Strategy','Strategy',_r5Text(publish.releaseStrategy,'manual'), 'release path', 'release path', 'neutral') +
+      _r5MetricCard('🛡','Gate','Gate',_r5Text(publish.gatePolicy,'light'), 'governance policy', 'governance policy', 'neutral') +
+      _r5MetricCard('📦','Version','Version',_r5Text(publish.versionTag,'—'), 'semantic version', 'semantic version', 'neutral') +
+      _r5MetricCard('🎯','Risk','Risk',_r5Text(publish.riskRating,'medium'), 'declared risk', 'declared risk', 'neutral') +
+      '</div><div class="mb-r5-checklist">' + checks + '</div></div>';
+  }
+
+  function _r5RenderPackageDeck(schema, supreme){
+    var marketplace = _getByPath(schema, 'marketplace') || {};
+    var compatibility = (marketplace.compatibility || []).map(function(item){ return '<span class="mb-r5-tag">' + _esc(item) + '</span>'; }).join('');
+    var dependencies = (marketplace.dependencies || []).map(function(item){ return '<span class="mb-r5-tag is-soft">' + _esc(item) + '</span>'; }).join('');
+    return '<div class="mb-r5-panel"><div class="mb-r5-panel-head"><strong>' + _esc(_t('Package deck', 'Package deck')) + '</strong><span>' + _esc(supreme.packageReadiness) + '%</span></div><div class="mb-r5-package-box"><div class="mb-r5-package-id">' + _esc(_r5Text(marketplace.packageId, 'hesem.workspace.module')) + '</div><div class="mb-r5-package-meta"><span>' + _esc(_r5Text(marketplace.packageVersion, '0.0.0')) + '</span><span>' + _esc(_r5Text(marketplace.visibility, 'private')) + '</span><span>' + _esc(_r5Text(marketplace.channel, 'internal')) + '</span></div><p>' + _esc(_r5Text(marketplace.changelog, _t('No changelog summary yet', 'No changelog summary yet'))) + '</p></div><div class="mb-r5-subhead">' + _esc(_t('Compatibility', 'Compatibility')) + '</div><div class="mb-r5-tagline">' + (compatibility || '<span class="mb-r5-tag is-empty">' + _esc(_t('No compatibility declared', 'No compatibility declared')) + '</span>') + '</div><div class="mb-r5-subhead">' + _esc(_t('Dependencies', 'Dependencies')) + '</div><div class="mb-r5-tagline">' + (dependencies || '<span class="mb-r5-tag is-empty">' + _esc(_t('No dependencies declared', 'No dependencies declared')) + '</span>') + '</div></div>';
+  }
+
+  function _r5RenderAiBrief(schema, supreme){
+    var ai = _getByPath(schema, 'ai') || {};
+    var prompt = _r5GenerateUpgradePrompt(schema, supreme);
+    return '<div class="mb-r5-panel"><div class="mb-r5-panel-head"><strong>' + _esc(_t('AI brief', 'AI brief')) + '</strong><span>' + _esc(supreme.aiCoverage) + '%</span></div><div class="mb-r5-ai-grid"><div><div class="mb-r5-subhead">' + _esc(_t('Goal', 'Goal')) + '</div><p class="mb-r5-copy">' + _esc(_r5Text(ai.goal, _r5DefaultAiGoal(schema))) + '</p><div class="mb-r5-subhead">' + _esc(_t('Guardrails', 'Guardrails')) + '</div><p class="mb-r5-copy">' + _esc(_r5Text(ai.guardrails, _r5DefaultAiGuardrails(schema))) + '</p></div><div><div class="mb-r5-subhead">' + _esc(_t('Prompt preview', 'Prompt preview')) + '</div><pre class="mb-r5-code">' + _esc(_r5PromptExcerpt(ai.promptSeed || prompt, 760)) + '</pre></div></div><div class="mb-r5-actions"><button class="mb-r5-chip" data-action="export-r5-ai-prompt">🧠 ' + _esc(_t('Export AI prompt', 'Export AI prompt')) + '</button><button class="mb-r5-chip" data-action="apply-r5-supreme-enhance">🚀 ' + _esc(_t('Supreme enhance', 'Supreme enhance')) + '</button></div></div>';
+  }
+
+  function _r5RenderMotionLab(schema){
+    var design = _getByPath(schema, 'design') || {};
+    return '<div class="mb-r5-panel"><div class="mb-r5-panel-head"><strong>' + _esc(_t('Motion lab', 'Motion lab')) + '</strong><span>' + _esc(_r5Text(design.motionPreset, 'subtle')) + '</span></div>' + _r5RenderMotionPresets(false) + '<div class="mb-r5-mini-grid">' +
+      _r5MetricCard('🎬','Preset','Preset',_r5Text(design.motionPreset,'subtle'), 'current motion preset', 'current motion preset', 'neutral') +
+      _r5MetricCard('⏱','Tempo','Tempo',_r5Text(design.motionTempo,'balanced'), 'timing bias', 'timing bias', 'neutral') +
+      _r5MetricCard('🪄','Entry','Entry',_r5Text(design.entryFx,'fade'), 'entry effect', 'entry effect', 'neutral') +
+      _r5MetricCard('✨','Glow','Glow',_r5Text(design.glowMode,'soft'), 'glow posture', 'glow posture', 'neutral') +
+      '</div></div>';
+  }
+
+  function _r5RenderTopRecommendations(recs){
+    var h = '<div class="mb-r5-recs">';
+    (recs || []).slice(0, 3).forEach(function(item){
+      h += '<div class="mb-r5-rec"><strong>' + _esc(item.label || '') + '</strong><small>' + _esc(item.detail || '') + '</small></div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r5RenderSupremeDeck(projected, diag, aura, prime, recs, supreme){
+    var constellation = supreme.constellation || _r5BuildConstellation(projected);
+    var h = '<div class="mb-r5-deck">';
+    h += '<div class="mb-r5-metric-grid">';
+    h += _r5MetricCard('🎬', 'Motion craft', 'Motion craft', supreme.motionCraft + '%', 'preset + tempo + effects', 'preset + tempo + effects', _r5Tone(supreme.motionCraft));
+    h += _r5MetricCard('🛡', 'Governance circuit', 'Governance circuit', supreme.governanceCircuit + '%', 'gate + rollback + signoff', 'gate + rollback + signoff', _r5Tone(supreme.governanceCircuit));
+    h += _r5MetricCard('📦', 'Package readiness', 'Package readiness', supreme.packageReadiness + '%', 'identity + compatibility + deps', 'identity + compatibility + deps', _r5Tone(supreme.packageReadiness));
+    h += _r5MetricCard('🧠', 'AI coverage', 'AI coverage', supreme.aiCoverage + '%', 'goal + persona + prompt', 'goal + persona + prompt', _r5Tone(supreme.aiCoverage));
+    h += _r5MetricCard('🕸', 'Constellation', 'Constellation', String(supreme.constellationNodes) + ' / ' + String(supreme.constellationEdges), 'nodes / edges', 'nodes / edges', 'neutral');
+    h += '</div>';
+    h += '<div class="mb-r5-commandbar"><div class="mb-r5-command-group">';
+    h += '<button class="mb-r5-chip' + (state.showR5Constellation ? ' is-active' : '') + '" data-action="toggle-r5-constellation">🕸 ' + _esc(_t('Constellation', 'Constellation')) + '</button>';
+    h += '<button class="mb-r5-chip' + (state.showR5Publish ? ' is-active' : '') + '" data-action="toggle-r5-publish">🚀 ' + _esc(_t('Publish', 'Publish')) + '</button>';
+    h += '<button class="mb-r5-chip' + (state.showR5Package ? ' is-active' : '') + '" data-action="toggle-r5-package">📦 ' + _esc(_t('Package deck', 'Package deck')) + '</button>';
+    h += '<button class="mb-r5-chip' + (state.showR5Ai ? ' is-active' : '') + '" data-action="toggle-r5-ai">🧠 ' + _esc(_t('AI brief', 'AI brief')) + '</button>';
+    h += '<button class="mb-r5-chip' + (state.showR5Motion ? ' is-active' : '') + '" data-action="toggle-r5-motion">🎬 ' + _esc(_t('Motion lab', 'Motion lab')) + '</button>';
+    h += '<button class="mb-r5-chip" data-action="apply-r5-supreme-enhance">🚀 ' + _esc(_t('Supreme enhance', 'Supreme enhance')) + '</button>';
+    h += '<button class="mb-r5-chip" data-action="export-r5-ai-prompt">🗂 ' + _esc(_t('Export AI prompt', 'Export AI prompt')) + '</button>';
+    h += '</div></div>';
+    h += _r5RenderTopRecommendations(recs || []);
+    h += '<div class="mb-r5-panel-grid">';
+    if(state.showR5Constellation) h += '<div class="mb-r5-panel"><div class="mb-r5-panel-head"><strong>' + _esc(_t('Workflow constellation', 'Workflow constellation')) + '</strong><span>' + _esc((constellation.nodes || []).length) + ' / ' + _esc((constellation.edges || []).length) + '</span></div>' + _r5RenderConstellation(constellation) + '</div>';
+    if(state.showR5Publish) h += _r5RenderPublishControl(projected, supreme);
+    if(state.showR5Package) h += _r5RenderPackageDeck(projected, supreme);
+    if(state.showR5Ai) h += _r5RenderAiBrief(projected, supreme);
+    if(state.showR5Motion) h += _r5RenderMotionLab(projected);
+    h += '</div></div>';
+    return h;
+  }
+
+  function _r5RenderIssueList(diag){
+    var h = '<div class="mb-r5-issue-list">';
+    (diag.issues || []).slice(0, 6).forEach(function(item){
+      h += '<div class="mb-r5-issue is-' + _esc(item.severity || 'info') + '"><strong>' + _esc(item.label || '') + '</strong><small>' + _esc(item.path || item.detail || '') + '</small></div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  function _r5RenderStudioAddons(projected, diag, aura, prime, recs, supreme){
+    var draft = _ngEnsureModuleStudioDraft();
+    var html = '';
+    if(!draft || !projected) return '';
+
+    if(state.moduleStudioTab === 'overview'){
+      html += '<div class="mb-rail-panel mb-r5-rail"><div class="mb-panel-header"><div class="mb-panel-title"><strong><span>🌌</span><span>' + _esc(_t('Supreme cockpit', 'Supreme cockpit')) + '</span></strong></div></div><div class="mb-panel-body"><div class="mb-r5-mini-grid">' +
+        _r5MetricCard('🎬','Motion craft','Motion craft',supreme.motionCraft + '%','motion posture','motion posture',_r5Tone(supreme.motionCraft)) +
+        _r5MetricCard('🛡','Governance circuit','Governance circuit',supreme.governanceCircuit + '%','release readiness','release readiness',_r5Tone(supreme.governanceCircuit)) +
+        _r5MetricCard('📦','Package readiness','Package readiness',supreme.packageReadiness + '%','package identity','package identity',_r5Tone(supreme.packageReadiness)) +
+        _r5MetricCard('🧠','AI coverage','AI coverage',supreme.aiCoverage + '%','prompt briefing','prompt briefing',_r5Tone(supreme.aiCoverage)) +
+        '</div>' + _r5RenderTopRecommendations(recs || []) + '<div class="mb-r5-actions"><button class="mb-r5-chip" data-action="apply-r5-supreme-enhance">🚀 ' + _esc(_t('Supreme enhance', 'Supreme enhance')) + '</button><button class="mb-r5-chip" data-action="export-r5-ai-prompt">🧠 ' + _esc(_t('Export AI prompt', 'Export AI prompt')) + '</button></div></div></div>';
+    }
+
+    if(state.moduleStudioTab === 'governance'){
+      html += '<div class="mb-rail-panel mb-r5-rail"><div class="mb-panel-header"><div class="mb-panel-title"><strong><span>📦</span><span>' + _esc(_t('Package & AI governance', 'Package & AI governance')) + '</span></strong></div></div><div class="mb-panel-body">';
+      html += _ngRenderStudioField({ labelVi:'Package ID', labelEn:'Package ID', path:'marketplace.packageId', value:_getByPath(draft, 'marketplace.packageId'), placeholder:'hesem.quality.module' });
+      html += _ngRenderStudioField({ labelVi:'Package version', labelEn:'Package version', path:'marketplace.packageVersion', value:_getByPath(draft, 'marketplace.packageVersion'), placeholder:'1.0.0' });
+      html += _ngRenderStudioField({ labelVi:'Visibility', labelEn:'Visibility', path:'marketplace.visibility', type:'select', value:_getByPath(draft, 'marketplace.visibility'), selectOptions:['private','team','enterprise','marketplace'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Channel', labelEn:'Channel', path:'marketplace.channel', type:'select', value:_getByPath(draft, 'marketplace.channel'), selectOptions:['internal','pilot','plant','enterprise'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Category', labelEn:'Category', path:'marketplace.category', value:_getByPath(draft, 'marketplace.category'), placeholder:'quality / production / warehouse' });
+      html += _ngRenderStudioField({ labelVi:'Audience tag', labelEn:'Audience tag', path:'marketplace.audienceTag', value:_getByPath(draft, 'marketplace.audienceTag'), placeholder:'executive / operator / quality' });
+      html += _ngRenderStudioField({ labelVi:'Compatibility (CSV)', labelEn:'Compatibility (CSV)', path:'marketplace.compatibilityCsv', value:_getByPath(draft, 'marketplace.compatibilityCsv'), placeholder:'erp,mes,qms,eqms' });
+      html += _ngRenderStudioField({ labelVi:'Dependencies (CSV)', labelEn:'Dependencies (CSV)', path:'marketplace.dependenciesCsv', value:_getByPath(draft, 'marketplace.dependenciesCsv'), placeholder:'ncr,capa,audit,evidence' });
+      html += _ngRenderStudioField({ labelVi:'Changelog summary', labelEn:'Changelog summary', path:'marketplace.changelog', type:'textarea', rows:4, value:_getByPath(draft, 'marketplace.changelog') });
+      html += '<div class="mb-r5-subhead">' + _esc(_t('AI brief controls', 'AI brief controls')) + '</div>';
+      html += _ngRenderStudioField({ labelVi:'AI goal', labelEn:'AI goal', path:'ai.goal', type:'textarea', rows:3, value:_getByPath(draft, 'ai.goal') });
+      html += _ngRenderStudioField({ labelVi:'AI persona', labelEn:'AI persona', path:'ai.persona', type:'select', value:_getByPath(draft, 'ai.persona'), selectOptions:['cross-functional','executive','quality','operator','auditor','planner','warehouse','maintenance'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Suggestion mode', labelEn:'Suggestion mode', path:'ai.suggestionMode', type:'select', value:_getByPath(draft, 'ai.suggestionMode'), selectOptions:['guided','aggressive','conservative'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Guardrails', labelEn:'Guardrails', path:'ai.guardrailsText', type:'textarea', rows:4, value:_getByPath(draft, 'ai.guardrailsText') });
+      html += _ngRenderStudioField({ labelVi:'Prompt seed', labelEn:'Prompt seed', path:'ai.promptSeed', type:'textarea', rows:6, value:_getByPath(draft, 'ai.promptSeed') });
+      html += '</div></div>';
+    }
+
+    if(state.moduleStudioTab === 'design'){
+      html += '<div class="mb-rail-panel mb-r5-rail"><div class="mb-panel-header"><div class="mb-panel-title"><strong><span>🎬</span><span>' + _esc(_t('Motion studio', 'Motion studio')) + '</span></strong></div></div><div class="mb-panel-body">';
+      html += _r5RenderMotionPresets(true);
+      html += _ngRenderStudioField({ labelVi:'Motion tempo', labelEn:'Motion tempo', path:'design.motionTempo', type:'select', value:_getByPath(draft, 'design.motionTempo'), selectOptions:['calm','balanced','fast'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Depth mode', labelEn:'Depth mode', path:'design.depthMode', type:'select', value:_getByPath(draft, 'design.depthMode'), selectOptions:['flat','layered','immersive'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Glow mode', labelEn:'Glow mode', path:'design.glowMode', type:'select', value:_getByPath(draft, 'design.glowMode'), selectOptions:['none','soft','medium','high'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Entry effect', labelEn:'Entry effect', path:'design.entryFx', type:'select', value:_getByPath(draft, 'design.entryFx'), selectOptions:['fade','slide-up','signal-rise','zoom-soft'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Hover effect', labelEn:'Hover effect', path:'design.hoverFx', type:'select', value:_getByPath(draft, 'design.hoverFx'), selectOptions:['lift','outline','glow','tilt-soft'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Alert effect', labelEn:'Alert effect', path:'design.alertFx', type:'select', value:_getByPath(draft, 'design.alertFx'), selectOptions:['pulse','signal-ring','shake-soft','flash-soft'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Respect reduced motion', labelEn:'Respect reduced motion', path:'design.reduceMotionRespect', type:'toggle', value:_getByPath(draft, 'design.reduceMotionRespect'), repaintOnChange:true });
+      html += '</div></div>';
+    }
+
+    if(state.moduleStudioTab === 'publish'){
+      html += '<div class="mb-rail-panel mb-r5-rail"><div class="mb-panel-header"><div class="mb-panel-title"><strong><span>🚀</span><span>' + _esc(_t('Release control', 'Release control')) + '</span></strong></div></div><div class="mb-panel-body">';
+      html += _ngRenderStudioField({ labelVi:'Version tag', labelEn:'Version tag', path:'publish.versionTag', value:_getByPath(draft, 'publish.versionTag'), placeholder:'1.0.0 / 0.9.0-beta' });
+      html += _ngRenderStudioField({ labelVi:'Release strategy', labelEn:'Release strategy', path:'publish.releaseStrategy', type:'select', value:_getByPath(draft, 'publish.releaseStrategy'), selectOptions:['manual','canary','ring','wave','big-bang'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Gate policy', labelEn:'Gate policy', path:'publish.gatePolicy', type:'select', value:_getByPath(draft, 'publish.gatePolicy'), selectOptions:['light','standard','strict','gxp'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Approval board', labelEn:'Approval board', path:'publish.approvalBoard', value:_getByPath(draft, 'publish.approvalBoard'), placeholder:'release_board / qa_board' });
+      html += _ngRenderStudioField({ labelVi:'Rollback owner', labelEn:'Rollback owner', path:'publish.rollbackOwner', value:_getByPath(draft, 'publish.rollbackOwner'), placeholder:'platform_ops / quality_manager' });
+      html += _ngRenderStudioField({ labelVi:'Release window', labelEn:'Release window', path:'publish.releaseWindow', value:_getByPath(draft, 'publish.releaseWindow'), placeholder:'Fri 19:00-21:00 ICT' });
+      html += _ngRenderStudioField({ labelVi:'Channel', labelEn:'Channel', path:'publish.channel', type:'select', value:_getByPath(draft, 'publish.channel'), selectOptions:['pilot','department','plant','enterprise','global'], repaintOnChange:true });
+      html += _ngRenderStudioField({ labelVi:'Risk rating', labelEn:'Risk rating', path:'publish.riskRating', type:'select', value:_getByPath(draft, 'publish.riskRating'), selectOptions:['low','medium','high'], repaintOnChange:true });
+      html += _r5RenderPublishControl(projected, supreme);
+      html += '</div></div>';
+    }
+
+    if(state.moduleStudioTab === 'quality'){
+      html += '<div class="mb-rail-panel mb-r5-rail"><div class="mb-panel-header"><div class="mb-panel-title"><strong><span>🕸</span><span>' + _esc(_t('Constellation diagnostics', 'Constellation diagnostics')) + '</span></strong></div></div><div class="mb-panel-body">';
+      html += '<div class="mb-r5-mini-grid">' +
+        _r5MetricCard('📡','Signal coverage','Signal coverage',((prime && prime.signalCoverage) || 0) + '%','signals + observability','signals + observability',_r5Tone((prime && prime.signalCoverage) || 0)) +
+        _r5MetricCard('🤝','Collaboration','Collaboration',((prime && prime.collaborationReadiness) || 0) + '%','signoff + review','signoff + review',_r5Tone((prime && prime.collaborationReadiness) || 0)) +
+        _r5MetricCard('✨','Design craft','Design craft',((prime && prime.designCraft) || 0) + '%','frame + contrast + story','frame + contrast + story',_r5Tone((prime && prime.designCraft) || 0)) +
+        _r5MetricCard('🕸','Constellation','Constellation',String(supreme.constellationNodes) + ' / ' + String(supreme.constellationEdges),'nodes / edges','nodes / edges','neutral') +
+        '</div>';
+      html += _r5RenderIssueList(diag);
+      html += '<div class="mb-r5-actions"><button class="mb-r5-chip" data-action="toggle-r5-constellation">🕸 ' + _esc(_t('Show constellation', 'Show constellation')) + '</button></div>';
+      html += '</div></div>';
+    }
+
+    return html;
+  }
+
+  var _r5PrevHandleClick = _handleClick;
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    var loc;
+    var projected;
+    var diag;
+    var aura;
+    var prime;
+    var supreme;
+    if(btn){
+      if(action === 'toggle-r5-constellation' || action === 'toggle-r5-publish' || action === 'toggle-r5-package' || action === 'toggle-r5-ai' || action === 'toggle-r5-motion'){
+        _r5EnsureState();
+        if(action === 'toggle-r5-constellation') state.showR5Constellation = !state.showR5Constellation;
+        if(action === 'toggle-r5-publish') state.showR5Publish = !state.showR5Publish;
+        if(action === 'toggle-r5-package') state.showR5Package = !state.showR5Package;
+        if(action === 'toggle-r5-ai') state.showR5Ai = !state.showR5Ai;
+        if(action === 'toggle-r5-motion') state.showR5Motion = !state.showR5Motion;
+        _paint();
+        return;
+      }
+      if(action === 'apply-r5-motion'){
+        _r5ApplyMotionPreset(btn.getAttribute('data-motion') || '');
+        if(BE.toast) BE.toast(_t('Đã áp motion preset cho draft hiện tại', 'Applied the motion preset to the current draft'), 'success');
+        _paint();
+        return;
+      }
+      if(action === 'apply-r5-supreme-enhance'){
+        if(!state.schema) return;
+        _mutateSchema(_t('Supreme enhance module', 'Supreme enhance module'), function(){
+          if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+          _r5SupremeEnhanceSchema(state.schema);
+          state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        });
+        if(BE.toast) BE.toast(_t('Đã áp supreme enhance cho motion, governance, package và AI brief.', 'Applied supreme enhance for motion, governance, package and AI brief.'), 'success');
+        return;
+      }
+      if(action === 'export-r5-ai-prompt'){
+        projected = state.r3ProjectedSchema || state.ultraProjectedSchema || _ngProjectedSchema();
+        diag = _r3CollectDiagnostics(projected, state.r3DiagnosticsCache || state.ultraDiagnosticsCache);
+        aura = _r3ComputeAuraMetrics(projected, diag);
+        prime = _r4ComputePrimeMetrics ? _r4ComputePrimeMetrics(projected, diag, aura) : {};
+        supreme = _r5ComputeSupremeMetrics(projected, diag, aura, prime);
+        _r5DownloadText((_r5ModuleKey(projected) || 'module') + '-gpt-pro-prompt.txt', _r5GenerateUpgradePrompt(projected, supreme));
+        if(BE.toast) BE.toast(_t('Đã xuất AI prompt cho GPT Pro', 'Exported the AI prompt for GPT Pro'), 'success');
+        return;
+      }
+      if(action === 'jump-r5-block'){
+        loc = typeof _r4FindBlockLocation === 'function' ? _r4FindBlockLocation(btn.getAttribute('data-block') || '') : _findBlockLocation(btn.getAttribute('data-block') || '');
+        if(loc && loc.tab && loc.block){
+          state.activeTab = loc.tab.tabId;
+          state.showModuleStudio = false;
+          state.showLibrary = false;
+          _openBlockConfig(loc.block.blockId || loc.block.id);
+        }
+        return;
+      }
+      if(action === 'jump-r5-tab'){
+        state.activeTab = btn.getAttribute('data-tab') || state.activeTab;
+        state.showModuleStudio = false;
+        state.showLibrary = false;
+        _paint();
+        return;
+      }
+    }
+    return _r5PrevHandleClick(e);
+  };
+
+  var _r5PrevRenderCanvasBlock = _renderCanvasBlock;
+  _renderCanvasBlock = function(block, tab, tree, depth){
+    var html = _r5PrevRenderCanvasBlock(block, tab, tree, depth);
+    var chips = [];
+    if(_getByPath(block, 'config.workflowStudio.mode')) chips.push('<span class="mb-r5-block-chip">🕸 ' + _esc(_getByPath(block, 'config.workflowStudio.mode')) + '</span>');
+    if(_getByPath(block, 'config.publishOps.versionTag')) chips.push('<span class="mb-r5-block-chip">📦 ' + _esc(_getByPath(block, 'config.publishOps.versionTag')) + '</span>');
+    if(_getByPath(block, 'config.motionSystem.preset')) chips.push('<span class="mb-r5-block-chip">🎬 ' + _esc(_getByPath(block, 'config.motionSystem.preset')) + '</span>');
+    if(_getByPath(block, 'config.ai.persona')) chips.push('<span class="mb-r5-block-chip">🧠 ' + _esc(_getByPath(block, 'config.ai.persona')) + '</span>');
+    if(chips.length) html = html.replace('<div class="mb-block-body">', '<div class="mb-r5-block-chipline">' + chips.join('') + '</div><div class="mb-block-body">');
+    return html;
+  };
+
+  var _r5PrevSyncManifest = _ngSyncModuleBuilderManifest;
+  _ngSyncModuleBuilderManifest = function(schema){
+    var manifest = _r5PrevSyncManifest(schema);
+    var diag;
+    var aura;
+    var prime;
+    var supreme;
+    if(!schema) return manifest;
+    _ngEnsureModuleBuilderMetadata(schema);
+    diag = _r3CollectDiagnostics(schema, state && (state.r3DiagnosticsCache || state.ultraDiagnosticsCache));
+    aura = _r3ComputeAuraMetrics(schema, diag);
+    prime = _r4ComputePrimeMetrics ? _r4ComputePrimeMetrics(schema, diag, aura) : {};
+    supreme = _r5ComputeSupremeMetrics(schema, diag, aura, prime);
+    schema.builderManifest = schema.builderManifest || {};
+    schema.builderManifest.patchVersion = '2026-04-07-r5';
+    schema.builderManifest.round5Version = '2026-04-07-r5';
+    schema.builderManifest.motionCraft = supreme.motionCraft;
+    schema.builderManifest.governanceCircuit = supreme.governanceCircuit;
+    schema.builderManifest.packageReadiness = supreme.packageReadiness;
+    schema.builderManifest.aiCoverage = supreme.aiCoverage;
+    schema.builderManifest.constellationNodes = supreme.constellationNodes;
+    schema.builderManifest.constellationEdges = supreme.constellationEdges;
+    schema.builderManifest.packageId = _getByPath(schema, 'marketplace.packageId') || '';
+    schema.builderManifest.packageVersion = _getByPath(schema, 'marketplace.packageVersion') || '';
+    schema.builderManifest.releaseStrategy = _getByPath(schema, 'publish.releaseStrategy') || '';
+    schema.builderManifest.gatePolicy = _getByPath(schema, 'publish.gatePolicy') || '';
+    return manifest;
+  };
+
+  var _r5PrevRenderBuilder = _renderBuilder;
+  _renderBuilder = function(){
+    var html;
+    var projected;
+    var diag;
+    var aura;
+    var prime;
+    var recs;
+    var supreme;
+    _r5EnsureState();
+    _r5EnsureStyles();
+    html = _r5PrevRenderBuilder();
+    if(!state.schema) return html;
+    projected = state.r3ProjectedSchema || state.ultraProjectedSchema || _ngProjectedSchema();
+    diag = _r3CollectDiagnostics(projected, state.r3DiagnosticsCache || state.ultraDiagnosticsCache);
+    aura = _r3ComputeAuraMetrics(projected, diag);
+    prime = _r4ComputePrimeMetrics ? _r4ComputePrimeMetrics(projected, diag, aura) : {};
+    recs = state.r3Recommendations || _r3CollectRecommendations(projected, diag, aura);
+    supreme = _r5ComputeSupremeMetrics(projected, diag, aura, prime);
+    state.r5SupremeMetrics = supreme;
+    state.r5ConstellationCache = supreme.constellation;
+    html = html.replace('<div class="mb-builder-shell">', _r5RenderSupremeDeck(projected, diag, aura, prime, recs, supreme) + '<div class="mb-builder-shell">');
+    return '<div class="mb-r5-shell">' + html + '</div>';
+  };
+
+  var _r5PrevStudioPanel = _ngRenderModuleStudioPanel;
+  _ngRenderModuleStudioPanel = function(){
+    var html;
+    var projected;
+    var diag;
+    var aura;
+    var recs;
+    var prime;
+    var supreme;
+    _r5EnsureState();
+    _r5EnsureStyles();
+    html = _r5PrevStudioPanel ? _r5PrevStudioPanel() : '';
+    if(!state.schema) return html;
+    projected = state.r3ProjectedSchema || state.ultraProjectedSchema || _ngProjectedSchema();
+    diag = _r3CollectDiagnostics(projected, state.r3DiagnosticsCache || state.ultraDiagnosticsCache);
+    aura = _r3ComputeAuraMetrics(projected, diag);
+    recs = state.r3Recommendations || _r3CollectRecommendations(projected, diag, aura);
+    prime = _r4ComputePrimeMetrics ? _r4ComputePrimeMetrics(projected, diag, aura) : {};
+    supreme = _r5ComputeSupremeMetrics(projected, diag, aura, prime);
+    state.r5SupremeMetrics = supreme;
+    state.r5ConstellationCache = supreme.constellation;
+    return html + _r5RenderStudioAddons(projected, diag, aura, prime, recs, supreme);
+  };
+
+  function _r5EnsureStyles(){
+    var id = 'hm-module-builder-supreme-r5';
+    var style;
+    var css = '';
+    if(typeof document === 'undefined') return;
+    if(document.getElementById(id)) return;
+    style = document.createElement('style');
+    style.id = id;
+    css += '.mb-r5-shell{display:grid;gap:14px;position:relative}';
+    css += '.mb-r5-shell:before{content:"";position:absolute;left:0;right:0;top:-30px;height:260px;background:radial-gradient(circle at 12% 18%,rgba(59,130,246,.12),transparent 30%),radial-gradient(circle at 86% 10%,rgba(168,85,247,.12),transparent 28%),radial-gradient(circle at 50% 100%,rgba(20,184,166,.10),transparent 32%);pointer-events:none;filter:blur(10px)}';
+    css += '.mb-r5-deck{display:grid;gap:12px;position:relative;z-index:1}';
+    css += '.mb-r5-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}';
+    css += '.mb-r5-metric{border:1px solid rgba(148,163,184,.18);border-radius:22px;padding:14px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.94));box-shadow:0 20px 38px rgba(15,23,42,.08);backdrop-filter:blur(12px)}';
+    css += '.mb-r5-metric.is-success{border-color:rgba(16,185,129,.22)}';
+    css += '.mb-r5-metric.is-warning{border-color:rgba(245,158,11,.24)}';
+    css += '.mb-r5-metric.is-danger{border-color:rgba(239,68,68,.24)}';
+    css += '.mb-r5-metric-head{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}';
+    css += '.mb-r5-metric-value{font-size:28px;font-weight:800;line-height:1.1;color:#0f172a}';
+    css += '.mb-r5-metric small{display:block;margin-top:4px;color:#64748b;font-size:12px}';
+    css += '.mb-r5-commandbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}';
+    css += '.mb-r5-command-group,.mb-r5-actions{display:flex;gap:8px;flex-wrap:wrap}';
+    css += '.mb-r5-chip{border:1px solid rgba(99,102,241,.18);background:rgba(255,255,255,.94);padding:9px 13px;border-radius:999px;font-size:12px;font-weight:800;color:#0f172a;cursor:pointer;box-shadow:0 14px 26px rgba(15,23,42,.06)}';
+    css += '.mb-r5-chip.is-active{background:linear-gradient(135deg,rgba(79,70,229,.12),rgba(14,165,233,.12));border-color:rgba(79,70,229,.26)}';
+    css += '.mb-r5-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}';
+    css += '.mb-r5-panel,.mb-r5-rail{border:1px solid rgba(148,163,184,.18);border-radius:22px;padding:14px;background:rgba(255,255,255,.94);box-shadow:0 18px 34px rgba(15,23,42,.08);backdrop-filter:blur(12px)}';
+    css += '.mb-r5-panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;color:#475569}';
+    css += '.mb-r5-panel-head strong{font-size:14px;color:#0f172a}';
+    css += '.mb-r5-mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}';
+    css += '.mb-r5-canvas{position:relative;overflow:auto;border-radius:20px;border:1px solid rgba(148,163,184,.14);background:radial-gradient(circle at 15% 15%,rgba(59,130,246,.10),transparent 24%),radial-gradient(circle at 80% 12%,rgba(168,85,247,.10),transparent 22%),linear-gradient(180deg,rgba(248,250,252,.96),rgba(241,245,249,.96));min-height:360px;padding:18px}';
+    css += '.mb-r5-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}';
+    css += '.mb-r5-edge{fill:none;stroke:rgba(148,163,184,.48);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:6 6}';
+    css += '.mb-r5-edge.is-primary{stroke:rgba(37,99,235,.55);stroke-dasharray:none}';
+    css += '.mb-r5-edge.is-package{stroke:rgba(124,58,237,.52)}';
+    css += '.mb-r5-edge.is-signal{stroke:rgba(16,185,129,.52)}';
+    css += '.mb-r5-edge.is-service{stroke:rgba(245,158,11,.52)}';
+    css += '.mb-r5-lanes{position:absolute;left:0;right:0;top:10px;height:20px;pointer-events:none}';
+    css += '.mb-r5-lane-label{position:absolute;top:0;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b}';
+    css += '.mb-r5-node{position:absolute;display:flex;align-items:flex-start;gap:10px;padding:12px;border-radius:18px;border:1px solid rgba(148,163,184,.18);background:rgba(255,255,255,.98);box-shadow:0 14px 28px rgba(15,23,42,.06);text-align:left}';
+    css += '.mb-r5-node button{cursor:pointer}';
+    css += '.mb-r5-node.is-module{background:linear-gradient(135deg,rgba(37,99,235,.96),rgba(124,58,237,.92));color:#fff;border-color:transparent}';
+    css += '.mb-r5-node.is-tab{background:linear-gradient(180deg,rgba(239,246,255,.98),rgba(255,255,255,.98));border-color:rgba(37,99,235,.18)}';
+    css += '.mb-r5-node.is-block{background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.98))}';
+    css += '.mb-r5-node.is-service{background:linear-gradient(180deg,rgba(245,243,255,.98),rgba(255,255,255,.98));border-color:rgba(124,58,237,.18)}';
+    css += '.mb-r5-node.is-governance{background:linear-gradient(180deg,rgba(236,253,245,.98),rgba(255,255,255,.98));border-color:rgba(16,185,129,.18)}';
+    css += '.mb-r5-node-icon{font-size:18px;line-height:1.2}';
+    css += '.mb-r5-node-copy{display:grid;gap:4px}';
+    css += '.mb-r5-node-copy strong{font-size:13px;color:inherit}';
+    css += '.mb-r5-node-copy small{font-size:11px;color:inherit;opacity:.8}';
+    css += '.mb-r5-node.is-module .mb-r5-node-copy small{opacity:.92}';
+    css += '.mb-r5-checklist{display:grid;gap:8px}';
+    css += '.mb-r5-check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.14);background:#fff}';
+    css += '.mb-r5-check.is-ok{border-color:rgba(16,185,129,.18);background:rgba(236,253,245,.7)}';
+    css += '.mb-r5-check.is-miss{border-color:rgba(245,158,11,.18);background:rgba(255,251,235,.7)}';
+    css += '.mb-r5-check strong{display:block;font-size:12px;color:#0f172a}';
+    css += '.mb-r5-check small{display:block;font-size:11px;color:#64748b;margin-top:2px}';
+    css += '.mb-r5-package-box{padding:14px;border-radius:18px;background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(124,58,237,.08));border:1px solid rgba(99,102,241,.16)}';
+    css += '.mb-r5-package-id{font-size:16px;font-weight:800;color:#0f172a;word-break:break-word}';
+    css += '.mb-r5-package-meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}';
+    css += '.mb-r5-package-meta span,.mb-r5-tag{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(255,255,255,.86);border:1px solid rgba(148,163,184,.14);color:#334155}';
+    css += '.mb-r5-tag.is-soft{background:rgba(248,250,252,.95)}';
+    css += '.mb-r5-tag.is-empty{opacity:.7}';
+    css += '.mb-r5-tagline{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}';
+    css += '.mb-r5-subhead{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin:10px 0 6px}';
+    css += '.mb-r5-ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}';
+    css += '.mb-r5-copy{margin:0;color:#475569;font-size:13px;line-height:1.6}';
+    css += '.mb-r5-code{margin:0;padding:12px;border-radius:16px;background:#0f172a;color:#e2e8f0;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto}';
+    css += '.mb-r5-motion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}';
+    css += '.mb-r5-motion-grid.is-compact{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}';
+    css += '.mb-r5-motion-card{border:1px solid rgba(99,102,241,.18);border-radius:18px;padding:14px;background:linear-gradient(180deg,rgba(248,250,252,.98),rgba(255,255,255,.98));text-align:left;cursor:pointer}';
+    css += '.mb-r5-motion-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}';
+    css += '.mb-r5-motion-card p{margin:0;color:#475569;font-size:13px;line-height:1.55}';
+    css += '.mb-r5-recs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}';
+    css += '.mb-r5-rec{padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.16);box-shadow:0 10px 22px rgba(15,23,42,.04)}';
+    css += '.mb-r5-rec strong{display:block;font-size:13px;color:#0f172a}';
+    css += '.mb-r5-rec small{display:block;margin-top:4px;color:#64748b;font-size:12px;line-height:1.5}';
+    css += '.mb-r5-issue-list{display:grid;gap:8px;margin-top:12px}';
+    css += '.mb-r5-issue{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.14);background:#fff}';
+    css += '.mb-r5-issue.is-error{border-color:rgba(239,68,68,.18);background:rgba(254,242,242,.88)}';
+    css += '.mb-r5-issue.is-warning{border-color:rgba(245,158,11,.18);background:rgba(255,251,235,.88)}';
+    css += '.mb-r5-issue strong{display:block;font-size:12px;color:#0f172a}';
+    css += '.mb-r5-issue small{display:block;font-size:11px;color:#64748b;margin-top:2px}';
+    css += '.mb-r5-block-chipline{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}';
+    css += '.mb-r5-block-chip{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(15,23,42,.04);border:1px solid rgba(148,163,184,.14);color:#475569}';
+    css += '@keyframes mbR5Float{0%{transform:translateY(0)}50%{transform:translateY(-1px)}100%{transform:translateY(0)}}';
+    css += '@keyframes mbR5Dash{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-40}}';
+    css += '.mb-r5-node.is-block,.mb-r5-motion-card,.mb-r5-chip{animation:mbR5Float 5.4s ease-in-out infinite}';
+    css += '.mb-r5-edge{animation:mbR5Dash 3.6s linear infinite}';
+    css += '@media (prefers-reduced-motion: reduce){.mb-r5-node,.mb-r5-motion-card,.mb-r5-chip,.mb-r5-edge{animation:none}}';
+    css += '@media (max-width: 1080px){.mb-r5-panel-grid,.mb-r5-ai-grid{grid-template-columns:1fr}.mb-r5-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+    css += '@media (max-width: 760px){.mb-r5-metric-grid,.mb-r5-motion-grid,.mb-r5-mini-grid,.mb-r5-recs{grid-template-columns:1fr}.mb-r5-commandbar{align-items:flex-start}}';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+}
+
+}
+
+}
+
+}
+
+
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder Ultra Round 6 Patch
+ * Experience OS · Flow Studio · Governance Matrix · Theme Atelier · AI Prompt Lab
+ * ============================================================================ */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R6__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R6__ = '2026-04-07-r6';
+
+  var _r6ThemePresets = {
+    'executive-lux': {
+      labelVi:'Executive Lux', labelEn:'Executive Lux',
+      descriptionVi:'Glow sang, thở rộng, hợp control tower và wallboard điều hành.',
+      descriptionEn:'Premium glow and breathing space for executive control towers and wallboards.',
+      patch:{
+        themeLab:{ preset:'executive-lux', density:'relaxed', surface:'glass', contrast:'balanced', accent:'violet-blue', cardStyle:'orbital', elevation:'deep' },
+        design:{ storyMode:'executive', chrome:'premium', audience:'executive' },
+        motion:{ preset:'cinematic-control', intensity:'immersive', edgeStyle:'flow', glow:'high' }
+      }
+    },
+    'plant-night': {
+      labelVi:'Plant Night Ops', labelEn:'Plant Night Ops',
+      descriptionVi:'Đậm, phản xạ nhanh, tối ưu shopfloor / war room / escalation board.',
+      descriptionEn:'Dark and fast for shopfloor, war room, and escalation boards.',
+      patch:{
+        themeLab:{ preset:'plant-night', density:'compact', surface:'steel-dark', contrast:'high', accent:'emerald-cyan', cardStyle:'command', elevation:'medium' },
+        design:{ storyMode:'operational', chrome:'balanced', audience:'supervisor' },
+        motion:{ preset:'guided-ops', intensity:'focused', edgeStyle:'straight', glow:'medium' }
+      }
+    },
+    'audit-paper': {
+      labelVi:'Audit Paper+', labelEn:'Audit Paper+',
+      descriptionVi:'Tĩnh, sáng rõ, phù hợp audit, compliance, validation, traceability.',
+      descriptionEn:'Stable and crisp for audit, compliance, validation, and traceability.',
+      patch:{
+        themeLab:{ preset:'audit-paper', density:'comfortable', surface:'paper', contrast:'high', accent:'ink-gold', cardStyle:'ledger', elevation:'light' },
+        design:{ storyMode:'quality', chrome:'minimal', audience:'auditor' },
+        motion:{ preset:'signal-cleanroom', intensity:'focused', edgeStyle:'straight', glow:'low' }
+      }
+    },
+    'operator-fast': {
+      labelVi:'Operator Fast', labelEn:'Operator Fast',
+      descriptionVi:'Ít nhiễu, nhấn chỉ dẫn và thao tác nhanh cho handheld / line-side.',
+      descriptionEn:'Low-noise fast mode for handheld and line-side operation.',
+      patch:{
+        themeLab:{ preset:'operator-fast', density:'dense', surface:'clean', contrast:'high', accent:'blue-green', cardStyle:'flat-command', elevation:'flat' },
+        design:{ storyMode:'operational', chrome:'minimal', audience:'operator' },
+        motion:{ preset:'guided-ops', intensity:'balanced', edgeStyle:'curved', glow:'low' }
+      }
+    }
+  };
+
+  var _r6GovernancePresets = {
+    'gxp-validated': {
+      labelVi:'GxP Validated', labelEn:'GxP Validated',
+      descriptionVi:'Gate chặt, trace rõ, ký duyệt chéo cho module critical.',
+      descriptionEn:'Strict gated release with full traceability for critical modules.',
+      patch:{
+        publish:{ mode:'controlled', environment:'uat', requireSignoff:true, rolloutPct:10 },
+        releaseGov:{ ring:'enterprise', gates:['design review','data contract','qa regression','validation signoff','business signoff','rollback rehearsal'], approvalSlaHours:24 },
+        governanceStudio:{ gatePolicy:'validated', riskProfile:'high', reviewCadence:'weekly', releaseWindow:'weekend window', signoffBoard:['design','quality','validation','business','it'], auditTrail:'strict' }
+      }
+    },
+    'cross-site-rollout': {
+      labelVi:'Cross-site Rollout', labelEn:'Cross-site Rollout',
+      descriptionVi:'Triển khai theo site/ring, có canary, owner và release window rõ.',
+      descriptionEn:'Site-by-site rollout with canary control, owners, and release windows.',
+      patch:{
+        publish:{ mode:'rolling', environment:'production', requireSignoff:true, rolloutPct:25 },
+        releaseGov:{ ring:'plant', gates:['site readiness','master data sync','qa smoke','plant signoff','rollback'], approvalSlaHours:12 },
+        governanceStudio:{ gatePolicy:'progressive', riskProfile:'medium', reviewCadence:'daily', releaseWindow:'off-shift wave', signoffBoard:['plant','quality','it'], auditTrail:'enhanced' }
+      }
+    },
+    'surgical-hotfix': {
+      labelVi:'Surgical Hotfix', labelEn:'Surgical Hotfix',
+      descriptionVi:'Nhanh nhưng vẫn giữ rollback, impact review và dấu vết thay đổi.',
+      descriptionEn:'Fast but disciplined with rollback, impact review, and traceability.',
+      patch:{
+        publish:{ mode:'rolling', environment:'production', requireSignoff:true, rolloutPct:15 },
+        releaseGov:{ ring:'department', gates:['impact review','owner signoff','rollback ready'], approvalSlaHours:4 },
+        governanceStudio:{ gatePolicy:'surgical', riskProfile:'medium', reviewCadence:'incident-driven', releaseWindow:'hotfix slot', signoffBoard:['owner','it'], auditTrail:'targeted' }
+      }
+    }
+  };
+
+  var _r6CopilotPersonas = {
+    'architect': {
+      labelVi:'AI Architect', labelEn:'AI Architect',
+      descriptionVi:'Ưu tiên kiến trúc, registry, flow, runtime, backward compatibility.',
+      descriptionEn:'Prioritizes architecture, registry, flow, runtime, and backward compatibility.',
+      patch:{ aiCopilot:{ persona:'architect', goal:'Elevate module architecture, flow topology, reuse, and runtime resilience.', promptStyle:'surgical' } }
+    },
+    'quality-captain': {
+      labelVi:'Quality Captain', labelEn:'Quality Captain',
+      descriptionVi:'Nhấn audit evidence, traceability, validation, review cadence.',
+      descriptionEn:'Focuses on audit evidence, traceability, validation, and review cadence.',
+      patch:{ aiCopilot:{ persona:'quality-captain', goal:'Strengthen audit evidence, validation readiness, and controlled release posture.', promptStyle:'validated' } }
+    },
+    'operator-coach': {
+      labelVi:'Operator Coach', labelEn:'Operator Coach',
+      descriptionVi:'Nhấn thao tác nhanh, hướng dẫn, empty state, error recovery.',
+      descriptionEn:'Focuses on speed, guidance, empty states, and operator error recovery.',
+      patch:{ aiCopilot:{ persona:'operator-coach', goal:'Improve operator speed, guidance density, and recovery paths on the shopfloor.', promptStyle:'operational' } }
+    }
+  };
+
+  function _r6Clone(obj){ return obj == null ? obj : JSON.parse(JSON.stringify(obj)); }
+  function _r6IsObject(value){ return !!value && typeof value === 'object' && !Array.isArray(value); }
+  function _r6Array(value){ return Array.isArray(value) ? value : []; }
+  function _r6Clamp(value, min, max){ return Math.max(min, Math.min(max, value)); }
+  function _r6Tone(score){ if(score >= 86) return 'success'; if(score >= 72) return 'warning'; return 'danger'; }
+  function _r6Slug(value){ return String(value == null ? '' : value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+  function _r6Csv(value){
+    if(Array.isArray(value)) return value.filter(Boolean).map(function(item){ return String(item).trim(); }).filter(Boolean);
+    return String(value == null ? '' : value).split(/[\n,]/).map(function(item){ return item.trim(); }).filter(Boolean);
+  }
+  function _r6GetByPath(obj, path){
+    return String(path || '').split('.').filter(Boolean).reduce(function(acc, key){ return acc == null ? undefined : acc[key]; }, obj);
+  }
+  function _r6Merge(target, patch){
+    target = target || {};
+    Object.keys(patch || {}).forEach(function(key){
+      var value = patch[key];
+      if(_r6IsObject(value)){
+        if(!_r6IsObject(target[key])) target[key] = {};
+        _r6Merge(target[key], value);
+      } else if(Array.isArray(value)){
+        target[key] = _r6Clone(value);
+      } else {
+        target[key] = value;
+      }
+    });
+    return target;
+  }
+  function _r6Unique(values){
+    var seen = {};
+    return _r6Array(values).filter(function(item){
+      var key = String(item || '');
+      if(!key || seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  }
+  function _r6EnsureState(){
+    if(state.showR6Flow == null) state.showR6Flow = true;
+    if(state.showR6Gov == null) state.showR6Gov = true;
+    if(state.showR6Theme == null) state.showR6Theme = false;
+    if(state.showR6AI == null) state.showR6AI = false;
+    if(state.showR6Diff == null) state.showR6Diff = false;
+    if(state.showR6Templates == null) state.showR6Templates = false;
+  }
+  function _r6EnsureTab(schema){
+    schema.tabs = _r6Array(schema.tabs);
+    if(!schema.tabs.length){
+      schema.tabs.push({ tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] });
+    }
+    if(!state.activeTab || !_r6Array(schema.tabs).some(function(tab){ return tab && tab.tabId === state.activeTab; })) state.activeTab = schema.tabs[0].tabId;
+    return schema.tabs[0];
+  }
+  function _r6EnsureSchemaMeta(schema){
+    if(!schema || typeof schema !== 'object') return schema;
+    if(!_r6IsObject(schema.design)) schema.design = {};
+    if(!_r6IsObject(schema.motion)) schema.motion = {};
+    if(!_r6IsObject(schema.package)) schema.package = {};
+    if(!_r6IsObject(schema.releaseGov)) schema.releaseGov = {};
+    if(!_r6IsObject(schema.publish)) schema.publish = {};
+    if(!_r6IsObject(schema.marketplace)) schema.marketplace = {};
+    if(!_r6IsObject(schema.builderManifest)) schema.builderManifest = {};
+    if(!_r6IsObject(schema.themeLab)) schema.themeLab = {};
+    if(!_r6IsObject(schema.flowStudio)) schema.flowStudio = {};
+    if(!_r6IsObject(schema.governanceStudio)) schema.governanceStudio = {};
+    if(!_r6IsObject(schema.aiCopilot)) schema.aiCopilot = {};
+    if(!_r6IsObject(schema.diffStudio)) schema.diffStudio = {};
+    if(!_r6IsObject(schema.experienceOS)) schema.experienceOS = {};
+    if(schema.design.storyMode == null) schema.design.storyMode = 'operational';
+    if(schema.design.chrome == null) schema.design.chrome = 'balanced';
+    if(schema.design.audience == null) schema.design.audience = 'cross-functional';
+    if(schema.motion.preset == null) schema.motion.preset = 'guided-ops';
+    if(schema.motion.intensity == null) schema.motion.intensity = 'balanced';
+    if(schema.motion.edgeStyle == null) schema.motion.edgeStyle = 'curved';
+    if(schema.motion.glow == null) schema.motion.glow = 'medium';
+    if(schema.package.version == null) schema.package.version = '0.1.0';
+    if(schema.package.channel == null) schema.package.channel = 'pilot';
+    if(schema.package.compatibility == null) schema.package.compatibility = 'hesemqms>=2026.04';
+    if(!Array.isArray(schema.package.dependencies)) schema.package.dependencies = [];
+    if(!Array.isArray(schema.package.contracts)) schema.package.contracts = [];
+    if(schema.releaseGov.ring == null) schema.releaseGov.ring = 'pilot';
+    if(!Array.isArray(schema.releaseGov.gates)) schema.releaseGov.gates = ['design review','qa smoke','rollback'];
+    if(schema.releaseGov.rollbackOwner == null) schema.releaseGov.rollbackOwner = schema.updatedBy || schema.createdBy || 'owner';
+    if(schema.releaseGov.approvalSlaHours == null) schema.releaseGov.approvalSlaHours = 12;
+    if(schema.publish.packageName == null || !String(schema.publish.packageName || '').trim()) schema.publish.packageName = schema.moduleId || 'module-package';
+    if(schema.publish.mode == null) schema.publish.mode = 'draft';
+    if(schema.publish.environment == null) schema.publish.environment = 'sit';
+    if(schema.publish.rolloutPct == null) schema.publish.rolloutPct = 10;
+    if(schema.publish.requireSignoff == null) schema.publish.requireSignoff = true;
+    if(schema.publish.rollbackPlan == null) schema.publish.rollbackPlan = _t('Khôi phục runtime schema gần nhất và vô hiệu gói mới.', 'Restore the latest runtime schema and disable the new package.');
+    if(schema.marketplace.heroTag == null) schema.marketplace.heroTag = 'ROUND 6';
+    if(schema.marketplace.summary == null) schema.marketplace.summary = _t('Supreme module cockpit với flow studio, governance matrix, theme atelier và AI prompt lab.', 'Supreme module cockpit with flow studio, governance matrix, theme atelier, and AI prompt lab.');
+    if(schema.marketplace.positioning == null) schema.marketplace.positioning = _t('Industrial experience operating system', 'Industrial experience operating system');
+    if(schema.themeLab.preset == null) schema.themeLab.preset = 'executive-lux';
+    if(schema.themeLab.density == null) schema.themeLab.density = 'comfortable';
+    if(schema.themeLab.surface == null) schema.themeLab.surface = 'glass';
+    if(schema.themeLab.contrast == null) schema.themeLab.contrast = 'balanced';
+    if(schema.themeLab.accent == null) schema.themeLab.accent = 'violet-blue';
+    if(schema.themeLab.cardStyle == null) schema.themeLab.cardStyle = 'orbital';
+    if(schema.themeLab.elevation == null) schema.themeLab.elevation = 'deep';
+    if(schema.flowStudio.layout == null) schema.flowStudio.layout = 'constellation-lanes';
+    if(schema.flowStudio.focus == null) schema.flowStudio.focus = 'system';
+    if(!Array.isArray(schema.flowStudio.scenarios)) schema.flowStudio.scenarios = ['overview','release','operations'];
+    if(!Array.isArray(schema.flowStudio.entrypoints)) schema.flowStudio.entrypoints = ['module-root'];
+    if(schema.governanceStudio.gatePolicy == null) schema.governanceStudio.gatePolicy = 'balanced';
+    if(schema.governanceStudio.riskProfile == null) schema.governanceStudio.riskProfile = 'medium';
+    if(schema.governanceStudio.reviewCadence == null) schema.governanceStudio.reviewCadence = 'daily';
+    if(schema.governanceStudio.releaseWindow == null) schema.governanceStudio.releaseWindow = 'weekday';
+    if(schema.governanceStudio.auditTrail == null) schema.governanceStudio.auditTrail = 'enhanced';
+    if(!Array.isArray(schema.governanceStudio.signoffBoard)) schema.governanceStudio.signoffBoard = ['design','quality','it'];
+    if(schema.aiCopilot.goal == null) schema.aiCopilot.goal = 'Elevate module quality, flow topology, visual craft, and controlled release posture.';
+    if(schema.aiCopilot.persona == null) schema.aiCopilot.persona = 'architect';
+    if(schema.aiCopilot.targetModel == null) schema.aiCopilot.targetModel = 'GPT Pro';
+    if(schema.aiCopilot.promptStyle == null) schema.aiCopilot.promptStyle = 'surgical';
+    if(!Array.isArray(schema.aiCopilot.guardrails)) schema.aiCopilot.guardrails = ['Respect current helper names and runtime patterns.','Keep overwrite package structure under qms.hesem.com.vn.','Preserve backward compatibility unless a bug fix requires change.'];
+    if(schema.diffStudio.compareMode == null) schema.diffStudio.compareMode = 'baseline';
+    if(schema.experienceOS.mode == null) schema.experienceOS.mode = 'supreme';
+    if(schema.experienceOS.primaryPersona == null) schema.experienceOS.primaryPersona = 'supervisor';
+    if(schema.experienceOS.beautyMode == null) schema.experienceOS.beautyMode = 'clarity-first';
+    if(schema.experienceOS.operatingModel == null) schema.experienceOS.operatingModel = 'industrial-command';
+    _r6EnsureTab(schema);
+    _r6EnsureBaseline(schema);
+    schema.builderManifest.patchVersion = '2026-04-07-r6';
+    return schema;
+  }
+
+  function _r6CollectBlocks(schema, iterator){
+    var count = 0;
+    _r6Array(schema && schema.tabs).forEach(function(tab){
+      tab.blocks = _r6Array(tab && tab.blocks);
+      tab.blocks.forEach(function(block, blockIndex){
+        count += 1;
+        if(iterator) iterator(block || {}, tab || {}, blockIndex);
+      });
+    });
+    return count;
+  }
+  function _r6CollectApis(schema){
+    var apis = [];
+    _r6CollectBlocks(schema, function(block){
+      var api = _r6GetByPath(block, 'config.dataSource.api');
+      if(api) apis.push(api);
+    });
+    return _r6Unique(apis);
+  }
+  function _r6CollectWorkflows(schema){
+    var workflows = [];
+    _r6CollectBlocks(schema, function(block){
+      var wf = _r6GetByPath(block, 'config.workflow.workflowId') || _r6GetByPath(block, 'config.workflowId') || _r6GetByPath(block, 'workflow.workflowId');
+      if(wf) workflows.push(wf);
+    });
+    return _r6Unique(workflows);
+  }
+  function _r6CountByType(schema, matcher){
+    var count = 0;
+    _r6CollectBlocks(schema, function(block){ if(matcher(block || {})) count += 1; });
+    return count;
+  }
+  function _r6CollectSurface(schema){
+    return {
+      tabs: _r6Array(schema && schema.tabs).length,
+      totalBlocks: _r6CollectBlocks(schema),
+      chartBlocks: _r6CountByType(schema, function(block){ return String(block.type || '').indexOf('chart-') === 0; }),
+      dataBlocks: _r6CountByType(schema, function(block){ return /^data-/.test(String(block.type || '')); }),
+      formBlocks: _r6CountByType(schema, function(block){ return /^form-/.test(String(block.type || '')); }),
+      containerBlocks: _r6CountByType(schema, function(block){ return typeof _isContainerType === 'function' ? _isContainerType(block.type) : /column|stack|grid/.test(String(block.type || '')); }),
+      templateBlocks: _r6CountByType(schema, function(block){ return !!block.templateKey; }),
+      hiddenBlocks: _r6CountByType(schema, function(block){ return block.visible === false; }),
+      lockedBlocks: _r6CountByType(schema, function(block){ return !!block.locked; }),
+      apiNodes: _r6CollectApis(schema).length,
+      workflowNodes: _r6CollectWorkflows(schema).length,
+      gateNodes: _r6Array(schema && schema.releaseGov && schema.releaseGov.gates).length
+    };
+  }
+  function _r6FindBlockLocal(blockId){
+    var found = null;
+    _r6CollectBlocks(state.schema, function(block, tab){
+      if(found) return;
+      if(String(block.blockId || block.id || '') === String(blockId || '')) found = { block:block, tab:tab };
+    });
+    return found;
+  }
+  function _r6BuildFlowGraph(schema){
+    var nodes = [];
+    var edges = [];
+    var apiNodes = {};
+    var wfNodes = {};
+    var gateNodes = {};
+    var packageId = 'package-' + _r6Slug(_r6GetByPath(schema, 'publish.packageName') || _r6GetByPath(schema, 'moduleId') || 'module');
+    nodes.push({ id:'module-root', kind:'module', label:_t(_r6GetByPath(schema, 'title.vi') || schema.moduleId || 'Module', _r6GetByPath(schema, 'title.en') || _r6GetByPath(schema, 'title.vi') || schema.moduleId || 'Module') });
+    nodes.push({ id:packageId, kind:'package', label:(schema.publish && schema.publish.packageName) || schema.moduleId || 'package', subtitle:(schema.package && schema.package.version) || '0.1.0' });
+    edges.push({ from:'module-root', to:packageId, relation:'packages' });
+    _r6Array(schema && schema.tabs).forEach(function(tab, tabIndex){
+      var tabId = 'tab-' + String(tab && tab.tabId || tabIndex);
+      nodes.push({ id:tabId, kind:'tab', label:_t(_r6GetByPath(tab, 'title.vi') || 'Tab', _r6GetByPath(tab, 'title.en') || _r6GetByPath(tab, 'title.vi') || 'Tab'), targetTab:tab && tab.tabId || '' });
+      edges.push({ from:'module-root', to:tabId, relation:'contains' });
+      _r6Array(tab && tab.blocks).forEach(function(block, blockIndex){
+        var blockKey = String(block.blockId || block.id || ('b' + tabIndex + '-' + blockIndex));
+        var blockId = 'block-' + blockKey;
+        var api = _r6GetByPath(block, 'config.dataSource.api');
+        var wf = _r6GetByPath(block, 'config.workflow.workflowId') || _r6GetByPath(block, 'config.workflowId');
+        nodes.push({ id:blockId, kind:'block', label:(_getBlockTitle ? _getBlockTitle(block) : (_r6GetByPath(block, 'title.vi') || block.type || 'Block')), subtitle:String(block.type || ''), targetBlock:blockKey, targetTab:tab && tab.tabId || '' });
+        edges.push({ from:(block.parentId ? 'block-' + block.parentId : tabId), to:blockId, relation:'renders' });
+        if(api){
+          if(!apiNodes[api]){
+            apiNodes[api] = { id:'api-' + _r6Slug(api), kind:'api', label:api };
+            nodes.push(apiNodes[api]);
+          }
+          edges.push({ from:blockId, to:apiNodes[api].id, relation:'queries' });
+        }
+        if(wf){
+          if(!wfNodes[wf]){
+            wfNodes[wf] = { id:'wf-' + _r6Slug(wf), kind:'workflow', label:wf };
+            nodes.push(wfNodes[wf]);
+          }
+          edges.push({ from:blockId, to:wfNodes[wf].id, relation:'orchestrates' });
+        }
+      });
+    });
+    _r6Array(schema && schema.releaseGov && schema.releaseGov.gates).forEach(function(gate){
+      var gateKey = String(gate || 'gate');
+      if(!gateNodes[gateKey]){
+        gateNodes[gateKey] = { id:'gate-' + _r6Slug(gateKey), kind:'gate', label:gateKey };
+        nodes.push(gateNodes[gateKey]);
+      }
+      edges.push({ from:packageId, to:gateNodes[gateKey].id, relation:'gated-by' });
+    });
+    return { nodes:nodes, edges:edges };
+  }
+  function _r6CaptureSnapshot(schema, label){
+    var surface = _r6CollectSurface(schema);
+    return {
+      label: label || 'baseline',
+      capturedAt: new Date().toISOString(),
+      moduleId: schema && schema.moduleId || '',
+      tabs: surface.tabs,
+      totalBlocks: surface.totalBlocks,
+      apiCount: surface.apiNodes,
+      workflowCount: surface.workflowNodes,
+      gateCount: surface.gateNodes,
+      packageVersion: _r6GetByPath(schema, 'package.version') || '0.1.0',
+      packageName: _r6GetByPath(schema, 'publish.packageName') || _r6GetByPath(schema, 'moduleId') || '',
+      releaseRing: _r6GetByPath(schema, 'releaseGov.ring') || 'pilot',
+      themePreset: _r6GetByPath(schema, 'themeLab.preset') || 'executive-lux',
+      riskProfile: _r6GetByPath(schema, 'governanceStudio.riskProfile') || 'medium'
+    };
+  }
+  function _r6EnsureBaseline(schema){
+    if(!schema || !_r6IsObject(schema.diffStudio)) return null;
+    if(!_r6IsObject(schema.diffStudio.baseline)) schema.diffStudio.baseline = _r6CaptureSnapshot(schema, 'auto baseline');
+    return schema.diffStudio.baseline;
+  }
+  function _r6BuildDiff(schema){
+    var current = _r6CaptureSnapshot(schema, 'current');
+    var baseline = _r6EnsureBaseline(schema);
+    var diff;
+    diff = {
+      baselineExists: !!baseline,
+      baseline: _r6Clone(baseline || {}),
+      current: current,
+      addedTabs: current.tabs - (baseline && baseline.tabs || 0),
+      addedBlocks: current.totalBlocks - (baseline && baseline.totalBlocks || 0),
+      addedApis: current.apiCount - (baseline && baseline.apiCount || 0),
+      addedWorkflows: current.workflowCount - (baseline && baseline.workflowCount || 0),
+      gateDelta: current.gateCount - (baseline && baseline.gateCount || 0),
+      packageChanged: !!baseline && current.packageVersion !== baseline.packageVersion,
+      themeChanged: !!baseline && current.themePreset !== baseline.themePreset,
+      riskChanged: !!baseline && current.riskProfile !== baseline.riskProfile,
+      releaseChanged: !!baseline && current.releaseRing !== baseline.releaseRing
+    };
+    diff.volatility = _r6Clamp(Math.abs(diff.addedTabs) * 12 + Math.abs(diff.addedBlocks) * 5 + Math.abs(diff.addedApis) * 8 + Math.abs(diff.addedWorkflows) * 10 + Math.abs(diff.gateDelta) * 12 + (diff.packageChanged ? 12 : 0), 0, 100);
+    return diff;
+  }
+  function _r6ComputeMetrics(schema){
+    var surface = _r6CollectSurface(schema);
+    var flow = _r6BuildFlowGraph(schema);
+    var diff = _r6BuildDiff(schema);
+    var flowOrchestration = _r6Clamp(flow.nodes.length * 4 + flow.edges.length * 3 + surface.apiNodes * 6 + surface.workflowNodes * 8 + surface.gateNodes * 5, 0, 100);
+    var governanceMaturity = _r6Clamp(surface.gateNodes * 12 + _r6Array(_r6GetByPath(schema, 'governanceStudio.signoffBoard')).length * 8 + (_r6GetByPath(schema, 'publish.requireSignoff') ? 12 : 0) + (_r6GetByPath(schema, 'releaseGov.rollbackOwner') ? 12 : 0) + (_r6GetByPath(schema, 'governanceStudio.releaseWindow') ? 8 : 0) + (_r6GetByPath(schema, 'governanceStudio.auditTrail') ? 8 : 0), 0, 100);
+    var themeSystem = _r6Clamp((_r6GetByPath(schema, 'themeLab.preset') ? 20 : 0) + (_r6GetByPath(schema, 'themeLab.surface') ? 14 : 0) + (_r6GetByPath(schema, 'themeLab.cardStyle') ? 14 : 0) + (_r6GetByPath(schema, 'themeLab.accent') ? 10 : 0) + (_r6GetByPath(schema, 'design.chrome') ? 12 : 0) + (_r6GetByPath(schema, 'motion.preset') ? 15 : 0) + (_r6GetByPath(schema, 'motion.glow') ? 15 : 0), 0, 100);
+    var aiLeverage = _r6Clamp((_r6GetByPath(schema, 'aiCopilot.goal') ? 24 : 0) + (_r6GetByPath(schema, 'aiCopilot.persona') ? 16 : 0) + (_r6GetByPath(schema, 'aiCopilot.targetModel') ? 16 : 0) + Math.min(_r6Array(_r6GetByPath(schema, 'aiCopilot.guardrails')).length * 10, 30) + (_r6GetByPath(schema, 'aiCopilot.promptStyle') ? 14 : 0), 0, 100);
+    var runtimeConfidence = _r6Clamp((surface.totalBlocks ? 18 : 0) + surface.tabs * 8 + surface.dataBlocks * 5 + surface.chartBlocks * 6 + surface.formBlocks * 5 + (_r6GetByPath(schema, 'package.version') ? 12 : 0) + (_r6GetByPath(schema, 'publish.packageName') ? 10 : 0) + (_r6GetByPath(schema, 'publish.rollbackPlan') ? 12 : 0) + Math.min(surface.templateBlocks * 3, 12), 0, 100);
+    var changeIntelligence = _r6Clamp((diff.baselineExists ? 26 : 0) + (diff.packageChanged ? 12 : 0) + (diff.themeChanged ? 8 : 0) + (diff.releaseChanged ? 12 : 0) + Math.min(diff.volatility * 0.42, 42), 0, 100);
+    return {
+      surface: surface,
+      flow: flow,
+      diff: diff,
+      flowOrchestration: Math.round(flowOrchestration),
+      governanceMaturity: Math.round(governanceMaturity),
+      themeSystem: Math.round(themeSystem),
+      aiLeverage: Math.round(aiLeverage),
+      runtimeConfidence: Math.round(runtimeConfidence),
+      changeIntelligence: Math.round(changeIntelligence)
+    };
+  }
+  function _r6SyncManifest(schema){
+    var metrics;
+    if(!schema) return null;
+    _r6EnsureSchemaMeta(schema);
+    metrics = _r6ComputeMetrics(schema);
+    schema.builderManifest.patchVersion = '2026-04-07-r6';
+    schema.builderManifest.flowOrchestration = metrics.flowOrchestration;
+    schema.builderManifest.governanceMaturity = metrics.governanceMaturity;
+    schema.builderManifest.themeSystem = metrics.themeSystem;
+    schema.builderManifest.aiLeverage = metrics.aiLeverage;
+    schema.builderManifest.runtimeConfidence = metrics.runtimeConfidence;
+    schema.builderManifest.changeIntelligence = metrics.changeIntelligence;
+    schema.builderManifest.graphNodes = metrics.flow.nodes.length;
+    schema.builderManifest.graphEdges = metrics.flow.edges.length;
+    schema.builderManifest.apiNodes = metrics.surface.apiNodes;
+    schema.builderManifest.workflowNodes = metrics.surface.workflowNodes;
+    schema.builderManifest.gateNodes = metrics.surface.gateNodes;
+    schema.builderManifest.totalBlocks = metrics.surface.totalBlocks;
+    schema.builderManifest.themePreset = _r6GetByPath(schema, 'themeLab.preset');
+    schema.builderManifest.releaseRing = _r6GetByPath(schema, 'releaseGov.ring');
+    schema.builderManifest.targetModel = _r6GetByPath(schema, 'aiCopilot.targetModel');
+    schema.builderManifest.updatedAt = new Date().toISOString();
+    return schema.builderManifest;
+  }
+
+  function _r6ScoreCard(icon, titleVi, titleEn, value, hintVi, hintEn, tone){
+    return '<div class="mb-r6-card is-' + _esc(tone || 'neutral') + '"><div class="mb-r6-card-head"><span>' + _esc(icon) + '</span><strong>' + _esc(_t(titleVi, titleEn)) + '</strong></div><div class="mb-r6-card-value">' + _esc(String(value)) + '</div><small>' + _esc(_t(hintVi, hintEn)) + '</small></div>';
+  }
+  function _r6RenderPresetGrid(source, action){
+    var h = '<div class="mb-r6-preset-grid">';
+    Object.keys(source || {}).forEach(function(key){
+      var item = source[key] || {};
+      h += '<button class="mb-r6-preset" data-action="' + _esc(action) + '" data-key="' + _esc(key) + '"><strong>' + _esc(_t(item.labelVi, item.labelEn)) + '</strong><small>' + _esc(_t(item.descriptionVi, item.descriptionEn)) + '</small></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+  function _r6RenderHero(schema, metrics){
+    return '<div class="mb-r6-hero"><div class="mb-r6-hero-copy"><div class="mb-r6-kicker">ROUND 6 · EXPERIENCE OS</div><h3>' + _esc(_t(_r6GetByPath(schema, 'title.vi') || schema.moduleId || 'Module', _r6GetByPath(schema, 'title.en') || _r6GetByPath(schema, 'title.vi') || schema.moduleId || 'Module')) + '</h3><p>' + _esc(schema.marketplace.summary || '') + '</p><div class="mb-r6-chip-row"><span>🧠 ' + _esc(_r6GetByPath(schema, 'aiCopilot.targetModel') || 'GPT Pro') + '</span><span>🎨 ' + _esc(_r6GetByPath(schema, 'themeLab.preset') || 'executive-lux') + '</span><span>🛡 ' + _esc(_r6GetByPath(schema, 'governanceStudio.gatePolicy') || 'balanced') + '</span><span>📦 ' + _esc(_r6GetByPath(schema, 'publish.packageName') || schema.moduleId || '') + '</span></div></div><div class="mb-r6-hero-stats"><div><strong>' + _esc(String(metrics.flow.nodes.length)) + '</strong><small>' + _esc(_t('Flow nodes', 'Flow nodes')) + '</small></div><div><strong>' + _esc(String(metrics.flow.edges.length)) + '</strong><small>' + _esc(_t('Flow edges', 'Flow edges')) + '</small></div><div><strong>' + _esc(String(metrics.surface.totalBlocks)) + '</strong><small>' + _esc(_t('Blocks', 'Blocks')) + '</small></div></div></div>';
+  }
+  function _r6RenderGovernanceMatrix(schema){
+    var gates = _r6Array(_r6GetByPath(schema, 'releaseGov.gates'));
+    var signoffs = _r6Array(_r6GetByPath(schema, 'governanceStudio.signoffBoard'));
+    var h = '<div class="mb-r6-gate-grid">';
+    gates.forEach(function(gate, index){
+      var ok = index < Math.max(1, Math.ceil((_r6GetByPath(schema, 'publish.rolloutPct') || 10) / 20) + 1);
+      h += '<div class="mb-r6-gate ' + (ok ? 'is-ok' : 'is-pending') + '"><strong>' + _esc(gate) + '</strong><small>' + _esc(ok ? _t('Owner/policy ready', 'Owner/policy ready') : _t('Needs completion before release', 'Needs completion before release')) + '</small></div>';
+    });
+    h += '</div>';
+    h += '<div class="mb-r6-chip-row"><span>🧷 ' + _esc(_r6GetByPath(schema, 'governanceStudio.gatePolicy') || 'balanced') + '</span><span>⚠ ' + _esc(_r6GetByPath(schema, 'governanceStudio.riskProfile') || 'medium') + '</span><span>🗓 ' + _esc(_r6GetByPath(schema, 'governanceStudio.releaseWindow') || 'weekday') + '</span><span>⏱ ' + _esc(String(_r6GetByPath(schema, 'releaseGov.approvalSlaHours') || 0)) + 'h SLA</span></div>';
+    if(signoffs.length){
+      h += '<div class="mb-r6-signoff-row">' + signoffs.map(function(item){ return '<span>' + _esc(item) + '</span>'; }).join('') + '</div>';
+    }
+    return h;
+  }
+  function _r6RenderFlowCanvas(flow){
+    var order = [
+      { key:'module', labelVi:'Module', labelEn:'Module' },
+      { key:'package', labelVi:'Package', labelEn:'Package' },
+      { key:'tab', labelVi:'Tabs', labelEn:'Tabs' },
+      { key:'block', labelVi:'Blocks', labelEn:'Blocks' },
+      { key:'api', labelVi:'APIs', labelEn:'APIs' },
+      { key:'workflow', labelVi:'Workflows', labelEn:'Workflows' },
+      { key:'gate', labelVi:'Gates', labelEn:'Gates' }
+    ];
+    var buckets = {};
+    var h = '<div class="mb-r6-lane-wrap">';
+    (flow.nodes || []).forEach(function(node){
+      var key = node.kind || 'block';
+      if(!buckets[key]) buckets[key] = [];
+      buckets[key].push(node);
+    });
+    order.forEach(function(lane){
+      var items = buckets[lane.key] || [];
+      if(!items.length) return;
+      h += '<section class="mb-r6-lane"><div class="mb-r6-lane-head"><strong>' + _esc(_t(lane.labelVi, lane.labelEn)) + '</strong><span>' + _esc(String(items.length)) + '</span></div><div class="mb-r6-node-grid">';
+      items.forEach(function(node){
+        var attrs = '';
+        if(node.kind === 'tab') attrs = ' data-action="r6-jump-tab" data-tab="' + _esc(node.targetTab || '') + '"';
+        else if(node.kind === 'block') attrs = ' data-action="r6-jump-block" data-tab="' + _esc(node.targetTab || '') + '" data-block="' + _esc(node.targetBlock || '') + '"';
+        else if(node.kind === 'api') attrs = ' data-action="r6-focus-api" data-api="' + _esc(node.label || '') + '"';
+        else if(node.kind === 'workflow') attrs = ' data-action="r6-focus-workflow" data-workflow="' + _esc(node.label || '') + '"';
+        if(attrs) h += '<button class="mb-r6-node is-' + _esc(node.kind) + '"' + attrs + '><strong>' + _esc(node.label || '') + '</strong><small>' + _esc(node.subtitle || node.kind || '') + '</small></button>';
+        else h += '<div class="mb-r6-node is-' + _esc(node.kind) + '"><strong>' + _esc(node.label || '') + '</strong><small>' + _esc(node.subtitle || node.kind || '') + '</small></div>';
+      });
+      h += '</div></section>';
+    });
+    h += '</div>';
+    h += '<div class="mb-r6-edge-strip">' + (flow.edges || []).slice(0, 18).map(function(edge){ return '<span>' + _esc(edge.from + ' → ' + edge.to) + '</span>'; }).join('') + '</div>';
+    return h;
+  }
+  function _r6RenderDiffPanel(diff){
+    var h = '<div class="mb-r6-diff-grid">';
+    h += '<div class="mb-r6-diff-card"><strong>' + _esc(_t('Baseline', 'Baseline')) + '</strong><small>' + _esc((diff.baseline && diff.baseline.capturedAt) || _t('No baseline', 'No baseline')) + '</small><div class="mb-r6-mini-grid"><span>Tabs <b>' + _esc(String((diff.baseline && diff.baseline.tabs) || 0)) + '</b></span><span>Blocks <b>' + _esc(String((diff.baseline && diff.baseline.totalBlocks) || 0)) + '</b></span><span>APIs <b>' + _esc(String((diff.baseline && diff.baseline.apiCount) || 0)) + '</b></span><span>WF <b>' + _esc(String((diff.baseline && diff.baseline.workflowCount) || 0)) + '</b></span></div></div>';
+    h += '<div class="mb-r6-diff-card"><strong>' + _esc(_t('Current', 'Current')) + '</strong><small>' + _esc(diff.current.capturedAt || '') + '</small><div class="mb-r6-mini-grid"><span>Tabs <b>' + _esc(String(diff.current.tabs || 0)) + '</b></span><span>Blocks <b>' + _esc(String(diff.current.totalBlocks || 0)) + '</b></span><span>APIs <b>' + _esc(String(diff.current.apiCount || 0)) + '</b></span><span>WF <b>' + _esc(String(diff.current.workflowCount || 0)) + '</b></span></div></div>';
+    h += '</div>';
+    h += '<div class="mb-r6-chip-row"><span>Δ Tabs ' + _esc(String(diff.addedTabs)) + '</span><span>Δ Blocks ' + _esc(String(diff.addedBlocks)) + '</span><span>Δ APIs ' + _esc(String(diff.addedApis)) + '</span><span>Δ WF ' + _esc(String(diff.addedWorkflows)) + '</span><span>Δ Gates ' + _esc(String(diff.gateDelta)) + '</span><span>Volatility ' + _esc(String(diff.volatility)) + '%</span></div>';
+    h += '<div class="mb-r6-chip-row">' + (diff.packageChanged ? '<span>📦 package changed</span>' : '') + (diff.themeChanged ? '<span>🎨 theme changed</span>' : '') + (diff.releaseChanged ? '<span>🚀 release ring changed</span>' : '') + (diff.riskChanged ? '<span>⚠ risk changed</span>' : '') + '</div>';
+    return h;
+  }
+  function _r6RenderCopilotPanel(schema){
+    var guardrails = _r6Array(_r6GetByPath(schema, 'aiCopilot.guardrails'));
+    var h = '<div class="mb-r6-copilot"><div class="mb-r6-kicker">GPT PRO</div><strong>' + _esc(_t('AI Prompt Lab', 'AI Prompt Lab')) + '</strong><p>' + _esc(_r6GetByPath(schema, 'aiCopilot.goal') || '') + '</p><div class="mb-r6-chip-row"><span>Persona: ' + _esc(_r6GetByPath(schema, 'aiCopilot.persona') || 'architect') + '</span><span>Style: ' + _esc(_r6GetByPath(schema, 'aiCopilot.promptStyle') || 'surgical') + '</span><span>Model: ' + _esc(_r6GetByPath(schema, 'aiCopilot.targetModel') || 'GPT Pro') + '</span></div>';
+    h += '<div class="mb-r6-chip-row">' + (guardrails.slice(0, 6).map(function(item){ return '<span>🧭 ' + _esc(item) + '</span>'; }).join('') || '<span>' + _esc(_t('No guardrails', 'No guardrails')) + '</span>') + '</div>';
+    h += '<div class="mb-r6-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r6-export-prompt">🧠 ' + _esc(_t('Export GPT Pro prompt', 'Export GPT Pro prompt')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-toggle-ai-personas">🎭 ' + _esc(_t('Persona presets', 'Persona presets')) + '</button></div>';
+    if(state.showR6AI){ h += _r6RenderPresetGrid(_r6CopilotPersonas, 'r6-apply-persona'); }
+    h += '</div>';
+    return h;
+  }
+  function _r6RenderTemplatePanel(){
+    var list = BE.MODULE_BUILDER_ROUND6_TEMPLATES || [];
+    return '<div class="mb-r6-chip-row">' + (list.map(function(key){ return '<button class="mb-r6-chip-btn" data-action="r6-add-template" data-key="' + _esc(key) + '">' + _esc(key) + '</button>'; }).join('') || '<span>' + _esc(_t('No templates', 'No templates')) + '</span>') + '</div>';
+  }
+  function _r6RenderDeck(schema){
+    var metrics = _r6ComputeMetrics(schema);
+    var diff = metrics.diff;
+    var h = '<div class="mb-r6-shell">';
+    h += _r6RenderHero(schema, metrics);
+    h += '<div class="mb-r6-score-grid">';
+    h += _r6ScoreCard('🕸', 'Flow orchestration', 'Flow orchestration', metrics.flowOrchestration + '%', 'module + package + tab + block + api + workflow graph', 'module + package + tab + block + api + workflow graph', _r6Tone(metrics.flowOrchestration));
+    h += _r6ScoreCard('🛡', 'Governance maturity', 'Governance maturity', metrics.governanceMaturity + '%', 'gates + signoff board + risk + rollback', 'gates + signoff board + risk + rollback', _r6Tone(metrics.governanceMaturity));
+    h += _r6ScoreCard('🎨', 'Theme system', 'Theme system', metrics.themeSystem + '%', 'preset + surface + chrome + motion', 'preset + surface + chrome + motion', _r6Tone(metrics.themeSystem));
+    h += _r6ScoreCard('🧠', 'AI leverage', 'AI leverage', metrics.aiLeverage + '%', 'goal + persona + guardrails + target model', 'goal + persona + guardrails + target model', _r6Tone(metrics.aiLeverage));
+    h += _r6ScoreCard('⚙', 'Runtime confidence', 'Runtime confidence', metrics.runtimeConfidence + '%', 'blocks + package + rollback posture', 'blocks + package + rollback posture', _r6Tone(metrics.runtimeConfidence));
+    h += _r6ScoreCard('📈', 'Change intelligence', 'Change intelligence', metrics.changeIntelligence + '%', 'baseline diff + package/theme/release deltas', 'baseline diff + package/theme/release deltas', _r6Tone(metrics.changeIntelligence));
+    h += '</div>';
+    h += '<div class="mb-r6-toolbar"><div class="mb-r6-toolbar-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r6-supreme-upgrade">👑 ' + _esc(_t('Supreme upgrade', 'Supreme upgrade')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-capture-baseline">📸 ' + _esc(_t('Capture baseline', 'Capture baseline')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-export-flow">🕸 ' + _esc(_t('Export flow JSON', 'Export flow JSON')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-export-prompt">🧠 ' + _esc(_t('Export GPT Pro prompt', 'Export GPT Pro prompt')) + '</button></div><div class="mb-r6-toolbar-row"><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-flow">🕸 ' + _esc(_t('Flow studio', 'Flow studio')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-gov">🛡 ' + _esc(_t('Governance', 'Governance')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-theme">🎨 ' + _esc(_t('Theme atelier', 'Theme atelier')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-ai">🧠 ' + _esc(_t('AI lab', 'AI lab')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-diff">📈 ' + _esc(_t('Diff studio', 'Diff studio')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-templates">🧩 ' + _esc(_t('Template rail', 'Template rail')) + '</button></div></div>';
+    h += '<div class="mb-r6-panel-grid">';
+    h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('Governance matrix', 'Governance matrix')) + '</strong><span>' + _esc(_r6GetByPath(schema, 'releaseGov.ring') || 'pilot') + '</span></div>' + _r6RenderGovernanceMatrix(schema) + '</div>';
+    h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('AI prompt lab', 'AI prompt lab')) + '</strong><span>' + _esc(_r6GetByPath(schema, 'aiCopilot.targetModel') || 'GPT Pro') + '</span></div>' + _r6RenderCopilotPanel(schema) + '</div>';
+    h += '</div>';
+    if(state.showR6Flow){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('Flow studio', 'Flow studio')) + '</strong><span>' + _esc(metrics.flow.nodes.length) + ' ' + _esc(_t('nodes', 'nodes')) + ' / ' + _esc(metrics.flow.edges.length) + ' ' + _esc(_t('edges', 'edges')) + '</span></div>' + _r6RenderFlowCanvas(metrics.flow) + '</div>';
+    }
+    if(state.showR6Gov){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('Governance presets', 'Governance presets')) + '</strong><span>' + _esc(_r6GetByPath(schema, 'governanceStudio.gatePolicy') || 'balanced') + '</span></div>' + _r6RenderPresetGrid(_r6GovernancePresets, 'r6-apply-governance') + '</div>';
+    }
+    if(state.showR6Theme){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('Theme atelier', 'Theme atelier')) + '</strong><span>' + _esc(_r6GetByPath(schema, 'themeLab.preset') || 'executive-lux') + '</span></div>' + _r6RenderPresetGrid(_r6ThemePresets, 'r6-apply-theme') + '</div>';
+    }
+    if(state.showR6Diff){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('Diff studio', 'Diff studio')) + '</strong><span>' + _esc(String(diff.volatility)) + '%</span></div>' + _r6RenderDiffPanel(diff) + '</div>';
+    }
+    if(state.showR6Templates){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('Round 6 templates', 'Round 6 templates')) + '</strong><span>' + _esc(String((BE.MODULE_BUILDER_ROUND6_TEMPLATES || []).length)) + '</span></div>' + _r6RenderTemplatePanel() + '</div>';
+    }
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function _r6Template(key){ return ((BE.BLOCK_TEMPLATES || {})[key]) || null; }
+  function _r6GetTab(schema, tabId){
+    var result = null;
+    _r6Array(schema && schema.tabs).forEach(function(tab){ if(!result && tab && tab.tabId === tabId) result = tab; });
+    return result || _r6Array(schema && schema.tabs)[0] || null;
+  }
+  function _r6ApplyTemplateMeta(block, tpl, key){
+    if(!block || !tpl) return;
+    block.templateKey = key;
+    if(tpl.title) block.title = _r6Clone(tpl.title);
+    if(tpl.subtitle) block.subtitle = _r6Clone(tpl.subtitle);
+    if(tpl.layout) block.layout = _r6Merge(block.layout || {}, _r6Clone(tpl.layout));
+    if(tpl.meta) block.templateMeta = _r6Clone(tpl.meta);
+  }
+  function _r6ManualInsertTemplate(schema, key, target){
+    var tpl = _r6Template(key);
+    var tab = _r6GetTab(schema, target && target.tabId || state.activeTab);
+    var newBlock;
+    if(!tpl || !tab) return false;
+    tab.blocks = _r6Array(tab.blocks);
+    newBlock = {
+      blockId: 'r6-' + _r6Slug(key) + '-' + Date.now().toString(36),
+      id: 'r6-' + _r6Slug(key) + '-' + Math.random().toString(36).slice(2, 8),
+      type: tpl.type,
+      title: _r6Clone(tpl.title || { vi:key, en:key }),
+      subtitle: _r6Clone(tpl.subtitle || { vi:'', en:'' }),
+      config: _r6Clone(tpl.config || {}),
+      layout: _r6Clone(tpl.layout || {}),
+      visible: true,
+      locked: false,
+      parentId: target && target.parentId || null
+    };
+    _r6ApplyTemplateMeta(newBlock, tpl, key);
+    tab.blocks.push(newBlock);
+    state.selectedBlock = newBlock.blockId;
+    return true;
+  }
+  function _r6InsertTemplate(key, target){
+    var tpl = _r6Template(key);
+    var currentId;
+    var block;
+    var found;
+    if(!tpl || !state.schema) return false;
+    if(typeof _insertBlockAtTarget === 'function'){
+      _insertBlockAtTarget(tpl.type, _r6Clone(tpl.config || {}), target || { tabId: state.insertTab || state.activeTab, parentId: state.insertParent || null, slotKey: state.insertSlot || 'default', insertIndex: state.insertPosition == null ? null : state.insertPosition });
+      currentId = state.selectedBlock;
+      found = typeof _findBlock === 'function' ? _findBlock(currentId) : (_r6FindBlockLocal(currentId) || {}).block;
+      block = found && found.block ? found.block : found;
+      _r6ApplyTemplateMeta(block, tpl, key);
+      return true;
+    }
+    return _r6ManualInsertTemplate(state.schema, key, target);
+  }
+  function _r6SeedDefaultTemplates(schema){
+    var keys = ['r6-mission-hero','r6-control-ribbon','r6-governance-gate-matrix','r6-approval-command-board','r6-event-mesh-timeline','r6-ai-brief-board'];
+    var activeTab = _r6GetTab(schema, state.activeTab);
+    if(!activeTab) return;
+    if(_r6Array(activeTab.blocks).length >= 6) return;
+    keys.forEach(function(key){ _r6InsertTemplate(key, { tabId: activeTab.tabId, parentId:null, slotKey:'default', insertIndex:null }); });
+  }
+  function _r6ApplyPatchToSchema(schema, patch){
+    _r6EnsureSchemaMeta(schema);
+    _r6Merge(schema, patch || {});
+    _r6SyncManifest(schema);
+  }
+  function _r6ApplyThemePreset(key){
+    var preset = _r6ThemePresets[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_t('Áp theme preset', 'Apply theme preset'), function(){ _r6ApplyPatchToSchema(state.schema, preset.patch || {}); });
+  }
+  function _r6ApplyGovernancePreset(key){
+    var preset = _r6GovernancePresets[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_t('Áp governance preset', 'Apply governance preset'), function(){ _r6ApplyPatchToSchema(state.schema, preset.patch || {}); });
+  }
+  function _r6ApplyPersonaPreset(key){
+    var preset = _r6CopilotPersonas[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_t('Áp persona preset', 'Apply persona preset'), function(){ _r6ApplyPatchToSchema(state.schema, preset.patch || {}); });
+  }
+  function _r6SupremeEnhanceSchema(schema){
+    _r6EnsureSchemaMeta(schema);
+    if(!schema.package.dependencies.length) schema.package.dependencies = ['erp','mes','eqms','analytics'];
+    if(!schema.package.contracts.length) schema.package.contracts = ['module.runtime','module.release','module.ai','module.theme'];
+    schema.publish.mode = schema.publish.mode === 'draft' ? 'controlled' : schema.publish.mode;
+    schema.publish.environment = schema.publish.environment === 'sit' ? 'uat' : schema.publish.environment;
+    schema.publish.requireSignoff = true;
+    if(!schema.releaseGov.gates.length || schema.releaseGov.gates.length < 4) schema.releaseGov.gates = ['design review','data contract','qa smoke','signoff','rollback'];
+    schema.releaseGov.rollbackOwner = schema.releaseGov.rollbackOwner || schema.updatedBy || schema.createdBy || 'owner';
+    schema.releaseGov.approvalSlaHours = Math.max(12, schema.releaseGov.approvalSlaHours || 0);
+    schema.themeLab.preset = schema.themeLab.preset || 'executive-lux';
+    schema.themeLab.surface = schema.themeLab.surface || 'glass';
+    schema.governanceStudio.gatePolicy = schema.governanceStudio.gatePolicy || 'balanced';
+    schema.governanceStudio.reviewCadence = schema.governanceStudio.reviewCadence || 'daily';
+    schema.governanceStudio.auditTrail = schema.governanceStudio.auditTrail || 'enhanced';
+    schema.aiCopilot.targetModel = 'GPT Pro';
+    if(!schema.aiCopilot.goal) schema.aiCopilot.goal = 'Elevate module quality, flow topology, visual craft, and controlled release posture.';
+    if(!schema.aiCopilot.guardrails.length) schema.aiCopilot.guardrails = ['Respect current helper names and runtime patterns.','Keep overwrite package structure under qms.hesem.com.vn.'];
+    _r6SeedDefaultTemplates(schema);
+    _r6SyncManifest(schema);
+  }
+  function _r6SupremeUpgrade(){
+    if(!state.schema) return;
+    _mutateSchema(_t('Supreme upgrade Round 6', 'Round 6 supreme upgrade'), function(){ _r6SupremeEnhanceSchema(state.schema); });
+  }
+  function _r6CaptureBaseline(label){
+    if(!state.schema) return null;
+    _mutateSchema(_t('Chụp baseline', 'Capture baseline'), function(){ state.schema.diffStudio.baseline = _r6CaptureSnapshot(state.schema, label || 'manual baseline'); _r6SyncManifest(state.schema); });
+    return state.schema.diffStudio.baseline;
+  }
+  function _r6DownloadText(filename, text, mime){
+    if(typeof document === 'undefined' || typeof Blob === 'undefined' || !document.createElement) return text;
+    try {
+      var blob = new Blob([String(text == null ? '' : text)], { type: mime || 'text/plain;charset=utf-8' });
+      var url = (window.URL || window.webkitURL).createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(function(){
+        try { document.body.removeChild(link); } catch(err){}
+        try { (window.URL || window.webkitURL).revokeObjectURL(url); } catch(err){}
+      }, 0);
+    } catch(err){ return text; }
+    return text;
+  }
+  function _r6DownloadJson(filename, payload){ return _r6DownloadText(filename, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8'); }
+  function _r6BuildCopilotPrompt(schema){
+    var tabs = _r6Array(schema && schema.tabs);
+    var lines = [];
+    lines.push('# HESEM QMS Module Builder Round 6 Prompt for GPT Pro');
+    lines.push('');
+    lines.push('You are GPT Pro acting directly on repo `sanhvo86-hesem/hesemqms`.');
+    lines.push('Work as a principal architect for ERP / MES / eQMS / industrial UX.');
+    lines.push('Your job is to upgrade the current module/builder experience without breaking runtime behavior.');
+    lines.push('');
+    lines.push('## Hard constraints');
+    lines.push('- Keep overwrite-ready output under `qms.hesem.com.vn/`.');
+    lines.push('- Respect current helper names, current runtime patterns, current registry/data workflow hooks.');
+    lines.push('- Prioritize surgical upgrades over destructive rewrites.');
+    lines.push('- Preserve backward compatibility unless a bug fix requires a change.');
+    lines.push('- When adding visuals, keep them industrial, premium, and readable on large wallboards plus handheld screens.');
+    lines.push('');
+    lines.push('## Current module snapshot');
+    lines.push('- moduleId: ' + (schema.moduleId || ''));
+    lines.push('- route: ' + (schema.route || ''));
+    lines.push('- packageName: ' + (_r6GetByPath(schema, 'publish.packageName') || ''));
+    lines.push('- packageVersion: ' + (_r6GetByPath(schema, 'package.version') || '0.1.0'));
+    lines.push('- releaseRing: ' + (_r6GetByPath(schema, 'releaseGov.ring') || 'pilot'));
+    lines.push('- governancePolicy: ' + (_r6GetByPath(schema, 'governanceStudio.gatePolicy') || 'balanced'));
+    lines.push('- themePreset: ' + (_r6GetByPath(schema, 'themeLab.preset') || 'executive-lux'));
+    lines.push('- aiPersona: ' + (_r6GetByPath(schema, 'aiCopilot.persona') || 'architect'));
+    lines.push('- aiTargetModel: ' + (_r6GetByPath(schema, 'aiCopilot.targetModel') || 'GPT Pro'));
+    lines.push('- aiGoal: ' + (_r6GetByPath(schema, 'aiCopilot.goal') || ''));
+    lines.push('');
+    lines.push('## Tabs and blocks');
+    tabs.forEach(function(tab, tabIndex){
+      lines.push((tabIndex + 1) + '. tab `' + (tab && tab.tabId || '') + '` · ' + _t(_r6GetByPath(tab, 'title.vi') || 'Tab', _r6GetByPath(tab, 'title.en') || _r6GetByPath(tab, 'title.vi') || 'Tab'));
+      _r6Array(tab && tab.blocks).forEach(function(block, blockIndex){
+        lines.push('   - [' + (blockIndex + 1) + '] blockId=' + (block.blockId || block.id || '') + ' | type=' + (block.type || '') + ' | title=' + (_getBlockTitle ? _getBlockTitle(block) : (_r6GetByPath(block, 'title.vi') || block.type || 'Block')) + ' | api=' + (_r6GetByPath(block, 'config.dataSource.api') || '-') + ' | workflow=' + (_r6GetByPath(block, 'config.workflow.workflowId') || _r6GetByPath(block, 'config.workflowId') || '-'));
+      });
+    });
+    lines.push('');
+    lines.push('## Integration and governance');
+    lines.push('- APIs: ' + _r6CollectApis(schema).join(', '));
+    lines.push('- Workflows: ' + _r6CollectWorkflows(schema).join(', '));
+    lines.push('- Release gates: ' + _r6Array(_r6GetByPath(schema, 'releaseGov.gates')).join(', '));
+    lines.push('- Signoff board: ' + _r6Array(_r6GetByPath(schema, 'governanceStudio.signoffBoard')).join(', '));
+    lines.push('- Guardrails: ' + _r6Array(_r6GetByPath(schema, 'aiCopilot.guardrails')).join(' | '));
+    lines.push('');
+    lines.push('## What to improve next');
+    lines.push('1. Deepen flow orchestration with visual topology, dependency edges, and operator path clarity.');
+    lines.push('2. Improve governance: release gates, signoff board, risk policy, rollback discipline, audit trace.');
+    lines.push('3. Improve design system: themes, surfaces, density, motion, readability, empty states, guidance.');
+    lines.push('4. Improve packaging and reuse: package manifest, contracts, compatibility, publish readiness.');
+    lines.push('5. Improve AI assistance: exported prompt quality, persona targeting, guardrails, change summary.');
+    lines.push('6. Fix any scope/runtime issues you detect before adding new capability.');
+    lines.push('');
+    lines.push('## Expected deliverables');
+    lines.push('- Exact changed files with overwrite-ready content.');
+    lines.push('- Keep file structure under `qms.hesem.com.vn/`.');
+    lines.push('- Include a concise overwrite manifest and release note.');
+    lines.push('- Prefer changes in `01-QMS-Portal/scripts/portal/00-block-engine.js` and `31-module-builder.js` unless broader repo impact is justified.');
+    lines.push('- Explain any compatibility risks or follow-up tests briefly.');
+    lines.push('');
+    lines.push('## Output discipline');
+    lines.push('- Do not return vague advice only.');
+    lines.push('- Return real upgraded code.');
+    lines.push('- Keep the result visually premium, operationally grounded, and production-minded.');
+    return lines.join('\n');
+  }
+  function _r6ExportPrompt(){
+    if(!state.schema) return '';
+    _r6EnsureSchemaMeta(state.schema);
+    _r6SyncManifest(state.schema);
+    var prompt = _r6BuildCopilotPrompt(state.schema);
+    _r6DownloadText((state.schema.moduleId || 'module') + '.gpt-pro.round6.prompt.md', prompt, 'text/markdown;charset=utf-8');
+    if(BE.toast) BE.toast(_t('Đã xuất prompt GPT Pro', 'GPT Pro prompt exported'), 'success');
+    return prompt;
+  }
+  function _r6ExportFlow(){
+    if(!state.schema) return null;
+    _r6EnsureSchemaMeta(state.schema);
+    _r6SyncManifest(state.schema);
+    var metrics = _r6ComputeMetrics(state.schema);
+    var payload = {
+      schemaVersion: '2026-04-07-r6',
+      moduleId: state.schema.moduleId || '',
+      packageName: _r6GetByPath(state.schema, 'publish.packageName') || '',
+      flow: metrics.flow,
+      diff: metrics.diff,
+      builderManifest: _r6Clone(state.schema.builderManifest || {}),
+      exportedAt: new Date().toISOString()
+    };
+    _r6DownloadJson((state.schema.moduleId || 'module') + '.flow.round6.json', payload);
+    if(BE.toast) BE.toast(_t('Đã xuất flow JSON', 'Flow JSON exported'), 'success');
+    return payload;
+  }
+  function _r6JumpTab(tabId){
+    if(!tabId) return;
+    state.activeTab = tabId;
+    _paint();
+  }
+  function _r6JumpBlock(tabId, blockId){
+    if(tabId) state.activeTab = tabId;
+    if(blockId && typeof _openBlockConfig === 'function') _openBlockConfig(blockId);
+    else _paint();
+  }
+  function _r6FocusApi(api){
+    var found = null;
+    _r6CollectBlocks(state.schema, function(block, tab){
+      if(found) return;
+      if(String(_r6GetByPath(block, 'config.dataSource.api') || '') === String(api || '')) found = { tabId:tab && tab.tabId || '', blockId:block.blockId || block.id || '' };
+    });
+    if(found) _r6JumpBlock(found.tabId, found.blockId);
+    else if(BE.toast) BE.toast(_t('Không tìm thấy block dùng API này', 'No block found for this API'), 'warning');
+  }
+  function _r6FocusWorkflow(workflowId){
+    var found = null;
+    _r6CollectBlocks(state.schema, function(block, tab){
+      if(found) return;
+      var wf = _r6GetByPath(block, 'config.workflow.workflowId') || _r6GetByPath(block, 'config.workflowId');
+      if(String(wf || '') === String(workflowId || '')) found = { tabId:tab && tab.tabId || '', blockId:block.blockId || block.id || '' };
+    });
+    if(found) _r6JumpBlock(found.tabId, found.blockId);
+    else if(BE.toast) BE.toast(_t('Không tìm thấy block dùng workflow này', 'No block found for this workflow'), 'warning');
+  }
+  function _r6BlockHalo(block){
+    var chips = [];
+    var api = _r6GetByPath(block, 'config.dataSource.api');
+    var wf = _r6GetByPath(block, 'config.workflow.workflowId') || _r6GetByPath(block, 'config.workflowId');
+    if(block.templateKey) chips.push('🧩 ' + block.templateKey);
+    if(api) chips.push('🔌 ' + api);
+    if(wf) chips.push('🛣 ' + wf);
+    if(block.locked) chips.push('🔒 ' + _t('Locked', 'Locked'));
+    if(block.visible === false) chips.push('🙈 ' + _t('Hidden', 'Hidden'));
+    if(!chips.length) return '';
+    return '<div class="mb-r6-chip-row mb-r6-chip-row--block">' + chips.map(function(chip){ return '<span>' + _esc(chip) + '</span>'; }).join('') + '</div>';
+  }
+  function _r6InjectStyles(){
+    var id = 'hm-module-builder-r6-style';
+    var style;
+    var css = '';
+    if(typeof document === 'undefined') return;
+    if(document.getElementById(id)) return;
+    style = document.createElement('style');
+    style.id = id;
+    css += '.mb-r6-shell{display:grid;gap:14px;margin:0 0 16px;position:relative}';
+    css += '.mb-r6-shell:before{content:"";position:absolute;inset:-10px 0 auto 0;height:220px;background:radial-gradient(circle at top left,rgba(99,102,241,.18),transparent 50%),radial-gradient(circle at top right,rgba(16,185,129,.12),transparent 46%);pointer-events:none}';
+    css += '.mb-r6-hero,.mb-r6-card,.mb-r6-panel{position:relative;overflow:hidden;border:1px solid rgba(148,163,184,.18);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.96));box-shadow:0 24px 56px rgba(15,23,42,.08);backdrop-filter:blur(14px)}';
+    css += '.mb-r6-hero{display:grid;grid-template-columns:1.4fr .7fr;gap:14px;padding:18px;background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(67,56,202,.92));color:#fff}';
+    css += '.mb-r6-kicker{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.72);margin-bottom:6px}';
+    css += '.mb-r6-hero h3{margin:0 0 6px;font-size:24px;line-height:1.1;color:#fff}';
+    css += '.mb-r6-hero p{margin:0 0 10px;color:rgba(255,255,255,.78);line-height:1.6}';
+    css += '.mb-r6-hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-self:stretch}';
+    css += '.mb-r6-hero-stats div{padding:12px;border-radius:18px;background:rgba(255,255,255,.12);display:grid;gap:4px}';
+    css += '.mb-r6-hero-stats strong{font-size:24px;color:#fff}';
+    css += '.mb-r6-hero-stats small{font-size:12px;color:rgba(255,255,255,.72)}';
+    css += '.mb-r6-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}';
+    css += '.mb-r6-card{padding:14px}';
+    css += '.mb-r6-card.is-success{border-color:rgba(16,185,129,.24)}';
+    css += '.mb-r6-card.is-warning{border-color:rgba(245,158,11,.22)}';
+    css += '.mb-r6-card.is-danger{border-color:rgba(239,68,68,.22)}';
+    css += '.mb-r6-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:.08em}';
+    css += '.mb-r6-card-value{font-size:28px;font-weight:800;color:#0f172a;line-height:1.05}';
+    css += '.mb-r6-card small{display:block;margin-top:6px;font-size:12px;color:#64748b;line-height:1.5}';
+    css += '.mb-r6-toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}';
+    css += '.mb-r6-toolbar-row{display:flex;gap:8px;flex-wrap:wrap}';
+    css += '.mb-r6-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}';
+    css += '.mb-r6-panel{padding:14px}';
+    css += '.mb-r6-panel-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:12px;color:#334155}';
+    css += '.mb-r6-chip-row{display:flex;gap:6px;flex-wrap:wrap}';
+    css += '.mb-r6-chip-row span,.mb-r6-chip-btn{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;border:1px solid rgba(148,163,184,.16);background:#f8fafc;font-size:11px;font-weight:700;color:#334155;text-decoration:none}';
+    css += '.mb-r6-chip-btn{cursor:pointer}';
+    css += '.mb-r6-chip-row--block{margin:0 0 10px}';
+    css += '.mb-r6-gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:10px}';
+    css += '.mb-r6-gate{padding:12px;border-radius:18px;border:1px solid rgba(148,163,184,.16);background:#fff;display:grid;gap:6px}';
+    css += '.mb-r6-gate.is-ok{border-color:rgba(16,185,129,.24);background:rgba(240,253,244,.92)}';
+    css += '.mb-r6-gate.is-pending{border-color:rgba(245,158,11,.22);background:rgba(255,251,235,.9)}';
+    css += '.mb-r6-gate strong{font-size:13px;color:#0f172a}';
+    css += '.mb-r6-gate small{font-size:12px;color:#64748b;line-height:1.5}';
+    css += '.mb-r6-signoff-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}';
+    css += '.mb-r6-signoff-row span{padding:6px 10px;border-radius:999px;background:rgba(99,102,241,.1);color:#4338ca;font-size:11px;font-weight:800}';
+    css += '.mb-r6-preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}';
+    css += '.mb-r6-preset{padding:14px;border-radius:18px;border:1px solid rgba(99,102,241,.18);background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.96));display:grid;gap:8px;text-align:left;cursor:pointer}';
+    css += '.mb-r6-preset strong{font-size:13px;color:#0f172a}';
+    css += '.mb-r6-preset small{font-size:12px;color:#64748b;line-height:1.55}';
+    css += '.mb-r6-lane-wrap{display:grid;gap:10px}';
+    css += '.mb-r6-lane{padding:12px;border-radius:20px;background:rgba(248,250,252,.9);border:1px solid rgba(148,163,184,.14)}';
+    css += '.mb-r6-lane-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px;color:#334155}';
+    css += '.mb-r6-node-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}';
+    css += '.mb-r6-node{padding:12px;border-radius:18px;border:1px solid rgba(148,163,184,.18);background:#fff;display:grid;gap:6px;text-align:left;cursor:pointer}';
+    css += '.mb-r6-node.is-module{background:linear-gradient(135deg,rgba(37,99,235,.96),rgba(79,70,229,.92));border-color:transparent;color:#fff;cursor:default}';
+    css += '.mb-r6-node.is-package{background:linear-gradient(135deg,rgba(16,185,129,.14),rgba(14,165,233,.1));border-color:rgba(16,185,129,.22)}';
+    css += '.mb-r6-node.is-api{background:rgba(239,246,255,.9)}';
+    css += '.mb-r6-node.is-workflow{background:rgba(245,243,255,.94)}';
+    css += '.mb-r6-node.is-gate{background:rgba(255,251,235,.92)}';
+    css += '.mb-r6-node strong{font-size:13px;color:#0f172a}';
+    css += '.mb-r6-node small{font-size:12px;color:#64748b;line-height:1.45}';
+    css += '.mb-r6-node.is-module strong,.mb-r6-node.is-module small{color:#fff}';
+    css += '.mb-r6-edge-strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}';
+    css += '.mb-r6-edge-strip span{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:#f8fafc;border:1px solid rgba(148,163,184,.14);font-size:11px;color:#64748b}';
+    css += '.mb-r6-copilot strong{display:block;font-size:16px;color:#0f172a;margin-bottom:6px}';
+    css += '.mb-r6-copilot p{margin:0 0 10px;color:#475569;line-height:1.6}';
+    css += '.mb-r6-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}';
+    css += '.mb-r6-diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}';
+    css += '.mb-r6-diff-card{padding:12px;border-radius:18px;border:1px solid rgba(148,163,184,.16);background:#fff;display:grid;gap:6px}';
+    css += '.mb-r6-mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}';
+    css += '.mb-r6-mini-grid span{padding:8px;border-radius:12px;background:#f8fafc;font-size:12px;color:#475569;display:flex;justify-content:space-between;gap:6px}';
+    css += '@media (max-width: 1200px){.mb-r6-panel-grid,.mb-r6-diff-grid,.mb-r6-hero{grid-template-columns:1fr}}';
+    style.appendChild(document.createTextNode(css));
+    (document.head || document.body || document.documentElement).appendChild(style);
+  }
+
+  var _r6PrevCreateBlankModule = _createBlankModule;
+  _createBlankModule = function(){
+    var result = _r6PrevCreateBlankModule();
+    if(state.schema){ _r6EnsureSchemaMeta(state.schema); _r6SyncManifest(state.schema); }
+    return result;
+  };
+
+  var _r6PrevOpenSavedModule = _openSavedModule;
+  _openSavedModule = function(moduleId){
+    var result = _r6PrevOpenSavedModule(moduleId);
+    return Promise.resolve(result).then(function(resp){
+      if(state.schema){ _r6EnsureSchemaMeta(state.schema); _r6SyncManifest(state.schema); }
+      return resp;
+    });
+  };
+
+  var _r6PrevSaveModule = _saveModule;
+  _saveModule = function(){
+    if(state.schema){ _r6EnsureSchemaMeta(state.schema); _r6SyncManifest(state.schema); }
+    return _r6PrevSaveModule();
+  };
+
+  var _r6PrevRenderBuilder = _renderBuilder;
+  _renderBuilder = function(){
+    var html;
+    _r6EnsureState();
+    _r6InjectStyles();
+    if(state.schema){ _r6EnsureSchemaMeta(state.schema); _r6SyncManifest(state.schema); }
+    html = _r6PrevRenderBuilder();
+    if(!state.schema || state.step !== 'build') return html;
+    html = html.replace('<div class="mb-r5-shell">', '<div class="mb-r5-shell" style="display:none!important">');
+    html = html.replace('MODULE BUILDER V2 · ROUND 5', 'MODULE BUILDER V2 · ROUND 6');
+    if(html.indexOf('MODULE BUILDER V2 · ROUND 6') === -1) html = html.replace('MODULE BUILDER V2', 'MODULE BUILDER V2 · ROUND 6');
+    return _r6RenderDeck(state.schema) + html;
+  };
+
+  var _r6PrevRenderPreview = _renderPreview;
+  _renderPreview = function(){
+    var html;
+    _r6EnsureState();
+    _r6InjectStyles();
+    if(state.schema){ _r6EnsureSchemaMeta(state.schema); _r6SyncManifest(state.schema); }
+    html = _r6PrevRenderPreview();
+    if(!state.schema) return html;
+    html = html.replace('<div class="mb-r5-shell">', '<div class="mb-r5-shell" style="display:none!important">');
+    return '<div class="mb-r6-shell"><div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_t('Round 6 package preview', 'Round 6 package preview')) + '</strong><span>' + _esc(_r6GetByPath(state.schema, 'publish.packageName') || state.schema.moduleId || '') + '</span></div>' + _r6RenderDiffPanel(_r6BuildDiff(state.schema)) + '<div class="mb-r6-actions"><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-export-flow">🕸 ' + _esc(_t('Export flow JSON', 'Export flow JSON')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-export-prompt">🧠 ' + _esc(_t('Export GPT Pro prompt', 'Export GPT Pro prompt')) + '</button></div></div></div>' + html;
+  };
+
+  var _r6PrevRenderCanvasBlock = _renderCanvasBlock;
+  _renderCanvasBlock = function(block, tab, tree, depth){
+    var html = _r6PrevRenderCanvasBlock(block, tab, tree, depth);
+    var halo = _r6BlockHalo(block);
+    if(halo) html = html.replace('<div class="mb-block-body">', halo + '<div class="mb-block-body">');
+    return html;
+  };
+
+  var _r6PrevHandleClick = _handleClick;
+  _handleClick = function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r6-supreme-upgrade': _r6SupremeUpgrade(); return;
+        case 'r6-capture-baseline': _r6CaptureBaseline(); return;
+        case 'r6-export-flow': _r6ExportFlow(); return;
+        case 'r6-export-prompt': _r6ExportPrompt(); return;
+        case 'r6-toggle-flow': state.showR6Flow = !state.showR6Flow; _paint(); return;
+        case 'r6-toggle-gov': state.showR6Gov = !state.showR6Gov; _paint(); return;
+        case 'r6-toggle-theme': state.showR6Theme = !state.showR6Theme; _paint(); return;
+        case 'r6-toggle-ai': state.showR6AI = !state.showR6AI; _paint(); return;
+        case 'r6-toggle-diff': state.showR6Diff = !state.showR6Diff; _paint(); return;
+        case 'r6-toggle-templates': state.showR6Templates = !state.showR6Templates; _paint(); return;
+        case 'r6-toggle-ai-personas': state.showR6AI = !state.showR6AI; _paint(); return;
+        case 'r6-apply-theme': _r6ApplyThemePreset(btn.getAttribute('data-key') || ''); return;
+        case 'r6-apply-governance': _r6ApplyGovernancePreset(btn.getAttribute('data-key') || ''); return;
+        case 'r6-apply-persona': _r6ApplyPersonaPreset(btn.getAttribute('data-key') || ''); return;
+        case 'r6-jump-tab': _r6JumpTab(btn.getAttribute('data-tab') || ''); return;
+        case 'r6-jump-block': _r6JumpBlock(btn.getAttribute('data-tab') || '', btn.getAttribute('data-block') || ''); return;
+        case 'r6-focus-api': _r6FocusApi(btn.getAttribute('data-api') || ''); return;
+        case 'r6-focus-workflow': _r6FocusWorkflow(btn.getAttribute('data-workflow') || ''); return;
+        case 'r6-add-template':
+          _mutateSchema(_t('Thêm template Round 6', 'Add Round 6 template'), function(){ _r6InsertTemplate(btn.getAttribute('data-key') || '', { tabId: state.activeTab, parentId:null, slotKey:'default', insertIndex:null }); _r6SyncManifest(state.schema); });
+          return;
+      }
+    }
+    return _r6PrevHandleClick(e);
+  };
+
+  window.__HM_MB_R6_TEST__ = {
+    version: '2026-04-07-r6',
+    createDemoSchema: function(){
+      state.schema = {
+        moduleId: 'round6-demo',
+        title: { vi:'Round 6 Demo', en:'Round 6 Demo' },
+        subtitle: { vi:'', en:'' },
+        icon: '👑',
+        route: 'round6-demo',
+        roles: ['it_admin'],
+        version: 1,
+        createdBy: 'tester',
+        createdAt: new Date().toISOString(),
+        tabs: [
+          { tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] },
+          { tabId:'release', title:{ vi:'Release', en:'Release' }, icon:'🚀', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] }
+        ]
+      };
+      state.activeTab = 'overview';
+      state.step = 'build';
+      state.selectedBlock = null;
+      state.propsDraft = null;
+      _r6EnsureSchemaMeta(state.schema);
+      _r6SyncManifest(state.schema);
+      return _r6Clone(state.schema);
+    },
+    supreme: function(){ if(state.schema){ _r6SupremeEnhanceSchema(state.schema); } return state.schema ? _r6Clone(state.schema) : null; },
+    captureBaseline: function(label){ if(state.schema){ state.schema.diffStudio.baseline = _r6CaptureSnapshot(state.schema, label || 'test baseline'); _r6SyncManifest(state.schema); } return state.schema ? _r6Clone(state.schema.diffStudio.baseline) : null; },
+    metrics: function(){ return state.schema ? _r6Clone(_r6ComputeMetrics(state.schema)) : null; },
+    flow: function(){ return state.schema ? _r6Clone(_r6BuildFlowGraph(state.schema)) : null; },
+    diff: function(){ return state.schema ? _r6Clone(_r6BuildDiff(state.schema)) : null; },
+    prompt: function(){ return state.schema ? _r6BuildCopilotPrompt(state.schema) : ''; },
+    exportPrompt: function(){ return state.schema ? _r6ExportPrompt() : ''; },
+    exportFlow: function(){ return state.schema ? _r6ExportFlow() : null; },
+    manifest: function(){ return state.schema ? _r6Clone(_r6SyncManifest(state.schema)) : null; },
+    renderBuilderHtml: function(){ return state.schema ? _renderBuilder() : ''; },
+    insertTemplate: function(key){ if(!state.schema) return false; return _r6InsertTemplate(key, { tabId: state.activeTab, parentId:null, slotKey:'default', insertIndex:null }); },
+    getState: function(){ return state.schema ? _r6Clone(state.schema) : null; }
+  };
+}
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder ULTRA Round 6
+ * Flow Atlas · Version Compare · Release Matrix · Package Surface · AI Copilot
+ * ============================================================================ */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R6__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R6__ = '2026-04-07-r6';
+
+  var _r6MotionPresets = {
+    'atlas-premium': {
+      labelVi:'Atlas Premium', labelEn:'Atlas Premium',
+      descriptionVi:'Kết nối lane, nổi bật graph và tăng chiều sâu cho deck vận hành.',
+      descriptionEn:'Connect lanes, elevate the graph, and deepen the operational deck.',
+      patch:{ motion:{ preset:'atlas-premium', intensity:'immersive', edgeStyle:'atlas', glow:'high' }, uiCraft:{ theme:'atlas-glass', density:'balanced', emphasis:'story' }, design:{ storyMode:'orchestration', chrome:'premium', audience:'executive' } }
+    },
+    'release-clinic': {
+      labelVi:'Release Clinic', labelEn:'Release Clinic',
+      descriptionVi:'Tăng tương phản, rõ gate và version compare cho QA / validated release.',
+      descriptionEn:'Sharper contrast and clearer gates/version compare for QA and validated releases.',
+      patch:{ motion:{ preset:'release-clinic', intensity:'focused', edgeStyle:'straight', glow:'low' }, uiCraft:{ theme:'sterile-light', density:'compact', emphasis:'governance' }, design:{ storyMode:'quality', chrome:'minimal', audience:'quality' } }
+    },
+    'handheld-velocity': {
+      labelVi:'Handheld Velocity', labelEn:'Handheld Velocity',
+      descriptionVi:'Nhịp nhanh, khối rõ, phù hợp supervisor và warehouse handheld.',
+      descriptionEn:'Fast tempo and crisp blocks for supervisors and warehouse handheld flows.',
+      patch:{ motion:{ preset:'handheld-velocity', intensity:'fast', edgeStyle:'segmented', glow:'medium' }, uiCraft:{ theme:'ops-contrast', density:'compact', emphasis:'action' }, design:{ storyMode:'operational', chrome:'balanced', audience:'supervisor' } }
+    }
+  };
+
+  var _r6ReleaseProfiles = {
+    'controlled-enterprise': {
+      labelVi:'Controlled Enterprise', labelEn:'Controlled Enterprise',
+      descriptionVi:'Ring enterprise, gates đầy đủ, compare baseline và approval board chặt.',
+      descriptionEn:'Enterprise ring with full gates, baseline compare, and strict approval board.',
+      patch:{ publish:{ mode:'controlled', environment:'uat', rolloutPct:15, requireSignoff:true, channel:'enterprise' }, releaseGov:{ ring:'enterprise', gates:['design review','data contract','qa smoke','signoff','rollback','release note'], approvalSlaHours:24 }, collabOps:{ approvalBoard:'enterprise-cab', escalation:'quality+it+ops' } }
+    },
+    'plant-wave': {
+      labelVi:'Plant Wave', labelEn:'Plant Wave',
+      descriptionVi:'Triển khai theo plant, có wave plan, rollback owner và coverage theo ring.',
+      descriptionEn:'Plant-based deployment with wave plan, rollback owner, and ring coverage.',
+      patch:{ publish:{ mode:'wave', environment:'production', rolloutPct:30, requireSignoff:true, channel:'plant-wave' }, releaseGov:{ ring:'plant', gates:['impact review','qa smoke','signoff','rollback'], approvalSlaHours:8 }, collabOps:{ approvalBoard:'plant-ops', escalation:'production+quality' } }
+    },
+    'fast-hotfix': {
+      labelVi:'Fast Hotfix', labelEn:'Fast Hotfix',
+      descriptionVi:'Nhanh nhưng vẫn giữ compare, signoff tối thiểu và rollback book.',
+      descriptionEn:'Fast while preserving compare, minimum signoff, and a rollback playbook.',
+      patch:{ publish:{ mode:'hotfix', environment:'production', rolloutPct:10, requireSignoff:true, channel:'hotfix' }, releaseGov:{ ring:'department', gates:['impact review','rollback','signoff'], approvalSlaHours:4 }, collabOps:{ approvalBoard:'duty-manager', escalation:'oncall-it' } }
+    }
+  };
+
+  var _r6PrevEnsureSchemaMeta = _r5EnsureSchemaMeta;
+  var _r6PrevBuildPackageManifest = _r5BuildPackageManifest;
+  var _r6PrevComputeMetrics = _r5ComputeMetrics;
+  var _r6PrevInjectStyles = _r5InjectStyles;
+  var _r6PrevRenderPreview = _renderPreview;
+  var _r6PrevHandleClick = _handleClick;
+  var _r6PrevHandleInput = _handleInput;
+  var _r6PrevRenderCanvasBlock = _renderCanvasBlock;
+  var _r6PrevCreateBlankModule = _createBlankModule;
+  var _r6PrevOpenSavedModule = _openSavedModule;
+  var _r6PrevSaveModule = _saveModule;
+  var _r6PrevRenderBuilder = _renderBuilder;
+
+  function _r6Array(value){ return Array.isArray(value) ? value : []; }
+  function _r6Clone(obj){ return _clone(obj); }
+  function _r6Unique(list){
+    var seen = {};
+    var out = [];
+    _r6Array(list).forEach(function(item){
+      var key = String(item == null ? '' : item).trim();
+      if(!key || seen[key]) return;
+      seen[key] = true;
+      out.push(key);
+    });
+    return out;
+  }
+  function _r6Clamp(value, min, max){ return Math.max(min, Math.min(max, value)); }
+  function _r6Stamp(){ return new Date().toISOString(); }
+  function _r6Short(value, max){
+    var str = String(value == null ? '' : value);
+    if(!max || str.length <= max) return str;
+    return str.slice(0, Math.max(0, max - 1)) + '…';
+  }
+  function _r6Tone(score){ return typeof _r5Tone === 'function' ? _r5Tone(score) : (score >= 85 ? 'success' : score >= 70 ? 'warning' : 'danger'); }
+  function _r6NowLabel(){
+    try { return new Date().toLocaleString(); } catch(err){}
+    return _r6Stamp();
+  }
+  function _r6Text(vi, en){ return _t(vi, en); }
+  function _r6TitlePair(title, fallback){
+    return {
+      vi: title && title.vi ? title.vi : (fallback || 'Untitled'),
+      en: title && title.en ? title.en : (title && title.vi ? title.vi : (fallback || 'Untitled'))
+    };
+  }
+
+  function _r6EnsureState(){
+    if(state.showR6Workflow == null) state.showR6Workflow = true;
+    if(state.showR6Compare == null) state.showR6Compare = true;
+    if(state.showR6ReleaseMatrix == null) state.showR6ReleaseMatrix = true;
+    if(state.showR6MarketCompare == null) state.showR6MarketCompare = false;
+    if(state.showR6Ai == null) state.showR6Ai = false;
+    if(state.showR6MotionLab == null) state.showR6MotionLab = false;
+  }
+
+  function _r6EnvRank(key){
+    key = String(key || 'sit').toLowerCase();
+    if(key === 'prod' || key === 'production') return 3;
+    if(key === 'uat') return 2;
+    return 1;
+  }
+
+  function _r6SnapshotSchema(schema){
+    var snap = _r6Clone(schema || {});
+    if(_isObject(snap.compareStudio)){
+      snap.compareStudio = {
+        baselines: [],
+        activeBaselineId: '',
+        lastCapturedAt: snap.compareStudio.lastCapturedAt || '',
+        lastComparedAt: snap.compareStudio.lastComparedAt || ''
+      };
+    }
+    return snap;
+  }
+
+  function _r6EnsureSchemaMeta(schema){
+    if(typeof _r6PrevEnsureSchemaMeta === 'function') _r6PrevEnsureSchemaMeta(schema);
+    if(!schema || typeof schema !== 'object') return schema;
+    if(!_isObject(schema.workflowStudio)) schema.workflowStudio = {};
+    if(!_isObject(schema.compareStudio)) schema.compareStudio = {};
+    if(!_isObject(schema.releaseMatrix)) schema.releaseMatrix = {};
+    if(!_isObject(schema.marketOps)) schema.marketOps = {};
+    if(!_isObject(schema.aiCopilot)) schema.aiCopilot = {};
+    if(!_isObject(schema.uiCraft)) schema.uiCraft = {};
+    if(!_isObject(schema.collabOps)) schema.collabOps = {};
+    if(!_isObject(schema.package)) schema.package = {};
+    if(!_isObject(schema.publish)) schema.publish = {};
+    if(!_isObject(schema.releaseGov)) schema.releaseGov = {};
+    if(!_isObject(schema.builderManifest)) schema.builderManifest = {};
+
+    if(schema.workflowStudio.layout == null) schema.workflowStudio.layout = 'atlas';
+    if(schema.workflowStudio.mode == null) schema.workflowStudio.mode = 'signal-first';
+    if(!Array.isArray(schema.workflowStudio.nodes)) schema.workflowStudio.nodes = [];
+    if(!Array.isArray(schema.workflowStudio.edges)) schema.workflowStudio.edges = [];
+    if(!Array.isArray(schema.workflowStudio.lanes)) schema.workflowStudio.lanes = ['module','tab','block','service','gate'];
+    if(schema.workflowStudio.lastGeneratedAt == null) schema.workflowStudio.lastGeneratedAt = '';
+
+    if(!Array.isArray(schema.compareStudio.baselines)) schema.compareStudio.baselines = [];
+    schema.compareStudio.baselines = schema.compareStudio.baselines.filter(function(item){ return item && item.id && item.schema; }).slice(0, 8);
+    if(schema.compareStudio.activeBaselineId == null) schema.compareStudio.activeBaselineId = '';
+    if(!schema.compareStudio.activeBaselineId && schema.compareStudio.baselines[0]) schema.compareStudio.activeBaselineId = schema.compareStudio.baselines[0].id;
+    if(schema.compareStudio.lastCapturedAt == null) schema.compareStudio.lastCapturedAt = '';
+    if(schema.compareStudio.lastComparedAt == null) schema.compareStudio.lastComparedAt = '';
+
+    if(!Array.isArray(schema.releaseMatrix.environments) || !schema.releaseMatrix.environments.length){
+      schema.releaseMatrix.environments = [
+        { key:'sit', label:'SIT', owner:'IT Build', window:'Daily', objective:_r6Text('Lắp ráp + smoke', 'Assembly + smoke') },
+        { key:'uat', label:'UAT', owner:'Process Owner', window:'Twice weekly', objective:_r6Text('Business validation', 'Business validation') },
+        { key:'production', label:'PROD', owner:'Release Manager', window:'Change window', objective:_r6Text('Controlled cutover', 'Controlled cutover') }
+      ];
+    }
+    if(schema.releaseMatrix.riskRating == null) schema.releaseMatrix.riskRating = 'medium';
+    if(schema.releaseMatrix.releaseWindow == null) schema.releaseMatrix.releaseWindow = 'Weekday 21:00–22:00';
+    if(schema.releaseMatrix.changeTicket == null) schema.releaseMatrix.changeTicket = '';
+    if(schema.releaseMatrix.generatedAt == null) schema.releaseMatrix.generatedAt = '';
+
+    if(!Array.isArray(schema.marketOps.catalog) || !schema.marketOps.catalog.length){
+      schema.marketOps.catalog = ['hesemqms-core', 'erp', 'mes', 'eqms'];
+    }
+    if(schema.marketOps.position == null) schema.marketOps.position = _r6Text('Core industrial control surface', 'Core industrial control surface');
+    if(schema.marketOps.releaseChannel == null) schema.marketOps.releaseChannel = schema.package.channel || 'pilot';
+    if(schema.marketOps.compareMode == null) schema.marketOps.compareMode = 'surface';
+    if(schema.marketOps.generatedAt == null) schema.marketOps.generatedAt = '';
+
+    if(schema.aiCopilot.targetModel == null) schema.aiCopilot.targetModel = 'GPT Pro';
+    if(schema.aiCopilot.mode == null) schema.aiCopilot.mode = 'upgrade-module';
+    if(schema.aiCopilot.lastGeneratedAt == null) schema.aiCopilot.lastGeneratedAt = '';
+    if(schema.aiCopilot.systemRole == null) schema.aiCopilot.systemRole = _r6Text('Kiến trúc sư sản phẩm công nghiệp + chuyên gia release governance', 'Industrial product architect + release governance specialist');
+
+    if(schema.uiCraft.theme == null) schema.uiCraft.theme = 'atlas-glass';
+    if(schema.uiCraft.density == null) schema.uiCraft.density = 'balanced';
+    if(schema.uiCraft.emphasis == null) schema.uiCraft.emphasis = 'story';
+
+    if(schema.collabOps.approvalBoard == null) schema.collabOps.approvalBoard = 'quality-it-ops';
+    if(schema.collabOps.escalation == null) schema.collabOps.escalation = 'quality+it';
+    if(schema.collabOps.watchers == null) schema.collabOps.watchers = 'quality lead, it lead, process owner';
+
+    if(!schema.package.dependencies || !schema.package.dependencies.length) schema.package.dependencies = ['erp', 'mes', 'eqms'];
+    if(!schema.package.contracts || !schema.package.contracts.length) schema.package.contracts = ['module.runtime', 'module.release', 'module.observability'];
+    if(schema.package.version == null) schema.package.version = '0.1.0';
+    if(schema.package.channel == null) schema.package.channel = 'pilot';
+    if(schema.package.compatibility == null) schema.package.compatibility = 'hesemqms>=2026.04';
+    if(schema.publish.channel == null) schema.publish.channel = schema.package.channel || 'pilot';
+
+    if(!Array.isArray(schema.releaseGov.gates) || !schema.releaseGov.gates.length){
+      schema.releaseGov.gates = ['design review', 'qa smoke', 'signoff', 'rollback'];
+    }
+    if(schema.releaseGov.ring == null) schema.releaseGov.ring = 'pilot';
+    if(schema.releaseGov.rollbackOwner == null) schema.releaseGov.rollbackOwner = schema.updatedBy || schema.createdBy || 'owner';
+
+    schema.builderManifest.patchVersion = '2026-04-07-r6';
+    schema.builderManifest.schemaVersion = '2026-04-07-r6';
+    schema.builderManifest.round = 6;
+    if(!Array.isArray(schema.builderManifest.capabilities)) schema.builderManifest.capabilities = [];
+    schema.builderManifest.capabilities = _r6Unique((schema.builderManifest.capabilities || []).concat([
+      'flow-atlas',
+      'version-compare',
+      'release-matrix',
+      'package-surface',
+      'ai-prompt-export'
+    ]));
+    return schema;
+  }
+  _r5EnsureSchemaMeta = _r6EnsureSchemaMeta;
+
+  function _r6IterateBlocks(schema, visitor){
+    _r6Array(schema && schema.tabs).forEach(function(tab){
+      var tree = _buildTabTree(tab || { blocks: [] });
+      function walk(items, parentId, slotKey, depth){
+        _r6Array(items).forEach(function(block, index){
+          visitor(block || {}, tab || {}, tree, {
+            parentId: parentId || null,
+            slotKey: slotKey || block.slotKey || 'default',
+            depth: depth || 0,
+            index: index
+          });
+          if(_isContainerType(block.type)){
+            _getContainerSlots(block.type).forEach(function(slot){
+              walk(_getTreeChildren(tree, block.blockId, slot), block.blockId, slot, (depth || 0) + 1);
+            });
+          }
+        });
+      }
+      walk(tree.roots || [], null, 'default', 0);
+    });
+  }
+
+  function _r6BlockApi(block){
+    return block && block.config && block.config.dataSource && block.config.dataSource.api ? String(block.config.dataSource.api) : '';
+  }
+  function _r6BlockWorkflow(block){
+    return block && block.config && block.config.workflow && block.config.workflow.workflowId ? String(block.config.workflow.workflowId) : '';
+  }
+  function _r6BlockSignature(block){
+    return [
+      String(block && block.type || ''),
+      String(block && block.templateKey || ''),
+      String(block && _getBlockTitle ? _getBlockTitle(block) : ''),
+      String(block && block.parentId || ''),
+      String(block && block.slotKey || 'default')
+    ].join('::');
+  }
+  function _r6BlockSignatures(schema){
+    var out = [];
+    _r6IterateBlocks(schema, function(block){ out.push(_r6BlockSignature(block)); });
+    return _r6Unique(out);
+  }
+  function _r6CollectApis(schema){
+    var out = [];
+    _r6IterateBlocks(schema, function(block){
+      var api = _r6BlockApi(block);
+      if(api) out.push(api);
+    });
+    return _r6Unique(out).sort();
+  }
+  function _r6CollectWorkflows(schema){
+    var out = [];
+    _r6IterateBlocks(schema, function(block){
+      var workflowId = _r6BlockWorkflow(block);
+      if(workflowId) out.push(workflowId);
+    });
+    return _r6Unique(out).sort();
+  }
+  function _r6CollectRoles(schema){
+    return _r6Unique(_r6Array(schema && schema.roles).map(function(role){ return String(role); })).sort();
+  }
+
+  function _r6BuildDeepGraph(schema){
+    var nodes = [];
+    var edges = [];
+    var map = {};
+    var serviceOrder = 0;
+    var gateOrder = 0;
+    var blockGlobalOrder = 0;
+    var titlePair = _r6TitlePair(schema && schema.title, schema && schema.moduleId || 'Module');
+
+    function addNode(node){
+      if(map[node.id]) return map[node.id];
+      map[node.id] = node;
+      nodes.push(node);
+      return node;
+    }
+    function addEdge(from, to, kind){
+      if(!from || !to) return;
+      edges.push({ from: from, to: to, kind: kind || 'flow' });
+    }
+
+    addNode({
+      id: 'module-root',
+      kind: 'module',
+      lane: 'module',
+      label: _t(titlePair.vi, titlePair.en),
+      subtitle: String(schema && schema.route || ''),
+      targetTab: '',
+      targetBlock: '',
+      order: 0
+    });
+
+    _r6Array(schema && schema.tabs).forEach(function(tab, tabIndex){
+      var tree = _buildTabTree(tab || { blocks: [] });
+      var tabTitle = _r6TitlePair(tab && tab.title, 'Tab ' + (tabIndex + 1));
+      var tabId = 'tab:' + String(tab && tab.tabId || tabIndex);
+      addNode({
+        id: tabId,
+        kind: 'tab',
+        lane: 'tab',
+        label: _t(tabTitle.vi, tabTitle.en),
+        subtitle: String(tab && tab.layout && tab.layout.type || 'stack'),
+        targetTab: tab && tab.tabId || '',
+        targetBlock: '',
+        order: tabIndex
+      });
+      addEdge('module-root', tabId, 'tab');
+
+      function walk(items, parentRef, slotKey, depth){
+        _r6Array(items).forEach(function(block){
+          var blockRef = 'block:' + String(block.blockId || block.id || ('b' + tabIndex + '-' + blockGlobalOrder));
+          var api = _r6BlockApi(block);
+          var workflowId = _r6BlockWorkflow(block);
+          addNode({
+            id: blockRef,
+            kind: 'block',
+            lane: 'block',
+            label: _getBlockTitle(block),
+            subtitle: String(block.type || ''),
+            targetTab: tab && tab.tabId || '',
+            targetBlock: block.blockId || block.id || '',
+            slotKey: slotKey || block.slotKey || 'default',
+            depth: depth || 0,
+            order: (tabIndex * 1000) + (blockGlobalOrder++)
+          });
+          addEdge(parentRef || tabId, blockRef, block.parentId ? 'container' : 'surface');
+          if(api){
+            addNode({
+              id: 'service:' + api,
+              kind: 'service',
+              lane: 'service',
+              label: api,
+              subtitle: 'API',
+              targetTab: '',
+              targetBlock: '',
+              order: serviceOrder++
+            });
+            addEdge(blockRef, 'service:' + api, 'data');
+          }
+          if(workflowId){
+            addNode({
+              id: 'workflow:' + workflowId,
+              kind: 'workflow',
+              lane: 'service',
+              label: workflowId,
+              subtitle: 'Workflow',
+              targetTab: '',
+              targetBlock: '',
+              order: serviceOrder++
+            });
+            addEdge(blockRef, 'workflow:' + workflowId, 'workflow');
+          }
+          if(_isContainerType(block.type)){
+            _getContainerSlots(block.type).forEach(function(slot){
+              walk(_getTreeChildren(tree, block.blockId, slot), blockRef, slot, (depth || 0) + 1);
+            });
+          }
+        });
+      }
+      walk(tree.roots || [], null, 'default', 0);
+    });
+
+    _r6Unique(_r6Array(schema && schema.releaseGov && schema.releaseGov.gates)).forEach(function(gate){
+      var gateId = 'gate:' + gate;
+      addNode({
+        id: gateId,
+        kind: 'gate',
+        lane: 'gate',
+        label: gate,
+        subtitle: String(schema && schema.releaseGov && schema.releaseGov.ring || 'ring'),
+        targetTab: '',
+        targetBlock: '',
+        order: gateOrder++
+      });
+      addEdge('module-root', gateId, 'gate');
+    });
+
+    var laneOrder = ['module', 'tab', 'block', 'service', 'gate'];
+    var laneX = { module: 60, tab: 300, block: 560, service: 890, gate: 1180 };
+    var laneBuckets = {};
+    var maxCount = 1;
+    laneOrder.forEach(function(lane){ laneBuckets[lane] = []; });
+    nodes.forEach(function(node){
+      if(!laneBuckets[node.lane]) laneBuckets[node.lane] = [];
+      laneBuckets[node.lane].push(node);
+    });
+    laneOrder.forEach(function(lane){
+      laneBuckets[lane].sort(function(a, b){ return (a.order || 0) - (b.order || 0); });
+      if(laneBuckets[lane].length > maxCount) maxCount = laneBuckets[lane].length;
+      laneBuckets[lane].forEach(function(node, index){
+        node.x = laneX[lane] || 60;
+        node.y = 70 + (index * 96);
+        node.w = node.kind === 'module' ? 190 : (node.kind === 'block' ? 240 : 210);
+        node.h = node.kind === 'module' ? 84 : 72;
+      });
+    });
+    if(map['module-root']) map['module-root'].y = Math.max(40, Math.round((70 + ((maxCount - 1) * 96)) / 2));
+
+    return {
+      nodes: nodes,
+      edges: edges,
+      lanes: laneOrder.map(function(lane){ return { key: lane, count: (laneBuckets[lane] || []).length }; }),
+      width: 1460,
+      height: Math.max(340, 140 + (maxCount * 96)),
+      summary: {
+        tabNodes: (laneBuckets.tab || []).length,
+        blockNodes: (laneBuckets.block || []).length,
+        serviceNodes: (laneBuckets.service || []).length,
+        gateNodes: (laneBuckets.gate || []).length,
+        edgeCount: edges.length
+      }
+    };
+  }
+  _r5BuildGraph = _r6BuildDeepGraph;
+
+  function _r6SurfaceSummary(schema){
+    var blocks = 0;
+    _r6IterateBlocks(schema, function(){ blocks += 1; });
+    return {
+      tabs: _r6Array(schema && schema.tabs).length,
+      blocks: blocks,
+      apis: _r6CollectApis(schema).length,
+      workflows: _r6CollectWorkflows(schema).length,
+      roles: _r6CollectRoles(schema).length,
+      dependencies: _r6Unique(schema && schema.package && schema.package.dependencies).length,
+      contracts: _r6Unique(schema && schema.package && schema.package.contracts).length,
+      gates: _r6Unique(schema && schema.releaseGov && schema.releaseGov.gates).length
+    };
+  }
+
+  function _r6ListDiff(currentList, baselineList){
+    var current = _r6Unique(currentList);
+    var baseline = _r6Unique(baselineList);
+    return {
+      added: current.filter(function(item){ return baseline.indexOf(item) < 0; }),
+      removed: baseline.filter(function(item){ return current.indexOf(item) < 0; })
+    };
+  }
+
+  function _r6ActiveBaseline(schema){
+    var studio = schema && schema.compareStudio || {};
+    var activeId = studio.activeBaselineId || '';
+    var baselines = _r6Array(studio.baselines);
+    var match = null;
+    baselines.forEach(function(item){ if(!match && item.id === activeId) match = item; });
+    return match || baselines[0] || null;
+  }
+
+  function _r6BuildCompareReport(schema){
+    var baseline = _r6ActiveBaseline(schema);
+    var currentSummary = _r6SurfaceSummary(schema);
+    var currentApis = _r6CollectApis(schema);
+    var currentWorkflows = _r6CollectWorkflows(schema);
+    var currentRoles = _r6CollectRoles(schema);
+    var currentTabs = _r6Array(schema && schema.tabs).map(function(tab){ return String(tab && tab.tabId || ''); }).filter(Boolean);
+    var currentGates = _r6Unique(schema && schema.releaseGov && schema.releaseGov.gates);
+    var currentDeps = _r6Unique(schema && schema.package && schema.package.dependencies);
+    var currentContracts = _r6Unique(schema && schema.package && schema.package.contracts);
+    var currentBlocks = _r6BlockSignatures(schema);
+    var lines = [];
+
+    if(!baseline){
+      return {
+        hasBaseline: false,
+        score: 34,
+        current: currentSummary,
+        baseline: null,
+        delta: { tabs: currentSummary.tabs, blocks: currentSummary.blocks, apis: currentSummary.apis },
+        lines: [{ tone:'info', label:_r6Text('Chưa có baseline', 'No baseline yet'), text:_r6Text('Chụp một baseline trước khi so sánh để kích hoạt version compare.', 'Capture a baseline before comparing to activate version compare.') }],
+        apiDiff: { added: currentApis, removed: [] },
+        workflowDiff: { added: currentWorkflows, removed: [] },
+        dependencyDiff: { added: currentDeps, removed: [] },
+        contractDiff: { added: currentContracts, removed: [] },
+        roleDiff: { added: currentRoles, removed: [] },
+        gateDiff: { added: currentGates, removed: [] },
+        blockDiff: { added: currentBlocks.slice(0, 12), removed: [] }
+      };
+    }
+
+    var baseSchema = baseline.schema || {};
+    var baseSummary = _r6SurfaceSummary(baseSchema);
+    var apiDiff = _r6ListDiff(currentApis, _r6CollectApis(baseSchema));
+    var workflowDiff = _r6ListDiff(currentWorkflows, _r6CollectWorkflows(baseSchema));
+    var roleDiff = _r6ListDiff(currentRoles, _r6CollectRoles(baseSchema));
+    var tabDiff = _r6ListDiff(currentTabs, _r6Array(baseSchema && baseSchema.tabs).map(function(tab){ return String(tab && tab.tabId || ''); }).filter(Boolean));
+    var gateDiff = _r6ListDiff(currentGates, _r6Unique(baseSchema && baseSchema.releaseGov && baseSchema.releaseGov.gates));
+    var dependencyDiff = _r6ListDiff(currentDeps, _r6Unique(baseSchema && baseSchema.package && baseSchema.package.dependencies));
+    var contractDiff = _r6ListDiff(currentContracts, _r6Unique(baseSchema && baseSchema.package && baseSchema.package.contracts));
+    var blockDiff = _r6ListDiff(currentBlocks, _r6BlockSignatures(baseSchema));
+    var currentVersion = schema && schema.package && schema.package.version || '';
+    var baselineVersion = baseSchema && baseSchema.package && baseSchema.package.version || '';
+    var versionChanged = currentVersion !== baselineVersion;
+    var envChanged = (schema && schema.publish && schema.publish.environment || '') !== (baseSchema && baseSchema.publish && baseSchema.publish.environment || '');
+    var ringChanged = (schema && schema.releaseGov && schema.releaseGov.ring || '') !== (baseSchema && baseSchema.releaseGov && baseSchema.releaseGov.ring || '');
+    var driftCount = 0;
+
+    [apiDiff, workflowDiff, roleDiff, tabDiff, gateDiff, dependencyDiff, contractDiff, blockDiff].forEach(function(group){
+      driftCount += _r6Array(group.added).length + _r6Array(group.removed).length;
+    });
+    if(versionChanged) driftCount += 2;
+    if(envChanged) driftCount += 1;
+    if(ringChanged) driftCount += 1;
+
+    if(versionChanged){
+      lines.push({ tone:'warning', label:_r6Text('Version', 'Version'), text:(baselineVersion || 'n/a') + ' → ' + (currentVersion || 'n/a') });
+    }
+    if(envChanged || ringChanged){
+      lines.push({ tone:'info', label:_r6Text('Release posture', 'Release posture'), text:(baseSchema.publish && baseSchema.publish.environment || 'sit') + ' / ' + (baseSchema.releaseGov && baseSchema.releaseGov.ring || 'pilot') + ' → ' + (schema.publish && schema.publish.environment || 'sit') + ' / ' + (schema.releaseGov && schema.releaseGov.ring || 'pilot') });
+    }
+    if(tabDiff.added.length || tabDiff.removed.length){
+      lines.push({ tone:'info', label:_r6Text('Tabs', 'Tabs'), text:_r6Text('+' + tabDiff.added.length + ' thêm, -' + tabDiff.removed.length + ' bớt', '+' + tabDiff.added.length + ' added, -' + tabDiff.removed.length + ' removed') });
+    }
+    if(blockDiff.added.length || blockDiff.removed.length){
+      lines.push({ tone:'warning', label:_r6Text('Widget surface', 'Widget surface'), text:_r6Text('+' + blockDiff.added.length + ' block mới, -' + blockDiff.removed.length + ' block mất', '+' + blockDiff.added.length + ' new blocks, -' + blockDiff.removed.length + ' removed blocks') });
+    }
+    if(apiDiff.added.length || apiDiff.removed.length){
+      lines.push({ tone:'warning', label:'API', text:_r6Text('+' + apiDiff.added.length + ' binding mới, -' + apiDiff.removed.length + ' binding cũ', '+' + apiDiff.added.length + ' new bindings, -' + apiDiff.removed.length + ' removed bindings') });
+    }
+    if(gateDiff.added.length || gateDiff.removed.length){
+      lines.push({ tone:'warning', label:_r6Text('Gates', 'Gates'), text:_r6Text('+' + gateDiff.added.length + ' gate mới, -' + gateDiff.removed.length + ' gate cũ', '+' + gateDiff.added.length + ' new gates, -' + gateDiff.removed.length + ' removed gates') });
+    }
+
+    return {
+      hasBaseline: true,
+      score: _r6Clamp(100 - (driftCount * 4) + 10, 32, 100),
+      baseline: {
+        id: baseline.id,
+        label: baseline.label || 'Baseline',
+        capturedAt: baseline.capturedAt || ''
+      },
+      current: currentSummary,
+      baselineSummary: baseSummary,
+      delta: {
+        tabs: currentSummary.tabs - baseSummary.tabs,
+        blocks: currentSummary.blocks - baseSummary.blocks,
+        apis: currentSummary.apis - baseSummary.apis,
+        workflows: currentSummary.workflows - baseSummary.workflows,
+        dependencies: currentSummary.dependencies - baseSummary.dependencies,
+        contracts: currentSummary.contracts - baseSummary.contracts,
+        gates: currentSummary.gates - baseSummary.gates
+      },
+      lines: lines,
+      apiDiff: apiDiff,
+      workflowDiff: workflowDiff,
+      dependencyDiff: dependencyDiff,
+      contractDiff: contractDiff,
+      roleDiff: roleDiff,
+      gateDiff: gateDiff,
+      tabDiff: tabDiff,
+      blockDiff: {
+        added: blockDiff.added.slice(0, 12),
+        removed: blockDiff.removed.slice(0, 12)
+      }
+    };
+  }
+
+  function _r6BuildReleaseMatrix(schema){
+    var gates = _r6Unique(schema && schema.releaseGov && schema.releaseGov.gates);
+    var environments = _r6Array(schema && schema.releaseMatrix && schema.releaseMatrix.environments);
+    var currentEnv = String(schema && schema.publish && schema.publish.environment || 'sit');
+    var currentRank = _r6EnvRank(currentEnv);
+    var envCards = environments.map(function(env){
+      var rank = _r6EnvRank(env.key);
+      var status = currentRank > rank ? 'passed' : (currentRank === rank ? 'active' : 'queued');
+      var doneCount = status === 'passed' ? gates.length : (status === 'active' ? Math.max(1, Math.round(gates.length * 0.66)) : 0);
+      var coverage = gates.length ? Math.round((doneCount / gates.length) * 100) : 0;
+      var score = _r6Clamp(Math.round(coverage + (schema.publish && schema.publish.requireSignoff ? 8 : -6) + ((schema.publish && parseInt(schema.publish.rolloutPct, 10) || 0) <= 25 ? 6 : 0)), 24, 100);
+      return {
+        key: env.key,
+        label: env.label || String(env.key || '').toUpperCase(),
+        owner: env.owner || '',
+        window: env.window || '',
+        objective: env.objective || '',
+        status: status,
+        coverage: coverage,
+        score: score,
+        gates: gates.map(function(gate, index){
+          var gateStatus = 'queued';
+          if(status === 'passed') gateStatus = 'passed';
+          else if(status === 'active' && index < doneCount) gateStatus = (index === (doneCount - 1) ? 'active' : 'passed');
+          return { name: gate, status: gateStatus };
+        })
+      };
+    });
+    var aggregate = envCards.length ? Math.round(envCards.reduce(function(sum, item){ return sum + item.score; }, 0) / envCards.length) : 0;
+    return {
+      currentEnv: currentEnv,
+      ring: schema && schema.releaseGov && schema.releaseGov.ring || 'pilot',
+      score: aggregate,
+      environments: envCards,
+      gates: gates
+    };
+  }
+
+  function _r6BuildPackageSurface(schema){
+    var apis = _r6CollectApis(schema);
+    var workflows = _r6CollectWorkflows(schema);
+    var dependencies = _r6Unique(schema && schema.package && schema.package.dependencies);
+    var contracts = _r6Unique(schema && schema.package && schema.package.contracts);
+    var baseline = _r6ActiveBaseline(schema);
+    var baselineDeps = baseline ? _r6Unique(baseline.schema && baseline.schema.package && baseline.schema.package.dependencies) : [];
+    var dependencyDiff = _r6ListDiff(dependencies, baselineDeps);
+    var entries = [];
+    dependencies.forEach(function(dep){ entries.push({ kind:'dependency', name:dep, status:'required', note:schema.package.compatibility || '' }); });
+    contracts.forEach(function(contract){ entries.push({ kind:'contract', name:contract, status:'declared', note:schema.package.channel || '' }); });
+    apis.forEach(function(api){ entries.push({ kind:'api', name:api, status:'bound', note:'data source' }); });
+    workflows.forEach(function(workflowId){ entries.push({ kind:'workflow', name:workflowId, status:'orchestrated', note:'workflow binding' }); });
+    return {
+      score: _r6Clamp(40 + (dependencies.length * 9) + (contracts.length * 7) + Math.min(apis.length, 8) * 4 + Math.min(workflows.length, 4) * 5, 30, 100),
+      summary: {
+        dependencies: dependencies.length,
+        contracts: contracts.length,
+        apis: apis.length,
+        workflows: workflows.length
+      },
+      dependencyDiff: dependencyDiff,
+      entries: entries.slice(0, 30)
+    };
+  }
+
+  _r5ComputeMetrics = function(schema){
+    var metrics = typeof _r6PrevComputeMetrics === 'function' ? _r6PrevComputeMetrics(schema) : {};
+    var flow = _r6BuildDeepGraph(schema);
+    var compare = _r6BuildCompareReport(schema);
+    var matrix = _r6BuildReleaseMatrix(schema);
+    var surface = _r6BuildPackageSurface(schema);
+    metrics.graph = flow;
+    metrics.flowAtlas = flow.summary;
+    metrics.versionDiscipline = compare.score;
+    metrics.releaseOrchestration = matrix.score;
+    metrics.packageSurface = surface.score;
+    metrics.aiReadiness = _r6Clamp(Math.round((compare.score + matrix.score + surface.score) / 3), 30, 100);
+    metrics.workflowDensity = _r6Clamp(flow.summary.blockNodes ? Math.round(((flow.summary.serviceNodes + flow.summary.gateNodes) / flow.summary.blockNodes) * 100) : 20, 20, 100);
+    metrics.compare = compare;
+    metrics.releaseMatrix = matrix;
+    metrics.packageSurfaceDetail = surface;
+    return metrics;
+  };
+
+  function _r6BuildAiBrief(schema){
+    var flow = _r6BuildDeepGraph(schema);
+    var compare = _r6BuildCompareReport(schema);
+    var matrix = _r6BuildReleaseMatrix(schema);
+    var surface = _r6BuildPackageSurface(schema);
+    var baseManifest = typeof _r6PrevBuildPackageManifest === 'function' ? _r6PrevBuildPackageManifest(schema) : {};
+    var payload = {
+      moduleId: schema && schema.moduleId || '',
+      title: schema && schema.title || {},
+      route: schema && schema.route || '',
+      version: schema && schema.package && schema.package.version || '',
+      dependencies: schema && schema.package && schema.package.dependencies || [],
+      contracts: schema && schema.package && schema.package.contracts || [],
+      release: {
+        ring: schema && schema.releaseGov && schema.releaseGov.ring || '',
+        environment: schema && schema.publish && schema.publish.environment || '',
+        rolloutPct: schema && schema.publish && schema.publish.rolloutPct || 0,
+        requireSignoff: !!(schema && schema.publish && schema.publish.requireSignoff)
+      },
+      flowSummary: flow.summary,
+      versionCompare: compare.hasBaseline ? {
+        baseline: compare.baseline,
+        score: compare.score,
+        delta: compare.delta,
+        lines: compare.lines
+      } : { score: compare.score, baseline: null, note:'No baseline captured yet' },
+      releaseMatrix: matrix.environments.map(function(env){ return { key: env.key, status: env.status, coverage: env.coverage, score: env.score }; }),
+      packageSurface: surface.summary,
+      existingManifest: {
+        packageName: baseManifest.packageName || schema && schema.moduleId || '',
+        version: baseManifest.version || schema && schema.package && schema.package.version || '',
+        channel: baseManifest.channel || schema && schema.package && schema.package.channel || '',
+        compatibility: baseManifest.compatibility || schema && schema.package && schema.package.compatibility || ''
+      }
+    };
+    return [
+      'You are GPT Pro operating directly on the HESEM QMS Module Builder codebase.',
+      'Your role: industrial product architect, UX systems designer, workflow orchestration expert, and release governance specialist.',
+      '',
+      'NON-NEGOTIABLE RULES',
+      '- Audit live code paths before changing anything.',
+      '- Keep backward compatibility for saved schemas, runtime JSON, route names, roles, and block IDs unless a change is explicitly justified.',
+      '- Preserve existing APIs, data contracts, and workflow bindings unless they are broken or clearly obsolete.',
+      '- Output file-by-file patches with exact changed functions and rationale.',
+      '- Prefer incremental, production-safe upgrades over rewrites.',
+      '',
+      'CURRENT MODULE PAYLOAD',
+      JSON.stringify(payload, null, 2),
+      '',
+      'REQUIRED DELIVERABLE',
+      '1. Audit and identify structural risks, UX debt, release-gate risks, and maintainability gaps.',
+      '2. Propose the strongest production-safe upgrade for workflow studio, version compare, release matrix, package surface, and AI export.',
+      '3. Provide exact code patches and brief test instructions.',
+      '4. Keep the builder visually premium, operationally clear, and suitable for ERP + MES + eQMS.',
+      '5. Explain tradeoffs if any aggressive refactor is required.'
+    ].join('\n');
+  }
+
+  function _r6DownloadText(filename, content){
+    if(typeof document === 'undefined' || typeof Blob === 'undefined' || !document.createElement) return content;
+    try {
+      var blob = new Blob([String(content == null ? '' : content)], { type:'text/plain;charset=utf-8' });
+      var url = (window.URL || window.webkitURL).createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(function(){
+        try { document.body.removeChild(link); } catch(err){}
+        try { (window.URL || window.webkitURL).revokeObjectURL(url); } catch(err){}
+      }, 0);
+      return content;
+    } catch(err){
+      return content;
+    }
+  }
+
+  _r5BuildPackageManifest = function(schema){
+    var manifest = typeof _r6PrevBuildPackageManifest === 'function' ? _r6PrevBuildPackageManifest(schema) : {};
+    _r6EnsureSchemaMeta(schema);
+    manifest.schemaVersion = '2026-04-07-r6';
+    manifest.flowAtlas = _r6BuildDeepGraph(schema);
+    manifest.versionCompare = _r6BuildCompareReport(schema);
+    manifest.releaseMatrix = _r6BuildReleaseMatrix(schema);
+    manifest.packageSurface = _r6BuildPackageSurface(schema);
+    manifest.aiCopilot = {
+      targetModel: schema && schema.aiCopilot && schema.aiCopilot.targetModel || 'GPT Pro',
+      mode: schema && schema.aiCopilot && schema.aiCopilot.mode || 'upgrade-module',
+      generatedAt: _r6Stamp()
+    };
+    manifest.generatedAt = _r6Stamp();
+    return manifest;
+  };
+
+  function _r6EdgePath(from, to){
+    var x1 = (from.x || 0) + (from.w || 0);
+    var y1 = (from.y || 0) + Math.round((from.h || 0) / 2);
+    var x2 = to.x || 0;
+    var y2 = (to.y || 0) + Math.round((to.h || 0) / 2);
+    var c = Math.max(70, Math.round((x2 - x1) * 0.45));
+    return 'M' + x1 + ' ' + y1 + ' C' + (x1 + c) + ' ' + y1 + ' ' + (x2 - c) + ' ' + y2 + ' ' + x2 + ' ' + y2;
+  }
+
+  function _r6RenderFlowAtlas(flow){
+    var map = {};
+    var chips = [];
+    var h = '<div class="mb-r6-atlas">';
+    flow.nodes.forEach(function(node){ map[node.id] = node; });
+    h += '<div class="mb-r6-lane-strip">' + flow.lanes.map(function(lane){ return '<span><strong>' + _esc(String(lane.key || '').toUpperCase()) + '</strong><small>' + _esc(lane.count) + '</small></span>'; }).join('') + '</div>';
+    h += '<div class="mb-r6-atlas-wrap"><svg class="mb-r6-atlas-svg" viewBox="0 0 ' + _esc(flow.width) + ' ' + _esc(flow.height) + '" preserveAspectRatio="xMinYMin meet">';
+    h += '<defs><linearGradient id="mbR6Edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c3aed"></stop><stop offset="100%" stop-color="#06b6d4"></stop></linearGradient><marker id="mbR6Arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7c3aed"></path></marker></defs>';
+    flow.edges.forEach(function(edge){
+      var from = map[edge.from];
+      var to = map[edge.to];
+      if(!from || !to) return;
+      h += '<path class="mb-r6-edge is-' + _esc(edge.kind || 'flow') + '" d="' + _esc(_r6EdgePath(from, to)) + '" marker-end="url(#mbR6Arrow)"></path>';
+    });
+    flow.nodes.forEach(function(node){
+      var label = _r6Short(node.label, node.kind === 'service' ? 26 : 28);
+      var subtitle = _r6Short(node.subtitle || '', 28);
+      h += '<g class="mb-r6-node is-' + _esc(node.kind) + '">';
+      h += '<rect x="' + _esc(node.x) + '" y="' + _esc(node.y) + '" rx="20" ry="20" width="' + _esc(node.w) + '" height="' + _esc(node.h) + '"></rect>';
+      h += '<text x="' + _esc((node.x || 0) + 18) + '" y="' + _esc((node.y || 0) + 29) + '" class="mb-r6-node-title">' + _esc(label) + '</text>';
+      h += '<text x="' + _esc((node.x || 0) + 18) + '" y="' + _esc((node.y || 0) + 50) + '" class="mb-r6-node-subtitle">' + _esc(subtitle) + '</text>';
+      h += '</g>';
+      if(node.kind === 'tab') chips.push('<button class="mb-r6-chip-btn" data-action="r5-jump-tab" data-tab="' + _esc(node.targetTab || '') + '">📑 ' + _esc(node.label) + '</button>');
+      if(node.kind === 'block' && chips.length < 14) chips.push('<button class="mb-r6-chip-btn" data-action="r5-jump-block" data-tab="' + _esc(node.targetTab || '') + '" data-block="' + _esc(node.targetBlock || '') + '">🧩 ' + _esc(_r6Short(node.label, 22)) + '</button>');
+    });
+    h += '</svg></div>';
+    h += '<div class="mb-r6-chip-row">' + chips.join('') + '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function _r6RenderCompareStudio(schema, metrics){
+    var compare = metrics.compare || _r6BuildCompareReport(schema);
+    var baselines = _r6Array(schema && schema.compareStudio && schema.compareStudio.baselines);
+    var options = baselines.map(function(item){ return '<option value="' + _esc(item.id) + '"' + ((schema.compareStudio.activeBaselineId || '') === item.id ? ' selected' : '') + '>' + _esc(item.label || item.id) + '</option>'; }).join('');
+    var h = '<div class="mb-r6-compare-shell">';
+    h += '<div class="mb-r6-inline-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r6-capture-baseline">📸 ' + _esc(_r6Text('Chụp baseline', 'Capture baseline')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-cycle-baseline">🔁 ' + _esc(_r6Text('Đổi baseline', 'Cycle baseline')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-export-compare">🧾 ' + _esc(_r6Text('Export compare', 'Export compare')) + '</button>';
+    if(options) h += '<select class="hm-input hm-input-sm" data-r6-select="baseline" style="min-width:210px"><option value="">' + _esc(_r6Text('Chọn baseline', 'Select baseline')) + '</option>' + options + '</select>';
+    h += '</div>';
+    if(!compare.hasBaseline){
+      h += '<div class="mb-r6-empty">' + _esc(_r6Text('Chưa có baseline. Hãy chụp một mốc trước khi phát hành hoặc refactor lớn.', 'No baseline yet. Capture a checkpoint before major release work or refactoring.')) + '</div>';
+      h += '</div>';
+      return h;
+    }
+    h += '<div class="mb-r6-mini-grid">';
+    h += _r5ScoreCard('🧬', 'Version discipline', 'Version discipline', compare.score + '%', 'baseline + diff + release drift', 'baseline + diff + release drift', _r6Tone(compare.score));
+    h += _r5ScoreCard('📚', 'Baseline', 'Baseline', _esc(compare.baseline && compare.baseline.label || 'Baseline'), 'active checkpoint', 'active checkpoint', 'success');
+    h += _r5ScoreCard('📐', 'Block delta', 'Block delta', (compare.delta.blocks > 0 ? '+' : '') + compare.delta.blocks, 'current vs baseline', 'current vs baseline', compare.delta.blocks === 0 ? 'success' : 'warning');
+    h += _r5ScoreCard('🔌', 'API delta', 'API delta', (compare.delta.apis > 0 ? '+' : '') + compare.delta.apis, 'bindings vs baseline', 'bindings vs baseline', compare.delta.apis === 0 ? 'success' : 'warning');
+    h += '</div>';
+    h += '<div class="mb-r6-list">' + compare.lines.map(function(line){ return '<div class="mb-r6-list-item is-' + _esc(line.tone || 'info') + '"><strong>' + _esc(line.label || '') + '</strong><span>' + _esc(line.text || '') + '</span></div>'; }).join('') + '</div>';
+    h += '<div class="mb-r6-compare-diff-grid">';
+    h += '<div class="mb-r6-compare-box"><h4>' + _esc(_r6Text('Đã thêm', 'Added')) + '</h4><div class="mb-r6-chip-row">' + compare.tabDiff.added.concat(compare.apiDiff.added).concat(compare.gateDiff.added).slice(0, 10).map(function(item){ return '<span>' + _esc(item) + '</span>'; }).join('') + '</div></div>';
+    h += '<div class="mb-r6-compare-box"><h4>' + _esc(_r6Text('Đã bỏ', 'Removed')) + '</h4><div class="mb-r6-chip-row">' + compare.tabDiff.removed.concat(compare.apiDiff.removed).concat(compare.gateDiff.removed).slice(0, 10).map(function(item){ return '<span>' + _esc(item) + '</span>'; }).join('') + '</div></div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function _r6RenderReleaseMatrix(schema, metrics){
+    var matrix = metrics.releaseMatrix || _r6BuildReleaseMatrix(schema);
+    var h = '<div class="mb-r6-matrix">';
+    h += '<div class="mb-r6-inline-actions"><label>' + _esc(_r6Text('Môi trường', 'Environment')) + '<select class="hm-input hm-input-sm" data-r6-field="publish.environment"><option value="sit"' + ((schema.publish.environment || 'sit') === 'sit' ? ' selected' : '') + '>SIT</option><option value="uat"' + ((schema.publish.environment || '') === 'uat' ? ' selected' : '') + '>UAT</option><option value="production"' + ((schema.publish.environment || '') === 'production' ? ' selected' : '') + '>PROD</option></select></label>';
+    h += '<label>' + _esc(_r6Text('Ring', 'Ring')) + '<select class="hm-input hm-input-sm" data-r6-field="releaseGov.ring"><option value="pilot"' + ((schema.releaseGov.ring || 'pilot') === 'pilot' ? ' selected' : '') + '>pilot</option><option value="department"' + ((schema.releaseGov.ring || '') === 'department' ? ' selected' : '') + '>department</option><option value="plant"' + ((schema.releaseGov.ring || '') === 'plant' ? ' selected' : '') + '>plant</option><option value="enterprise"' + ((schema.releaseGov.ring || '') === 'enterprise' ? ' selected' : '') + '>enterprise</option></select></label>';
+    h += '<label>' + _esc(_r6Text('Rollout %', 'Rollout %')) + '<input class="hm-input hm-input-sm" type="number" min="0" max="100" data-r6-field="publish.rolloutPct" value="' + _esc(schema.publish.rolloutPct == null ? 0 : schema.publish.rolloutPct) + '"></label>';
+    h += '</div>';
+    h += '<div class="mb-r6-env-grid">';
+    matrix.environments.forEach(function(env){
+      h += '<div class="mb-r6-env-card is-' + _esc(env.status) + '">';
+      h += '<div class="mb-r6-env-head"><strong>' + _esc(env.label) + '</strong><span>' + _esc(env.coverage) + '%</span></div>';
+      h += '<div class="mb-r6-env-meta">' + _esc(env.owner || '') + ' • ' + _esc(env.window || '') + '</div>';
+      h += '<div class="mb-r6-progress"><span style="width:' + _esc(env.coverage) + '%"></span></div>';
+      h += '<div class="mb-r6-chip-row">' + env.gates.map(function(gate){ return '<span class="is-' + _esc(gate.status) + '">' + _esc(_r6Short(gate.name, 18)) + '</span>'; }).join('') + '</div>';
+      h += '<small>' + _esc(env.objective || '') + '</small>';
+      h += '</div>';
+    });
+    h += '</div></div>';
+    return h;
+  }
+
+  function _r6RenderPackageSurface(schema, metrics){
+    var surface = metrics.packageSurfaceDetail || _r6BuildPackageSurface(schema);
+    var h = '<div class="mb-r6-package-surface">';
+    h += '<div class="mb-r6-mini-grid">';
+    h += _r5ScoreCard('📦', 'Dependencies', 'Dependencies', surface.summary.dependencies, 'package foundations', 'package foundations', surface.summary.dependencies >= 2 ? 'success' : 'warning');
+    h += _r5ScoreCard('🧾', 'Contracts', 'Contracts', surface.summary.contracts, 'declared export contracts', 'declared export contracts', surface.summary.contracts >= 2 ? 'success' : 'warning');
+    h += _r5ScoreCard('🔌', 'API bindings', 'API bindings', surface.summary.apis, 'data surface count', 'data surface count', surface.summary.apis >= 2 ? 'success' : 'warning');
+    h += _r5ScoreCard('🧭', 'Workflows', 'Workflows', surface.summary.workflows, 'orchestrated paths', 'orchestrated paths', surface.summary.workflows >= 1 ? 'success' : 'warning');
+    h += '</div>';
+    h += '<div class="mb-r6-table">';
+    surface.entries.forEach(function(entry){
+      h += '<div class="mb-r6-table-row"><strong>' + _esc(entry.name) + '</strong><span>' + _esc(entry.kind) + '</span><span>' + _esc(entry.status) + '</span><small>' + _esc(entry.note || '') + '</small></div>';
+    });
+    h += '</div>';
+    if(surface.dependencyDiff.added.length || surface.dependencyDiff.removed.length){
+      h += '<div class="mb-r6-compare-diff-grid">';
+      h += '<div class="mb-r6-compare-box"><h4>' + _esc(_r6Text('Dependency mới', 'New dependency')) + '</h4><div class="mb-r6-chip-row">' + surface.dependencyDiff.added.slice(0, 10).map(function(item){ return '<span>' + _esc(item) + '</span>'; }).join('') + '</div></div>';
+      h += '<div class="mb-r6-compare-box"><h4>' + _esc(_r6Text('Dependency bị bỏ', 'Removed dependency')) + '</h4><div class="mb-r6-chip-row">' + surface.dependencyDiff.removed.slice(0, 10).map(function(item){ return '<span>' + _esc(item) + '</span>'; }).join('') + '</div></div>';
+      h += '</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function _r6RenderAiCopilot(schema){
+    var prompt = _r6BuildAiBrief(schema);
+    return '<div class="mb-r6-ai"><div class="mb-r6-inline-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r6-export-ai">🤖 ' + _esc(_r6Text('Export prompt GPT Pro', 'Export GPT Pro prompt')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-auto-weave">🕸 ' + _esc(_r6Text('Làm mới flow atlas', 'Refresh flow atlas')) + '</button></div><textarea readonly class="mb-r6-textarea">' + _esc(prompt) + '</textarea></div>';
+  }
+
+  function _r6RenderPresetDeck(){
+    return '<div class="mb-r6-panel-grid"><div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Motion Lab', 'Motion Lab')) + '</strong><span>' + _esc(_r6Text('Round 6 presets', 'Round 6 presets')) + '</span></div>' + _r5RenderPresetGroup(_r6MotionPresets, 'r6-apply-motion') + '</div><div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Release profiles', 'Release profiles')) + '</strong><span>' + _esc(_r6Text('ring + env + rollout', 'ring + env + rollout')) + '</span></div>' + _r5RenderPresetGroup(_r6ReleaseProfiles, 'r6-apply-release') + '</div></div>';
+  }
+
+  function _r5RenderDeck(schema){
+    var metrics;
+    var flow;
+    _r6EnsureState();
+    _r6EnsureSchemaMeta(schema);
+    metrics = _r5ComputeMetrics(schema);
+    flow = metrics.graph || _r6BuildDeepGraph(schema);
+    var h = '<div class="mb-r6-shell">';
+    h += '<div class="mb-r6-hero"><div class="mb-r6-hero-copy"><div class="mb-r6-kicker">ROUND 6 · Flow Atlas · Version Compare · Release Matrix</div><h2>' + _esc(_r6Text('Module Builder Supreme Deck', 'Module Builder Supreme Deck')) + '</h2><p>' + _esc(_r6Text('Canvas điều phối sâu hơn: graph đúng cây block, baseline compare, release matrix và package surface cùng lúc.', 'A deeper control canvas: tree-accurate graph, baseline compare, release matrix, and package surface in one place.')) + '</p><div class="mb-r6-chip-row"><span>' + _esc((schema.package && schema.package.version) || '0.1.0') + '</span><span>' + _esc((schema.publish && schema.publish.environment) || 'sit') + '</span><span>' + _esc((schema.releaseGov && schema.releaseGov.ring) || 'pilot') + '</span><span>' + _esc((schema.aiCopilot && schema.aiCopilot.targetModel) || 'GPT Pro') + '</span></div></div><div class="mb-r6-hero-side">' + _r5RenderPackageCard(schema, metrics) + '</div></div>';
+    h += '<div class="mb-r6-score-grid">';
+    h += _r5ScoreCard('🕸', 'Flow Atlas', 'Flow Atlas', metrics.workflowDensity + '%', 'tree + service + gates', 'tree + service + gates', _r6Tone(metrics.workflowDensity));
+    h += _r5ScoreCard('🧬', 'Version discipline', 'Version discipline', metrics.versionDiscipline + '%', 'baseline + drift + diff', 'baseline + drift + diff', _r6Tone(metrics.versionDiscipline));
+    h += _r5ScoreCard('🛡', 'Release matrix', 'Release matrix', metrics.releaseOrchestration + '%', 'env + gates + rollout', 'env + gates + rollout', _r6Tone(metrics.releaseOrchestration));
+    h += _r5ScoreCard('📦', 'Package surface', 'Package surface', metrics.packageSurface + '%', 'deps + contracts + APIs', 'deps + contracts + APIs', _r6Tone(metrics.packageSurface));
+    h += _r5ScoreCard('🤖', 'AI readiness', 'AI readiness', metrics.aiReadiness + '%', 'manifest + compare + export', 'manifest + compare + export', _r6Tone(metrics.aiReadiness));
+    h += '</div>';
+    h += '<div class="mb-r6-toolbar"><div class="mb-r6-toolbar-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r6-seed-supreme">✨ ' + _esc(_r6Text('Seed supreme kit', 'Seed supreme kit')) + '</button><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r6-auto-weave">🕸 ' + _esc(_r6Text('Auto weave flow', 'Auto weave flow')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-capture-baseline">📸 ' + _esc(_r6Text('Capture baseline', 'Capture baseline')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r6-export-ai">🤖 ' + _esc(_r6Text('Export AI prompt', 'Export AI prompt')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r5-export-pack">⬇️ ' + _esc(_r6Text('Export pack', 'Export pack')) + '</button></div><div class="mb-r6-toolbar-row"><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-workflow">🕸 ' + _esc(_r6Text('Flow atlas', 'Flow atlas')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-compare">🧬 ' + _esc(_r6Text('Version compare', 'Version compare')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-release-matrix">🛡 ' + _esc(_r6Text('Release matrix', 'Release matrix')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-market-compare">📦 ' + _esc(_r6Text('Package surface', 'Package surface')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-motion-lab">✨ ' + _esc(_r6Text('Labs', 'Labs')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r6-toggle-ai">🤖 ' + _esc(_r6Text('AI copilot', 'AI copilot')) + '</button></div></div>';
+    h += '<div class="mb-r6-panel-grid">';
+    h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Release posture', 'Release posture')) + '</strong><span>' + _esc((schema.publish && schema.publish.environment) || 'sit') + ' • ' + _esc((schema.releaseGov && schema.releaseGov.ring) || 'pilot') + '</span></div>' + _r5RenderReleaseBoard(schema) + '</div>';
+    h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Package manifest', 'Package manifest')) + '</strong><span>' + _esc((schema.package && schema.package.channel) || 'pilot') + ' • ' + _esc((schema.package && schema.package.compatibility) || '') + '</span></div>' + _r5RenderPackageCard(schema, metrics) + '</div>';
+    h += '</div>';
+    if(state.showR6Workflow){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Flow Atlas', 'Flow Atlas')) + '</strong><span>' + _esc(flow.summary.blockNodes) + ' ' + _esc(_r6Text('blocks', 'blocks')) + ' • ' + _esc(flow.summary.serviceNodes) + ' ' + _esc(_r6Text('services', 'services')) + '</span></div>' + _r6RenderFlowAtlas(flow) + '</div>';
+    }
+    if(state.showR6Compare){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Version Compare Studio', 'Version Compare Studio')) + '</strong><span>' + _esc(metrics.compare.hasBaseline ? (metrics.compare.baseline && metrics.compare.baseline.label || 'baseline') : _r6Text('capture required', 'capture required')) + '</span></div>' + _r6RenderCompareStudio(schema, metrics) + '</div>';
+    }
+    if(state.showR6ReleaseMatrix){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Release Matrix', 'Release Matrix')) + '</strong><span>' + _esc(metrics.releaseMatrix.currentEnv || 'sit') + ' • ' + _esc(metrics.releaseMatrix.ring || 'pilot') + '</span></div>' + _r6RenderReleaseMatrix(schema, metrics) + '</div>';
+    }
+    if(state.showR6MarketCompare){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Package Surface Compare', 'Package Surface Compare')) + '</strong><span>' + _esc(metrics.packageSurfaceDetail.summary.dependencies) + ' deps • ' + _esc(metrics.packageSurfaceDetail.summary.contracts) + ' contracts</span></div>' + _r6RenderPackageSurface(schema, metrics) + '</div>';
+    }
+    if(state.showR6MotionLab){
+      h += _r6RenderPresetDeck();
+    }
+    if(state.showR6Ai){
+      h += '<div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('AI Copilot Export', 'AI Copilot Export')) + '</strong><span>' + _esc((schema.aiCopilot && schema.aiCopilot.targetModel) || 'GPT Pro') + '</span></div>' + _r6RenderAiCopilot(schema) + '</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function _r6BlockRibbon(block){
+    var chips = [];
+    var api = _r6BlockApi(block);
+    var workflowId = _r6BlockWorkflow(block);
+    if(block && block.templateKey) chips.push('<span>tpl · ' + _esc(block.templateKey) + '</span>');
+    if(api) chips.push('<span>api · ' + _esc(api) + '</span>');
+    if(workflowId) chips.push('<span>wf · ' + _esc(workflowId) + '</span>');
+    if(block && block.visible === false) chips.push('<span>hidden</span>');
+    return chips.length ? '<div class="mb-r6-block-ribbon">' + chips.join('') + '</div>' : '';
+  }
+
+  function _r6ApplyPatchObject(target, patch){
+    if(typeof _r5ApplyPatchObject === 'function') return _r5ApplyPatchObject(target, patch);
+    return _mergeDeep(target, patch || {});
+  }
+
+  function _r6AutoWeaveCore(){
+    var flow = _r6BuildDeepGraph(state.schema);
+    var surface = _r6BuildPackageSurface(state.schema);
+    state.schema.workflowStudio.nodes = flow.nodes.map(function(node){ return { id:node.id, kind:node.kind, lane:node.lane, label:node.label, subtitle:node.subtitle, targetTab:node.targetTab || '', targetBlock:node.targetBlock || '' }; });
+    state.schema.workflowStudio.edges = flow.edges.map(function(edge){ return { from:edge.from, to:edge.to, kind:edge.kind }; });
+    state.schema.workflowStudio.lanes = flow.lanes.map(function(lane){ return lane.key; });
+    state.schema.workflowStudio.lastGeneratedAt = _r6Stamp();
+    state.schema.releaseMatrix.generatedAt = _r6Stamp();
+    state.schema.marketOps.generatedAt = _r6Stamp();
+    state.schema.marketOps.lastSummary = surface.summary;
+    state.schema.aiCopilot.lastGeneratedAt = _r6Stamp();
+    state.schema.aiCopilot.lastBrief = _r6BuildAiBrief(state.schema);
+  }
+
+  function _r6AutoWeaveFlow(){
+    if(!state.schema) return;
+    _mutateSchema(_r6Text('Auto weave Flow Atlas', 'Auto weave Flow Atlas'), function(){
+      _r6EnsureSchemaMeta(state.schema);
+      _r6AutoWeaveCore();
+    });
+    if(typeof _toastBuilder === 'function') _toastBuilder(_r6Text('Đã làm mới Flow Atlas, package surface và AI brief.', 'Flow Atlas, package surface, and AI brief were refreshed.'), 'success');
+  }
+
+  function _r6CaptureBaseline(){
+    if(!state.schema) return;
+    _mutateSchema(_r6Text('Chụp baseline Round 6', 'Capture Round 6 baseline'), function(){
+      var label = _r6Text('Baseline', 'Baseline') + ' ' + (state.schema.compareStudio.baselines.length + 1);
+      var id = 'baseline-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      var baseline = { id:id, label:label, capturedAt:_r6Stamp(), schema:_r6SnapshotSchema(state.schema) };
+      state.schema.compareStudio.baselines.unshift(baseline);
+      state.schema.compareStudio.baselines = state.schema.compareStudio.baselines.slice(0, 8);
+      state.schema.compareStudio.activeBaselineId = id;
+      state.schema.compareStudio.lastCapturedAt = baseline.capturedAt;
+      state.schema.compareStudio.lastComparedAt = baseline.capturedAt;
+    });
+    if(typeof _toastBuilder === 'function') _toastBuilder(_r6Text('Đã chụp baseline để so sánh version.', 'Baseline captured for version comparison.'), 'success');
+  }
+
+  function _r6CycleBaseline(){
+    if(!state.schema) return;
+    var baselines = _r6Array(state.schema.compareStudio && state.schema.compareStudio.baselines);
+    if(!baselines.length) return;
+    var currentId = state.schema.compareStudio.activeBaselineId || '';
+    var index = baselines.findIndex(function(item){ return item.id === currentId; });
+    index = index < 0 ? 0 : ((index + 1) % baselines.length);
+    state.schema.compareStudio.activeBaselineId = baselines[index].id;
+    state.schema.compareStudio.lastComparedAt = _r6Stamp();
+    _paint();
+  }
+
+  function _r6ExportCompare(){
+    if(!state.schema) return null;
+    var report = _r6BuildCompareReport(state.schema);
+    return _r5DownloadJson('module-builder-round6-compare-' + (state.schema.moduleId || 'module') + '.json', report);
+  }
+
+  function _r6ExportAiPrompt(){
+    if(!state.schema) return null;
+    return _r6DownloadText('module-builder-round6-gpt-pro-' + (state.schema.moduleId || 'module') + '.txt', _r6BuildAiBrief(state.schema));
+  }
+
+  function _r6ApplyMotionPreset(key){
+    var preset = _r6MotionPresets[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_r6Text('Áp dụng motion preset', 'Apply motion preset'), function(){
+      _r6EnsureSchemaMeta(state.schema);
+      _r6ApplyPatchObject(state.schema, preset.patch || {});
+    });
+  }
+
+  function _r6ApplyReleaseProfile(key){
+    var preset = _r6ReleaseProfiles[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_r6Text('Áp dụng release profile', 'Apply release profile'), function(){
+      _r6EnsureSchemaMeta(state.schema);
+      _r6ApplyPatchObject(state.schema, preset.patch || {});
+    });
+  }
+
+  function _r6InsertTemplate(key, tabId){
+    if(typeof _r5InsertTemplate !== 'function') return;
+    _r5InsertTemplate(key, { tabId: tabId, parentId: null, slotKey: 'default', insertIndex: null });
+  }
+
+  function _r6SeedSupremeExperience(){
+    if(!state.schema) return;
+    _mutateSchema(_r6Text('Seed supreme Round 6 kit', 'Seed supreme Round 6 kit'), function(){
+      var tabs = _r6Array(state.schema.tabs);
+      var primaryTab = state.activeTab || (tabs[0] && tabs[0].tabId) || '';
+      var releaseTab = (tabs.find(function(tab){ return tab && tab.tabId === 'release'; }) || tabs[1] || tabs[0] || {}).tabId || primaryTab;
+      ['r6-flow-atlas-banner','r6-stage-command-kpi','r6-flow-lane-cards','r6-signal-radar'].forEach(function(key){ _r6InsertTemplate(key, primaryTab); });
+      ['r6-release-matrix-table','r6-version-compare-cards','r6-governance-timeline','r6-marketplace-compat-table','r6-approval-trace'].forEach(function(key){ _r6InsertTemplate(key, releaseTab); });
+      _r6AutoWeaveCore();
+    });
+    if(typeof _toastBuilder === 'function') _toastBuilder(_r6Text('Đã thêm supreme kit Round 6 và auto weave flow atlas.', 'Round 6 supreme kit was added and the flow atlas was auto-woven.'), 'success');
+  }
+
+  function _r6InjectStyles(){
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-module-builder-round6-style')) return;
+    var style = document.createElement('style');
+    var css = '';
+    style.id = 'hm-module-builder-round6-style';
+    css += '.mb-r6-shell{display:grid;gap:14px;margin:0 0 18px}';
+    css += '.mb-r6-hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:14px;padding:18px;border-radius:26px;border:1px solid rgba(99,102,241,.16);background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(239,246,255,.96) 42%,rgba(238,242,255,.94));box-shadow:0 20px 40px rgba(15,23,42,.06)}';
+    css += '.mb-r6-hero-copy h2{margin:0 0 8px;font-size:28px;line-height:1.12;color:#0f172a}';
+    css += '.mb-r6-hero-copy p{margin:0 0 12px;color:#475569;line-height:1.7;font-size:13px}';
+    css += '.mb-r6-kicker{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#4338ca;margin-bottom:6px}';
+    css += '.mb-r6-hero-side .mb-r5-package-card{height:100%}';
+    css += '.mb-r6-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}';
+    css += '.mb-r6-toolbar,.mb-r6-panel,.mb-r6-panel-grid{display:grid;gap:10px}';
+    css += '.mb-r6-toolbar{padding:12px 14px;border-radius:22px;border:1px solid rgba(148,163,184,.18);background:rgba(255,255,255,.92)}';
+    css += '.mb-r6-toolbar-row,.mb-r6-inline-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}';
+    css += '.mb-r6-panel-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}';
+    css += '.mb-r6-panel{padding:14px;border-radius:24px;border:1px solid rgba(148,163,184,.18);background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94));box-shadow:0 12px 28px rgba(15,23,42,.05)}';
+    css += '.mb-r6-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}';
+    css += '.mb-r6-panel-head strong{font-size:14px;color:#0f172a}';
+    css += '.mb-r6-panel-head span{font-size:12px;color:#64748b;font-weight:700}';
+    css += '.mb-r6-lane-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}';
+    css += '.mb-r6-lane-strip span{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:14px;background:#eef2ff;border:1px solid rgba(99,102,241,.12);font-size:11px;color:#4338ca;font-weight:800;text-transform:uppercase;letter-spacing:.08em}';
+    css += '.mb-r6-atlas{display:grid;gap:12px}';
+    css += '.mb-r6-atlas-wrap{overflow:auto;border-radius:22px;border:1px solid rgba(148,163,184,.16);background:radial-gradient(circle at top left,rgba(124,58,237,.08),rgba(255,255,255,.96) 42%,rgba(236,253,245,.96));padding:10px}';
+    css += '.mb-r6-atlas-svg{width:100%;min-width:1180px;height:520px;display:block}';
+    css += '.mb-r6-edge{fill:none;stroke:url(#mbR6Edge);stroke-width:2.4;stroke-linecap:round;opacity:.92}';
+    css += '.mb-r6-edge.is-gate{stroke:#f59e0b}.mb-r6-edge.is-data{stroke:#0ea5e9}.mb-r6-edge.is-workflow{stroke:#8b5cf6}.mb-r6-edge.is-container{stroke:#94a3b8;stroke-dasharray:5 6}';
+    css += '.mb-r6-node rect{stroke:rgba(15,23,42,.08);stroke-width:1.2;fill:#fff}';
+    css += '.mb-r6-node.is-module rect{fill:url(#mbR6Edge);stroke:none;filter:drop-shadow(0 10px 18px rgba(99,102,241,.22))}';
+    css += '.mb-r6-node.is-tab rect{fill:#eef2ff;stroke:#c7d2fe}.mb-r6-node.is-block rect{fill:#ffffff;stroke:#dbeafe}.mb-r6-node.is-service rect,.mb-r6-node.is-workflow rect{fill:#ecfeff;stroke:#99f6e4}.mb-r6-node.is-gate rect{fill:#fff7ed;stroke:#fdba74}';
+    css += '.mb-r6-node-title{font-size:13px;font-weight:800;fill:#0f172a}.mb-r6-node-subtitle{font-size:11px;fill:#64748b}.mb-r6-node.is-module .mb-r6-node-title,.mb-r6-node.is-module .mb-r6-node-subtitle{fill:#fff}';
+    css += '.mb-r6-chip-row{display:flex;flex-wrap:wrap;gap:6px}';
+    css += '.mb-r6-chip-row span,.mb-r6-chip-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f8fafc;border:1px solid rgba(148,163,184,.16);font-size:11px;font-weight:700;color:#334155}';
+    css += '.mb-r6-chip-btn{cursor:pointer}';
+    css += '.mb-r6-mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}';
+    css += '.mb-r6-list{display:grid;gap:8px;margin-top:10px}';
+    css += '.mb-r6-list-item{display:grid;gap:4px;padding:10px 12px;border-radius:16px;border:1px solid rgba(148,163,184,.16);background:#fff}';
+    css += '.mb-r6-list-item strong{font-size:12px;color:#0f172a}.mb-r6-list-item span{font-size:12px;color:#475569;line-height:1.55}';
+    css += '.mb-r6-list-item.is-warning{border-color:rgba(245,158,11,.18);background:#fffaf0}.mb-r6-list-item.is-info{border-color:rgba(59,130,246,.18);background:#eff6ff}';
+    css += '.mb-r6-compare-diff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}';
+    css += '.mb-r6-compare-box{padding:12px;border-radius:18px;border:1px solid rgba(148,163,184,.16);background:#fff}.mb-r6-compare-box h4{margin:0 0 10px;font-size:12px;color:#0f172a}';
+    css += '.mb-r6-empty{padding:16px;border-radius:18px;background:#f8fafc;border:1px dashed rgba(148,163,184,.28);font-size:13px;color:#475569;line-height:1.65}';
+    css += '.mb-r6-env-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}';
+    css += '.mb-r6-env-card{padding:12px;border-radius:20px;border:1px solid rgba(148,163,184,.16);background:#fff;display:grid;gap:8px}';
+    css += '.mb-r6-env-card.is-passed{background:#f0fdf4;border-color:rgba(16,185,129,.24)}.mb-r6-env-card.is-active{background:#eff6ff;border-color:rgba(59,130,246,.24)}.mb-r6-env-card.is-queued{background:#fffaf0;border-color:rgba(245,158,11,.24)}';
+    css += '.mb-r6-env-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.mb-r6-env-head strong{font-size:13px;color:#0f172a}.mb-r6-env-head span{font-size:12px;font-weight:800;color:#4338ca}';
+    css += '.mb-r6-env-meta{font-size:12px;color:#64748b}.mb-r6-progress{height:8px;border-radius:999px;background:rgba(148,163,184,.14);overflow:hidden}.mb-r6-progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#06b6d4)}';
+    css += '.mb-r6-chip-row .is-passed{background:#dcfce7}.mb-r6-chip-row .is-active{background:#dbeafe}.mb-r6-chip-row .is-queued{background:#fef3c7}';
+    css += '.mb-r6-table{display:grid;gap:8px;max-height:320px;overflow:auto;padding-right:4px}';
+    css += '.mb-r6-table-row{display:grid;grid-template-columns:minmax(0,1.1fr) 86px 90px minmax(0,.9fr);gap:8px;align-items:center;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid rgba(148,163,184,.14)}';
+    css += '.mb-r6-table-row strong{font-size:12px;color:#0f172a}.mb-r6-table-row span{font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:.08em;font-weight:700}.mb-r6-table-row small{font-size:11px;color:#64748b;line-height:1.5}';
+    css += '.mb-r6-ai{display:grid;gap:10px}.mb-r6-textarea{width:100%;min-height:280px;border-radius:18px;border:1px solid rgba(148,163,184,.18);padding:12px 14px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0f172a;color:#e2e8f0;resize:vertical}';
+    css += '.mb-r6-block-ribbon{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.mb-r6-block-ribbon span{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:linear-gradient(180deg,rgba(79,70,229,.08),rgba(56,189,248,.08));border:1px solid rgba(79,70,229,.12);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#4338ca}';
+    css += '@media (max-width: 1180px){.mb-r6-hero{grid-template-columns:1fr}.mb-r6-lane-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+    style.appendChild(document.createTextNode(css));
+    (document.head || document.body || document.documentElement).appendChild(style);
+  }
+
+  _r5InjectStyles = function(){
+    if(typeof _r6PrevInjectStyles === 'function') _r6PrevInjectStyles();
+    _r6InjectStyles();
+  };
+
+  _createBlankModule = function(){
+    var result = _r6PrevCreateBlankModule();
+    if(state.schema) _r6EnsureSchemaMeta(state.schema);
+    return result;
+  };
+
+  _openSavedModule = function(moduleId){
+    var result = _r6PrevOpenSavedModule(moduleId);
+    return Promise.resolve(result).then(function(resp){
+      if(state.schema) _r6EnsureSchemaMeta(state.schema);
+      return resp;
+    });
+  };
+
+  _saveModule = function(){
+    if(state.schema) _r6EnsureSchemaMeta(state.schema);
+    return _r6PrevSaveModule();
+  };
+
+  _renderCanvasBlock = function(block, tab, tree, depth){
+    var html = _r6PrevRenderCanvasBlock(block, tab, tree, depth);
+    var ribbon = _r6BlockRibbon(block);
+    if(ribbon) html = html.replace('<div class="mb-block-body">', ribbon + '<div class="mb-block-body">');
+    return html;
+  };
+
+  _renderPreview = function(){
+    var html = _r6PrevRenderPreview();
+    var metrics;
+    var flow;
+    if(!state.schema) return html;
+    _r6EnsureState();
+    _r6EnsureSchemaMeta(state.schema);
+    metrics = _r5ComputeMetrics(state.schema);
+    flow = metrics.graph || _r6BuildDeepGraph(state.schema);
+    return '<div class="mb-r6-shell"><div class="mb-r6-panel-grid"><div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Preview · Flow Atlas', 'Preview · Flow Atlas')) + '</strong><span>' + _esc(flow.summary.blockNodes) + ' ' + _esc(_r6Text('blocks', 'blocks')) + '</span></div>' + _r6RenderFlowAtlas(flow) + '</div><div class="mb-r6-panel"><div class="mb-r6-panel-head"><strong>' + _esc(_r6Text('Preview · Version Compare', 'Preview · Version Compare')) + '</strong><span>' + _esc(metrics.compare.hasBaseline ? (metrics.compare.baseline && metrics.compare.baseline.label || 'baseline') : _r6Text('capture baseline', 'capture baseline')) + '</span></div>' + _r6RenderCompareStudio(state.schema, metrics) + '</div></div></div>' + html;
+  };
+
+  _renderBuilder = function(){
+    var html = _r6PrevRenderBuilder();
+    if(!state.schema || state.step !== 'build') return html;
+    return html.replace('MODULE BUILDER V2 · ROUND 5', 'MODULE BUILDER V2 · ROUND 6');
+  };
+
+  _handleInput = function(e){
+    var target = e && e.target ? e.target : null;
+    var path;
+    var value;
+    if(target && target.hasAttribute && target.hasAttribute('data-r6-select')){
+      if(!state.schema) return;
+      switch(target.getAttribute('data-r6-select')){
+        case 'baseline':
+          state.schema.compareStudio.activeBaselineId = target.value || '';
+          state.schema.compareStudio.lastComparedAt = _r6Stamp();
+          _paint();
+          return;
+      }
+    }
+    if(target && target.hasAttribute && target.hasAttribute('data-r6-field')){
+      path = target.getAttribute('data-r6-field') || '';
+      value = target.value;
+      if(path){
+        _mutateSchema(_r6Text('Cập nhật Round 6 field', 'Update Round 6 field'), function(){
+          if(path === 'publish.rolloutPct') value = parseInt(value, 10) || 0;
+          _setByPath(state.schema, path, value);
+          if(path === 'publish.channel') state.schema.package.channel = value || state.schema.package.channel;
+        });
+        return;
+      }
+    }
+    return _r6PrevHandleInput(e);
+  };
+
+  _handleClick = function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r6-seed-supreme':
+          _r6SeedSupremeExperience();
+          return;
+        case 'r6-auto-weave':
+          _r6AutoWeaveFlow();
+          return;
+        case 'r6-capture-baseline':
+          _r6CaptureBaseline();
+          return;
+        case 'r6-cycle-baseline':
+          _r6CycleBaseline();
+          return;
+        case 'r6-export-compare':
+          _r6ExportCompare();
+          return;
+        case 'r6-export-ai':
+          _r6ExportAiPrompt();
+          return;
+        case 'r6-toggle-workflow':
+          state.showR6Workflow = !state.showR6Workflow;
+          _paint();
+          return;
+        case 'r6-toggle-compare':
+          state.showR6Compare = !state.showR6Compare;
+          _paint();
+          return;
+        case 'r6-toggle-release-matrix':
+          state.showR6ReleaseMatrix = !state.showR6ReleaseMatrix;
+          _paint();
+          return;
+        case 'r6-toggle-market-compare':
+          state.showR6MarketCompare = !state.showR6MarketCompare;
+          _paint();
+          return;
+        case 'r6-toggle-ai':
+          state.showR6Ai = !state.showR6Ai;
+          _paint();
+          return;
+        case 'r6-toggle-motion-lab':
+          state.showR6MotionLab = !state.showR6MotionLab;
+          _paint();
+          return;
+        case 'r6-apply-motion':
+          _r6ApplyMotionPreset(btn.getAttribute('data-key') || '');
+          return;
+        case 'r6-apply-release':
+          _r6ApplyReleaseProfile(btn.getAttribute('data-key') || '');
+          return;
+      }
+    }
+    return _r6PrevHandleClick(e);
+  };
+
+  window.__HM_MB_R6_TEST__ = {
+    version: '2026-04-07-r6',
+    createDemoSchema: function(){
+      if(window.__HM_MB_R5_TEST__ && window.__HM_MB_R5_TEST__.createDemoSchema){
+        window.__HM_MB_R5_TEST__.createDemoSchema();
+      } else {
+        state.schema = {
+          moduleId: 'round6-demo',
+          title: { vi:'Round 6 Demo', en:'Round 6 Demo' },
+          route: 'round6-demo',
+          roles: ['it_admin'],
+          package: { version:'0.1.0', channel:'pilot', compatibility:'hesemqms>=2026.04', dependencies:['erp','mes','eqms'], contracts:['module.runtime'] },
+          publish: { environment:'sit', rolloutPct:10, requireSignoff:true },
+          releaseGov: { ring:'pilot', gates:['design review','qa smoke','signoff','rollback'] },
+          tabs: [
+            { tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] },
+            { tabId:'release', title:{ vi:'Release', en:'Release' }, icon:'🚀', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] }
+          ]
+        };
+        state.activeTab = 'overview';
+        state.step = 'build';
+      }
+      _r6EnsureSchemaMeta(state.schema);
+      return _r6Clone(state.schema);
+    },
+    seedSupreme: function(){ _r6SeedSupremeExperience(); return _r6Clone(state.schema); },
+    autoWeave: function(){ _r6AutoWeaveFlow(); return _r6Clone(state.schema.workflowStudio); },
+    captureBaseline: function(){ _r6CaptureBaseline(); return _r6Clone(state.schema.compareStudio); },
+    compare: function(){ return state.schema ? _r6Clone(_r6BuildCompareReport(state.schema)) : null; },
+    flowAtlas: function(){ return state.schema ? _r6Clone(_r6BuildDeepGraph(state.schema)) : null; },
+    releaseMatrix: function(){ return state.schema ? _r6Clone(_r6BuildReleaseMatrix(state.schema)) : null; },
+    packageSurface: function(){ return state.schema ? _r6Clone(_r6BuildPackageSurface(state.schema)) : null; },
+    manifest: function(){ return state.schema ? _r6Clone(_r5BuildPackageManifest(state.schema)) : null; },
+    renderBuilderHtml: function(){ return state.schema ? _renderBuilder() : ''; },
+    renderPreviewHtml: function(){ return state.schema ? _renderPreview() : ''; },
+    aiPrompt: function(){ return state.schema ? _r6BuildAiBrief(state.schema) : ''; }
+  };
+}
+
+
+
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder ULTRA Round 7
+ * Experience Director · Scenario Studio · Layout Harmony · Accessibility Ops · Market Lens
+ * ============================================================================ */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R7__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R7__ = '2026-04-07-r7';
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R6_RECOVERED__ = '2026-04-07-r7';
+
+  var _r7ScenarioPresets = {
+    'executive-theatre': {
+      labelVi:'Executive Theatre', labelEn:'Executive Theatre',
+      descriptionVi:'Control tower điện ảnh cho điều hành, release và executive review.',
+      descriptionEn:'Cinematic control tower for leadership, release, and executive reviews.',
+      storyTitle:{ vi:'Executive theatre storyboard', en:'Executive theatre storyboard' },
+      patch:{
+        design:{ storyMode:'executive', chrome:'premium', audience:'executive' },
+        motion:{ preset:'cinematic-control', intensity:'immersive', edgeStyle:'flow', glow:'high' },
+        themeLab:{ preset:'executive-lux', density:'comfortable', surface:'glass', contrast:'balanced', accent:'violet-blue', cardStyle:'orbital', elevation:'deep' },
+        publish:{ mode:'controlled', environment:'uat', rolloutPct:20, channel:'executive', requireSignoff:true },
+        governanceStudio:{ gatePolicy:'balanced', reviewCadence:'daily', releaseWindow:'weekday' },
+        aiCopilot:{ persona:'architect', promptStyle:'surgical', targetModel:'GPT Pro' }
+      },
+      templates:['r6-mission-hero','r6-control-ribbon','r7-experience-command-hub','r7-market-lens-grid']
+    },
+    'operator-shift': {
+      labelVi:'Operator Shift', labelEn:'Operator Shift',
+      descriptionVi:'Rõ thao tác, đậm tín hiệu, tối ưu line-side và handheld.',
+      descriptionEn:'Clear action signals optimized for line-side and handheld operation.',
+      storyTitle:{ vi:'Operator shift storyboard', en:'Operator shift storyboard' },
+      patch:{
+        design:{ storyMode:'operational', chrome:'minimal', audience:'operator' },
+        motion:{ preset:'guided-ops', intensity:'focused', edgeStyle:'straight', glow:'low' },
+        themeLab:{ preset:'operator-fast', density:'dense', surface:'clean', contrast:'high', accent:'blue-green', cardStyle:'flat-command', elevation:'flat' },
+        accessOps:{ profile:'handheld-thumb', narration:'guided', contrastMode:'high', focusRing:'visible', hitTarget:'48px', ariaCoverage:'enhanced' },
+        aiCopilot:{ persona:'operator-coach', promptStyle:'checklist', targetModel:'GPT Pro' }
+      },
+      templates:['r7-shift-readiness-kpi','r7-story-ribbon','r7-issue-radar-table']
+    },
+    'audit-sprint': {
+      labelVi:'Audit Sprint', labelEn:'Audit Sprint',
+      descriptionVi:'Traceability, evidence và readability cao cho audit/compliance.',
+      descriptionEn:'High traceability, evidence density, and readability for audit/compliance.',
+      storyTitle:{ vi:'Audit sprint storyboard', en:'Audit sprint storyboard' },
+      patch:{
+        design:{ storyMode:'quality', chrome:'minimal', audience:'auditor' },
+        motion:{ preset:'signal-cleanroom', intensity:'focused', edgeStyle:'straight', glow:'low' },
+        themeLab:{ preset:'audit-paper', density:'comfortable', surface:'paper', contrast:'high', accent:'ink-gold', cardStyle:'ledger', elevation:'light' },
+        accessOps:{ profile:'high-clarity', narration:'documented', contrastMode:'high', focusRing:'bold', hitTarget:'44px', ariaCoverage:'enhanced' },
+        governanceStudio:{ auditTrail:'evidence-plus', reviewCadence:'per-release', gatePolicy:'strict' },
+        aiCopilot:{ persona:'quality-lead', promptStyle:'evidence-led', targetModel:'GPT Pro' }
+      },
+      templates:['r6-governance-gate-matrix','r7-layout-harmony-table','r7-accessibility-ops-board']
+    },
+    'supplier-radar': {
+      labelVi:'Supplier Radar', labelEn:'Supplier Radar',
+      descriptionVi:'Nổi bật issue radar, package value và escalation liên quan supplier quality.',
+      descriptionEn:'Highlights issue radar, package value, and escalation for supplier quality.',
+      storyTitle:{ vi:'Supplier radar storyboard', en:'Supplier radar storyboard' },
+      patch:{
+        design:{ storyMode:'quality', chrome:'balanced', audience:'quality' },
+        motion:{ preset:'guided-ops', intensity:'balanced', edgeStyle:'curved', glow:'medium' },
+        themeLab:{ preset:'plant-night', density:'compact', surface:'steel-dark', contrast:'high', accent:'emerald-cyan', cardStyle:'command', elevation:'medium' },
+        governanceStudio:{ riskProfile:'elevated', reviewCadence:'shiftly', gatePolicy:'supplier' },
+        aiCopilot:{ persona:'supplier-quality', promptStyle:'triage', targetModel:'GPT Pro' }
+      },
+      templates:['r7-market-lens-grid','r7-issue-radar-table','r7-release-choreography-timeline']
+    },
+    'release-theatre': {
+      labelVi:'Release Theatre', labelEn:'Release Theatre',
+      descriptionVi:'Nhấn wave rollout, release choreography và audit-ready package compare.',
+      descriptionEn:'Emphasizes wave rollout, release choreography, and audit-ready package compare.',
+      storyTitle:{ vi:'Release theatre storyboard', en:'Release theatre storyboard' },
+      patch:{
+        design:{ storyMode:'executive', chrome:'premium', audience:'release-manager' },
+        motion:{ preset:'precision-flow', intensity:'focused', edgeStyle:'segmented', glow:'medium' },
+        themeLab:{ preset:'executive-lux', density:'balanced', surface:'glass', contrast:'balanced', accent:'violet-blue', cardStyle:'orbital', elevation:'deep' },
+        publish:{ mode:'wave', environment:'production', rolloutPct:35, channel:'release-theatre', requireSignoff:true },
+        governanceStudio:{ gatePolicy:'strict', reviewCadence:'hourly', releaseWindow:'controlled-window' },
+        aiCopilot:{ persona:'release-manager', promptStyle:'war-room', targetModel:'GPT Pro' }
+      },
+      templates:['r6-release-wave-kpi','r7-release-choreography-timeline','r6-package-diff-table']
+    }
+  };
+
+  var _r7VisualPresets = {
+    'aurora-command': {
+      labelVi:'Aurora Command', labelEn:'Aurora Command',
+      descriptionVi:'Glow premium, chiều sâu lớn, hợp executive theatre và wallboard.',
+      descriptionEn:'Premium glow and deep layers for executive theatre and wallboards.',
+      patch:{ motion:{ preset:'cinematic-control', intensity:'immersive', edgeStyle:'flow', glow:'high' }, themeLab:{ preset:'executive-lux', surface:'glass', accent:'violet-blue', cardStyle:'orbital', elevation:'deep' }, previewChrome:{ frame:'cinematic', ribbon:'insight', density:'balanced' }, experienceDirector:{ visualMode:'aurora-command', beautyMode:'cinematic' } }
+    },
+    'calm-paper': {
+      labelVi:'Calm Paper', labelEn:'Calm Paper',
+      descriptionVi:'Sáng rõ, yên, phù hợp audit, review và validation.',
+      descriptionEn:'Calm and crisp for audit, reviews, and validation.',
+      patch:{ motion:{ preset:'signal-cleanroom', intensity:'focused', edgeStyle:'straight', glow:'low' }, themeLab:{ preset:'audit-paper', surface:'paper', accent:'ink-gold', cardStyle:'ledger', elevation:'light' }, previewChrome:{ frame:'document', ribbon:'assurance', density:'comfortable' }, experienceDirector:{ visualMode:'calm-paper', beautyMode:'clarity' } }
+    },
+    'night-plant': {
+      labelVi:'Night Plant', labelEn:'Night Plant',
+      descriptionVi:'Đậm tương phản, thao tác nhanh, hợp war room và plant command.',
+      descriptionEn:'High contrast and fast action for war rooms and plant command.',
+      patch:{ motion:{ preset:'guided-ops', intensity:'focused', edgeStyle:'straight', glow:'medium' }, themeLab:{ preset:'plant-night', surface:'steel-dark', accent:'emerald-cyan', cardStyle:'command', elevation:'medium' }, previewChrome:{ frame:'operations', ribbon:'signal', density:'compact' }, experienceDirector:{ visualMode:'night-plant', beautyMode:'operations' } }
+    }
+  };
+
+  var _r7A11yPresets = {
+    'high-clarity': {
+      labelVi:'High Clarity', labelEn:'High Clarity',
+      descriptionVi:'Ưu tiên contrast, focus ring và caption/ARIA rõ ràng.',
+      descriptionEn:'Prioritize contrast, focus rings, and clear caption/ARIA discipline.',
+      patch:{ accessOps:{ profile:'high-clarity', narration:'documented', contrastMode:'high', focusRing:'bold', hitTarget:'44px', ariaCoverage:'enhanced' } }
+    },
+    'handheld-thumb': {
+      labelVi:'Handheld Thumb', labelEn:'Handheld Thumb',
+      descriptionVi:'Hit target lớn hơn, điều hướng ngắn và động tác nhanh.',
+      descriptionEn:'Larger hit targets, shorter navigation, and faster actions.',
+      patch:{ accessOps:{ profile:'handheld-thumb', narration:'guided', contrastMode:'high', focusRing:'visible', hitTarget:'48px', ariaCoverage:'core+' } }
+    },
+    'executive-wall': {
+      labelVi:'Executive Wall', labelEn:'Executive Wall',
+      descriptionVi:'Font/spacing thoáng và ribbon mạnh cho màn hình lớn.',
+      descriptionEn:'Breathing space and stronger ribbons for large-format displays.',
+      patch:{ accessOps:{ profile:'executive-wall', narration:'guided', contrastMode:'balanced', focusRing:'visible', hitTarget:'52px', ariaCoverage:'enhanced' } }
+    }
+  };
+
+  var _r7PrevRenderBuilder = _renderBuilder;
+  var _r7PrevRenderPreview = _renderPreview;
+  var _r7PrevHandleClick = _handleClick;
+
+  function _r7IsObject(v){ return !!v && typeof v === 'object' && !Array.isArray(v); }
+  function _r7Array(v){ return Array.isArray(v) ? v : []; }
+  function _r7Clone(v){ try { return JSON.parse(JSON.stringify(v)); } catch(err){ return v; } }
+  function _r7Localize(v, fallback){
+    if(v == null) return fallback || '';
+    if(typeof v === 'string' || typeof v === 'number') return String(v);
+    if(_r7IsObject(v)) return String(v.vi || v.en || fallback || '');
+    return fallback || '';
+  }
+  function _r7GetByPath(obj, path){
+    var ctx = obj;
+    _r7Array(String(path || '').split('.')).forEach(function(part){ if(part && ctx != null) ctx = ctx[part]; });
+    return ctx;
+  }
+  function _r7Merge(target, patch){
+    if(!_r7IsObject(target) || !_r7IsObject(patch)) return target;
+    Object.keys(patch).forEach(function(key){
+      var incoming = patch[key];
+      if(Array.isArray(incoming)) target[key] = _r7Clone(incoming);
+      else if(_r7IsObject(incoming)){
+        if(!_r7IsObject(target[key])) target[key] = {};
+        _r7Merge(target[key], incoming);
+      } else target[key] = incoming;
+    });
+    return target;
+  }
+  function _r7UniquePush(arr, value){ if(arr.indexOf(value) === -1) arr.push(value); }
+  function _r7EnsureState(){
+    if(state.showR7Scenes == null) state.showR7Scenes = true;
+    if(state.showR7Layout == null) state.showR7Layout = true;
+    if(state.showR7Access == null) state.showR7Access = false;
+    if(state.showR7Market == null) state.showR7Market = false;
+    if(state.showR7Beauty == null) state.showR7Beauty = false;
+  }
+  function _r7EnsureTabShape(tab){
+    if(!_r7IsObject(tab.layout)) tab.layout = { type:'stack', columns:1, gap:'16px', align:'stretch' };
+    if(!_r7Array(tab.blocks)) tab.blocks = [];
+    return tab;
+  }
+  function _r7EnsureSchemaMeta(schema){
+    if(!_r7IsObject(schema)) return schema;
+    if(!_r7Array(schema.tabs)) schema.tabs = [];
+    if(!_r7IsObject(schema.design)) schema.design = {};
+    if(!_r7IsObject(schema.motion)) schema.motion = {};
+    if(!_r7IsObject(schema.package)) schema.package = {};
+    if(!_r7IsObject(schema.publish)) schema.publish = {};
+    if(!_r7IsObject(schema.releaseGov)) schema.releaseGov = {};
+    if(!_r7IsObject(schema.themeLab)) schema.themeLab = {};
+    if(!_r7IsObject(schema.governanceStudio)) schema.governanceStudio = {};
+    if(!_r7IsObject(schema.aiCopilot)) schema.aiCopilot = {};
+    if(!_r7IsObject(schema.marketplace)) schema.marketplace = {};
+    if(!_r7IsObject(schema.builderManifest)) schema.builderManifest = {};
+    if(!_r7IsObject(schema.diffStudio)) schema.diffStudio = {};
+    if(!_r7IsObject(schema.flowStudio)) schema.flowStudio = {};
+    if(!_r7IsObject(schema.experienceDirector)) schema.experienceDirector = {};
+    if(!_r7IsObject(schema.scenarioStudio)) schema.scenarioStudio = {};
+    if(!_r7IsObject(schema.layoutHarmony)) schema.layoutHarmony = {};
+    if(!_r7IsObject(schema.accessOps)) schema.accessOps = {};
+    if(!_r7IsObject(schema.marketLens)) schema.marketLens = {};
+    if(!_r7IsObject(schema.storyboard)) schema.storyboard = {};
+    if(!_r7IsObject(schema.previewChrome)) schema.previewChrome = {};
+    schema.tabs.forEach(_r7EnsureTabShape);
+    if(!schema.tabs.length) schema.tabs.push(_r7EnsureTabShape({ tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', blocks:[] }));
+    if(!state.activeTab) state.activeTab = schema.tabs[0].tabId;
+    if(schema.design.storyMode == null) schema.design.storyMode = 'operational';
+    if(schema.design.chrome == null) schema.design.chrome = 'balanced';
+    if(schema.design.audience == null) schema.design.audience = 'cross-functional';
+    if(schema.motion.preset == null) schema.motion.preset = 'guided-ops';
+    if(schema.motion.intensity == null) schema.motion.intensity = 'balanced';
+    if(schema.motion.edgeStyle == null) schema.motion.edgeStyle = 'curved';
+    if(schema.motion.glow == null) schema.motion.glow = 'medium';
+    if(schema.package.version == null) schema.package.version = '0.1.0';
+    if(!Array.isArray(schema.package.dependencies)) schema.package.dependencies = [];
+    if(!Array.isArray(schema.package.contracts)) schema.package.contracts = [];
+    if(schema.publish.packageName == null || !String(schema.publish.packageName || '').trim()) schema.publish.packageName = schema.moduleId || 'module-package';
+    if(schema.publish.mode == null) schema.publish.mode = 'draft';
+    if(schema.publish.environment == null) schema.publish.environment = 'sit';
+    if(schema.publish.rolloutPct == null) schema.publish.rolloutPct = 10;
+    if(schema.publish.requireSignoff == null) schema.publish.requireSignoff = true;
+    if(!Array.isArray(schema.releaseGov.gates)) schema.releaseGov.gates = ['design review','qa smoke','rollback'];
+    if(schema.releaseGov.ring == null) schema.releaseGov.ring = 'pilot';
+    if(schema.releaseGov.rollbackOwner == null) schema.releaseGov.rollbackOwner = schema.updatedBy || schema.createdBy || 'owner';
+    if(schema.themeLab.preset == null) schema.themeLab.preset = 'executive-lux';
+    if(schema.themeLab.surface == null) schema.themeLab.surface = 'glass';
+    if(schema.themeLab.density == null) schema.themeLab.density = 'comfortable';
+    if(schema.themeLab.contrast == null) schema.themeLab.contrast = 'balanced';
+    if(schema.themeLab.accent == null) schema.themeLab.accent = 'violet-blue';
+    if(schema.themeLab.cardStyle == null) schema.themeLab.cardStyle = 'orbital';
+    if(schema.themeLab.elevation == null) schema.themeLab.elevation = 'deep';
+    if(schema.governanceStudio.gatePolicy == null) schema.governanceStudio.gatePolicy = 'balanced';
+    if(schema.governanceStudio.reviewCadence == null) schema.governanceStudio.reviewCadence = 'daily';
+    if(schema.governanceStudio.releaseWindow == null) schema.governanceStudio.releaseWindow = 'weekday';
+    if(schema.governanceStudio.auditTrail == null) schema.governanceStudio.auditTrail = 'enhanced';
+    if(schema.aiCopilot.targetModel == null) schema.aiCopilot.targetModel = 'GPT Pro';
+    if(schema.marketplace.summary == null) schema.marketplace.summary = _t('Round 7 experience director kết hợp scenario studio, layout harmony, accessibility ops và market lens để builder vừa mạnh vừa đẹp vừa dễ vận hành.', 'Round 7 experience director combines scenario studio, layout harmony, accessibility ops, and market lens so the builder is powerful, beautiful, and operationally clear.');
+    if(schema.experienceDirector.visualMode == null) schema.experienceDirector.visualMode = 'aurora-command';
+    if(schema.experienceDirector.beautyMode == null) schema.experienceDirector.beautyMode = 'cinematic';
+    if(schema.experienceDirector.r6UltraRecovered == null) schema.experienceDirector.r6UltraRecovered = true;
+    if(schema.scenarioStudio.activeScenario == null) schema.scenarioStudio.activeScenario = 'executive-theatre';
+    if(!Array.isArray(schema.scenarioStudio.catalog)) schema.scenarioStudio.catalog = Object.keys(_r7ScenarioPresets);
+    if(schema.layoutHarmony.strategy == null) schema.layoutHarmony.strategy = 'adaptive-grid';
+    if(schema.layoutHarmony.breakpointModel == null) schema.layoutHarmony.breakpointModel = 'desktop-tablet-handheld';
+    if(schema.accessOps.profile == null) schema.accessOps.profile = 'high-clarity';
+    if(schema.accessOps.narration == null) schema.accessOps.narration = 'guided';
+    if(schema.accessOps.contrastMode == null) schema.accessOps.contrastMode = 'high';
+    if(schema.accessOps.focusRing == null) schema.accessOps.focusRing = 'visible';
+    if(schema.accessOps.hitTarget == null) schema.accessOps.hitTarget = '44px';
+    if(schema.accessOps.ariaCoverage == null) schema.accessOps.ariaCoverage = 'enhanced';
+    if(schema.marketLens.compareMode == null) schema.marketLens.compareMode = 'best-in-class';
+    if(!Array.isArray(schema.marketLens.valueProps)) schema.marketLens.valueProps = ['reusable package','governed release','AI-ready prompt export','responsive experience','audit evidence'];
+    if(schema.marketLens.reuseScore == null) schema.marketLens.reuseScore = 95;
+    if(schema.storyboard.title == null) schema.storyboard.title = { vi:'Experience storyboard', en:'Experience storyboard' };
+    if(!Array.isArray(schema.storyboard.moments)) schema.storyboard.moments = [];
+    if(schema.previewChrome.frame == null) schema.previewChrome.frame = 'cinematic';
+    if(schema.previewChrome.ribbon == null) schema.previewChrome.ribbon = 'insight';
+    if(schema.previewChrome.density == null) schema.previewChrome.density = 'balanced';
+    return schema;
+  }
+  function _r7CollectBlocks(schema){
+    var blocks = [];
+    _r7Array(schema && schema.tabs).forEach(function(tab){ _r7Array(tab && tab.blocks).forEach(function(block){ blocks.push(block); }); });
+    return blocks;
+  }
+  function _r7FindTab(schema, tabId){
+    var found = null;
+    _r7Array(schema && schema.tabs).forEach(function(tab){ if(!found && tab && tab.tabId === tabId) found = tab; });
+    return found || _r7Array(schema && schema.tabs)[0] || null;
+  }
+  function _r7Template(key){ return ((BE && BE.BLOCK_TEMPLATES) || {})[key] || null; }
+  function _r7InsertTemplate(key, opts){
+    if(!state.schema) return false;
+    var tpl = _r7Template(key);
+    var tab = _r7FindTab(state.schema, opts && opts.tabId || state.activeTab);
+    var block;
+    if(!tpl || !tab) return false;
+    block = typeof _createBlockScaffold === 'function' ? _createBlockScaffold(tpl.type, tpl.config) : { blockId: (typeof _uid === 'function' ? _uid() : ('blk-' + Date.now())), id:(typeof _uid === 'function' ? _uid() : ('blk-' + Date.now())), type:tpl.type, config:_r7Clone(tpl.config || {}) };
+    block.templateKey = key;
+    if(tpl.title) block.title = _r7Clone(tpl.title);
+    if(tpl.subtitle) block.subtitle = _r7Clone(tpl.subtitle);
+    if(!_r7Array(tab.blocks)) tab.blocks = [];
+    tab.blocks.push(block);
+    return true;
+  }
+  function _r7EnsureScenarioTemplates(schema, scenarioKey){
+    var preset = _r7ScenarioPresets[scenarioKey] || _r7ScenarioPresets['executive-theatre'];
+    var tab = _r7FindTab(schema, state.activeTab);
+    if(!tab) return;
+    _r7Array(preset.templates).forEach(function(key){
+      var exists = _r7CollectBlocks(schema).some(function(block){ return block && block.templateKey === key; });
+      if(!exists) _r7InsertTemplate(key, { tabId:tab.tabId });
+    });
+  }
+  function _r7BuildSceneMoments(schema){
+    var moments = [];
+    _r7Array(schema && schema.tabs).forEach(function(tab){
+      var blocks = _r7Array(tab && tab.blocks);
+      moments.push({ kind:'tab', tabId:tab.tabId, label:_r7Localize(tab.title, tab.tabId || 'tab'), subtitle:String(blocks.length) + ' blocks' });
+      blocks.slice(0, 4).forEach(function(block){
+        moments.push({ kind:'block', tabId:tab.tabId, blockId:block.blockId || block.id, label:_r7Localize(block.title, block.type || 'block'), subtitle:block.type || 'block' });
+      });
+    });
+    return moments;
+  }
+  function _r7BuildLayoutReport(schema){
+    var rows = _r7Array(schema && schema.tabs).map(function(tab){
+      var count = _r7Array(tab && tab.blocks).length;
+      return { tabId:tab.tabId || '', label:_r7Localize(tab.title, tab.tabId || 'tab'), count:count };
+    });
+    var counts = rows.map(function(row){ return row.count; });
+    var max = counts.length ? Math.max.apply(null, counts) : 0;
+    var min = counts.length ? Math.min.apply(null, counts) : 0;
+    var emptyCount = counts.filter(function(v){ return !v; }).length;
+    var density = rows.length ? Math.round((_r7CollectBlocks(schema).length / rows.length) * 10) / 10 : 0;
+    var score = rows.length ? 92 : 0;
+    score -= (max - min) * 10;
+    score -= emptyCount * 12;
+    if(density >= 3 && density <= 6) score += 10;
+    if(_r7GetByPath(schema, 'layoutHarmony.breakpointModel')) score += 8;
+    if(_r7GetByPath(schema, 'themeLab.density')) score += 6;
+    score = Math.max(0, Math.min(100, score));
+    rows.forEach(function(row){ row.ratio = max ? Math.max(8, Math.round((row.count / max) * 100)) : 8; });
+    var recommendations = [];
+    if(max - min >= 3) recommendations.push(_t('Một số tab quá dày so với phần còn lại. Nên phân cụm lại block hoặc tách thành tab chuyên biệt.', 'Some tabs are much denser than others. Recluster blocks or split into specialized tabs.'));
+    if(emptyCount) recommendations.push(_t('Có tab đang rỗng hoặc chưa đủ nội dung chủ đạo. Nên seed scenario template phù hợp.', 'Some tabs are empty or too sparse. Seed a matching scenario template.'));
+    if(density > 6) recommendations.push(_t('Mật độ block đang cao. Nên chuyển grid 2-3 cột và tăng spacing.', 'Block density is high. Move to a 2-3 column grid and increase spacing.'));
+    if(!recommendations.length) recommendations.push(_t('Bố cục đang cân bằng tốt cho desktop/tablet/handheld.', 'The layout is well balanced for desktop/tablet/handheld.'));
+    return { rows:rows, max:max, min:min, density:density, spread:max-min, score:score, recommendations:recommendations };
+  }
+  function _r7CollectApisFromBlock(block){
+    var apis = [];
+    function dive(node){
+      if(!node) return;
+      if(Array.isArray(node)) return node.forEach(dive);
+      if(_r7IsObject(node)){
+        if(typeof node.api === 'string' && node.api.trim()) _r7UniquePush(apis, node.api.trim());
+        Object.keys(node).forEach(function(key){ dive(node[key]); });
+      }
+    }
+    dive(block && block.config);
+    return apis;
+  }
+  function _r7BuildFlowGraph(schema){
+    var nodes = [];
+    var edges = [];
+    var seen = {};
+    function pushNode(node){ if(!node || seen[node.id]) return; seen[node.id] = true; nodes.push(node); }
+    function pushEdge(from, to, relation){ edges.push({ from:from, to:to, relation:relation }); }
+    pushNode({ id:'module-root', kind:'module', label:_r7Localize(schema && schema.title, schema && schema.moduleId || 'Module') });
+    pushNode({ id:'package-' + (schema && schema.moduleId || 'module'), kind:'package', label:_r7GetByPath(schema, 'publish.packageName') || schema.moduleId || 'module', subtitle:_r7GetByPath(schema, 'package.version') || '0.1.0' });
+    pushEdge('module-root', 'package-' + (schema && schema.moduleId || 'module'), 'packages');
+    _r7Array(schema && schema.tabs).forEach(function(tab){
+      var tabId = 'tab-' + (tab.tabId || 'tab');
+      pushNode({ id:tabId, kind:'tab', label:_r7Localize(tab.title, tab.tabId || 'tab'), targetTab:tab.tabId || '' });
+      pushEdge('module-root', tabId, 'contains');
+      _r7Array(tab.blocks).forEach(function(block){
+        var blockId = 'block-' + (block.blockId || block.id || 'blk');
+        pushNode({ id:blockId, kind:'block', label:_r7Localize(block.title, block.type || 'block'), subtitle:block.type || 'block', targetTab:tab.tabId || '', targetBlock:block.blockId || block.id || '' });
+        pushEdge(tabId, blockId, 'renders');
+        _r7CollectApisFromBlock(block).forEach(function(api){
+          var apiId = 'api-' + api.replace(/[^a-z0-9]+/ig,'-').toLowerCase();
+          pushNode({ id:apiId, kind:'api', label:api });
+          pushEdge(blockId, apiId, 'queries');
+        });
+      });
+    });
+    _r7Array(_r7GetByPath(schema, 'releaseGov.gates')).forEach(function(gate){
+      var gateId = 'gate-' + String(gate).replace(/[^a-z0-9]+/ig,'-').toLowerCase();
+      pushNode({ id:gateId, kind:'gate', label:String(gate) });
+      pushEdge('package-' + (schema && schema.moduleId || 'module'), gateId, 'gated-by');
+    });
+    return { nodes:nodes, edges:edges };
+  }
+  function _r7CaptureSnapshot(schema, label){
+    return {
+      label:label || 'current',
+      capturedAt:new Date().toISOString(),
+      moduleId:schema.moduleId || '',
+      tabs:_r7Array(schema.tabs).length,
+      totalBlocks:_r7CollectBlocks(schema).length,
+      apiCount:_r7BuildFlowGraph(schema).nodes.filter(function(node){ return node.kind === 'api'; }).length,
+      gateCount:_r7Array(_r7GetByPath(schema, 'releaseGov.gates')).length,
+      packageVersion:_r7GetByPath(schema, 'package.version') || '0.1.0',
+      packageName:_r7GetByPath(schema, 'publish.packageName') || schema.moduleId || '',
+      releaseRing:_r7GetByPath(schema, 'releaseGov.ring') || 'pilot',
+      themePreset:_r7GetByPath(schema, 'themeLab.preset') || 'executive-lux',
+      scenario:_r7GetByPath(schema, 'scenarioStudio.activeScenario') || 'executive-theatre'
+    };
+  }
+  function _r7BuildDiff(schema){
+    var baseline = _r7GetByPath(schema, 'diffStudio.baseline') || null;
+    var current = _r7CaptureSnapshot(schema, 'current');
+    if(!baseline){
+      return { baselineExists:false, current:current, addedTabs:current.tabs, addedBlocks:current.totalBlocks, addedApis:current.apiCount, gateDelta:current.gateCount, volatility:100 };
+    }
+    var volatility = 0;
+    volatility += Math.abs((current.tabs || 0) - (baseline.tabs || 0)) * 16;
+    volatility += Math.abs((current.totalBlocks || 0) - (baseline.totalBlocks || 0)) * 8;
+    volatility += Math.abs((current.apiCount || 0) - (baseline.apiCount || 0)) * 6;
+    volatility += Math.abs((current.gateCount || 0) - (baseline.gateCount || 0)) * 5;
+    if(current.packageVersion !== baseline.packageVersion) volatility += 18;
+    if(current.themePreset !== baseline.themePreset) volatility += 12;
+    if(current.releaseRing !== baseline.releaseRing) volatility += 12;
+    if(current.scenario !== baseline.scenario) volatility += 10;
+    volatility = Math.max(0, Math.min(100, volatility));
+    return {
+      baselineExists:true,
+      baseline:baseline,
+      current:current,
+      addedTabs:(current.tabs || 0) - (baseline.tabs || 0),
+      addedBlocks:(current.totalBlocks || 0) - (baseline.totalBlocks || 0),
+      addedApis:(current.apiCount || 0) - (baseline.apiCount || 0),
+      gateDelta:(current.gateCount || 0) - (baseline.gateCount || 0),
+      packageChanged:current.packageVersion !== baseline.packageVersion,
+      themeChanged:current.themePreset !== baseline.themePreset,
+      releaseChanged:current.releaseRing !== baseline.releaseRing,
+      scenarioChanged:current.scenario !== baseline.scenario,
+      volatility:volatility
+    };
+  }
+  function _r7ComputeExperienceMetrics(schema){
+    var flow = _r7BuildFlowGraph(schema);
+    var layout = _r7BuildLayoutReport(schema);
+    var diff = _r7BuildDiff(schema);
+    var totalBlocks = _r7CollectBlocks(schema).length;
+    var dataBlocks = _r7CollectBlocks(schema).filter(function(block){ return /^data-|^chart-|^quality-/.test(block.type || ''); }).length;
+    var apiNodes = flow.nodes.filter(function(node){ return node.kind === 'api'; }).length;
+    var gateNodes = flow.nodes.filter(function(node){ return node.kind === 'gate'; }).length;
+    var moments = _r7BuildSceneMoments(schema);
+    var accessibilityReady = 35;
+    if(_r7GetByPath(schema, 'accessOps.profile')) accessibilityReady += 10;
+    if(_r7GetByPath(schema, 'accessOps.contrastMode') === 'high') accessibilityReady += 18;
+    if(_r7GetByPath(schema, 'accessOps.focusRing')) accessibilityReady += 12;
+    if(_r7GetByPath(schema, 'accessOps.hitTarget')) accessibilityReady += 10;
+    if(_r7GetByPath(schema, 'accessOps.ariaCoverage')) accessibilityReady += 15;
+    var visualCraft = 30;
+    if(_r7GetByPath(schema, 'themeLab.surface')) visualCraft += 14;
+    if(_r7GetByPath(schema, 'themeLab.cardStyle')) visualCraft += 14;
+    if(_r7GetByPath(schema, 'themeLab.elevation')) visualCraft += 10;
+    if(_r7GetByPath(schema, 'motion.preset')) visualCraft += 10;
+    if(_r7GetByPath(schema, 'previewChrome.frame')) visualCraft += 10;
+    visualCraft += Math.min(12, moments.length * 2);
+    var scenarioReadiness = 34;
+    if(_r7GetByPath(schema, 'scenarioStudio.activeScenario')) scenarioReadiness += 16;
+    scenarioReadiness += Math.min(18, _r7Array(_r7GetByPath(schema, 'scenarioStudio.catalog')).length * 3);
+    scenarioReadiness += Math.min(18, moments.length * 2);
+    if(totalBlocks >= 6) scenarioReadiness += 10;
+    var operatorClarity = 28;
+    if(_r7GetByPath(schema, 'design.audience')) operatorClarity += 10;
+    if(_r7GetByPath(schema, 'accessOps.narration') === 'guided') operatorClarity += 18;
+    if(_r7GetByPath(schema, 'themeLab.contrast') === 'high') operatorClarity += 16;
+    operatorClarity += Math.min(16, dataBlocks * 4);
+    return {
+      surface:{ tabs:_r7Array(schema.tabs).length, totalBlocks:totalBlocks, dataBlocks:dataBlocks, apiNodes:apiNodes, gateNodes:gateNodes },
+      flow:flow,
+      diff:diff,
+      storyboard:{ moments:moments },
+      layout:layout,
+      layoutHarmony:Math.max(0, Math.min(100, layout.score)),
+      accessibilityReady:Math.max(0, Math.min(100, accessibilityReady)),
+      visualCraft:Math.max(0, Math.min(100, visualCraft)),
+      scenarioReadiness:Math.max(0, Math.min(100, scenarioReadiness)),
+      operatorClarity:Math.max(0, Math.min(100, operatorClarity)),
+      r6UltraRecovery:_r7GetByPath(schema, 'experienceDirector.r6UltraRecovered') ? 100 : 0
+    };
+  }
+  function _r7SyncManifest(schema){
+    if(!schema) return null;
+    _r7EnsureSchemaMeta(schema);
+    var metrics = _r7ComputeExperienceMetrics(schema);
+    schema.storyboard.moments = _r7Clone(metrics.storyboard.moments);
+    schema.builderManifest.patchVersion = '2026-04-07-r7';
+    schema.builderManifest.graphNodes = metrics.flow.nodes.length;
+    schema.builderManifest.graphEdges = metrics.flow.edges.length;
+    schema.builderManifest.totalBlocks = metrics.surface.totalBlocks;
+    schema.builderManifest.apiNodes = metrics.surface.apiNodes;
+    schema.builderManifest.gateNodes = metrics.surface.gateNodes;
+    schema.builderManifest.layoutHarmony = metrics.layoutHarmony;
+    schema.builderManifest.accessibilityReady = metrics.accessibilityReady;
+    schema.builderManifest.visualCraft = metrics.visualCraft;
+    schema.builderManifest.scenarioReadiness = metrics.scenarioReadiness;
+    schema.builderManifest.operatorClarity = metrics.operatorClarity;
+    schema.builderManifest.r6UltraRecovery = metrics.r6UltraRecovery;
+    schema.builderManifest.sceneMoments = metrics.storyboard.moments.length;
+    schema.builderManifest.activeScenario = _r7GetByPath(schema, 'scenarioStudio.activeScenario') || 'executive-theatre';
+    schema.builderManifest.visualMode = _r7GetByPath(schema, 'experienceDirector.visualMode') || 'aurora-command';
+    schema.builderManifest.previewChrome = _r7GetByPath(schema, 'previewChrome.frame') || 'cinematic';
+    schema.builderManifest.targetModel = _r7GetByPath(schema, 'aiCopilot.targetModel') || 'GPT Pro';
+    schema.builderManifest.updatedAt = new Date().toISOString();
+    return schema.builderManifest;
+  }
+  function _r7ApplyScenario(key){
+    var preset = _r7ScenarioPresets[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_t('Áp Round 7 scenario', 'Apply Round 7 scenario'), function(){
+      _r7EnsureSchemaMeta(state.schema);
+      _r7Merge(state.schema, _r7Clone(preset.patch || {}));
+      state.schema.scenarioStudio.activeScenario = key;
+      state.schema.storyboard.title = _r7Clone(preset.storyTitle);
+      _r7EnsureScenarioTemplates(state.schema, key);
+      _r7SyncManifest(state.schema);
+    });
+    if(typeof _toastBuilder === 'function') _toastBuilder(_t('Đã áp scenario ' + preset.labelVi + '.', 'Scenario ' + preset.labelEn + ' was applied.'), 'success');
+  }
+  function _r7ApplyVisualMode(key){
+    var preset = _r7VisualPresets[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_t('Áp visual mode', 'Apply visual mode'), function(){
+      _r7EnsureSchemaMeta(state.schema);
+      _r7Merge(state.schema, _r7Clone(preset.patch || {}));
+      state.schema.experienceDirector.visualMode = key;
+      _r7SyncManifest(state.schema);
+    });
+  }
+  function _r7ApplyA11yMode(key){
+    var preset = _r7A11yPresets[key];
+    if(!preset || !state.schema) return;
+    _mutateSchema(_t('Áp accessibility mode', 'Apply accessibility mode'), function(){
+      _r7EnsureSchemaMeta(state.schema);
+      _r7Merge(state.schema, _r7Clone(preset.patch || {}));
+      state.schema.accessOps.profile = key;
+      _r7SyncManifest(state.schema);
+    });
+  }
+  function _r7RecoverSkippedUltra(){
+    if(!state.schema) return;
+    _mutateSchema(_t('Khôi phục các năng lực Ultra bị skip', 'Recover skipped Ultra capabilities'), function(){
+      _r7EnsureSchemaMeta(state.schema);
+      state.schema.experienceDirector.r6UltraRecovered = true;
+      _r7UniquePush(state.schema.flowStudio.scenarios = _r7Array(state.schema.flowStudio.scenarios), 'audit');
+      _r7UniquePush(state.schema.flowStudio.scenarios, 'supplier');
+      _r7UniquePush(state.schema.package.dependencies, 'analytics');
+      _r7UniquePush(state.schema.package.dependencies, 'traceability');
+      _r7UniquePush(state.schema.package.contracts, 'module.audit');
+      _r7UniquePush(state.schema.package.contracts, 'module.marketplace');
+      state.schema.marketLens.compareMode = 'best-in-class';
+      _r7EnsureScenarioTemplates(state.schema, state.schema.scenarioStudio.activeScenario || 'executive-theatre');
+      _r7SyncManifest(state.schema);
+    });
+  }
+  function _r7AutoBalanceLayout(){
+    if(!state.schema) return;
+    _mutateSchema(_t('Auto balance layout', 'Auto balance layout'), function(){
+      _r7EnsureSchemaMeta(state.schema);
+      _r7Array(state.schema.tabs).forEach(function(tab){
+        var count = _r7Array(tab && tab.blocks).length;
+        tab.layout = tab.layout || {};
+        tab.layout.type = 'grid';
+        tab.layout.columns = count > 8 ? 3 : (count > 4 ? 2 : 1);
+        tab.layout.gap = count > 5 ? '18px' : '16px';
+        tab.layout.align = 'stretch';
+        if(count === 0){
+          if(/release/i.test(tab.tabId || '')) _r7InsertTemplate('r7-release-choreography-timeline', { tabId:tab.tabId });
+          else _r7InsertTemplate('r7-story-ribbon', { tabId:tab.tabId });
+        }
+      });
+      state.schema.layoutHarmony.strategy = 'auto-balanced';
+      state.schema.layoutHarmony.lastBalancedAt = new Date().toISOString();
+      _r7SyncManifest(state.schema);
+    });
+  }
+  function _r7BeautyForge(){
+    if(!state.schema) return;
+    _mutateSchema(_t('Beauty forge Round 7', 'Round 7 beauty forge'), function(){
+      _r7EnsureSchemaMeta(state.schema);
+      var visualMode = state.schema.experienceDirector.visualMode || 'aurora-command';
+      _r7Merge(state.schema, _r7Clone((_r7VisualPresets[visualMode] || _r7VisualPresets['aurora-command']).patch));
+      state.schema.marketplace.summary = _t('Round 7 experience director kết hợp scenario studio, layout harmony, accessibility ops và market lens để builder vừa mạnh vừa đẹp vừa dễ vận hành.', 'Round 7 experience director combines scenario studio, layout harmony, accessibility ops, and market lens so the builder is powerful, beautiful, and operationally clear.');
+      state.schema.experienceDirector.beautyForgedAt = new Date().toISOString();
+      _r7SyncManifest(state.schema);
+    });
+  }
+  function _r7CaptureBaseline(label){
+    if(!state.schema) return null;
+    _mutateSchema(_t('Chụp baseline Round 7', 'Capture Round 7 baseline'), function(){
+      _r7EnsureSchemaMeta(state.schema);
+      state.schema.diffStudio.baseline = _r7CaptureSnapshot(state.schema, label || 'round7 baseline');
+      _r7SyncManifest(state.schema);
+    });
+    return state.schema.diffStudio.baseline;
+  }
+  function _r7BuildExecutiveBrief(schema){
+    var metrics = _r7ComputeExperienceMetrics(schema || state.schema || {});
+    var lines = [];
+    lines.push('# HESEM QMS Module Builder Round 7 Executive Brief');
+    lines.push('');
+    lines.push('- Patch version: 2026-04-07-r7');
+    lines.push('- Target model: ' + (_r7GetByPath(schema, 'aiCopilot.targetModel') || 'GPT Pro'));
+    lines.push('- Active scenario: ' + (_r7GetByPath(schema, 'scenarioStudio.activeScenario') || 'executive-theatre'));
+    lines.push('- Visual mode: ' + (_r7GetByPath(schema, 'experienceDirector.visualMode') || 'aurora-command'));
+    lines.push('- Layout harmony: ' + metrics.layoutHarmony + '%');
+    lines.push('- Accessibility ready: ' + metrics.accessibilityReady + '%');
+    lines.push('- Visual craft: ' + metrics.visualCraft + '%');
+    lines.push('- Scenario readiness: ' + metrics.scenarioReadiness + '%');
+    lines.push('- Operator clarity: ' + metrics.operatorClarity + '%');
+    lines.push('');
+    lines.push('## Mission');
+    lines.push('Elevate HESEM QMS module builder into an experience director that is visually premium, operationally explicit, accessibility-aware, release-governed, and scenario-driven.');
+    lines.push('');
+    lines.push('## Required upgrades');
+    lines.push('1. Preserve current runtime wiring and overwrite package structure under qms.hesem.com.vn.');
+    lines.push('2. Maintain backward compatibility while fixing skipped or duplicated guards.');
+    lines.push('3. Deepen scenario-based UX: executive theatre, operator shift, audit sprint, supplier radar, release theatre.');
+    lines.push('4. Improve theme craft, responsive balance, accessibility, and reusable package storytelling.');
+    lines.push('5. Keep the system exportable for GPT Pro refinement and local manual git commit/push.');
+    lines.push('');
+    lines.push('## Current module context');
+    lines.push('- Module: ' + (schema && schema.moduleId || 'module'));
+    lines.push('- Tabs: ' + _r7Array(schema && schema.tabs).length);
+    lines.push('- Total blocks: ' + metrics.surface.totalBlocks);
+    lines.push('- API nodes: ' + metrics.surface.apiNodes);
+    lines.push('- Governance gates: ' + metrics.surface.gateNodes);
+    lines.push('- Scene moments: ' + metrics.storyboard.moments.length);
+    return lines.join('\n');
+  }
+  function _r7BuildAuditPack(schema){
+    _r7SyncManifest(schema);
+    return {
+      version:'2026-04-07-r7',
+      manifest:_r7Clone(schema.builderManifest || {}),
+      metrics:_r7Clone(_r7ComputeExperienceMetrics(schema)),
+      diff:_r7Clone(_r7BuildDiff(schema)),
+      flow:_r7Clone(_r7BuildFlowGraph(schema)),
+      storyboard:_r7Clone(_r7BuildSceneMoments(schema)),
+      layout:_r7Clone(_r7BuildLayoutReport(schema)),
+      scenario:_r7GetByPath(schema, 'scenarioStudio.activeScenario'),
+      visualMode:_r7GetByPath(schema, 'experienceDirector.visualMode'),
+      accessProfile:_r7GetByPath(schema, 'accessOps.profile')
+    };
+  }
+  function _r7DownloadText(filename, text, mime){
+    if(typeof document === 'undefined' || typeof Blob === 'undefined' || !document.createElement || !(window.URL || window.webkitURL)) return text;
+    try {
+      var blob = new Blob([String(text == null ? '' : text)], { type: mime || 'text/plain;charset=utf-8' });
+      var url = (window.URL || window.webkitURL).createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      if(document.body && document.body.appendChild) document.body.appendChild(link);
+      if(link.click) link.click();
+      setTimeout(function(){
+        try { if(document.body && document.body.removeChild) document.body.removeChild(link); } catch(err){}
+        try { (window.URL || window.webkitURL).revokeObjectURL(url); } catch(err){}
+      }, 0);
+    } catch(err){ return text; }
+    return text;
+  }
+  function _r7DownloadJson(filename, payload){ return _r7DownloadText(filename, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8'); }
+  function _r7ExportExecutiveBrief(){ return state.schema ? _r7DownloadText('module-builder-round7-executive-brief.md', _r7BuildExecutiveBrief(state.schema), 'text/markdown;charset=utf-8') : ''; }
+  function _r7ExportAuditPack(){ return state.schema ? _r7DownloadJson('module-builder-round7-audit-pack.json', _r7BuildAuditPack(state.schema)) : null; }
+  function _r7Tone(score){ if(score >= 90) return 'high'; if(score >= 75) return 'mid'; return 'low'; }
+  function _r7Card(icon, titleVi, titleEn, value, noteVi, noteEn, tone){ return '<div class="mb-r7-card is-' + _esc(tone || 'neutral') + '"><div class="mb-r7-card-head"><span>' + _esc(icon) + '</span><strong>' + _esc(_t(titleVi, titleEn)) + '</strong></div><div class="mb-r7-card-value">' + _esc(String(value)) + '</div><small>' + _esc(_t(noteVi, noteEn)) + '</small></div>'; }
+  function _r7RenderPresetGrid(source, action){
+    var h = '<div class="mb-r7-preset-grid">';
+    Object.keys(source || {}).forEach(function(key){
+      var item = source[key] || {};
+      h += '<button class="mb-r7-preset" data-action="' + _esc(action) + '" data-key="' + _esc(key) + '"><strong>' + _esc(_t(item.labelVi, item.labelEn)) + '</strong><small>' + _esc(_t(item.descriptionVi, item.descriptionEn)) + '</small></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+  function _r7RenderDirectorShell(schema, metrics){
+    var h = '<section class="mb-r7-shell">';
+    h += '<div class="mb-r7-hero"><div><div class="mb-r7-kicker">ROUND 7 · EXPERIENCE DIRECTOR</div><h3>' + _esc(_r7Localize(schema.title, schema.moduleId || 'Module')) + '</h3><p>' + _esc(_r7GetByPath(schema, 'marketplace.summary') || '') + '</p><div class="mb-r7-chip-row"><span>🎭 ' + _esc(_r7GetByPath(schema, 'scenarioStudio.activeScenario') || 'executive-theatre') + '</span><span>🎨 ' + _esc(_r7GetByPath(schema, 'experienceDirector.visualMode') || 'aurora-command') + '</span><span>♿ ' + _esc(_r7GetByPath(schema, 'accessOps.profile') || 'high-clarity') + '</span><span>📦 ' + _esc(_r7GetByPath(schema, 'publish.packageName') || schema.moduleId || '') + '</span></div></div><div class="mb-r7-hero-stats"><div><strong>' + _esc(String(metrics.storyboard.moments.length)) + '</strong><small>' + _esc(_t('Scene moments', 'Scene moments')) + '</small></div><div><strong>' + _esc(String(metrics.layoutHarmony)) + '%</strong><small>' + _esc(_t('Layout harmony', 'Layout harmony')) + '</small></div><div><strong>' + _esc(String(metrics.visualCraft)) + '%</strong><small>' + _esc(_t('Visual craft', 'Visual craft')) + '</small></div></div></div>';
+    h += '<div class="mb-r7-card-grid">';
+    h += _r7Card('🧭', 'Layout harmony', 'Layout harmony', metrics.layoutHarmony + '%', 'cân bằng mật độ tab và flow', 'balanced tab density and flow', _r7Tone(metrics.layoutHarmony));
+    h += _r7Card('♿', 'Accessibility ready', 'Accessibility ready', metrics.accessibilityReady + '%', 'contrast, focus, ARIA, hit-target', 'contrast, focus, ARIA, hit-target', _r7Tone(metrics.accessibilityReady));
+    h += _r7Card('✨', 'Visual craft', 'Visual craft', metrics.visualCraft + '%', 'theme, motion, preview chrome', 'theme, motion, preview chrome', _r7Tone(metrics.visualCraft));
+    h += _r7Card('🎬', 'Scenario readiness', 'Scenario readiness', metrics.scenarioReadiness + '%', 'storyboard, presets, reusable narrative', 'storyboard, presets, reusable narrative', _r7Tone(metrics.scenarioReadiness));
+    h += _r7Card('🛠', 'Operator clarity', 'Operator clarity', metrics.operatorClarity + '%', 'guided narration + readable action path', 'guided narration + readable action path', _r7Tone(metrics.operatorClarity));
+    h += '</div>';
+    h += '<div class="mb-r7-toolbar"><div class="mb-r7-toolbar-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r7-recover-ultra">🧬 ' + _esc(_t('Recover skipped ultra', 'Recover skipped ultra')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r7-auto-balance">📐 ' + _esc(_t('Auto balance layout', 'Auto balance layout')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r7-beauty-forge">✨ ' + _esc(_t('Beauty forge', 'Beauty forge')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r7-capture-baseline">📸 ' + _esc(_t('Capture baseline', 'Capture baseline')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r7-export-brief">🧠 ' + _esc(_t('Executive brief', 'Executive brief')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r7-export-audit">🛡 ' + _esc(_t('Audit pack', 'Audit pack')) + '</button></div><div class="mb-r7-toolbar-row"><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r7-toggle-scenes">🎞 ' + _esc(_t('Scene rail', 'Scene rail')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r7-toggle-layout">📐 ' + _esc(_t('Layout lab', 'Layout lab')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r7-toggle-access">♿ ' + _esc(_t('Accessibility ops', 'Accessibility ops')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r7-toggle-market">📦 ' + _esc(_t('Market lens', 'Market lens')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r7-toggle-beauty">🎨 ' + _esc(_t('Visual modes', 'Visual modes')) + '</button></div></div>';
+    h += '</section>';
+    return h;
+  }
+  function _r7RenderSceneRail(schema, metrics){
+    var moments = metrics.storyboard.moments || [];
+    if(!moments.length) return '<div class="mb-r7-empty">' + _esc(_t('Chưa có scene moments.', 'No scene moments yet.')) + '</div>';
+    var h = '<div class="mb-r7-filmstrip">';
+    moments.slice(0, 18).forEach(function(item){
+      var action = item.kind === 'tab' ? 'r6-jump-tab' : 'r6-jump-block';
+      var attrs = item.kind === 'tab' ? ' data-action="' + action + '" data-tab="' + _esc(item.tabId || '') + '"' : ' data-action="' + action + '" data-tab="' + _esc(item.tabId || '') + '" data-block="' + _esc(item.blockId || '') + '"';
+      h += '<button class="mb-r7-scene is-' + _esc(item.kind) + '"' + attrs + '><strong>' + _esc(item.label || '') + '</strong><small>' + _esc(item.subtitle || '') + '</small></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+  function _r7RenderLayoutPanel(schema, metrics){
+    var report = metrics.layout;
+    var h = '<div class="mb-r7-layout-grid"><div class="mb-r7-panel-note"><strong>' + _esc(_t('Density', 'Density')) + ':</strong> ' + _esc(String(report.density)) + ' · <strong>' + _esc(_t('Spread', 'Spread')) + ':</strong> ' + _esc(String(report.spread)) + '</div>';
+    report.rows.forEach(function(row){ h += '<div class="mb-r7-bar-row"><div><strong>' + _esc(row.label) + '</strong><small>' + _esc(row.count + ' blocks') + '</small></div><div class="mb-r7-bar"><span style="width:' + _esc(String(row.ratio)) + '%"></span></div></div>'; });
+    h += '</div><ul class="mb-r7-rec-list">';
+    report.recommendations.forEach(function(text){ h += '<li>' + _esc(text) + '</li>'; });
+    h += '</ul>';
+    return h;
+  }
+  function _r7RenderAccessPanel(schema){
+    var h = '<div class="mb-r7-chip-row"><span>profile: ' + _esc(_r7GetByPath(schema, 'accessOps.profile') || '') + '</span><span>contrast: ' + _esc(_r7GetByPath(schema, 'accessOps.contrastMode') || '') + '</span><span>focus: ' + _esc(_r7GetByPath(schema, 'accessOps.focusRing') || '') + '</span><span>hit target: ' + _esc(_r7GetByPath(schema, 'accessOps.hitTarget') || '') + '</span><span>ARIA: ' + _esc(_r7GetByPath(schema, 'accessOps.ariaCoverage') || '') + '</span></div>';
+    h += _r7RenderPresetGrid(_r7A11yPresets, 'r7-apply-a11y');
+    return h;
+  }
+  function _r7RenderMarketPanel(schema){
+    var props = _r7Array(_r7GetByPath(schema, 'marketLens.valueProps'));
+    var h = '<div class="mb-r7-market-grid">';
+    h += '<div class="mb-r7-market-card"><strong>' + _esc(_t('Package', 'Package')) + '</strong><small>' + _esc((_r7GetByPath(schema, 'publish.packageName') || schema.moduleId || '') + ' · ' + (_r7GetByPath(schema, 'package.version') || '0.1.0')) + '</small></div>';
+    h += '<div class="mb-r7-market-card"><strong>' + _esc(_t('Compare mode', 'Compare mode')) + '</strong><small>' + _esc(_r7GetByPath(schema, 'marketLens.compareMode') || 'best-in-class') + '</small></div>';
+    h += '<div class="mb-r7-market-card"><strong>' + _esc(_t('Reuse score', 'Reuse score')) + '</strong><small>' + _esc(String(_r7GetByPath(schema, 'marketLens.reuseScore') || 0)) + '%</small></div>';
+    h += '<div class="mb-r7-market-card"><strong>' + _esc(_t('Dependencies', 'Dependencies')) + '</strong><small>' + _esc(_r7Array(_r7GetByPath(schema, 'package.dependencies')).join(', ')) + '</small></div>';
+    h += '</div>';
+    if(props.length) h += '<div class="mb-r7-chip-row">' + props.map(function(item){ return '<span>' + _esc(item) + '</span>'; }).join('') + '</div>';
+    return h;
+  }
+  function _r7RenderVisualPanel(schema){
+    var h = '<div class="mb-r7-chip-row"><span>frame: ' + _esc(_r7GetByPath(schema, 'previewChrome.frame') || '') + '</span><span>ribbon: ' + _esc(_r7GetByPath(schema, 'previewChrome.ribbon') || '') + '</span><span>theme: ' + _esc(_r7GetByPath(schema, 'themeLab.preset') || '') + '</span><span>motion: ' + _esc(_r7GetByPath(schema, 'motion.preset') || '') + '</span></div>';
+    h += _r7RenderPresetGrid(_r7VisualPresets, 'r7-apply-visual');
+    return h;
+  }
+  function _r7RenderScenarioPanel(schema){
+    var h = '<div class="mb-r7-chip-row"><span>' + _esc(_t('Storyboard', 'Storyboard')) + ': ' + _esc(_r7Localize(_r7GetByPath(schema, 'storyboard.title'), 'Experience storyboard')) + '</span><span>' + _esc(_t('Scenario', 'Scenario')) + ': ' + _esc(_r7GetByPath(schema, 'scenarioStudio.activeScenario') || 'executive-theatre') + '</span></div>';
+    h += _r7RenderPresetGrid(_r7ScenarioPresets, 'r7-apply-scenario');
+    return h;
+  }
+  function _r7InjectStyles(){
+    if(typeof document === 'undefined' || !document.createElement || !document.head) return;
+    var existing = document.getElementById ? document.getElementById('hmMbR7Styles') : null;
+    if(existing && existing.tagName) return;
+    var style = document.createElement('style');
+    style.id = 'hmMbR7Styles';
+    style.textContent = '.mb-r7-shell{margin:14px 0 18px;padding:18px;border-radius:20px;background:linear-gradient(135deg,rgba(23,37,84,.96),rgba(59,130,246,.14) 42%,rgba(16,185,129,.12));border:1px solid rgba(148,163,184,.28);box-shadow:0 18px 42px rgba(15,23,42,.18)}' +
+      '.mb-r7-hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:14px}' +
+      '.mb-r7-kicker{font-size:11px;letter-spacing:.18em;font-weight:700;color:#c4b5fd;margin-bottom:6px}' +
+      '.mb-r7-hero h3{margin:0 0 6px;font-size:24px;color:#fff}' +
+      '.mb-r7-hero p{margin:0 0 10px;color:rgba(255,255,255,.82);max-width:860px;line-height:1.55}' +
+      '.mb-r7-chip-row{display:flex;flex-wrap:wrap;gap:8px}' +
+      '.mb-r7-chip-row span{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);color:#e2e8f0;font-size:12px}' +
+      '.mb-r7-hero-stats{display:grid;grid-template-columns:repeat(3,minmax(92px,1fr));gap:10px;min-width:280px}' +
+      '.mb-r7-hero-stats div{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.08);text-align:center}' +
+      '.mb-r7-hero-stats strong{display:block;font-size:22px;color:#fff}' +
+      '.mb-r7-hero-stats small{color:#cbd5e1}' +
+      '.mb-r7-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}' +
+      '.mb-r7-card{padding:14px 14px 12px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);color:#f8fafc}' +
+      '.mb-r7-card.is-high{box-shadow:0 12px 24px rgba(16,185,129,.16)}.mb-r7-card.is-mid{box-shadow:0 12px 24px rgba(251,191,36,.14)}.mb-r7-card.is-low{box-shadow:0 12px 24px rgba(239,68,68,.14)}' +
+      '.mb-r7-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}.mb-r7-card-head strong{font-size:13px}.mb-r7-card-value{font-size:24px;font-weight:800;line-height:1.1;margin-bottom:6px}.mb-r7-card small{display:block;color:#cbd5e1;line-height:1.45}' +
+      '.mb-r7-toolbar{display:flex;flex-direction:column;gap:8px}.mb-r7-toolbar-row{display:flex;flex-wrap:wrap;gap:8px}' +
+      '.mb-r7-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin:12px 0 18px}' +
+      '.mb-r7-panel{padding:16px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}.mb-r7-panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#f8fafc}.mb-r7-panel-head span{color:#cbd5e1;font-size:12px}' +
+      '.mb-r7-filmstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.mb-r7-scene{padding:12px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);text-align:left;color:#fff}.mb-r7-scene strong{display:block;font-size:13px;margin-bottom:4px}.mb-r7-scene small{display:block;color:#cbd5e1}.mb-r7-scene.is-tab{background:rgba(124,58,237,.18)}.mb-r7-scene.is-block{background:rgba(14,165,233,.14)}' +
+      '.mb-r7-layout-grid{display:grid;gap:10px}.mb-r7-panel-note{color:#e2e8f0;font-size:13px}.mb-r7-bar-row{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:center}.mb-r7-bar-row strong{display:block;color:#fff}.mb-r7-bar-row small{color:#cbd5e1}.mb-r7-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.mb-r7-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#06b6d4,#10b981)}.mb-r7-rec-list{margin:10px 0 0;padding-left:18px;color:#e2e8f0}.mb-r7-rec-list li{margin:6px 0;line-height:1.45}' +
+      '.mb-r7-market-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:10px}.mb-r7-market-card{padding:12px;border-radius:14px;background:rgba(255,255,255,.08)}.mb-r7-market-card strong{display:block;color:#fff;margin-bottom:4px}.mb-r7-market-card small{display:block;color:#cbd5e1;line-height:1.45}' +
+      '.mb-r7-empty{padding:12px;border-radius:14px;background:rgba(255,255,255,.06);color:#cbd5e1}.mb-r7-preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.mb-r7-preset{padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);text-align:left;color:#fff}.mb-r7-preset strong{display:block;font-size:13px;margin-bottom:4px}.mb-r7-preset small{display:block;color:#cbd5e1;line-height:1.45}' +
+      '.mb-r7-preview-shell{margin:0 0 12px}.mb-r7-preview-ribbon{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;border-radius:16px;background:linear-gradient(90deg,rgba(124,58,237,.15),rgba(6,182,212,.12));border:1px solid rgba(148,163,184,.22);margin-bottom:12px}.mb-r7-preview-ribbon span{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.72);font-size:12px;color:#0f172a}' +
+      '@media (max-width: 960px){.mb-r7-hero{flex-direction:column}.mb-r7-hero-stats{min-width:0;width:100%}.mb-r7-bar-row{grid-template-columns:1fr}}';
+    document.head.appendChild(style);
+  }
+
+  _renderBuilder = function(){
+    var html = _r7PrevRenderBuilder();
+    _r7EnsureState();
+    _r7InjectStyles();
+    if(!state.schema) return html;
+    _r7EnsureSchemaMeta(state.schema);
+    _r7SyncManifest(state.schema);
+    if(String(html || '').indexOf('mb-r7-shell') !== -1) return html;
+    var metrics = _r7ComputeExperienceMetrics(state.schema);
+    var shell = _r7RenderDirectorShell(state.schema, metrics);
+    var panels = '<div class="mb-r7-panel-grid">';
+    if(state.showR7Scenes) panels += '<div class="mb-r7-panel"><div class="mb-r7-panel-head"><strong>' + _esc(_t('Scene rail', 'Scene rail')) + '</strong><span>' + _esc(String(metrics.storyboard.moments.length)) + '</span></div>' + _r7RenderSceneRail(state.schema, metrics) + '</div><div class="mb-r7-panel"><div class="mb-r7-panel-head"><strong>' + _esc(_t('Scenario studio', 'Scenario studio')) + '</strong><span>' + _esc(_r7GetByPath(state.schema, 'scenarioStudio.activeScenario') || 'executive-theatre') + '</span></div>' + _r7RenderScenarioPanel(state.schema) + '</div>';
+    if(state.showR7Layout) panels += '<div class="mb-r7-panel"><div class="mb-r7-panel-head"><strong>' + _esc(_t('Layout harmony', 'Layout harmony')) + '</strong><span>' + _esc(String(metrics.layoutHarmony)) + '%</span></div>' + _r7RenderLayoutPanel(state.schema, metrics) + '</div>';
+    if(state.showR7Access) panels += '<div class="mb-r7-panel"><div class="mb-r7-panel-head"><strong>' + _esc(_t('Accessibility ops', 'Accessibility ops')) + '</strong><span>' + _esc(String(metrics.accessibilityReady)) + '%</span></div>' + _r7RenderAccessPanel(state.schema) + '</div>';
+    if(state.showR7Market) panels += '<div class="mb-r7-panel"><div class="mb-r7-panel-head"><strong>' + _esc(_t('Market lens', 'Market lens')) + '</strong><span>' + _esc(String(_r7GetByPath(state.schema, 'marketLens.reuseScore') || 0)) + '%</span></div>' + _r7RenderMarketPanel(state.schema) + '</div>';
+    if(state.showR7Beauty) panels += '<div class="mb-r7-panel"><div class="mb-r7-panel-head"><strong>' + _esc(_t('Visual modes', 'Visual modes')) + '</strong><span>' + _esc(_r7GetByPath(state.schema, 'experienceDirector.visualMode') || 'aurora-command') + '</span></div>' + _r7RenderVisualPanel(state.schema) + '</div>';
+    panels += '</div>';
+    return shell + panels + html;
+  };
+
+  _renderPreview = function(){
+    var html = _r7PrevRenderPreview();
+    _r7InjectStyles();
+    if(!state.schema || String(html || '').indexOf('mb-r7-preview-ribbon') !== -1) return html;
+    _r7EnsureSchemaMeta(state.schema);
+    _r7SyncManifest(state.schema);
+    return '<div class="mb-r7-preview-shell"><div class="mb-r7-preview-ribbon"><span>🎭 ' + _esc(_r7GetByPath(state.schema, 'scenarioStudio.activeScenario') || 'executive-theatre') + '</span><span>🎨 ' + _esc(_r7GetByPath(state.schema, 'experienceDirector.visualMode') || 'aurora-command') + '</span><span>♿ ' + _esc(_r7GetByPath(state.schema, 'accessOps.profile') || 'high-clarity') + '</span><span>📦 ' + _esc(_r7GetByPath(state.schema, 'publish.packageName') || state.schema.moduleId || '') + '</span></div>' + html + '</div>';
+  };
+
+  _handleClick = function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r7-recover-ultra': _r7RecoverSkippedUltra(); return;
+        case 'r7-auto-balance': _r7AutoBalanceLayout(); return;
+        case 'r7-beauty-forge': _r7BeautyForge(); return;
+        case 'r7-capture-baseline': _r7CaptureBaseline(); return;
+        case 'r7-export-brief': _r7ExportExecutiveBrief(); return;
+        case 'r7-export-audit': _r7ExportAuditPack(); return;
+        case 'r7-toggle-scenes': state.showR7Scenes = !state.showR7Scenes; _paint(); return;
+        case 'r7-toggle-layout': state.showR7Layout = !state.showR7Layout; _paint(); return;
+        case 'r7-toggle-access': state.showR7Access = !state.showR7Access; _paint(); return;
+        case 'r7-toggle-market': state.showR7Market = !state.showR7Market; _paint(); return;
+        case 'r7-toggle-beauty': state.showR7Beauty = !state.showR7Beauty; _paint(); return;
+        case 'r7-apply-scenario': _r7ApplyScenario(btn.getAttribute('data-key') || 'executive-theatre'); return;
+        case 'r7-apply-visual': _r7ApplyVisualMode(btn.getAttribute('data-key') || 'aurora-command'); return;
+        case 'r7-apply-a11y': _r7ApplyA11yMode(btn.getAttribute('data-key') || 'high-clarity'); return;
+      }
+    }
+    return _r7PrevHandleClick(e);
+  };
+
+  window.__HM_MB_R7_TEST__ = {
+    version:'2026-04-07-r7',
+    createDemoSchema:function(){
+      if(window.__HM_MB_R6_TEST__ && typeof window.__HM_MB_R6_TEST__.createDemoSchema === 'function') window.__HM_MB_R6_TEST__.createDemoSchema();
+      if(!state.schema){
+        state.schema = { moduleId:'round7-demo', title:{ vi:'Round 7 Demo', en:'Round 7 Demo' }, route:'round7-demo', roles:['it_admin'], tabs:[ { tabId:'overview', title:{ vi:'Tổng quan', en:'Overview' }, icon:'🧭', blocks:[] }, { tabId:'release', title:{ vi:'Release', en:'Release' }, icon:'🚀', blocks:[] } ] };
+        state.activeTab = 'overview';
+        state.step = 'build';
+      }
+      _r7EnsureSchemaMeta(state.schema);
+      _r7RecoverSkippedUltra();
+      _r7BeautyForge();
+      _r7SyncManifest(state.schema);
+      return _r7Clone(state.schema);
+    },
+    recoverUltra:function(){ _r7RecoverSkippedUltra(); return state.schema ? _r7Clone(state.schema) : null; },
+    seedSupreme:function(){ if(window.__HM_MB_R6_TEST__ && typeof window.__HM_MB_R6_TEST__.supreme === 'function') window.__HM_MB_R6_TEST__.supreme(); _r7RecoverSkippedUltra(); _r7BeautyForge(); _r7AutoBalanceLayout(); return state.schema ? _r7Clone(state.schema) : null; },
+    scenario:function(key){ _r7ApplyScenario(key || 'executive-theatre'); return state.schema ? _r7Clone(state.schema) : null; },
+    visual:function(key){ _r7ApplyVisualMode(key || 'aurora-command'); return state.schema ? _r7Clone(state.schema) : null; },
+    access:function(key){ _r7ApplyA11yMode(key || 'high-clarity'); return state.schema ? _r7Clone(state.schema) : null; },
+    autoBalance:function(){ _r7AutoBalanceLayout(); return state.schema ? _r7Clone(_r7GetByPath(state.schema, 'layoutHarmony')) : null; },
+    beauty:function(){ _r7BeautyForge(); return state.schema ? _r7Clone(_r7GetByPath(state.schema, 'themeLab')) : null; },
+    captureBaseline:function(){ return _r7Clone(_r7CaptureBaseline()); },
+    metrics:function(){ return state.schema ? _r7Clone(_r7ComputeExperienceMetrics(state.schema)) : null; },
+    layout:function(){ return state.schema ? _r7Clone(_r7BuildLayoutReport(state.schema)) : null; },
+    auditPack:function(){ return state.schema ? _r7Clone(_r7BuildAuditPack(state.schema)) : null; },
+    brief:function(){ return state.schema ? _r7BuildExecutiveBrief(state.schema) : ''; },
+    manifest:function(){ return state.schema ? _r7Clone(_r7SyncManifest(state.schema)) : null; },
+    renderBuilderHtml:function(){ return state.schema ? _renderBuilder() : ''; },
+    renderPreviewHtml:function(){ return state.schema ? _renderPreview() : ''; },
+    getState:function(){ return state.schema ? _r7Clone(state.schema) : null; }
+  };
+
+  if(window.__HM_MB_R6_TEST__){
+    if(!window.__HM_MB_R6_TEST__.seedSupreme) window.__HM_MB_R6_TEST__.seedSupreme = function(){ return window.__HM_MB_R7_TEST__.seedSupreme(); };
+    if(!window.__HM_MB_R6_TEST__.autoWeave) window.__HM_MB_R6_TEST__.autoWeave = function(){ return state.schema ? _r7Clone(_r7BuildFlowGraph(state.schema)) : null; };
+    if(!window.__HM_MB_R6_TEST__.compare) window.__HM_MB_R6_TEST__.compare = function(){ return state.schema ? _r7Clone(_r7BuildDiff(state.schema)) : null; };
+    if(!window.__HM_MB_R6_TEST__.flowAtlas) window.__HM_MB_R6_TEST__.flowAtlas = function(){ return state.schema ? _r7Clone(_r7BuildFlowGraph(state.schema)) : null; };
+    if(!window.__HM_MB_R6_TEST__.aiPrompt) window.__HM_MB_R6_TEST__.aiPrompt = function(){ return state.schema ? _r7BuildExecutiveBrief(state.schema) : ''; };
+    window.__HM_MB_R6_TEST__.round7 = window.__HM_MB_R7_TEST__;
+  }
+}
+
+
+/* ── MODULE BUILDER ULTRA ROUND 8 HOTFIX (2026-04-08 R8) ───────────────── */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R8__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R8__ = '2026-04-08-r8-hotfix';
+
+  var _r8PrevRenderBuilder = _renderBuilder;
+  var _r8PrevRenderPreview = _renderPreview;
+
+  function _r8EnsureState(){
+    if(state.showR7Scenes == null) state.showR7Scenes = false;
+    if(state.showR7Layout == null) state.showR7Layout = false;
+    if(state.showR7Access == null) state.showR7Access = false;
+    if(state.showR7Market == null) state.showR7Market = false;
+    if(state.showR7Beauty == null) state.showR7Beauty = false;
+    if(state.showBuilderCockpit == null) state.showBuilderCockpit = true;
+    if(state.showDiagnosticsPanel == null) state.showDiagnosticsPanel = false;
+  }
+
+  function _r8RestoreHiddenBuilder(html){
+    html = String(html || '');
+    html = html.replace(/<div class="mb-r5-shell" style="display:none!important">/g, '<div class="mb-r5-shell">');
+    html = html.replace(/<div class="mb-r5-shell" style="display:none !important">/g, '<div class="mb-r5-shell">');
+    html = html.replace(/<div class="mb-r5-shell" style="display:\s*none\s*!important;?">/g, '<div class="mb-r5-shell">');
+    return html;
+  }
+
+  function _r8RemoveNodes(root, selector){
+    var nodes;
+    if(!root || !root.querySelectorAll) return;
+    nodes = root.querySelectorAll(selector);
+    Array.prototype.forEach.call(nodes, function(node){
+      if(node && node.parentNode) node.parentNode.removeChild(node);
+    });
+  }
+
+  function _r8MovePanelsIntoShell(root){
+    var shell, grids;
+    if(!root || !root.querySelector) return;
+    shell = root.querySelector('.mb-r7-shell');
+    if(!shell) return;
+    grids = root.querySelectorAll('.mb-r7-panel-grid');
+    Array.prototype.forEach.call(grids, function(node){
+      if(node && node.parentNode !== shell){
+        shell.appendChild(node);
+      }
+    });
+  }
+
+  function _r8NormalizeHtml(html){
+    var host, builderShell;
+    html = _r8RestoreHiddenBuilder(html);
+    if(typeof document === 'undefined' || !document.createElement) return html;
+    host = document.createElement('div');
+    host.innerHTML = html;
+    _r8RemoveNodes(host, '.mb-r6-shell');
+    _r8RemoveNodes(host, '.mb-r5-deck');
+    _r8RemoveNodes(host, '.mb-r4-deck');
+    _r8RemoveNodes(host, '.mb-r3-superdock');
+    _r8RemoveNodes(host, '.mb-ultra-dock');
+    _r8MovePanelsIntoShell(host);
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-shell'), function(node){
+      if(node && node.classList) node.classList.add('mb-r8-shell');
+    });
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-panel-grid'), function(node){
+      if(node && node.classList) node.classList.add('mb-r8-panel-grid');
+    });
+    builderShell = host.querySelector('.mb-builder-shell');
+    if(builderShell && builderShell.classList) builderShell.classList.add('mb-r8-builder-shell');
+    return host.innerHTML;
+  }
+
+  function _r8InjectStyles(){
+    var style;
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-module-builder-round8-style')) return;
+    style = document.createElement('style');
+    style.id = 'hm-module-builder-round8-style';
+    style.textContent = '' +
+      '.mb-r8-shell{margin:0 0 14px;padding:16px 18px;border-radius:22px;background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 44%,#0f766e 100%);border:1px solid rgba(148,163,184,.22);box-shadow:0 14px 28px rgba(15,23,42,.14)}' +
+      '.mb-r8-shell .mb-r7-hero{margin-bottom:12px;gap:14px}' +
+      '.mb-r8-shell .mb-r7-hero h3{font-size:26px;line-height:1.15}' +
+      '.mb-r8-shell .mb-r7-card-grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}' +
+      '.mb-r8-shell .mb-r7-card{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14)}' +
+      '.mb-r8-shell .mb-r7-card-value{font-size:18px}' +
+      '.mb-r8-shell .mb-r7-toolbar{gap:8px}' +
+      '.mb-r8-shell .mb-r7-toolbar-row{gap:8px}' +
+      '.mb-r8-shell .mb-r8-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0 0}' +
+      '.mb-r8-shell .mb-r7-panel{padding:14px;border-radius:18px;background:#fff;border:1px solid rgba(148,163,184,.18);box-shadow:0 10px 24px rgba(15,23,42,.05)}' +
+      '.mb-r8-shell .mb-r7-panel-head strong{color:#0f172a}' +
+      '.mb-r8-shell .mb-r7-panel-head span,.mb-r8-shell .mb-r7-panel-note,.mb-r8-shell .mb-r7-rec-list,.mb-r8-shell .mb-r7-empty,.mb-r8-shell .mb-r7-market-card small,.mb-r8-shell .mb-r7-preset small,.mb-r8-shell .mb-r7-scene small{color:#475569}' +
+      '.mb-r8-shell .mb-r7-market-card,.mb-r8-shell .mb-r7-preset,.mb-r8-shell .mb-r7-scene{background:#f8fafc;border:1px solid rgba(148,163,184,.16);color:#0f172a}' +
+      '.mb-r8-shell .mb-r7-market-card strong,.mb-r8-shell .mb-r7-scene strong,.mb-r8-shell .mb-r7-preset strong,.mb-r8-shell .mb-r7-bar-row strong{color:#0f172a}' +
+      '.mb-r8-shell .mb-r7-bar-row small{color:#64748b}' +
+      '.mb-r8-shell .mb-r7-bar{background:rgba(148,163,184,.18)}' +
+      '.mb-r8-shell .mb-r7-scene.is-tab{background:#eef2ff}.mb-r8-shell .mb-r7-scene.is-block{background:#eff6ff}' +
+      '.mb-r6-shell,.mb-r5-deck,.mb-r4-deck,.mb-r3-superdock,.mb-ultra-dock{display:none!important}' +
+      '.mb-r5-shell:before,.mb-r4-shell .mb-ultra-root:before{display:none!important;content:none!important}' +
+      '.mb-r5-shell{display:grid!important;gap:12px!important}' +
+      '.mb-r5-shell,.mb-r4-shell,.mb-r3-shell,.mb-ultra-root{gap:12px}' +
+      '.mb-r8-builder-shell,.mb-builder-shell,.mb-main-panel,.mb-main-panel>.mb-toolbar{opacity:1!important;visibility:visible!important}' +
+      '.mb-ultra-root .mb-builder-shell{margin-top:0}' +
+      '.mb-main-panel>.mb-toolbar{position:sticky;top:0;z-index:30;background:#fff;box-shadow:0 8px 20px rgba(15,23,42,.05)}' +
+      '@media (max-width: 960px){.mb-r8-shell{padding:14px 16px}.mb-r8-shell .mb-r7-hero-stats{grid-template-columns:repeat(3,minmax(72px,1fr));min-width:0;width:100%}.mb-r8-shell .mb-r7-card-grid{grid-template-columns:1fr 1fr}}' +
+      '@media (max-width: 640px){.mb-r8-shell .mb-r7-card-grid{grid-template-columns:1fr}.mb-r8-shell .mb-r7-toolbar-row{flex-direction:column;align-items:stretch}}';
+    document.head.appendChild(style);
+  }
+
+  _renderBuilder = function(){
+    var html;
+    _r8EnsureState();
+    _r8InjectStyles();
+    html = _r8PrevRenderBuilder();
+    return _r8NormalizeHtml(html);
+  };
+
+  _renderPreview = function(){
+    var html;
+    _r8InjectStyles();
+    html = _r8PrevRenderPreview();
+    return _r8NormalizeHtml(html);
+  };
+
+  window.__HM_MB_R8_TEST__ = {
+    version:'2026-04-08-r8-hotfix',
+    normalizeHtml:function(html){ return _r8NormalizeHtml(html); },
+    restoreBuilderHtml:function(html){ return _r8RestoreHiddenBuilder(html); },
+    renderBuilderHtml:function(){ return state.schema ? _renderBuilder() : ''; },
+    renderPreviewHtml:function(){ return state.schema ? _renderPreview() : ''; }
+  };
+
+  if(window.__HM_MB_R7_TEST__) window.__HM_MB_R7_TEST__.round8 = window.__HM_MB_R8_TEST__;
+}
+
+
+
+/* ── MODULE BUILDER ULTRA ROUND 9 GLASS PRO (2026-04-08 R9) ───────────────── */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R9__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R9__ = '2026-04-08-r9-glass-pro';
+
+  var _r9PrevRenderBuilder = _renderBuilder;
+  var _r9PrevRenderPreview = _renderPreview;
+  var _r9PrevHandleClick = _handleClick;
+
+  function _r9Array(v){ return Array.isArray(v) ? v : []; }
+  function _r9Text(v, fallback){
+    if(v == null || v === '') return fallback || '';
+    if(typeof v === 'string' || typeof v === 'number') return String(v);
+    if(v && typeof v === 'object') return String(v.vi || v.en || fallback || '');
+    return fallback || '';
+  }
+  function _r9SafeObject(v){ return v && typeof v === 'object' && !Array.isArray(v) ? v : {}; }
+  function _r9Clamp(n, min, max){ n = Number(n) || 0; return Math.max(min, Math.min(max, n)); }
+  function _r9FindTab(schema, tabId){
+    var found = null;
+    _r9Array(schema && schema.tabs).forEach(function(tab){ if(!found && tab && tab.tabId === tabId) found = tab; });
+    return found || _r9Array(schema && schema.tabs)[0] || null;
+  }
+  function _r9EnsureState(){
+    if(state.showR9Contrast == null) state.showR9Contrast = true;
+    if(state.showR9Structure == null) state.showR9Structure = false;
+    if(state.showR9Palette == null) state.showR9Palette = false;
+    if(state.r9ActiveMode == null) state.r9ActiveMode = 'executive-glass-pro';
+  }
+  function _r9EnsureSchema(schema){
+    if(!schema || typeof schema !== 'object') return schema;
+    schema.themeLab = _r9SafeObject(schema.themeLab);
+    schema.accessOps = _r9SafeObject(schema.accessOps);
+    schema.layoutHarmony = _r9SafeObject(schema.layoutHarmony);
+    schema.experienceDirector = _r9SafeObject(schema.experienceDirector);
+    schema.previewChrome = _r9SafeObject(schema.previewChrome);
+    schema.publish = _r9SafeObject(schema.publish);
+    schema.releaseGov = _r9SafeObject(schema.releaseGov);
+    schema.marketplace = _r9SafeObject(schema.marketplace);
+    schema.storyboard = _r9SafeObject(schema.storyboard);
+    schema.glassStudio = _r9SafeObject(schema.glassStudio);
+    if(schema.glassStudio.mode == null) schema.glassStudio.mode = state.r9ActiveMode || 'executive-glass-pro';
+    if(schema.glassStudio.surface == null) schema.glassStudio.surface = 'glass-pro';
+    if(schema.glassStudio.contrastTarget == null) schema.glassStudio.contrastTarget = 'AAA';
+    if(schema.glassStudio.professionalTone == null) schema.glassStudio.professionalTone = 'boardroom';
+    if(schema.glassStudio.chrome == null) schema.glassStudio.chrome = 'frosted-toolbar';
+    if(schema.glassStudio.noise == null) schema.glassStudio.noise = 'subtle';
+    if(schema.themeLab.surface == null) schema.themeLab.surface = 'glass';
+    if(schema.themeLab.preset == null) schema.themeLab.preset = 'executive-lux';
+    if(schema.themeLab.contrast == null) schema.themeLab.contrast = 'pro-high';
+    if(schema.themeLab.density == null) schema.themeLab.density = 'comfortable';
+    if(schema.themeLab.accent == null) schema.themeLab.accent = 'violet-cyan';
+    if(schema.themeLab.cardStyle == null) schema.themeLab.cardStyle = 'frosted';
+    if(schema.themeLab.elevation == null) schema.themeLab.elevation = 'boardroom';
+    if(schema.accessOps.profile == null) schema.accessOps.profile = 'high-clarity';
+    if(schema.accessOps.contrastMode == null) schema.accessOps.contrastMode = 'high';
+    if(schema.accessOps.focusRing == null) schema.accessOps.focusRing = 'visible';
+    if(schema.accessOps.hitTarget == null) schema.accessOps.hitTarget = '44px';
+    if(schema.layoutHarmony.strategy == null) schema.layoutHarmony.strategy = 'adaptive-grid';
+    if(schema.layoutHarmony.breakpointModel == null) schema.layoutHarmony.breakpointModel = 'desktop-tablet-handheld';
+    if(schema.experienceDirector.visualMode == null) schema.experienceDirector.visualMode = 'executive-glass-pro';
+    if(schema.previewChrome.frame == null) schema.previewChrome.frame = 'glass';
+    if(schema.previewChrome.ribbon == null) schema.previewChrome.ribbon = 'signal';
+    if(schema.publish.packageName == null || !String(schema.publish.packageName || '').trim()) schema.publish.packageName = schema.moduleId || 'module-package';
+    if(schema.publish.requireSignoff == null) schema.publish.requireSignoff = true;
+    if(!Array.isArray(schema.releaseGov.gates)) schema.releaseGov.gates = ['design review','qa smoke','rollback'];
+    if(schema.marketplace.summary == null || !String(schema.marketplace.summary).trim()) schema.marketplace.summary = _t('Round 9 tập trung vào glass chuyên nghiệp: tương phản cao, toolbar rõ, canvas sáng sủa và shell điều hành đẹp hơn cho điều hành, chất lượng và audit.', 'Round 9 focuses on professional glass: higher contrast, clearer toolbars, cleaner canvas surfaces, and a more executive shell for operations, quality, and audit.');
+    if(!Array.isArray(schema.storyboard.moments)) schema.storyboard.moments = [];
+    state.r9ActiveMode = schema.glassStudio.mode || state.r9ActiveMode || 'executive-glass-pro';
+    return schema;
+  }
+  function _r9TotalBlocks(schema){
+    var total = 0;
+    _r9Array(schema && schema.tabs).forEach(function(tab){ total += _r9Array(tab && tab.blocks).length; });
+    return total;
+  }
+  function _r9UniquePush(arr, value){ if(arr.indexOf(value) === -1) arr.push(value); }
+  function _r9ComputeMetrics(schema){
+    var tabs = _r9Array(schema && schema.tabs);
+    var totalBlocks = _r9TotalBlocks(schema);
+    var emptyTabs = 0;
+    var maxBlocks = 0;
+    var minBlocks = 999999;
+    var activeTab = _r9FindTab(schema, state.activeTab);
+    var board = tabs.length ? 58 : 40;
+    var readability = 62;
+    var contrast = 60;
+    var glass = 66;
+    var professionalism = 60;
+    var palette = [];
+    tabs.forEach(function(tab){
+      var count = _r9Array(tab && tab.blocks).length;
+      if(!count) emptyTabs += 1;
+      if(count > maxBlocks) maxBlocks = count;
+      if(count < minBlocks) minBlocks = count;
+    });
+    if(minBlocks === 999999) minBlocks = 0;
+    if(schema && schema.themeLab){
+      if(String(schema.themeLab.surface || '').indexOf('glass') !== -1) glass += 10;
+      if(String(schema.themeLab.contrast || '').indexOf('high') !== -1) contrast += 12;
+      if(String(schema.themeLab.cardStyle || '').indexOf('frost') !== -1) glass += 5;
+      if(String(schema.themeLab.elevation || '').indexOf('boardroom') !== -1 || String(schema.themeLab.elevation || '').indexOf('cinema') !== -1) professionalism += 6;
+      _r9UniquePush(palette, schema.themeLab.accent || 'violet-cyan');
+      _r9UniquePush(palette, schema.themeLab.preset || 'executive-lux');
+    }
+    if(schema && schema.accessOps){
+      if(String(schema.accessOps.profile || '').indexOf('clarity') !== -1) readability += 12;
+      if(String(schema.accessOps.contrastMode || '').indexOf('high') !== -1) contrast += 14;
+      if(String(schema.accessOps.focusRing || '').indexOf('visible') !== -1) readability += 8;
+    }
+    if(schema && schema.publish && schema.publish.requireSignoff) professionalism += 10;
+    if(schema && schema.releaseGov && _r9Array(schema.releaseGov.gates).length >= 3) professionalism += 8;
+    if(tabs.length >= 2) board += 8;
+    if(totalBlocks >= 3) board += 10;
+    if(totalBlocks >= 6) board += 6;
+    if(emptyTabs === 0 && tabs.length) board += 8;
+    if(maxBlocks - minBlocks <= 2 && tabs.length > 1) board += 10;
+    if(maxBlocks - minBlocks >= 5) board -= 12;
+    if(emptyTabs) board -= emptyTabs * 10;
+    readability += tabs.length ? 4 : 0;
+    readability += totalBlocks >= 3 ? 6 : 0;
+    contrast += totalBlocks >= 2 ? 4 : 0;
+    glass += totalBlocks ? 4 : 0;
+    board = _r9Clamp(board, 0, 100);
+    readability = _r9Clamp(readability, 0, 100);
+    contrast = _r9Clamp(contrast, 0, 100);
+    glass = _r9Clamp(glass, 0, 100);
+    professionalism = _r9Clamp(professionalism, 0, 100);
+    return {
+      totalBlocks:totalBlocks,
+      tabCount:tabs.length,
+      emptyTabs:emptyTabs,
+      maxBlocks:maxBlocks,
+      minBlocks:minBlocks,
+      activeTabId:activeTab && activeTab.tabId || '',
+      activeTabBlocks:_r9Array(activeTab && activeTab.blocks).length,
+      contrast:contrast,
+      readability:readability,
+      glass:glass,
+      professionalism:professionalism,
+      board:board,
+      palette:palette,
+      summary: emptyTabs ? _t('Còn tab rỗng hoặc quá thưa. Nên auto polish để seed bố cục và nâng độ rõ.', 'There are still empty or sparse tabs. Auto polish can seed the layout and raise clarity.') : _t('Bố cục đủ trưởng thành cho điều hành, chất lượng và reviewer với độ rõ cao hơn.', 'The layout is mature enough for operations, quality, and reviewers with stronger clarity.')
+    };
+  }
+  function _r9MakeModeButton(key, icon, titleVi, titleEn, noteVi, noteEn, active){
+    return '<button class="mb-r9-mode' + (active ? ' is-active' : '') + '" data-action="r9-apply-glass-mode" data-key="' + _esc(key) + '"><strong>' + _esc(icon + ' ' + _t(titleVi, titleEn)) + '</strong><small>' + _esc(_t(noteVi, noteEn)) + '</small></button>';
+  }
+  function _r9RenderGlassRail(schema, metrics){
+    var mode = (schema && schema.glassStudio && schema.glassStudio.mode) || state.r9ActiveMode || 'executive-glass-pro';
+    var h = '<div class="mb-r9-glass-rail">';
+    h += '<div class="mb-r9-rail-head"><div><div class="mb-r9-kicker">ROUND 9 · GLASS PRO</div><strong>' + _esc(_t('Glass cockpit', 'Glass cockpit')) + '</strong><p>' + _esc(metrics.summary) + '</p></div><div class="mb-r9-chipline"><span>' + _esc(_t('Mode', 'Mode')) + ': ' + _esc(mode) + '</span><span>' + _esc(_t('Tabs', 'Tabs')) + ': ' + _esc(String(metrics.tabCount)) + '</span><span>' + _esc(_t('Blocks', 'Blocks')) + ': ' + _esc(String(metrics.totalBlocks)) + '</span><span>' + _esc(_t('Contrast target', 'Contrast target')) + ': ' + _esc(schema && schema.glassStudio && schema.glassStudio.contrastTarget || 'AAA') + '</span></div></div>';
+    h += '<div class="mb-r9-stat-grid">';
+    h += '<div class="mb-r9-stat"><small>' + _esc(_t('Contrast', 'Contrast')) + '</small><strong>' + _esc(String(metrics.contrast)) + '%</strong></div>';
+    h += '<div class="mb-r9-stat"><small>' + _esc(_t('Readability', 'Readability')) + '</small><strong>' + _esc(String(metrics.readability)) + '%</strong></div>';
+    h += '<div class="mb-r9-stat"><small>' + _esc(_t('Glass craft', 'Glass craft')) + '</small><strong>' + _esc(String(metrics.glass)) + '%</strong></div>';
+    h += '<div class="mb-r9-stat"><small>' + _esc(_t('Professionalism', 'Professionalism')) + '</small><strong>' + _esc(String(metrics.professionalism)) + '%</strong></div>';
+    h += '</div></div>';
+    h += '<div class="mb-r9-mode-grid">';
+    h += _r9MakeModeButton('executive-glass-pro','💎','Executive glass pro','Executive glass pro','Giữ cảm hứng aurora của round 7 nhưng gọn và rõ hơn.','Keeps the round 7 aurora feel but tighter and clearer.', mode === 'executive-glass-pro');
+    h += _r9MakeModeButton('precision-glass','🎯','Precision glass','Precision glass','Ít hiệu ứng hơn, tập trung lên dữ liệu và thao tác.','Less flourish, stronger data and action clarity.', mode === 'precision-glass');
+    h += _r9MakeModeButton('audit-glass','🛡','Audit glass','Audit glass','Tương phản cao nhất, phù hợp review/audit/compliance.','Maximum contrast for review, audit, and compliance.', mode === 'audit-glass');
+    h += _r9MakeModeButton('night-ops-glass','🌙','Night ops glass','Night ops glass','Tối chuyên nghiệp cho shopfloor, war room và trực ca.','Professional dark mode for shopfloor, war room, and shift ops.', mode === 'night-ops-glass');
+    h += '</div>';
+    h += '<div class="mb-r9-action-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r9-auto-polish">✨ ' + _esc(_t('Glass auto polish', 'Glass auto polish')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r9-export-visual-brief">🧾 ' + _esc(_t('Visual QA brief', 'Visual QA brief')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r9-toggle-contrast">◐ ' + _esc(_t('Contrast board', 'Contrast board')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r9-toggle-structure">🧱 ' + _esc(_t('Structure lens', 'Structure lens')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r9-toggle-palette">🎨 ' + _esc(_t('Palette rack', 'Palette rack')) + '</button></div>';
+    h += '</div>';
+    return h;
+  }
+  function _r9RenderContrastPanel(schema, metrics){
+    var h = '<div class="mb-r9-panel"><div class="mb-r9-panel-head"><strong>' + _esc(_t('Contrast board', 'Contrast board')) + '</strong><span>' + _esc(String(metrics.contrast)) + '%</span></div>';
+    h += '<div class="mb-r9-meter"><span style="width:' + _esc(String(metrics.contrast)) + '%"></span></div>';
+    h += '<ul class="mb-r9-list">';
+    h += '<li><strong>' + _esc(_t('Toolbar chrome', 'Toolbar chrome')) + ':</strong> ' + _esc(schema && schema.glassStudio && schema.glassStudio.chrome || 'frosted-toolbar') + '</li>';
+    h += '<li><strong>' + _esc(_t('Theme contrast', 'Theme contrast')) + ':</strong> ' + _esc(schema && schema.themeLab && schema.themeLab.contrast || 'pro-high') + '</li>';
+    h += '<li><strong>' + _esc(_t('Access profile', 'Access profile')) + ':</strong> ' + _esc(schema && schema.accessOps && schema.accessOps.profile || 'high-clarity') + '</li>';
+    h += '<li><strong>' + _esc(_t('Focus ring', 'Focus ring')) + ':</strong> ' + _esc(schema && schema.accessOps && schema.accessOps.focusRing || 'visible') + '</li>';
+    h += '</ul>';
+    h += '<div class="mb-r9-note">' + _esc(metrics.contrast >= 88 ? _t('Độ tương phản đã đủ tốt cho màn điều hành và review kéo dài.', 'Contrast is strong enough for executive dashboards and prolonged review.') : _t('Nên nâng contrast hoặc chuyển sang audit glass khi cần review cường độ cao.', 'Raise contrast or switch to audit glass for intense review sessions.')) + '</div>';
+    h += '</div>';
+    return h;
+  }
+  function _r9RenderStructurePanel(schema, metrics){
+    var h = '<div class="mb-r9-panel"><div class="mb-r9-panel-head"><strong>' + _esc(_t('Structure lens', 'Structure lens')) + '</strong><span>' + _esc(metrics.activeTabId || '-') + '</span></div>';
+    h += '<div class="mb-r9-structure-grid">';
+    h += '<div><small>' + _esc(_t('Tabs', 'Tabs')) + '</small><strong>' + _esc(String(metrics.tabCount)) + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Blocks', 'Blocks')) + '</small><strong>' + _esc(String(metrics.totalBlocks)) + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Empty tabs', 'Empty tabs')) + '</small><strong>' + _esc(String(metrics.emptyTabs)) + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Active tab blocks', 'Active tab blocks')) + '</small><strong>' + _esc(String(metrics.activeTabBlocks)) + '</strong></div>';
+    h += '</div>';
+    h += '<div class="mb-r9-note">' + _esc(metrics.emptyTabs ? _t('Có tab chưa đủ nội dung chính. Auto polish có thể seed block round 9 để hoàn thiện nhanh.', 'Some tabs still lack primary content. Auto polish can seed round 9 blocks for a faster finish.') : _t('Cấu trúc tab đang gọn và dễ điều hướng.', 'The tab structure is compact and easy to navigate.')) + '</div>';
+    h += '</div>';
+    return h;
+  }
+  function _r9RenderPalettePanel(schema, metrics){
+    var h = '<div class="mb-r9-panel"><div class="mb-r9-panel-head"><strong>' + _esc(_t('Palette rack', 'Palette rack')) + '</strong><span>' + _esc(schema && schema.themeLab && schema.themeLab.preset || 'executive-lux') + '</span></div>';
+    h += '<div class="mb-r9-palette-grid">';
+    [
+      { label:_t('Accent', 'Accent'), value:(schema && schema.themeLab && schema.themeLab.accent) || 'violet-cyan' },
+      { label:_t('Surface', 'Surface'), value:(schema && schema.themeLab && schema.themeLab.surface) || 'glass' },
+      { label:_t('Card', 'Card'), value:(schema && schema.themeLab && schema.themeLab.cardStyle) || 'frosted' },
+      { label:_t('Elevation', 'Elevation'), value:(schema && schema.themeLab && schema.themeLab.elevation) || 'boardroom' }
+    ].forEach(function(item){
+      h += '<div class="mb-r9-swatch"><small>' + _esc(item.label) + '</small><strong>' + _esc(item.value) + '</strong></div>';
+    });
+    h += '</div>';
+    h += '<div class="mb-r9-note">' + _esc(_t('Preset này ưu tiên glass có tương phản, đỡ loá và giữ cảm giác điều hành chuyên nghiệp.', 'This preset favors glass with contrast, reduced glare, and a more professional executive tone.')) + '</div>';
+    h += '</div>';
+    return h;
+  }
+  function _r9RenderPanels(schema, metrics){
+    var h = '';
+    if(!state.showR9Contrast && !state.showR9Structure && !state.showR9Palette) return h;
+    h += '<div class="mb-r9-panel-grid">';
+    if(state.showR9Contrast) h += _r9RenderContrastPanel(schema, metrics);
+    if(state.showR9Structure) h += _r9RenderStructurePanel(schema, metrics);
+    if(state.showR9Palette) h += _r9RenderPalettePanel(schema, metrics);
+    h += '</div>';
+    return h;
+  }
+  function _r9DownloadText(filename, text, mime){
+    if(typeof document === 'undefined' || typeof Blob === 'undefined' || !document.createElement || !(window.URL || window.webkitURL)) return text;
+    try {
+      var blob = new Blob([String(text == null ? '' : text)], { type: mime || 'text/plain;charset=utf-8' });
+      var url = (window.URL || window.webkitURL).createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      if(document.body && document.body.appendChild) document.body.appendChild(link);
+      if(link.click) link.click();
+      setTimeout(function(){
+        try { if(document.body && document.body.removeChild) document.body.removeChild(link); } catch(err){}
+        try { (window.URL || window.webkitURL).revokeObjectURL(url); } catch(err){}
+      }, 0);
+    } catch(err){ return text; }
+    return text;
+  }
+  function _r9BuildVisualBrief(schema){
+    var metrics = _r9ComputeMetrics(schema || state.schema || {});
+    var lines = [];
+    lines.push('# HESEM Module Builder Round 9 Visual QA Brief');
+    lines.push('');
+    lines.push('- Patch: 2026-04-08-r9-glass-pro');
+    lines.push('- Module: ' + (schema && schema.moduleId || 'module'));
+    lines.push('- Glass mode: ' + (((schema || {}).glassStudio || {}).mode || state.r9ActiveMode || 'executive-glass-pro'));
+    lines.push('- Contrast score: ' + metrics.contrast + '%');
+    lines.push('- Readability score: ' + metrics.readability + '%');
+    lines.push('- Glass craft: ' + metrics.glass + '%');
+    lines.push('- Professionalism: ' + metrics.professionalism + '%');
+    lines.push('- Tabs / blocks: ' + metrics.tabCount + ' / ' + metrics.totalBlocks);
+    lines.push('');
+    lines.push('## Visual direction');
+    lines.push('- Preserve the aurora-glass spirit from Round 7.');
+    lines.push('- Raise contrast for toolbar, panel text, and action controls.');
+    lines.push('- Keep builder surfaces professional, less noisy, more boardroom-ready.');
+    lines.push('- Maintain compatibility with existing builder workflow and schema.');
+    lines.push('');
+    lines.push('## Current config');
+    lines.push('- Theme preset: ' + (((schema || {}).themeLab || {}).preset || 'executive-lux'));
+    lines.push('- Theme accent: ' + (((schema || {}).themeLab || {}).accent || 'violet-cyan'));
+    lines.push('- Theme surface: ' + (((schema || {}).themeLab || {}).surface || 'glass'));
+    lines.push('- Access profile: ' + (((schema || {}).accessOps || {}).profile || 'high-clarity'));
+    lines.push('- Focus ring: ' + (((schema || {}).accessOps || {}).focusRing || 'visible'));
+    lines.push('- Publish signoff: ' + ((((schema || {}).publish || {}).requireSignoff) ? 'required' : 'optional'));
+    lines.push('');
+    lines.push('## Recommendations');
+    lines.push('- ' + metrics.summary);
+    lines.push('- ' + (metrics.contrast >= 88 ? 'Contrast is ready for high-intensity review.' : 'Consider audit glass or stronger contrast tuning for heavy review sessions.'));
+    lines.push('- ' + (metrics.emptyTabs ? 'Seed sparse tabs with round 9 templates.' : 'Tab structure is visually stable.'));
+    return lines.join('\n');
+  }
+  function _r9EnsureTemplate(tab, key){
+    var BE = window.HmBlockEngine || {};
+    var tpl = BE.BLOCK_TEMPLATES && BE.BLOCK_TEMPLATES[key];
+    var block;
+    if(!tab || !tpl) return false;
+    if(_r9Array(tab.blocks).some(function(item){ return item && item.templateKey === key; })) return false;
+    if(typeof _createBlockScaffold === 'function') block = _createBlockScaffold(tpl.type, tpl.config);
+    else block = { blockId:(typeof _uid === 'function' ? _uid() : ('blk-' + Date.now())), id:(typeof _uid === 'function' ? _uid() : ('blk-' + Date.now())), type:tpl.type, config:JSON.parse(JSON.stringify(tpl.config || {})) };
+    block.templateKey = key;
+    if(tpl.title) block.title = JSON.parse(JSON.stringify(tpl.title));
+    if(tpl.subtitle) block.subtitle = JSON.parse(JSON.stringify(tpl.subtitle));
+    tab.blocks = _r9Array(tab.blocks);
+    tab.blocks.push(block);
+    return true;
+  }
+  function _r9AutoPolish(){
+    var schema = state.schema;
+    var tab;
+    var added = 0;
+    if(!schema) return;
+    _r9EnsureSchema(schema);
+    tab = _r9FindTab(schema, state.activeTab);
+    schema.glassStudio.mode = state.r9ActiveMode || schema.glassStudio.mode || 'executive-glass-pro';
+    schema.glassStudio.surface = 'glass-pro';
+    schema.glassStudio.contrastTarget = 'AAA';
+    schema.glassStudio.professionalTone = state.r9ActiveMode === 'night-ops-glass' ? 'war-room' : 'boardroom';
+    schema.glassStudio.chrome = 'frosted-toolbar';
+    schema.themeLab.surface = 'glass';
+    schema.themeLab.cardStyle = 'frosted';
+    schema.themeLab.contrast = state.r9ActiveMode === 'audit-glass' ? 'maximum-high' : 'pro-high';
+    schema.themeLab.elevation = 'boardroom';
+    schema.accessOps.profile = state.r9ActiveMode === 'audit-glass' ? 'audit-clarity' : 'high-clarity';
+    schema.accessOps.contrastMode = 'high';
+    schema.accessOps.focusRing = 'visible';
+    schema.accessOps.hitTarget = '46px';
+    schema.layoutHarmony.strategy = 'adaptive-grid';
+    schema.layoutHarmony.breakpointModel = 'desktop-tablet-handheld';
+    schema.previewChrome.frame = 'glass';
+    schema.previewChrome.ribbon = 'signal';
+    schema.experienceDirector.visualMode = state.r9ActiveMode || 'executive-glass-pro';
+    schema.publish.requireSignoff = true;
+    _r9UniquePush(schema.releaseGov.gates, 'ux review');
+    _r9UniquePush(schema.releaseGov.gates, 'a11y scan');
+    if(tab){
+      added += _r9EnsureTemplate(tab, 'r9-glass-executive-kpi') ? 1 : 0;
+      if(_r9TotalBlocks(schema) < 3) added += _r9EnsureTemplate(tab, 'r9-operator-focus-banner') ? 1 : 0;
+      if(_r9TotalBlocks(schema) < 4) added += _r9EnsureTemplate(tab, 'r9-approval-glass-board') ? 1 : 0;
+    }
+    if(typeof _toastBuilder === 'function') _toastBuilder(_t('Đã auto polish giao diện glass, nâng contrast và seed block round 9.', 'Auto-polished the glass experience, raised contrast, and seeded round 9 blocks.'), 'success');
+    _paint();
+  }
+  function _r9ApplyGlassMode(key){
+    var schema = state.schema;
+    if(!schema) return;
+    _r9EnsureSchema(schema);
+    state.r9ActiveMode = key || 'executive-glass-pro';
+    schema.glassStudio.mode = state.r9ActiveMode;
+    switch(state.r9ActiveMode){
+      case 'precision-glass':
+        schema.themeLab.preset = 'precision-glass';
+        schema.themeLab.accent = 'slate-blue';
+        schema.themeLab.surface = 'glass';
+        schema.themeLab.contrast = 'pro-high';
+        schema.themeLab.cardStyle = 'precision-frost';
+        schema.themeLab.elevation = 'boardroom';
+        schema.accessOps.profile = 'high-clarity';
+        schema.accessOps.contrastMode = 'high';
+        schema.previewChrome.frame = 'precision';
+        schema.previewChrome.ribbon = 'decision';
+        schema.experienceDirector.visualMode = 'precision-glass';
+        break;
+      case 'audit-glass':
+        schema.themeLab.preset = 'audit-glass';
+        schema.themeLab.accent = 'blue-slate';
+        schema.themeLab.surface = 'glass';
+        schema.themeLab.contrast = 'maximum-high';
+        schema.themeLab.cardStyle = 'crisp-frost';
+        schema.themeLab.elevation = 'boardroom';
+        schema.accessOps.profile = 'audit-clarity';
+        schema.accessOps.contrastMode = 'maximum';
+        schema.previewChrome.frame = 'audit';
+        schema.previewChrome.ribbon = 'compliance';
+        schema.experienceDirector.visualMode = 'audit-glass';
+        break;
+      case 'night-ops-glass':
+        schema.themeLab.preset = 'night-ops-glass';
+        schema.themeLab.accent = 'emerald-cyan';
+        schema.themeLab.surface = 'glass-dark';
+        schema.themeLab.contrast = 'high';
+        schema.themeLab.cardStyle = 'dark-frost';
+        schema.themeLab.elevation = 'cinema';
+        schema.accessOps.profile = 'night-clarity';
+        schema.accessOps.contrastMode = 'high';
+        schema.previewChrome.frame = 'night-ops';
+        schema.previewChrome.ribbon = 'ops';
+        schema.experienceDirector.visualMode = 'night-ops-glass';
+        break;
+      default:
+        schema.themeLab.preset = 'executive-lux';
+        schema.themeLab.accent = 'violet-cyan';
+        schema.themeLab.surface = 'glass';
+        schema.themeLab.contrast = 'pro-high';
+        schema.themeLab.cardStyle = 'frosted';
+        schema.themeLab.elevation = 'boardroom';
+        schema.accessOps.profile = 'high-clarity';
+        schema.accessOps.contrastMode = 'high';
+        schema.previewChrome.frame = 'glass';
+        schema.previewChrome.ribbon = 'signal';
+        schema.experienceDirector.visualMode = 'executive-glass-pro';
+        break;
+    }
+    if(typeof _toastBuilder === 'function') _toastBuilder(_t('Đã áp preset glass: ', 'Applied glass preset: ') + state.r9ActiveMode, 'success');
+    _paint();
+  }
+  function _r9ExportVisualBrief(){ return state.schema ? _r9DownloadText('module-builder-round9-visual-qa-brief.md', _r9BuildVisualBrief(state.schema), 'text/markdown;charset=utf-8') : ''; }
+  function _r9RemoveExisting(host){
+    if(!host || !host.querySelectorAll) return;
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r9-glass-rail,.mb-r9-panel-grid'), function(node){ if(node && node.parentNode) node.parentNode.removeChild(node); });
+  }
+  function _r9AppendHtml(doc, parent, anchor, html){
+    var wrap;
+    if(!doc || !parent || !doc.createElement) return;
+    wrap = doc.createElement('div');
+    wrap.innerHTML = html;
+    while(wrap.firstChild){
+      if(anchor && anchor.parentNode === parent) parent.insertBefore(wrap.firstChild, anchor);
+      else parent.appendChild(wrap.firstChild);
+    }
+  }
+  function _r9DecorateHost(host, previewOnly){
+    var doc = host && host.ownerDocument ? host.ownerDocument : (typeof document !== 'undefined' ? document : null);
+    var shell = host && host.querySelector ? host.querySelector('.mb-r8-shell,.mb-r7-shell') : null;
+    var builderShell = host && host.querySelector ? host.querySelector('.mb-builder-shell') : null;
+    var mainPanel = host && host.querySelector ? host.querySelector('.mb-main-panel') : null;
+    var shellAnchor;
+    var metrics;
+    if(host && host.querySelectorAll){
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-side-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r9-side-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-rail-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r9-rail-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-block-card'), function(node){ if(node && node.classList) node.classList.add('mb-r9-block-card'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-canvas-root'), function(node){ if(node && node.classList) node.classList.add('mb-r9-canvas-root'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-main-panel>.mb-toolbar'), function(node){ if(node && node.classList) node.classList.add('mb-r9-toolbar'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-tab-pill'), function(node){ if(node && node.classList) node.classList.add('mb-r9-tab-pill'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-preview-shell'), function(node){ if(node && node.classList) node.classList.add('mb-r9-preview-shell'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-preview-ribbon'), function(node){ if(node && node.classList) node.classList.add('mb-r9-preview-ribbon'); });
+    }
+    if(builderShell && builderShell.classList) builderShell.classList.add('mb-r9-builder-shell');
+    if(mainPanel && mainPanel.classList) mainPanel.classList.add('mb-r9-main-panel');
+    if(shell && shell.classList) shell.classList.add('mb-r9-shell');
+    if(!shell || previewOnly || !state.schema) return;
+    _r9RemoveExisting(host);
+    _r9EnsureSchema(state.schema);
+    metrics = _r9ComputeMetrics(state.schema);
+    shellAnchor = shell.querySelector('.mb-r7-panel-grid,.mb-r8-panel-grid');
+    _r9AppendHtml(doc, shell, shellAnchor, _r9RenderGlassRail(state.schema, metrics) + _r9RenderPanels(state.schema, metrics));
+  }
+  function _r9NormalizeHtml(html, previewOnly){
+    var host;
+    html = String(html || '');
+    if(typeof document === 'undefined' || !document.createElement) return html;
+    host = document.createElement('div');
+    host.innerHTML = html;
+    _r9DecorateHost(host, !!previewOnly);
+    return host.innerHTML;
+  }
+  function _r9InjectStyles(){
+    var style;
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-module-builder-round9-style')) return;
+    style = document.createElement('style');
+    style.id = 'hm-module-builder-round9-style';
+    style.textContent = '' +
+      '.mb-r9-shell{position:relative;overflow:hidden;margin:0 0 16px;padding:18px 18px 16px;border-radius:24px;background:linear-gradient(135deg,rgba(15,23,42,.96) 0%,rgba(30,41,59,.92) 24%,rgba(30,64,175,.82) 58%,rgba(8,145,178,.72) 100%);border:1px solid rgba(255,255,255,.18);box-shadow:0 22px 50px rgba(15,23,42,.18)}' +
+      '.mb-r9-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 0%,rgba(255,255,255,.18),transparent 32%),radial-gradient(circle at 100% 0%,rgba(125,211,252,.16),transparent 28%);pointer-events:none}' +
+      '.mb-r9-shell>*{position:relative;z-index:1}' +
+      '.mb-r9-shell .mb-r7-kicker{color:#ddd6fe}' +
+      '.mb-r9-shell .mb-r7-hero h3{font-size:28px;color:#fff;letter-spacing:-.02em}' +
+      '.mb-r9-shell .mb-r7-hero p{color:rgba(255,255,255,.88)}' +
+      '.mb-r9-shell .mb-r7-chip-row span,.mb-r9-shell .mb-r7-hero-stats div,.mb-r9-shell .mb-r7-card,.mb-r9-shell .mb-r7-panel,.mb-r9-shell .mb-r9-glass-rail,.mb-r9-shell .mb-r9-panel{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}' +
+      '.mb-r9-shell .mb-r7-chip-row span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.1);color:#eff6ff}' +
+      '.mb-r9-shell .mb-r7-hero-stats div{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.10));border:1px solid rgba(255,255,255,.14)}' +
+      '.mb-r9-shell .mb-r7-hero-stats strong{color:#fff}.mb-r9-shell .mb-r7-hero-stats small{color:#e2e8f0}' +
+      '.mb-r9-shell .mb-r7-card{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.16);box-shadow:0 14px 28px rgba(15,23,42,.14)}' +
+      '.mb-r9-shell .mb-r7-card small{color:#e2e8f0}.mb-r9-shell .mb-r7-card-value,.mb-r9-shell .mb-r7-card-head strong{color:#fff}' +
+      '.mb-r9-glass-rail{margin:14px 0 12px;padding:14px 14px 12px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.16);box-shadow:0 14px 28px rgba(15,23,42,.14)}' +
+      '.mb-r9-rail-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:12px}.mb-r9-kicker{font-size:11px;letter-spacing:.16em;font-weight:700;color:#c4b5fd;margin-bottom:6px}.mb-r9-rail-head strong{display:block;font-size:18px;color:#fff;margin-bottom:4px}.mb-r9-rail-head p{margin:0;color:rgba(255,255,255,.84);max-width:760px;line-height:1.5}' +
+      '.mb-r9-chipline{display:flex;flex-wrap:wrap;gap:8px}.mb-r9-chipline span{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(15,23,42,.26);border:1px solid rgba(255,255,255,.12);color:#eff6ff;font-size:12px}' +
+      '.mb-r9-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(92px,1fr));gap:10px;min-width:320px}.mb-r9-stat{padding:12px;border-radius:16px;background:rgba(15,23,42,.24);border:1px solid rgba(255,255,255,.12);text-align:center}.mb-r9-stat small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r9-stat strong{display:block;color:#fff;font-size:22px}' +
+      '.mb-r9-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px}.mb-r9-mode{padding:12px;border-radius:16px;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:transform .15s ease, border-color .15s ease, background .15s ease}.mb-r9-mode:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.12)}.mb-r9-mode.is-active{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.10));border-color:rgba(255,255,255,.26);box-shadow:0 10px 24px rgba(15,23,42,.16)}.mb-r9-mode strong{display:block;font-size:13px;margin-bottom:4px}.mb-r9-mode small{display:block;color:#dbeafe;line-height:1.45}' +
+      '.mb-r9-action-row{display:flex;flex-wrap:wrap;gap:8px}' +
+      '.mb-r9-panel-grid,.mb-r9-shell .mb-r7-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0 0}' +
+      '.mb-r9-panel,.mb-r9-shell .mb-r7-panel{padding:15px;border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.34),rgba(15,23,42,.26));border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 26px rgba(15,23,42,.12)}' +
+      '.mb-r9-panel-head,.mb-r9-shell .mb-r7-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.mb-r9-panel-head strong,.mb-r9-shell .mb-r7-panel-head strong{color:#fff}.mb-r9-panel-head span,.mb-r9-shell .mb-r7-panel-head span{color:#bfdbfe;font-size:12px}' +
+      '.mb-r9-meter{height:10px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;margin-bottom:10px}.mb-r9-meter span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#38bdf8,#34d399)}' +
+      '.mb-r9-list{margin:0;padding-left:18px;color:#e2e8f0}.mb-r9-list li{margin:6px 0;line-height:1.45}.mb-r9-list strong{color:#fff}.mb-r9-note{margin-top:10px;color:#dbeafe;line-height:1.5}' +
+      '.mb-r9-structure-grid,.mb-r9-palette-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mb-r9-structure-grid>div,.mb-r9-swatch{padding:12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}.mb-r9-structure-grid small,.mb-r9-swatch small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r9-structure-grid strong,.mb-r9-swatch strong{display:block;color:#fff}' +
+      '.mb-r9-builder-shell{gap:14px!important}.mb-r9-side-panel,.mb-r9-main-panel,.mb-r9-rail-panel{background:linear-gradient(180deg,rgba(255,255,255,.90),rgba(248,250,252,.82));border:1px solid rgba(148,163,184,.24);box-shadow:0 16px 36px rgba(15,23,42,.06);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}' +
+      '.mb-r9-main-panel>.mb-r9-toolbar,.mb-r9-main-panel>.mb-toolbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(248,250,252,.88));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 10px 24px rgba(15,23,42,.05)}' +
+      '.mb-r9-main-panel>.mb-canvas-stage{background:transparent}.mb-r9-canvas-root{background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(241,245,249,.98));box-shadow:inset 0 1px 0 rgba(255,255,255,.74)}' +
+      '.mb-r9-block-card{border-color:rgba(148,163,184,.24)!important;box-shadow:0 10px 20px rgba(15,23,42,.04)!important;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.96))!important}.mb-r9-block-card .mb-block-name,.mb-r9-block-card .mb-block-type{color:#0f172a}' +
+      '.mb-r9-main-panel .hm-btn.hm-btn-sm{border-radius:12px}.mb-r9-main-panel .hm-btn.hm-btn-primary{box-shadow:0 10px 18px rgba(37,99,235,.18)}.mb-r9-main-panel .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.78)}' +
+      '.mb-r9-tab-pill{box-shadow:0 8px 18px rgba(15,23,42,.04)}' +
+      '.mb-r9-preview-shell .mb-r9-preview-ribbon,.mb-r9-preview-ribbon{background:linear-gradient(90deg,rgba(30,41,59,.92),rgba(30,64,175,.82),rgba(8,145,178,.78));border:1px solid rgba(255,255,255,.14)}.mb-r9-preview-ribbon span{background:rgba(255,255,255,.86);color:#0f172a}' +
+      '.mb-r9-shell .hm-btn.hm-btn-secondary,.mb-r9-shell .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.86);color:#0f172a;border:1px solid rgba(148,163,184,.18)}.mb-r9-shell .hm-btn.hm-btn-primary{background:linear-gradient(135deg,#2563eb,#7c3aed);border-color:rgba(255,255,255,.12);box-shadow:0 10px 20px rgba(37,99,235,.18)}' +
+      '@media (max-width: 1120px){.mb-r9-rail-head{flex-direction:column}.mb-r9-stat-grid{min-width:0;width:100%}}' +
+      '@media (max-width: 960px){.mb-r9-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mb-r9-mode-grid{grid-template-columns:1fr 1fr}.mb-r9-shell{padding:16px}}' +
+      '@media (max-width: 640px){.mb-r9-mode-grid,.mb-r9-panel-grid,.mb-r9-shell .mb-r7-panel-grid,.mb-r9-structure-grid,.mb-r9-palette-grid{grid-template-columns:1fr}.mb-r9-action-row{flex-direction:column;align-items:stretch}}';
+    document.head.appendChild(style);
+  }
+
+  _renderBuilder = function(){
+    var html;
+    _r9EnsureState();
+    _r9InjectStyles();
+    if(state.schema) _r9EnsureSchema(state.schema);
+    html = _r9PrevRenderBuilder();
+    return _r9NormalizeHtml(html, false);
+  };
+
+  _renderPreview = function(){
+    var html;
+    _r9EnsureState();
+    _r9InjectStyles();
+    if(state.schema) _r9EnsureSchema(state.schema);
+    html = _r9PrevRenderPreview();
+    return _r9NormalizeHtml(html, true);
+  };
+
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r9-toggle-contrast': state.showR9Contrast = !state.showR9Contrast; _paint(); return;
+        case 'r9-toggle-structure': state.showR9Structure = !state.showR9Structure; _paint(); return;
+        case 'r9-toggle-palette': state.showR9Palette = !state.showR9Palette; _paint(); return;
+        case 'r9-apply-glass-mode': _r9ApplyGlassMode(btn.getAttribute('data-key') || 'executive-glass-pro'); return;
+        case 'r9-auto-polish': _r9AutoPolish(); return;
+        case 'r9-export-visual-brief': _r9ExportVisualBrief(); return;
+      }
+    }
+    return _r9PrevHandleClick(e);
+  };
+
+  window.__HM_MB_R9_TEST__ = {
+    version:'2026-04-08-r9-glass-pro',
+    computeMetrics:function(schema){ _r9EnsureState(); return _r9ComputeMetrics(schema || state.schema || {}); },
+    buildVisualBrief:function(schema){ _r9EnsureState(); return _r9BuildVisualBrief(schema || state.schema || {}); },
+    normalizeHtml:function(html, previewOnly){ _r9EnsureState(); return _r9NormalizeHtml(html, !!previewOnly); },
+    renderBuilderHtml:function(){ _r9EnsureState(); return state.schema ? _renderBuilder() : ''; }
+  };
+}
+
+
+
+/* ── MODULE BUILDER ULTRA ROUND 10 GLASS EXECUTIVE (2026-04-08 R10) ─────── */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R10__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R10__ = '2026-04-08-r10-glass-executive';
+
+  var _r10PrevRenderBuilder = _renderBuilder;
+  var _r10PrevRenderPreview = _renderPreview;
+  var _r10PrevHandleClick = _handleClick;
+
+  function _r10Arr(v){ return Array.isArray(v) ? v : []; }
+  function _r10Obj(v){ return v && typeof v === 'object' && !Array.isArray(v) ? v : {}; }
+  function _r10Text(v, fallback){
+    if(v == null || v === '') return fallback || '';
+    if(typeof v === 'string' || typeof v === 'number') return String(v);
+    if(v && typeof v === 'object') return String(v.vi || v.en || fallback || '');
+    return fallback || '';
+  }
+  function _r10Clamp(n, min, max){ n = Number(n) || 0; return Math.max(min, Math.min(max, n)); }
+  function _r10Clone(v){ try{ return JSON.parse(JSON.stringify(v)); }catch(_e){ return v; } }
+  function _r10MergeInto(target, patch){
+    Object.keys(patch || {}).forEach(function(key){
+      var next = patch[key];
+      if(next && typeof next === 'object' && !Array.isArray(next)){
+        target[key] = target[key] && typeof target[key] === 'object' && !Array.isArray(target[key]) ? target[key] : {};
+        _r10MergeInto(target[key], next);
+      }else if(Array.isArray(next)){
+        target[key] = _r10Clone(next);
+      }else{
+        target[key] = next;
+      }
+    });
+    return target;
+  }
+  function _r10EnsureState(){
+    if(state.showR10Governance == null) state.showR10Governance = true;
+    if(state.showR10Workflow == null) state.showR10Workflow = false;
+    if(state.showR10Typography == null) state.showR10Typography = false;
+    if(state.showR10Discipline == null) state.showR10Discipline = false;
+    if(state.showR10LegacyLabs == null) state.showR10LegacyLabs = false;
+    if(state.r10ActiveMode == null) state.r10ActiveMode = 'boardroom-crystal';
+  }
+  function _r10EnsureSchema(schema){
+    if(!schema || typeof schema !== 'object') return schema;
+    schema.themeLab = _r10Obj(schema.themeLab);
+    schema.accessOps = _r10Obj(schema.accessOps);
+    schema.previewChrome = _r10Obj(schema.previewChrome);
+    schema.releaseGov = _r10Obj(schema.releaseGov);
+    schema.publish = _r10Obj(schema.publish);
+    schema.package = _r10Obj(schema.package);
+    schema.storyboard = _r10Obj(schema.storyboard);
+    schema.marketplace = _r10Obj(schema.marketplace);
+    schema.glassStudio = _r10Obj(schema.glassStudio);
+    schema.glassExecutive = _r10Obj(schema.glassExecutive);
+    schema.typographyLab = _r10Obj(schema.typographyLab);
+    schema.workflowAtlas = _r10Obj(schema.workflowAtlas);
+    schema.decisionDesk = _r10Obj(schema.decisionDesk);
+    schema.experienceDirector = _r10Obj(schema.experienceDirector);
+    if(!Array.isArray(schema.storyboard.moments)) schema.storyboard.moments = [];
+    if(!Array.isArray(schema.releaseGov.gates)) schema.releaseGov.gates = ['design review','qa smoke','signoff','rollback'];
+    if(!Array.isArray(schema.decisionDesk.notes)) schema.decisionDesk.notes = [];
+    if(schema.package.version == null || !String(schema.package.version || '').trim()) schema.package.version = '0.1.0';
+    if(schema.publish.packageName == null || !String(schema.publish.packageName || '').trim()) schema.publish.packageName = schema.moduleId || 'module-package';
+    if(schema.publish.releaseStrategy == null) schema.publish.releaseStrategy = 'gated';
+    if(schema.publish.requireSignoff == null) schema.publish.requireSignoff = true;
+    if(schema.themeLab.preset == null) schema.themeLab.preset = 'boardroom-crystal';
+    if(schema.themeLab.surface == null) schema.themeLab.surface = 'glass-pro';
+    if(schema.themeLab.contrast == null) schema.themeLab.contrast = 'professional-max';
+    if(schema.themeLab.accent == null) schema.themeLab.accent = 'indigo-cyan';
+    if(schema.themeLab.cardStyle == null) schema.themeLab.cardStyle = 'crisp-frost';
+    if(schema.themeLab.elevation == null) schema.themeLab.elevation = 'executive';
+    if(schema.accessOps.profile == null) schema.accessOps.profile = 'executive-clarity';
+    if(schema.accessOps.contrastMode == null) schema.accessOps.contrastMode = 'max';
+    if(schema.accessOps.focusRing == null) schema.accessOps.focusRing = 'disciplined';
+    if(schema.accessOps.hitTarget == null) schema.accessOps.hitTarget = '44px';
+    if(schema.previewChrome.frame == null) schema.previewChrome.frame = 'boardroom';
+    if(schema.previewChrome.ribbon == null) schema.previewChrome.ribbon = 'executive';
+    if(schema.glassStudio.mode == null) schema.glassStudio.mode = state.r10ActiveMode || 'boardroom-crystal';
+    if(schema.glassStudio.surface == null) schema.glassStudio.surface = 'glass-pro';
+    if(schema.glassStudio.contrastTarget == null) schema.glassStudio.contrastTarget = 'AAA';
+    if(schema.glassStudio.professionalTone == null) schema.glassStudio.professionalTone = 'boardroom';
+    if(schema.glassExecutive.mode == null) schema.glassExecutive.mode = schema.glassStudio.mode || state.r10ActiveMode || 'boardroom-crystal';
+    if(schema.glassExecutive.shell == null) schema.glassExecutive.shell = 'executive-crystal';
+    if(schema.glassExecutive.chrome == null) schema.glassExecutive.chrome = 'disciplined';
+    if(schema.glassExecutive.noise == null) schema.glassExecutive.noise = 'low';
+    if(schema.typographyLab.scale == null) schema.typographyLab.scale = '14/20';
+    if(schema.typographyLab.headings == null) schema.typographyLab.headings = 'semibold-tight';
+    if(schema.typographyLab.numerics == null) schema.typographyLab.numerics = 'tabular';
+    if(schema.typographyLab.captionTone == null) schema.typographyLab.captionTone = 'muted-strong';
+    if(schema.typographyLab.labels == null) schema.typographyLab.labels = 'high-contrast';
+    if(schema.workflowAtlas.emphasis == null) schema.workflowAtlas.emphasis = 'decision-first';
+    if(schema.workflowAtlas.laneDiscipline == null) schema.workflowAtlas.laneDiscipline = 'clear-handoff';
+    if(schema.workflowAtlas.evidenceRibbon == null) schema.workflowAtlas.evidenceRibbon = true;
+    if(schema.workflowAtlas.escalationMode == null) schema.workflowAtlas.escalationMode = 'controlled';
+    if(schema.decisionDesk.releaseWindow == null) schema.decisionDesk.releaseWindow = 'weekly';
+    if(schema.decisionDesk.signoffCadence == null) schema.decisionDesk.signoffCadence = 'formal';
+    if(schema.decisionDesk.board == null) schema.decisionDesk.board = 'executive';
+    if(schema.decisionDesk.riskFrame == null) schema.decisionDesk.riskFrame = 'balanced';
+    if(schema.experienceDirector.visualMode == null) schema.experienceDirector.visualMode = 'boardroom-crystal';
+    if(schema.marketplace.summary == null || !String(schema.marketplace.summary).trim()) schema.marketplace.summary = _t('Round 10 giữ chất glass của bản 7 nhưng tăng tương phản, siết typography, dọn analytical clutter và đưa builder về phong cách boardroom chuyên nghiệp.', 'Round 10 keeps the Round 7 glass aura while raising contrast, tightening typography, reducing analytical clutter, and shifting the builder toward a more professional boardroom aesthetic.');
+    state.r10ActiveMode = schema.glassExecutive.mode || schema.glassStudio.mode || state.r10ActiveMode || 'boardroom-crystal';
+    return schema;
+  }
+  function _r10ModeCatalog(){
+    return [
+      {
+        key:'boardroom-crystal', icon:'🧊', titleVi:'Boardroom Crystal', titleEn:'Boardroom Crystal',
+        subtitleVi:'Glass điều hành đậm, sáng rõ, chuyên nghiệp cho executive và quality.',
+        subtitleEn:'Disciplined executive glass for leadership and quality rooms.',
+        patch:{ themeLab:{ preset:'boardroom-crystal', surface:'glass-pro', contrast:'professional-max', accent:'indigo-cyan', cardStyle:'crisp-frost', elevation:'executive' }, accessOps:{ profile:'executive-clarity', contrastMode:'max', focusRing:'disciplined', hitTarget:'44px' }, previewChrome:{ frame:'boardroom', ribbon:'executive' }, glassStudio:{ mode:'boardroom-crystal', professionalTone:'boardroom' }, glassExecutive:{ mode:'boardroom-crystal', shell:'executive-crystal', chrome:'disciplined', noise:'low' }, experienceDirector:{ visualMode:'boardroom-crystal' } }
+      },
+      {
+        key:'quality-clarity-pro', icon:'🧪', titleVi:'Quality Clarity Pro', titleEn:'Quality Clarity Pro',
+        subtitleVi:'Sạch, chuẩn, dễ đọc cho QMS, NCR, CAPA và audit evidence.',
+        subtitleEn:'Clean and precise for QMS, NCR, CAPA, and audit evidence.',
+        patch:{ themeLab:{ preset:'quality-clarity-pro', surface:'glass-clean', contrast:'professional-max', accent:'emerald-cyan', cardStyle:'precision-frost', elevation:'executive' }, accessOps:{ profile:'precision-clarity', contrastMode:'max', focusRing:'visible', hitTarget:'44px' }, previewChrome:{ frame:'clarity', ribbon:'quality' }, glassStudio:{ mode:'quality-clarity-pro', professionalTone:'quality' }, glassExecutive:{ mode:'quality-clarity-pro', shell:'precision-glass', chrome:'controlled', noise:'low' }, experienceDirector:{ visualMode:'quality-clarity-pro' } }
+      },
+      {
+        key:'audit-ledger-glass', icon:'📘', titleVi:'Audit Ledger Glass', titleEn:'Audit Ledger Glass',
+        subtitleVi:'Tông audit chuyên nghiệp, rõ traceability và evidence chain.',
+        subtitleEn:'Professional audit tone with clear traceability and evidence chain.',
+        patch:{ themeLab:{ preset:'audit-ledger-glass', surface:'ledger-glass', contrast:'max', accent:'blue-slate', cardStyle:'document-frost', elevation:'audit-executive' }, accessOps:{ profile:'audit-clarity', contrastMode:'max', focusRing:'visible', hitTarget:'44px' }, previewChrome:{ frame:'ledger', ribbon:'audit' }, glassStudio:{ mode:'audit-ledger-glass', professionalTone:'audit' }, glassExecutive:{ mode:'audit-ledger-glass', shell:'ledger-glass', chrome:'disciplined', noise:'none' }, experienceDirector:{ visualMode:'audit-ledger-glass' } }
+      },
+      {
+        key:'night-command-pro', icon:'🌙', titleVi:'Night Command Pro', titleEn:'Night Command Pro',
+        subtitleVi:'Tối ưu trực ca, war room và shopfloor nhưng vẫn giữ glass chuyên nghiệp.',
+        subtitleEn:'Professional night mode for shifts, war rooms, and shopfloor control.',
+        patch:{ themeLab:{ preset:'night-command-pro', surface:'glass-dark-pro', contrast:'night-max', accent:'emerald-cyan', cardStyle:'dark-crisp', elevation:'control-room' }, accessOps:{ profile:'night-clarity', contrastMode:'night-max', focusRing:'disciplined', hitTarget:'48px' }, previewChrome:{ frame:'night-command', ribbon:'ops' }, glassStudio:{ mode:'night-command-pro', professionalTone:'night-ops' }, glassExecutive:{ mode:'night-command-pro', shell:'night-command', chrome:'ops-disciplined', noise:'low' }, experienceDirector:{ visualMode:'night-command-pro' } }
+      }
+    ];
+  }
+  function _r10FindMode(key){
+    var found = null;
+    _r10ModeCatalog().forEach(function(item){ if(!found && item.key === key) found = item; });
+    return found || _r10ModeCatalog()[0];
+  }
+  function _r10TotalBlocks(schema){
+    var total = 0;
+    _r10Arr(schema && schema.tabs).forEach(function(tab){ total += _r10Arr(tab && tab.blocks).length; });
+    return total;
+  }
+  function _r10CollectWorkflow(schema){
+    var rows = [];
+    var mixMap = {};
+    var tabs = _r10Arr(schema && schema.tabs);
+    tabs.forEach(function(tab, index){
+      var blocks = _r10Arr(tab && tab.blocks);
+      var label = _r10Text((tab && tab.title) || (tab && tab.label), (tab && tab.tabId) || (_t('Tab', 'Tab') + ' ' + (index + 1)));
+      var focus = blocks.length ? _r10Text(blocks[0].title || blocks[0].label || blocks[0].subtitle, blocks[0].type || 'block') : _t('Empty tab', 'Empty tab');
+      var status = !blocks.length ? _t('empty', 'empty') : (blocks.length > 5 ? _t('dense', 'dense') : _t('balanced', 'balanced'));
+      blocks.forEach(function(block){
+        var type = _r10Text(block && (block.blockType || block.type), 'block');
+        mixMap[type] = (mixMap[type] || 0) + 1;
+      });
+      rows.push({ label:label, count:blocks.length, focus:focus, status:status, ratio:0 });
+    });
+    var max = 0;
+    rows.forEach(function(row){ if(row.count > max) max = row.count; });
+    if(!max) max = 1;
+    rows.forEach(function(row){ row.ratio = _r10Clamp(Math.round((row.count / max) * 100), 0, 100); });
+    var mix = Object.keys(mixMap).map(function(key){ return { key:key, count:mixMap[key] }; }).sort(function(a,b){ return b.count - a.count; }).slice(0, 5);
+    return { rows:rows, mix:mix };
+  }
+  function _r10BuildPalette(schema){
+    var mode = _r10EnsureSchema(schema || {}).glassExecutive.mode || state.r10ActiveMode || 'boardroom-crystal';
+    var catalog = {
+      'boardroom-crystal': [
+        { label:'Ink Navy', value:'#0b1220' },
+        { label:'Slate Glass', value:'#1e293b' },
+        { label:'Executive Blue', value:'#2563eb' },
+        { label:'Violet Signal', value:'#7c3aed' },
+        { label:'Ice White', value:'#f8fafc' },
+        { label:'Fog Border', value:'#cbd5e1' }
+      ],
+      'quality-clarity-pro': [
+        { label:'Quality Ink', value:'#0f172a' },
+        { label:'Emerald Signal', value:'#10b981' },
+        { label:'Cyan Assist', value:'#06b6d4' },
+        { label:'Lab White', value:'#ffffff' },
+        { label:'Panel Mist', value:'#ecfeff' },
+        { label:'Steel Line', value:'#94a3b8' }
+      ],
+      'audit-ledger-glass': [
+        { label:'Ledger Navy', value:'#111827' },
+        { label:'Audit Blue', value:'#1d4ed8' },
+        { label:'Paper Glass', value:'#f8fafc' },
+        { label:'Slate Caption', value:'#475569' },
+        { label:'Trace Line', value:'#93c5fd' },
+        { label:'Evidence Fog', value:'#e2e8f0' }
+      ],
+      'night-command-pro': [
+        { label:'Night Black', value:'#020617' },
+        { label:'Ops Slate', value:'#0f172a' },
+        { label:'Emerald Pulse', value:'#34d399' },
+        { label:'Cyan Pulse', value:'#22d3ee' },
+        { label:'Moon White', value:'#f8fafc' },
+        { label:'Night Border', value:'#334155' }
+      ]
+    };
+    return catalog[mode] || catalog['boardroom-crystal'];
+  }
+  function _r10ComputeMetrics(schema){
+    var tabs = _r10Arr(schema && schema.tabs);
+    var workflow = _r10CollectWorkflow(schema || {});
+    var totalBlocks = _r10TotalBlocks(schema || {});
+    var emptyTabs = 0;
+    var maxBlocks = 0;
+    var minBlocks = 999999;
+    var contrast = 68;
+    var professionalism = 70;
+    var hierarchy = 62;
+    var operability = 60;
+    var governance = 56;
+    var storyCount = _r10Arr(schema && schema.storyboard && schema.storyboard.moments).length;
+    var gates = _r10Arr(schema && schema.releaseGov && schema.releaseGov.gates);
+    tabs.forEach(function(tab){
+      var count = _r10Arr(tab && tab.blocks).length;
+      if(!count) emptyTabs += 1;
+      if(count > maxBlocks) maxBlocks = count;
+      if(count < minBlocks) minBlocks = count;
+    });
+    if(minBlocks === 999999) minBlocks = 0;
+    if(schema && schema.themeLab){
+      if(/max|high|professional/i.test(String(schema.themeLab.contrast || ''))) contrast += 16;
+      if(/crisp|precision/i.test(String(schema.themeLab.cardStyle || ''))) contrast += 6;
+      if(/executive|boardroom|audit|control-room/i.test(String(schema.themeLab.elevation || ''))) professionalism += 10;
+      if(/glass/i.test(String(schema.themeLab.surface || ''))) professionalism += 4;
+    }
+    if(schema && schema.accessOps){
+      if(/max|high|night-max/i.test(String(schema.accessOps.contrastMode || ''))) contrast += 12;
+      if(/visible|disciplined/i.test(String(schema.accessOps.focusRing || ''))) operability += 8;
+      if(/44|48/i.test(String(schema.accessOps.hitTarget || ''))) operability += 6;
+      if(/clarity/i.test(String(schema.accessOps.profile || ''))) hierarchy += 6;
+    }
+    if(schema && schema.typographyLab){
+      if(schema.typographyLab.scale) hierarchy += 8;
+      if(/tabular/i.test(String(schema.typographyLab.numerics || ''))) hierarchy += 4;
+      if(/high-contrast|muted-strong/i.test(String(schema.typographyLab.labels || '') + ' ' + String(schema.typographyLab.captionTone || ''))) contrast += 4;
+    }
+    if(schema && schema.workflowAtlas){
+      if(/clear|handoff/i.test(String(schema.workflowAtlas.laneDiscipline || ''))) operability += 10;
+      if(/decision/i.test(String(schema.workflowAtlas.emphasis || ''))) hierarchy += 6;
+      if(schema.workflowAtlas.evidenceRibbon) governance += 4;
+    }
+    if(schema && schema.publish){
+      if(schema.publish.requireSignoff) governance += 12;
+      if(/gated|phased|controlled/i.test(String(schema.publish.releaseStrategy || ''))) professionalism += 6;
+      if(schema.publish.packageName) governance += 4;
+    }
+    governance += gates.length * 5;
+    if(totalBlocks >= 3){ hierarchy += 8; operability += 6; }
+    if(totalBlocks >= 6){ hierarchy += 4; professionalism += 4; }
+    if(tabs.length >= 2) hierarchy += 6;
+    if(emptyTabs === 0 && tabs.length) hierarchy += 8;
+    if(emptyTabs) hierarchy -= emptyTabs * 10;
+    if(maxBlocks - minBlocks <= 2 && tabs.length > 1) professionalism += 8;
+    if(maxBlocks - minBlocks >= 5) hierarchy -= 12;
+    if(storyCount) professionalism += 4;
+    contrast = _r10Clamp(contrast, 0, 100);
+    professionalism = _r10Clamp(professionalism, 0, 100);
+    hierarchy = _r10Clamp(hierarchy, 0, 100);
+    operability = _r10Clamp(operability, 0, 100);
+    governance = _r10Clamp(governance, 0, 100);
+    return {
+      totalBlocks:totalBlocks,
+      tabCount:tabs.length,
+      emptyTabs:emptyTabs,
+      maxBlocks:maxBlocks,
+      minBlocks:minBlocks,
+      contrast:contrast,
+      professionalism:professionalism,
+      hierarchy:hierarchy,
+      operability:operability,
+      governance:governance,
+      gateCount:gates.length,
+      storyCount:storyCount,
+      workflow:workflow,
+      palette:_r10BuildPalette(schema || {}),
+      summary:_t('Glass executive shell giữ aura của round 7 nhưng chuyển sang boardroom professional: contrast cao hơn, canvas sáng rõ hơn, panel analytics gọn hơn và toolbar kỷ luật hơn.', 'Glass executive shell keeps the Round 7 aura while moving toward a more professional boardroom: higher contrast, clearer canvas surfaces, cleaner analytics panels, and more disciplined toolbars.')
+    };
+  }
+  function _r10ModeButton(item, active){
+    return '<button class="mb-r10-mode' + (active ? ' is-active' : '') + '" data-action="r10-apply-mode" data-key="' + _esc(item.key) + '"><strong>' + _esc(item.icon + ' ' + _t(item.titleVi, item.titleEn)) + '</strong><small>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</small></button>';
+  }
+  function _r10RenderExecutiveRail(schema, metrics){
+    var mode = _r10EnsureSchema(schema || {}).glassExecutive.mode || state.r10ActiveMode || 'boardroom-crystal';
+    var h = '<section class="mb-r10-executive-rail">';
+    h += '<div class="mb-r10-rail-head"><div><div class="mb-r10-kicker">ROUND 10 · GLASS EXECUTIVE</div><strong>' + _esc(_t('Professional glass command', 'Professional glass command')) + '</strong><p>' + _esc(metrics.summary) + '</p><div class="mb-r10-chipline"><span>' + _esc(_t('Mode', 'Mode')) + ': ' + _esc(mode) + '</span><span>' + _esc(_t('Contrast target', 'Contrast target')) + ': ' + _esc(schema && schema.glassStudio && schema.glassStudio.contrastTarget || 'AAA') + '</span><span>' + _esc(_t('Typography', 'Typography')) + ': ' + _esc(schema && schema.typographyLab && schema.typographyLab.scale || '14/20') + '</span><span>' + _esc(_t('Gates', 'Gates')) + ': ' + _esc(String(metrics.gateCount)) + '</span></div></div>';
+    h += '<div class="mb-r10-stat-grid">';
+    h += '<div class="mb-r10-stat"><small>' + _esc(_t('Contrast', 'Contrast')) + '</small><strong>' + _esc(String(metrics.contrast)) + '%</strong><span>' + _esc(_t('glare-controlled', 'glare-controlled')) + '</span></div>';
+    h += '<div class="mb-r10-stat"><small>' + _esc(_t('Hierarchy', 'Hierarchy')) + '</small><strong>' + _esc(String(metrics.hierarchy)) + '%</strong><span>' + _esc(_t('clear scan path', 'clear scan path')) + '</span></div>';
+    h += '<div class="mb-r10-stat"><small>' + _esc(_t('Operability', 'Operability')) + '</small><strong>' + _esc(String(metrics.operability)) + '%</strong><span>' + _esc(_t('toolbar + task flow', 'toolbar + task flow')) + '</span></div>';
+    h += '<div class="mb-r10-stat"><small>' + _esc(_t('Governance', 'Governance')) + '</small><strong>' + _esc(String(metrics.governance)) + '%</strong><span>' + _esc(_t('signoff + release', 'signoff + release')) + '</span></div>';
+    h += '<div class="mb-r10-stat"><small>' + _esc(_t('Professionalism', 'Professionalism')) + '</small><strong>' + _esc(String(metrics.professionalism)) + '%</strong><span>' + _esc(_t('boardroom finish', 'boardroom finish')) + '</span></div>';
+    h += '</div></div>';
+    h += '<div class="mb-r10-mode-grid">';
+    _r10ModeCatalog().forEach(function(item){ h += _r10ModeButton(item, item.key === mode); });
+    h += '</div>';
+    h += '<div class="mb-r10-action-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r10-auto-refine">✨ ' + _esc(_t('Auto refine', 'Auto refine')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r10-export-style-guide">🧾 ' + _esc(_t('Style guide', 'Style guide')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r10-toggle-governance">🛡 ' + _esc(_t('Governance board', 'Governance board')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r10-toggle-workflow">🧭 ' + _esc(_t('Workflow atlas', 'Workflow atlas')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r10-toggle-typography">🔤 ' + _esc(_t('Typography lab', 'Typography lab')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r10-toggle-discipline">🎚 ' + _esc(_t('Discipline board', 'Discipline board')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r10-toggle-legacy">🧪 ' + _esc(_t('Legacy labs', 'Legacy labs')) + '</button></div>';
+    h += '</section>';
+    return h;
+  }
+  function _r10RenderGovernancePanel(schema, metrics){
+    var gates = _r10Arr(schema && schema.releaseGov && schema.releaseGov.gates);
+    var h = '<section class="mb-r10-panel"><div class="mb-r10-panel-head"><strong>' + _esc(_t('Governance board', 'Governance board')) + '</strong><span>' + _esc(_t('release discipline', 'release discipline')) + '</span></div>';
+    h += '<div class="mb-r10-meter"><span style="width:' + _esc(String(metrics.governance)) + '%"></span></div>';
+    h += '<div class="mb-r10-line-list"><div><small>' + _esc(_t('Package', 'Package')) + '</small><strong>' + _esc((schema && schema.publish && schema.publish.packageName) || (schema && schema.moduleId) || '') + ' · ' + _esc((schema && schema.package && schema.package.version) || '0.1.0') + '</strong></div><div><small>' + _esc(_t('Release window', 'Release window')) + '</small><strong>' + _esc((schema && schema.decisionDesk && schema.decisionDesk.releaseWindow) || 'weekly') + '</strong></div><div><small>' + _esc(_t('Cadence', 'Cadence')) + '</small><strong>' + _esc((schema && schema.decisionDesk && schema.decisionDesk.signoffCadence) || 'formal') + '</strong></div><div><small>' + _esc(_t('Strategy', 'Strategy')) + '</small><strong>' + _esc((schema && schema.publish && schema.publish.releaseStrategy) || 'gated') + '</strong></div></div>';
+    h += '<ul class="mb-r10-list">';
+    gates.forEach(function(gate){ h += '<li><strong>' + _esc(_r10Text(gate, 'gate')) + '</strong> · ' + _esc(_t('ready for signoff review', 'ready for signoff review')) + '</li>'; });
+    if(!gates.length) h += '<li>' + _esc(_t('Chưa có gate nào được cấu hình.', 'No governance gates configured yet.')) + '</li>';
+    h += '</ul></section>';
+    return h;
+  }
+  function _r10RenderWorkflowPanel(schema, metrics){
+    var h = '<section class="mb-r10-panel"><div class="mb-r10-panel-head"><strong>' + _esc(_t('Workflow atlas', 'Workflow atlas')) + '</strong><span>' + _esc(_t('clear handoff map', 'clear handoff map')) + '</span></div>';
+    if(!metrics.workflow.rows.length){
+      h += '<div class="mb-r10-note">' + _esc(_t('Chưa có tab hoặc block để dựng workflow atlas.', 'No tabs or blocks yet to build a workflow atlas.')) + '</div>';
+    }else{
+      metrics.workflow.rows.forEach(function(row){
+        h += '<div class="mb-r10-bar-row"><div><strong>' + _esc(row.label) + '</strong><small>' + _esc(row.count + ' blocks · ' + row.status) + '</small></div><div class="mb-r10-bar"><span style="width:' + _esc(String(row.ratio)) + '%"></span></div></div>';
+        h += '<div class="mb-r10-note">' + _esc(_t('Focus', 'Focus')) + ': ' + _esc(row.focus) + '</div>';
+      });
+      if(metrics.workflow.mix.length){
+        h += '<div class="mb-r10-chipline">';
+        metrics.workflow.mix.forEach(function(item){ h += '<span>' + _esc(item.key + ' · ' + item.count) + '</span>'; });
+        h += '</div>';
+      }
+    }
+    h += '</section>';
+    return h;
+  }
+  function _r10RenderTypographyPanel(schema, metrics){
+    var t = _r10Obj(schema && schema.typographyLab);
+    var h = '<section class="mb-r10-panel"><div class="mb-r10-panel-head"><strong>' + _esc(_t('Typography lab', 'Typography lab')) + '</strong><span>' + _esc(_t('contrast + rhythm', 'contrast + rhythm')) + '</span></div>';
+    h += '<div class="mb-r10-meter"><span style="width:' + _esc(String(metrics.hierarchy)) + '%"></span></div>';
+    h += '<div class="mb-r10-type-grid">';
+    h += '<div><small>' + _esc(_t('Scale', 'Scale')) + '</small><strong>' + _esc(t.scale || '14/20') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Headings', 'Headings')) + '</small><strong>' + _esc(t.headings || 'semibold-tight') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Numerics', 'Numerics')) + '</small><strong>' + _esc(t.numerics || 'tabular') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Caption tone', 'Caption tone')) + '</small><strong>' + _esc(t.captionTone || 'muted-strong') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Labels', 'Labels')) + '</small><strong>' + _esc(t.labels || 'high-contrast') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Hit target', 'Hit target')) + '</small><strong>' + _esc((schema && schema.accessOps && schema.accessOps.hitTarget) || '44px') + '</strong></div>';
+    h += '</div></section>';
+    return h;
+  }
+  function _r10RenderDisciplinePanel(schema, metrics){
+    var h = '<section class="mb-r10-panel"><div class="mb-r10-panel-head"><strong>' + _esc(_t('Discipline board', 'Discipline board')) + '</strong><span>' + _esc(_t('palette + chrome + restraint', 'palette + chrome + restraint')) + '</span></div>';
+    h += '<div class="mb-r10-swatch-grid">';
+    metrics.palette.forEach(function(item){ h += '<div class="mb-r10-swatch"><small>' + _esc(item.label) + '</small><strong>' + _esc(item.value) + '</strong><span style="background:' + _esc(item.value) + '"></span></div>'; });
+    h += '</div>';
+    h += '<div class="mb-r10-line-list"><div><small>' + _esc(_t('Shell', 'Shell')) + '</small><strong>' + _esc((schema && schema.glassExecutive && schema.glassExecutive.shell) || 'executive-crystal') + '</strong></div><div><small>' + _esc(_t('Chrome', 'Chrome')) + '</small><strong>' + _esc((schema && schema.glassExecutive && schema.glassExecutive.chrome) || 'disciplined') + '</strong></div><div><small>' + _esc(_t('Noise', 'Noise')) + '</small><strong>' + _esc((schema && schema.glassExecutive && schema.glassExecutive.noise) || 'low') + '</strong></div><div><small>' + _esc(_t('Legacy labs', 'Legacy labs')) + '</small><strong>' + _esc(state.showR10LegacyLabs ? _t('visible', 'visible') : _t('hidden', 'hidden')) + '</strong></div></div>';
+    h += '</section>';
+    return h;
+  }
+  function _r10RenderPanels(schema, metrics){
+    var parts = [];
+    if(state.showR10Governance) parts.push(_r10RenderGovernancePanel(schema, metrics));
+    if(state.showR10Workflow) parts.push(_r10RenderWorkflowPanel(schema, metrics));
+    if(state.showR10Typography) parts.push(_r10RenderTypographyPanel(schema, metrics));
+    if(state.showR10Discipline) parts.push(_r10RenderDisciplinePanel(schema, metrics));
+    if(!parts.length) return '';
+    return '<div class="mb-r10-panel-grid">' + parts.join('') + '</div>';
+  }
+  function _r10ApplyMode(key, silent){
+    if(!state.schema) return;
+    _mutateSchema(_t('Áp preset glass executive', 'Apply glass executive preset'), function(){
+      var schema = state.schema;
+      var mode = _r10FindMode(key || state.r10ActiveMode || 'boardroom-crystal');
+      _r10EnsureSchema(schema);
+      _r10MergeInto(schema, _r10Clone(mode.patch));
+      schema.glassExecutive.mode = mode.key;
+      schema.glassStudio.mode = mode.key;
+      state.r10ActiveMode = mode.key;
+      if(typeof _r7SyncManifest === 'function') _r7SyncManifest(schema);
+    });
+    if(!silent && typeof _toastBuilder === 'function') _toastBuilder(_t('Đã áp preset Round 10: ', 'Applied Round 10 preset: ') + key, 'success');
+  }
+  function _r10AutoRefine(){
+    if(!state.schema) return;
+    _mutateSchema(_t('Round 10 glass executive auto refine', 'Round 10 glass executive auto refine'), function(){
+      var schema = state.schema;
+      var mode = _r10FindMode(state.r10ActiveMode || (schema.glassExecutive && schema.glassExecutive.mode) || 'boardroom-crystal');
+      _r10EnsureSchema(schema);
+      _r10MergeInto(schema, _r10Clone(mode.patch));
+      schema.themeLab.contrast = /night/.test(mode.key) ? 'night-max' : 'professional-max';
+      schema.themeLab.cardStyle = /night/.test(mode.key) ? 'dark-crisp' : 'crisp-frost';
+      schema.themeLab.elevation = /audit/.test(mode.key) ? 'audit-executive' : (/night/.test(mode.key) ? 'control-room' : 'executive');
+      schema.accessOps.focusRing = 'disciplined';
+      schema.accessOps.hitTarget = /night/.test(mode.key) ? '48px' : '44px';
+      schema.typographyLab.scale = '14/20';
+      schema.typographyLab.headings = 'semibold-tight';
+      schema.typographyLab.numerics = 'tabular';
+      schema.typographyLab.captionTone = 'muted-strong';
+      schema.typographyLab.labels = 'high-contrast';
+      schema.workflowAtlas.emphasis = 'decision-first';
+      schema.workflowAtlas.laneDiscipline = 'clear-handoff';
+      schema.workflowAtlas.evidenceRibbon = true;
+      schema.workflowAtlas.escalationMode = 'controlled';
+      schema.decisionDesk.board = 'executive';
+      schema.decisionDesk.signoffCadence = 'formal';
+      schema.decisionDesk.releaseWindow = schema.decisionDesk.releaseWindow || 'weekly';
+      schema.decisionDesk.riskFrame = 'balanced';
+      _r10Arr(schema.tabs).forEach(function(tab){
+        var count = _r10Arr(tab && tab.blocks).length;
+        tab.layout = tab.layout || {};
+        tab.layout.type = 'grid';
+        tab.layout.columns = count > 8 ? 3 : (count > 4 ? 2 : 1);
+        tab.layout.gap = count > 5 ? '18px' : '16px';
+        tab.layout.align = 'stretch';
+        if(count === 0){
+          if(/release/i.test(tab.tabId || '')) _r7InsertTemplate('r9-release-assurance-timeline', { tabId:tab.tabId });
+          else if(/audit|evidence/i.test(tab.tabId || '')) _r7InsertTemplate('r9-audit-evidence-glass', { tabId:tab.tabId });
+          else _r7InsertTemplate('r7-story-ribbon', { tabId:tab.tabId });
+        }
+      });
+      if(typeof _r7BuildSceneMoments === 'function') schema.storyboard.moments = _r7BuildSceneMoments(schema);
+      schema.glassExecutive.lastRefinedAt = new Date().toISOString();
+      state.showR10Governance = true;
+      state.showR10Workflow = true;
+      state.showR10Typography = true;
+      if(typeof _r7SyncManifest === 'function') _r7SyncManifest(schema);
+    });
+    if(typeof _toastBuilder === 'function') _toastBuilder(_t('Round 10 đã auto refine shell, contrast và layout.', 'Round 10 auto refined shell, contrast, and layout.'), 'success');
+  }
+  function _r10BuildStyleGuide(schema){
+    schema = _r10EnsureSchema(schema || {});
+    var metrics = _r10ComputeMetrics(schema);
+    var lines = [];
+    lines.push('# Module Builder Round 10 - Glass Executive Style Guide');
+    lines.push('');
+    lines.push('- Module: ' + (schema.moduleId || 'module'));
+    lines.push('- Mode: ' + ((schema.glassExecutive || {}).mode || state.r10ActiveMode || 'boardroom-crystal'));
+    lines.push('- Package: ' + ((schema.publish || {}).packageName || schema.moduleId || 'module-package') + ' · ' + ((schema.package || {}).version || '0.1.0'));
+    lines.push('- Release strategy: ' + ((schema.publish || {}).releaseStrategy || 'gated'));
+    lines.push('');
+    lines.push('## Scorecard');
+    lines.push('- Contrast: ' + metrics.contrast + '%');
+    lines.push('- Hierarchy: ' + metrics.hierarchy + '%');
+    lines.push('- Operability: ' + metrics.operability + '%');
+    lines.push('- Governance: ' + metrics.governance + '%');
+    lines.push('- Professionalism: ' + metrics.professionalism + '%');
+    lines.push('');
+    lines.push('## Surface recipe');
+    lines.push('- Shell: ' + ((schema.glassExecutive || {}).shell || 'executive-crystal'));
+    lines.push('- Chrome: ' + ((schema.glassExecutive || {}).chrome || 'disciplined'));
+    lines.push('- Noise: ' + ((schema.glassExecutive || {}).noise || 'low'));
+    lines.push('- Theme surface: ' + ((schema.themeLab || {}).surface || 'glass-pro'));
+    lines.push('- Card style: ' + ((schema.themeLab || {}).cardStyle || 'crisp-frost'));
+    lines.push('- Elevation: ' + ((schema.themeLab || {}).elevation || 'executive'));
+    lines.push('');
+    lines.push('## Typography system');
+    lines.push('- Scale: ' + ((schema.typographyLab || {}).scale || '14/20'));
+    lines.push('- Headings: ' + ((schema.typographyLab || {}).headings || 'semibold-tight'));
+    lines.push('- Numerics: ' + ((schema.typographyLab || {}).numerics || 'tabular'));
+    lines.push('- Caption tone: ' + ((schema.typographyLab || {}).captionTone || 'muted-strong'));
+    lines.push('- Labels: ' + ((schema.typographyLab || {}).labels || 'high-contrast'));
+    lines.push('');
+    lines.push('## Governance discipline');
+    _r10Arr(schema.releaseGov && schema.releaseGov.gates).forEach(function(gate){ lines.push('- ' + _r10Text(gate, 'gate')); });
+    lines.push('- Signoff cadence: ' + ((schema.decisionDesk || {}).signoffCadence || 'formal'));
+    lines.push('- Release window: ' + ((schema.decisionDesk || {}).releaseWindow || 'weekly'));
+    lines.push('- Risk frame: ' + ((schema.decisionDesk || {}).riskFrame || 'balanced'));
+    lines.push('');
+    lines.push('## Workflow atlas');
+    metrics.workflow.rows.forEach(function(row){ lines.push('- ' + row.label + ': ' + row.count + ' blocks / ' + row.status + ' / focus: ' + row.focus); });
+    if(!metrics.workflow.rows.length) lines.push('- No tabs or blocks yet.');
+    lines.push('');
+    lines.push('## Palette');
+    metrics.palette.forEach(function(item){ lines.push('- ' + item.label + ': ' + item.value); });
+    lines.push('');
+    lines.push('## Recommended next moves');
+    if(metrics.emptyTabs) lines.push('- Seed narrative or operational blocks into empty tabs.');
+    if(metrics.contrast < 88) lines.push('- Raise shell chip and caption contrast toward AAA.');
+    if(metrics.hierarchy < 82) lines.push('- Tighten heading scale and scan path across hero, rails, and KPI cards.');
+    if(metrics.operability < 80) lines.push('- Increase task focus and reduce block overload inside the busiest tab.');
+    if(metrics.governance < 82) lines.push('- Add explicit signoff ownership, release rhythm, and rollback checkpoints.');
+    if(metrics.professionalism >= 90) lines.push('- Preserve restraint: avoid extra glow, keep boardroom density controlled.');
+    return lines.join('\n');
+  }
+  function _r10ExportStyleGuide(){
+    if(!state.schema) return '';
+    return _r9DownloadText('module-builder-round10-glass-executive-style-guide.md', _r10BuildStyleGuide(state.schema), 'text/markdown;charset=utf-8');
+  }
+  function _r10RemoveExisting(host){
+    if(!host || !host.querySelectorAll) return;
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r10-executive-rail,.mb-r10-panel-grid,.mb-r9-glass-rail,.mb-r9-panel-grid'), function(node){ if(node && node.parentNode) node.parentNode.removeChild(node); });
+  }
+  function _r10AppendHtml(doc, parent, anchor, html){
+    var wrap;
+    if(!doc || !parent || !doc.createElement) return;
+    wrap = doc.createElement('div');
+    wrap.innerHTML = html;
+    while(wrap.firstChild){
+      if(anchor && anchor.parentNode === parent) parent.insertBefore(wrap.firstChild, anchor);
+      else parent.appendChild(wrap.firstChild);
+    }
+  }
+  function _r10DecorateHost(host, previewOnly){
+    var doc = host && host.ownerDocument ? host.ownerDocument : (typeof document !== 'undefined' ? document : null);
+    var shell = host && host.querySelector ? host.querySelector('.mb-r9-shell,.mb-r8-shell,.mb-r7-shell') : null;
+    var builderShell = host && host.querySelector ? host.querySelector('.mb-builder-shell') : null;
+    var mainPanel = host && host.querySelector ? host.querySelector('.mb-main-panel') : null;
+    var shellAnchor;
+    var metrics;
+    if(host && host.querySelectorAll){
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-side-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r10-side-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-rail-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r10-rail-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-block-card'), function(node){ if(node && node.classList) node.classList.add('mb-r10-block-card'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-canvas-root'), function(node){ if(node && node.classList) node.classList.add('mb-r10-canvas-root'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-main-panel>.mb-toolbar'), function(node){ if(node && node.classList) node.classList.add('mb-r10-toolbar'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-tab-pill'), function(node){ if(node && node.classList) node.classList.add('mb-r10-tab-pill'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-preview-shell,.mb-r9-preview-shell'), function(node){ if(node && node.classList) node.classList.add('mb-r10-preview-shell'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-preview-ribbon,.mb-r9-preview-ribbon'), function(node){ if(node && node.classList) node.classList.add('mb-r10-preview-ribbon'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-panel-grid,.mb-r8-panel-grid'), function(node){
+        if(node && node.classList){
+          node.classList.add('mb-r10-legacy-panels');
+          if(state.showR10LegacyLabs) node.classList.add('is-visible');
+          else node.classList.remove('is-visible');
+        }
+      });
+    }
+    if(builderShell && builderShell.classList) builderShell.classList.add('mb-r10-builder-shell');
+    if(mainPanel && mainPanel.classList) mainPanel.classList.add('mb-r10-main-panel');
+    if(shell && shell.classList) shell.classList.add('mb-r10-shell');
+    if(!shell || previewOnly || !state.schema) return;
+    _r10RemoveExisting(host);
+    _r10EnsureSchema(state.schema);
+    metrics = _r10ComputeMetrics(state.schema);
+    shellAnchor = shell.querySelector('.mb-r7-panel-grid,.mb-r8-panel-grid,.mb-r9-panel-grid');
+    _r10AppendHtml(doc, shell, shellAnchor, _r10RenderExecutiveRail(state.schema, metrics) + _r10RenderPanels(state.schema, metrics));
+  }
+  function _r10NormalizeHtml(html, previewOnly){
+    var host;
+    html = String(html || '');
+    if(typeof document === 'undefined' || !document.createElement) return html;
+    host = document.createElement('div');
+    host.innerHTML = html;
+    _r10DecorateHost(host, !!previewOnly);
+    return host.innerHTML;
+  }
+  function _r10InjectStyles(){
+    var style;
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-module-builder-round10-style')) return;
+    style = document.createElement('style');
+    style.id = 'hm-module-builder-round10-style';
+    style.textContent = '' +
+      '.mb-r10-shell{position:relative;overflow:hidden;border-radius:24px;background:linear-gradient(135deg,rgba(8,15,28,.98) 0%,rgba(15,23,42,.96) 32%,rgba(30,41,59,.94) 68%,rgba(37,99,235,.42) 100%);border:1px solid rgba(255,255,255,.14);box-shadow:0 24px 56px rgba(2,6,23,.24)}' +
+      '.mb-r10-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 10% 0%,rgba(255,255,255,.16),transparent 32%),radial-gradient(circle at 100% 0%,rgba(56,189,248,.12),transparent 30%);pointer-events:none}' +
+      '.mb-r10-shell>*{position:relative;z-index:1}' +
+      '.mb-r10-shell .mb-r7-kicker{color:#c7d2fe}' +
+      '.mb-r10-shell .mb-r7-hero h3{font-size:30px;color:#fff;letter-spacing:-.02em;line-height:1.08}' +
+      '.mb-r10-shell .mb-r7-hero p{color:rgba(241,245,249,.90)}' +
+      '.mb-r10-shell .mb-r7-chip-row span,.mb-r10-shell .mb-r7-hero-stats div,.mb-r10-shell .mb-r7-card,.mb-r10-shell .mb-r7-panel,.mb-r10-shell .mb-r10-executive-rail,.mb-r10-shell .mb-r10-panel{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}' +
+      '.mb-r10-shell .mb-r7-chip-row span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.10);color:#eff6ff}' +
+      '.mb-r10-shell .mb-r7-hero-stats div{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.10));border:1px solid rgba(255,255,255,.12)}' +
+      '.mb-r10-shell .mb-r7-card{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.09));border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 30px rgba(2,6,23,.18)}' +
+      '.mb-r10-shell .mb-r7-card small{color:#dbeafe}.mb-r10-shell .mb-r7-card-value,.mb-r10-shell .mb-r7-card-head strong{color:#fff}' +
+      '.mb-r10-shell .mb-r7-toolbar{gap:10px}.mb-r10-shell .mb-r7-toolbar .hm-btn.hm-btn-primary{background:linear-gradient(135deg,#1d4ed8,#6d28d9);border-color:rgba(255,255,255,.12);box-shadow:0 10px 20px rgba(29,78,216,.22)}' +
+      '.mb-r10-shell .mb-r7-toolbar .hm-btn.hm-btn-secondary,.mb-r10-shell .mb-r7-toolbar .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.88);color:#0f172a;border:1px solid rgba(148,163,184,.16)}' +
+      '.mb-r10-executive-rail{margin:14px 0 12px;padding:16px 16px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.10));border:1px solid rgba(255,255,255,.16);box-shadow:0 14px 30px rgba(2,6,23,.18)}' +
+      '.mb-r10-rail-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:12px}.mb-r10-kicker{font-size:11px;letter-spacing:.18em;font-weight:700;color:#c4b5fd;margin-bottom:6px}.mb-r10-rail-head strong{display:block;font-size:18px;color:#fff;margin-bottom:4px}.mb-r10-rail-head p{margin:0;color:rgba(241,245,249,.88);max-width:760px;line-height:1.55}' +
+      '.mb-r10-chipline{display:flex;flex-wrap:wrap;gap:8px}.mb-r10-chipline span{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(15,23,42,.28);border:1px solid rgba(255,255,255,.12);color:#eff6ff;font-size:12px}' +
+      '.mb-r10-stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;min-width:420px}.mb-r10-stat{padding:12px;border-radius:16px;background:rgba(15,23,42,.24);border:1px solid rgba(255,255,255,.12);text-align:center}.mb-r10-stat small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r10-stat strong{display:block;color:#fff;font-size:22px;line-height:1.05;margin-bottom:3px}.mb-r10-stat span{display:block;color:#cbd5e1;font-size:11px}' +
+      '.mb-r10-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:12px}.mb-r10-mode{padding:12px;border-radius:16px;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease}.mb-r10-mode:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.12)}.mb-r10-mode.is-active{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.11));border-color:rgba(255,255,255,.24);box-shadow:0 10px 24px rgba(2,6,23,.18)}.mb-r10-mode strong{display:block;font-size:13px;margin-bottom:4px}.mb-r10-mode small{display:block;color:#dbeafe;line-height:1.45}' +
+      '.mb-r10-action-row{display:flex;flex-wrap:wrap;gap:8px}' +
+      '.mb-r10-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:12px 0 0}.mb-r10-panel{padding:15px;border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.36),rgba(15,23,42,.28));border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 26px rgba(2,6,23,.14)}' +
+      '.mb-r10-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.mb-r10-panel-head strong{color:#fff}.mb-r10-panel-head span{color:#bfdbfe;font-size:12px}' +
+      '.mb-r10-meter{height:10px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;margin-bottom:10px}.mb-r10-meter span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#60a5fa,#22d3ee,#34d399)}' +
+      '.mb-r10-line-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}.mb-r10-line-list>div{padding:12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10)}.mb-r10-line-list small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r10-line-list strong{display:block;color:#fff}' +
+      '.mb-r10-list{margin:0;padding-left:18px;color:#e2e8f0}.mb-r10-list li{margin:6px 0;line-height:1.45}.mb-r10-list strong{color:#fff}.mb-r10-note{margin-top:8px;color:#dbeafe;line-height:1.5}' +
+      '.mb-r10-bar-row{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:center;margin-bottom:8px}.mb-r10-bar-row strong{display:block;color:#fff}.mb-r10-bar-row small{display:block;color:#bfdbfe}.mb-r10-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden}.mb-r10-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#818cf8,#38bdf8,#34d399)}' +
+      '.mb-r10-type-grid,.mb-r10-swatch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mb-r10-type-grid>div,.mb-r10-swatch{padding:12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10)}.mb-r10-type-grid small,.mb-r10-swatch small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r10-type-grid strong,.mb-r10-swatch strong{display:block;color:#fff}.mb-r10-swatch span{display:block;height:10px;border-radius:999px;margin-top:10px}' +
+      '.mb-r10-legacy-panels{display:none}.mb-r10-legacy-panels.is-visible{display:grid}' +
+      '.mb-r10-builder-shell{gap:14px!important}.mb-r10-side-panel,.mb-r10-main-panel,.mb-r10-rail-panel{background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(248,250,252,.94));border:1px solid rgba(148,163,184,.20);box-shadow:0 18px 38px rgba(2,6,23,.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}' +
+      '.mb-r10-main-panel>.mb-r10-toolbar,.mb-r10-main-panel>.mb-toolbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.95));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 10px 24px rgba(2,6,23,.05);border-bottom:1px solid rgba(148,163,184,.14)}' +
+      '.mb-r10-main-panel>.mb-canvas-stage{background:transparent}.mb-r10-canvas-root{background:radial-gradient(circle at 50% -20%,rgba(255,255,255,1),rgba(248,250,252,.99) 44%,rgba(241,245,249,.98) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.78)}' +
+      '.mb-r10-block-card{border-color:rgba(148,163,184,.22)!important;box-shadow:0 10px 22px rgba(2,6,23,.05)!important;background:linear-gradient(180deg,rgba(255,255,255,.985),rgba(248,250,252,.97))!important;transition:transform .15s ease,box-shadow .15s ease}.mb-r10-block-card:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(2,6,23,.08)!important}.mb-r10-block-card .mb-block-name,.mb-r10-block-card .mb-block-type{color:#0f172a}' +
+      '.mb-r10-main-panel .hm-btn.hm-btn-sm{border-radius:12px}.mb-r10-main-panel .hm-btn.hm-btn-primary{box-shadow:0 10px 18px rgba(29,78,216,.16)}.mb-r10-main-panel .hm-btn.hm-btn-ghost,.mb-r10-main-panel .hm-btn.hm-btn-secondary{background:rgba(255,255,255,.92)}' +
+      '.mb-r10-tab-pill{box-shadow:0 8px 18px rgba(2,6,23,.04);border:1px solid rgba(148,163,184,.16);background:rgba(255,255,255,.94)}' +
+      '.mb-r10-preview-shell .mb-r10-preview-ribbon,.mb-r10-preview-ribbon{background:linear-gradient(90deg,rgba(15,23,42,.94),rgba(30,64,175,.84),rgba(8,145,178,.76));border:1px solid rgba(255,255,255,.12)}.mb-r10-preview-ribbon span{background:rgba(255,255,255,.88);color:#0f172a}' +
+      '.mb-r10-shell .hm-btn.hm-btn-secondary,.mb-r10-shell .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.88);color:#0f172a;border:1px solid rgba(148,163,184,.18)}.mb-r10-shell .hm-btn.hm-btn-primary{background:linear-gradient(135deg,#2563eb,#6d28d9);border-color:rgba(255,255,255,.12);box-shadow:0 10px 20px rgba(37,99,235,.18)}' +
+      '@media (max-width: 1180px){.mb-r10-rail-head{flex-direction:column}.mb-r10-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr));min-width:0;width:100%}}' +
+      '@media (max-width: 920px){.mb-r10-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mb-r10-shell{padding:16px}}' +
+      '@media (max-width: 640px){.mb-r10-mode-grid,.mb-r10-panel-grid,.mb-r10-type-grid,.mb-r10-swatch-grid,.mb-r10-line-list{grid-template-columns:1fr}.mb-r10-bar-row{grid-template-columns:1fr}.mb-r10-action-row{flex-direction:column;align-items:stretch}}';
+    document.head.appendChild(style);
+  }
+
+  _renderBuilder = function(){
+    var html;
+    _r10EnsureState();
+    if(state.schema) _r10EnsureSchema(state.schema);
+    _r10InjectStyles();
+    html = _r10PrevRenderBuilder();
+    return _r10NormalizeHtml(html, false);
+  };
+
+  _renderPreview = function(){
+    var html;
+    _r10EnsureState();
+    if(state.schema) _r10EnsureSchema(state.schema);
+    _r10InjectStyles();
+    html = _r10PrevRenderPreview();
+    return _r10NormalizeHtml(html, true);
+  };
+
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r10-auto-refine': _r10AutoRefine(); return;
+        case 'r10-export-style-guide': _r10ExportStyleGuide(); return;
+        case 'r10-toggle-governance': state.showR10Governance = !state.showR10Governance; _paint(); return;
+        case 'r10-toggle-workflow': state.showR10Workflow = !state.showR10Workflow; _paint(); return;
+        case 'r10-toggle-typography': state.showR10Typography = !state.showR10Typography; _paint(); return;
+        case 'r10-toggle-discipline': state.showR10Discipline = !state.showR10Discipline; _paint(); return;
+        case 'r10-toggle-legacy': state.showR10LegacyLabs = !state.showR10LegacyLabs; _paint(); return;
+        case 'r10-apply-mode': _r10ApplyMode(btn.getAttribute('data-key') || 'boardroom-crystal'); return;
+      }
+    }
+    return _r10PrevHandleClick(e);
+  };
+
+  window.__HM_MB_R10_TEST__ = {
+    version:'2026-04-08-r10-glass-executive',
+    computeMetrics:function(schema){ _r10EnsureState(); return _r10ComputeMetrics(_r10EnsureSchema(schema || state.schema || {})); },
+    buildStyleGuide:function(schema){ _r10EnsureState(); return _r10BuildStyleGuide(_r10EnsureSchema(schema || state.schema || {})); },
+    renderExecutiveRail:function(schema){ _r10EnsureState(); schema = _r10EnsureSchema(schema || state.schema || {}); return _r10RenderExecutiveRail(schema, _r10ComputeMetrics(schema)); },
+    renderPanels:function(schema){ _r10EnsureState(); schema = _r10EnsureSchema(schema || state.schema || {}); return _r10RenderPanels(schema, _r10ComputeMetrics(schema)); },
+    normalizeHtml:function(html, previewOnly){ _r10EnsureState(); return _r10NormalizeHtml(html, !!previewOnly); }
+  };
+  if(window.__HM_MB_R9_TEST__) window.__HM_MB_R9_TEST__.round10 = window.__HM_MB_R10_TEST__;
+}
 
 window._renderModuleBuilder = render;
 
