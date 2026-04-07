@@ -1,0 +1,437 @@
+{
+    "runtime_proof_run_id": "e1149868cef10502",
+    "generatedAt": "2026-04-07T08:23:58+00:00",
+    "total": 67,
+    "passed": 67,
+    "failed": 0,
+    "workstreams": {
+        "A": {
+            "total": 9,
+            "passed": 9
+        },
+        "B": {
+            "total": 9,
+            "passed": 9
+        },
+        "C": {
+            "total": 8,
+            "passed": 8
+        },
+        "D": {
+            "total": 10,
+            "passed": 10
+        },
+        "E": {
+            "total": 11,
+            "passed": 11
+        },
+        "G": {
+            "total": 20,
+            "passed": 20
+        }
+    },
+    "results": [
+        {
+            "workstream": "A",
+            "name": "Valid transition pending→approved",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "Valid transition pending→rejected",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "Valid transition pending→request_changes",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "Cursor round-trip preserves fields",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "Cursor round-trip preserves directions",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "Cursor round-trip preserves values",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "ETag is quoted SHA-256",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "ETag is deterministic",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "A",
+            "name": "Different input → different ETag",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "parseIfMatch accepts quoted string",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "parseIfMatch accepts wildcard",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "parseIfMatch returns null for missing",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "parseIfMatch rejects malformed value",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "registerOrganizationNode requires array + string",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "registerParty requires array + string",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "amendOrganizationNode uses row_version guard",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "deactivateOrganizationNode uses row_version + status guard",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "B",
+            "name": "registerOrganizationNode uses INSERT...RETURNING",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "Self-approval rejected by adapter",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "Already-approved rejects further approval",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "Rejected state rejects approval",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "Invalid decision code rejected",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "Engine rejection is fatal (returns false)",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "APPROVAL_STEP workflow definition exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "WORKFLOW_BRIDGE_READY is true",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "C",
+            "name": "decide() uses workflowAdapter",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "AuditTrail is append-only (no update\/delete methods)",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "AuditTrail uses hash chain (prev_hash + event_hash)",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "AuditEventType::APPROVED exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "electronic_signature has signature_meaning",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "electronic_signature has hash_value",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "electronic_signature has signed_by_party_id",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "approval table references electronic_signature_id",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "SliceObservability::logApprovalDecision exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "SliceObservability::logSignatureApplication exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "D",
+            "name": "Problem details enriched with trace_id",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "trace_id generated (UUID format)",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "correlation_id generated",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "request_id generated",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "enrichProblem adds trace_id",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "enrichProblem adds correlation_id",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "logApprovalDecision method",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "logSignatureApplication method",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "logAttachmentVerification method",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "logPolicyDenial method",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "logCommandExecution method",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "E",
+            "name": "Observability is file_export_only (honest)",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "governance.approval_group exists in catalog",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag has detail_layout.sections",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag has capabilities (>5 keys)",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag has readiness.verdict = ready",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag has readiness.score >= 80",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag has no stale workflow_blocker",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag.capabilities.workflow.state = ready",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag.capabilities.decide.state = ready",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag.capabilities.list.state = ready",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "ag.capabilities.detail.state = ready",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "foundation.organization exists in catalog",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "org entity is present with entity_key",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "governance_approval_group_header pack exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "governance_approval_group_list_columns pack exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "governance_approval_group_decide_form pack exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "foundation_organization_header pack exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "foundation_party_header pack exists",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "OpenAPI has \/api\/v1\/governance\/approval-groups",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "OpenAPI has \/api\/v1\/foundation\/organizations",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "workstream": "G",
+            "name": "OpenAPI has decideApprovalGroup operationId",
+            "status": "PASS",
+            "detail": ""
+        }
+    ]
+}
