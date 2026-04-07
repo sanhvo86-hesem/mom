@@ -1,12 +1,5 @@
 {
-    "density": {
-        "controlGap": "2px",
-        "controlH": "24px",
-        "controlHSm": "20px",
-        "controlHLg": "32px",
-        "iconSm": "14px",
-        "iconMd": "16px"
-    },
+    "density": "compact",
     "colorMode": "light",
     "radius": "rounded",
     "motion": "normal",
@@ -35,7 +28,7 @@
         }
     },
     "fontScale": {
-        "xs": 11,
+        "xs": "11px",
         "sm": 13,
         "base": 14,
         "md": 16,
@@ -172,7 +165,7 @@
             "fontWeight": "800px"
         },
         "input": {
-            "paddingY": "0px",
+            "paddingY": "3px",
             "borderWidth": "1px"
         },
         "icon": {
@@ -192,7 +185,7 @@
     "_meta": {
         "version": "2.0",
         "description": "Admin-configurable design system.",
-        "updatedAt": "2026-04-06T11:05:30+07:00",
+        "updatedAt": "2026-04-07T20:15:42+07:00",
         "updatedBy": "sanh.vo"
     }
 }
