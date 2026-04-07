@@ -12549,31 +12549,68 @@ function git_discard_meaningful_local_changes(string $repoDir): array {
     ];
   }
 
+  // Build a map of path => status-code from porcelain output so we can
+  // reliably classify tracked vs untracked without calling git ls-files
+  // for each file (which can give wrong results on some cPanel git builds).
+  $statusCodeMap = [];
+  foreach ($meaningfulLines as $line) {
+    if (!is_string($line) || strlen($line) < 3) continue;
+    $xy = substr($line, 0, 2);
+    $p  = git_status_entry_path($line);
+    if ($p !== '') $statusCodeMap[$p] = $xy;
+  }
+
   $tracked = [];
   $untracked = [];
   foreach ($meaningfulPaths as $path) {
-    if (git_is_tracked_path($repoReal, $path)) {
-      $tracked[] = $path;
-    } else {
+    $xy = $statusCodeMap[$path] ?? null;
+    // '??' is the only porcelain code that means truly untracked.
+    // Everything else (M, A, D, R, C, U, combinations) is tracked.
+    if ($xy === '??' || $xy === null) {
       $untracked[] = $path;
+    } else {
+      $tracked[] = $path;
     }
   }
   $tracked = array_values(array_unique($tracked));
   $untracked = array_values(array_unique($untracked));
 
+  // --- Restore tracked files to HEAD ---
   if (!empty($tracked)) {
+    // Try git restore first (git >= 2.23), fall back to git checkout.
     $restoreCode = 0;
     $restoreOut = git_command(['restore', '--source=HEAD', '--staged', '--worktree', '--', ...$tracked], $repoReal, $restoreCode);
     if ($restoreCode !== 0) {
-      throw new RuntimeException('git_discard_failed' . ($restoreOut !== '' ? ': ' . $restoreOut : ''));
+      // Fallback: git checkout HEAD -- <paths>
+      $checkoutCode = 0;
+      $checkoutOut = git_command(['checkout', 'HEAD', '--', ...$tracked], $repoReal, $checkoutCode);
+      if ($checkoutCode !== 0) {
+        throw new RuntimeException('git_discard_failed' . ($checkoutOut !== '' ? ': ' . $checkoutOut : ''));
+      }
     }
   }
 
+  // --- Remove untracked files ---
   if (!empty($untracked)) {
     $cleanCode = 0;
     $cleanOut = git_command(['clean', '-fd', '--', ...$untracked], $repoReal, $cleanCode);
     if ($cleanCode !== 0) {
       throw new RuntimeException('git_discard_failed' . ($cleanOut !== '' ? ': ' . $cleanOut : ''));
+    }
+  }
+
+  // --- Nuclear fallback: if files still remain, force reset ---
+  $midStatusCode = 0;
+  $midStatusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $midStatusCode);
+  if ($midStatusCode === 0) {
+    $midLines = git_filter_non_runtime_status_lines(split_nonempty_lines($midStatusOut), true);
+    $midPaths = git_filter_non_runtime_paths(git_collect_paths_from_status_lines($midLines), true);
+    if (!empty($midPaths)) {
+      // Some files survived — force-checkout + clean everything meaningful
+      $resetCode = 0;
+      git_command(['checkout', 'HEAD', '--', '.'], $repoReal, $resetCode);
+      $cleanAllCode = 0;
+      git_command(['clean', '-fd'], $repoReal, $cleanAllCode);
     }
   }
 
