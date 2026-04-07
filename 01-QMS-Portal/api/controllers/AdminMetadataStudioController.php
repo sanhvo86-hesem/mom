@@ -335,6 +335,11 @@ class AdminMetadataStudioController extends BaseController
         return $this->readJsonFile($this->registryPath('schema-studio-round7-report')) ?? [];
     }
 
+    private function schemaStudioRound9Report(): array
+    {
+        return $this->readJsonFile($this->registryPath('schema-studio-round9-report')) ?? [];
+    }
+
 
     /**
      * @return array<int, array<string, mixed>>
@@ -497,6 +502,7 @@ class AdminMetadataStudioController extends BaseController
         $schemaStudioOperationsReport = $this->schemaStudioOperationsReport();
         $schemaStudioCommandCenterReport = $this->schemaStudioCommandCenterReport();
         $schemaStudioRound7Report = $this->schemaStudioRound7Report();
+        $schemaStudioRound9Report = $this->schemaStudioRound9Report();
 
         $apiSummaries = $this->apiSummaries($endpointCatalog);
         $tableSummaries = $this->tableSummaries($tableRegistry);
@@ -577,6 +583,18 @@ class AdminMetadataStudioController extends BaseController
                 'schemaStudioRoleModeCount' => (int)($schemaStudioManifest['summary']['roleModeCount'] ?? $schemaStudioRound7Report['summary']['roleModeCount'] ?? count((array)($schemaStudioRound7Report['roleModes'] ?? []))),
                 'schemaStudioReviewBoardCount' => (int)($schemaStudioManifest['summary']['reviewBoardCount'] ?? $schemaStudioRound7Report['summary']['reviewBoardCount'] ?? count((array)($schemaStudioRound7Report['reviewBoards'] ?? []))),
                 'schemaStudioExportBundleCount' => (int)($schemaStudioManifest['summary']['exportBundleCount'] ?? $schemaStudioRound7Report['summary']['exportBundleCount'] ?? count((array)($schemaStudioRound7Report['exports'] ?? []))),
+                'schemaStudioVisualLanguageScore' => (int)($schemaStudioManifest['summary']['visualLanguageScore'] ?? $schemaStudioRound9Report['summary']['visualLanguageScore'] ?? 0),
+                'schemaStudioCardHierarchy' => (int)($schemaStudioManifest['summary']['cardHierarchyScore'] ?? $schemaStudioRound9Report['summary']['cardHierarchyScore'] ?? 0),
+                'schemaStudioEdgeLegibility' => (int)($schemaStudioManifest['summary']['edgeLegibilityScore'] ?? $schemaStudioRound9Report['summary']['edgeLegibilityScore'] ?? 0),
+                'schemaStudioLaneReadability' => (int)($schemaStudioManifest['summary']['laneReadabilityScore'] ?? $schemaStudioRound9Report['summary']['laneReadabilityScore'] ?? 0),
+                'schemaStudioAccessibilityScore' => (int)($schemaStudioManifest['summary']['accessibilityScore'] ?? $schemaStudioRound9Report['summary']['accessibilityScore'] ?? 0),
+                'schemaStudioDensityDiscipline' => (int)($schemaStudioManifest['summary']['densityDisciplineScore'] ?? $schemaStudioRound9Report['summary']['densityDisciplineScore'] ?? 0),
+                'schemaStudioCardModeCoverage' => (int)($schemaStudioManifest['summary']['cardModeCoverageScore'] ?? $schemaStudioRound9Report['summary']['cardModeCoverageScore'] ?? 0),
+                'schemaStudioVisualDirectorScore' => (int)($schemaStudioManifest['summary']['visualDirectorScore'] ?? $schemaStudioRound9Report['summary']['visualDirectorScore'] ?? 0),
+                'schemaStudioVisualLaneCount' => (int)($schemaStudioManifest['summary']['laneCount'] ?? $schemaStudioRound9Report['summary']['laneCount'] ?? count((array)($schemaStudioRound9Report['laneGuides'] ?? []))),
+                'schemaStudioVisualModeCount' => (int)($schemaStudioManifest['summary']['cardModeCount'] ?? $schemaStudioRound9Report['summary']['cardModeCount'] ?? count((array)($schemaStudioRound9Report['cardModes'] ?? []))),
+                'schemaStudioEdgeLensCount' => (int)($schemaStudioManifest['summary']['edgeLensCount'] ?? $schemaStudioRound9Report['summary']['edgeLensCount'] ?? count((array)($schemaStudioRound9Report['edgeLenses'] ?? []))),
+                'schemaStudioVisualQuickActionCount' => (int)($schemaStudioManifest['summary']['quickActionCount'] ?? $schemaStudioRound9Report['summary']['quickActionCount'] ?? count((array)($schemaStudioRound9Report['quickActions'] ?? []))),
             ],
             'benchmarks' => $this->benchmarkReferences(),
             'principles' => $this->benchmarkPrinciples(),
@@ -591,6 +609,7 @@ class AdminMetadataStudioController extends BaseController
                 'operationsReport' => $schemaStudioOperationsReport,
                 'commandCenterReport' => $schemaStudioCommandCenterReport,
                 'round7Report' => $schemaStudioRound7Report,
+                'round9Report' => $schemaStudioRound9Report,
                 'releaseLog' => array_slice((array)($schemaStudioReleaseLog['items'] ?? []), 0, 10),
             ],
             'lists' => [

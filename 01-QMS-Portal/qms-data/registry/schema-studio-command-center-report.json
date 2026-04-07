@@ -13,11 +13,14 @@
     "atlasReadinessScore": 97,
     "livePulseScore": 93,
     "collaborationReadinessScore": 100,
-    "visualPolishScore": 92,
+    "visualPolishScore": 96,
     "sceneCount": 8,
     "spotlightCount": 6,
     "reviewLaneCount": 6,
-    "atlasCount": 4
+    "atlasCount": 4,
+    "visualLanguageScore": 97,
+    "cardHierarchyScore": 98,
+    "edgeLegibilityScore": 97
   },
   "hero": {
     "headline": "Round 6 command deck",

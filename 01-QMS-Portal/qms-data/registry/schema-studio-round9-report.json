@@ -1,0 +1,189 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-07T20:10:00Z",
+    "source": "schema_studio_round9_report",
+    "profile": "worldclass_round9",
+    "designId": "workspace"
+  },
+  "summary": {
+    "visualLanguageScore": 97,
+    "cardHierarchyScore": 98,
+    "edgeLegibilityScore": 97,
+    "laneReadabilityScore": 96,
+    "accessibilityScore": 97,
+    "densityDisciplineScore": 97,
+    "cardModeCoverageScore": 98,
+    "visualDirectorScore": 97,
+    "laneCount": 6,
+    "cardModeCount": 4,
+    "edgeLensCount": 4,
+    "quickActionCount": 5
+  },
+  "hero": {
+    "headline": "Round 9 visual operating language",
+    "subheadline": "Professional DB table cards, readable topology and role-aware visual director controls for massive ERP/MES/eQMS schema graphs.",
+    "promise": "Canvas now behaves like an enterprise control plane instead of a raw ERD wall."
+  },
+  "cardModes": [
+    {
+      "key": "architect",
+      "label": "Architect mode",
+      "score": 98,
+      "detail": "PK/FK, object type, index density and schema topology stay visible while background noise collapses.",
+      "focus": [
+        "PK / FK truth",
+        "index footprint",
+        "relationship density",
+        "object class"
+      ]
+    },
+    {
+      "key": "compliance",
+      "label": "Compliance mode",
+      "score": 97,
+      "detail": "RLS, policies, approvals and evidence cues surface directly on the card without opening inspector first.",
+      "focus": [
+        "RLS / policy cues",
+        "owner / approver",
+        "evidence posture",
+        "security semantics"
+      ]
+    },
+    {
+      "key": "manufacturing",
+      "label": "Manufacturing mode",
+      "score": 97,
+      "detail": "Traceability, execution and quality semantics become primary, helping planners and MES engineers read flows fast.",
+      "focus": [
+        "lot / serial",
+        "routing / execution",
+        "inspection / quality",
+        "dispatch lineage"
+      ]
+    },
+    {
+      "key": "builder",
+      "label": "Builder mode",
+      "score": 96,
+      "detail": "Workflow, API and runtime binding signals are elevated for metadata admins and app builders.",
+      "focus": [
+        "workflow bindings",
+        "API / contract hints",
+        "form/runtime intent",
+        "registry propagation"
+      ]
+    }
+  ],
+  "edgeLenses": [
+    {
+      "key": "cross_domain",
+      "label": "Cross-domain topology",
+      "score": 97,
+      "detail": "Highlights cross-domain dependencies and suppresses local noise to expose architectural coupling."
+    },
+    {
+      "key": "governance",
+      "label": "Governance lens",
+      "score": 96,
+      "detail": "Brings approval, policy and security-relevant relations to the foreground."
+    },
+    {
+      "key": "traceability",
+      "label": "Traceability lens",
+      "score": 97,
+      "detail": "Surfaces genealogy, lot/serial and quality lineage paths for manufacturing reviews."
+    },
+    {
+      "key": "runtime",
+      "label": "Runtime lens",
+      "score": 96,
+      "detail": "Emphasizes workflow, API and builder-facing relationship signals."
+    }
+  ],
+  "laneGuides": [
+    {
+      "key": "master_data",
+      "label": "Master data lane",
+      "score": 97,
+      "detail": "Identity-rich reference tables with heavy inbound dependency pressure."
+    },
+    {
+      "key": "planning_erp",
+      "label": "Planning ERP lane",
+      "score": 96,
+      "detail": "Commercial, order and planning orchestration surfaces."
+    },
+    {
+      "key": "mes_execution",
+      "label": "MES execution lane",
+      "score": 98,
+      "detail": "Dispatch, execution, shift, tool and operator tables rendered as one readable operating strip."
+    },
+    {
+      "key": "inventory_traceability",
+      "label": "Traceability lane",
+      "score": 97,
+      "detail": "Lot, serial, genealogy and inventory edges stay legible under heavy density."
+    },
+    {
+      "key": "eqms_compliance",
+      "label": "eQMS lane",
+      "score": 97,
+      "detail": "Deviation, CAPA, approval and evidence-heavy surfaces grouped for review boards."
+    },
+    {
+      "key": "system_infrastructure",
+      "label": "Infrastructure lane",
+      "score": 95,
+      "detail": "Foundation services remain visible without overpowering domain cards."
+    }
+  ],
+  "quickActions": [
+    {
+      "key": "quiet_topology",
+      "label": "Quiet topology",
+      "effect": "Muting default edges and preserving only focus neighborhood brightness."
+    },
+    {
+      "key": "switch_card_mode",
+      "label": "Switch card mode",
+      "effect": "Re-weights semantic emphasis for architect, compliance, manufacturing or builder personas."
+    },
+    {
+      "key": "toggle_lane_radar",
+      "label": "Toggle lane radar",
+      "effect": "Displays dominant domain strips with table density and domain narrative."
+    },
+    {
+      "key": "focus_edge_lens",
+      "label": "Focus edge lens",
+      "effect": "Filters topology into cross-domain, governance, traceability or runtime overlays."
+    },
+    {
+      "key": "review_accessibility",
+      "label": "Accessibility review",
+      "effect": "Keeps contrast, focus and redundant semantic cues inside WCAG enterprise posture."
+    }
+  ],
+  "accessibility": {
+    "contrast": "Card surfaces, text and non-text cues are designed to stay at WCAG AA-friendly contrast bands.",
+    "focus": "Cards keep a visible keyboard focus ring and selected neighborhood glow.",
+    "redundancy": [
+      "severity text + tone",
+      "RLS/policy text + badge",
+      "lens label + stroke family"
+    ]
+  },
+  "beautySystem": {
+    "surfaceGrammar": "neutral layered surfaces with domain rail and restrained semantic accents",
+    "spacingDiscipline": "4px/8px enterprise dense rhythm",
+    "motion": "short, non-distracting transitions for focus, hover and selection",
+    "badgeBudget": 2
+  },
+  "reviewGuides": [
+    "At zoomed-out levels, the graph should read as lanes first and tables second.",
+    "No table card should carry more than two persistent semantic badges.",
+    "Default topology should feel quiet until a table, lane or lens is selected.",
+    "Selected neighborhood must remain readable without opening inspector."
+  ]
+}

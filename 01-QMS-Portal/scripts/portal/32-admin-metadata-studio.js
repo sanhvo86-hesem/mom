@@ -1852,3 +1852,192 @@ window._renderAdminMetadataStudio = render;
   };
   win._renderAdminMetadataStudio.__round7Patched = true;
 })(window);
+
+
+/* ── Admin Metadata Studio Round 9 Visual Language Shell ───────────────── */
+(function(win){
+  'use strict';
+  if(!win || typeof win._renderAdminMetadataStudio !== 'function') return;
+  if(win._renderAdminMetadataStudio.__round9Patched) return;
+
+  var state = { container:null, summary:null, loading:false, observer:null };
+
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){ var n = Number(value); return isFinite(n) ? n : (fallback == null ? 0 : fallback); }
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function tone(score){
+    score = num(score, 0);
+    return score >= 95 ? 'good' : (score >= 85 ? 'warning' : 'critical');
+  }
+  function api(action, payload, method){
+    if(typeof window.apiCall === 'function') return window.apiCall(action, payload || {}, method || 'GET', 30000);
+    return fetch('api.php?action=' + encodeURIComponent(action), {
+      method: method || 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type':'application/json' },
+      body: (method || 'GET').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function ensureStyles(){
+    if(document.getElementById('ams-r9-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'ams-r9-styles';
+    style.textContent = [
+      '.ams-r9-shell{display:grid;gap:14px;margin-top:16px;}',
+      '.ams-r9-hero,.ams-r9-card{border:1px solid rgba(125,211,252,.16);background:linear-gradient(180deg,rgba(8,16,30,.96),rgba(10,21,42,.90));box-shadow:0 20px 48px rgba(2,6,23,.30);border-radius:24px;padding:18px;color:#eaf2ff;}',
+      '.ams-r9-kicker{color:#7dd3fc;font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:800;}',
+      '.ams-r9-title{font-size:24px;font-weight:800;line-height:1.18;color:#f8fbff;margin-top:4px;}',
+      '.ams-r9-sub{color:#93a3c7;font-size:12px;line-height:1.5;letter-spacing:.01em;}',
+      '.ams-r9-badges,.ams-r9-inline,.ams-r9-chip-wrap{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.ams-r9-grid,.ams-r9-metrics{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));}',
+      '.ams-r9-metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:14px;}',
+      '.ams-r9-badge,.ams-r9-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:12px;font-weight:700;color:#f5f8ff;}',
+      '.ams-r9-badge.tone-good{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.28);}',
+      '.ams-r9-badge.tone-warning{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.28);}',
+      '.ams-r9-badge.tone-critical{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.28);}',
+      '.ams-r9-chip{font-weight:600;color:#dbeafe;background:rgba(59,130,246,.14);}',
+      '.ams-r9-metric{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);display:grid;gap:6px;min-height:102px;}',
+      '.ams-r9-metric strong{font-size:28px;line-height:1;color:#f8fbff;}',
+      '.ams-r9-metric.tone-good{background:linear-gradient(180deg,rgba(18,83,53,.24),rgba(15,25,48,.66));}',
+      '.ams-r9-metric.tone-warning{background:linear-gradient(180deg,rgba(108,78,18,.24),rgba(15,25,48,.66));}',
+      '.ams-r9-metric.tone-critical{background:linear-gradient(180deg,rgba(109,31,42,.26),rgba(15,25,48,.66));}',
+      '.ams-r9-list{display:grid;gap:10px;}',
+      '.ams-r9-item{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);}',
+      '.ams-r9-item strong{color:#f8fbff;}',
+      '@media (max-width:1180px){.ams-r9-grid,.ams-r9-metrics{grid-template-columns:1fr;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+  function metric(label, value, hint, toneKey){
+    return '<div class="ams-r9-metric tone-' + esc(toneKey || 'warning') + '"><div class="ams-r9-kicker">' + esc(label) + '</div><strong>' + esc(value) + '</strong><div class="ams-r9-sub">' + esc(hint || '') + '</div></div>';
+  }
+  function normalize(summary){
+    var overview = summary && summary.overview ? summary.overview : {};
+    var report = summary && summary.schemaStudio && summary.schemaStudio.round9Report ? summary.schemaStudio.round9Report : {
+      summary: {
+        visualLanguageScore: num(overview.schemaStudioVisualLanguageScore, 0),
+        cardHierarchyScore: num(overview.schemaStudioCardHierarchy, 0),
+        edgeLegibilityScore: num(overview.schemaStudioEdgeLegibility, 0),
+        laneReadabilityScore: num(overview.schemaStudioLaneReadability, 0),
+        accessibilityScore: num(overview.schemaStudioAccessibilityScore, 0),
+        densityDisciplineScore: num(overview.schemaStudioDensityDiscipline, 0),
+        cardModeCoverageScore: num(overview.schemaStudioCardModeCoverage, 0),
+        visualDirectorScore: num(overview.schemaStudioVisualDirectorScore, 0),
+        laneCount: num(overview.schemaStudioVisualLaneCount, 0),
+        cardModeCount: num(overview.schemaStudioVisualModeCount, 0),
+        edgeLensCount: num(overview.schemaStudioEdgeLensCount, 0),
+        quickActionCount: num(overview.schemaStudioVisualQuickActionCount, 0)
+      },
+      hero: {
+        headline: 'Round 9 visual operating language',
+        subheadline: 'Professional DB table cards, readable topology and role-aware visual control surface.'
+      },
+      cardModes: [],
+      edgeLenses: [],
+      laneGuides: [],
+      quickActions: [],
+      accessibility: {},
+      beautySystem: {},
+      reviewGuides: []
+    };
+    return { overview:overview, report:report };
+  }
+  function render(){
+    if(!state.container) return;
+    var root = state.container.querySelector('.ams');
+    if(!root) return;
+    var metrics = root.querySelector('.ams-metrics');
+    if(!metrics || !state.summary) return;
+    ensureStyles();
+    var data = normalize(state.summary);
+    var report = data.report;
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    var modes = arr(report.cardModes).slice(0, 4);
+    var lenses = arr(report.edgeLenses).slice(0, 4);
+    var lanes = arr(report.laneGuides).slice(0, 6);
+    var quick = arr(report.quickActions).slice(0, 5);
+    var guides = arr(report.reviewGuides).slice(0, 4);
+    var beauty = report.beautySystem || {};
+    var accessibility = report.accessibility || {};
+    var existing = root.querySelector('.ams-r9-shell');
+    if(!existing){
+      existing = document.createElement('section');
+      existing.className = 'ams-r9-shell';
+      var anchor = root.querySelector('.ams-r7-shell') || metrics;
+      anchor.insertAdjacentElement('afterend', existing);
+    }
+    existing.innerHTML = [
+      '<section class="ams-r9-hero">',
+        '<div class="ams-r9-kicker">Round 9 visual language</div>',
+        '<div class="ams-r9-title">' + esc(hero.headline || 'Professional database table cards + readable topology') + '</div>',
+        '<div class="ams-r9-sub">' + esc(hero.subheadline || 'Metadata admins now see the same visual operating language as schema architects.') + '</div>',
+        '<div class="ams-r9-badges" style="margin-top:12px">',
+          '<span class="ams-r9-badge tone-' + esc(tone(summary.visualLanguageScore)) + '">Visual language: ' + esc(num(summary.visualLanguageScore, 0) + '%') + '</span>',
+          '<span class="ams-r9-badge tone-' + esc(tone(summary.cardHierarchyScore)) + '">Card hierarchy: ' + esc(num(summary.cardHierarchyScore, 0) + '%') + '</span>',
+          '<span class="ams-r9-badge tone-' + esc(tone(summary.edgeLegibilityScore)) + '">Edge legibility: ' + esc(num(summary.edgeLegibilityScore, 0) + '%') + '</span>',
+          '<span class="ams-r9-badge tone-' + esc(tone(summary.accessibilityScore)) + '">Accessibility: ' + esc(num(summary.accessibilityScore, 0) + '%') + '</span>',
+          '<span class="ams-r9-badge">Lanes: ' + esc(num(summary.laneCount, 0)) + '</span>',
+          '<span class="ams-r9-badge">Modes: ' + esc(num(summary.cardModeCount, 0)) + '</span>',
+          '<span class="ams-r9-badge">Lenses: ' + esc(num(summary.edgeLensCount, 0)) + '</span>',
+        '</div>',
+        '<div class="ams-r9-metrics">',
+          metric('Lane readability', num(summary.laneReadabilityScore, 0) + '%', 'Domain strips stay readable before opening inspector.', tone(summary.laneReadabilityScore)),
+          metric('Density discipline', num(summary.densityDisciplineScore, 0) + '%', 'Dense enterprise cards keep strong hierarchy.', tone(summary.densityDisciplineScore)),
+          metric('Card mode coverage', num(summary.cardModeCoverageScore, 0) + '%', 'Architect, compliance, manufacturing and builder views.', tone(summary.cardModeCoverageScore)),
+          metric('Visual director', num(summary.visualDirectorScore, 0) + '%', 'Floating control surface for mode/lens/lane switching.', tone(summary.visualDirectorScore)),
+        '</div>',
+      '</section>',
+      '<div class="ams-r9-grid">',
+        '<article class="ams-r9-card"><h4>Card modes</h4><div class="ams-r9-sub">Role-aware emphasis for table cards.</div><div class="ams-r9-list">' + (modes.length ? modes.map(function(item){ return '<div class="ams-r9-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r9-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r9-inline"><span class="ams-r9-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r9-sub">No card mode details yet.</div>') + '</div></article>',
+        '<article class="ams-r9-card"><h4>Edge lenses & lanes</h4><div class="ams-r9-sub">Topology is grouped by lane and filtered by lens.</div><div class="ams-r9-list">' + (lenses.length ? lenses.map(function(item){ return '<div class="ams-r9-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r9-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r9-inline"><span class="ams-r9-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '') + (lanes.length ? lanes.map(function(item){ return '<div class="ams-r9-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r9-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r9-inline"><span class="ams-r9-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r9-sub">No lane guides yet.</div>') + '</div></article>',
+        '<article class="ams-r9-card"><h4>Quick actions</h4><div class="ams-r9-sub">World-class canvas controls now exposed in admin control plane.</div><div class="ams-r9-chip-wrap">' + (quick.length ? quick.map(function(item){ return '<span class="ams-r9-chip">' + esc(item.label || item.key || '-') + '</span>'; }).join('') : '<span class="ams-r9-sub">No quick actions yet.</span>') + '</div><div class="ams-r9-list" style="margin-top:12px">' + (guides.length ? guides.map(function(item){ return '<div class="ams-r9-item"><div><strong>Review guide</strong><div class="ams-r9-sub">' + esc(item) + '</div></div></div>'; }).join('') : '') + '</div></article>',
+        '<article class="ams-r9-card"><h4>Accessibility & beauty</h4><div class="ams-r9-sub">Visual polish is locked to enterprise readability, not decorative noise.</div><div class="ams-r9-list">',
+          '<div class="ams-r9-item"><div><strong>Contrast</strong><div class="ams-r9-sub">' + esc(accessibility.contrast || 'WCAG AA-friendly contrast targets on card surfaces.') + '</div></div><div class="ams-r9-inline"><span class="ams-r9-badge tone-' + esc(tone(summary.accessibilityScore)) + '">' + esc(num(summary.accessibilityScore, 0) + '%') + '</span></div></div>',
+          '<div class="ams-r9-item"><div><strong>Focus</strong><div class="ams-r9-sub">' + esc(accessibility.focus || 'Visible focus ring and selected-neighborhood clarity.') + '</div></div><div class="ams-r9-inline"><span class="ams-r9-badge">Badge budget: ' + esc(num(beauty.badgeBudget, 2)) + '</span></div></div>',
+          '<div class="ams-r9-item"><div><strong>Surface grammar</strong><div class="ams-r9-sub">' + esc(beauty.surfaceGrammar || 'neutral layered surfaces with domain rails') + '</div></div></div>',
+          '<div class="ams-r9-item"><div><strong>Spacing & motion</strong><div class="ams-r9-sub">' + esc((beauty.spacingDiscipline || '') + ' · ' + (beauty.motion || '')) + '</div></div></div>',
+        '</div></article>',
+      '</div>'
+    ].join('');
+  }
+  function fetchSummary(force){
+    if(state.loading && !force) return Promise.resolve(state.summary || null);
+    state.loading = true;
+    return api('admin_metadata_studio_summary', {}, 'GET').then(function(payload){
+      state.loading = false;
+      state.summary = payload || null;
+      render();
+      return state.summary;
+    }).catch(function(){
+      state.loading = false;
+      render();
+      return state.summary || null;
+    });
+  }
+  function attach(container){
+    state.container = container;
+    if(state.observer){ state.observer.disconnect(); state.observer = null; }
+    if(container && typeof MutationObserver !== 'undefined'){
+      state.observer = new MutationObserver(function(){ render(); });
+      state.observer.observe(container, { childList:true, subtree:true });
+    }
+    render();
+    fetchSummary(false);
+  }
+  var original = win._renderAdminMetadataStudio;
+  win._renderAdminMetadataStudio = function(container){
+    var result = original ? original.apply(this, arguments) : undefined;
+    attach(container);
+    return result;
+  };
+  win._renderAdminMetadataStudio.__round9Patched = true;
+})(window);

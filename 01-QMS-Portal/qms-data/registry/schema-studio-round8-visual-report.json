@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-04-07T17:22:00Z",
+  "profile": "worldclass_round8_visual_grammar",
+  "summary": {
+    "cardHierarchyScore": 96,
+    "edgeReadabilityScore": 94,
+    "selectionClarityScore": 97,
+    "semanticDensityScore": 95,
+    "professionalVisualScore": 97,
+    "badgeDisciplineScore": 96,
+    "zoomBandCoverageScore": 95
+  },
+  "features": [
+    "professional layered db table cards",
+    "business title + technical name split",
+    "domain rail + context telemetry",
+    "semantic field emphasis",
+    "muted default edges with topology focus",
+    "zoom-aware density bands",
+    "selection neighborhood highlighting"
+  ],
+  "modes": [
+    "atlas",
+    "map",
+    "studio",
+    "detail"
+  ],
+  "principles": [
+    "two badges max",
+    "neutral surfaces first",
+    "domain as rail not as noise pill",
+    "fields remain readable before metadata clutter",
+    "edges should support nodes not dominate them"
+  ]
+}

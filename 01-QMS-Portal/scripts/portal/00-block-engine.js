@@ -12521,3 +12521,169 @@ Object.assign(window.HmBlockEngine, {
   BE.MODULE_BUILDER_CINEMA_SCHEMA_VERSION = '2026-04-07-r7';
   BE.MODULE_BUILDER_ROUND7_TEMPLATES = Object.keys(ROUND7_TEMPLATES);
 })();
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder Ultra Round 9 Block Engine Patch
+ * Glass Pro · Contrast Board · Structure Lens · Professional Executive Surfaces
+ * ============================================================================ */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_GLASS_SCHEMA_VERSION === '2026-04-08-r9') return;
+  var BE = window.HmBlockEngine;
+  function _mergeRound9(target, source){ Object.keys(source || {}).forEach(function(key){ target[key] = source[key]; }); }
+  var ROUND9_TEMPLATES = {
+    'r9-glass-executive-kpi': {
+      type:'kpi-row',
+      title:{ vi:'Glass Executive KPIs', en:'Glass Executive KPIs' },
+      config:{ dataSource:{ api:'module_glass_executive_summary', method:'GET' }, items:[ { label:'Contrast', labelEn:'Contrast', dataKey:'contrast_score', color:'var(--brand-2)', suffix:'%' }, { label:'Readability', labelEn:'Readability', dataKey:'readability_score', color:'var(--green)', suffix:'%' }, { label:'Craft', labelEn:'Craft', dataKey:'glass_craft', color:'var(--amber)', suffix:'%' }, { label:'Approval', labelEn:'Approval', dataKey:'approval_ready', color:'var(--red)', suffix:'%' } ] },
+      meta:{ module:'builder-round9', category:'glass' }
+    },
+    'r9-contrast-readiness-board': {
+      type:'data-cards',
+      title:{ vi:'Contrast Readiness Board', en:'Contrast Readiness Board' },
+      config:{ columns:4, titleKey:'area', subtitleKey:'detail', badgeKey:'status', dataSource:{ api:'module_contrast_readiness', method:'GET', dataKey:'items' } },
+      meta:{ module:'builder-round9', category:'contrast' }
+    },
+    'r9-approval-glass-board': {
+      type:'data-cards',
+      title:{ vi:'Approval Glass Board', en:'Approval Glass Board' },
+      config:{ columns:3, titleKey:'gate', subtitleKey:'owner', badgeKey:'status', dataSource:{ api:'module_approval_glass', method:'GET', dataKey:'items' } },
+      meta:{ module:'builder-round9', category:'governance' }
+    },
+    'r9-structure-lens-table': {
+      type:'data-table',
+      title:{ vi:'Structure Lens Table', en:'Structure Lens Table' },
+      config:{ pageSize:12, dataSource:{ api:'module_structure_lens', method:'GET', dataKey:'tabs' }, dataKey:'tabs', columns:[ { key:'tab', label:{vi:'Tab', en:'Tab'}, type:'text' }, { key:'blocks', label:{vi:'Blocks', en:'Blocks'}, type:'number' }, { key:'density', label:{vi:'Density', en:'Density'}, type:'text' }, { key:'empty_state', label:{vi:'Empty state', en:'Empty state'}, type:'badge' }, { key:'recommendation', label:{vi:'Recommendation', en:'Recommendation'}, type:'text' } ] },
+      meta:{ module:'builder-round9', category:'structure' }
+    },
+    'r9-professional-command-table': {
+      type:'data-table',
+      title:{ vi:'Professional Command Table', en:'Professional Command Table' },
+      config:{ pageSize:10, dataSource:{ api:'module_professional_command', method:'GET', dataKey:'actions' }, dataKey:'actions', columns:[ { key:'action', label:{vi:'Action', en:'Action'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'sla', label:{vi:'SLA', en:'SLA'}, type:'text' }, { key:'risk', label:{vi:'Risk', en:'Risk'}, type:'badge' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] },
+      meta:{ module:'builder-round9', category:'command' }
+    },
+    'r9-operator-focus-banner': {
+      type:'info-banner',
+      title:{ vi:'Operator Focus Banner', en:'Operator Focus Banner' },
+      config:{ type:'info', icon:'🎯', text:'Focus the operator on the next safe action with a high-contrast, glare-controlled message ribbon.', textEn:'Focus the operator on the next safe action with a high-contrast, glare-controlled message ribbon.' },
+      meta:{ module:'builder-round9', category:'operator' }
+    },
+    'r9-palette-rack-gallery': {
+      type:'data-cards',
+      title:{ vi:'Palette Rack Gallery', en:'Palette Rack Gallery' },
+      config:{ columns:4, titleKey:'token', subtitleKey:'value', badgeKey:'group', dataSource:{ api:'module_palette_rack', method:'GET', dataKey:'tokens' } },
+      meta:{ module:'builder-round9', category:'design' }
+    },
+    'r9-supplier-radar-table': {
+      type:'data-table',
+      title:{ vi:'Supplier Radar Table', en:'Supplier Radar Table' },
+      config:{ pageSize:15, dataSource:{ api:'module_supplier_radar', method:'GET', dataKey:'suppliers' }, dataKey:'suppliers', columns:[ { key:'supplier', label:{vi:'Supplier', en:'Supplier'}, type:'text' }, { key:'issue', label:{vi:'Issue', en:'Issue'}, type:'text' }, { key:'risk', label:{vi:'Risk', en:'Risk'}, type:'badge' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'eta', label:{vi:'ETA', en:'ETA'}, type:'text' } ] },
+      meta:{ module:'builder-round9', category:'supplier' }
+    },
+    'r9-audit-evidence-glass': {
+      type:'data-table',
+      title:{ vi:'Audit Evidence Glass', en:'Audit Evidence Glass' },
+      config:{ pageSize:12, dataSource:{ api:'module_audit_evidence_glass', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'evidence_id', label:{vi:'Evidence', en:'Evidence'}, type:'text' }, { key:'headline', label:{vi:'Headline', en:'Headline'}, type:'text' }, { key:'trace', label:{vi:'Trace', en:'Trace'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] },
+      meta:{ module:'builder-round9', category:'audit' }
+    },
+    'r9-release-assurance-timeline': {
+      type:'data-timeline',
+      title:{ vi:'Release Assurance Timeline', en:'Release Assurance Timeline' },
+      config:{ dataSource:{ api:'module_release_assurance', method:'GET', dataKey:'events' }, dateKey:'stage', titleKey:'title', descKey:'description' },
+      meta:{ module:'builder-round9', category:'release' }
+    }
+  };
+  BE.BLOCK_TEMPLATES = BE.BLOCK_TEMPLATES || {};
+  _mergeRound9(BE.BLOCK_TEMPLATES, ROUND9_TEMPLATES);
+  BE.EXTRA_TEMPLATES = BE.EXTRA_TEMPLATES || {};
+  _mergeRound9(BE.EXTRA_TEMPLATES, ROUND9_TEMPLATES);
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-08-r9';
+  BE.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION = '2026-04-08-r9';
+  BE.MODULE_BUILDER_SUPREME_SCHEMA_VERSION = '2026-04-08-r9';
+  BE.MODULE_BUILDER_CINEMA_SCHEMA_VERSION = '2026-04-08-r9';
+  BE.MODULE_BUILDER_GLASS_SCHEMA_VERSION = '2026-04-08-r9';
+  BE.MODULE_BUILDER_ROUND9_TEMPLATES = Object.keys(ROUND9_TEMPLATES);
+})();
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder Ultra Round 10 Block Engine Patch
+ * Glass Executive · Workflow Atlas · Typography Discipline · Governance Boardroom
+ * ============================================================================ */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_GLASS_SCHEMA_VERSION === '2026-04-08-r10') return;
+  var BE = window.HmBlockEngine;
+  function _mergeRound10(target, source){ Object.keys(source || {}).forEach(function(key){ target[key] = source[key]; }); }
+  var ROUND10_TEMPLATES = {
+    'r10-boardroom-command-kpi': {
+      type:'kpi-row',
+      title:{ vi:'Boardroom Command KPIs', en:'Boardroom Command KPIs' },
+      config:{ dataSource:{ api:'module_boardroom_command', method:'GET' }, items:[ { label:'Contrast', labelEn:'Contrast', dataKey:'contrast', color:'var(--brand-2)', suffix:'%' }, { label:'Hierarchy', labelEn:'Hierarchy', dataKey:'hierarchy', color:'var(--green)', suffix:'%' }, { label:'Governance', labelEn:'Governance', dataKey:'governance', color:'var(--amber)', suffix:'%' }, { label:'Operate', labelEn:'Operate', dataKey:'operability', color:'var(--red)', suffix:'%' } ] },
+      meta:{ module:'builder-round10', category:'boardroom' }
+    },
+    'r10-governance-signoff-wall': {
+      type:'data-cards',
+      title:{ vi:'Governance Signoff Wall', en:'Governance Signoff Wall' },
+      config:{ columns:4, titleKey:'gate', subtitleKey:'owner', badgeKey:'status', dataSource:{ api:'module_governance_signoff', method:'GET', dataKey:'items' } },
+      meta:{ module:'builder-round10', category:'governance' }
+    },
+    'r10-workflow-atlas-table': {
+      type:'data-table',
+      title:{ vi:'Workflow Atlas Table', en:'Workflow Atlas Table' },
+      config:{ pageSize:12, dataSource:{ api:'module_workflow_atlas', method:'GET', dataKey:'rows' }, dataKey:'rows', columns:[ { key:'lane', label:{vi:'Lane', en:'Lane'}, type:'text' }, { key:'focus', label:{vi:'Focus', en:'Focus'}, type:'text' }, { key:'blocks', label:{vi:'Blocks', en:'Blocks'}, type:'number' }, { key:'risk', label:{vi:'Risk', en:'Risk'}, type:'badge' }, { key:'recommendation', label:{vi:'Recommendation', en:'Recommendation'}, type:'text' } ] },
+      meta:{ module:'builder-round10', category:'workflow' }
+    },
+    'r10-typography-discipline-gallery': {
+      type:'data-cards',
+      title:{ vi:'Typography Discipline Gallery', en:'Typography Discipline Gallery' },
+      config:{ columns:3, titleKey:'token', subtitleKey:'value', badgeKey:'impact', dataSource:{ api:'module_typography_discipline', method:'GET', dataKey:'tokens' } },
+      meta:{ module:'builder-round10', category:'typography' }
+    },
+    'r10-decision-desk-banner': {
+      type:'info-banner',
+      title:{ vi:'Decision Desk Banner', en:'Decision Desk Banner' },
+      config:{ type:'info', icon:'🏛️', text:'Decision desk ribbon for release rhythm, signoff ownership, and boardroom next actions.', textEn:'Decision desk ribbon for release rhythm, signoff ownership, and boardroom next actions.' },
+      meta:{ module:'builder-round10', category:'decision' }
+    },
+    'r10-readability-assurance-table': {
+      type:'data-table',
+      title:{ vi:'Readability Assurance Table', en:'Readability Assurance Table' },
+      config:{ pageSize:10, dataSource:{ api:'module_readability_assurance', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'area', label:{vi:'Area', en:'Area'}, type:'text' }, { key:'issue', label:{vi:'Issue', en:'Issue'}, type:'text' }, { key:'contrast', label:{vi:'Contrast', en:'Contrast'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] },
+      meta:{ module:'builder-round10', category:'readability' }
+    },
+    'r10-professional-palette-gallery': {
+      type:'data-cards',
+      title:{ vi:'Professional Palette Gallery', en:'Professional Palette Gallery' },
+      config:{ columns:4, titleKey:'token', subtitleKey:'hex', badgeKey:'role', dataSource:{ api:'module_professional_palette', method:'GET', dataKey:'tokens' } },
+      meta:{ module:'builder-round10', category:'palette' }
+    },
+    'r10-release-clarity-timeline': {
+      type:'data-timeline',
+      title:{ vi:'Release Clarity Timeline', en:'Release Clarity Timeline' },
+      config:{ dataSource:{ api:'module_release_clarity', method:'GET', dataKey:'events' }, dateKey:'stage', titleKey:'title', descKey:'description' },
+      meta:{ module:'builder-round10', category:'release' }
+    },
+    'r10-operator-precision-grid': {
+      type:'data-cards',
+      title:{ vi:'Operator Precision Grid', en:'Operator Precision Grid' },
+      config:{ columns:3, titleKey:'task', subtitleKey:'guidance', badgeKey:'status', dataSource:{ api:'module_operator_precision', method:'GET', dataKey:'items' } },
+      meta:{ module:'builder-round10', category:'operator' }
+    },
+    'r10-executive-decision-table': {
+      type:'data-table',
+      title:{ vi:'Executive Decision Table', en:'Executive Decision Table' },
+      config:{ pageSize:12, dataSource:{ api:'module_executive_decisions', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'decision', label:{vi:'Decision', en:'Decision'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'window', label:{vi:'Window', en:'Window'}, type:'text' }, { key:'risk', label:{vi:'Risk', en:'Risk'}, type:'badge' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] },
+      meta:{ module:'builder-round10', category:'executive' }
+    }
+  };
+  BE.BLOCK_TEMPLATES = BE.BLOCK_TEMPLATES || {};
+  _mergeRound10(BE.BLOCK_TEMPLATES, ROUND10_TEMPLATES);
+  BE.EXTRA_TEMPLATES = BE.EXTRA_TEMPLATES || {};
+  _mergeRound10(BE.EXTRA_TEMPLATES, ROUND10_TEMPLATES);
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-08-r10';
+  BE.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION = '2026-04-08-r10';
+  BE.MODULE_BUILDER_SUPREME_SCHEMA_VERSION = '2026-04-08-r10';
+  BE.MODULE_BUILDER_CINEMA_SCHEMA_VERSION = '2026-04-08-r10';
+  BE.MODULE_BUILDER_GLASS_SCHEMA_VERSION = '2026-04-08-r10';
+  BE.MODULE_BUILDER_ROUND10_TEMPLATES = Object.keys(ROUND10_TEMPLATES);
+})();

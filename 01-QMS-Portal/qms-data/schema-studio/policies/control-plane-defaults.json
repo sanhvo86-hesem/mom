@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T14:16:00Z",
+    "generatedAt": "2026-04-07T20:10:00Z",
     "source": "schema_studio_control_plane_defaults",
-    "profile": "worldclass_round7"
+    "profile": "worldclass_round9"
   },
   "visual": {
     "defaultTab": "operations",
     "preferredAmbience": "midnight",
-    "preferredHeatmap": "risk",
+    "preferredHeatmap": "canonical",
     "preferredDensity": "comfortable",
     "quickActions": [
       "command_deck",
@@ -21,8 +21,54 @@
       "review_graph",
       "export_surface",
       "role_mode_architect",
-      "traceability_atlas"
-    ]
+      "traceability_atlas",
+      "visual_director",
+      "role_mode_compliance",
+      "role_mode_manufacturing",
+      "role_mode_builder",
+      "edge_lens_cross_domain",
+      "edge_lens_governance",
+      "edge_lens_traceability",
+      "edge_lens_runtime",
+      "lane_radar"
+    ],
+    "tableCardSystem": "round9_visual_operating_language",
+    "edgeGrammar": "quiet_default_with_role_aware_lenses",
+    "selectionFocusMode": "lane_plus_neighbor_highlight",
+    "badgeBudget": 2,
+    "zoomBands": [
+      "atlas",
+      "map",
+      "studio",
+      "detail"
+    ],
+    "graphicPrinciples": [
+      "neutral layered surfaces with domain rail",
+      "two persistent badges max per card",
+      "technical name separated from business title",
+      "muted default edges with bright connected path",
+      "zoom-aware information density"
+    ],
+    "visualDirector": {
+      "defaultMode": "architect",
+      "defaultLens": "cross_domain",
+      "laneOverlay": true,
+      "labelDiscipline": "selection_only",
+      "keyboardShortcut": "Alt+9"
+    },
+    "cardModes": [
+      "architect",
+      "compliance",
+      "manufacturing",
+      "builder"
+    ],
+    "edgeLenses": [
+      "cross_domain",
+      "governance",
+      "traceability",
+      "runtime"
+    ],
+    "laneOverlayMode": "domain_row_radar"
   },
   "thresholds": {
     "visualReadiness": 80,
@@ -41,7 +87,17 @@
     "atlasReadiness": 88,
     "livePulseScore": 85,
     "collaborationReadiness": 90,
-    "visualPolishScore": 88
+    "visualPolishScore": 92,
+    "edgeReadabilityScore": 90,
+    "cardHierarchyScore": 96,
+    "selectionClarityScore": 94,
+    "visualLanguageScore": 95,
+    "edgeLegibilityScore": 95,
+    "laneReadabilityScore": 94,
+    "accessibilityScore": 95,
+    "densityDisciplineScore": 95,
+    "cardModeCoverageScore": 96,
+    "visualDirectorScore": 95
   },
   "storyboards": [
     {
@@ -209,6 +265,7 @@
     }
   ],
   "guidance": [
+    "Use round 8 professional cards as the default visual grammar: title, technical name, context rail, field semantics, and micro-telemetry.",
     "Drive release readiness through the promotion board instead of ad-hoc canvas inspection.",
     "Keep firewall, compatibility and blocker posture visible in every review lane.",
     "Use focus decks as the default executive navigation model for large manufacturing graphs.",
@@ -396,6 +453,40 @@
       "physicalCoverageScore",
       "reviewOpsScore",
       "exportSurfaceScore"
+    ]
+  },
+  "visualDirector": {
+    "visualLanguageScore": 97,
+    "cardHierarchyScore": 98,
+    "edgeLegibilityScore": 97,
+    "laneReadabilityScore": 96,
+    "accessibilityScore": 97,
+    "densityDisciplineScore": 97,
+    "cardModeCoverageScore": 98,
+    "visualDirectorScore": 97,
+    "laneCount": 6,
+    "cardModeCount": 4,
+    "edgeLensCount": 4,
+    "quickActionCount": 5,
+    "modes": [
+      "architect",
+      "compliance",
+      "manufacturing",
+      "builder"
+    ],
+    "lenses": [
+      "cross_domain",
+      "governance",
+      "traceability",
+      "runtime"
+    ],
+    "laneGuides": [
+      "master_data",
+      "planning_erp",
+      "mes_execution",
+      "inventory_traceability",
+      "eqms_compliance",
+      "system_infrastructure"
     ]
   }
 }

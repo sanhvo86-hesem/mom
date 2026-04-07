@@ -1420,6 +1420,11 @@ class SchemaStudioController extends BaseController
         return $this->registryDirPath() . '/schema-studio-round7-report.json';
     }
 
+    private function round9ReportPath(): string
+    {
+        return $this->registryDirPath() . '/schema-studio-round9-report.json';
+    }
+
     /**
      * @param mixed $items
      * @return array<int, array<string, mixed>>
@@ -6010,6 +6015,75 @@ class SchemaStudioController extends BaseController
             (string)($user['username'] ?? 'system')
         );
         $this->success($artifact);
+    }
+
+    public function getRound9Report(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+        $body = $this->jsonBody();
+        $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $artifact = $this->readJsonFile($this->round9ReportPath());
+        if (is_array($artifact) && (($artifact['_meta']['designId'] ?? '') === $designId || ($artifact['_meta']['designId'] ?? '') === 'workspace' || $designId === 'workspace')) {
+            $this->success($artifact);
+        }
+
+        $manifest = $this->readJsonFile($this->registryDirPath() . '/schema-studio-enterprise-manifest.json') ?? [];
+        $diagnostics = $this->readJsonFile($this->registryDirPath() . '/schema-studio-diagnostics.json') ?? [];
+        $commandCenter = $this->readJsonFile($this->commandCenterReportPath()) ?? [];
+        $summary = array_merge(
+            (array)($manifest['summary'] ?? []),
+            (array)($diagnostics['summary'] ?? []),
+            (array)($commandCenter['summary'] ?? [])
+        );
+
+        $fallback = [
+            '_meta' => [
+                'generatedAt' => gmdate('c'),
+                'source' => 'schema_studio_round9_report_fallback',
+                'profile' => 'worldclass_round9',
+                'designId' => $designId,
+            ],
+            'summary' => [
+                'visualLanguageScore' => (int)($summary['visualLanguageScore'] ?? $summary['visualPolishScore'] ?? 0),
+                'cardHierarchyScore' => (int)($summary['cardHierarchyScore'] ?? $summary['visualPolishScore'] ?? 0),
+                'edgeLegibilityScore' => (int)($summary['edgeLegibilityScore'] ?? $summary['visualPolishScore'] ?? 0),
+                'laneReadabilityScore' => (int)($summary['laneReadabilityScore'] ?? $summary['atlasMeshScore'] ?? 0),
+                'accessibilityScore' => (int)($summary['accessibilityScore'] ?? $summary['visualPolishScore'] ?? 0),
+                'densityDisciplineScore' => (int)($summary['densityDisciplineScore'] ?? $summary['visualReadinessScore'] ?? 0),
+                'cardModeCoverageScore' => (int)($summary['cardModeCoverageScore'] ?? $summary['roleModeScore'] ?? 0),
+                'visualDirectorScore' => (int)($summary['visualDirectorScore'] ?? $summary['commandCenterScore'] ?? 0),
+                'laneCount' => (int)($summary['laneCount'] ?? $summary['domainCount'] ?? 0),
+                'cardModeCount' => (int)($summary['cardModeCount'] ?? $summary['roleModeCount'] ?? 0),
+                'edgeLensCount' => (int)($summary['edgeLensCount'] ?? 4),
+                'quickActionCount' => (int)($summary['quickActionCount'] ?? 5),
+            ],
+            'hero' => [
+                'headline' => 'Round 9 visual operating language',
+                'subheadline' => 'Professional DB table cards and readable topology for enterprise-scale schema graphs.',
+                'promise' => 'Fallback report synthesized from manifest and diagnostics.',
+            ],
+            'cardModes' => [],
+            'edgeLenses' => [],
+            'laneGuides' => [],
+            'quickActions' => [],
+            'accessibility' => [
+                'contrast' => 'WCAG AA-friendly contrast targets on card surfaces.',
+                'focus' => 'Visible keyboard focus and selected-neighborhood emphasis.',
+                'redundancy' => ['severity text + tone', 'lens label + stroke family'],
+            ],
+            'beautySystem' => [
+                'surfaceGrammar' => 'neutral layered surfaces with domain rails',
+                'spacingDiscipline' => '4px/8px enterprise dense rhythm',
+                'motion' => 'short, non-distracting transitions',
+                'badgeBudget' => 2,
+            ],
+            'reviewGuides' => [
+                'Default topology should stay quiet until a table or lens is selected.',
+                'No card should expose more than two persistent semantic badges.',
+            ],
+        ];
+        $this->success($fallback);
     }
 
     public function export(): never

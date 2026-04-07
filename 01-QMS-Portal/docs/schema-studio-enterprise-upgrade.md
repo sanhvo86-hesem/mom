@@ -2,6 +2,100 @@
 
 Đây là gói overwrite **cộng dồn tất cả thay đổi đã tạo trong đoạn chat** cho `Schema Studio`, `Admin Metadata Studio`, `Module Builder` và registry artifacts liên quan.
 
+## Round 9 — Visual Operating Language
+
+Round 9 tiếp tục trực diện vào vấn đề lớn nhất của canvas enterprise graph: **đủ thông tin nhưng không rối**. Thay vì chỉ thêm visual polish, round 9 đưa vào một **visual operating language** hoàn chỉnh cho `Schema Studio`.
+
+### Frontend
+
+#### `32-schema-studio.js`
+
+Round 9 bổ sung patch `World-Class Visual Operating Language` với các điểm chính:
+
+- thêm `Visual Director` nổi trên canvas để điều khiển `card mode`, `edge lens`, `lane overlay` và `label discipline`
+- thêm 4 `card modes`: `architect`, `compliance`, `manufacturing`, `builder`
+- thêm 4 `edge lenses`: `cross_domain`, `governance`, `traceability`, `runtime`
+- thêm `intel strip` cho từng table card, thay đổi theo persona và vẫn giữ tương thích với card structure hiện có
+- thêm `lane overlay / lane radar` để đọc topology theo từng row/domain thay vì chỉ nhìn từng node rời rạc
+- hover focus được mở rộng theo `table neighborhood` và `edge neighborhood`
+- edge labels được kiểm soát theo `focus/all/off`, tránh noise khi canvas rất lớn
+
+#### `32-admin-metadata-studio.js`
+
+- thêm `Round 9 visual language shell` để metadata admins nhìn cùng một grammar/telemetry với schema architects
+- hiển thị `card modes`, `edge lenses`, `lane guides`, `quick actions`, `accessibility`, `beauty system`
+
+#### `31-module-builder.js`
+
+- health notice đọc thêm telemetry round 9: `visualLanguage`, `cardHierarchy`, `edgeLegibility`, `laneReadability`, `accessibility`, `densityDiscipline`, `cardModeCoverage`, `visualDirector`, `laneCount`, `edgeLensCount`
+
+### Backend / registry
+
+- thêm API `schema_studio_round9_report`
+- thêm persisted artifact `qms-data/registry/schema-studio-round9-report.json`
+- `AdminMetadataStudioController` trả thêm `round9Report` và overview metrics tương ứng
+- `SchemaStudioController` có fallback synthesis nếu artifact round 9 chưa được regenerate
+
+### Round 9 target posture
+
+- `97` visual language score
+- `98` card hierarchy score
+- `97` edge legibility score
+- `96` lane readability score
+- `97` accessibility score
+- `97` density discipline score
+- `98` card mode coverage score
+- `97` visual director score
+- `6` lanes
+- `4` card modes
+- `4` edge lenses
+- `5` quick actions
+
+## Round 8 — Professional DB Table Visual Grammar
+
+Round 8 tập trung rất sâu vào **đồ họa table card + edge grammar + readability ở canvas thực tế**, không chỉ thêm shell control-plane. Mục tiêu là biến `Schema Studio` thành studio có **DB table cards chuyên nghiệp, trực quan, đẹp và đủ thông tin** cho hệ ERP/MES/eQMS dày đặc quan hệ.
+
+### Frontend
+
+#### `32-schema-studio.js`
+
+Round 8 bổ sung patch `World-Class Visual Grammar` với các thay đổi chính:
+
+- nâng table card thành phong cách `professional layered cards`
+- tách rõ **business title** và **technical table name**
+- chuyển domain thành **accent rail** thay vì thêm noise badge
+- chuẩn hóa **2 badge max**: severity + object type
+- làm mới footer thành **micro telemetry strip**
+- enrich field rows bằng **semantic emphasis**: identity / relation / workflow / traceability / quality / governance / timeline / security
+- bổ sung **zoom bands**: `atlas`, `map`, `studio`, `detail`
+- mặc định edge chuyển sang **muted topology**, chỉ sáng mạnh ở selected/connected path
+- thêm **selection neighborhood highlighting** để giảm rối khi tập trung 1 bảng hoặc 1 edge
+- giữ tương thích với round 2–7 bằng cách patch trên structure hiện có, không rewrite phá kiến trúc
+
+### Config / artifacts
+
+`control-plane-defaults.json` được nâng lên profile `worldclass_round8` và thêm visual guidance mới:
+
+- `tableCardSystem: round8_professional_db_cards`
+- `edgeGrammar: muted_default_focus_topology`
+- `selectionFocusMode: topology_neighbor_highlight`
+- `badgeBudget: 2`
+- `zoomBands: atlas / map / studio / detail`
+
+Artifact mới:
+
+- `qms-data/registry/schema-studio-round8-visual-report.json`
+
+### Round 8 target posture
+
+- `96` card hierarchy score
+- `94` edge readability score
+- `97` selection clarity score
+- `95` semantic density score
+- `97` professional visual score
+- `96` badge discipline score
+- `95` zoom-band coverage score
+
 ## Round 7 — Atlas Mesh
 
 Round 7 bổ sung lớp làm sâu object coverage + review/governance + export/interoperability + role-aware cockpit.
@@ -120,10 +214,12 @@ Round 6 bổ sung lớp trực quan và orchestration sâu hơn trên nền roun
 - API mới:
   - `schema_studio_command_center_report`
   - `schema_studio_round6_report`
+- `schema_studio_round9_report`
 
 Round 6 artifact mới:
 
 - `qms-data/registry/schema-studio-command-center-report.json`
+- `qms-data/registry/schema-studio-round9-report.json`
 
 Các artifact cũ cũng được refresh lại để đồng bộ round 6 summary:
 
@@ -243,6 +339,7 @@ Artifact đi kèm gói overwrite hiện có:
 - `qms-data/registry/schema-studio-experience-report.json`
 - `qms-data/registry/schema-studio-operations-report.json`
 - `qms-data/registry/schema-studio-command-center-report.json`
+- `qms-data/registry/schema-studio-round9-report.json`
 
 ## API actions after this package
 
@@ -253,6 +350,7 @@ Artifact đi kèm gói overwrite hiện có:
 - `schema_studio_operations_report`
 - `schema_studio_command_center_report`
 - `schema_studio_round6_report`
+- `schema_studio_round9_report`
 
 ## Sau khi overwrite
 
@@ -262,3 +360,15 @@ Artifact đi kèm gói overwrite hiện có:
 4. Dùng `Alt + 5`, `Alt + 6`, `Alt + 7`.
 5. Kiểm tra `Admin Metadata Studio` overview và `Module Builder` health notice.
 6. Chạy smoke test local trước khi commit/push.
+
+
+## Sau khi overwrite round 9
+
+1. Overwrite local theo đúng root `qms.hesem.com.vn/`.
+2. Mở `Schema Studio`.
+3. Kiểm tra `Visual Director` xuất hiện ở canvas.
+4. Chuyển qua 4 `card modes` và 4 `edge lenses`.
+5. Kiểm tra lane overlay không che các table cards và vẫn đọc được topology.
+6. Kiểm tra `Admin Metadata Studio` hiển thị round 9 shell.
+7. Kiểm tra `Module Builder` health notice có round 9 telemetry.
+8. Chạy smoke test local trước khi commit/push.

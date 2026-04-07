@@ -1,0 +1,58 @@
+{
+  "patchVersion": "2026-04-08-r10-glass-executive",
+  "packageType": "cumulative-overwrite",
+  "root": "qms.hesem.com.vn",
+  "basedOn": "2026-04-08-r9-glass-pro",
+  "styleDirection": {
+    "preserve": "round 7 glass aura",
+    "improve": [
+      "higher contrast with lower glare",
+      "more professional boardroom shell",
+      "cleaner builder surfaces and toolbar discipline",
+      "less analytical clutter by tucking legacy labs behind a toggle",
+      "on-demand governance, workflow, typography, and discipline panels"
+    ]
+  },
+  "changedFiles": [
+    "01-QMS-Portal/scripts/portal/00-block-engine.js",
+    "01-QMS-Portal/scripts/portal/31-module-builder.js",
+    "01-QMS-Portal/docs/module-builder-ultra-round10-2026-04-08.md",
+    "01-QMS-Portal/release/module-builder-ultra-round10-manifest-2026-04-08.json",
+    "01-QMS-Portal/release/module-builder-ultra-round10-smoke-2026-04-08.txt",
+    "01-QMS-Portal/release/module-builder-ultra-round10-sample-style-guide-2026-04-08.md",
+    "OVERWRITE-MANIFEST-2026-04-08-R10.md"
+  ],
+  "features": [
+    "Glass Executive shell",
+    "Boardroom Crystal / Quality Clarity Pro / Audit Ledger Glass / Night Command Pro presets",
+    "Professional glass command rail",
+    "Governance board",
+    "Workflow atlas",
+    "Typography lab",
+    "Discipline board",
+    "Legacy labs toggle",
+    "Auto refine for contrast, layout, typography, and release discipline",
+    "Style guide export",
+    "10 round 10 templates in block engine"
+  ],
+  "round10Templates": 10,
+  "totalTemplates": 157,
+  "fixes": {
+    "replacedRound9RailAndPanelStack": true,
+    "reducedVisualClutter": true,
+    "improvedProfessionalContrast": true,
+    "improvedBuilderSurfaceReadability": true,
+    "preservedCoreToolbarAndCanvas": true
+  },
+  "tests": {
+    "nodeCheck31": "pass",
+    "nodeCheck00": "pass",
+    "round10Smoke": "pass",
+    "builderPatch": "2026-04-08-r10-glass-executive",
+    "blockEngineVersion": "2026-04-08-r10"
+  },
+  "notes": [
+    "designed for direct overwrite deployment",
+    "no browser E2E was run in the target live environment from this session"
+  ]
+}

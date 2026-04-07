@@ -2282,7 +2282,19 @@ function _registryHealthSummary(){
     schemaStudioObjectSurfaceCount: schemaStudioSummary.objectSurfaceCount || 0,
     schemaStudioRoleModeCount: schemaStudioSummary.roleModeCount || 0,
     schemaStudioReviewBoardCount: schemaStudioSummary.reviewBoardCount || 0,
-    schemaStudioExportBundleCount: schemaStudioSummary.exportBundleCount || 0
+    schemaStudioExportBundleCount: schemaStudioSummary.exportBundleCount || 0,
+    schemaStudioVisualLanguageScore: schemaStudioSummary.visualLanguageScore || 0,
+    schemaStudioCardHierarchy: schemaStudioSummary.cardHierarchyScore || 0,
+    schemaStudioEdgeLegibility: schemaStudioSummary.edgeLegibilityScore || 0,
+    schemaStudioLaneReadability: schemaStudioSummary.laneReadabilityScore || 0,
+    schemaStudioAccessibilityScore: schemaStudioSummary.accessibilityScore || 0,
+    schemaStudioDensityDiscipline: schemaStudioSummary.densityDisciplineScore || 0,
+    schemaStudioCardModeCoverage: schemaStudioSummary.cardModeCoverageScore || 0,
+    schemaStudioVisualDirectorScore: schemaStudioSummary.visualDirectorScore || 0,
+    schemaStudioVisualLaneCount: schemaStudioSummary.laneCount || 0,
+    schemaStudioVisualModeCount: schemaStudioSummary.cardModeCount || 0,
+    schemaStudioEdgeLensCount: schemaStudioSummary.edgeLensCount || 0,
+    schemaStudioVisualQuickActionCount: schemaStudioSummary.quickActionCount || 0
   };
 }
 
@@ -2335,6 +2347,10 @@ function _renderRegistryHealthNotice(){
     h += '<div>'+_esc(_t('Export surface / interoperability / role modes: ','Export surface / interoperability / role modes: ') + info.schemaStudioExportSurfaceScore + '% / ' + info.schemaStudioInteroperabilityScore + '% / ' + info.schemaStudioRoleModeScore + '%')+'</div>';
     h += '<div>'+_esc(_t('Traceability atlas / beauty system / object surfaces: ','Traceability atlas / beauty system / object surfaces: ') + info.schemaStudioTraceabilityAtlasScore + '% / ' + info.schemaStudioBeautySystemScore + '% / ' + info.schemaStudioObjectSurfaceCount)+'</div>';
     h += '<div>'+_esc(_t('Role modes / review boards / export bundles: ','Role modes / review boards / export bundles: ') + info.schemaStudioRoleModeCount + ' / ' + info.schemaStudioReviewBoardCount + ' / ' + info.schemaStudioExportBundleCount)+'</div>';
+    h += '<div>'+_esc(_t('Visual language / card hierarchy / edge legibility: ','Visual language / card hierarchy / edge legibility: ') + info.schemaStudioVisualLanguageScore + '% / ' + info.schemaStudioCardHierarchy + '% / ' + info.schemaStudioEdgeLegibility + '%')+'</div>';
+    h += '<div>'+_esc(_t('Lane readability / accessibility / density discipline: ','Lane readability / accessibility / density discipline: ') + info.schemaStudioLaneReadability + '% / ' + info.schemaStudioAccessibilityScore + '% / ' + info.schemaStudioDensityDiscipline + '%')+'</div>';
+    h += '<div>'+_esc(_t('Card mode coverage / visual director: ','Card mode coverage / visual director: ') + info.schemaStudioCardModeCoverage + '% / ' + info.schemaStudioVisualDirectorScore + '%')+'</div>';
+    h += '<div>'+_esc(_t('Visual lanes / card modes / edge lenses / quick actions: ','Visual lanes / card modes / edge lenses / quick actions: ') + info.schemaStudioVisualLaneCount + ' / ' + info.schemaStudioVisualModeCount + ' / ' + info.schemaStudioEdgeLensCount + ' / ' + info.schemaStudioVisualQuickActionCount)+'</div>';
   }
   if(info.compositePkTables){
     h += '<div>'+_esc(_t('Bang composite PK da co contract rieng: ','Composite-PK tables use dedicated identity contracts: ') + info.compositePkTables)+'</div>';

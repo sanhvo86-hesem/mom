@@ -1,33 +1,38 @@
-# HESEM QMS overwrite package — 2026-04-07
+# HESEMQMS overwrite package — post single-schema merge docs (2026-04-07)
 
-Gói này chỉ chứa **các file tài liệu/prompt mới hoặc cập nhật** theo đúng cấu trúc thư mục repo để bạn giải nén đè vào local repo rồi `git add`, `git commit`, `git push`.
+## Package purpose
 
-## Mục tiêu của gói này
+This overwrite package updates repo documentation for the **post-single-schema-merge phase**.
+It does **not** patch runtime code directly.
+It adds a new current-authority document, a fresh deep evaluation, a gap matrix, and an active platform-wide convergence prompt.
 
-- đưa file `prompt-02-foundation-governance-release-candidate-truth-convergence-and-live-proof-prompt-2026-04-07.md` vào đúng tree repo;
-- cập nhật lại đánh giá sâu theo **repo-truth public hiện thấy được**;
-- tạo một prompt kế tiếp kiểu **self-healing closure loop** để Codex tự kiểm tra lại, tự sửa tiếp, tự regenerate lại, rồi chỉ dừng khi không còn finding nào trong phạm vi Foundation Governance slice hoặc còn đúng các blocker không thể đóng trong cùng vòng chạy;
-- giúp bạn không bị lạc trong chuỗi Prompt 02 dài.
+## Files included
 
-## File trong gói
+Under `01-QMS-Portal/docs/ai-prompts/`:
+- `CURRENT-PLATFORM-AUTHORITY-2026-04-07.md`
+- `platform-wide-post-single-schema-merge-deep-evaluation-2026-04-07.md`
+- `platform-wide-post-single-schema-merge-gap-matrix-2026-04-07.md`
+- `prompt-03-platform-single-schema-authority-and-global-proof-convergence-prompt-2026-04-07.md`
+- `prompt-03-platform-concurrent-execution-runbook-2026-04-07.md`
 
-- `01-QMS-Portal/docs/ai-prompts/prompt-02-foundation-governance-prompt-chain-status-2026-04-07.md`
-- `01-QMS-Portal/docs/ai-prompts/prompt-02-foundation-governance-release-candidate-truth-convergence-deep-evaluation-2026-04-07.md`
-- `01-QMS-Portal/docs/ai-prompts/prompt-02-foundation-governance-release-candidate-truth-convergence-and-live-proof-prompt-2026-04-07.md`
-- `01-QMS-Portal/docs/ai-prompts/prompt-02-foundation-governance-self-healing-release-candidate-closure-loop-deep-evaluation-2026-04-07.md`
-- `01-QMS-Portal/docs/ai-prompts/prompt-02-foundation-governance-self-healing-release-candidate-closure-loop-prompt-2026-04-07.md`
+## Intended use
 
-## Cách dùng
+1. Extract this zip into the **repo root**.
+2. Let it overwrite/create the included files.
+3. Review the new prompt docs in `01-QMS-Portal/docs/ai-prompts/`.
+4. Commit them to your local repo.
+5. Push to Git.
+6. Run the active prompt file in a fresh Codex section.
 
-1. Giải nén gói này vào **root repo local**.
-2. Kiểm tra diff.
-3. Commit/push các file tài liệu trước.
-4. Chạy prompt được khuyến nghị trong file `prompt-02-foundation-governance-prompt-chain-status-2026-04-07.md`.
+## Recommended order after overwrite
 
-## Ghi chú trung thực
+1. Read `CURRENT-PLATFORM-AUTHORITY-2026-04-07.md`
+2. Read `platform-wide-post-single-schema-merge-deep-evaluation-2026-04-07.md`
+3. Read `platform-wide-post-single-schema-merge-gap-matrix-2026-04-07.md`
+4. Run `prompt-03-platform-single-schema-authority-and-global-proof-convergence-prompt-2026-04-07.md`
+5. Use `prompt-03-platform-concurrent-execution-runbook-2026-04-07.md` as operator checklist
 
-Gói này **không sửa trực tiếp runtime code** vì phiên làm việc hiện tại không có checkout repo đồng bộ để patch trực tiếp source rồi chạy local validation thật. Gói này tập trung vào:
+## Important note
 
-- đánh giá sâu theo repo public hiện thấy được,
-- cập nhật prompt chain,
-- khóa logic vòng tiếp theo để Codex sửa nốt các finding còn lại một cách triệt để hơn.
+This package is designed to reduce prompt debt and set the **current platform authority** after the schema merge.
+It intentionally does **not** add another wide architecture package.

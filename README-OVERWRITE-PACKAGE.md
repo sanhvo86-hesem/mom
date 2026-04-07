@@ -2,7 +2,48 @@
 
 Package root: `qms.hesem.com.vn/`
 
-Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 7**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 9**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+
+## Round 9 highlights
+
+Round 9 nâng `Schema Studio` từ visual grammar tốt lên **visual operating language** thật sự cho canvas enterprise graph:
+
+- thêm `Visual Director` nổi trên canvas để chuyển **card mode**: `architect`, `compliance`, `manufacturing`, `builder`
+- thêm **edge lenses**: `cross_domain`, `governance`, `traceability`, `runtime`
+- thêm **lane overlay / lane radar** để nhóm các table card theo từng row/domain dễ đọc hơn trên graph dày
+- card được enrich thêm `intel strip` theo mode, giữ card đẹp nhưng giàu ngữ nghĩa hơn
+- field rows được re-emphasize theo persona thay vì hiển thị một cách phẳng cho mọi vai trò
+- thêm endpoint `schema_studio_round9_report`
+- thêm artifact `schema-studio-round9-report.json`
+- `Admin Metadata Studio` và `Module Builder` đã nhận telemetry round 9 về visual language, card hierarchy, edge legibility, lane readability và visual director
+
+## Round 8 highlights
+
+Round 8 tập trung trực tiếp vào **đồ họa table cards và edge readability** để canvas schema thật sự chuyên nghiệp, trực quan và dễ đọc trên graph ERP/MES/eQMS dày đặc:
+
+- thêm patch `World-Class Visual Grammar Round 8` vào `32-schema-studio.js`
+- nâng card thành `professional layered db cards` với domain rail, business title, technical name riêng, severity + object-type badges, field semantics và micro telemetry
+- thêm `zoom bands`: `atlas`, `map`, `studio`, `detail`
+- edge mặc định chuyển sang `muted default / bright connected path`
+- thêm `selection neighborhood highlighting` cho tables và relations
+- giữ tương thích với round 2–7 bằng cách patch trực tiếp trên card/edge structure hiện hữu
+- `control-plane-defaults.json` nâng profile thành `worldclass_round8`
+- thêm artifact `schema-studio-round8-visual-report.json`
+
+## Seeded round 9 posture in this package
+
+- `97` visual language score
+- `98` card hierarchy score
+- `97` edge legibility score
+- `96` lane readability score
+- `97` accessibility score
+- `97` density discipline score
+- `98` card mode coverage score
+- `97` visual director score
+- `6` lanes
+- `4` card modes
+- `4` edge lenses
+- `5` quick actions
 
 ## Round 7 highlights
 
@@ -129,6 +170,7 @@ Package đã được seed sẵn artifact round 6:
 ### New
 
 - `01-QMS-Portal/qms-data/registry/schema-studio-command-center-report.json`
+- `01-QMS-Portal/qms-data/registry/schema-studio-round9-report.json`
 
 ## Validation completed before packaging
 
@@ -147,7 +189,9 @@ Package đã được seed sẵn artifact round 6:
    - existing WorldClass shell still works
    - round 5 operations shell still appears
    - round 6 command deck appears below the WorldClass overlay
-4. Use `Alt + 5` / `Alt + 6` and now `Alt + 7`.
-5. Verify `Admin Metadata Studio` overview now shows round 6 command deck summary.
-6. Verify `Module Builder` registry health notice now includes round 6 command-deck metrics.
-7. Smoke test locally, then commit/push from your workstation.
+4. Use `Alt + 5` / `Alt + 6` / `Alt + 7` / `Alt + 8`, rồi mở `Visual Director` round 9 trên canvas.
+5. Kiểm tra card modes `architect / compliance / manufacturing / builder`.
+6. Kiểm tra edge lenses `cross-domain / governance / traceability / runtime` và lane overlay.
+7. Verify `Admin Metadata Studio` overview now shows round 9 visual language summary.
+8. Verify `Module Builder` registry health notice now includes round 9 visual-language metrics.
+9. Smoke test locally, then commit/push from your workstation.
