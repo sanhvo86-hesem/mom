@@ -20,7 +20,13 @@ REQUIRED_ARTIFACTS = [
     REG / "registry-manifest.json",
     REG / "registry-quality-report.json",
     REG / "wave-gap-ledger.json",
+    REG / "publication-truth-summary.json",
+    REG / "publication-entity-accounting.json",
+    REG / "foundation-governance-publication-summary.json",
 ]
+
+SCHEMA_AUTHORITY = PORTAL / "database" / "schema-authority-summary.json"
+PROMPT_LINEAGE = PORTAL / "docs" / "ai-prompts" / "prompt-lineage-index-2026-04-07.json"
 
 checks_passed = 0
 checks_failed = 0
@@ -135,6 +141,67 @@ def main() -> int:
               "stale workflow_blocker in nested readiness")
     else:
         check("ag_exists", False, "governance.approval_group not in entities")
+
+    # Gate J: Schema authority
+    print("\nGate J: Schema authority")
+    check("schema_authority_exists", SCHEMA_AUTHORITY.is_file(), "Missing schema-authority-summary.json")
+    if SCHEMA_AUTHORITY.is_file():
+        sa = load(SCHEMA_AUTHORITY)
+        sa_data = sa.get("schema_authority", {})
+        check("schema_authority_scope", sa_data.get("authority_scope") == "platform_global",
+              f"scope={sa_data.get('authority_scope')}")
+        check("schema_authority_anti_parallel", "anti_parallel_authority_statement" in sa_data,
+              "missing anti_parallel_authority_statement")
+        refs = sa_data.get("reference_sql_artifacts", [])
+        check("schema_refs_non_authoritative", all(r.get("authority") is False for r in refs),
+              "some reference artifacts have authority=true")
+
+    # Gate K: Truth summary consistency
+    print("\nGate K: Truth summary consistency")
+    pts_path = REG / "publication-truth-summary.json"
+    if pts_path.is_file():
+        pts = load(pts_path)
+        pt = pts.get("publication_truth", {})
+        check("truth_scope_global", pt.get("scope") == "platform_global",
+              f"scope={pt.get('scope')}")
+        check("truth_model_explicit", pt.get("truth_model") == "global_canonical_plus_slice_summary",
+              f"model={pt.get('truth_model')}")
+        pub_ready = pt.get("publishability", {}).get("ready")
+        qr_ready = qrs.get("publishability_ready", qr.get("gates",{}).get("publishability",{}).get("ready"))
+        check("truth_publishability_matches_qr", pub_ready == qr_ready,
+              f"truth={pub_ready} qr={qr_ready}")
+
+    # Gate L: Entity accounting
+    print("\nGate L: Entity accounting")
+    ea_path = REG / "publication-entity-accounting.json"
+    if ea_path.is_file():
+        ea = load(ea_path)
+        ea_data = ea.get("entity_accounting", {})
+        schema_tables = ea_data.get("schema_tables", {}).get("count", 0)
+        fe_entities = ea_data.get("frontend_entities", {}).get("count", 0)
+        check("accounting_tables_628", schema_tables == 628, f"schema_tables={schema_tables}")
+        check("accounting_entities_match_fc", fe_entities == fcs.get("entity_count"),
+              f"accounting={fe_entities} fc={fcs.get('entity_count')}")
+
+    # Gate M: Prompt lineage
+    print("\nGate M: Prompt lineage")
+    check("prompt_lineage_exists", PROMPT_LINEAGE.is_file(), "Missing prompt-lineage-index")
+    if PROMPT_LINEAGE.is_file():
+        pl = load(PROMPT_LINEAGE)
+        pl_data = pl.get("prompt_lineage", {})
+        check("prompt_current_authority_set", "current_authority" in pl_data,
+              "no current_authority field")
+
+    # Gate N: Slice summary consistency
+    print("\nGate N: Slice summary")
+    fgs_path = REG / "foundation-governance-publication-summary.json"
+    if fgs_path.is_file():
+        fgs = load(fgs_path)
+        sp = fgs.get("slice_publication", {})
+        check("slice_scope_correct", sp.get("scope") == "foundation_governance_contract_slice",
+              f"scope={sp.get('scope')}")
+        check("slice_verdict_pass", sp.get("slice_verdict") == "PASS",
+              f"verdict={sp.get('slice_verdict')}")
 
     # Summary
     total = checks_passed + checks_failed

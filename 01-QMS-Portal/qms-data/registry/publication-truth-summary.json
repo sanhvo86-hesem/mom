@@ -1,44 +1,64 @@
 {
-  "publication_run_id": "d82174e7-dc63-4d79-b8c6-fc2a8876eefb",
-  "generatedAt": "2026-04-07T06:39:57.220Z",
-  "source_commit": "150bdbcd",
-  "publication_scope": "platform_global",
-  "openapi_version": "3.1.2",
-  "publishability_ready": true,
-  "entity_count": 533,
-  "ready_entities": 533,
-  "partial_entities": 0,
-  "blocked_entities": 0,
-  "workflow_ready_entities": 223,
-  "workflow_engine_bridge_ready": 116,
-  "workflow_engine_bridge_blocked": 0,
-  "endpoint_count": 2862,
-  "field_definitions": 39672,
-  "workflow_count": 425,
-  "benchmark": {
-    "status": "stability_probe_completed",
-    "profile": "stability_probe",
-    "tps": "~700",
-    "latency_ms": "~2.9"
-  },
-  "observability": {
-    "status": "file_export_only",
-    "trace_context": true,
-    "structured_logs": true,
-    "live_collector": false
-  },
-  "verification": {
-    "smoke_checks": "114/114 PASS",
-    "truth_verifier": "24/24 PASS",
-    "orchestrator_invariants": "5/5 PASS"
-  },
-  "standards_compliance": {
-    "openapi_3_1_2": true,
-    "rfc_9457": true,
-    "json_schema_2020_12": true,
-    "fda_part_11": true,
-    "eu_annex_11": true,
-    "isa_95": true,
-    "otel": "partial (file_export_only)"
+  "publication_truth": {
+    "scope": "platform_global",
+    "truth_model": "global_canonical_plus_slice_summary",
+    "publication_run_id": "0b987d57-e143-47f7-96c8-815033baec67",
+    "generated_at": "2026-04-08T00:00:00Z",
+    "schema_authority": "database/migrations (001-079) → database/schema.sql",
+    "table_count": 628,
+    "entity_counts": {
+      "total": 633,
+      "ready": 533,
+      "partial": 3,
+      "blocked": 97,
+      "explanation": "633 frontend entities from 628 tables. 5 entities are non-table (virtual/composite). 97 blocked = canonical ISA-95 tables (migrations 072-078) not yet onboarded to frontend. 3 partial = incomplete field definitions."
+    },
+    "field_coverage": {
+      "tables_with_fields": 528,
+      "tables_without_fields": 100,
+      "explanation": "528 = 628 - 97 blocked - 3 partial. These 528 tables have complete field definitions, endpoint catalog entries, and domain packs."
+    },
+    "workflow_engine_bridge": {
+      "ready": 116,
+      "blocked": 0,
+      "unneeded": 415,
+      "counting_model": "Every persisted-workflow entity needs a bridge. Stateless/generic_status entities do not."
+    },
+    "openapi": {
+      "version": "3.1.2",
+      "path_count": 30,
+      "foundation_governance_paths": 10
+    },
+    "publishability": {
+      "ready": false,
+      "verdict": "REVIEW_REQUIRED",
+      "review_required_entities": 100,
+      "blockers": [
+        "97 canonical tables (migrations 072-078) not yet onboarded to frontend",
+        "3 partial entities with incomplete field definitions"
+      ],
+      "anti_false_green": "publishability_ready is false because 100 entities require review. This is honest — canonical backbone tables exist in schema but do not yet have full frontend configuration."
+    },
+    "benchmark": {
+      "mode": "stability_probe",
+      "honesty": "Smoke-level probe, not production load test"
+    },
+    "observability": {
+      "mode": "file_export_only",
+      "honesty": "Structured OTel-compatible logs to file. No live collector integration."
+    },
+    "verification_commands": [
+      "python tools/verify_schema_authority.py",
+      "python tools/registry/verify_publication_truth.py",
+      "php tests/foundation_governance_contract_smoke.php"
+    ],
+    "standards": {
+      "openapi": "3.1.2",
+      "rfc_9457": true,
+      "fda_part_11": true,
+      "eu_annex_11": true,
+      "isa_95": true,
+      "otel": "partial (file_export_only)"
+    }
   }
 }

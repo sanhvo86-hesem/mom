@@ -1,124 +1,81 @@
 {
-  "generatedAt": "2026-04-07T07:16:58.109Z",
-  "description": "Prompt execution lineage index for the HESEM ERP/MES/eQMS platform",
-  "prompt_chain": [
-    {
-      "prompt_id": "prompt-01",
-      "name": "Canonical Platform Architecture",
-      "date": "2026-04-06",
-      "status": "ARCHITECTURE TRUTH — preserved, not reopened",
-      "file": "prompt-01-canonical-platform-architecture-package-2026-04-06.md",
-      "exists": true
-    },
-    {
-      "prompt_id": "prompt-02",
-      "name": "Backend Implementation Factory (Foundation Governance)",
-      "date": "2026-04-06 through 2026-04-07",
-      "status": "COMPLETE — 7 hardening passes executed",
-      "files": [
-        "prompt-02-backend-implementation-final-package-2026-04-06.md",
-        "prompt-02-foundation-governance-bridge-truthfulness-metadata-closure-and-observability-prompt-2026-04-07.md",
-        "prompt-02-foundation-governance-closure-deep-evaluation-2026-04-06.md",
-        "prompt-02-foundation-governance-closure-package-2026-04-06.md",
-        "prompt-02-foundation-governance-closure-prompt-2026-04-06.md",
-        "prompt-02-foundation-governance-hardening-proof-deep-evaluation-2026-04-07.md",
-        "prompt-02-foundation-governance-proof-stabilization-and-publication-integrity-deep-evaluation-2026-04-07.md",
-        "prompt-02-foundation-governance-proof-stabilization-and-publication-integrity-prompt-2026-04-07.md",
-        "prompt-02-foundation-governance-publication-authority-and-benchmark-charter-hardening-deep-evaluation-2026-04-07.md",
-        "prompt-02-foundation-governance-publication-authority-and-benchmark-charter-hardening-prompt-2026-04-07.md",
-        "prompt-02-foundation-governance-runnable-proof-and-contract-alignment-deep-evaluation-2026-04-07.md",
-        "prompt-02-foundation-governance-runnable-proof-and-contract-alignment-prompt-2026-04-07.md",
-        "prompt-02-foundation-governance-tranche1-deep-evaluation-2026-04-07.md",
-        "prompt-02-foundation-governance-tranche1-hardening-and-proof-prompt-2026-04-07.md",
-        "prompt-02-foundation-governance-tranche1-implementation-prompt-2026-04-06.md",
-        "prompt-02-foundation-governance-workflow-bridge-and-canonical-write-implementation-deep-evaluation-2026-04-07.md",
-        "prompt-02-foundation-governance-workflow-bridge-and-canonical-write-implementation-prompt-2026-04-07.md",
-        "prompt-02-output-deep-evaluation-2026-04-06.md"
-      ],
-      "key_outputs": [
-        "Foundation Governance Contract Slice fully implemented",
-        "10 public REST routes + 12 internal commands",
-        "ApprovalWorkflowAdapter with engine-backed bridge",
-        "SliceObservability with OTel-compatible events",
-        "114-check smoke suite"
-      ]
-    },
-    {
-      "prompt_id": "prompt-03",
-      "name": "World-Class Re-Audit and Domain Closure",
-      "date": "2026-04-07",
-      "status": "GO WITH CONDITIONS — re-audit passed",
-      "files": [
-        "prompt-03-backend-audit-final-package-2026-04-06.md",
-        "prompt-03-domain-map-and-entity-catalog-2026-04-07.md",
-        "prompt-03-erp-mes-eqms-domain-closure-and-frontend-readiness-2026-04-07.md",
-        "prompt-03-foundation-governance-slice-re-audit-2026-04-07.md",
-        "prompt-03-foundation-governance-slice-re-audit-output-2026-04-07.md",
-        "prompt-03-frontend-contract-authority-2026-04-07.md",
-        "prompt-03-platform-re-audit-and-gap-matrix-2026-04-07.md",
-        "prompt-03-priority-waves-and-frontend-readiness-plan-2026-04-07.md",
-        "prompt-03-screen-and-field-definition-catalog-2026-04-07.md",
-        "prompt-03-world-class-reference-architecture-2026-04-07.md"
-      ],
-      "key_outputs": [
-        "Platform re-audit and gap matrix",
-        "World-class reference architecture (ISA-95, Part 11, Annex 11, GAMP 5)",
-        "Domain map and entity catalog (528 tables, 15+ bounded contexts)",
-        "Frontend contract authority rules",
-        "Screen and field definition catalog (P0 entities)",
-        "Priority waves plan (P0/P1/P2)"
-      ]
-    },
-    {
-      "prompt_id": "prompt-04",
-      "name": "Master Orchestrator / Platform Authority Closure",
-      "date": "2026-04-06 (original), 2026-04-07 (updated)",
-      "status": "GO WITH CONDITIONS — updated from NO-GO",
-      "file": "prompt-04-master-orchestrator-final-package-2026-04-06.md",
-      "exists": true
-    },
-    {
-      "prompt_id": "prompt-05",
-      "name": "Repo Truth Reconciliation",
-      "date": "2026-04-07",
-      "status": "PASS — all 9 acceptance gates passed",
-      "files": [
-        "prompt-05-repo-truth-reconciliation-and-platform-gap-closure-output-2026-04-07.md",
-        "prompt-05-repo-truth-reconciliation-and-platform-gap-closure-prompt-2026-04-07.md"
-      ]
-    },
-    {
-      "prompt_id": "prompt-06",
-      "name": "Global Publication Authority and Wave Closure",
-      "date": "2026-04-07",
-      "status": "PASS — 533/533 ready, publishability=true achieved",
-      "files": [
-        "prompt-06-global-publication-authority-and-wave-closure-prompt-2026-04-07.md"
-      ]
-    },
-    {
-      "prompt_id": "prompt-07",
-      "name": "Global Publishability Truth and Platform Closure",
-      "date": "2026-04-07",
-      "status": "EXECUTING",
-      "files": [
-        "prompt-07-global-publishability-truth-and-platform-closure-prompt-2026-04-07.md"
-      ]
-    },
-    {
-      "prompt_id": "prompt-08",
-      "name": "Public-Repo Truth Convergence and Global Release Proof",
-      "date": "2026-04-07",
-      "status": "PASS — public-repo truth convergence achieved",
-      "files": [
-        "prompt-08-public-repo-truth-convergence-and-global-release-proof-2026-04-07.md",
-        "repo-truth-deep-evaluation-after-claimed-prompt07-pass-2026-04-07.md"
-      ]
+  "prompt_lineage": {
+    "version": "3.0.0",
+    "updated_at": "2026-04-08T00:00:00Z",
+    "current_authority": "prompt-03-platform-single-schema-authority-and-global-proof-convergence-prompt-2026-04-07.md",
+    "authority_document": "CURRENT-PLATFORM-AUTHORITY-2026-04-07.md",
+    "publication_run_id": "0b987d57-e143-47f7-96c8-815033baec67",
+    "chain": [
+      {
+        "id": "prompt-01",
+        "role": "architecture",
+        "status": "completed",
+        "description": "Canonical platform architecture — ISA-95 7-layer design",
+        "key_file": "prompt-01-canonical-platform-architecture-package-2026-04-06.md"
+      },
+      {
+        "id": "prompt-02",
+        "role": "implementation",
+        "status": "completed",
+        "description": "Backend implementation — Foundation Governance contract slice runtime",
+        "key_file": "prompt-02-foundation-governance-self-healing-release-candidate-closure-loop-prompt-2026-04-07.md",
+        "note": "Last implementation-driving prompt-02. Created services, controllers, tests, bridges, observability, publication."
+      },
+      {
+        "id": "prompt-03",
+        "role": "convergence",
+        "status": "active",
+        "description": "Platform single-schema authority and global proof convergence after schema merge",
+        "key_file": "prompt-03-platform-single-schema-authority-and-global-proof-convergence-prompt-2026-04-07.md",
+        "note": "Current authority. Convergence pass, not new architecture."
+      },
+      {
+        "id": "prompt-04",
+        "role": "orchestration",
+        "status": "completed",
+        "key_file": "prompt-04-master-orchestrator-final-package-2026-04-06.md"
+      },
+      {
+        "id": "prompt-05",
+        "role": "reconciliation",
+        "status": "completed",
+        "key_file": "prompt-05-repo-truth-reconciliation-and-platform-gap-closure-prompt-2026-04-07.md"
+      },
+      {
+        "id": "prompt-06",
+        "role": "publication",
+        "status": "completed",
+        "key_file": "prompt-06-global-publication-authority-and-wave-closure-prompt-2026-04-07.md"
+      },
+      {
+        "id": "prompt-07",
+        "role": "publishability",
+        "status": "completed",
+        "key_file": "prompt-07-global-publishability-truth-and-platform-closure-prompt-2026-04-07.md"
+      },
+      {
+        "id": "prompt-08",
+        "role": "convergence",
+        "status": "completed",
+        "key_file": "prompt-08-public-repo-truth-convergence-and-global-release-proof-2026-04-07.md"
+      },
+      {
+        "id": "prompt-09",
+        "role": "runtime_assurance",
+        "status": "completed",
+        "key_file": "prompt-09-runtime-assurance-production-hardening-and-frontend-execution-proof-2026-04-07.md"
+      },
+      {
+        "id": "prompt-10",
+        "role": "live_proof",
+        "status": "completed",
+        "key_file": "prompt-10-live-stack-http-ui-collector-and-load-proof-prompt-2026-04-07.md"
+      }
+    ],
+    "file_classification": {
+      "prompt-NN-*-prompt-*.md": "implementation/execution driver",
+      "*-evaluation-*.md": "assessment reference — does not drive implementation",
+      "*-execution-report-*.md": "evidence record of work done"
     }
-  ],
-  "current_canonical_prompt": "prompt-08",
-  "publication_run_ids": [
-    "d82174e7-dc63-4d79-b8c6-fc2a8876eefb"
-  ],
-  "total_prompt_files": 48
+  }
 }

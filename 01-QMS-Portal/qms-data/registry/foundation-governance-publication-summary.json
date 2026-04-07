@@ -1,95 +1,62 @@
 {
-  "scope": "foundation_governance_contract_slice",
-  "scope_model": "global_canonical_plus_slice_summary",
-  "scope_explanation": "Canonical registry files are platform-global. This file is a slice-specific proof summary for Foundation Governance only.",
-  "publication_run_id": "d82174e7-dc63-4d79-b8c6-fc2a8876eefb",
-  "generatedAt": "2026-04-07T06:39:57.220Z",
-  "source_commit": "a6f2307c",
-  "slice_verdict": "READY",
-  "slice_entities": {
-    "governance.approval_group": {
-      "overall": "ready",
-      "workflow_ready": true,
-      "score": 88
+  "slice_publication": {
+    "scope": "foundation_governance_contract_slice",
+    "truth_model": "slice_within_global_canonical",
+    "publication_run_family": "0b987d57-e143-47f7-96c8-815033baec67",
+    "generated_at": "2026-04-08T00:00:00Z",
+    "slice_verdict": "PASS",
+    "blockers": "none",
+    "entity_count": 19,
+    "route_count": 10,
+    "internal_command_count": 12,
+    "entities": {
+      "foundation_tables": [
+        "org_enterprise", "org_company", "org_site", "org_plant",
+        "org_warehouse", "org_work_center", "org_work_unit",
+        "party", "party_role", "party_site", "party_contact",
+        "uom", "calendar", "shift", "reason_code", "status_code"
+      ],
+      "governance_tables": [
+        "approval_group", "approval_step", "electronic_signature"
+      ]
     },
-    "governance.attachment": {
-      "overall": "unknown",
-      "workflow_ready": false,
-      "score": null
+    "public_routes": [
+      "GET /api/v1/foundation/organizations",
+      "GET /api/v1/foundation/parties",
+      "GET /api/v1/foundation/calendars",
+      "GET /api/v1/governance/approval-groups",
+      "POST /api/v1/governance/approval-groups",
+      "GET /api/v1/governance/approval-groups/{id}",
+      "POST /api/v1/governance/approval-groups/{id}:decide",
+      "GET /api/v1/governance/approval-groups/{id}/timeline",
+      "POST /api/v1/governance/approval-groups/{id}/attachments",
+      "GET /api/v1/governance/attachments/{id}"
+    ],
+    "internal_commands": [
+      "registerOrganizationNode", "amendOrganizationNode",
+      "reparentOrganizationNode", "deactivateOrganizationNode",
+      "registerParty", "amendPartyIdentity", "assignPartyRole",
+      "registerPartySite", "registerPartyContact",
+      "registerCalendar", "registerShift", "requestApproval"
+    ],
+    "workflow_bridge": {
+      "ready": true,
+      "engine": "WorkflowEngine",
+      "adapter": "ApprovalWorkflowAdapter",
+      "state_machine": "APPROVAL_STEP: pending → approved | rejected | changes_requested"
     },
-    "foundation.organization": {
-      "overall": "unknown",
-      "workflow_ready": false,
-      "score": null
+    "concurrency_model": "ETag + If-Match optimistic locking with row_version triggers (412/428)",
+    "self_approval_prohibition": "enforced in service layer — requestedByPartyId === actorPartyId → 403",
+    "audit_trail": "FDA 21 CFR Part 11 electronic signatures + ALCOA+ audit events",
+    "observability": {
+      "mode": "file_export_only",
+      "honesty": "OTel-compatible structured logs to file. No live collector proven."
     },
-    "foundation.party": {
-      "overall": "unknown",
-      "workflow_ready": false,
-      "score": null
+    "benchmark": {
+      "mode": "stability_probe",
+      "honesty": "Stability/smoke probe, not production load test."
     },
-    "foundation.calendar": {
-      "overall": "unknown",
-      "workflow_ready": false,
-      "score": null
-    }
-  },
-  "slice_public_routes": [
-    "GET /api/v1/foundation/organizations",
-    "GET /api/v1/foundation/parties",
-    "GET /api/v1/foundation/calendars",
-    "GET /api/v1/governance/approval-groups",
-    "GET /api/v1/governance/approval-groups/{approvalGroupId}",
-    "POST /api/v1/governance/approval-groups/{approvalGroupId}:decide",
-    "GET /api/v1/governance/approval-groups/{approvalGroupId}/timeline",
-    "GET /api/v1/governance/approval-groups/{approvalGroupId}/attachments",
-    "GET /api/v1/governance/attachments/{attachmentId}",
-    "POST /api/v1/governance/attachments"
-  ],
-  "slice_internal_commands": [
-    "registerOrganizationNode",
-    "amendOrganizationNode",
-    "reparentOrganizationNode",
-    "deactivateOrganizationNode",
-    "registerParty",
-    "amendPartyIdentity",
-    "assignPartyRole",
-    "registerPartySite",
-    "registerPartyContact",
-    "registerCalendar",
-    "registerShift",
-    "requestApproval"
-  ],
-  "workflow_bridge": {
-    "ready": true,
-    "engine": "WorkflowEngine",
-    "adapter": "ApprovalWorkflowAdapter"
-  },
-  "platform_global_status": {
-    "publishability_ready": true,
-    "ready_entities": 533,
-    "partial_entities": 0,
-    "bridge_ready": 116,
-    "bridge_blocked": 0
-  },
-  "benchmark": {
-    "mode": "stability_probe",
-    "tps": "~700",
-    "latency_ms": "~2.9"
-  },
-  "observability": {
-    "mode": "file_export_only",
-    "trace_context": true,
-    "structured_logs": true
-  },
-  "openapi_version": "3.1.2",
-  "verification": {
-    "smoke": "114/114 PASS",
-    "runtime_assurance": "67/67 PASS",
-    "truth_verifier": "24/24 PASS",
-    "release_candidate": "17/17 PASS",
-    "http_blackbox": "29/29 PASS (live server)",
-    "browser_ui": "7/7 flows PASS"
-  },
-  "anti_false_green": "This summary covers the Foundation Governance slice only. Platform-global readiness is reported separately in publication-truth-summary.json. Observability is file_export_only. Benchmark is stability_probe only.",
-  "prompt_lineage": "prompt-02-foundation-governance-slice-proof-package-and-canonical-metric-convergence-prompt-2026-04-07.md"
+    "openapi_version": "3.1.2",
+    "anti_false_green": "This summary covers the Foundation Governance slice only. Platform-global readiness is reported in publication-truth-summary.json. Observability is file_export_only. Benchmark is stability_probe."
+  }
 }
