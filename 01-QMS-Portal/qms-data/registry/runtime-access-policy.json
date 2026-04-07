@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-07T06:39:50.602Z",
+    "generatedAt": "2026-04-07T14:38:04.928Z",
     "description": "Runtime access policy generated from domain architecture and table-registry defaults.",
-    "domainPolicyCount": 48,
+    "domainPolicyCount": 49,
     "tableOverrideCount": 105
   },
   "defaults": {
@@ -1112,6 +1112,41 @@
         "ceo",
         "qa_manager",
         "quality_manager"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ]
+    },
+    "foundation_governance": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
       ],
       "delete": [
         "it_admin",

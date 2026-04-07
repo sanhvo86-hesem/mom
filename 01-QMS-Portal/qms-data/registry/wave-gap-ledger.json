@@ -1,17 +1,322 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T06:39:59.441Z",
-    "publication_run_id": "d82174e7-dc63-4d79-b8c6-fc2a8876eefb",
+    "generatedAt": "2026-04-07T14:38:14.293Z",
+    "publication_run_id": "c4774bed-3928-4a1a-b200-0d339e8d4c78",
     "generator_name": "canonical_publication_orchestrator",
     "source_catalog": "qms-data/registry/frontend-foundation-catalog.json"
   },
   "summary": {
-    "total_entities": 533,
+    "total_entities": 552,
     "ready": 533,
     "partial": 0,
-    "blocked": 0,
+    "blocked": 19,
     "partial_by_reason": {},
     "closure_modes": {}
   },
-  "entities": {}
+  "entities": {
+    "foundation_governance.org_enterprise": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.org_company": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.org_site": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.org_plant": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.org_warehouse": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.org_work_center": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.org_work_unit": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.party": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.party_role": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.party_site": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.party_contact": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.uom": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.calendar": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.shift": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.reason_code": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.status_code": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.electronic_signature": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.approval": {
+      "verdict": "blocked",
+      "score": 49,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    },
+    "foundation_governance.attachment": {
+      "verdict": "blocked",
+      "score": 44,
+      "blockers": [
+        "missing_list_endpoint",
+        "insufficient_list_fields",
+        "missing_detail_endpoint",
+        "missing_detail_sections",
+        "missing_form_mutation_endpoints",
+        "missing_editable_fields"
+      ],
+      "reason_bucket": "blocked",
+      "closure_mode": "manual_domain_decision",
+      "wave_assignment": "P0",
+      "blocker_summary": "Entity is fully blocked"
+    }
+  }
 }

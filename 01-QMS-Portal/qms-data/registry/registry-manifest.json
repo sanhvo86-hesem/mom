@@ -2,13 +2,13 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-07T06:39:57.220Z",
+    "generatedAt": "2026-04-07T14:38:11.802Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "d82174e7-dc63-4d79-b8c6-fc2a8876eefb"
+    "publication_run_id": "c4774bed-3928-4a1a-b200-0d339e8d4c78"
   },
   "coverage": {
-    "router_actions": 2862,
+    "router_actions": 2865,
     "field_registry_actions": 2872,
     "field_definitions": 39672,
     "unique_field_keys": 4041,
@@ -17,30 +17,30 @@
     "relation_edges": 2440,
     "validation_rules": 27794,
     "formula_count": 960,
-    "domain_pack_count": 3168,
-    "scalar_record_endpoints": 2762,
+    "domain_pack_count": 3282,
+    "scalar_record_endpoints": 2765,
     "workflow_runtime_modes": {
       "stateless": 291,
-      "generic_status_only": 122,
+      "generic_status_only": 124,
       "persisted": 115,
       "unknown": 0
     },
     "deletion_modes": {
       "hard_delete": 100,
       "soft_delete": 0,
-      "archive_only": 428
+      "archive_only": 430
     },
     "workflow_engine_bridge": {
       "ready": 116,
       "blocked": 0,
-      "unneeded": 413
+      "unneeded": 415
     },
     "frontend_foundation": {
-      "entity_count": 533,
+      "entity_count": 552,
       "ready_entities": 533,
       "partial_entities": 0,
-      "blocked_entities": 0,
-      "workflow_ready_entities": 223,
+      "blocked_entities": 19,
+      "workflow_ready_entities": 239,
       "related_ready_entities": 513,
       "analytics_ready_entities": 483,
       "planning_console_entities": 28,
@@ -54,7 +54,7 @@
     },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
-      "records": 2862
+      "records": 2865
     },
     "runtime-access-policy.json": {
       "kind": "runtime-access-policy",
@@ -62,7 +62,7 @@
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 3168
+      "records": 3282
     },
     "relation-map.json": {
       "kind": "relation-map",
@@ -70,7 +70,7 @@
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
-      "records": 533
+      "records": 552
     },
     "workflow-library.json": {
       "kind": "workflow-library",

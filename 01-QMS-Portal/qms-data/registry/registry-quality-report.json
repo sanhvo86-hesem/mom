@@ -2,16 +2,16 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-07T06:39:57.220Z",
+    "generatedAt": "2026-04-07T14:38:11.802Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "d82174e7-dc63-4d79-b8c6-fc2a8876eefb"
+    "publication_run_id": "c4774bed-3928-4a1a-b200-0d339e8d4c78"
   },
   "summary": {
-    "endpoint_count": 2862,
-    "pack_count": 3168,
+    "endpoint_count": 2865,
+    "pack_count": 3282,
     "relation_edge_count": 2440,
     "workflow_count": 425,
     "status_set_count": 536,
@@ -19,69 +19,86 @@
     "formula_count": 960,
     "formula_reference_count": 960,
     "field_context_count": 39672,
-    "row_version_tables": 408,
-    "org_scoped_tables": 408,
+    "row_version_tables": 547,
+    "org_scoped_tables": 547,
     "composite_pk_tables": 19,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
     "optimistic_concurrency_issues": 0,
     "org_scope_contract_issues": 0,
-    "contract_issues": 0,
+    "contract_issues": 16,
     "workflow_alignment_issues": 0,
     "transition_runtime_warnings": 115,
     "workflow_engine_bridge_ready": 116,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 428,
+    "archive_only_tables": 444,
     "soft_delete_tables": 0,
-    "hard_delete_tables": 100,
+    "hard_delete_tables": 103,
     "workflow_lifecycle_modes": {
-      "stateless": 291,
-      "generic_status_only": 122,
+      "stateless": 294,
+      "generic_status_only": 138,
       "persisted": 115,
       "unknown": 0
     },
-    "frontend_foundation_entities": 533,
+    "frontend_foundation_entities": 552,
     "frontend_ready_entities": 533,
     "frontend_partial_entities": 0,
-    "frontend_blocked_entities": 0,
-    "attachment_contract_entities": 521,
-    "comment_contract_entities": 521,
-    "activity_contract_entities": 411,
-    "publishability_ready": true,
-    "publishability_review_required_entities": 0
+    "frontend_blocked_entities": 19,
+    "attachment_contract_entities": 547,
+    "comment_contract_entities": 547,
+    "activity_contract_entities": 547,
+    "publishability_ready": false,
+    "publishability_review_required_entities": 19
   },
   "publishability": {
-    "ready": true,
-    "status": "ready",
-    "review_required": false,
-    "failed_checks": [],
+    "ready": false,
+    "status": "review_required",
+    "review_required": true,
+    "failed_checks": [
+      {
+        "id": "frontend_entities_publishable",
+        "passed": false,
+        "actual": 19,
+        "target": 0
+      },
+      {
+        "id": "record_endpoint_contracts_clean",
+        "passed": false,
+        "actual": 16,
+        "target": 0
+      }
+    ],
     "blocking_counts": {
       "frontend_partial_entities": 0,
-      "frontend_blocked_entities": 0,
+      "frontend_blocked_entities": 19,
       "workflow_engine_bridge_blocked": 0,
       "unsupported_record_endpoints": 0,
-      "contract_issues": 0
+      "contract_issues": 16
     },
-    "recommended_next_actions": []
+    "recommended_next_actions": [
+      "Promote partial frontend foundation entities into publishable contracts.",
+      "Bridge persisted workflows into the workflow engine before exposing transition UX.",
+      "Resolve remaining record endpoint/runtime contract gaps before publishing modules."
+    ]
   },
   "checks": [
     {
       "id": "tables_have_fields",
-      "passed": true,
+      "passed": false,
       "actual": 528,
-      "target": 528
+      "target": 547
     },
     {
       "id": "tables_have_endpoint_catalog",
-      "passed": true,
+      "passed": false,
       "actual": 528,
-      "target": 528
+      "target": 547
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 528,
-      "target": 528
+      "actual": 547,
+      "target": 547
     },
     {
       "id": "fk_edges_covered",
@@ -91,21 +108,21 @@
     },
     {
       "id": "workflow_coverage",
-      "passed": true,
+      "passed": false,
       "actual": 528,
-      "target": 528
+      "target": 547
     },
     {
       "id": "status_coverage",
-      "passed": true,
+      "passed": false,
       "actual": 222,
-      "target": 222
+      "target": 238
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 509,
-      "target": 496
+      "actual": 528,
+      "target": 515
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -128,8 +145,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 528,
-      "target": 528
+      "actual": 547,
+      "target": 547
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -139,8 +156,8 @@
     },
     {
       "id": "endpoint_contract_readiness",
-      "passed": true,
-      "actual": 0,
+      "passed": false,
+      "actual": 16,
       "target": 0
     },
     {
@@ -213,11 +230,23 @@
         "concurrency_field": "row_version"
       },
       {
+        "table": "aps_demand_forecast_lines",
+        "concurrency_field": "row_version"
+      },
+      {
         "table": "aps_demand_forecasts",
         "concurrency_field": "row_version"
       },
       {
+        "table": "aps_kpi_snapshots",
+        "concurrency_field": "row_version"
+      },
+      {
         "table": "aps_material_availability",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_pegging_links",
         "concurrency_field": "row_version"
       },
       {
@@ -242,6 +271,10 @@
       },
       {
         "table": "audit_actions",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit_events",
         "concurrency_field": "row_version"
       },
       {
@@ -273,11 +306,19 @@
         "concurrency_field": "row_version"
       },
       {
+        "table": "capa_8d_steps",
+        "concurrency_field": "row_version"
+      },
+      {
         "table": "capa_effectiveness_checks",
         "concurrency_field": "row_version"
       },
       {
         "table": "capa_records",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "capacity_snapshots",
         "concurrency_field": "row_version"
       },
       {
@@ -289,11 +330,19 @@
         "concurrency_field": "row_version"
       },
       {
+        "table": "cnc_program_versions",
+        "concurrency_field": "row_version"
+      },
+      {
         "table": "cnc_programs",
         "concurrency_field": "row_version"
       },
       {
         "table": "com_contract_amendments",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_contract_lines",
         "concurrency_field": "row_version"
       },
       {
@@ -318,6 +367,10 @@
       },
       {
         "table": "com_payment_terms_profiles",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_price_list_lines",
         "concurrency_field": "row_version"
       },
       {
@@ -350,6 +403,10 @@
       },
       {
         "table": "contamination_checks",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "contract_review_items",
         "concurrency_field": "row_version"
       },
       {
@@ -386,46 +443,6 @@
       },
       {
         "table": "crm_customer_touchpoints",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "crm_forecasts",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "crm_leads",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "crm_opportunities",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "crm_quotes_pipeline",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "customer_complaints",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "customer_sites",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "customers",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "demand_classifications",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "demand_history_buckets",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "departments",
         "concurrency_field": "row_version"
       }
     ],
@@ -485,6 +502,15 @@
         ]
       },
       {
+        "table": "aps_demand_forecast_lines",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
         "table": "aps_demand_forecasts",
         "scope_fields": [
           "org_company_code",
@@ -494,7 +520,25 @@
         ]
       },
       {
+        "table": "aps_kpi_snapshots",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
         "table": "aps_material_availability",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_pegging_links",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -549,6 +593,15 @@
       },
       {
         "table": "audit_actions",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit_events",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -620,6 +673,15 @@
         ]
       },
       {
+        "table": "capa_8d_steps",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
         "table": "capa_effectiveness_checks",
         "scope_fields": [
           "org_company_code",
@@ -630,6 +692,15 @@
       },
       {
         "table": "capa_records",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "capacity_snapshots",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -656,6 +727,15 @@
         ]
       },
       {
+        "table": "cnc_program_versions",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
         "table": "cnc_programs",
         "scope_fields": [
           "org_company_code",
@@ -666,6 +746,15 @@
       },
       {
         "table": "com_contract_amendments",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_contract_lines",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -720,6 +809,15 @@
       },
       {
         "table": "com_payment_terms_profiles",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_price_list_lines",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -792,6 +890,15 @@
       },
       {
         "table": "contamination_checks",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "contract_review_items",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -873,96 +980,6 @@
       },
       {
         "table": "crm_customer_touchpoints",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "crm_forecasts",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "crm_leads",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "crm_opportunities",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "crm_quotes_pipeline",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "customer_complaints",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "customer_sites",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "customers",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "demand_classifications",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "demand_history_buckets",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "departments",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -1131,7 +1148,24 @@
     "unsupported_record_endpoints": [],
     "optimistic_concurrency_issues": [],
     "org_scope_contract_issues": [],
-    "contract_issues": [],
+    "contract_issues": [
+      "foundation_governance.org_enterprise.transition:missing_targets",
+      "foundation_governance.org_company.transition:missing_targets",
+      "foundation_governance.org_site.transition:missing_targets",
+      "foundation_governance.org_plant.transition:missing_targets",
+      "foundation_governance.org_warehouse.transition:missing_targets",
+      "foundation_governance.org_work_center.transition:missing_targets",
+      "foundation_governance.org_work_unit.transition:missing_targets",
+      "foundation_governance.party.transition:missing_targets",
+      "foundation_governance.party_role.transition:missing_targets",
+      "foundation_governance.party_site.transition:missing_targets",
+      "foundation_governance.party_contact.transition:missing_targets",
+      "foundation_governance.uom.transition:missing_targets",
+      "foundation_governance.calendar.transition:missing_targets",
+      "foundation_governance.shift.transition:missing_targets",
+      "foundation_governance.status_code.transition:missing_targets",
+      "foundation_governance.approval.transition:missing_targets"
+    ],
     "workflow_alignment_issues": [],
     "transition_runtime_warnings": [
       {
@@ -1778,7 +1812,255 @@
         "governance_level": "governed"
       }
     ],
-    "frontend_foundation": []
+    "frontend_foundation": [
+      {
+        "entity_key": "foundation_governance.org_enterprise",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.org_company",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.org_site",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.org_plant",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.org_warehouse",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.org_work_center",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.org_work_unit",
+        "profile": "master_data",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.party",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.party_role",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.party_site",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.party_contact",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.uom",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.calendar",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.shift",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.reason_code",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "foundation_governance.status_code",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.electronic_signature",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      },
+      {
+        "entity_key": "foundation_governance.approval",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 49
+      },
+      {
+        "entity_key": "foundation_governance.attachment",
+        "profile": "business_record",
+        "blockers": [
+          "missing_list_endpoint",
+          "insufficient_list_fields",
+          "missing_detail_endpoint",
+          "missing_detail_sections",
+          "missing_form_mutation_endpoints",
+          "missing_editable_fields"
+        ],
+        "score": 44
+      }
+    ]
   },
-  "all_passed": true
+  "all_passed": false
 }

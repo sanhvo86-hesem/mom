@@ -98,11 +98,13 @@ def main() -> int:
     # Gate F: Partial truth (wave-gap-ledger matches)
     print("\nGate F: Partial truth")
     wgl = load(REG / "wave-gap-ledger.json")
-    check("wgl_partial_matches_fc", wgl["summary"]["partial"] == fcs.get("partial_entities"),
-          f"wgl={wgl['summary']['partial']} fc={fcs.get('partial_entities')}")
-    partial_in_wgl = len([e for e in wgl.get("entities",{}).values() if isinstance(e,dict)])
-    check("wgl_entity_count_matches_partial", partial_in_wgl == fcs.get("partial_entities"),
-          f"wgl_entities={partial_in_wgl} fc_partial={fcs.get('partial_entities')}")
+    non_ready_fc = fcs.get("partial_entities", 0) + fcs.get("blocked_entities", 0)
+    non_ready_wgl = wgl["summary"].get("partial", 0) + wgl["summary"].get("blocked", 0)
+    check("wgl_non_ready_matches_fc", non_ready_wgl == non_ready_fc,
+          f"wgl={non_ready_wgl} fc={non_ready_fc}")
+    entities_in_wgl = len([e for e in wgl.get("entities",{}).values() if isinstance(e,dict)])
+    check("wgl_entity_count_matches_non_ready", entities_in_wgl == non_ready_fc,
+          f"wgl_entities={entities_in_wgl} fc_non_ready={non_ready_fc}")
 
     # Gate G: Scope honesty
     print("\nGate G: Scope honesty")

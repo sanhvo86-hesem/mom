@@ -1,24 +1,24 @@
 {
-  "publication_run_id": "2bee0601-f1fa-404b-994b-c5381106762c",
-  "generatedAt": "2026-04-07T06:39:59.458Z",
-  "source_commit": "150bdbcd",
+  "publication_run_id": "822d927b-dd16-44e1-82fc-a5a9c6ad6fcd",
+  "generatedAt": "2026-04-07T14:38:14.309Z",
+  "source_commit": "ecb0c2c0",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "fe4ade1f9d2a1d6b84222ee0c36d177553f493469019e4afeda907fea5799f5f",
-    "frontend-foundation-catalog.json": "9fe19378b3321e867374920d48e6ce9a2568810e7893beebf866e277968247ab",
-    "registry-manifest.json": "a6477b237fc48ac074da1d5747768216f1459c58bb3e70f0e1e7da57f79a4720",
-    "registry-quality-report.json": "98f4a6dd1f258abbc04734369ac3d68a272c7d435549832bc02abb23acac368a",
-    "domain-field-packs.json": "5166af5e1878e4e4eec07d8b938d4fae79f78f1fcfd8fa592e9e04a30df5f368",
+    "endpoint-catalog.json": "9782e9fe53f0ce0349bfa4b1168e7e016f3083bf5890dbd5af8b2b1ec68782e0",
+    "frontend-foundation-catalog.json": "2083e7b2ce578e7964801a886dc4587ed9859a122a7a8f9be1ec6e9861d3550a",
+    "registry-manifest.json": "3321632cd220157dd9bb497a33b3da0747b515aa94a8ee10ecbcb86ac861b427",
+    "registry-quality-report.json": "76a44b8b2d638c699c2eb3bf2e6c3c97e9e17aa65c8a8f9165cd78c0fb0ef1e0",
+    "domain-field-packs.json": "4d4b9a7a1f0a5aa02e899c0c3dee9f6f555c81bbf66899c5a08081c1c5a824e6",
     "data-fields-part2.json": "61b73b0d47034449b103fc52abc22b58cf0fdd01e17da37a194a303c992cde72",
-    "wave-gap-ledger.json": "2a0d8f3937b2b16eee359fd631601099d1f245ec8b83c400273690f555e2daf6"
+    "wave-gap-ledger.json": "1b739cbb22dd2ea60a56d7658df45930a9a3eb7c296b63a304bd75ad1c3ec33b"
   },
   "summary_counts": {
     "ready": 533,
     "partial": 0,
-    "blocked": 0,
-    "wf_ready": 223,
+    "blocked": 19,
+    "wf_ready": 239,
     "bridge_ready": 116,
     "bridge_blocked": 0,
     "endpoints": 2872
@@ -32,7 +32,7 @@
     {
       "name": "frontend_entity_counts_consistent",
       "status": "PASS",
-      "detail": "summary.entity_count=533 vs actual=533; ready=533/533; partial=0/0; blocked=0/0"
+      "detail": "summary.entity_count=552 vs actual=552; ready=533/533; partial=0/0; blocked=19/19"
     },
     {
       "name": "bridge_counts_consistent",
@@ -42,7 +42,7 @@
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['d82174e7-dc63-4d79-b8c6-fc2a8876eefb']"
+      "detail": "distinct_run_ids=['c4774bed-3928-4a1a-b200-0d339e8d4c78']"
     },
     {
       "name": "approval_group_not_split_truth",
