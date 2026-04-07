@@ -2,11 +2,11 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-07T01:52:34.067Z",
+    "generatedAt": "2026-04-07T03:26:12.380Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
-    "publication_run_id": "6f52becb-b777-4517-a068-6afe91eab08c"
+    "publication_run_id": "6729d21b-8aeb-4d09-96b9-8383a144e2bf"
   },
   "summary": {
     "endpoint_count": 2862,
@@ -17,7 +17,7 @@
     "validation_rule_count": 27794,
     "formula_count": 960,
     "formula_reference_count": 960,
-    "field_context_count": 39604,
+    "field_context_count": 39672,
     "row_version_tables": 408,
     "org_scoped_tables": 408,
     "composite_pk_tables": 19,
@@ -28,8 +28,8 @@
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
     "transition_runtime_warnings": 115,
-    "workflow_engine_bridge_ready": 2,
-    "workflow_engine_bridge_blocked": 113,
+    "workflow_engine_bridge_ready": 105,
+    "workflow_engine_bridge_blocked": 10,
     "archive_only_tables": 428,
     "soft_delete_tables": 0,
     "hard_delete_tables": 100,
@@ -40,14 +40,14 @@
       "unknown": 0
     },
     "frontend_foundation_entities": 533,
-    "frontend_ready_entities": 335,
-    "frontend_partial_entities": 198,
+    "frontend_ready_entities": 419,
+    "frontend_partial_entities": 114,
     "frontend_blocked_entities": 0,
     "attachment_contract_entities": 521,
     "comment_contract_entities": 521,
     "activity_contract_entities": 411,
     "publishability_ready": false,
-    "publishability_review_required_entities": 198
+    "publishability_review_required_entities": 114
   },
   "publishability": {
     "ready": false,
@@ -57,20 +57,20 @@
       {
         "id": "frontend_entities_publishable",
         "passed": false,
-        "actual": 198,
+        "actual": 114,
         "target": 0
       },
       {
         "id": "workflow_engine_bridges_ready",
         "passed": false,
-        "actual": 115,
+        "actual": 12,
         "target": 0
       }
     ],
     "blocking_counts": {
-      "frontend_partial_entities": 198,
+      "frontend_partial_entities": 114,
       "frontend_blocked_entities": 0,
-      "workflow_engine_bridge_blocked": 115,
+      "workflow_engine_bridge_blocked": 12,
       "unsupported_record_endpoints": 0,
       "contract_issues": 0
     },
@@ -1154,42 +1154,42 @@
         "table": "apqp_gate_reviews",
         "workflowId": "wf_apqp_project",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "apqp_projects",
         "workflowId": "wf_apqp_project",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "aps_planning_horizons",
         "workflowId": "wf_aps_planning_horizon",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "audit_actions",
         "workflowId": "wf_audit_action",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "calibration_grr_studies",
         "workflowId": "wf_calibration_control",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "calibration_oot_investigations",
         "workflowId": "wf_calibration_control",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1203,28 +1203,28 @@
         "table": "capa_effectiveness_checks",
         "workflowId": "wf_capa",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "capa_records",
         "workflowId": "wf_capa",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "certificates",
         "workflowId": "wf_certificate",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "cnc_program_approvals",
         "workflowId": "wf_cnc_program_approval",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1238,35 +1238,35 @@
         "table": "cnc_programs",
         "workflowId": "wf_cnc_program_approval",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "concessions",
         "workflowId": "wf_concession",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "control_plans",
         "workflowId": "wf_fmea",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "customer_complaints",
         "workflowId": "wf_customer_complaint",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "deviations",
         "workflowId": "wf_deviation",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1280,7 +1280,7 @@
         "table": "documents",
         "workflowId": "wf_document_change_control",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1294,342 +1294,163 @@
         "table": "ehs_corrective_actions",
         "workflowId": "wf_ehs_corrective_action",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "ehs_incidents",
         "workflowId": "wf_ehs_incident",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "ehs_permit_register",
         "workflowId": "wf_ehs_permit_register",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "ehs_regulatory_submissions",
         "workflowId": "wf_ehs_regulatory_submission",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "ehs_sustainability_projects",
         "workflowId": "wf_ehs_incident",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "employee_certifications",
         "workflowId": "wf_employee_certification",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "export_licenses",
         "workflowId": "wf_export_licens",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fin_customs_declarations",
         "workflowId": "wf_fin_customs_declaration",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fin_lc_draw_requests",
         "workflowId": "wf_fin_lc_draw_request",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fin_letters_of_credit",
         "workflowId": "wf_fin_letters_of_credit",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fin_multi_book_ledgers",
         "workflowId": "wf_fin_multi_book_ledger",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fin_withholding_tax_codes",
         "workflowId": "wf_fin_withholding_tax_code",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fmea_actions",
         "workflowId": "wf_fmea",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fmea_failure_modes",
         "workflowId": "wf_fmea",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "fmea_records",
         "workflowId": "wf_fmea",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "form_schemas",
         "workflowId": "wf_form_schema",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "hcm_certifications",
         "workflowId": "wf_hcm_certification",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "hcm_disciplinary_actions",
         "workflowId": "wf_hcm_disciplinary_action",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "hcm_org_units",
         "workflowId": "wf_hcm_org_unit",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
         "table": "hcm_payroll_periods",
         "workflowId": "wf_hcm_payroll_period",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       }
     ],
     "workflow_engine_bridge": [
       {
-        "table": "apqp_gate_reviews",
-        "workflowId": "wf_apqp_project",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "apqp_projects",
-        "workflowId": "wf_apqp_project",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "aps_planning_horizons",
-        "workflowId": "wf_aps_planning_horizon",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "audit_actions",
-        "workflowId": "wf_audit_action",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "calibration_grr_studies",
-        "workflowId": "wf_calibration_control",
-        "record_type": "CAL",
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "calibration_oot_investigations",
-        "workflowId": "wf_calibration_control",
-        "record_type": "CAL",
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
         "table": "capa_8d_steps",
         "workflowId": "wf_capa",
         "record_type": "CAPA",
         "identity_field": null,
-        "state_alignment_ratio": 0.5,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_engine_record_identity",
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "capa_effectiveness_checks",
-        "workflowId": "wf_capa",
-        "record_type": "CAPA",
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0.5,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "capa_records",
-        "workflowId": "wf_capa",
-        "record_type": "CAPA",
-        "identity_field": "record_id",
-        "state_alignment_ratio": 0.5,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "certificates",
-        "workflowId": "wf_certificate",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "cnc_program_approvals",
-        "workflowId": "wf_cnc_program_approval",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
         "table": "cnc_program_versions",
         "workflowId": "wf_cnc_program_approval",
-        "record_type": null,
+        "record_type": "CNC_PROGRAM_APPROVAL",
         "identity_field": null,
-        "state_alignment_ratio": 0,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_record_identity",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "cnc_programs",
-        "workflowId": "wf_cnc_program_approval",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "concessions",
-        "workflowId": "wf_concession",
-        "record_type": null,
-        "identity_field": "record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "control_plans",
-        "workflowId": "wf_fmea",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "customer_complaints",
-        "workflowId": "wf_customer_complaint",
-        "record_type": null,
-        "identity_field": "record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "deviations",
-        "workflowId": "wf_deviation",
-        "record_type": null,
-        "identity_field": "record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
@@ -1638,274 +1459,108 @@
         "workflowId": "wf_document_change_control",
         "record_type": "DOC",
         "identity_field": null,
-        "state_alignment_ratio": 0.667,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_engine_record_identity",
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "documents",
-        "workflowId": "wf_document_change_control",
-        "record_type": "DOC",
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0.667,
-        "block_reasons": [
-          "state_model_mismatch"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
         "table": "dw_supplier_dim",
         "workflowId": "wf_dw_supplier_dim",
-        "record_type": null,
+        "record_type": "DW_SUPPLIER_DIM",
         "identity_field": null,
-        "state_alignment_ratio": 0,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_record_identity",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "ehs_corrective_actions",
-        "workflowId": "wf_ehs_corrective_action",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
+        "table": "incoming_inspection_results",
+        "workflowId": "wf_receiving_inspection",
+        "record_type": "RECEIVING_INSPECTION",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "ehs_incidents",
-        "workflowId": "wf_ehs_incident",
-        "record_type": null,
-        "identity_field": "record_id",
-        "state_alignment_ratio": 0,
+        "table": "integration_monitors",
+        "workflowId": "wf_integration_monitor",
+        "record_type": "INTEGRATION_MONITOR",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "ehs_permit_register",
-        "workflowId": "wf_ehs_permit_register",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
+        "table": "job_operations",
+        "workflowId": "wf_job_order",
+        "record_type": "JOB_ORDER",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "ehs_regulatory_submissions",
-        "workflowId": "wf_ehs_regulatory_submission",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
+        "table": "passport_events",
+        "workflowId": "wf_product_passport",
+        "record_type": "PRODUCT_PASSPORT",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "ehs_sustainability_projects",
-        "workflowId": "wf_ehs_incident",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
+        "table": "purchase_order_lines",
+        "workflowId": "wf_purchase_order",
+        "record_type": "PURCHASE_ORDER",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "employee_certifications",
-        "workflowId": "wf_employee_certification",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
+        "table": "quote_history",
+        "workflowId": "wf_quote_lifecycle",
+        "record_type": "QUOTE_LIFECYCLE",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "export_licenses",
-        "workflowId": "wf_export_licens",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
+        "table": "retention_policies",
+        "workflowId": "wf_retention_policy",
+        "record_type": "RETENTION_POLICY",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       },
       {
-        "table": "fin_customs_declarations",
-        "workflowId": "wf_fin_customs_declaration",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
+        "table": "sales_order_lines",
+        "workflowId": "wf_sales_order",
+        "record_type": "SALES_ORDER",
+        "identity_field": null,
+        "state_alignment_ratio": 1,
         "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "fin_lc_draw_requests",
-        "workflowId": "wf_fin_lc_draw_request",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "fin_letters_of_credit",
-        "workflowId": "wf_fin_letters_of_credit",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "fin_multi_book_ledgers",
-        "workflowId": "wf_fin_multi_book_ledger",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "fin_withholding_tax_codes",
-        "workflowId": "wf_fin_withholding_tax_code",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "fmea_actions",
-        "workflowId": "wf_fmea",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "fmea_failure_modes",
-        "workflowId": "wf_fmea",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "fmea_records",
-        "workflowId": "wf_fmea",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "form_schemas",
-        "workflowId": "wf_form_schema",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "hcm_certifications",
-        "workflowId": "wf_hcm_certification",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "hcm_disciplinary_actions",
-        "workflowId": "wf_hcm_disciplinary_action",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "hcm_org_units",
-        "workflowId": "wf_hcm_org_unit",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "hcm_payroll_periods",
-        "workflowId": "wf_hcm_payroll_period",
-        "record_type": null,
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "missing_explicit_record_type_mapping",
-          "missing_engine_state_model"
+          "missing_engine_record_identity"
         ],
         "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
       }
