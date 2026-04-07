@@ -1,18 +1,18 @@
 {
-  "publication_run_id": "ba5a0fe7-22c9-4d68-88f0-382d7517c864",
-  "generatedAt": "2026-04-07T06:09:27.995Z",
-  "source_commit": "786e7250",
+  "publication_run_id": "2bee0601-f1fa-404b-994b-c5381106762c",
+  "generatedAt": "2026-04-07T06:39:59.458Z",
+  "source_commit": "150bdbcd",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "28177bbeac8a9d7390b80031ae36f3d25a0697e9dc68b5cf70ea1c5c9cbcc3d0",
-    "frontend-foundation-catalog.json": "ef9c618aa5e3d59aae403707f073f991709243427373617504aeee67c5149f0c",
-    "registry-manifest.json": "2ed27391f9d398a3ee8d20df200423a0b6dccd08f0a5f6f7fa85f8dedf30bd74",
-    "registry-quality-report.json": "f57d9ab5b4871eed7acb15abac849246cfddcd961f48b110c8722c3e6f9b80eb",
-    "domain-field-packs.json": "deade24bdba7c607b71b169eeb3faa364ff91ab69d90395cd524a0160f1fbd0b",
+    "endpoint-catalog.json": "fe4ade1f9d2a1d6b84222ee0c36d177553f493469019e4afeda907fea5799f5f",
+    "frontend-foundation-catalog.json": "9fe19378b3321e867374920d48e6ce9a2568810e7893beebf866e277968247ab",
+    "registry-manifest.json": "a6477b237fc48ac074da1d5747768216f1459c58bb3e70f0e1e7da57f79a4720",
+    "registry-quality-report.json": "98f4a6dd1f258abbc04734369ac3d68a272c7d435549832bc02abb23acac368a",
+    "domain-field-packs.json": "5166af5e1878e4e4eec07d8b938d4fae79f78f1fcfd8fa592e9e04a30df5f368",
     "data-fields-part2.json": "61b73b0d47034449b103fc52abc22b58cf0fdd01e17da37a194a303c992cde72",
-    "wave-gap-ledger.json": "9b189d8443fbc348fe260cdb1a77a9cc09eb2d167c9614e9357e35ea3b493304"
+    "wave-gap-ledger.json": "2a0d8f3937b2b16eee359fd631601099d1f245ec8b83c400273690f555e2daf6"
   },
   "summary_counts": {
     "ready": 533,
@@ -42,7 +42,7 @@
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['bc410f68-84c7-44a2-804e-c6c231c7eddc']"
+      "detail": "distinct_run_ids=['d82174e7-dc63-4d79-b8c6-fc2a8876eefb']"
     },
     {
       "name": "approval_group_not_split_truth",

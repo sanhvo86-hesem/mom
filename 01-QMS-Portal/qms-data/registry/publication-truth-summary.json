@@ -1,0 +1,44 @@
+{
+  "publication_run_id": "d82174e7-dc63-4d79-b8c6-fc2a8876eefb",
+  "generatedAt": "2026-04-07T06:39:57.220Z",
+  "source_commit": "150bdbcd",
+  "publication_scope": "platform_global",
+  "openapi_version": "3.1.2",
+  "publishability_ready": true,
+  "entity_count": 533,
+  "ready_entities": 533,
+  "partial_entities": 0,
+  "blocked_entities": 0,
+  "workflow_ready_entities": 223,
+  "workflow_engine_bridge_ready": 116,
+  "workflow_engine_bridge_blocked": 0,
+  "endpoint_count": 2862,
+  "field_definitions": 39672,
+  "workflow_count": 425,
+  "benchmark": {
+    "status": "stability_probe_completed",
+    "profile": "stability_probe",
+    "tps": "~700",
+    "latency_ms": "~2.9"
+  },
+  "observability": {
+    "status": "file_export_only",
+    "trace_context": true,
+    "structured_logs": true,
+    "live_collector": false
+  },
+  "verification": {
+    "smoke_checks": "114/114 PASS",
+    "truth_verifier": "24/24 PASS",
+    "orchestrator_invariants": "5/5 PASS"
+  },
+  "standards_compliance": {
+    "openapi_3_1_2": true,
+    "rfc_9457": true,
+    "json_schema_2020_12": true,
+    "fda_part_11": true,
+    "eu_annex_11": true,
+    "isa_95": true,
+    "otel": "partial (file_export_only)"
+  }
+}

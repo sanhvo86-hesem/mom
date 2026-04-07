@@ -78,6 +78,9 @@ SLICE_ENTITY_OVERRIDES = {
 # Number of workflow-engine bridges newly ready in this slice (added to global count)
 SLICE_BRIDGE_READY_INCREMENT = 1
 
+# Publication scope: elevated to platform_global when all entities are ready
+PUBLICATION_SCOPE = "platform_global"
+
 
 def make_timestamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
@@ -89,6 +92,7 @@ def regenerate_all() -> dict:
     meta_patch = {
         "generatedAt": now,
         "slice_publication_pass": "foundation_governance_contract_slice",
+        "publication_scope": PUBLICATION_SCOPE,
         "publication_run_id": run_id,
     }
 
