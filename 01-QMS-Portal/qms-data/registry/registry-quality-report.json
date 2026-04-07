@@ -2,11 +2,11 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-07T06:02:55.956Z",
+    "generatedAt": "2026-04-07T06:09:25.585Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
-    "publication_run_id": "41ad98f5-c72e-4c88-8de1-bcf3dd3ff548"
+    "publication_run_id": "bc410f68-84c7-44a2-804e-c6c231c7eddc"
   },
   "summary": {
     "endpoint_count": 2862,
@@ -28,8 +28,8 @@
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
     "transition_runtime_warnings": 115,
-    "workflow_engine_bridge_ready": 109,
-    "workflow_engine_bridge_blocked": 6,
+    "workflow_engine_bridge_ready": 116,
+    "workflow_engine_bridge_blocked": 0,
     "archive_only_tables": 428,
     "soft_delete_tables": 0,
     "hard_delete_tables": 100,
@@ -46,33 +46,22 @@
     "attachment_contract_entities": 521,
     "comment_contract_entities": 521,
     "activity_contract_entities": 411,
-    "publishability_ready": false,
+    "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
   "publishability": {
-    "ready": false,
-    "status": "review_required",
-    "review_required": true,
-    "failed_checks": [
-      {
-        "id": "workflow_engine_bridges_ready",
-        "passed": false,
-        "actual": 7,
-        "target": 0
-      }
-    ],
+    "ready": true,
+    "status": "ready",
+    "review_required": false,
+    "failed_checks": [],
     "blocking_counts": {
       "frontend_partial_entities": 0,
       "frontend_blocked_entities": 0,
-      "workflow_engine_bridge_blocked": 7,
+      "workflow_engine_bridge_blocked": 0,
       "unsupported_record_endpoints": 0,
       "contract_issues": 0
     },
-    "recommended_next_actions": [
-      "Promote partial frontend foundation entities into publishable contracts.",
-      "Bridge persisted workflows into the workflow engine before exposing transition UX.",
-      "Resolve remaining record endpoint/runtime contract gaps before publishing modules."
-    ]
+    "recommended_next_actions": []
   },
   "checks": [
     {
@@ -1225,7 +1214,7 @@
         "table": "cnc_program_versions",
         "workflowId": "wf_cnc_program_approval",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1267,7 +1256,7 @@
         "table": "document_versions",
         "workflowId": "wf_document_change_control",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1425,85 +1414,7 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       }
     ],
-    "workflow_engine_bridge": [
-      {
-        "table": "cnc_program_versions",
-        "workflowId": "wf_cnc_program_approval",
-        "record_type": "CNC_PROGRAM_APPROVAL",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "document_versions",
-        "workflowId": "wf_document_change_control",
-        "record_type": "DOC",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "incoming_inspection_results",
-        "workflowId": "wf_receiving_inspection",
-        "record_type": "RECEIVING_INSPECTION",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "passport_events",
-        "workflowId": "wf_product_passport",
-        "record_type": "PRODUCT_PASSPORT",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "purchase_order_lines",
-        "workflowId": "wf_purchase_order",
-        "record_type": "PURCHASE_ORDER",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "quote_history",
-        "workflowId": "wf_quote_lifecycle",
-        "record_type": "QUOTE_LIFECYCLE",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "sales_order_lines",
-        "workflowId": "wf_sales_order",
-        "record_type": "SALES_ORDER",
-        "identity_field": null,
-        "state_alignment_ratio": 1,
-        "block_reasons": [
-          "missing_engine_record_identity"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      }
-    ],
+    "workflow_engine_bridge": [],
     "delete_governance": [
       {
         "table": "ap_ar_invoices",

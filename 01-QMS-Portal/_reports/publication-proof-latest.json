@@ -1,26 +1,26 @@
 {
-  "publication_run_id": "d5384cdd-c58f-4c2b-9f06-fb3dd5b4efc8",
-  "generatedAt": "2026-04-07T06:02:58.194Z",
-  "source_commit": "eddfdf59",
+  "publication_run_id": "ba5a0fe7-22c9-4d68-88f0-382d7517c864",
+  "generatedAt": "2026-04-07T06:09:27.995Z",
+  "source_commit": "786e7250",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "bdb3bf8d73ce7c8630135bd4222eeab0942bc82eb36571ae432c909a04eedaeb",
-    "frontend-foundation-catalog.json": "7cbe8158106ee78bc3604e8ee997c7c0f3e341bca3f15aa442248a0d7f9720a7",
-    "registry-manifest.json": "f224474a890aecba1ab82e051f3aa409d9b8fcd4e605be135f9c517f806c38eb",
-    "registry-quality-report.json": "c747e0942e3383ae513b1ad41cb49e6ee7fffabf99bddf9b03dfdaaa0d3748ee",
-    "domain-field-packs.json": "6986cc43d93f682b9245278bec5491361180a90ad3a060f46d32677c80dbad9d",
+    "endpoint-catalog.json": "28177bbeac8a9d7390b80031ae36f3d25a0697e9dc68b5cf70ea1c5c9cbcc3d0",
+    "frontend-foundation-catalog.json": "ef9c618aa5e3d59aae403707f073f991709243427373617504aeee67c5149f0c",
+    "registry-manifest.json": "2ed27391f9d398a3ee8d20df200423a0b6dccd08f0a5f6f7fa85f8dedf30bd74",
+    "registry-quality-report.json": "f57d9ab5b4871eed7acb15abac849246cfddcd961f48b110c8722c3e6f9b80eb",
+    "domain-field-packs.json": "deade24bdba7c607b71b169eeb3faa364ff91ab69d90395cd524a0160f1fbd0b",
     "data-fields-part2.json": "61b73b0d47034449b103fc52abc22b58cf0fdd01e17da37a194a303c992cde72",
-    "wave-gap-ledger.json": "ffb65037bf79b70eaa2c866eaee9f7ebfe69d8845a51eac8b980fb815761d6a8"
+    "wave-gap-ledger.json": "9b189d8443fbc348fe260cdb1a77a9cc09eb2d167c9614e9357e35ea3b493304"
   },
   "summary_counts": {
     "ready": 533,
     "partial": 0,
     "blocked": 0,
     "wf_ready": 223,
-    "bridge_ready": 109,
-    "bridge_blocked": 6,
+    "bridge_ready": 116,
+    "bridge_blocked": 0,
     "endpoints": 2872
   },
   "invariant_checks": [
@@ -37,12 +37,12 @@
     {
       "name": "bridge_counts_consistent",
       "status": "PASS",
-      "detail": "qr: ready=109, blocked=6; manifest: ready=109, blocked=6"
+      "detail": "qr: ready=116, blocked=0; manifest: ready=116, blocked=0"
     },
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['41ad98f5-c72e-4c88-8de1-bcf3dd3ff548']"
+      "detail": "distinct_run_ids=['bc410f68-84c7-44a2-804e-c6c231c7eddc']"
     },
     {
       "name": "approval_group_not_split_truth",
