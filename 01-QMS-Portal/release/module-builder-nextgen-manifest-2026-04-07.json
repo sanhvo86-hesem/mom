@@ -1,0 +1,19 @@
+{
+  "packageName": "hesemqms-module-builder-nextgen-overwrite",
+  "generatedAt": "2026-04-07T00:00:00Z",
+  "root": "qms.hesem.com.vn",
+  "files": [
+    "01-QMS-Portal/scripts/portal/00-block-engine.js",
+    "01-QMS-Portal/scripts/portal/31-module-builder.js",
+    "01-QMS-Portal/docs/module-builder-nextgen-upgrade-2026-04-07.md",
+    "OVERWRITE-MANIFEST-2026-04-07.md"
+  ],
+  "highlights": [
+    "nextgen block schema extension",
+    "module studio cockpit",
+    "builder/runtime json export",
+    "duplicate module",
+    "readiness scoring",
+    "builder manifest sync"
+  ]
+}

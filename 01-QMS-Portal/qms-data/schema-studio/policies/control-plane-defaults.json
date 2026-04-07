@@ -1,0 +1,357 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-07T11:38:08Z",
+    "source": "schema_studio_control_plane_defaults",
+    "profile": "worldclass_round6"
+  },
+  "visual": {
+    "defaultTab": "operations",
+    "preferredAmbience": "midnight",
+    "preferredHeatmap": "risk",
+    "preferredDensity": "comfortable",
+    "quickActions": [
+      "command_deck",
+      "operations_overview",
+      "promotion_board",
+      "focus_executive_release_orbit",
+      "scene_executive_release_radar",
+      "scene_journey_production_dispatch",
+      "journey_traceability_genealogy"
+    ]
+  },
+  "thresholds": {
+    "visualReadiness": 80,
+    "governanceCoverage": 65,
+    "journeyReadiness": 80,
+    "releaseRadar": 75,
+    "hotspotScoreHigh": 12,
+    "operationsScore": 85,
+    "promotionReadiness": 85,
+    "firewallScore": 90,
+    "observabilityScore": 80,
+    "commandCenterScore": 85,
+    "orchestrationScore": 90,
+    "narrativeCoverage": 88,
+    "reviewWallScore": 90,
+    "atlasReadiness": 88,
+    "livePulseScore": 85,
+    "collaborationReadiness": 90,
+    "visualPolishScore": 88
+  },
+  "storyboards": [
+    {
+      "key": "executive_release_radar",
+      "title": "Executive release radar",
+      "subtitle": "Cross-domain readiness, hotspots and blockers",
+      "focusTables": [
+        "party",
+        "item_revision",
+        "job",
+        "production_order",
+        "item_site"
+      ],
+      "heatmap": "risk",
+      "ambience": "midnight",
+      "density": "comfortable",
+      "narrative": "Best view for change advisory board and architecture review.",
+      "layers": [
+        "Engineering",
+        "Foundation",
+        "Inventory Traceability",
+        "MES Execution",
+        "Master Data",
+        "Planning ERP",
+        "eQMS Compliance"
+      ],
+      "domains": [
+        "engineering",
+        "eqms_compliance",
+        "foundation",
+        "inventory_traceability",
+        "master_data",
+        "mes_execution",
+        "planning_erp"
+      ]
+    },
+    {
+      "key": "journey_production_dispatch",
+      "title": "Production dispatch → execution",
+      "subtitle": "Planning-to-execution orchestration",
+      "focusTables": [
+        "production_order",
+        "work_order",
+        "dispatch_queue",
+        "track_in",
+        "track_out",
+        "production_completion"
+      ],
+      "heatmap": "workflow",
+      "ambience": "aurora",
+      "density": "compact",
+      "narrative": "Planning-to-execution orchestration",
+      "layers": [
+        "MES Execution",
+        "Planning ERP"
+      ],
+      "domains": [
+        "mes_execution",
+        "planning_erp"
+      ]
+    },
+    {
+      "key": "journey_traceability_genealogy",
+      "title": "Lot / serial genealogy",
+      "subtitle": "End-to-end traceability and lineage",
+      "focusTables": [
+        "item",
+        "item_revision",
+        "lot",
+        "serial",
+        "genealogy_link",
+        "material_consumption"
+      ],
+      "heatmap": "canonical",
+      "ambience": "clean",
+      "density": "compact",
+      "narrative": "End-to-end traceability and lineage",
+      "layers": [
+        "Engineering",
+        "Inventory Traceability",
+        "MES Execution",
+        "Master Data"
+      ],
+      "domains": [
+        "engineering",
+        "inventory_traceability",
+        "master_data",
+        "mes_execution"
+      ]
+    },
+    {
+      "key": "journey_incoming_quality",
+      "title": "Incoming quality containment",
+      "subtitle": "Supplier receipt → inspection → quality case",
+      "focusTables": [
+        "purchase_order",
+        "purchase_order_line",
+        "quality_order",
+        "inspection_lot",
+        "inspection_result",
+        "supplier_quality_case"
+      ],
+      "heatmap": "risk",
+      "ambience": "midnight",
+      "density": "comfortable",
+      "narrative": "Supplier receipt → inspection → quality case",
+      "layers": [
+        "Planning ERP",
+        "eQMS Compliance"
+      ],
+      "domains": [
+        "eqms_compliance",
+        "planning_erp"
+      ]
+    },
+    {
+      "key": "journey_nc_capa_closure",
+      "title": "NC / deviation / CAPA closure",
+      "subtitle": "Containment, root cause, approval and evidence chain",
+      "focusTables": [
+        "nonconformance",
+        "deviation",
+        "capa",
+        "change_control",
+        "approval",
+        "electronic_signature"
+      ],
+      "heatmap": "security",
+      "ambience": "midnight",
+      "density": "comfortable",
+      "narrative": "Containment, root cause, approval and evidence chain",
+      "layers": [
+        "Foundation",
+        "eQMS Compliance"
+      ],
+      "domains": [
+        "eqms_compliance",
+        "foundation"
+      ]
+    },
+    {
+      "key": "journey_document_training",
+      "title": "Document → training → competency",
+      "subtitle": "Controlled documents and workforce readiness",
+      "focusTables": [
+        "document",
+        "document_revision",
+        "training_matrix",
+        "training_record",
+        "competency",
+        "approval"
+      ],
+      "heatmap": "workflow",
+      "ambience": "aurora",
+      "density": "comfortable",
+      "narrative": "Controlled documents and workforce readiness",
+      "layers": [
+        "Foundation",
+        "eQMS Compliance"
+      ],
+      "domains": [
+        "eqms_compliance",
+        "foundation"
+      ]
+    }
+  ],
+  "guidance": [
+    "Drive release readiness through the promotion board instead of ad-hoc canvas inspection.",
+    "Keep firewall, compatibility and blocker posture visible in every review lane.",
+    "Use focus decks as the default executive navigation model for large manufacturing graphs.",
+    "Treat observability tiles as performance governance for canvas, search, inspector and registry freshness.",
+    "Promote through explicit branch topology: main → preview → release_candidate → production/hotfix.",
+    "Assign owner, steward and approver metadata across all operational domains.",
+    "Bind workflow contracts to order, inspection, CAPA, document/training and equipment flows.",
+    "Use storyboards as saved review views for architecture board, manufacturing leaders and compliance auditors.",
+    "Treat hotspot tables as platform hubs and harden their metadata, policies and view presets first."
+  ],
+  "operationsModes": {
+    "tabs": [
+      {
+        "key": "operations",
+        "label": "Operations overview",
+        "defaultEnvironment": "workspace"
+      },
+      {
+        "key": "release",
+        "label": "Promotion & firewall",
+        "defaultEnvironment": "uat"
+      },
+      {
+        "key": "branches",
+        "label": "Branch topology",
+        "defaultEnvironment": "integration"
+      },
+      {
+        "key": "copilot",
+        "label": "AI release copilot",
+        "defaultEnvironment": "workspace"
+      }
+    ],
+    "environments": [
+      {
+        "key": "workspace",
+        "label": "Workspace design",
+        "goal": "Model clarity, typed diff preview, focus decks",
+        "score": 99
+      },
+      {
+        "key": "integration",
+        "label": "Integration / registry",
+        "goal": "Compiler output, registry drift, workflow contracts",
+        "score": 98
+      },
+      {
+        "key": "uat",
+        "label": "Controlled UAT",
+        "goal": "Evidence, governance sign-off, lane readiness",
+        "score": 98
+      },
+      {
+        "key": "production",
+        "label": "Production release",
+        "goal": "Firewall clear, release lane approved, rollback proof",
+        "score": 100
+      }
+    ],
+    "promotionStages": [
+      {
+        "key": "discover",
+        "label": "Discover",
+        "gate": "Graph readability, domain/layer clarity, focus deck ready",
+        "score": 98
+      },
+      {
+        "key": "model",
+        "label": "Model & diff",
+        "gate": "Typed diff, policy intent, contract continuity",
+        "score": 100
+      },
+      {
+        "key": "governance",
+        "label": "Governance review",
+        "gate": "Owner/steward/approver, evidence, policy posture",
+        "score": 98
+      },
+      {
+        "key": "promotion",
+        "label": "Promotion",
+        "gate": "Lane recommendation, release radar, branch topology",
+        "score": 98
+      },
+      {
+        "key": "release",
+        "label": "Release",
+        "gate": "Firewall clear, compiler synced, rollback rehearsed",
+        "score": 100
+      },
+      {
+        "key": "verify",
+        "label": "Verify",
+        "gate": "Registry health, observability, post-release storyboards",
+        "score": 92
+      }
+    ],
+    "focusDecks": [
+      {
+        "key": "executive_release_orbit",
+        "title": "Executive release orbit",
+        "type": "executive",
+        "focus": "Release radar, promotion stages, firewall, and branch readiness",
+        "score": 97
+      },
+      {
+        "key": "governance_firewall_board",
+        "title": "Governance firewall board",
+        "type": "governance",
+        "focus": "Approver coverage, evidence posture, destructive diff gating",
+        "score": 100
+      },
+      {
+        "key": "journey_production_dispatch",
+        "title": "Production dispatch → execution",
+        "type": "journey",
+        "focus": "Planning-to-execution orchestration",
+        "score": 100
+      },
+      {
+        "key": "journey_traceability_genealogy",
+        "title": "Lot / serial genealogy",
+        "type": "journey",
+        "focus": "End-to-end traceability and lineage",
+        "score": 100
+      },
+      {
+        "key": "hotspot_tbl_0053",
+        "title": "party",
+        "type": "hotspot",
+        "focus": "Dependency hotspot and metadata pressure remediation",
+        "score": 90
+      },
+      {
+        "key": "hotspot_tbl_0163",
+        "title": "item_revision",
+        "type": "hotspot",
+        "focus": "Dependency hotspot and metadata pressure remediation",
+        "score": 90
+      }
+    ]
+  },
+  "commandDeck": {
+    "defaultScene": "executive_release_radar",
+    "spotlightLimit": 6,
+    "sceneLimit": 8,
+    "atlasLimit": 4,
+    "reviewLaneLimit": 6,
+    "pulseRadarLimit": 6
+  }
+}

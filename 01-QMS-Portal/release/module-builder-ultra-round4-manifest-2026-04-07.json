@@ -1,0 +1,79 @@
+{
+  "package": "hesemqms-module-builder-ultra-round4-overwrite-2026-04-07.zip",
+  "date": "2026-04-07",
+  "root": "qms.hesem.com.vn/",
+  "schemaVersion": "2026-04-07-r4",
+  "builderPatch": "2026-04-07-r4",
+  "files": [
+    "qms.hesem.com.vn/01-QMS-Portal/scripts/portal/00-block-engine.js",
+    "qms.hesem.com.vn/01-QMS-Portal/scripts/portal/31-module-builder.js",
+    "qms.hesem.com.vn/01-QMS-Portal/docs/module-builder-ultra-round4-2026-04-07.md",
+    "qms.hesem.com.vn/01-QMS-Portal/release/module-builder-ultra-round4-manifest-2026-04-07.json",
+    "qms.hesem.com.vn/OVERWRITE-MANIFEST-2026-04-07-R4.md"
+  ],
+  "fixes": [
+    "Preserve template seeds by removing BLOCK_TEMPLATES reset before merge",
+    "Move round 4 patch into the round 3 ultra patch scope before window export",
+    "Add local fallback helpers for _r2BlockApiId, _r2BlockWorkflowId, _r2BlockDataMode"
+  ],
+  "features": [
+    "Observability/storytelling/accessibility/collaboration/operator schema extensions",
+    "12 new round 4 templates for control tower, war room, evidence, warehouse, maintenance and release pulse",
+    "Expanded blueprints: audit-evidence-hub, warehouse-handheld, maintenance-response",
+    "Expanded personas: planner, warehouse, maintenance",
+    "Blueprint auto-seeding for sparse modules",
+    "Flow Mesh visual map",
+    "Beauty Lab presets",
+    "Prime metrics: signalCoverage, collaborationReadiness, designCraft, flowNodes, flowEdges",
+    "Deeper auto-enhance and diagnostics"
+  ],
+  "validation": {
+    "nodeCheck": {
+      "00-block-engine.js": "pass",
+      "31-module-builder.js": "pass"
+    },
+    "smoke": {
+      "status": "pass",
+      "htmlLength": 41604,
+      "hasFlowMesh": true,
+      "hasBeautyLab": true,
+      "templateCount": 101,
+      "schemaVersion": "2026-04-07-r4",
+      "manifest": {
+        "signalCoverage": 100,
+        "collaborationReadiness": 100,
+        "designCraft": 100,
+        "flowNodes": 5,
+        "flowEdges": 2
+      },
+      "tabs": 3,
+      "blocks": 5
+    },
+    "multiScenario": {
+      "executive-control": {
+        "status": "pass",
+        "theme": "hesem-executive",
+        "tabs": 3,
+        "blocks": 4,
+        "firstTab": "Tổng quan điều hành",
+        "firstBlockRole": "entry"
+      },
+      "warehouse-handheld": {
+        "status": "pass",
+        "theme": "warehouse-ops",
+        "tabs": 3,
+        "blocks": 4,
+        "firstTab": "Warehouse",
+        "firstBlockRole": "entry"
+      },
+      "maintenance-response": {
+        "status": "pass",
+        "theme": "shopfloor-dark",
+        "tabs": 3,
+        "blocks": 5,
+        "firstTab": "Maintenance",
+        "firstBlockRole": "entry"
+      }
+    }
+  }
+}

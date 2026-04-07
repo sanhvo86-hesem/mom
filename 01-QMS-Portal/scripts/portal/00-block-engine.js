@@ -2987,7 +2987,7 @@ var BLOCK_TEMPLATES = {
 /**
  * Render a two-column block with left/right slots.
  */
-BLOCK_TEMPLATES = {};
+/* Round 4 fix: preserve previously declared template seeds instead of resetting the catalog. */
 
 function _tplLabel(vi, en){
   return { vi:vi, en:en };
@@ -10685,8 +10685,6 @@ var EXTRA_TEMPLATES = {
   'iot-alarm-timeline': { type:'data-timeline', title:{vi:'Lịch sử cảnh báo máy',en:'Machine Alarm History'}, config:{ dataSource:{api:'mobile_shop_overview',method:'GET'}, dateKey:'timestamp', titleKey:'alarm_code', descKey:'description' } },
 };
 
-EXTRA_TEMPLATES = {};
-
 // Merge extra templates into existing BLOCK_TEMPLATES
 if (window.HmBlockEngine && window.HmBlockEngine.BLOCK_TEMPLATES) {
   Object.keys(EXTRA_TEMPLATES).forEach(function(key) {
@@ -10832,4 +10830,1694 @@ Object.assign(window.HmBlockEngine, {
   renderUndoHistoryPanel: renderUndoHistoryPanel,
 });
 
+
+/* ─── 8. MODULE BUILDER NEXTGEN SCHEMA PATCH (2026-04-07) ───────────────── */
+(function(){
+  function _ngFindTab(tabs, key){
+    var found = null;
+    (tabs || []).forEach(function(tab){
+      if(tab && tab.key === key) found = tab;
+    });
+    return found;
+  }
+
+  function _ngEnsureTab(tabs, key, label, labelEn, icon){
+    var tab = _ngFindTab(tabs, key);
+    if(tab) return tab;
+    tab = _blockTab(key, label, labelEn, [], icon || '');
+    tabs.push(tab);
+    return tab;
+  }
+
+  function _ngEnsureSection(tab, key, label, labelEn){
+    var section = null;
+    (tab.sections || []).forEach(function(item){
+      if(item && item.key === key) section = item;
+    });
+    if(section) return section;
+    section = _blockSection(key, label, labelEn, []);
+    if(!Array.isArray(tab.sections)) tab.sections = [];
+    tab.sections.push(section);
+    return section;
+  }
+
+  function _ngEnsureField(section, field){
+    if(!section || !field) return;
+    if(!Array.isArray(section.fields)) section.fields = [];
+    if(section.fields.some(function(item){
+      return item && ((field.path && item.path === field.path) || (field.key && item.key === field.key));
+    })) return;
+    section.fields.push(field);
+  }
+
+  function _ngAppendFields(section, fields){
+    (fields || []).forEach(function(field){
+      _ngEnsureField(section, field);
+    });
+  }
+
+  function _ngApplySectionOrder(tab, sectionKeys){
+    if(!tab || !Array.isArray(tab.sections)) return;
+    tab.sections.sort(function(a, b){
+      var ai = sectionKeys.indexOf(a.key);
+      var bi = sectionKeys.indexOf(b.key);
+      if(ai < 0) ai = 999;
+      if(bi < 0) bi = 999;
+      return ai - bi;
+    });
+  }
+
+  function _ngGovernanceFields(){
+    return [
+      _blockField('domain', 'Miền nghiệp vụ', 'Business domain', 'select', 'config.governance.domain', {
+        default:'quality',
+        options:['quality','manufacturing','planning','procurement','warehouse','sales','supplier','customer','maintenance','energy','documents','admin']
+      }),
+      _blockField('boundedContext', 'Bounded context', 'Bounded context', 'text', 'config.governance.boundedContext', { default:'', placeholder:'quality.ncr' }),
+      _blockField('entityKey', 'Entity key', 'Entity key', 'text', 'config.governance.entityKey', { default:'', placeholder:'ncr_case' }),
+      _blockField('ownerTeam', 'Nhóm phụ trách', 'Owner team', 'text', 'config.governance.ownerTeam', { default:'', placeholder:'QMS / Operations' }),
+      _blockField('processOwner', 'Process owner', 'Process owner', 'text', 'config.governance.processOwner', { default:'' }),
+      _blockField('lifecycle', 'Vòng đời', 'Lifecycle', 'select', 'config.governance.lifecycle', {
+        default:'draft',
+        options:['draft','review','pilot','active','deprecated']
+      }),
+      _blockField('criticality', 'Mức độ quan trọng', 'Criticality', 'select', 'config.governance.criticality', {
+        default:'medium',
+        options:['low','medium','high','mission-critical']
+      }),
+      _blockField('packRef', 'Field pack chuẩn', 'Standard field pack', 'text', 'config.governance.packRef', { default:'', placeholder:'chat_luong.ncr_header' }),
+      _blockField('tagsText', 'Tags', 'Tags', 'text', 'config.governance.tagsText', { default:'', placeholder:'ncr,capa,8d' }),
+      _blockField('auditRequired', 'Bắt buộc audit trail', 'Audit trail required', 'toggle', 'config.governance.auditRequired', { default:false }),
+      _blockField('governanceNote', 'Ghi chú governance', 'Governance note', 'textarea', 'config.governance.note', { default:'', rows:2 })
+    ];
+  }
+
+  function _ngPipelineFields(){
+    return [
+      _blockField('sourceMode', 'Chế độ nguồn dữ liệu', 'Data source mode', 'select', 'config.dataSource.mode', {
+        default:'api',
+        options:['api','query-pipeline','registry','manual','stream']
+      }),
+      _blockField('queryProfile', 'Kiểu pipeline', 'Pipeline profile', 'select', 'config.dataPipeline.profile', {
+        default:'list',
+        options:['list','detail','analytics','transaction','timeline','kanban','monitoring']
+      }),
+      _blockField('primaryKey', 'Primary key', 'Primary key', 'field-select', 'config.dataPipeline.primaryKey', { default:'id' }),
+      _blockField('labelField', 'Label field', 'Label field', 'field-select', 'config.dataPipeline.labelField', { default:'name' }),
+      _blockField('cacheStrategy', 'Chiến lược cache', 'Cache strategy', 'select', 'config.dataSource.cacheStrategy', {
+        default:'memory',
+        options:['none','memory','session','edge','server']
+      }),
+      _blockField('offlineReady', 'Sẵn sàng offline', 'Offline ready', 'toggle', 'config.dataSource.offlineReady', { default:false }),
+      _blockField('joins', 'Data joins', 'Data joins', 'collection', 'config.dataPipeline.joins', {
+        default:[],
+        addLabel:'Thêm join',
+        itemLabel:'Join',
+        itemFields:[
+          _blockField('entity', 'Entity / API', 'Entity / API', 'text', 'entity', { default:'' }),
+          _blockField('joinType', 'Kiểu join', 'Join type', 'select', 'joinType', { default:'left', options:['left','inner','right','full'] }),
+          _blockField('sourceField', 'Field nguồn', 'Source field', 'field-select', 'sourceField', { default:'' }),
+          _blockField('targetField', 'Field đích', 'Target field', 'text', 'targetField', { default:'' }),
+          _blockField('alias', 'Alias', 'Alias', 'text', 'alias', { default:'' }),
+          _blockField('enabled', 'Kích hoạt', 'Enabled', 'toggle', 'enabled', { default:true })
+        ]
+      }),
+      _blockField('pipelineSteps', 'Data pipeline', 'Data pipeline', 'collection', 'config.dataPipeline.steps', {
+        default:[],
+        addLabel:'Thêm bước',
+        itemLabel:'Bước',
+        itemFields:[
+          _blockField('stepType', 'Loại bước', 'Step type', 'select', 'stepType', {
+            default:'filter',
+            options:['filter','sort','group','aggregate','join','map','compute','window','pivot','deduplicate','limit']
+          }),
+          _blockField('sourceField', 'Field nguồn', 'Source field', 'field-select', 'sourceField', { default:'' }),
+          _blockField('operator', 'Toán tử', 'Operator', 'select', 'operator', {
+            default:'=',
+            options:['=','!=','>','>=','<','<=','contains','startsWith','in','between','sum','avg','count','min','max','custom']
+          }),
+          _blockField('targetField', 'Field đích', 'Target field', 'text', 'targetField', { default:'' }),
+          _blockField('expression', 'Biểu thức', 'Expression', 'expression', 'expression', { default:'' }),
+          _blockField('enabled', 'Kích hoạt', 'Enabled', 'toggle', 'enabled', { default:true })
+        ]
+      }),
+      _blockField('contracts', 'Data contract', 'Data contract', 'collection', 'config.dataPipeline.contracts', {
+        default:[],
+        addLabel:'Thêm field contract',
+        itemLabel:'Field',
+        itemFields:[
+          _blockField('fieldKey', 'Field key', 'Field key', 'text', 'fieldKey', { default:'' }),
+          _blockField('fieldType', 'Kiểu dữ liệu', 'Data type', 'field-type-select', 'fieldType', { default:'string' }),
+          _blockField('required', 'Bắt buộc', 'Required', 'toggle', 'required', { default:false }),
+          _blockField('nullable', 'Cho phép null', 'Nullable', 'toggle', 'nullable', { default:true }),
+          _blockField('defaultValue', 'Giá trị mặc định', 'Default value', 'text', 'defaultValue', { default:'' })
+        ]
+      })
+    ];
+  }
+
+  function _ngStreamingFields(){
+    return [
+      _blockField('streamEnabled', 'Bật luồng realtime', 'Enable realtime stream', 'toggle', 'config.stream.enabled', { default:false }),
+      _blockField('connector', 'Connector', 'Connector', 'iot-connector-select', 'config.stream.connector', { default:'' }),
+      _blockField('topic', 'Topic / channel', 'Topic / channel', 'text', 'config.stream.topic', { default:'', placeholder:'machine/+/state' }),
+      _blockField('snapshotField', 'Snapshot field', 'Snapshot field', 'field-select', 'config.stream.snapshotField', { default:'' }),
+      _blockField('refreshMs', 'Refresh (ms)', 'Refresh (ms)', 'number', 'config.stream.refreshMs', { default:1000, min:100, step:100 }),
+      _blockField('bufferSize', 'Kích thước buffer', 'Buffer size', 'number', 'config.stream.bufferSize', { default:200, min:10, step:10 })
+    ];
+  }
+
+  function _ngDesignFields(){
+    return [
+      _blockField('themePreset', 'Preset giao diện', 'Theme preset', 'select', 'config.design.themePreset', {
+        default:'inherit',
+        options:['inherit','enterprise','industrial','executive','shopfloor','lab','dark-ops']
+      }),
+      _blockField('density', 'Mật độ UI', 'UI density', 'select', 'config.design.density', {
+        default:'inherit',
+        options:['inherit','comfortable','compact','dense']
+      }),
+      _blockField('shellPreset', 'Shell preset', 'Shell preset', 'select', 'config.design.shellPreset', {
+        default:'inherit',
+        options:['inherit','page','workspace','ops-center','executive-board']
+      }),
+      _blockField('surfaceVariant', 'Surface variant', 'Surface variant', 'select', 'config.design.surfaceVariant', {
+        default:'default',
+        options:['default','elevated','outlined','tinted','glass','solid']
+      }),
+      _blockField('semanticTone', 'Semantic tone', 'Semantic tone', 'select', 'config.design.semanticTone', {
+        default:'default',
+        options:['default','brand','info','success','warning','danger']
+      }),
+      _blockField('motionPreset', 'Motion preset', 'Motion preset', 'select', 'config.design.motionPreset', {
+        default:'inherit',
+        options:['inherit','none','subtle','standard','expressive']
+      }),
+      _blockField('className', 'CSS class', 'CSS class', 'text', 'config.design.className', { default:'' }),
+      _blockField('cssVars', 'CSS vars', 'CSS vars', 'json', 'config.design.cssVars', { default:{} })
+    ];
+  }
+
+  function _ngBreakpointFields(){
+    return [
+      _blockField('mobileSpan', 'Span mobile', 'Mobile span', 'number', 'config.responsive.mobile.span', { default:12, min:1, max:12 }),
+      _blockField('tabletSpan', 'Span tablet', 'Tablet span', 'number', 'config.responsive.tablet.span', { default:6, min:1, max:12 }),
+      _blockField('desktopSpan', 'Span desktop', 'Desktop span', 'number', 'config.responsive.desktop.span', { default:12, min:1, max:12 }),
+      _blockField('wideSpan', 'Span wide', 'Wide span', 'number', 'config.responsive.wide.span', { default:12, min:1, max:12 }),
+      _blockField('mobileHide', 'Ẩn trên mobile', 'Hide on mobile', 'toggle', 'config.responsive.mobile.hide', { default:false }),
+      _blockField('tabletHide', 'Ẩn trên tablet', 'Hide on tablet', 'toggle', 'config.responsive.tablet.hide', { default:false }),
+      _blockField('desktopHide', 'Ẩn trên desktop', 'Hide on desktop', 'toggle', 'config.responsive.desktop.hide', { default:false }),
+      _blockField('overflowMode', 'Overflow mode', 'Overflow mode', 'select', 'config.responsive.overflowMode', {
+        default:'wrap',
+        options:['wrap','scroll','stack','grid']
+      }),
+      _blockField('stickyPriority', 'Ưu tiên sticky', 'Sticky priority', 'select', 'config.responsive.stickyPriority', {
+        default:'none',
+        options:['none','low','medium','high']
+      }),
+      _blockField('printPreset', 'Preset khi in', 'Print preset', 'select', 'config.responsive.print.preset', {
+        default:'standard',
+        options:['standard','condensed','executive','a4-form']
+      })
+    ];
+  }
+
+  function _ngActionFlowFields(){
+    return [
+      _blockField('steps', 'Action flow', 'Action flow', 'collection', 'config.eventFlow.steps', {
+        default:[],
+        addLabel:'Thêm bước',
+        itemLabel:'Bước',
+        itemFields:[
+          _blockField('trigger', 'Trigger', 'Trigger', 'select', 'trigger', {
+            default:'click',
+            options:['load','click','change','submit','select','row-click','schedule','stream']
+          }),
+          _blockField('actionType', 'Loại action', 'Action type', 'select', 'actionType', {
+            default:'navigate',
+            options:['navigate','api-call','open-modal','set-state','emit-event','refresh-block','run-workflow','download','approve','reject','custom']
+          }),
+          _blockField('api', 'API', 'API', 'api-select', 'api', { default:'' }),
+          _blockField('workflowId', 'Workflow', 'Workflow', 'workflow-select', 'workflowId', { default:'' }),
+          _blockField('target', 'Target', 'Target', 'text', 'target', { default:'' }),
+          _blockField('payload', 'Payload', 'Payload', 'expression', 'payload', { default:'' }),
+          _blockField('condition', 'Điều kiện', 'Condition', 'expression', 'condition', { default:'' }),
+          _blockField('async', 'Async', 'Async', 'toggle', 'async', { default:true }),
+          _blockField('timeoutMs', 'Timeout (ms)', 'Timeout (ms)', 'number', 'timeoutMs', { default:15000, min:0, step:100 }),
+          _blockField('confirmText', 'Xác nhận', 'Confirmation', 'text', 'confirmText', { default:'' }),
+          _blockField('auditTag', 'Audit tag', 'Audit tag', 'text', 'auditTag', { default:'' }),
+          _blockField('enabled', 'Kích hoạt', 'Enabled', 'toggle', 'enabled', { default:true })
+        ]
+      })
+    ];
+  }
+
+  function _ngAutomationPolicyFields(){
+    return [
+      _blockField('requireComment', 'Bắt buộc comment', 'Require comment', 'toggle', 'config.eventFlow.requireComment', { default:false }),
+      _blockField('requireESign', 'Bắt buộc e-sign', 'Require e-sign', 'toggle', 'config.eventFlow.requireESign', { default:false }),
+      _blockField('requireApproval', 'Bắt buộc phê duyệt', 'Require approval', 'toggle', 'config.eventFlow.requireApproval', { default:false }),
+      _blockField('approvalWorkflow', 'Workflow phê duyệt', 'Approval workflow', 'workflow-select', 'config.eventFlow.approvalWorkflow', { default:'' }),
+      _blockField('rollbackOnError', 'Rollback khi lỗi', 'Rollback on error', 'toggle', 'config.eventFlow.rollbackOnError', { default:false }),
+      _blockField('concurrencyKey', 'Concurrency key', 'Concurrency key', 'text', 'config.eventFlow.concurrencyKey', { default:'' }),
+      _blockField('namespace', 'Event namespace', 'Event namespace', 'text', 'config.eventFlow.namespace', { default:'' }),
+      _blockField('approvalNote', 'Ghi chú điều phối', 'Orchestration note', 'textarea', 'config.eventFlow.note', { default:'', rows:2 })
+    ];
+  }
+
+  function _applyNextGenSchemaPatch(){
+    Object.keys(BLOCK_PROPERTIES_SCHEMA || {}).forEach(function(type){
+      var tabs = BLOCK_PROPERTIES_SCHEMA[type] || [];
+      var general = _ngEnsureTab(tabs, 'general', 'Tổng quan', 'General', '⚙️');
+      var data = _ngEnsureTab(tabs, 'data', 'Dữ liệu', 'Data', '🗄️');
+      var style = _ngEnsureTab(tabs, 'style', 'Giao diện', 'Style', '🎨');
+      var events = _ngEnsureTab(tabs, 'events', 'Sự kiện', 'Events', '⚡');
+      var governance = _ngEnsureSection(general, 'governance', 'Governance', 'Governance');
+      var queryPipeline = _ngEnsureSection(data, 'queryPipeline', 'Query pipeline', 'Query pipeline');
+      var stream = _ngEnsureSection(data, 'stream', 'Realtime / Stream', 'Realtime / Stream');
+      var designSystem = _ngEnsureSection(style, 'designSystem', 'Design system', 'Design system');
+      var responsiveGrid = _ngEnsureSection(style, 'responsiveGrid', 'Breakpoints & span', 'Breakpoints & span');
+      var eventFlow = _ngEnsureSection(events, 'actionFlow', 'Action flow', 'Action flow');
+      var automationPolicy = _ngEnsureSection(events, 'automationPolicy', 'Automation policy', 'Automation policy');
+      _ngAppendFields(governance, _ngGovernanceFields());
+      _ngAppendFields(queryPipeline, _ngPipelineFields());
+      _ngAppendFields(stream, _ngStreamingFields());
+      _ngAppendFields(designSystem, _ngDesignFields());
+      _ngAppendFields(responsiveGrid, _ngBreakpointFields());
+      _ngAppendFields(eventFlow, _ngActionFlowFields());
+      _ngAppendFields(automationPolicy, _ngAutomationPolicyFields());
+      _ngApplySectionOrder(general, ['identity','behavior','governance']);
+      _ngApplySectionOrder(data, ['source','refresh','queryPipeline','stream']);
+      _ngApplySectionOrder(style, ['layout','surface','typography','responsive','designSystem','responsiveGrid']);
+      _ngApplySectionOrder(events, ['actions','lifecycle','advanced','actionFlow','automationPolicy']);
+    });
+    if(window.HmBlockEngine){
+      window.HmBlockEngine.BLOCK_PROPERTIES_SCHEMA = BLOCK_PROPERTIES_SCHEMA;
+      window.HmBlockEngine.MODULE_BUILDER_NEXTGEN_SCHEMA_VERSION = '2026-04-07';
+    }
+  }
+
+  _applyNextGenSchemaPatch();
+})();
+
+})();
+
+
+/* ─── 9. MODULE BUILDER ULTRA SCHEMA PATCH (2026-04-07 R2) ───────────────── */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_ULTRA_SCHEMA_VERSION === '2026-04-07-r2') return;
+  var BE = window.HmBlockEngine;
+  var SCHEMA = BE.BLOCK_PROPERTIES_SCHEMA || {};
+
+  function ensureTab(tabs, key, label, labelEn, icon){
+    var found = null;
+    (tabs || []).forEach(function(tab){
+      if(tab && tab.key === key) found = tab;
+    });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, icon:icon || '', sections:[] };
+    tabs.push(found);
+    return found;
+  }
+
+  function ensureSection(tab, key, label, labelEn){
+    var found = null;
+    if(!tab.sections) tab.sections = [];
+    tab.sections.forEach(function(section){
+      if(section && section.key === key) found = section;
+    });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, fields:[] };
+    tab.sections.push(found);
+    return found;
+  }
+
+  function field(key, label, labelEn, type, path, extra){
+    var out = { key:key, label:label, labelEn:labelEn || label, type:type, path:path };
+    Object.keys(extra || {}).forEach(function(name){ out[name] = extra[name]; });
+    return out;
+  }
+
+  function ensureField(section, def){
+    var exists = false;
+    if(!section.fields) section.fields = [];
+    section.fields.forEach(function(item){
+      if(item && ((def.path && item.path === def.path) || (def.key && item.key === def.key))) exists = true;
+    });
+    if(!exists) section.fields.push(def);
+  }
+
+  function append(section, defs){
+    (defs || []).forEach(function(def){ ensureField(section, def); });
+  }
+
+  Object.keys(SCHEMA).forEach(function(type){
+    var tabs = SCHEMA[type] || [];
+    var dataTab = ensureTab(tabs, 'data', 'Dữ liệu', 'Data', '🗄️');
+    var styleTab = ensureTab(tabs, 'style', 'Giao diện', 'Style', '🎨');
+    var eventsTab = ensureTab(tabs, 'events', 'Sự kiện', 'Events', '⚡');
+
+    var dataOps = ensureSection(dataTab, 'dataOps', 'Data experience', 'Data experience');
+    var designPolish = ensureSection(styleTab, 'designPolish', 'Visual polish', 'Visual polish');
+    var responsiveAdvanced = ensureSection(styleTab, 'responsiveAdvanced', 'Responsive advanced', 'Responsive advanced');
+    var executionResilience = ensureSection(eventsTab, 'executionResilience', 'Execution resilience', 'Execution resilience');
+
+    append(dataOps, [
+      field('emptyStateTitle', 'Tiêu đề empty state', 'Empty state title', 'text', 'config.dataSource.emptyStateTitle', { default:'', placeholder:'Không có dữ liệu' }),
+      field('emptyStateNote', 'Mô tả empty state', 'Empty state note', 'textarea', 'config.dataSource.emptyStateNote', { default:'', rows:2 }),
+      field('prefetch', 'Prefetch trước khi mở', 'Prefetch on load', 'toggle', 'config.dataSource.prefetch', { default:false }),
+      field('timeoutMs', 'Timeout dữ liệu (ms)', 'Data timeout (ms)', 'number', 'config.dataSource.timeoutMs', { default:15000, min:0, step:100 }),
+      field('queryTag', 'Query tag', 'Query tag', 'text', 'config.dataPipeline.queryTag', { default:'', placeholder:'qms.builder.table.header' }),
+      field('telemetryDataset', 'Telemetry dataset', 'Telemetry dataset', 'text', 'config.dataPipeline.telemetryDataset', { default:'', placeholder:'machine_status_live' })
+    ]);
+
+    append(designPolish, [
+      field('visualLanguage', 'Visual language', 'Visual language', 'select', 'config.design.visualLanguage', {
+        default:'inherit',
+        options:['inherit','industrial-glass','executive-premium','dark-ops','precision-clean','warehouse-neon']
+      }),
+      field('accentTone', 'Accent tone', 'Accent tone', 'select', 'config.design.accentTone', {
+        default:'inherit',
+        options:['inherit','blue','indigo','emerald','amber','teal','rose']
+      }),
+      field('heroMood', 'Hero mood', 'Hero mood', 'select', 'config.design.heroMood', {
+        default:'inherit',
+        options:['inherit','aurora','cinematic','night-shift','clear-day','focused']
+      }),
+      field('cardRadius', 'Card radius', 'Card radius', 'select', 'config.design.cardRadius', {
+        default:'inherit',
+        options:['inherit','md','lg','xl']
+      }),
+      field('iconStyle', 'Icon style', 'Icon style', 'select', 'config.design.iconStyle', {
+        default:'inherit',
+        options:['inherit','outlined','filled','duotone']
+      }),
+      field('chartStyle', 'Chart style', 'Chart style', 'select', 'config.design.chartStyle', {
+        default:'inherit',
+        options:['inherit','balanced','executive','realtime','clean-room']
+      }),
+      field('panelGlass', 'Glass panel', 'Glass panel', 'toggle', 'config.design.panelGlass', { default:false }),
+      field('microcopy', 'Caption / microcopy', 'Caption / microcopy', 'textarea', 'config.design.caption', { default:'', rows:2 })
+    ]);
+
+    append(responsiveAdvanced, [
+      field('breakpointStrategy', 'Breakpoint strategy', 'Breakpoint strategy', 'select', 'config.responsive.strategy', {
+        default:'inherit',
+        options:['inherit','desktop-first','mobile-first','operator-screen']
+      }),
+      field('mobileOrder', 'Thứ tự mobile', 'Mobile order', 'number', 'config.responsive.mobile.order', { default:0, step:1 }),
+      field('tabletOrder', 'Thứ tự tablet', 'Tablet order', 'number', 'config.responsive.tablet.order', { default:0, step:1 }),
+      field('desktopOrder', 'Thứ tự desktop', 'Desktop order', 'number', 'config.responsive.desktop.order', { default:0, step:1 }),
+      field('minHeight', 'Min height', 'Min height', 'text', 'config.responsive.minHeight', { default:'', placeholder:'160px' }),
+      field('maxHeight', 'Max height', 'Max height', 'text', 'config.responsive.maxHeight', { default:'', placeholder:'480px' }),
+      field('stickyOffset', 'Sticky offset', 'Sticky offset', 'text', 'config.responsive.stickyOffset', { default:'', placeholder:'64px' })
+    ]);
+
+    append(executionResilience, [
+      field('retryPolicy', 'Retry policy', 'Retry policy', 'select', 'config.eventFlow.retryPolicy', {
+        default:'none',
+        options:['none','immediate','exponential','manual']
+      }),
+      field('retryCount', 'Retry count', 'Retry count', 'number', 'config.eventFlow.retryCount', { default:0, min:0, step:1 }),
+      field('retryBackoffMs', 'Retry backoff (ms)', 'Retry backoff (ms)', 'number', 'config.eventFlow.retryBackoffMs', { default:300, min:0, step:50 }),
+      field('successToast', 'Toast khi thành công', 'Success toast', 'text', 'config.eventFlow.successToast', { default:'', placeholder:'Lưu thành công' }),
+      field('errorToast', 'Toast khi lỗi', 'Error toast', 'text', 'config.eventFlow.errorToast', { default:'', placeholder:'Có lỗi xảy ra' }),
+      field('telemetryEvent', 'Telemetry event', 'Telemetry event', 'text', 'config.eventFlow.telemetryEvent', { default:'', placeholder:'module.save.click' }),
+      field('failSafeMode', 'Fail-safe mode', 'Fail-safe mode', 'select', 'config.eventFlow.failSafeMode', {
+        default:'none',
+        options:['none','disable-block','soft-warning','fallback-view']
+      })
+    ]);
+
+    SCHEMA[type] = tabs;
+  });
+
+  BE.BLOCK_PROPERTIES_SCHEMA = SCHEMA;
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-07-r2';
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODULE BUILDER ULTRA ROUND 3 PATCH — 2026-04-07
+   Deep schema, new archetypes, storytelling/a11y/observability fields
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_ULTRA_SCHEMA_VERSION === '2026-04-07-r3') return;
+
+  var BE = window.HmBlockEngine;
+  var SCHEMA = BE.BLOCK_PROPERTIES_SCHEMA || {};
+  var clone = function(value){ return value == null ? value : JSON.parse(JSON.stringify(value)); };
+  var extraCatalog = {
+    'ops-control-tower': {
+      label:'Control Tower',
+      labelEn:'Control Tower',
+      category:'insight',
+      icon:'🛰️',
+      desc:'Trung tâm điều hành đa tín hiệu cho KPI, ngoại lệ và trạng thái điều phối',
+      descEn:'Multi-signal control tower for KPI, exceptions and orchestration state',
+      renderer:'data-cards'
+    },
+    'quality-warroom-kpi': {
+      label:'Quality War Room',
+      labelEn:'Quality War Room',
+      category:'quality',
+      icon:'🧪',
+      desc:'Băng KPI chất lượng dành cho NCR, CAPA, audit và escalation',
+      descEn:'Quality KPI band for NCR, CAPA, audit and escalation',
+      renderer:'kpi-row'
+    },
+    'audit-evidence-stage': {
+      label:'Evidence Stage',
+      labelEn:'Evidence Stage',
+      category:'quality',
+      icon:'🧾',
+      desc:'Sân khấu chứng cứ, chain-of-custody và mốc review',
+      descEn:'Evidence stage for chain-of-custody and review milestones',
+      renderer:'data-timeline'
+    },
+    'flow-command-lane': {
+      label:'Command Lane',
+      labelEn:'Command Lane',
+      category:'action',
+      icon:'🧭',
+      desc:'Lane điều phối workflow, approval và escalation',
+      descEn:'Workflow, approval and escalation command lane',
+      renderer:'action-status-flow'
+    },
+    'release-readiness-board': {
+      label:'Release Readiness',
+      labelEn:'Release Readiness',
+      category:'automation',
+      icon:'🚀',
+      desc:'Bảng readiness cho publish, signoff và rollback',
+      descEn:'Readiness board for publish, signoff and rollback',
+      renderer:'data-table'
+    },
+    'story-hero-banner': {
+      label:'Story Hero',
+      labelEn:'Story Hero',
+      category:'media',
+      icon:'🌌',
+      desc:'Banner kể chuyện cho module, campaign và operational narrative',
+      descEn:'Narrative hero banner for modules, campaigns and operations',
+      renderer:'info-banner'
+    }
+  };
+
+  Object.keys(extraCatalog).forEach(function(key){
+    if(!BE.BLOCK_CATALOG[key]) BE.BLOCK_CATALOG[key] = clone(extraCatalog[key]);
+  });
+
+  var extraTemplates = {
+    'tpl-r3-executive-control-tower-kpi': {
+      type:'quality-warroom-kpi',
+      title:{ vi:'KPI Control Tower', en:'Control Tower KPIs' },
+      config:{
+        dataSource:{ api:'report_dashboard', method:'GET' },
+        items:[
+          { label:{vi:'Doanh thu dự phóng', en:'Projected Revenue'}, dataSource:{ api:'report_dashboard', field:'projected_revenue' }, color:'var(--brand-2)', suffix:' VND' },
+          { label:{vi:'Rủi ro đỏ', en:'Red Risks'}, dataSource:{ api:'report_dashboard', field:'critical_risks' }, color:'var(--red)' },
+          { label:{vi:'Luồng trễ SLA', en:'SLA Breaches'}, dataSource:{ api:'report_dashboard', field:'sla_breaches' }, color:'var(--amber)' },
+          { label:{vi:'Hành động hôm nay', en:'Actions Today'}, dataSource:{ api:'report_dashboard', field:'actions_today' }, color:'var(--green)' }
+        ],
+        design:{ caption:'Một dải KPI cấp điều hành cho control tower đa domain' }
+      }
+    },
+    'tpl-r3-shopfloor-signal-wall': {
+      type:'ops-control-tower',
+      title:{ vi:'Signal Wall xưởng', en:'Shopfloor Signal Wall' },
+      config:{
+        dataSource:{ api:'mobile_shop_overview', method:'GET', dataKey:'machines' },
+        columns:4,
+        titleKey:'machine_id',
+        subtitleKey:'status',
+        badgeKey:'status',
+        design:{ caption:'Signal wall realtime cho production, andon và downtime' }
+      }
+    },
+    'tpl-r3-audit-evidence-stage': {
+      type:'audit-evidence-stage',
+      title:{ vi:'Evidence Stage', en:'Evidence Stage' },
+      config:{
+        dataSource:{ api:'evidence_event_list', method:'GET', dataKey:'events' },
+        dateKey:'event_at',
+        titleKey:'event_title',
+        descKey:'event_note',
+        design:{ caption:'Timeline chain-of-custody, signoff và checkpoint điều tra' }
+      }
+    },
+    'tpl-r3-release-readiness-board': {
+      type:'release-readiness-board',
+      title:{ vi:'Release Readiness', en:'Release Readiness' },
+      config:{
+        dataSource:{ api:'system_health', method:'GET', dataKey:'checks' },
+        dataKey:'checks',
+        pageSize:10,
+        columns:[
+          { key:'domain', label:{vi:'Miền', en:'Domain'}, type:'text' },
+          { key:'status', label:{vi:'Trạng thái', en:'Status'}, type:'badge' },
+          { key:'owner', label:{vi:'Phụ trách', en:'Owner'}, type:'text' },
+          { key:'updated_at', label:{vi:'Cập nhật', en:'Updated'}, type:'date' }
+        ],
+        design:{ caption:'Board readiness cho publish, signoff, runbook và rollback' }
+      }
+    },
+    'tpl-r3-command-lane': {
+      type:'flow-command-lane',
+      title:{ vi:'Lane điều phối', en:'Command Lane' },
+      config:{
+        workflow:{
+          id:'release_readiness',
+          label:{vi:'Release readiness', en:'Release readiness'},
+          currentStatus:'review',
+          states:[
+            { key:'draft', label:{vi:'Draft', en:'Draft'} },
+            { key:'review', label:{vi:'Review', en:'Review'} },
+            { key:'approved', label:{vi:'Approved', en:'Approved'} },
+            { key:'released', label:{vi:'Released', en:'Released'} }
+          ]
+        }
+      }
+    },
+    'tpl-r3-story-hero': {
+      type:'story-hero-banner',
+      title:{ vi:'Operational Narrative', en:'Operational Narrative' },
+      config:{
+        tone:'info',
+        title:{ vi:'Điều phối end-to-end trong một bức tranh', en:'End-to-end orchestration in one view' },
+        description:{ vi:'Banner hero cho control tower, war room và release narrative.', en:'Hero banner for control tower, war room and release narrative.' },
+        design:{ caption:'Hero story giúp module có mở đầu rõ ràng và giàu ngữ cảnh' }
+      }
+    }
+  };
+
+  Object.keys(extraTemplates).forEach(function(key){
+    BE.BLOCK_TEMPLATES[key] = clone(extraTemplates[key]);
+  });
+
+  function ensureTab(tabs, key, label, labelEn, icon){
+    var found = null;
+    if(!tabs) return null;
+    tabs.forEach(function(tab){
+      if(tab && tab.key === key) found = tab;
+    });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, icon:icon || '•', sections:[] };
+    tabs.push(found);
+    return found;
+  }
+
+  function ensureSection(tab, key, label, labelEn){
+    var found = null;
+    if(!tab) return null;
+    if(!tab.sections) tab.sections = [];
+    tab.sections.forEach(function(section){
+      if(section && section.key === key) found = section;
+    });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, fields:[] };
+    tab.sections.push(found);
+    return found;
+  }
+
+  function field(key, label, labelEn, type, path, extra){
+    var out = { key:key, label:label, labelEn:labelEn || label, type:type, path:path };
+    Object.keys(extra || {}).forEach(function(name){ out[name] = extra[name]; });
+    return out;
+  }
+
+  function append(section, defs){
+    (defs || []).forEach(function(def){
+      var exists = false;
+      (section.fields || []).forEach(function(item){
+        if(item && ((def.path && item.path === def.path) || (def.key && item.key === def.key))) exists = true;
+      });
+      if(!exists) section.fields.push(def);
+    });
+  }
+
+  Object.keys(extraCatalog).forEach(function(type){
+    var sourceType = extraCatalog[type].renderer || 'data-cards';
+    if(!SCHEMA[type]) SCHEMA[type] = clone(SCHEMA[sourceType] || []);
+  });
+
+  Object.keys(SCHEMA).forEach(function(type){
+    var tabs = SCHEMA[type] || [];
+    var generalTab = ensureTab(tabs, 'general', 'Tổng quan', 'General', '🧩');
+    var dataTab = ensureTab(tabs, 'data', 'Dữ liệu', 'Data', '🗄️');
+    var styleTab = ensureTab(tabs, 'style', 'Giao diện', 'Style', '🎨');
+    var eventsTab = ensureTab(tabs, 'events', 'Sự kiện', 'Events', '⚡');
+
+    var narrative = ensureSection(generalTab, 'narrative', 'Narrative & guidance', 'Narrative & guidance');
+    var observability = ensureSection(dataTab, 'observability', 'Observability', 'Observability');
+    var experience = ensureSection(styleTab, 'experience', 'Experience modes', 'Experience modes');
+    var accessibility = ensureSection(styleTab, 'accessibility', 'Accessibility & ergonomics', 'Accessibility & ergonomics');
+    var collaboration = ensureSection(eventsTab, 'collaboration', 'Collaboration & signoff', 'Collaboration & signoff');
+
+    append(narrative, [
+      field('eyebrow', 'Eyebrow', 'Eyebrow', 'text', 'config.story.eyebrow', { default:'', placeholder:'QUALITY / CONTROL TOWER' }),
+      field('headline', 'Headline', 'Headline', 'text', 'config.story.headline', { default:'', placeholder:'From detection to closure in one canvas' }),
+      field('supportingText', 'Supporting text', 'Supporting text', 'textarea', 'config.story.supportingText', { default:'', rows:2 }),
+      field('priorityTag', 'Priority tag', 'Priority tag', 'text', 'config.story.priorityTag', { default:'', placeholder:'High risk / executive review' })
+    ]);
+
+    append(observability, [
+      field('cachePolicy', 'Cache policy', 'Cache policy', 'select', 'config.observability.cachePolicy', {
+        default:'inherit',
+        options:['inherit','none','memory','session','edge']
+      }),
+      field('staleAfterSec', 'Stale after (sec)', 'Stale after (sec)', 'number', 'config.observability.staleAfterSec', { default:0, min:0, step:5 }),
+      field('queryBudgetMs', 'Query budget (ms)', 'Query budget (ms)', 'number', 'config.observability.queryBudgetMs', { default:0, min:0, step:50 }),
+      field('skeletonPreset', 'Skeleton preset', 'Skeleton preset', 'select', 'config.observability.skeletonPreset', {
+        default:'inherit',
+        options:['inherit','none','card','table','chart','detail']
+      }),
+      field('traceTag', 'Trace tag', 'Trace tag', 'text', 'config.observability.traceTag', { default:'', placeholder:'quality.ncr.table' })
+    ]);
+
+    append(experience, [
+      field('chromeLevel', 'Chrome level', 'Chrome level', 'select', 'config.design.chromeLevel', {
+        default:'inherit',
+        options:['inherit','minimal','balanced','immersive']
+      }),
+      field('glancePriority', 'Glance priority', 'Glance priority', 'select', 'config.design.glancePriority', {
+        default:'inherit',
+        options:['inherit','balanced','kpi-first','workflow-first','evidence-first']
+      }),
+      field('operatorDistance', 'Operator distance', 'Operator distance', 'select', 'config.design.operatorDistance', {
+        default:'inherit',
+        options:['inherit','desk','arm-length','wallboard']
+      }),
+      field('motionPreset', 'Motion preset', 'Motion preset', 'select', 'config.design.motionPreset', {
+        default:'inherit',
+        options:['inherit','none','subtle','guided','cinematic']
+      }),
+      field('audiencePrimary', 'Primary audience', 'Primary audience', 'select', 'config.design.audiencePrimary', {
+        default:'inherit',
+        options:['inherit','operator','supervisor','quality','auditor','executive','cross-functional']
+      })
+    ]);
+
+    append(accessibility, [
+      field('ariaLabel', 'ARIA label', 'ARIA label', 'text', 'config.accessibility.ariaLabel', { default:'' }),
+      field('contrastMode', 'Contrast mode', 'Contrast mode', 'select', 'config.accessibility.contrastMode', {
+        default:'inherit',
+        options:['inherit','standard','high','night']
+      }),
+      field('touchTarget', 'Touch target', 'Touch target', 'select', 'config.accessibility.touchTarget', {
+        default:'inherit',
+        options:['inherit','md','lg','xl']
+      }),
+      field('keyboardOrder', 'Keyboard order', 'Keyboard order', 'number', 'config.accessibility.keyboardOrder', { default:0, step:1 }),
+      field('screenReaderNote', 'Screen reader note', 'Screen reader note', 'textarea', 'config.accessibility.screenReaderNote', { default:'', rows:2 })
+    ]);
+
+    append(collaboration, [
+      field('approvalChannel', 'Approval channel', 'Approval channel', 'text', 'config.collaboration.approvalChannel', { default:'', placeholder:'quality.review.board' }),
+      field('notifyRoles', 'Notify roles (CSV)', 'Notify roles (CSV)', 'text', 'config.collaboration.notifyRoles', { default:'', placeholder:'quality_manager, process_owner' }),
+      field('esignRequired', 'Require e-sign', 'Require e-sign', 'toggle', 'config.collaboration.esignRequired', { default:false }),
+      field('handoverTemplate', 'Handover template', 'Handover template', 'text', 'config.collaboration.handoverTemplate', { default:'', placeholder:'warroom_handover_v1' }),
+      field('reviewCadence', 'Review cadence', 'Review cadence', 'select', 'config.collaboration.reviewCadence', {
+        default:'inherit',
+        options:['inherit','shift','daily','weekly','release']
+      })
+    ]);
+
+    SCHEMA[type] = tabs;
+  });
+
+  if(BE.BREAKPOINTS && !BE.BREAKPOINTS.wide){
+    BE.BREAKPOINTS.wide = { maxWidth: 1600, label:'Màn hình rộng', labelEn:'Wide' };
+  }
+
+  BE.EXTRA_TEMPLATES_ROUND3 = extraTemplates;
+  BE.BLOCK_PROPERTIES_SCHEMA = SCHEMA;
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-07-r3';
+})();
+
+
+/* ─── 10. MODULE BUILDER ULTIMATE SCHEMA + TEMPLATE PATCH (2026-04-07 R4) ─ */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION === '2026-04-07-r4') return;
+  var BE = window.HmBlockEngine;
+  var SCHEMA = BE.BLOCK_PROPERTIES_SCHEMA || {};
+  var TEMPLATES = BE.BLOCK_TEMPLATES || {};
+
+  function ensureTab(tabs, key, label, labelEn, icon){
+    var found = null;
+    (tabs || []).forEach(function(tab){
+      if(tab && tab.key === key) found = tab;
+    });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, icon:icon || '', sections:[] };
+    tabs.push(found);
+    return found;
+  }
+
+  function ensureSection(tab, key, label, labelEn){
+    var found = null;
+    if(!tab.sections) tab.sections = [];
+    (tab.sections || []).forEach(function(section){
+      if(section && section.key === key) found = section;
+    });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, fields:[] };
+    tab.sections.push(found);
+    return found;
+  }
+
+  function field(key, label, labelEn, type, path, extra){
+    var out = { key:key, label:label, labelEn:labelEn || label, type:type, path:path };
+    Object.keys(extra || {}).forEach(function(name){ out[name] = extra[name]; });
+    return out;
+  }
+
+  function ensureField(section, def){
+    var exists = false;
+    if(!section.fields) section.fields = [];
+    (section.fields || []).forEach(function(item){
+      if(item && ((def.path && item.path === def.path) || (def.key && item.key === def.key))) exists = true;
+    });
+    if(!exists) section.fields.push(def);
+  }
+
+  function append(section, defs){
+    (defs || []).forEach(function(def){ ensureField(section, def); });
+  }
+
+  Object.keys(SCHEMA).forEach(function(type){
+    var tabs = SCHEMA[type] || [];
+    var dataTab = ensureTab(tabs, 'data', 'Dữ liệu', 'Data', '🗄️');
+    var styleTab = ensureTab(tabs, 'style', 'Giao diện', 'Style', '🎨');
+    var eventsTab = ensureTab(tabs, 'events', 'Sự kiện', 'Events', '⚡');
+
+    var observability = ensureSection(dataTab, 'observability', 'Signal & observability', 'Signal & observability');
+    var storytelling = ensureSection(styleTab, 'storytelling', 'Storytelling', 'Storytelling');
+    var accessibility = ensureSection(styleTab, 'accessibilityErgonomics', 'Accessibility & ergonomics', 'Accessibility & ergonomics');
+    var collaboration = ensureSection(eventsTab, 'collaborationOps', 'Collaboration & signoff', 'Collaboration & signoff');
+    var operatorOps = ensureSection(eventsTab, 'operatorOps', 'Operator interaction', 'Operator interaction');
+
+    append(observability, [
+      field('signalClass', 'Nhóm tín hiệu', 'Signal class', 'select', 'config.observability.signalClass', {
+        default:'status',
+        options:['status','command','warning','critical','evidence','release']
+      }),
+      field('refreshCadenceSec', 'Chu kỳ refresh (giây)', 'Refresh cadence (sec)', 'number', 'config.observability.refreshCadenceSec', { default:30, min:0, step:5 }),
+      field('alertChannel', 'Kênh cảnh báo', 'Alert channel', 'text', 'config.observability.alertChannel', { default:'', placeholder:'andon.wall / slack.quality / email.audit' }),
+      field('signalOwner', 'Chủ tín hiệu', 'Signal owner', 'text', 'config.observability.signalOwner', { default:'', placeholder:'quality_manager' }),
+      field('logContext', 'Log context', 'Log context', 'text', 'config.observability.logContext', { default:'', placeholder:'quality.ncr.review' }),
+      field('traceKey', 'Trace key', 'Trace key', 'text', 'config.observability.traceKey', { default:'', placeholder:'ncr_number / work_order' })
+    ]);
+
+    append(storytelling, [
+      field('sceneRole', 'Vai trò scene', 'Scene role', 'select', 'config.story.sceneRole', {
+        default:'observe',
+        options:['entry','observe','analyze','act','decide','review','prove','handoff']
+      }),
+      field('sceneTitle', 'Tiêu đề scene', 'Scene title', 'text', 'config.story.sceneTitle', { default:'', placeholder:'Detect, decide and close with evidence' }),
+      field('sceneNarrative', 'Narrative', 'Narrative', 'textarea', 'config.story.sceneNarrative', { default:'', rows:3 }),
+      field('callToAction', 'Call to action', 'Call to action', 'text', 'config.story.callToAction', { default:'', placeholder:'Escalate now / Review exceptions / Confirm release' }),
+      field('heroBadge', 'Hero badge', 'Hero badge', 'text', 'config.story.heroBadge', { default:'', placeholder:'LIVE / CONTROL / EVIDENCE' }),
+      field('priorityWeight', 'Trọng số ưu tiên', 'Priority weight', 'number', 'config.story.priorityWeight', { default:50, min:0, max:100, step:5 })
+    ]);
+
+    append(accessibility, [
+      field('ariaLabel', 'ARIA label', 'ARIA label', 'text', 'config.accessibility.ariaLabel', { default:'', placeholder:'Action lane for NCR review' }),
+      field('operatorDistance', 'Khoảng cách người dùng', 'Operator distance', 'select', 'config.accessibility.operatorDistance', {
+        default:'desk',
+        options:['desk','arm-length','wallboard']
+      }),
+      field('touchTarget', 'Kích thước touch', 'Touch target', 'select', 'config.accessibility.touchTarget', {
+        default:'md',
+        options:['sm','md','lg','xl']
+      }),
+      field('highContrast', 'High contrast', 'High contrast', 'toggle', 'config.accessibility.highContrast', { default:false }),
+      field('screenReaderNote', 'Ghi chú screen reader', 'Screen reader note', 'textarea', 'config.accessibility.screenReaderNote', { default:'', rows:2 }),
+      field('keyboardHint', 'Gợi ý phím tắt', 'Keyboard hint', 'text', 'config.accessibility.keyboardHint', { default:'', placeholder:'Ctrl+Enter / Alt+S' })
+    ]);
+
+    append(collaboration, [
+      field('reviewMode', 'Chế độ review', 'Review mode', 'select', 'config.collaboration.reviewMode', {
+        default:'optional',
+        options:['optional','mandatory','four-eyes','esign']
+      }),
+      field('reviewOwner', 'Người review', 'Review owner', 'text', 'config.collaboration.reviewOwner', { default:'', placeholder:'quality_manager' }),
+      field('handoverQueue', 'Hàng đợi handover', 'Handover queue', 'text', 'config.collaboration.handoverQueue', { default:'', placeholder:'quality-war-room / plant-daily-tier2' }),
+      field('evidenceRequired', 'Yêu cầu chứng cứ', 'Evidence required', 'toggle', 'config.collaboration.evidenceRequired', { default:false }),
+      field('commentPrompt', 'Prompt bình luận', 'Comment prompt', 'text', 'config.collaboration.commentPrompt', { default:'', placeholder:'Explain rationale and residual risk' }),
+      field('esignRole', 'Vai trò ký số', 'E-sign role', 'text', 'config.collaboration.esignRole', { default:'', placeholder:'qa_manager / plant_head' })
+    ]);
+
+    append(operatorOps, [
+      field('mode', 'Operator mode', 'Operator mode', 'select', 'config.operatorMode.mode', {
+        default:'default',
+        options:['default','focus','gloves','handheld','wallboard']
+      }),
+      field('confirmationStyle', 'Kiểu xác nhận', 'Confirmation style', 'select', 'config.operatorMode.confirmationStyle', {
+        default:'toast',
+        options:['toast','modal','double-confirm','scan']
+      }),
+      field('safetyPrompt', 'Safety prompt', 'Safety prompt', 'text', 'config.operatorMode.safetyPrompt', { default:'', placeholder:'Verify machine safe state before override' }),
+      field('offlineHint', 'Offline hint', 'Offline hint', 'text', 'config.operatorMode.offlineHint', { default:'', placeholder:'Sync will resume when network is back' }),
+      field('barcodeIntent', 'Barcode intent', 'Barcode intent', 'text', 'config.operatorMode.barcodeIntent', { default:'', placeholder:'scan work order / batch / pallet' }),
+      field('attentionStyle', 'Attention style', 'Attention style', 'select', 'config.operatorMode.attentionStyle', {
+        default:'calm',
+        options:['calm','assertive','critical']
+      })
+    ]);
+
+    SCHEMA[type] = tabs;
+  });
+
+  var ROUND4_TEMPLATES = {
+    'tpl-r4-story-hero': {
+      type:'insight-scorecard',
+      title:{ vi:'Story Hero', en:'Story Hero' },
+      description:'Narrative-first hero tile for executive, quality and industrial control surfaces.',
+      module:'experience',
+      config:{
+        title:'Story Hero',
+        caption:'Lead operators and leaders from awareness to action in one glance.',
+        items:[
+          { label:'Audience', value:'Cross-functional', tone:'neutral' },
+          { label:'Mode', value:'Control plane', tone:'info' },
+          { label:'Next move', value:'Review / Decide / Act', tone:'success' }
+        ],
+        design:{ caption:'Use this hero to frame the module mission, next move and control context.' },
+        story:{ sceneRole:'entry', sceneTitle:'Enter with context', sceneNarrative:'Set intent, confidence and next action in one block.', callToAction:'Review the command surface now', heroBadge:'CONTROL' }
+      }
+    },
+    'tpl-r4-control-tower-kpi': {
+      type:'kpi-row',
+      title:{ vi:'Control Tower KPIs', en:'Control Tower KPIs' },
+      description:'Boardroom KPI stack for top-level orchestration.',
+      module:'executive',
+      config:{
+        dataSource:{ api:'executive_control_tower', method:'GET', dataKey:'kpis' },
+        items:[
+          { label:{ vi:'Doanh thu rủi ro', en:'Revenue at risk' }, dataSource:{ api:'executive_control_tower', field:'revenue_at_risk' }, color:'var(--red)', prefix:'$' },
+          { label:{ vi:'Lệnh trễ', en:'Delayed work orders' }, dataSource:{ api:'executive_control_tower', field:'delayed_work_orders' }, color:'var(--amber)' },
+          { label:{ vi:'CAPA mở', en:'Open CAPA' }, dataSource:{ api:'executive_control_tower', field:'open_capa' }, color:'var(--brand-2)' },
+          { label:{ vi:'OTD', en:'OTD' }, dataSource:{ api:'executive_control_tower', field:'otd_pct' }, color:'var(--green)', suffix:'%' }
+        ],
+        design:{ caption:'Escalate revenue, delivery and quality risk from one executive strip.' },
+        story:{ sceneRole:'observe', sceneTitle:'See the plant pulse', sceneNarrative:'Track risk, delivery and quality pulse before drilling into details.', heroBadge:'LIVE KPI' },
+        observability:{ signalClass:'critical', refreshCadenceSec:60, alertChannel:'executive.board' }
+      }
+    },
+    'tpl-r4-war-room-readiness': {
+      type:'data-cards',
+      title:{ vi:'Readiness Board', en:'Readiness Board' },
+      description:'Status wall for containment, CAPA, signoff and closure readiness.',
+      module:'quality',
+      config:{
+        dataSource:{ api:'quality_readiness_board', method:'GET', dataKey:'items' },
+        columns:2,
+        titleKey:'title',
+        subtitleKey:'owner',
+        badgeKey:'status',
+        design:{ caption:'Use this board to surface red readiness gaps and unblock signoff.' },
+        story:{ sceneRole:'analyze', sceneTitle:'See readiness at a glance', sceneNarrative:'Focus on containment, evidence and closure readiness before release.', heroBadge:'READY?' },
+        observability:{ signalClass:'warning', refreshCadenceSec:45, alertChannel:'quality.war-room' }
+      }
+    },
+    'tpl-r4-command-lane': {
+      type:'action-toolbar',
+      title:{ vi:'Command Lane', en:'Command Lane' },
+      description:'High-clarity action lane for escalation, approval and workflow control.',
+      module:'operations',
+      config:{
+        actions:[
+          { key:'refresh', label:{ vi:'Làm mới', en:'Refresh' }, style:'ghost' },
+          { key:'escalate', label:{ vi:'Escalate', en:'Escalate' }, style:'danger' },
+          { key:'assign', label:{ vi:'Giao việc', en:'Assign' }, style:'primary' },
+          { key:'approve', label:{ vi:'Duyệt', en:'Approve' }, style:'success' }
+        ],
+        design:{ caption:'Put the most critical next actions in one operator-safe command lane.' },
+        story:{ sceneRole:'act', sceneTitle:'Act without hunting for buttons', sceneNarrative:'Shorten time-to-action with a focused high-clarity toolbar.', callToAction:'Escalate or approve now', heroBadge:'ACTION' },
+        accessibility:{ ariaLabel:'Command lane for high priority workflow actions', touchTarget:'xl' },
+        collaboration:{ reviewMode:'mandatory', evidenceRequired:true }
+      }
+    },
+    'tpl-r4-live-signal-wall': {
+      type:'mfg-machine-status',
+      title:{ vi:'Live Signal Wall', en:'Live Signal Wall' },
+      description:'Realtime signal wall for machine, line or workflow pulse.',
+      module:'production',
+      config:{
+        dataSource:{ api:'live_signal_wall', method:'GET', dataKey:'machines' },
+        titleKey:'machine_name',
+        statusKey:'status',
+        metrics:[
+          { key:'oee', label:{ vi:'OEE', en:'OEE' } },
+          { key:'downtime_min', label:{ vi:'Downtime', en:'Downtime' } }
+        ],
+        design:{ caption:'Show green/yellow/red pulse for lines, cells or machines with zero scroll.' },
+        story:{ sceneRole:'observe', sceneTitle:'Watch live signals', sceneNarrative:'Use the wallboard to detect loss, downtime and escalation conditions immediately.', heroBadge:'LIVE' },
+        observability:{ signalClass:'critical', refreshCadenceSec:15, alertChannel:'andon.wall' },
+        operatorMode:{ mode:'wallboard', attentionStyle:'critical' }
+      }
+    },
+    'tpl-r4-evidence-stage': {
+      type:'audit-log',
+      title:{ vi:'Evidence Stage', en:'Evidence Stage' },
+      description:'Evidence and chain-of-custody stream for audits and investigations.',
+      module:'evidence',
+      config:{
+        dataSource:{ api:'evidence_stage', method:'GET', dataKey:'events' },
+        dateKey:'created_at',
+        actorKey:'actor',
+        actionKey:'action',
+        detailKey:'detail',
+        design:{ caption:'Tell the evidence story with time, actor, action and proof context.' },
+        story:{ sceneRole:'prove', sceneTitle:'Prove with evidence', sceneNarrative:'Track chain of custody, approvals and integrity events in one timeline.', heroBadge:'EVIDENCE' },
+        collaboration:{ evidenceRequired:true, reviewMode:'esign', esignRole:'qa_manager' },
+        observability:{ signalClass:'evidence', refreshCadenceSec:120, alertChannel:'audit.evidence' }
+      }
+    },
+    'tpl-r4-review-matrix': {
+      type:'matrix-grid',
+      title:{ vi:'Review Matrix', en:'Review Matrix' },
+      description:'Cross-check matrix for signoff, residual risk and evidence completeness.',
+      module:'governance',
+      config:{
+        rows:['Containment','Root cause','CAPA','Validation','Release'],
+        columns:['Owner','Reviewer','Evidence','Residual risk','Status'],
+        design:{ caption:'Use a matrix when signoff and evidence need to be crystal clear.' },
+        story:{ sceneRole:'review', sceneTitle:'Review with structure', sceneNarrative:'Expose signoff gaps and evidence status without opening multiple views.', heroBadge:'4-EYES' },
+        collaboration:{ reviewMode:'four-eyes', evidenceRequired:true, commentPrompt:'Describe remaining risk before release.' }
+      }
+    },
+    'tpl-r4-handoff-board': {
+      type:'data-kanban',
+      title:{ vi:'Handoff Board', en:'Handoff Board' },
+      description:'Kanban lane for handoff between functions and shifts.',
+      module:'handoff',
+      config:{
+        dataSource:{ api:'handoff_board', method:'GET', dataKey:'items' },
+        columnKey:'lane',
+        columns:['incoming','doing','review','ready','done'],
+        design:{ caption:'Coordinate handoff across roles, shifts and exception queues.' },
+        story:{ sceneRole:'handoff', sceneTitle:'Handover without losing context', sceneNarrative:'Surface ownership, readiness and blockers in one handoff board.', heroBadge:'HANDOFF' },
+        collaboration:{ reviewMode:'mandatory', handoverQueue:'handoff.board', commentPrompt:'Confirm what changed and what still blocks completion.' }
+      }
+    },
+    'tpl-r4-warehouse-wave': {
+      type:'data-table',
+      title:{ vi:'Warehouse Wave', en:'Warehouse Wave' },
+      description:'Wave release and handheld-friendly execution grid.',
+      module:'warehouse',
+      config:{
+        dataSource:{ api:'warehouse_wave_execution', method:'GET', dataKey:'items' },
+        columns:[
+          { key:'wave_id', label:{ vi:'Wave', en:'Wave' }, type:'text' },
+          { key:'priority', label:{ vi:'Ưu tiên', en:'Priority' }, type:'badge' },
+          { key:'zone', label:{ vi:'Zone', en:'Zone' }, type:'text' },
+          { key:'status', label:{ vi:'Trạng thái', en:'Status' }, type:'badge' },
+          { key:'owner', label:{ vi:'Người xử lý', en:'Owner' }, type:'text' }
+        ],
+        pagination:true,
+        pageSize:10,
+        design:{ caption:'Release and monitor warehouse waves in a handheld-friendly table.' },
+        story:{ sceneRole:'act', sceneTitle:'Release and execute waves', sceneNarrative:'Keep wave execution, priority and readiness visible for handheld operators.', heroBadge:'WAVE' },
+        operatorMode:{ mode:'handheld', barcodeIntent:'scan pallet / tote / task', touchTarget:'xl' },
+        observability:{ signalClass:'command', refreshCadenceSec:20, alertChannel:'warehouse.wave' }
+      }
+    },
+    'tpl-r4-release-pulse': {
+      type:'data-timeline',
+      title:{ vi:'Release Pulse', en:'Release Pulse' },
+      description:'Release timeline for rollout, signoff and rollback visibility.',
+      module:'release',
+      config:{
+        dataSource:{ api:'release_pulse', method:'GET', dataKey:'events' },
+        dateKey:'event_at',
+        titleKey:'title',
+        descKey:'detail',
+        design:{ caption:'Make release state, approvals and rollback cues visible on one line.' },
+        story:{ sceneRole:'review', sceneTitle:'Control the release pulse', sceneNarrative:'Show signoff, rollout, rollback and evidence milestones in one timeline.', heroBadge:'RELEASE' },
+        collaboration:{ reviewMode:'esign', evidenceRequired:true, esignRole:'release_manager' },
+        observability:{ signalClass:'release', refreshCadenceSec:300, alertChannel:'release.control' }
+      }
+    },
+    'tpl-r4-machine-signal': {
+      type:'mfg-machine-status',
+      title:{ vi:'Machine Signal', en:'Machine Signal' },
+      description:'Machine and asset pulse for maintenance response.',
+      module:'maintenance',
+      config:{
+        dataSource:{ api:'maintenance_signal_wall', method:'GET', dataKey:'assets' },
+        titleKey:'asset_name',
+        statusKey:'status',
+        metrics:[
+          { key:'mttr', label:{ vi:'MTTR', en:'MTTR' } },
+          { key:'overdue_pm', label:{ vi:'PM trễ', en:'Overdue PM' } }
+        ],
+        design:{ caption:'Expose maintenance risk and response urgency without leaving the command view.' },
+        story:{ sceneRole:'observe', sceneTitle:'Spot assets at risk', sceneNarrative:'Use the signal board to detect overdue PM and failure escalation conditions.', heroBadge:'ASSET' },
+        observability:{ signalClass:'warning', refreshCadenceSec:30, alertChannel:'maintenance.ops' }
+      }
+    },
+    'tpl-r4-maintenance-response': {
+      type:'data-table',
+      title:{ vi:'Maintenance Response', en:'Maintenance Response' },
+      description:'Response queue for maintenance action and escalation.',
+      module:'maintenance',
+      config:{
+        dataSource:{ api:'maintenance_response_queue', method:'GET', dataKey:'items' },
+        columns:[
+          { key:'ticket_no', label:{ vi:'Phiếu', en:'Ticket' }, type:'text' },
+          { key:'asset', label:{ vi:'Thiết bị', en:'Asset' }, type:'text' },
+          { key:'severity', label:{ vi:'Mức độ', en:'Severity' }, type:'badge' },
+          { key:'owner', label:{ vi:'Owner', en:'Owner' }, type:'text' },
+          { key:'status', label:{ vi:'Trạng thái', en:'Status' }, type:'badge' }
+        ],
+        pagination:true,
+        pageSize:12,
+        design:{ caption:'Prioritize response by severity, owner and asset criticality.' },
+        story:{ sceneRole:'act', sceneTitle:'Respond and close fast', sceneNarrative:'Put the response queue next to the live asset wall for faster closeout.', heroBadge:'RESPONSE' },
+        collaboration:{ reviewMode:'mandatory', handoverQueue:'maintenance.response' },
+        observability:{ signalClass:'command', refreshCadenceSec:30, alertChannel:'maintenance.response' }
+      }
+    }
+  };
+
+  Object.keys(ROUND4_TEMPLATES).forEach(function(key){
+    TEMPLATES[key] = ROUND4_TEMPLATES[key];
+  });
+
+  BE.BLOCK_TEMPLATES = TEMPLATES;
+  BE.BLOCK_PROPERTIES_SCHEMA = SCHEMA;
+  BE.ROUND4_TEMPLATES = ROUND4_TEMPLATES;
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-07-r4';
+  BE.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION = '2026-04-07-r4';
+
+  /* ─── 11. MODULE BUILDER COSMOS PATCH (2026-04-07 R5) ──────────────────── */
+  Object.keys(SCHEMA).forEach(function(type){
+    var tabs = SCHEMA[type] || [];
+    var dataTab = ensureTab(tabs, 'data', 'Dữ liệu', 'Data', '🗄️');
+    var styleTab = ensureTab(tabs, 'style', 'Giao diện', 'Style', '🎨');
+    var eventsTab = ensureTab(tabs, 'events', 'Sự kiện', 'Events', '⚡');
+
+    var flowGraph = ensureSection(dataTab, 'flowGraph', 'Flow graph & canvas', 'Flow graph & canvas');
+    var motionSystem = ensureSection(styleTab, 'motionSystem', 'Motion & stagecraft', 'Motion & stagecraft');
+    var releaseGov = ensureSection(eventsTab, 'governanceRelease', 'Release governance', 'Release governance');
+
+    append(flowGraph, [
+      field('nodeRole', 'Vai trò node', 'Node role', 'select', 'config.flowGraph.nodeRole', {
+        default:'step',
+        options:['entry','step','decision','service','handoff','approval','evidence','release']
+      }),
+      field('swimlane', 'Swimlane', 'Swimlane', 'text', 'config.flowGraph.swimlane', { default:'', placeholder:'intake / review / execute / release' }),
+      field('edgeTo', 'Edge tới', 'Edge to', 'text', 'config.flowGraph.edgeTo', { default:'', placeholder:'review.stage / release.orbit / api.service' }),
+      field('serviceRef', 'Service ref', 'Service ref', 'text', 'config.flowGraph.serviceRef', { default:'', placeholder:'quality.ncr / release.package / scada.machine' }),
+      field('evidenceSignal', 'Tín hiệu bằng chứng', 'Evidence signal', 'text', 'config.flowGraph.evidenceSignal', { default:'', placeholder:'approval.signoff / evidence.chain' })
+    ]);
+
+    append(motionSystem, [
+      field('preset', 'Motion preset', 'Motion preset', 'select', 'config.motion.preset', {
+        default:'subtle',
+        options:['none','subtle','guided','cinematic','focus-pulse']
+      }),
+      field('speed', 'Tốc độ chuyển động', 'Motion speed', 'select', 'config.motion.speed', {
+        default:'normal',
+        options:['slow','normal','fast','expressive']
+      }),
+      field('depth', 'Chiều sâu sân khấu', 'Stage depth', 'select', 'config.motion.depth', {
+        default:'medium',
+        options:['flat','medium','deep']
+      }),
+      field('emphasis', 'Trọng tâm motion', 'Motion emphasis', 'select', 'config.motion.emphasis', {
+        default:'focus',
+        options:['focus','signal','guidance','celebration']
+      }),
+      field('reducedSafe', 'An toàn reduced motion', 'Reduced-motion safe', 'toggle', 'config.motion.reducedSafe', { default:true })
+    ]);
+
+    append(releaseGov, [
+      field('releaseStage', 'Giai đoạn release', 'Release stage', 'select', 'config.governance.releaseStage', {
+        default:'draft',
+        options:['draft','review','signoff','ready','released','rollback']
+      }),
+      field('approvalRole', 'Vai trò duyệt', 'Approval role', 'text', 'config.governance.approvalRole', { default:'', placeholder:'release_manager / qa_manager' }),
+      field('versionTag', 'Version tag', 'Version tag', 'text', 'config.governance.versionTag', { default:'', placeholder:'1.4.0 / rel-2026.04' }),
+      field('changeWindow', 'Change window', 'Change window', 'text', 'config.governance.changeWindow', { default:'', placeholder:'Thu 22:00-23:00 ICT' }),
+      field('rollbackCue', 'Cue rollback', 'Rollback cue', 'text', 'config.governance.rollbackCue', { default:'', placeholder:'Revert feature flag and restore prior stable package' })
+    ]);
+
+    SCHEMA[type] = tabs;
+  });
+
+  var ROUND5_TEMPLATES = {
+    'tpl-r5-release-orbit': {
+      type:'insight-scorecard',
+      title:{ vi:'Release Orbit', en:'Release Orbit' },
+      description:'Hero board for semantic version, release train and control-gate awareness.',
+      module:'release',
+      config:{
+        title:'Release Orbit',
+        caption:'Version, train, signoff and rollback confidence in one control surface.',
+        items:[
+          { label:'Version', value:'1.0.0', tone:'info' },
+          { label:'Train', value:'core-main', tone:'neutral' },
+          { label:'Channel', value:'enterprise', tone:'success' },
+          { label:'Rollback', value:'Ready', tone:'success' }
+        ],
+        design:{ caption:'Use this hero to anchor semantic version, train, signoff and rollback confidence.' },
+        story:{ sceneRole:'review', sceneTitle:'Review release orbit', sceneNarrative:'Give leaders and release owners a clear orbital view of version, gates and package confidence.', callToAction:'Review gates before rollout', heroBadge:'RELEASE' },
+        observability:{ signalClass:'release', refreshCadenceSec:180, alertChannel:'release.orbit' },
+        governance:{ releaseStage:'review', approvalRole:'release_manager', versionTag:'1.0.0' }
+      }
+    },
+    'tpl-r5-flow-canvas': {
+      type:'data-tree',
+      title:{ vi:'Flow Canvas', en:'Flow Canvas' },
+      description:'Directed story-lane flow for handoff, service hops and release path.',
+      module:'orchestration',
+      config:{
+        dataSource:{ api:'module_flow_canvas', method:'GET', dataKey:'nodes' },
+        dataKey:'nodes',
+        childrenKey:'children',
+        titleField:'title',
+        subtitleField:'owner',
+        design:{ caption:'Render orchestration, handoff and release hops in a visual story lane.' },
+        story:{ sceneRole:'analyze', sceneTitle:'See the directed flow', sceneNarrative:'Make handoff, service calls and release path visible before people act.', heroBadge:'FLOW' },
+        flowGraph:{ nodeRole:'step', swimlane:'review', edgeTo:'release.orbit', serviceRef:'module.flow' },
+        observability:{ signalClass:'command', refreshCadenceSec:60, alertChannel:'flow.canvas' }
+      }
+    },
+    'tpl-r5-governance-gate': {
+      type:'matrix-grid',
+      title:{ vi:'Governance Gate Matrix', en:'Governance Gate Matrix' },
+      description:'Cross-check matrix for semver, signoff, rollback and release train readiness.',
+      module:'governance',
+      config:{
+        rows:['Semver','Smoke','Signoff','Rollback','Package'],
+        columns:['Owner','Evidence','Gate','Status','Next move'],
+        design:{ caption:'Keep release gates and proof visible without opening separate screens.' },
+        story:{ sceneRole:'review', sceneTitle:'Prove release readiness', sceneNarrative:'Use a matrix when you need to show version, signoff, rollback and package proof side by side.', heroBadge:'GATE' },
+        collaboration:{ reviewMode:'esign', evidenceRequired:true, esignRole:'release_manager' },
+        governance:{ releaseStage:'signoff', approvalRole:'release_manager', versionTag:'1.0.0' }
+      }
+    },
+    'tpl-r5-package-shelf': {
+      type:'data-cards',
+      title:{ vi:'Package Shelf', en:'Package Shelf' },
+      description:'Module package shelf with tiers, compatibility and rollout intent.',
+      module:'platform',
+      config:{
+        dataSource:{ api:'module_package_shelf', method:'GET', dataKey:'packages' },
+        columns:3,
+        titleKey:'package_name',
+        subtitleKey:'tier',
+        badgeKey:'share_mode',
+        design:{ caption:'Present package catalog, compatibility and rollout intent as a clean gallery.' },
+        story:{ sceneRole:'observe', sceneTitle:'See package fit', sceneNarrative:'Expose package tier, compatibility and rollout intent before teams adopt the module.', heroBadge:'PACKAGE' },
+        flowGraph:{ nodeRole:'service', swimlane:'package', serviceRef:'release.package' }
+      }
+    },
+    'tpl-r5-journey-filmstrip': {
+      type:'data-timeline',
+      title:{ vi:'Journey Filmstrip', en:'Journey Filmstrip' },
+      description:'Step-by-step user journey and operator walkthrough filmstrip.',
+      module:'experience',
+      config:{
+        dataSource:{ api:'module_journey_filmstrip', method:'GET', dataKey:'steps' },
+        dateKey:'sequence',
+        titleKey:'title',
+        descKey:'detail',
+        statusKey:'status',
+        design:{ caption:'Explain the ideal task path with a filmstrip instead of a dense SOP.' },
+        story:{ sceneRole:'handoff', sceneTitle:'Walk the user journey', sceneNarrative:'Use a filmstrip to align operator, reviewer and release owner on the happy path.', heroBadge:'JOURNEY' },
+        flowGraph:{ nodeRole:'handoff', swimlane:'journey', edgeTo:'package.shelf', evidenceSignal:'journey.confirmed' }
+      }
+    },
+    'tpl-r5-command-pulse': {
+      type:'action-toolbar',
+      title:{ vi:'Command Pulse', en:'Command Pulse' },
+      description:'Focused toolbar for bump version, export package, approve and rollback.',
+      module:'release',
+      config:{
+        actions:[
+          { key:'bump_patch', label:{ vi:'Bump patch', en:'Bump patch' }, style:'primary' },
+          { key:'export_package', label:{ vi:'Xuất package', en:'Export package' }, style:'success' },
+          { key:'approve_release', label:{ vi:'Duyệt release', en:'Approve release' }, style:'primary' },
+          { key:'rollback_ready', label:{ vi:'Rollback ready', en:'Rollback ready' }, style:'ghost' }
+        ],
+        design:{ caption:'Keep release owner actions together in a high-clarity command pulse.' },
+        story:{ sceneRole:'act', sceneTitle:'Act on release with confidence', sceneNarrative:'Bring versioning, export, approval and rollback controls into one pulse lane.', callToAction:'Bump version or export package now', heroBadge:'PULSE' },
+        accessibility:{ ariaLabel:'Release command pulse for versioning and package actions', touchTarget:'xl' },
+        governance:{ releaseStage:'ready', approvalRole:'release_manager', versionTag:'1.0.0' }
+      }
+    }
+  };
+
+  Object.keys(ROUND5_TEMPLATES).forEach(function(key){
+    TEMPLATES[key] = ROUND5_TEMPLATES[key];
+  });
+
+  BE.ROUND5_TEMPLATES = ROUND5_TEMPLATES;
+  BE.BLOCK_TEMPLATES = TEMPLATES;
+  BE.BLOCK_PROPERTIES_SCHEMA = SCHEMA;
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-07-r5';
+  BE.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION = '2026-04-07-r5';
+
+})();
+
+
+/* ─── 12. MODULE BUILDER SUPREME SCHEMA + TEMPLATE PATCH (2026-04-07 R5) ── */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_SUPREME_SCHEMA_VERSION === '2026-04-07-r5') return;
+  var BE = window.HmBlockEngine;
+  var SCHEMA = BE.BLOCK_PROPERTIES_SCHEMA || {};
+  var TEMPLATES = BE.BLOCK_TEMPLATES || {};
+
+  function ensureTab(tabs, key, label, labelEn, icon){
+    var found = null;
+    (tabs || []).forEach(function(tab){ if(tab && tab.key === key) found = tab; });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, icon:icon || '', sections:[] };
+    tabs.push(found);
+    return found;
+  }
+
+  function ensureSection(tab, key, label, labelEn){
+    var found = null;
+    if(!tab.sections) tab.sections = [];
+    (tab.sections || []).forEach(function(section){ if(section && section.key === key) found = section; });
+    if(found) return found;
+    found = { key:key, label:label, labelEn:labelEn || label, fields:[] };
+    tab.sections.push(found);
+    return found;
+  }
+
+  function field(key, label, labelEn, type, path, extra){
+    var out = { key:key, label:label, labelEn:labelEn || label, type:type, path:path };
+    Object.keys(extra || {}).forEach(function(name){ out[name] = extra[name]; });
+    return out;
+  }
+
+  function ensureField(section, def){
+    var exists = false;
+    if(!section.fields) section.fields = [];
+    (section.fields || []).forEach(function(item){
+      if(item && ((def.path && item.path === def.path) || (def.key && item.key === def.key))) exists = true;
+    });
+    if(!exists) section.fields.push(def);
+  }
+
+  function append(section, defs){
+    (defs || []).forEach(function(def){ ensureField(section, def); });
+  }
+
+  Object.keys(SCHEMA).forEach(function(type){
+    var tabs = SCHEMA[type] || [];
+    var dataTab = ensureTab(tabs, 'data', 'Dữ liệu', 'Data', '🗄️');
+    var styleTab = ensureTab(tabs, 'style', 'Giao diện', 'Style', '🎨');
+    var eventsTab = ensureTab(tabs, 'events', 'Sự kiện', 'Events', '⚡');
+
+    var workflowStudio = ensureSection(dataTab, 'workflowStudio', 'Workflow studio', 'Workflow studio');
+    var motionSystem = ensureSection(styleTab, 'motionSystem', 'Motion system', 'Motion system');
+    var publishOps = ensureSection(eventsTab, 'publishOps', 'Publish control', 'Publish control');
+    var packageOps = ensureSection(eventsTab, 'packageOps', 'Package & version', 'Package & version');
+    var aiCopilot = ensureSection(eventsTab, 'aiCopilot', 'AI copilot', 'AI copilot');
+
+    append(workflowStudio, [
+      field('mode', 'Workflow mode', 'Workflow mode', 'select', 'config.workflowStudio.mode', { default:'observe', options:['observe','queue','kanban','constellation','timeline','storyboard'] }),
+      field('laneKey', 'Lane key', 'Lane key', 'text', 'config.workflowStudio.laneKey', { default:'', placeholder:'stage / owner / line / shift' }),
+      field('decisionKey', 'Decision key', 'Decision key', 'text', 'config.workflowStudio.decisionKey', { default:'', placeholder:'decision / risk / disposition' }),
+      field('handoffKey', 'Handoff key', 'Handoff key', 'text', 'config.workflowStudio.handoffKey', { default:'', placeholder:'next_owner / next_station' }),
+      field('serviceAlias', 'Service alias', 'Service alias', 'text', 'config.workflowStudio.serviceAlias', { default:'', placeholder:'quality.ncr.review / warehouse.wave' }),
+      field('constellationGroup', 'Constellation group', 'Constellation group', 'text', 'config.workflowStudio.constellationGroup', { default:'', placeholder:'control / evidence / action / publish' }),
+      field('slaMinutes', 'SLA (minutes)', 'SLA (minutes)', 'number', 'config.workflowStudio.slaMinutes', { default:0, min:0, step:5 })
+    ]);
+
+    append(motionSystem, [
+      field('preset', 'Motion preset', 'Motion preset', 'select', 'config.motionSystem.preset', { default:'subtle', options:['none','subtle','guided','cinematic','kinetic-glass','precision-flow','night-ops','handheld-fast'] }),
+      field('tempo', 'Motion tempo', 'Motion tempo', 'select', 'config.motionSystem.tempo', { default:'balanced', options:['calm','balanced','fast'] }),
+      field('entryFx', 'Entry effect', 'Entry effect', 'select', 'config.motionSystem.entryFx', { default:'fade', options:['fade','slide-up','zoom-soft','signal-rise','none'] }),
+      field('hoverFx', 'Hover effect', 'Hover effect', 'select', 'config.motionSystem.hoverFx', { default:'lift', options:['lift','outline','glow','tilt-soft','none'] }),
+      field('alertFx', 'Alert effect', 'Alert effect', 'select', 'config.motionSystem.alertFx', { default:'pulse', options:['pulse','signal-ring','shake-soft','flash-soft','none'] }),
+      field('depthMode', 'Depth mode', 'Depth mode', 'select', 'config.motionSystem.depthMode', { default:'layered', options:['flat','layered','immersive'] }),
+      field('glowLevel', 'Glow level', 'Glow level', 'select', 'config.motionSystem.glowLevel', { default:'soft', options:['none','soft','medium','high'] }),
+      field('reduceMotionRespect', 'Respect reduced motion', 'Respect reduced motion', 'toggle', 'config.motionSystem.reduceMotionRespect', { default:true })
+    ]);
+
+    append(publishOps, [
+      field('versionTag', 'Version tag', 'Version tag', 'text', 'config.publishOps.versionTag', { default:'', placeholder:'1.0.0 / 0.9.0-beta.2' }),
+      field('releaseStrategy', 'Release strategy', 'Release strategy', 'select', 'config.publishOps.releaseStrategy', { default:'manual', options:['manual','canary','ring','wave','big-bang'] }),
+      field('gatePolicy', 'Gate policy', 'Gate policy', 'select', 'config.publishOps.gatePolicy', { default:'standard', options:['light','standard','strict','gxp'] }),
+      field('approvalBoard', 'Approval board', 'Approval board', 'text', 'config.publishOps.approvalBoard', { default:'', placeholder:'qa_board / release_board / plant_review' }),
+      field('rollbackOwner', 'Rollback owner', 'Rollback owner', 'text', 'config.publishOps.rollbackOwner', { default:'', placeholder:'it_admin / quality_manager' }),
+      field('releaseWindow', 'Release window', 'Release window', 'text', 'config.publishOps.releaseWindow', { default:'', placeholder:'Fri 19:00-21:00 / shift handover' }),
+      field('channel', 'Release channel', 'Release channel', 'text', 'config.publishOps.channel', { default:'', placeholder:'pilot / plant / enterprise / internal' })
+    ]);
+
+    append(packageOps, [
+      field('packageId', 'Package ID', 'Package ID', 'text', 'config.packageOps.packageId', { default:'', placeholder:'hesem.quality.war-room' }),
+      field('packageVersion', 'Package version', 'Package version', 'text', 'config.packageOps.packageVersion', { default:'', placeholder:'1.0.0' }),
+      field('packageVisibility', 'Visibility', 'Visibility', 'select', 'config.packageOps.packageVisibility', { default:'private', options:['private','team','enterprise','marketplace'] }),
+      field('compatibility', 'Compatibility', 'Compatibility', 'text', 'config.packageOps.compatibility', { default:'', placeholder:'erp,mes,qms,eqms' }),
+      field('dependencies', 'Dependencies', 'Dependencies', 'text', 'config.packageOps.dependencies', { default:'', placeholder:'ncr,capa,audit,evidence' }),
+      field('releaseTrack', 'Release track', 'Release track', 'select', 'config.packageOps.releaseTrack', { default:'pilot', options:['experimental','pilot','stable','lts'] })
+    ]);
+
+    append(aiCopilot, [
+      field('goal', 'AI goal', 'AI goal', 'text', 'config.ai.goal', { default:'', placeholder:'Make the workflow clearer and more governable' }),
+      field('persona', 'AI persona', 'AI persona', 'select', 'config.ai.persona', { default:'cross-functional', options:['cross-functional','executive','quality','operator','auditor','planner','warehouse','maintenance'] }),
+      field('suggestionMode', 'Suggestion mode', 'Suggestion mode', 'select', 'config.ai.suggestionMode', { default:'guided', options:['guided','aggressive','conservative'] }),
+      field('guardrails', 'Guardrails', 'Guardrails', 'textarea', 'config.ai.guardrails', { default:'', rows:3 }),
+      field('promptSeed', 'Prompt seed', 'Prompt seed', 'textarea', 'config.ai.promptSeed', { default:'', rows:5 })
+    ]);
+
+    SCHEMA[type] = tabs;
+  });
+
+  var ROUND5_SUPREME_TEMPLATES = {
+    'tpl-r5-orchestration-board': {
+      type:'data-kanban',
+      title:{ vi:'Orchestration Board', en:'Orchestration Board' },
+      description:'Cross-functional workflow board for detection, action and verification.',
+      module:'operations',
+      config:{
+        dataSource:{ api:'orchestration_board', method:'GET', dataKey:'items' },
+        columnKey:'lane',
+        columns:['signal','triage','action','verify','ready'],
+        design:{ caption:'Make ownership, lane flow and bottlenecks visible in one orchestration board.' },
+        story:{ sceneRole:'act', sceneTitle:'Orchestrate actions across roles', sceneNarrative:'Show what needs triage, who owns it and what is ready for verification.', heroBadge:'FLOW' },
+        workflowStudio:{ mode:'kanban', laneKey:'lane', decisionKey:'risk_level', handoffKey:'next_owner', constellationGroup:'action', slaMinutes:120 },
+        collaboration:{ reviewMode:'mandatory', handoverQueue:'orchestration.board' },
+        observability:{ signalClass:'command', refreshCadenceSec:30, alertChannel:'ops.orchestrator' },
+        motionSystem:{ preset:'precision-flow', tempo:'balanced', entryFx:'slide-up', hoverFx:'lift', alertFx:'signal-ring', depthMode:'layered', glowLevel:'soft', reduceMotionRespect:true },
+        publishOps:{ versionTag:'0.9.0-beta', releaseStrategy:'wave', gatePolicy:'standard', approvalBoard:'ops_review', rollbackOwner:'ops_admin', channel:'plant' },
+        packageOps:{ packageId:'hesem.ops.orchestration-board', packageVersion:'0.9.0-beta', packageVisibility:'team', releaseTrack:'pilot' },
+        ai:{ goal:'Clarify handoffs and reduce stalled items', persona:'cross-functional', suggestionMode:'guided' }
+      }
+    },
+    'tpl-r5-governance-gate-plus': {
+      type:'matrix-grid',
+      title:{ vi:'Governance Gate+', en:'Governance Gate+' },
+      description:'Gate matrix for release, quality and signoff readiness.',
+      module:'governance',
+      config:{
+        rows:['Scope freeze','Evidence ready','Smoke pass','Signoff complete','Rollback verified'],
+        columns:['Owner','Board','Evidence','Risk','Status'],
+        design:{ caption:'Expose gate state, owner and remaining risk without opening separate checklists.' },
+        story:{ sceneRole:'review', sceneTitle:'Gate the release with confidence', sceneNarrative:'Use one structured matrix to see what still blocks the release decision.', heroBadge:'GATE' },
+        collaboration:{ reviewMode:'four-eyes', evidenceRequired:true, esignRole:'release_manager' },
+        workflowStudio:{ mode:'storyboard', constellationGroup:'publish', slaMinutes:240 },
+        publishOps:{ versionTag:'1.0.0', releaseStrategy:'ring', gatePolicy:'strict', approvalBoard:'release_board', rollbackOwner:'it_admin', channel:'enterprise' },
+        packageOps:{ packageId:'hesem.release.governance-gate', packageVersion:'1.0.0', packageVisibility:'enterprise', releaseTrack:'stable' },
+        ai:{ goal:'Tighten release governance and signoff clarity', persona:'executive', suggestionMode:'conservative' }
+      }
+    },
+    'tpl-r5-version-trace-plus': {
+      type:'data-timeline',
+      title:{ vi:'Version Trace+', en:'Version Trace+' },
+      description:'Version, rollout and rollback trace for controlled deployments.',
+      module:'release',
+      config:{
+        dataSource:{ api:'version_trace', method:'GET', dataKey:'events' },
+        dateKey:'event_at',
+        titleKey:'title',
+        descKey:'detail',
+        design:{ caption:'Trace who approved, deployed, rolled back and verified each release wave.' },
+        story:{ sceneRole:'prove', sceneTitle:'Trace every rollout step', sceneNarrative:'Keep approval, deployment and rollback history visible in one evidence line.', heroBadge:'TRACE' },
+        observability:{ signalClass:'release', refreshCadenceSec:300, alertChannel:'release.trace' },
+        workflowStudio:{ mode:'timeline', constellationGroup:'publish', serviceAlias:'release.trace', slaMinutes:180 },
+        publishOps:{ versionTag:'1.0.0', releaseStrategy:'ring', gatePolicy:'strict', approvalBoard:'release_board', rollbackOwner:'platform_lead', channel:'enterprise' },
+        packageOps:{ packageId:'hesem.release.version-trace', packageVersion:'1.0.0', packageVisibility:'enterprise', releaseTrack:'stable' },
+        ai:{ goal:'Summarize release history with audit context', persona:'auditor', suggestionMode:'guided' }
+      }
+    },
+    'tpl-r5-package-spotlight': {
+      type:'insight-scorecard',
+      title:{ vi:'Package Spotlight', en:'Package Spotlight' },
+      description:'Package identity, version and compatibility at a glance.',
+      module:'platform',
+      config:{
+        title:'Package Spotlight',
+        caption:'Show package identity, release track and compatibility on one premium card.',
+        items:[
+          { label:'Package', value:'hesem.module.supreme', tone:'info' },
+          { label:'Version', value:'1.0.0', tone:'success' },
+          { label:'Track', value:'stable', tone:'neutral' },
+          { label:'Visibility', value:'enterprise', tone:'warning' }
+        ],
+        design:{ caption:'Make package ID, version, visibility and track impossible to miss.' },
+        story:{ sceneRole:'entry', sceneTitle:'Enter with package clarity', sceneNarrative:'Lead with package identity before discussing release or governance.', heroBadge:'PACKAGE' },
+        workflowStudio:{ mode:'observe', constellationGroup:'publish' },
+        motionSystem:{ preset:'kinetic-glass', tempo:'calm', entryFx:'fade', hoverFx:'glow', alertFx:'none', depthMode:'layered', glowLevel:'soft', reduceMotionRespect:true },
+        packageOps:{ packageId:'hesem.platform.package-spotlight', packageVersion:'1.0.0', packageVisibility:'enterprise', compatibility:'erp,mes,qms,eqms', dependencies:'identity,notification,audit', releaseTrack:'stable' },
+        ai:{ goal:'Summarize package identity for humans and AI', persona:'cross-functional', suggestionMode:'guided' }
+      }
+    },
+    'tpl-r5-operator-coach': {
+      type:'action-toolbar',
+      title:{ vi:'Operator Coach', en:'Operator Coach' },
+      description:'Guided operator command strip with safe confirmations.',
+      module:'operator',
+      config:{
+        actions:[
+          { key:'scan', label:{ vi:'Scan', en:'Scan' }, style:'primary' },
+          { key:'ack', label:{ vi:'Xác nhận', en:'Acknowledge' }, style:'success' },
+          { key:'hold', label:{ vi:'Hold', en:'Hold' }, style:'warning' },
+          { key:'escalate', label:{ vi:'Escalate', en:'Escalate' }, style:'danger' }
+        ],
+        design:{ caption:'Create a clean operator-safe command strip with next actions and confirmations.' },
+        story:{ sceneRole:'act', sceneTitle:'Coach the next safe action', sceneNarrative:'Guide the operator toward the right next move with strong confirm patterns.', heroBadge:'COACH' },
+        operatorMode:{ mode:'handheld', confirmationStyle:'double-confirm', touchTarget:'xl', attentionStyle:'assertive', barcodeIntent:'scan task / pallet / machine' },
+        accessibility:{ ariaLabel:'Operator coach action strip', touchTarget:'xl', highContrast:true },
+        workflowStudio:{ mode:'queue', constellationGroup:'action', slaMinutes:30 },
+        motionSystem:{ preset:'handheld-fast', tempo:'fast', entryFx:'slide-up', hoverFx:'outline', alertFx:'signal-ring', depthMode:'flat', glowLevel:'medium', reduceMotionRespect:true },
+        ai:{ goal:'Reduce hesitation and error at point of action', persona:'operator', suggestionMode:'aggressive' }
+      }
+    },
+    'tpl-r5-process-radar': {
+      type:'kpi-row',
+      title:{ vi:'Process Radar', en:'Process Radar' },
+      description:'Multi-domain process radar for flow, risk and handoff health.',
+      module:'executive',
+      config:{
+        items:[
+          { label:{ vi:'Flow health', en:'Flow health' }, value:'92%', color:'var(--green)' },
+          { label:{ vi:'Blocked lanes', en:'Blocked lanes' }, value:'3', color:'var(--red)' },
+          { label:{ vi:'Gate risk', en:'Gate risk' }, value:'Medium', color:'var(--amber)' },
+          { label:{ vi:'Package drift', en:'Package drift' }, value:'1', color:'var(--blue)' }
+        ],
+        design:{ caption:'Balance flow, gate and package signals in one high-clarity radar row.' },
+        story:{ sceneRole:'observe', sceneTitle:'Read the process radar', sceneNarrative:'Watch flow health, blocked lanes and release risk before they escalate.', heroBadge:'RADAR' },
+        workflowStudio:{ mode:'constellation', constellationGroup:'control', slaMinutes:60 },
+        observability:{ signalClass:'warning', refreshCadenceSec:60, alertChannel:'process.radar' },
+        motionSystem:{ preset:'cinematic', tempo:'balanced', entryFx:'signal-rise', hoverFx:'glow', alertFx:'pulse', depthMode:'immersive', glowLevel:'soft', reduceMotionRespect:true },
+        publishOps:{ versionTag:'0.9.0-beta', releaseStrategy:'manual', gatePolicy:'standard', approvalBoard:'process_council', rollbackOwner:'process_owner', channel:'enterprise' },
+        ai:{ goal:'Surface flow risk and governance drift in one glance', persona:'executive', suggestionMode:'guided' }
+      }
+    }
+  };
+
+  Object.keys(ROUND5_SUPREME_TEMPLATES).forEach(function(key){ TEMPLATES[key] = ROUND5_SUPREME_TEMPLATES[key]; });
+
+  BE.BLOCK_TEMPLATES = TEMPLATES;
+  BE.BLOCK_PROPERTIES_SCHEMA = SCHEMA;
+  BE.ROUND5_SUPREME_TEMPLATES = ROUND5_SUPREME_TEMPLATES;
+  BE.MODULE_BUILDER_SUPREME_SCHEMA_VERSION = '2026-04-07-r5';
+})();
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder Ultra Round 6 Block Engine Patch
+ * Adds supreme experience templates, governance surfaces, AI boards, and version markers.
+ * ============================================================================ */
+(function(){
+  'use strict';
+  var BE = window.HmBlockEngine || {};
+  if(!BE || BE.__MODULE_BUILDER_R6_PATCH__) return;
+  BE.__MODULE_BUILDER_R6_PATCH__ = '2026-04-07-r6';
+
+  function _clone(obj){ return obj == null ? obj : JSON.parse(JSON.stringify(obj)); }
+  function _mergeTemplates(target, source){
+    target = target || {};
+    Object.keys(source || {}).forEach(function(key){
+      if(!target[key]) target[key] = _clone(source[key]);
+    });
+    return target;
+  }
+
+  var ROUND6_TEMPLATES = {
+    'r6-mission-hero': {
+      type:'info-banner',
+      title:{ vi:'Round 6 Mission Hero', en:'Round 6 Mission Hero' },
+      config:{ text:'ROUND 6 · Experience OS · Flow Studio · Governance Matrix · Theme Atelier · AI Prompt Lab', textEn:'ROUND 6 · Experience OS · Flow Studio · Governance Matrix · Theme Atelier · AI Prompt Lab', type:'info' },
+      meta:{ module:'builder-round6', category:'hero' }
+    },
+    'r6-control-ribbon': {
+      type:'kpi-row',
+      title:{ vi:'Round 6 Control Ribbon', en:'Round 6 Control Ribbon' },
+      config:{ dataSource:{ api:'module_round6_summary', method:'GET' }, items:[ { label:'Flow', labelEn:'Flow', dataKey:'flow_orchestration', color:'var(--brand-2)', suffix:'%' }, { label:'Governance', labelEn:'Governance', dataKey:'governance_maturity', color:'var(--green)', suffix:'%' }, { label:'AI', labelEn:'AI', dataKey:'ai_leverage', color:'var(--amber)', suffix:'%' }, { label:'Runtime', labelEn:'Runtime', dataKey:'runtime_confidence', color:'var(--red)', suffix:'%' } ] },
+      meta:{ module:'builder-round6', category:'kpi' }
+    },
+    'r6-flow-lane-board': {
+      type:'data-cards',
+      title:{ vi:'Flow Lane Board', en:'Flow Lane Board' },
+      config:{ columns:3, titleKey:'lane', subtitleKey:'summary', badgeKey:'status', dataSource:{ api:'module_flow_lane_board', method:'GET', dataKey:'lanes' } },
+      meta:{ module:'builder-round6', category:'flow' }
+    },
+    'r6-governance-gate-matrix': {
+      type:'data-table',
+      title:{ vi:'Governance Gate Matrix', en:'Governance Gate Matrix' },
+      config:{ pageSize:12, dataSource:{ api:'module_governance_gates', method:'GET', dataKey:'gates' }, dataKey:'gates', columns:[ { key:'gate', label:{vi:'Gate',en:'Gate'}, type:'text' }, { key:'owner', label:{vi:'Owner',en:'Owner'}, type:'text' }, { key:'policy', label:{vi:'Policy',en:'Policy'}, type:'text' }, { key:'status', label:{vi:'Status',en:'Status'}, type:'badge' }, { key:'sla_hours', label:{vi:'SLA(h)',en:'SLA(h)'}, type:'number' } ] },
+      meta:{ module:'builder-round6', category:'governance' }
+    },
+    'r6-approval-command-board': {
+      type:'data-cards',
+      title:{ vi:'Approval Command Board', en:'Approval Command Board' },
+      config:{ columns:3, titleKey:'approver', subtitleKey:'scope', badgeKey:'status', dataSource:{ api:'module_approval_command_board', method:'GET', dataKey:'items' } },
+      meta:{ module:'builder-round6', category:'governance' }
+    },
+    'r6-event-mesh-timeline': {
+      type:'data-timeline',
+      title:{ vi:'Event Mesh Timeline', en:'Event Mesh Timeline' },
+      config:{ dataSource:{ api:'module_event_mesh_stream', method:'GET', dataKey:'events' }, dateKey:'occurred_at', titleKey:'event_name', descKey:'description' },
+      meta:{ module:'builder-round6', category:'observability' }
+    },
+    'r6-package-diff-table': {
+      type:'data-table',
+      title:{ vi:'Package Diff Table', en:'Package Diff Table' },
+      config:{ pageSize:20, dataSource:{ api:'module_package_diff', method:'GET', dataKey:'diff' }, dataKey:'diff', columns:[ { key:'path', label:{vi:'Path',en:'Path'}, type:'text' }, { key:'before', label:{vi:'Before',en:'Before'}, type:'text' }, { key:'after', label:{vi:'After',en:'After'}, type:'text' }, { key:'impact', label:{vi:'Impact',en:'Impact'}, type:'badge' } ] },
+      meta:{ module:'builder-round6', category:'package' }
+    },
+    'r6-risk-command-table': {
+      type:'data-table',
+      title:{ vi:'Risk Command Table', en:'Risk Command Table' },
+      config:{ pageSize:12, dataSource:{ api:'module_risk_command', method:'GET', dataKey:'risks' }, dataKey:'risks', columns:[ { key:'risk_id', label:{vi:'Risk',en:'Risk'}, type:'text' }, { key:'title', label:{vi:'Tiêu đề',en:'Title'}, type:'text' }, { key:'severity', label:{vi:'Severity',en:'Severity'}, type:'badge' }, { key:'owner', label:{vi:'Owner',en:'Owner'}, type:'text' }, { key:'mitigation', label:{vi:'Mitigation',en:'Mitigation'}, type:'text' } ] },
+      meta:{ module:'builder-round6', category:'risk' }
+    },
+    'r6-design-token-gallery': {
+      type:'data-cards',
+      title:{ vi:'Design Token Gallery', en:'Design Token Gallery' },
+      config:{ columns:4, titleKey:'token', subtitleKey:'value', badgeKey:'group', dataSource:{ api:'module_design_tokens', method:'GET', dataKey:'tokens' } },
+      meta:{ module:'builder-round6', category:'design' }
+    },
+    'r6-operator-guidance-stream': {
+      type:'data-timeline',
+      title:{ vi:'Operator Guidance Stream', en:'Operator Guidance Stream' },
+      config:{ dataSource:{ api:'module_operator_guidance', method:'GET', dataKey:'steps' }, dateKey:'sequence', titleKey:'headline', descKey:'instruction' },
+      meta:{ module:'builder-round6', category:'operator' }
+    },
+    'r6-ai-brief-board': {
+      type:'data-cards',
+      title:{ vi:'AI Brief Board', en:'AI Brief Board' },
+      config:{ columns:3, titleKey:'headline', subtitleKey:'detail', badgeKey:'priority', dataSource:{ api:'module_ai_brief', method:'GET', dataKey:'brief' } },
+      meta:{ module:'builder-round6', category:'ai' }
+    },
+    'r6-dependency-trace-table': {
+      type:'data-table',
+      title:{ vi:'Dependency Trace Table', en:'Dependency Trace Table' },
+      config:{ pageSize:20, dataSource:{ api:'module_dependency_trace', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'artifact', label:{vi:'Artifact',en:'Artifact'}, type:'text' }, { key:'dependency', label:{vi:'Dependency',en:'Dependency'}, type:'text' }, { key:'relation', label:{vi:'Relation',en:'Relation'}, type:'badge' }, { key:'owner', label:{vi:'Owner',en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status',en:'Status'}, type:'badge' } ] },
+      meta:{ module:'builder-round6', category:'traceability' }
+    },
+    'r6-release-wave-kpi': {
+      type:'kpi-row',
+      title:{ vi:'Release Wave KPIs', en:'Release Wave KPIs' },
+      config:{ dataSource:{ api:'module_release_wave_summary', method:'GET' }, items:[ { label:'Sites', labelEn:'Sites', dataKey:'sites', color:'var(--brand-2)' }, { label:'Ready', labelEn:'Ready', dataKey:'ready_sites', color:'var(--green)' }, { label:'Blocked', labelEn:'Blocked', dataKey:'blocked_sites', color:'var(--red)' }, { label:'Rollout', labelEn:'Rollout', dataKey:'rollout_pct', color:'var(--amber)', suffix:'%' } ] },
+      meta:{ module:'builder-round6', category:'release' }
+    }
+  };
+
+  BE.BLOCK_TEMPLATES = BE.BLOCK_TEMPLATES || {};
+  _mergeTemplates(BE.BLOCK_TEMPLATES, ROUND6_TEMPLATES);
+  BE.EXTRA_TEMPLATES = BE.EXTRA_TEMPLATES || {};
+  _mergeTemplates(BE.EXTRA_TEMPLATES, ROUND6_TEMPLATES);
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-07-r6';
+  BE.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION = '2026-04-07-r6';
+  BE.MODULE_BUILDER_ROUND6_TEMPLATES = Object.keys(ROUND6_TEMPLATES);
+})();
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder Ultra Round 7 Block Engine Patch
+ * Experience Director · Scenario Studio · Accessibility Ops · Market Lens
+ * ============================================================================ */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_CINEMA_SCHEMA_VERSION === '2026-04-07-r7') return;
+  var BE = window.HmBlockEngine;
+  function _mergeRound7(target, source){ Object.keys(source || {}).forEach(function(key){ target[key] = source[key]; }); }
+  var ROUND7_TEMPLATES = {
+    'r7-experience-command-hub': {
+      type:'kpi-row',
+      title:{ vi:'Experience Command Hub', en:'Experience Command Hub' },
+      config:{ dataSource:{ api:'module_experience_director', method:'GET' }, items:[ { label:'Craft', labelEn:'Craft', dataKey:'visual_craft', color:'var(--brand-2)', suffix:'%' }, { label:'Access', labelEn:'Access', dataKey:'accessibility_ready', color:'var(--green)', suffix:'%' }, { label:'Scenario', labelEn:'Scenario', dataKey:'scenario_readiness', color:'var(--amber)', suffix:'%' }, { label:'Clarity', labelEn:'Clarity', dataKey:'operator_clarity', color:'var(--red)', suffix:'%' } ] },
+      meta:{ module:'builder-round7', category:'director' }
+    },
+    'r7-scenario-simulator-board': {
+      type:'data-cards',
+      title:{ vi:'Scenario Simulator Board', en:'Scenario Simulator Board' },
+      config:{ columns:3, titleKey:'scenario', subtitleKey:'summary', badgeKey:'impact', dataSource:{ api:'module_scenario_simulator', method:'GET', dataKey:'scenarios' } },
+      meta:{ module:'builder-round7', category:'scenario' }
+    },
+    'r7-layout-harmony-table': {
+      type:'data-table',
+      title:{ vi:'Layout Harmony Table', en:'Layout Harmony Table' },
+      config:{ pageSize:12, dataSource:{ api:'module_layout_harmony', method:'GET', dataKey:'tabs' }, dataKey:'tabs', columns:[ { key:'tab', label:{vi:'Tab', en:'Tab'}, type:'text' }, { key:'blocks', label:{vi:'Blocks', en:'Blocks'}, type:'number' }, { key:'density', label:{vi:'Density', en:'Density'}, type:'text' }, { key:'balance', label:{vi:'Balance', en:'Balance'}, type:'badge' }, { key:'recommendation', label:{vi:'Recommendation', en:'Recommendation'}, type:'text' } ] },
+      meta:{ module:'builder-round7', category:'layout' }
+    },
+    'r7-accessibility-ops-board': {
+      type:'data-cards',
+      title:{ vi:'Accessibility Ops Board', en:'Accessibility Ops Board' },
+      config:{ columns:3, titleKey:'area', subtitleKey:'status', badgeKey:'priority', dataSource:{ api:'module_accessibility_ops', method:'GET', dataKey:'items' } },
+      meta:{ module:'builder-round7', category:'accessibility' }
+    },
+    'r7-story-ribbon': {
+      type:'info-banner',
+      title:{ vi:'Story Ribbon', en:'Story Ribbon' },
+      config:{ type:'info', icon:'🎬', text:'Scenario-led narrative ribbon for operators, reviewers, and auditors.', textEn:'Scenario-led narrative ribbon for operators, reviewers, and auditors.' },
+      meta:{ module:'builder-round7', category:'story' }
+    },
+    'r7-market-lens-grid': {
+      type:'data-cards',
+      title:{ vi:'Market Lens Grid', en:'Market Lens Grid' },
+      config:{ columns:3, titleKey:'value_prop', subtitleKey:'evidence', badgeKey:'grade', dataSource:{ api:'module_market_lens', method:'GET', dataKey:'items' } },
+      meta:{ module:'builder-round7', category:'market' }
+    },
+    'r7-release-choreography-timeline': {
+      type:'data-timeline',
+      title:{ vi:'Release Choreography Timeline', en:'Release Choreography Timeline' },
+      config:{ dataSource:{ api:'module_release_choreography', method:'GET', dataKey:'events' }, dateKey:'stage', titleKey:'title', descKey:'description' },
+      meta:{ module:'builder-round7', category:'release' }
+    },
+    'r7-issue-radar-table': {
+      type:'data-table',
+      title:{ vi:'Issue Radar Table', en:'Issue Radar Table' },
+      config:{ pageSize:15, dataSource:{ api:'module_issue_radar', method:'GET', dataKey:'issues' }, dataKey:'issues', columns:[ { key:'issue_id', label:{vi:'Issue', en:'Issue'}, type:'text' }, { key:'headline', label:{vi:'Headline', en:'Headline'}, type:'text' }, { key:'priority', label:{vi:'Priority', en:'Priority'}, type:'badge' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] },
+      meta:{ module:'builder-round7', category:'issue' }
+    },
+    'r7-shift-readiness-kpi': {
+      type:'kpi-row',
+      title:{ vi:'Shift Readiness KPIs', en:'Shift Readiness KPIs' },
+      config:{ dataSource:{ api:'module_shift_readiness', method:'GET' }, items:[ { label:'Ready', labelEn:'Ready', dataKey:'ready_pct', color:'var(--green)', suffix:'%' }, { label:'Blocked', labelEn:'Blocked', dataKey:'blocked_pct', color:'var(--red)', suffix:'%' }, { label:'Guided', labelEn:'Guided', dataKey:'guided_steps', color:'var(--brand-2)' }, { label:'Escalations', labelEn:'Escalations', dataKey:'escalations', color:'var(--amber)' } ] },
+      meta:{ module:'builder-round7', category:'operator' }
+    },
+    'r7-design-command-gallery': {
+      type:'data-cards',
+      title:{ vi:'Design Command Gallery', en:'Design Command Gallery' },
+      config:{ columns:4, titleKey:'token', subtitleKey:'value', badgeKey:'group', dataSource:{ api:'module_design_command_gallery', method:'GET', dataKey:'tokens' } },
+      meta:{ module:'builder-round7', category:'design' }
+    },
+    'r7-package-value-table': {
+      type:'data-table',
+      title:{ vi:'Package Value Table', en:'Package Value Table' },
+      config:{ pageSize:12, dataSource:{ api:'module_package_value', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'package', label:{vi:'Package', en:'Package'}, type:'text' }, { key:'value', label:{vi:'Value', en:'Value'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'reuse_score', label:{vi:'Reuse', en:'Reuse'}, type:'number' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] },
+      meta:{ module:'builder-round7', category:'package' }
+    }
+  };
+  BE.BLOCK_TEMPLATES = BE.BLOCK_TEMPLATES || {};
+  _mergeRound7(BE.BLOCK_TEMPLATES, ROUND7_TEMPLATES);
+  BE.EXTRA_TEMPLATES = BE.EXTRA_TEMPLATES || {};
+  _mergeRound7(BE.EXTRA_TEMPLATES, ROUND7_TEMPLATES);
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-07-r7';
+  BE.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION = '2026-04-07-r7';
+  BE.MODULE_BUILDER_SUPREME_SCHEMA_VERSION = '2026-04-07-r7';
+  BE.MODULE_BUILDER_CINEMA_SCHEMA_VERSION = '2026-04-07-r7';
+  BE.MODULE_BUILDER_ROUND7_TEMPLATES = Object.keys(ROUND7_TEMPLATES);
 })();

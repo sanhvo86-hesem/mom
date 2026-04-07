@@ -369,21 +369,71 @@ function currentUsername(){
 }
 
 function createBlankSchemaDoc(name){
+  var nowIso = new Date().toISOString();
   return {
     _meta: {
       id: _uid(),
       name: name || _t('Schema mới', 'New schema'),
       version: '1.0.0',
       description: '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      author: currentUsername()
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      author: currentUsername(),
+      enterprise: {
+        profile: 'hesem_schema_studio_enterprise',
+        lifecycle: 'draft',
+        change_request_id: '',
+        approval_class: 'standard',
+        environment: 'workspace',
+        branch_key: 'main',
+        effective_from: '',
+        effective_until: '',
+        canonical_model: 'erp_mes_eqms_7layer',
+        compiler_version: '2026.04.enterprise',
+        release_notes: '',
+        governance: {
+          owner: currentUsername(),
+          stewards: [],
+          approvers: [],
+          reviewers: [],
+          required_evidence: [],
+          electronic_signature_required: false,
+          last_reviewed_at: ''
+        }
+      }
     },
     enums: [],
     tables: [],
     relations: [],
     groups: [],
-    notes: []
+    notes: [],
+    views: [
+      {
+        id: 'vw_domain',
+        name: _t('Theo domain', 'By domain'),
+        kind: 'domain',
+        state: {
+          browserView: 'domains',
+          hiddenDomains: {},
+          isolatedDomain: '',
+          zoom: 1
+        }
+      },
+      {
+        id: 'vw_table',
+        name: _t('Theo bảng', 'By table'),
+        kind: 'table',
+        state: {
+          browserView: 'tables',
+          hiddenDomains: {},
+          isolatedDomain: '',
+          zoom: 1
+        }
+      }
+    ],
+    securityPolicies: [],
+    releaseBundles: [],
+    runtimeProjections: []
   };
 }
 
@@ -8573,6 +8623,2183 @@ Browser.adjustDomainSplit = function(nextRatio){
   Browser.render();
 };
 
+
+/* ── Enterprise Upgrade Control Plane ────────────────────────────────────── */
+(function(){
+  var ENTERPRISE_STYLE_ID = 'ss-enterprise-style';
+  var LAYER_DOMAIN_MAP = {
+    foundation: 'Foundation',
+    core_system: 'Foundation',
+    master_data: 'Master Data',
+    master_data_governance: 'Master Data',
+    engineering: 'Engineering',
+    planning_erp: 'Planning ERP',
+    mes_execution: 'MES Execution',
+    production: 'MES Execution',
+    scheduling: 'Planning ERP',
+    inventory_traceability: 'Inventory Traceability',
+    inventory: 'Inventory Traceability',
+    eqms_compliance: 'eQMS Compliance',
+    quality_management: 'eQMS Compliance',
+    compliance: 'eQMS Compliance',
+    document_control: 'eQMS Compliance'
+  };
+
+  STORE.enterprise = STORE.enterprise || {
+    tab: 'summary',
+    overlayEl: null,
+    releases: [],
+    loading: false,
+    lastCompiler: null,
+    lastRelease: null
+  };
+
+  function enterpriseEsc(value){
+    return _esc(value == null ? '' : String(value));
+  }
+
+  function enterpriseNow(){
+    return new Date().toISOString();
+  }
+
+  function enterprisePlainLabel(value){
+    return String(value == null ? '' : value)
+      .replace(/[_\-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\b\w/g, function(chr){ return chr.toUpperCase(); })
+      .trim();
+  }
+
+  function enterpriseStableKey(value, fallback){
+    var clean = String(value == null ? '' : value)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .replace(/_{2,}/g, '_');
+    return clean || (fallback || 'enterprise_key');
+  }
+
+  function enterpriseEnsureArray(value){
+    return Array.isArray(value) ? value : [];
+  }
+
+  function enterpriseGroupByTableId(schema){
+    var map = {};
+    enterpriseEnsureArray(schema && schema.groups).forEach(function(group){
+      enterpriseEnsureArray(group && group.table_ids).forEach(function(id){
+        if(id) map[id] = group;
+      });
+    });
+    return map;
+  }
+
+  function enterpriseInferLayer(schema, table){
+    var groupMap = enterpriseGroupByTableId(schema);
+    var group = groupMap[String((table && table.id) || '')];
+    var domain = enterpriseStableKey(table && table.domain, '');
+    if(group && group.name) return String(group.name);
+    if(domain && LAYER_DOMAIN_MAP[domain]) return LAYER_DOMAIN_MAP[domain];
+    if(domain) return enterprisePlainLabel(domain);
+    return 'Foundation';
+  }
+
+  function enterpriseCapabilityCatalog(){
+    return [
+      { key:'organization', label:'Organization / Site / Plant', patterns:['organization', 'site', 'plant', 'line', 'workcenter', 'machine'], critical:true },
+      { key:'item_bom_routing', label:'Item / Revision / BOM / Routing', patterns:['item', 'revision', 'bom', 'routing', 'operation'], critical:true },
+      { key:'production_execution', label:'Work Order / Production Execution', patterns:['work_order', 'production_order', 'dispatch', 'execution', 'labor_log', 'machine_log'], critical:true },
+      { key:'quality_execution', label:'Quality Plan / Inspection / Measurement', patterns:['quality_plan', 'inspection_lot', 'inspection', 'characteristic', 'measurement'], critical:true },
+      { key:'nc_capa', label:'NC / CAPA / Deviation / Concession', patterns:['nonconformance', 'nc_', 'capa', 'deviation', 'concession'], critical:true },
+      { key:'doc_training_competency', label:'Document / Training / Competency', patterns:['document', 'training', 'competency'], critical:false },
+      { key:'calibration_maintenance', label:'Calibration / Maintenance', patterns:['calibration', 'maintenance', 'equipment'], critical:false },
+      { key:'supplier_customer_inventory', label:'Supplier / Customer / Inventory', patterns:['supplier', 'customer', 'inventory', 'warehouse', 'stock'], critical:true },
+      { key:'traceability', label:'Lot / Serial / Traceability / Genealogy', patterns:['lot', 'serial', 'traceability', 'genealogy'], critical:true },
+      { key:'approval_audit_event', label:'Approval / E-Signature / Audit / Alarm', patterns:['approval', 'electronic_signature', 'signature', 'audit', 'event', 'alarm'], critical:true }
+    ];
+  }
+
+  function enterpriseTableTokens(table){
+    var values = [
+      table && table.name,
+      table && table.comment,
+      table && table.domain,
+      table && table.labels && table.labels.vi,
+      table && table.labels && table.labels.en,
+      table && table.business && table.business.business_name_vi,
+      table && table.business && table.business.business_name_en,
+      table && table.canonical && table.canonical.object_key
+    ].concat(enterpriseEnsureArray(table && table.tags));
+    return values.join(' ').toLowerCase();
+  }
+
+  function enterpriseMatchCapability(table, capability){
+    var haystack = enterpriseTableTokens(table);
+    return enterpriseEnsureArray(capability && capability.patterns).some(function(pattern){
+      return haystack.indexOf(String(pattern).toLowerCase()) >= 0;
+    });
+  }
+
+  function enterpriseEnsureTableMeta(schema, table){
+    var layer = enterpriseInferLayer(schema, table);
+    table.labels = Object.assign({
+      vi: enterprisePlainLabel(table.name || table.id || 'table'),
+      en: enterprisePlainLabel(table.name || table.id || 'table'),
+      technical: String(table.name || '')
+    }, (table.labels && typeof table.labels === 'object') ? table.labels : {});
+    table.business = Object.assign({
+      business_name_vi: table.labels.vi,
+      business_name_en: table.labels.en,
+      domain: table.domain || 'default',
+      subdomain: '',
+      manufacturing_semantics: '',
+      qms_semantics: '',
+      glossary_links: [],
+      tags: enterpriseEnsureArray(table.tags)
+    }, (table.business && typeof table.business === 'object') ? table.business : {});
+    table.ui = Object.assign({
+      icon: 'fa-table',
+      default_widget: 'grid',
+      preferred_card_density: 'comfortable',
+      saved_view_ids: [],
+      inspector_sections: ['business', 'physical', 'security', 'integration']
+    }, (table.ui && typeof table.ui === 'object') ? table.ui : {});
+    table.validation = Object.assign({
+      profile: 'enterprise_default',
+      rules: [],
+      required_approvals: [],
+      destructive_firewall_exemptions: []
+    }, (table.validation && typeof table.validation === 'object') ? table.validation : {});
+    table.reporting = Object.assign({
+      subject_area: table.domain || 'default',
+      grain: 'transaction',
+      dimensions: [],
+      measures: [],
+      lifecycle_stage: 'active'
+    }, (table.reporting && typeof table.reporting === 'object') ? table.reporting : {});
+    table.integration = Object.assign({
+      api_contracts: [],
+      workflow_bindings: [],
+      event_topics: [],
+      digital_thread_links: []
+    }, (table.integration && typeof table.integration === 'object') ? table.integration : {});
+    table.governance = Object.assign({
+      owner: '',
+      steward: '',
+      approver_role: '',
+      classification: 'internal',
+      reason_codes: [],
+      review_evidence: []
+    }, (table.governance && typeof table.governance === 'object') ? table.governance : {});
+    table.security = Object.assign({
+      sensitivity: (table.rls_enabled ? 'confidential' : 'internal'),
+      masking: [],
+      roles: [],
+      policy_refs: enterpriseEnsureArray(table.policies).map(function(item){ return item && (item.key || item.name || item.id || 'policy'); })
+    }, (table.security && typeof table.security === 'object') ? table.security : {});
+    table.canonical = Object.assign({
+      layer: layer,
+      layer_code: enterpriseStableKey(layer, 'foundation'),
+      object_key: enterpriseStableKey(table.name || table.id, 'table'),
+      capability: table.domain || 'default',
+      canonical_status: 'candidate',
+      lineage_targets: []
+    }, (table.canonical && typeof table.canonical === 'object') ? table.canonical : {});
+    table.performance = Object.assign({
+      partition_strategy: table.partitioning || '',
+      expected_volume: '',
+      access_pattern: '',
+      online_migration_notes: []
+    }, (table.performance && typeof table.performance === 'object') ? table.performance : {});
+    table.lifecycle = Object.assign({
+      stage: 'active',
+      deprecated_at: '',
+      effective_from: '',
+      effective_until: ''
+    }, (table.lifecycle && typeof table.lifecycle === 'object') ? table.lifecycle : {});
+    table.columns = enterpriseEnsureArray(table.columns).map(function(column){
+      column.labels = Object.assign({
+        vi: enterprisePlainLabel(column.name || column.id || 'column'),
+        en: enterprisePlainLabel(column.name || column.id || 'column'),
+        technical: String(column.name || '')
+      }, (column.labels && typeof column.labels === 'object') ? column.labels : {});
+      column.business = Object.assign({
+        business_name_vi: column.labels.vi,
+        business_name_en: column.labels.en,
+        glossary_links: [],
+        semantics: '',
+        unit: ''
+      }, (column.business && typeof column.business === 'object') ? column.business : {});
+      column.ui = Object.assign({
+        widget: '',
+        placeholder: '',
+        readonly_intent: false,
+        hidden_intent: false,
+        list_badge: false
+      }, (column.ui && typeof column.ui === 'object') ? column.ui : {});
+      column.validation = Object.assign({
+        rules: [],
+        required_if: [],
+        format_hint: '',
+        quality_gate: ''
+      }, (column.validation && typeof column.validation === 'object') ? column.validation : {});
+      column.reporting = Object.assign({
+        dimension: false,
+        measure: false,
+        sort_priority: null,
+        searchable: true
+      }, (column.reporting && typeof column.reporting === 'object') ? column.reporting : {});
+      column.integration = Object.assign({
+        api_name: column.name || '',
+        external_keys: [],
+        source_systems: []
+      }, (column.integration && typeof column.integration === 'object') ? column.integration : {});
+      column.security = Object.assign({
+        sensitivity: column.primary_key ? 'internal' : '',
+        mask_strategy: '',
+        pii: false
+      }, (column.security && typeof column.security === 'object') ? column.security : {});
+      return column;
+    });
+    return table;
+  }
+
+  function enterpriseEnsureRelationMeta(relation){
+    relation.labels = Object.assign({
+      vi: enterprisePlainLabel(relation.name || relation.id || 'relation'),
+      en: enterprisePlainLabel(relation.name || relation.id || 'relation')
+    }, (relation.labels && typeof relation.labels === 'object') ? relation.labels : {});
+    relation.runtime = Object.assign({
+      contract_key: enterpriseStableKey(relation.name || relation.id, 'relation'),
+      cascade_profile: relation.on_delete || 'RESTRICT',
+      sync_mode: 'runtime'
+    }, (relation.runtime && typeof relation.runtime === 'object') ? relation.runtime : {});
+    relation.governance = Object.assign({
+      owner: '',
+      review_required: false,
+      approval_class: 'standard'
+    }, (relation.governance && typeof relation.governance === 'object') ? relation.governance : {});
+    relation.integration = Object.assign({
+      digital_thread: false,
+      workflow_bindings: []
+    }, (relation.integration && typeof relation.integration === 'object') ? relation.integration : {});
+    return relation;
+  }
+
+  function enterpriseEnsureSchemaDoc(schema){
+    var savedViews;
+    if(!schema || typeof schema !== 'object') return schema;
+    schema._meta = (schema._meta && typeof schema._meta === 'object') ? schema._meta : {};
+    schema._meta.enterprise = Object.assign({
+      profile: 'hesem_schema_studio_enterprise',
+      lifecycle: 'draft',
+      change_request_id: '',
+      approval_class: 'standard',
+      environment: 'workspace',
+      branch_key: 'main',
+      effective_from: '',
+      effective_until: '',
+      canonical_model: 'erp_mes_eqms_7layer',
+      compiler_version: '2026.04.enterprise',
+      release_notes: '',
+      governance: {
+        owner: currentUsername(),
+        stewards: [],
+        approvers: [],
+        reviewers: [],
+        required_evidence: [],
+        electronic_signature_required: false,
+        last_reviewed_at: ''
+      }
+    }, (schema._meta.enterprise && typeof schema._meta.enterprise === 'object') ? schema._meta.enterprise : {});
+    if(!schema._meta.enterprise.governance || typeof schema._meta.enterprise.governance !== 'object'){
+      schema._meta.enterprise.governance = {
+        owner: currentUsername(),
+        stewards: [],
+        approvers: [],
+        reviewers: [],
+        required_evidence: [],
+        electronic_signature_required: false,
+        last_reviewed_at: ''
+      };
+    }
+    if(!Array.isArray(schema.views)) schema.views = [];
+    if(!Array.isArray(schema.securityPolicies)) schema.securityPolicies = [];
+    if(!Array.isArray(schema.releaseBundles)) schema.releaseBundles = [];
+    if(!Array.isArray(schema.runtimeProjections)) schema.runtimeProjections = [];
+    if(!Array.isArray(schema.notes)) schema.notes = [];
+    schema.tables = enterpriseEnsureArray(schema.tables).map(function(table){
+      return enterpriseEnsureTableMeta(schema, table || {});
+    });
+    schema.relations = enterpriseEnsureArray(schema.relations).map(function(relation){
+      return enterpriseEnsureRelationMeta(relation || {});
+    });
+    savedViews = schema.views.filter(function(view){ return view && view.id; });
+    if(!savedViews.length){
+      schema.views.push({
+        id: 'vw_domain',
+        name: _t('Theo domain', 'By domain'),
+        kind: 'domain',
+        state: {
+          browserView: 'domains',
+          hiddenDomains: {},
+          isolatedDomain: '',
+          zoom: 1
+        }
+      });
+    }
+    return schema;
+  }
+
+  function enterpriseCountPolicies(schema){
+    var tablePolicies = 0;
+    enterpriseEnsureArray(schema && schema.tables).forEach(function(table){
+      tablePolicies += enterpriseEnsureArray(table && table.policies).length;
+    });
+    return enterpriseEnsureArray(schema && schema.securityPolicies).length + tablePolicies;
+  }
+
+  function enterpriseBuildReport(schema){
+    var normalized = enterpriseEnsureSchemaDoc(_clone(schema || {}));
+    var domains = {};
+    var layers = {};
+    var columnCount = 0;
+    var generatedColumns = 0;
+    var fkColumns = 0;
+    var rlsTables = 0;
+    var partitionedTables = 0;
+    var required = enterpriseCapabilityCatalog();
+    var capabilities = required.map(function(item){
+      var matched = normalized.tables.filter(function(table){ return enterpriseMatchCapability(table, item); }).map(function(table){ return table.name; });
+      return Object.assign({}, item, {
+        present: matched.length > 0,
+        matched_tables: matched
+      });
+    });
+    normalized.tables.forEach(function(table){
+      var domain = String(table.domain || 'default');
+      var layer = String((table.canonical && table.canonical.layer) || enterpriseInferLayer(normalized, table) || 'Foundation');
+      domains[domain] = (domains[domain] || 0) + 1;
+      layers[layer] = (layers[layer] || 0) + 1;
+      columnCount += enterpriseEnsureArray(table.columns).length;
+      generatedColumns += enterpriseEnsureArray(table.columns).filter(function(col){ return !!(col && col.generated_expr); }).length;
+      fkColumns += enterpriseEnsureArray(table.columns).filter(function(col){ return !!(col && col.foreign_key); }).length;
+      if(table.rls_enabled) rlsTables += 1;
+      if(table.partitioning || (table.performance && table.performance.partition_strategy)) partitionedTables += 1;
+    });
+    var presentCount = capabilities.filter(function(item){ return item.present; }).length;
+    var criticalMissing = capabilities.filter(function(item){ return item.critical && !item.present; }).map(function(item){ return item.label; });
+    var coverage = capabilities.length ? Math.round((presentCount / capabilities.length) * 100) : 0;
+    var releaseReadiness = Math.max(0, Math.min(100,
+      coverage
+      + Math.min(20, rlsTables * 2)
+      + Math.min(10, Math.round((enterpriseCountPolicies(normalized) || 0) / 3))
+      - (criticalMissing.length * 7)
+    ));
+    return {
+      summary: {
+        tableCount: normalized.tables.length,
+        relationCount: enterpriseEnsureArray(normalized.relations).length,
+        columnCount: columnCount,
+        domainCount: Object.keys(domains).length,
+        layerCount: Object.keys(layers).length,
+        policyCount: enterpriseCountPolicies(normalized),
+        rlsTableCount: rlsTables,
+        generatedColumnCount: generatedColumns,
+        foreignKeyColumnCount: fkColumns,
+        partitionedTableCount: partitionedTables,
+        savedViewCount: enterpriseEnsureArray(normalized.views).length,
+        canonicalCoveragePercent: coverage,
+        releaseReadinessScore: releaseReadiness
+      },
+      domains: domains,
+      layers: layers,
+      canonical: {
+        capabilities: capabilities,
+        presentCount: presentCount,
+        totalCount: capabilities.length,
+        criticalMissing: criticalMissing,
+        coveragePercent: coverage
+      }
+    };
+  }
+
+  function enterpriseCompareValue(beforeValue, afterValue){
+    return JSON.stringify(beforeValue == null ? null : beforeValue) !== JSON.stringify(afterValue == null ? null : afterValue);
+  }
+
+  function enterpriseColumnMap(table){
+    var map = {};
+    enterpriseEnsureArray(table && table.columns).forEach(function(column){
+      map[String(column && column.name || '')] = column;
+    });
+    return map;
+  }
+
+  function enterpriseTableMap(schema){
+    var map = {};
+    enterpriseEnsureArray(schema && schema.tables).forEach(function(table){
+      map[String(table && table.name || '')] = table;
+    });
+    return map;
+  }
+
+  function enterpriseDiffItem(type, objectKind, table, column, detail, severity, destructive, meta){
+    return Object.assign({
+      id: _uid(),
+      type: type,
+      objectKind: objectKind,
+      table: table || '',
+      column: column || '',
+      detail: detail || '',
+      severity: severity || 'info',
+      destructive: !!destructive,
+      breaking: !!destructive || severity === 'critical' || severity === 'high',
+      runtimeImpact: destructive ? _t('Có nguy cơ vỡ runtime contract', 'Can break runtime contracts') : _t('Cần đồng bộ runtime projection', 'Requires runtime projection sync'),
+      dataMigration: destructive ? _t('Bắt buộc', 'Required') : _t('Có thể không cần', 'May be optional'),
+      rollbackComplexity: destructive ? _t('Cao', 'High') : _t('Trung bình', 'Medium'),
+      approvalClass: destructive ? 'cab_esign' : (severity === 'high' ? 'elevated' : 'standard')
+    }, meta || {});
+  }
+
+  function enterpriseHighestApproval(items){
+    var score = { standard:1, elevated:2, cab:3, cab_esign:4 };
+    var winner = 'standard';
+    items.forEach(function(item){
+      var key = item && item.approvalClass ? item.approvalClass : 'standard';
+      if((score[key] || 0) > (score[winner] || 0)) winner = key;
+    });
+    return winner;
+  }
+
+  function enterpriseRiskWeight(item){
+    if(!item) return 0;
+    if(item.destructive) return 22;
+    switch(item.severity){
+      case 'critical': return 18;
+      case 'high': return 12;
+      case 'medium': return 7;
+      case 'low': return 3;
+      default: return 1;
+    }
+  }
+
+  function enterpriseBuildTypedDiff(baseline, current){
+    var base = enterpriseEnsureSchemaDoc(_clone(baseline || { tables:[], relations:[] })) || { tables:[], relations:[] };
+    var next = enterpriseEnsureSchemaDoc(_clone(current || { tables:[], relations:[] })) || { tables:[], relations:[] };
+    var baseTables = enterpriseTableMap(base);
+    var nextTables = enterpriseTableMap(next);
+    var items = [];
+
+    enterpriseEnsureArray(next.tables).forEach(function(table){
+      var baseTable = baseTables[table.name];
+      if(!baseTable){
+        items.push(enterpriseDiffItem('object_added', 'table', table.name, '', _t('Tạo bảng mới', 'Create new table'), 'low', false, {
+          runtimeImpact: _t('Cần compile registry và module builder projection', 'Requires registry compile and module builder projection sync'),
+          dataMigration: _t('Không', 'No')
+        }));
+        return;
+      }
+
+      if(enterpriseCompareValue(baseTable.comment || '', table.comment || '')){
+        items.push(enterpriseDiffItem('metadata_only_change', 'table', table.name, '', _t('Comment/description thay đổi', 'Comment/description changed'), 'low', false));
+      }
+      if(enterpriseCompareValue(baseTable.domain || '', table.domain || '')){
+        items.push(enterpriseDiffItem('metadata_only_change', 'table', table.name, '', _t('Domain/canonical capability thay đổi', 'Domain/canonical capability changed'), 'medium', false, {
+          runtimeImpact: _t('Có thể thay đổi module ownership và reporting subject area', 'Can change module ownership and reporting subject area')
+        }));
+      }
+      if(!!baseTable.rls_enabled !== !!table.rls_enabled){
+        items.push(enterpriseDiffItem('policy_changed', 'table', table.name, '', table.rls_enabled ? _t('Bật RLS', 'Enable RLS') : _t('Tắt RLS', 'Disable RLS'), table.rls_enabled ? 'high' : 'medium', !!baseTable.rls_enabled && !table.rls_enabled, {
+          runtimeImpact: _t('Ảnh hưởng truy cập runtime và báo cáo', 'Affects runtime access and reporting'),
+          dataMigration: _t('Không', 'No'),
+          rollbackComplexity: table.rls_enabled ? _t('Trung bình', 'Medium') : _t('Cao', 'High'),
+          approvalClass: table.rls_enabled ? 'elevated' : 'cab_esign'
+        }));
+      }
+
+      var baseColumns = enterpriseColumnMap(baseTable);
+      enterpriseEnsureArray(table.columns).forEach(function(column){
+        var baseColumn = baseColumns[column.name];
+        if(!baseColumn){
+          items.push(enterpriseDiffItem('object_added', 'column', table.name, column.name, _t('Thêm cột mới', 'Add new column'), column.nullable ? 'low' : 'medium', false, {
+            runtimeImpact: _t('Cần đồng bộ form/API/runtime bindings', 'Requires form/API/runtime binding sync'),
+            dataMigration: column.nullable ? _t('Không', 'No') : _t('Có thể cần backfill', 'May require backfill'),
+            approvalClass: column.nullable ? 'standard' : 'elevated'
+          }));
+          return;
+        }
+        if(String(baseColumn.type || '') !== String(column.type || '') || Number(baseColumn.length || 0) !== Number(column.length || 0) || Number(baseColumn.scale || 0) !== Number(column.scale || 0)){
+          items.push(enterpriseDiffItem('column_type_changed', 'column', table.name, column.name, String(baseColumn.type || '') + ' → ' + String(column.type || ''), 'high', false, {
+            runtimeImpact: _t('Có thể ảnh hưởng API contract, report và index', 'Can affect API contracts, reports, and indexes'),
+            dataMigration: _t('Bắt buộc kiểm tra', 'Manual review required'),
+            rollbackComplexity: _t('Cao', 'High'),
+            approvalClass: 'elevated'
+          }));
+        }
+        if(!!baseColumn.nullable !== !!column.nullable){
+          items.push(enterpriseDiffItem('nullability_changed', 'column', table.name, column.name, column.nullable ? _t('Bỏ NOT NULL', 'Drop NOT NULL') : _t('Thêm NOT NULL', 'Set NOT NULL'), column.nullable ? 'medium' : 'high', !column.nullable, {
+            runtimeImpact: _t('Có thể làm gãy data entry/runtime insert', 'Can break data entry/runtime inserts'),
+            dataMigration: column.nullable ? _t('Không', 'No') : _t('Phải backfill dữ liệu hiện có', 'Existing data must be backfilled'),
+            rollbackComplexity: column.nullable ? _t('Trung bình', 'Medium') : _t('Cao', 'High'),
+            approvalClass: column.nullable ? 'elevated' : 'cab'
+          }));
+        }
+        if(String(baseColumn.default_val || '') !== String(column.default_val || '')){
+          items.push(enterpriseDiffItem('default_changed', 'column', table.name, column.name, _t('Default expression thay đổi', 'Default expression changed'), 'medium', false, {
+            runtimeImpact: _t('Ảnh hưởng insert mới và automation', 'Affects new inserts and automation'),
+            dataMigration: _t('Không', 'No')
+          }));
+        }
+        if(String(baseColumn.generated_expr || '') !== String(column.generated_expr || '')){
+          items.push(enterpriseDiffItem('generated_expr_changed', 'column', table.name, column.name, _t('Generated expression thay đổi', 'Generated expression changed'), 'high', false, {
+            runtimeImpact: _t('Ảnh hưởng báo cáo, audit và derived fields', 'Affects reporting, audit, and derived fields'),
+            dataMigration: _t('Có thể cần rebuild', 'May require rebuild')
+          }));
+        }
+        var baseFk = baseColumn.foreign_key || null;
+        var nextFk = column.foreign_key || null;
+        if(enterpriseCompareValue(baseFk, nextFk)){
+          items.push(enterpriseDiffItem('fk_retargeted', 'column', table.name, column.name, _t('Foreign key/action thay đổi', 'Foreign key target/action changed'), 'high', !!baseFk || !!nextFk, {
+            runtimeImpact: _t('Ảnh hưởng traceability, joins và workflow linkage', 'Affects traceability, joins, and workflow linkage'),
+            dataMigration: _t('Cần kiểm tra orphan risk', 'Must review orphan risk'),
+            rollbackComplexity: _t('Cao', 'High'),
+            approvalClass: 'cab'
+          }));
+        }
+        if(enterpriseCompareValue(baseColumn.business || {}, column.business || {}) || enterpriseCompareValue(baseColumn.ui || {}, column.ui || {}) || enterpriseCompareValue(baseColumn.validation || {}, column.validation || {})){
+          items.push(enterpriseDiffItem('metadata_only_change', 'column', table.name, column.name, _t('Business/UI/validation metadata thay đổi', 'Business/UI/validation metadata changed'), 'low', false, {
+            runtimeImpact: _t('Cần đồng bộ registry compiler', 'Requires registry compiler sync')
+          }));
+        }
+      });
+
+      enterpriseEnsureArray(baseTable.columns).forEach(function(column){
+        if(!enterpriseColumnMap(table)[column.name]){
+          items.push(enterpriseDiffItem('object_removed', 'column', table.name, column.name, _t('Xóa cột hiện có', 'Drop existing column'), 'critical', true, {
+            runtimeImpact: _t('Làm vỡ form/API/report hiện hữu', 'Breaks existing forms/APIs/reports'),
+            dataMigration: _t('Có nguy cơ mất dữ liệu', 'Data loss risk'),
+            rollbackComplexity: _t('Rất cao', 'Very high'),
+            approvalClass: 'cab_esign'
+          }));
+        }
+      });
+    });
+
+    enterpriseEnsureArray(base.tables).forEach(function(table){
+      if(!nextTables[table.name]){
+        items.push(enterpriseDiffItem('object_removed', 'table', table.name, '', _t('Xóa bảng hiện có', 'Drop existing table'), 'critical', true, {
+          runtimeImpact: _t('Làm vỡ runtime contract/module builder/workflow', 'Breaks runtime contracts/module builder/workflows'),
+          dataMigration: _t('Có nguy cơ mất dữ liệu lớn', 'High data loss risk'),
+          rollbackComplexity: _t('Rất cao', 'Very high'),
+          approvalClass: 'cab_esign'
+        }));
+      }
+    });
+
+    var breakingCount = items.filter(function(item){ return item.breaking; }).length;
+    var destructiveCount = items.filter(function(item){ return item.destructive; }).length;
+    var criticalCount = items.filter(function(item){ return item.severity === 'critical'; }).length;
+    var riskScore = Math.min(100, items.reduce(function(total, item){ return total + enterpriseRiskWeight(item); }, 0));
+    var compatibilityScore = Math.max(0, 100 - Math.min(100, Math.round(
+      (criticalCount * 18) +
+      (destructiveCount * 12) +
+      (items.filter(function(item){ return item.severity === 'high'; }).length * 6) +
+      (items.filter(function(item){ return item.type === 'metadata_only_change'; }).length * 1)
+    )));
+    return {
+      items: items,
+      summary: {
+        total: items.length,
+        breakingCount: breakingCount,
+        destructiveCount: destructiveCount,
+        criticalCount: criticalCount,
+        highCount: items.filter(function(item){ return item.severity === 'high'; }).length,
+        mediumCount: items.filter(function(item){ return item.severity === 'medium'; }).length,
+        lowCount: items.filter(function(item){ return item.severity === 'low'; }).length,
+        compatibilityScore: compatibilityScore,
+        riskScore: riskScore,
+        approvalClass: enterpriseHighestApproval(items),
+        destructiveBlocked: items.some(function(item){ return item.destructive && (item.severity === 'critical' || item.type === 'policy_changed'); })
+      }
+    };
+  }
+
+  function enterpriseCollectCurrentView(){
+    return {
+      browserView: STORE.browser.view,
+      activeDomain: STORE.browser.activeDomain,
+      hiddenDomains: _clone(STORE.browser.hiddenDomains || {}),
+      isolatedDomain: STORE.browser.isolatedDomain || '',
+      zoom: STORE.canvas.zoom,
+      panX: STORE.canvas.panX,
+      panY: STORE.canvas.panY
+    };
+  }
+
+  function enterpriseSavedViews(){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    return enterpriseEnsureArray(schema.views).filter(function(item){ return item && item.id; });
+  }
+
+  function enterpriseSaveCurrentView(){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    var name = window.prompt(_t('Tên view preset', 'View preset name'), _t('View doanh nghiệp', 'Enterprise view'));
+    if(!name) return;
+    schema.views = enterpriseSavedViews().concat([{
+      id: 'vw_' + enterpriseStableKey(name, _uid()),
+      name: name,
+      kind: 'saved',
+      state: enterpriseCollectCurrentView(),
+      savedAt: enterpriseNow(),
+      author: currentUsername()
+    }]);
+    markDirty();
+    saveDraft();
+    toast(_t('Đã lưu view preset', 'View preset saved'), 'success');
+    enterpriseRefreshControlPlane();
+  }
+
+  function enterpriseApplyView(viewId){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    var view = enterpriseSavedViews().find(function(item){ return item.id === viewId; });
+    var state = view && view.state;
+    if(!view || !state) return;
+    STORE.browser.view = state.browserView || STORE.browser.view;
+    STORE.browser.activeDomain = state.activeDomain || STORE.browser.activeDomain || '';
+    STORE.browser.hiddenDomains = _clone(state.hiddenDomains || {});
+    STORE.browser.isolatedDomain = state.isolatedDomain || '';
+    STORE.canvas.zoom = Number(state.zoom || 1);
+    STORE.canvas.panX = Number(state.panX || 0);
+    STORE.canvas.panY = Number(state.panY || 0);
+    saveUiPrefs();
+    Browser.render();
+    Canvas.render();
+    renderToolbar(refs.toolbar);
+    toast(_t('Đã áp dụng view preset', 'View preset applied'), 'success');
+  }
+
+  function enterpriseDownloadReport(){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    var payload = {
+      generatedAt: enterpriseNow(),
+      schema: {
+        id: schema && schema._meta && schema._meta.id,
+        name: schema && schema._meta && schema._meta.name,
+        version: schema && schema._meta && schema._meta.version
+      },
+      report: enterpriseBuildReport(schema),
+      diff: STORE.baseline ? enterpriseBuildTypedDiff(STORE.baseline, schema) : null
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'schema-studio-enterprise-report-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json';
+    link.click();
+    window.setTimeout(function(){ URL.revokeObjectURL(link.href); }, 1000);
+  }
+
+  function enterpriseListReleases(){
+    return _api('schema_studio_list_releases', {
+      design_id: STORE.currentDesignId || (STORE.schema && STORE.schema._meta && STORE.schema._meta.id) || ''
+    }, 'POST').then(function(res){
+      STORE.enterprise.releases = enterpriseEnsureArray(res && res.releases);
+      enterpriseRefreshControlPlane();
+      return STORE.enterprise.releases;
+    }).catch(function(err){
+      toast(_t('Không tải được release bundle', 'Could not load release bundles') + ': ' + (err.message || ''), 'error');
+      return [];
+    });
+  }
+
+  function enterpriseCompileRegistryBundle(){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    STORE.enterprise.loading = true;
+    enterpriseRefreshControlPlane();
+    return _api('schema_studio_compile_registry', {
+      design_id: STORE.currentDesignId || (schema && schema._meta && schema._meta.id) || 'workspace',
+      schema: schema,
+      mode: 'runtime_projection'
+    }, 'POST').then(function(res){
+      STORE.enterprise.loading = false;
+      STORE.enterprise.lastCompiler = res && (res.bundleSummary || res.manifest || null);
+      schema._meta.enterprise.last_compiled_at = enterpriseNow();
+      schema._meta.enterprise.last_compiler_bundle_id = res && res.bundleId ? res.bundleId : '';
+      markDirty();
+      toast(_t('Đã compile registry bundle', 'Registry bundle compiled'), 'success');
+      enterpriseRefreshControlPlane();
+      return res;
+    }).catch(function(err){
+      STORE.enterprise.loading = false;
+      enterpriseRefreshControlPlane();
+      toast(_t('Compile registry bundle thất bại', 'Registry bundle compilation failed') + ': ' + (err.message || ''), 'error');
+      throw err;
+    });
+  }
+
+  function enterpriseCreateReleaseBundle(){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    var diff = STORE.baseline ? enterpriseBuildTypedDiff(STORE.baseline, schema) : { summary:{ approvalClass:'standard' } };
+    STORE.enterprise.loading = true;
+    enterpriseRefreshControlPlane();
+    return _api('schema_studio_release_bundle', {
+      design_id: STORE.currentDesignId || (schema && schema._meta && schema._meta.id) || 'workspace',
+      schema: schema,
+      baseline: STORE.baseline || null,
+      change_request_id: schema._meta && schema._meta.enterprise ? schema._meta.enterprise.change_request_id || '' : '',
+      effective_from: schema._meta && schema._meta.enterprise ? schema._meta.enterprise.effective_from || '' : '',
+      release_notes: schema._meta && schema._meta.enterprise ? schema._meta.enterprise.release_notes || '' : '',
+      requested_approval_class: diff.summary.approvalClass || 'standard'
+    }, 'POST').then(function(res){
+      var summary = res && res.bundleSummary ? res.bundleSummary : null;
+      STORE.enterprise.loading = false;
+      STORE.enterprise.lastRelease = summary;
+      if(summary){
+        schema.releaseBundles = enterpriseEnsureArray(schema.releaseBundles);
+        schema.releaseBundles = [summary].concat(schema.releaseBundles.filter(function(item){ return item && item.id !== summary.id; })).slice(0, 25);
+        schema._meta.enterprise.last_release_id = summary.id;
+        schema._meta.enterprise.last_release_at = summary.createdAt || enterpriseNow();
+        schema._meta.enterprise.approval_class = summary.approvalClass || diff.summary.approvalClass || 'standard';
+      }
+      markDirty();
+      toast(_t('Đã tạo release bundle', 'Release bundle created'), 'success');
+      return enterpriseListReleases();
+    }).catch(function(err){
+      STORE.enterprise.loading = false;
+      enterpriseRefreshControlPlane();
+      toast(_t('Không tạo được release bundle', 'Could not create release bundle') + ': ' + (err.message || ''), 'error');
+      throw err;
+    });
+  }
+
+  function enterpriseSetTab(tab){
+    STORE.enterprise.tab = tab || 'summary';
+    enterpriseRefreshControlPlane();
+  }
+
+  function enterpriseSummaryCard(label, value, hint){
+    return '<div class="ss-enterprise-card"><div class="ss-enterprise-card-label">' + enterpriseEsc(label) + '</div><div class="ss-enterprise-card-value">' + enterpriseEsc(value) + '</div><div class="ss-enterprise-card-hint">' + enterpriseEsc(hint || '') + '</div></div>';
+  }
+
+  function enterpriseRenderSummary(schema, report){
+    var views = enterpriseSavedViews();
+    var governance = (schema && schema._meta && schema._meta.enterprise && schema._meta.enterprise.governance) || {};
+    var layerItems = Object.keys(report.layers || {}).sort().map(function(key){
+      return '<span class="ss-enterprise-badge">' + enterpriseEsc(key) + ': ' + enterpriseEsc(report.layers[key]) + '</span>';
+    }).join('');
+    var missingCritical = enterpriseEnsureArray(report.canonical && report.canonical.criticalMissing).map(function(label){
+      return '<span class="ss-enterprise-badge tone-danger">' + enterpriseEsc(label) + '</span>';
+    }).join('');
+    var viewHtml = views.length ? views.map(function(view){
+      return '<button class="hm-btn hm-btn-ghost ss-btn-sm ss-enterprise-view-btn" type="button" onclick="SchemaStudioEnterprise.applyView(\'' + enterpriseEsc(view.id) + '\')">' + enterpriseEsc(view.name) + '</button>';
+    }).join('') : '<div class="ss-enterprise-empty">' + enterpriseEsc(_t('Chưa có saved view', 'No saved views yet')) + '</div>';
+    return [
+      '<div class="ss-enterprise-grid">',
+        enterpriseSummaryCard(_t('Bảng', 'Tables'), report.summary.tableCount, _t('Mô hình vật lý + metadata', 'Physical model + metadata')),
+        enterpriseSummaryCard(_t('Quan hệ', 'Relations'), report.summary.relationCount, _t('Dependency + traceability', 'Dependency + traceability')),
+        enterpriseSummaryCard(_t('Policy', 'Policies'), report.summary.policyCount, _t('RLS / governance policy', 'RLS / governance policy')),
+        enterpriseSummaryCard(_t('Canonical coverage', 'Canonical coverage'), report.summary.canonicalCoveragePercent + '%', _t('Bao phủ capability ERP/MES/eQMS', 'ERP/MES/eQMS capability coverage')),
+        enterpriseSummaryCard(_t('Release readiness', 'Release readiness'), report.summary.releaseReadinessScore + '%', _t('Độ sẵn sàng để publish', 'Readiness for publish')),
+        enterpriseSummaryCard(_t('Saved views', 'Saved views'), report.summary.savedViewCount, _t('Preset cho role/domain/layer', 'Presets for role/domain/layer'))
+      ,'</div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Governance control plane', 'Governance control plane')) + '</div><div class="ss-enterprise-inline-list">' +
+        '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Owner', 'Owner')) + ': ' + enterpriseEsc(governance.owner || currentUsername()) + '</span>' +
+        '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Lifecycle', 'Lifecycle')) + ': ' + enterpriseEsc((schema && schema._meta && schema._meta.enterprise && schema._meta.enterprise.lifecycle) || 'draft') + '</span>' +
+        '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Branch', 'Branch')) + ': ' + enterpriseEsc((schema && schema._meta && schema._meta.enterprise && schema._meta.enterprise.branch_key) || 'main') + '</span>' +
+        '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Compiler', 'Compiler')) + ': ' + enterpriseEsc((schema && schema._meta && schema._meta.enterprise && schema._meta.enterprise.compiler_version) || '2026.04.enterprise') + '</span>' +
+      '</div></div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Layer distribution', 'Layer distribution')) + '</div><div class="ss-enterprise-inline-list">' + (layerItems || '<span class="ss-enterprise-empty">' + enterpriseEsc(_t('Chưa có layer', 'No layers yet')) + '</span>') + '</div></div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Critical canonical gaps', 'Critical canonical gaps')) + '</div><div class="ss-enterprise-inline-list">' + (missingCritical || '<span class="ss-enterprise-badge tone-success">' + enterpriseEsc(_t('Không có gap critical', 'No critical gaps')) + '</span>') + '</div></div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Saved views', 'Saved views')) + '</div><div class="ss-enterprise-inline-list">' + viewHtml + '</div></div>'
+    ].join('');
+  }
+
+  function enterpriseRenderDiff(schema, typedDiff){
+    if(!STORE.baseline){
+      return '<div class="ss-enterprise-empty">' + enterpriseEsc(_t('Chưa có baseline. Hãy đặt baseline để mở typed diff và destructive firewall.', 'No baseline yet. Save a baseline to unlock typed diff and destructive firewall.')) + '</div>';
+    }
+    var items = enterpriseEnsureArray(typedDiff.items).slice(0, 200);
+    var tone = typedDiff.summary.destructiveBlocked ? 'tone-danger' : (typedDiff.summary.riskScore >= 45 ? 'tone-warn' : 'tone-success');
+    return [
+      '<div class="ss-enterprise-grid">',
+        enterpriseSummaryCard(_t('Compatibility', 'Compatibility'), typedDiff.summary.compatibilityScore + '%', _t('Điểm tương thích ngược', 'Backward compatibility score')),
+        enterpriseSummaryCard(_t('Risk', 'Risk'), typedDiff.summary.riskScore + '/100', _t('Mức rủi ro migration', 'Migration risk level')),
+        enterpriseSummaryCard(_t('Approval class', 'Approval class'), typedDiff.summary.approvalClass, _t('Mức phê duyệt bắt buộc', 'Required approval level')),
+        enterpriseSummaryCard(_t('Destructive', 'Destructive'), typedDiff.summary.destructiveCount, _t('Firewall / escalation', 'Firewall / escalation')),
+        enterpriseSummaryCard(_t('Breaking', 'Breaking'), typedDiff.summary.breakingCount, _t('Có thể làm vỡ runtime', 'Potential runtime breakage')),
+        enterpriseSummaryCard(_t('Critical', 'Critical'), typedDiff.summary.criticalCount, _t('Cần CAB / e-signature', 'Needs CAB / e-signature'))
+      ,'</div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Diff posture', 'Diff posture')) + '</div><div class="ss-enterprise-inline-list"><span class="ss-enterprise-badge ' + tone + '">' + enterpriseEsc(typedDiff.summary.destructiveBlocked ? _t('Destructive firewall đang bật', 'Destructive firewall active') : _t('Có thể review theo luồng chuẩn', 'Can proceed with standard review')) + '</span></div></div>',
+      '<div class="ss-enterprise-diff-list">' + (items.length ? items.map(function(item){
+        return '<div class="ss-enterprise-diff-item severity-' + enterpriseEsc(item.severity || 'low') + '"><div><strong>' + enterpriseEsc(item.type || '') + '</strong><div class="ss-enterprise-help">' + enterpriseEsc((item.table || '') + (item.column ? '.' + item.column : '')) + '</div></div><div class="ss-enterprise-diff-detail"><div>' + enterpriseEsc(item.detail || '') + '</div><div class="ss-enterprise-help">' + enterpriseEsc(item.runtimeImpact || '') + ' · ' + enterpriseEsc(item.dataMigration || '') + ' · ' + enterpriseEsc(item.approvalClass || '') + '</div></div></div>';
+      }).join('') : '<div class="ss-enterprise-empty">' + enterpriseEsc(_t('Không có thay đổi typed diff', 'No typed diff changes')) + '</div>') + '</div>'
+    ].join('');
+  }
+
+  function enterpriseRenderCompiler(schema, report){
+    var meta = (schema && schema._meta && schema._meta.enterprise) || {};
+    return [
+      '<div class="ss-enterprise-grid">',
+        enterpriseSummaryCard(_t('Projection tables', 'Projection tables'), report.summary.tableCount, _t('Table registry projection', 'Table registry projection')),
+        enterpriseSummaryCard(_t('Projected columns', 'Projected columns'), report.summary.columnCount, _t('Field registry projection', 'Field registry projection')),
+        enterpriseSummaryCard(_t('RLS tables', 'RLS tables'), report.summary.rlsTableCount, _t('Security-aware projections', 'Security-aware projections')),
+        enterpriseSummaryCard(_t('Generated columns', 'Generated columns'), report.summary.generatedColumnCount, _t('Derived/runtime fields', 'Derived/runtime fields')),
+        enterpriseSummaryCard(_t('Partitioned', 'Partitioned'), report.summary.partitionedTableCount, _t('Online scale posture', 'Online scale posture')),
+        enterpriseSummaryCard(_t('Last compile', 'Last compile'), meta.last_compiled_at || '-', _t('Registry compiler timestamp', 'Registry compiler timestamp'))
+      ,'</div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Compiler actions', 'Compiler actions')) + '</div><div class="ss-enterprise-inline-list"><button class="hm-btn hm-btn-primary ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.compileRegistryBundle()">' + enterpriseEsc(_t('Compile registry bundle', 'Compile registry bundle')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.downloadReport()">' + enterpriseEsc(_t('Xuất báo cáo', 'Export report')) + '</button></div><div class="ss-enterprise-help">' + enterpriseEsc(_t('Compiler sẽ sinh runtime projections, registry contracts và enterprise manifest dưới qms-data/registry.', 'The compiler writes runtime projections, registry contracts, and the enterprise manifest under qms-data/registry.')) + '</div></div>'
+    ].join('');
+  }
+
+  function enterpriseRenderReleases(schema){
+    var releases = enterpriseEnsureArray(STORE.enterprise.releases);
+    var lastRelease = (schema && schema._meta && schema._meta.enterprise && schema._meta.enterprise.last_release_at) || '';
+    return [
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Release management', 'Release management')) + '</div><div class="ss-enterprise-inline-list"><button class="hm-btn hm-btn-primary ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.createReleaseBundle()">' + enterpriseEsc(_t('Tạo release bundle', 'Create release bundle')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.listReleases()">' + enterpriseEsc(_t('Tải danh sách release', 'Refresh release list')) + '</button></div><div class="ss-enterprise-help">' + enterpriseEsc(_t('Bundle bao gồm typed diff, risk score, approval class, compiler targets và rollback posture.', 'The bundle includes typed diff, risk score, approval class, compiler targets, and rollback posture.')) + '</div></div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Last release', 'Last release')) + '</div><div class="ss-enterprise-inline-list"><span class="ss-enterprise-badge">' + enterpriseEsc(lastRelease || '-') + '</span></div></div>',
+      '<div class="ss-enterprise-release-list">' + (releases.length ? releases.map(function(item){
+        return '<div class="ss-enterprise-release-item"><div><strong>' + enterpriseEsc(item.name || item.id || '') + '</strong><div class="ss-enterprise-help">' + enterpriseEsc(item.createdAt || '') + ' · ' + enterpriseEsc(item.actor || '') + '</div></div><div class="ss-enterprise-inline-list"><span class="ss-enterprise-badge">' + enterpriseEsc(item.approvalClass || 'standard') + '</span><span class="ss-enterprise-badge">' + enterpriseEsc((item.compatibilityScore == null ? '-' : item.compatibilityScore + '%')) + '</span><span class="ss-enterprise-badge">' + enterpriseEsc((item.riskScore == null ? '-' : item.riskScore + '/100')) + '</span></div></div>';
+      }).join('') : '<div class="ss-enterprise-empty">' + enterpriseEsc(_t('Chưa có release bundle', 'No release bundles yet')) + '</div>') + '</div>'
+    ].join('');
+  }
+
+  function enterpriseRenderCanonical(report){
+    var capabilities = enterpriseEnsureArray(report.canonical && report.canonical.capabilities);
+    return [
+      '<div class="ss-enterprise-grid">',
+        enterpriseSummaryCard(_t('Canonical present', 'Canonical present'), report.canonical.presentCount + '/' + report.canonical.totalCount, _t('Capability có mặt', 'Capabilities present')),
+        enterpriseSummaryCard(_t('Critical gaps', 'Critical gaps'), enterpriseEnsureArray(report.canonical.criticalMissing).length, _t('Capability critical còn thiếu', 'Missing critical capabilities')),
+        enterpriseSummaryCard(_t('Layers', 'Layers'), report.summary.layerCount, _t('7-layer governance', '7-layer governance')),
+        enterpriseSummaryCard(_t('Domains', 'Domains'), report.summary.domainCount, _t('Business capability domains', 'Business capability domains')),
+        enterpriseSummaryCard(_t('RLS coverage', 'RLS coverage'), report.summary.rlsTableCount, _t('Security-aware objects', 'Security-aware objects')),
+        enterpriseSummaryCard(_t('Readiness', 'Readiness'), report.summary.releaseReadinessScore + '%', _t('Canonical orchestration readiness', 'Canonical orchestration readiness'))
+      ,'</div>',
+      '<div class="ss-enterprise-section"><div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Manufacturing / eQMS capability map', 'Manufacturing / eQMS capability map')) + '</div><div class="ss-enterprise-capability-list">' + (capabilities.length ? capabilities.map(function(item){
+        return '<div class="ss-enterprise-capability-item"><div><strong>' + enterpriseEsc(item.label || item.key || '') + '</strong><div class="ss-enterprise-help">' + enterpriseEsc((item.present ? _t('Có mặt', 'Present') : _t('Thiếu', 'Missing')) + ' · ' + (item.critical ? _t('Critical', 'Critical') : _t('Optional', 'Optional'))) + '</div></div><div class="ss-enterprise-help">' + enterpriseEsc(enterpriseEnsureArray(item.matched_tables).slice(0, 6).join(', ') || '-') + '</div></div>';
+      }).join('') : '<div class="ss-enterprise-empty">' + enterpriseEsc(_t('Chưa có canonical capability', 'No canonical capability data')) + '</div>') + '</div></div>'
+    ].join('');
+  }
+
+  function enterpriseRenderBody(){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    var report = enterpriseBuildReport(schema);
+    var diff = STORE.baseline ? enterpriseBuildTypedDiff(STORE.baseline, schema) : { items:[], summary:{} };
+    switch(STORE.enterprise.tab){
+      case 'diff':
+        return enterpriseRenderDiff(schema, diff);
+      case 'compiler':
+        return enterpriseRenderCompiler(schema, report);
+      case 'releases':
+        return enterpriseRenderReleases(schema);
+      case 'canonical':
+        return enterpriseRenderCanonical(report);
+      case 'summary':
+      default:
+        return enterpriseRenderSummary(schema, report);
+    }
+  }
+
+  function enterpriseRenderDialog(){
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    var report = enterpriseBuildReport(schema);
+    var loadingNote = STORE.enterprise.loading ? '<div class="ss-enterprise-loading"><span class="ss-enterprise-spinner"></span><span>' + enterpriseEsc(_t('Đang xử lý enterprise action...', 'Running enterprise action...')) + '</span></div>' : '';
+    return [
+      '<div class="ss-enterprise-dialog">',
+        '<div class="ss-enterprise-head">',
+          '<div><div class="ss-enterprise-kicker">' + enterpriseEsc(_t('Schema control plane', 'Schema control plane')) + '</div><h3>' + enterpriseEsc((schema && schema._meta && schema._meta.name) || _t('Schema làm việc', 'Workspace schema')) + '</h3><div class="ss-enterprise-help">' + enterpriseEsc(_t('Governance + migration intelligence + registry compiler + canonical orchestration', 'Governance + migration intelligence + registry compiler + canonical orchestration')) + '</div></div>',
+          '<button class="hm-btn hm-btn-ghost ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.close()">' + enterpriseEsc(_t('Đóng', 'Close')) + '</button>',
+        '</div>',
+        '<div class="ss-enterprise-topline">',
+          '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Bảng', 'Tables')) + ': ' + enterpriseEsc(report.summary.tableCount) + '</span>',
+          '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Canonical', 'Canonical')) + ': ' + enterpriseEsc(report.summary.canonicalCoveragePercent + '%') + '</span>',
+          '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Release', 'Release')) + ': ' + enterpriseEsc((schema && schema._meta && schema._meta.enterprise && schema._meta.enterprise.last_release_id) || '-') + '</span>',
+          '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Compile', 'Compile')) + ': ' + enterpriseEsc((schema && schema._meta && schema._meta.enterprise && schema._meta.enterprise.last_compiled_at) || '-') + '</span>',
+        '</div>',
+        '<div class="ss-enterprise-tabs">' +
+          ['summary','diff','compiler','releases','canonical'].map(function(tab){
+            var labels = {
+              summary: _t('Tổng quan', 'Summary'),
+              diff: _t('Typed diff', 'Typed diff'),
+              compiler: _t('Compiler', 'Compiler'),
+              releases: _t('Release', 'Release'),
+              canonical: _t('Canonical', 'Canonical')
+            };
+            return '<button class="ss-enterprise-tab' + (STORE.enterprise.tab === tab ? ' active' : '') + '" type="button" onclick="SchemaStudioEnterprise.setTab(\'' + tab + '\')">' + enterpriseEsc(labels[tab]) + '</button>';
+          }).join('') +
+        '</div>',
+        loadingNote,
+        '<div class="ss-enterprise-body">' + enterpriseRenderBody() + '</div>',
+        '<div class="ss-enterprise-footer"><button class="hm-btn hm-btn-ghost ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.saveCurrentView()">' + enterpriseEsc(_t('Lưu view hiện tại', 'Save current view')) + '</button><button class="hm-btn hm-btn-secondary ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.downloadReport()">' + enterpriseEsc(_t('Xuất report', 'Export report')) + '</button><button class="hm-btn hm-btn-primary ss-btn-sm" type="button" onclick="SchemaStudioEnterprise.createReleaseBundle()">' + enterpriseEsc(_t('Release bundle', 'Release bundle')) + '</button></div>',
+      '</div>'
+    ].join('');
+  }
+
+  function enterpriseRefreshControlPlane(){
+    if(STORE.enterprise.overlayEl){
+      STORE.enterprise.overlayEl.innerHTML = enterpriseRenderDialog();
+    }
+  }
+
+  function enterpriseOpenControlPlane(tab){
+    if(tab) STORE.enterprise.tab = tab;
+    ensureEnterpriseStyles();
+    if(!STORE.enterprise.overlayEl){
+      STORE.enterprise.overlayEl = document.createElement('div');
+      STORE.enterprise.overlayEl.className = 'ss-enterprise-overlay';
+      STORE.enterprise.overlayEl.addEventListener('click', function(ev){
+        if(ev.target === STORE.enterprise.overlayEl) enterpriseCloseControlPlane();
+      });
+      document.body.appendChild(STORE.enterprise.overlayEl);
+    }
+    enterpriseRefreshControlPlane();
+    enterpriseListReleases();
+  }
+
+  function enterpriseCloseControlPlane(){
+    if(STORE.enterprise.overlayEl){
+      removeNode(STORE.enterprise.overlayEl);
+      STORE.enterprise.overlayEl = null;
+    }
+  }
+
+  function ensureEnterpriseStyles(){
+    var styleEl;
+    if(document.getElementById(ENTERPRISE_STYLE_ID)) return;
+    styleEl = document.createElement('style');
+    styleEl.id = ENTERPRISE_STYLE_ID;
+    styleEl.textContent = [
+      '.ss-enterprise-overlay{position:fixed;inset:0;background:rgba(5,10,25,.44);z-index:10040;display:flex;align-items:center;justify-content:center;padding:24px;}',
+      '.ss-enterprise-dialog{width:min(1200px,96vw);max-height:92vh;overflow:hidden;background:#fff;border:1px solid rgba(15,23,42,.14);border-radius:18px;box-shadow:0 22px 68px rgba(15,23,42,.22);display:flex;flex-direction:column;}',
+      '.ss-enterprise-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 22px;border-bottom:1px solid rgba(148,163,184,.28);background:linear-gradient(180deg,rgba(248,250,252,.96),rgba(255,255,255,1));}',
+      '.ss-enterprise-head h3{margin:2px 0 0;font-size:20px;color:#0f172a;}',
+      '.ss-enterprise-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#2563eb;font-weight:700;}',
+      '.ss-enterprise-help{font-size:12px;color:#64748b;}',
+      '.ss-enterprise-topline{display:flex;flex-wrap:wrap;gap:10px;padding:10px 22px;border-bottom:1px solid rgba(148,163,184,.24);background:#f8fafc;}',
+      '.ss-enterprise-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:600;border:1px solid rgba(59,130,246,.18);}',
+      '.ss-enterprise-badge.tone-danger{background:#fef2f2;color:#b91c1c;border-color:rgba(239,68,68,.18);}',
+      '.ss-enterprise-badge.tone-success{background:#f0fdf4;color:#166534;border-color:rgba(34,197,94,.18);}',
+      '.ss-enterprise-badge.tone-warn{background:#fff7ed;color:#c2410c;border-color:rgba(249,115,22,.18);}',
+      '.ss-enterprise-tabs{display:flex;gap:8px;padding:12px 22px 0;flex-wrap:wrap;}',
+      '.ss-enterprise-tab{border:1px solid rgba(148,163,184,.24);background:#fff;padding:8px 12px;border-radius:12px;font-weight:600;color:#334155;cursor:pointer;}',
+      '.ss-enterprise-tab.active{background:#0f172a;color:#fff;border-color:#0f172a;}',
+      '.ss-enterprise-body{padding:18px 22px 22px;overflow:auto;display:flex;flex-direction:column;gap:16px;}',
+      '.ss-enterprise-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid rgba(148,163,184,.24);background:#fff;}',
+      '.ss-enterprise-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;}',
+      '.ss-enterprise-card{padding:14px;border-radius:14px;background:#fff;border:1px solid rgba(148,163,184,.24);box-shadow:0 4px 18px rgba(15,23,42,.04);}',
+      '.ss-enterprise-card-label{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;}',
+      '.ss-enterprise-card-value{margin-top:8px;font-size:24px;font-weight:800;color:#0f172a;}',
+      '.ss-enterprise-card-hint{margin-top:6px;font-size:12px;color:#64748b;line-height:1.45;}',
+      '.ss-enterprise-section{padding:14px 16px;border-radius:14px;background:#fff;border:1px solid rgba(148,163,184,.24);box-shadow:0 4px 18px rgba(15,23,42,.04);}',
+      '.ss-enterprise-section-title{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:10px;}',
+      '.ss-enterprise-inline-list{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.ss-enterprise-empty{padding:18px;border:1px dashed rgba(148,163,184,.45);border-radius:14px;color:#64748b;background:#f8fafc;}',
+      '.ss-enterprise-diff-list,.ss-enterprise-release-list,.ss-enterprise-capability-list{display:flex;flex-direction:column;gap:10px;}',
+      '.ss-enterprise-diff-item,.ss-enterprise-release-item,.ss-enterprise-capability-item{display:grid;grid-template-columns:minmax(200px,.9fr) minmax(0,1.6fr);gap:14px;align-items:flex-start;padding:12px 14px;border:1px solid rgba(148,163,184,.24);border-radius:14px;background:#fff;}',
+      '.ss-enterprise-diff-item.severity-critical{border-color:rgba(220,38,38,.24);background:rgba(254,242,242,.66);}',
+      '.ss-enterprise-diff-item.severity-high{border-color:rgba(249,115,22,.24);background:rgba(255,247,237,.7);}',
+      '.ss-enterprise-diff-item.severity-medium{border-color:rgba(59,130,246,.18);background:rgba(239,246,255,.72);}',
+      '.ss-enterprise-diff-item.severity-low{border-color:rgba(34,197,94,.16);background:rgba(240,253,244,.72);}',
+      '.ss-enterprise-diff-detail{display:flex;flex-direction:column;gap:6px;}',
+      '.ss-enterprise-loading{display:flex;align-items:center;gap:10px;padding:10px 22px;color:#334155;}',
+      '.ss-enterprise-spinner{width:14px;height:14px;border-radius:999px;border:2px solid rgba(37,99,235,.18);border-top-color:#2563eb;display:inline-block;animation:ss-enterprise-spin .7s linear infinite;}',
+      '.ss-enterprise-view-btn{white-space:nowrap;}',
+      '.ss-toolbar-right .ss-enterprise-toolbar-btn{display:inline-flex;align-items:center;gap:8px;}',
+      '.ss-toolbar-right .ss-enterprise-toolbar-btn .ss-enterprise-toolbar-dot{width:8px;height:8px;border-radius:999px;background:#2563eb;display:inline-block;}',
+      '@keyframes ss-enterprise-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}',
+      '@media (max-width: 920px){.ss-enterprise-dialog{width:min(96vw,96vw);max-height:96vh}.ss-enterprise-diff-item,.ss-enterprise-release-item,.ss-enterprise-capability-item{grid-template-columns:1fr;}.ss-enterprise-overlay{padding:8px;}}'
+    ].join('');
+    document.head.appendChild(styleEl);
+  }
+
+  var SchemaStudioEnterprise = {
+    ensureSchemaDoc: enterpriseEnsureSchemaDoc,
+    buildReport: enterpriseBuildReport,
+    buildTypedDiff: enterpriseBuildTypedDiff,
+    open: enterpriseOpenControlPlane,
+    close: enterpriseCloseControlPlane,
+    refresh: enterpriseRefreshControlPlane,
+    setTab: enterpriseSetTab,
+    saveCurrentView: enterpriseSaveCurrentView,
+    applyView: enterpriseApplyView,
+    downloadReport: enterpriseDownloadReport,
+    compileRegistryBundle: enterpriseCompileRegistryBundle,
+    createReleaseBundle: enterpriseCreateReleaseBundle,
+    listReleases: enterpriseListReleases
+  };
+
+  var originalSchemaSave = SchemaLib.save;
+  SchemaLib.save = function(){
+    if(STORE.schema){
+      enterpriseEnsureSchemaDoc(STORE.schema);
+      STORE.schema._meta.enterprise.last_saved_from = 'schema_studio';
+    }
+    return originalSchemaSave.apply(this, arguments);
+  };
+
+  var originalSchemaLoad = SchemaLib.load;
+  SchemaLib.load = function(){
+    return originalSchemaLoad.apply(this, arguments).then(function(result){
+      if(STORE.schema) enterpriseEnsureSchemaDoc(STORE.schema);
+      ensureEnterpriseStyles();
+      return result;
+    });
+  };
+
+  var originalLoadSystemRegistry = SchemaLib.loadSystemRegistry;
+  SchemaLib.loadSystemRegistry = function(){
+    return originalLoadSystemRegistry.apply(this, arguments).then(function(result){
+      if(STORE.schema) enterpriseEnsureSchemaDoc(STORE.schema);
+      ensureEnterpriseStyles();
+      return result;
+    });
+  };
+
+  var originalLoadLiveDb = SchemaLib.loadFromLiveDB;
+  SchemaLib.loadFromLiveDB = function(){
+    return originalLoadLiveDb.apply(this, arguments).then(function(result){
+      if(STORE.schema) enterpriseEnsureSchemaDoc(STORE.schema);
+      ensureEnterpriseStyles();
+      return result;
+    });
+  };
+
+  var originalRenderToolbar = renderToolbar;
+  renderToolbar = function(container){
+    var right;
+    var button;
+    var insertBefore;
+    originalRenderToolbar(container);
+    if(!container) return;
+    right = container.querySelector('.ss-toolbar-right');
+    if(!right) return;
+    if(!right.querySelector('.ss-enterprise-toolbar-btn')){
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'hm-btn hm-btn-ghost ss-btn-sm ss-enterprise-toolbar-btn';
+      button.innerHTML = '<span class="ss-enterprise-toolbar-dot"></span><span>' + enterpriseEsc(_t('Enterprise', 'Enterprise')) + '</span>';
+      button.onclick = function(){ enterpriseOpenControlPlane('summary'); };
+      insertBefore = right.querySelector('.hm-btn-primary');
+      if(insertBefore) right.insertBefore(button, insertBefore);
+      else right.appendChild(button);
+    }
+  };
+
+  var originalInit = init;
+  init = function(page){
+    originalInit(page);
+    if(STORE.schema) enterpriseEnsureSchemaDoc(STORE.schema);
+    ensureEnterpriseStyles();
+    if(window.SchemaStudio) window.SchemaStudio.openEnterprise = function(){ enterpriseOpenControlPlane('summary'); };
+  };
+
+  var originalValidatorRun = Validator.run;
+  Validator.run = function(){
+    var result = originalValidatorRun.apply(this, arguments) || [];
+    var schema = enterpriseEnsureSchemaDoc(ensureSchema());
+    var additions = [];
+    enterpriseEnsureArray(schema.tables).forEach(function(table){
+      if(table.rls_enabled && !enterpriseEnsureArray(table.policies).length && !enterpriseEnsureArray(schema.securityPolicies).length){
+        additions.push({ level:'warning', code:'W90', tableId:table.id, table:table.name, msg:_t('Bảng bật RLS nhưng chưa có policy metadata: ', 'RLS is enabled but policy metadata is missing: ') + table.name });
+      }
+      if(!table.governance || !(table.governance.owner || table.governance.steward)){
+        additions.push({ level:'info', code:'I90', tableId:table.id, table:table.name, msg:_t('Bảng chưa có owner/steward metadata: ', 'Table is missing owner/steward metadata: ') + table.name });
+      }
+      if(!table.canonical || !table.canonical.layer){
+        additions.push({ level:'info', code:'I91', tableId:table.id, table:table.name, msg:_t('Bảng chưa gắn canonical layer: ', 'Table is missing canonical layer metadata: ') + table.name });
+      }
+    });
+    if(additions.length){
+      STORE.validation.results = enterpriseEnsureArray(STORE.validation.results).concat(additions);
+      if(refs.validationPanel && refs.validationPanel.style.display !== 'none'){
+        Validator.renderPanel();
+      }
+    }
+    return STORE.validation.results;
+  };
+
+  var originalComputeDiff = MigGen.computeDiff;
+  MigGen.computeDiff = function(baseline, current){
+    var legacy = originalComputeDiff.apply(this, arguments) || { safe:[], destructive:[], sql:[] };
+    var typed = enterpriseBuildTypedDiff(baseline, current);
+    legacy.typedItems = typed.items;
+    legacy.summary = typed.summary;
+    return legacy;
+  };
+
+  var originalRenderPreview = MigGen.renderPreview;
+  MigGen.renderPreview = function(){
+    originalRenderPreview.apply(this, arguments);
+    if(STORE.migration && STORE.migration.overlayEl && STORE.migration.diff && STORE.migration.diff.summary){
+      var body = STORE.migration.overlayEl.querySelector('.ss-diff-body');
+      var summary = STORE.migration.diff.summary;
+      var pill;
+      if(body && !STORE.migration.overlayEl.querySelector('.ss-enterprise-migration-summary')){
+        pill = document.createElement('div');
+        pill.className = 'ss-enterprise-section ss-enterprise-migration-summary';
+        pill.style.marginBottom = '14px';
+        pill.innerHTML = '<div class="ss-enterprise-section-title">' + enterpriseEsc(_t('Enterprise migration posture', 'Enterprise migration posture')) + '</div><div class="ss-enterprise-inline-list">'
+          + '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Compatibility', 'Compatibility')) + ': ' + enterpriseEsc(summary.compatibilityScore + '%') + '</span>'
+          + '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Risk', 'Risk')) + ': ' + enterpriseEsc(summary.riskScore + '/100') + '</span>'
+          + '<span class="ss-enterprise-badge">' + enterpriseEsc(_t('Approval', 'Approval')) + ': ' + enterpriseEsc(summary.approvalClass) + '</span>'
+          + '<span class="ss-enterprise-badge' + (summary.destructiveBlocked ? ' tone-danger' : '') + '">' + enterpriseEsc(summary.destructiveBlocked ? _t('Firewall bật', 'Firewall active') : _t('Chuẩn review', 'Standard review')) + '</span>'
+          + '</div>';
+        body.insertBefore(pill, body.firstChild);
+      }
+    }
+  };
+
+  CmdPalette.COMMANDS = CmdPalette.COMMANDS.filter(function(command){
+    return !command || ['Open enterprise control plane','Save current schema view','Create schema release bundle','Compile schema registry bundle'].indexOf(command.label_en) < 0;
+  });
+  CmdPalette.COMMANDS.push(
+    {
+      icon:'⚙',
+      label:'Mở Enterprise control plane',
+      label_en:'Open enterprise control plane',
+      category:'schema',
+      action:function(){ enterpriseOpenControlPlane('summary'); }
+    },
+    {
+      icon:'👁',
+      label:'Lưu view hiện tại',
+      label_en:'Save current schema view',
+      category:'view',
+      action:function(){ enterpriseSaveCurrentView(); }
+    },
+    {
+      icon:'⇪',
+      label:'Tạo release bundle',
+      label_en:'Create schema release bundle',
+      category:'migration',
+      action:function(){ enterpriseCreateReleaseBundle(); }
+    },
+    {
+      icon:'⧉',
+      label:'Compile registry bundle',
+      label_en:'Compile schema registry bundle',
+      category:'schema',
+      action:function(){ enterpriseCompileRegistryBundle(); }
+    }
+  );
+
+  window.SchemaStudioEnterprise = SchemaStudioEnterprise;
+})();
+
+
+/* ── World-Class Visual Cockpit Round 2 ─────────────────────────────────── */
+(function(){
+  var WORLD_PREFS_KEY = 'hesem.schemaStudio.worldClassPrefs';
+
+  function wcClamp(value, min, max){
+    value = Number(value);
+    if(isNaN(value)) value = 0;
+    if(value < min) return min;
+    if(value > max) return max;
+    return value;
+  }
+
+  function wcArray(value){
+    return Array.isArray(value) ? value : [];
+  }
+
+  function wcText(value){
+    return value == null ? '' : String(value);
+  }
+
+  function wcEsc(value){
+    return _esc(wcText(value));
+  }
+
+  function wcNow(){
+    return new Date().toISOString();
+  }
+
+  function wcEnsureState(){
+    if(!STORE.worldClass || typeof STORE.worldClass !== 'object'){
+      STORE.worldClass = {
+        tab:'dashboard',
+        heatmap:'risk',
+        ambience:'aurora',
+        density:'comfortable',
+        diagnosis:null,
+        loading:false,
+        overlayEl:null,
+        focusTableId:'',
+        lastSyncAt:'',
+        decorateTimer:0,
+        keyListenerBound:false
+      };
+    }
+    return STORE.worldClass;
+  }
+
+  function wcDesignId(){
+    return STORE.currentDesignId || (STORE.schema && STORE.schema._meta && STORE.schema._meta.id) || 'workspace';
+  }
+
+  function wcPrefsSnapshot(){
+    var state = wcEnsureState();
+    return {
+      heatmap: state.heatmap,
+      ambience: state.ambience,
+      density: state.density,
+      tab: state.tab
+    };
+  }
+
+  function wcPersistPrefs(){
+    try{
+      window.localStorage.setItem(WORLD_PREFS_KEY, JSON.stringify(wcPrefsSnapshot()));
+    }catch(err){}
+  }
+
+  function wcLoadPrefs(){
+    var state = wcEnsureState();
+    var raw;
+    var payload;
+    try{
+      raw = window.localStorage.getItem(WORLD_PREFS_KEY);
+      if(!raw) return state;
+      payload = JSON.parse(raw);
+      if(payload && typeof payload === 'object'){
+        if(payload.heatmap) state.heatmap = payload.heatmap;
+        if(payload.ambience) state.ambience = payload.ambience;
+        if(payload.density) state.density = payload.density;
+        if(payload.tab) state.tab = payload.tab;
+      }
+    }catch(err){}
+    return state;
+  }
+
+  function wcWorkflowCandidate(table){
+    var name = wcText(table && table.name).toLowerCase();
+    var workflow = table && (table.workflowId || table.workflow_id || table.workflow || (table.runtime && table.runtime.workflowId) || (table.governance && table.governance.workflow));
+    if(workflow) return true;
+    return /(order|production|dispatch|execution|inspection|quality|nc|capa|deviation|concession|approval|signature|alarm|audit|maintenance|calibration|training|competency|lot|serial|trace|traceability|supplier|incoming|inventory|genealogy|routing|operation)/.test(name);
+  }
+
+  function wcWorkflowBound(table){
+    return !!(table && (table.workflowId || table.workflow_id || table.workflow || (table.runtime && table.runtime.workflowId) || (table.governance && table.governance.workflow)));
+  }
+
+  function wcMetadataScore(table){
+    var score = 0;
+    var governance = table && table.governance && typeof table.governance === 'object' ? table.governance : {};
+    if(table && (table.label || table.label_vi || table.label_en)) score += 10;
+    if(table && (table.description || table.description_vi || table.description_en)) score += 14;
+    if(table && table.domain) score += 12;
+    if(table && table.canonical && table.canonical.layer) score += 16;
+    if(governance.owner || governance.steward) score += 16;
+    if(governance.approver || governance.approval_class) score += 8;
+    if(table && table.ui) score += 10;
+    if(table && table.reporting) score += 6;
+    if(table && table.integration) score += 4;
+    if(table && table.workflowId) score += 4;
+    return wcClamp(score, 0, 100);
+  }
+
+  function wcRelationMap(schema){
+    var map = {};
+    wcArray(schema && schema.relations).forEach(function(rel){
+      var from = wcText(rel && rel.from_table_id);
+      var to = wcText(rel && rel.to_table_id);
+      if(from){ map[from] = (map[from] || 0) + 1; }
+      if(to){ map[to] = (map[to] || 0) + 1; }
+    });
+    return map;
+  }
+
+  function wcOrphanRelationRisk(schema){
+    var tableById = {};
+    var colById = {};
+    var risk = 0;
+    wcArray(schema && schema.tables).forEach(function(table){
+      tableById[wcText(table && table.id)] = table || {};
+      wcArray(table && table.columns).forEach(function(col){
+        colById[wcText(col && col.id)] = { tableId: wcText(table && table.id), column: col };
+      });
+    });
+    wcArray(schema && schema.relations).forEach(function(rel){
+      var fromTableId = wcText(rel && rel.from_table_id);
+      var toTableId = wcText(rel && rel.to_table_id);
+      var fromColId = wcText(rel && rel.from_col_id);
+      var toColId = wcText(rel && rel.to_col_id);
+      if(!tableById[fromTableId] || !tableById[toTableId] || !colById[fromColId] || !colById[toColId]){
+        risk += 1;
+      }
+    });
+    return risk;
+  }
+
+  function wcGraphDensityScore(tableCount, relationCount){
+    if(tableCount <= 1) return relationCount ? 40 : 0;
+    var ratio = (relationCount * 2) / tableCount;
+    var score = Math.round(100 - Math.min(100, Math.abs(ratio - 3.2) * 18));
+    return wcClamp(score, 0, 100);
+  }
+
+  function wcDiffItems(){
+    if(!STORE.baseline || !window.SchemaStudioEnterprise || typeof window.SchemaStudioEnterprise.buildTypedDiff !== 'function') return [];
+    try{
+      var diff = window.SchemaStudioEnterprise.buildTypedDiff(STORE.baseline, ensureSchema()) || {};
+      return wcArray(diff.items);
+    }catch(err){
+      return [];
+    }
+  }
+
+  function wcHotspotForTable(table, schema, report, diffItems, relationByTable){
+    var reasons = [];
+    var score = 0;
+    var relationCount = relationByTable[wcText(table && table.id)] || 0;
+    var metadataScore = wcMetadataScore(table);
+    var governance = table && table.governance && typeof table.governance === 'object' ? table.governance : {};
+    var policies = wcArray(table && table.policies);
+    var diffForTable = diffItems.filter(function(item){ return wcText(item && item.table) === wcText(table && table.name); });
+    var destructiveCount = diffForTable.filter(function(item){ return !!(item && item.destructive); }).length;
+    var breakingCount = diffForTable.filter(function(item){ return !!(item && item.breaking); }).length;
+    if(!(governance.owner || governance.steward)){
+      score += 8;
+      reasons.push(_t('Thiếu owner/steward', 'Missing owner/steward'));
+    }
+    if(!(table && table.canonical && table.canonical.layer)){
+      score += 7;
+      reasons.push(_t('Thiếu canonical layer', 'Missing canonical layer'));
+    }
+    if(table && table.rls_enabled && !policies.length){
+      score += 10;
+      reasons.push(_t('Bật RLS nhưng chưa có policy', 'RLS enabled without policies'));
+    }
+    if(!table || !(table.description || table.description_vi || table.description_en)){
+      score += 5;
+      reasons.push(_t('Thiếu mô tả nghiệp vụ', 'Missing business description'));
+    }
+    if(wcWorkflowCandidate(table) && !wcWorkflowBound(table)){
+      score += 6;
+      reasons.push(_t('Ứng viên workflow chưa bind runtime', 'Workflow candidate not yet bound to runtime'));
+    }
+    if(relationCount >= 8){
+      score += Math.min(12, relationCount - 6);
+      reasons.push(_t('Mật độ relation cao', 'High relation fan-in/fan-out'));
+    }
+    if(wcArray(table && table.columns).length >= 18){
+      score += Math.min(8, Math.round((wcArray(table && table.columns).length - 16) / 2));
+      reasons.push(_t('Bảng rộng, nên nhóm và chuẩn hóa metadata', 'Wide table; group and normalize metadata'));
+    }
+    diffForTable.forEach(function(item){
+      if(!item) return;
+      score += item.destructive ? 10 : (item.severity === 'high' ? 6 : (item.severity === 'medium' ? 3 : 1));
+      if(item.detail && reasons.length < 5) reasons.push(item.detail);
+    });
+    score += Math.max(0, Math.round((100 - metadataScore) / 14));
+    score = wcClamp(score, 0, 100);
+    return {
+      table: wcText(table && table.name),
+      tableId: wcText(table && table.id),
+      domain: wcText(table && table.domain) || 'default',
+      layer: wcText(table && table.canonical && table.canonical.layer) || '',
+      relationCount: relationCount,
+      metadataScore: metadataScore,
+      score: score,
+      severity: score >= 36 ? 'critical' : (score >= 24 ? 'high' : (score >= 12 ? 'medium' : 'low')),
+      destructiveCount: destructiveCount,
+      breakingCount: breakingCount,
+      issueCount: diffForTable.length,
+      reasons: reasons.slice(0, 5),
+      workflowBound: wcWorkflowBound(table),
+      workflowCandidate: wcWorkflowCandidate(table),
+      rlsEnabled: !!(table && table.rls_enabled),
+      policyCount: policies.length
+    };
+  }
+
+  function wcRecommendationText(item){
+    if(typeof item === 'string') return item;
+    if(!item || typeof item !== 'object') return '';
+    if(item.title && item.detail) return item.title + ': ' + item.detail;
+    return item.detail || item.title || item.code || '';
+  }
+
+  function wcLocalDiagnosis(){
+    var schema = ensureSchema();
+    var report = window.SchemaStudioEnterprise && typeof window.SchemaStudioEnterprise.buildReport === 'function'
+      ? (window.SchemaStudioEnterprise.buildReport(schema) || { summary:{}, domains:{}, layers:{}, canonical:{ capabilities:[], criticalMissing:[] } })
+      : { summary:{}, domains:{}, layers:{}, canonical:{ capabilities:[], criticalMissing:[] } };
+    var diff = STORE.baseline && window.SchemaStudioEnterprise && typeof window.SchemaStudioEnterprise.buildTypedDiff === 'function'
+      ? (window.SchemaStudioEnterprise.buildTypedDiff(STORE.baseline, schema) || { summary:{ compatibilityScore:100, riskScore:0, approvalClass:'standard' }, items:[] })
+      : { summary:{ compatibilityScore:100, riskScore:0, approvalClass:'standard' }, items:[] };
+    var tables = wcArray(schema && schema.tables);
+    var relations = wcArray(schema && schema.relations);
+    var relationByTable = wcRelationMap(schema);
+    var workflowCandidates = 0;
+    var workflowBound = 0;
+    var metadataTotal = 0;
+    var hotspots = tables.map(function(table){
+      var hotspot = wcHotspotForTable(table, schema, report, wcArray(diff.items), relationByTable);
+      metadataTotal += hotspot.metadataScore;
+      if(hotspot.workflowCandidate) workflowCandidates += 1;
+      if(hotspot.workflowBound) workflowBound += 1;
+      return hotspot;
+    }).sort(function(a, b){
+      return (b.score - a.score) || (b.issueCount - a.issueCount) || (b.relationCount - a.relationCount) || a.table.localeCompare(b.table);
+    }).filter(function(item){ return item.score > 0; }).slice(0, 12);
+    var orphanRisk = wcOrphanRelationRisk(schema);
+    var metadataCompleteness = tables.length ? Math.round(metadataTotal / tables.length) : 0;
+    var workflowCoverage = workflowCandidates ? Math.round((workflowBound / workflowCandidates) * 100) : (tables.length ? 0 : 100);
+    var graphDensity = wcGraphDensityScore(tables.length, relations.length);
+    var hotspotCount = hotspots.filter(function(item){ return item.score >= 12; }).length;
+    var releaseReadiness = Number((report.summary && report.summary.releaseReadinessScore) || 0);
+    var visualReadiness = wcClamp(Math.round(
+      (releaseReadiness * 0.30)
+      + (metadataCompleteness * 0.25)
+      + (graphDensity * 0.15)
+      + (workflowCoverage * 0.15)
+      + ((100 - Math.min(100, orphanRisk * 14)) * 0.15)
+    ), 0, 100);
+    var recommendations = [];
+    if(orphanRisk > 0) recommendations.push(_t('Sửa toàn bộ relation đang trỏ tới table/column không còn tồn tại trước khi publish.', 'Repair relations that still point to missing tables/columns before publishing.'));
+    if((diff.summary && diff.summary.destructiveCount) > 0) recommendations.push(_t('Escalate mọi thay đổi destructive qua CAB/e-sign kèm rollback evidence.', 'Escalate destructive changes through CAB/e-sign with rollback evidence.'));
+    if(metadataCompleteness < 75) recommendations.push(_t('Bổ sung label, mô tả, owner, steward, canonical layer và UI hints cho các bảng trọng yếu.', 'Add labels, descriptions, owners, stewards, canonical layers, and UI hints to critical tables.'));
+    if(workflowCoverage < 60 && workflowCandidates > 0) recommendations.push(_t('Liên kết thêm workflow/runtime bindings cho các bảng vận hành như order, inspection, CAPA, maintenance.', 'Bind more workflow/runtime contracts to operational tables such as orders, inspections, CAPA, and maintenance.'));
+    if((report.summary && report.summary.policyCount) === 0 && (report.summary && report.summary.rlsTableCount) > 0) recommendations.push(_t('Model policy metadata cho toàn bộ bảng bật RLS để tránh khóa nghiệp vụ khi siết policy.', 'Model policy metadata for all RLS-enabled tables to avoid operational lockouts when tightening security.'));
+    if((report.summary && report.summary.canonicalCoveragePercent) < 80) recommendations.push(_t('Đóng gap canonical ERP/MES/eQMS, đặc biệt genealogy, inspection, NC/CAPA, approval/e-sign và maintenance.', 'Close canonical ERP/MES/eQMS gaps, especially genealogy, inspection, NC/CAPA, approval/e-sign, and maintenance.'));
+    if(graphDensity < 60) recommendations.push(_t('Tối ưu graph density: tách domain quá dày, bổ sung relation còn thiếu và lưu các focused view cho domain lớn.', 'Rebalance graph density: split dense domains, add missing relations, and save focused views for large domains.'));
+    if(visualReadiness < 70) recommendations.push(_t('Cần thêm saved views, visual heatmaps và metadata badges trước khi coi studio là control-plane trực diện cho enterprise.', 'Add saved views, visual heatmaps, and metadata badges before treating the studio as the direct enterprise control plane.'));
+    return {
+      generatedAt: wcNow(),
+      backend: false,
+      report: report,
+      diff: diff,
+      summary: {
+        tableCount: tables.length,
+        relationCount: relations.length,
+        avgColumnsPerTable: tables.length ? Math.round((((report.summary && report.summary.columnCount) || 0) / tables.length) * 10) / 10 : 0,
+        avgRelationsPerTable: tables.length ? Math.round(((relations.length * 2) / tables.length) * 10) / 10 : 0,
+        graphDensityScore: graphDensity,
+        metadataCompletenessPercent: metadataCompleteness,
+        workflowBindingCoveragePercent: workflowCoverage,
+        orphanRelationRiskCount: orphanRisk,
+        hotspotCount: hotspotCount,
+        visualReadinessScore: visualReadiness,
+        releaseReadinessScore: Number((report.summary && report.summary.releaseReadinessScore) || 0),
+        compatibilityScore: Number((diff.summary && diff.summary.compatibilityScore) || 100),
+        riskScore: Number((diff.summary && diff.summary.riskScore) || 0),
+        criticalGapCount: wcArray(report.canonical && report.canonical.criticalMissing).length
+      },
+      hotspots: hotspots,
+      recommendations: recommendations,
+      diffSummary: diff.summary || {},
+      reportSummary: report.summary || {}
+    };
+  }
+
+  function wcNormalizeDiagnosis(payload){
+    if(!payload) return wcLocalDiagnosis();
+    if(payload.summary && payload.hotspots){
+      return payload;
+    }
+    if(payload.health){
+      return {
+        generatedAt: wcNow(),
+        backend: true,
+        report: payload.report || {},
+        diff: payload.diff || {},
+        summary: payload.health.summary || {},
+        hotspots: wcArray(payload.health.hotspots),
+        recommendations: wcArray(payload.health.recommendations),
+        diffSummary: payload.health.diffSummary || {},
+        reportSummary: payload.health.reportSummary || {}
+      };
+    }
+    return wcLocalDiagnosis();
+  }
+
+  function wcFetchDiagnosis(force){
+    var state = wcEnsureState();
+    var schema;
+    if(state.loading && !force) return Promise.resolve(state.diagnosis || wcLocalDiagnosis());
+    schema = ensureSchema();
+    state.loading = true;
+    wcRefreshOverlay();
+    return _api('schema_studio_diagnose', {
+      design_id: wcDesignId(),
+      schema: schema,
+      baseline: STORE.baseline || null,
+      persist_artifacts: true
+    }, 'POST').then(function(res){
+      state.loading = false;
+      state.lastSyncAt = wcNow();
+      state.diagnosis = wcNormalizeDiagnosis(res || {});
+      wcPersistPrefs();
+      wcRefreshOverlay();
+      wcScheduleDecorations();
+      return state.diagnosis;
+    }).catch(function(){
+      state.loading = false;
+      state.lastSyncAt = wcNow();
+      state.diagnosis = wcLocalDiagnosis();
+      wcRefreshOverlay();
+      wcScheduleDecorations();
+      return state.diagnosis;
+    });
+  }
+
+  function wcGetDiagnosis(){
+    var state = wcEnsureState();
+    if(!state.diagnosis) state.diagnosis = wcLocalDiagnosis();
+    return state.diagnosis;
+  }
+
+  function wcThemeClassPrefix(prefix, node){
+    if(!node || !node.classList) return;
+    Array.prototype.slice.call(node.classList).forEach(function(cls){
+      if(cls.indexOf(prefix) === 0) node.classList.remove(cls);
+    });
+  }
+
+  function wcApplyPrefs(){
+    var state = wcEnsureState();
+    var root = refs.root || document.body;
+    wcEnsureStyles();
+    if(!root) return;
+    wcThemeClassPrefix('ss-wc-ambience-', root);
+    wcThemeClassPrefix('ss-wc-density-', root);
+    root.classList.add('ss-wc-ambience-' + state.ambience);
+    root.classList.add('ss-wc-density-' + state.density);
+    root.setAttribute('data-ss-wc-heatmap', state.heatmap);
+  }
+
+  function wcSeverityClass(severity){
+    return severity === 'critical' ? 'critical' : (severity === 'high' ? 'high' : (severity === 'medium' ? 'medium' : 'low'));
+  }
+
+  function wcCardStat(table){
+    var diag = wcGetDiagnosis();
+    var hotspot = wcArray(diag.hotspots).find(function(item){
+      return wcText(item && item.tableId) === wcText(table && table.id) || wcText(item && item.table) === wcText(table && table.name);
+    });
+    if(hotspot) return hotspot;
+    return wcHotspotForTable(table, ensureSchema(), diag.report || {}, wcArray(diag.diff && diag.diff.items), wcRelationMap(ensureSchema()));
+  }
+
+  function wcDecorateCard(tableId){
+    var table = findTable(tableId);
+    var card = document.getElementById('tc_' + tableId);
+    var stat;
+    var header;
+    var footer;
+    var ribbon;
+    var kpis;
+    if(!table || !card) return;
+    stat = wcCardStat(table);
+    header = card.querySelector('.ss-table-card-header');
+    footer = card.querySelector('.ss-table-footer');
+    if(!header || !footer) return;
+    card.setAttribute('data-wc-severity', stat.severity || 'low');
+    card.setAttribute('data-wc-heatmap', wcEnsureState().heatmap);
+    card.setAttribute('data-wc-layer', wcText(stat.layer || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+    card.setAttribute('data-wc-domain', wcText(stat.domain || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+    wcThemeClassPrefix('ss-wc-card-', card);
+    card.classList.add('ss-wc-card-' + wcSeverityClass(stat.severity));
+    ribbon = card.querySelector('.ss-wc-ribbon');
+    if(!ribbon){
+      ribbon = document.createElement('div');
+      ribbon.className = 'ss-wc-ribbon';
+      header.appendChild(ribbon);
+    }
+    ribbon.innerHTML = [
+      '<span class="ss-wc-chip tone-' + wcSeverityClass(stat.severity) + '">' + wcEsc((stat.severity || 'low').toUpperCase()) + '</span>',
+      (stat.layer ? '<span class="ss-wc-chip">' + wcEsc(stat.layer) + '</span>' : ''),
+      '<span class="ss-wc-chip">' + wcEsc(table.domain || 'default') + '</span>',
+      (stat.rlsEnabled ? '<span class="ss-wc-chip tone-security">RLS</span>' : ''),
+      (stat.workflowBound ? '<span class="ss-wc-chip tone-workflow">WF</span>' : (stat.workflowCandidate ? '<span class="ss-wc-chip tone-muted">WF?</span>' : ''))
+    ].join('');
+    kpis = card.querySelector('.ss-wc-kpis');
+    if(!kpis){
+      kpis = document.createElement('div');
+      kpis.className = 'ss-wc-kpis';
+      footer.parentNode.insertBefore(kpis, footer);
+    }
+    kpis.innerHTML = [
+      '<span>' + wcEsc(_t('Meta', 'Meta')) + ' ' + wcEsc(stat.metadataScore + '%') + '</span>',
+      '<span>' + wcEsc(_t('Risk', 'Risk')) + ' ' + wcEsc(stat.score) + '</span>',
+      '<span>' + wcEsc(_t('Rel', 'Rel')) + ' ' + wcEsc(stat.relationCount) + '</span>',
+      '<span>' + wcEsc(_t('Issues', 'Issues')) + ' ' + wcEsc(stat.issueCount || 0) + '</span>'
+    ].join('');
+  }
+
+  function wcRefreshDecorations(){
+    var schema = ensureSchema();
+    wcArray(schema && schema.tables).forEach(function(table){
+      wcDecorateCard(table.id);
+    });
+  }
+
+  function wcScheduleDecorations(){
+    var state = wcEnsureState();
+    clearTimeout(state.decorateTimer);
+    state.decorateTimer = setTimeout(function(){
+      wcApplyPrefs();
+      wcRefreshDecorations();
+    }, 60);
+  }
+
+  function wcMetric(label, value, sub, tone){
+    return '<div class="ss-wc-metric ' + (tone ? 'tone-' + tone : '') + '"><div class="ss-wc-metric-label">' + wcEsc(label) + '</div><div class="ss-wc-metric-value">' + wcEsc(value) + '</div><div class="ss-wc-metric-sub">' + wcEsc(sub || '') + '</div></div>';
+  }
+
+  function wcHotspotsHtml(diag){
+    var hotspots = wcArray(diag && diag.hotspots).slice(0, 8);
+    if(!hotspots.length) return '<div class="ss-wc-empty">' + wcEsc(_t('Chưa có hotspot nào.', 'No hotspots recorded yet.')) + '</div>';
+    return hotspots.map(function(item){
+      return [
+        '<div class="ss-wc-list-item" data-table-id="' + wcEsc(item.tableId || '') + '">',
+          '<div class="ss-wc-list-main">',
+            '<div class="ss-wc-list-title"><span class="ss-wc-dot tone-' + wcSeverityClass(item.severity) + '"></span>' + wcEsc(item.table || '-') + '</div>',
+            '<div class="ss-wc-list-meta">' + wcEsc((item.layer || '-') + ' · ' + (item.domain || 'default') + ' · ' + _t('Meta ', 'Meta ') + (item.metadataScore || 0) + '% · ' + _t('Rel ', 'Rel ') + (item.relationCount || 0)) + '</div>',
+            '<div class="ss-wc-list-help">' + wcEsc(wcArray(item.reasons).slice(0, 2).join(' · ')) + '</div>',
+          '</div>',
+          '<div class="ss-wc-list-side">',
+            '<div class="ss-wc-score">' + wcEsc(item.score || 0) + '</div>',
+            '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" data-wc-action="focus-table" data-table-id="' + wcEsc(item.tableId || '') + '">' + wcEsc(_t('Focus', 'Focus')) + '</button>',
+          '</div>',
+        '</div>'
+      ].join('');
+    }).join('');
+  }
+
+  function wcRecommendationsHtml(diag){
+    var recommendations = wcArray(diag && diag.recommendations).slice(0, 6);
+    if(!recommendations.length) return '<div class="ss-wc-empty">' + wcEsc(_t('Chưa có recommendation nào.', 'No recommendations generated yet.')) + '</div>';
+    return recommendations.map(function(item){
+      return '<div class="ss-wc-note">• ' + wcEsc(wcRecommendationText(item)) + '</div>';
+    }).join('');
+  }
+
+  function wcCompareHtml(diag){
+    var diff = (diag && diag.diff) || {};
+    var summary = diff.summary || {};
+    var items = wcArray(diff.items).slice(0, 12);
+    if(!STORE.baseline){
+      return '<div class="ss-wc-empty">' + wcEsc(_t('Chưa có baseline để compare. Hãy load/bật baseline trước.', 'No baseline available for compare. Load or enable a baseline first.')) + '</div>';
+    }
+    return [
+      '<div class="ss-wc-metric-grid">',
+        wcMetric(_t('Compatibility', 'Compatibility'), (summary.compatibilityScore || 0) + '%', _t('Backward compatibility posture', 'Backward compatibility posture'), 'good'),
+        wcMetric(_t('Risk score', 'Risk score'), summary.riskScore || 0, _t('Migration and runtime risk', 'Migration and runtime risk'), (summary.riskScore || 0) >= 60 ? 'critical' : 'warning'),
+        wcMetric(_t('Approval class', 'Approval class'), summary.approvalClass || 'standard', _t('Review and escalation lane', 'Review and escalation lane')),
+        wcMetric(_t('Destructive', 'Destructive'), summary.destructiveCount || 0, _t('Firewall-sensitive changes', 'Firewall-sensitive changes'), (summary.destructiveCount || 0) ? 'critical' : 'good'),
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Typed diff spotlight', 'Typed diff spotlight')) + '</div>',
+        (items.length ? items.map(function(item){
+          return '<div class="ss-wc-note"><strong>' + wcEsc(item.type || '-') + '</strong> · ' + wcEsc(item.table || '-') + (item.column ? '.' + wcEsc(item.column) : '') + ' · ' + wcEsc(item.detail || '') + ' · ' + wcEsc(item.approvalClass || 'standard') + '</div>';
+        }).join('') : '<div class="ss-wc-empty">' + wcEsc(_t('Chưa có typed diff item.', 'No typed diff items yet.')) + '</div>'),
+      '</div>'
+    ].join('');
+  }
+
+  function wcVisualHtml(diag){
+    var state = wcEnsureState();
+    var schema = ensureSchema();
+    var views = wcArray(schema && schema.views);
+    function optionButton(action, value, label, active){
+      return '<button type="button" class="hm-btn ' + (active ? 'hm-btn-primary' : 'hm-btn-ghost') + ' ss-btn-sm" data-wc-action="' + action + '" data-value="' + wcEsc(value) + '">' + wcEsc(label) + '</button>';
+    }
+    return [
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Visual ambience', 'Visual ambience')) + '</div>',
+        '<div class="ss-wc-inline">',
+          optionButton('set-ambience', 'aurora', _t('Aurora', 'Aurora'), state.ambience === 'aurora'),
+          optionButton('set-ambience', 'midnight', _t('Midnight', 'Midnight'), state.ambience === 'midnight'),
+          optionButton('set-ambience', 'clean', _t('Clean', 'Clean'), state.ambience === 'clean'),
+        '</div>',
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Heatmap mode', 'Heatmap mode')) + '</div>',
+        '<div class="ss-wc-inline">',
+          optionButton('set-heatmap', 'risk', _t('Risk', 'Risk'), state.heatmap === 'risk'),
+          optionButton('set-heatmap', 'security', _t('Security', 'Security'), state.heatmap === 'security'),
+          optionButton('set-heatmap', 'workflow', _t('Workflow', 'Workflow'), state.heatmap === 'workflow'),
+          optionButton('set-heatmap', 'canonical', _t('Canonical', 'Canonical'), state.heatmap === 'canonical'),
+        '</div>',
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Canvas density', 'Canvas density')) + '</div>',
+        '<div class="ss-wc-inline">',
+          optionButton('set-density', 'compact', _t('Compact', 'Compact'), state.density === 'compact'),
+          optionButton('set-density', 'comfortable', _t('Comfortable', 'Comfortable'), state.density === 'comfortable'),
+        '</div>',
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Saved views and cockpit posture', 'Saved views and cockpit posture')) + '</div>',
+        '<div class="ss-wc-note">' + wcEsc(_t('Saved views', 'Saved views')) + ': ' + wcEsc(views.length) + ' · ' + wcEsc(_t('Visual readiness', 'Visual readiness')) + ': ' + wcEsc(((diag && diag.summary && diag.summary.visualReadinessScore) || 0) + '%') + '</div>',
+        '<div class="ss-wc-note">' + wcEsc(_t('Lưu thêm các focused views theo domain, manufacturing line, genealogy, quality, CAPA và maintenance.', 'Save more focused views by domain, manufacturing line, genealogy, quality, CAPA, and maintenance.')) + '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function wcManufacturingHtml(diag){
+    var report = (diag && diag.report) || {};
+    var layers = report.layers || {};
+    var canonical = report.canonical || {};
+    var criticalMissing = wcArray(canonical.criticalMissing);
+    return [
+      '<div class="ss-wc-metric-grid">',
+        wcMetric(_t('Canonical coverage', 'Canonical coverage'), ((report.summary && report.summary.canonicalCoveragePercent) || 0) + '%', _t('ERP/MES/eQMS capability coverage', 'ERP/MES/eQMS capability coverage'), ((report.summary && report.summary.canonicalCoveragePercent) || 0) >= 80 ? 'good' : 'warning'),
+        wcMetric(_t('Policies', 'Policies'), (report.summary && report.summary.policyCount) || 0, _t('Governance and RLS policies', 'Governance and RLS policies')),
+        wcMetric(_t('RLS tables', 'RLS tables'), (report.summary && report.summary.rlsTableCount) || 0, _t('Security-sensitive tables', 'Security-sensitive tables')),
+        wcMetric(_t('Partitioned', 'Partitioned'), (report.summary && report.summary.partitionedTableCount) || 0, _t('Scale-oriented tables', 'Scale-oriented tables')),
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Layer distribution', 'Layer distribution')) + '</div>',
+        '<div class="ss-wc-chip-cloud">' + Object.keys(layers).map(function(layer){ return '<span class="ss-wc-chip">' + wcEsc(layer + ': ' + layers[layer]) + '</span>'; }).join('') + '</div>',
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Critical canonical gaps', 'Critical canonical gaps')) + '</div>',
+        (criticalMissing.length ? criticalMissing.map(function(item){ return '<div class="ss-wc-note">• ' + wcEsc(item) + '</div>'; }).join('') : '<div class="ss-wc-empty">' + wcEsc(_t('Không có critical gap nào.', 'No critical gaps detected.')) + '</div>'),
+      '</div>'
+    ].join('');
+  }
+
+  function wcDiagnosticsHtml(diag){
+    var validatorResults = wcArray(STORE.validation && STORE.validation.results).slice(0, 10);
+    return [
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Recommendations', 'Recommendations')) + '</div>',
+        wcRecommendationsHtml(diag),
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Live validator signals', 'Live validator signals')) + '</div>',
+        (validatorResults.length ? validatorResults.map(function(item){
+          return '<div class="ss-wc-note"><strong>' + wcEsc(item.code || item.level || 'INFO') + '</strong> · ' + wcEsc(item.table || item.tableId || '-') + ' · ' + wcEsc(item.msg || '') + '</div>';
+        }).join('') : '<div class="ss-wc-empty">' + wcEsc(_t('Chưa có tín hiệu validator nào.', 'No validator signals yet.')) + '</div>'),
+      '</div>',
+      '<div class="ss-wc-section">',
+        '<div class="ss-wc-section-title">' + wcEsc(_t('Hotspots', 'Hotspots')) + '</div>',
+        wcHotspotsHtml(diag),
+      '</div>'
+    ].join('');
+  }
+
+  function wcDashboardHtml(diag){
+    var summary = (diag && diag.summary) || {};
+    var report = (diag && diag.report) || {};
+    return [
+      '<div class="ss-wc-metric-grid">',
+        wcMetric(_t('Visual readiness', 'Visual readiness'), (summary.visualReadinessScore || 0) + '%', _t('Canvas + governance cockpit quality', 'Canvas + governance cockpit quality'), (summary.visualReadinessScore || 0) >= 75 ? 'good' : 'warning'),
+        wcMetric(_t('Metadata completeness', 'Metadata completeness'), (summary.metadataCompletenessPercent || 0) + '%', _t('Owner/steward/layer/UI semantics', 'Owner/steward/layer/UI semantics'), (summary.metadataCompletenessPercent || 0) >= 75 ? 'good' : 'warning'),
+        wcMetric(_t('Workflow coverage', 'Workflow coverage'), (summary.workflowBindingCoveragePercent || 0) + '%', _t('Operational tables bound to workflow', 'Operational tables bound to workflow'), (summary.workflowBindingCoveragePercent || 0) >= 65 ? 'good' : 'warning'),
+        wcMetric(_t('Graph density', 'Graph density'), summary.graphDensityScore || 0, _t('Readability of relation topology', 'Readability of relation topology'), (summary.graphDensityScore || 0) >= 60 ? 'good' : 'warning'),
+        wcMetric(_t('Orphan risk', 'Orphan risk'), summary.orphanRelationRiskCount || 0, _t('Broken relation targets', 'Broken relation targets'), (summary.orphanRelationRiskCount || 0) ? 'critical' : 'good'),
+        wcMetric(_t('Compatibility / risk', 'Compatibility / risk'), (summary.compatibilityScore || 0) + '% / ' + (summary.riskScore || 0), _t('Migration posture', 'Migration posture'), (summary.riskScore || 0) >= 60 ? 'critical' : 'warning'),
+      '</div>',
+      '<div class="ss-wc-grid-two">',
+        '<div class="ss-wc-section"><div class="ss-wc-section-title">' + wcEsc(_t('Top hotspots', 'Top hotspots')) + '</div>' + wcHotspotsHtml(diag) + '</div>',
+        '<div class="ss-wc-section"><div class="ss-wc-section-title">' + wcEsc(_t('Immediate recommendations', 'Immediate recommendations')) + '</div>' + wcRecommendationsHtml(diag) + '<div class="ss-wc-note" style="margin-top:10px">' + wcEsc(_t('Canonical coverage', 'Canonical coverage')) + ': ' + wcEsc(((report.summary && report.summary.canonicalCoveragePercent) || 0) + '%') + ' · ' + wcEsc(_t('Critical gaps', 'Critical gaps')) + ': ' + wcEsc((diag.summary && diag.summary.criticalGapCount) || 0) + '</div></div>',
+      '</div>'
+    ].join('');
+  }
+
+  function wcRenderBody(diag){
+    var state = wcEnsureState();
+    if(state.tab === 'compare') return wcCompareHtml(diag);
+    if(state.tab === 'visual') return wcVisualHtml(diag);
+    if(state.tab === 'manufacturing') return wcManufacturingHtml(diag);
+    if(state.tab === 'diagnostics') return wcDiagnosticsHtml(diag);
+    return wcDashboardHtml(diag);
+  }
+
+  function wcRefreshOverlay(){
+    var state = wcEnsureState();
+    var overlay = state.overlayEl;
+    var diag = wcGetDiagnosis();
+    var summary = diag.summary || {};
+    var tabs;
+    if(!overlay) return;
+    tabs = [
+      ['dashboard', _t('Dashboard', 'Dashboard')],
+      ['compare', _t('Compare', 'Compare')],
+      ['visual', _t('Visual', 'Visual')],
+      ['manufacturing', _t('Manufacturing', 'Manufacturing')],
+      ['diagnostics', _t('Diagnostics', 'Diagnostics')]
+    ];
+    overlay.innerHTML = [
+      '<div class="ss-wc-shell">',
+        '<div class="ss-wc-backdrop" data-wc-action="close"></div>',
+        '<section class="ss-wc-panel">',
+          '<header class="ss-wc-header">',
+            '<div>',
+              '<div class="ss-wc-kicker">' + wcEsc(_t('World-class schema cockpit', 'World-class schema cockpit')) + '</div>',
+              '<h3>' + wcEsc(_t('Visual intelligence, diagnostics, governance, manufacturing overlays', 'Visual intelligence, diagnostics, governance, manufacturing overlays')) + '</h3>',
+              '<div class="ss-wc-header-meta">' + wcEsc(_t('Visual readiness', 'Visual readiness')) + ': ' + wcEsc((summary.visualReadinessScore || 0) + '%') + ' · ' + wcEsc(_t('Hotspots', 'Hotspots')) + ': ' + wcEsc(summary.hotspotCount || 0) + ' · ' + wcEsc(_t('Last sync', 'Last sync')) + ': ' + wcEsc(state.lastSyncAt || diag.generatedAt || '-') + '</div>',
+            '</div>',
+            '<div class="ss-wc-inline">',
+              '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" data-wc-action="refresh">' + wcEsc(state.loading ? _t('Đang phân tích...', 'Analysing...') : _t('Phân tích lại', 'Re-run diagnostics')) + '</button>',
+              '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" data-wc-action="open-enterprise">' + wcEsc(_t('Enterprise', 'Enterprise')) + '</button>',
+              '<button type="button" class="hm-btn hm-btn-primary ss-btn-sm" data-wc-action="close">' + wcEsc(_t('Đóng', 'Close')) + '</button>',
+            '</div>',
+          '</header>',
+          '<nav class="ss-wc-tabs">',
+            tabs.map(function(item){
+              return '<button type="button" class="ss-wc-tab ' + (state.tab === item[0] ? 'active' : '') + '" data-wc-action="tab" data-tab="' + wcEsc(item[0]) + '">' + wcEsc(item[1]) + '</button>';
+            }).join(''),
+          '</nav>',
+          '<div class="ss-wc-body">',
+            wcRenderBody(diag),
+          '</div>',
+        '</section>',
+      '</div>'
+    ].join('');
+  }
+
+  function wcEnsureOverlay(){
+    var state = wcEnsureState();
+    var host = refs.root || document.body;
+    if(state.overlayEl && state.overlayEl.parentNode) return state.overlayEl;
+    state.overlayEl = document.createElement('div');
+    state.overlayEl.className = 'ss-wc-overlay';
+    state.overlayEl.addEventListener('click', function(ev){
+      var actionNode = ev.target && ev.target.closest ? ev.target.closest('[data-wc-action]') : null;
+      var action;
+      var value;
+      if(!actionNode) return;
+      action = actionNode.getAttribute('data-wc-action');
+      value = actionNode.getAttribute('data-value') || '';
+      if(action === 'close'){
+        wcClose();
+        return;
+      }
+      if(action === 'refresh'){
+        wcFetchDiagnosis(true);
+        return;
+      }
+      if(action === 'open-enterprise'){
+        if(window.SchemaStudioEnterprise && typeof window.SchemaStudioEnterprise.open === 'function'){
+          window.SchemaStudioEnterprise.open('summary');
+        }
+        return;
+      }
+      if(action === 'tab'){
+        wcEnsureState().tab = actionNode.getAttribute('data-tab') || 'dashboard';
+        wcPersistPrefs();
+        wcRefreshOverlay();
+        return;
+      }
+      if(action === 'set-heatmap'){
+        wcEnsureState().heatmap = value || 'risk';
+        wcPersistPrefs();
+        wcApplyPrefs();
+        wcScheduleDecorations();
+        wcRefreshOverlay();
+        return;
+      }
+      if(action === 'set-ambience'){
+        wcEnsureState().ambience = value || 'aurora';
+        wcPersistPrefs();
+        wcApplyPrefs();
+        wcRefreshOverlay();
+        return;
+      }
+      if(action === 'set-density'){
+        wcEnsureState().density = value || 'comfortable';
+        wcPersistPrefs();
+        wcApplyPrefs();
+        wcScheduleDecorations();
+        wcRefreshOverlay();
+        return;
+      }
+      if(action === 'focus-table'){
+        wcFocusTable(actionNode.getAttribute('data-table-id') || '');
+      }
+    });
+    if(!state.keyListenerBound){
+      document.addEventListener('keydown', function(ev){
+        if(ev.key === 'Escape' && wcEnsureState().overlayEl){
+          wcClose();
+        }
+      });
+      state.keyListenerBound = true;
+    }
+    host.appendChild(state.overlayEl);
+    return state.overlayEl;
+  }
+
+  function wcFocusTable(tableId){
+    if(!tableId) return;
+    wcEnsureState().focusTableId = tableId;
+    try{
+      if(Browser && typeof Browser.focusTable === 'function') Browser.focusTable(tableId);
+      if(Canvas && typeof Canvas.selectTable === 'function') Canvas.selectTable(tableId);
+      if(Inspector && typeof Inspector.open === 'function') Inspector.open({ kind:'table', tableId:tableId });
+    }catch(err){}
+  }
+
+  function wcOpen(tab){
+    var state = wcLoadPrefs();
+    wcEnsureStyles();
+    wcApplyPrefs();
+    if(tab) state.tab = tab;
+    wcEnsureOverlay();
+    wcRefreshOverlay();
+    wcFetchDiagnosis(false);
+  }
+
+  function wcClose(){
+    var state = wcEnsureState();
+    if(state.overlayEl && state.overlayEl.parentNode){
+      state.overlayEl.parentNode.removeChild(state.overlayEl);
+    }
+    state.overlayEl = null;
+  }
+
+  function wcEnsureStyles(){
+    var style;
+    if(document.getElementById('ss-worldclass-style')) return;
+    style = document.createElement('style');
+    style.id = 'ss-worldclass-style';
+    style.textContent = [
+      '.ss-wc-overlay{position:fixed;inset:0;z-index:4100;pointer-events:none;}',
+      '.ss-wc-shell{position:absolute;inset:0;display:flex;align-items:stretch;justify-content:flex-end;pointer-events:auto;}',
+      '.ss-wc-backdrop{position:absolute;inset:0;background:rgba(2,6,23,.38);backdrop-filter:blur(4px);}',
+      '.ss-wc-panel{position:relative;margin-left:auto;width:min(1080px,calc(100vw - 32px));height:100%;background:linear-gradient(180deg,rgba(10,15,29,.98),rgba(13,20,38,.98));color:#e5eefb;border-left:1px solid rgba(148,163,184,.18);box-shadow:-24px 0 60px rgba(2,6,23,.44);display:flex;flex-direction:column;}',
+      '.ss-wc-header{padding:18px 22px 14px;border-bottom:1px solid rgba(148,163,184,.14);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;background:radial-gradient(circle at top left,rgba(56,189,248,.14),transparent 38%),radial-gradient(circle at top right,rgba(168,85,247,.16),transparent 32%);}',
+      '.ss-wc-kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#7dd3fc;margin-bottom:8px;}',
+      '.ss-wc-header h3{margin:0;font-size:20px;line-height:1.3;color:#f8fbff;}',
+      '.ss-wc-header-meta{font-size:12px;color:#a9b7d0;margin-top:8px;}',
+      '.ss-wc-tabs{display:flex;gap:8px;padding:14px 20px;border-bottom:1px solid rgba(148,163,184,.12);overflow:auto;}',
+      '.ss-wc-tab{border:1px solid rgba(148,163,184,.18);background:rgba(15,23,42,.68);color:#cbd5e1;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;}',
+      '.ss-wc-tab.active{background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(168,85,247,.22));color:#fff;border-color:rgba(125,211,252,.42);box-shadow:0 0 0 1px rgba(125,211,252,.10) inset;}',
+      '.ss-wc-body{padding:18px 20px 28px;overflow:auto;display:grid;gap:16px;}',
+      '.ss-wc-metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}',
+      '.ss-wc-grid-two{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;}',
+      '.ss-wc-metric,.ss-wc-section{border:1px solid rgba(148,163,184,.14);background:rgba(15,23,42,.68);border-radius:18px;padding:14px 16px;box-shadow:0 10px 28px rgba(2,6,23,.18);}',
+      '.ss-wc-metric.tone-good{box-shadow:0 0 0 1px rgba(34,197,94,.16) inset;}',
+      '.ss-wc-metric.tone-warning{box-shadow:0 0 0 1px rgba(245,158,11,.16) inset;}',
+      '.ss-wc-metric.tone-critical{box-shadow:0 0 0 1px rgba(239,68,68,.20) inset;}',
+      '.ss-wc-metric-label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#8ba0bf;}',
+      '.ss-wc-metric-value{font-size:30px;font-weight:800;color:#fff;line-height:1.15;margin-top:10px;}',
+      '.ss-wc-metric-sub{font-size:12px;color:#94a3b8;margin-top:8px;line-height:1.5;}',
+      '.ss-wc-section-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#93c5fd;margin-bottom:12px;font-weight:800;}',
+      '.ss-wc-inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
+      '.ss-wc-note{font-size:13px;line-height:1.55;color:#d7e3f7;padding:8px 0;border-bottom:1px dashed rgba(148,163,184,.12);}',
+      '.ss-wc-note:last-child{border-bottom:0;}',
+      '.ss-wc-empty{padding:18px;border:1px dashed rgba(148,163,184,.20);border-radius:14px;color:#93a6c5;background:rgba(15,23,42,.42);}',
+      '.ss-wc-list-item{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed rgba(148,163,184,.12);}',
+      '.ss-wc-list-item:last-child{border-bottom:0;}',
+      '.ss-wc-list-title{font-size:14px;font-weight:700;color:#f8fbff;display:flex;align-items:center;gap:8px;}',
+      '.ss-wc-list-meta,.ss-wc-list-help{font-size:12px;color:#9fb0ca;margin-top:4px;line-height:1.5;}',
+      '.ss-wc-list-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}',
+      '.ss-wc-score{font-size:24px;font-weight:800;color:#fff;line-height:1;}',
+      '.ss-wc-dot{width:10px;height:10px;border-radius:999px;display:inline-block;box-shadow:0 0 0 4px rgba(255,255,255,.04);}',
+      '.ss-wc-dot.tone-critical,.ss-wc-chip.tone-critical{background:#ef4444;color:#fff;}',
+      '.ss-wc-dot.tone-high,.ss-wc-chip.tone-high{background:#f97316;color:#fff;}',
+      '.ss-wc-dot.tone-medium,.ss-wc-chip.tone-medium{background:#f59e0b;color:#fff;}',
+      '.ss-wc-dot.tone-low,.ss-wc-chip.tone-low{background:#38bdf8;color:#082f49;}',
+      '.ss-wc-chip-cloud{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.ss-wc-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(30,41,59,.82);color:#e2e8f0;font-size:12px;border:1px solid rgba(148,163,184,.16);}',
+      '.ss-wc-chip.tone-security{background:rgba(14,116,144,.28);color:#d8fbff;border-color:rgba(34,211,238,.22);}',
+      '.ss-wc-chip.tone-workflow{background:rgba(37,99,235,.26);color:#e0eaff;border-color:rgba(96,165,250,.26);}',
+      '.ss-wc-chip.tone-muted{background:rgba(71,85,105,.40);color:#d5dde8;}',
+      '.ss-worldclass-toolbar-btn{position:relative;border-color:rgba(96,165,250,.36)!important;background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(168,85,247,.20))!important;color:#fff!important;}',
+      '.ss-worldclass-toolbar-btn .ss-worldclass-toolbar-dot{width:8px;height:8px;border-radius:999px;background:linear-gradient(135deg,#7dd3fc,#c084fc);box-shadow:0 0 14px rgba(125,211,252,.8);display:inline-block;margin-right:8px;}',
+      '.ss-wc-ribbon{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;align-items:center;}',
+      '.ss-wc-kpis{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px 0;font-size:11px;color:#7b8aa6;}',
+      '.ss-wc-kpis span{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.12);}',
+      '.ss-table-card.ss-wc-card-critical{box-shadow:0 18px 38px rgba(239,68,68,.18),0 0 0 1px rgba(239,68,68,.14) inset;}',
+      '.ss-table-card.ss-wc-card-high{box-shadow:0 18px 38px rgba(249,115,22,.14),0 0 0 1px rgba(249,115,22,.10) inset;}',
+      '.ss-table-card.ss-wc-card-medium{box-shadow:0 18px 36px rgba(245,158,11,.14),0 0 0 1px rgba(245,158,11,.10) inset;}',
+      '.ss-wc-ambience-aurora .ss-table-card{background:linear-gradient(180deg,#fff,rgba(248,250,252,.98));}',
+      '.ss-wc-ambience-midnight .ss-table-card{background:linear-gradient(180deg,#0f172a,#111827);color:#e5eefb;border-color:rgba(148,163,184,.16);}',
+      '.ss-wc-ambience-midnight .ss-table-card .ss-table-footer,.ss-wc-ambience-midnight .ss-table-card .ss-col-type,.ss-wc-ambience-midnight .ss-table-card .ss-tbl-meta{color:#93a5c4;}',
+      '.ss-wc-ambience-clean .ss-table-card{background:#ffffff;box-shadow:0 10px 18px rgba(15,23,42,.08);}',
+      '.ss-wc-density-compact .ss-table-card .ss-col-item{padding-top:4px;padding-bottom:4px;}',
+      '.ss-wc-density-compact .ss-table-card .ss-wc-kpis{padding-top:4px;}',
+      '[data-ss-wc-heatmap="security"] .ss-table-card[data-wc-severity] .ss-wc-chip.tone-security{box-shadow:0 0 0 1px rgba(34,211,238,.18) inset;}',
+      '[data-ss-wc-heatmap="workflow"] .ss-table-card .ss-wc-chip.tone-workflow{box-shadow:0 0 0 1px rgba(96,165,250,.18) inset;}',
+      '[data-ss-wc-heatmap="canonical"] .ss-table-card[data-wc-layer^="experience"], [data-ss-wc-heatmap="canonical"] .ss-table-card[data-wc-layer^="execution"]{outline:1px solid rgba(125,211,252,.24);outline-offset:2px;}',
+      '@media (max-width:1100px){.ss-wc-panel{width:100vw;}.ss-wc-metric-grid,.ss-wc-grid-two{grid-template-columns:1fr;}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+
+  var wcOriginalRenderToolbar = renderToolbar;
+  renderToolbar = function(container){
+    var right;
+    var button;
+    var insertBefore;
+    wcOriginalRenderToolbar(container);
+    if(!container) return;
+    right = container.querySelector('.ss-toolbar-right');
+    if(!right) return;
+    if(!right.querySelector('.ss-worldclass-toolbar-btn')){
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'hm-btn hm-btn-ghost ss-btn-sm ss-worldclass-toolbar-btn';
+      button.innerHTML = '<span class="ss-worldclass-toolbar-dot"></span><span>' + wcEsc(_t('WorldClass', 'WorldClass')) + '</span>';
+      button.onclick = function(){ wcOpen('dashboard'); };
+      insertBefore = right.querySelector('.hm-btn-primary');
+      if(insertBefore) right.insertBefore(button, insertBefore);
+      else right.appendChild(button);
+    }
+  };
+
+  var wcOriginalTableRender = TableCard.renderTable;
+  TableCard.renderTable = function(tbl){
+    wcOriginalTableRender.apply(this, arguments);
+    if(tbl && tbl.id) wcDecorateCard(tbl.id);
+  };
+
+  var wcOriginalCanvasRender = Canvas.render;
+  Canvas.render = function(){
+    var result = wcOriginalCanvasRender.apply(this, arguments);
+    wcScheduleDecorations();
+    return result;
+  };
+
+  var wcOriginalValidatorRun = Validator.run;
+  Validator.run = function(){
+    var result = wcOriginalValidatorRun.apply(this, arguments) || [];
+    var seen = {};
+    var deduped = [];
+    var schema = ensureSchema();
+    wcArray(schema && schema.tables).forEach(function(table){
+      if(wcWorkflowCandidate(table) && !wcWorkflowBound(table)){
+        result.push({ level:'info', code:'I92', tableId:table.id, table:table.name, msg:_t('Bảng ứng viên workflow chưa liên kết runtime workflow: ', 'Workflow candidate table is not yet linked to runtime workflow: ') + table.name });
+      }
+      if(wcArray(table && table.columns).length >= 24 && !(table && table.ui && table.ui.column_groups)){
+        result.push({ level:'info', code:'I93', tableId:table.id, table:table.name, msg:_t('Bảng rộng nên có column groups / view presets để đọc tốt hơn: ', 'Wide table should define column groups / view presets for better readability: ') + table.name });
+      }
+    });
+    wcArray(result).forEach(function(item){
+      var key = [item && item.code, item && item.level, item && item.tableId, item && item.msg].join('|');
+      if(seen[key]) return;
+      seen[key] = true;
+      deduped.push(item);
+    });
+    STORE.validation.results = deduped;
+    if(refs.validationPanel && refs.validationPanel.style.display !== 'none'){
+      Validator.renderPanel();
+    }
+    return deduped;
+  };
+
+  var wcOriginalInit = init;
+  init = function(page){
+    wcOriginalInit(page);
+    wcLoadPrefs();
+    wcEnsureStyles();
+    wcApplyPrefs();
+    wcScheduleDecorations();
+    setTimeout(function(){ wcFetchDiagnosis(false); }, 220);
+    if(window.SchemaStudio) window.SchemaStudio.openWorldClass = function(){ wcOpen('dashboard'); };
+  };
+
+  if(window.SchemaStudioEnterprise){
+    if(typeof window.SchemaStudioEnterprise.compileRegistryBundle === 'function'){
+      var wcOriginalCompileRegistryBundle = window.SchemaStudioEnterprise.compileRegistryBundle;
+      window.SchemaStudioEnterprise.compileRegistryBundle = function(){
+        return Promise.resolve(wcOriginalCompileRegistryBundle.apply(this, arguments)).then(function(res){
+          wcFetchDiagnosis(true);
+          return res;
+        });
+      };
+    }
+    if(typeof window.SchemaStudioEnterprise.createReleaseBundle === 'function'){
+      var wcOriginalCreateReleaseBundle = window.SchemaStudioEnterprise.createReleaseBundle;
+      window.SchemaStudioEnterprise.createReleaseBundle = function(){
+        return Promise.resolve(wcOriginalCreateReleaseBundle.apply(this, arguments)).then(function(res){
+          wcFetchDiagnosis(true);
+          return res;
+        });
+      };
+    }
+    if(typeof window.SchemaStudioEnterprise.saveCurrentView === 'function'){
+      var wcOriginalSaveCurrentView = window.SchemaStudioEnterprise.saveCurrentView;
+      window.SchemaStudioEnterprise.saveCurrentView = function(){
+        var before = wcArray(ensureSchema().views).length;
+        var result = wcOriginalSaveCurrentView.apply(this, arguments);
+        var views = wcArray(ensureSchema().views);
+        if(views.length > before){
+          views[views.length - 1].worldClassState = wcPrefsSnapshot();
+          ensureSchema().views = views.slice(-24);
+          markDirty();
+        }
+        return result;
+      };
+    }
+    if(typeof window.SchemaStudioEnterprise.applyView === 'function'){
+      var wcOriginalApplyView = window.SchemaStudioEnterprise.applyView;
+      window.SchemaStudioEnterprise.applyView = function(viewId){
+        var views = wcArray(ensureSchema().views);
+        var view = views.find(function(item){ return item && item.id === viewId; });
+        var result = wcOriginalApplyView.apply(this, arguments);
+        if(view && view.worldClassState){
+          wcEnsureState().heatmap = view.worldClassState.heatmap || wcEnsureState().heatmap;
+          wcEnsureState().ambience = view.worldClassState.ambience || wcEnsureState().ambience;
+          wcEnsureState().density = view.worldClassState.density || wcEnsureState().density;
+          wcPersistPrefs();
+          wcApplyPrefs();
+          wcScheduleDecorations();
+        }
+        return result;
+      };
+    }
+  }
+
+  CmdPalette.COMMANDS = CmdPalette.COMMANDS.filter(function(command){
+    return !command || ['Open world-class cockpit', 'Refresh world-class diagnostics', 'Toggle workflow heatmap', 'Toggle security heatmap'].indexOf(command.label_en) < 0;
+  });
+  CmdPalette.COMMANDS.push(
+    {
+      icon:'✦',
+      label:'Mở World-Class cockpit',
+      label_en:'Open world-class cockpit',
+      category:'schema',
+      action:function(){ wcOpen('dashboard'); }
+    },
+    {
+      icon:'↻',
+      label:'Làm mới world-class diagnostics',
+      label_en:'Refresh world-class diagnostics',
+      category:'schema',
+      action:function(){ wcFetchDiagnosis(true); }
+    },
+    {
+      icon:'🧭',
+      label:'Bật workflow heatmap',
+      label_en:'Toggle workflow heatmap',
+      category:'view',
+      action:function(){ wcEnsureState().heatmap = 'workflow'; wcPersistPrefs(); wcApplyPrefs(); wcScheduleDecorations(); wcOpen('visual'); }
+    },
+    {
+      icon:'🔐',
+      label:'Bật security heatmap',
+      label_en:'Toggle security heatmap',
+      category:'view',
+      action:function(){ wcEnsureState().heatmap = 'security'; wcPersistPrefs(); wcApplyPrefs(); wcScheduleDecorations(); wcOpen('visual'); }
+    }
+  );
+
+  window.SchemaStudioWorldClass = {
+    open: wcOpen,
+    close: wcClose,
+    refresh: function(){ return wcFetchDiagnosis(true); },
+    getDiagnosis: wcGetDiagnosis,
+    applyVisualPrefs: function(payload){
+      payload = payload || {};
+      if(payload.heatmap) wcEnsureState().heatmap = payload.heatmap;
+      if(payload.ambience) wcEnsureState().ambience = payload.ambience;
+      if(payload.density) wcEnsureState().density = payload.density;
+      wcPersistPrefs();
+      wcApplyPrefs();
+      wcScheduleDecorations();
+      wcRefreshOverlay();
+    },
+    focusTable: wcFocusTable
+  };
+})();
+
 window.STORE = STORE;
 window.Canvas = Canvas;
 window.EdgeLayer = EdgeLayer;
@@ -8592,10 +10819,12 @@ window.TableDialog = TableDialog;
 window.Diagnostics = Diagnostics;
 window.switchMode = switchMode;
 window.SchemaStudio = {
-  buildId:'20260405ah',
+  buildId:'20260407worldclass2',
   init:init,
   destroy:destroy,
   getDiagnostics:function(){ return Diagnostics.snapshot(); },
+  getWorldClassDiagnostics:function(){ return window.SchemaStudioWorldClass ? window.SchemaStudioWorldClass.getDiagnosis() : null; },
+  openWorldClass:function(){ if(window.SchemaStudioWorldClass) window.SchemaStudioWorldClass.open('dashboard'); },
   runSelfCheck:function(){ return Diagnostics.runSelfCheck(); },
   exportDiagnostics:function(){ Diagnostics.exportReport(); }
 };
@@ -8603,4 +10832,2969 @@ window._renderSchemaStudio = function(page){
   init(page);
 };
 
+})(window);
+
+/* ── World-Class Mission Control Round 3 ────────────────────────────────── */
+(function(win){
+  'use strict';
+  if(!win || !win.SchemaStudioWorldClass || !win.STORE) return;
+
+  var STORE = win.STORE;
+  var STYLE_ID = 'ss-worldclass-round3-style';
+  var renderTimer = 0;
+  var hotspotCursor = 0;
+  var clickBound = false;
+  var keyBound = false;
+  var patched = !!win.SchemaStudioWorldClass.__round3Patched;
+
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function pct(numerator, denominator, whenZero){
+    numerator = Number(numerator || 0);
+    denominator = Number(denominator || 0);
+    if(!denominator) return whenZero == null ? 100 : whenZero;
+    return Math.max(0, Math.min(100, Math.round((numerator / denominator) * 100)));
+  }
+  function clamp(value, min, max){
+    value = Number(value);
+    if(isNaN(value)) value = 0;
+    if(value < min) return min;
+    if(value > max) return max;
+    return value;
+  }
+  function schema(){
+    return (STORE && STORE.schema && typeof STORE.schema === 'object') ? STORE.schema : { tables:[], relations:[], views:[] };
+  }
+  function tableByNameMap(currentSchema){
+    var map = {};
+    arr(currentSchema && currentSchema.tables).forEach(function(table){
+      if(table && table.name) map[String(table.name)] = table;
+    });
+    return map;
+  }
+  function relationTouchMap(currentSchema){
+    var map = {};
+    arr(currentSchema && currentSchema.relations).forEach(function(rel){
+      var fromId = txt(rel && rel.from_table_id);
+      var toId = txt(rel && rel.to_table_id);
+      if(fromId) map[fromId] = (map[fromId] || 0) + 1;
+      if(toId && toId !== fromId) map[toId] = (map[toId] || 0) + 1;
+    });
+    return map;
+  }
+  function workflowCandidate(table){
+    var haystack = [
+      table && table.name,
+      table && table.domain,
+      table && table.comment,
+      table && table.business && table.business.manufacturing_semantics,
+      table && table.business && table.business.qms_semantics,
+      table && table.labels && table.labels.en,
+      table && table.labels && table.labels.vi
+    ].join(' ').toLowerCase();
+    return /(approval|inspection|quality|audit|capa|deviation|dispatch|execution|order|maintenance|calibration|training|conformance|genealogy|lot|serial|trace|supplier|complaint|change_control)/.test(haystack);
+  }
+  function workflowBound(table){
+    var integration = table && table.integration && typeof table.integration === 'object' ? table.integration : {};
+    return !!(integration.workflow_id || (Array.isArray(integration.workflow_bindings) && integration.workflow_bindings.length));
+  }
+  function metadataScore(table){
+    var labels = table && table.labels && typeof table.labels === 'object' ? table.labels : {};
+    var business = table && table.business && typeof table.business === 'object' ? table.business : {};
+    var governance = table && table.governance && typeof table.governance === 'object' ? table.governance : {};
+    var security = table && table.security && typeof table.security === 'object' ? table.security : {};
+    var ui = table && table.ui && typeof table.ui === 'object' ? table.ui : {};
+    var reporting = table && table.reporting && typeof table.reporting === 'object' ? table.reporting : {};
+    var integration = table && table.integration && typeof table.integration === 'object' ? table.integration : {};
+    var checks = 10;
+    var points = 0;
+    if(labels.vi) points += 1;
+    if(labels.en) points += 1;
+    if(business.business_name_vi || business.business_name_en) points += 1;
+    if(table && table.domain) points += 1;
+    if(table && table.canonical && table.canonical.layer) points += 1;
+    if(governance.owner || governance.steward) points += 1;
+    if(security.sensitivity || (table && table.rls_enabled)) points += 1;
+    if(ui.default_widget || ui.icon) points += 1;
+    if(reporting.subject_area) points += 1;
+    if(integration.workflow_id || arr(integration.workflow_bindings).length || arr(table && table.tags).length || business.manufacturing_semantics) points += 1;
+    return Math.round((points / checks) * 100);
+  }
+  function layerOf(table){
+    return txt(table && table.canonical && table.canonical.layer) || txt(table && table.domain).replace(/_/g, ' ');
+  }
+  function toneByScore(score){
+    score = Number(score || 0);
+    return score >= 80 ? 'good' : (score >= 65 ? 'warning' : 'critical');
+  }
+  function journeySpecs(){
+    return [
+      { key:'production_dispatch', label:'Production dispatch → execution', focus:'Planning-to-execution orchestration', tables:['production_order','work_order','dispatch_queue','track_in','track_out','production_completion','job','job_event'], heatmap:'workflow', ambience:'aurora', density:'compact' },
+      { key:'traceability_genealogy', label:'Lot / serial genealogy', focus:'End-to-end traceability and lineage', tables:['item','item_revision','lot','serial','genealogy_link','material_consumption','operation_output','inventory_ledger'], heatmap:'canonical', ambience:'clean', density:'compact' },
+      { key:'incoming_quality', label:'Incoming quality containment', focus:'Supplier receipt → inspection → quality case', tables:['purchase_order','purchase_order_line','quality_order','inspection_lot','inspection_result','supplier_quality_case','nonconformance'], heatmap:'risk', ambience:'midnight', density:'comfortable' },
+      { key:'nc_capa_closure', label:'NC / deviation / CAPA closure', focus:'Containment, root cause, approval and evidence chain', tables:['nonconformance','deviation','capa','change_control','approval','electronic_signature','audit_trail'], heatmap:'security', ambience:'midnight', density:'comfortable' },
+      { key:'document_training', label:'Document → training → competency', focus:'Controlled documents and workforce readiness', tables:['document','document_revision','training_matrix','training_record','competency','approval','electronic_signature'], heatmap:'workflow', ambience:'aurora', density:'comfortable' },
+      { key:'equipment_runtime', label:'Equipment runtime and maintenance signal', focus:'Runtime events, downtime and resource orchestration', tables:['org_work_center','machine_event','downtime_event','tool_usage','operation_resource','work_instruction'], heatmap:'workflow', ambience:'midnight', density:'comfortable' },
+      { key:'inventory_commitment', label:'Demand, supply and inventory commitment', focus:'ERP planning with inventory posture', tables:['demand','planned_supply','allocation','pegging','inventory_balance_snapshot','location_balance','cost_ledger'], heatmap:'canonical', ambience:'aurora', density:'compact' }
+    ];
+  }
+  function buildExtendedDiagnosis(input){
+    var diag = input && typeof input === 'object' ? input : {};
+    var currentSchema = schema();
+    var tables = arr(currentSchema && currentSchema.tables);
+    var relations = arr(currentSchema && currentSchema.relations);
+    var summary = diag.summary && typeof diag.summary === 'object' ? diag.summary : {};
+    var relationMap = relationTouchMap(currentSchema);
+    var hotspots = arr(diag.hotspots);
+    var tableByName = tableByNameMap(currentSchema);
+    var domainPalette = {
+      foundation:'#0f766e',
+      master_data:'#0284c7',
+      planning_erp:'#d97706',
+      mes_execution:'#7c3aed',
+      inventory_traceability:'#15803d',
+      eqms_compliance:'#be123c',
+      engineering:'#475569'
+    };
+
+    if(!hotspots.length && tables.length){
+      hotspots = tables.map(function(table){
+        var score = Math.max(0, Math.round((100 - metadataScore(table)) / 12));
+        var reasons = [];
+        var governance = table && table.governance && typeof table.governance === 'object' ? table.governance : {};
+        if(!(governance.owner || governance.steward)){ score += 6; reasons.push('Missing owner/steward metadata'); }
+        if(table && table.rls_enabled && !arr(table.policies).length){ score += 10; reasons.push('RLS enabled without policy metadata'); }
+        if(!(table && table.canonical && table.canonical.layer)){ score += 6; reasons.push('Canonical layer missing'); }
+        if((relationMap[txt(table && table.id)] || 0) >= 8){ score += Math.min(10, (relationMap[txt(table && table.id)] || 0) - 7); reasons.push('High dependency fan-in/fan-out'); }
+        return {
+          table: txt(table && table.name),
+          tableId: txt(table && table.id),
+          domain: txt(table && table.domain) || 'default',
+          layer: layerOf(table),
+          metadataScore: metadataScore(table),
+          relationCount: relationMap[txt(table && table.id)] || 0,
+          score: score,
+          issueCount: 0,
+          destructiveCount: 0,
+          breakingCount: 0,
+          reasons: reasons,
+          severity: score >= 40 ? 'critical' : (score >= 24 ? 'high' : (score >= 12 ? 'medium' : 'low')),
+          workflowBound: workflowBound(table),
+          workflowCandidate: workflowCandidate(table),
+          rlsEnabled: !!(table && table.rls_enabled),
+          policyCount: arr(table && table.policies).length + arr(table && table.security && table.security.policy_refs).length
+        };
+      }).filter(function(item){ return item.score > 0; }).sort(function(a,b){
+        return (b.score - a.score) || (b.relationCount - a.relationCount) || a.table.localeCompare(b.table);
+      }).slice(0, 12);
+    }
+
+    var hotspotHigh = hotspots.filter(function(item){ return Number(item && item.score || 0) >= 12; });
+    var hotspotByDomain = {};
+    var hotspotByLayer = {};
+    hotspotHigh.forEach(function(item){
+      var domain = txt(item && item.domain) || 'default';
+      var layer = txt(item && item.layer) || 'Unassigned';
+      hotspotByDomain[domain] = (hotspotByDomain[domain] || 0) + 1;
+      hotspotByLayer[layer] = (hotspotByLayer[layer] || 0) + 1;
+    });
+
+    var domains = arr(diag.domains);
+    if(!domains.length && tables.length){
+      var grouped = {};
+      tables.forEach(function(table){
+        var domain = txt(table && table.domain) || 'default';
+        if(!grouped[domain]) grouped[domain] = { tables:[], layers:{} };
+        grouped[domain].tables.push(table);
+        grouped[domain].layers[layerOf(table)] = true;
+      });
+      domains = Object.keys(grouped).map(function(domain){
+        var rows = grouped[domain].tables;
+        var metadataAvg = rows.length ? Math.round(rows.reduce(function(sum, table){ return sum + metadataScore(table); }, 0) / rows.length) : 0;
+        var candidates = rows.filter(function(table){ return workflowCandidate(table) || workflowBound(table); });
+        var bound = candidates.filter(function(table){ return workflowBound(table); }).length;
+        var workflowCoverage = candidates.length ? pct(bound, candidates.length, 0) : 0;
+        var ownershipCoverage = pct(rows.filter(function(table){
+          var governance = table && table.governance && typeof table.governance === 'object' ? table.governance : {};
+          return !!(governance.owner || governance.steward);
+        }).length, rows.length, 100);
+        var layers = Object.keys(grouped[domain].layers);
+        var readiness = clamp(Math.round(
+          (metadataAvg * 0.42)
+          + (workflowCoverage * 0.18)
+          + (ownershipCoverage * 0.16)
+          + ((100 - Math.min(100, (hotspotByDomain[domain] || 0) * 14)) * 0.12)
+          + ((layers.length ? 100 : 40) * 0.12)
+        ), 0, 100);
+        return {
+          domain: domain,
+          label: domain.replace(/_/g, ' ').replace(/\b\w/g, function(ch){ return ch.toUpperCase(); }),
+          color: domainPalette[domain] || '#64748b',
+          tableCount: rows.length,
+          relationTouchCount: rows.reduce(function(sum, table){ return sum + (relationMap[txt(table && table.id)] || 0); }, 0),
+          metadataCompletenessPercent: metadataAvg,
+          workflowCoveragePercent: workflowCoverage,
+          ownershipCoveragePercent: ownershipCoverage,
+          rlsTableCount: rows.filter(function(table){ return !!(table && table.rls_enabled); }).length,
+          policyCount: rows.reduce(function(sum, table){ return sum + arr(table && table.policies).length + arr(table && table.security && table.security.policy_refs).length; }, 0),
+          hotspotCount: hotspotByDomain[domain] || 0,
+          layerCount: layers.length,
+          layers: layers,
+          representativeTables: rows.slice().sort(function(a,b){
+            return ((relationMap[txt(b && b.id)] || 0) - (relationMap[txt(a && a.id)] || 0)) || txt(a && a.name).localeCompare(txt(b && b.name));
+          }).slice(0,5).map(function(table){ return txt(table && table.name); }),
+          blockers: [
+            metadataAvg < 80 ? 'metadata_depth' : '',
+            workflowCoverage < 60 ? 'workflow_binding' : '',
+            ownershipCoverage < 60 ? 'ownership_gap' : ''
+          ].filter(Boolean),
+          readinessScore: readiness,
+          tone: toneByScore(readiness)
+        };
+      }).sort(function(a,b){ return (b.readinessScore - a.readinessScore) || (b.tableCount - a.tableCount) || a.domain.localeCompare(b.domain); });
+    }
+
+    var layers = arr(diag.layers);
+    if(!layers.length && tables.length){
+      var groupedLayers = {};
+      tables.forEach(function(table){
+        var layer = layerOf(table) || 'Unassigned';
+        if(!groupedLayers[layer]) groupedLayers[layer] = { tables:[] };
+        groupedLayers[layer].tables.push(table);
+      });
+      layers = Object.keys(groupedLayers).sort().map(function(layer){
+        var rows = groupedLayers[layer].tables;
+        var metadataAvg = rows.length ? Math.round(rows.reduce(function(sum, table){ return sum + metadataScore(table); }, 0) / rows.length) : 0;
+        var candidates = rows.filter(function(table){ return workflowCandidate(table) || workflowBound(table); });
+        var bound = candidates.filter(function(table){ return workflowBound(table); }).length;
+        var workflowCoverage = candidates.length ? pct(bound, candidates.length, 0) : 0;
+        var domainCount = {};
+        rows.forEach(function(table){ domainCount[txt(table && table.domain) || 'default'] = true; });
+        var readiness = clamp(Math.round(
+          (metadataAvg * 0.48)
+          + (workflowCoverage * 0.20)
+          + ((100 - Math.min(100, (hotspotByLayer[layer] || 0) * 16)) * 0.14)
+          + ((Object.keys(domainCount).length ? 100 : 50) * 0.18)
+        ), 0, 100);
+        return {
+          layer: layer,
+          tableCount: rows.length,
+          domainCount: Object.keys(domainCount).length,
+          domains: Object.keys(domainCount),
+          relationTouchCount: rows.reduce(function(sum, table){ return sum + (relationMap[txt(table && table.id)] || 0); }, 0),
+          metadataCompletenessPercent: metadataAvg,
+          workflowCoveragePercent: workflowCoverage,
+          hotspotCount: hotspotByLayer[layer] || 0,
+          readinessScore: readiness,
+          tone: toneByScore(readiness)
+        };
+      });
+    }
+
+    var governance = diag.governance && typeof diag.governance === 'object' ? diag.governance : null;
+    if(!governance){
+      var ownerCount = 0, stewardCount = 0, approverCount = 0, evidenceCount = 0, lifecycleCount = 0, uiHintCount = 0, workflowCount = 0, policyCount = 0, roleCount = 0;
+      var missingOwners = [], missingApprovers = [], missingPolicies = [];
+      tables.forEach(function(table){
+        var governanceInfo = table && table.governance && typeof table.governance === 'object' ? table.governance : {};
+        var lifecycle = table && table.lifecycle && typeof table.lifecycle === 'object' ? table.lifecycle : {};
+        var ui = table && table.ui && typeof table.ui === 'object' ? table.ui : {};
+        var integration = table && table.integration && typeof table.integration === 'object' ? table.integration : {};
+        var security = table && table.security && typeof table.security === 'object' ? table.security : {};
+        var hasOwner = !!governanceInfo.owner;
+        var hasSteward = !!governanceInfo.steward;
+        var hasApprover = !!(governanceInfo.approver_role || governanceInfo.approver);
+        var hasEvidence = arr(governanceInfo.review_evidence).length > 0;
+        var hasLifecycle = !!(lifecycle.stage || lifecycle.effective_from || lifecycle.effective_until);
+        var hasUiHints = !!(ui.default_widget || ui.icon);
+        var hasWorkflow = !!(integration.workflow_id || arr(integration.workflow_bindings).length);
+        var hasPolicy = !!(table && table.rls_enabled) || arr(table && table.policies).length > 0 || arr(security.policy_refs).length > 0;
+        var hasRoles = arr(security.roles).length > 0;
+        if(hasOwner) ownerCount += 1;
+        if(hasSteward) stewardCount += 1;
+        if(hasApprover) approverCount += 1; else if(missingApprovers.length < 12) missingApprovers.push(txt(table && table.name));
+        if(hasEvidence) evidenceCount += 1;
+        if(hasLifecycle) lifecycleCount += 1;
+        if(hasUiHints) uiHintCount += 1;
+        if(hasWorkflow) workflowCount += 1;
+        if(hasPolicy) policyCount += 1; else if(table && table.rls_enabled && missingPolicies.length < 12) missingPolicies.push(txt(table && table.name));
+        if(hasRoles) roleCount += 1;
+        if(!(hasOwner || hasSteward) && missingOwners.length < 12) missingOwners.push(txt(table && table.name));
+      });
+      governance = {
+        ownerCoveragePercent: pct(ownerCount, tables.length, 100),
+        stewardCoveragePercent: pct(stewardCount, tables.length, 100),
+        approverCoveragePercent: pct(approverCount, tables.length, 100),
+        evidenceCoveragePercent: pct(evidenceCount, tables.length, 100),
+        lifecycleCoveragePercent: pct(lifecycleCount, tables.length, 100),
+        uiHintCoveragePercent: pct(uiHintCount, tables.length, 100),
+        workflowBindingCoveragePercent: pct(workflowCount, tables.length, 100),
+        policyIntentCoveragePercent: pct(policyCount, tables.length, 100),
+        securityRoleCoveragePercent: pct(roleCount, tables.length, 100),
+        overallCoveragePercent: clamp(Math.round(
+          Math.max(pct(ownerCount, tables.length, 100), pct(stewardCount, tables.length, 100)) * 0.24
+          + pct(approverCount, tables.length, 100) * 0.16
+          + pct(evidenceCount, tables.length, 100) * 0.10
+          + pct(lifecycleCount, tables.length, 100) * 0.18
+          + pct(uiHintCount, tables.length, 100) * 0.12
+          + pct(workflowCount, tables.length, 100) * 0.10
+          + pct(policyCount, tables.length, 100) * 0.10
+        ), 0, 100),
+        missingOwners: missingOwners,
+        missingApprovers: missingApprovers,
+        missingPolicies: missingPolicies
+      };
+    }
+
+    var journeys = arr(diag.journeys);
+    if(!journeys.length){
+      journeys = journeySpecs().map(function(spec){
+        var present = [];
+        var missing = [];
+        var metadataAvg = 0;
+        var workflowBoundCount = 0;
+        var relationTouchCount = 0;
+        var domainMap = {};
+        var layerMap = {};
+        spec.tables.forEach(function(name){
+          var table = tableByName[name];
+          if(!table){ missing.push(name); return; }
+          present.push(name);
+          metadataAvg += metadataScore(table);
+          if(workflowBound(table)) workflowBoundCount += 1;
+          relationTouchCount += relationMap[txt(table && table.id)] || 0;
+          domainMap[txt(table && table.domain) || 'default'] = true;
+          layerMap[layerOf(table)] = true;
+        });
+        metadataAvg = present.length ? Math.round(metadataAvg / present.length) : 0;
+        var presencePct = pct(present.length, spec.tables.length, 100);
+        var workflowPct = present.length ? pct(workflowBoundCount, present.length, 0) : 100;
+        var readiness = clamp(Math.round(
+          (presencePct * 0.58) + (metadataAvg * 0.18) + (workflowPct * 0.12) + (Math.min(100, relationTouchCount * 3) * 0.12)
+        ), 0, 100);
+        return {
+          key: spec.key,
+          label: spec.label,
+          focus: spec.focus,
+          requiredTables: spec.tables,
+          tablesPresent: present,
+          missingTables: missing,
+          domains: Object.keys(domainMap),
+          layers: Object.keys(layerMap),
+          relationTouchCount: relationTouchCount,
+          workflowBoundCount: workflowBoundCount,
+          metadataCompletenessPercent: metadataAvg,
+          readinessScore: readiness,
+          tone: readiness >= 82 ? 'good' : (readiness >= 65 ? 'warning' : 'critical'),
+          focusTables: present.slice(0, 6),
+          highlight: spec.focus + (missing.length ? '; missing: ' + missing.slice(0,3).join(', ') + (missing.length > 3 ? '...' : '') : ''),
+          heatmap: spec.heatmap,
+          ambience: spec.ambience,
+          density: spec.density
+        };
+      });
+    }
+
+    var dependencyMatrix = diag.dependencyMatrix && typeof diag.dependencyMatrix === 'object' ? diag.dependencyMatrix : null;
+    if(!dependencyMatrix){
+      var domainKeys = {};
+      var tableById = {};
+      tables.forEach(function(table){
+        tableById[txt(table && table.id)] = table || {};
+        domainKeys[txt(table && table.domain) || 'default'] = true;
+      });
+      var domainList = Object.keys(domainKeys).sort();
+      var matrix = {};
+      domainList.forEach(function(from){ matrix[from] = {}; domainList.forEach(function(to){ matrix[from][to] = 0; }); });
+      relations.forEach(function(rel){
+        var from = tableById[txt(rel && rel.from_table_id)] || {};
+        var to = tableById[txt(rel && rel.to_table_id)] || {};
+        var fromDomain = txt(from && from.domain) || 'default';
+        var toDomain = txt(to && to.domain) || 'default';
+        if(matrix[fromDomain] && matrix[fromDomain][toDomain] != null) matrix[fromDomain][toDomain] += 1;
+      });
+      var strongest = [];
+      domainList.forEach(function(from){
+        domainList.forEach(function(to){
+          if(matrix[from][to]){
+            strongest.push({ fromDomain:from, toDomain:to, count:matrix[from][to] });
+          }
+        });
+      });
+      strongest.sort(function(a,b){ return (b.count - a.count) || a.fromDomain.localeCompare(b.fromDomain) || a.toDomain.localeCompare(b.toDomain); });
+      dependencyMatrix = {
+        domains: domainList,
+        matrix: domainList.map(function(from){ return domainList.map(function(to){ return matrix[from][to] || 0; }); }),
+        strongestLinks: strongest.slice(0, 16)
+      };
+    }
+
+    var blockers = arr(diag.blockers);
+    if(!blockers.length){
+      blockers = [];
+      if((governance.overallCoveragePercent || 0) < 55){
+        blockers.push({
+          key:'governance_ownership_gap',
+          severity:'high',
+          title:'Governance ownership is not modeled',
+          detail:'Most canonical tables still miss owner/steward/approver metadata, so review routing and accountability are weak.',
+          nextAction:'Populate owner, steward and approver roles for every domain before broad runtime onboarding.',
+          approvalClass:'elevated',
+          focusTargets: arr(governance.missingOwners).slice(0, 6)
+        });
+      }
+      if((governance.workflowBindingCoveragePercent || 0) < 55){
+        var workflowFocus = [];
+        journeys.forEach(function(journey){
+          arr(journey && journey.focusTables).forEach(function(name){
+            if(workflowFocus.indexOf(name) < 0 && workflowFocus.length < 8) workflowFocus.push(name);
+          });
+        });
+        blockers.push({
+          key:'workflow_runtime_gap',
+          severity:'medium',
+          title:'Workflow bindings are not connected',
+          detail:'Operational tables already exist but runtime workflow bindings are still largely absent.',
+          nextAction:'Bind workflow IDs/contracts for order, inspection, CAPA, training and equipment flows.',
+          approvalClass:'standard',
+          focusTargets: workflowFocus
+        });
+      }
+      if(arr(diag.report && diag.report.canonical && diag.report.canonical.criticalMissing).length){
+        blockers.push({
+          key:'canonical_gap',
+          severity:'high',
+          title:'Canonical capability gaps remain',
+          detail:'Some critical ERP/MES/eQMS capabilities are still missing or not explicit in the model.',
+          nextAction:'Complete the missing capability areas and define lineage for them before large-scale onboarding.',
+          approvalClass:'elevated',
+          focusTargets: arr(diag.report && diag.report.canonical && diag.report.canonical.criticalMissing).slice(0,6)
+        });
+      }
+      var highHotspots = hotspotHigh.slice(0, 6).map(function(item){ return item.table; });
+      if(highHotspots.length){
+        blockers.push({
+          key:'hotspot_remediation',
+          severity:'medium',
+          title:'High-dependency hotspots need refactoring attention',
+          detail:'A few hub tables carry high dependency pressure and need stronger metadata and governance signals.',
+          nextAction:'Prioritize hotspot remediation, domain views and targeted stewardship for hub tables.',
+          approvalClass:'standard',
+          focusTargets: highHotspots
+        });
+      }
+    }
+
+    var releaseRadar = diag.releaseRadar && typeof diag.releaseRadar === 'object' ? diag.releaseRadar : null;
+    if(!releaseRadar){
+      var journeyReadiness = journeys.length ? Math.round(journeys.reduce(function(sum, item){ return sum + Number(item && item.readinessScore || 0); }, 0) / journeys.length) : 100;
+      var domainReadiness = domains.length ? Math.round(domains.reduce(function(sum, item){ return sum + Number(item && item.readinessScore || 0); }, 0) / domains.length) : 100;
+      var radarReadiness = clamp(Math.round(
+        Number(summary.releaseReadinessScore || (diag.reportSummary && diag.reportSummary.releaseReadinessScore) || 0) * 0.34
+        + Number(governance.overallCoveragePercent || 0) * 0.24
+        + journeyReadiness * 0.22
+        + domainReadiness * 0.10
+        + (100 - Math.min(100, blockers.length * 12)) * 0.10
+      ), 0, 100);
+      releaseRadar = {
+        readinessScore: radarReadiness,
+        journeyReadinessScore: journeyReadiness,
+        domainReadinessScore: domainReadiness,
+        recommendedLane: radarReadiness >= 85 && !blockers.length ? 'standard' : (radarReadiness >= 72 ? 'review' : (radarReadiness >= 60 ? 'elevated' : 'cab_esign')),
+        quadrants: [
+          { key:'accelerate', label:'Accelerate', count: domains.filter(function(item){ return (item.readinessScore || 0) >= 75 && (item.hotspotCount || 0) === 0; }).length, tone:'good', hint:'Low blockers, ready for rapid onboarding' },
+          { key:'stabilize', label:'Stabilize', count: domains.filter(function(item){ return ((item.readinessScore || 0) >= 65 && (item.readinessScore || 0) < 75) || (item.hotspotCount || 0) === 1; }).length, tone:'warning', hint:'Good structure but needs targeted hardening' },
+          { key:'govern', label:'Govern', count: domains.filter(function(item){ return (item.readinessScore || 0) >= 55 && (item.readinessScore || 0) < 65; }).length, tone:'warning', hint:'Add ownership, workflow and policy signals' },
+          { key:'rework', label:'Rework', count: domains.filter(function(item){ return (item.readinessScore || 0) < 55; }).length, tone:'critical', hint:'Architecture or metadata posture needs redesign' }
+        ],
+        approvalLanes: [
+          { key:'standard', label:'Standard', count: domains.filter(function(item){ return (item.readinessScore || 0) >= 75; }).length, tone:'good' },
+          { key:'review', label:'Review board', count: domains.filter(function(item){ return (item.readinessScore || 0) >= 65 && (item.readinessScore || 0) < 75; }).length, tone:'warning' },
+          { key:'elevated', label:'Elevated', count: domains.filter(function(item){ return (item.readinessScore || 0) >= 55 && (item.readinessScore || 0) < 65; }).length, tone:'warning' },
+          { key:'cab_esign', label:'CAB / e-sign', count: domains.filter(function(item){ return (item.readinessScore || 0) < 55; }).length + blockers.filter(function(item){ return txt(item && item.severity) === 'critical'; }).length, tone:'critical' }
+        ],
+        window: radarReadiness >= 85 && !blockers.length ? 'now' : (radarReadiness >= 70 ? 'review_cycle' : 'hardening_required'),
+        narrative:'World-class posture is strongest in canonical breadth and journey completeness; the dominant release drag now comes from ownership/workflow governance rather than physical schema coverage.'
+      };
+    }
+
+    var storyboards = arr(diag.storyboards);
+    if(!storyboards.length){
+      storyboards = [{
+        key:'executive_release_radar',
+        title:'Executive release radar',
+        subtitle:'Cross-domain readiness, hotspots and blockers',
+        focusTables: hotspots.slice(0, 5).map(function(item){ return item.table; }),
+        heatmap:'risk',
+        ambience:'midnight',
+        density:'comfortable',
+        narrative:'Best view for change advisory board and architecture review.',
+        layers: layers.map(function(item){ return item.layer; }),
+        domains: domains.map(function(item){ return item.domain; })
+      }];
+      journeys.slice(0,5).forEach(function(journey){
+        storyboards.push({
+          key:'journey_' + txt(journey && journey.key),
+          title: txt(journey && journey.label) || 'Journey view',
+          subtitle: txt(journey && journey.focus) || '',
+          focusTables: arr(journey && journey.focusTables).slice(0, 6),
+          heatmap: txt(journey && journey.heatmap) || (txt(journey && journey.key).indexOf('capa') >= 0 ? 'security' : (txt(journey && journey.key).indexOf('production') >= 0 ? 'workflow' : 'canonical')),
+          ambience: txt(journey && journey.ambience) || (txt(journey && journey.key).indexOf('production') >= 0 ? 'aurora' : 'midnight'),
+          density: txt(journey && journey.density) || (txt(journey && journey.key).indexOf('traceability') >= 0 ? 'compact' : 'comfortable'),
+          narrative: txt(journey && journey.highlight) || '',
+          layers: arr(journey && journey.layers),
+          domains: arr(journey && journey.domains)
+        });
+      });
+    }
+
+    diag.generatedAt = diag.generatedAt || (diag._meta && diag._meta.generatedAt) || new Date().toISOString();
+    diag.summary = summary;
+    diag.hotspots = hotspots;
+    diag.domains = domains;
+    diag.layers = layers;
+    diag.governance = governance;
+    diag.journeys = journeys;
+    diag.dependencyMatrix = dependencyMatrix;
+    diag.blockers = blockers;
+    diag.releaseRadar = releaseRadar;
+    diag.storyboards = storyboards;
+    diag.summary.domainCount = Number(summary.domainCount || domains.length || 0);
+    diag.summary.layerCount = Number(summary.layerCount || layers.length || 0);
+    diag.summary.governanceCoveragePercent = Number(summary.governanceCoveragePercent || governance.overallCoveragePercent || 0);
+    diag.summary.journeyReadinessScore = Number(summary.journeyReadinessScore || releaseRadar.journeyReadinessScore || 0);
+    diag.summary.domainReadinessScore = Number(summary.domainReadinessScore || releaseRadar.domainReadinessScore || 0);
+    diag.summary.blockerCount = Number(summary.blockerCount || blockers.length || 0);
+    diag.summary.storyboardCount = Number(summary.storyboardCount || storyboards.length || 0);
+    diag.summary.releaseRadarScore = Number(summary.releaseRadarScore || releaseRadar.readinessScore || 0);
+    diag.__round3Enhanced = true;
+    return diag;
+  }
+
+  function ensureStyles(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      '.ss-wc-r3-root{margin-top:18px;display:grid;gap:14px;}',
+      '.ss-wc-r3-deck{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;}',
+      '.ss-wc-r3-card{border:1px solid rgba(148,163,184,.14);border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.64),rgba(15,23,42,.38));padding:16px;box-shadow:0 18px 42px rgba(2,6,23,.22);}',
+      '.ss-wc-r3-card h4{margin:0 0 6px;font-size:14px;color:#f8fbff;}',
+      '.ss-wc-r3-sub{font-size:12px;color:#9fb2cf;line-height:1.55;}',
+      '.ss-wc-r3-pillrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}',
+      '.ss-wc-r3-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;border:1px solid rgba(148,163,184,.14);background:rgba(15,23,42,.42);font-size:12px;font-weight:700;color:#e2e8f0;}',
+      '.ss-wc-r3-pill.tone-good{background:rgba(22,163,74,.12);border-color:rgba(74,222,128,.30);color:#bbf7d0;}',
+      '.ss-wc-r3-pill.tone-warning{background:rgba(245,158,11,.10);border-color:rgba(251,191,36,.28);color:#fde68a;}',
+      '.ss-wc-r3-pill.tone-critical{background:rgba(220,38,38,.10);border-color:rgba(248,113,113,.28);color:#fecaca;}',
+      '.ss-wc-r3-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}',
+      '.ss-wc-r3-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}',
+      '.ss-wc-r3-list{display:grid;gap:10px;}',
+      '.ss-wc-r3-item{border:1px solid rgba(148,163,184,.12);border-radius:14px;padding:12px;background:rgba(15,23,42,.32);}',
+      '.ss-wc-r3-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}',
+      '.ss-wc-r3-item-title{font-weight:700;color:#f8fbff;}',
+      '.ss-wc-r3-item-meta{font-size:12px;color:#9fb2cf;margin-top:6px;line-height:1.5;}',
+      '.ss-wc-r3-score{font-size:24px;font-weight:800;line-height:1;color:#f8fbff;}',
+      '.ss-wc-r3-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7dd3fc;margin-bottom:10px;}',
+      '.ss-wc-r3-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}',
+      '.ss-wc-r3-actions .hm-btn{min-height:34px;}',
+      '.ss-wc-r3-matrix{overflow:auto;border-radius:14px;border:1px solid rgba(148,163,184,.10);}',
+      '.ss-wc-r3-matrix table{width:100%;border-collapse:collapse;font-size:12px;}',
+      '.ss-wc-r3-matrix th,.ss-wc-r3-matrix td{padding:8px 10px;border-bottom:1px solid rgba(148,163,184,.08);text-align:right;color:#dce6f7;}',
+      '.ss-wc-r3-matrix th:first-child,.ss-wc-r3-matrix td:first-child{text-align:left;color:#9fb2cf;position:sticky;left:0;background:rgba(8,15,28,.96);}',
+      '.ss-wc-r3-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}',
+      '.ss-wc-r3-note{font-size:12px;line-height:1.6;color:#b7c7de;margin-top:10px;}',
+      '.ss-wc-r3-tag{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:rgba(56,189,248,.10);color:#bae6fd;font-size:11px;font-weight:700;}',
+      '.ss-wc-r3-blocker{border-left:4px solid rgba(248,113,113,.72);}',
+      '.ss-wc-r3-blocker.medium{border-left-color:rgba(251,191,36,.72);}',
+      '.ss-wc-r3-blocker.low,.ss-wc-r3-blocker.info{border-left-color:rgba(96,165,250,.72);}',
+      '.ss-wc-r3-domain-card{position:relative;overflow:hidden;}',
+      '.ss-wc-r3-domain-card::before{content:\"\";position:absolute;inset:0 auto 0 0;width:4px;background:var(--r3-domain-color,#7dd3fc);opacity:.95;}',
+      '.ss-wc-r3-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px;}',
+      '.ss-wc-r3-kpi .box{padding:12px;border-radius:14px;background:rgba(15,23,42,.36);border:1px solid rgba(148,163,184,.12);}',
+      '.ss-wc-r3-kpi .box .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8ba1c1;margin-bottom:6px;}',
+      '.ss-wc-r3-kpi .box .v{font-size:20px;font-weight:800;color:#f8fbff;}',
+      '.ss-wc-r3-story{display:grid;gap:10px;}',
+      '.ss-wc-r3-story .ss-wc-r3-item{background:linear-gradient(180deg,rgba(20,28,48,.58),rgba(13,20,38,.36));}',
+      '.ss-wc-r3-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:center;margin-bottom:2px;}',
+      '.ss-wc-r3-inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
+      '@media (max-width:1200px){.ss-wc-r3-deck,.ss-wc-r3-grid,.ss-wc-r3-grid-3,.ss-wc-r3-kpi{grid-template-columns:1fr;}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+
+  function metricPill(label, value, tone){
+    return '<span class=\"ss-wc-r3-pill tone-' + esc(tone || 'good') + '\"><strong>' + esc(label) + '</strong><span>' + esc(value) + '</span></span>';
+  }
+
+  function blockersHtml(diag){
+    var blockers = arr(diag && diag.blockers).slice(0, 6);
+    if(!blockers.length){
+      return '<div class=\"ss-wc-r3-item\"><div class=\"ss-wc-r3-item-title\">No blocker currently recorded</div><div class=\"ss-wc-r3-item-meta\">The current model has no explicit blocker board items. Keep governance and workflow signals under observation.</div></div>';
+    }
+    return blockers.map(function(item){
+      return [
+        '<div class=\"ss-wc-r3-item ss-wc-r3-blocker ' + esc(txt(item && item.severity).toLowerCase()) + '\">',
+          '<div class=\"ss-wc-r3-item-top\">',
+            '<div>',
+              '<div class=\"ss-wc-r3-item-title\">' + esc(item && item.title || '-') + '</div>',
+              '<div class=\"ss-wc-r3-item-meta\">' + esc(item && item.detail || '') + '</div>',
+            '</div>',
+            '<span class=\"ss-wc-r3-pill tone-' + esc(txt(item && item.severity) === 'critical' ? 'critical' : (txt(item && item.severity) === 'high' ? 'warning' : 'good')) + '\">' + esc(item && item.approvalClass || 'standard') + '</span>',
+          '</div>',
+          '<div class=\"ss-wc-r3-note\"><strong>Next:</strong> ' + esc(item && item.nextAction || '') + '</div>',
+          (arr(item && item.focusTargets).length ? '<div class=\"ss-wc-r3-legend\">' + arr(item.focusTargets).slice(0,6).map(function(target){ return '<span class=\"ss-wc-r3-tag\">' + esc(target) + '</span>'; }).join('') + '</div>' : ''),
+        '</div>'
+      ].join('');
+    }).join('');
+  }
+
+  function governanceHtml(diag){
+    var gov = diag && diag.governance || {};
+    return [
+      '<div class=\"ss-wc-r3-card\">',
+        '<div class=\"ss-wc-r3-label\">Governance posture</div>',
+        '<h4>Ownership, approvals and evidence coverage</h4>',
+        '<div class=\"ss-wc-r3-kpi\">',
+          '<div class=\"box\"><div class=\"k\">Overall</div><div class=\"v\">' + esc((gov.overallCoveragePercent || 0) + '%') + '</div></div>',
+          '<div class=\"box\"><div class=\"k\">Owner / steward</div><div class=\"v\">' + esc((gov.ownerCoveragePercent || 0) + '%') + '</div></div>',
+          '<div class=\"box\"><div class=\"k\">Approver</div><div class=\"v\">' + esc((gov.approverCoveragePercent || 0) + '%') + '</div></div>',
+          '<div class=\"box\"><div class=\"k\">Workflow</div><div class=\"v\">' + esc((gov.workflowBindingCoveragePercent || 0) + '%') + '</div></div>',
+        '</div>',
+        '<div class=\"ss-wc-r3-note\">Lifecycle and UI hints are already modeled broadly, but ownership, approval and workflow metadata remain the primary hardening gap.</div>',
+        ((arr(gov.missingOwners).length || arr(gov.missingApprovers).length) ? '<div class=\"ss-wc-r3-legend\">' + arr(gov.missingOwners).slice(0,4).map(function(name){ return '<span class=\"ss-wc-r3-tag\">owner: ' + esc(name) + '</span>'; }).join('') + arr(gov.missingApprovers).slice(0,4).map(function(name){ return '<span class=\"ss-wc-r3-tag\">approver: ' + esc(name) + '</span>'; }).join('') + '</div>' : ''),
+      '</div>'
+    ].join('');
+  }
+
+  function domainCardsHtml(diag){
+    var items = arr(diag && diag.domains).slice(0, 6);
+    if(!items.length) return '';
+    return [
+      '<div class=\"ss-wc-r3-card\">',
+        '<div class=\"ss-wc-r3-label\">Domain spotlight</div>',
+        '<h4>Cross-domain readiness mosaic</h4>',
+        '<div class=\"ss-wc-r3-grid\">',
+          items.map(function(item){
+            return [
+              '<div class=\"ss-wc-r3-item ss-wc-r3-domain-card\" style=\"--r3-domain-color:' + esc(item && item.color || '#7dd3fc') + '\">',
+                '<div class=\"ss-wc-r3-item-top\">',
+                  '<div><div class=\"ss-wc-r3-item-title\">' + esc(item && (item.label || item.domain) || '-') + '</div><div class=\"ss-wc-r3-item-meta\">' + esc((item && item.tableCount || 0) + ' tables · ' + (item && item.relationTouchCount || 0) + ' relation touches') + '</div></div>',
+                  '<div class=\"ss-wc-r3-score\">' + esc(item && item.readinessScore || 0) + '</div>',
+                '</div>',
+                '<div class=\"ss-wc-r3-pillrow\">',
+                  metricPill('Metadata', (item && item.metadataCompletenessPercent || 0) + '%', toneByScore(item && item.metadataCompletenessPercent || 0)),
+                  metricPill('Workflow', (item && item.workflowCoveragePercent || 0) + '%', toneByScore(item && item.workflowCoveragePercent || 0)),
+                  metricPill('Hotspots', item && item.hotspotCount || 0, (item && item.hotspotCount || 0) > 0 ? 'warning' : 'good'),
+                '</div>',
+                (arr(item && item.representativeTables).length ? '<div class=\"ss-wc-r3-note\"><strong>Focus:</strong> ' + arr(item.representativeTables).slice(0,4).map(esc).join(', ') + '</div>' : ''),
+              '</div>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function radarHtml(diag){
+    var radar = diag && diag.releaseRadar || {};
+    return [
+      '<div class=\"ss-wc-r3-card\">',
+        '<div class=\"ss-wc-r3-toolbar\">',
+          '<div><div class=\"ss-wc-r3-label\">Release radar</div><h4>Promotion readiness and approval lanes</h4></div>',
+          '<div class=\"ss-wc-r3-pillrow\">',
+            metricPill('Radar', (radar.readinessScore || 0) + '%', toneByScore(radar.readinessScore || 0)),
+            metricPill('Journey', (radar.journeyReadinessScore || 0) + '%', toneByScore(radar.journeyReadinessScore || 0)),
+            metricPill('Domain', (radar.domainReadinessScore || 0) + '%', toneByScore(radar.domainReadinessScore || 0)),
+            metricPill('Lane', radar.recommendedLane || 'review', radar.recommendedLane === 'standard' ? 'good' : (radar.recommendedLane === 'review' ? 'warning' : 'critical')),
+          '</div>',
+        '</div>',
+        '<div class=\"ss-wc-r3-grid\">',
+          '<div class=\"ss-wc-r3-item\"><div class=\"ss-wc-r3-item-title\">Quadrants</div><div class=\"ss-wc-r3-pillrow\">' + arr(radar.quadrants).map(function(item){ return metricPill(item && item.label || '-', item && item.count || 0, item && item.tone || 'warning'); }).join('') + '</div><div class=\"ss-wc-r3-note\">' + esc(radar.narrative || '') + '</div></div>',
+          '<div class=\"ss-wc-r3-item\"><div class=\"ss-wc-r3-item-title\">Approval lanes</div><div class=\"ss-wc-r3-pillrow\">' + arr(radar.approvalLanes).map(function(item){ return metricPill(item && item.label || '-', item && item.count || 0, item && item.tone || 'warning'); }).join('') + '</div><div class=\"ss-wc-r3-note\">Window: ' + esc(radar.window || 'review_cycle') + '</div></div>',
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function journeysHtml(diag){
+    var journeys = arr(diag && diag.journeys);
+    if(!journeys.length) return '';
+    return [
+      '<div class=\"ss-wc-r3-card\">',
+        '<div class=\"ss-wc-r3-label\">Manufacturing journeys</div>',
+        '<h4>Operational storylines for ERP / MES / eQMS</h4>',
+        '<div class=\"ss-wc-r3-story\">',
+          journeys.slice(0, 6).map(function(item){
+            return [
+              '<div class=\"ss-wc-r3-item\">',
+                '<div class=\"ss-wc-r3-item-top\">',
+                  '<div><div class=\"ss-wc-r3-item-title\">' + esc(item && item.label || '-') + '</div><div class=\"ss-wc-r3-item-meta\">' + esc(item && item.focus || '') + '</div></div>',
+                  '<div class=\"ss-wc-r3-score\">' + esc(item && item.readinessScore || 0) + '</div>',
+                '</div>',
+                '<div class=\"ss-wc-r3-pillrow\">',
+                  metricPill('Tables', arr(item && item.tablesPresent).length + '/' + arr(item && item.requiredTables).length, (arr(item && item.missingTables).length ? 'warning' : 'good')),
+                  metricPill('Workflow', item && item.workflowBoundCount || 0, (item && item.workflowBoundCount ? 'good' : 'warning')),
+                  metricPill('Touches', item && item.relationTouchCount || 0, toneByScore(item && item.readinessScore || 0)),
+                '</div>',
+                '<div class=\"ss-wc-r3-note\">' + esc(item && item.highlight || '') + '</div>',
+                '<div class=\"ss-wc-r3-actions\">' +
+                  '<button type=\"button\" class=\"hm-btn hm-btn-ghost ss-btn-sm\" data-wc-r3-action=\"focus-storyboard\" data-key=\"journey_' + esc(item && item.key || '') + '\">Storyboard</button>' +
+                  arr(item && item.focusTables).slice(0, 2).map(function(name){ return '<button type=\"button\" class=\"hm-btn hm-btn-ghost ss-btn-sm\" data-wc-r3-action=\"focus-table-name\" data-table=\"' + esc(name) + '\">' + esc(name) + '</button>'; }).join('') +
+                '</div>',
+              '</div>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function dependencyMatrixHtml(diag){
+    var matrix = diag && diag.dependencyMatrix || {};
+    var domains = arr(matrix.domains);
+    var rows = arr(matrix.matrix);
+    if(!domains.length || !rows.length) return '';
+    return [
+      '<div class=\"ss-wc-r3-card\">',
+        '<div class=\"ss-wc-r3-label\">Dependency mesh</div>',
+        '<h4>Domain-to-domain dependency matrix</h4>',
+        '<div class=\"ss-wc-r3-matrix\"><table><thead><tr><th>Domain</th>' + domains.map(function(domain){ return '<th>' + esc(domain) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+          domains.map(function(domain, rowIndex){
+            var row = arr(rows[rowIndex]);
+            return '<tr><td>' + esc(domain) + '</td>' + domains.map(function(_, columnIndex){ return '<td>' + esc(row[columnIndex] == null ? 0 : row[columnIndex]) + '</td>'; }).join('') + '</tr>';
+          }).join('') +
+        '</tbody></table></div>',
+        '<div class=\"ss-wc-r3-note\">Strongest links: ' + arr(matrix.strongestLinks).slice(0,4).map(function(item){ return esc((item && item.fromDomain || '-') + '→' + (item && item.toDomain || '-') + ' (' + (item && item.count || 0) + ')'); }).join(' · ') + '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function storyboardsHtml(diag){
+    var items = arr(diag && diag.storyboards).slice(0, 6);
+    if(!items.length) return '';
+    return [
+      '<div class=\"ss-wc-r3-card\">',
+        '<div class=\"ss-wc-r3-label\">Storyboards</div>',
+        '<h4>Ready-made visual modes and quick focus paths</h4>',
+        '<div class=\"ss-wc-r3-list\">',
+          items.map(function(item){
+            return [
+              '<div class=\"ss-wc-r3-item\">',
+                '<div class=\"ss-wc-r3-item-top\">',
+                  '<div><div class=\"ss-wc-r3-item-title\">' + esc(item && item.title || '-') + '</div><div class=\"ss-wc-r3-item-meta\">' + esc(item && item.subtitle || item && item.narrative || '') + '</div></div>',
+                  '<span class=\"ss-wc-r3-pill tone-good\">' + esc((item && item.heatmap) || 'risk') + '</span>',
+                '</div>',
+                '<div class=\"ss-wc-r3-pillrow\">',
+                  metricPill('Ambience', item && item.ambience || 'midnight', 'good'),
+                  metricPill('Density', item && item.density || 'comfortable', 'good'),
+                  metricPill('Focus', arr(item && item.focusTables).length || 0, 'good'),
+                '</div>',
+                '<div class=\"ss-wc-r3-actions\">',
+                  '<button type=\"button\" class=\"hm-btn hm-btn-primary ss-btn-sm\" data-wc-r3-action=\"focus-storyboard\" data-key=\"' + esc(item && item.key || '') + '\">Apply focus</button>',
+                  (arr(item && item.focusTables).length ? '<button type=\"button\" class=\"hm-btn hm-btn-ghost ss-btn-sm\" data-wc-r3-action=\"focus-table-name\" data-table=\"' + esc(arr(item && item.focusTables)[0]) + '\">Open first table</button>' : ''),
+                '</div>',
+              '</div>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function commandDeckHtml(diag){
+    var summary = diag && diag.summary || {};
+    return [
+      '<div class=\"ss-wc-r3-deck\">',
+        '<div class=\"ss-wc-r3-card\">',
+          '<div class=\"ss-wc-r3-toolbar\">',
+            '<div><div class=\"ss-wc-r3-label\">Mission control</div><h4>Round 3 command deck</h4><div class=\"ss-wc-r3-sub\">World-class control plane now includes governance posture, journey overlays, release radar, storyboards and dependency mesh.</div></div>',
+            '<div class=\"ss-wc-r3-inline\">',
+              '<button type=\"button\" class=\"hm-btn hm-btn-ghost ss-btn-sm\" data-wc-r3-action=\"prev-hotspot\">◀ Hotspot</button>',
+              '<button type=\"button\" class=\"hm-btn hm-btn-ghost ss-btn-sm\" data-wc-r3-action=\"next-hotspot\">Hotspot ▶</button>',
+            '</div>',
+          '</div>',
+          '<div class=\"ss-wc-r3-pillrow\">',
+            metricPill('Visual', (summary.visualReadinessScore || 0) + '%', toneByScore(summary.visualReadinessScore || 0)),
+            metricPill('Governance', (summary.governanceCoveragePercent || 0) + '%', toneByScore(summary.governanceCoveragePercent || 0)),
+            metricPill('Journeys', (summary.journeyReadinessScore || 0) + '%', toneByScore(summary.journeyReadinessScore || 0)),
+            metricPill('Radar', (summary.releaseRadarScore || 0) + '%', toneByScore(summary.releaseRadarScore || 0)),
+            metricPill('Blockers', summary.blockerCount || 0, (summary.blockerCount || 0) ? 'critical' : 'good'),
+            metricPill('Storyboards', summary.storyboardCount || 0, 'good'),
+          '</div>',
+        '</div>',
+        '<div class=\"ss-wc-r3-card\">',
+          '<div class=\"ss-wc-r3-label\">Quick guidance</div>',
+          '<h4>Immediate hardening path</h4>',
+          '<div class=\"ss-wc-r3-note\">1) assign owner/steward/approver metadata, 2) bind workflow contracts for operational tables, 3) resolve hotspots, 4) save focused storyboard views for governance walkthroughs.</div>',
+          '<div class=\"ss-wc-r3-actions\">' +
+            '<button type=\"button\" class=\"hm-btn hm-btn-primary ss-btn-sm\" data-wc-r3-action=\"focus-storyboard\" data-key=\"executive_release_radar\">Open executive view</button>' +
+            '<button type=\"button\" class=\"hm-btn hm-btn-ghost ss-btn-sm\" data-wc-r3-action=\"next-hotspot\">Focus hotspot</button>' +
+          '</div>',
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function buildSupplement(tab, diag){
+    if(tab === 'manufacturing'){
+      return journeysHtml(diag) + storyboardsHtml(diag);
+    }
+    if(tab === 'diagnostics'){
+      return '<div class=\"ss-wc-r3-grid\">' + '<div>' + blockersHtml(diag) + '</div>' + '<div>' + governanceHtml(diag) + '</div>' + '</div>' + dependencyMatrixHtml(diag);
+    }
+    if(tab === 'visual'){
+      return storyboardsHtml(diag) + dependencyMatrixHtml(diag);
+    }
+    if(tab === 'compare'){
+      return radarHtml(diag) + dependencyMatrixHtml(diag);
+    }
+    return radarHtml(diag) + '<div class=\"ss-wc-r3-grid\">' + governanceHtml(diag) + domainCardsHtml(diag) + '</div>' + blockersHtml(diag);
+  }
+
+  function renderRound3(){
+    var overlay = document.querySelector('.ss-wc-overlay');
+    var body;
+    var activeTab;
+    var diag;
+    var root;
+    if(!overlay) return;
+    body = overlay.querySelector('.ss-wc-body');
+    if(!body) return;
+    activeTab = overlay.querySelector('.ss-wc-tab.active');
+    diag = buildExtendedDiagnosis(win.SchemaStudioWorldClass.getDiagnosis ? win.SchemaStudioWorldClass.getDiagnosis() : {});
+    root = body.querySelector('.ss-wc-r3-root');
+    if(root) root.parentNode.removeChild(root);
+    root = document.createElement('div');
+    root.className = 'ss-wc-r3-root';
+    root.innerHTML = commandDeckHtml(diag) + buildSupplement(activeTab ? activeTab.getAttribute('data-tab') : 'dashboard', diag);
+    body.appendChild(root);
+    var meta = overlay.querySelector('.ss-wc-header-meta');
+    if(meta){
+      meta.setAttribute('data-round3-enhanced', '1');
+      meta.innerHTML = meta.textContent + ' · Governance: ' + esc((diag.summary && diag.summary.governanceCoveragePercent || 0) + '%') + ' · Journey: ' + esc((diag.summary && diag.summary.journeyReadinessScore || 0) + '%') + ' · Radar: ' + esc((diag.summary && diag.summary.releaseRadarScore || 0) + '%');
+    }
+  }
+
+  function scheduleRender(){
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(function(){
+      ensureStyles();
+      renderRound3();
+    }, 20);
+  }
+
+  function focusTableByName(name){
+    var currentSchema = schema();
+    var table = arr(currentSchema && currentSchema.tables).find(function(item){ return item && item.name === name; });
+    if(table && win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.focusTable === 'function'){
+      win.SchemaStudioWorldClass.focusTable(table.id);
+    }
+  }
+
+  function focusHotspot(step){
+    var diag = buildExtendedDiagnosis(win.SchemaStudioWorldClass.getDiagnosis ? win.SchemaStudioWorldClass.getDiagnosis() : {});
+    var hotspots = arr(diag && diag.hotspots);
+    if(!hotspots.length) return;
+    hotspotCursor = (hotspotCursor + step + hotspots.length) % hotspots.length;
+    if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.focusTable === 'function'){
+      win.SchemaStudioWorldClass.focusTable(hotspots[hotspotCursor].tableId);
+    }
+    scheduleRender();
+  }
+
+  function applyStoryboard(key){
+    var diag = buildExtendedDiagnosis(win.SchemaStudioWorldClass.getDiagnosis ? win.SchemaStudioWorldClass.getDiagnosis() : {});
+    var story = arr(diag && diag.storyboards).find(function(item){ return item && item.key === key; });
+    if(!story) return;
+    if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.applyVisualPrefs === 'function'){
+      win.SchemaStudioWorldClass.applyVisualPrefs({
+        heatmap: story.heatmap || 'risk',
+        ambience: story.ambience || 'midnight',
+        density: story.density || 'comfortable'
+      });
+    }
+    if(arr(story.focusTables).length){
+      focusTableByName(arr(story.focusTables)[0]);
+    }
+    scheduleRender();
+  }
+
+  function ensureBindings(){
+    if(!clickBound){
+      document.addEventListener('click', function(ev){
+        var actionNode = ev.target && ev.target.closest ? ev.target.closest('[data-wc-r3-action], .ss-wc-tab, [data-wc-action]') : null;
+        var action = actionNode && actionNode.getAttribute ? actionNode.getAttribute('data-wc-r3-action') : '';
+        if(action === 'next-hotspot'){
+          ev.preventDefault();
+          focusHotspot(1);
+          return;
+        }
+        if(action === 'prev-hotspot'){
+          ev.preventDefault();
+          focusHotspot(-1);
+          return;
+        }
+        if(action === 'focus-table-name'){
+          ev.preventDefault();
+          focusTableByName(actionNode.getAttribute('data-table') || '');
+          return;
+        }
+        if(action === 'focus-storyboard'){
+          ev.preventDefault();
+          applyStoryboard(actionNode.getAttribute('data-key') || '');
+          return;
+        }
+        if(actionNode){
+          setTimeout(scheduleRender, 40);
+          setTimeout(scheduleRender, 180);
+        }
+      }, true);
+      clickBound = true;
+    }
+    if(!keyBound){
+      document.addEventListener('keydown', function(ev){
+        if(!document.querySelector('.ss-wc-overlay')) return;
+        if(ev.altKey && ev.key === 'ArrowRight'){
+          ev.preventDefault();
+          focusHotspot(1);
+        } else if(ev.altKey && ev.key === 'ArrowLeft'){
+          ev.preventDefault();
+          focusHotspot(-1);
+        }
+      });
+      keyBound = true;
+    }
+  }
+
+  if(!patched){
+    var originalGetDiagnosis = win.SchemaStudioWorldClass.getDiagnosis;
+    var originalRefresh = win.SchemaStudioWorldClass.refresh;
+    var originalOpen = win.SchemaStudioWorldClass.open;
+    win.SchemaStudioWorldClass.getDiagnosis = function(){
+      return buildExtendedDiagnosis(originalGetDiagnosis ? originalGetDiagnosis.apply(this, arguments) : null);
+    };
+    win.SchemaStudioWorldClass.refresh = function(){
+      return Promise.resolve(originalRefresh ? originalRefresh.apply(this, arguments) : (originalGetDiagnosis ? originalGetDiagnosis.apply(this, arguments) : null)).then(function(diag){
+        return buildExtendedDiagnosis(diag);
+      }).then(function(diag){
+        scheduleRender();
+        return diag;
+      });
+    };
+    win.SchemaStudioWorldClass.open = function(){
+      var result = originalOpen ? originalOpen.apply(this, arguments) : undefined;
+      scheduleRender();
+      return result;
+    };
+    win.SchemaStudioWorldClass.__round3Patched = true;
+  }
+
+  ensureBindings();
+  ensureStyles();
+  if(win.SchemaStudio){
+    win.SchemaStudio.buildId = '20260407worldclass3';
+    win.SchemaStudio.getWorldClassDiagnostics = function(){
+      return win.SchemaStudioWorldClass ? win.SchemaStudioWorldClass.getDiagnosis() : null;
+    };
+  }
+  setTimeout(scheduleRender, 120);
+})(window);
+
+/* ── World-Class Experience Engine Round 4 ─────────────────────────────── */
+(function(win){
+  'use strict';
+
+  if(!win || !win.SchemaStudioWorldClass || !win.STORE) return;
+  if(win.SchemaStudioWorldClass.__round4Patched) return;
+
+  var rafId = 0;
+  var clickBound = false;
+  var keyBound = false;
+  var cacheDiag = null;
+
+  function arr(value){
+    return Array.isArray(value) ? value : [];
+  }
+
+  function txt(value){
+    return value == null ? '' : String(value);
+  }
+
+  function num(value, fallback){
+    var n = Number(value);
+    return isFinite(n) ? n : Number(fallback || 0);
+  }
+
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function toneByScore(score){
+    score = num(score, 0);
+    return score >= 82 ? 'good' : (score >= 65 ? 'warning' : 'critical');
+  }
+
+  function schema(){
+    return (win.STORE && win.STORE.schema) || null;
+  }
+
+  function currentTab(){
+    var active = document.querySelector('.ss-wc-tab.active');
+    return active ? (active.getAttribute('data-tab') || 'dashboard') : 'dashboard';
+  }
+
+  function findTableByName(name){
+    var currentSchema = schema();
+    var tables = arr(currentSchema && currentSchema.tables);
+    name = txt(name);
+    if(!name) return null;
+    return tables.find(function(item){ return item && item.name === name; }) || null;
+  }
+
+  function focusTableByName(name){
+    var table = findTableByName(name);
+    if(table && win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.focusTable === 'function'){
+      win.SchemaStudioWorldClass.focusTable(table.id);
+    }
+  }
+
+  function gotoTab(tab){
+    var button = document.querySelector('.ss-wc-tab[data-tab="' + tab + '"]');
+    if(button && typeof button.click === 'function') button.click();
+  }
+
+  function withClipboard(text){
+    text = txt(text);
+    if(!text) return Promise.resolve(false);
+    if(navigator && navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).then(function(){ return true; }).catch(function(){ return false; });
+    }
+    try{
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', 'readonly');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      document.body.removeChild(area);
+      return Promise.resolve(true);
+    }catch(err){
+      return Promise.resolve(false);
+    }
+  }
+
+  function badge(label, tone){
+    return '<span class="ss-wc-r4-badge tone-' + esc(tone || 'neutral') + '">' + esc(label) + '</span>';
+  }
+
+  function metricCard(label, value, sub, tone){
+    return [
+      '<article class="ss-wc-r4-metric tone-' + esc(tone || 'neutral') + '">',
+        '<div class="ss-wc-r4-kicker">' + esc(label) + '</div>',
+        '<div class="ss-wc-r4-value">' + esc(value) + '</div>',
+        '<div class="ss-wc-r4-sub">' + esc(sub || '') + '</div>',
+      '</article>'
+    ].join('');
+  }
+
+  function listPills(items, mapper){
+    return arr(items).map(function(item, index){
+      var value = mapper ? mapper(item, index) : item;
+      return value || '';
+    }).join('');
+  }
+
+  function ensureSummary(summary){
+    summary = summary && typeof summary === 'object' ? summary : {};
+    summary.visualReadinessScore = num(summary.visualReadinessScore, 0);
+    summary.metadataCompletenessPercent = num(summary.metadataCompletenessPercent, 0);
+    summary.workflowBindingCoveragePercent = num(summary.workflowBindingCoveragePercent, 0);
+    summary.governanceCoveragePercent = num(summary.governanceCoveragePercent, 0);
+    summary.journeyReadinessScore = num(summary.journeyReadinessScore, 0);
+    summary.releaseRadarScore = num(summary.releaseRadarScore, 0);
+    summary.policyCoveragePercent = num(summary.policyCoveragePercent, summary.governanceCoveragePercent || 0);
+    summary.performancePostureScore = num(summary.performancePostureScore, Math.round((summary.visualReadinessScore * 0.62) + (Math.max(0, 100 - num(summary.hotspotCount, 0) * 6) * 0.38)));
+    summary.registrySyncScore = num(summary.registrySyncScore, Math.round((summary.metadataCompletenessPercent * 0.45) + (summary.workflowBindingCoveragePercent * 0.35) + (num(summary.visualReadinessScore, 0) * 0.20)));
+    summary.complianceReadinessScore = num(summary.complianceReadinessScore, Math.round((summary.governanceCoveragePercent * 0.45) + (summary.releaseRadarScore * 0.30) + (summary.policyCoveragePercent * 0.25)));
+    summary.aiCopilotReadinessScore = num(summary.aiCopilotReadinessScore, Math.round((summary.metadataCompletenessPercent * 0.40) + (summary.visualReadinessScore * 0.25) + (summary.registrySyncScore * 0.20) + (summary.governanceCoveragePercent * 0.15)));
+    summary.experienceScore = num(summary.experienceScore, Math.round(
+      (summary.visualReadinessScore * 0.18) +
+      (summary.governanceCoveragePercent * 0.15) +
+      (summary.journeyReadinessScore * 0.12) +
+      (summary.releaseRadarScore * 0.12) +
+      (summary.performancePostureScore * 0.14) +
+      (summary.registrySyncScore * 0.12) +
+      (summary.complianceReadinessScore * 0.09) +
+      (summary.aiCopilotReadinessScore * 0.08)
+    ));
+    return summary;
+  }
+
+  function ensureDiag(diag){
+    var summary;
+    var hotspots;
+    var journeys;
+    var storyboards;
+    var dependency;
+    var strongLinks;
+    diag = diag && typeof diag === 'object' ? diag : {};
+    summary = ensureSummary(diag.summary || {});
+    hotspots = arr(diag.hotspots);
+    journeys = arr(diag.journeys);
+    storyboards = arr(diag.storyboards);
+    dependency = diag.dependencyMatrix && typeof diag.dependencyMatrix === 'object' ? diag.dependencyMatrix : {};
+    strongLinks = arr(dependency.strongestLinks);
+
+    if(!arr(diag.personas).length){
+      diag.personas = [
+        {
+          key:'system_architect',
+          label:'System architect',
+          defaultTab:'compare',
+          focus:'Compatibility, release lanes, hotspots',
+          heatmap:'risk',
+          ambience:'midnight',
+          density:'comfortable',
+          readinessScore:Math.round((summary.releaseRadarScore * 0.45) + (summary.visualReadinessScore * 0.30) + (summary.metadataCompletenessPercent * 0.25)),
+          focusTables:hotspots.slice(0, 4).map(function(item){ return item.table; }),
+          nextActions:['Review typed diff and hotspot hubs','Prepare executive storyboard and release notes']
+        },
+        {
+          key:'manufacturing_process_engineer',
+          label:'Manufacturing engineer',
+          defaultTab:'manufacturing',
+          focus:'Dispatch, execution, genealogy, line readiness',
+          heatmap:'workflow',
+          ambience:'aurora',
+          density:'compact',
+          readinessScore:summary.journeyReadinessScore || 72,
+          focusTables:arr((journeys[0] && journeys[0].focusTables) || []).slice(0, 6),
+          nextActions:['Apply production storyboard','Bind execution workflow contracts']
+        },
+        {
+          key:'quality_manager',
+          label:'Quality manager',
+          defaultTab:'diagnostics',
+          focus:'Inspection, NC/CAPA, evidence and approval posture',
+          heatmap:'security',
+          ambience:'midnight',
+          density:'comfortable',
+          readinessScore:summary.complianceReadinessScore || 68,
+          focusTables:arr((journeys[1] && journeys[1].focusTables) || []).slice(0, 6),
+          nextActions:['Review policy gaps','Save quality/compliance storyboard']
+        },
+        {
+          key:'app_builder_metadata_admin',
+          label:'App builder / metadata admin',
+          defaultTab:'dashboard',
+          focus:'Registry sync, field contracts, builder packs',
+          heatmap:'canonical',
+          ambience:'clean',
+          density:'comfortable',
+          readinessScore:summary.registrySyncScore || 70,
+          focusTables:hotspots.slice(0, 3).map(function(item){ return item.table; }),
+          nextActions:['Compile registry bundle','Inspect runtime projections and saved views']
+        }
+      ];
+    }
+
+    if(!arr(diag.playbooks).length){
+      diag.playbooks = [
+        {
+          key:'executive_release_gate',
+          title:'Executive release gate',
+          persona:'system_architect',
+          startTab:'dashboard',
+          heatmap:'risk',
+          readinessScore:summary.releaseRadarScore || 70,
+          focusTables:hotspots.slice(0, 5).map(function(item){ return item.table; }),
+          checklist:['Review hotspots and blockers','Check release lane and compatibility','Validate rollback and evidence']
+        },
+        {
+          key:'manufacturing_storyboard_walkthrough',
+          title:'Manufacturing storyboard walkthrough',
+          persona:'manufacturing_process_engineer',
+          startTab:'manufacturing',
+          heatmap:'workflow',
+          readinessScore:summary.journeyReadinessScore || 72,
+          focusTables:arr((journeys[0] && journeys[0].focusTables) || []).slice(0, 6),
+          checklist:['Follow planning → execution → genealogy','Validate workflow bindings','Save line-ready focused view']
+        },
+        {
+          key:'quality_compliance_gate',
+          title:'Quality / compliance gate',
+          persona:'quality_manager',
+          startTab:'diagnostics',
+          heatmap:'security',
+          readinessScore:summary.complianceReadinessScore || 68,
+          focusTables:arr((journeys[1] && journeys[1].focusTables) || []).slice(0, 6),
+          checklist:['Check owner/steward/approver gaps','Verify evidence and signature posture','Inspect policy and approval lane']
+        }
+      ];
+    }
+
+    if(!arr(diag.releaseLanes).length){
+      diag.releaseLanes = [
+        { key:'standard', label:'Standard lane', tone:'good', score:summary.releaseRadarScore + 12, eligible:num(summary.hotspotCount, 0) <= 2, recommended:(summary.releaseRadarScore || 0) >= 85, gates:['No destructive changes','Strong compatibility','Saved storyboard ready'] },
+        { key:'review', label:'Review board', tone:'warning', score:summary.releaseRadarScore, eligible:true, recommended:(summary.releaseRadarScore || 0) >= 70 && (summary.releaseRadarScore || 0) < 85, gates:['Typed diff reviewed','Hotspots acknowledged','Registry projections checked'] },
+        { key:'elevated', label:'Elevated governance', tone:'warning', score:Math.max(0, summary.releaseRadarScore - 8), eligible:true, recommended:(summary.releaseRadarScore || 0) >= 58 && (summary.releaseRadarScore || 0) < 70, gates:['Governance gaps tracked','Owners assigned','Reason codes attached'] },
+        { key:'cab_esign', label:'CAB / e-sign', tone:'critical', score:Math.max(0, summary.releaseRadarScore - 16), eligible:num(summary.hotspotCount, 0) > 0, recommended:(summary.releaseRadarScore || 0) < 58, gates:['Rollback proof','CAB sign-off','Effective window agreed'] }
+      ];
+    }
+
+    if(!arr(diag.aiCopilot).length){
+      diag.aiCopilot = [
+        {
+          key:'release_notes',
+          title:'Impact-aware release notes',
+          objective:'Generate structured release notes by domain, impact, and approvals.',
+          confidence:0.91,
+          requiredApprovals:['review'],
+          focusTables:hotspots.slice(0, 4).map(function(item){ return item.table; }),
+          prompt:'Summarize this schema diff into release notes grouped by domain, impact, risk, required approvals, and rollback evidence.',
+          tone:'good'
+        },
+        {
+          key:'hotspot_refactor',
+          title:'Hotspot refactor plan',
+          objective:'Propose metadata, workflow, and policy improvements for hub tables.',
+          confidence:0.88,
+          requiredApprovals:['review','elevated'],
+          focusTables:hotspots.slice(0, 3).map(function(item){ return item.table; }),
+          prompt:'Create a remediation plan for the top hotspot tables including ownership, workflow bindings, policy posture, relation hygiene, and visual presets.',
+          tone:'warning'
+        },
+        {
+          key:'manufacturing_storyboard',
+          title:'Manufacturing storyboard builder',
+          objective:'Generate focused views for planning, execution, genealogy, and quality.',
+          confidence:0.87,
+          requiredApprovals:['review'],
+          focusTables:arr((journeys[0] && journeys[0].focusTables) || []).slice(0, 6),
+          prompt:'Build manufacturing storyboard presets for planning → execution → traceability, including saved views, focus tables, and review checkpoints.',
+          tone:'good'
+        }
+      ];
+    }
+
+    if(!diag.renderInsights || typeof diag.renderInsights !== 'object'){
+      diag.renderInsights = {
+        complexityScore:Math.round((num(summary.tableCount, 0) * 0.42) + (num(summary.relationCount, 0) * 0.18) + (num(summary.hotspotCount, 0) * 8)),
+        complexityTier:num(summary.tableCount, 0) >= 90 ? 'enterprise_huge' : 'enterprise_large',
+        savedViewCount:num(summary.savedViewCount, storyboards.length),
+        strongLinks:strongLinks.slice(0, 6),
+        suggestedLayouts:[
+          { key:'layered', label:'Layered governance view', reason:'Best for executive and architecture walkthroughs.' },
+          { key:'domain', label:'Domain swimlanes', reason:'Best for stewardship, bounded contexts and ownership.' },
+          { key:'workflow', label:'Workflow-centric lens', reason:'Best for runtime contracts and approval chains.' }
+        ],
+        notes:[
+          'Prefer storyboard presets over free-pan exploration during reviews.',
+          'Use compact density for line/execution walkthroughs and comfortable density for compliance reviews.',
+          'Keep hotspot hubs visible with KPI chips while collapsing low-signal domains.'
+        ]
+      };
+    }
+
+    summary.personaCount = num(summary.personaCount, arr(diag.personas).length);
+    summary.playbookCount = num(summary.playbookCount, arr(diag.playbooks).length);
+    summary.releaseLaneCount = num(summary.releaseLaneCount, arr(diag.releaseLanes).length);
+    summary.copilotSuggestionCount = num(summary.copilotSuggestionCount, arr(diag.aiCopilot).length);
+    diag.summary = summary;
+    return diag;
+  }
+
+  function heroHtml(diag){
+    var summary = diag.summary || {};
+    var personas = arr(diag.personas);
+    var strongLinks = arr(diag.renderInsights && diag.renderInsights.strongLinks).slice(0, 2);
+    return [
+      '<section class="ss-wc-r4-hero">',
+        '<div class="ss-wc-r4-hero-copy">',
+          '<div>',
+            '<div class="ss-wc-r4-eyebrow">Mission control round 4</div>',
+            '<h3 class="ss-wc-r4-title">Executive glass, persona-guided reviews, AI copilots, and release-lane intelligence</h3>',
+            '<div class="ss-wc-r4-sub">Schema Studio now behaves like a control tower for ERP / MES / eQMS design, governance, migration safety, and runtime onboarding.</div>',
+          '</div>',
+          '<div class="ss-wc-r4-hero-pills">' + [
+            badge('Experience ' + num(summary.experienceScore, 0) + '%', toneByScore(summary.experienceScore)),
+            badge('Compliance ' + num(summary.complianceReadinessScore, 0) + '%', toneByScore(summary.complianceReadinessScore)),
+            badge('Registry sync ' + num(summary.registrySyncScore, 0) + '%', toneByScore(summary.registrySyncScore)),
+            badge('AI ' + num(summary.aiCopilotReadinessScore, 0) + '%', toneByScore(summary.aiCopilotReadinessScore)),
+            badge('Personas ' + personas.length, 'neutral')
+          ].join('') + '</div>',
+          '<div class="ss-wc-r4-hero-meta">' +
+            esc(_t('Tab hiện tại', 'Current tab')) + ': ' + esc(currentTab()) +
+            ' · ' + esc(_t('Hotspots', 'Hotspots')) + ': ' + esc(num(summary.hotspotCount, 0)) +
+            ' · ' + esc(_t('Playbooks', 'Playbooks')) + ': ' + esc(num(summary.playbookCount, 0)) +
+            (strongLinks.length ? ' · ' + esc(_t('Dominant links', 'Dominant links')) + ': ' + esc(strongLinks.map(function(item){ return txt(item.fromDomain) + '→' + txt(item.toDomain); }).join(', ')) : '') +
+          '</div>',
+        '</div>',
+        '<div class="ss-wc-r4-hero-grid">' + [
+          metricCard(_t('Experience', 'Experience'), num(summary.experienceScore, 0) + '%', _t('Độ trưởng thành cockpit + review', 'Cockpit + review maturity'), toneByScore(summary.experienceScore)),
+          metricCard(_t('Compliance', 'Compliance'), num(summary.complianceReadinessScore, 0) + '%', _t('Governance + policy + evidence', 'Governance + policy + evidence'), toneByScore(summary.complianceReadinessScore)),
+          metricCard(_t('Performance', 'Performance'), num(summary.performancePostureScore, 0) + '%', _t('Virtualization + readability posture', 'Virtualization + readability posture'), toneByScore(summary.performancePostureScore)),
+          metricCard(_t('Registry sync', 'Registry sync'), num(summary.registrySyncScore, 0) + '%', _t('Schema → registry → runtime', 'Schema → registry → runtime'), toneByScore(summary.registrySyncScore)),
+          metricCard(_t('AI copilot', 'AI copilot'), num(summary.aiCopilotReadinessScore, 0) + '%', _t('Promptable, explainable, review-safe', 'Promptable, explainable, review-safe'), toneByScore(summary.aiCopilotReadinessScore))
+        ].join('') + '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function personasHtml(diag){
+    var personas = arr(diag.personas).slice(0, 6);
+    if(!personas.length) return '';
+    return [
+      '<section class="ss-wc-r4-section">',
+        '<div class="ss-wc-r4-section-head">',
+          '<div><div class="ss-wc-r4-kicker">Role-aware modes</div><h4>Persona rails</h4><div class="ss-wc-r4-sub">One studio, different lenses for architecture, data, manufacturing, quality, compliance, and builder operations.</div></div>',
+          '<div class="ss-wc-r4-note">' + esc(_t('Phím tắt', 'Keyboard')) + ': Shift + 1..6</div>',
+        '</div>',
+        '<div class="ss-wc-r4-persona-grid">',
+          personas.map(function(item, index){
+            return [
+              '<button type="button" class="ss-wc-r4-persona tone-' + esc(toneByScore(item.readinessScore)) + '" data-wc-r4-action="apply-persona" data-key="' + esc(item.key || '') + '" title="' + esc(item.focus || '') + '">',
+                '<div class="ss-wc-r4-persona-top">',
+                  '<span class="ss-wc-r4-persona-index">' + esc(index + 1) + '</span>',
+                  '<span class="ss-wc-r4-persona-score">' + esc(num(item.readinessScore, 0) + '%') + '</span>',
+                '</div>',
+                '<div class="ss-wc-r4-persona-title">' + esc(item.label || item.key || '-') + '</div>',
+                '<div class="ss-wc-r4-persona-sub">' + esc(item.focus || '') + '</div>',
+                '<div class="ss-wc-r4-persona-meta">' + [
+                  txt(item.defaultTab || 'dashboard'),
+                  txt(item.heatmap || 'risk'),
+                  txt(item.ambience || 'midnight')
+                ].filter(Boolean).join(' · ') + '</div>',
+              '</button>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function playbooksHtml(diag, limit){
+    var items = arr(diag.playbooks).slice(0, limit || 4);
+    if(!items.length) return '';
+    return [
+      '<section class="ss-wc-r4-section">',
+        '<div class="ss-wc-r4-section-head"><div><div class="ss-wc-r4-kicker">Review playbooks</div><h4>Stage-by-stage walkthroughs</h4><div class="ss-wc-r4-sub">Pre-wired review motions for executives, architects, manufacturing, quality, and builder onboarding.</div></div></div>',
+        '<div class="ss-wc-r4-card-grid">',
+          items.map(function(item){
+            return [
+              '<article class="ss-wc-r4-card tone-' + esc(toneByScore(item.readinessScore)) + '">',
+                '<div class="ss-wc-r4-card-head">',
+                  '<div><div class="ss-wc-r4-kicker">' + esc(item.stage || 'review') + '</div><h5>' + esc(item.title || item.key || '-') + '</h5></div>',
+                  '<div class="ss-wc-r4-bigscore">' + esc(num(item.readinessScore, 0) + '%') + '</div>',
+                '</div>',
+                '<div class="ss-wc-r4-sub">' + esc(item.hero || '') + '</div>',
+                '<ul class="ss-wc-r4-checklist">' + arr(item.checklist).slice(0, 4).map(function(line){ return '<li>' + esc(line) + '</li>'; }).join('') + '</ul>',
+                '<div class="ss-wc-r4-badges">' +
+                  badge(item.persona || 'persona', 'neutral') +
+                  badge(item.startTab || 'dashboard', 'neutral') +
+                  badge(item.approvalLane || 'review', toneByScore(item.readinessScore)) +
+                '</div>',
+                '<div class="ss-wc-r4-actions">',
+                  '<button type="button" class="hm-btn hm-btn-primary ss-btn-sm" data-wc-r4-action="apply-playbook" data-key="' + esc(item.key || '') + '">' + esc(_t('Áp dụng', 'Apply')) + '</button>',
+                  '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" data-wc-r4-action="goto-tab" data-tab="' + esc(item.startTab || 'dashboard') + '">' + esc(_t('Mở tab', 'Open tab')) + '</button>',
+                '</div>',
+              '</article>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function releaseLanesHtml(diag){
+    var items = arr(diag.releaseLanes);
+    if(!items.length) return '';
+    return [
+      '<section class="ss-wc-r4-section">',
+        '<div class="ss-wc-r4-section-head"><div><div class="ss-wc-r4-kicker">Release intelligence</div><h4>Lane orchestration</h4><div class="ss-wc-r4-sub">Decide whether this change goes standard, review, elevated, or CAB / e-sign.</div></div></div>',
+        '<div class="ss-wc-r4-card-grid ss-wc-r4-card-grid-lanes">',
+          items.map(function(item){
+            return [
+              '<article class="ss-wc-r4-card lane tone-' + esc(item.tone || toneByScore(item.score)) + '">',
+                '<div class="ss-wc-r4-card-head">',
+                  '<div><div class="ss-wc-r4-kicker">' + esc(item.recommended ? _t('Đề xuất', 'Recommended') : _t('Lane', 'Lane')) + '</div><h5>' + esc(item.label || item.key || '-') + '</h5></div>',
+                  '<div class="ss-wc-r4-bigscore">' + esc(num(item.score, 0) + '%') + '</div>',
+                '</div>',
+                '<div class="ss-wc-r4-progress"><span style="width:' + esc(Math.max(0, Math.min(100, num(item.score, 0)))) + '%"></span></div>',
+                '<div class="ss-wc-r4-sub">' + esc(item.hero || '') + '</div>',
+                '<div class="ss-wc-r4-badges">' +
+                  badge(item.eligible ? _t('Có thể dùng', 'Eligible') : _t('Chưa đạt', 'Not yet'), item.eligible ? 'good' : 'critical') +
+                  badge(_t('Cổng', 'Gates') + ' ' + arr(item.gates).length, 'neutral') +
+                  (item.recommended ? badge(_t('Ưu tiên', 'Preferred'), 'good') : '') +
+                '</div>',
+                '<ul class="ss-wc-r4-checklist compact">' + arr(item.gates).slice(0, 4).map(function(line){ return '<li>' + esc(line) + '</li>'; }).join('') + '</ul>',
+              '</article>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function aiCopilotHtml(diag, limit){
+    var items = arr(diag.aiCopilot).slice(0, limit || 4);
+    if(!items.length) return '';
+    return [
+      '<section class="ss-wc-r4-section">',
+        '<div class="ss-wc-r4-section-head"><div><div class="ss-wc-r4-kicker">AI copilot</div><h4>Promptable, explainable, review-safe actions</h4><div class="ss-wc-r4-sub">Every suggestion remains grounded in diff, hotspots, approvals, and focused tables.</div></div></div>',
+        '<div class="ss-wc-r4-card-grid">',
+          items.map(function(item, index){
+            return [
+              '<article class="ss-wc-r4-card tone-' + esc(item.tone || 'good') + '">',
+                '<div class="ss-wc-r4-card-head">',
+                  '<div><div class="ss-wc-r4-kicker">' + esc(item.type || 'copilot') + '</div><h5>' + esc(item.title || item.key || '-') + '</h5></div>',
+                  '<div class="ss-wc-r4-confidence">' + esc(Math.round(num(item.confidence, 0) * 100)) + '%</div>',
+                '</div>',
+                '<div class="ss-wc-r4-sub">' + esc(item.objective || '') + '</div>',
+                '<div class="ss-wc-r4-badges">' +
+                  listPills(item.requiredApprovals, function(tag){ return badge(tag, 'neutral'); }) +
+                  listPills(arr(item.focusTables).slice(0, 2), function(tag){ return badge(tag, 'neutral'); }) +
+                '</div>',
+                '<div class="ss-wc-r4-note prompt">' + esc(item.prompt || '') + '</div>',
+                '<div class="ss-wc-r4-actions">',
+                  '<button type="button" class="hm-btn hm-btn-primary ss-btn-sm" data-wc-r4-action="copy-copilot" data-index="' + esc(index) + '">' + esc(_t('Copy prompt', 'Copy prompt')) + '</button>',
+                  (arr(item.focusTables).length ? '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" data-wc-r4-action="focus-table-name" data-table="' + esc(arr(item.focusTables)[0] || '') + '">' + esc(_t('Focus table', 'Focus table')) + '</button>' : ''),
+                '</div>',
+              '</article>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function renderInsightsHtml(diag){
+    var insights = diag.renderInsights || {};
+    var layouts = arr(insights.suggestedLayouts).slice(0, 5);
+    var strongLinks = arr(insights.strongLinks).slice(0, 6);
+    return [
+      '<section class="ss-wc-r4-section">',
+        '<div class="ss-wc-r4-section-head">',
+          '<div><div class="ss-wc-r4-kicker">Beauty + scale</div><h4>Render insights</h4><div class="ss-wc-r4-sub">Cinematic UI cues layered on top of virtualization, focused views, and dependency-aware routing.</div></div>',
+          '<div class="ss-wc-r4-note">' + esc(_t('Complexity', 'Complexity')) + ': ' + esc(num(insights.complexityScore, 0)) + ' · ' + esc(txt(insights.complexityTier || 'enterprise_large')) + '</div>',
+        '</div>',
+        '<div class="ss-wc-r4-split">',
+          '<div class="ss-wc-r4-mini-stack">',
+            '<div class="ss-wc-r4-mini"><div class="ss-wc-r4-kicker">' + esc(_t('Layouts', 'Layouts')) + '</div>' + layouts.map(function(item){ return '<div class="ss-wc-r4-line"><strong>' + esc(item.label || item.key || '-') + '</strong><span>' + esc(item.reason || '') + '</span></div>'; }).join('') + '</div>',
+            '<div class="ss-wc-r4-mini"><div class="ss-wc-r4-kicker">' + esc(_t('Notes', 'Notes')) + '</div>' + arr(insights.notes).slice(0, 4).map(function(item){ return '<div class="ss-wc-r4-line"><span>' + esc(item) + '</span></div>'; }).join('') + '</div>',
+          '</div>',
+          '<div class="ss-wc-r4-mini-stack">',
+            '<div class="ss-wc-r4-mini"><div class="ss-wc-r4-kicker">' + esc(_t('Strong links', 'Strong links')) + '</div>' + (strongLinks.length ? strongLinks.map(function(item){ return '<div class="ss-wc-r4-line"><strong>' + esc(txt(item.fromDomain) + ' → ' + txt(item.toDomain)) + '</strong><span>' + esc(item.count) + '</span></div>'; }).join('') : '<div class="ss-wc-r4-line"><span>' + esc(_t('Chưa có liên kết nổi bật', 'No strong links recorded')) + '</span></div>') + '</div>',
+            '<div class="ss-wc-r4-mini"><div class="ss-wc-r4-kicker">' + esc(_t('Saved views', 'Saved views')) + '</div><div class="ss-wc-r4-line"><strong>' + esc(num(insights.savedViewCount, 0)) + '</strong><span>' + esc(_t('Use storyboards and persona views instead of raw free-pan reviews.', 'Use storyboards and persona views instead of raw free-pan reviews.')) + '</span></div></div>',
+          '</div>',
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function manufacturingAtlasHtml(diag){
+    var journeys = arr(diag.journeys).slice(0, 6);
+    if(!journeys.length) return '';
+    return [
+      '<section class="ss-wc-r4-section">',
+        '<div class="ss-wc-r4-section-head"><div><div class="ss-wc-r4-kicker">Manufacturing atlas</div><h4>Operational journeys</h4><div class="ss-wc-r4-sub">Fast review lanes for production, genealogy, quality, CAPA, training, and equipment readiness.</div></div></div>',
+        '<div class="ss-wc-r4-card-grid">',
+          journeys.map(function(item){
+            return [
+              '<article class="ss-wc-r4-card tone-' + esc(item.tone || toneByScore(item.readinessScore)) + '">',
+                '<div class="ss-wc-r4-card-head">',
+                  '<div><div class="ss-wc-r4-kicker">' + esc((item.layers || []).slice(0, 2).join(' · ') || 'journey') + '</div><h5>' + esc(item.label || item.key || '-') + '</h5></div>',
+                  '<div class="ss-wc-r4-bigscore">' + esc(num(item.readinessScore, 0) + '%') + '</div>',
+                '</div>',
+                '<div class="ss-wc-r4-sub">' + esc(item.focus || item.highlight || '') + '</div>',
+                '<div class="ss-wc-r4-badges">' +
+                  badge((arr(item.tablesPresent).length || 0) + '/' + (arr(item.requiredTables).length || 0) + ' tables', 'neutral') +
+                  badge('WF ' + num(item.workflowBoundCount, 0), 'neutral') +
+                  badge('Rel ' + num(item.relationTouchCount, 0), 'neutral') +
+                '</div>',
+                '<div class="ss-wc-r4-actions">',
+                  '<button type="button" class="hm-btn hm-btn-primary ss-btn-sm" data-wc-r4-action="focus-storyboard-like" data-key="' + esc(item.key || '') + '">' + esc(_t('Open journey', 'Open journey')) + '</button>',
+                  (arr(item.focusTables).length ? '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" data-wc-r4-action="focus-table-name" data-table="' + esc(arr(item.focusTables)[0] || '') + '">' + esc(_t('Focus table', 'Focus table')) + '</button>' : ''),
+                '</div>',
+              '</article>'
+            ].join('');
+          }).join(''),
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function supplementHtml(tab, diag){
+    if(tab === 'compare'){
+      return releaseLanesHtml(diag) + aiCopilotHtml(diag, 3);
+    }
+    if(tab === 'visual'){
+      return renderInsightsHtml(diag) + personasHtml(diag);
+    }
+    if(tab === 'manufacturing'){
+      return manufacturingAtlasHtml(diag) + playbooksHtml(diag, 3);
+    }
+    if(tab === 'diagnostics'){
+      return aiCopilotHtml(diag, 4) + playbooksHtml(diag, 3);
+    }
+    return playbooksHtml(diag, 4) + releaseLanesHtml(diag) + renderInsightsHtml(diag);
+  }
+
+  function syncThemeClasses(overlay){
+    var prefs = (win.SchemaStudioWorldClass && win.SchemaStudioWorldClass.state) || {};
+    var ambience = txt(prefs.ambience || 'midnight');
+    overlay.classList.remove('ss-wc-r4-ambience-aurora', 'ss-wc-r4-ambience-midnight', 'ss-wc-r4-ambience-clean');
+    overlay.classList.add('ss-wc-r4-ambience-' + ambience);
+  }
+
+  function renderRound4(){
+    var overlay = document.querySelector('.ss-wc-overlay');
+    var body;
+    var shell;
+    var diag;
+    if(!overlay) return;
+    body = overlay.querySelector('.ss-wc-body');
+    if(!body) return;
+    diag = cacheDiag = ensureDiag(win.SchemaStudioWorldClass.getDiagnosis ? win.SchemaStudioWorldClass.getDiagnosis() : {});
+    syncThemeClasses(overlay);
+    shell = body.querySelector('.ss-wc-r4-shell');
+    if(!shell){
+      shell = document.createElement('section');
+      shell.className = 'ss-wc-r4-shell';
+      body.insertBefore(shell, body.firstChild);
+    }
+    shell.innerHTML = heroHtml(diag) + personasHtml(diag) + supplementHtml(currentTab(), diag);
+  }
+
+  function scheduleRender(){
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(renderRound4);
+  }
+
+  function findPersona(key){
+    return arr(cacheDiag && cacheDiag.personas).find(function(item){ return item && item.key === key; }) || null;
+  }
+
+  function findPlaybook(key){
+    return arr(cacheDiag && cacheDiag.playbooks).find(function(item){ return item && item.key === key; }) || null;
+  }
+
+  function findJourney(key){
+    return arr(cacheDiag && cacheDiag.journeys).find(function(item){ return item && item.key === key; }) || null;
+  }
+
+  function applyVisualPreset(payload){
+    if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.applyVisualPrefs === 'function'){
+      win.SchemaStudioWorldClass.applyVisualPrefs(payload || {});
+    }
+  }
+
+  function applyPersona(key){
+    var persona = findPersona(key);
+    if(!persona) return;
+    applyVisualPreset({
+      heatmap: persona.heatmap || 'risk',
+      ambience: persona.ambience || 'midnight',
+      density: persona.density || 'comfortable'
+    });
+    gotoTab(persona.defaultTab || 'dashboard');
+    if(arr(persona.focusTables).length) focusTableByName(arr(persona.focusTables)[0]);
+    scheduleRender();
+  }
+
+  function applyPlaybook(key){
+    var item = findPlaybook(key);
+    if(!item) return;
+    applyVisualPreset({
+      heatmap: item.heatmap || 'risk',
+      ambience: (item.heatmap === 'workflow' ? 'aurora' : 'midnight'),
+      density: (item.heatmap === 'workflow' ? 'compact' : 'comfortable')
+    });
+    gotoTab(item.startTab || 'dashboard');
+    if(arr(item.focusTables).length) focusTableByName(arr(item.focusTables)[0]);
+    scheduleRender();
+  }
+
+  function openJourney(key){
+    var journey = findJourney(key);
+    if(!journey) return;
+    applyVisualPreset({
+      heatmap: txt(journey.key).indexOf('capa') >= 0 ? 'security' : (txt(journey.key).indexOf('production') >= 0 ? 'workflow' : 'canonical'),
+      ambience: txt(journey.key).indexOf('production') >= 0 ? 'aurora' : 'midnight',
+      density: txt(journey.key).indexOf('traceability') >= 0 ? 'compact' : 'comfortable'
+    });
+    gotoTab('manufacturing');
+    if(arr(journey.focusTables).length) focusTableByName(arr(journey.focusTables)[0]);
+    scheduleRender();
+  }
+
+  function copyCopilot(index){
+    var item = arr(cacheDiag && cacheDiag.aiCopilot)[num(index, -1)];
+    if(!item || !item.prompt) return;
+    withClipboard(item.prompt).then(function(ok){
+      if(ok && win.toast) win.toast(_t('Đã copy AI prompt', 'AI prompt copied'), 'success');
+      else if(win.toast) win.toast(_t('Không copy được prompt', 'Could not copy prompt'), 'warning');
+    });
+  }
+
+  function ensureStyles(){
+    if(document.getElementById('ss-wc-r4-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'ss-wc-r4-styles';
+    style.innerHTML = [
+      '.ss-wc-r4-shell{display:grid;gap:16px;}',
+      '.ss-wc-r4-hero,.ss-wc-r4-section{position:relative;overflow:hidden;border:1px solid rgba(148,163,184,.16);border-radius:24px;background:linear-gradient(180deg,rgba(15,23,42,.84),rgba(15,23,42,.72));box-shadow:0 20px 48px rgba(2,6,23,.24);}',
+      '.ss-wc-r4-hero{padding:18px 18px 16px;}',
+      '.ss-wc-r4-hero:before,.ss-wc-r4-section:before{content:"";position:absolute;inset:-28%;background:radial-gradient(circle at 20% 20%,rgba(56,189,248,.16),transparent 24%),radial-gradient(circle at 80% 20%,rgba(168,85,247,.16),transparent 24%),radial-gradient(circle at 50% 90%,rgba(34,197,94,.10),transparent 26%);pointer-events:none;opacity:.9;animation:ss-wc-r4-float 24s linear infinite;}',
+      '@keyframes ss-wc-r4-float{0%{transform:translate3d(-4%,0,0) scale(1);}50%{transform:translate3d(4%,3%,0) scale(1.08);}100%{transform:translate3d(-4%,0,0) scale(1);}}',
+      '.ss-wc-r4-hero-copy,.ss-wc-r4-section-head,.ss-wc-r4-hero-grid,.ss-wc-r4-persona-grid,.ss-wc-r4-card-grid,.ss-wc-r4-split{position:relative;z-index:1;}',
+      '.ss-wc-r4-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#7dd3fc;margin-bottom:8px;font-weight:800;}',
+      '.ss-wc-r4-title{margin:0;font-size:22px;line-height:1.3;color:#f8fbff;max-width:880px;}',
+      '.ss-wc-r4-sub{font-size:13px;line-height:1.6;color:#bfd0e6;margin-top:8px;}',
+      '.ss-wc-r4-hero-pills,.ss-wc-r4-badges,.ss-wc-r4-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
+      '.ss-wc-r4-hero-meta{margin-top:10px;font-size:12px;color:#97aac7;}',
+      '.ss-wc-r4-hero-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:16px;}',
+      '.ss-wc-r4-metric{padding:14px 14px 12px;border:1px solid rgba(148,163,184,.14);border-radius:18px;background:rgba(2,6,23,.34);backdrop-filter:blur(8px);}',
+      '.ss-wc-r4-metric.tone-good{box-shadow:0 0 0 1px rgba(34,197,94,.14) inset;}',
+      '.ss-wc-r4-metric.tone-warning{box-shadow:0 0 0 1px rgba(245,158,11,.16) inset;}',
+      '.ss-wc-r4-metric.tone-critical{box-shadow:0 0 0 1px rgba(239,68,68,.18) inset;}',
+      '.ss-wc-r4-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8fb3d9;font-weight:800;}',
+      '.ss-wc-r4-value{font-size:28px;font-weight:800;color:#fff;line-height:1.12;margin-top:8px;}',
+      '.ss-wc-r4-note{font-size:12px;line-height:1.55;color:#a6b8d2;padding:10px 12px;border-radius:14px;background:rgba(15,23,42,.42);border:1px solid rgba(148,163,184,.10);}',
+      '.ss-wc-r4-note.prompt{max-height:120px;overflow:auto;white-space:normal;}',
+      '.ss-wc-r4-section{padding:16px 16px 18px;}',
+      '.ss-wc-r4-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;}',
+      '.ss-wc-r4-section-head h4,.ss-wc-r4-card h5{margin:4px 0 0;font-size:18px;line-height:1.3;color:#fff;}',
+      '.ss-wc-r4-persona-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}',
+      '.ss-wc-r4-persona{padding:14px;border-radius:18px;border:1px solid rgba(148,163,184,.12);background:linear-gradient(180deg,rgba(15,23,42,.72),rgba(15,23,42,.54));text-align:left;cursor:pointer;transition:transform .16s ease, box-shadow .16s ease,border-color .16s ease;box-shadow:0 14px 34px rgba(2,6,23,.18);}',
+      '.ss-wc-r4-persona:hover,.ss-wc-r4-card:hover{transform:translateY(-1px);}',
+      '.ss-wc-r4-persona.tone-good{border-color:rgba(34,197,94,.24);}',
+      '.ss-wc-r4-persona.tone-warning{border-color:rgba(245,158,11,.24);}',
+      '.ss-wc-r4-persona.tone-critical{border-color:rgba(239,68,68,.28);}',
+      '.ss-wc-r4-persona-top,.ss-wc-r4-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}',
+      '.ss-wc-r4-persona-index{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;background:rgba(56,189,248,.16);color:#7dd3fc;font-size:12px;font-weight:800;}',
+      '.ss-wc-r4-persona-score,.ss-wc-r4-bigscore{font-size:24px;font-weight:800;color:#fff;line-height:1;}',
+      '.ss-wc-r4-persona-title{margin-top:12px;font-size:15px;font-weight:700;color:#fff;}',
+      '.ss-wc-r4-persona-sub{margin-top:6px;font-size:12px;line-height:1.55;color:#bfd0e6;min-height:36px;}',
+      '.ss-wc-r4-persona-meta{margin-top:10px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8ea2bf;}',
+      '.ss-wc-r4-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}',
+      '.ss-wc-r4-card-grid-lanes{grid-template-columns:repeat(4,minmax(0,1fr));}',
+      '.ss-wc-r4-card{padding:14px;border-radius:20px;border:1px solid rgba(148,163,184,.12);background:linear-gradient(180deg,rgba(2,6,23,.32),rgba(2,6,23,.22));}',
+      '.ss-wc-r4-card.tone-good{box-shadow:0 0 0 1px rgba(34,197,94,.12) inset;}',
+      '.ss-wc-r4-card.tone-warning{box-shadow:0 0 0 1px rgba(245,158,11,.14) inset;}',
+      '.ss-wc-r4-card.tone-critical{box-shadow:0 0 0 1px rgba(239,68,68,.18) inset;}',
+      '.ss-wc-r4-checklist{margin:12px 0 0;padding-left:18px;color:#d4e2f7;font-size:13px;line-height:1.65;}',
+      '.ss-wc-r4-checklist.compact{font-size:12px;}',
+      '.ss-wc-r4-checklist li{margin:0 0 4px;}',
+      '.ss-wc-r4-badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(148,163,184,.14);background:rgba(15,23,42,.66);color:#e2e8f0;}',
+      '.ss-wc-r4-badge.tone-good{background:rgba(34,197,94,.16);color:#dcfce7;border-color:rgba(34,197,94,.24);}',
+      '.ss-wc-r4-badge.tone-warning{background:rgba(245,158,11,.16);color:#fef3c7;border-color:rgba(245,158,11,.24);}',
+      '.ss-wc-r4-badge.tone-critical{background:rgba(239,68,68,.16);color:#fee2e2;border-color:rgba(239,68,68,.24);}',
+      '.ss-wc-r4-badge.tone-neutral{background:rgba(30,41,59,.82);color:#dbeafe;}',
+      '.ss-wc-r4-progress{height:10px;border-radius:999px;background:rgba(148,163,184,.12);overflow:hidden;margin-top:12px;}',
+      '.ss-wc-r4-progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(56,189,248,.95),rgba(168,85,247,.92));box-shadow:0 0 18px rgba(125,211,252,.34);}',
+      '.ss-wc-r4-confidence{font-size:14px;font-weight:800;color:#7dd3fc;padding:8px 10px;border-radius:999px;background:rgba(56,189,248,.12);}',
+      '.ss-wc-r4-split{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;}',
+      '.ss-wc-r4-mini-stack{display:grid;gap:12px;}',
+      '.ss-wc-r4-mini{padding:14px;border-radius:18px;border:1px solid rgba(148,163,184,.12);background:rgba(2,6,23,.28);}',
+      '.ss-wc-r4-line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed rgba(148,163,184,.10);font-size:13px;color:#dce7f7;}',
+      '.ss-wc-r4-line:last-child{border-bottom:0;}',
+      '.ss-wc-r4-line strong{color:#fff;font-weight:700;}',
+      '.ss-wc-r4-ambience-aurora .ss-wc-r4-hero,.ss-wc-r4-ambience-aurora .ss-wc-r4-section{background:linear-gradient(180deg,rgba(8,27,48,.88),rgba(15,23,42,.72));}',
+      '.ss-wc-r4-ambience-clean .ss-wc-r4-hero,.ss-wc-r4-ambience-clean .ss-wc-r4-section{background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(248,250,252,.88));}',
+      '.ss-wc-r4-ambience-clean .ss-wc-r4-title,.ss-wc-r4-ambience-clean .ss-wc-r4-card h5,.ss-wc-r4-ambience-clean .ss-wc-r4-value,.ss-wc-r4-ambience-clean .ss-wc-r4-bigscore,.ss-wc-r4-ambience-clean .ss-wc-r4-persona-title,.ss-wc-r4-ambience-clean .ss-wc-r4-line strong{color:#0f172a;}',
+      '.ss-wc-r4-ambience-clean .ss-wc-r4-sub,.ss-wc-r4-ambience-clean .ss-wc-r4-note,.ss-wc-r4-ambience-clean .ss-wc-r4-line,.ss-wc-r4-ambience-clean .ss-wc-r4-persona-sub{color:#475569;}',
+      '.ss-wc-r4-ambience-clean .ss-wc-r4-card,.ss-wc-r4-ambience-clean .ss-wc-r4-persona,.ss-wc-r4-ambience-clean .ss-wc-r4-metric,.ss-wc-r4-ambience-clean .ss-wc-r4-mini{background:rgba(255,255,255,.84);}',
+      '.ss-table-card:after{content:"";position:absolute;inset:auto 0 0 0;height:2px;opacity:0;transition:opacity .18s ease;background:linear-gradient(90deg,rgba(56,189,248,.95),rgba(168,85,247,.92));pointer-events:none;}',
+      '.ss-table-card:hover:after,.ss-table-card[data-wc-severity="critical"]:after,.ss-table-card[data-wc-severity="high"]:after{opacity:1;}',
+      '.ss-table-card[data-wc-severity="critical"] .ss-wc-kpis span{background:rgba(239,68,68,.08);}',
+      '.ss-table-card[data-wc-severity="high"] .ss-wc-kpis span{background:rgba(249,115,22,.08);}',
+      '@media (max-width:1320px){.ss-wc-r4-hero-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.ss-wc-r4-card-grid-lanes{grid-template-columns:repeat(2,minmax(0,1fr));}.ss-wc-r4-persona-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}',
+      '@media (max-width:980px){.ss-wc-r4-hero-grid,.ss-wc-r4-persona-grid,.ss-wc-r4-card-grid,.ss-wc-r4-card-grid-lanes,.ss-wc-r4-split{grid-template-columns:1fr;}.ss-wc-r4-section-head{flex-direction:column;}.ss-wc-r4-title{font-size:20px;}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+
+  function bind(){
+    if(!clickBound){
+      document.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-wc-r4-action], .ss-wc-tab, [data-wc-action]') : null;
+        var action = node && node.getAttribute ? node.getAttribute('data-wc-r4-action') : '';
+        if(!node) return;
+        if(action === 'apply-persona'){
+          ev.preventDefault();
+          applyPersona(node.getAttribute('data-key') || '');
+          return;
+        }
+        if(action === 'apply-playbook'){
+          ev.preventDefault();
+          applyPlaybook(node.getAttribute('data-key') || '');
+          return;
+        }
+        if(action === 'goto-tab'){
+          ev.preventDefault();
+          gotoTab(node.getAttribute('data-tab') || 'dashboard');
+          scheduleRender();
+          return;
+        }
+        if(action === 'copy-copilot'){
+          ev.preventDefault();
+          copyCopilot(node.getAttribute('data-index') || '0');
+          return;
+        }
+        if(action === 'focus-table-name'){
+          ev.preventDefault();
+          focusTableByName(node.getAttribute('data-table') || '');
+          return;
+        }
+        if(action === 'focus-storyboard-like'){
+          ev.preventDefault();
+          openJourney(node.getAttribute('data-key') || '');
+          return;
+        }
+        setTimeout(scheduleRender, 20);
+        setTimeout(scheduleRender, 120);
+      }, true);
+      clickBound = true;
+    }
+
+    if(!keyBound){
+      document.addEventListener('keydown', function(ev){
+        if(!document.querySelector('.ss-wc-overlay')) return;
+        if(ev.shiftKey && !ev.altKey && !ev.ctrlKey && !ev.metaKey && /^[1-6]$/.test(ev.key || '')){
+          var index = num(ev.key, 1) - 1;
+          var personas = arr(cacheDiag && cacheDiag.personas);
+          if(personas[index]){
+            ev.preventDefault();
+            applyPersona(personas[index].key);
+          }
+          return;
+        }
+        if(ev.altKey && (ev.key === 'r' || ev.key === 'R')){
+          ev.preventDefault();
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.refresh === 'function'){
+            win.SchemaStudioWorldClass.refresh().then(scheduleRender);
+          }
+        }
+      });
+      keyBound = true;
+    }
+  }
+
+  var originalGetDiagnosis = win.SchemaStudioWorldClass.getDiagnosis;
+  var originalRefresh = win.SchemaStudioWorldClass.refresh;
+  var originalOpen = win.SchemaStudioWorldClass.open;
+
+  win.SchemaStudioWorldClass.getDiagnosis = function(){
+    return cacheDiag = ensureDiag(originalGetDiagnosis ? originalGetDiagnosis.apply(this, arguments) : {});
+  };
+  win.SchemaStudioWorldClass.refresh = function(){
+    var result = originalRefresh ? originalRefresh.apply(this, arguments) : Promise.resolve(win.SchemaStudioWorldClass.getDiagnosis());
+    return Promise.resolve(result).then(function(diag){
+      cacheDiag = ensureDiag(diag || {});
+      scheduleRender();
+      return cacheDiag;
+    });
+  };
+  win.SchemaStudioWorldClass.open = function(){
+    var result = originalOpen ? originalOpen.apply(this, arguments) : undefined;
+    scheduleRender();
+    return result;
+  };
+  win.SchemaStudioWorldClass.__round4Patched = true;
+
+  ensureStyles();
+  bind();
+  scheduleRender();
+
+  if(win.SchemaStudio){
+    win.SchemaStudio.buildId = '20260407worldclass4';
+    win.SchemaStudio.applyWorldClassPersona = applyPersona;
+  }
+})(window);
+
+
+/* ── World-Class Command Center Round 5 ───────────────────────────────── */
+(function(win){
+  'use strict';
+  if(!win || !win.SchemaStudioWorldClass || !win.STORE) return;
+  if(win.SchemaStudioWorldClass.__round5Patched) return;
+
+  var LS_KEY = 'hesem:schema-studio:wc:r5';
+  var state = { tab:'operations', env:'workspace', branch:'main' };
+  var renderTimer = null;
+  var clickBound = false;
+  var keyBound = false;
+  var cacheDiag = null;
+
+  function arr(value){ return Array.isArray(value) ? value.filter(Boolean) : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){
+    var n = Number(value);
+    return isFinite(n) ? n : (fallback == null ? 0 : Number(fallback) || 0);
+  }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function loadState(){
+    try{
+      var parsed = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      if(parsed && typeof parsed === 'object'){
+        if(parsed.tab) state.tab = parsed.tab;
+        if(parsed.env) state.env = parsed.env;
+        if(parsed.branch) state.branch = parsed.branch;
+      }
+    }catch(_err){}
+  }
+  function saveState(){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        tab: state.tab,
+        env: state.env,
+        branch: state.branch
+      }));
+    }catch(_err){}
+  }
+  function toneByScore(score){
+    score = num(score, 0);
+    return score >= 85 ? 'good' : (score >= 70 ? 'warning' : 'critical');
+  }
+  function statusBadge(status){
+    status = txt(status || 'attention').toLowerCase();
+    return '<span class="ss-wc-r5-badge tone-' + esc(status === 'ready' || status === 'clear' || status === 'recorded' ? 'good' : (status === 'attention' ? 'warning' : 'critical')) + '">' + esc(status) + '</span>';
+  }
+  function metric(label, value, hint, tone){
+    return [
+      '<div class="ss-wc-r5-metric tone-' + esc(tone || 'neutral') + '">',
+        '<div class="ss-wc-r5-kicker">' + esc(label || '-') + '</div>',
+        '<div class="ss-wc-r5-value">' + esc(value == null ? '-' : value) + '</div>',
+        hint ? '<div class="ss-wc-r5-sub">' + esc(hint) + '</div>' : '',
+      '</div>'
+    ].join('');
+  }
+  function card(title, subtitle, body){
+    return [
+      '<article class="ss-wc-r5-card">',
+        '<div class="ss-wc-r5-card-head">',
+          '<div>',
+            '<h5>' + esc(title || '-') + '</h5>',
+            subtitle ? '<div class="ss-wc-r5-sub">' + esc(subtitle) + '</div>' : '',
+          '</div>',
+        '</div>',
+        body || '',
+      '</article>'
+    ].join('');
+  }
+  function ensureDiag(diag){
+    diag = diag && typeof diag === 'object' ? diag : {};
+    var summary = diag.summary && typeof diag.summary === 'object' ? diag.summary : {};
+    var compatibility = num(summary.compatibilityScore, 100);
+    var risk = num(summary.riskScore, 0);
+    var blockers = arr(diag.blockers);
+    var journeys = arr(diag.journeys);
+    var hotspots = arr(diag.hotspots);
+    var personas = arr(diag.personas);
+    var releaseLanes = arr(diag.releaseLanes);
+    var workflow = num(summary.workflowBindingCoveragePercent, 0);
+    var governance = num(summary.governanceCoveragePercent, 0);
+    var radar = num(summary.releaseRadarScore, 0);
+    var release = num(summary.releaseReadinessScore, 0);
+    var visual = num(summary.visualReadinessScore, 0);
+    var metadata = num(summary.metadataCompletenessPercent, 0);
+    var performance = num(summary.performancePostureScore, 0);
+    var registry = num(summary.registrySyncScore, 0);
+    var compliance = num(summary.complianceReadinessScore, 0);
+    var ai = num(summary.aiCopilotReadinessScore, 0);
+    var experience = num(summary.experienceScore, 0);
+    var destructive = num(diag.diffSummary && diag.diffSummary.destructiveCount, 0);
+    var critical = num(diag.diffSummary && diag.diffSummary.criticalCount, 0);
+
+    if(!diag.operations || typeof diag.operations !== 'object'){
+      diag.operations = {
+        operationsScore: Math.max(0, Math.min(100, Math.round((experience * 0.28) + (registry * 0.18) + (radar * 0.16) + ((100 - risk) * 0.16) + (ai * 0.10) + (workflow * 0.12)))),
+        promotionReadinessScore: Math.max(0, Math.min(100, Math.round((release * 0.30) + (radar * 0.24) + (compatibility * 0.18) + (governance * 0.14) + ((100 - Math.min(100, blockers.length * 14)) * 0.14)))),
+        firewallScore: Math.max(0, Math.min(100, Math.round((compatibility * 0.38) + ((100 - risk) * 0.24) + (governance * 0.12) + ((100 - Math.min(100, destructive * 30 + critical * 14)) * 0.26)))),
+        observabilityScore: Math.max(0, Math.min(100, Math.round((performance * 0.36) + (visual * 0.26) + (registry * 0.18) + ((100 - Math.min(100, hotspots.length * 12)) * 0.20)))),
+        commandCenterScore: Math.max(0, Math.min(100, Math.round((experience * 0.32) + (radar * 0.18) + (governance * 0.12) + (performance * 0.12) + (ai * 0.12) + (workflow * 0.14)))),
+        focusDeckCount: arr(diag.focusDeck).length,
+        branchCount: arr(diag.branchTopology).length,
+        environmentCount: arr(diag.environments).length,
+        stageCount: arr(diag.promotionBoard).length,
+        eventRailCount: arr(diag.eventRail).length
+      };
+    }
+    summary.operationsScore = num(summary.operationsScore, diag.operations.operationsScore || 0);
+    summary.promotionReadinessScore = num(summary.promotionReadinessScore, diag.operations.promotionReadinessScore || 0);
+    summary.firewallScore = num(summary.firewallScore, diag.operations.firewallScore || 0);
+    summary.observabilityScore = num(summary.observabilityScore, diag.operations.observabilityScore || 0);
+    summary.commandCenterScore = num(summary.commandCenterScore, diag.operations.commandCenterScore || 0);
+    summary.focusDeckCount = num(summary.focusDeckCount, diag.operations.focusDeckCount || 0);
+    summary.branchCount = num(summary.branchCount, diag.operations.branchCount || 0);
+    summary.environmentCount = num(summary.environmentCount, diag.operations.environmentCount || 0);
+    summary.stageCount = num(summary.stageCount, diag.operations.stageCount || 0);
+    summary.eventRailCount = num(summary.eventRailCount, diag.operations.eventRailCount || 0);
+    diag.summary = summary;
+
+    if(!arr(diag.promotionBoard).length){
+      diag.promotionBoard = [
+        { key:'discover', label:'Discover', score:Math.round((visual * 0.44) + (experience * 0.30) + (num(summary.journeyReadinessScore, 0) * 0.26)), status:(visual >= 82 ? 'ready' : 'attention'), gate:'Graph clarity, journeys, saved views', nextAction:'Review scale posture and save focus views.' },
+        { key:'model', label:'Model & diff', score:Math.round((metadata * 0.34) + (compatibility * 0.28) + (workflow * 0.18) + ((100 - risk) * 0.20)), status:(compatibility >= 90 ? 'ready' : 'attention'), gate:'Typed diff and contract continuity', nextAction:'Inspect diff items by severity and approval.' },
+        { key:'governance', label:'Governance review', score:Math.round((governance * 0.36) + (compliance * 0.24) + (workflow * 0.18) + ((100 - Math.min(100, blockers.length * 16)) * 0.22)), status:(governance >= 80 ? 'ready' : 'attention'), gate:'Owner, approver, evidence, policies', nextAction:'Close blockers and attach evidence.' },
+        { key:'release', label:'Release', score:summary.promotionReadinessScore, status:(summary.promotionReadinessScore >= 80 ? 'ready' : 'attention'), gate:'Lane, firewall, registry sync', nextAction:'Compile registry bundle and validate release lane.' },
+        { key:'verify', label:'Verify', score:summary.observabilityScore, status:(summary.observabilityScore >= 78 ? 'ready' : 'attention'), gate:'Observability, registry freshness, post-release checks', nextAction:'Inspect observability tiles and timeline.' }
+      ];
+    }
+
+    if(!diag.firewall || typeof diag.firewall !== 'object' || !Object.keys(diag.firewall).length){
+      diag.firewall = {
+        recommendedLane: num(summary.firewallScore, 0) >= 88 ? 'standard' : (num(summary.firewallScore, 0) >= 72 ? 'review' : 'cab_esign'),
+        approvalClass: txt(diag.diffSummary && diag.diffSummary.approvalClass || 'standard'),
+        compatibilityScore: compatibility,
+        riskScore: risk,
+        destructiveCount: destructive,
+        criticalCount: critical,
+        blockerCount: blockers.length,
+        clearToPromote: destructive === 0 && critical === 0 && blockers.length <= 1,
+        gates: [
+          { label:'Destructive diff', status:destructive === 0 ? 'clear' : 'blocked', detail:destructive + ' destructive changes' },
+          { label:'Critical blockers', status:critical === 0 && blockers.length <= 1 ? 'clear' : 'attention', detail:critical + ' critical items, ' + blockers.length + ' blockers' },
+          { label:'Governance', status:governance >= 80 ? 'clear' : 'attention', detail:'Governance ' + governance + '%' },
+          { label:'Workflow / registry', status:workflow >= 85 && registry >= 85 ? 'clear' : 'attention', detail:'Workflow ' + workflow + '% · Registry ' + registry + '%' }
+        ]
+      };
+    }
+
+    if(!arr(diag.branchTopology).length){
+      diag.branchTopology = [
+        { key:'main', label:'Main canonical branch', score:Math.round((registry * 0.34) + (metadata * 0.24) + (workflow * 0.18) + (governance * 0.14) + (visual * 0.10)), lane:'standard', status:registry >= 90 ? 'ready' : 'attention', focus:'Canonical baseline and source-of-truth stewardship' },
+        { key:'preview', label:'Preview branch', score:Math.round((experience * 0.28) + (ai * 0.20) + (visual * 0.18) + (metadata * 0.16) + (registry * 0.18)), lane:'review', status:experience >= 82 ? 'ready' : 'attention', focus:'Fast compare loops and AI-assisted exploration' },
+        { key:'release_candidate', label:'Release candidate', score:summary.promotionReadinessScore, lane:txt(diag.firewall.recommendedLane || 'review'), status:summary.promotionReadinessScore >= 80 ? 'ready' : 'attention', focus:'Promotion gates, release notes, contract freeze' },
+        { key:'hotfix', label:'Hotfix branch', score:Math.round((summary.firewallScore * 0.46) + (compliance * 0.24) + (compatibility * 0.16) + ((100 - Math.min(100, destructive * 22)) * 0.14)), lane:destructive > 0 || critical > 0 ? 'cab_esign' : 'elevated', status:(destructive > 0 || critical > 0) ? 'attention' : 'ready', focus:'Controlled remediation and rollback discipline' }
+      ];
+    }
+
+    if(!arr(diag.focusDeck).length){
+      var firstJourney = journeys[0] || {};
+      var secondJourney = journeys[1] || {};
+      diag.focusDeck = [
+        { key:'executive_release_orbit', title:'Executive release orbit', score:summary.commandCenterScore, focus:'Release radar, promotion board, firewall and branch readiness', type:'executive', targets:arr(diag.releaseLanes).map(function(item){ return item && item.key; }).filter(Boolean).slice(0,6) },
+        { key:'governance_firewall_board', title:'Governance firewall board', score:summary.firewallScore, focus:'Approvers, evidence, destructive change discipline', type:'governance', targets:arr(diag.governance && diag.governance.missingOwners).slice(0,6) },
+        { key:'journey_' + esc(firstJourney.key || 'production'), title:txt(firstJourney.label || 'Journey'), score:num(firstJourney.readinessScore, summary.promotionReadinessScore), focus:txt(firstJourney.focus || ''), type:'journey', targets:arr(firstJourney.tablesPresent || firstJourney.requiredTables).slice(0,8) },
+        { key:'journey_' + esc(secondJourney.key || 'quality'), title:txt(secondJourney.label || 'Journey'), score:num(secondJourney.readinessScore, summary.commandCenterScore), focus:txt(secondJourney.focus || ''), type:'journey', targets:arr(secondJourney.tablesPresent || secondJourney.requiredTables).slice(0,8) }
+      ].filter(function(item){ return txt(item.title).trim() !== ''; });
+    }
+
+    if(!diag.observability || typeof diag.observability !== 'object' || !arr(diag.observability.tiles).length){
+      diag.observability = {
+        score:summary.observabilityScore,
+        tiles:[
+          { key:'virtualization', label:'Canvas virtualization', score:Math.round((performance * 0.42) + (visual * 0.24) + ((100 - Math.min(100, hotspots.length * 10)) * 0.18) + ((100 - num(diag.renderInsights && diag.renderInsights.complexityScore, 0)) * 0.16)), detail:'Large-graph readability and culling posture', tone:toneByScore(Math.round((performance * 0.42) + (visual * 0.24) + ((100 - Math.min(100, hotspots.length * 10)) * 0.18) + ((100 - num(diag.renderInsights && diag.renderInsights.complexityScore, 0)) * 0.16))) },
+          { key:'search_index', label:'Search / command indexing', score:Math.round((metadata * 0.40) + (experience * 0.24) + (registry * 0.18) + (visual * 0.18)), detail:'Keyboard-first discovery quality', tone:toneByScore(Math.round((metadata * 0.40) + (experience * 0.24) + (registry * 0.18) + (visual * 0.18))) },
+          { key:'registry_freshness', label:'Registry freshness', score:Math.round((registry * 0.46) + (workflow * 0.22) + (metadata * 0.18) + (compatibility * 0.14)), detail:'Schema-to-runtime contract freshness', tone:toneByScore(Math.round((registry * 0.46) + (workflow * 0.22) + (metadata * 0.18) + (compatibility * 0.14))) },
+          { key:'review_signal', label:'Review signal quality', score:Math.round((summary.commandCenterScore * 0.42) + (summary.firewallScore * 0.24) + (summary.promotionReadinessScore * 0.18) + (governance * 0.16)), detail:'How clearly the cockpit signals release readiness', tone:toneByScore(Math.round((summary.commandCenterScore * 0.42) + (summary.firewallScore * 0.24) + (summary.promotionReadinessScore * 0.18) + (governance * 0.16))) }
+        ]
+      };
+    }
+
+    if(!arr(diag.eventRail).length){
+      diag.eventRail = [
+        { key:'baseline', label:'Baseline secured', detail:'Canonical baseline and compare artifacts are ready.', status:'recorded' },
+        { key:'diagnostics', label:'Diagnostics refreshed', detail:'World-class health, operations, and firewall signals are available.', status:'recorded' },
+        { key:'promotion', label:'Promotion lane ' + txt(diag.firewall.recommendedLane || 'review'), detail:'Recommended lane is derived from compatibility, blockers, and governance.', status:summary.promotionReadinessScore >= 80 ? 'ready' : 'attention' }
+      ];
+      if(destructive > 0 || critical > 0){
+        diag.eventRail.push({ key:'firewall', label:'Firewall escalation', detail:'Breaking changes require stronger review discipline.', status:'attention' });
+      }
+    }
+
+    if(!arr(diag.environments).length){
+      diag.environments = [
+        { key:'workspace', label:'Workspace design', score:Math.round((visual * 0.26) + (metadata * 0.24) + (experience * 0.20) + (ai * 0.16) + ((100 - Math.min(100, hotspots.length * 10)) * 0.14)), status:(visual >= 82 ? 'ready' : 'attention'), gate:'Model clarity, views, compare' },
+        { key:'integration', label:'Integration / registry', score:Math.round((registry * 0.38) + (workflow * 0.26) + (metadata * 0.18) + ((100 - Math.min(100, blockers.length * 12)) * 0.18)), status:(registry >= 88 ? 'ready' : 'attention'), gate:'Compiler sync, registry drift' },
+        { key:'uat', label:'Controlled UAT', score:Math.round((summary.promotionReadinessScore * 0.38) + (governance * 0.20) + (compatibility * 0.22) + (compliance * 0.20)), status:(summary.promotionReadinessScore >= 80 ? 'ready' : 'attention'), gate:'Evidence, sign-off, lane readiness' },
+        { key:'production', label:'Production release', score:Math.round((release * 0.30) + (summary.firewallScore * 0.26) + (compliance * 0.22) + (compatibility * 0.12) + ((100 - Math.min(100, destructive * 22 + critical * 14)) * 0.10)), status:(summary.firewallScore >= 84 ? 'ready' : 'attention'), gate:'Firewall clear, rollback proof' }
+      ];
+    }
+
+    return diag;
+  }
+
+  function currentTab(){
+    return ['operations','release','branches','copilot'].indexOf(state.tab) >= 0 ? state.tab : 'operations';
+  }
+
+  function heroHtml(diag){
+    var summary = diag.summary || {};
+    return [
+      '<section class="ss-wc-r5-hero">',
+        '<div class="ss-wc-r5-hero-copy">',
+          '<div class="ss-wc-r5-kicker">Command center round 5</div>',
+          '<h3 class="ss-wc-r5-title">Operations-grade schema command center with promotion board, firewall, branch topology and observability</h3>',
+          '<div class="ss-wc-r5-sub">Round 5 tightens the control plane: fewer decorative screens, more governed release signals, focus decks, branch-aware workflows and post-release visibility.</div>',
+          '<div class="ss-wc-r5-badges">',
+            '<span class="ss-wc-r5-badge tone-' + esc(toneByScore(summary.operationsScore)) + '">Operations ' + esc(num(summary.operationsScore, 0)) + '%</span>',
+            '<span class="ss-wc-r5-badge tone-' + esc(toneByScore(summary.promotionReadinessScore)) + '">Promotion ' + esc(num(summary.promotionReadinessScore, 0)) + '%</span>',
+            '<span class="ss-wc-r5-badge tone-' + esc(toneByScore(summary.firewallScore)) + '">Firewall ' + esc(num(summary.firewallScore, 0)) + '%</span>',
+            '<span class="ss-wc-r5-badge tone-' + esc(toneByScore(summary.observabilityScore)) + '">Observability ' + esc(num(summary.observabilityScore, 0)) + '%</span>',
+          '</div>',
+        '</div>',
+        '<div class="ss-wc-r5-metric-grid">',
+          metric('Operations', num(summary.operationsScore, 0) + '%', 'Operating maturity of the release cockpit', toneByScore(summary.operationsScore)),
+          metric('Promotion', num(summary.promotionReadinessScore, 0) + '%', 'Gate readiness across review → release', toneByScore(summary.promotionReadinessScore)),
+          metric('Firewall', num(summary.firewallScore, 0) + '%', 'Discipline against breaking/destructive changes', toneByScore(summary.firewallScore)),
+          metric('Observability', num(summary.observabilityScore, 0) + '%', 'Scale posture and signal quality after release', toneByScore(summary.observabilityScore)),
+          metric('Command center', num(summary.commandCenterScore, 0) + '%', 'Composite of release, journeys, governance and UX', toneByScore(summary.commandCenterScore)),
+          metric('Focus decks', num(summary.focusDeckCount, arr(diag.focusDeck).length), 'Curated views for executive and domain reviews', 'neutral'),
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+
+  function tabsHtml(diag){
+    var tabs = [
+      { key:'operations', label:'Operations', score:num(diag.summary && diag.summary.operationsScore, 0) },
+      { key:'release', label:'Release', score:num(diag.summary && diag.summary.promotionReadinessScore, 0) },
+      { key:'branches', label:'Branches', score:num(diag.summary && diag.summary.branchCount, 0) },
+      { key:'copilot', label:'Copilot', score:num(diag.summary && diag.summary.aiCopilotReadinessScore, 0) }
+    ];
+    return [
+      '<div class="ss-wc-r5-tabs">',
+        tabs.map(function(tab){
+          return '<button type="button" class="ss-wc-r5-tab' + (currentTab() === tab.key ? ' active' : '') + '" data-wc-r5-action="tab" data-key="' + esc(tab.key) + '">' + esc(tab.label) + '<span>' + esc(tab.key === 'branches' ? tab.score : (tab.score + (tab.key === 'copilot' ? '%' : '%'))) + '</span></button>';
+        }).join(''),
+        '<div class="ss-wc-r5-toolbar"><button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" data-wc-r5-action="refresh">Refresh</button><button type="button" class="hm-btn hm-btn-primary ss-btn-sm" data-wc-r5-action="copy-brief">Copy brief</button></div>',
+      '</div>'
+    ].join('');
+  }
+
+  function environmentsHtml(diag){
+    var envs = arr(diag.environments);
+    return card('Environment posture', 'Workspace → integration → UAT → production', [
+      '<div class="ss-wc-r5-grid-2">',
+        envs.map(function(item){
+          return '<button type="button" class="ss-wc-r5-mini tone-' + esc(toneByScore(item.score || 0)) + (state.env === item.key ? ' active' : '') + '" data-wc-r5-action="env" data-key="' + esc(item.key || '') + '"><div class="ss-wc-r5-mini-top"><strong>' + esc(item.label || item.key || '-') + '</strong>' + statusBadge(item.status || '') + '</div><div class="ss-wc-r5-value">' + esc((item.score || 0) + '%') + '</div><div class="ss-wc-r5-sub">' + esc(item.gate || item.nextAction || '') + '</div></button>';
+        }).join(''),
+      '</div>'
+    ].join(''));
+  }
+
+  function observabilityHtml(diag){
+    var obs = diag.observability || {};
+    var tiles = arr(obs.tiles);
+    return card('Observability tiles', 'Scale, registry freshness and review signal quality', [
+      '<div class="ss-wc-r5-grid-2">',
+        tiles.map(function(tile){
+          var score = num(tile.score, 0);
+          return '<div class="ss-wc-r5-mini tone-' + esc(tile.tone || toneByScore(score)) + '"><div class="ss-wc-r5-mini-top"><strong>' + esc(tile.label || tile.key || '-') + '</strong><span class="ss-wc-r5-badge tone-' + esc(tile.tone || toneByScore(score)) + '">' + esc(score + '%') + '</span></div><div class="ss-wc-r5-sub">' + esc(tile.detail || '') + '</div></div>';
+        }).join(''),
+      '</div>'
+    ].join(''));
+  }
+
+  function releaseHtml(diag){
+    var stages = arr(diag.promotionBoard);
+    var firewall = diag.firewall || {};
+    var eventRail = arr(diag.eventRail);
+    return [
+      card('Promotion board', 'Default route from modeling to governed release', '<div class="ss-wc-r5-list">' + (stages.length ? stages.map(function(stage){ return '<button type="button" class="ss-wc-r5-list-item" data-wc-r5-action="focus-stage" data-key="' + esc(stage.key || '') + '"><div><strong>' + esc(stage.label || stage.key || '-') + '</strong><div class="ss-wc-r5-sub">' + esc(stage.gate || stage.nextAction || '') + '</div></div><div class="ss-wc-r5-inline">' + statusBadge(stage.status || '') + '<span class="ss-wc-r5-badge tone-' + esc(toneByScore(stage.score || 0)) + '">' + esc((stage.score || 0) + '%') + '</span></div></button>'; }).join('') : '<div class="ss-wc-r5-sub">No promotion stages available.</div>') + '</div>'),
+      card('Destructive-change firewall', 'Lane recommendation, gate checks and release discipline', [
+        '<div class="ss-wc-r5-inline" style="margin-bottom:10px">',
+          '<span class="ss-wc-r5-badge tone-' + esc(toneByScore(firewall.firewallScore || 0)) + '">Firewall ' + esc((firewall.firewallScore || 0) + '%') + '</span>',
+          '<span class="ss-wc-r5-badge tone-neutral">Lane ' + esc(firewall.recommendedLane || firewall.approvalClass || 'standard') + '</span>',
+          '<span class="ss-wc-r5-badge tone-neutral">Compat ' + esc((firewall.compatibilityScore || 0) + '%') + '</span>',
+          '<span class="ss-wc-r5-badge tone-neutral">Risk ' + esc((firewall.riskScore || 0) + '/100') + '</span>',
+        '</div>',
+        '<div class="ss-wc-r5-list">' + arr(firewall.gates).map(function(gate){ return '<div class="ss-wc-r5-list-item"><div><strong>' + esc(gate.label || '-') + '</strong><div class="ss-wc-r5-sub">' + esc(gate.detail || '') + '</div></div><div>' + statusBadge(gate.status || '') + '</div></div>'; }).join('') + '</div>'
+      ].join('')),
+      card('Event rail', 'Timeline checkpoints generated by the command center', '<div class="ss-wc-r5-list">' + (eventRail.length ? eventRail.map(function(item){ return '<div class="ss-wc-r5-list-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r5-sub">' + esc(item.detail || '') + '</div></div><div>' + statusBadge(item.status || '') + '</div></div>'; }).join('') : '<div class="ss-wc-r5-sub">No event rail entries.</div>') + '</div>')
+    ].join('');
+  }
+
+  function branchesHtml(diag){
+    var branches = arr(diag.branchTopology);
+    var focusDeck = arr(diag.focusDeck);
+    return [
+      card('Branch topology', 'Branch-aware review and promotion posture', '<div class="ss-wc-r5-list">' + (branches.length ? branches.map(function(branch){ return '<button type="button" class="ss-wc-r5-list-item' + (state.branch === branch.key ? ' active' : '') + '" data-wc-r5-action="branch" data-key="' + esc(branch.key || '') + '"><div><strong>' + esc(branch.label || branch.key || '-') + '</strong><div class="ss-wc-r5-sub">' + esc(branch.focus || '') + '</div></div><div class="ss-wc-r5-inline">' + statusBadge(branch.status || '') + '<span class="ss-wc-r5-badge tone-' + esc(toneByScore(branch.score || 0)) + '">' + esc((branch.score || 0) + '%') + '</span><span class="ss-wc-r5-badge tone-neutral">' + esc(branch.lane || '') + '</span></div></button>'; }).join('') : '<div class="ss-wc-r5-sub">No branch topology.</div>') + '</div>'),
+      card('Focus decks', 'Curated review views instead of raw free-pan sessions', '<div class="ss-wc-r5-grid-2">' + (focusDeck.length ? focusDeck.map(function(deck){ return '<button type="button" class="ss-wc-r5-mini tone-' + esc(deck.tone || toneByScore(deck.score || 0)) + '" data-wc-r5-action="focus-deck" data-key="' + esc(deck.key || '') + '"><div class="ss-wc-r5-mini-top"><strong>' + esc(deck.title || deck.key || '-') + '</strong><span class="ss-wc-r5-badge tone-' + esc(deck.tone || toneByScore(deck.score || 0)) + '">' + esc((deck.score || 0) + '%') + '</span></div><div class="ss-wc-r5-sub">' + esc(deck.focus || '') + '</div></button>'; }).join('') : '<div class="ss-wc-r5-sub">No focus decks.</div>') + '</div>')
+    ].join('');
+  }
+
+  function copilotHtml(diag){
+    var playbooks = arr(diag.playbooks).slice(0, 5);
+    var copilots = arr(diag.aiCopilot).slice(0, 5);
+    return [
+      card('Review playbooks', 'Structured review flows for governance and release', '<div class="ss-wc-r5-list">' + (playbooks.length ? playbooks.map(function(item){ return '<div class="ss-wc-r5-list-item"><div><strong>' + esc(item.title || item.key || '-') + '</strong><div class="ss-wc-r5-sub">' + esc(item.hero || item.summary || item.objective || '') + '</div></div><div class="ss-wc-r5-inline"><span class="ss-wc-r5-badge tone-' + esc(toneByScore(item.readinessScore || 0)) + '">' + esc((item.readinessScore || 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ss-wc-r5-sub">No playbooks.</div>') + '</div>'),
+      card('AI copilot queue', 'Controlled prompts for diff, migration and manufacturing intelligence', '<div class="ss-wc-r5-list">' + (copilots.length ? copilots.map(function(item, index){ return '<div class="ss-wc-r5-list-item"><div><strong>' + esc(item.title || item.key || '-') + '</strong><div class="ss-wc-r5-sub">' + esc(item.objective || item.prompt || '') + '</div></div><div><button type="button" class="hm-btn hm-btn-primary ss-btn-sm" data-wc-r5-action="copy-copilot" data-index="' + esc(index) + '">Copy</button></div></div>'; }).join('') : '<div class="ss-wc-r5-sub">No AI copilot queue.</div>') + '</div>')
+    ].join('');
+  }
+
+  function bodyHtml(diag){
+    var tab = currentTab();
+    if(tab === 'release') return releaseHtml(diag);
+    if(tab === 'branches') return branchesHtml(diag);
+    if(tab === 'copilot') return copilotHtml(diag);
+    return environmentsHtml(diag) + observabilityHtml(diag);
+  }
+
+  function render(){
+    var overlay = document.querySelector('.ss-wc-overlay');
+    if(!overlay) return;
+    var shell = overlay.querySelector('.ss-wc-shell');
+    if(!shell) return;
+    var host = shell.querySelector('.ss-wc-r5-shell');
+    if(!host){
+      host = document.createElement('section');
+      host.className = 'ss-wc-r5-shell';
+      shell.appendChild(host);
+    }
+    cacheDiag = ensureDiag(win.SchemaStudioWorldClass.getDiagnosis ? win.SchemaStudioWorldClass.getDiagnosis() : {});
+    host.innerHTML = heroHtml(cacheDiag) + tabsHtml(cacheDiag) + bodyHtml(cacheDiag);
+  }
+  function scheduleRender(){
+    if(renderTimer) clearTimeout(renderTimer);
+    renderTimer = setTimeout(render, 30);
+  }
+  function ensureStyles(){
+    if(document.getElementById('schema-studio-r5-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'schema-studio-r5-styles';
+    style.textContent = [
+      '.ss-wc-r5-shell{margin-top:18px;padding-top:8px;border-top:1px solid rgba(148,163,184,.10);}',
+      '.ss-wc-r5-hero{position:relative;padding:20px;border-radius:24px;background:linear-gradient(135deg,rgba(15,23,42,.90),rgba(22,33,62,.86));border:1px solid rgba(56,189,248,.18);box-shadow:0 18px 48px rgba(2,6,23,.20);overflow:hidden;}',
+      '.ss-wc-r5-hero:before,.ss-wc-r5-hero:after{content:"";position:absolute;border-radius:999px;filter:blur(10px);opacity:.55;pointer-events:none;}',
+      '.ss-wc-r5-hero:before{width:220px;height:220px;right:-40px;top:-70px;background:radial-gradient(circle,rgba(56,189,248,.34),transparent 68%);}',
+      '.ss-wc-r5-hero:after{width:180px;height:180px;left:-40px;bottom:-70px;background:radial-gradient(circle,rgba(168,85,247,.28),transparent 70%);}',
+      '.ss-wc-r5-hero-copy,.ss-wc-r5-metric-grid,.ss-wc-r5-tabs,.ss-wc-r5-card{position:relative;z-index:1;}',
+      '.ss-wc-r5-title{margin:8px 0 10px;font-size:24px;line-height:1.15;color:#fff;}',
+      '.ss-wc-r5-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7dd3fc;font-weight:800;}',
+      '.ss-wc-r5-sub{font-size:12px;line-height:1.55;color:#b9cae0;}',
+      '.ss-wc-r5-badges,.ss-wc-r5-inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
+      '.ss-wc-r5-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(148,163,184,.12);font-size:11px;font-weight:700;color:#dbeafe;}',
+      '.ss-wc-r5-badge.tone-good{border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.10);color:#dcfce7;}',
+      '.ss-wc-r5-badge.tone-warning{border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.10);color:#fef3c7;}',
+      '.ss-wc-r5-badge.tone-critical{border-color:rgba(239,68,68,.28);background:rgba(239,68,68,.10);color:#fee2e2;}',
+      '.ss-wc-r5-badge.tone-neutral{color:#e2e8f0;}',
+      '.ss-wc-r5-metric-grid{margin-top:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}',
+      '.ss-wc-r5-metric{padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.56),rgba(15,23,42,.42));border:1px solid rgba(148,163,184,.10);box-shadow:0 12px 34px rgba(2,6,23,.12);}',
+      '.ss-wc-r5-metric .ss-wc-r5-value{font-size:26px;font-weight:800;line-height:1;color:#fff;margin-top:6px;}',
+      '.ss-wc-r5-metric.tone-good{border-color:rgba(34,197,94,.18);}',
+      '.ss-wc-r5-metric.tone-warning{border-color:rgba(245,158,11,.18);}',
+      '.ss-wc-r5-metric.tone-critical{border-color:rgba(239,68,68,.18);}',
+      '.ss-wc-r5-tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding:8px 4px;}',
+      '.ss-wc-r5-tab{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(15,23,42,.34);color:#dbeafe;cursor:pointer;font-weight:700;}',
+      '.ss-wc-r5-tab span{font-size:11px;opacity:.78;font-weight:700;}',
+      '.ss-wc-r5-tab.active{background:linear-gradient(135deg,rgba(59,130,246,.18),rgba(56,189,248,.14));border-color:rgba(56,189,248,.30);color:#fff;}',
+      '.ss-wc-r5-toolbar{margin-left:auto;display:flex;gap:8px;}',
+      '.ss-wc-r5-card{margin-top:12px;padding:16px;border-radius:22px;background:linear-gradient(180deg,rgba(15,23,42,.62),rgba(15,23,42,.44));border:1px solid rgba(148,163,184,.10);box-shadow:0 14px 34px rgba(2,6,23,.12);}',
+      '.ss-wc-r5-card h5{margin:0;font-size:15px;color:#fff;}',
+      '.ss-wc-r5-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;}',
+      '.ss-wc-r5-mini{padding:14px;border-radius:18px;border:1px solid rgba(148,163,184,.10);background:linear-gradient(180deg,rgba(15,23,42,.56),rgba(15,23,42,.38));text-align:left;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}',
+      '.ss-wc-r5-mini:hover,.ss-wc-r5-list-item:hover{transform:translateY(-1px);}',
+      '.ss-wc-r5-mini.active,.ss-wc-r5-list-item.active{border-color:rgba(56,189,248,.30);box-shadow:0 12px 28px rgba(56,189,248,.10);}',
+      '.ss-wc-r5-mini.tone-good{border-color:rgba(34,197,94,.18);}',
+      '.ss-wc-r5-mini.tone-warning{border-color:rgba(245,158,11,.18);}',
+      '.ss-wc-r5-mini.tone-critical{border-color:rgba(239,68,68,.18);}',
+      '.ss-wc-r5-mini-top,.ss-wc-r5-card-head,.ss-wc-r5-list-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}',
+      '.ss-wc-r5-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}',
+      '.ss-wc-r5-list-item{padding:12px 14px;border-radius:16px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.30);cursor:pointer;}',
+      '.ss-wc-r5-value{font-size:22px;font-weight:800;color:#fff;line-height:1;margin-top:8px;}',
+      '@media (max-width:1100px){.ss-wc-r5-metric-grid,.ss-wc-r5-grid-2{grid-template-columns:repeat(2,minmax(0,1fr));}}',
+      '@media (max-width:760px){.ss-wc-r5-metric-grid,.ss-wc-r5-grid-2{grid-template-columns:1fr;}.ss-wc-r5-toolbar{width:100%;margin-left:0;}.ss-wc-r5-tabs{align-items:stretch;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function focusDeckByKey(key){
+    var decks = arr(cacheDiag && cacheDiag.focusDeck);
+    var deck = decks.find(function(item){ return item && item.key === key; });
+    if(!deck) return;
+    var target = arr(deck.targets)[0];
+    if(target && win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.focusTable === 'function'){
+      win.SchemaStudioWorldClass.focusTable(target);
+    }
+    if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.applyVisualPrefs === 'function'){
+      var prefs = { heatmap:'risk', ambience:'midnight', density:'comfortable' };
+      if(deck.type === 'journey') prefs = { heatmap:'workflow', ambience:'aurora', density:'compact' };
+      if(deck.type === 'governance') prefs = { heatmap:'security', ambience:'clean', density:'comfortable' };
+      win.SchemaStudioWorldClass.applyVisualPrefs(prefs);
+    }
+  }
+
+  function focusStage(key){
+    var stage = arr(cacheDiag && cacheDiag.promotionBoard).find(function(item){ return item && item.key === key; });
+    if(!stage) return;
+    state.tab = 'release';
+    saveState();
+    scheduleRender();
+    if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.applyVisualPrefs === 'function'){
+      win.SchemaStudioWorldClass.applyVisualPrefs({
+        heatmap: key === 'discover' ? 'canonical' : (key === 'model' ? 'risk' : (key === 'governance' ? 'security' : 'workflow')),
+        ambience: key === 'release' ? 'midnight' : (key === 'discover' ? 'aurora' : 'clean'),
+        density: key === 'discover' ? 'comfortable' : 'compact'
+      });
+    }
+  }
+
+  function copyCopilot(index){
+    var item = arr(cacheDiag && cacheDiag.aiCopilot)[num(index, 0)] || null;
+    var text = txt(item && (item.prompt || item.objective || item.title));
+    if(!text) return;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text);
+      return;
+    }
+    try{
+      var area = document.createElement('textarea');
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      document.body.removeChild(area);
+    }catch(_err){}
+  }
+
+  function copyBrief(){
+    var diag = cacheDiag || ensureDiag(win.SchemaStudioWorldClass.getDiagnosis ? win.SchemaStudioWorldClass.getDiagnosis() : {});
+    var summary = diag.summary || {};
+    var firewall = diag.firewall || {};
+    var lines = [
+      'Schema Studio Round 5 release brief',
+      'Operations: ' + num(summary.operationsScore, 0) + '%',
+      'Promotion readiness: ' + num(summary.promotionReadinessScore, 0) + '%',
+      'Firewall: ' + num(summary.firewallScore, 0) + '%',
+      'Observability: ' + num(summary.observabilityScore, 0) + '%',
+      'Lane: ' + txt(firewall.recommendedLane || firewall.approvalClass || 'standard'),
+      'Compatibility: ' + num(firewall.compatibilityScore || summary.compatibilityScore, 0) + '%',
+      'Risk: ' + num(firewall.riskScore || summary.riskScore, 0) + '/100',
+      'Blockers: ' + num(firewall.blockerCount || summary.blockerCount, 0),
+      'Focus decks: ' + arr(diag.focusDeck).map(function(item){ return item && (item.title || item.key); }).filter(Boolean).slice(0, 4).join(', ')
+    ].join('\n');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lines);
+      return;
+    }
+  }
+
+  function bind(){
+    if(!clickBound){
+      document.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-wc-r5-action]') : null;
+        if(!node) return;
+        var action = node.getAttribute('data-wc-r5-action') || '';
+        if(action === 'tab'){
+          ev.preventDefault();
+          state.tab = node.getAttribute('data-key') || 'operations';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'env'){
+          ev.preventDefault();
+          state.env = node.getAttribute('data-key') || 'workspace';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'branch'){
+          ev.preventDefault();
+          state.branch = node.getAttribute('data-key') || 'main';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'focus-deck'){
+          ev.preventDefault();
+          focusDeckByKey(node.getAttribute('data-key') || '');
+          return;
+        }
+        if(action === 'focus-stage'){
+          ev.preventDefault();
+          focusStage(node.getAttribute('data-key') || '');
+          return;
+        }
+        if(action === 'copy-copilot'){
+          ev.preventDefault();
+          copyCopilot(node.getAttribute('data-index') || '0');
+          return;
+        }
+        if(action === 'refresh'){
+          ev.preventDefault();
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.refresh === 'function'){
+            Promise.resolve(win.SchemaStudioWorldClass.refresh()).then(scheduleRender);
+          }
+          return;
+        }
+        if(action === 'copy-brief'){
+          ev.preventDefault();
+          copyBrief();
+          return;
+        }
+      }, true);
+      clickBound = true;
+    }
+    if(!keyBound){
+      document.addEventListener('keydown', function(ev){
+        if(ev.altKey && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey && (ev.key === '5')){
+          ev.preventDefault();
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.open === 'function') win.SchemaStudioWorldClass.open();
+          state.tab = 'operations';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(ev.altKey && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey && (ev.key === '6')){
+          ev.preventDefault();
+          state.tab = 'release';
+          saveState();
+          scheduleRender();
+          return;
+        }
+      });
+      keyBound = true;
+    }
+  }
+
+  function addCommands(){
+    if(!win.CmdPalette || !Array.isArray(win.CmdPalette.COMMANDS)) return;
+    win.CmdPalette.COMMANDS = win.CmdPalette.COMMANDS.filter(function(command){
+      return !command || ['Open round 5 command center', 'Open promotion board', 'Copy round 5 release brief'].indexOf(command.label_en) < 0;
+    });
+    win.CmdPalette.COMMANDS.push(
+      {
+        icon:'🛰',
+        label:'Mở command center round 5',
+        label_en:'Open round 5 command center',
+        category:'schema',
+        action:function(){
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.open === 'function') win.SchemaStudioWorldClass.open();
+          state.tab = 'operations';
+          saveState();
+          scheduleRender();
+        }
+      },
+      {
+        icon:'🚦',
+        label:'Mở promotion board',
+        label_en:'Open promotion board',
+        category:'schema',
+        action:function(){
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.open === 'function') win.SchemaStudioWorldClass.open();
+          state.tab = 'release';
+          saveState();
+          scheduleRender();
+        }
+      },
+      {
+        icon:'📋',
+        label:'Copy release brief round 5',
+        label_en:'Copy round 5 release brief',
+        category:'schema',
+        action:function(){ copyBrief(); }
+      }
+    );
+  }
+
+  var originalGetDiagnosis = win.SchemaStudioWorldClass.getDiagnosis;
+  var originalRefresh = win.SchemaStudioWorldClass.refresh;
+  var originalOpen = win.SchemaStudioWorldClass.open;
+  win.SchemaStudioWorldClass.getDiagnosis = function(){
+    return cacheDiag = ensureDiag(originalGetDiagnosis ? originalGetDiagnosis.apply(this, arguments) : {});
+  };
+  win.SchemaStudioWorldClass.refresh = function(){
+    var result = originalRefresh ? originalRefresh.apply(this, arguments) : Promise.resolve(win.SchemaStudioWorldClass.getDiagnosis());
+    return Promise.resolve(result).then(function(diag){
+      cacheDiag = ensureDiag(diag || {});
+      scheduleRender();
+      return cacheDiag;
+    });
+  };
+  win.SchemaStudioWorldClass.open = function(){
+    var result = originalOpen ? originalOpen.apply(this, arguments) : undefined;
+    scheduleRender();
+    return result;
+  };
+
+  loadState();
+  ensureStyles();
+  bind();
+  addCommands();
+  scheduleRender();
+  win.SchemaStudioWorldClass.__round5Patched = true;
+  if(win.SchemaStudio){
+    win.SchemaStudio.buildId = '20260407worldclass5';
+    win.SchemaStudio.copyWorldClassReleaseBrief = copyBrief;
+  }
+})(window);
+
+
+/* ── World-Class Command Deck Round 6 ─────────────────────────────────── */
+(function(win){
+  'use strict';
+  if(!win || !win.SchemaStudioWorldClass || !win.STORE) return;
+  if(win.SchemaStudioWorldClass.__round6Patched) return;
+
+  var LS_KEY = 'hesem:schema-studio:wc:r6';
+  var state = { tab:'deck', spotlight:'', scene:'' };
+  var cacheReport = null;
+  var renderTimer = null;
+  var requestPending = false;
+  var clickBound = false;
+  var keyBound = false;
+
+  function arr(value){ return Array.isArray(value) ? value.filter(Boolean) : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){
+    var n = Number(value);
+    return isFinite(n) ? n : (fallback == null ? 0 : Number(fallback) || 0);
+  }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function tone(score){
+    score = num(score, 0);
+    return score >= 90 ? 'good' : (score >= 75 ? 'warning' : 'critical');
+  }
+  function api(action, payload, method){
+    if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'POST', 30000);
+    return fetch('api.php?action=' + encodeURIComponent(action), {
+      method: method || 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '')
+      },
+      body: JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function loadState(){
+    try{
+      var parsed = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      if(parsed && typeof parsed === 'object'){
+        if(parsed.tab) state.tab = parsed.tab;
+        if(parsed.spotlight) state.spotlight = parsed.spotlight;
+        if(parsed.scene) state.scene = parsed.scene;
+      }
+    }catch(_err){}
+  }
+  function saveState(){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify({ tab:state.tab, spotlight:state.spotlight, scene:state.scene }));
+    }catch(_err){}
+  }
+  function currentDiag(){
+    return win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.getDiagnosis === 'function' ? (win.SchemaStudioWorldClass.getDiagnosis() || {}) : {};
+  }
+  function badge(label, value, toneKey){
+    return '<span class="ss-wc-r6-badge tone-' + esc(toneKey || 'neutral') + '">' + esc(label || '-') + ': ' + esc(value == null ? '-' : value) + '</span>';
+  }
+  function metric(label, value, hint, toneKey){
+    return [
+      '<div class="ss-wc-r6-metric tone-' + esc(toneKey || 'neutral') + '">',
+        '<div class="ss-wc-r6-kicker">' + esc(label || '-') + '</div>',
+        '<div class="ss-wc-r6-value">' + esc(value == null ? '-' : value) + '</div>',
+        hint ? '<div class="ss-wc-r6-sub">' + esc(hint) + '</div>' : '',
+      '</div>'
+    ].join('');
+  }
+  function card(title, subtitle, body){
+    return [
+      '<article class="ss-wc-r6-card">',
+        '<div class="ss-wc-r6-card-head">',
+          '<div>',
+            '<h5>' + esc(title || '-') + '</h5>',
+            subtitle ? '<div class="ss-wc-r6-sub">' + esc(subtitle) + '</div>' : '',
+          '</div>',
+        '</div>',
+        body || '',
+      '</article>'
+    ].join('');
+  }
+  function deriveReport(diag){
+    diag = diag && typeof diag === 'object' ? diag : {};
+    var summary = diag.summary && typeof diag.summary === 'object' ? diag.summary : {};
+    var hotspots = arr(diag.hotspots);
+    var blockers = arr(diag.blockers);
+    var focusDeck = arr(diag.focusDeck);
+    var personas = arr(diag.personas);
+    var playbooks = arr(diag.playbooks);
+    var promotionBoard = arr(diag.promotionBoard);
+    var storyboards = arr(diag.storyboards);
+    var journeys = arr(diag.journeys);
+    var observability = diag.observability && typeof diag.observability === 'object' ? diag.observability : {};
+    var command = diag.commandCenter && typeof diag.commandCenter === 'object' ? diag.commandCenter : {};
+    var reportSummary = command.summary && typeof command.summary === 'object' ? command.summary : {};
+    if(!Object.keys(reportSummary).length){
+      reportSummary = {
+        commandCenterScore: num(summary.commandCenterScore, 0),
+        orchestrationScore: Math.round((num(summary.commandCenterScore, 0) * 0.30) + (num(summary.operationsScore, 0) * 0.20) + (num(summary.releaseReadinessScore, 0) * 0.18) + (num(summary.governanceCoveragePercent, 0) * 0.16) + (num(summary.registrySyncScore, 0) * 0.16)),
+        narrativeCoverageScore: Math.round((num(summary.visualReadinessScore, 0) * 0.28) + (num(summary.journeyReadinessScore, 0) * 0.22) + (num(summary.domainReadinessScore, 0) * 0.18) + (num(summary.metadataCompletenessPercent, 0) * 0.16) + (Math.min(100, storyboards.length * 16) * 0.16)),
+        reviewWallScore: Math.round((num(summary.promotionReadinessScore, 0) * 0.32) + (num(summary.firewallScore, 0) * 0.24) + (num(summary.complianceReadinessScore, 0) * 0.14) + (num(summary.governanceCoveragePercent, 0) * 0.14) + ((100 - Math.min(100, blockers.length * 16)) * 0.16)),
+        atlasReadinessScore: Math.round((num(summary.domainReadinessScore, 0) * 0.34) + (num(summary.journeyReadinessScore, 0) * 0.24) + (num(summary.canonicalCoveragePercent, 0) * 0.18) + (num(summary.metadataCompletenessPercent, 0) * 0.14) + (num(summary.visualReadinessScore, 0) * 0.10)),
+        livePulseScore: Math.round((num(summary.observabilityScore, 0) * 0.34) + (num(summary.performancePostureScore, 0) * 0.18) + (num(summary.releaseRadarScore, 0) * 0.18) + (num(summary.registrySyncScore, 0) * 0.14) + ((100 - Math.min(100, hotspots.length * 10)) * 0.16)),
+        collaborationReadinessScore: Math.round((num(summary.governanceCoveragePercent, 0) * 0.30) + (num(summary.workflowBindingCoveragePercent, 0) * 0.18) + (num(summary.complianceReadinessScore, 0) * 0.16) + (Math.min(100, personas.length * 16 + playbooks.length * 12) * 0.18) + (num(summary.aiCopilotReadinessScore, 0) * 0.18)),
+        visualPolishScore: Math.round((num(summary.experienceScore, 0) * 0.30) + (num(summary.visualReadinessScore, 0) * 0.28) + (num(summary.metadataCompletenessPercent, 0) * 0.12) + (num(summary.commandCenterScore, 0) * 0.16) + (Math.min(100, focusDeck.length * 14) * 0.14)),
+        sceneCount: Math.max(storyboards.length, journeys.length),
+        spotlightCount: Math.min(6, focusDeck.length + personas.length),
+        reviewLaneCount: promotionBoard.length,
+        atlasCount: 4
+      };
+    }
+    var report = {
+      summary: reportSummary,
+      hero: command.hero || {
+        headline:'Round 6 command deck',
+        subheadline:'Executive narrative, review wall, atlas and live pulse make the schema cockpit presentation-grade while preserving governance discipline.',
+        commandCenterScore:num(reportSummary.commandCenterScore, num(summary.commandCenterScore, 0)),
+        orchestrationScore:num(reportSummary.orchestrationScore, 0),
+        visualPolishScore:num(reportSummary.visualPolishScore, 0),
+        riskScore:num(summary.riskScore, 0),
+        compatibilityScore:num(summary.compatibilityScore, 100)
+      },
+      spotlight: arr(command.spotlight).length ? arr(command.spotlight) : arr(focusDeck).slice(0, 4).concat(arr(personas).slice(0, 2).map(function(item){
+        return {
+          key:'persona_' + txt(item.key || ''),
+          title:item.label || item.key || 'Persona',
+          subtitle:item.focus || '',
+          score:num(item.readinessScore, 0),
+          tone:item.tone || tone(item.readinessScore),
+          targets:arr(item.focusTables || []).slice(0, 6),
+          kind:'persona'
+        };
+      })).slice(0, 6),
+      reviewWall: command.reviewWall || {
+        score:num(reportSummary.reviewWallScore, 0),
+        lanes: promotionBoard.slice(0, 6).map(function(item){
+          return {
+            key:item.key || '',
+            label:item.label || item.key || '-',
+            score:num(item.score, 0),
+            status:item.status || 'attention',
+            gate:item.gate || item.nextAction || '',
+            nextAction:item.nextAction || ''
+          };
+        }),
+        evidenceStack: blockers.slice(0, 3).map(function(item){ return { kind:'blocker', title:item.title || item.key || '-', detail:item.detail || item.nextAction || '', tone:'critical' }; })
+          .concat(hotspots.slice(0, 3).map(function(item){ return { kind:'hotspot', title:item.table || item.tableId || '-', detail:(item.reasons && item.reasons[0]) || item.reason || '', tone:'warning' }; })).slice(0, 6)
+      },
+      atlas: arr(command.atlas).length ? arr(command.atlas) : [
+        {
+          key:'journeys',
+          label:'Journey atlas',
+          count:journeys.length,
+          items:journeys.slice(0, 6).map(function(item){ return { label:item.label || item.key || '-', score:num(item.readinessScore, 0), detail:arr(item.tablesPresent).length + '/' + arr(item.requiredTables).length + ' tables' }; })
+        },
+        {
+          key:'domains',
+          label:'Domain atlas',
+          count:arr(diag.domains).length,
+          items:arr(diag.domains).slice(0, 6).map(function(item){ return { label:item.domain || '-', score:num(item.readinessScore, 0), detail:num(item.tableCount, 0) + ' tables' }; })
+        },
+        {
+          key:'layers',
+          label:'Layer atlas',
+          count:arr(diag.layers).length,
+          items:arr(diag.layers).slice(0, 6).map(function(item){ return { label:item.layer || '-', score:num(item.readinessScore, 0), detail:num(item.tableCount, 0) + ' tables' }; })
+        },
+        {
+          key:'dependencies',
+          label:'Dependency matrix',
+          count:arr(diag.dependencyMatrix && diag.dependencyMatrix.strongLinks).length,
+          items:arr(diag.dependencyMatrix && diag.dependencyMatrix.strongLinks).slice(0, 6).map(function(item){ return { label:txt(item.fromDomain || '-') + ' → ' + txt(item.toDomain || '-'), score:Math.min(100, num(item.count, 0) * 8), detail:num(item.count, 0) + ' links' }; })
+        }
+      ],
+      livePulse: command.livePulse || {
+        score:num(reportSummary.livePulseScore, 0),
+        bands:[
+          { key:'observability', label:'Observability', score:num(summary.observabilityScore, 0), detail:'Canvas scale and registry freshness' },
+          { key:'promotion', label:'Promotion', score:num(summary.promotionReadinessScore, 0), detail:'Review lanes and gate discipline' },
+          { key:'firewall', label:'Firewall', score:num(summary.firewallScore, 0), detail:'Destructive change containment' },
+          { key:'release_radar', label:'Release radar', score:num(summary.releaseRadarScore, 0), detail:txt(diag.releaseRadar && diag.releaseRadar.recommendedLane || 'review') + ' lane recommended' }
+        ],
+        radar:arr(observability.tiles).slice(0, 4).concat(arr(diag.eventRail).slice(0, 2).map(function(item){ return { label:item.label || item.key || '-', score:(item.status === 'ready' ? 94 : (item.status === 'attention' ? 76 : 88)), detail:item.detail || '' }; })).slice(0, 6)
+      },
+      collaboration: command.collaboration || {
+        ownersCoveredPercent:num(diag.governance && diag.governance.ownerCoveragePercent, num(summary.governanceCoveragePercent, 0)),
+        approverCoveragePercent:num(diag.governance && diag.governance.approverCoveragePercent, 0),
+        evidenceCoveragePercent:num(diag.governance && diag.governance.evidenceCoveragePercent, 0),
+        personaCount:personas.length,
+        playbookCount:playbooks.length,
+        releaseLaneCount:arr(diag.releaseLanes).length,
+        environments:arr(diag.environments).slice(0, 4).map(function(item){ return { label:item.label || item.key || '-', score:num(item.score, 0), status:item.status || '' }; })
+      },
+      scenes: arr(command.scenes).length ? arr(command.scenes) : storyboards.slice(0, 6).concat(journeys.slice(0, 2).map(function(item){ return { key:'journey_' + txt(item.key || ''), title:item.label || item.key || '-', subtitle:item.focus || '', ambience:(txt(item.key || '').indexOf('production') >= 0 ? 'aurora' : 'clean'), density:'compact', heatmap:(txt(item.key || '').indexOf('capa') >= 0 ? 'security' : 'workflow'), focusTables:arr(item.focusTables || item.tablesPresent || []).slice(0, 8) }; })).slice(0, 8)
+    };
+    return report;
+  }
+  function ensureReport(source){
+    var report = source && typeof source === 'object' && source.summary ? source : null;
+    if(report) return report;
+    return deriveReport(source || currentDiag());
+  }
+  function ensureSelected(){
+    if(!cacheReport) return;
+    if(!state.spotlight && arr(cacheReport.spotlight).length) state.spotlight = txt(arr(cacheReport.spotlight)[0].key || '');
+    if(!state.scene && arr(cacheReport.scenes).length) state.scene = txt(arr(cacheReport.scenes)[0].key || '');
+  }
+  function findSpotlight(key){
+    return arr(cacheReport && cacheReport.spotlight).find(function(item){ return item && txt(item.key) === txt(key); }) || null;
+  }
+  function findScene(key){
+    return arr(cacheReport && cacheReport.scenes).find(function(item){ return item && txt(item.key) === txt(key); }) || null;
+  }
+  function applyFocusTargets(targets){
+    targets = arr(targets);
+    if(targets[0] && win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.focusTable === 'function') win.SchemaStudioWorldClass.focusTable(targets[0]);
+  }
+  function applyScene(key){
+    var item = findScene(key);
+    if(!item) return;
+    state.scene = txt(item.key || '');
+    saveState();
+    applyFocusTargets(item.focusTables || []);
+    if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.applyVisualPrefs === 'function'){
+      win.SchemaStudioWorldClass.applyVisualPrefs({
+        heatmap:item.heatmap || 'risk',
+        ambience:item.ambience || 'midnight',
+        density:item.density || 'comfortable'
+      });
+    }
+    scheduleRender();
+  }
+  function applySpotlight(key){
+    var item = findSpotlight(key);
+    if(!item) return;
+    state.spotlight = txt(item.key || '');
+    saveState();
+    applyFocusTargets(item.targets || []);
+    scheduleRender();
+  }
+  function copyBrief(){
+    var report = cacheReport || ensureReport(currentDiag());
+    var hero = report.hero || {};
+    var summary = report.summary || {};
+    var lines = [
+      'Schema Studio Round 6 command deck',
+      'Command center: ' + num(hero.commandCenterScore, 0) + '%',
+      'Orchestration: ' + num(summary.orchestrationScore, 0) + '%',
+      'Narrative coverage: ' + num(summary.narrativeCoverageScore, 0) + '%',
+      'Review wall: ' + num(summary.reviewWallScore, 0) + '%',
+      'Atlas readiness: ' + num(summary.atlasReadinessScore, 0) + '%',
+      'Live pulse: ' + num(summary.livePulseScore, 0) + '%',
+      'Collaboration: ' + num(summary.collaborationReadinessScore, 0) + '%',
+      'Visual polish: ' + num(summary.visualPolishScore, 0) + '%',
+      'Scenes / spotlight / review lanes: ' + num(summary.sceneCount, 0) + ' / ' + num(summary.spotlightCount, 0) + ' / ' + num(summary.reviewLaneCount, 0)
+    ].join('\n');
+    if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(lines);
+  }
+  function heroHtml(report){
+    var hero = report.hero || {};
+    var summary = report.summary || {};
+    return [
+      '<section class="ss-wc-r6-hero">',
+        '<div class="ss-wc-r6-hero-copy">',
+          '<div class="ss-wc-r6-kicker">Round 6 command deck</div>',
+          '<h4 class="ss-wc-r6-title">' + esc(hero.headline || 'Executive schema narrative deck') + '</h4>',
+          '<div class="ss-wc-r6-sub">' + esc(hero.subheadline || 'Narrative, review wall and atlas quality lift the command center into an executive-grade cockpit.') + '</div>',
+          '<div class="ss-wc-r6-badges">' +
+            badge('Command center', num(hero.commandCenterScore, num(summary.commandCenterScore, 0)) + '%', tone(hero.commandCenterScore || summary.commandCenterScore)) +
+            badge('Orchestration', num(summary.orchestrationScore, 0) + '%', tone(summary.orchestrationScore)) +
+            badge('Visual polish', num(summary.visualPolishScore, 0) + '%', tone(summary.visualPolishScore)) +
+            badge('Scenes', num(summary.sceneCount, arr(report.scenes).length), 'neutral') +
+            badge('Review lanes', num(summary.reviewLaneCount, arr(report.reviewWall && report.reviewWall.lanes).length), 'neutral') +
+          '</div>',
+        '</div>',
+        '<div class="ss-wc-r6-metric-grid">',
+          metric('Narrative coverage', num(summary.narrativeCoverageScore, 0) + '%', 'Storyboards, journeys and saved perspectives stay coherent', tone(summary.narrativeCoverageScore)),
+          metric('Review wall', num(summary.reviewWallScore, 0) + '%', 'Promotion lanes + evidence stack stay sign-off ready', tone(summary.reviewWallScore)),
+          metric('Atlas readiness', num(summary.atlasReadinessScore, 0) + '%', 'Domain, layer and dependency storytelling remain complete', tone(summary.atlasReadinessScore)),
+          metric('Live pulse', num(summary.livePulseScore, 0) + '%', 'Release radar, observability and event timeline clarity', tone(summary.livePulseScore)),
+          metric('Collaboration', num(summary.collaborationReadinessScore, 0) + '%', 'Owners, approvers, personas and playbooks align', tone(summary.collaborationReadinessScore)),
+          metric('Visual polish', num(summary.visualPolishScore, 0) + '%', 'Glass hero, spotlight cards and deck readability stay strong', tone(summary.visualPolishScore)),
+        '</div>',
+      '</section>'
+    ].join('');
+  }
+  function tabsHtml(){
+    var tabs = [
+      { key:'deck', label:'Command deck', hint:'Hero + spotlight + scenes' },
+      { key:'review', label:'Review wall', hint:'Lanes, evidence, collaboration' },
+      { key:'atlas', label:'Atlas', hint:'Domain, layer, journeys, dependencies' },
+      { key:'pulse', label:'Live pulse', hint:'Signals, tiles, event rail' }
+    ];
+    return [
+      '<div class="ss-wc-r6-tabs">',
+        tabs.map(function(item){
+          return '<button type="button" class="ss-wc-r6-tab ' + (state.tab === item.key ? 'active' : '') + '" data-wc-r6-action="tab" data-key="' + esc(item.key) + '"><strong>' + esc(item.label) + '</strong><span>' + esc(item.hint) + '</span></button>';
+        }).join(''),
+        '<div class="ss-wc-r6-toolbar">',
+          '<button type="button" class="hm-btn hm-btn-secondary ss-btn-sm" data-wc-r6-action="refresh">Refresh</button>',
+          '<button type="button" class="hm-btn hm-btn-primary ss-btn-sm" data-wc-r6-action="copy-brief">Copy deck brief</button>',
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+  function spotlightHtml(report){
+    var spotlight = arr(report.spotlight);
+    var scenes = arr(report.scenes);
+    return [
+      '<div class="ss-wc-r6-grid-2">',
+        card('Spotlight rails', 'Executive and persona lanes for fast navigation', '<div class="ss-wc-r6-mini-grid">' + (spotlight.length ? spotlight.map(function(item){ return '<button type="button" class="ss-wc-r6-mini tone-' + esc(item.tone || tone(item.score || 0)) + ' ' + (state.spotlight === txt(item.key || '') ? 'active' : '') + '" data-wc-r6-action="spotlight" data-key="' + esc(item.key || '') + '"><div class="ss-wc-r6-mini-top"><strong>' + esc(item.title || item.key || '-') + '</strong><span class="ss-wc-r6-badge tone-' + esc(item.tone || tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div><div class="ss-wc-r6-sub">' + esc(item.subtitle || '') + '</div><div class="ss-wc-r6-sub">' + esc(arr(item.targets).slice(0, 4).join(' · ')) + '</div></button>'; }).join('') : '<div class="ss-wc-r6-sub">No spotlight rails.</div>') + '</div>'),
+        card('Scene storyboard', 'Deck scenes bind heatmap, ambience and focus tables', '<div class="ss-wc-r6-list">' + (scenes.length ? scenes.map(function(item){ return '<button type="button" class="ss-wc-r6-list-item ' + (state.scene === txt(item.key || '') ? 'active' : '') + '" data-wc-r6-action="scene" data-key="' + esc(item.key || '') + '"><div><strong>' + esc(item.title || item.key || '-') + '</strong><div class="ss-wc-r6-sub">' + esc(item.subtitle || '') + '</div><div class="ss-wc-r6-sub">' + esc((item.heatmap || 'risk') + ' · ' + (item.ambience || 'midnight') + ' · ' + (item.density || 'comfortable')) + '</div></div><div class="ss-wc-r6-inline"><span class="ss-wc-r6-badge tone-neutral">' + esc(arr(item.focusTables).length + ' tables') + '</span></div></button>'; }).join('') : '<div class="ss-wc-r6-sub">No scenes available.</div>') + '</div>') ,
+      '</div>'
+    ].join('');
+  }
+  function reviewHtml(report){
+    var wall = report.reviewWall || {};
+    var collaboration = report.collaboration || {};
+    return [
+      '<div class="ss-wc-r6-grid-2">',
+        card('Review wall lanes', 'Promotion discipline and next actions', '<div class="ss-wc-r6-list">' + (arr(wall.lanes).length ? arr(wall.lanes).map(function(item){ return '<div class="ss-wc-r6-list-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r6-sub">' + esc(item.gate || item.nextAction || '') + '</div></div><div class="ss-wc-r6-inline"><span class="ss-wc-r6-badge tone-' + esc(tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span>' + badge('Status', item.status || 'attention', item.status === 'ready' ? 'good' : 'warning') + '</div></div>'; }).join('') : '<div class="ss-wc-r6-sub">No review wall lanes.</div>') + '</div>'),
+        card('Evidence stack', 'Blockers and signals surfaced for sign-off', '<div class="ss-wc-r6-list">' + (arr(wall.evidenceStack).length ? arr(wall.evidenceStack).map(function(item){ return '<div class="ss-wc-r6-list-item"><div><strong>' + esc(item.title || '-') + '</strong><div class="ss-wc-r6-sub">' + esc(item.detail || '') + '</div></div><div class="ss-wc-r6-inline"><span class="ss-wc-r6-badge tone-' + esc(item.tone || 'neutral') + '">' + esc(item.kind || 'evidence') + '</span></div></div>'; }).join('') : '<div class="ss-wc-r6-sub">No evidence stack items.</div>') + '</div>' + '<div class="ss-wc-r6-pills">' + badge('Owners', num(collaboration.ownersCoveredPercent, 0) + '%', tone(collaboration.ownersCoveredPercent)) + badge('Approvers', num(collaboration.approverCoveragePercent, 0) + '%', tone(collaboration.approverCoveragePercent)) + badge('Evidence', num(collaboration.evidenceCoveragePercent, 0) + '%', tone(collaboration.evidenceCoveragePercent)) + badge('Personas', num(collaboration.personaCount, 0), 'neutral') + badge('Playbooks', num(collaboration.playbookCount, 0), 'neutral') + '</div>') ,
+      '</div>'
+    ].join('');
+  }
+  function atlasHtml(report){
+    return '<div class="ss-wc-r6-grid-2">' + arr(report.atlas).map(function(group){
+      return card(group.label || group.key || '-', (group.count || 0) + ' mapped lenses', '<div class="ss-wc-r6-list">' + (arr(group.items).length ? arr(group.items).map(function(item){ return '<div class="ss-wc-r6-list-item"><div><strong>' + esc(item.label || '-') + '</strong><div class="ss-wc-r6-sub">' + esc(item.detail || '') + '</div></div><div class="ss-wc-r6-inline"><span class="ss-wc-r6-badge tone-' + esc(tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ss-wc-r6-sub">No atlas items.</div>') + '</div>');
+    }).join('') + '</div>';
+  }
+  function pulseHtml(report){
+    var live = report.livePulse || {};
+    return [
+      '<div class="ss-wc-r6-grid-2">',
+        card('Pulse bands', 'Operating gauges kept visible during release', '<div class="ss-wc-r6-mini-grid">' + (arr(live.bands).length ? arr(live.bands).map(function(item){ return '<div class="ss-wc-r6-mini tone-' + esc(tone(item.score || 0)) + '"><div class="ss-wc-r6-mini-top"><strong>' + esc(item.label || item.key || '-') + '</strong><span class="ss-wc-r6-badge tone-' + esc(tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div><div class="ss-wc-r6-sub">' + esc(item.detail || '') + '</div></div>'; }).join('') : '<div class="ss-wc-r6-sub">No pulse bands.</div>') + '</div>'),
+        card('Pulse radar', 'Observability tiles and event rail signals', '<div class="ss-wc-r6-list">' + (arr(live.radar).length ? arr(live.radar).map(function(item){ return '<div class="ss-wc-r6-list-item"><div><strong>' + esc(item.label || '-') + '</strong><div class="ss-wc-r6-sub">' + esc(item.detail || '') + '</div></div><div class="ss-wc-r6-inline"><span class="ss-wc-r6-badge tone-' + esc(tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ss-wc-r6-sub">No radar items.</div>') + '</div>'),
+      '</div>'
+    ].join('');
+  }
+  function bodyHtml(report){
+    if(state.tab === 'review') return reviewHtml(report);
+    if(state.tab === 'atlas') return atlasHtml(report);
+    if(state.tab === 'pulse') return pulseHtml(report);
+    return spotlightHtml(report) + pulseHtml(report);
+  }
+  function render(){
+    var overlay = document.querySelector('.ss-wc-overlay');
+    if(!overlay) return;
+    var shell = overlay.querySelector('.ss-wc-shell');
+    if(!shell) return;
+    var host = shell.querySelector('.ss-wc-r6-shell');
+    if(!host){
+      host = document.createElement('section');
+      host.className = 'ss-wc-r6-shell';
+      shell.appendChild(host);
+    }
+    cacheReport = ensureReport(cacheReport || currentDiag());
+    ensureSelected();
+    host.innerHTML = heroHtml(cacheReport) + tabsHtml() + (requestPending ? '<div class="ss-wc-r6-sub ss-wc-r6-loading">Syncing round 6 command deck…</div>' : '') + bodyHtml(cacheReport);
+  }
+  function scheduleRender(){
+    if(renderTimer) clearTimeout(renderTimer);
+    renderTimer = setTimeout(render, 40);
+  }
+  function fetchReport(force){
+    if(requestPending && !force) return Promise.resolve(cacheReport || ensureReport(currentDiag()));
+    cacheReport = ensureReport(cacheReport || currentDiag());
+    requestPending = true;
+    scheduleRender();
+    return api('schema_studio_round6_report', { design_id:'workspace' }, 'POST').then(function(res){
+      requestPending = false;
+      cacheReport = ensureReport((res && res.commandCenterReport) || cacheReport || currentDiag());
+      var diag = currentDiag();
+      if(diag && typeof diag === 'object') diag.commandCenter = cacheReport;
+      ensureSelected();
+      scheduleRender();
+      return cacheReport;
+    }).catch(function(){
+      requestPending = false;
+      scheduleRender();
+      return cacheReport || ensureReport(currentDiag());
+    });
+  }
+  function ensureStyles(){
+    if(document.getElementById('schema-studio-r6-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'schema-studio-r6-styles';
+    style.textContent = [
+      '.ss-wc-r6-shell{margin-top:20px;padding-top:10px;border-top:1px solid rgba(148,163,184,.10);}',
+      '.ss-wc-r6-hero{position:relative;padding:22px;border-radius:28px;background:linear-gradient(135deg,rgba(9,11,24,.96),rgba(18,32,62,.90));border:1px solid rgba(96,165,250,.24);box-shadow:0 26px 64px rgba(2,6,23,.28);overflow:hidden;}',
+      '.ss-wc-r6-hero:before,.ss-wc-r6-hero:after{content:"";position:absolute;border-radius:999px;filter:blur(16px);opacity:.54;pointer-events:none;}',
+      '.ss-wc-r6-hero:before{width:260px;height:260px;right:-50px;top:-90px;background:radial-gradient(circle,rgba(56,189,248,.34),transparent 68%);}',
+      '.ss-wc-r6-hero:after{width:220px;height:220px;left:-60px;bottom:-90px;background:radial-gradient(circle,rgba(168,85,247,.28),transparent 72%);}',
+      '.ss-wc-r6-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7dd3fc;font-weight:800;}',
+      '.ss-wc-r6-title{margin:8px 0 10px;font-size:28px;line-height:1.12;color:#fff;}',
+      '.ss-wc-r6-sub{font-size:12px;line-height:1.55;color:#bed4ea;}',
+      '.ss-wc-r6-loading{margin-top:8px;}',
+      '.ss-wc-r6-badges,.ss-wc-r6-inline,.ss-wc-r6-pills{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
+      '.ss-wc-r6-badges{margin-top:14px;}',
+      '.ss-wc-r6-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(148,163,184,.12);font-size:11px;font-weight:700;color:#dbeafe;}',
+      '.ss-wc-r6-badge.tone-good{border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.10);color:#dcfce7;}',
+      '.ss-wc-r6-badge.tone-warning{border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.10);color:#fef3c7;}',
+      '.ss-wc-r6-badge.tone-critical{border-color:rgba(239,68,68,.28);background:rgba(239,68,68,.10);color:#fee2e2;}',
+      '.ss-wc-r6-badge.tone-neutral{color:#e2e8f0;}',
+      '.ss-wc-r6-metric-grid{margin-top:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}',
+      '.ss-wc-r6-metric{padding:15px;border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.58),rgba(15,23,42,.42));border:1px solid rgba(148,163,184,.10);box-shadow:0 16px 36px rgba(2,6,23,.16);}',
+      '.ss-wc-r6-metric .ss-wc-r6-value{font-size:28px;font-weight:800;line-height:1;color:#fff;margin-top:7px;}',
+      '.ss-wc-r6-metric.tone-good,.ss-wc-r6-mini.tone-good{border-color:rgba(34,197,94,.18);}',
+      '.ss-wc-r6-metric.tone-warning,.ss-wc-r6-mini.tone-warning{border-color:rgba(245,158,11,.18);}',
+      '.ss-wc-r6-metric.tone-critical,.ss-wc-r6-mini.tone-critical{border-color:rgba(239,68,68,.18);}',
+      '.ss-wc-r6-tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding:8px 4px;}',
+      '.ss-wc-r6-tab{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(15,23,42,.34);color:#dbeafe;cursor:pointer;font-weight:700;}',
+      '.ss-wc-r6-tab span{font-size:11px;opacity:.78;font-weight:700;}',
+      '.ss-wc-r6-tab.active{background:linear-gradient(135deg,rgba(59,130,246,.18),rgba(56,189,248,.14));border-color:rgba(56,189,248,.30);color:#fff;}',
+      '.ss-wc-r6-toolbar{margin-left:auto;display:flex;gap:8px;}',
+      '.ss-wc-r6-card{margin-top:12px;padding:16px;border-radius:22px;background:linear-gradient(180deg,rgba(15,23,42,.62),rgba(15,23,42,.46));border:1px solid rgba(148,163,184,.10);box-shadow:0 16px 36px rgba(2,6,23,.16);}',
+      '.ss-wc-r6-card h5{margin:0;font-size:15px;color:#fff;}',
+      '.ss-wc-r6-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;}',
+      '.ss-wc-r6-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;}',
+      '.ss-wc-r6-mini{padding:14px;border-radius:18px;border:1px solid rgba(148,163,184,.10);background:linear-gradient(180deg,rgba(15,23,42,.56),rgba(15,23,42,.38));text-align:left;transition:transform .16s ease,border-color .16s ease;}',
+      '.ss-wc-r6-mini.active,.ss-wc-r6-list-item.active{border-color:rgba(56,189,248,.30);box-shadow:0 12px 28px rgba(56,189,248,.10);}',
+      '.ss-wc-r6-mini:hover,.ss-wc-r6-list-item:hover{transform:translateY(-1px);}',
+      '.ss-wc-r6-mini-top,.ss-wc-r6-card-head,.ss-wc-r6-list-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}',
+      '.ss-wc-r6-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}',
+      '.ss-wc-r6-list-item{padding:12px 14px;border-radius:16px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.30);}',
+      '@media (max-width:1100px){.ss-wc-r6-metric-grid,.ss-wc-r6-grid-2,.ss-wc-r6-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}',
+      '@media (max-width:760px){.ss-wc-r6-metric-grid,.ss-wc-r6-grid-2,.ss-wc-r6-mini-grid{grid-template-columns:1fr;}.ss-wc-r6-toolbar{width:100%;margin-left:0;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+  function bind(){
+    if(!clickBound){
+      document.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-wc-r6-action]') : null;
+        if(!node) return;
+        var action = node.getAttribute('data-wc-r6-action') || '';
+        if(action === 'tab'){
+          ev.preventDefault();
+          state.tab = node.getAttribute('data-key') || 'deck';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'spotlight'){
+          ev.preventDefault();
+          applySpotlight(node.getAttribute('data-key') || '');
+          return;
+        }
+        if(action === 'scene'){
+          ev.preventDefault();
+          applyScene(node.getAttribute('data-key') || '');
+          return;
+        }
+        if(action === 'refresh'){
+          ev.preventDefault();
+          fetchReport(true);
+          return;
+        }
+        if(action === 'copy-brief'){
+          ev.preventDefault();
+          copyBrief();
+          return;
+        }
+      }, true);
+      clickBound = true;
+    }
+    if(!keyBound){
+      document.addEventListener('keydown', function(ev){
+        if(ev.altKey && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey && ev.key === '7'){
+          ev.preventDefault();
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.open === 'function') win.SchemaStudioWorldClass.open();
+          state.tab = 'deck';
+          saveState();
+          fetchReport(false);
+          scheduleRender();
+        }
+      });
+      keyBound = true;
+    }
+  }
+  function addCommands(){
+    if(!win.CmdPalette || !Array.isArray(win.CmdPalette.COMMANDS)) return;
+    win.CmdPalette.COMMANDS = win.CmdPalette.COMMANDS.filter(function(command){
+      return !command || ['Open round 6 command deck', 'Copy round 6 command brief'].indexOf(command.label_en) < 0;
+    });
+    win.CmdPalette.COMMANDS.push(
+      {
+        icon:'🌌',
+        label:'Mở command deck round 6',
+        label_en:'Open round 6 command deck',
+        category:'schema',
+        action:function(){
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.open === 'function') win.SchemaStudioWorldClass.open();
+          state.tab = 'deck';
+          saveState();
+          fetchReport(false);
+          scheduleRender();
+        }
+      },
+      {
+        icon:'🪄',
+        label:'Copy command brief round 6',
+        label_en:'Copy round 6 command brief',
+        category:'schema',
+        action:function(){ copyBrief(); }
+      }
+    );
+  }
+
+  var originalGetDiagnosis = win.SchemaStudioWorldClass.getDiagnosis;
+  var originalRefresh = win.SchemaStudioWorldClass.refresh;
+  var originalOpen = win.SchemaStudioWorldClass.open;
+  win.SchemaStudioWorldClass.getDiagnosis = function(){
+    var diag = originalGetDiagnosis ? originalGetDiagnosis.apply(this, arguments) : {};
+    if(diag && typeof diag === 'object' && cacheReport) diag.commandCenter = cacheReport;
+    return diag;
+  };
+  win.SchemaStudioWorldClass.refresh = function(){
+    var result = originalRefresh ? originalRefresh.apply(this, arguments) : Promise.resolve(currentDiag());
+    return Promise.resolve(result).then(function(diag){
+      if(diag && typeof diag === 'object' && diag.commandCenterReport) cacheReport = ensureReport(diag.commandCenterReport);
+      return fetchReport(true).then(function(){ scheduleRender(); return diag; });
+    });
+  };
+  win.SchemaStudioWorldClass.open = function(){
+    var result = originalOpen ? originalOpen.apply(this, arguments) : undefined;
+    fetchReport(false);
+    scheduleRender();
+    return result;
+  };
+  win.SchemaStudioWorldClass.getCommandCenterReport = function(){
+    return cacheReport || ensureReport(currentDiag());
+  };
+
+  loadState();
+  ensureStyles();
+  bind();
+  addCommands();
+  fetchReport(false);
+  scheduleRender();
+  win.SchemaStudioWorldClass.__round6Patched = true;
+  if(win.SchemaStudio){
+    win.SchemaStudio.buildId = '20260407worldclass6';
+    win.SchemaStudio.copyRound6CommandBrief = copyBrief;
+  }
 })(window);

@@ -1,0 +1,99 @@
+schema version 2026-04-07-r7
+round7 templates 11
+total templates 137
+sample manifest {
+  "patchVersion": "2026-04-07-r7",
+  "activeScenario": "release-theatre",
+  "visualMode": "aurora-command",
+  "previewChrome": "cinematic",
+  "sceneMoments": 7,
+  "targetModel": "GPT Pro"
+}
+sample metrics {
+  "layoutHarmony": 56,
+  "accessibilityReady": 82,
+  "visualCraft": 100,
+  "scenarioReadiness": 89,
+  "operatorClarity": 72,
+  "r6UltraRecovery": 100,
+  "graphNodes": 21,
+  "graphEdges": 21
+}
+sample audit {
+  "storyboard": 7,
+  "layoutScore": 56,
+  "flowNodes": 21,
+  "flowEdges": 21,
+  "volatility": 0
+}
+builder contains {
+  "director": true,
+  "scenarioStudio": true,
+  "layoutHarmony": true,
+  "accessibilityOps": true,
+  "marketLens": true,
+  "visualModes": true
+}
+preview contains {
+  "ribbon": true,
+  "scenario": true,
+  "visual": true
+}
+scenario matrix [
+  {
+    "scenario": "executive-theatre",
+    "blocks": 5,
+    "layoutHarmony": 76,
+    "accessibilityReady": 100,
+    "visualCraft": 100,
+    "scenarioReadiness": 79,
+    "operatorClarity": 64,
+    "nodes": 16,
+    "edges": 15
+  },
+  {
+    "scenario": "operator-shift",
+    "blocks": 8,
+    "layoutHarmony": 56,
+    "accessibilityReady": 100,
+    "visualCraft": 100,
+    "scenarioReadiness": 89,
+    "operatorClarity": 84,
+    "nodes": 21,
+    "edges": 20
+  },
+  {
+    "scenario": "audit-sprint",
+    "blocks": 8,
+    "layoutHarmony": 56,
+    "accessibilityReady": 100,
+    "visualCraft": 100,
+    "scenarioReadiness": 89,
+    "operatorClarity": 70,
+    "nodes": 22,
+    "edges": 21
+  },
+  {
+    "scenario": "supplier-radar",
+    "blocks": 7,
+    "layoutHarmony": 66,
+    "accessibilityReady": 100,
+    "visualCraft": 100,
+    "scenarioReadiness": 89,
+    "operatorClarity": 88,
+    "nodes": 19,
+    "edges": 19
+  },
+  {
+    "scenario": "release-theatre",
+    "blocks": 8,
+    "layoutHarmony": 56,
+    "accessibilityReady": 100,
+    "visualCraft": 100,
+    "scenarioReadiness": 89,
+    "operatorClarity": 72,
+    "nodes": 21,
+    "edges": 21
+  }
+]
+SMOKE_OK

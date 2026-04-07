@@ -780,6 +780,26 @@ function listSubtitle(parts){
 function renderHeader(){
   var overview = ((state.summary || {}).overview || {});
   var benchmarkCount = ensureArray((state.summary || {}).benchmarks).length;
+  var schemaStudioCoverage = overview.schemaStudioCanonicalCoverage || 0;
+  var schemaStudioReleaseCount = overview.schemaStudioReleaseCount || 0;
+  var visualReadiness = overview.schemaStudioVisualReadiness || 0;
+  var metadataCompleteness = overview.schemaStudioMetadataCompleteness || 0;
+  var workflowCoverage = overview.schemaStudioWorkflowCoverage || 0;
+  var hotspotCount = overview.schemaStudioHotspots || 0;
+  var governanceCoverage = overview.schemaStudioGovernanceCoverage || 0;
+  var journeyReadiness = overview.schemaStudioJourneyReadiness || 0;
+  var blockerCount = overview.schemaStudioBlockers || 0;
+  var performancePosture = overview.schemaStudioPerformancePosture || 0;
+  var registrySync = overview.schemaStudioRegistrySync || 0;
+  var complianceReadiness = overview.schemaStudioComplianceReadiness || 0;
+  var aiCopilotReadiness = overview.schemaStudioAICopilotReadiness || 0;
+  var experienceScore = overview.schemaStudioExperienceScore || 0;
+  var operationsScore = overview.schemaStudioOperationsScore || 0;
+  var promotionReadiness = overview.schemaStudioPromotionReadiness || 0;
+  var firewallScore = overview.schemaStudioFirewallScore || 0;
+  var observabilityScore = overview.schemaStudioObservabilityScore || 0;
+  var personaCount = overview.schemaStudioPersonaCount || 0;
+  var playbookCount = overview.schemaStudioPlaybookCount || 0;
   return [
     '<div class="ams-topbar">',
       '<section class="ams-hero">',
@@ -794,6 +814,25 @@ function renderHeader(){
           '<span class="ams-pill">' + esc(T('Tables: ', 'Tables: ')) + esc(overview.tableCount || 0) + '</span>',
           '<span class="ams-pill">' + esc(T('Schemas: ', 'Schemas: ')) + esc(overview.schemaCount || 0) + '</span>',
           '<span class="ams-pill">' + esc(T('Variable categories: ', 'Variable categories: ')) + esc(overview.variableCategoryCount || 0) + '</span>',
+          '<span class="ams-pill">' + esc(T('Schema Studio releases: ', 'Schema Studio releases: ')) + esc(schemaStudioReleaseCount) + '</span>',
+          '<span class="ams-pill">' + esc(T('Canonical coverage: ', 'Canonical coverage: ')) + esc(schemaStudioCoverage) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Visual readiness: ', 'Visual readiness: ')) + esc(visualReadiness) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Metadata completeness: ', 'Metadata completeness: ')) + esc(metadataCompleteness) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Workflow coverage: ', 'Workflow coverage: ')) + esc(workflowCoverage) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Governance: ', 'Governance: ')) + esc(governanceCoverage) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Journey readiness: ', 'Journey readiness: ')) + esc(journeyReadiness) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Hotspots: ', 'Hotspots: ')) + esc(hotspotCount) + '</span>',
+          '<span class="ams-pill">' + esc(T('Blockers: ', 'Blockers: ')) + esc(blockerCount) + '</span>',
+          '<span class="ams-pill">' + esc(T('Experience: ', 'Experience: ')) + esc(experienceScore) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Operations: ', 'Operations: ')) + esc(operationsScore) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Promotion: ', 'Promotion: ')) + esc(promotionReadiness) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Firewall: ', 'Firewall: ')) + esc(firewallScore) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Observability: ', 'Observability: ')) + esc(observabilityScore) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Compliance: ', 'Compliance: ')) + esc(complianceReadiness) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Performance: ', 'Performance: ')) + esc(performancePosture) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Registry sync: ', 'Registry sync: ')) + esc(registrySync) + '%</span>',
+          '<span class="ams-pill">' + esc(T('AI copilot: ', 'AI copilot: ')) + esc(aiCopilotReadiness) + '%</span>',
+          '<span class="ams-pill">' + esc(T('Personas / playbooks: ', 'Personas / playbooks: ')) + esc(personaCount + ' / ' + playbookCount) + '</span>',
         '</div>',
       '</section>',
       '<aside class="ams-sidecard">',
@@ -811,6 +850,27 @@ function renderHeader(){
           '<div class="ams-kv-card"><div class="k">' + esc(T('Benchmark refs', 'Benchmark refs')) + '</div><div class="v">' + esc(benchmarkCount) + '</div></div>',
           '<div class="ams-kv-card"><div class="k">' + esc(T('Data field packs', 'Data field packs')) + '</div><div class="v">' + esc(overview.dataFieldEndpointCount || 0) + '</div></div>',
           '<div class="ams-kv-card"><div class="k">' + esc(T('Variables', 'Variables')) + '</div><div class="v">' + esc(overview.variableCount || 0) + '</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Schema Studio policies', 'Schema Studio policies')) + '</div><div class="v">' + esc(overview.schemaStudioPolicyCount || 0) + '</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Canonical critical gaps', 'Canonical critical gaps')) + '</div><div class="v">' + esc(overview.schemaStudioCriticalGaps || 0) + '</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Visual readiness', 'Visual readiness')) + '</div><div class="v">' + esc(visualReadiness) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Metadata completeness', 'Metadata completeness')) + '</div><div class="v">' + esc(metadataCompleteness) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Workflow coverage', 'Workflow coverage')) + '</div><div class="v">' + esc(workflowCoverage) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Governance coverage', 'Governance coverage')) + '</div><div class="v">' + esc(governanceCoverage) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Journey readiness', 'Journey readiness')) + '</div><div class="v">' + esc(journeyReadiness) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Graph density', 'Graph density')) + '</div><div class="v">' + esc(overview.schemaStudioGraphDensity || 0) + '</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Orphan relation risk', 'Orphan relation risk')) + '</div><div class="v">' + esc(overview.schemaStudioOrphanRisk || 0) + '</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Hotspots', 'Hotspots')) + '</div><div class="v">' + esc(hotspotCount) + '</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Blockers', 'Blockers')) + '</div><div class="v">' + esc(blockerCount) + '</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Experience score', 'Experience score')) + '</div><div class="v">' + esc(experienceScore) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Operations score', 'Operations score')) + '</div><div class="v">' + esc(operationsScore) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Promotion readiness', 'Promotion readiness')) + '</div><div class="v">' + esc(promotionReadiness) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Firewall score', 'Firewall score')) + '</div><div class="v">' + esc(firewallScore) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Observability', 'Observability')) + '</div><div class="v">' + esc(observabilityScore) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Compliance readiness', 'Compliance readiness')) + '</div><div class="v">' + esc(complianceReadiness) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Performance posture', 'Performance posture')) + '</div><div class="v">' + esc(performancePosture) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Registry sync', 'Registry sync')) + '</div><div class="v">' + esc(registrySync) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('AI copilot', 'AI copilot')) + '</div><div class="v">' + esc(aiCopilotReadiness) + '%</div></div>',
+          '<div class="ams-kv-card"><div class="k">' + esc(T('Persona / playbook', 'Persona / playbook')) + '</div><div class="v">' + esc(personaCount + ' / ' + playbookCount) + '</div></div>',
         '</div>',
       '</aside>',
     '</div>'
@@ -840,6 +900,30 @@ function renderOverview(){
   var overview = summary.overview || {};
   var benchmarks = ensureArray(summary.benchmarks);
   var principles = ensureArray(summary.principles);
+  var schemaStudio = summary.schemaStudio || {};
+  var schemaStudioManifest = schemaStudio.manifest || {};
+  var schemaStudioReleaseLog = ensureArray(schemaStudio.releaseLog);
+  var schemaStudioDiagnostics = schemaStudio.diagnostics || {};
+  var schemaStudioExperience = schemaStudio.experienceReport || {};
+  var schemaStudioOperations = schemaStudio.operationsReport || {};
+  var schemaStudioSummary = (schemaStudioManifest.summary || {});
+  var experienceSummary = schemaStudioExperience.summary || {};
+  var operationsSummary = schemaStudioOperations.summary || {};
+  var hotspotItems = ensureArray(schemaStudioDiagnostics.hotspots).slice(0, 6);
+  var recommendationItems = ensureArray(schemaStudioDiagnostics.recommendations).slice(0, 5);
+  var blockerItems = ensureArray(schemaStudioDiagnostics.blockers).slice(0, 5);
+  var journeyItems = ensureArray(schemaStudioDiagnostics.journeys).slice(0, 4);
+  var personaItems = ensureArray(schemaStudioDiagnostics.personas || schemaStudioExperience.personas).slice(0, 4);
+  var playbookItems = ensureArray(schemaStudioDiagnostics.playbooks || schemaStudioExperience.playbooks).slice(0, 4);
+  var copilotItems = ensureArray(schemaStudioDiagnostics.aiCopilot || schemaStudioExperience.aiCopilot).slice(0, 4);
+  var focusDeckItems = ensureArray(schemaStudioDiagnostics.focusDeck || schemaStudioExperience.focusDeck || schemaStudioOperations.focusDeck).slice(0, 4);
+  var promotionItems = ensureArray(schemaStudioDiagnostics.promotionBoard || schemaStudioOperations.promotionBoard).slice(0, 5);
+  var branchItems = ensureArray(schemaStudioDiagnostics.branchTopology || schemaStudioExperience.branchTopology || schemaStudioOperations.branchTopology).slice(0, 4);
+  var environmentItems = ensureArray(schemaStudioDiagnostics.environments || schemaStudioOperations.environments).slice(0, 4);
+  var eventRailItems = ensureArray(schemaStudioDiagnostics.eventRail || schemaStudioExperience.eventRail || schemaStudioOperations.eventRail).slice(0, 4);
+  var firewall = schemaStudioDiagnostics.firewall || schemaStudioExperience.firewall || schemaStudioOperations.firewall || {};
+  var observability = schemaStudioDiagnostics.observability || schemaStudioExperience.observability || schemaStudioOperations.observability || {};
+  var observabilityTiles = ensureArray(observability.tiles).slice(0, 4);
 
   return [
     '<section class="ams-metrics">',
@@ -847,7 +931,18 @@ function renderOverview(){
       '<article class="ams-overview-card"><div class="label">' + esc(T('DB tables', 'DB tables')) + '</div><div class="value">' + esc(overview.tableCount || 0) + '</div><div class="sub">' + esc(T('Table registry va column mapping', 'Table registry and column mapping')) + '</div></article>',
       '<article class="ams-overview-card"><div class="label">' + esc(T('Schema groups', 'Schema groups')) + '</div><div class="value">' + esc(overview.schemaCount || 0) + '</div><div class="sub">' + esc(T('Blueprint nghiep vu va migration', 'Business blueprints and migrations')) + '</div></article>',
       '<article class="ams-overview-card"><div class="label">' + esc(T('Reusable variables', 'Reusable variables')) + '</div><div class="value">' + esc(overview.variableCount || 0) + '</div><div class="sub">' + esc(T('Dung lai cho form, document, automation', 'Reused across forms, documents, and automation')) + '</div></article>',
+      '<article class="ams-overview-card"><div class="label">' + esc(T('Schema Studio projections', 'Schema Studio projections')) + '</div><div class="value">' + esc(overview.schemaStudioProjectionCount || 0) + '</div><div class="sub">' + esc(T('Runtime projection compiler output', 'Runtime projection compiler output')) + '</div></article>',
+      '<article class="ams-overview-card"><div class="label">' + esc(T('Canonical coverage', 'Canonical coverage')) + '</div><div class="value">' + esc(overview.schemaStudioCanonicalCoverage || 0) + '%</div><div class="sub">' + esc(T('ERP/MES/eQMS capability coverage', 'ERP/MES/eQMS capability coverage')) + '</div></article>',
+      '<article class="ams-overview-card"><div class="label">' + esc(T('Operations score', 'Operations score')) + '</div><div class="value">' + esc(overview.schemaStudioOperationsScore || operationsSummary.operationsScore || 0) + '%</div><div class="sub">' + esc(T('Do san sang van hanh control plane va release cockpit', 'Control-plane operating and release-cockpit readiness')) + '</div></article>',
+      '<article class="ams-overview-card"><div class="label">' + esc(T('Promotion / firewall', 'Promotion / firewall')) + '</div><div class="value">' + esc((overview.schemaStudioPromotionReadiness || operationsSummary.promotionReadinessScore || 0) + '% / ' + (overview.schemaStudioFirewallScore || operationsSummary.firewallScore || 0) + '%') + '</div><div class="sub">' + esc(T('Gate readiness va destructive change discipline', 'Gate readiness and destructive-change discipline')) + '</div></article>',
+      '<article class="ams-overview-card"><div class="label">' + esc(T('Observability / command center', 'Observability / command center')) + '</div><div class="value">' + esc((overview.schemaStudioObservabilityScore || operationsSummary.observabilityScore || 0) + '% / ' + (overview.schemaStudioCommandCenterScore || operationsSummary.commandCenterScore || 0) + '%') + '</div><div class="sub">' + esc(T('Scale posture, cockpit clarity, release signal quality', 'Scale posture, cockpit clarity, and release-signal quality')) + '</div></article>',
+      '<article class="ams-overview-card"><div class="label">' + esc(T('Focus decks / branches', 'Focus decks / branches')) + '</div><div class="value">' + esc((overview.schemaStudioFocusDeckCount || operationsSummary.focusDeckCount || focusDeckItems.length || 0) + ' / ' + (overview.schemaStudioBranchCount || operationsSummary.branchCount || branchItems.length || 0)) + '</div><div class="sub">' + esc(T('Curated review views va topology branch/promotion', 'Curated review views and branch/promotion topology')) + '</div></article>',
     '</section>',
+    ((overview.schemaStudioProjectionCount || 0) || (overview.schemaStudioReleaseCount || 0) ? '<section class="ams-overview-grid"><article class="ams-benchmark"><h4>' + esc(T('Schema Studio enterprise compiler', 'Schema Studio enterprise compiler')) + '</h4><p>' + esc(T('Bang thong ke nay tong hop runtime projections, release bundles, policy coverage va canonical posture duoc sinh tu Schema Studio enterprise control plane.', 'This summary consolidates runtime projections, release bundles, policy coverage, and canonical posture generated by the Schema Studio enterprise control plane.')) + '</p><div class="ams-grid" style="margin-top:14px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Runtime projections', 'Runtime projections')) + '</strong><div class="ams-help">' + esc(T('Table + relation + field registry projections', 'Table + relation + field registry projections')) + '</div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc(overview.schemaStudioProjectionCount || 0) + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Release bundles', 'Release bundles')) + '</strong><div class="ams-help">' + esc(T('Typed diff, risk score, approval class', 'Typed diff, risk score, approval class')) + '</div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc(overview.schemaStudioReleaseCount || 0) + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Policy coverage', 'Policy coverage')) + '</strong><div class="ams-help">' + esc(T('RLS va governance policies duoc model hoa', 'RLS and governance policies modeled declaratively')) + '</div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc(overview.schemaStudioPolicyCount || 0) + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Last releases', 'Last releases')) + '</strong><div class="ams-help">' + esc(T('Ban phat hanh moi nhat tu control plane', 'Most recent control plane release bundles')) + '</div></div></div><div style="margin-top:10px">' + (schemaStudioReleaseLog.length ? schemaStudioReleaseLog.slice(0, 3).map(function(item){ return '<div class="ams-help" style="margin-bottom:6px"><strong>' + esc(item.name || item.id || '') + '</strong> · ' + esc(item.approvalClass || 'standard') + ' · ' + esc(item.compatibilityScore || 0) + '%</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co release bundle', 'No release bundles yet')) + '</div>') + '</div></div></div></article></section>' : ''),
+    ((overview.schemaStudioVisualReadiness || 0) || hotspotItems.length || recommendationItems.length ? '<section class="ams-overview-grid"><article class="ams-benchmark"><h4>' + esc(T('Schema Studio world-class cockpit', 'Schema Studio world-class cockpit')) + '</h4><p>' + esc(T('Lop diagnostics nay mo rong enterprise compiler thanh control tower danh gia do dep, do ro, do day metadata, workflow binding va diem nong can xu ly trong mo hinh schema.', 'This diagnostics layer extends the enterprise compiler into a control tower that scores visual clarity, metadata depth, workflow binding, and hotspots that still need remediation across the schema model.')) + '</p><div class="ams-grid" style="margin-top:14px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Visual readiness', 'Visual readiness')) + '</strong><div class="ams-help">' + esc(T('Kha nang doc/quan tri/so sanh tren canvas lon', 'Readability/governance/compare readiness on large canvases')) + '</div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc(overview.schemaStudioVisualReadiness || schemaStudioSummary.visualReadinessScore || 0) + '%</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Metadata completeness', 'Metadata completeness')) + '</strong><div class="ams-help">' + esc(T('Owner/steward/domain/layer/workflow/semantic tags', 'Owner/steward/domain/layer/workflow/semantic tags')) + '</div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc(overview.schemaStudioMetadataCompleteness || schemaStudioSummary.metadataCompletenessPercent || 0) + '%</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Workflow coverage', 'Workflow coverage')) + '</strong><div class="ams-help">' + esc(T('Bang duoc lien ket voi workflow/runtime contract', 'Tables linked to workflow/runtime contracts')) + '</div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc(overview.schemaStudioWorkflowCoverage || schemaStudioSummary.workflowBindingCoveragePercent || 0) + '%</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Graph density / orphan risk', 'Graph density / orphan risk')) + '</strong><div class="ams-help">' + esc(T('Do day relation va nguy co mo co metadata', 'Relation richness versus metadata orphan risk')) + '</div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc((overview.schemaStudioGraphDensity || schemaStudioSummary.graphDensityScore || 0) + ' / ' + (overview.schemaStudioOrphanRisk || schemaStudioSummary.orphanRelationRiskCount || 0)) + '</div></div></div><div class="ams-grid" style="margin-top:16px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Top hotspots', 'Top hotspots')) + '</strong><div class="ams-help">' + esc(T('Bang uu tien can bo sung metadata, policy, workflow hoac relation hygiene', 'Priority tables needing metadata, policy, workflow, or relation hygiene upgrades')) + '</div></div></div><div style="margin-top:10px">' + (hotspotItems.length ? hotspotItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.table || item.tableName || item.id || '-') + '</strong> · ' + esc((item.score || 0) + ' pts') + (item.reason ? ' · ' + esc(item.reason) : '') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co hotspot nao duoc ghi nhan', 'No hotspots recorded yet')) + '</div>') + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Recommendations', 'Recommendations')) + '</strong><div class="ams-help">' + esc(T('Checklist de day metadata, giam risk va dep hon tren canvas', 'Checklist to deepen metadata, reduce risk, and improve visual clarity on canvas')) + '</div></div></div><div style="margin-top:10px">' + (recommendationItems.length ? recommendationItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px">• ' + esc(item) + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('He thong chua sinh recommendation', 'No recommendations generated yet')) + '</div>') + '</div></div></div></article></section>' : ''),
+    ((overview.schemaStudioGovernanceCoverage || 0) || blockerItems.length || journeyItems.length ? '<section class="ams-overview-grid"><article class="ams-benchmark"><h4>' + esc(T('Schema Studio mission control round 3', 'Schema Studio mission control round 3')) + '</h4><p>' + esc(T('Round 3 day diagnostics thanh ban do van hanh: governance coverage, journey readiness, blocker board, release radar va cac storyline de review nhanh theo manufacturing / quality / compliance.', 'Round 3 turns diagnostics into an operating map: governance coverage, journey readiness, blocker board, release radar, and fast-review storylines for manufacturing, quality, and compliance.')) + '</p><div class="ams-grid" style="margin-top:14px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Governance / journey / radar', 'Governance / journey / radar')) + '</strong><div class="ams-help">' + esc(T('Ba thang do moi cua control plane world-class', 'Three new control-plane gauges for world-class readiness')) + '</div></div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc((overview.schemaStudioGovernanceCoverage || 0) + '% / ' + (overview.schemaStudioJourneyReadiness || 0) + '% / ' + (overview.schemaStudioReleaseRadar || 0) + '%') + '</div><div class="ams-help" style="margin-top:8px">' + esc(T('Governance, journey orchestration va release radar can duoc day song song de studio tro thanh control tower that su.', 'Governance, journey orchestration and release radar need to move together for the studio to become a true control tower.')) + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Domains / layers / storyboards', 'Domains / layers / storyboards')) + '</strong><div class="ams-help">' + esc(T('Do rong cua enterprise canvas va cac man hinh review san co', 'Breadth of the enterprise canvas and ready-made review screens')) + '</div></div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc((overview.schemaStudioDomainCount || 0) + ' / ' + (overview.schemaStudioLayerCount || 0) + ' / ' + (overview.schemaStudioStoryboardCount || 0)) + '</div><div class="ams-help" style="margin-top:8px">' + esc(T('So domain, layer va storyboard da duoc cockpit nhan dien/seed san.', 'Number of domains, layers, and storyboards currently recognized or seeded by the cockpit.')) + '</div></div></div><div class="ams-grid" style="margin-top:16px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Blocker board', 'Blocker board')) + '</strong><div class="ams-help">' + esc(T('Cac rao chan can xu ly de release va onboarding nhanh hon', 'Constraints that must be addressed to accelerate release and onboarding')) + '</div></div></div></div><div style="margin-top:10px">' + (blockerItems.length ? blockerItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.title || item.key || '-') + '</strong> · ' + esc(item.severity || 'info') + ' · ' + esc(item.nextAction || item.detail || '') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co blocker nao duoc ghi nhan', 'No blockers recorded yet')) + '</div>') + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Manufacturing / QMS journeys', 'Manufacturing / QMS journeys')) + '</strong><div class="ams-help">' + esc(T('Cac storyline de review nhanh phan plan-execute-quality-compliance-traceability', 'Storylines for fast review across plan-execute-quality-compliance-traceability')) + '</div></div></div></div><div style="margin-top:10px">' + (journeyItems.length ? journeyItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.label || item.key || '-') + '</strong> · ' + esc((item.readinessScore || 0) + '%') + ' · ' + esc((ensureArray(item.tablesPresent).length || 0) + '/' + (ensureArray(item.requiredTables).length || 0)) + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('He thong chua sinh journey diagnostics', 'No journey diagnostics generated yet')) + '</div>') + '</div></div></div></article></section>' : ''),
+    (((overview.schemaStudioExperienceScore || experienceSummary.experienceScore || 0) || personaItems.length || playbookItems.length || copilotItems.length) ? '<section class="ams-overview-grid"><article class="ams-benchmark"><h4>' + esc(T('Schema Studio experience engine round 4', 'Schema Studio experience engine round 4')) + '</h4><p>' + esc(T('Round 4 bo sung lop giao dien executive glass, persona rails, release lanes, AI copilots va render insights de studio khong chi manh ma con cuc ky truc quan va dep.', 'Round 4 adds executive glass UI, persona rails, release lanes, AI copilots, and render insights so the studio becomes not only powerful but also highly visual and beautiful.')) + '</p><div class="ams-grid" style="margin-top:14px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Experience / compliance / performance', 'Experience / compliance / performance')) + '</strong><div class="ams-help">' + esc(T('Ba thang do moi cua mission control round 4', 'Three new gauges introduced by the round 4 mission control layer')) + '</div></div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc((overview.schemaStudioExperienceScore || experienceSummary.experienceScore || 0) + '% / ' + (overview.schemaStudioComplianceReadiness || experienceSummary.complianceReadinessScore || 0) + '% / ' + (overview.schemaStudioPerformancePosture || experienceSummary.performancePostureScore || 0) + '%') + '</div><div class="ams-help" style="margin-top:8px">' + esc(T('Experience score danh gia do dep + do ro + do san sang review; compliance readiness danh gia governance/evidence/policy; performance posture danh gia scale va readability.', 'Experience score reflects visual polish + clarity + review readiness; compliance readiness tracks governance/evidence/policy; performance posture tracks scale and readability.')) + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Registry / AI / personas', 'Registry / AI / personas')) + '</strong><div class="ams-help">' + esc(T('Schema-to-runtime posture, prompt intelligence va role-aware modes', 'Schema-to-runtime posture, prompt intelligence, and role-aware modes')) + '</div></div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc((overview.schemaStudioRegistrySync || experienceSummary.registrySyncScore || 0) + '% / ' + (overview.schemaStudioAICopilotReadiness || experienceSummary.aiCopilotReadinessScore || 0) + '% / ' + ((overview.schemaStudioPersonaCount || personaItems.length || 0) + ' / ' + (overview.schemaStudioPlaybookCount || playbookItems.length || 0))) + '</div><div class="ams-help" style="margin-top:8px">' + esc(T('Cac metric nay mo ta studio da san sang den muc nao de day metadata sang registry va su dung AI co kiem soat.', 'These metrics show how ready the studio is to project metadata into runtime registries and to use AI in a controlled way.')) + '</div></div></div><div class="ams-grid" style="margin-top:16px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Persona rails', 'Persona rails')) + '</strong><div class="ams-help">' + esc(T('Che do xem cho architect, manufacturing, quality, compliance va builder', 'View modes for architects, manufacturing, quality, compliance, and builders')) + '</div></div></div></div><div style="margin-top:10px">' + (personaItems.length ? personaItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.label || item.key || '-') + '</strong> · ' + esc((item.readinessScore || 0) + '%') + ' · ' + esc(item.focus || '') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co persona mode nao duoc sinh', 'No persona modes have been generated yet')) + '</div>') + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Playbooks / AI copilots', 'Playbooks / AI copilots')) + '</strong><div class="ams-help">' + esc(T('Checklist review san co va prompt AI de thao tac nhanh', 'Ready-made review checklists and AI prompts for fast action')) + '</div></div></div></div><div style="margin-top:10px">' + (playbookItems.length ? playbookItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.title || item.key || '-') + '</strong> · ' + esc((item.readinessScore || 0) + '%') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co playbook nao duoc sinh', 'No playbooks generated yet')) + '</div>') + (copilotItems.length ? '<div class="ams-help" style="margin-top:12px"><strong>' + esc(T('AI copilots', 'AI copilots')) + ':</strong><br>' + copilotItems.map(function(item){ return '• ' + esc(item.title || item.key || '-'); }).join('<br>') + '</div>' : '') + '</div></div></div></article></section>' : ''),
+    (((overview.schemaStudioOperationsScore || operationsSummary.operationsScore || 0) || promotionItems.length || focusDeckItems.length || branchItems.length || observabilityTiles.length) ? '<section class="ams-overview-grid"><article class="ams-benchmark"><h4>' + esc(T('Schema Studio command center round 5', 'Schema Studio command center round 5')) + '</h4><p>' + esc(T('Round 5 day mission control thanh release command center that su: co operations score, promotion board, destructive-change firewall, branch topology, focus decks va observability tiles de review nhanh ma van rat ky luat.', 'Round 5 turns mission control into a true release command center with an operations score, promotion board, destructive-change firewall, branch topology, focus decks, and observability tiles for fast but disciplined reviews.')) + '</p><div class="ams-grid" style="margin-top:14px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Operations / promotion / firewall', 'Operations / promotion / firewall')) + '</strong><div class="ams-help">' + esc(T('Ba thang do moi cua round 5', 'Three new round 5 operating gauges')) + '</div></div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc((overview.schemaStudioOperationsScore || operationsSummary.operationsScore || 0) + '% / ' + (overview.schemaStudioPromotionReadiness || operationsSummary.promotionReadinessScore || 0) + '% / ' + (overview.schemaStudioFirewallScore || operationsSummary.firewallScore || 0) + '%') + '</div><div class="ams-help" style="margin-top:8px">' + esc(T('Operations score danh gia kha nang van hanh cockpit; promotion readiness danh gia gate review; firewall score danh gia ky luat doi voi change pha vo.', 'Operations score measures cockpit operating maturity; promotion readiness measures gate review posture; firewall score measures discipline against breaking changes.')) + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Observability / command center', 'Observability / command center')) + '</strong><div class="ams-help">' + esc(T('Scale, registry freshness va signal quality sau release', 'Scale, registry freshness, and post-release signal quality')) + '</div></div></div></div><div style="margin-top:10px;font-size:28px;font-weight:700">' + esc((overview.schemaStudioObservabilityScore || operationsSummary.observabilityScore || 0) + '% / ' + (overview.schemaStudioCommandCenterScore || operationsSummary.commandCenterScore || 0) + '%') + '</div><div class="ams-help" style="margin-top:8px">' + esc(T('Observability tap trung vao tile scale/readability; command center score tong hop release + firewall + journeys + UX control.', 'Observability focuses on scale/readability tiles; command center score blends release, firewall, journeys, and UX control.')) + '</div></div></div><div class="ams-grid" style="margin-top:16px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Promotion board', 'Promotion board')) + '</strong><div class="ams-help">' + esc(T('Tuyen review mac dinh de dua schema tu workspace ra production', 'Default review route for moving schema from workspace to production')) + '</div></div></div></div><div style="margin-top:10px">' + (promotionItems.length ? promotionItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.label || item.key || '-') + '</strong> · ' + esc((item.score || 0) + '%') + ' · ' + esc(item.status || '') + ' · ' + esc(item.gate || item.nextAction || '') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co promotion board', 'No promotion board yet')) + '</div>') + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Firewall / focus decks', 'Firewall / focus decks')) + '</strong><div class="ams-help">' + esc(T('Gate destructive change va cac view review san co', 'Destructive-change gate and curated review decks')) + '</div></div></div></div><div style="margin-top:10px">' + '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(T('Lane', 'Lane')) + ':</strong> ' + esc(firewall.recommendedLane || firewall.approvalClass || 'standard') + ' · <strong>' + esc(T('Compat', 'Compat')) + ':</strong> ' + esc((firewall.compatibilityScore || schemaStudioSummary.compatibilityScore || 0) + '%') + ' · <strong>' + esc(T('Risk', 'Risk')) + ':</strong> ' + esc((firewall.riskScore || schemaStudioSummary.riskScore || 0) + '/100') + '</div>' + (focusDeckItems.length ? focusDeckItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.title || item.key || '-') + '</strong> · ' + esc((item.score || 0) + '%') + ' · ' + esc(item.focus || '') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co focus deck', 'No focus deck yet')) + '</div>') + '</div></div></div><div class="ams-grid" style="margin-top:16px"><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Branch topology / environments', 'Branch topology / environments')) + '</strong><div class="ams-help">' + esc(T('Branch van hanh va environment review duoc de xuat boi control plane', 'Operational branches and review environments proposed by the control plane')) + '</div></div></div></div><div style="margin-top:10px">' + (branchItems.length ? branchItems.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.label || item.key || '-') + '</strong> · ' + esc((item.score || 0) + '%') + ' · ' + esc(item.lane || '') + ' · ' + esc(item.focus || '') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co branch topology', 'No branch topology yet')) + '</div>') + (environmentItems.length ? '<div class="ams-help" style="margin-top:12px"><strong>' + esc(T('Environments', 'Environments')) + ':</strong><br>' + environmentItems.map(function(item){ return '• ' + esc((item.label || item.key || '-')) + ' · ' + esc((item.score || 0) + '%') + ' · ' + esc(item.status || ''); }).join('<br>') + '</div>' : '') + '</div></div><div class="ams-section"><div class="ams-item-title"><div><strong>' + esc(T('Observability / event rail', 'Observability / event rail')) + '</strong><div class="ams-help">' + esc(T('Tile scale/readability va timeline review', 'Scale/readability tiles and review timeline')) + '</div></div></div></div><div style="margin-top:10px">' + (observabilityTiles.length ? observabilityTiles.map(function(item){ return '<div class="ams-help" style="margin-bottom:8px"><strong>' + esc(item.label || item.key || '-') + '</strong> · ' + esc((item.score || 0) + '%') + ' · ' + esc(item.detail || '') + '</div>'; }).join('') : '<div class="ams-help">' + esc(T('Chua co observability tile', 'No observability tiles yet')) + '</div>') + (eventRailItems.length ? '<div class="ams-help" style="margin-top:12px"><strong>' + esc(T('Event rail', 'Event rail')) + ':</strong><br>' + eventRailItems.map(function(item){ return '• ' + esc(item.label || item.key || '-') + ' · ' + esc(item.status || '') + ' · ' + esc(item.detail || ''); }).join('<br>') + '</div>' : '') + '</div></div></div></article></section>' : ''),
     '<section class="ams-overview-grid">',
       '<article class="ams-benchmark">',
         '<h4>' + esc(T('Design pattern tham chieu', 'Referenced design patterns')) + '</h4>',
@@ -1364,3 +1459,200 @@ function render(container){
 window._renderAdminMetadataStudio = render;
 
 })();
+
+
+/* ── Admin Metadata Studio Round 6 Command Deck ───────────────────────── */
+(function(win){
+  'use strict';
+  if(!win || !win._renderAdminMetadataStudio) return;
+  if(win._renderAdminMetadataStudio.__round6Patched) return;
+
+  var state = { container:null, summary:null, loading:false, observer:null };
+
+  function arr(value){ return Array.isArray(value) ? value.filter(Boolean) : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){
+    var n = Number(value);
+    return isFinite(n) ? n : (fallback == null ? 0 : Number(fallback) || 0);
+  }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function tone(score){
+    score = num(score, 0);
+    return score >= 90 ? 'good' : (score >= 75 ? 'warning' : 'critical');
+  }
+  function api(action, payload, method){
+    if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', 30000);
+    if((method || 'GET') === 'GET'){
+      return fetch('api.php?action=' + encodeURIComponent(action), { credentials:'include' }).then(function(r){ return r.json(); });
+    }
+    return fetch('api.php?action=' + encodeURIComponent(action), {
+      method: method || 'POST',
+      credentials:'include',
+      headers:{ 'Content-Type':'application/json', 'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '') },
+      body: JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function ensureStyles(){
+    if(document.getElementById('admin-metadata-round6-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'admin-metadata-round6-styles';
+    style.textContent = [
+      '.ams-r6-shell{margin-top:18px;display:grid;gap:14px;}',
+      '.ams-r6-hero{position:relative;padding:20px;border-radius:24px;background:linear-gradient(135deg,rgba(9,11,24,.96),rgba(18,32,62,.90));border:1px solid rgba(96,165,250,.24);box-shadow:0 22px 54px rgba(2,6,23,.18);overflow:hidden;}',
+      '.ams-r6-hero:before,.ams-r6-hero:after{content:"";position:absolute;border-radius:999px;filter:blur(14px);opacity:.48;pointer-events:none;}',
+      '.ams-r6-hero:before{width:220px;height:220px;right:-50px;top:-80px;background:radial-gradient(circle,rgba(56,189,248,.34),transparent 68%);}',
+      '.ams-r6-hero:after{width:200px;height:200px;left:-50px;bottom:-90px;background:radial-gradient(circle,rgba(168,85,247,.26),transparent 72%);}',
+      '.ams-r6-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7dd3fc;font-weight:800;position:relative;z-index:1;}',
+      '.ams-r6-title{margin:8px 0 10px;font-size:26px;line-height:1.1;color:#fff;position:relative;z-index:1;}',
+      '.ams-r6-sub{font-size:12px;line-height:1.55;color:#cbd5e1;position:relative;z-index:1;}',
+      '.ams-r6-badges,.ams-r6-inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:relative;z-index:1;}',
+      '.ams-r6-badges{margin-top:14px;}',
+      '.ams-r6-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(148,163,184,.12);font-size:11px;font-weight:700;color:#dbeafe;}',
+      '.ams-r6-badge.tone-good{border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.10);color:#dcfce7;}',
+      '.ams-r6-badge.tone-warning{border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.10);color:#fef3c7;}',
+      '.ams-r6-badge.tone-critical{border-color:rgba(239,68,68,.28);background:rgba(239,68,68,.10);color:#fee2e2;}',
+      '.ams-r6-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}',
+      '.ams-r6-card{padding:16px;border-radius:22px;background:linear-gradient(180deg,rgba(15,23,42,.62),rgba(15,23,42,.46));border:1px solid rgba(148,163,184,.10);box-shadow:0 14px 34px rgba(2,6,23,.12);}',
+      '.ams-r6-card h4{margin:0 0 8px;font-size:15px;color:#fff;}',
+      '.ams-r6-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}',
+      '.ams-r6-item{padding:12px 14px;border-radius:16px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.30);display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}',
+      '.ams-r6-metrics{margin-top:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;position:relative;z-index:1;}',
+      '.ams-r6-metric{padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.56),rgba(15,23,42,.42));border:1px solid rgba(148,163,184,.10);}',
+      '.ams-r6-metric strong{display:block;font-size:24px;color:#fff;line-height:1;margin-top:6px;}',
+      '.ams-r6-metric.tone-good{border-color:rgba(34,197,94,.18);}',
+      '.ams-r6-metric.tone-warning{border-color:rgba(245,158,11,.18);}',
+      '.ams-r6-metric.tone-critical{border-color:rgba(239,68,68,.18);}',
+      '@media (max-width:1100px){.ams-r6-grid,.ams-r6-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}',
+      '@media (max-width:760px){.ams-r6-grid,.ams-r6-metrics{grid-template-columns:1fr;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+  function normalizeSummary(payload){
+    payload = payload && typeof payload === 'object' ? payload : {};
+    var overview = payload.overview || {};
+    var schemaStudio = payload.schemaStudio || {};
+    var report = schemaStudio.commandCenterReport || {};
+    if(!report.summary){
+      report = {
+        summary: {
+          orchestrationScore:num(overview.schemaStudioOrchestrationScore, 0),
+          narrativeCoverageScore:num(overview.schemaStudioNarrativeCoverage, 0),
+          reviewWallScore:num(overview.schemaStudioReviewWallScore, 0),
+          atlasReadinessScore:num(overview.schemaStudioAtlasReadiness, 0),
+          livePulseScore:num(overview.schemaStudioLivePulseScore, 0),
+          collaborationReadinessScore:num(overview.schemaStudioCollaborationReadiness, 0),
+          visualPolishScore:num(overview.schemaStudioVisualPolish, 0),
+          sceneCount:num(overview.schemaStudioSceneCount, 0),
+          spotlightCount:num(overview.schemaStudioSpotlightCount, 0),
+          reviewLaneCount:num(overview.schemaStudioReviewLaneCount, 0),
+          atlasCount:num(overview.schemaStudioAtlasCount, 0)
+        },
+        hero:{
+          headline:'Round 6 command deck',
+          subheadline:'Admin Metadata Studio now sees the same orchestration, narrative, atlas and live-pulse posture as Schema Studio.',
+          commandCenterScore:num(overview.schemaStudioCommandCenterScore, 0)
+        },
+        spotlight:[],
+        reviewWall:{ lanes:[] },
+        atlas:[],
+        livePulse:{ radar:[] }
+      };
+    }
+    return { overview:overview, report:report };
+  }
+  function metric(label, value, hint, toneKey){
+    return '<div class="ams-r6-metric tone-' + esc(toneKey || 'neutral') + '"><div class="ams-r6-sub">' + esc(label || '-') + '</div><strong>' + esc(value == null ? '-' : value) + '</strong><div class="ams-r6-sub">' + esc(hint || '') + '</div></div>';
+  }
+  function render(){
+    if(!state.container) return;
+    var root = state.container.querySelector('.ams');
+    if(!root) return;
+    var metrics = root.querySelector('.ams-metrics');
+    var existing = root.querySelector('.ams-r6-shell');
+    if(!metrics){
+      if(existing) existing.remove();
+      return;
+    }
+    if(!state.summary) return;
+    ensureStyles();
+    var data = normalizeSummary(state.summary);
+    var overview = data.overview;
+    var report = data.report;
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    var spotlight = arr(report.spotlight).slice(0, 4);
+    var lanes = arr(report.reviewWall && report.reviewWall.lanes).slice(0, 5);
+    var atlas = arr(report.atlas).slice(0, 4);
+    var radar = arr(report.livePulse && report.livePulse.radar).slice(0, 5);
+    if(!existing){
+      existing = document.createElement('section');
+      existing.className = 'ams-r6-shell';
+      metrics.insertAdjacentElement('afterend', existing);
+    }
+    existing.innerHTML = [
+      '<section class="ams-r6-hero">',
+        '<div class="ams-r6-kicker">Round 6 command deck</div>',
+        '<div class="ams-r6-title">' + esc(hero.headline || 'Executive command deck for schema + metadata') + '</div>',
+        '<div class="ams-r6-sub">' + esc(hero.subheadline || 'Metadata governance now receives a presentation-grade lens across orchestration, narrative, review wall and live pulse.') + '</div>',
+        '<div class="ams-r6-badges">',
+          '<span class="ams-r6-badge tone-' + esc(tone(overview.schemaStudioCommandCenterScore || hero.commandCenterScore || 0)) + '">Command center: ' + esc(num(overview.schemaStudioCommandCenterScore || hero.commandCenterScore, 0) + '%') + '</span>',
+          '<span class="ams-r6-badge tone-' + esc(tone(summary.orchestrationScore || overview.schemaStudioOrchestrationScore || 0)) + '">Orchestration: ' + esc(num(summary.orchestrationScore || overview.schemaStudioOrchestrationScore, 0) + '%') + '</span>',
+          '<span class="ams-r6-badge tone-' + esc(tone(summary.visualPolishScore || overview.schemaStudioVisualPolish || 0)) + '">Visual polish: ' + esc(num(summary.visualPolishScore || overview.schemaStudioVisualPolish, 0) + '%') + '</span>',
+          '<span class="ams-r6-badge">Scenes: ' + esc(num(summary.sceneCount || overview.schemaStudioSceneCount, 0)) + '</span>',
+          '<span class="ams-r6-badge">Spotlights: ' + esc(num(summary.spotlightCount || overview.schemaStudioSpotlightCount, 0)) + '</span>',
+        '</div>',
+        '<div class="ams-r6-metrics">',
+          metric('Narrative coverage', num(summary.narrativeCoverageScore || overview.schemaStudioNarrativeCoverage, 0) + '%', 'Storyboards and journeys remain coherent', tone(summary.narrativeCoverageScore || overview.schemaStudioNarrativeCoverage)),
+          metric('Review wall', num(summary.reviewWallScore || overview.schemaStudioReviewWallScore, 0) + '%', 'Promotion lanes and evidence stay visible', tone(summary.reviewWallScore || overview.schemaStudioReviewWallScore)),
+          metric('Atlas readiness', num(summary.atlasReadinessScore || overview.schemaStudioAtlasReadiness, 0) + '%', 'Domain, layer and dependency maps stay complete', tone(summary.atlasReadinessScore || overview.schemaStudioAtlasReadiness)),
+          metric('Live pulse', num(summary.livePulseScore || overview.schemaStudioLivePulseScore, 0) + '%', 'Release radar and observability stay visible', tone(summary.livePulseScore || overview.schemaStudioLivePulseScore)),
+        '</div>',
+      '</section>',
+      '<div class="ams-r6-grid">',
+        '<article class="ams-r6-card"><h4>Spotlight rails</h4><div class="ams-r6-sub">Focused decks and personas worth surfacing to admins and architects.</div><div class="ams-r6-list">' + (spotlight.length ? spotlight.map(function(item){ return '<div class="ams-r6-item"><div><strong>' + esc(item.title || item.key || '-') + '</strong><div class="ams-r6-sub">' + esc(item.subtitle || '') + '</div></div><div class="ams-r6-inline"><span class="ams-r6-badge tone-' + esc(item.tone || tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r6-sub">Use the command center report to surface spotlight rails here.</div>') + '</div></article>',
+        '<article class="ams-r6-card"><h4>Review wall</h4><div class="ams-r6-sub">Promotion lanes and mandatory evidence items synced from the release control plane.</div><div class="ams-r6-list">' + (lanes.length ? lanes.map(function(item){ return '<div class="ams-r6-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r6-sub">' + esc(item.gate || item.nextAction || '') + '</div></div><div class="ams-r6-inline"><span class="ams-r6-badge tone-' + esc(tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r6-sub">Review wall metrics are available once the round 6 artifact is regenerated.</div>') + '</div></article>',
+        '<article class="ams-r6-card"><h4>Atlas packs</h4><div class="ams-r6-sub">Cross-check domain/layer/journey/dependency coverage directly from metadata control plane.</div><div class="ams-r6-list">' + (atlas.length ? atlas.map(function(group){ return '<div class="ams-r6-item"><div><strong>' + esc(group.label || group.key || '-') + '</strong><div class="ams-r6-sub">' + esc(num(group.count, 0) + ' mapped lenses') + '</div></div><div class="ams-r6-inline"><span class="ams-r6-badge">' + esc(arr(group.items).length) + ' items</span></div></div>'; }).join('') : '<div class="ams-r6-sub">Atlas packs will appear after the command center report is present.</div>') + '</div></article>',
+        '<article class="ams-r6-card"><h4>Live pulse</h4><div class="ams-r6-sub">Watch the same release radar and observability signals without leaving metadata studio.</div><div class="ams-r6-list">' + (radar.length ? radar.map(function(item){ return '<div class="ams-r6-item"><div><strong>' + esc(item.label || '-') + '</strong><div class="ams-r6-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r6-inline"><span class="ams-r6-badge tone-' + esc(tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r6-sub">Live pulse tiles are waiting for the regenerated round 6 artifact.</div>') + '</div></article>',
+      '</div>'
+    ].join('');
+  }
+  function fetchSummary(force){
+    if(state.loading && !force) return Promise.resolve(state.summary || null);
+    state.loading = true;
+    return api('admin_metadata_studio_summary', {}, 'GET').then(function(payload){
+      state.loading = false;
+      state.summary = payload || null;
+      render();
+      return state.summary;
+    }).catch(function(){
+      state.loading = false;
+      render();
+      return state.summary || null;
+    });
+  }
+  function attach(container){
+    state.container = container;
+    if(state.observer){ state.observer.disconnect(); state.observer = null; }
+    if(container && typeof MutationObserver !== 'undefined'){
+      state.observer = new MutationObserver(function(){ render(); });
+      state.observer.observe(container, { childList:true, subtree:true });
+    }
+    render();
+    fetchSummary(false);
+  }
+
+  var original = win._renderAdminMetadataStudio;
+  win._renderAdminMetadataStudio = function(container){
+    var result = original ? original.apply(this, arguments) : undefined;
+    attach(container);
+    return result;
+  };
+  win._renderAdminMetadataStudio.__round6Patched = true;
+})(window);

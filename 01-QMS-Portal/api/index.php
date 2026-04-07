@@ -575,6 +575,13 @@ $router->actions([
     'schema_studio_apply_migration' => [SchemaStudioController::class, 'applyMigration'],
     'schema_studio_table_preview'   => [SchemaStudioController::class, 'previewTableData'],
     'schema_studio_table_row_save'  => [SchemaStudioController::class, 'saveTableRow'],
+    'schema_studio_list_releases'   => [SchemaStudioController::class, 'listReleaseBundles'],
+    'schema_studio_compile_registry'=> [SchemaStudioController::class, 'compileRegistryBundle'],
+    'schema_studio_release_bundle'  => [SchemaStudioController::class, 'createReleaseBundle'],
+    'schema_studio_diagnose'        => [SchemaStudioController::class, 'diagnoseSchema'],
+    'schema_studio_operations_report'=> [SchemaStudioController::class, 'getOperationsReport'],
+    'schema_studio_command_center_report'=> [SchemaStudioController::class, 'getCommandCenterReport'],
+    'schema_studio_round6_report'   => [SchemaStudioController::class, 'getRound6Report'],
     'schema_studio_export'          => [SchemaStudioController::class, 'export'],
 ]);
 
