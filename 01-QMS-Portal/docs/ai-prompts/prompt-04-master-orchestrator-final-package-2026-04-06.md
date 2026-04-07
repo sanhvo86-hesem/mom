@@ -1,10 +1,10 @@
 # Prompt 04 Master Orchestrator Final Package
 
 Generated at: `2026-04-06T20:54:25+07:00`
-Updated at: `2026-04-07T13:15:00+07:00`
+Updated at: `2026-04-07T14:30:00+07:00`
 Prompt: `04-master-orchestrator-prompt.md`
 Scope: Program-level reconciliation for canonical ERP + MES + eQMS backend
-Current status: **Updated after Prompt 02→06 implementation and re-audit cycles**
+Current status: **Updated after Prompt 02→09 implementation, re-audit, and runtime assurance cycles**
 
 ## Section 1: Current Program State
 
@@ -18,6 +18,9 @@ Current status: **Updated after Prompt 02→06 implementation and re-audit cycle
 | Prompt 04 | `NO-GO` | **Updated to reflect achieved state** |
 | Prompt 05 | N/A | **PASS** — repo truth reconciliation completed |
 | Prompt 06 | N/A | **PASS** — 533/533 entities ready, publishability achieved |
+| Prompt 07 | N/A | **PASS** — global publishability truth, platform-global scope |
+| Prompt 08 | N/A | **PASS** — public-repo truth convergence, compact proof artifacts |
+| Prompt 09 | N/A | **PASS** — runtime assurance suite 67/67, behavioral proof |
 
 ### Program posture: `READY FOR LIMITED FRONTEND ON P0+ MODULES`
 
@@ -45,20 +48,20 @@ The platform has moved from `split-path / NO-GO` to a state where:
 ### Live Metrics Reconciliation Block (2026-04-07)
 
 ```yaml
-normalized_at: 2026-04-07T13:15:00+07:00
+normalized_at: 2026-04-07T14:30:00+07:00
 sources:
   registry_quality_report:
     file: qms-data/registry/registry-quality-report.json
-    generated_at: 2026-04-07T06:09:25.585Z
-    publication_run_id: bc410f68-84c7-44a2-804e-c6c231c7eddc
+    generated_at: 2026-04-07T06:39:57.220Z
+    publication_run_id: d82174e7-dc63-4d79-b8c6-fc2a8876eefb
   frontend_foundation_catalog:
     file: qms-data/registry/frontend-foundation-catalog.json
-    generated_at: 2026-04-07T06:09:25.585Z
-    publication_run_id: bc410f68-84c7-44a2-804e-c6c231c7eddc
+    generated_at: 2026-04-07T06:39:57.220Z
+    publication_run_id: d82174e7-dc63-4d79-b8c6-fc2a8876eefb
   registry_manifest:
     file: qms-data/registry/registry-manifest.json
-    generated_at: 2026-04-07T06:09:25.585Z
-    publication_run_id: bc410f68-84c7-44a2-804e-c6c231c7eddc
+    generated_at: 2026-04-07T06:39:57.220Z
+    publication_run_id: d82174e7-dc63-4d79-b8c6-fc2a8876eefb
   openapi:
     file: api/openapi.yaml
     version: "3.1.2"
@@ -73,8 +76,13 @@ sources:
   truth_verifier:
     file: tools/registry/verify_publication_truth.py
     result: 24/24 PASS
+  runtime_assurance:
+    file: tests/runtime_assurance_suite.php
+    result: 67/67 PASS
+    report: _reports/runtime-assurance/runtime-assurance-report.json
 metrics:
   publishability_ready: true
+  publication_scope: platform_global
   workflow_engine_bridge_ready: 116
   workflow_engine_bridge_blocked: 0
   frontend_ready_entities: 533
@@ -84,7 +92,7 @@ metrics:
   workflow_ready_entities: 223
   endpoint_count: 2862
   openapi_version: "3.1.2"
-  source_commit: 6fa9be8f
+  source_commit: ca510ac6
 ```
 
 ### Comparison: Original vs Current
@@ -100,7 +108,9 @@ metrics:
 | `orphan_tables` | 45 | **0** (for slice) | Closed |
 | OpenAPI version | 3.1.0 | **3.1.2** | Upgraded |
 | Smoke checks | 0 | **114** | +114 |
+| Runtime assurance | None | **67/67** | New |
 | Benchmark FG | None | **~700 TPS** | New |
+| Publication scope | slice | **platform_global** | Elevated |
 
 ## Section 2: Evidence Matrix (Updated)
 
@@ -142,9 +152,19 @@ metrics:
 - Wave-gap ledger: `qms-data/registry/wave-gap-ledger.json`
 
 #### Tests and proof
-- `tests/foundation_governance_contract_smoke.php` — 114 checks
+- `tests/foundation_governance_contract_smoke.php` — 114 checks (publication truth, metadata, behavioral)
+- `tests/runtime_assurance_suite.php` — 67 checks across 6 workstreams:
+  - A: E2E contract proof (transitions, cursor, ETag) — 9/9
+  - B: Write-side truth (concurrency guards, INSERT...RETURNING) — 9/9
+  - C: Workflow authority (self-approval, engine fatality, bridge) — 8/8
+  - D: Audit/signature/record-link (hash chain, Part 11 schema) — 10/10
+  - E: Observability (trace context, 5 log types, enrichment) — 11/11
+  - G: Frontend execution (metadata, capabilities, packs, OpenAPI) — 20/20
+- `tools/registry/verify_publication_truth.py` — 24 publication truth gates
 - Benchmark: FG stability_probe completed (~700 TPS, 2.9ms avg)
 - Observability: file_export_only (honest)
+- Publication proof: `_reports/publication-proof-latest.json` (5/5 invariants PASS)
+- Runtime assurance report: `_reports/runtime-assurance/runtime-assurance-report.json`
 
 ### 10 Public Routes
 
@@ -258,13 +278,31 @@ The platform has achieved global publishability. The Foundation Governance Contr
 4. **Screen contract catalog** at `docs/ai-prompts/prompt-03-screen-and-field-definition-catalog-2026-04-07.md`
 5. **Priority wave plan** at `docs/ai-prompts/prompt-03-priority-waves-and-frontend-readiness-plan-2026-04-07.md`
 
-### Publication truth guarantees:
+### Publication and runtime truth guarantees:
 
-- All artifacts share single `publication_run_id`
-- Truth verifier validates 24 consistency checks
-- Smoke suite validates 114 behavioral checks
-- No split truth, no false-green metadata
+- All artifacts share single `publication_run_id` (`d82174e7-dc63-4d79-b8c6-fc2a8876eefb`)
+- Publication scope: `platform_global`
+- Truth verifier validates 24 consistency checks — ALL PASS
+- Smoke suite validates 114 behavioral checks — ALL PASS
+- Runtime assurance suite validates 67 behavioral checks across 6 workstreams — ALL PASS
+- Compact truth summary: `qms-data/registry/publication-truth-summary.md` (GitHub-renderable)
+- Prompt lineage index: `docs/ai-prompts/prompt-lineage-index-2026-04-07.json` (8 prompts)
+- No split truth, no false-green metadata, no ghost artifacts
+
+## Section 9: Verification Summary
+
+| Test Suite | Checks | Result |
+|-----------|--------|--------|
+| Publication truth verifier | 24 | **24/24 PASS** |
+| Foundation governance smoke | 114 | **114/114 PASS** |
+| Runtime assurance suite | 67 | **67/67 PASS** |
+| Orchestrator invariants | 5 | **5/5 PASS** |
+| **Total** | **210** | **210/210 PASS** |
 
 ## Final Package Status
 
 **GO WITH CONDITIONS** — Frontend generation approved. Platform is publishable.
+
+Prompt chain: 01 → 02 (×7) → 03 → 04 → 05 → 06 → 07 → 08 → 09
+Total implementation passes: 15+
+Total verification checks: 210/210 PASS
