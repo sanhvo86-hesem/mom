@@ -1,12 +1,12 @@
 {
-    "release_candidate_run_id": "4c1d9d72d905bde3",
-    "generatedAt": "2026-04-07T09:05:19+00:00",
-    "server_url": "http:\/\/localhost:8080",
-    "server_reachable": false,
-    "total": 27,
-    "passed": 23,
+    "release_candidate_run_id": "2e2e1882685de737",
+    "generatedAt": "2026-04-07T09:07:38+00:00",
+    "server_url": "http:\/\/127.0.0.1:8080\/api\/index.php",
+    "server_reachable": true,
+    "total": 29,
+    "passed": 29,
     "failed": 0,
-    "skipped": 4,
+    "skipped": 0,
     "results": [
         {
             "name": "Route in OpenAPI: GET \/api\/v1\/foundation\/organizations",
@@ -89,24 +89,34 @@
             "detail": ""
         },
         {
-            "name": "Live HTTP foundation routes",
-            "status": "SKIP",
-            "detail": "Server not reachable"
+            "name": "GET \/api\/v1\/foundation\/organizations returns 200 or 401",
+            "status": "PASS",
+            "detail": ""
         },
         {
-            "name": "Live HTTP governance routes",
-            "status": "SKIP",
-            "detail": "Server not reachable"
+            "name": "GET \/api\/v1\/foundation\/parties returns 200 or 401",
+            "status": "PASS",
+            "detail": ""
         },
         {
-            "name": "Live HTTP auth enforcement",
-            "status": "SKIP",
-            "detail": "Server not reachable"
+            "name": "GET \/api\/v1\/foundation\/calendars returns 200 or 401",
+            "status": "PASS",
+            "detail": ""
         },
         {
-            "name": "Live HTTP malformed request",
-            "status": "SKIP",
-            "detail": "Server not reachable"
+            "name": "GET \/approval-groups returns 200 or 401",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "name": "POST without auth\/CSRF returns 401 or 403",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "name": "Malformed decide returns 4xx",
+            "status": "PASS",
+            "detail": ""
         },
         {
             "name": "approval_group entity exists",
