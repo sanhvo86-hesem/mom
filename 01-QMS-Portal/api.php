@@ -12845,47 +12845,25 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
     throw new RuntimeException('not_a_git_repo');
   }
 
-  // Auto-clean runtime noise before safety checks so Pull can run without
-  // manual cleanup in cPanel Terminal.
+  // Auto-clean runtime noise so pull can run without manual cleanup.
   git_cleanup_runtime_noise($repoReal);
-
-  $stagedCode = 0;
-  $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
-  if ($stagedCode !== 0) {
-    throw new RuntimeException('git_index_check_failed');
-  }
-  $stagedFiles = split_nonempty_lines($stagedOut);
-  $stagedMeaningful = git_filter_non_runtime_paths($stagedFiles, true);
-  if (!empty($stagedMeaningful)) {
-    throw new RuntimeException('staged_changes_present: ' . git_join_paths_for_error($stagedMeaningful));
-  }
-
-  $statusCode = 0;
-  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
-  if ($statusCode !== 0) {
-    throw new RuntimeException('git_status_failed');
-  }
-  $dirtyLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut), true);
-  if (!empty($dirtyLines)) {
-    $dirtyPaths = git_collect_paths_from_status_lines($dirtyLines);
-    throw new RuntimeException('working_tree_dirty: ' . git_join_paths_for_error($dirtyPaths));
-  }
 
   $branchCode = 0;
   $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
   if ($branchCode !== 0 || $branch === '') $branch = 'main';
   $headBefore = git_head_commit($repoReal);
 
+  // Fetch remote state.
   $fetchCode = 0;
   $fetchOut = git_command(['fetch', 'origin', $branch], $repoReal, $fetchCode);
   if ($fetchCode !== 0) {
     throw new RuntimeException('git_fetch_failed' . ($fetchOut !== '' ? ': ' . $fetchOut : ''));
   }
 
-  $behindCode = 0;
-  $behindOut = git_command(['rev-list', '--count', $branch . '..origin/' . $branch], $repoReal, $behindCode);
-  $behindCount = $behindCode === 0 ? (int)trim($behindOut) : 0;
-  if ($behindCount <= 0) {
+  // Check if remote has new commits (compare local HEAD vs origin).
+  $localHead = trim((string)git_command(['rev-parse', $branch], $repoReal, $code));
+  $remoteHead = trim((string)git_command(['rev-parse', 'origin/' . $branch], $repoReal, $code));
+  if ($localHead === $remoteHead) {
     return [
       'pulled' => false,
       'branch' => $branch,
@@ -12899,11 +12877,17 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
     ];
   }
 
-  $pullCode = 0;
-  $pullOut = git_command(['pull', '--ff-only', 'origin', $branch], $repoReal, $pullCode);
-  if ($pullCode !== 0) {
+  // Force-reset local branch to match remote — works regardless of dirty
+  // working tree, staged changes, or diverged branches (same behaviour as
+  // cPanel Git Version Control "Update from Remote").
+  $resetCode = 0;
+  $pullOut = git_command(['reset', '--hard', 'origin/' . $branch], $repoReal, $resetCode);
+  if ($resetCode !== 0) {
     throw new RuntimeException('git_pull_failed' . ($pullOut !== '' ? ': ' . $pullOut : ''));
   }
+
+  // Clean leftover untracked files that are no longer in the remote tree.
+  git_command(['clean', '-fd'], $repoReal, $cleanCode);
 
   $headAfter = git_head_commit($repoReal);
   $changedFiles = [];
