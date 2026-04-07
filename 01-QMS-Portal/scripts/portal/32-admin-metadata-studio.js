@@ -1656,3 +1656,199 @@ window._renderAdminMetadataStudio = render;
   };
   win._renderAdminMetadataStudio.__round6Patched = true;
 })(window);
+
+
+/* ── Admin Metadata Studio Round 7 Atlas Mesh ────────────────────────── */
+(function(win){
+  'use strict';
+  if(!win || !win._renderAdminMetadataStudio) return;
+  if(win._renderAdminMetadataStudio.__round7Patched) return;
+
+  var state = { container:null, summary:null, loading:false, observer:null };
+
+  function arr(value){ return Array.isArray(value) ? value.filter(Boolean) : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){
+    var n = Number(value);
+    return isFinite(n) ? n : (fallback == null ? 0 : Number(fallback) || 0);
+  }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function tone(score){
+    score = num(score, 0);
+    return score >= 90 ? 'good' : (score >= 75 ? 'warning' : 'critical');
+  }
+  function api(action, payload, method){
+    if(typeof window.apiCall === 'function') return window.apiCall(action, payload || {}, method || 'GET', 30000);
+    return fetch('api.php?action=' + encodeURIComponent(action), {
+      method: method || 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '')
+      },
+      body: (method || 'GET').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function metric(label, value, hint, toneKey){
+    return '<div class="ams-r7-metric tone-' + esc(toneKey || 'neutral') + '"><div class="ams-r7-sub">' + esc(label || '-') + '</div><strong>' + esc(value == null ? '-' : value) + '</strong><div class="ams-r7-sub">' + esc(hint || '') + '</div></div>';
+  }
+  function normalize(payload){
+    payload = payload && typeof payload === 'object' ? payload : {};
+    var overview = payload.overview || {};
+    var schemaStudio = payload.schemaStudio || {};
+    var report = schemaStudio.round7Report || {};
+    if(!report.summary){
+      report = {
+        summary: {
+          atlasMeshScore:num(overview.schemaStudioAtlasMeshScore, 0),
+          physicalCoverageScore:num(overview.schemaStudioPhysicalCoverage, 0),
+          reviewOpsScore:num(overview.schemaStudioReviewOpsScore, 0),
+          exportSurfaceScore:num(overview.schemaStudioExportSurfaceScore, 0),
+          interoperabilityScore:num(overview.schemaStudioInteroperabilityScore, 0),
+          roleModeScore:num(overview.schemaStudioRoleModeScore, 0),
+          traceabilityAtlasScore:num(overview.schemaStudioTraceabilityAtlasScore, 0),
+          beautySystemScore:num(overview.schemaStudioBeautySystemScore, 0),
+          objectSurfaceCount:num(overview.schemaStudioObjectSurfaceCount, 0),
+          roleModeCount:num(overview.schemaStudioRoleModeCount, 0),
+          reviewBoardCount:num(overview.schemaStudioReviewBoardCount, 0),
+          exportBundleCount:num(overview.schemaStudioExportBundleCount, 0)
+        },
+        hero:{
+          headline:'Round 7 atlas mesh',
+          subheadline:'Admin metadata now sees the same physical coverage, review boards, export surfaces, role modes and traceability atlas posture as Schema Studio.'
+        },
+        atlas:{ objectSurfaces:[], capabilityBands:[] },
+        reviewBoards:[],
+        exports:[],
+        roleModes:[],
+        interoperability:[],
+        traceabilityAtlas:[],
+        beautySystem:{ ambiences:[], densities:[], sceneFamilies:[] }
+      };
+    }
+    return { overview:overview, report:report };
+  }
+  function ensureStyles(){
+    if(document.getElementById('ams-r7-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'ams-r7-styles';
+    style.textContent = [
+      '.ams-r7-shell{display:grid;gap:14px;margin-top:16px;}',
+      '.ams-r7-hero,.ams-r7-card{border:1px solid rgba(117,139,255,.16);background:linear-gradient(180deg,rgba(13,20,36,.96),rgba(12,21,42,.9));box-shadow:0 18px 42px rgba(3,9,24,.28);border-radius:24px;padding:18px;color:#eaf2ff;}',
+      '.ams-r7-title{font-size:24px;font-weight:800;line-height:1.2;}',
+      '.ams-r7-sub{color:#93a3c7;font-size:12px;letter-spacing:.01em;line-height:1.45;}',
+      '.ams-r7-kicker{color:#93a3c7;font-size:12px;text-transform:uppercase;letter-spacing:.08em;}',
+      '.ams-r7-badges,.ams-r7-grid,.ams-r7-inline,.ams-r7-chip-wrap,.ams-r7-metrics{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.ams-r7-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}',
+      '.ams-r7-badge,.ams-r7-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:12px;font-weight:700;color:#f5f8ff;}',
+      '.ams-r7-badge.tone-good{background:rgba(31,197,123,.16);border-color:rgba(31,197,123,.26);}',
+      '.ams-r7-badge.tone-warning{background:rgba(255,191,71,.16);border-color:rgba(255,191,71,.26);}',
+      '.ams-r7-badge.tone-critical{background:rgba(255,92,117,.16);border-color:rgba(255,92,117,.28);}',
+      '.ams-r7-chip{font-weight:600;color:#d9e4ff;background:rgba(60,86,155,.16);}',
+      '.ams-r7-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px;}',
+      '.ams-r7-metric{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);display:grid;gap:6px;min-height:102px;}',
+      '.ams-r7-metric strong{font-size:28px;line-height:1;}',
+      '.ams-r7-metric.tone-good{background:linear-gradient(180deg,rgba(25,84,55,.26),rgba(15,25,48,.68));}',
+      '.ams-r7-metric.tone-warning{background:linear-gradient(180deg,rgba(109,78,21,.24),rgba(15,25,48,.68));}',
+      '.ams-r7-metric.tone-critical{background:linear-gradient(180deg,rgba(116,37,49,.26),rgba(15,25,48,.68));}',
+      '.ams-r7-list{display:grid;gap:10px;}',
+      '.ams-r7-item{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);}',
+      '@media (max-width:1100px){.ams-r7-grid,.ams-r7-metrics{grid-template-columns:1fr;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+  function render(){
+    if(!state.container) return;
+    var root = state.container.querySelector('.ams');
+    if(!root) return;
+    var metrics = root.querySelector('.ams-metrics');
+    if(!metrics) return;
+    if(!state.summary) return;
+    ensureStyles();
+    var data = normalize(state.summary);
+    var report = data.report;
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    var surfaces = arr(report.atlas && report.atlas.objectSurfaces).slice(0, 6);
+    var boards = arr(report.reviewBoards).slice(0, 4);
+    var modes = arr(report.roleModes).slice(0, 4);
+    var exports = arr(report.exports).slice(0, 4);
+    var interop = arr(report.interoperability).slice(0, 4);
+    var trace = arr(report.traceabilityAtlas).slice(0, 4);
+    var beauty = report.beautySystem || {};
+    var existing = root.querySelector('.ams-r7-shell');
+    if(!existing){
+      existing = document.createElement('section');
+      existing.className = 'ams-r7-shell';
+      var anchor = root.querySelector('.ams-r6-shell') || metrics;
+      anchor.insertAdjacentElement('afterend', existing);
+    }
+    existing.innerHTML = [
+      '<section class="ams-r7-hero">',
+        '<div class="ams-r7-kicker">Round 7 atlas mesh</div>',
+        '<div class="ams-r7-title">' + esc(hero.headline || 'Physical coverage and traceability atlas for admins') + '</div>',
+        '<div class="ams-r7-sub">' + esc(hero.subheadline || 'Metadata admins now see the same world-class control-plane posture as schema architects.') + '</div>',
+        '<div class="ams-r7-badges">',
+          '<span class="ams-r7-badge tone-' + esc(tone(summary.atlasMeshScore)) + '">Atlas mesh: ' + esc(num(summary.atlasMeshScore, 0) + '%') + '</span>',
+          '<span class="ams-r7-badge tone-' + esc(tone(summary.physicalCoverageScore)) + '">Physical: ' + esc(num(summary.physicalCoverageScore, 0) + '%') + '</span>',
+          '<span class="ams-r7-badge tone-' + esc(tone(summary.reviewOpsScore)) + '">Review ops: ' + esc(num(summary.reviewOpsScore, 0) + '%') + '</span>',
+          '<span class="ams-r7-badge tone-' + esc(tone(summary.exportSurfaceScore)) + '">Export surface: ' + esc(num(summary.exportSurfaceScore, 0) + '%') + '</span>',
+          '<span class="ams-r7-badge">Surfaces: ' + esc(num(summary.objectSurfaceCount, 0)) + '</span>',
+          '<span class="ams-r7-badge">Boards: ' + esc(num(summary.reviewBoardCount, 0)) + '</span>',
+          '<span class="ams-r7-badge">Role modes: ' + esc(num(summary.roleModeCount, 0)) + '</span>',
+        '</div>',
+        '<div class="ams-r7-metrics">',
+          metric('Interoperability', num(summary.interoperabilityScore, 0) + '%', 'Registry, API, workflow and builder propagation', tone(summary.interoperabilityScore)),
+          metric('Role modes', num(summary.roleModeScore, 0) + '%', 'Persona-aware control-plane views', tone(summary.roleModeScore)),
+          metric('Traceability atlas', num(summary.traceabilityAtlasScore, 0) + '%', 'Genealogy, quality and dispatch scenario maps', tone(summary.traceabilityAtlasScore)),
+          metric('Beauty system', num(summary.beautySystemScore, 0) + '%', 'Ambience, density and storyboard system', tone(summary.beautySystemScore)),
+        '</div>',
+      '</section>',
+      '<div class="ams-r7-grid">',
+        '<article class="ams-r7-card"><h4>Object surfaces</h4><div class="ams-r7-sub">Physical modeling posture visible to metadata governance.</div><div class="ams-r7-list">' + (surfaces.length ? surfaces.map(function(item){ return '<div class="ams-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r7-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r7-inline"><span class="ams-r7-badge tone-' + esc(item.tone || tone(item.readinessScore)) + '">' + esc(num(item.readinessScore, 0) + '%') + '</span><span class="ams-r7-badge">' + esc(num(item.count, 0)) + '</span></div></div>'; }).join('') : '<div class="ams-r7-sub">No object surface data yet.</div>') + '</div></article>',
+        '<article class="ams-r7-card"><h4>Review boards</h4><div class="ams-r7-sub">Approval matrices and evidence lanes synced from Schema Studio.</div><div class="ams-r7-list">' + (boards.length ? boards.map(function(item){ return '<div class="ams-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r7-sub">' + esc(item.owner || '') + ' → ' + esc(item.approver || '') + '</div></div><div class="ams-r7-inline"><span class="ams-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r7-sub">Review boards will appear once the round 7 artifact is regenerated.</div>') + '</div></article>',
+        '<article class="ams-r7-card"><h4>Exports & interoperability</h4><div class="ams-r7-sub">Governed export bundles and propagation tracks.</div><div class="ams-r7-list">' + (exports.length ? exports.map(function(item){ return '<div class="ams-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r7-sub">' + esc(item.format || '') + ' · ' + esc(item.purpose || '') + '</div></div><div class="ams-r7-inline"><span class="ams-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(item.status || '-') + '</span></div></div>'; }).join('') : '<div class="ams-r7-sub">No export bundles yet.</div>') + (interop.length ? interop.map(function(item){ return '<div class="ams-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r7-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r7-inline"><span class="ams-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '') + '</div></article>',
+        '<article class="ams-r7-card"><h4>Role modes, beauty & traceability</h4><div class="ams-r7-sub">Persona rails and premium visual system now visible from metadata control plane.</div><div class="ams-r7-chip-wrap">' + (modes.length ? modes.map(function(item){ return '<span class="ams-r7-chip">' + esc(item.label || item.key || '-') + ' · ' + esc(num(item.score, 0) + '%') + '</span>'; }).join('') : '<span class="ams-r7-sub">No role modes yet.</span>') + '</div><div class="ams-r7-chip-wrap">' + arr(beauty.ambiences).map(function(item){ return '<span class="ams-r7-chip">🌌 ' + esc(item.label || item.key || '-') + '</span>'; }).join('') + '</div><div class="ams-r7-chip-wrap">' + arr(beauty.densities).map(function(item){ return '<span class="ams-r7-chip">▥ ' + esc(item.label || item.key || '-') + '</span>'; }).join('') + '</div><div class="ams-r7-list">' + (trace.length ? trace.map(function(item){ return '<div class="ams-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r7-sub">' + esc(arr(item.domains).join(' · ')) + '</div></div><div class="ams-r7-inline"><span class="ams-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r7-sub">Traceability atlas not available yet.</div>') + '</div></article>',
+      '</div>'
+    ].join('');
+  }
+  function fetchSummary(force){
+    if(state.loading && !force) return Promise.resolve(state.summary || null);
+    state.loading = true;
+    return api('admin_metadata_studio_summary', {}, 'GET').then(function(payload){
+      state.loading = false;
+      state.summary = payload || null;
+      render();
+      return state.summary;
+    }).catch(function(){
+      state.loading = false;
+      render();
+      return state.summary || null;
+    });
+  }
+  function attach(container){
+    state.container = container;
+    if(state.observer){ state.observer.disconnect(); state.observer = null; }
+    if(container && typeof MutationObserver !== 'undefined'){
+      state.observer = new MutationObserver(function(){ render(); });
+      state.observer.observe(container, { childList:true, subtree:true });
+    }
+    render();
+    fetchSummary(false);
+  }
+
+  var original = win._renderAdminMetadataStudio;
+  win._renderAdminMetadataStudio = function(container){
+    var result = original ? original.apply(this, arguments) : undefined;
+    attach(container);
+    return result;
+  };
+  win._renderAdminMetadataStudio.__round7Patched = true;
+})(window);

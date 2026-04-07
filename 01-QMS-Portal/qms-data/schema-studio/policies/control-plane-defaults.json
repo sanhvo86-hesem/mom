@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T11:38:08Z",
+    "generatedAt": "2026-04-07T14:16:00Z",
     "source": "schema_studio_control_plane_defaults",
-    "profile": "worldclass_round6"
+    "profile": "worldclass_round7"
   },
   "visual": {
     "defaultTab": "operations",
@@ -16,7 +16,12 @@
       "focus_executive_release_orbit",
       "scene_executive_release_radar",
       "scene_journey_production_dispatch",
-      "journey_traceability_genealogy"
+      "journey_traceability_genealogy",
+      "atlas_mesh",
+      "review_graph",
+      "export_surface",
+      "role_mode_architect",
+      "traceability_atlas"
     ]
   },
   "thresholds": {
@@ -212,7 +217,12 @@
     "Assign owner, steward and approver metadata across all operational domains.",
     "Bind workflow contracts to order, inspection, CAPA, document/training and equipment flows.",
     "Use storyboards as saved review views for architecture board, manufacturing leaders and compliance auditors.",
-    "Treat hotspot tables as platform hubs and harden their metadata, policies and view presets first."
+    "Treat hotspot tables as platform hubs and harden their metadata, policies and view presets first.",
+    "Model PostgreSQL-native objects as first-class surfaces: views, materialized views, functions, procedures, event triggers, schemas, and roles.",
+    "Use the atlas mesh to balance physical coverage with governance boards, export surfaces, and traceability views.",
+    "Make workspace default to a seeded canonical design so reports never render empty in first-run environments.",
+    "Treat export bundles as governance artifacts: DBML, Mermaid, PlantUML, manifest, typed diff, SQL plan, and release notes must stay aligned.",
+    "Review changes through role-aware modes so architects, quality managers, compliance leads, and builders read the same source of truth differently."
   ],
   "operationsModes": {
     "tabs": [
@@ -349,9 +359,43 @@
   "commandDeck": {
     "defaultScene": "executive_release_radar",
     "spotlightLimit": 6,
-    "sceneLimit": 8,
-    "atlasLimit": 4,
-    "reviewLaneLimit": 6,
-    "pulseRadarLimit": 6
+    "sceneLimit": 10,
+    "atlasLimit": 6,
+    "reviewLaneLimit": 8,
+    "pulseRadarLimit": 6,
+    "roleModeLimit": 6,
+    "exportBundleLimit": 8,
+    "traceabilityLimit": 6
+  },
+  "atlasMesh": {
+    "defaultTab": "atlas",
+    "tabs": [
+      {
+        "key": "atlas",
+        "label": "Physical atlas"
+      },
+      {
+        "key": "review",
+        "label": "Review graph"
+      },
+      {
+        "key": "exports",
+        "label": "Export surface"
+      },
+      {
+        "key": "roles",
+        "label": "Role modes"
+      },
+      {
+        "key": "trace",
+        "label": "Traceability atlas"
+      }
+    ],
+    "heroMetrics": [
+      "atlasMeshScore",
+      "physicalCoverageScore",
+      "reviewOpsScore",
+      "exportSurfaceScore"
+    ]
   }
 }

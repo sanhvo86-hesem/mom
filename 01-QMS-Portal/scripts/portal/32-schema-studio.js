@@ -13798,3 +13798,564 @@ window._renderSchemaStudio = function(page){
     win.SchemaStudio.copyRound6CommandBrief = copyBrief;
   }
 })(window);
+
+
+/* ── World-Class Atlas Mesh Round 7 ─────────────────────────────────── */
+(function(win){
+  'use strict';
+  if(!win || !win.SchemaStudioWorldClass || !win.STORE) return;
+  if(win.SchemaStudioWorldClass.__round7Patched) return;
+
+  var LS_KEY = 'hesem:schema-studio:wc:r7';
+  var state = { tab:'atlas', surface:'', role:'', trace:'' };
+  var cacheReport = null;
+  var renderTimer = null;
+  var requestPending = false;
+  var clickBound = false;
+  var keyBound = false;
+
+  function arr(value){ return Array.isArray(value) ? value.filter(Boolean) : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){
+    var n = Number(value);
+    return isFinite(n) ? n : (fallback == null ? 0 : Number(fallback) || 0);
+  }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function tone(score){
+    score = num(score, 0);
+    return score >= 90 ? 'good' : (score >= 75 ? 'warning' : 'critical');
+  }
+  function api(action, payload, method){
+    if(typeof _api === 'function') return _api(action, payload || {}, method || 'POST');
+    if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'POST', 30000);
+    var qs = new URLSearchParams();
+    qs.set('action', action);
+    if((method || 'POST').toUpperCase() === 'GET'){
+      Object.keys(payload || {}).forEach(function(key){
+        if(payload[key] == null) return;
+        qs.set(key, String(payload[key]));
+      });
+    }
+    return fetch('api/index.php?' + qs.toString(), {
+      method: method || 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type':'application/json',
+        'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '')
+      },
+      body: (method || 'POST').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function currentDesignId(){
+    var schema = win.STORE && win.STORE.schema ? win.STORE.schema : {};
+    return txt(schema && schema._meta && schema._meta.id) || 'workspace';
+  }
+  function currentDiag(){
+    return win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.getDiagnosis === 'function'
+      ? (win.SchemaStudioWorldClass.getDiagnosis() || {})
+      : {};
+  }
+  function loadState(){
+    try{
+      var parsed = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      if(parsed && typeof parsed === 'object'){
+        if(parsed.tab) state.tab = parsed.tab;
+        if(parsed.surface) state.surface = parsed.surface;
+        if(parsed.role) state.role = parsed.role;
+        if(parsed.trace) state.trace = parsed.trace;
+      }
+    }catch(_err){}
+  }
+  function saveState(){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify({ tab:state.tab, surface:state.surface, role:state.role, trace:state.trace }));
+    }catch(_err){}
+  }
+  function badge(label, value, toneKey){
+    return '<span class="ss-wc-r7-badge tone-' + esc(toneKey || 'neutral') + '">' + esc(label || '-') + ': ' + esc(value == null ? '-' : value) + '</span>';
+  }
+  function metric(label, value, hint, toneKey){
+    return [
+      '<div class="ss-wc-r7-metric tone-' + esc(toneKey || 'neutral') + '">',
+        '<div class="ss-wc-r7-kicker">' + esc(label || '-') + '</div>',
+        '<div class="ss-wc-r7-value">' + esc(value == null ? '-' : value) + '</div>',
+        hint ? '<div class="ss-wc-r7-sub">' + esc(hint) + '</div>' : '',
+      '</div>'
+    ].join('');
+  }
+  function card(title, subtitle, body){
+    return [
+      '<article class="ss-wc-r7-card">',
+        '<div class="ss-wc-r7-card-head">',
+          '<div>',
+            '<h5>' + esc(title || '-') + '</h5>',
+            subtitle ? '<div class="ss-wc-r7-sub">' + esc(subtitle) + '</div>' : '',
+          '</div>',
+        '</div>',
+        body || '',
+      '</article>'
+    ].join('');
+  }
+  function ensureReport(source){
+    var diag = source && typeof source === 'object' ? source : {};
+    if(diag.round7Report && diag.round7Report.summary) return diag.round7Report;
+    if(diag.round7 && diag.round7.summary) return diag.round7;
+    if(diag.summary && diag.atlas && diag.reviewBoards) return diag;
+    var live = currentDiag();
+    if(live.round7Report && live.round7Report.summary) return live.round7Report;
+    if(live.round7 && live.round7.summary) return live.round7;
+    var summary = live.summary || {};
+    return {
+      summary: {
+        atlasMeshScore: num(summary.atlasMeshScore, 0),
+        physicalCoverageScore: num(summary.physicalCoverageScore, 0),
+        reviewOpsScore: num(summary.reviewOpsScore, 0),
+        exportSurfaceScore: num(summary.exportSurfaceScore, 0),
+        interoperabilityScore: num(summary.interoperabilityScore, 0),
+        roleModeScore: num(summary.roleModeScore, 0),
+        traceabilityAtlasScore: num(summary.traceabilityAtlasScore, 0),
+        beautySystemScore: num(summary.beautySystemScore, 0),
+        objectSurfaceCount: num(summary.objectSurfaceCount, 0),
+        roleModeCount: num(summary.roleModeCount, 0),
+        reviewBoardCount: num(summary.reviewBoardCount, 0),
+        exportBundleCount: num(summary.exportBundleCount, 0)
+      },
+      hero: {
+        headline:'Round 7 atlas mesh',
+        subheadline:'Physical PostgreSQL coverage, review boards, export surfaces, role-aware modes and traceability atlas now sit on one mission-grade control plane.',
+        atlasMeshScore:num(summary.atlasMeshScore, 0),
+        physicalCoverageScore:num(summary.physicalCoverageScore, 0),
+        reviewOpsScore:num(summary.reviewOpsScore, 0),
+        exportSurfaceScore:num(summary.exportSurfaceScore, 0),
+        interoperabilityScore:num(summary.interoperabilityScore, 0)
+      },
+      atlas:{ score:num(summary.physicalCoverageScore, 0), objectSurfaces:[], capabilityBands:[] },
+      reviewBoards:[],
+      exports:[],
+      roleModes:[],
+      interoperability:[],
+      traceabilityAtlas:[],
+      beautySystem:{ score:num(summary.beautySystemScore, 0), ambiences:[], densities:[], sceneFamilies:[] },
+      reportSummary: live.reportSummary || {},
+      diffSummary: live.diffSummary || {}
+    };
+  }
+  function ensureSelected(){
+    if(!cacheReport) return;
+    if(!state.surface && arr(cacheReport.atlas && cacheReport.atlas.objectSurfaces).length){
+      state.surface = txt(arr(cacheReport.atlas.objectSurfaces)[0].key || '');
+    }
+    if(!state.role && arr(cacheReport.roleModes).length){
+      state.role = txt(arr(cacheReport.roleModes)[0].key || '');
+    }
+    if(!state.trace && arr(cacheReport.traceabilityAtlas).length){
+      state.trace = txt(arr(cacheReport.traceabilityAtlas)[0].key || '');
+    }
+  }
+  function findByKey(list, key){
+    return arr(list).filter(function(item){ return txt(item && item.key) === txt(key); })[0] || null;
+  }
+  function surfaceDetail(surface){
+    if(!surface) return '<div class="ss-wc-r7-empty">Chọn một surface để xem chi tiết coverage, ví dụ và khoảng trống còn lại.</div>';
+    return [
+      '<div class="ss-wc-r7-detail">',
+        '<div class="ss-wc-r7-detail-head">',
+          '<div><strong>' + esc(surface.label || surface.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(surface.detail || '') + '</div></div>',
+          '<div class="ss-wc-r7-inline">',
+            badge('Coverage', num(surface.coverageScore, 0) + '%', tone(surface.coverageScore)),
+            badge('Readiness', num(surface.readinessScore, 0) + '%', tone(surface.readinessScore)),
+            badge('Count', num(surface.count, 0), 'neutral'),
+            badge('Target', num(surface.target, 0), 'neutral'),
+          '</div>',
+        '</div>',
+        '<div class="ss-wc-r7-detail-grid">',
+          '<div><div class="ss-wc-r7-subtitle">Examples</div><div class="ss-wc-r7-chip-wrap">' + (arr(surface.examples).length ? arr(surface.examples).map(function(item){ return '<span class="ss-wc-r7-chip">' + esc(item) + '</span>'; }).join('') : '<span class="ss-wc-r7-sub">No examples yet</span>') + '</div></div>',
+          '<div><div class="ss-wc-r7-subtitle">Gaps</div><div class="ss-wc-r7-list compact">' + (arr(surface.gaps).length ? arr(surface.gaps).map(function(item){ return '<div class="ss-wc-r7-item"><span class="ss-wc-r7-dot tone-warning"></span><div>' + esc(item) + '</div></div>'; }).join('') : '<div class="ss-wc-r7-sub">Surface already meets or exceeds target posture.</div>') + '</div></div>',
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+  function roleDetail(role, beauty){
+    if(!role && !beauty) return '<div class="ss-wc-r7-empty">Role modes and beauty system will appear after round 7 report loads.</div>';
+    var beautyBody = beauty ? [
+      '<div class="ss-wc-r7-subtitle">Beauty system</div>',
+      '<div class="ss-wc-r7-chip-wrap">' + arr(beauty.ambiences).map(function(item){ return '<span class="ss-wc-r7-chip">🌌 ' + esc(item.label || item.key || '-') + '</span>'; }).join('') + '</div>',
+      '<div class="ss-wc-r7-chip-wrap">' + arr(beauty.densities).map(function(item){ return '<span class="ss-wc-r7-chip">▥ ' + esc(item.label || item.key || '-') + '</span>'; }).join('') + '</div>',
+      '<div class="ss-wc-r7-chip-wrap">' + arr(beauty.sceneFamilies).map(function(item){ return '<span class="ss-wc-r7-chip">◆ ' + esc(item.label || item.key || '-') + (item.count != null ? ' (' + esc(item.count) + ')' : '') + '</span>'; }).join('') + '</div>'
+    ].join('') : '';
+    if(!role) return '<div class="ss-wc-r7-detail">' + beautyBody + '</div>';
+    return [
+      '<div class="ss-wc-r7-detail">',
+        '<div class="ss-wc-r7-detail-head">',
+          '<div><strong>' + esc(role.label || role.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(role.persona || '') + (role.subtitle ? ' · ' + esc(role.subtitle) : '') + '</div></div>',
+          '<div class="ss-wc-r7-inline">' + badge('Readiness', num(role.score, 0) + '%', tone(role.score)) + '</div>',
+        '</div>',
+        '<div class="ss-wc-r7-detail-grid">',
+          '<div><div class="ss-wc-r7-subtitle">Focus rails</div><div class="ss-wc-r7-chip-wrap">' + (arr(role.focus).length ? arr(role.focus).map(function(item){ return '<span class="ss-wc-r7-chip">' + esc(item) + '</span>'; }).join('') : '<span class="ss-wc-r7-sub">No focus rails modeled</span>') + '</div></div>',
+          '<div>' + beautyBody + '</div>',
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+  function traceDetail(item){
+    if(!item) return '<div class="ss-wc-r7-empty">Chọn một traceability scenario để xem domain và focus table backbone.</div>';
+    return [
+      '<div class="ss-wc-r7-detail">',
+        '<div class="ss-wc-r7-detail-head">',
+          '<div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(arr(item.domains).join(' · ')) + '</div></div>',
+          '<div class="ss-wc-r7-inline">' + badge('Readiness', num(item.score, 0) + '%', tone(item.score)) + '</div>',
+        '</div>',
+        '<div class="ss-wc-r7-subtitle">Focus tables</div>',
+        '<div class="ss-wc-r7-chip-wrap">' + (arr(item.focusTables).length ? arr(item.focusTables).map(function(name){ return '<span class="ss-wc-r7-chip">' + esc(name) + '</span>'; }).join('') : '<span class="ss-wc-r7-sub">No focus tables mapped</span>') + '</div>',
+      '</div>'
+    ].join('');
+  }
+  function renderAtlas(report){
+    var summary = report.summary || {};
+    var atlas = report.atlas || {};
+    var surfaces = arr(atlas.objectSurfaces);
+    var selected = findByKey(surfaces, state.surface) || surfaces[0] || null;
+    return [
+      '<div class="ss-wc-r7-grid-2">',
+        card('Object surfaces', 'PostgreSQL-native coverage and runtime-facing object posture.', '<div class="ss-wc-r7-list">' + (surfaces.length ? surfaces.map(function(item){ return '<button class="ss-wc-r7-item is-action' + (selected && txt(selected.key) === txt(item.key) ? ' active' : '') + '" type="button" data-wc-r7-action="surface" data-key="' + esc(item.key || '') + '"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(item.detail || '') + '</div></div><div class="ss-wc-r7-inline"><span class="ss-wc-r7-badge tone-' + esc(item.tone || tone(item.readinessScore)) + '">' + esc(num(item.readinessScore, 0) + '%') + '</span><span class="ss-wc-r7-badge">' + esc(num(item.count, 0)) + '</span></div></button>'; }).join('') : '<div class="ss-wc-r7-empty">Atlas object surfaces will appear after compile/diagnose.</div>') + '</div>' + surfaceDetail(selected)),
+        card('Capability bands', 'Cross-check domains, layers, policies and compiler contracts.', '<div class="ss-wc-r7-list">' + (arr(atlas.capabilityBands).length ? arr(atlas.capabilityBands).map(function(item){ return '<div class="ss-wc-r7-item"><div><strong>' + esc(item.label || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(item.detail || '') + '</div></div><div class="ss-wc-r7-inline"><span class="ss-wc-r7-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span><span class="ss-wc-r7-badge">' + esc(num(item.count, 0)) + '</span></div></div>'; }).join('') : '<div class="ss-wc-r7-empty">Capability bands not available yet.</div>') + '</div>' + '<div class="ss-wc-r7-inline ss-wc-r7-inline-wrap">' + badge('Atlas mesh', num(summary.atlasMeshScore, 0) + '%', tone(summary.atlasMeshScore)) + badge('Physical', num(summary.physicalCoverageScore, 0) + '%', tone(summary.physicalCoverageScore)) + badge('Object surfaces', num(summary.objectSurfaceCount, 0), 'neutral') + '</div>'),
+      '</div>'
+    ].join('');
+  }
+  function renderReview(report){
+    var boards = arr(report.reviewBoards);
+    var diff = report.diffSummary || {};
+    return [
+      '<div class="ss-wc-r7-grid-2">',
+        card('Review boards', 'Approval matrices, evidence lanes and enterprise release governance.', '<div class="ss-wc-r7-list">' + (boards.length ? boards.map(function(item){ return '<div class="ss-wc-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(item.owner || '') + ' → ' + esc(item.approver || '') + '</div><div class="ss-wc-r7-sub">' + esc(item.detail || '') + '</div></div><div class="ss-wc-r7-inline"><span class="ss-wc-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ss-wc-r7-empty">Review boards will appear after round 7 artifact is regenerated.</div>') + '</div>'),
+        card('Diff & firewall posture', 'Typed-diff severity, compatibility and destructive-change discipline.', '<div class="ss-wc-r7-mini-grid">' + metric('Compatibility', num(diff.compatibilityScore, 100) + '%', 'Runtime contract compatibility posture', tone(diff.compatibilityScore || 100)) + metric('Risk score', num(diff.riskScore, 0), 'Aggregate migration + runtime risk', tone(100 - num(diff.riskScore, 0))) + metric('Destructive', num(diff.destructiveCount, 0), 'Requires escalation and rollback evidence', num(diff.destructiveCount, 0) > 0 ? 'critical' : 'good') + metric('Breaking', num(diff.breakingCount, 0), 'Changes that may break callers', num(diff.breakingCount, 0) > 0 ? 'warning' : 'good') + '</div>'),
+      '</div>'
+    ].join('');
+  }
+  function renderExports(report){
+    var exports = arr(report.exports);
+    var interop = arr(report.interoperability);
+    return [
+      '<div class="ss-wc-r7-grid-2">',
+        card('Export surface', 'Bundle every view of the model from a single governed source of truth.', '<div class="ss-wc-r7-list">' + (exports.length ? exports.map(function(item){ return '<div class="ss-wc-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(item.format || '') + ' · ' + esc(item.purpose || '') + '</div></div><div class="ss-wc-r7-inline"><span class="ss-wc-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(item.status || '-') + '</span></div></div>'; }).join('') : '<div class="ss-wc-r7-empty">Export bundles not modeled yet.</div>') + '</div>'),
+        card('Interoperability tracks', 'Schema → registry → workflow → module builder → docs propagation.', '<div class="ss-wc-r7-list">' + (interop.length ? interop.map(function(item){ return '<div class="ss-wc-r7-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(item.detail || '') + '</div></div><div class="ss-wc-r7-inline"><span class="ss-wc-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ss-wc-r7-empty">Interoperability tracks not available yet.</div>') + '</div>'),
+      '</div>'
+    ].join('');
+  }
+  function renderRoles(report){
+    var roles = arr(report.roleModes);
+    var beauty = report.beautySystem || {};
+    var selected = findByKey(roles, state.role) || roles[0] || null;
+    return [
+      '<div class="ss-wc-r7-grid-2">',
+        card('Role-aware modes', 'Architect, engineer, quality, compliance and builder lenses in one cockpit.', '<div class="ss-wc-r7-list">' + (roles.length ? roles.map(function(item){ return '<button class="ss-wc-r7-item is-action' + (selected && txt(selected.key) === txt(item.key) ? ' active' : '') + '" type="button" data-wc-r7-action="role" data-key="' + esc(item.key || '') + '"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(item.persona || '') + '</div><div class="ss-wc-r7-sub">' + esc(item.subtitle || '') + '</div></div><div class="ss-wc-r7-inline"><span class="ss-wc-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></button>'; }).join('') : '<div class="ss-wc-r7-empty">Role-aware modes are waiting for the round 7 artifact.</div>') + '</div>'),
+        card('Beauty system', 'Ambiences, densities and scene families for a more premium enterprise studio.', roleDetail(selected, beauty)),
+      '</div>'
+    ].join('');
+  }
+  function renderTrace(report){
+    var scenarios = arr(report.traceabilityAtlas);
+    var selected = findByKey(scenarios, state.trace) || scenarios[0] || null;
+    return [
+      '<div class="ss-wc-r7-grid-2">',
+        card('Traceability atlas', 'Manufacturing + quality intelligence overlays grounded in canonical tables.', '<div class="ss-wc-r7-list">' + (scenarios.length ? scenarios.map(function(item){ return '<button class="ss-wc-r7-item is-action' + (selected && txt(selected.key) === txt(item.key) ? ' active' : '') + '" type="button" data-wc-r7-action="trace" data-key="' + esc(item.key || '') + '"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-wc-r7-sub">' + esc(arr(item.domains).join(' · ')) + '</div></div><div class="ss-wc-r7-inline"><span class="ss-wc-r7-badge tone-' + esc(item.tone || tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></button>'; }).join('') : '<div class="ss-wc-r7-empty">Traceability scenarios will appear after canonical round 7 artifact is available.</div>') + '</div>'),
+        card('Scenario detail', 'See focus tables for lot/serial genealogy, incoming quality, NC/CAPA and dispatch-to-completion chains.', traceDetail(selected)),
+      '</div>'
+    ].join('');
+  }
+  function panel(report){
+    switch(state.tab){
+      case 'review': return renderReview(report);
+      case 'exports': return renderExports(report);
+      case 'roles': return renderRoles(report);
+      case 'trace': return renderTrace(report);
+      default: return renderAtlas(report);
+    }
+  }
+  function copyBrief(){
+    var report = cacheReport || ensureReport(currentDiag());
+    var summary = report.summary || {};
+    var lines = [
+      'HESEM Schema Studio — Round 7 atlas mesh',
+      'Atlas mesh: ' + num(summary.atlasMeshScore, 0) + '%',
+      'Physical coverage: ' + num(summary.physicalCoverageScore, 0) + '%',
+      'Review ops: ' + num(summary.reviewOpsScore, 0) + '%',
+      'Export surface: ' + num(summary.exportSurfaceScore, 0) + '%',
+      'Interoperability: ' + num(summary.interoperabilityScore, 0) + '%',
+      'Role modes: ' + num(summary.roleModeScore, 0) + '%',
+      'Traceability atlas: ' + num(summary.traceabilityAtlasScore, 0) + '%',
+      'Beauty system: ' + num(summary.beautySystemScore, 0) + '%',
+      'Object surfaces: ' + num(summary.objectSurfaceCount, 0),
+      'Review boards: ' + num(summary.reviewBoardCount, 0),
+      'Export bundles: ' + num(summary.exportBundleCount, 0)
+    ].join('\n');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lines).then(function(){
+        if(typeof toast === 'function') toast('Đã copy round 7 atlas brief', 'success');
+      }).catch(function(){
+        if(typeof toast === 'function') toast('Không thể copy round 7 atlas brief', 'error');
+      });
+      return;
+    }
+    if(typeof toast === 'function') toast('Clipboard không khả dụng trên trình duyệt này', 'info');
+  }
+  function render(){
+    renderTimer = null;
+    var shell = document.querySelector('.ss-wc-overlay .ss-wc-shell');
+    if(!shell) return;
+    ensureSelected();
+    var report = cacheReport || ensureReport(currentDiag());
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    var existing = shell.querySelector('.ss-wc-r7-shell');
+    if(!existing){
+      existing = document.createElement('section');
+      existing.className = 'ss-wc-r7-shell';
+      shell.appendChild(existing);
+    }
+    existing.innerHTML = [
+      '<section class="ss-wc-r7-hero">',
+        '<div class="ss-wc-r7-hero-head">',
+          '<div>',
+            '<div class="ss-wc-r7-kicker">Round 7 atlas mesh</div>',
+            '<div class="ss-wc-r7-title">' + esc(hero.headline || 'Physical coverage, governance boards and traceability atlas') + '</div>',
+            '<div class="ss-wc-r7-sub">' + esc(hero.subheadline || 'Round 7 turns Schema Studio into a richer PostgreSQL-native control plane with deeper review, export, role and manufacturing intelligence.') + '</div>',
+          '</div>',
+          '<div class="ss-wc-r7-toolbar">',
+            '<button class="ss-wc-r7-btn" type="button" data-wc-r7-action="copy-brief">Copy atlas brief</button>',
+            '<button class="ss-wc-r7-btn primary" type="button" data-wc-r7-action="refresh">Refresh</button>',
+          '</div>',
+        '</div>',
+        '<div class="ss-wc-r7-badges">',
+          badge('Atlas mesh', num(summary.atlasMeshScore, hero.atlasMeshScore || 0) + '%', tone(summary.atlasMeshScore || hero.atlasMeshScore)),
+          badge('Physical', num(summary.physicalCoverageScore, hero.physicalCoverageScore || 0) + '%', tone(summary.physicalCoverageScore || hero.physicalCoverageScore)),
+          badge('Review ops', num(summary.reviewOpsScore, hero.reviewOpsScore || 0) + '%', tone(summary.reviewOpsScore || hero.reviewOpsScore)),
+          badge('Export surface', num(summary.exportSurfaceScore, hero.exportSurfaceScore || 0) + '%', tone(summary.exportSurfaceScore || hero.exportSurfaceScore)),
+          badge('Interoperability', num(summary.interoperabilityScore, hero.interoperabilityScore || 0) + '%', tone(summary.interoperabilityScore || hero.interoperabilityScore)),
+          badge('Surfaces', num(summary.objectSurfaceCount, 0), 'neutral'),
+          badge('Boards', num(summary.reviewBoardCount, 0), 'neutral'),
+          badge('Exports', num(summary.exportBundleCount, 0), 'neutral'),
+        '</div>',
+        '<div class="ss-wc-r7-metric-grid">',
+          metric('Role modes', num(summary.roleModeScore, 0) + '%', 'Persona-specific focus rails and cockpit modes', tone(summary.roleModeScore)),
+          metric('Traceability atlas', num(summary.traceabilityAtlasScore, 0) + '%', 'Genealogy, incoming quality and NC/CAPA intelligence', tone(summary.traceabilityAtlasScore)),
+          metric('Beauty system', num(summary.beautySystemScore, 0) + '%', 'Ambiences, densities and scene families', tone(summary.beautySystemScore)),
+          metric('Object surfaces', num(summary.objectSurfaceCount, 0), 'Tables, views, functions, procedures and policies', 'neutral'),
+        '</div>',
+      '</section>',
+      '<div class="ss-wc-r7-tabs">',
+        '<button class="ss-wc-r7-tab' + (state.tab === 'atlas' ? ' active' : '') + '" type="button" data-wc-r7-action="tab" data-key="atlas">Atlas</button>',
+        '<button class="ss-wc-r7-tab' + (state.tab === 'review' ? ' active' : '') + '" type="button" data-wc-r7-action="tab" data-key="review">Review</button>',
+        '<button class="ss-wc-r7-tab' + (state.tab === 'exports' ? ' active' : '') + '" type="button" data-wc-r7-action="tab" data-key="exports">Exports</button>',
+        '<button class="ss-wc-r7-tab' + (state.tab === 'roles' ? ' active' : '') + '" type="button" data-wc-r7-action="tab" data-key="roles">Roles</button>',
+        '<button class="ss-wc-r7-tab' + (state.tab === 'trace' ? ' active' : '') + '" type="button" data-wc-r7-action="tab" data-key="trace">Traceability</button>',
+      '</div>',
+      '<div class="ss-wc-r7-panel">' + panel(report) + '</div>'
+    ].join('');
+  }
+  function scheduleRender(){
+    if(renderTimer) win.clearTimeout(renderTimer);
+    renderTimer = win.setTimeout(render, 50);
+  }
+  function fetchReport(force){
+    if(requestPending && !force) return Promise.resolve(cacheReport || ensureReport(currentDiag()));
+    requestPending = true;
+    return api('schema_studio_round7_report', { design_id:currentDesignId() }, 'POST').then(function(res){
+      requestPending = false;
+      cacheReport = ensureReport(res && (res.round7Report || res.report || res));
+      ensureSelected();
+      scheduleRender();
+      return cacheReport;
+    }).catch(function(){
+      requestPending = false;
+      cacheReport = cacheReport || ensureReport(currentDiag());
+      ensureSelected();
+      scheduleRender();
+      return cacheReport;
+    });
+  }
+  function ensureStyles(){
+    if(document.getElementById('ss-wc-r7-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'ss-wc-r7-styles';
+    style.textContent = [
+      '.ss-wc-r7-shell{margin-top:16px;display:grid;gap:14px;}',
+      '.ss-wc-r7-hero,.ss-wc-r7-card{border:1px solid rgba(123,145,255,.18);background:linear-gradient(180deg,rgba(13,20,36,.94),rgba(15,25,48,.88));box-shadow:0 18px 48px rgba(5,12,28,.38);border-radius:24px;padding:18px;color:#eaf2ff;backdrop-filter:blur(12px);}',
+      '.ss-wc-r7-hero-head,.ss-wc-r7-detail-head,.ss-wc-r7-item,.ss-wc-r7-card-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;}',
+      '.ss-wc-r7-title{font-size:24px;font-weight:800;line-height:1.2;letter-spacing:.01em;}',
+      '.ss-wc-r7-kicker,.ss-wc-r7-sub,.ss-wc-r7-subtitle{color:#93a3c7;font-size:12px;letter-spacing:.06em;text-transform:uppercase;}',
+      '.ss-wc-r7-sub{letter-spacing:.01em;text-transform:none;font-size:13px;line-height:1.5;}',
+      '.ss-wc-r7-badges,.ss-wc-r7-chip-wrap,.ss-wc-r7-inline,.ss-wc-r7-tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
+      '.ss-wc-r7-inline-wrap{margin-top:10px;}',
+      '.ss-wc-r7-badge,.ss-wc-r7-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:12px;font-weight:700;color:#f5f8ff;}',
+      '.ss-wc-r7-chip{font-weight:600;color:#d9e4ff;background:rgba(60,86,155,.16);}',
+      '.ss-wc-r7-badge.tone-good,.ss-wc-r7-chip.tone-good{background:rgba(31,197,123,.16);border-color:rgba(31,197,123,.26);}',
+      '.ss-wc-r7-badge.tone-warning{background:rgba(255,191,71,.16);border-color:rgba(255,191,71,.26);}',
+      '.ss-wc-r7-badge.tone-critical{background:rgba(255,92,117,.16);border-color:rgba(255,92,117,.28);}',
+      '.ss-wc-r7-metric-grid,.ss-wc-r7-grid-2,.ss-wc-r7-mini-grid{display:grid;gap:12px;}',
+      '.ss-wc-r7-metric-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:14px;}',
+      '.ss-wc-r7-grid-2{grid-template-columns:repeat(2,minmax(0,1fr));}',
+      '.ss-wc-r7-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr));}',
+      '.ss-wc-r7-metric{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);display:grid;gap:6px;min-height:110px;}',
+      '.ss-wc-r7-metric.tone-good{background:linear-gradient(180deg,rgba(25,84,55,.26),rgba(15,25,48,.68));}',
+      '.ss-wc-r7-metric.tone-warning{background:linear-gradient(180deg,rgba(109,78,21,.24),rgba(15,25,48,.68));}',
+      '.ss-wc-r7-metric.tone-critical{background:linear-gradient(180deg,rgba(116,37,49,.26),rgba(15,25,48,.68));}',
+      '.ss-wc-r7-value{font-size:28px;font-weight:800;line-height:1;}',
+      '.ss-wc-r7-tabs{padding:4px;background:rgba(10,16,30,.72);border:1px solid rgba(255,255,255,.06);border-radius:16px;}',
+      '.ss-wc-r7-tab,.ss-wc-r7-btn,.ss-wc-r7-item.is-action{appearance:none;border:0;cursor:pointer;font:inherit;}',
+      '.ss-wc-r7-tab{padding:10px 14px;border-radius:12px;background:transparent;color:#b9c8ea;font-weight:700;}',
+      '.ss-wc-r7-tab.active{background:linear-gradient(135deg,#345fff,#6e86ff);color:#fff;box-shadow:0 10px 20px rgba(46,83,255,.26);}',
+      '.ss-wc-r7-toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;}',
+      '.ss-wc-r7-btn{padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.06);color:#eff4ff;border:1px solid rgba(255,255,255,.08);font-weight:700;}',
+      '.ss-wc-r7-btn.primary{background:linear-gradient(135deg,#385eff,#7a8eff);color:#fff;border-color:rgba(122,142,255,.32);}',
+      '.ss-wc-r7-list{display:grid;gap:10px;}',
+      '.ss-wc-r7-list.compact{gap:8px;}',
+      '.ss-wc-r7-item{padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);color:#eef4ff;text-align:left;}',
+      '.ss-wc-r7-item.is-action{width:100%;}',
+      '.ss-wc-r7-item.is-action.active{border-color:rgba(124,147,255,.42);background:linear-gradient(180deg,rgba(60,90,185,.24),rgba(255,255,255,.05));box-shadow:0 12px 24px rgba(31,43,99,.22);}',
+      '.ss-wc-r7-detail{margin-top:12px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(9,14,26,.55);display:grid;gap:12px;}',
+      '.ss-wc-r7-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}',
+      '.ss-wc-r7-empty{padding:18px;border-radius:18px;border:1px dashed rgba(255,255,255,.14);color:#9fb0d6;background:rgba(255,255,255,.03);}',
+      '.ss-wc-r7-dot{width:9px;height:9px;border-radius:999px;display:inline-block;background:#6f87ff;}',
+      '.ss-wc-r7-dot.tone-warning{background:#ffbf47;}',
+      '@media (max-width:1100px){.ss-wc-r7-metric-grid,.ss-wc-r7-grid-2,.ss-wc-r7-detail-grid{grid-template-columns:1fr;}}',
+      '@media (max-width:760px){.ss-wc-r7-hero-head{flex-direction:column;}.ss-wc-r7-toolbar{width:100%;justify-content:flex-start;}.ss-wc-r7-mini-grid{grid-template-columns:1fr;}.ss-wc-r7-title{font-size:22px;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+  function bind(){
+    if(!clickBound){
+      document.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-wc-r7-action]') : null;
+        if(!node) return;
+        var action = node.getAttribute('data-wc-r7-action') || '';
+        if(action === 'tab'){
+          ev.preventDefault();
+          state.tab = node.getAttribute('data-key') || 'atlas';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'surface'){
+          ev.preventDefault();
+          state.surface = node.getAttribute('data-key') || '';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'role'){
+          ev.preventDefault();
+          state.role = node.getAttribute('data-key') || '';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'trace'){
+          ev.preventDefault();
+          state.trace = node.getAttribute('data-key') || '';
+          saveState();
+          scheduleRender();
+          return;
+        }
+        if(action === 'refresh'){
+          ev.preventDefault();
+          fetchReport(true);
+          return;
+        }
+        if(action === 'copy-brief'){
+          ev.preventDefault();
+          copyBrief();
+        }
+      }, true);
+      clickBound = true;
+    }
+    if(!keyBound){
+      document.addEventListener('keydown', function(ev){
+        if(ev.altKey && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey && ev.key === '8'){
+          ev.preventDefault();
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.open === 'function') win.SchemaStudioWorldClass.open();
+          state.tab = 'atlas';
+          saveState();
+          fetchReport(false);
+          scheduleRender();
+        }
+      });
+      keyBound = true;
+    }
+  }
+  function addCommands(){
+    if(!win.CmdPalette || !Array.isArray(win.CmdPalette.COMMANDS)) return;
+    win.CmdPalette.COMMANDS = win.CmdPalette.COMMANDS.filter(function(command){
+      return !command || ['Open round 7 atlas mesh', 'Copy round 7 atlas brief'].indexOf(command.label_en) < 0;
+    });
+    win.CmdPalette.COMMANDS.push(
+      {
+        icon:'🧭',
+        label:'Mở atlas mesh round 7',
+        label_en:'Open round 7 atlas mesh',
+        category:'schema',
+        action:function(){
+          if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.open === 'function') win.SchemaStudioWorldClass.open();
+          state.tab = 'atlas';
+          saveState();
+          fetchReport(false);
+          scheduleRender();
+        }
+      },
+      {
+        icon:'📋',
+        label:'Copy atlas brief round 7',
+        label_en:'Copy round 7 atlas brief',
+        category:'schema',
+        action:function(){ copyBrief(); }
+      }
+    );
+  }
+
+  var originalGetDiagnosis = win.SchemaStudioWorldClass.getDiagnosis;
+  var originalRefresh = win.SchemaStudioWorldClass.refresh;
+  var originalOpen = win.SchemaStudioWorldClass.open;
+  win.SchemaStudioWorldClass.getDiagnosis = function(){
+    var diag = originalGetDiagnosis ? originalGetDiagnosis.apply(this, arguments) : {};
+    if(diag && typeof diag === 'object' && cacheReport) diag.round7 = cacheReport;
+    return diag;
+  };
+  win.SchemaStudioWorldClass.refresh = function(){
+    var result = originalRefresh ? originalRefresh.apply(this, arguments) : Promise.resolve(currentDiag());
+    return Promise.resolve(result).then(function(diag){
+      if(diag && typeof diag === 'object'){
+        if(diag.round7Report) cacheReport = ensureReport(diag.round7Report);
+        else if(diag.round7) cacheReport = ensureReport(diag.round7);
+      }
+      return fetchReport(true).then(function(){ scheduleRender(); return diag; });
+    });
+  };
+  win.SchemaStudioWorldClass.open = function(){
+    var result = originalOpen ? originalOpen.apply(this, arguments) : undefined;
+    fetchReport(false);
+    scheduleRender();
+    return result;
+  };
+  win.SchemaStudioWorldClass.getRound7Report = function(){
+    return cacheReport || ensureReport(currentDiag());
+  };
+
+  loadState();
+  ensureStyles();
+  bind();
+  addCommands();
+  fetchReport(false);
+  scheduleRender();
+  win.SchemaStudioWorldClass.__round7Patched = true;
+  if(win.SchemaStudio){
+    win.SchemaStudio.buildId = '20260407worldclass7';
+    win.SchemaStudio.copyRound7AtlasBrief = copyBrief;
+  }
+})(window);

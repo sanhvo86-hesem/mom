@@ -1415,6 +1415,76 @@ class SchemaStudioController extends BaseController
         return $this->registryDirPath() . '/schema-studio-command-center-report.json';
     }
 
+    private function round7ReportPath(): string
+    {
+        return $this->registryDirPath() . '/schema-studio-round7-report.json';
+    }
+
+    /**
+     * @param mixed $items
+     * @return array<int, array<string, mixed>>
+     */
+    private function arrayRows(mixed $items): array
+    {
+        return is_array($items) ? array_values(array_filter($items, 'is_array')) : [];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function designCandidatePaths(string $designId): array
+    {
+        $id = $this->safeId($designId, 'workspace');
+        $paths = [$this->designPath($id)];
+        if (in_array($id, ['workspace', 'canonical', 'canonical_erp_mes_eqms_7layer_core'], true)) {
+            foreach ([
+                $this->designDir . '/workspace.json',
+                $this->designDir . '/canonical_erp_mes_eqms_7layer_core.json',
+                $this->designDir . '/canonical_erp_mes_eqms_7layer_core.enterprise.json',
+            ] as $alias) {
+                if (!in_array($alias, $paths, true)) {
+                    $paths[] = $alias;
+                }
+            }
+        }
+        return $paths;
+    }
+
+    private function loadDesignDocument(string $designId): ?array
+    {
+        foreach ($this->designCandidatePaths($designId) as $path) {
+            $doc = $this->readJsonFile($path);
+            if (is_array($doc)) {
+                return $doc;
+            }
+        }
+        return null;
+    }
+
+    private function loadBaselineDocument(string $designId, ?array $design = null): array
+    {
+        $id = $this->safeId($designId, 'workspace');
+        $paths = [$this->baselinePath($id)];
+        if (in_array($id, ['workspace', 'canonical', 'canonical_erp_mes_eqms_7layer_core'], true)) {
+            foreach ([
+                $this->snapshotDir . '/workspace.baseline.json',
+                $this->baselinePath('canonical_erp_mes_eqms_7layer_core'),
+            ] as $alias) {
+                if (!in_array($alias, $paths, true)) {
+                    $paths[] = $alias;
+                }
+            }
+        }
+        foreach ($paths as $path) {
+            $doc = $this->readJsonFile($path);
+            if (is_array($doc)) {
+                return $doc;
+            }
+        }
+
+        return is_array($design) ? $design : ['_meta' => ['id' => $id . '_baseline'], 'tables' => [], 'relations' => [], 'groups' => [], 'notes' => []];
+    }
+
     /**
      * @return array<int, array<string, mixed>>
      */
@@ -2867,6 +2937,298 @@ class SchemaStudioController extends BaseController
         return $artifact;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildRound7Artifact(string $designId, string $designName, array $schema, array $health, array $report = [], array $diff = [], ?string $actor = null): array
+    {
+        $summary = is_array($health['summary'] ?? null) ? $health['summary'] : [];
+        $reportSummary = is_array($report['summary'] ?? null) ? $report['summary'] : [];
+        $diffSummary = is_array($diff['summary'] ?? null) ? $diff['summary'] : [];
+        $tables = $this->arrayRows($schema['tables'] ?? []);
+        $relations = $this->arrayRows($schema['relations'] ?? []);
+        $viewsCatalog = $this->arrayRows($schema['viewsCatalog'] ?? []);
+        $materializedViews = $this->arrayRows($schema['materializedViews'] ?? []);
+        $functionsCatalog = $this->arrayRows($schema['functionsCatalog'] ?? []);
+        $proceduresCatalog = $this->arrayRows($schema['proceduresCatalog'] ?? []);
+        $eventTriggers = $this->arrayRows($schema['eventTriggers'] ?? []);
+        $schemasCatalog = $this->arrayRows($schema['schemasCatalog'] ?? []);
+        $rolesCatalog = $this->arrayRows($schema['rolesCatalog'] ?? []);
+        $exportBundles = $this->arrayRows($schema['exportBundles'] ?? []);
+        $approvalMatrix = $this->arrayRows($schema['approvalMatrix'] ?? []);
+        $roleModes = $this->arrayRows($schema['roleModes'] ?? []);
+        $interoperabilityTracks = $this->arrayRows($schema['interoperabilityTracks'] ?? []);
+        $traceabilityScenarios = $this->arrayRows($schema['traceabilityScenarios'] ?? []);
+        $beautySystem = is_array($schema['beautySystem'] ?? null) ? $schema['beautySystem'] : [];
+        $ambiences = $this->arrayRows($beautySystem['ambiences'] ?? []);
+        $densities = $this->arrayRows($beautySystem['densities'] ?? []);
+        $sceneFamilies = $this->arrayRows($beautySystem['sceneFamilies'] ?? []);
+
+        $indexCount = 0;
+        $checkConstraintCount = 0;
+        $triggerCount = 0;
+        $indexExamples = [];
+        $checkExamples = [];
+        $triggerExamples = [];
+        foreach ($tables as $table) {
+            $indexes = $this->arrayRows($table['indexes'] ?? []);
+            $checks = $this->arrayRows($table['check_constraints'] ?? []);
+            $triggers = $this->arrayRows($table['triggers'] ?? []);
+            $indexCount += count($indexes);
+            $checkConstraintCount += count($checks);
+            $triggerCount += count($triggers);
+            foreach ($indexes as $index) {
+                $name = trim((string)($index['name'] ?? ''));
+                if ($name !== '') {
+                    $indexExamples[] = $name;
+                }
+            }
+            foreach ($checks as $check) {
+                $name = trim((string)($check['name'] ?? ''));
+                if ($name !== '') {
+                    $checkExamples[] = $name;
+                }
+            }
+            foreach ($triggers as $trigger) {
+                $name = trim((string)($trigger['name'] ?? ''));
+                if ($name !== '') {
+                    $triggerExamples[] = $name;
+                }
+            }
+        }
+
+        $policyCount = (int)($reportSummary['policyCount'] ?? 0);
+        if ($policyCount <= 0) {
+            $policyCount = $this->countPolicies($schema);
+        }
+
+        $makeSurface = function (string $key, string $label, int $count, int $target, string $detail, array $examples): array {
+            $target = max(1, $target);
+            $score = max(0, min(100, (int)round(($count / $target) * 100)));
+            return [
+                'key' => $key,
+                'label' => $label,
+                'count' => $count,
+                'target' => $target,
+                'detail' => $detail,
+                'examples' => array_slice(array_values(array_filter(array_map(static fn($value): string => trim((string)$value), $examples))), 0, 6),
+                'coverageScore' => $score,
+                'readinessScore' => $score,
+                'tone' => $score >= 90 ? 'good' : ($score >= 75 ? 'warning' : 'critical'),
+                'gaps' => $count >= $target ? [] : ['Add ' . max(0, $target - $count) . ' more modeled objects to reach target posture'],
+            ];
+        };
+
+        $objectSurfaces = [
+            $makeSurface('tables', 'Tables', count($tables), 96, 'Canonical operational and runtime-facing table coverage.', array_map(static fn(array $table): string => (string)($table['name'] ?? ''), $tables)),
+            $makeSurface('relations', 'Relations', count($relations), 150, 'Cross-domain dependencies and digital thread edges.', array_map(static fn(array $relation): string => (string)($relation['name'] ?? ''), $relations)),
+            $makeSurface('indexes', 'Indexes', $indexCount, 120, 'Lookup, queue, and join posture for scale-heavy flows.', $indexExamples),
+            $makeSurface('checks', 'Check constraints', $checkConstraintCount, 60, 'Guardrails for status and quantity invariants.', $checkExamples),
+            $makeSurface('triggers', 'Triggers', $triggerCount, 90, 'Audit and live-pulse hooks for release evidence.', $triggerExamples),
+            $makeSurface('views', 'Views', count($viewsCatalog), 8, 'Curated read models for operations and review.', array_map(static fn(array $item): string => (string)($item['name'] ?? ''), $viewsCatalog)),
+            $makeSurface('materialized_views', 'Materialized views', count($materializedViews), 4, 'Accelerated atlas and backlog surfaces.', array_map(static fn(array $item): string => (string)($item['name'] ?? ''), $materializedViews)),
+            $makeSurface('functions', 'Functions', count($functionsCatalog), 8, 'Reusable database logic for audit, masking, and pulse.', array_map(static fn(array $item): string => (string)($item['name'] ?? ''), $functionsCatalog)),
+            $makeSurface('procedures', 'Procedures', count($proceduresCatalog), 4, 'Promotion, backfill, and control-plane orchestration.', array_map(static fn(array $item): string => (string)($item['name'] ?? ''), $proceduresCatalog)),
+            $makeSurface('event_triggers', 'Event triggers', count($eventTriggers), 3, 'Destructive-change firewall and release telemetry hooks.', array_map(static fn(array $item): string => (string)($item['name'] ?? ''), $eventTriggers)),
+            $makeSurface('policies', 'Policies', $policyCount, 60, 'RLS and policy-backed runtime exposure discipline.', ['policy_runtime_release_gate']),
+            $makeSurface('schemas_roles', 'Schemas & roles', count($schemasCatalog) + count($rolesCatalog), 15, 'Ownership and access-intent modeling surfaces.', array_merge(array_map(static fn(array $item): string => (string)($item['key'] ?? $item['name'] ?? ''), $schemasCatalog), array_map(static fn(array $item): string => (string)($item['key'] ?? $item['name'] ?? ''), $rolesCatalog))),
+        ];
+
+        $physicalCoverageScore = max(0, min(100, (int)round(array_reduce($objectSurfaces, static function (int $carry, array $item): int {
+            return $carry + (int)($item['readinessScore'] ?? 0);
+        }, 0) / max(1, count($objectSurfaces)))));
+
+        $reviewBoards = [];
+        foreach ($approvalMatrix as $board) {
+            $score = (int)($board['score'] ?? 0);
+            $reviewBoards[] = [
+                'key' => (string)($board['key'] ?? 'board'),
+                'label' => (string)($board['label'] ?? $board['key'] ?? 'Board'),
+                'owner' => (string)($board['owner'] ?? ''),
+                'approver' => (string)($board['approver'] ?? ''),
+                'score' => $score,
+                'tone' => $score >= 90 ? 'good' : ($score >= 75 ? 'warning' : 'critical'),
+                'evidence' => array_slice(array_values(array_filter((array)($board['evidence'] ?? []))), 0, 8),
+                'detail' => implode(' → ', array_slice(array_values(array_filter((array)($board['evidence'] ?? []))), 0, 3)),
+            ];
+        }
+
+        $exports = [];
+        foreach ($exportBundles as $item) {
+            $status = (string)($item['status'] ?? 'ready');
+            $score = $status === 'ready' ? 100 : ($status === 'partial' ? 78 : 68);
+            $exports[] = [
+                'key' => (string)($item['key'] ?? 'export'),
+                'label' => (string)($item['label'] ?? $item['key'] ?? 'Export'),
+                'status' => $status,
+                'format' => (string)($item['format'] ?? 'json'),
+                'purpose' => (string)($item['purpose'] ?? ''),
+                'score' => $score,
+                'tone' => $score >= 90 ? 'good' : ($score >= 75 ? 'warning' : 'critical'),
+            ];
+        }
+
+        $modeCards = [];
+        foreach ($roleModes as $item) {
+            $score = (int)($item['score'] ?? 0);
+            $modeCards[] = [
+                'key' => (string)($item['key'] ?? 'mode'),
+                'label' => (string)($item['label'] ?? $item['key'] ?? 'Mode'),
+                'persona' => (string)($item['persona'] ?? ''),
+                'score' => $score,
+                'tone' => $score >= 90 ? 'good' : ($score >= 75 ? 'warning' : 'critical'),
+                'focus' => array_slice(array_values(array_filter((array)($item['focus'] ?? []))), 0, 8),
+                'subtitle' => implode(' · ', array_slice(array_values(array_filter((array)($item['focus'] ?? []))), 0, 4)),
+            ];
+        }
+
+        $interopCards = [];
+        foreach ($interoperabilityTracks as $item) {
+            $status = (string)($item['status'] ?? 'ready');
+            $score = $status === 'ready' ? 98 : ($status === 'partial' ? 78 : 66);
+            $interopCards[] = [
+                'key' => (string)($item['key'] ?? 'track'),
+                'label' => (string)($item['label'] ?? $item['key'] ?? 'Track'),
+                'status' => $status,
+                'detail' => (string)($item['detail'] ?? ''),
+                'score' => $score,
+                'tone' => $score >= 90 ? 'good' : ($score >= 75 ? 'warning' : 'critical'),
+            ];
+        }
+
+        $traceabilityAtlas = [];
+        foreach ($traceabilityScenarios as $item) {
+            $score = (int)($item['score'] ?? 0);
+            $traceabilityAtlas[] = [
+                'key' => (string)($item['key'] ?? 'scenario'),
+                'label' => (string)($item['label'] ?? $item['key'] ?? 'Scenario'),
+                'domains' => array_slice(array_values(array_filter((array)($item['domains'] ?? []))), 0, 8),
+                'focusTables' => array_slice(array_values(array_filter((array)($item['focusTables'] ?? []))), 0, 8),
+                'score' => $score,
+                'tone' => $score >= 90 ? 'good' : ($score >= 75 ? 'warning' : 'critical'),
+            ];
+        }
+
+        $modeAverageScore = count($modeCards) > 0
+            ? (int)round(array_reduce($modeCards, static fn(int $carry, array $item): int => $carry + (int)($item['score'] ?? 0), 0) / count($modeCards))
+            : 84;
+        $beautyConfigCoverageScore = min(100, (count($ambiences) * 24) + (count($densities) * 18) + (count($sceneFamilies) * 16));
+        $storyCoverageScore = min(100, ((int)($summary['sceneCount'] ?? 0) * 10) + ((int)($summary['spotlightCount'] ?? 0) * 6));
+
+        $reviewOpsScore = max(0, min(100, (int)round(
+            ((int)($summary['governanceCoveragePercent'] ?? 0) * 0.24)
+            + ((int)($summary['reviewWallScore'] ?? 0) * 0.22)
+            + ((int)($summary['promotionReadinessScore'] ?? 0) * 0.18)
+            + ((int)($summary['firewallScore'] ?? 0) * 0.18)
+            + ((int)($summary['complianceReadinessScore'] ?? 0) * 0.10)
+            + (min(100, count($reviewBoards) * 18) * 0.08)
+        )));
+        $exportSurfaceScore = max(0, min(100, (int)round(
+            ((int)($summary['registrySyncScore'] ?? 0) * 0.28)
+            + ((int)($diffSummary['compatibilityScore'] ?? $summary['compatibilityScore'] ?? 100) * 0.20)
+            + ((int)($summary['visualPolishScore'] ?? 0) * 0.12)
+            + (min(100, count($exports) * 12) * 0.24)
+            + ((int)($summary['releaseReadinessScore'] ?? 0) * 0.16)
+        )));
+        $interoperabilityScore = max(0, min(100, (int)round(
+            ((int)($summary['workflowBindingCoveragePercent'] ?? 0) * 0.26)
+            + ((int)($summary['registrySyncScore'] ?? 0) * 0.24)
+            + (min(100, count($interopCards) * 16) * 0.18)
+            + (min(100, (int)($reportSummary['tableCount'] ?? count($tables)) * 1) * 0.12)
+            + ((int)($reportSummary['canonicalCoveragePercent'] ?? 0) * 0.20)
+        )));
+        $roleModeScore = max(0, min(100, (int)round(
+            ((int)($summary['collaborationReadinessScore'] ?? 0) * 0.18)
+            + (min(100, (int)($summary['personaCount'] ?? 0) * 16) * 0.08)
+            + (min(100, (int)($summary['playbookCount'] ?? 0) * 16) * 0.08)
+            + (min(100, count($modeCards) * 16) * 0.14)
+            + ($modeAverageScore * 0.30)
+            + ((int)($summary['narrativeCoverageScore'] ?? 0) * 0.22)
+        )));
+        $traceabilityAtlasScore = max(0, min(100, (int)round(
+            ((int)($summary['journeyReadinessScore'] ?? 0) * 0.30)
+            + ((int)($reportSummary['canonicalCoveragePercent'] ?? 0) * 0.22)
+            + ((int)($summary['domainReadinessScore'] ?? 0) * 0.16)
+            + (min(100, count($traceabilityAtlas) * 16) * 0.20)
+            + ((int)($summary['releaseRadarScore'] ?? 0) * 0.12)
+        )));
+        $beautySystemScore = max(0, min(100, (int)round(
+            ((int)($summary['visualPolishScore'] ?? 0) * 0.30)
+            + ((int)($summary['experienceScore'] ?? 0) * 0.18)
+            + ($beautyConfigCoverageScore * 0.30)
+            + ($storyCoverageScore * 0.22)
+        )));
+        $atlasMeshScore = max(0, min(100, (int)round(
+            ($physicalCoverageScore * 0.22)
+            + ($reviewOpsScore * 0.18)
+            + ($exportSurfaceScore * 0.14)
+            + ($interoperabilityScore * 0.16)
+            + ($roleModeScore * 0.10)
+            + ($traceabilityAtlasScore * 0.12)
+            + ($beautySystemScore * 0.08)
+        )));
+
+        $artifact = [
+            '_meta' => [
+                'generatedAt' => $this->nowIso(),
+                'source' => 'schema_studio_round7_report',
+                'designId' => $designId,
+                'designName' => $designName,
+            ],
+            'summary' => [
+                'atlasMeshScore' => $atlasMeshScore,
+                'physicalCoverageScore' => $physicalCoverageScore,
+                'reviewOpsScore' => $reviewOpsScore,
+                'exportSurfaceScore' => $exportSurfaceScore,
+                'interoperabilityScore' => $interoperabilityScore,
+                'roleModeScore' => $roleModeScore,
+                'traceabilityAtlasScore' => $traceabilityAtlasScore,
+                'beautySystemScore' => $beautySystemScore,
+                'objectSurfaceCount' => count($objectSurfaces),
+                'roleModeCount' => count($modeCards),
+                'reviewBoardCount' => count($reviewBoards),
+                'exportBundleCount' => count($exports),
+            ],
+            'hero' => [
+                'headline' => 'Round 7 atlas mesh',
+                'subheadline' => 'Physical PostgreSQL object coverage, governance boards, export surfaces, role-aware views and traceability atlas now sit on the same world-class control plane.',
+                'atlasMeshScore' => $atlasMeshScore,
+                'physicalCoverageScore' => $physicalCoverageScore,
+                'reviewOpsScore' => $reviewOpsScore,
+                'exportSurfaceScore' => $exportSurfaceScore,
+                'interoperabilityScore' => $interoperabilityScore,
+            ],
+            'atlas' => [
+                'score' => $physicalCoverageScore,
+                'objectSurfaces' => $objectSurfaces,
+                'capabilityBands' => [
+                    ['label' => 'Domains', 'count' => (int)($summary['domainCount'] ?? 0), 'score' => (int)($summary['domainReadinessScore'] ?? 0), 'detail' => 'Cross-domain semantic coverage.'],
+                    ['label' => 'Layers', 'count' => (int)($summary['layerCount'] ?? 0), 'score' => (int)($summary['journeyReadinessScore'] ?? 0), 'detail' => 'Canonical 7-layer orchestration posture.'],
+                    ['label' => 'Policies', 'count' => $policyCount, 'score' => (int)($summary['policyCoveragePercent'] ?? 0), 'detail' => 'RLS / policy / masking intent visibility.'],
+                    ['label' => 'Compiler contracts', 'count' => (int)($reportSummary['tableCount'] ?? count($tables)), 'score' => (int)($summary['registrySyncScore'] ?? 0), 'detail' => 'Registry/API/module-builder propagation.'],
+                ],
+            ],
+            'reviewBoards' => $reviewBoards,
+            'exports' => $exports,
+            'roleModes' => $modeCards,
+            'interoperability' => $interopCards,
+            'traceabilityAtlas' => $traceabilityAtlas,
+            'beautySystem' => [
+                'score' => $beautySystemScore,
+                'ambiences' => $ambiences,
+                'densities' => $densities,
+                'sceneFamilies' => $sceneFamilies,
+            ],
+            'reportSummary' => $reportSummary,
+            'diffSummary' => $diffSummary,
+        ];
+        if ($actor !== null && $actor !== '') {
+            $artifact['_meta']['actor'] = $actor;
+        }
+
+        return $artifact;
+    }
+
     private function buildHealthDiagnostics(array $schema, array $baseline = []): array
     {
         $schema = $this->normalizeEnterpriseSchema($schema);
@@ -3265,6 +3627,9 @@ class SchemaStudioController extends BaseController
         $fkColumns = 0;
         $rlsTables = 0;
         $partitionedTables = 0;
+        $indexCount = 0;
+        $checkConstraintCount = 0;
+        $triggerCount = 0;
 
         foreach ((array)($schema['tables'] ?? []) as $table) {
             if (!is_array($table)) {
@@ -3287,6 +3652,9 @@ class SchemaStudioController extends BaseController
                     $fkColumns++;
                 }
             }
+            $indexCount += count($this->arrayRows($table['indexes'] ?? []));
+            $checkConstraintCount += count($this->arrayRows($table['check_constraints'] ?? []));
+            $triggerCount += count($this->arrayRows($table['triggers'] ?? []));
             if (!empty($table['rls_enabled'])) {
                 $rlsTables++;
             }
@@ -3294,6 +3662,19 @@ class SchemaStudioController extends BaseController
                 $partitionedTables++;
             }
         }
+
+        $viewCatalogCount = count($this->arrayRows($schema['viewsCatalog'] ?? []));
+        $materializedViewCount = count($this->arrayRows($schema['materializedViews'] ?? []));
+        $functionCount = count($this->arrayRows($schema['functionsCatalog'] ?? []));
+        $procedureCount = count($this->arrayRows($schema['proceduresCatalog'] ?? []));
+        $eventTriggerCount = count($this->arrayRows($schema['eventTriggers'] ?? []));
+        $schemaCatalogCount = count($this->arrayRows($schema['schemasCatalog'] ?? []));
+        $roleCatalogCount = count($this->arrayRows($schema['rolesCatalog'] ?? []));
+        $exportBundleCount = count($this->arrayRows($schema['exportBundles'] ?? []));
+        $reviewBoardCount = count($this->arrayRows($schema['approvalMatrix'] ?? []));
+        $roleModeCount = count($this->arrayRows($schema['roleModes'] ?? []));
+        $interoperabilityTrackCount = count($this->arrayRows($schema['interoperabilityTracks'] ?? []));
+        $traceabilityScenarioCount = count($this->arrayRows($schema['traceabilityScenarios'] ?? []));
 
         $capabilities = [];
         $presentCount = 0;
@@ -3335,6 +3716,21 @@ class SchemaStudioController extends BaseController
                 'generatedColumnCount' => $generatedColumns,
                 'foreignKeyColumnCount' => $fkColumns,
                 'partitionedTableCount' => $partitionedTables,
+                'indexCount' => $indexCount,
+                'checkConstraintCount' => $checkConstraintCount,
+                'triggerCount' => $triggerCount,
+                'viewCatalogCount' => $viewCatalogCount,
+                'materializedViewCount' => $materializedViewCount,
+                'functionCount' => $functionCount,
+                'procedureCount' => $procedureCount,
+                'eventTriggerCount' => $eventTriggerCount,
+                'schemaCatalogCount' => $schemaCatalogCount,
+                'roleCatalogCount' => $roleCatalogCount,
+                'exportBundleCount' => $exportBundleCount,
+                'reviewBoardCount' => $reviewBoardCount,
+                'roleModeCount' => $roleModeCount,
+                'interoperabilityTrackCount' => $interoperabilityTrackCount,
+                'traceabilityScenarioCount' => $traceabilityScenarioCount,
                 'savedViewCount' => count((array)($schema['views'] ?? [])),
                 'canonicalCoveragePercent' => $coverage,
                 'releaseReadinessScore' => $releaseReadiness,
@@ -3592,7 +3988,7 @@ class SchemaStudioController extends BaseController
     private function buildCompilerBundle(array $schema, string $designId, string $actor): array
     {
         $schema = $this->normalizeEnterpriseSchema($schema, $actor);
-        $baseline = $this->readJsonFile($this->baselinePath($designId));
+        $baseline = $this->loadBaselineDocument($designId, $schema);
         if (!is_array($baseline)) {
             $baseline = $schema;
         }
@@ -3717,6 +4113,7 @@ class SchemaStudioController extends BaseController
                 'workflowBindings' => $workflowBindings,
                 'digitalThreads' => $digitalThreads,
             ],
+            'schemaDocument' => $schema,
             'contracts' => $contracts,
             'health' => $health,
         ];
@@ -3849,6 +4246,16 @@ class SchemaStudioController extends BaseController
             (array)($compilerBundle['report'] ?? []),
             ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
         );
+        $round7Report = $this->buildRound7Artifact(
+            (string)($compilerBundle['_meta']['designId'] ?? ''),
+            (string)($compilerBundle['_meta']['designName'] ?? ''),
+            is_array($compilerBundle['schemaDocument'] ?? null) ? $compilerBundle['schemaDocument'] : [],
+            (array)($compilerBundle['health'] ?? []),
+            (array)($compilerBundle['report'] ?? []),
+            ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
+        );
+        $diagnostics['summary'] = array_merge((array)($diagnostics['summary'] ?? []), (array)($round7Report['summary'] ?? []));
+        $diagnostics['round7'] = $round7Report;
 
         $manifest = [
             '_meta' => [
@@ -3865,6 +4272,16 @@ class SchemaStudioController extends BaseController
                 }, 0),
                 'contractCount' => count((array)($contracts['contracts'] ?? [])),
                 'policyCount' => (int)($compilerBundle['report']['summary']['policyCount'] ?? 0),
+                'indexCount' => (int)($compilerBundle['report']['summary']['indexCount'] ?? 0),
+                'checkConstraintCount' => (int)($compilerBundle['report']['summary']['checkConstraintCount'] ?? 0),
+                'triggerCount' => (int)($compilerBundle['report']['summary']['triggerCount'] ?? 0),
+                'viewCatalogCount' => (int)($compilerBundle['report']['summary']['viewCatalogCount'] ?? 0),
+                'materializedViewCount' => (int)($compilerBundle['report']['summary']['materializedViewCount'] ?? 0),
+                'functionCount' => (int)($compilerBundle['report']['summary']['functionCount'] ?? 0),
+                'procedureCount' => (int)($compilerBundle['report']['summary']['procedureCount'] ?? 0),
+                'eventTriggerCount' => (int)($compilerBundle['report']['summary']['eventTriggerCount'] ?? 0),
+                'schemaCatalogCount' => (int)($compilerBundle['report']['summary']['schemaCatalogCount'] ?? 0),
+                'roleCatalogCount' => (int)($compilerBundle['report']['summary']['roleCatalogCount'] ?? 0),
                 'canonicalCoveragePercent' => (int)($compilerBundle['report']['summary']['canonicalCoveragePercent'] ?? 0),
                 'releaseReadinessScore' => (int)($compilerBundle['report']['summary']['releaseReadinessScore'] ?? 0),
                 'releaseCount' => count((array)($releaseLog['items'] ?? [])),
@@ -3916,12 +4333,25 @@ class SchemaStudioController extends BaseController
                 'spotlightCount' => (int)($commandCenterReport['summary']['spotlightCount'] ?? 0),
                 'reviewLaneCount' => (int)($commandCenterReport['summary']['reviewLaneCount'] ?? 0),
                 'atlasCount' => (int)($commandCenterReport['summary']['atlasCount'] ?? 0),
+                'atlasMeshScore' => (int)($round7Report['summary']['atlasMeshScore'] ?? 0),
+                'physicalCoverageScore' => (int)($round7Report['summary']['physicalCoverageScore'] ?? 0),
+                'reviewOpsScore' => (int)($round7Report['summary']['reviewOpsScore'] ?? 0),
+                'exportSurfaceScore' => (int)($round7Report['summary']['exportSurfaceScore'] ?? 0),
+                'interoperabilityScore' => (int)($round7Report['summary']['interoperabilityScore'] ?? 0),
+                'roleModeScore' => (int)($round7Report['summary']['roleModeScore'] ?? 0),
+                'traceabilityAtlasScore' => (int)($round7Report['summary']['traceabilityAtlasScore'] ?? 0),
+                'beautySystemScore' => (int)($round7Report['summary']['beautySystemScore'] ?? 0),
+                'objectSurfaceCount' => (int)($round7Report['summary']['objectSurfaceCount'] ?? 0),
+                'roleModeCount' => (int)($round7Report['summary']['roleModeCount'] ?? 0),
+                'reviewBoardCount' => (int)($round7Report['summary']['reviewBoardCount'] ?? 0),
+                'exportBundleCount' => (int)($round7Report['summary']['exportBundleCount'] ?? 0),
             ],
             'report' => $compilerBundle['report'] ?? [],
             'health' => $diagnostics,
             'experienceSummary' => (array)($experienceReport['summary'] ?? []),
             'operationsSummary' => (array)($operationsReport['summary'] ?? []),
             'commandCenterSummary' => (array)($commandCenterReport['summary'] ?? []),
+            'round7Summary' => (array)($round7Report['summary'] ?? []),
             'lastRelease' => $releaseSummary,
         ];
 
@@ -3931,6 +4361,7 @@ class SchemaStudioController extends BaseController
         $this->writeJsonFile($this->experienceReportPath(), $experienceReport);
         $this->writeJsonFile($this->operationsReportPath(), $operationsReport);
         $this->writeJsonFile($this->commandCenterReportPath(), $commandCenterReport);
+        $this->writeJsonFile($this->round7ReportPath(), $round7Report);
         $this->writeJsonFile($registryDir . '/schema-studio-enterprise-manifest.json', $manifest);
 
         return $manifest;
@@ -4320,12 +4751,12 @@ class SchemaStudioController extends BaseController
         if ($id === '') {
             $this->error('missing_id', 400);
         }
-        $schema = $this->readJsonFile($this->designPath($id));
+        $schema = $this->loadDesignDocument($id);
         if (!$schema) {
             $this->error('not_found', 404);
         }
         $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
-        $baseline = $this->readJsonFile($this->baselinePath($id));
+        $baseline = $this->loadBaselineDocument($id, $schema);
         if (is_array($baseline)) {
             $baseline = $this->normalizeEnterpriseSchema($baseline, (string)($user['username'] ?? 'system'));
         }
@@ -5145,7 +5576,7 @@ class SchemaStudioController extends BaseController
 
         $body = $this->jsonBody();
         $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
-        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->readJsonFile($this->designPath($designId));
+        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
         }
@@ -5201,12 +5632,12 @@ class SchemaStudioController extends BaseController
 
         $body = $this->jsonBody();
         $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
-        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->readJsonFile($this->designPath($designId));
+        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
         }
 
-        $baseline = is_array($body['baseline'] ?? null) ? $body['baseline'] : $this->readJsonFile($this->baselinePath($designId));
+        $baseline = is_array($body['baseline'] ?? null) ? $body['baseline'] : $this->loadBaselineDocument($designId, $schema);
         if (!is_array($baseline)) {
             $baseline = ['_meta' => ['id' => $designId . '_baseline'], 'tables' => [], 'relations' => [], 'groups' => [], 'notes' => []];
         }
@@ -5303,12 +5734,12 @@ class SchemaStudioController extends BaseController
 
         $body = $this->jsonBody();
         $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
-        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->readJsonFile($this->designPath($designId));
+        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
         }
 
-        $baseline = is_array($body['baseline'] ?? null) ? $body['baseline'] : $this->readJsonFile($this->baselinePath($designId));
+        $baseline = is_array($body['baseline'] ?? null) ? $body['baseline'] : $this->loadBaselineDocument($designId, $schema);
         if (!is_array($baseline)) {
             $baseline = ['_meta' => ['id' => $designId . '_baseline'], 'tables' => [], 'relations' => [], 'groups' => [], 'notes' => []];
         }
@@ -5378,13 +5809,25 @@ class SchemaStudioController extends BaseController
             $diff,
             (string)($user['username'] ?? 'system')
         );
+        $round7Report = $this->buildRound7Artifact(
+            $designId,
+            (string)($schema['_meta']['name'] ?? $designId),
+            $schema,
+            $health,
+            $report,
+            $diff,
+            (string)($user['username'] ?? 'system')
+        );
         $artifact['commandCenter'] = $commandCenterReport;
+        $artifact['round7'] = $round7Report;
+        $artifact['summary'] = array_merge((array)($artifact['summary'] ?? []), (array)($round7Report['summary'] ?? []));
 
         if (($body['persist_artifacts'] ?? true) !== false) {
             $this->writeJsonFile($this->registryDirPath() . '/schema-studio-diagnostics.json', $artifact);
             $this->writeJsonFile($this->experienceReportPath(), $experienceReport);
             $this->writeJsonFile($this->operationsReportPath(), $operationsReport);
             $this->writeJsonFile($this->commandCenterReportPath(), $commandCenterReport);
+            $this->writeJsonFile($this->round7ReportPath(), $round7Report);
         }
 
         $this->auditLog('schema_studio_diagnose', [
@@ -5402,6 +5845,7 @@ class SchemaStudioController extends BaseController
             'experienceReport' => $experienceReport,
             'operationsReport' => $operationsReport,
             'commandCenterReport' => $commandCenterReport,
+            'round7Report' => $round7Report,
         ]);
     }
 
@@ -5416,11 +5860,11 @@ class SchemaStudioController extends BaseController
             $this->success($artifact);
         }
 
-        $schema = $this->readJsonFile($this->designPath($designId));
+        $schema = $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('operations_report_not_found', 404);
         }
-        $baseline = $this->readJsonFile($this->baselinePath($designId));
+        $baseline = $this->loadBaselineDocument($designId, $schema);
         if (!is_array($baseline)) {
             $baseline = $schema;
         }
@@ -5448,11 +5892,11 @@ class SchemaStudioController extends BaseController
             $this->success($artifact);
         }
 
-        $schema = $this->readJsonFile($this->designPath($designId));
+        $schema = $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('command_center_report_not_found', 404);
         }
-        $baseline = $this->readJsonFile($this->baselinePath($designId));
+        $baseline = $this->loadBaselineDocument($designId, $schema);
         if (!is_array($baseline)) {
             $baseline = $schema;
         }
@@ -5485,11 +5929,11 @@ class SchemaStudioController extends BaseController
         $commandCenter = $this->readJsonFile($this->commandCenterReportPath());
 
         if (!is_array($commandCenter) || (($commandCenter['_meta']['designId'] ?? '') !== $designId && $designId !== 'workspace')) {
-            $schema = $this->readJsonFile($this->designPath($designId));
+            $schema = $this->loadDesignDocument($designId);
             if (!is_array($schema)) {
                 $this->error('round6_report_not_found', 404);
             }
-            $baseline = $this->readJsonFile($this->baselinePath($designId));
+            $baseline = $this->loadBaselineDocument($designId, $schema);
             if (!is_array($baseline)) {
                 $baseline = $schema;
             }
@@ -5501,9 +5945,11 @@ class SchemaStudioController extends BaseController
             $experience = $this->buildExperienceArtifact($designId, (string)($schema['_meta']['name'] ?? $designId), $health, $report, $diff, (string)($user['username'] ?? 'system'));
             $operations = $this->buildOperationsArtifact($designId, (string)($schema['_meta']['name'] ?? $designId), $health, $report, $diff, (string)($user['username'] ?? 'system'));
             $commandCenter = $this->buildCommandCenterArtifact($designId, (string)($schema['_meta']['name'] ?? $designId), $health, $report, $diff, (string)($user['username'] ?? 'system'));
+            $round7 = $this->buildRound7Artifact($designId, (string)($schema['_meta']['name'] ?? $designId), $schema, $health, $report, $diff, (string)($user['username'] ?? 'system'));
             $diagnostics = [
-                'summary' => (array)($health['summary'] ?? []),
+                'summary' => array_merge((array)($health['summary'] ?? []), (array)($round7['summary'] ?? [])),
                 'commandCenter' => $commandCenter,
+                'round7' => $round7,
             ];
             $manifest = [
                 'summary' => [
@@ -5513,7 +5959,13 @@ class SchemaStudioController extends BaseController
                 'experienceSummary' => (array)($experience['summary'] ?? []),
                 'operationsSummary' => (array)($operations['summary'] ?? []),
                 'commandCenterSummary' => (array)($commandCenter['summary'] ?? []),
+                'round7Summary' => is_array($round7 ?? null) ? (array)($round7['summary'] ?? []) : [],
             ];
+        }
+
+        $round7 = $this->readJsonFile($this->round7ReportPath());
+        if (!is_array($round7) && is_array($diagnostics) && is_array($diagnostics['round7'] ?? null)) {
+            $round7 = $diagnostics['round7'];
         }
 
         $this->success([
@@ -5523,7 +5975,41 @@ class SchemaStudioController extends BaseController
             'experienceReport' => is_array($experience) ? $experience : [],
             'operationsReport' => is_array($operations) ? $operations : [],
             'commandCenterReport' => is_array($commandCenter) ? $commandCenter : [],
+            'round7Report' => is_array($round7) ? $round7 : [],
         ]);
+    }
+
+    public function getRound7Report(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+        $body = $this->jsonBody();
+        $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $artifact = $this->readJsonFile($this->round7ReportPath());
+        if (is_array($artifact) && (($artifact['_meta']['designId'] ?? '') === $designId || $designId === 'workspace')) {
+            $this->success($artifact);
+        }
+
+        $schema = $this->loadDesignDocument($designId);
+        if (!is_array($schema)) {
+            $this->error('round7_report_not_found', 404);
+        }
+        $baseline = $this->loadBaselineDocument($designId, $schema);
+        $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
+        $baseline = $this->normalizeEnterpriseSchema($baseline, (string)($user['username'] ?? 'system'));
+        $report = $this->buildSchemaReport($schema);
+        $diff = $this->buildTypedDiff($baseline, $schema);
+        $health = $this->buildHealthDiagnostics($schema, $baseline);
+        $artifact = $this->buildRound7Artifact(
+            $designId,
+            (string)($schema['_meta']['name'] ?? $designId),
+            $schema,
+            $health,
+            $report,
+            $diff,
+            (string)($user['username'] ?? 'system')
+        );
+        $this->success($artifact);
     }
 
     public function export(): never

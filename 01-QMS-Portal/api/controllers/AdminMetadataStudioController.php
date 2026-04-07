@@ -330,6 +330,11 @@ class AdminMetadataStudioController extends BaseController
         return $this->readJsonFile($this->registryPath('schema-studio-command-center-report')) ?? [];
     }
 
+    private function schemaStudioRound7Report(): array
+    {
+        return $this->readJsonFile($this->registryPath('schema-studio-round7-report')) ?? [];
+    }
+
 
     /**
      * @return array<int, array<string, mixed>>
@@ -491,6 +496,7 @@ class AdminMetadataStudioController extends BaseController
         $schemaStudioExperienceReport = $this->schemaStudioExperienceReport();
         $schemaStudioOperationsReport = $this->schemaStudioOperationsReport();
         $schemaStudioCommandCenterReport = $this->schemaStudioCommandCenterReport();
+        $schemaStudioRound7Report = $this->schemaStudioRound7Report();
 
         $apiSummaries = $this->apiSummaries($endpointCatalog);
         $tableSummaries = $this->tableSummaries($tableRegistry);
@@ -559,6 +565,18 @@ class AdminMetadataStudioController extends BaseController
                 'schemaStudioSpotlightCount' => (int)($schemaStudioManifest['summary']['spotlightCount'] ?? $schemaStudioCommandCenterReport['summary']['spotlightCount'] ?? count((array)($schemaStudioCommandCenterReport['spotlight'] ?? []))),
                 'schemaStudioReviewLaneCount' => (int)($schemaStudioManifest['summary']['reviewLaneCount'] ?? $schemaStudioCommandCenterReport['summary']['reviewLaneCount'] ?? count((array)($schemaStudioCommandCenterReport['reviewWall']['lanes'] ?? []))),
                 'schemaStudioAtlasCount' => (int)($schemaStudioManifest['summary']['atlasCount'] ?? $schemaStudioCommandCenterReport['summary']['atlasCount'] ?? count((array)($schemaStudioCommandCenterReport['atlas'] ?? []))),
+                'schemaStudioAtlasMeshScore' => (int)($schemaStudioManifest['summary']['atlasMeshScore'] ?? $schemaStudioDiagnostics['summary']['atlasMeshScore'] ?? $schemaStudioRound7Report['summary']['atlasMeshScore'] ?? 0),
+                'schemaStudioPhysicalCoverage' => (int)($schemaStudioManifest['summary']['physicalCoverageScore'] ?? $schemaStudioDiagnostics['summary']['physicalCoverageScore'] ?? $schemaStudioRound7Report['summary']['physicalCoverageScore'] ?? 0),
+                'schemaStudioReviewOpsScore' => (int)($schemaStudioManifest['summary']['reviewOpsScore'] ?? $schemaStudioDiagnostics['summary']['reviewOpsScore'] ?? $schemaStudioRound7Report['summary']['reviewOpsScore'] ?? 0),
+                'schemaStudioExportSurfaceScore' => (int)($schemaStudioManifest['summary']['exportSurfaceScore'] ?? $schemaStudioDiagnostics['summary']['exportSurfaceScore'] ?? $schemaStudioRound7Report['summary']['exportSurfaceScore'] ?? 0),
+                'schemaStudioInteroperabilityScore' => (int)($schemaStudioManifest['summary']['interoperabilityScore'] ?? $schemaStudioDiagnostics['summary']['interoperabilityScore'] ?? $schemaStudioRound7Report['summary']['interoperabilityScore'] ?? 0),
+                'schemaStudioRoleModeScore' => (int)($schemaStudioManifest['summary']['roleModeScore'] ?? $schemaStudioDiagnostics['summary']['roleModeScore'] ?? $schemaStudioRound7Report['summary']['roleModeScore'] ?? 0),
+                'schemaStudioTraceabilityAtlasScore' => (int)($schemaStudioManifest['summary']['traceabilityAtlasScore'] ?? $schemaStudioDiagnostics['summary']['traceabilityAtlasScore'] ?? $schemaStudioRound7Report['summary']['traceabilityAtlasScore'] ?? 0),
+                'schemaStudioBeautySystemScore' => (int)($schemaStudioManifest['summary']['beautySystemScore'] ?? $schemaStudioDiagnostics['summary']['beautySystemScore'] ?? $schemaStudioRound7Report['summary']['beautySystemScore'] ?? 0),
+                'schemaStudioObjectSurfaceCount' => (int)($schemaStudioManifest['summary']['objectSurfaceCount'] ?? $schemaStudioRound7Report['summary']['objectSurfaceCount'] ?? count((array)($schemaStudioRound7Report['atlas']['objectSurfaces'] ?? []))),
+                'schemaStudioRoleModeCount' => (int)($schemaStudioManifest['summary']['roleModeCount'] ?? $schemaStudioRound7Report['summary']['roleModeCount'] ?? count((array)($schemaStudioRound7Report['roleModes'] ?? []))),
+                'schemaStudioReviewBoardCount' => (int)($schemaStudioManifest['summary']['reviewBoardCount'] ?? $schemaStudioRound7Report['summary']['reviewBoardCount'] ?? count((array)($schemaStudioRound7Report['reviewBoards'] ?? []))),
+                'schemaStudioExportBundleCount' => (int)($schemaStudioManifest['summary']['exportBundleCount'] ?? $schemaStudioRound7Report['summary']['exportBundleCount'] ?? count((array)($schemaStudioRound7Report['exports'] ?? []))),
             ],
             'benchmarks' => $this->benchmarkReferences(),
             'principles' => $this->benchmarkPrinciples(),
@@ -572,6 +590,7 @@ class AdminMetadataStudioController extends BaseController
                 'experienceReport' => $schemaStudioExperienceReport,
                 'operationsReport' => $schemaStudioOperationsReport,
                 'commandCenterReport' => $schemaStudioCommandCenterReport,
+                'round7Report' => $schemaStudioRound7Report,
                 'releaseLog' => array_slice((array)($schemaStudioReleaseLog['items'] ?? []), 0, 10),
             ],
             'lists' => [

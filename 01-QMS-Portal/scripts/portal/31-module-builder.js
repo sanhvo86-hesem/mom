@@ -2270,7 +2270,19 @@ function _registryHealthSummary(){
     schemaStudioSceneCount: schemaStudioSummary.sceneCount || 0,
     schemaStudioSpotlightCount: schemaStudioSummary.spotlightCount || 0,
     schemaStudioReviewLaneCount: schemaStudioSummary.reviewLaneCount || 0,
-    schemaStudioAtlasCount: schemaStudioSummary.atlasCount || 0
+    schemaStudioAtlasCount: schemaStudioSummary.atlasCount || 0,
+    schemaStudioAtlasMeshScore: schemaStudioSummary.atlasMeshScore || 0,
+    schemaStudioPhysicalCoverage: schemaStudioSummary.physicalCoverageScore || 0,
+    schemaStudioReviewOpsScore: schemaStudioSummary.reviewOpsScore || 0,
+    schemaStudioExportSurfaceScore: schemaStudioSummary.exportSurfaceScore || 0,
+    schemaStudioInteroperabilityScore: schemaStudioSummary.interoperabilityScore || 0,
+    schemaStudioRoleModeScore: schemaStudioSummary.roleModeScore || 0,
+    schemaStudioTraceabilityAtlasScore: schemaStudioSummary.traceabilityAtlasScore || 0,
+    schemaStudioBeautySystemScore: schemaStudioSummary.beautySystemScore || 0,
+    schemaStudioObjectSurfaceCount: schemaStudioSummary.objectSurfaceCount || 0,
+    schemaStudioRoleModeCount: schemaStudioSummary.roleModeCount || 0,
+    schemaStudioReviewBoardCount: schemaStudioSummary.reviewBoardCount || 0,
+    schemaStudioExportBundleCount: schemaStudioSummary.exportBundleCount || 0
   };
 }
 
@@ -2319,6 +2331,10 @@ function _renderRegistryHealthNotice(){
     h += '<div>'+_esc(_t('Atlas / live pulse / collaboration: ','Atlas / live pulse / collaboration: ') + info.schemaStudioAtlasReadiness + '% / ' + info.schemaStudioLivePulseScore + '% / ' + info.schemaStudioCollaborationReadiness + '%')+'</div>';
     h += '<div>'+_esc(_t('Visual polish / scenes / spotlights / atlas packs: ','Visual polish / scenes / spotlights / atlas packs: ') + info.schemaStudioVisualPolish + '% / ' + info.schemaStudioSceneCount + ' / ' + info.schemaStudioSpotlightCount + ' / ' + info.schemaStudioAtlasCount)+'</div>';
     h += '<div>'+_esc(_t('Command events / review lanes tracked: ','Command events / review lanes tracked: ') + info.schemaStudioEventRailCount + ' / ' + info.schemaStudioReviewLaneCount)+'</div>';
+    h += '<div>'+_esc(_t('Atlas mesh / physical coverage / review ops: ','Atlas mesh / physical coverage / review ops: ') + info.schemaStudioAtlasMeshScore + '% / ' + info.schemaStudioPhysicalCoverage + '% / ' + info.schemaStudioReviewOpsScore + '%')+'</div>';
+    h += '<div>'+_esc(_t('Export surface / interoperability / role modes: ','Export surface / interoperability / role modes: ') + info.schemaStudioExportSurfaceScore + '% / ' + info.schemaStudioInteroperabilityScore + '% / ' + info.schemaStudioRoleModeScore + '%')+'</div>';
+    h += '<div>'+_esc(_t('Traceability atlas / beauty system / object surfaces: ','Traceability atlas / beauty system / object surfaces: ') + info.schemaStudioTraceabilityAtlasScore + '% / ' + info.schemaStudioBeautySystemScore + '% / ' + info.schemaStudioObjectSurfaceCount)+'</div>';
+    h += '<div>'+_esc(_t('Role modes / review boards / export bundles: ','Role modes / review boards / export bundles: ') + info.schemaStudioRoleModeCount + ' / ' + info.schemaStudioReviewBoardCount + ' / ' + info.schemaStudioExportBundleCount)+'</div>';
   }
   if(info.compositePkTables){
     h += '<div>'+_esc(_t('Bang composite PK da co contract rieng: ','Composite-PK tables use dedicated identity contracts: ') + info.compositePkTables)+'</div>';

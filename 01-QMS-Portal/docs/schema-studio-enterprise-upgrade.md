@@ -2,7 +2,96 @@
 
 Đây là gói overwrite **cộng dồn tất cả thay đổi đã tạo trong đoạn chat** cho `Schema Studio`, `Admin Metadata Studio`, `Module Builder` và registry artifacts liên quan.
 
-Nó không phải delta patch. Nó là bộ overwrite tổng thể để bạn có thể cập nhật local một lần nếu chưa apply vòng nào trước đó.
+## Round 7 — Atlas Mesh
+
+Round 7 bổ sung lớp làm sâu object coverage + review/governance + export/interoperability + role-aware cockpit.
+
+### Backend
+
+`SchemaStudioController.php` được mở rộng thêm:
+
+- `round7ReportPath()`
+- `designCandidatePaths()` + `loadDesignDocument()` + `loadBaselineDocument()` để vá fallback `workspace` / `canonical`
+- `buildRound7Artifact()` để sinh artifact round 7
+- API mới: `schema_studio_round7_report`
+
+Artifact round 7 mới:
+
+- `qms-data/registry/schema-studio-round7-report.json`
+
+Round 7 còn làm giàu manifest/diagnostics với các metric mới:
+
+- `atlasMeshScore`
+- `physicalCoverageScore`
+- `reviewOpsScore`
+- `exportSurfaceScore`
+- `interoperabilityScore`
+- `roleModeScore`
+- `traceabilityAtlasScore`
+- `beautySystemScore`
+- `objectSurfaceCount`
+- `reviewBoardCount`
+- `exportBundleCount`
+- `roleModeCount`
+
+### Frontend
+
+#### `32-schema-studio.js`
+
+Bổ sung shell `Round 7 atlas mesh` với 5 mặt nhìn:
+
+- `Atlas`
+- `Review`
+- `Exports`
+- `Roles`
+- `Traceability`
+
+Bổ sung:
+
+- object-surface explorer
+- capability bands
+- review boards + diff/firewall posture
+- export surface + interoperability tracks
+- role-aware mode cards
+- beauty system (ambience / density / scene family)
+- traceability atlas scenarios
+- command palette actions: `Open round 7 atlas mesh`, `Copy round 7 atlas brief`
+- shortcut `Alt + 8`
+
+#### `32-admin-metadata-studio.js`
+
+Bổ sung shell round 7 để metadata admin cũng thấy:
+
+- physical coverage
+- review boards
+- export bundles
+- role modes
+- traceability atlas
+- beauty system
+
+### Canonical seed changes
+
+Canonical design/baseline/workspace được enrich thêm:
+
+- alias `canonical_erp_mes_eqms_7layer_core.json`
+- `workspace.json` + `workspace.baseline.json`
+- `approvalMatrix`
+- `roleModes`
+- `interoperabilityTracks`
+- `traceabilityScenarios`
+- `beautySystem`
+- richer `indexes`, `check_constraints`, `triggers` trên tables
+
+### Round 7 target posture
+
+- `98` physical coverage
+- `98` review ops
+- `98` export surface
+- `97` interoperability
+- `97` role modes
+- `96` traceability atlas
+- `97` beauty system
+- `97` atlas mesh
 
 ## End-state included in this package
 

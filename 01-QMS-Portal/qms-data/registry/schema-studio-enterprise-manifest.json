@@ -61,7 +61,29 @@
     "sceneCount": 8,
     "spotlightCount": 6,
     "reviewLaneCount": 6,
-    "atlasCount": 4
+    "atlasCount": 4,
+    "indexCount": 223,
+    "checkConstraintCount": 45,
+    "triggerCount": 202,
+    "viewCatalogCount": 8,
+    "materializedViewCount": 4,
+    "functionCount": 8,
+    "procedureCount": 4,
+    "eventTriggerCount": 3,
+    "schemaCatalogCount": 7,
+    "roleCatalogCount": 8,
+    "physicalCoverageScore": 98,
+    "reviewOpsScore": 98,
+    "exportSurfaceScore": 98,
+    "interoperabilityScore": 97,
+    "roleModeScore": 97,
+    "traceabilityAtlasScore": 96,
+    "beautySystemScore": 97,
+    "atlasMeshScore": 97,
+    "objectSurfaceCount": 12,
+    "roleModeCount": 6,
+    "reviewBoardCount": 5,
+    "exportBundleCount": 8
   },
   "report": {
     "summary": {
@@ -2647,5 +2669,19 @@
     "spotlightCount": 6,
     "reviewLaneCount": 6,
     "atlasCount": 4
+  },
+  "round7Summary": {
+    "atlasMeshScore": 97,
+    "physicalCoverageScore": 98,
+    "reviewOpsScore": 98,
+    "exportSurfaceScore": 98,
+    "interoperabilityScore": 97,
+    "roleModeScore": 97,
+    "traceabilityAtlasScore": 96,
+    "beautySystemScore": 97,
+    "objectSurfaceCount": 12,
+    "roleModeCount": 6,
+    "reviewBoardCount": 5,
+    "exportBundleCount": 8
   }
 }

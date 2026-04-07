@@ -2,7 +2,46 @@
 
 Package root: `qms.hesem.com.vn/`
 
-Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 6**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo vì bạn chưa apply bất kỳ vòng nào trước đó.
+Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 7**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+
+## Round 7 highlights
+
+Round 7 tiếp tục trên toàn bộ nền đã tích lũy và đóng các khoảng trống lớn còn lại của `Schema Studio`:
+
+- thêm `schema_studio_round7_report` và persisted artifact `schema-studio-round7-report.json`
+- vá fallback thực tế cho `workspace` / `canonical_erp_mes_eqms_7layer_core` để tránh active workspace rơi vào trạng thái rỗng
+- làm sâu object model theo hướng PostgreSQL-native hơn: `views`, `materialized views`, `functions`, `procedures`, `event triggers`, `schemas`, `roles`, `indexes`, `checks`, `triggers`
+- thêm `Atlas Mesh` UI trong `32-schema-studio.js`
+- thêm `Round 7` overview shell trong `32-admin-metadata-studio.js`
+- đồng bộ telemetry mới sang `31-module-builder.js`
+- bổ sung `beautySystem`, `approvalMatrix`, `roleModes`, `interoperabilityTracks`, `traceabilityScenarios`, `exportBundles` vào canonical design seed
+- nâng `control-plane-defaults.json` lên profile `worldclass_round7`
+
+## Seeded round 7 posture in this package
+
+- `101` tables
+- `161` relations
+- `577` fields
+- `223` indexes
+- `45` check constraints
+- `202` triggers
+- `8` views
+- `4` materialized views
+- `8` functions
+- `4` procedures
+- `3` event triggers
+- `98` physical coverage score
+- `98` review ops score
+- `98` export surface score
+- `97` interoperability score
+- `97` role mode score
+- `96` traceability atlas score
+- `97` beauty system score
+- `97` atlas mesh score
+- `12` object surfaces
+- `5` review boards
+- `8` export bundles
+- `6` role modes
 
 ## Included scope
 

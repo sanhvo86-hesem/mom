@@ -1,26 +1,7 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-07T13:22:55+00:00",
+        "generatedAt": "2026-04-07T04:06:04Z",
         "source": "schema_studio_release_log"
     },
-    "items": [
-        {
-            "id": "schema_release_canonical_erp_mes_eqms_7layer_core_20260407_132255",
-            "name": "Canonical ERP+MES+eQMS 7-Layer Core · 2026-04-07 13:22:55 UTC",
-            "designId": "canonical_erp_mes_eqms_7layer_core",
-            "designName": "Canonical ERP+MES+eQMS 7-Layer Core",
-            "createdAt": "2026-04-07T13:22:55+00:00",
-            "actor": "sanh.vo",
-            "approvalClass": "cab_esign",
-            "compatibilityScore": 0,
-            "riskScore": 100,
-            "destructiveCount": 36,
-            "breakingCount": 36,
-            "releaseReadinessScore": 90,
-            "visualReadinessScore": 79,
-            "metadataCompletenessPercent": 90,
-            "graphDensityScore": 97,
-            "hotspotCount": 12
-        }
-    ]
+    "items": []
 }

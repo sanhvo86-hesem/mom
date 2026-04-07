@@ -1,0 +1,12 @@
+node --check: run separately and passed
+contains r8 hotfix guard: PASS
+contains restore hidden builder helper: PASS
+contains normalize html helper: PASS
+contains move panel helper: PASS
+contains mb-r6-shell hide selector: PASS
+synthetic restore shell: PASS
+synthetic remove r6 shell: PASS
+synthetic remove old decks: PASS
+synthetic keep builder shell: PASS
+synthetic move panel grid into shell: PASS
+synthetic mark builder shell: PASS
