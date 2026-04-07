@@ -2,7 +2,9 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-06T02:22:55.218Z"
+    "generatedAt": "2026-04-07T01:52:34.067Z",
+    "slice_publication_pass": "foundation_governance_contract_slice",
+    "publication_run_id": "6f52becb-b777-4517-a068-6afe91eab08c"
   },
   "coverage": {
     "router_actions": 2862,
@@ -33,11 +35,11 @@
       "unneeded": 413
     },
     "frontend_foundation": {
-      "entity_count": 528,
-      "ready_entities": 330,
+      "entity_count": 533,
+      "ready_entities": 335,
       "partial_entities": 198,
       "blocked_entities": 0,
-      "workflow_ready_entities": 122,
+      "workflow_ready_entities": 123,
       "related_ready_entities": 513,
       "analytics_ready_entities": 479,
       "planning_console_entities": 28,

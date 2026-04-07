@@ -2525,12 +2525,9 @@ paths:
         Submit an approve, reject, or request-changes decision on an approval group.
         Requires the If-Match header with the current ETag to prevent lost updates.
 
-        **Workflow Bridge Status: BLOCKED.**
-        This route is currently fail-closed. The approval workflow engine bridge
-        is not yet ready. All decision attempts will receive a `409` response with
-        problem type `urn:qms:problem:bridge-not-ready` until the bridge is
-        implemented and validated. Read operations (list, detail, timeline) are
-        unaffected.
+        Decisions are validated through the ApprovalWorkflowAdapter which enforces:
+        state validation, self-approval prohibition, and concurrency protection
+        before canonical persistence.
       security:
         - sessionCookie: []
           csrfHeader: []

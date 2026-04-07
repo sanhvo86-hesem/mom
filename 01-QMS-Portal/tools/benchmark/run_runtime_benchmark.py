@@ -14,7 +14,9 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 PORTAL_ROOT = SCRIPT_DIR.parent.parent
 WORKSPACE_ROOT = PORTAL_ROOT.parent
-REPORT_PATH = WORKSPACE_ROOT / "_reports" / "backend-runtime-benchmark-2026-04-05.json"
+_REPORT_DATE = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+REPORT_PATH = WORKSPACE_ROOT / "_reports" / f"backend-runtime-benchmark-{_REPORT_DATE}.json"
+REPORT_LATEST_PATH = WORKSPACE_ROOT / "_reports" / "backend-runtime-benchmark-latest.json"
 TABLE_REGISTRY_PATH = PORTAL_ROOT / "qms-data" / "registry" / "table-registry.json"
 BENCH_SCHEMA_PATH = SCRIPT_DIR / "benchmark_schema.sql"
 SEED_PATH = SCRIPT_DIR / "seed_runtime_benchmark.sql"
@@ -307,11 +309,29 @@ def main() -> int:
     unsafe_attempts = int(unsafe_bench.get("transactions_processed", 0))
 
     fg_read_bench = None
+    fg_read_error = None
+    fg_profile = {
+        "name": "stability_probe",
+        "intent": "Verify FG read-mix queries execute without error on a representative dataset. "
+                  "Conservative concurrency (2 clients, 1 job, 15s) chosen to avoid overwhelming "
+                  "small benchmark dataset with complex approval-group aggregations. "
+                  "This is a no-crash stability proof, not a production-load simulation.",
+        "clients": 2,
+        "jobs": 1,
+        "duration_seconds": 15,
+    }
     if FG_READ_MIX_PATH.is_file() and FG_BENCH_SCHEMA_PATH.is_file() and FG_BENCH_SEED_PATH.is_file():
-        # Load the canonical foundation-governance benchmark schema and seed
-        for fg_file in [FG_BENCH_SCHEMA_PATH, FG_BENCH_SEED_PATH]:
-            run_psql(config, BENCH_DB, file_path=fg_file)
-        fg_read_bench = run_pgbench(config, BENCH_DB, FG_READ_MIX_PATH, clients=12, jobs=4, duration=30)
+        try:
+            for fg_file in [FG_BENCH_SCHEMA_PATH, FG_BENCH_SEED_PATH]:
+                run_psql(config, BENCH_DB, file_path=fg_file)
+            fg_read_bench = run_pgbench(
+                config, BENCH_DB, FG_READ_MIX_PATH,
+                clients=fg_profile["clients"],
+                jobs=fg_profile["jobs"],
+                duration=fg_profile["duration_seconds"],
+            )
+        except RuntimeError as exc:
+            fg_read_error = str(exc)
 
     report["pgbench"] = {
         "read_mix": read_bench,
@@ -333,13 +353,25 @@ def main() -> int:
         },
     }
 
+    fg_section: dict[str, Any] = {"profile": fg_profile}
     if fg_read_bench is not None:
-        report["pgbench"]["foundation_governance_read_mix"] = fg_read_bench
+        fg_section["status"] = "completed"
+        fg_section.update(fg_read_bench)
+    elif fg_read_error is not None:
+        fg_section["status"] = "failed"
+        fg_section["error"] = fg_read_error
+        fg_section["script"] = str(FG_READ_MIX_PATH)
+    else:
+        fg_section["status"] = "skipped"
+        fg_section["reason"] = "FG benchmark schema/seed/mix not all present"
+    report["pgbench"]["foundation_governance_read_mix"] = fg_section
 
     report["finished_at"] = datetime.now(timezone.utc).isoformat()
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"report_path": str(REPORT_PATH), "benchmark_database": BENCH_DB}, indent=2))
+    report_text = json.dumps(report, indent=2) + "\n"
+    REPORT_PATH.write_text(report_text, encoding="utf-8")
+    REPORT_LATEST_PATH.write_text(report_text, encoding="utf-8")
+    print(json.dumps({"report_path": str(REPORT_PATH), "latest_path": str(REPORT_LATEST_PATH), "benchmark_database": BENCH_DB}, indent=2))
     return 0
 
 

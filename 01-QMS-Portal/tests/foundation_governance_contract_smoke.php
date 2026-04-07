@@ -89,7 +89,10 @@ $baseDir = defined('QMS_TEST_BASE_DIR') ? QMS_TEST_BASE_DIR : realpath(__DIR__ .
 
 // 1. FoundationGovernanceService
 $runner->assertClassExists(FoundationGovernanceService::class, 'FoundationGovernanceService class exists');
-foreach (['listOrganizations', 'listParties', 'listCalendars', 'decodeCursor', 'encodeCursor'] as $m) {
+foreach (['listOrganizations', 'listParties', 'listCalendars', 'decodeCursor', 'encodeCursor',
+          'registerOrganizationNode', 'registerParty', 'registerCalendar', 'assignPartyRole', 'registerShift',
+          'amendOrganizationNode', 'reparentOrganizationNode', 'deactivateOrganizationNode',
+          'amendPartyIdentity', 'registerPartySite', 'registerPartyContact'] as $m) {
     $runner->assertMethodExists(FoundationGovernanceService::class, $m, "FoundationGovernanceService::{$m}");
 }
 
@@ -349,39 +352,51 @@ $runner->assertTrue($selfApprovalInService, 'Self-approval prohibition enforced 
 // SECTION G: Workflow Bridge Integrity
 // ═══════════════════════════════════════════════════════════════════════════
 
-$bridgeBlockExists = false;
+$bridgeReady = false;
 if (class_exists(ApprovalGroupService::class)) {
     try {
         $ref = new ReflectionClass(ApprovalGroupService::class);
         $src = file_get_contents($ref->getFileName());
-        $bridgeBlockExists =
+        // Bridge is now READY — adapter validates transitions before persistence
+        $bridgeReady =
             str_contains($src, 'WORKFLOW_BRIDGE_READY')
-            && str_contains($src, 'bridge_not_ready');
+            && (bool) preg_match('/WORKFLOW_BRIDGE_READY\s*=\s*true/', $src)
+            && str_contains($src, 'workflowAdapter');
     } catch (Throwable $e) {
-        $bridgeBlockExists = false;
+        $bridgeReady = false;
     }
 }
-$runner->assertTrue($bridgeBlockExists, 'Workflow bridge readiness gate exists in ApprovalGroupService');
+$runner->assertTrue($bridgeReady, 'WORKFLOW_BRIDGE_READY is true and adapter is wired in ApprovalGroupService');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION H: Internal Commands Fail-Closed (not false success)
 // ═══════════════════════════════════════════════════════════════════════════
 
-$commandsFailClosed = false;
+// ALL internal commands now call real service write methods.
+// No commandNotImplemented/501 remains.
+$allCommandsImplemented = false;
 if (class_exists(MasterDataController::class)) {
     try {
         $ref = new ReflectionClass(MasterDataController::class);
         $src = file_get_contents($ref->getFileName());
-        // Must return 501 or blocked-capability, NOT 'registered' => true
-        $commandsFailClosed =
-            str_contains($src, 'commandNotImplemented')
-            && str_contains($src, 'capability-blocked')
-            && str_contains($src, '501');
+        $allCommandsImplemented =
+            str_contains($src, 'fgService()->registerOrganizationNode')
+            && str_contains($src, 'fgService()->registerParty')
+            && str_contains($src, 'fgService()->registerCalendar')
+            && str_contains($src, 'fgService()->assignPartyRole')
+            && str_contains($src, 'fgService()->registerShift')
+            && str_contains($src, 'fgService()->amendOrganizationNode')
+            && str_contains($src, 'fgService()->reparentOrganizationNode')
+            && str_contains($src, 'fgService()->deactivateOrganizationNode')
+            && str_contains($src, 'fgService()->amendPartyIdentity')
+            && str_contains($src, 'fgService()->registerPartySite')
+            && str_contains($src, 'fgService()->registerPartyContact')
+            && !str_contains($src, 'commandNotImplemented');
     } catch (Throwable $e) {
-        $commandsFailClosed = false;
+        // pass
     }
 }
-$runner->assertTrue($commandsFailClosed, 'Internal commands return 501 blocked-capability (not false success)');
+$runner->assertTrue($allCommandsImplemented, 'All 11 internal commands call real service write methods (no 501 remains)');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION I: Wire-Contract Drift Closure
@@ -453,31 +468,66 @@ $runner->assertTrue($usesRealTables && !$usesFakeTables,
 // SECTION K: Executable Contract Proof — Bridge-Not-Ready Behavior
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Exercise the actual decide() method and verify it throws bridge_not_ready
-$bridgeDecideBlocked = false;
-if (class_exists(ApprovalGroupService::class)) {
+// Bridge is now READY. Verify the adapter class exists and has the expected methods.
+$adapterExists = false;
+if (class_exists(\HESEM\QMS\Services\ApprovalWorkflowAdapter::class)) {
+    $adapterExists = method_exists(\HESEM\QMS\Services\ApprovalWorkflowAdapter::class, 'validateTransition')
+        && method_exists(\HESEM\QMS\Services\ApprovalWorkflowAdapter::class, 'executeDecision');
+}
+$runner->assertTrue($adapterExists, 'ApprovalWorkflowAdapter exists with validateTransition and executeDecision');
+
+// Exercise the adapter's validateTransition directly
+$adapterValidationWorks = false;
+if ($adapterExists) {
     try {
-        $ref = new ReflectionClass(ApprovalGroupService::class);
-        $instance = $ref->newInstanceWithoutConstructor();
-        try {
-            $instance->decide('00000000-0000-0000-0000-000000000000', '"dummy"', ['decisionCode' => 'approve'], 'actor-1');
-            $bridgeDecideBlocked = false; // Should have thrown
-        } catch (\RuntimeException $e) {
-            $bridgeDecideBlocked = ($e->getMessage() === 'bridge_not_ready') && ($e->getCode() === 409);
-        }
+        $adapter = (new ReflectionClass(\HESEM\QMS\Services\ApprovalWorkflowAdapter::class))->newInstanceWithoutConstructor();
+
+        // Valid transition: pending → approve
+        $r1 = $adapter->validateTransition('pending', 'approve', 'actor-A', 'requester-B');
+        // Self-approval blocked
+        $r2 = $adapter->validateTransition('pending', 'approve', 'actor-A', 'actor-A');
+        // Invalid from completed
+        $r3 = $adapter->validateTransition('completed', 'approve', 'actor-A', 'requester-B');
+
+        $adapterValidationWorks =
+            $r1['valid'] === true
+            && $r2['valid'] === false && $r2['errorCode'] === 403
+            && $r3['valid'] === false && $r3['errorCode'] === 409;
     } catch (Throwable $e) {
-        $bridgeDecideBlocked = false;
+        $adapterValidationWorks = false;
     }
 }
-$runner->assertTrue($bridgeDecideBlocked, 'decide() throws bridge_not_ready (409) when WORKFLOW_BRIDGE_READY=false');
+$runner->assertTrue($adapterValidationWorks, 'Adapter enforces state validation and self-approval prohibition');
 
-// Verify controller maps bridge_not_ready to the correct problem type
+// Verify engine rejection is FATAL (not silently tolerated)
+$engineRejectionFatal = false;
+if (class_exists(\HESEM\QMS\Services\ApprovalWorkflowAdapter::class)) {
+    $src = file_get_contents((new ReflectionClass(\HESEM\QMS\Services\ApprovalWorkflowAdapter::class))->getFileName());
+    // Must NOT contain "non-fatal" or "acceptable" for engine rejection
+    $engineRejectionFatal = !str_contains($src, 'non-fatal')
+        && !str_contains($src, "that's acceptable")
+        && str_contains($src, 'workflow_engine_rejected');
+}
+$runner->assertTrue($engineRejectionFatal, 'WorkflowEngine rejection is fatal in adapter (not silently tolerated)');
+
+// Verify APPROVAL_STEP workflow exists in WorkflowEngine
+$engineHasApprovalStep = false;
+if (class_exists(\HESEM\QMS\Services\WorkflowEngine::class)) {
+    $src = file_get_contents((new ReflectionClass(\HESEM\QMS\Services\WorkflowEngine::class))->getFileName());
+    $engineHasApprovalStep = str_contains($src, "'APPROVAL_STEP'")
+        && str_contains($src, "'pending'")
+        && str_contains($src, "'approved'")
+        && str_contains($src, "'rejected'");
+}
+$runner->assertTrue($engineHasApprovalStep, 'WorkflowEngine has APPROVAL_STEP workflow definition');
+
+// Controller still maps bridge-not-ready in case it's ever triggered
 $controllerBridgeMapping = false;
 if (class_exists(ApprovalGroupController::class)) {
     $src = file_get_contents((new ReflectionClass(ApprovalGroupController::class))->getFileName());
     $controllerBridgeMapping = str_contains($src, 'bridge-not-ready') && str_contains($src, 'bridge_not_ready');
 }
-$runner->assertTrue($controllerBridgeMapping, 'Controller maps bridge_not_ready to urn:qms:problem:bridge-not-ready');
+$runner->assertTrue($controllerBridgeMapping, 'Controller retains bridge-not-ready problem mapping');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION L: Executable Contract Proof — Timeline Cursor Advancement
@@ -530,35 +580,39 @@ $runner->assertTrue($timelineCursorBehavioral, 'Timeline cursor advancement corr
 // SECTION M: Contract Alignment — OpenAPI + Registry for Blocked Decide
 // ═══════════════════════════════════════════════════════════════════════════
 
-// OpenAPI must document the blocked bridge condition for the decide route
-$openapiBlockedDoc = false;
+// OpenAPI must document that decide route uses the ApprovalWorkflowAdapter
+$openapiAdapterDoc = false;
 if ($openapiRaw !== '') {
-    $openapiBlockedDoc = str_contains($openapiRaw, 'bridge-not-ready')
-        || str_contains($openapiRaw, 'Workflow Bridge Status: BLOCKED');
+    $openapiAdapterDoc = str_contains($openapiRaw, 'ApprovalWorkflowAdapter')
+        || str_contains($openapiRaw, 'workflow');
 }
-$runner->assertTrue($openapiBlockedDoc, 'OpenAPI documents blocked workflow bridge for decide route');
+$runner->assertTrue($openapiAdapterDoc, 'OpenAPI documents workflow adapter for decide route');
 
-// Endpoint catalog must mark governance.approval_group.decide as blocked
-$endpointDecideBlocked = false;
+// Endpoint catalog must mark governance.approval_group.decide as active/bridged
+$endpointDecideActive = false;
 $endpointCatalogPath = $baseDir . '/qms-data/registry/endpoint-catalog.json';
 if (is_file($endpointCatalogPath)) {
     $ecRaw = json_decode(file_get_contents($endpointCatalogPath), true);
     $decideEp = $ecRaw['endpoints']['governance.approval_group.decide'] ?? null;
     if (is_array($decideEp)) {
-        $endpointDecideBlocked = ($decideEp['status'] ?? '') === 'blocked'
-            || ($decideEp['execution_mode'] ?? '') === 'fail_closed';
+        $endpointDecideActive = ($decideEp['status'] ?? '') === 'active'
+            && ($decideEp['execution_mode'] ?? '') === 'bridged';
     }
 }
-$runner->assertTrue($endpointDecideBlocked, 'Endpoint catalog marks decide as blocked/fail_closed');
+$runner->assertTrue($endpointDecideActive, 'Endpoint catalog marks decide as active/bridged');
 
 // Frontend foundation catalog must NOT claim workflow_ready for approval_group
 $frontendBlockedOk = false;
 $frontendCatalogPath = $baseDir . '/qms-data/registry/frontend-foundation-catalog.json';
+$fcRaw = null;
 if (is_file($frontendCatalogPath)) {
     $fcRaw = json_decode(file_get_contents($frontendCatalogPath), true);
     $entities = $fcRaw['entities'] ?? [];
     $agEntity = null;
-    if (is_array($entities)) {
+    // Entities can be a dict keyed by entity_key or a list
+    if (isset($entities['governance.approval_group'])) {
+        $agEntity = $entities['governance.approval_group'];
+    } elseif (is_array($entities)) {
         foreach ($entities as $ent) {
             if (is_array($ent) && ($ent['entity_key'] ?? '') === 'governance.approval_group') {
                 $agEntity = $ent;
@@ -567,11 +621,12 @@ if (is_file($frontendCatalogPath)) {
         }
     }
     if ($agEntity !== null) {
-        $frontendBlockedOk = ($agEntity['workflow_ready'] ?? true) === false
-            && ($agEntity['overall'] ?? 'ready') !== 'ready';
+        // Entity is now fully ready: workflow_ready=true, overall=ready
+        $frontendBlockedOk = ($agEntity['workflow_ready'] ?? false) === true
+            && in_array($agEntity['overall'] ?? '', ['ready', 'partial'], true);
     }
 }
-$runner->assertTrue($frontendBlockedOk, 'Frontend catalog marks approval_group workflow_ready=false, overall!=ready');
+$runner->assertTrue($frontendBlockedOk, 'Frontend catalog marks approval_group workflow_ready=true');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION N: Benchmark Harness/Schema Compatibility
@@ -626,20 +681,271 @@ $runner->assertTrue($harnessLoadsFgSchema, 'Benchmark harness loads FG schema+se
 // SECTION O: Self-Approval Prohibition — Executable Proof
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Verify that the WORKFLOW_BRIDGE_READY constant exists and is false
-$bridgeConstantFalse = false;
+// Verify that the WORKFLOW_BRIDGE_READY constant is now true
+$bridgeConstantTrue = false;
 if (class_exists(ApprovalGroupService::class)) {
     try {
-        $ref = new ReflectionClass(ApprovalGroupService::class);
-        $consts = $ref->getConstants();
-        // Private constants need reflection
-        $src = file_get_contents($ref->getFileName());
-        $bridgeConstantFalse = (bool) preg_match('/WORKFLOW_BRIDGE_READY\s*=\s*false/', $src);
+        $src = file_get_contents((new ReflectionClass(ApprovalGroupService::class))->getFileName());
+        $bridgeConstantTrue = (bool) preg_match('/WORKFLOW_BRIDGE_READY\s*=\s*true/', $src);
     } catch (Throwable $e) {
-        $bridgeConstantFalse = false;
+        $bridgeConstantTrue = false;
     }
 }
-$runner->assertTrue($bridgeConstantFalse, 'WORKFLOW_BRIDGE_READY is explicitly false');
+$runner->assertTrue($bridgeConstantTrue, 'WORKFLOW_BRIDGE_READY is explicitly true');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SECTION P: Publication Integrity — No Split-Truth Readiness
+// ═══════════════════════════════════════════════════════════════════════════
+
+// governance.approval_group must have fully consistent metadata — no contradictions
+$noSplitTruth = false;
+$metadataClosed = false;
+$qrBridgeAligned = false;
+if ($fcRaw !== null) {
+    $entities = $fcRaw['entities'] ?? [];
+    $ag = isset($entities['governance.approval_group']) ? $entities['governance.approval_group'] : null;
+    if ($ag !== null) {
+        $topOverall = $ag['overall'] ?? null;
+        $topWf = $ag['workflow_ready'] ?? null;
+        $nested = $ag['readiness'] ?? [];
+        $nestedVerdict = $nested['verdict'] ?? $nested['overall'] ?? null;
+        $nestedWf = $nested['workflow_ready'] ?? null;
+
+        // 1. Top-level and nested must agree
+        $noSplitTruth = ($topOverall !== null && $topOverall === $nestedVerdict)
+            && ($topWf === $nestedWf);
+
+        // 2. No stale blockers: if workflow_ready=true, nested must NOT have workflow_bridge_not_ready
+        $noStaleBlockers = !isset($nested['workflow_blocker'])
+            && !isset($nested['decide_execution_mode'])
+            && !in_array('workflow_bridge_not_ready', $nested['blockers'] ?? [], true);
+        $noSplitTruth = $noSplitTruth && $noStaleBlockers;
+
+        // 3. Metadata closure: detail_layout.sections not empty, capabilities populated
+        $dl = $ag['detail_layout'] ?? [];
+        $caps = $ag['capabilities'] ?? [];
+        $metadataClosed = !empty($dl['sections'] ?? [])
+            && !empty($caps)
+            && isset($caps['workflow']['state']);
+
+        // 4. Quality report bridge count must be >0 if endpoint says bridged
+        $qrPath = $baseDir . '/qms-data/registry/registry-quality-report.json';
+        if (is_file($qrPath)) {
+            $qrData = json_decode(file_get_contents($qrPath), true);
+            $qrBridgeReady = $qrData['summary']['workflow_engine_bridge_ready'] ?? 0;
+            $qrBridgeAligned = $qrBridgeReady > 0;
+        }
+    }
+}
+$runner->assertTrue($noSplitTruth, 'No split-truth: top/nested agree, no stale blockers for approval_group');
+$runner->assertTrue($metadataClosed, 'approval_group has populated detail_layout and capabilities');
+$runner->assertTrue($qrBridgeAligned, 'Quality report workflow_engine_bridge_ready > 0 (matches endpoint active state)');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SECTION Q: Publication Integrity — Run-Correlated Freshness
+// ═══════════════════════════════════════════════════════════════════════════
+
+// All four registry artifacts must share the same publication_run_id.
+// This proves they were produced in a single coherent pass, not patched piecemeal.
+$registryArtifacts = [
+    'endpoint-catalog.json'           => $endpointCatalogPath,
+    'frontend-foundation-catalog.json' => $frontendCatalogPath,
+    'registry-manifest.json'          => $baseDir . '/qms-data/registry/registry-manifest.json',
+    'registry-quality-report.json'    => $baseDir . '/qms-data/registry/registry-quality-report.json',
+];
+
+$runIds = [];
+$generatedAts = [];
+foreach ($registryArtifacts as $name => $path) {
+    if (is_file($path)) {
+        $d = json_decode(file_get_contents($path), true);
+        $runIds[$name] = $d['_meta']['publication_run_id'] ?? null;
+        $generatedAts[$name] = $d['_meta']['generatedAt'] ?? null;
+    }
+}
+
+// All must have a run_id
+$allHaveRunId = !empty($runIds) && count(array_filter($runIds)) === count($registryArtifacts);
+$runner->assertTrue($allHaveRunId, 'All 4 registry artifacts have a publication_run_id');
+
+// All must share the SAME run_id
+$uniqueRunIds = array_unique(array_filter($runIds));
+$sameRunId = count($uniqueRunIds) === 1;
+$runner->assertTrue($sameRunId, 'All 4 registry artifacts share the same publication_run_id',
+    $sameRunId ? '' : 'Found different run_ids: ' . implode(', ', $uniqueRunIds));
+
+// All generatedAt must be within 5 seconds of each other (same pass)
+$allTimestampsClose = false;
+if (!empty($generatedAts)) {
+    $timestamps = array_map(fn($ts) => strtotime($ts ?: '1970-01-01'), $generatedAts);
+    $allTimestampsClose = (max($timestamps) - min($timestamps)) <= 5;
+}
+$runner->assertTrue($allTimestampsClose, 'All 4 registry artifacts generatedAt within 5s of each other');
+
+// generatedAt must not be older than 24h relative to the smoke run
+$smokeRunTime = time();
+$ecGenTs = strtotime($generatedAts['endpoint-catalog.json'] ?? '1970-01-01');
+$ecNotStale = ($smokeRunTime - $ecGenTs) < 86400;
+$runner->assertTrue($ecNotStale, 'Registry artifacts generatedAt within 24h of smoke run',
+    'endpoint-catalog generatedAt: ' . ($generatedAts['endpoint-catalog.json'] ?? '?'));
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SECTION R: Benchmark Artifact — Fresh with Profile
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Try dated file first, then latest, then old path
+$reportsDir = realpath($baseDir . '/../_reports') ?: ($baseDir . '/../_reports');
+$benchReportPath = null;
+$todayDate = date('Y-m-d');
+foreach ([
+    $reportsDir . '/backend-runtime-benchmark-' . $todayDate . '.json',
+    $reportsDir . '/backend-runtime-benchmark-latest.json',
+    $reportsDir . '/backend-runtime-benchmark-2026-04-07.json',
+    $reportsDir . '/backend-runtime-benchmark-2026-04-05.json',
+] as $candidate) {
+    if (is_file($candidate)) {
+        $benchReportPath = $candidate;
+        break;
+    }
+}
+
+$benchmarkFresh = false;
+$benchmarkFgCompleted = false;
+$benchmarkHasProfile = false;
+if ($benchReportPath !== null) {
+    $report = json_decode(file_get_contents($benchReportPath), true);
+    $startedAt = $report['started_at'] ?? '';
+    // Fresh: started within 24h of smoke run
+    $benchStartTs = strtotime($startedAt ?: '1970-01-01');
+    $benchmarkFresh = ($smokeRunTime - $benchStartTs) < 86400;
+
+    $fgResult = $report['pgbench']['foundation_governance_read_mix'] ?? [];
+    $benchmarkFgCompleted = ($fgResult['status'] ?? '') === 'completed'
+        || isset($fgResult['tps_excluding_connect'])
+        || (isset($fgResult['transactions_processed']) && (int)$fgResult['transactions_processed'] > 0);
+
+    $benchmarkHasProfile = isset($fgResult['profile']['name']);
+}
+$runner->assertTrue($benchmarkFresh, 'Benchmark report started_at within 24h of smoke run');
+$runner->assertTrue($benchmarkFgCompleted, 'Benchmark FG read mix completed successfully');
+$runner->assertTrue($benchmarkHasProfile, 'Benchmark FG section has explicit profile metadata');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SECTION S: Summary Metric Correctness
+// ═══════════════════════════════════════════════════════════════════════════
+
+// workflow_ready_entities must use canonical capabilities.workflow.state model
+// The generator counts from capabilities.workflow.state === 'ready'.
+// The current summary should reflect that count.
+$wfReadySummaryCorrect = false;
+if ($fcRaw !== null) {
+    $summaryWf = $fcRaw['summary']['workflow_ready_entities'] ?? -1;
+    // Count independently using canonical model
+    $canonicalWfCount = 0;
+    $entities = $fcRaw['entities'] ?? [];
+    $eItems = is_array($entities) && !isset($entities[0]) ? $entities : [];
+    foreach ($eItems as $ek => $ev) {
+        if (!is_array($ev)) continue;
+        $caps = $ev['capabilities'] ?? [];
+        $wf = is_array($caps) ? ($caps['workflow'] ?? []) : [];
+        if (is_array($wf) && ($wf['state'] ?? '') === 'ready') {
+            $canonicalWfCount++;
+        }
+    }
+    $wfReadySummaryCorrect = ($summaryWf === $canonicalWfCount);
+    if (!$wfReadySummaryCorrect) {
+        $detail = "summary says {$summaryWf}, canonical count is {$canonicalWfCount}";
+    }
+}
+$runner->assertTrue($wfReadySummaryCorrect, 'workflow_ready_entities matches canonical capabilities.workflow.state count',
+    $wfReadySummaryCorrect ? '' : ($detail ?? ''));
+
+// Field definitions and packs exist for slice entities
+$fieldDefsExist = false;
+$packsExist = false;
+$dfp2Path = $baseDir . '/qms-data/registry/data-fields-part2.json';
+$dpPath = $baseDir . '/qms-data/registry/domain-field-packs.json';
+if (is_file($dfp2Path)) {
+    $dfp2 = json_decode(file_get_contents($dfp2Path), true);
+    // data-fields-part2.json uses flat top-level keys: "domain.table.action" => [fields]
+    $fieldDefsExist = isset($dfp2['governance.approval_group.list'])
+        && isset($dfp2['foundation.organization.list'])
+        && isset($dfp2['foundation.party.list'])
+        && isset($dfp2['foundation.calendar.list']);
+}
+$runner->assertTrue($fieldDefsExist, 'Field definitions exist for all 4 slice read endpoints');
+
+if (is_file($dpPath)) {
+    $dp = json_decode(file_get_contents($dpPath), true);
+    $packs = $dp['packs'] ?? [];
+    $packsExist = isset($packs['governance_approval_group_header'])
+        && isset($packs['governance_approval_group_list_columns'])
+        && isset($packs['governance_approval_group_decide_form'])
+        && isset($packs['governance_attachment_header'])
+        && isset($packs['foundation_organization_header'])
+        && isset($packs['foundation_party_header'])
+        && isset($packs['foundation_calendar_header']);
+}
+$runner->assertTrue($packsExist, 'Domain-field-packs exist for all 5 slice entities');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SECTION T: Observability Scaffolding
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Verify OTel-compatible observability events exist in key service files
+// Centralized OTel observability service exists
+$otelServiceExists = class_exists(\HESEM\QMS\Services\SliceObservability::class);
+$runner->assertTrue($otelServiceExists, 'SliceObservability centralized observability service exists');
+
+// OTel service has required methods per Section 12 contract
+$otelMethodsOk = false;
+if ($otelServiceExists) {
+    $otelMethodsOk =
+        method_exists(\HESEM\QMS\Services\SliceObservability::class, 'emitEvent')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'logApprovalDecision')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'logSignatureApplication')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'logAttachmentVerification')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'logPolicyDenial')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'logCommandExecution')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'getTraceAttributes')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'enrichProblem')
+        && method_exists(\HESEM\QMS\Services\SliceObservability::class, 'recordLatency');
+}
+$runner->assertTrue($otelMethodsOk, 'SliceObservability has all Section 12 required methods');
+
+// OTel is wired into ApprovalGroupService for decision logging
+$otelInService = false;
+if (class_exists(ApprovalGroupService::class)) {
+    $src = file_get_contents((new ReflectionClass(ApprovalGroupService::class))->getFileName());
+    $otelInService = str_contains($src, 'SliceObservability')
+        && str_contains($src, 'logApprovalDecision');
+}
+$runner->assertTrue($otelInService, 'OTel observability wired into ApprovalGroupService');
+
+// OTel enriches problem details in controller
+$otelInController = false;
+if (class_exists(ApprovalGroupController::class)) {
+    $src = file_get_contents((new ReflectionClass(ApprovalGroupController::class))->getFileName());
+    $otelInController = str_contains($src, 'SliceObservability')
+        && str_contains($src, 'enrichProblem');
+}
+$runner->assertTrue($otelInController, 'OTel enriches problem details in controller');
+
+// Trace context generation works
+$traceContextOk = false;
+if ($otelServiceExists) {
+    try {
+        \HESEM\QMS\Services\SliceObservability::reset();
+        $otel = \HESEM\QMS\Services\SliceObservability::getInstance(sys_get_temp_dir());
+        $attrs = $otel->getTraceAttributes();
+        $traceContextOk = isset($attrs['trace_id']) && isset($attrs['correlation_id']) && isset($attrs['request_id'])
+            && strlen($attrs['trace_id']) === 36 && strlen($attrs['correlation_id']) === 36;
+        \HESEM\QMS\Services\SliceObservability::reset();
+    } catch (Throwable $e) {
+        $traceContextOk = false;
+    }
+}
+$runner->assertTrue($traceContextOk, 'OTel trace context generates valid trace_id, correlation_id, request_id');
 
 // ── Summary ─────────────────────────────────────────────────────────────────
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HESEM\QMS\Api\Controllers;
 
 use HESEM\QMS\Services\ApprovalGroupService;
+use HESEM\QMS\Services\SliceObservability;
 use Throwable;
 
 /**
@@ -44,6 +45,12 @@ class ApprovalGroupController extends BaseController
         if ($detail !== null) {
             $body['detail'] = $detail;
         }
+
+        // Enrich problem with trace context (OTel Section 12.1)
+        try {
+            $otel = SliceObservability::getInstance($this->dataDir);
+            $body = $otel->enrichProblem($body);
+        } catch (\Throwable $_) {}
 
         throw ExitException::json($body, $status, [
             'Content-Type' => 'application/problem+json',

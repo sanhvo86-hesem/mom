@@ -20,20 +20,27 @@ final class ApprovalGroupService
     /**
      * Workflow-engine bridge readiness flag.
      *
-     * When false, the public decision route returns an explicit
-     * bridge_not_ready problem instead of executing a direct table update.
-     * Set to true only when a WorkflowEngine adapter validates transitions
-     * before persistence.
+     * Set to true now that ApprovalWorkflowAdapter validates transitions
+     * before canonical persistence.
      */
-    private const WORKFLOW_BRIDGE_READY = false;
+    private const WORKFLOW_BRIDGE_READY = true;
 
     private DataLayer $data;
     private FoundationGovernanceService $fgService;
+    private ?ApprovalWorkflowAdapter $workflowAdapter = null;
 
     public function __construct(DataLayer $data)
     {
         $this->data = $data;
         $this->fgService = new FoundationGovernanceService($data);
+    }
+
+    private function workflowAdapter(): ApprovalWorkflowAdapter
+    {
+        if ($this->workflowAdapter === null) {
+            $this->workflowAdapter = new ApprovalWorkflowAdapter($this->data);
+        }
+        return $this->workflowAdapter;
     }
 
     // ── ETag helpers ───────────────────────────────────────────────────────
@@ -325,17 +332,7 @@ final class ApprovalGroupService
             throw new \RuntimeException('invalid_state_transition', 409);
         }
 
-        // Self-approval prohibition: requester may not decide their own request
-        $requestedByPartyId = $detail['requestedByPartyId'] ?? null;
-        if ($requestedByPartyId !== null && $requestedByPartyId === $actorPartyId) {
-            throw new \RuntimeException('self_approval_forbidden', 403);
-        }
-
         $decisionCode = $payload['decisionCode'] ?? '';
-        if (!in_array($decisionCode, ['approve', 'reject', 'request_changes'], true)) {
-            throw new \RuntimeException('validation_error', 422);
-        }
-
         $commentText = $payload['commentText'] ?? null;
         $reasonCode  = $payload['reasonCode'] ?? null;
         $esigId      = $payload['electronicSignatureId'] ?? null;
@@ -350,6 +347,31 @@ final class ApprovalGroupService
 
         if ($pendingStep === null) {
             throw new \RuntimeException('invalid_state_transition', 409);
+        }
+
+        // Execute through the WorkflowEngine bridge adapter.
+        // This validates state, decision code, and self-approval prohibition.
+        $bridgeResult = $this->workflowAdapter()->executeDecision(
+            $approvalGroupId,
+            $pendingStep['approvalStepCode'],
+            $pendingStep['statusCode'],
+            $decisionCode,
+            $actorPartyId,
+            $detail['requestedByPartyId'] ?? null,
+            $commentText,
+        );
+
+        if (!$bridgeResult['success']) {
+            $errorMsg = $bridgeResult['error'] ?? 'workflow_transition_failed';
+            $errorCode = $bridgeResult['errorCode'] ?? 409;
+            // Map adapter errors to the right exception codes
+            if (str_contains($errorMsg, 'self_approval_forbidden')) {
+                throw new \RuntimeException('self_approval_forbidden', 403);
+            }
+            if (str_contains($errorMsg, 'validation_error')) {
+                throw new \RuntimeException('validation_error', 422);
+            }
+            throw new \RuntimeException('invalid_state_transition', $errorCode);
         }
 
         $conn = $this->data->getConnection();
@@ -407,6 +429,14 @@ final class ApprovalGroupService
                 'reason_code'   => $reasonCode,
             ]
         ));
+
+        // OTel structured observability
+        $otel = SliceObservability::getInstance($this->data->getDataDir());
+        $otel->setActorContext($actorPartyId);
+        $otel->logApprovalDecision($approvalGroupId, $pendingStep['approvalStepCode'], $decisionCode, $actorPartyId, $commentText);
+        if ($esigId !== null) {
+            $otel->logSignatureApplication($approvalGroupId, $esigId, true, true);
+        }
 
         $updated = $this->getApprovalGroup($approvalGroupId);
 

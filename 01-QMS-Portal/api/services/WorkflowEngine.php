@@ -1017,6 +1017,49 @@ final class WorkflowEngine
     private function buildWorkflowDefinitions(): array
     {
         return [
+            // Foundation Governance Contract Slice: approval-step lifecycle
+            'APPROVAL_STEP' => [
+                'initial'  => 'pending',
+                'terminal' => ['approved', 'rejected'],
+                'states'   => ['pending', 'approved', 'rejected', 'changes_requested'],
+                'transitions' => [
+                    'pending' => [
+                        'approved' => [
+                            'label'    => 'Approve',
+                            'label_vi' => 'Phe duyet',
+                            'roles'    => ['qa_manager', 'admin', 'general_manager', 'approver'],
+                            'actions'  => ['audit_decision'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject',
+                            'label_vi' => 'Tu choi',
+                            'roles'    => ['qa_manager', 'admin', 'general_manager', 'approver'],
+                            'actions'  => ['audit_decision'],
+                            'requires' => [],
+                        ],
+                        'changes_requested' => [
+                            'label'    => 'Request Changes',
+                            'label_vi' => 'Yeu cau thay doi',
+                            'roles'    => ['qa_manager', 'admin', 'general_manager', 'approver'],
+                            'actions'  => ['audit_decision'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'approved' => [],
+                    'rejected' => [],
+                    'changes_requested' => [
+                        'pending' => [
+                            'label'    => 'Resubmit for Review',
+                            'label_vi' => 'Gui lai xem xet',
+                            'roles'    => ['owner', 'admin', 'requester'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                ],
+            ],
+
             'DOC' => [
                 'initial'  => 'draft',
                 'terminal' => ['obsolete'],

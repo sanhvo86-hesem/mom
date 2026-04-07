@@ -706,93 +706,207 @@ class MasterDataController extends BaseController
     }
 
     // ── Internal commands (Router action keys) ────────────────────────────
-    // Fail-closed: these commands validate auth/CSRF but return 501 because
-    // canonical DB writes are not yet implemented for this slice.
-
-    private function commandNotImplemented(string $commandName): never
-    {
-        $this->sliceProblem(
-            'urn:qms:problem:capability-blocked',
-            'Command not yet implemented',
-            501,
-            "Internal command '{$commandName}' is registered but canonical persistence is not yet implemented."
-        );
-    }
+    // All commands now persist to canonical 072 tables with concurrency protection.
 
     public function registerOrganizationNode(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('registerOrganizationNode');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function amendOrganizationNode(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('amendOrganizationNode');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->amendOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function reparentOrganizationNode(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('reparentOrganizationNode');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->reparentOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function deactivateOrganizationNode(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('deactivateOrganizationNode');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->deactivateOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function registerParty(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('registerParty');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerParty($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function amendPartyIdentity(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('amendPartyIdentity');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->amendPartyIdentity($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function assignPartyRole(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('assignPartyRole');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->assignPartyRole($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function registerPartySite(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('registerPartySite');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerPartySite($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function registerPartyContact(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('registerPartyContact');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerPartyContact($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function registerCalendar(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('registerCalendar');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerCalendar($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
     }
 
     public function registerShiftEntry(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
-        $this->commandNotImplemented('registerShift');
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerShift($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
     }
 }
