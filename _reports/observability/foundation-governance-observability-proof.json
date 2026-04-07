@@ -1,0 +1,137 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-07T03:33:56.175Z",
+    "proof_run_id": "dd4f5910-dedf-465b-abae-84741fc3db49",
+    "scope": "foundation_governance_contract_slice"
+  },
+  "infrastructure": {
+    "service": "SliceObservability.php",
+    "trace_context": {
+      "trace_id": "generated_per_request_uuid_v4",
+      "correlation_id": "generated_per_request_uuid_v4",
+      "request_id": "generated_per_request_uuid_v4",
+      "status": "implemented"
+    },
+    "collector_exporter": {
+      "status": "file_export_only",
+      "reason": "No live OTel collector/exporter deployed; structured JSONL logs written to qms-data/observability/",
+      "log_format": "JSONL with [otel.event] prefix in error_log + file append"
+    }
+  },
+  "trace_spans": {
+    "foundation_governance.approval_group.decide": {
+      "status": "implemented",
+      "service": "ApprovalGroupService",
+      "adapter": "ApprovalWorkflowAdapter"
+    },
+    "foundation_governance.approval_group.create": {
+      "status": "implemented",
+      "service": "ApprovalGroupService"
+    },
+    "foundation_governance.foundation.write": {
+      "status": "implemented",
+      "service": "FoundationGovernanceService"
+    },
+    "registry.publication.generate": {
+      "status": "implemented",
+      "tool": "regenerate_slice_publication.py"
+    },
+    "registry.publication.validate": {
+      "status": "implemented",
+      "tool": "foundation_governance_contract_smoke.php"
+    }
+  },
+  "structured_log_types": {
+    "approval_decision": {
+      "method": "logApprovalDecision",
+      "fields": [
+        "approval_group_id",
+        "step_code",
+        "decision_code",
+        "actor_party_id",
+        "comment",
+        "trace_id"
+      ]
+    },
+    "signature_application": {
+      "method": "logSignatureApplication",
+      "fields": [
+        "resource_id",
+        "signature_id",
+        "required",
+        "applied",
+        "trace_id"
+      ]
+    },
+    "attachment_verification": {
+      "method": "logAttachmentVerification",
+      "fields": [
+        "attachment_id",
+        "success",
+        "checksum",
+        "trace_id"
+      ]
+    },
+    "policy_denial": {
+      "method": "logPolicyDenial",
+      "fields": [
+        "resource_type",
+        "resource_id",
+        "reason",
+        "actor_party_id",
+        "trace_id"
+      ]
+    },
+    "command_execution": {
+      "method": "logCommandExecution",
+      "fields": [
+        "command_name",
+        "resource_type",
+        "resource_id",
+        "actor_id",
+        "success"
+      ]
+    }
+  },
+  "metrics": {
+    "decision_request_count": {
+      "status": "derivable_from_logs"
+    },
+    "decision_success_fail_blocked": {
+      "status": "derivable_from_logs"
+    },
+    "workflow_bridge_success_fail": {
+      "status": "derivable_from_logs"
+    },
+    "canonical_write_success_fail_conflict": {
+      "status": "derivable_from_logs"
+    },
+    "publication_generation_success_fail": {
+      "status": "derivable_from_logs"
+    },
+    "smoke_gate_pass_fail": {
+      "status": "implemented",
+      "current": "114/114 PASS"
+    },
+    "benchmark_latency_tps": {
+      "status": "implemented",
+      "current": "stability_probe: 702 TPS, 2.86ms avg"
+    }
+  },
+  "problem_enrichment": {
+    "status": "implemented",
+    "fields_added": [
+      "trace_id",
+      "correlation_id"
+    ],
+    "controller": "ApprovalGroupController"
+  },
+  "overall_status": "file_export_only",
+  "publish_readiness": {
+    "trace_context": true,
+    "structured_logs": true,
+    "metrics": "derivable_from_logs",
+    "collector_exporter": false,
+    "verdict": "PARTIAL - file export only, no live collector"
+  }
+}

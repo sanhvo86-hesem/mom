@@ -2,11 +2,11 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-07T03:26:12.380Z",
+    "generatedAt": "2026-04-07T03:32:24.724Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
-    "publication_run_id": "6729d21b-8aeb-4d09-96b9-8383a144e2bf"
+    "publication_run_id": "97074ae9-bed7-4b4b-8ca0-c4b3e8233e9e"
   },
   "summary": {
     "endpoint_count": 2862,
@@ -28,8 +28,8 @@
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
     "transition_runtime_warnings": 115,
-    "workflow_engine_bridge_ready": 105,
-    "workflow_engine_bridge_blocked": 10,
+    "workflow_engine_bridge_ready": 104,
+    "workflow_engine_bridge_blocked": 11,
     "archive_only_tables": 428,
     "soft_delete_tables": 0,
     "hard_delete_tables": 100,
@@ -40,14 +40,14 @@
       "unknown": 0
     },
     "frontend_foundation_entities": 533,
-    "frontend_ready_entities": 419,
-    "frontend_partial_entities": 114,
+    "frontend_ready_entities": 425,
+    "frontend_partial_entities": 108,
     "frontend_blocked_entities": 0,
     "attachment_contract_entities": 521,
     "comment_contract_entities": 521,
     "activity_contract_entities": 411,
     "publishability_ready": false,
-    "publishability_review_required_entities": 114
+    "publishability_review_required_entities": 108
   },
   "publishability": {
     "ready": false,
@@ -57,7 +57,7 @@
       {
         "id": "frontend_entities_publishable",
         "passed": false,
-        "actual": 114,
+        "actual": 108,
         "target": 0
       },
       {
@@ -68,7 +68,7 @@
       }
     ],
     "blocking_counts": {
-      "frontend_partial_entities": 114,
+      "frontend_partial_entities": 108,
       "frontend_blocked_entities": 0,
       "workflow_engine_bridge_blocked": 12,
       "unsupported_record_endpoints": 0,
