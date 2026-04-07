@@ -223,10 +223,6 @@ def regenerate_all() -> dict:
         ff["blocked_entities"] = blocked_count
         ff["workflow_ready_entities"] = wf_ready_count
 
-    with open(REGISTRY_MANIFEST, "w", encoding="utf-8") as f:
-        json.dump(rm, f, ensure_ascii=False, indent=2)
-    print(f"  registry-manifest.json: updated")
-
     # ── 4. Registry quality report ─────────────────────────────────────────
     with open(QUALITY_REPORT, "r", encoding="utf-8") as f:
         qr = json.load(f)
@@ -240,22 +236,30 @@ def regenerate_all() -> dict:
     s["frontend_blocked_entities"] = blocked_count
 
     # Align workflow_engine_bridge counts with slice truth
-    # The canonical generator originally set bridge_ready=0, bridge_blocked=115.
-    # Our slice adds SLICE_BRIDGE_READY_INCREMENT bridges that are now ready.
     current_ready = s.get("workflow_engine_bridge_ready", 0)
     current_blocked = s.get("workflow_engine_bridge_blocked", 115)
     s["workflow_engine_bridge_ready"] = current_ready + SLICE_BRIDGE_READY_INCREMENT
     s["workflow_engine_bridge_blocked"] = max(0, current_blocked - SLICE_BRIDGE_READY_INCREMENT)
 
-    # Also update the coverage block in manifest
+    with open(QUALITY_REPORT, "w", encoding="utf-8") as f:
+        json.dump(qr, f, ensure_ascii=False, indent=2)
+    print(f"  registry-quality-report.json: updated")
+
+    # ── 5. Fix manifest bridge counts + assets records AFTER quality report ──
     web = rm.get("coverage", {}).get("workflow_engine_bridge", {})
     if web:
         web["ready"] = s["workflow_engine_bridge_ready"]
         web["blocked"] = s["workflow_engine_bridge_blocked"]
 
-    with open(QUALITY_REPORT, "w", encoding="utf-8") as f:
-        json.dump(qr, f, ensure_ascii=False, indent=2)
-    print(f"  registry-quality-report.json: updated")
+    # Fix 528→533 gap: update assets.records to match actual entity count
+    assets = rm.get("assets", {})
+    fc_asset = assets.get("frontend-foundation-catalog.json", {})
+    if fc_asset:
+        fc_asset["records"] = fc["summary"].get("entity_count", len(entities))
+
+    with open(REGISTRY_MANIFEST, "w", encoding="utf-8") as f:
+        json.dump(rm, f, ensure_ascii=False, indent=2)
+    print(f"  registry-manifest.json: updated (bridge+records fixed)")
 
     print(f"\n=== Publication complete. run_id={run_id} ===")
     return {"run_id": run_id, "timestamp": now}

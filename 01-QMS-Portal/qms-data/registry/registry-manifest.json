@@ -2,9 +2,9 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-07T03:32:24.724Z",
+    "generatedAt": "2026-04-07T04:31:36.434Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
-    "publication_run_id": "97074ae9-bed7-4b4b-8ca0-c4b3e8233e9e"
+    "publication_run_id": "125236b7-2b71-4e39-9520-5f23d29c74b2"
   },
   "coverage": {
     "router_actions": 2862,
@@ -30,8 +30,8 @@
       "archive_only": 428
     },
     "workflow_engine_bridge": {
-      "ready": 103,
-      "blocked": 12,
+      "ready": 104,
+      "blocked": 11,
       "unneeded": 413
     },
     "frontend_foundation": {
@@ -69,7 +69,7 @@
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
-      "records": 528
+      "records": 533
     },
     "workflow-library.json": {
       "kind": "workflow-library",

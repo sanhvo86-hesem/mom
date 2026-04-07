@@ -651,7 +651,14 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         step_results["wave_gap_ledger"] = True
     else:
         try:
-            ledger = generate_wave_gap_ledger(run_id)
+            # Use the run_id from the freshly-written frontend-catalog so all artifacts share the same run_id
+            actual_run_id = run_id
+            try:
+                with open(FRONTEND_CATALOG, "r", encoding="utf-8") as _fc:
+                    actual_run_id = json.load(_fc).get("_meta", {}).get("publication_run_id", run_id)
+            except Exception:
+                pass
+            ledger = generate_wave_gap_ledger(actual_run_id)
             with open(WAVE_GAP_LEDGER, "w", encoding="utf-8") as f:
                 json.dump(ledger, f, ensure_ascii=False, indent=2)
             print(f"  [OK] wave-gap-ledger.json written.")

@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-04-07T03:34:31.423692+00:00",
+  "started_at": "2026-04-07T04:32:18.687128+00:00",
   "benchmark_database": "qms_runtime_bench_20260405",
   "live_alignment": {
     "live_database": "HESEM_ERP",
@@ -122,8 +122,8 @@
   },
   "query_plans": {
     "scenario_list": {
-      "execution_time_ms": 13.05,
-      "planning_time_ms": 1.205,
+      "execution_time_ms": 12.864,
+      "planning_time_ms": 1.224,
       "plan_rows": 50,
       "actual_rows": 50,
       "node_type": "Limit",
@@ -133,8 +133,8 @@
       "shared_read_blocks": 0
     },
     "schedule_blocks_by_scenario": {
-      "execution_time_ms": 34.918,
-      "planning_time_ms": 1.411,
+      "execution_time_ms": 39.689,
+      "planning_time_ms": 1.401,
       "plan_rows": 20,
       "actual_rows": 20,
       "node_type": "Limit",
@@ -144,8 +144,8 @@
       "shared_read_blocks": 0
     },
     "optimistic_update": {
-      "execution_time_ms": 2.056,
-      "planning_time_ms": 1.046,
+      "execution_time_ms": 1.91,
+      "planning_time_ms": 1.004,
       "plan_rows": 1,
       "actual_rows": 0,
       "node_type": "ModifyTable",
@@ -161,37 +161,37 @@
       "jobs": 4,
       "duration_seconds": 30,
       "script": "C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\read_mix.sql",
-      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\read_mix.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 12\nnumber of threads: 4\nduration: 30 s\nnumber of transactions actually processed: 3601\nlatency average = 100.218 ms\ntps = 119.738447 (including connections establishing)\ntps = 120.034630 (excluding connections establishing)",
-      "transactions_processed": 3601,
-      "average_latency_ms": 100.218,
-      "tps_including_connect": 119.738447,
-      "tps_excluding_connect": 120.03463
+      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\read_mix.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 12\nnumber of threads: 4\nduration: 30 s\nnumber of transactions actually processed: 3488\nlatency average = 103.604 ms\ntps = 115.826189 (including connections establishing)\ntps = 116.611986 (excluding connections establishing)",
+      "transactions_processed": 3488,
+      "average_latency_ms": 103.604,
+      "tps_including_connect": 115.826189,
+      "tps_excluding_connect": 116.611986
     },
     "optimistic_hot_update": {
       "clients": 16,
       "jobs": 4,
       "duration_seconds": 20,
       "script": "C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\optimistic_hot_update.sql",
-      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\optimistic_hot_update.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 16\nnumber of threads: 4\nduration: 20 s\nnumber of transactions actually processed: 169696\nlatency average = 1.886 ms\ntps = 8481.661785 (including connections establishing)\ntps = 8510.829238 (excluding connections establishing)",
-      "transactions_processed": 169696,
-      "average_latency_ms": 1.886,
-      "tps_including_connect": 8481.661785,
-      "tps_excluding_connect": 8510.829238,
-      "successful_updates": 128870,
-      "conflict_count": 40826,
-      "conflict_rate_pct": 24.06
+      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\optimistic_hot_update.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 16\nnumber of threads: 4\nduration: 20 s\nnumber of transactions actually processed: 151816\nlatency average = 2.110 ms\ntps = 7584.251719 (including connections establishing)\ntps = 7612.452451 (excluding connections establishing)",
+      "transactions_processed": 151816,
+      "average_latency_ms": 2.11,
+      "tps_including_connect": 7584.251719,
+      "tps_excluding_connect": 7612.452451,
+      "successful_updates": 115705,
+      "conflict_count": 36111,
+      "conflict_rate_pct": 23.79
     },
     "unsafe_hot_update": {
       "clients": 16,
       "jobs": 4,
       "duration_seconds": 20,
       "script": "C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\unsafe_hot_update.sql",
-      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\unsafe_hot_update.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 16\nnumber of threads: 4\nduration: 20 s\nnumber of transactions actually processed: 172083\nlatency average = 1.861 ms\ntps = 8596.525741 (including connections establishing)\ntps = 8622.179411 (excluding connections establishing)",
-      "transactions_processed": 172083,
-      "average_latency_ms": 1.861,
-      "tps_including_connect": 8596.525741,
-      "tps_excluding_connect": 8622.179411,
-      "successful_updates": 172083,
+      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\unsafe_hot_update.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 16\nnumber of threads: 4\nduration: 20 s\nnumber of transactions actually processed: 145060\nlatency average = 2.207 ms\ntps = 7250.423562 (including connections establishing)\ntps = 7275.922133 (excluding connections establishing)",
+      "transactions_processed": 145060,
+      "average_latency_ms": 2.207,
+      "tps_including_connect": 7250.423562,
+      "tps_excluding_connect": 7275.922133,
+      "successful_updates": 145060,
       "conflict_count": 0,
       "conflict_rate_pct": 0.0
     },
@@ -208,12 +208,12 @@
       "jobs": 1,
       "duration_seconds": 15,
       "script": "C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\foundation_governance_contract_read_mix.sql",
-      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\foundation_governance_contract_read_mix.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 2\nnumber of threads: 1\nduration: 15 s\nnumber of transactions actually processed: 10464\nlatency average = 2.869 ms\ntps = 697.084747 (including connections establishing)\ntps = 698.572760 (excluding connections establishing)",
-      "transactions_processed": 10464,
-      "average_latency_ms": 2.869,
-      "tps_including_connect": 697.084747,
-      "tps_excluding_connect": 698.57276
+      "raw_output": "transaction type: C:\\Users\\TEST4\\qms.hesem.com.vn\\01-QMS-Portal\\tools\\benchmark\\foundation_governance_contract_read_mix.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 2\nnumber of threads: 1\nduration: 15 s\nnumber of transactions actually processed: 10336\nlatency average = 2.903 ms\ntps = 688.853315 (including connections establishing)\ntps = 690.356916 (excluding connections establishing)",
+      "transactions_processed": 10336,
+      "average_latency_ms": 2.903,
+      "tps_including_connect": 688.853315,
+      "tps_excluding_connect": 690.356916
     }
   },
-  "finished_at": "2026-04-07T03:38:18.105721+00:00"
+  "finished_at": "2026-04-07T04:36:05.311275+00:00"
 }
