@@ -1,0 +1,182 @@
+<div><p>thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../../assets/style.css">
+
+</p>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../../mom/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">C10-L3</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">C10-L3</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+<div class="doc-content" id="docContent"><h1>C10-L3 - C10-L3</h1>
+<p class="lead"><strong>Level 3 — Điều phối liên phòng cho 10–30 job song song (cadence &amp; escalation).</strong> Mô-đun này giúp nhân sự hiểu và vận hành chuỗi RFQ → Cash bằng "cổng kiểm soát + hồ sơ", giữ đúng revision set và bàn giao không mất thông tin.</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 3</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></div>
+<div><strong>Đầu ra bắt buộc</strong>
+<ul>
+<li>Thiết lập nhịp độ / chu kỳ họp (hàng ngày/hàng tuần) và điều phối ưu tiên dựa trên dữ liệu: Ngày đến hạn, mức sẵn sàng, nút thắt / điểm nghẽn, rủi ro khách hàng.</li><li>Khóa 'phiên bản set' cho từng Job và kiểm soát thay đổi bằng kiểm soát thay đổi; không phát hành bản rời.</li><li>Dùng KPI pack để ra quyết định: OTD, tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn), FPY, NCR tỷ lệ, outsource thời gian dẫn (lead time).</li>
+</ul>
+</div>
+<div><strong>Cổng kiểm soát trọng yếu</strong><br><span class="badge bad">Ưu tiên sai / tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng / thay đổi ngoài kiểm soát</span> = TẠM GIỮ/FAIL</div>
+<div><strong>Thời lượng</strong><br>Lý thuyết 75 phút • OJT 150 phút</div>
+</div>
+<p class="small-note">Nguyên tắc vận hành: không nhảy cổng kiểm soát, không dùng file rời làm nguồn, không giao hàng khi thiếu bộ hồ sơ giao hàng (ship gói hồ sơ).</p>
+</div><div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>tại G0→G7 — CNC Job Order Process (trọng tâm vòng đời đơn hàng)</b>.
+</div>
+<div class="card">
+<span class="badge">Bộ diễn tập (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Thực hiện diễn tập trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship gói hồ sơ) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-shipping-packet-coc.html">DRL-07 — TRN-Bài diễn tập ACA-DRL-07 — Giao vận Gói hồ sơ + CoC | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html">DRL-02 — TRN-Bài diễn tập ACA-DRL-02 — Phiên bản &amp;amp; SSOT (Đánh giá 60-Thứ hai / Giây) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-customer-ctq-translation.html">DRL-11 — TRN-Bài diễn tập ACA-DRL-11 — Customer Yêu cầu → CTQ Dịch thuật | HESEM Academy</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Đưa mọi Người về cùng một "bản đồ công việc": RFQ → Báo giá → Khởi động → <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span> phát hành → Thực thi → <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> → Ship → Hóa đơn.</li>
+<li>Chặn 3 rủi ro lớn của phân xưởng gia công theo đơn (job xưởng) CNC: <strong>sai phiên bản</strong>, <strong>thiếu chứng từ</strong>, <strong>bàn giao mất thông tin</strong>.</li>
+<li>Biến hiểu biết thành hành động: bảng kiểm + OJT + hiệu suất test + MRR để vận hành <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> hàng ngày.</li>
+</ul>
+</div>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<p>Chuỗi Lệnh sản xuất vận hành theo cổng kiểm soát G0–G7. Mỗi cổng kiểm soát có điều kiện vào/ra và hồ sơ tối thiểu (MRR). Khi thiếu MRR hoặc sai phiên bản set: kích hoạt TẠM GIỮ.</p>
+<div class="vflow">
+<div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nhịp độ</strong><p>Thiết lập nhịp độ / chu kỳ họp hàng ngày/hàng tuần để điều phối đa job.</p></div></div>
+<div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Mức sẵn sàng rà soát</strong><p>Đánh giá mức sẵn sàng theo cổng kiểm soát: đầu vào, nguyên vật liệu, program, <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> công suất.</p></div></div>
+<div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Đóng băng cửa sổ / khung thời gian</strong><p>Khóa kế hoạch ngắn hạn; thay đổi đi qua escal + kiểm soát thay đổi.</p></div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>nút thắt / điểm nghẽn control</strong><p>Governance nút thắt / điểm nghẽn và tuổi tồn WIP (tuổi tồn / tuổi tồn) theo ngưỡng.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Giao hàng rà soát</strong><p>Review OTD theo rủi ro; kích hoạt khôi phục / thu hồi plan.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>học tập vòng lặp</strong><p>Đóng vòng phản hồi: khiếu nại / yêu cầu bồi thường → ngăn chặn → CAPA → cập nhật standard.</p></div></div>
+</div>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Ưu tiên theo cảm tính; không có điều phối xuất hàng Photos trạng thái và rule đổi ưu tiên.</li><li>tuổi tồn WIP (tuổi tồn / tuổi tồn) tăng nhưng không có hành động; nút thắt / điểm nghẽn bị che.</li><li>Kế hoạch bị thay liên tục; không có cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch); phân xưởng mất nhịp.</li><li>Phát hành kỹ thuật trễ nhưng vẫn phát hành sản xuất; lỗi phiên bản/cổng kiểm soát bùng phát.</li><li><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> công suất không được tính; FAI/final bị nghẽn gây trễ ship.</li><li>Outsource thời gian dẫn không theo dõi; phát hiện trễ khi đã sát ship.</li><li>Escal log không được đóng; hành động không có người chịu trách nhiệm/due.</li><li>Tồn tại nhiều version của job pack; SSOT bị phá.</li><li>Không đo OTD theo cổng kiểm soát; chỉ đo cuối cùng phải không thấy nguyên nhân sớm.</li><li>khiếu nại / yêu cầu bồi thường khách lặp lại nhưng không cập nhật standard/bài học kinh nghiệm.</li><li>Biên lợi nhuận xói mòn do làm lại/OT nhưng không phản ứng.</li></ol>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người chịu trách nhiệm + bằng chứng)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>người chịu trách nhiệm</th><th>Evidence/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Hàng Ngày Tier nhịp độ / chu kỳ họp</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>Tier cuộc họp log + Photos trạng thái KPI</td><td>Không họp = không đổi ưu tiên</td></tr><tr><td><strong>Mức sẵn sàng score theo cổng kiểm soát</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>Mức sẵn sàng bảng kiểm (G0–G3)</td><td>Mức sẵn sàng &lt; 80% = escal</td></tr><tr><td><strong>Đóng băng cửa sổ / khung thời gian 24–72h</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></span></td><td>Rule + log ghi đè / bỏ qua</td><td>ghi đè / bỏ qua phải có lý do và phê duyệt</td></tr><tr><td><strong>nút thắt / điểm nghẽn &amp; WIP tuổi tồn ngưỡng</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>WIP tuổi tồn báo cáo</td><td>Tuổi tồn vượt ngưỡng = khôi phục / thu hồi plan</td></tr><tr><td><strong><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> công suất lập kế hoạch</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a></span></td><td>FAI/final công suất bảng</td><td>Không phát hành giao hàng khi <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> chưa phát hành</td></tr><tr><td><strong>Supplier thời gian dẫn bảng điều khiển</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>Supplier xác nhận log</td><td>Trễ thời gian dẫn = escal + option NCC</td></tr><tr><td><strong>Cổng kiểm soát-dựa trên OTD chỉ số</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>OTD by cổng kiểm soát báo cáo</td><td>OTD giảm = điều tra nguyên nhân theo cổng kiểm soát</td></tr><tr><td><strong>học tập vòng lặp (CAPA)</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>SOP-606 CAPA + đã cập nhật standard</td><td>Lặp lại vấn đề = cập nhật WI/biểu mẫu/đào tạo</td></tr></tbody></table></div>
+<h2>6) Fail-nhanh quy tắc (STOP/TẠM GIỮ/CHẶN)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc không xác định được phiên bản set của job.</strong></td><td>Dừng vận hành; gắn TẠM GIỮ; báo <a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a> + <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>; mở Thay đổi Thông báo khi có thay đổi.</td></tr><tr><td><span class="badge warn">TẠM GIỮ</span></td><td><strong>Thiếu MRR bắt buộc tại cổng kiểm soát (rà soát hợp đồng , khởi động, mốc chuẩn, FAI, bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</strong></td><td>Không chuyển công đoạn/không ship; cập nhật log; escal theo ANNEX-117.</td></tr><tr><td><span class="badge bad">CHẶN</span></td><td><strong>Thay đổi program/setup/spec/đổi NCC mà không có hồ sơ hoặc không có phê duyệt.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở thay đổi gói hàng; chạy xác minh; cập nhật SSOT.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol>
+<li>Xác định loại rủi ro: sai phiên bản / thiếu hồ sơ / sai bàn giao / thay đổi không kiểm soát.</li>
+<li>Kích hoạt TẠM GIỮ ngay tại điểm phát hiện (tag + cập nhật log/ERP).</li>
+<li>Chụp 01 bằng chứng thời điểm phát hiện (màn hình ERP có dấu thời gian hoặc link SSOT).</li>
+<li>Báo theo bậc thang năng lực: cell người chịu trách nhiệm → supervisor → <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> (≤ 10 phút).</li>
+<li>Mở 01 hành động có người chịu trách nhiệm + due trong Ngày và liên kết SSOT.</li>
+</ol>
+<h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>người chịu trách nhiệm</th><th>Evidence/MRR</th><th>Lặp lại vấn đề lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Chốt nhịp độ / chu kỳ họp: hằng ngày tier + hàng tuần plan; lưu biên bản họp vào SSOT.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>Tier biên bản họp</td><td>Không có biên bản họp</td></tr><tr><td>2</td><td><strong>Tạo tuổi tồn WIP (tuổi tồn / tuổi tồn) báo cáo theo nhóm công đoạn và nút thắt / điểm nghẽn.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>WIP tuổi tồn báo cáo</td><td>Không nhìn thấy tuổi tồn</td></tr><tr><td>3</td><td><strong>Đánh giá mức sẵn sàng top 10 job sắp ship (đầu vào/nguyên vật liệu/program/QA).</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Mức sẵn sàng bảng kiểm</td><td>Ship Cấp nhưng mức sẵn sàng thấp</td></tr><tr><td>4</td><td><strong>Thiết lập cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) 24–72h; log mọi ghi đè / bỏ qua.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></span></td><td>ghi đè / bỏ qua log</td><td>Kế hoạch thay liên tục</td></tr><tr><td>5</td><td><strong>Khi machine xuống / Từng: mở escal; cập nhật khôi phục / thu hồi plan trong 2h.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>Escal log + khôi phục / thu hồi plan</td><td>Chờ đến cuối ca</td></tr><tr><td>6</td><td><strong>Theo dõi outsource quan trọng / nghiêm trọng path và thời gian dẫn bằng bảng điều khiển.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>Supplier log</td><td>Phát hiện trễ sát ship</td></tr><tr><td>7</td><td><strong>Review OTD theo cổng kiểm soát (G0–G7) và xác định nguyên nhân top 3.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>OTD by cổng kiểm soát</td><td>Chỉ đo cuối</td></tr><tr><td>8</td><td><strong>Đóng học tập vòng lặp: khiếu nại / yêu cầu bồi thường/NCR lặp → CAPA → cập nhật standard.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>CAPA + WI cập nhật</td><td>Lặp lại vấn đề không cải tiến</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job sự cố hỏng máy (Step / Điểm then chốt / Lý do)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Vận hành</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Đọc job pack</td><td>Xác nhận JobNum/PartNo/REV và yêu cầu đặc biệt</td><td>Ngăn sai phiên bản và bỏ sót CTQ</td></tr><tr><td>2</td><td>Nhận diện cổng kiểm soát</td><td>Xác định cổng kiểm soát Current và điều kiện ra cổng kiểm soát</td><td>Không nhảy cổng kiểm soát</td></tr><tr><td>3</td><td>Chuẩn bị hồ sơ</td><td>Mở đúng biểu mẫu, điền đúng trường bắt buộc</td><td>sẵn sàng cho đánh giá</td></tr><tr><td>4</td><td>Thực thi &amp; ghi nhận</td><td>Ghi theo thời điểm phát sinh; lưu SSOT</td><td>Dữ liệu có giá trị</td></tr><tr><td>5</td><td>TẠM GIỮ &amp; escal</td><td>Kích hoạt TẠM GIỮ/STOP/CHẶN đúng rule</td><td>Chặn lỗi lan rộng</td></tr><tr><td>6</td><td>Bàn giao</td><td>Bàn giao bằng link SSOT + bảng kiểm + Người nhận xác nhận</td><td>Không mất thông tin</td></tr></tbody></table></div>
+<h3>OJT đầu ra bắt buộc</h3>
+<ul>
+<li>01 trang "Job 5 dòng" (JobNum/PartNo/REV/CTQ/Ngày đến hạn/công đoạn đặc biệt) lưu vào SSOT.</li>
+<li>01 bảng kiểm xác nhận cổng kiểm soát mức sẵn sàng (G0/G2/G3 theo phạm vi) và link SSOT.</li>
+<li>01 hồ sơ TẠM GIỮ + 01 hành động đóng trong Ngày cho tình huống giả lập thiếu MRR.</li>
+</ul>
+<h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric">
+<thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead>
+<tbody>
+<tr><td><strong>L1</strong></td><td>Nhận diện đúng luồng và cổng kiểm soát; làm đúng tại điểm làm việc</td><td>Không sai JobNum/REV; biết TẠM GIỮ; truy xuất nguồn gốc hồ sơ ≤ 60 giây</td></tr>
+<tr><td><strong>L2</strong></td><td>Chạy job phân khúc và bàn giao chuẩn bằng chứng</td><td>Không thiếu MRR trong phạm vi; escal đúng SLA; bàn giao có xác nhận</td></tr>
+<tr><td><strong>L3</strong></td><td>Điều phối đa job theo nhịp độ / chu kỳ họp và dữ liệu</td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) kiểm soát; ưu tiên đúng; thay đổi được kiểm soát</td></tr>
+<tr><td><strong>L4</strong></td><td>Thiết kế hệ thống RFQ→Tiền mặt</td><td>Cổng kiểm soát quản trị + KPI + đánh giá plan; thực thi / cưỡng chế SSOT/ERP</td></tr>
+</tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Mức sẵn sàng score gồm những yếu tố nào trong phân xưởng gia công theo đơn CNC?</li><li>cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) dùng để chặn rủi ro gì?</li><li>tuổi tồn WIP (tuổi tồn / tuổi tồn) đo như thế nào và ngưỡng escal là gì?</li><li>OTD by cổng kiểm soát khác gì OTD cuối cùng?</li><li>nút thắt / điểm nghẽn control cần dữ liệu nào từ ERP?</li><li>Khi <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> công suất nghẽn, phản ứng đúng là gì?</li><li>Rule đổi ưu tiên trong Ngày cần bằng chứng gì?</li><li>Outsource quan trọng / nghiêm trọng path được theo dõi ra sao?</li><li>Biên lợi nhuận xói mòn nhìn thấy qua chỉ số nào?</li><li>Tier nhịp độ / chu kỳ họp gồm những cuộc họp nào và mục tiêu từng cuộc?</li><li>Escal log cần các trường nào để đóng được?</li><li>Khi Phát hành kỹ thuật trễ, cổng kiểm soát nào bị ảnh hưởng?</li><li>Tại sao SSOT là cưỡng chế trong điều phối đa job?</li><li>Khi OTD giảm, quy trình điều tra theo cổng kiểm soát là gì?</li><li>Chỉ ra 3 dấu hiệu 'phân xưởng mất nhịp' do lập kế hoạch.</li><li>học tập vòng lặp yêu cầu cập nhật tài liệu nào?</li><li>Khi khiếu nại / yêu cầu bồi thường khách lặp, CAPA phải làm gì?</li><li>Phân biệt khôi phục / thu hồi plan và re-plan.</li><li>KPI pack tối thiểu cho hàng tuần plan gồm những gì?</li><li>Định nghĩa 'quan trọng / nghiêm trọng path' trong lệnh sản xuất CNC.</li><li>Khi có đẩy nhanh tiến độ, điều gì không được phá?</li><li>Cách đánh giá hiệu lực của nhịp độ / chu kỳ họp.</li></ol></div>
+<h3>Tình huống (≥ 3 tình huống thật)</h3>
+<details>
+<summary>Máy nút thắt / điểm nghẽn dừng 6 giờ, ảnh hưởng 7 job sắp ship</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Máy 5-trục xuống / Từng do sự cố nghiêm trọng</li><li>7 job đang chờ OP40 trên máy này</li><li>3 job có due trong 2 ngày</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động điều phối trong 2 giờ đầu và bằng chứng cần có.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Mở escal; cập nhật thời gian dừng máy + ETA; tạo khôi phục / thu hồi plan.</li><li>Re-ưu tiên hóa bằng điều phối xuất hàng Photos trạng thái; log ghi đè / bỏ qua.</li><li>Kỹ thuật/OPS đánh giá option: chuyển máy, OT, outsource, tách / chia lot.</li><li><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span> cập nhật khách theo SLA; không hứa vượt cổng kiểm soát <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Phát hành kỹ thuật trễ nhưng sản xuất muốn chạy trước</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Job J24031 đã có vật liệu và tool</li><li>Bộ hồ sơ chuẩn (mốc chuẩn gói hàng) chưa phát hành</li><li>OPS muốn chạy để giữ OTD</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Quyết định và cổng kiểm soát bị ảnh hưởng.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>TẠM GIỮ phát hành; bộ hồ sơ chuẩn là điều kiện cổng kiểm soát G2.</li><li>Escal Phát hành kỹ thuật; đặt due trong ngày.</li><li>Chỉ chạy khi phiên bản set khóa và program/setup phát hành theo PROC-CNC-002.</li><li>Log quyết định; tránh tạo song song 2 version.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Outsource hoàn thiện bề mặt lặp lỗi bề mặt, ảnh hưởng 4 job</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>4 job trả về có dấu xước/đốm</li><li>Supplier nói do giá đỡ / khung mới</li><li>Ngày đến hạn sát</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Cách điều phối theo rủi ro và kiểm soát thay đổi.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Cô lập lot; mở NCR và ngăn chặn; đánh giá làm lại option.</li><li>Mở nhà cung cấp CAPA; yêu cầu điều tra giá đỡ / khung thay đổi.</li><li>Kế hoạch cập nhật OTD rủi ro; <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span> cập nhật khách theo SLA.</li><li>Xem xét đổi NCC qua thay đổi bảng; tác động matrix bắt buộc.</li></ul></div>
+</div>
+</details>
+<h3>Hiệu suất test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Điều phối 10–30 job theo dữ liệu và cổng kiểm soát</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol>
+<li>Chuẩn bị 01 báo cáo tuổi tồn WIP (tuổi tồn / tuổi tồn) + nút thắt / điểm nghẽn cho tuần Current.</li><li>Chọn 05 job rủi ro OTD và tạo khôi phục / thu hồi plan có người chịu trách nhiệm + due + cổng kiểm soát tác động.</li><li>Thiết lập rule đổi ưu tiên và chứng minh bằng điều phối xuất hàng Photos trạng thái + log ghi đè / bỏ qua.</li>
+</ol>
+<h4>ĐẠT/KHÔNG ĐẠT</h4>
+<ul>
+<li>đạt khi: cổng kiểm soát quyết định đúng; bằng chứng đủ; SSOT sạch; escal đúng SLA.</li>
+<li>Không đạt khi: vượt qua cổng kiểm soát; sai REV; giao hàng khi thiếu bộ hồ sơ giao hàng; thay đổi không hồ sơ.</li>
+</ul>
+</div>
+<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí</h2>
+<div class="kpi-gate">
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</strong>
+<ul>
+<li>đạt khi hoàn thành OJT đầu ra và hiệu suất test đạt; bằng chứng nằm SSOT và truy xuất nguồn gốc ≤ 60 giây.</li>
+<li>FAIL ngay khi: vượt qua cổng kiểm soát; sai phiên bản; giao hàng khi thiếu bộ hồ sơ giao hàng; thay đổi không hồ sơ.</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + đặt tên + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_PartNo_REV_DocType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; không dùng dấu cách).</span></p>
+<ul>
+<li>Hàng Ngày tier biên bản họp + KPI Photos trạng thái.</li><li>hàng tuần plan + đóng băng cửa sổ / khung thời gian rule + ghi đè / bỏ qua log.</li><li>WIP tuổi tồn báo cáo + nút thắt / điểm nghẽn hành động list.</li><li>Mức sẵn sàng bảng kiểm top công việc / đơn hàng.</li><li>Khôi phục plan (người chịu trách nhiệm + due + cổng kiểm soát tác động).</li><li>Supplier thời gian dẫn bảng điều khiển + CAPA khi phát sinh.</li><li>OTD by cổng kiểm soát báo cáo.</li><li>CAPA/standard cập nhật bằng chứng (WI/biểu mẫu/đào tạo).</li>
+</ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">Job-Hồ sơ</span>.</div>
+<h2>13) Chung đánh giá phát hiện &amp; phòng ngừa</h2>
+<ol>
+<li>Thiếu bằng chứng cổng kiểm soát (rà soát hợp đồng /khởi động/mốc chuẩn/FAI/final/bộ hồ sơ giao hàng bộ hồ sơ giao hàng / rà soát hợp đồng).</li>
+<li>Phiên bản set không được khóa; dùng file rời; tồn tại nhiều bản.</li>
+<li>Traveler/kế hoạch kiểm tra (plan) không đồng bộ CTQ và điểm giữ.</li>
+<li>Outsource hoàn thiện bề mặt thiếu cert hoặc spec không khớp nhưng vẫn phát hành.</li>
+<li>WIP trạng thái lệch hiện trường; điều phối xuất hàng sai ưu tiên.</li>
+<li>Escal log không có hoặc không đóng; rủi ro OTD không nhìn thấy.</li>
+<li>Evidence không truy xuất nguồn gốc ≤ 60 giây do sai tên/sai thư mục.</li>
+</ol>
+<h2>Tài liệu liên quan</h2>
+<ul><li><a href="../../../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501 — Sản xuất Kế hoạch &amp; lập lịch</a></li><li><a href="../../../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">WI-501 — Điều phối Control &amp; Công suất Review</a></li><li><a href="../../../mom/docs/operations/sops/09-SOP-900/sop-901-internal-audit-and-lpa.html">SOP-901 — Phân tầng Quy trình Đánh giá (LPA)</a></li><li><a href="../../../mom/docs/operations//01-SOPs//06-SOP-600//sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606 — NC/CAPA</a></li><li><a href="../../../mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">SOP-803 — Job Tính giá thành &amp; Biên lợi nhuận Review</a></li></ul></div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+
+</div>

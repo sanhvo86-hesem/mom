@@ -1,0 +1,9 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^docs/ - [F,L,NC]
+  RewriteRule ^(?:form_workflow\.php|SECURITY_OPERATIONS\.md)$ - [F,L,NC]
+  RewriteRule \.(zip|sql|bak|old|md|log)$ - [F,L,NC]
+  RewriteRule ^data/ - [F,L,NC]
+</IfModule>

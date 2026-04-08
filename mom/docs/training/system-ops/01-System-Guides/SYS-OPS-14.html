@@ -1,0 +1,76 @@
+<div><p>thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../assets/style.css">
+
+</p>
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">14</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-14</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a></span>
+
+<tr>
+<td>Nhận hàng gói hồ sơ + chứng chỉ</td>
+<td><code>REC-[PO]-[Lot]-[YYYYMMDD]</code></td>
+<td>M365/SharePoint → HESEM-QMS-SSOT Nhận hàng hồ sơ</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
+</tr>
+<tr>
+<td>IR/FAI/IPQC/FQC</td>
+<td><code>IR-[WO]-[Op]-[YYYYMMDD]</code></td>
+<td>M365/SharePoint → HESEM-QMS-SSOT <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> kiểm tra hồ sơ</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td>
+</tr>
+<tr>
+<td>Bộ hồ sơ giao hàng bảng kiểm</td>
+<td><code>SHIP-[WO]-[Customer]-[YYYYMMDD]</code></td>
+<td>M365/SharePoint → HESEM-QMS-SSOT Giao vận hồ sơ</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
+</tr>
+<tr>
+<td>Thay đổi Tác động Matrix (khi thay đổi)</td>
+<td><code>CIM-[ID]-[YYYYMMDD]</code></td>
+<td>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → biểu mẫu</td>
+<td>người chịu trách nhiệm thay đổi + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
+</tr>
+<tr>
+<td>NCR/CAPA/MRB (khi NG)</td>
+<td><code>NCR-[ID]-[YYYYMMDD]</code> / <code>CAPA-[ID]</code></td>
+<td>M365/SharePoint → HESEM-QMS-SSOT NCR/CAPA kho lưu trữ</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
+</tr>
+<tr>
+<td>Hồ sơ đào tạo (chuyên cần / điểm danh + OJT + test)</td>
+<td><code>TRN-SYS-OPS-14-[Name]-[YYYYMMDD]</code></td>
+<td>M365/SharePoint → HESEM-QMS-SSOT Training hồ sơ</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+</tr>
+
+
+<div class="req"><span class="req-tag shall">PHẢI</span>
+<div>
+ Khi hệ thống lưu trữ chưa sẵn sàng, owner hệ thống <b>PHẢI</b> điền M365/SharePoint → HESEM-QMS-SSOT ngay trong bảng MRR và đóng trong vòng 30 Ngày kể từ Ngày phát hành mô-đun.
+ </div></div></div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+
+</div></div></div>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<title>DI - Drill Cost Waste Tool Scrap | HESEM MOM</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+
+<style>
+ .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+ .tight li{
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+}
+</style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+</head>
+<body>
+
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">Drill Cost Waste Tool Scrap</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">DI</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">Bộ diễn tập</div>
+<h1 class="h1">DI - Drill Cost Waste Tool Scrap</h1>
+<p class="lead">
+ Diễn tập này rèn năng lực <b>tính chi phí thực tế</b> và <b>khóa lãng phí</b>: phế phẩm, làm lại, tool mài mòn, thời gian dừng máy.
+ Đầu ra của diễn tập là 01 hành động cập nhật standard và có kiểm chứng.
+ </p>
+</div>
+<div class="grid-2">
+<div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Material</b>.
+</div>
+<div class="card">
+<span class="badge">Mục tiêu</span>
+<ul class="tight">
+<li>Chuyển "cảm giác tốn kém" thành con số.</li>
+<li>Chọn 1 hành động tác động lớn và khóa vào standard.</li>
+<li>Xác minh bằng trước/sau KPI.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Năng lực kích hoạt</span>
+<ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C12"><b>C12</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C07"><b>C07</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C09"><b>C09</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C05"><b>C05</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C06"><b>C06</b></a></li></ul>
+</div>
+</div>
+<div class="card">
+<span class="badge">Chuẩn bị</span>
+<ul class="tight">
+<li>ERP/MES log hoặc bảng theo dõi tool, phế phẩm, thời gian dừng máy.</li>
+<li>Template chi phí tính toán sheet.</li>
+<li>Bảng KPI cell.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Trình tự thực hiện</span>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Chọn 01 job/cell và lấy dữ liệu: phế phẩm qty, làm lại time, tool tiêu thụ, thời gian dừng máy.</td><td>Team lead + <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>Data trích xuất (sheet)</td><td>FAIL</td></tr><tr><td>2</td><td>Tính chi phí: nguyên vật liệu phế phẩm + machine time + tool chi phí + outsource chi phí (KHI có).</td><td>Team lead</td><td>Chi phí tính toán sheet (ký)</td><td>FAIL</td></tr><tr><td>3</td><td>Xếp hạng 3 nguyên nhân chi phí cao nhất và chỉ ra điểm gãy trong quy trình.</td><td>Team</td><td>Pareto + vấn đề báo cáo / tuyên bố</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Chốt 1 biện pháp đối phó có tác động lớn: thông số, tool thay đổi rule, kiểm tra step, poka (chống sai) (chống sai)-giá đỡ (yoke).</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Kế hoạch hành động + đã cập nhật standard</td><td>CHẶN</td></tr><tr><td>5</td><td>Chạy xác minh sau 1 ca: đo lại phế phẩm/làm lại/tool và cập nhật bảng.</td><td>Team lead</td><td>trước/sau KPI Photos trạng thái</td><td>FAIL</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card danger">
+<span class="badge">Fail-nhanh</span>
+<ul class="tight">
+<li>Dữ liệu không có nguồn hoặc không truy xuất nguồn gốc được.</li>
+<li>Tính chi phí sai đơn vị hoặc sai công thức.</li>
+<li>Hành động không cập nhật standard.</li>
+<li>Không có xác minh.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Tiêu chí đánh giá chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-nhanh.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
+<tbody>
+<tr><td><b>Data độ chính xác</b></td><td>Dữ liệu có nguồn rõ (ERP/MES/log); không nhập tay theo cảm tính.</td><td>0/1/2</td></tr><tr><td><b>Chi phí tính toán</b></td><td>Công thức đúng; đơn vị đúng; có kiểm tra chéo.</td><td>0/1/2</td></tr><tr><td><b>Vấn đề trọng tâm</b></td><td>Chọn đúng 3 nguyên nhân chính; không dàn trải.</td><td>0/1/2</td></tr><tr><td><b>biện pháp đối phó chất lượng</b></td><td>Hành động gắn vào standard; có người chịu trách nhiệm + due + điều kiện kiểm soát.</td><td>0/1/2</td></tr><tr><td><b>Xác minh</b></td><td>Có trước/sau KPI; kết luận dựa trên số liệu.</td><td>0/1/2</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<span class="badge">MRR tối thiểu</span>
+<ul class="tight">
+<li>Data trích xuất sheet (nguồn rõ).</li>
+<li>Chi phí tính toán sheet (ký + ngày).</li>
+<li>Vấn đề báo cáo / tuyên bố + Pareto.</li>
+<li>đã cập nhật standard (phiếu cài đặt/SOP) + trước/sau KPI Photos trạng thái.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>

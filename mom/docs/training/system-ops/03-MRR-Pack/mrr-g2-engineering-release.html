@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<title>MRR-G2 - Engineering Release | HESEM MOM</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+
+<style>
+ .chk{font-family:var(--mono); font-weight:800;}
+ .print-grid{display:grid; grid-template-columns: 1fr 1fr; gap: 12px;}
+ .sig{display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;}
+ .sig .box{border:1px dashed var(--line); border-radius:10px; padding:10px; min-height:64px;}
+ .mini{font-size:.92rem}
+ .tight li{margin:4px 0;}
+ .formline{display:inline-block; min-width:160px; border-bottom:1px solid var(--line);}
+ .muted2{color:var(--muted);}
+ .pill{
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+}
+</style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+</head>
+<body>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">Engineering Release</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">MRR-G2</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Fail-nhanh (STOP/TẠM GIỮ/CHẶN)</h2>
+<ul class="tight">
+<li>NC program phát hành không có mô phỏng bằng chứng → <b>STOP</b>.</li>
+<li>Kế hoạch kiểm soát thiếu CTQ hoặc thiếu tiêu chí chấp nhận → <b>TẠM GIỮ</b>.</li>
+<li>Thay đổi REV không qua kiểm soát thay đổi → <b>CHẶN</b> (khóa phát hành).</li>
+</ul>
+<div class="note mini">
+<b>Nguyên tắc:</b> Thiếu MRR ở cổng kiểm soát Current → <b>không</b> được chuyển sang cổng kiểm soát tiếp theo. Cập nhật log và gửi escal theo SYS-OPS.
+ </div>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
+<ol class="tight">
+<li>Mở SSOT Hồ sơ công việc (hồ sơ công việc) theo JobCode.</li>
+<li>Mở đúng thư mục cổng kiểm soát G3 theo "Thư mục Map" (MRR-01).</li>
+<li>Đối chiếu bảng bảng kiểm: mỗi dòng phải có file đúng tên, đúng REV, đúng chữ ký số/scan.</li>
+<li>Chỉ ra 03 file nMẫu nhiên trong 20 giây và đọc được <b>REV + Ngày + Người ký</b>.</li>
+</ol>
+</div>
+<div class="card">
+<h2 class="h2" style="margin-top:0;">Ký xác nhận</h2>
+<div class="sig">
+<div class="box mini"><b>Người lập</b><br>Tên: <span class="formline"> </span><br>Ngày: <span class="formline"> </span></div>
+<div class="box mini"><b>Người kiểm</b><br>Tên: <span class="formline"> </span><br>Ngày: <span class="formline"> </span></div>
+<div class="box mini"><b><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> xác nhận</b><br>Tên: <span class="formline"> </span><br>Ngày: <span class="formline"> </span></div>
+</div>
+</div>
+</div>
+</div></div></div>
+
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>

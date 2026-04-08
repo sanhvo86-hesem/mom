@@ -1,0 +1,653 @@
+<div><p>thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../assets/style.css">
+
+</p>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">25</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-25</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+
+<!-- 1) Form Header (tách rời Doc-Control) -->
+<div class="title">
+<strong>SYS-OPS-25 — SOP-QMS-14 Doanh nghiệp Data Phân loại &amp; Lưu kho: độ nhạy, DLP, lưu kho / lưu trữ quy tắc</strong><br>
+<span class="sub-vn"></span>
+<span class="muted">Training thực chiến để vận hành dữ liệu sẵn sàng đánh giá: phân loại độ nhạy, lưu đúng nơi, khóa hồ sơ, kiểm soát chia sẻ, DLP và bằng chứng (MRR).</span>
+</div>
+<div class="meta">
+<div class="row"><span><b>Code:</b></span><span>SYS-OPS-25</span></div>
+<div class="row"><span><b>TrainingID:</b></span><span>25</span></div>
+<div class="row"><span><b>Version:</b></span><span>V0</span></div>
+<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></span></div>
+<div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
+</div>
+</div>
+<!-- 2–14) Doc Content -->
+<div class="doc-content" id="docContent">
+<div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+</div>
+<div class="card">
+<div class="grid-2">
+<div>
+<div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-25</div>
+<h1 style="margin-top:10px">SYS-OPS-25 - 25</h1>
+<div class="tag blue">Phiên bản • sẵn sàng cho đánh giá</div>
+<p class="muted" style="margin-top:10px">
+ Mô-đun này chuyển SOP thành vận hành vận hành: <b>lưu đúng nơi</b> – <b>đúng quyền</b> – <b>đúng phiên bản</b> – <b>đúng trạng thái kiểm soát</b>, và tạo <b>bằng chứng truy xuất nguồn gốc ≤ 3 phút</b>.
+ </p>
+</div>
+<div class="note">
+<strong>Mốc chuẩn HESEM bắt buộc bám theo</strong>
+<ul>
+<li><a href="../../../mom/docs/operations//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Doanh nghiệp Data Phân loại &amp; Lưu kho Hướng dẫn</a></li>
+<li><a href="../../../mom/docs/operations//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Data Governance &amp; Truy cập Standard</a></li>
+</ul>
+<div style="height:8px"></div>
+<strong>Thời lượng triển khai (khả thi 2 ca/ngày)</strong>
+<ul>
+<li>Lý thuyết tập trung: 90 phút (đúng thuật ngữ, đúng khu vực, đúng phân loại).</li>
+<li>Phân xưởng vận hành: 60 phút (đặt tên, lưu đúng kho, tạo gói minh chứng).</li>
+<li>OJT tại hiện trường: 120 phút (trên 01 WO/Lot thật hoặc mô phỏng).</li>
+<li>Giới hạn vận hành: mỗi vai trò học tối đa 02 buổi/tuần; phần còn lại thực Current job và nộp MRR.</li>
+</ul>
+<div class="req"><span class="req-tag shall">PHẢI</span>
+<div>Không có MRR (bằng chứng) thì không có cổng chặn: <b>No bằng chứng = No cổng chặn</b>.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toc">
+<strong>Mục lục nhanh</strong>
+<ul>
+<li><a href="#s2">2) Mục đích &amp; bối cảnh vận hành</a></li>
+<li><a href="#s3">3) Vị trí trong chuỗi E2E + bàn giao + điểm chặn</a></li>
+<li><a href="#s4">4) Điểm đứt gãy (≥10)</a></li>
+<li><a href="#s5">5) Biện pháp kiểm soát rủi ro (≥6)</a></li>
+<li><a href="#s6">6) Fail-nhanh quy tắc (STOP/TẠM GIỮ/CHẶN)</a></li>
+<li><a href="#s7">7) Phản ứng 60 giây</a></li>
+<li><a href="#s8">8) Bảng kiểm vận hành (≤15 bước)</a></li>
+<li><a href="#s9">9) OJT theo TWI (Job Sự cố hỏng máy + Tiêu chí đánh giá L1–L4)</a></li>
+<li><a href="#s10">10) Đánh giá (Trắc Nhiệm + Tình huống + Bài kiểm tra thực hành)</a></li>
+<li><a href="#s11">11) ĐẠT/KHÔNG ĐẠT tiêu chí</a></li>
+<li><a href="#s12">12) MRR tối thiểu + nơi lưu</a></li>
+<li><a href="#s13">13) Đánh giá phát hiện &amp; phòng ngừa</a></li>
+<li><a href="#s14">14) DCR hồ sơ</a></li>
+</ul>
+</div>
+</div>
+<!-- 2) Mục đích module & bối cảnh operation -->
+<h2 class="h2" id="s2">2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng chặn/bàn giao; kích hoạt; trách nhiệm)</h2>
+<div class="callout">
+<b>Lý do tồn tại (Cổng chặn logic):</b> sai vị trí lưu / sai quyền / sai phiên bản tạo lỗi chạy máy, lỗi kiểm tra, lỗi giao hàng và lỗi đánh giá. Mô-đun này là "cổng chặn hệ thống" để chặn 6 rủi ro chết Người: <b>sai Rev</b>, <b>lẫn lộn (mix-up)/lẫn lô</b>, <b>thiếu/giả chứng từ</b>, <b>chỉnh sửa âm thầm hồ sơ</b>, <b>rò rỉ dữ liệu khách hàng</b>, <b>vượt qua cổng chặn giao hàng</b>.
+ </div>
+<div class="grid-2">
+<div class="card">
+<h3 class="h3" style="margin-top:0">Khi nào kích hoạt</h3>
+<ul class="iso-list">
+<li>Khi tạo mới hoặc cập nhật bất kỳ file thuộc WO/Lot (Hồ sơ công việc (hồ sơ công việc), đặc biệt: bản vẽ/spec, CAD/CAM, CNC program, setup pack, kiểm tra hồ sơ.</li>
+<li>Khi phát hành tài liệu kiểm soát (Released) hoặc đóng băng hồ sơ (Hồ sơ).</li>
+<li>Khi chia sẻ ngoài công ty (khách hàng/đánh giá viên) hoặc cấp quyền truy cập vượt mốc chuẩn.</li>
+<li>Khi phát hiện rủi ro sai Rev, nghi ngờ rò rỉ dữ liệu, nghi ngờ chỉnh sửa hồ sơ.</li>
+</ul>
+</div>
+<div class="card">
+<h3 class="h3" style="margin-top:0">Ai chịu trách nhiệm</h3>
+<table class="table">
+<thead><tr><th style="width:220px">Vai trò</th><th>Trách nhiệm bắt buộc</th></tr></thead>
+<tbody>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Thiết lập chuẩn kiểm soát (Released/Hồ sơ/WIP), điểm / tại chỗ-kiểm tra tuân thủ, lập gói minh chứng đánh giá.</td></tr>
+<tr><td><b>IT/M365 Admin</b></td><td>Thiết lập cấu trúc địa điểm / site/thư viện, quản lý phiên bản/phê duyệt, lưu giữ/DLP, nhóm quyền, xuất đánh giá các log.</td></tr>
+<tr><td><b><a class="entity-link bundle-link bundle-chip" data-bundle="OPS_SCOPE_OWNERS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-ops-scope-owners" title="Operational Scope Owners (Nhom dau moi so huu pham vi van hanh) — CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG"><span class="entity-code bundle-code">OPS_SCOPE_OWNERS</span></a>/Dept Trưởng / Đầu</b></td><td>Phê duyệt quyền truy cập, thu hồi quyền, chấp thuận ngoại lệ có thời hạn.</td></tr>
+<tr><td><b>All Người dùng</b></td><td>Lưu đúng nơi, đúng tên, đúng phân loại; không tự ý chia sẻ ngoài; báo cáo sự cố ngay.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="kpi-cổng chặn">
+<strong>Cổng chặn cam kết vận hành:</strong>
+ Từ thời điểm mô-đun có hiệu lực, mọi WO/Lot phải truy xuất nguồn gốc được hồ sơ theo chuẩn trong ≤ <b>3 phút</b> (từ Tài liệu Set → thư mục chuẩn → file đúng tên), và mọi chia sẻ bên ngoài có log + thời hạn + thu hồi.
+ </div>
+<div class="card">
+<h3 class="h3" style="margin-top:0">Chuẩn bắt buộc: 3 khu vực + 4 mức phân loại + quy tắc DLP</h3>
+<div class="grid-2">
+<div>
+<h4 style="margin:0 0 8px 0">3 khu vực thông tin (không trộn)</h4>
+<table class="table">
+<thead><tr><th style="width:160px">Khu vực</th><th>Nơi lưu chuẩn</th><th>Quy tắc khóa</th></tr></thead>
+<tbody>
+<tr><td><b>Released</b></td><td>QMS-Được kiểm soát-Tài liệu</td><td>Quản lý phiên bản + phê duyệt; bản hết hiệu lực chỉ đọc</td></tr>
+<tr><td><b>Hồ sơ</b></td><td>QMS-Hồ sơ hoặc Hồ sơ công việc (gắn WO/Lot)</td><td>Không sửa nội dung; đính chính bằng file mới có lý do; lưu giữ</td></tr>
+<tr><td><b>WIP</b></td><td>OPS-Job-Hồ sơ (Tài liệu Set theo WO/Lot)</td><td>Cho phép cập nhật theo quyền; khi kết thúc / đóng hồ sơ phải đóng băng → Hồ sơ và khóa</td></tr>
+</tbody>
+</table>
+<div class="callout warn" style="margin-top:10px">
+<b>Quy tắc đóng hồ sơ:</b> Khi WO/Lot kết thúc / đóng hồ sơ, toàn bộ WIP phải được <b>đóng băng</b> thành Hồ sơ và khóa. Mọi thay đổi sau kết thúc / đóng hồ sơ đi qua NCR/CAPA hoặc Yêu cầu thay đổi.
+ </div>
+</div>
+<div>
+<h4 style="margin:0 0 8px 0">4 mức phân loại (gắn DLP)</h4>
+<table class="table">
+<thead><tr><th style="width:160px">Mức</th><th>Ví dụ CNC phân xưởng gia công theo đơn (job xưởng)</th><th>Quy tắc lưu &amp; chia sẻ tối thiểu</th></tr></thead>
+<tbody>
+<tr><td><b>Công khai</b></td><td>danh mục năng lực, tài liệu giới thiệu</td><td>Chỉ dùng cho danh mục năng lực, tài liệu giới thiệu; PHẢI giữ hồ sơ QMS/WO ở mức phân loại cao hơn</td></tr>
+<tr><td><b>Nội bộ</b></td><td>SOP/WI nội bộ, biểu mẫu không chứa dữ liệu khách</td><td>Chỉ chia sẻ bên ngoài khi đã có phê duyệt</td></tr>
+<tr><td><b>Customer-Bảo mật</b></td><td>Drawing/spec/mô hình, dữ liệu đo, khiếu nại, CoC theo yêu cầu khách</td><td>Chỉ chia sẻ bên ngoài qua gói minh chứng; link có hết hạn; chỉ đọc</td></tr>
+<tr><td><b>Hạn chế</b></td><td>CNC chương trình/ghi sổ / đăng, định giá/biên lợi nhuận, đánh giá các log, HR/Finance nhạy cảm</td><td>PHẢI chặn chia sẻ bên ngoài; giới hạn nghiêm ngặt theo nhóm; DLP chặn Exports</td></tr>
+</tbody>
+</table>
+<div class="req"><span class="req-tag shall">PHẢI</span>
+<div>DLP thực thi 3 chặn cứng: (1) <b>CHẶN</b> chia sẻ bên ngoài cho Hạn chế; (2) <b>CHẶN</b> chia sẻ khi chưa có phân loại; (3) <b>NHẬT KÝ</b> mọi chia sẻ Customer-Bảo mật qua gói minh chứng. <span class="muted">Label: Được kiểm soát/Nội bộ/Hạn chế • chặn chia sẻ ngoài • đánh giá log bật.</span></div>
+</div>
+</div>
+</div>
+</div>
+<h3 class="h3">Áp dụng theo vai trò (bắt buộc)</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:160px">Vai trò</th>
+<th>Phạm vi áp dụng trong mô-đun này</th>
+<th style="width:320px">Điều kiện đạt riêng theo vai trò (DoD)</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td>Chỉ sử dụng bản Released/WIP đúng nguồn; không sao chép file ra ngoài; nộp IPQC các log đúng nơi.</td><td>Hoàn thành 01 ca làm: IPQC log + ảnh/scan bảng kiểm lưu đúng Hồ sơ công việc; không phát sinh "nội bộ / tại chỗ chủ / gốc".</td></tr>
+<tr><td><b>Setup</b></td><td>Lưu phiếu cài đặt, danh sách dao cụ, bù trừ (offset) log đúng thư mục; khóa theo kết thúc / đóng hồ sơ.</td><td>01 bộ setup pack đúng chuẩn tên + thư mục; xác nhận dùng đúng Rev từ Hồ sơ công việc.</td></tr>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></b></td><td>Governance CNC program/CAM/ghi sổ / đăng trong thư viện Hạn chế; kiểm soát phiên bản, phát hành bản chạy.</td><td>Bài kiểm tra thực hành đạt 100% điểm "Program source &amp; phát hành"; không có file program nằm ngoài thư viện Hạn chế.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>Lưu FAI/CMM/FQC đúng Hồ sơ; bảo toàn tính toàn vẹn hồ sơ.</td><td>01 bộ kiểm tra hồ sơ "chỉ đọc/lưu giữ" sau phát hành; truy xuất nguồn gốc ≤ 3 phút.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Thiết lập gói minh chứng, NCR/CAPA, đánh giá các log; kiểm tra tuân thủ.</td><td>Thực hiện 01 điểm / tại chỗ-kiểm tra hồ sơ công việc + lập biên bản; tạo 01 gói minh chứng chia sẻ chỉ đọc có hết hạn.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Lưu truy xuất nguồn gốc, CoC vật liệu, đóng gói/giao vận pack đúng thư mục; không sửa âm thầm.</td><td>01 giao vận pack đủ: CoC/truy xuất nguồn gốc/phiếu kê đóng gói lưu đúng nơi; không thiếu MRR.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>Lưu nhà cung cấp approvals/chứng chỉ đúng QMS-Hồ sơ; link vào Hồ sơ công việc/Nguyên vật liệu.</td><td>01 bộ chứng từ nhà cung cấp: lưu đúng QMS-Hồ sơ và gắn link vào WO/Lot.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>Lưu lập kế hoạch Photos trạng thái và thay đổi lịch có dấu vết; tránh dùng file cá nhân làm chủ / gốc.</td><td>01 lập kế hoạch hồ sơ có quản lý phiên bản và log thay đổi liên quan WO/Lot.</td></tr>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span></b></td><td>Lưu PM các log, machine các log đúng QMS-Hồ sơ/<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span>; giữ lịch sử.</td><td>01 bộ PM hồ sơ: tên đúng chuẩn + không bị ghi đè.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td><td>Lưu sự cố/sự cố suýt xảy ra (Cần / suýt-thiếu / bỏ sót)/đào tạo <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> đúng khu vực Hồ sơ; quyền truy cập theo phân loại.</td><td>01 hồ sơ <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> được phân loại đúng và giới hạn quyền truy cập.</td></tr>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></b></td><td>Lưu RFQ/PO/rà soát hợp đồng đúng khu vực; chia sẻ khách hàng theo cơ chế kiểm soát.</td><td>01 rà soát hợp đồng hồ sơ gắn WO/Lot; chia sẻ khách hàng qua gói minh chứng có log.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Thực thi cổng chặn: không cho chạy/giao hàng khi hồ sơ sai vị trí/sai quyền/sai Rev.</td><td>Đạt L3: thực hiện 02 lần đánh giá nhanh + xử lý 01 tình huống vi phạm theo chặn lỗi tức thì.</td></tr>
+</tbody>
+</table>
+</div>
+<!-- 3) Vị trí trong chuỗi E2E + handoff -->
+<h2 class="h2" id="s3">3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + "điểm chặn"</h2>
+<div class="vflow">
+<div class="vstep">
+<div class="vnum">1</div>
+<div class="vbody">
+<div class="vtitle">Báo giá/Hợp đồng</div>
+<div class="vdesc"><b>Đầu vào:</b> RFQ, NDA, PO • <b>Đầu ra:</b> rà soát hợp đồng Hồ sơ (s) gắn WO/Lot</div>
+<div class="small muted">Điểm chặn: không tạo WO khi file khách hàng chưa lưu đúng khu vực + chưa gắn REV.</div>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">2</div>
+<div class="vbody">
+<div class="vtitle">Kế hoạch → Kỹ thuật</div>
+<div class="vdesc"><b>Đầu vào:</b> drawing/spec/mô hình • <b>Đầu ra:</b> bộ định tuyến / lộ trình/setup pack/phát hành chương trình (program phát hành)</div>
+<div class="small muted">Điểm chặn: program/phiếu cài đặt thuộc <b>Hạn chế</b> và chỉ phát hành từ thư viện Chương trình (Hạn chế).</div>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">3</div>
+<div class="vbody">
+<div class="vtitle">Mua hàng → Nhận hàng</div>
+<div class="vdesc"><b>Đầu vào:</b> nhà cung cấp cert/CoC • <b>Đầu ra:</b> truy xuất nguồn gốc + nguyên vật liệu pack trong Hồ sơ công việc</div>
+<div class="small muted">Điểm chặn: không nhập kho/không phát vật tư khi cert lưu sai nơi hoặc thiếu liên kết WO/Lot.</div>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">4</div>
+<div class="vbody">
+<div class="vtitle">Sản xuất → QC/QA</div>
+<div class="vdesc"><b>Đầu vào:</b> Released/WIP đúng nguồn • <b>Đầu ra:</b> IPQC/FAI/CMM/FQC Hồ sơ</div>
+<div class="small muted">Điểm chặn: không chạy máy khi nguồn program không truy xuất nguồn gốc được từ thư viện Hạn chế; không phát hành <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> khi hồ sơ chưa khóa.</div>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">5</div>
+<div class="vbody">
+<div class="vtitle">NCR/MRB → Final → Đóng gói → Ship</div>
+<div class="vdesc"><b>Đầu vào:</b> NCR/CAPA hồ sơ + kết thúc / đóng hồ sơ • <b>Đầu ra:</b> Giao vận pack (Hồ sơ) + gói minh chứng</div>
+<div class="small muted">Điểm chặn: TẠM GIỮ lô giao hàng khi thiếu giao vận pack / thiếu kết thúc / đóng hồ sơ khóa / thiếu bằng chứng phân loại &amp; quyền chia sẻ.</div>
+</div>
+</div>
+<div class="vstep">
+<div class="vnum">6</div>
+<div class="vbody">
+<div class="vtitle">Phản hồi/CI</div>
+<div class="vdesc"><b>Đầu vào:</b> đánh giá phát hiện/sự cố các log • <b>Đầu ra:</b> cập nhật quyền/lưu giữ/DLP + đào tạo lại</div>
+<div class="small muted">Điểm chặn: không đóng CAPA khi chưa có bằng chứng kiểm soát dữ liệu hiệu lực.</div>
+</div>
+</div>
+</div>
+<div class="card">
+<h3 class="h3" style="margin-top:0">Đầu vào/Đầu ra bắt buộc cho mô-đun này</h3>
+<table class="table">
+<thead><tr><th style="width:260px">Bàn giao</th><th>Đầu vào tối thiểu</th><th>Đầu ra/MRR bắt buộc</th></tr></thead>
+<tbody>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span> → Kế hoạch</b></td><td>RFQ/PO/NDA + drawing/spec + Rev</td><td>rà soát hợp đồng Hồ sơ + Customer Đầu vào lưu trong Hồ sơ công việc (đúng thư mục + tên)</td></tr>
+<tr><td><b>Kỹ thuật → Sản xuất</b></td><td>bộ định tuyến / lộ trình/phiếu cài đặt + program Released</td><td>Link "nguồn sự thật" program từ thư viện Hạn chế + dấu phát hành (note)</td></tr>
+<tr><td><b>Nhận hàng → Sản xuất</b></td><td>CoC/chứng chỉ vật liệu</td><td>Nguyên vật liệu pack: CoC + truy xuất nguồn gốc link đúng WO/Lot</td></tr>
+<tr><td><b>Sản xuất → QC/QA</b></td><td>IPQC các log + setup bằng chứng</td><td>IPQC hồ sơ + ảnh/bảng kiểm, lưu đúng khu vực, khóa khi kết thúc / đóng hồ sơ</td></tr>
+<tr><td><b><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> → External (đánh giá/khách hàng)</b></td><td>Scope đánh giá + danh mục bằng chứng</td><td>Bộ bằng chứng chỉ đọc có hết hạn + log quyền truy cập (FRM-QMS-15/17)</td></tr>
+</tbody>
+</table>
+</div>
+<!-- 4) Failure points -->
+<h2 class="h2" id="s4">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:46px">#</th><th>Điểm gãy</th><th>Hậu quả trực tiếp</th><th>Cổng chặn bị phá</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Lưu bản vẽ/spec trên OneDrive cá nhân hoặc máy nội bộ / tại chỗ làm "bản chính".</td><td>Chạy sai Rev; không truy xuất nguồn gốc đánh giá.</td><td>Báo giá/Hợp đồng → Kỹ thuật</td></tr>
+<tr><td>2</td><td>Gửi file khách hàng qua email/chat ngoài kiểm soát, không log.</td><td>Rò rỉ dữ liệu; vi phạm NDA.</td><td>External chia sẻ</td></tr>
+<tr><td>3</td><td>Trộn Released/WIP/Hồ sơ trong cùng thư mục, không phân khu vực.</td><td>Đúng nội dung nhưng sai trạng thái kiểm soát; chỉnh sửa hồ sơ.</td><td>Hồ sơ tính toàn vẹn</td></tr>
+<tr><td>4</td><td>CNC program nằm ngoài thư viện Hạn chế; copy USB giữa máy.</td><td>Chạy nhầm chương trình; không truy vết.</td><td>Kỹ thuật → Sản xuất</td></tr>
+<tr><td>5</td><td>Không gắn REV/WO/Lot trong tên file; dùng "final_v3".</td><td>Lẫn lộn/lẫn lô; truy xuất nguồn gốc chậm.</td><td>Truy xuất nguồn gốc</td></tr>
+<tr><td>6</td><td>Bẻ quyền theo file để "tiện", không có phê duyệt và thời hạn.</td><td>Không kiểm soát ai truy cập; đánh giá không đạt.</td><td>Kiểm soát truy cập</td></tr>
+<tr><td>7</td><td>Không đóng băng Hồ sơ công việc khi kết thúc / đóng hồ sơ; tiếp tục sửa file sau giao hàng.</td><td>Hồ sơ không toàn vẹn; tranh chấp khách hàng.</td><td>kết thúc / đóng hồ sơ khóa</td></tr>
+<tr><td>8</td><td>chia sẻ link không hết hạn hoặc chia sẻ cả thư viện thay vì gói minh chứng.</td><td>Rò rỉ dữ liệu kéo dài; không thu hồi.</td><td>External chia sẻ</td></tr>
+<tr><td>9</td><td>Hồ sơ bị ghi đè thay vì tạo bản đính chính có lý do.</td><td>Mất lịch sử; mất non-từ chối / phủ nhận.</td><td>Hồ sơ tính toàn vẹn</td></tr>
+<tr><td>10</td><td>Thiếu chứng từ CoC/chứng chỉ trong Hồ sơ công việc/Nguyên vật liệu.</td><td>TẠM GIỮ lô giao hàng; NCR/MRB.</td><td>Nhận hàng → Ship</td></tr>
+<tr><td>11</td><td>Kiểm tra data lưu sai nơi, thiếu liên kết WO/Lot.</td><td>Không chứng minh phù hợp; đánh giá không đạt.</td><td>QC/QA → Ship</td></tr>
+<tr><td>12</td><td>Không thực hiện rà soát quyền truy cập hàng quý; khách truy cập tồn tại vô hạn.</td><td>Rủi ro truy cập trái phép; đánh giá không đạt.</td><td>Governance</td></tr>
+</tbody>
+</table>
+</div>
+<!-- 5) Risk Controls -->
+<h2 class="h2" id="s5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:46px">#</th><th>điểm kiểm soát bắt buộc</th><th style="width:180px">người chịu trách nhiệm</th><th>Evidence (MRR)</th><th style="width:160px">Tần suất</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>Đơn lẻ nguồn sự thật</b>: Released tài liệu chỉ nằm trong <b>QMS-Được kiểm soát-Tài liệu</b>; nơi khác chỉ link.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Link Released + trang doc-control + log phát hành</td><td>Mỗi lần phát hành</td></tr>
+<tr><td>2</td><td><b>Hồ sơ công việc Tài liệu Set</b> theo WO/Lot + thư mục chuẩn; WIP → Hồ sơ theo kết thúc / đóng hồ sơ.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html" title="Logistics / Shipping Coordinator (Dieu phoi logistics / giao nhan)"><span class="entity-code role-code">LOG</span></a></span></td><td>01 Tài liệu Set đúng cấu trúc + kết thúc / đóng hồ sơ bảng kiểm ký</td><td>Mỗi WO/Lot</td></tr>
+<tr><td>3</td><td><b>Chương trình Hạn chế Thư viện</b>: CNC chương trình/ghi sổ / đăng/setup chỉ phát hành từ thư viện Hạn chế; PROD chỉ đọc/Use.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td><td>Phát hành note + đường dẫn program + quyền nhóm</td><td>Mỗi lần phát hành</td></tr>
+<tr><td>4</td><td><b>ít nhất quyền hạn &amp; group-dựa trên</b>: cấp quyền qua nhóm; mọi thay đổi có log và thời hạn.</td><td>IT + chủ dữ liệu</td><td><a href="../../../mom/docs/operations/references/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR%20record">FRM-QMS-15</a> + cập nhật Truy cập Matrix (<a href="../../../mom/docs/operations/references/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html">FRM-QMS-14</a>/<a href="../../../mom/docs/operations/references/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#edam">FRM-QMS-18</a>)</td><td>Mỗi thay đổi</td></tr>
+<tr><td>5</td><td><b>rà soát quyền truy cập hàng quý</b>: rà soát quyền + khách hết hạn + gói minh chứng.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td><a download="" href="../../../mom/docs/forms/frm-100-sales/FRM-111_Quarterly_Access_Review.xlsx">FRM-QMS-17</a> (gói minh chứng) + danh sách thu hồi</td><td>Hàng quý</td></tr>
+<tr><td>6</td><td><b>Hồ sơ tính toàn vẹn</b>: hồ sơ không chỉnh sửa; đính chính bằng file mới có lý do; lưu giữ label áp dụng.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Phiên bản/lưu giữ + log đính chính</td><td>Mỗi hồ sơ</td></tr>
+<tr><td>7</td><td><b>External chia sẻ cổng chặn</b>: chỉ chia sẻ qua gói minh chứng; link chỉ đọc có hết hạn; PHẢI chặn chia sẻ Hạn chế.</td><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> + <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></td><td>Bộ bằng chứng link + FRM-QMS-15 + Photos màn hình hết hạn</td><td>Mỗi lần chia sẻ</td></tr>
+<tr><td>8</td><td><b>điểm / tại chỗ-kiểm tra tuân thủ</b>: chọn mẫu WO/Lot kiểm tra vị trí lưu, tên file, quyền truy cập, khóa kết thúc / đóng hồ sơ.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Biên bản điểm / tại chỗ-kiểm tra + NCR/CAPA khi phát hiện</td><td>Hàng tháng</td></tr>
+</tbody>
+</table>
+</div>
+<!-- 6) Fail-fast -->
+<h2 class="h2" id="s6">6) Fail-nhanh quy tắc (≥3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
+<div class="card">
+<div class="req"><span class="req-tag shall">STOP</span>
+<div><b>Dừng gia công ngay</b> khi CNC program/phiếu cài đặt không truy xuất nguồn gốc được nguồn từ thư viện <b>Chương trình (Hạn chế)</b> hoặc không khớp REV/WO/Lot. MRR: Photos màn hình đường dẫn + báo <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + Kỹ thuật trong ≤ 5 phút.</div>
+</div>
+<div class="req"><span class="req-tag shall">TẠM GIỮ</span>
+<div><b>Giữ lô/giữ giao hàng</b> khi thiếu bất kỳ hồ sơ bắt buộc trong giao vận pack (CoC/chứng chỉ/kiểm tra/kết thúc / đóng hồ sơ khóa) hoặc hồ sơ nằm sai khu vực. MRR: log TẠM GIỮ + danh sách thiếu + Người chịu trách nhiệm.</div>
+</div>
+<div class="req"><span class="req-tag shall">CHẶN</span>
+<div><b>Chặn chia sẻ bên ngoài</b> khi file chưa được phân loại (Công khai/Nội bộ/Customer-Bảo mật/Hạn chế) hoặc file thuộc <b>Hạn chế</b>. MRR: phiếu yêu cầu/FRM-QMS-15 + quyết định phê duyệt/không phê duyệt.</div>
+</div>
+<div class="req"><span class="req-tag shall">STOP</span>
+<div><b>Dừng sử dụng hồ sơ</b> khi phát hiện dấu hiệu chỉnh sửa âm thầm hồ sơ (đổi nội dung thay vì đính chính). MRR: xuất DCR hồ sơ/đánh giá log + mở NCR/CAPA.</div>
+</div>
+</div>
+<!-- 7) 60-second reaction -->
+<h2 class="h2" id="s7">7) Phản ứng 60 giây (sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng chặn/rủi ro giao hàng…)</h2>
+<div class="card">
+<h3 class="h3" style="margin-top:0">Chuỗi phản ứng 60 giây (bắt buộc thuộc lòng)</h3>
+<ol class="iso-list">
+<li><b>Khoanh vùng ngay</b>: dừng vận hành đang tạo rủi ro (STOP/TẠM GIỮ/CHẶN theo mục 6).</li>
+<li><b>Chụp bằng chứng tức thì</b>: ảnh màn hình đường dẫn file, REV/WO/Lot, quyền chia sẻ, DCR hồ sơ.</li>
+<li><b>Đóng băng trạng thái</b>: không sửa file; tạo bản sao "Evidence_YYYYMMDD_HHMM" trong khu vực gói minh chứng nội bộ (chỉ đọc) để điều tra. <span class="muted">CNC-IMS-HUB → QMS-SSOT → Evidence-Pack.</span></li>
+<li><b>Báo đúng tuyến</b> trong ≤ 60 giây: <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> + IT (khi liên quan quyền/chia sẻ) + Kỹ thuật (khi liên quan program/rev).</li>
+<li><b>Ghi log sự cố</b>: mở NCR hoặc rủi ro log theo quy định <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>, gắn WO/Lot và đính kèm ảnh chứng cứ.</li>
+</ol>
+<div class="callout warn">
+<b>Nguyên tắc:</b> xử lý trước – phân tích sau. Không tranh luận tại hiện trường. Không "sửa cho xong" trước khi lưu bằng chứng.
+ </div>
+</div>
+<!-- 8) Checklist operation -->
+<h2 class="h2" id="s8">8) Bảng kiểm vận hành (≤15 bước) — người chịu trách nhiệm, Evidence/MRR, "điểm sai phổ biến"</h2>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:46px">#</th>
+<th>Bước vận hành bắt buộc</th>
+<th style="width:160px">người chịu trách nhiệm</th>
+<th style="width:260px">Evidence/MRR</th>
+<th>Điểm sai phổ biến (phải tránh)</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Xác định file thuộc khu vực nào: Released / WIP / Hồ sơ.</td><td>Người tạo file</td><td>Tag/nhãn khu vực trong siêu dữ liệu hoặc thư mục chuẩn</td><td>Trộn WIP và Hồ sơ trong 1 thư mục</td></tr>
+<tr><td>2</td><td>Gán mức phân loại: Công khai / Nội bộ / Customer-Bảo mật / Hạn chế.</td><td>Người tạo file</td><td>Nhãn phân loại trên file/thư viện</td><td>Để trống phân loại; gán sai "Nội bộ" cho dữ liệu khách</td></tr>
+<tr><td>3</td><td>Lưu file vào đúng nơi theo SOP: QMS-Được kiểm soát-Tài liệu / QMS-Hồ sơ / OPS-Job-Hồ sơ.</td><td>Người tạo file</td><td>Đường dẫn đúng site/thư viện/thư mục</td><td>Lưu OneDrive cá nhân/máy nội bộ / tại chỗ làm bản chính</td></tr>
+<tr><td>4</td><td>Đặt tên file có đủ: Customer, Part No, Phiên bản, WO/Lot, DocType, ngày.</td><td>Người tạo file</td><td>Tên file theo chuẩn</td><td>Dùng "final_v3"; thiếu REV/WO</td></tr>
+<tr><td>5</td><td>Đối với drawing/spec: chỉ lưu "Customer Đầu vào" trong Hồ sơ công việc; mọi bản phát hành nội bộ chỉ link.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Link "nguồn sự thật" + hồ sơ nhận file</td><td>Sao chép bản vẽ sang thư mục riêng để tiện</td></tr>
+<tr><td>6</td><td>Đối với CNC program/CAM/ghi sổ / đăng: lưu trong Chương trình (Hạn chế) và phát hành bản chạy.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Phát hành note + đường dẫn program</td><td>Copy program qua USB giữa máy; chỉnh tại máy</td></tr>
+<tr><td>7</td><td>Đối với kiểm tra hồ sơ: phát hành vào Hồ sơ; khóa không sửa; đính chính bằng file mới có lý do.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>DCR hồ sơ/lưu giữ + log đính chính</td><td>ghi đè file để "đẹp số"</td></tr>
+<tr><td>8</td><td>Đối với nhà cung cấp cert/CoC: lưu QMS-Hồ sơ/Suppliers và gắn link vào Hồ sơ công việc/Nguyên vật liệu.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Link cert + dấu nhận hàng</td><td>Để cert trong email/scan rời không truy xuất nguồn gốc</td></tr>
+<tr><td>9</td><td>Không bẻ quyền theo file; mọi thay đổi quyền qua FRM-QMS-15 và nhóm quyền.</td><td>IT + chủ dữ liệu</td><td>FRM-QMS-15 + nhóm quyền</td><td>Chia sẻ trực tiếp cho cá nhân, không thời hạn</td></tr>
+<tr><td>10</td><td>Chia sẻ bên ngoài chỉ qua gói minh chứng chỉ đọc có hết hạn; PHẢI chặn chia sẻ Hạn chế.</td><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></td><td>Link hết hạn + log chia sẻ</td><td>chia sẻ cả thư viện hoặc thư mục WO</td></tr>
+<tr><td>11</td><td>Khi kết thúc / đóng hồ sơ WO/Lot: đóng băng WIP thành Hồ sơ và khóa chỉ đọc/lưu giữ.</td><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>kết thúc / đóng hồ sơ bảng kiểm ký + trạng thái đã khóa</td><td>Tiếp tục sửa hồ sơ sau giao hàng</td></tr>
+<tr><td>12</td><td>Thực hiện điểm / tại chỗ-kiểm tra định kỳ: 01 WO/Lot/tuần theo lịch <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Biên bản điểm / tại chỗ-kiểm tra + hành động</td><td>Kiểm tra "cho có" không có bằng chứng</td></tr>
+<tr><td>13</td><td>Thực hiện rà soát quyền truy cập hàng quý + thu hồi quyền trong ≤ 24h khi kết thúc đánh giá/Projects.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>FRM-QMS-17 + danh sách thu hồi</td><td>Khách truy cập tồn tại vô hạn</td></tr>
+<tr><td>14</td><td>Kích hoạt phản ứng 60 giây khi phát hiện sai Rev/rò rỉ/chỉnh sửa hồ sơ.</td><td>Tất cả</td><td>Ảnh chứng cứ + log NCR/rủi ro</td><td>Sửa trước rồi mới báo</td></tr>
+<tr><td>15</td><td>Đóng bài học: cập nhật đào tạo hồ sơ và gắn MRR vào hồ sơ đào tạo.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Training hồ sơ + tiêu chí đánh giá ký</td><td>Chỉ có điểm trắc Nhiệm, không có hiệu suất bằng chứng</td></tr>
+</tbody>
+</table>
+</div>
+<!-- 9) OJT theo TWI -->
+<h2 class="h2" id="s9">9) OJT thực chiến theo TWI (Job Sự cố hỏng máy + OJT đầu ra + Tiêu chí đánh giá L1–L4)</h2>
+<div class="card">
+<h3 class="h3" style="margin-top:0">OJT Đầu ra bắt buộc (Đầu ra yêu cầu)</h3>
+<ul class="iso-list">
+<li><b>01 WO/Lot Tài liệu Set hoàn chỉnh</b> (cấu trúc thư mục chuẩn) gồm tối thiểu: Customer Đầu vào, bộ định tuyến / lộ trình/Setup, Chương trình (Hạn chế link), IPQC, Kiểm tra, Nguyên vật liệu/CoC, Giao vận, kết thúc / đóng hồ sơ khóa.</li>
+<li><b>01 Truy cập DCR hồ sơ</b> hoàn chỉnh (khi có cấp quyền/chia sẻ) theo <a href="../../../mom/docs/operations/references/03-ANNEX-Digital/annex-qms-031-html-form-to-excel-workbook-crosswalk-and-impact-register.html#DCR%20record">FRM-QMS-15</a>.</li>
+<li><b>01 Gói minh chứng</b> chỉ đọc có hết hạn (mô phỏng đánh giá/khách hàng) + Photos cấu hình hết hạn + danh sách Người được cấp quyền.</li>
+</ul>
+<div class="req"><span class="req-tag shall">PHẢI</span>
+<div>OJT kết thúc khi đủ 3 đầu ra trên và <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> ký xác nhận. Không đủ đầu ra thì KHÔNG ĐẠT.</div>
+</div>
+</div>
+<div class="card">
+<h3 class="h3" style="margin-top:0">Job Sự cố hỏng máy (TWI Hướng dẫn công việc)</h3>
+<p class="muted">Mục tiêu: vận hành đúng <b>khu vực</b> + đúng <b>phân loại</b> + đúng <b>nơi lưu</b> + đúng <b>tên file</b> + đúng <b>quyền</b> + đúng <b>khóa kết thúc / đóng hồ sơ</b>.</p>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:260px">Step (Bước)</th>
+<th>Điểm then chốt</th>
+<th>Lý do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>1. Nhận diện khu vực</b></td>
+<td>Gắn đúng Released/WIP/Hồ sơ trước khi lưu.</td>
+<td>Chặn "đúng nội dung nhưng sai trạng thái kiểm soát".</td>
+</tr>
+<tr>
+<td><b>2. Gán phân loại</b></td>
+<td>Chọn 1 trong 4 mức: Công khai/Nội bộ/Customer-Bảo mật/Hạn chế.</td>
+<td>Chặn rò rỉ dữ liệu, kích hoạt DLP/giới hạn quyền.</td>
+</tr>
+<tr>
+<td><b>3. Lưu đúng kho</b></td>
+<td>Released vào QMS-Được kiểm soát-Tài liệu; Hồ sơ vào QMS-Hồ sơ; WIP theo WO/Lot vào OPS-Job-Hồ sơ.</td>
+<td>Đơn lẻ nguồn sự thật + đánh giá truy xuất nguồn gốc nhanh.</td>
+</tr>
+<tr>
+<td><b>4. Đặt tên chuẩn</b></td>
+<td>Tên có WO/Lot + Part No + Rev + DocType + ngày.</td>
+<td>Chặn lẫn lộn/lẫn lô, tìm ≤ 3 phút.</td>
+</tr>
+<tr>
+<td><b>5. Program cổng chặn</b></td>
+<td>Chương trình nằm trong thư viện Hạn chế; phát hành bản chạy; PROD chỉ dùng bản phát hành.</td>
+<td>Chặn chạy nhầm program, chặn chỉnh tại máy.</td>
+</tr>
+<tr>
+<td><b>6. Hồ sơ tính toàn vẹn</b></td>
+<td>Hồ sơ không sửa; đính chính bằng file mới có lý do; giữ lịch sử.</td>
+<td>Non-từ chối / phủ nhận, chặn gian lận/che lỗi.</td>
+</tr>
+<tr>
+<td><b>7. chia sẻ bên ngoài đúng cổng chặn</b></td>
+<td>Chỉ chia sẻ gói minh chứng chỉ đọc có hết hạn; ghi log FRM-QMS-15; PHẢI chặn chia sẻ Hạn chế.</td>
+<td>Thu hồi được, đáp ứng NDA và đánh giá.</td>
+</tr>
+<tr>
+<td><b>8. kết thúc / đóng hồ sơ khóa</b></td>
+<td>Khi đóng WO/Lot: đóng băng WIP → Hồ sơ + khóa chỉ đọc/lưu giữ.</td>
+<td>Hồ sơ toàn vẹn sau giao hàng, chống tranh chấp.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<h3 class="h3" style="margin-top:0">Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn được cấp)</h3>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr>
+<th style="width:90px">Level</th>
+<th>Hành vi quan sát được</th>
+<th>Điều kiện lên level</th>
+<th style="width:220px">Quyền hạn sau khi đạt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>L1</b></td>
+<td>Lưu đúng thư mục theo hướng dẫn; đặt tên đúng; không tạo bản chính ở nội bộ / tại chỗ. Thực hiện phản ứng 60 giây khi phát hiện sai.</td>
+<td>Trắc Nhiệm ≥ 80% + hoàn thành 01 OJT đầu ra có giám sát.</td>
+<td>Được Đóng góp trong Hồ sơ công việc theo vai trò; không được chia sẻ bên ngoài.</td>
+</tr>
+<tr>
+<td><b>L2</b></td>
+<td>Thực hiện độc lập: gán phân loại đúng; tạo hồ sơ không bị ghi đè; gắn link đúng giữa QMS-Hồ sơ và Hồ sơ công việc.</td>
+<td>2 WO/Lot liên tiếp không lỗi lưu trữ + bài kiểm tra thực hành ĐẠT.</td>
+<td>Được tạo hồ sơ theo phạm vi; được khởi tạo yêu cầu cấp quyền qua FRM-QMS-15.</td>
+</tr>
+<tr>
+<td><b>L3</b></td>
+<td>Phát hiện và chặn lỗi của Người khác tại hiện trường; thực hiện điểm / tại chỗ-kiểm tra; mở NCR/CAPA khi phát hiện chỉnh sửa hồ sơ.</td>
+<td>Thực hiện 02 điểm / tại chỗ-kiểm tra có biên bản + xử lý 01 tình huống TẠM GIỮ/STOP đúng chuẩn.</td>
+<td>Được làm "Người đi kèm (buddy) Người đào tạo"; được phê duyệt nội bộ cấp quyền trong phạm vi chủ dữ liệu uỷ quyền.</td>
+</tr>
+<tr>
+<td><b>L4</b></td>
+<td>Thiết kế/chuẩn hóa cấu trúc dữ liệu; xử lý sự cố rò rỉ; điều phối truy cập rà soát; cung cấp gói minh chứng đánh giá theo scope.</td>
+<td>Chủ trì 01 rà soát quyền truy cập hàng quý + 01 sự cố diễn tập + đánh giá pass không phát hiện trọng yếu.</td>
+<td>Được làm Data Người quản lý/<a class="entity-link bundle-link bundle-chip" data-bundle="OPS_SCOPE_OWNERS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-ops-scope-owners" title="Operational Scope Owners (Nhom dau moi so huu pham vi van hanh) — CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG"><span class="entity-code bundle-code">OPS_SCOPE_OWNERS</span></a>; được yêu cầu IT thay đổi cấu hình mốc chuẩn (có phê duyệt).</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 10) Đánh giá -->
+<h2 class="h2" id="s10">10) Đánh giá: Trắc Nhiệm (≥20) + Tình huống (≥3) + Bài kiểm tra thực hành (bắt buộc)</h2>
+<div class="card" id="trắc Nhiệm">
+<h3 class="h3" style="margin-top:0">10.1 Trắc Nhiệm (25 câu) — trắc Nhiệm + tình huống ngắn</h3>
+<ol class="iso-list">
+<li>Ba khu vực thông tin trong HESEM gồm những khu vực nào?</li>
+<li><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> "nguồn sự thật duy nhất" cho Released/Được kiểm soát Tài liệu là kho nào?</li>
+<li>Mức phân loại nào áp dụng cho CNC chương trình/ghi sổ / đăng/định giá/biên lợi nhuận theo SOP-QMS-011?</li>
+<li>Khi file thuộc Customer-Bảo mật, hành vi chia sẻ bên ngoài bắt buộc đi qua cơ chế nào?</li>
+<li>Quy tắc bắt buộc số 1 liên quan lưu trữ hồ sơ là gì?</li>
+<li>Ý nghĩa vận hành của "đóng băng WIP thành Hồ sơ khi kết thúc / đóng hồ sơ" là gì?</li>
+<li>Khi phát hiện program không truy xuất nguồn gốc được đường dẫn thư viện Hạn chế, hành động chặn lỗi tức thì là gì?</li>
+<li>ít nhất quyền hạn được thực thi bằng cách cấp quyền qua gì?</li>
+<li>FRM nào dùng để ghi log cấp quyền/chia sẻ ngoài?</li>
+<li>FRM nào là bằng chứng truy cập rà soát hàng quý?</li>
+<li>Vì sao "đính chính hồ sơ bằng file mới có lý do" bắt buộc?</li>
+<li>4 key tối thiểu gắn với hồ sơ theo SOP-QMS-011 là gì?</li>
+<li>DocType chuẩn dùng trong tên file job gồm những loại nào? Nêu tối thiểu 5 loại.</li>
+<li>Khi nhận CoC vật liệu, file phải lưu ở đâu và gắn vào đâu?</li>
+<li>Khi cần chia sẻ cho đánh giá viên, đối tượng chia sẻ là thư viện WO/Lot hay gói minh chứng? Vì sao?</li>
+<li>Khi thấy Người khác bẻ quyền theo file "cho tiện", hành động bắt buộc là gì?</li>
+<li>Rủi ro "đúng nội dung nhưng sai trạng thái kiểm soát" xuất hiện khi nào?</li>
+<li>Lưu giữ policy không được "né" bằng cách tạo thư mục nào?</li>
+<li>Khi WO/Lot đã giao hàng, sửa file kiểm tra hồ sơ có được phép không? Mô tả cách xử lý đúng.</li>
+<li>Trong Hồ sơ công việc, Chương trình thư mục được kiểm soát theo nguyên tắc quyền nào giữa <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span> và PROD?</li>
+<li>Khi phát hiện nghi ngờ rò rỉ dữ liệu, 2 hành động đầu tiên trong 60 giây là gì?</li>
+<li>Chỉ số vận hành "truy xuất nguồn gốc hồ sơ ≤ 3 phút" đo bằng cách nào trong thực tế?</li>
+<li>Khi file chưa được gán phân loại, hành động chia sẻ link là GO hay CHẶN?</li>
+<li>Những nhóm quyền mốc chuẩn trong SOP-QMS-011 gồm nhóm nào? Nêu tối thiểu 3 nhóm.</li>
+<li>"No bằng chứng = No cổng chặn" áp dụng vào quyết định nào trong chuỗi E2E?</li>
+</ol>
+<div class="note">
+<b>Chấm điểm:</b> đúng ≥ 80% mới qua phần trắc Nhiệm. Dưới ngưỡng là KHÔNG ĐẠT và học lại ngay trong ca tiếp theo.
+ </div>
+</div>
+<div class="card">
+<h3 class="h3" style="margin-top:0">10.2 Tình huống (3 tình huống thật) — yêu cầu quyết định TẠM GIỮ/GO và ghi MRR</h3>
+<details>
+<summary>Tình huống 1 — Sai Rev (Kỹ thuật → Sản xuất)</summary>
+<p><b>Dữ kiện:</b> Operator đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Hồ sơ công việc có 2 file drawing: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Setup sheet đang tham chiếu RevA. <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span> báo Released program theo RevB.</p>
+<p><b>Yêu cầu:</b> Ra quyết định <b>STOP/TẠM GIỮ/GO</b>. Ghi tối thiểu 3 MRR phải tạo ngay.</p>
+<ul class="iso-list">
+<li>Quyết định bắt buộc: <b>STOP</b> cho tới khi phiếu cài đặt và drawing thống nhất Rev.</li>
+<li>MRR: ảnh đường dẫn file + log dừng + cập nhật phiếu cài đặt bản mới có lý do + xác nhận phát hành program.</li>
+</ul>
+</details>
+<details>
+<summary>Tình huống 2 — Chia sẻ bên ngoài sai cổng chặn (<a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> → Đánh giá viên)</summary>
+<p><b>Dữ kiện:</b> Đánh giá viên yêu cầu xem 01 hồ sơ công việc mẫu và 01 báo cáo FQC. <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> yêu cầu <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> gửi link ngay trong 10 phút. <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> thấy chia sẻ nhanh bằng cách chia sẻ cả thư mục WO/Lot.</p>
+<p><b>Yêu cầu:</b> Ra quyết định <b>CHẶN/GO</b>. Nêu cấu hình chia sẻ bắt buộc (chỉ đọc/hết hạn/log). Ghi MRR.</p>
+<ul class="iso-list">
+<li>Quyết định bắt buộc: <b>CHẶN</b> chia sẻ thư mục WO/Lot; chỉ chia sẻ <b>Gói minh chứng</b> chỉ đọc có hết hạn.</li>
+<li>MRR: link gói minh chứng + ảnh hết hạn + FRM-QMS-15 + danh sách Người được cấp quyền + thời điểm thu hồi.</li>
+</ul>
+</details>
+<details>
+<summary>Tình huống 3 — Thiếu CoC vật liệu (Nhận hàng → Ship)</summary>
+<p><b>Dữ kiện:</b> Lô đã hoàn tất, chuẩn bị ship. Trong Hồ sơ công việc/Nguyên vật liệu có phiếu nhập kho và truy xuất nguồn gốc, thiếu CoC vật liệu. Mua hàng xác nhận CoC nằm trong email, chưa upload vào QMS-Hồ sơ.</p>
+<p><b>Yêu cầu:</b> Ra quyết định <b>TẠM GIỮ/GO</b>. Nêu 5 bước xử lý trong ca Current và MRR tương ứng.</p>
+<ul class="iso-list">
+<li>Quyết định bắt buộc: <b>TẠM GIỮ lô giao hàng</b> cho tới khi CoC được lưu đúng khu vực + link đúng WO/Lot.</li>
+<li>MRR: CoC upload QMS-Hồ sơ/Suppliers + link vào Hồ sơ công việc/Nguyên vật liệu + cập nhật Giao vận Bảng kiểm + log TẠM GIỮ/Phát hành.</li>
+</ul>
+</details>
+</div>
+<div class="card">
+<h3 class="h3" style="margin-top:0">10.3 Bài kiểm tra thực hành (bắt buộc) — bài test + tiêu chí đánh giá + ĐẠT/KHÔNG ĐẠT</h3>
+<div class="callout">
+<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, bộ định tuyến / lộ trình, phiếu cài đặt, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a> file, CNC program, FQC báo cáo) và 1 yêu cầu chia sẻ cho "khách hàng" phạm vi 2 file. Người học phải lưu đúng khu vực, gán phân loại, đặt tên đúng, tạo gói minh chứng chia sẻ chỉ đọc có hết hạn, ghi log FRM-QMS-15, và thực hiện kết thúc / đóng hồ sơ khóa.
+ </div>
+<table class="table">
+<thead><tr><th style="width:280px">Hạng mục chấm</th><th>Tiêu chí ĐẠT</th><th style="width:220px">Lỗi KHÔNG ĐẠT ngay</th></tr></thead>
+<tbody>
+<tr>
+<td><b>Khu vực &amp; Vị trí</b></td>
+<td>6/6 file vào đúng kho (Released/WIP/Hồ sơ) theo SOP; đường dẫn truy xuất nguồn gốc được.</td>
+<td>Lưu file vào OneDrive cá nhân/máy nội bộ / tại chỗ làm bản chính; trộn Hồ sơ với WIP.</td>
+</tr>
+<tr>
+<td><b>Phân loại</b></td>
+<td>Gán đúng 4 mức; CNC program là <b>Hạn chế</b>; drawing là <b>Customer-Bảo mật</b>.</td>
+<td>Gán "Nội bộ" cho CNC program hoặc chia sẻ file Hạn chế.</td>
+</tr>
+<tr>
+<td><b>Đặt tên &amp; siêu dữ liệu</b></td>
+<td>Tên file có WO/Lot + PartNo + Rev + DocType + ngày; không dùng "final_v3".</td>
+<td>Thiếu REV/WO/Lot; dùng tên mơ hồ gây lẫn lộn.</td>
+</tr>
+<tr>
+<td><b>External chia sẻ cổng chặn</b></td>
+<td>Chỉ chia sẻ gói minh chứng; chỉ đọc; hết hạn; có log FRM-QMS-15.</td>
+<td>chia sẻ cả WO/Lot thư mục; chia sẻ không hết hạn; không có log.</td>
+</tr>
+<tr>
+<td><b>kết thúc / đóng hồ sơ khóa</b></td>
+<td>Đóng băng WIP → Hồ sơ và khóa; lưu kết thúc / đóng hồ sơ bảng kiểm.</td>
+<td>Không khóa; sửa file sau kết thúc / đóng hồ sơ.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- 11) ĐẠT/KHÔNG ĐẠT -->
+<h2 class="h2" id="s11">11) ĐẠT/KHÔNG ĐẠT tiêu chí (rõ ràng; "No bằng chứng = No cổng chặn")</h2>
+<div class="card">
+<ul class="iso-list">
+<li><b>ĐẠT</b> khi đồng thời đạt:
+ <ul class="iso-list">
+<li>Trắc Nhiệm ≥ <b>80%</b>.</li>
+<li>Tình huống: 3/3 quyết định đúng (STOP/TẠM GIỮ/CHẶN/GO) và ghi đủ MRR.</li>
+<li>Bài kiểm tra thực hành: đạt ĐẠT cho tất cả hạng mục; không có lỗi KHÔNG ĐẠT ngay.</li>
+<li>OJT đầu ra đủ 3 đầu ra yêu cầu (WO/Lot Tài liệu Set + FRM-QMS-15 + Gói minh chứng) có chữ ký <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</li>
+</ul>
+</li>
+<li><b>KHÔNG ĐẠT</b> khi xảy ra 1 trong các lỗi:
+ <ul class="iso-list">
+<li>chia sẻ bên ngoài dữ liệu <b>Hạn chế</b> hoặc chia sẻ không hết hạn.</li>
+<li>Không truy xuất nguồn gốc được "nguồn sự thật" program từ thư viện Hạn chế.</li>
+<li>Chỉnh sửa/ghi đè hồ sơ thay vì đính chính có lý do.</li>
+<li>Thiếu MRR cho quyết định cổng chặn (No bằng chứng = No cổng chặn).</li>
+</ul>
+</li>
+</ul>
+</div>
+<!-- 12) MRR -->
+<h2 class="h2" id="s12">12) MRR tối thiểu: hồ sơ phải tạo/đính kèm + quy tắc đặt tên + nơi lưu</h2>
+<div class="card">
+<h3 class="h3" style="margin-top:0">12.1 Danh sách MRR tối thiểu (bắt buộc)</h3>
+<table class="table">
+<thead><tr><th style="width:280px">MRR</th><th>Nội dung</th><th style="width:220px">Nơi lưu</th></tr></thead>
+<tbody>
+<tr><td><b>MRR-25-01</b></td><td>Ảnh chụp đường dẫn "nguồn sự thật" cho drawing/spec và program (Hạn chế).</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
+<tr><td><b>MRR-25-02</b></td><td>Bảng kiểm vận hành mục 8 ký xác nhận (theo vai trò).</td><td>QMS-Hồ sơ/Training</td></tr>
+<tr><td><b>MRR-25-03</b></td><td>FRM-QMS-15 Truy cập DCR hồ sơ (cấp quyền/chia sẻ).</td><td>QMS-Hồ sơ/IT_Evidence</td></tr>
+<tr><td><b>MRR-25-04</b></td><td>Gói minh chứng chia sẻ chỉ đọc có hết hạn + danh sách Người được cấp.</td><td>Z_Audit_Evidence_Pack</td></tr>
+<tr><td><b>MRR-25-05</b></td><td>Biên bản điểm / tại chỗ-kiểm tra tuân thủ (mẫu WO/Lot).</td><td>QMS-Hồ sơ/đợt đánh giá</td></tr>
+<tr><td><b>MRR-25-06</b></td><td>kết thúc / đóng hồ sơ bảng kiểm + trạng thái khóa/lưu giữ của WO/Lot.</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
+</tbody>
+</table>
+<h3 class="h3">12.2 Quy tắc đặt tên (bắt buộc)</h3>
+<div class="req"><span class="req-tag shall">PHẢI</span>
+<div>Tên file hồ sơ gắn WO/Lot có tối thiểu: <b>WO</b>, <b>Lot</b>, <b>Part No</b>, <b>Phiên bản</b>, <b>DocType</b>, <b>YYYYMMDD</b>.</div>
+</div>
+<pre class="code">WO####_LOT##_PartNo_Rev##_DocType_YYYYMMDD.ext</pre>
+<h3 class="h3">12.3 Nơi lưu (SharePoint) — bắt buộc xác định rõ</h3>
+<table class="table">
+<thead><tr><th style="width:260px">Khu vực/<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></th><th>Đường dẫn chuẩn</th><th style="width:240px">Ghi chú</th></tr></thead>
+<tbody>
+<tr><td><b>Released</b></td><td>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu</td><td>Chỉ link từ nơi khác</td></tr>
+<tr><td><b>Hồ sơ</b></td><td>M365/SharePoint → CNC-IMS-HUB → QMS-Hồ sơ</td><td>Lưu giữ + hạn chế ghi đè</td></tr>
+<tr><td><b>WIP → Hồ sơ</b></td><td>M365/SharePoint → CNC-IMS-HUB → OPS-Job-Hồ sơ</td><td>Tài liệu Set per WO/Lot</td></tr>
+<tr><td><b>Bộ bằng chứng</b></td><td>M365/SharePoint → CNC-IMS-HUB → Z_Audit_Evidence_Pack</td><td>đọc-chỉ / duy nhất; chia sẻ có hết hạn</td></tr>
+<tr><td><b>Training kho lưu trữ</b></td><td>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops</td><td>Theo chuẩn <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>: SSOT = CNC-IMS-HUB (SharePoint).</td></tr>
+</tbody>
+</table>
+</div>
+<!-- 13) Audit findings -->
+<h2 class="h2" id="s13">13) Chung đánh giá phát hiện &amp; phòng ngừa (ít nhất 8 lỗi đánh giá và cách chặn)</h2>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:46px">#</th><th>Phát hiện phổ biến</th><th>Vì sao bị fail</th><th>Phòng ngừa bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Không chứng minh được "nguồn sự thật duy nhất" cho Released tài liệu.</td><td>Đánh giá viên thấy nhiều bản SOP/WI rải rác.</td><td>Chỉ lưu Released trong QMS-Được kiểm soát-Tài liệu; nơi khác chỉ link; điểm / tại chỗ-kiểm tra hàng tháng.</td></tr>
+<tr><td>2</td><td>Hồ sơ công việc thiếu cấu trúc chuẩn hoặc thiếu thư mục bắt buộc.</td><td>Không truy xuất nguồn gốc đủ bằng chứng theo WO/Lot.</td><td>Template Tài liệu Set chuẩn + bảng kiểm kết thúc / đóng hồ sơ bắt buộc.</td></tr>
+<tr><td>3</td><td>Hồ sơ chỉnh sửa/ghi đè, không có lịch sử đính chính.</td><td>Mất non-từ chối / phủ nhận.</td><td>Đính chính bằng file mới có lý do; giữ bản cũ; lưu giữ.</td></tr>
+<tr><td>4</td><td>Cấp quyền theo cá nhân; không có log thay đổi quyền.</td><td>Không kiểm soát ít nhất quyền hạn.</td><td>Chỉ cấp qua group; mọi thay đổi ghi FRM-QMS-15.</td></tr>
+<tr><td>5</td><td>Khách/bên ngoài truy cập không có hết hạn hoặc không thu hồi sau đánh giá.</td><td>Rủi ro rò rỉ kéo dài.</td><td>Bộ bằng chứng chia sẻ có hết hạn; hàng quý rà soát + thu hồi ≤ 24h.</td></tr>
+<tr><td>6</td><td>Dữ liệu nhạy cảm (program/định giá) được chia sẻ hoặc lưu sai mức.</td><td>Vi phạm phân loại dữ liệu.</td><td>PHẢI chặn chia sẻ Hạn chế; thư viện Hạn chế giới hạn download; kiểm tra định kỳ.</td></tr>
+<tr><td>7</td><td>Thiếu CoC/chứng chỉ/truy xuất nguồn gốc liên kết WO/Lot.</td><td>Không chứng minh nguồn gốc vật liệu.</td><td>Cổng chặn Nhận hàng → Sản xuất: không phát vật tư khi thiếu cert đúng nơi.</td></tr>
+<tr><td>8</td><td>Không chứng minh rà soát quyền truy cập hàng quý (không có gói minh chứng).</td><td>đánh giá không đạt quản trị.</td><td>FRM-QMS-17 bắt buộc hàng quý; lưu trong QMS-Hồ sơ/IT_Evidence.</td></tr>
+<tr><td>9</td><td>Chia sẻ bên ngoài ngoài gói minh chứng (chia sẻ cả thư mục/hồ sơ công việc).</td><td>Phạm vi lộ dữ liệu vượt scope.</td><td>Fail-nhanh CHẶN; đào tạo lại bắt buộc; log sự cố.</td></tr>
+<tr><td>10</td><td>Không đóng băng WIP thành hồ sơ khi kết thúc / đóng hồ sơ.</td><td>Hồ sơ thay đổi sau giao hàng.</td><td>kết thúc / đóng hồ sơ khóa bắt buộc; <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> ký; <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> kiểm tra.</td></tr>
+</tbody>
+</table>
+</div>
+<!-- 14) DCR record -->
+</div><!-- /doc-content -->
+</div><!-- /page-body -->
+<!-- Doc Control (tách rời) -->
+
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+
+</div>

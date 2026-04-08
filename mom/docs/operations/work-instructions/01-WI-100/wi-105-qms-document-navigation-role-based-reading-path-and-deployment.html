@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-105 - QMS Document Navigation Role Based Reading Path and Deployment | HESEM MOM</title>
+<link rel="stylesheet" href="../../../assets/style.css">
+<style>
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f7fbff 0%,#fffdf6 100%);margin:0 0 18px;}
+.hero h1{margin:0 0 8px;font-size:24px;line-height:1.35;color:var(--navy);}
+.hero p{margin:0;color:var(--ink2);}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.step{border-left: 3px solid var(--blue);padding:10px 12px;background:#fcfdff;border-radius:8px;margin:10px 0;}
+.path-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
+.path-card h3{margin:0 0 8px;font-size:14px;color:var(--navy);}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:10px;font-weight:700;margin:0 6px 6px 0;}
+.matrix-table{width:100%;border-collapse:collapse;table-layout:fixed;word-wrap:break-word;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom;}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.5;}
+.tight{margin:8px 0;padding-left:18px;}
+.tight li{margin:4px 0;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:#fff;}
+.metric-card .value{font-size:22px;font-weight:800;color:var(--navy);}
+.metric-card .label{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-top:4px;}
+.note-warn{border-left: 3px solid #e67700;background:#fff7ed;padding:12px 14px;border-radius:var(--r);margin:12px 0;}
+@media (max-width:960px){
+ .grid-2,.grid-3{grid-template-columns:1fr;}
+ .page-body{padding:24px 18px 36px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+
+<div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">QMS Document Navigation Role Based Reading Path and Deployment</strong>
+</div>
+ <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">WI-105</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V2</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho hội nhập nhân sự mới, chuyển vai trò, đào tạo định kỳ, triển khai tài liệu vận hành, triển khai dashboard, go-live M365 hồ sơ, hypercare sau go-live và đánh giá sẵn sàng theo phòng ban.</div>
+
+<div class="hero">
+ <h1>WI-105 - QMS Document Navigation Role Based Reading Path and Deployment</h1>
+ <p>Người dùng phải biết mở tài liệu đúng lớp, đúng thứ tự, đúng thời điểm và đúng nơi lưu hồ sơ. <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> và Champion phải dùng WI này để giao đúng playlist tài liệu cho từng phòng ban thay vì yêu cầu Người dùng tự bơi trong toàn thư viện.</p>
+</div>
+
+<div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong><br>Trong vòng 3 phút, Người dùng phải xác định được 5 câu trả lời: bắt đầu từ tài liệu nào, SOP gốc là gì, WI thao tác là gì, FRM hoặc hồ sơ số nào phải dùng và nơi lưu bằng chứng ở đâu.</div>
+
+<div class="section">
+ <h2>1. Nguyên tắc điều hướng bắt buộc</h2>
+ <div class="grid-2">
+ <div class="path-card">
+ <h3>1.1 Tuyến đọc chuẩn</h3>
+ <ul class="tight">
+ <li>Bắt đầu từ <b>Department Handbook</b> của phòng ban.</li>
+ <li>Ra quyết định bằng <b>SOP</b>.</li>
+ <li>Thao tác tại điểm dùng bằng <b>WI</b>.</li>
+ <li>Ghi bằng chứng bằng <b>FRM</b> hoặc hồ sơ số được chỉ định.</li>
+ <li>Tra path, quyền, ngưỡng và mapping bằng <b>ANNEX</b>.</li>
+ </ul>
+ </div>
+ <div class="path-card">
+ <h3>1.2 Điều cấm</h3>
+ <ul class="tight">
+ <li>Không bắt đầu từ biểu mẫu khi chưa biết SOP gốc.</li>
+ <li>Không dùng email, chat, màn hình desktop hoặc USB làm nơi lưu hồ sơ chính.</li>
+ <li>Không phát cho Người dùng một danh sách link rời rạc không có thứ tự đọc.</li>
+ <li>Không yêu cầu nhân sự đọc toàn bộ thư viện nếu công việc chỉ chạm một luồng cụ thể.</li>
+ </ul>
+ </div>
+ </div>
+ <div class="step"><strong>Tuyến đọc chuẩn duy nhất:</strong> Department Handbook → SOP → WI → FRM → ANNEX → nơi lưu hồ sơ.</div>
+</div>
+
+<div class="section">
+ <h2>2. Playlist tài liệu theo nhóm Người dùng</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Nhóm Người dùng</th>
+ <th>Phải đọc trước</th>
+ <th>Phải đọc tiếp</th>
+ <th>Đầu ra bắt buộc</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
+ <td><a href="../../../mom/docs/system/quality-manual/qms-man-001-qms-manual.html">QMS-MAN-001</a>, <a href="wi-106-job-order-deployment-master-plan.html">WI-106</a></td>
+ <td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a>, <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+ <td>Phê duyệt wave, nguồn lực, gate Go/No-Go và cơ chế escalation</td>
+ </tr>
+ <tr>
+ <td><span class="role-cluster"><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a><span class="role-sep">/</span><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="role-code">ENGM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="role-code">QA[QMR]</span></a><span class="role-sep">/</span><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="role-code">SCM</span></a><span class="role-sep">/</span><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="role-code">FIN</span></a><span class="role-sep">/</span><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="role-code">HR</span></a><span class="role-sep">/</span><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="role-code">EHS</span></a><span class="role-sep">/</span><a class="role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="role-code">ITA</span></a></span></td>
+ <td><a href="../../../mom/docs/system/organization/02-Department-Handbooks/index.html">Department Handbooks Index</a>, sổ tay phòng mình, WI này</td>
+ <td>SOP cốt lõi của phòng, WI thao tác trọng yếu, <a href="wi-106-job-order-deployment-master-plan.html">WI-106</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td>
+ <td>Playlist tài liệu theo vai trò, danh sách Champion, lịch đào tạo, kiểm soát no-go</td>
+ </tr>
+ <tr>
+ <td>Champion triển khai</td>
+ <td><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a>, WI này</td>
+ <td><a href="wi-106-job-order-deployment-master-plan.html">WI-106</a>, <a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>, <a href="../02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+ <td>Hỗ trợ tại chỗ, kiểm 3 phút truy xuất, log vấn đề, xác nhận readiness từng ca</td>
+ </tr>
+ <tr>
+ <td>Nhân sự vận hành theo vai trò</td>
+ <td>Sổ tay phòng ban, SOP của luồng công việc đang làm</td>
+ <td>WI tại điểm dùng, Quick Card, FRM cần ghi</td>
+ <td>Thao tác đúng tuyến tài liệu và lưu bằng chứng đúng chỗ</td>
+ </tr>
+ <tr>
+ <td>Nhân sự mới / chuyển vị trí</td>
+ <td>Sổ tay phòng ban, thư viện JD, WI này</td>
+ <td>SOP/WI/FRM của vai trò mới, checklist OJT</td>
+ <td>Hoàn thành OJT, được supervisor xác nhận năng lực, biết route hồ sơ</td>
+ </tr>
+ <tr>
+ <td>Auditor / Người rà soát</td>
+ <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> Manual, WI này, sổ tay phòng ban</td>
+ <td>SOP, WI, ANNEX, hồ sơ bằng chứng của luồng được audit</td>
+ <td>Truy được từ yêu cầu tới bằng chứng trong cùng một tuyến tài liệu</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+</div>
+
+<div class="section">
+ <h2>3. Bản đồ tiếp cận theo phòng ban</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Phòng ban</th>
+ <th>Điểm vào bắt buộc</th>
+ <th>SOP cốt lõi</th>
+ <th>WI vận hành chính</th>
+ <th>Nơi lưu bằng chứng</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a></span></td>
+ <td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>, <a href="../../01-SOPs/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a>, <a href="../../01-SOPs/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td>
+ <td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>, <a href="../02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a></td>
+ <td>DEP-SAL current pack, Job Dossier, hồ sơ khách hàng có kiểm soát</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td>
+ <td><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a>, <a href="../../01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a>, <a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
+ <td><a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, <a href="../05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td>
+ <td>Part master, Job Dossier, DEP-ENG current pack</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td>
+ <td><a href="../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>, <a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+ <td><a href="../05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a>, <a href="../02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td>
+ <td>DEP-PRO current pack, Job Dossier, dispatch evidence</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phong Chat luong)"><span class="entity-code dept-code">D-QUAL</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phong Chat luong)"><span class="entity-code dept-code">D-QUAL</span></a></span></td>
+ <td><a href="../../01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a>, <a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>, <a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+ <td><a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>, <a href="../06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a>, <a href="../06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>, <a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td>
+ <td>Quality records, Job Dossier, DEP-QA current pack</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phong Chuoi cung ung)"><span class="entity-code dept-code">D-SCM</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bo phan Logistics va Giao van)"><span class="entity-code dept-code">D-LOG</span></a></span></td>
+ <td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a>, <a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a></td>
+ <td><a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, <a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>, <a href="../02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td>
+ <td>DEP-SCM, receiving pack, shipping pack, Epicor giao dịch</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a></span></td>
+ <td><a href="../../01-SOPs/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html">SOP-803</a>, <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td>
+ <td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+ <td>DEP-FIN current pack, ERP SoR, hồ sơ chi phí công việc</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></td>
+ <td><a href="../../01-SOPs/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a>, <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td>
+ <td><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a></td>
+ <td>Training records, OJT evidence, restricted people site</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td>
+ <td><a href="../../01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a>, <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
+ <td><a href="../07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>, <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a></td>
+ <td>DEP-EHS, sự cố và môi trường có kiểm soát</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td>
+ <td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a>, <a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
+ <td><a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>, <a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td>
+ <td>Site số hóa, access log, provisioning records</td>
+ </tr>
+ <tr>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td>
+ <td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
+ <td><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>, <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td>
+ <td>ERP SoR, interface map, exception and fallback log</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+</div>
+
+<div class="section">
+ <h2>4. Playlist triển khai theo pha tiếp cận</h2>
+ <div class="grid-3">
+ <div class="path-card">
+ <h3>4.1 Trước go-live</h3>
+ <span class="chip">Manager</span><span class="chip">Champion</span>
+ <ul class="tight">
+ <li>Chốt sổ tay phòng ban và playlist theo vai trò.</li>
+ <li>Phát hành QR hoặc link vào đúng sổ tay, WI và Quick Card.</li>
+ <li>Huấn luyện Người dùng theo công việc thật, không huấn luyện theo danh mục tài liệu.</li>
+ <li>Kiểm thử truy xuất trong 3 phút đối với 3 tình huống thật.</li>
+ </ul>
+ </div>
+ <div class="path-card">
+ <h3>4.2 Trong go-live</h3>
+ <span class="chip"><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></span><span class="chip">Champion</span>
+ <ul class="tight">
+ <li>Kiểm 100% job mới có đúng điểm vào tài liệu.</li>
+ <li>Kiểm Người dùng mở đúng WI tại điểm dùng và ghi đúng FRM/hồ sơ số.</li>
+ <li>Ghi mọi lỗi wrong-document, wrong-location, wrong-revision vào log triển khai.</li>
+ <li>Escalate ngay khi Người dùng phải hỏi lại cùng một câu hỏi nhiều hơn 2 lần trong ngày.</li>
+ </ul>
+ </div>
+ <div class="path-card">
+ <h3>4.3 Trong hypercare</h3>
+ <span class="chip"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span><span class="chip">Dept Head</span>
+ <ul class="tight">
+ <li>Rà log lỗi lặp lại theo phòng ban và theo vai trò.</li>
+ <li>Cập nhật playlist, QR, dashboard hoặc WI khi lỗi lặp xuất phát từ cấu trúc điều hướng.</li>
+ <li>Giảm hỗ trợ tại chỗ theo dữ liệu pass, không giảm theo cảm tính.</li>
+ <li>Đưa tuyến tài liệu vào hội nhập nhân sự mới và refresh định kỳ.</li>
+ </ul>
+ </div>
+ </div>
+</div>
+
+<div class="section">
+ <h2>5. Trình tự supervisor phải triển khai</h2>
+ <div class="step"><strong>Bước 1.</strong> Chốt owner cho handbook, SOP, WI, FRM, ANNEX của phòng ban.</div>
+ <div class="step"><strong>Bước 2.</strong> Xác định 5 đến 10 tình huống công việc thật mà phòng ban lặp lại nhiều nhất.</div>
+ <div class="step"><strong>Bước 3.</strong> Gắn cho từng tình huống một tuyến tài liệu chuẩn: handbook → SOP → WI → FRM → nơi lưu.</div>
+ <div class="step"><strong>Bước 4.</strong> Lập playlist riêng cho Manager, Champion, nhân sự văn phòng, nhân sự hiện trường và nhân sự mới.</div>
+ <div class="step"><strong>Bước 5.</strong> Cấp QR hoặc link trực tiếp đến đúng tài liệu tại điểm dùng.</div>
+ <div class="step"><strong>Bước 6.</strong> Kiểm 3 phút truy xuất và ghi kết quả vào OJT hoặc checklist triển khai.</div>
+ <div class="step"><strong>Bước 7.</strong> Không công nhận pass nếu Người dùng mở đúng file nhưng lưu hồ sơ sai chỗ.</div>
+ <div class="step"><strong>Bước 8.</strong> Không công nhận pass nếu Người dùng biết link nhưng không biết SOP gốc.</div>
+ <div class="step"><strong>Bước 9.</strong> Cập nhật playlist ngay khi tài liệu đổi mã, đổi link hoặc đổi nơi lưu hồ sơ.</div>
+ <div class="step"><strong>Bước 10.</strong> Đưa checklist điều hướng vào đào tạo định kỳ, onboarding và audit nội bộ.</div>
+</div>
+
+<div class="section">
+ <h2>6. Điều kiện không được công nhận sẵn sàng</h2>
+ <div class="note-warn">
+ <strong>NO-GO</strong><br>
+ Không công nhận go-live hoặc handoff khi còn một trong các điều kiện sau.
+ </div>
+ <ul class="tight">
+ <li>Phòng ban chưa có handbook hoặc handbook không phản ánh bộ SOP/WI hiện hành.</li>
+ <li>Playlist tài liệu chưa phân theo vai trò và theo ca.</li>
+ <li>Champion chưa được chỉ định hoặc không có backup.</li>
+ <li>QR, link portal hoặc đường dẫn hồ sơ có link chết.</li>
+ <li>Người dùng không truy được hồ sơ thật trong 3 phút.</li>
+ <li>Người dùng vẫn dùng email, chat hoặc thư mục cá nhân làm nơi lưu hồ sơ chính.</li>
+ <li><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> chưa chứng minh được bằng chứng đào tạo, OJT và truy xuất.</li>
+ </ul>
+</div>
+
+<div class="section">
+ <h2>7. KPI điều hướng tài liệu phải theo dõi</h2>
+ <div class="metric-grid">
+ <div class="metric-card">
+ <div class="value">≥90%</div>
+ <div class="label">Tự truy xuất đúng tuyến</div>
+ <div class="mini-note">Người dùng tự tìm đúng tài liệu và đúng nơi lưu mà không cần hỏi lại.</div>
+ </div>
+ <div class="metric-card">
+ <div class="value">≤3 phút</div>
+ <div class="label">Thời gian tìm tài liệu</div>
+ <div class="mini-note">Đo trên tình huống thật, không đo trên ví dụ đã báo trước.</div>
+ </div>
+ <div class="metric-card">
+ <div class="value">0</div>
+ <div class="label">Wrong revision do điều hướng</div>
+ <div class="mini-note">Mọi lỗi wrong revision phải truy ra handbook, playlist, QR hoặc WI tại điểm dùng.</div>
+ </div>
+ <div class="metric-card">
+ <div class="value">100%</div>
+ <div class="label">Playlist theo vai trò</div>
+ <div class="mini-note">Mỗi vai trò trong phòng ban phải có playlist được manager xác nhận.</div>
+ </div>
+ </div>
+</div>
+
+<div class="section">
+ <h2>8. Tài liệu liên quan</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Nhóm</th>
+ <th>Tài liệu</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>Điểm vào tổ chức</td>
+ <td><a href="../../../mom/docs/system/quality-manual/qms-man-001-qms-manual.html">QMS-MAN-001</a><br><a href="../../../mom/docs/system/organization/02-Department-Handbooks/index.html">Department Handbooks Index</a><br><a href="../../../mom/docs/system/organization/03-Job-Descriptions/index.html">Thư viện JD</a></td>
+ </tr>
+ <tr>
+ <td>Triển khai vận hành</td>
+ <td><a href="wi-106-job-order-deployment-master-plan.html">WI-106</a><br><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a><br><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html">ANNEX-114</a><br><a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+ </tr>
+ <tr>
+ <td>M365 và điểm dùng</td>
+ <td><a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a><br><a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a><br><a href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104</a><br><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td>
+ </tr>
+ <tr>
+ <td>Đào tạo và năng lực</td>
+ <td><a download="" href="../../../mom/docs/forms/frm-800-hr/FRM-801_Training_Plan.xlsx">FRM-801</a><br><a download="" href="../../../mom/docs/forms/frm-800-hr/FRM-802_Attendance_List.xlsx">FRM-802</a><br><a download="" href="../../../mom/docs/forms/frm-800-hr/FRM-803_OJT_Checklist.xlsx">FRM-803</a><br><a download="" href="../../../mom/docs/forms/frm-800-hr/FRM-804_Competence_Assessment.xlsx">FRM-804</a><br><a download="" href="../../../mom/docs/forms/frm-800-hr/FRM-807_Skills_Matrix.xlsx">FRM-807</a></td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+</div>
+
+ </div>
+ </div>
+</div>
+</body>
+</html>

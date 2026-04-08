@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-512 - 3 Axis Vertical Milling Guide | HESEM MOM</title>
+<link rel="stylesheet" href="../../../assets/style.css">
+<style>
+
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 960px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">3 Axis Vertical Milling Guide</strong>
+</div>
+ <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">WI-512</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ 
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi Job chạy trên VMC 3 trục hoặc máy phay/khoan có logic setup tương đương.</div>
+ <h1>WI-512 - 3 Axis Vertical Milling Guide</h1>
+ <div class="section"><h2>1. Mục đích, phạm vi và ranh giới</h2><p>WI này chuẩn hóa thao tác tại máy phay đứng 3 trục từ lúc nhận máy đến lúc bàn giao Job. Mục tiêu là giữ đúng WCS, đúng tool, đúng vùng kẹp, đúng mẫu đầu (first piece) và giữ quá trình ổn định trong suốt ca chạy. WI này áp dụng cho VMC 3 trục, máy khoan/phay cùng logic trục X/Y/Z và các setup không có rotary 5-axis.</p><div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Thực hiện warm-up đầu ca, xác minh WCS sau mỗi changeover, xóa logic offset của Job trước khi nhận Job mới và chứng minh đủ clearance trước khi chạy qua clamp hoặc soft jaw.</div></div><div class="section"><h2>2. Chuẩn bị trước khi chạy</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Đạt/không đạt</th></tr></thead><tbody><tr><td>Tình trạng máy</td><td>Điện/khí/dung dịch làm mát (coolant)/bôi trơn/chip conveyor/guard/liên động an toàn (interlock) bình thường; vùng làm việc sạch</td><td>Thiếu 1 mục = không nhận máy</td></tr>
+<tr><td>Tài liệu</td><td>Bộ hồ sơ công việc (job packet), setup sheet, tool list, phát hành chương trình (program release), cổng kiểm soát trạng thái mở</td><td>Thiếu hoặc mâu thuẫn = HOLD</td></tr>
+<tr><td>Đồ gá / vật tư</td><td>Fixture đúng revision, mặt tựa sạch, clamp đủ lực và đủ khoảng hở dao</td><td>Không chứng minh được = HOLD</td></tr>
+<tr><td>Dụng cụ cắt</td><td>Tool đúng pocket, đúng gauge length/holder, tình trạng sắc bén phù hợp, tuổi dao (tool life)/reset đúng</td><td>Sai pocket hoặc tool mòn vượt ngưỡng = không chạy</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Setup và prove-out tại máy</h2><h3>3.1 Xác lập WCS và offset</h3><ul><li>Làm zero theo method đã release. Không tự đổi method nếu chưa được Engineering chấp thuận.</li><li>Probe/edge finder phải ở trạng thái dùng được; nếu probe bị nghi ngờ sau va chạm, chuyển sang WI-516 và xác minh lại trước khi tiếp tục.</li><li>Ghi nhận offset/wear theo trường dữ liệu quy định; không để note rời không kiểm soát.</li></ul><h3>3.2 Dry-run và first cut</h3><ul><li>Chạy graphics hoặc mô phỏng đã được release; sau đó air-cut hoặc dry-run với mức override an toàn cho đoạn có rủi ro cao.</li><li>Đoạn tiếp cận đầu tiên tới clamp, pocket sâu, khoan dài hoặc dao có gauge length lớn phải quan sát trực tiếp.</li><li>Bất kỳ dấu hiệu rung, cạ clamp, chip tích bất thường, phun dung dịch làm mát lệch, tiếng cắt không ổn định đều phải dừng và điều chỉnh có kiểm soát.</li></ul><h3>3.3 Mẫu đầu</h3><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>Yêu cầu</th></tr></thead><tbody><tr><td>Kích thước/CTQ đầu tiên</td><td>Đo đủ theo mẫu đầu / control plan / balloon nếu áp dụng</td></tr>
+<tr><td>Bề mặt và bavia</td><td>Kiểm ngay sau nguyên công; xác nhận burr-risk area và edge break requirement</td></tr>
+<tr><td>Đối chiếu chương trình - thực tế</td><td>Program comment, tool call, offset, operation note phải khớp với thao tác thực tế</td></tr>
+<tr><td>Release chạy tiếp</td><td>Chỉ được chạy tiếp khi cổng kiểm soát mẫu đầu đã mở theo WI-302/SOP-302</td></tr>
+</tbody></table></div></div><div class="section"><h2>4. Kiểm soát trong khi chạy và kết thúc Job</h2><h3>4.1 Trong khi chạy</h3><ul><li>Theo dõi spindle load, âm thanh cắt, chip color/form, dung dịch làm mát coverage, tool wear và bề mặt cắt; không chờ tới khi part ra lỗi mới phản ứng.</li><li>Đối với CTQ nhạy drift, giữ nhịp đo theo control plan hoặc theo chỉ thị mẫu đầu release.</li><li>Khi thay dao, phải xác nhận lại tool identity, offset/wear entry và part trạng thái bị ảnh hưởng.</li></ul><h3>4.2 Kết thúc và bàn giao</h3><ul><li>Làm sạch bàn máy, đồ gá, khay WIP và khu đặt hồ sơ; không để chip hoặc part còn lẫn.</li><li>Bàn giao rõ trạng thái tool, offset wear, part count, hàng nghi ngờ, hàng sample, và công đoạn tiếp theo.</li><li>Nếu Job chưa hoàn tất hết ca, để lại trạng thái máy an toàn, hồ sơ rõ ràng và nhãn WIP đúng trạng thái.</li></ul><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">First-pass mẫu đầu; setup-related scrap; số lần dừng do WCS/offset/tool mismatch; số lần clamp/fixture interference Cần xảy ra.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, SOP-503, WI-302, WI-517, WI-519, WI-516, ANNEX-301, ANNEX-803.</div></div></div></div>
+ </div>
+ </div>
+</div>
+</body>
+</html>

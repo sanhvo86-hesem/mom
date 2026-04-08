@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ANNEX-603 - Quality Package Levels Qpl | HESEM MOM</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+<style>
+
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 960px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+<div class="fh-company">
+<a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Annex</span>
+</div>
+</div>
+<div class="title">
+<strong class="doc-name">Quality Package Levels Qpl</strong>
+</div>
+<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-603</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi xác định <span class="code">Base QPL</span>, mã overlay chất lượng, bộ bằng chứng bắt buộc theo cổng kiểm soát, và thẩm quyền nâng/hạ/giữ mức kiểm soát cho từng Job, lot, giao hàng một phầnment hoặc chuyển giao công việc.</div>
+<h1>ANNEX-603 - Quality Package Levels Qpl</h1>
+<div class="section"><h2>1. Mục đích và nguyên tắc cứng</h2>
+<p>ANNEX này quy định cách chọn <strong>Quality Package Level (QPL)</strong> cho từng Job và cách cộng thêm gói chứng cứ bắt buộc theo rủi ro, theo route, theo yêu cầu khách hàng và theo đặc thù giao hàng. QPL điều khiển độ sâu hồ sơ, độ chặt của cổng kiểm soát, mức review trước release và mức cưỡng chế đối với FAI, sampling, final release, packaging và phê duyệt giao hàng (ship release).</p>
+<div class="callout-danger"><strong>Quy tắc cứng:</strong> (1) mọi Job phải có Base QPL trước khi planning release; (2) overlay chỉ được cộng thêm, không được dùng để giảm yêu cầu; (3) thiếu 1 mục bằng chứng bắt buộc theo QPL/overlay = HOLD cổng kiểm soát; (4) giao hàng một phần không phải là lý do để hạ QPL; (5) QPL do khách hàng hoặc do route đặc biệt áp đặt chỉ được hạ khi có chấp thuận đúng thẩm quyền và đã cập nhật toàn bộ hồ sơ liên quan.</div>
+</div>
+<div class="section"><h2>2. Cách xác định cơ sở / nền QPL</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điều kiện chính</th><th>cơ sở / nền QPL tối thiểu</th><th>Giải thích vận hành</th></tr></thead><tbody>
+<tr><td>Part lặp ổn định, lộ trình gia công chuẩn, không CTQ đặc biệt, không công đoạn đặc biệt, không yêu cầu sạch/truy vết sâu</td><td><span class="badge-green">QPL-1</span></td><td>Dùng cho job thật sự quen, rủi ro thấp và không có dấu hiệu phải tăng mức kiểm soát</td></tr>
+<tr><td>Rev mới, part nhóm sản phẩm mới với HESEM, setup mới, CTQ mức vừa, thời gian dẫn (lead time) Cấp, tách / chia lot ở mức đơn giản</td><td><span class="badge-blue">QPL-2</span></td><td>Tăng rà soát ở G0–G2, yêu cầu ghi rõ kích hoạt FAI/mẫu đầu (tiên chi tiết / sản phẩm) và bộ hồ sơ kiểm soát cơ bản</td></tr>
+<tr><td>đa-setup, đa-trục, dung sai chặt, hình học khó, FAI bắt buộc, chuyển giao công việc, năng lực / khả năng chưa chứng minh, lịch sử trôi / sai lệch/làm lại</td><td><span class="badge-amber">QPL-3</span></td><td>Yêu cầu kế hoạch kiểm soát, rà soát gage/kiểm tra program, phản ứng logic và rà soát sâu hơn ở G2–G4</td></tr>
+<tr><td>Clean/chân không-nhạy cảm, công đoạn đặc biệt/outsource cert-quan trọng / nghiêm trọng, truy xuất nguồn gốc sâu, khách hàng source kiểm tra, khách hàng-cụ thể hồ sơ, thoát / bỏ qua lịch sử, sản phẩm an toàn độ nhạy</td><td><span class="badge-red">QPL-4</span></td><td>Áp dụng gói chứng cứ dày nhất, cổng kiểm soát nghiêm nhất, và PHẢI chặn giao hàng khi thiếu một mục chứng từ/pack/phát hành yêu cầu</td></tr>
+</tbody></table></div>
+<div class="callout-info"><strong>Chọn mức:</strong> khi có nhiều dấu hiệu cùng lúc, dùng mức cao nhất đang bị kích hoạt. Không lấy trung bình, không "bù trừ" bằng kinh nghiệm Người làm.</div>
+</div>
+<div class="section"><h2>3. lớp phủ chất lượng bắt buộc cộng thêm vào cơ sở / nền QPL</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mã lớp phủ</th><th>Khi nào kích hoạt</th><th>Evidence phải cộng thêm</th></tr></thead><tbody>
+<tr><td><span class="code">O-FAI</span></td><td>FAI/mẫu đầu bắt buộc theo part mới, rev mới, setup mới, thay đổi đáng kể, khách hàng yêu cầu</td><td><a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> pack, balloon/đặc tính list, báo cáo đo, quyết định PASS/TẠM GIỮ/FAIL, tái xác nhận hiệu lực khi chạy lại sau thay đổi trọng yếu</td></tr>
+<tr><td><span class="code">O-SP</span></td><td>Có outsource công đoạn đặc biệt hoặc in-nhà / nội bộ đặc biệt xác minh nhạy cao</td><td>Pack Người xử lý/lộ trình gia công/cert, phiếu nhận / biên nhận xác minh, cert truy vết, Người xử lý trạng thái, phát hành kiểm tra</td></tr>
+<tr><td><span class="code">O-MAT</span></td><td>Nguyên vật liệu/mẻ nấu (heat) truy vết sâu, khách hàng-được cung cấp nguyên vật liệu, tách / chia lot, thay thế rủi ro</td><td>Mẻ nấu (mẻ nấu (heat)/lot chuỗi, cert sơ đồ ánh xạ, tách / chia-lot map, thay thế phê duyệt nếu có</td></tr>
+<tr><td><span class="code">O-CLEAN</span></td><td>Vệ sinh / chân không / rò rỉ-nhạy cảm / clean-pack yêu cầu nghiêm</td><td>Làm sạch, clean xây dựng, đóng gói spec, danh mục vật tư được phép và vật tư phải loại trừ, bảo quản bằng chứng, Photos/hồ sơ theo lộ trình gia công</td></tr>
+<tr><td><span class="code">O-CMM</span></td><td>CMM/raw data/kiểm tra program là điều kiện phát hành</td><td>Program ID/rev, phát hành bảng kiểm, raw data/bản địa / gốc file lưu giữ, PDF tóm tắt liên kết đúng job/rev</td></tr>
+<tr><td><span class="code">O-SHIP</span></td><td>Một phần ship, đã hợp nhất ship, khách hàng-cụ thể bộ hồ sơ giao hàng (ship gói hồ sơ), SSCC yêu cầu</td><td>Pack xây dựng, SSCC đối soát, một phần-ship bằng chứng, hold-mở cân bằng / số dư logic, xác nhận giao hàng (xác nhận giao hàng) bàn giao</td></tr>
+<tr><td><span class="code">O-khách hàng (CUST)</span></td><td>Customer yêu cầu data pack, source kiểm tra, chứng kiến điểm, CSR/SEMI/lĩnh vực pack</td><td>Customer-cụ thể bảng kiểm, chứng kiến/source ký-off, pack index riêng, ngoại lệ phê duyệt khi thiếu</td></tr>
+</tbody></table></div>
+<p class="tiny">lớp phủ không đổi tên QPL. Ví dụ: cơ sở / nền QPL-2 + O-SP + O-CLEAN vẫn là job QPL-2 nhưng cổng kiểm soát và bằng chứng phải cộng toàn bộ yêu cầu của lớp phủ.</p></div>
+<div class="section"><h2>4. Định nghĩa vận hành cho QPL-1 đến QPL-4</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mức</th><th>Loại job điển hình</th><th>Mức kiểm soát tại cổng kiểm soát</th><th>Điểm phải chặn</th></tr></thead><tbody>
+<tr><td>QPL-1</td><td>Job lặp ổn định, lộ trình gia công ngắn, không CTQ đặc biệt</td><td>Cổng kiểm soát chuẩn G0 → G7, hồ sơ cơ bản nhưng vẫn đủ phát hành chuỗi</td><td>Không được tự gắn QPL-1 cho job mới chỉ vì lô nhỏ hoặc giao Cấp</td></tr>
+<tr><td>QPL-2</td><td>Job mới mức vừa, rev mới, CTQ mức vừa, setup mới nhưng rủi ro còn kiểm soát được</td><td>Review kỹ hơn ở G0/G2/G3, kích hoạt FAI phải rõ, hồ sơ chất lượng phải nhìn được rủi ro logic</td><td>Không được bỏ mẫu đầu bằng chứng khi kích hoạt FAI đã bật</td></tr>
+<tr><td>QPL-3</td><td>Dung sai chặt, đa-trục, nhiều setup, năng lực / khả năng chưa chứng minh, chuyển giao công việc</td><td>Kế hoạch kiểm soát/phản ứng logic/kiểm tra phát hành phải đầy đủ, cổng kiểm soát G3–G5 rà soát sâu</td><td>Không được chuyển máy/chuyển Người/chuyển lộ trình gia công khi chưa đóng công việc-chuyển giao bằng chứng</td></tr>
+<tr><td>QPL-4</td><td>Job nhạy sạch/chân không, công đoạn đặc biệt cert-quan trọng / nghiêm trọng, truy xuất nguồn gốc sâu, source kiểm tra, khách hàng pack riêng</td><td>Cổng kiểm soát nghiêm nhất; thiếu một mục pack/cert/bằng chứng là TẠM GIỮ ngay cả khi part đã đạt đo lường</td><td>PHẢI giữ nguyên mức kiểm soát; không hạ mức để rút giấy tờ và phải chặn giao hàng khi khách hàng-cụ thể pack chưa đủ</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>5. Ma trận bằng chứng bắt buộc theo phase</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Phase / Cổng kiểm soát</th><th>Tối thiểu cho mọi job</th><th>Cộng thêm khi QPL-2</th><th>Cộng thêm khi QPL-3</th><th>Cộng thêm khi QPL-4 hoặc lớp phủ</th></tr></thead><tbody>
+<tr><td>G0 – Hợp đồng / khởi động / lập kế hoạch phát hành</td><td>Review hợp đồng, yêu cầu tóm tắt, cơ sở / nền QPL, lớp phủ code, due-date logic, lộ trình gia công người chịu trách nhiệm</td><td>Rủi ro note cho part/rev/setup mới</td><td>Kế hoạch kiểm soát draft hoặc rủi ro-định hướng bởi control note</td><td>CSR/SEMI/khách hàng pack, source/chứng kiến điểm, nguyên vật liệu/truy xuất nguồn gốc/vệ sinh / sạch sẽ ràng buộc</td></tr>
+<tr><td>G3 – Mốc chuẩn / setup / mức sẵn sàng</td><td>Bộ hồ sơ chuẩn (mốc chuẩn gói hàng), phiếu cài đặt, danh sách dao cụ, nguyên vật liệu phân bổ, machine/gage mức sẵn sàng</td><td>Mẫu đầu plan và điểm kiểm CTQ chính</td><td>Phát hành chương trình kiểm tra (phát hành chương trình (program phát hành), kế hoạch kiểm soát có phản ứng logic, công việc-chuyển giao rule nếu áp dụng</td><td>Người xử lý/cert path, clean-pack nguyên vật liệu mức sẵn sàng, khách hàng-cụ thể setup/kiểm tra điểm kiểm tra</td></tr>
+<tr><td>G4 — Mẫu đầu / FAI</td><td>Kích hoạt quyết định rõ ràng: yêu cầu hay không yêu cầu</td><td>Khi kích hoạt thì phải có mẫu đầu bằng chứng</td><td>FAI/mẫu đầu Cần như mặc định cho part mới, setup mới, làm lại hoặc thay đổi trọng yếu</td><td>O-FAI hoặc khách hàng yêu cầu: đầy đủ bộ bằng chứng, raw/CMM data khi yêu cầu, phát hành thẩm quyền chặt hơn</td></tr>
+<tr><td>G5 – Trong quá trình / sản xuất</td><td>Traveler, IPQC, bất thường/hold/khởi động lại các log</td><td>CTQ kiểm tra hồ sơ theo plan</td><td>SPC/năng lực / khả năng hoặc phản ứng-định hướng bởi xác minh; chuyển giao công việc bằng chứng khi có chuyển máy/Người/khu</td><td>Nguyên vật liệu truy vết tiếp tục, đặc biệt vệ sinh / sạch sẽ kiểm soát, source-kiểm tra ready bằng chứng</td></tr>
+<tr><td>G6 — Final / đóng gói</td><td>Kiểm tra cuối, Đóng gói Bảng kiểm, bảo quản bằng chứng theo lộ trình gia công</td><td>Photos/label/pack bằng chứng khi lộ trình gia công yêu cầu</td><td>Cert link, final rà soát bảng kiểm sâu hơn, đặc biệt đặc tính kết thúc / đóng</td><td>Công đoạn đặc biệt pack, clean/chân không pack, khách hàng-cụ thể final pack, hạt / phần tử/vệ sinh / sạch sẽ/rò rỉ bằng chứng khi áp dụng</td></tr>
+<tr><td>G7 — Phê duyệt giao hàng</td><td>CoC/phiếu kê đóng gói/phê duyệt giao hàng bàn giao</td><td>Một phần-ship logic nếu có</td><td>Mở cân bằng / số dư theo dõi, phát hành rà soát sâu hơn</td><td>SSCC đối soát, source kiểm tra kết thúc / đóng, khách hàng pack index, phải chặn giao hàng khi thiếu một mục bắt buộc</td></tr>
+</tbody></table></div>
+<div class="callout-warn"><strong>Thiếu bằng chứng bắt buộc theo phase</strong> không được coi là "bổ sung sau". Cổng kiểm soát không đóng, traveler không release, shipment không confirm.</div></div>
+<div class="section"><h2>6. Quy tắc mixed-QPL, giao hàng một phầnment, chuyển giao công việc và rebaseline</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Quy tắc áp dụng</th></tr></thead><tbody>
+<tr><td>Job có nhiều lộ trình gia công, mức rủi ro khác nhau</td><td>Dùng cơ sở / nền QPL cho toàn job và cộng lớp phủ cho lộ trình gia công nhạy. dùng chung cổng dùng mức yêu cầu cao nhất đang có hiệu lực.</td></tr>
+<tr><td>Một phần lô giao hàng</td><td>Không hạ QPL cho lô ship trước. Lô ship trước phải có đầy đủ bằng chứng tương ứng phần đã giao và phải giữ truy vết với mở cân bằng / số dư còn lại.</td></tr>
+<tr><td>Chuyển giao công việc / đổi máy / đổi cell / đổi Operator chính</td><td>Không đổi cơ sở / nền QPL, nhưng bắt buộc cộng rà soát và bằng chứng theo <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>; QPL-3/QPL-4 coi chuyển giao công việc là kích hoạt tăng độ chặt tại G2/G3/G4.</td></tr>
+<tr><td>Thay đổi phiên bản giữa chừng / thiết lập lại mốc chuẩn</td><td>Phiên bản thay đổi không tự động cho phép giữ mức cũ. Phải đánh giá lại cơ sở / nền QPL và lớp phủ; ít nhất giữ hoặc nâng, không được tự hạ.</td></tr>
+<tr><td>Khiếu nại / thoát / bỏ qua / lặp lại trôi / sai lệch</td><td>Job đang mở phải nâng mức nếu rủi ro tăng. Job cùng nhóm sản phẩm/rev cũng phải rà soát lại cơ sở / nền QPL cho các lô kế tiếp.</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>7. Thẩm quyền thiết lập, nâng, hạ và ghi đè / bỏ qua</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Quyết định</th><th>Người đề xuất</th><th>Người chấp thuận tối thiểu</th><th>Điều kiện bắt buộc</th></tr></thead><tbody>
+<tr><td>Thiết lập cơ sở / nền QPL ban đầu</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + Kỹ thuật, và Kinh doanh khi liên quan cam kết khách hàng</td><td>Phải ghi trong khởi động/mốc chuẩn hồ sơ</td></tr>
+<tr><td>Nâng QPL</td><td>Bất kỳ người chịu trách nhiệm cổng kiểm soát nào phát hiện rủi ro</td><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> hoặc <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + Kỹ thuật tùy ảnh hưởng</td><td>Cập nhật traveler, hồ sơ, bảng điều khiển và mọi bảng kiểm liên quan</td></tr>
+<tr><td>Hạ QPL</td><td>QA/Kỹ thuật đề xuất dựa trên dữ liệu ổn định</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a></span> + <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a></span> / khách hàng nếu yêu cầu khách hàng chi phối</td><td>Chỉ sau khi dữ liệu chứng minh; không hạ giữa job đang chạy trừ khi có quyết định chính thức</td></tr>
+<tr><td>ghi đè / bỏ qua giao hàng khi thiếu pack</td><td>Không khuyến khích</td><td>Chỉ theo thẩm quyền điều hành cao nhất và phải có hồ sơ ngoại lệ</td><td>Không áp dụng cho yêu cầu pháp lý, khách hàng-cụ thể bắt buộc hoặc an toàn/truy vết-quan trọng / nghiêm trọng</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>8. Tài liệu liên kết</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Cổng kiểm soát, điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn)) và phát hành thực thi</td></tr>
+<tr><td><a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a></td><td>FAI/mẫu đầu thực thi và bộ bằng chứng</td></tr>
+<tr><td><a href="../../02-Work-Instructions/06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a></td><td>AQL lấy mẫu thực thi</td></tr>
+<tr><td><a href="../../02-Work-Instructions/06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a></td><td>kiểm tra cuối, CoC và bàn giao phê duyệt giao hàng</td></tr>
+<tr><td><a href="annex-604-control-plan-guide.html">ANNEX-604</a></td><td>Kế hoạch kiểm soát hướng dẫn</td></tr>
+<tr><td><a href="annex-605-spc-lite-and-reaction-plan.html">ANNEX-605</a></td><td>SPC-rút gọn và phản ứng plan</td></tr>
+<tr><td><a href="../05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a></td><td>Put-xuyên qua (thru) / lộ trình gia công đặc biệt tác động mức hồ sơ</td></tr>
+<tr><td><a href="../04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402</a></td><td>Gói chứng từ outsource/công đoạn đặc biệt</td></tr>
+<tr><td><a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Đóng gói, bảo quản và label spec</td></tr>
+</tbody></table></div></div>
+</div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>

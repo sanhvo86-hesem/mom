@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-505 - Put Thru Index | HESEM MOM</title>
+<link rel="stylesheet" href="../../../assets/style.css">
+<style>
+
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 960px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">Put Thru Index</strong>
+</div>
+ <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-505</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ 
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi Job không đi tuyến chuẩn hoặc có tuyến đặc biệt: pass-xuyên suốt, outsource-chỉ / duy nhất, clean-pack trực tiếp / chỉ đạo, làm lại vòng lặp, tách / chia lô giao hàng, hot-job, khách hàng-trả lại, hoặc thử Nhiệm run.</div>
+ <h1>ANNEX-505 - Put Thru Index</h1>
+ 
+<div class="section"><h2>1. Mục đích và cách dùng</h2>
+<p>ANNEX này là chỉ mục cho các Job không đi tuyến chuẩn. Khi Job có route đặc biệt, Người dùng phải tra đúng loại tuyến, bộ hồ sơ tăng cường, cổng kiểm soát bổ sung và Người có thẩm quyền cho phép. Annex này không thay routing/traveler; nó xác định <strong>phải mang thêm gì</strong> để Job vẫn kiểm soát được.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Gắn mọi route đặc biệt bằng hồ sơ đã phát hành và giữ đủ bộ hồ sơ tăng cường cho job đặc biệt. Job càng Cấp càng phải khóa rõ điều kiện trước khi chạy.</div></div>
+
+<div class="section"><h2>2. Chỉ mục tuyến đặc biệt</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Lộ trình code</th><th>Tuyến</th><th>Khi dùng</th><th>Hồ sơ tăng cường bắt buộc</th><th>Cổng kiểm soát / người chịu trách nhiệm</th></tr></thead><tbody>
+<tr><td>PT-01</td><td>Pass-xuyên suốt kiểm tra chỉ / duy nhất</td><td>Job không gia công, chỉ kiểm/đóng gói/chuyển tiếp theo yêu cầu</td><td>Customer hướng dẫn, xác minh đầu vào, phát hành quyết định</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td></tr>
+<tr><td>PT-02</td><td>Outsource-chỉ / duy nhất / nhà cung cấp lộ trình gia công</td><td>Part đi thẳng nhà cung cấp công đoạn đặc biệt hoặc hoàn thiện bề mặt</td><td>PO truyền đạt yêu cầu, bộ chứng từ chứng nhận, nhận hàng phát hành, đóng gói spec</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td></tr>
+<tr><td>PT-03</td><td>Clean-pack trực tiếp / chỉ đạo</td><td>Part sau final đi thẳng clean pack/ship, không qua khu vực chuẩn bị / sắp xếp thường</td><td>Vệ sinh hồ sơ, đóng gói Photos, niêm phong/label bằng chứng</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td></tr>
+<tr><td>PT-04</td><td>Customer nguyên vật liệu / khách hàng thuộc tính / tài sản trả lại</td><td>Dùng vật tư hoặc tài sản khách hàng; có thể trả lại phần dư/fixture</td><td>Nguyên vật liệu/thuộc tính / tài sản log, truy xuất nguồn gốc, trả lại pack</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td></tr>
+<tr><td>PT-05</td><td>Làm lại vòng lặp</td><td>Job quay lại bước trước hoặc sang tuyến sửa</td><td>Disposition/NCR, đã sửa đổi lộ trình gia công, hold-phát hành bằng chứng</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
+<tr><td>PT-06</td><td>tách / chia lô giao hàng / một phần phát hành</td><td>Giao từng phần theo lịch / hot lot</td><td>Qty tách / chia log, bộ hồ sơ giao hàng (ship gói hồ sơ) riêng từng phần, khách hàng xác nhận nếu cần</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td></tr>
+<tr><td>PT-07</td><td>thử Nhiệm run / chứng minh-out / kỹ thuật lot</td><td>Lot thử để xác nhận quy trình trước lô chính</td><td>thử Nhiệm mục tiêu, kết quả, phê duyệt to chuyển đổi or stop</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td></tr>
+<tr><td>PT-08</td><td>Ngăn chặn / nghi ngờ cách ly</td><td>Job có ngăn chặn đặc biệt sau vấn đề/khiếu nại</td><td>Ngăn chặn plan, nghi ngờ map, phát hành tiêu chí</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>3. Quy tắc dùng lộ trình gia công đặc biệt</h2>
+<div class="matrix">
+<div class="card"><h3>3.1 Gắn lộ trình gia công code</h3><ul class="tight" style="padding-left:20px;"><li>Lộ trình code phải xuất hiện trên traveler/điều phối xuất hàng/label nơi Operator nhìn thấy.</li><li>Nếu Job có nhiều lộ trình gia công code, phải ghi thứ tự áp dụng và lộ trình gia công nào là lộ trình gia công chi phối phát hành.</li><li>Không được tạo lộ trình gia công code mới ngoài danh mục này nếu chưa có phê duyệt thay đổi hệ thống.</li></ul></div>
+<div class="card"><h3>3.2 Hồ sơ tăng cường</h3><ul class="tight" style="padding-left:20px;"><li>Mỗi lộ trình gia công code phải kéo theo bộ bằng chứng tương ứng trong Hồ sơ công việc (hồ sơ công việc).</li><li>Thiếu một hồ sơ tăng cường bắt buộc thì cổng kiểm soát tương ứng không được mở.</li><li>Lộ trình code không thay thế QPL; nếu QPL cao và lộ trình gia công đặc biệt cùng áp dụng thì lấy mức cưỡng chế cao hơn.</li></ul></div>
+</div>
+<p>Hồ sơ Job và tính đầy đủ theo <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a> và <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>.</p></div>
+
+<div class="section"><h2>4. Ví dụ thực chiến</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Lộ trình code</th><th>Điểm bắt buộc</th></tr></thead><tbody>
+<tr><td>Khách gửi vật tư, gia công một phần rồi trả lại cả part và vật tư dư</td><td>PT-04</td><td>Phải truy vết vật tư khách hàng, ghi qty nhận-dùng-trả, giữ pack trả lại riêng.</td></tr>
+<tr><td>Part không cần gia công cơ khí, chỉ nhận hàng outsource về kiểm và ship</td><td>PT-02 + PT-01</td><td>Nhận hàng phát hành, bộ chứng từ chứng nhận và bộ hồ sơ giao hàng phải đủ dù không có traveler sản xuất nội bộ.</td></tr>
+<tr><td>Lot đầu chỉ chạy 3 pcs để chứng minh-out trước khi mở lô 200 pcs</td><td>PT-07</td><td>3 pcs đầu là thử Nhiệm lot; kết quả thử Nhiệm phải đóng và có quyết định chuyển sang sản xuất lot.</td></tr>
+<tr><td>Job bị khiếu nại, phải ngăn chặn 100% kiểm tra cho 2 lô tiếp theo</td><td>PT-08</td><td>Phải có ngăn chặn plan, log 100% kiểm tra và điều kiện kết thúc ngăn chặn.</td></tr>
+</tbody></table></div></div>
+
+<div class="section"><h2>5. Tài liệu liên kết</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Nhanh-kiểm tra card nhận biết lộ trình gia công đặc biệt trước khi chạy.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Hồ sơ công việc và tính đầy đủ logic.</td></tr>
+<tr><td><a href="../06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>QPL và cưỡng chế hồ sơ/cổng kiểm soát.</td></tr>
+<tr><td><a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Đóng gói/dán nhãn cho lộ trình gia công ship đặc biệt.</td></tr>
+<tr><td><a href="../07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a></td><td>SSCC/đối chiếu đóng gói cho tách / chia lô giao hàng.</td></tr>
+</tbody></table></div></div>
+
+ </div>
+ </div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>

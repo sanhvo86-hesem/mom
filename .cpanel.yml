@@ -1,8 +1,8 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/pqobnire/qms.hesem.com.vn
+    - export DEPLOYPATH=/home/pqobnire/eqms.hesemeng.com
     - /bin/cp -R * $DEPLOYPATH/
     - /bin/cp .htaccess $DEPLOYPATH/.htaccess
-    # One-time migration: copy live data from qms-data-private back into in-repo qms-data
-    - /bin/cp -n /home/pqobnire/qms-data-private/config/*.json $DEPLOYPATH/01-QMS-Portal/qms-data/config/ 2>/dev/null || true
+    # One-time migration: copy live data from private config back into in-repo data
+    - /bin/cp -n /home/pqobnire/qms-data-private/config/*.json $DEPLOYPATH/mom/data/config/ 2>/dev/null || true

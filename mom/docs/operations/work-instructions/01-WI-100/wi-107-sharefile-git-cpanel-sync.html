@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-107 - Sharefile Git Cpanel Sync | HESEM MOM</title>
+<link rel="stylesheet" href="../../../assets/style.css">
+<style>
+
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color:var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.45; margin:12px 0 6px; color:var(--ink);}
+
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.code {font-family:var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.path, .cmd {font-family:var(--mono); font-size:12px; background:#0f172a; color:#e2e8f0; border-radius:10px; padding:12px; white-space:pre-wrap; overflow:auto;}
+.figure-box, .step-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.section ul, .section ol {margin:8px 0; padding-left:20px;}
+@media (max-width:960px) {
+ .two-col {grid-template-columns:1fr;}
+ .page-body {padding:24px 18px 36px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+
+<div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">Sharefile Git Cpanel Sync</strong>
+</div>
+ <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">WI-107</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V1</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+
+
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi thiết lập hoặc vận hành đường đi bắt buộc cho source của bộ tài liệu HESEM: SharePoint local synced working copy, Git version history, server deployment, reverse sync và boundary với runtime data. Cách Mọi cũ "ShareFile" trong bộ tài liệu legacy được hiểu là <b>SharePoint-synced local working copy</b>.</div>
+ <h1>WI-107 - Sharefile Git Cpanel Sync</h1>
+
+ <div class="section">
+ <h2>1. Kết quả phải đạt</h2>
+ <ul>
+ <li>Controlled source nằm trong <span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span> trên SharePoint.</li>
+ <li>Local working copy được sync bởi OneDrive/SharePoint, nhưng thư mục <span class="code">.git</span> nằm ngoài vùng sync.</li>
+ <li>Mọi thay đổi source đi theo đường <span class="code">SharePoint local sync → Git → server deployment</span>.</li>
+ <li>Mọi hotfix từ server quay về theo đường <span class="code">server → Git → local sync</span>.</li>
+ <li>Runtime data, session files, secrets và submission payload không đi vào source library.</li>
+ </ul>
+ </div>
+
+ <div class="section">
+ <h2>2. Điều kiện tiên quyết</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr><th>Điều kiện</th><th>Yêu cầu</th></tr>
+ </thead>
+ <tbody>
+ <tr><td>SharePoint site/library</td><td><span class="code">HESEM-Digital / QMS-Source-Control</span> đã tồn tại theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>.</td></tr>
+ <tr><td>Endpoint</td><td>Máy local đã được IT phê duyệt để sync source library.</td></tr>
+ <tr><td>Git remote</td><td>Remote repository đã được tạo và cấp quyền push/pull đúng Người dùng.</td></tr>
+ <tr><td>Server operator</td><td>Tài khoản deploy có quyền pull repo và chạy smoke test.</td></tr>
+ <tr><td>Runtime boundary</td><td>.gitignore và runtime path exclusions đã được xác nhận theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>.</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>3. Chuẩn bị local synced worktree</h2>
+ <div class="two-col">
+ <div class="figure-box">
+ <h3>Worktree được phép</h3>
+ <p>Ví dụ path sync được phép:</p>
+ <div class="path">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</div>
+ </div>
+ <div class="figure-box">
+ <h3>Git-dir được phép</h3>
+ <p>Ví dụ git metadata path:</p>
+ <div class="path">C:\HESEM-Git\qms.hesem.com.vn.git\</div>
+ </div>
+ </div>
+ <div class="keyline"><strong>Rule cứng:</strong> không để <span class="code">.git</span> trong thư mục SharePoint sync. Không sync source library trên máy không được đăng ký. Không cho nhiều Người cùng dùng chung một local worktree.</div>
+ </div>
+
+ <div class="section">
+ <h2>4. Tạo local working copy đúng chuẩn</h2>
+ <div class="step-box">
+ <h3>Bước 4.1 - Đồng bộ library source xuống máy</h3>
+ <ol>
+ <li>Đăng nhập OneDrive bằng tài khoản công ty được cấp quyền.</li>
+ <li>Mở <span class="code">QMS-Source-Control</span> và chọn <span class="code">Sync</span>.</li>
+ <li>Xác nhận thư mục local xuất hiện đúng dưới profile Người dùng.</li>
+ </ol>
+ </div>
+ <div class="step-box">
+ <h3>Bước 4.2 - Clone với separate git-dir</h3>
+ <p>Chỉ thực hiện khi thư mục worktree đang trống:</p>
+ <div class="cmd">git clone --separate-git-dir C:\HESEM-Git\qms.hesem.com.vn.git &lt;git-remote-url&gt; "%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn"</div>
+ <p>Nếu worktree đã có dữ liệu sync sẵn, IT phải tạo lại worktree sạch trước khi clone.</p>
+ </div>
+ <div class="step-box">
+ <h3>Bước 4.3 - Kiểm tra ranh giới</h3>
+ <ol>
+ <li>Chạy <span class="code">git status</span> trong worktree.</li>
+ <li>Xác nhận thư mục worktree không có <span class="code">.git</span>.</li>
+ <li>Xác nhận <span class="code">git rev-parse --git-dir</span> trỏ về <span class="code">C:\HESEM-Git\...</span>.</li>
+ </ol>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>5. Chu trình chuẩn local → Git → server</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Evidence</th></tr>
+ </thead>
+ <tbody>
+ <tr><td>1</td><td>Soạn/chỉnh source trong worktree local đang sync.</td><td>Changed files</td></tr>
+ <tr><td>2</td><td>Kiểm tra diff, loại runtime noise khỏi commit.</td><td>Clean git status</td></tr>
+ <tr><td>3</td><td><span class="code">git add</span> → <span class="code">git commit</span> → <span class="code">git push</span>.</td><td>CommitId</td></tr>
+ <tr><td>4</td><td>Đăng ký release manifest theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a>.</td><td>Manifest URL</td></tr>
+ <tr><td>5</td><td>Server operator pull đúng commit/tag, chạy smoke test, lưu deploy receipt.</td><td>Deploy receipt</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>6. Chu trình hotfix server → Git → local</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Evidence</th></tr>
+ </thead>
+ <tbody>
+ <tr><td>1</td><td>Khi sửa trực tiếp trên server, mở reverse-sync intake ngay.</td><td>ReverseSyncId</td></tr>
+ <tr><td>2</td><td>Commit và push thay đổi từ server về Git remote.</td><td>CommitId</td></tr>
+ <tr><td>3</td><td>Local admin endpoint pull về worktree đang sync.</td><td>Local pull log</td></tr>
+ <tr><td>4</td><td>Kiểm tra SharePoint sync hoàn tất.</td><td>Sync complete evidence</td></tr>
+ <tr><td>5</td><td>Đóng reverse-sync register.</td><td>Close-out record</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <div class="keyline"><strong>Rule khẩn:</strong> không giữ thay đổi meaningful trên server mà chưa commit back quá một ca làm việc. Không dùng server như nơi soạn thảo chính.</div>
+ </div>
+
+ <div class="section">
+ <h2>7. Runtime exclusions bắt buộc</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr><th>Path / nhóm dữ liệu</th><th>Quy tắc</th></tr>
+ </thead>
+ <tbody>
+ <tr><td><span class="code">mom/qms-data/form-workflow/</span></td><td>Runtime workflow binaries, archives và working state. Không commit vào source library.</td></tr>
+ <tr><td><span class="code">mom/qms-data/sessions/</span></td><td>Session runtime. Không sync, không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/ratelimit/</span></td><td>Rate-limit state. Không sync, không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/php_error.log</span></td><td>Runtime log. Không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/scan_cache.json</span></td><td>Runtime cache. Không commit.</td></tr>
+ <tr><td><span class="code">mom/qms-data/config/users.json</span> và secret-bearing config</td><td>Xem như runtime/server-only control data; không dùng như controlled source artifact nếu chưa có kiến trúc secret control riêng được duyệt.</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>8. Online forms boundary</h2>
+ <ul>
+ <li>Form definition, released schema, source template và supporting source code đi theo source cycle của WI-107.</li>
+ <li>Form submissions, approvals, operational responses và record payload đi về records libraries hoặc runtime record areas theo <a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a>.</li>
+ <li>Workflow runtime files trong <span class="code">qms-data/form-workflow</span> không được coi là source artifact.</li>
+ </ul>
+ </div>
+
+ <div class="section">
+ <h2>9. Evidence bắt buộc cho mỗi release</h2>
+ <ul>
+ <li>CommitId và GitRef</li>
+ <li>Release manifest</li>
+ <li>Deploy receipt</li>
+ <li>Smoke test hoặc point-of-use verification</li>
+ <li>Rollback readiness</li>
+ <li>Reverse-sync close-out nếu có hotfix</li>
+ </ul>
+ </div>
+
+ <div class="section">
+ <h2>10. Không được go-live khi</h2>
+ <ul>
+ <li>Worktree local chưa tách khỏi git-dir</li>
+ <li>Source library vẫn mở external sharing</li>
+ <li>Runtime noise còn bị stage vào commit</li>
+ <li>Deploy không truy được manifest và smoke evidence</li>
+ <li>Server hotfix chưa có reverse-sync close-out</li>
+ </ul>
+ </div>
+
+ <div class="section">
+ <h2>11. Tài liệu liên kết</h2>
+ <div class="table-card">
+ <table class="table">
+ <thead>
+ <tr><th>Nhóm</th><th>Tài liệu</th><th>Vai trò</th></tr>
+ </thead>
+ <tbody>
+ <tr><td>SOP</td><td><a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khóa document control, governance và change control.</td></tr>
+ <tr><td>ANNEX</td><td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-138-sharepoint-local-sync-and-git-workspace-boundary.html">ANNEX-138</a> ; <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> ; <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>Khóa workspace model, flow control và boundary.</td></tr>
+ <tr><td>WI</td><td><a href="wi-101-digital-online-forms-and-approvals.html">WI-101</a> ; <a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td><td>Khóa forms boundary và site/library setup.</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <div class="keyline"><strong>Nguồn chính thức tham khảo:</strong> <a href="https://support.microsoft.com/en-us/office/work-with-synced-files-in-file-explorer-8d9b1c45-4a3f-4fa8-a55b-fd0635e77d4d" target="_blank" rel="noopener">Microsoft Support - Work with synced files in File Explorer</a>; <a href="https://support.microsoft.com/en-us/office/restrictions-and-limitations-in-onedrive-and-sharepoint-64883a5d-228e-48f5-b3d2-eb39e07630fa" target="_blank" rel="noopener">Microsoft Support - Restrictions and limitations in OneDrive and SharePoint</a>.</div>
+ </div>
+
+ </div>
+ </div>
+</div>
+</body>
+</html>

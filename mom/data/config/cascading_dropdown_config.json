@@ -1,0 +1,87 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-29",
+    "description": "Cascading dropdown configuration for Form Hub Tab 2 (Fill & Download) and Tab 3 (Record ID allocation). Each cascade defines ordered levels; UI renders one dropdown per level, filtering next level based on selection."
+  },
+
+  "fill_download": {
+    "levels": ["department", "delivery_mode", "form_series", "form"],
+    "department": {
+      "QA":  { "label": "Quality Assurance",       "label_vi": "Dam bao Chat luong",     "color": "#dc2626" },
+      "PRO": { "label": "Production",              "label_vi": "San xuat",               "color": "#059669" },
+      "ENG": { "label": "Engineering",             "label_vi": "Ky thuat",               "color": "#0369a1" },
+      "SCM": { "label": "Supply Chain",            "label_vi": "Chuoi cung ung",         "color": "#84cc16" },
+      "HR":  { "label": "HR & Training",           "label_vi": "Nhan su & Dao tao",      "color": "#8b5cf6" },
+      "EXE": { "label": "Executive / Management",  "label_vi": "Ban Giam doc",           "color": "#7c3aed" },
+      "SAL": { "label": "Sales",                   "label_vi": "Kinh doanh",             "color": "#f59e0b" },
+      "WH":  { "label": "Warehouse / Logistics",   "label_vi": "Kho van",                "color": "#d97706" },
+      "IT":  { "label": "IT / Digital",             "label_vi": "Cong nghe thong tin",    "color": "#6366f1" },
+      "EHS": { "label": "EHS / Safety",            "label_vi": "An toan & Moi truong",   "color": "#ea580c" }
+    },
+    "delivery_mode": [
+      { "value": "online",  "label": "Online (Web Portal)", "label_vi": "Truc tuyen (Portal)", "icon": "monitor" },
+      { "value": "offline", "label": "Offline (Excel)",     "label_vi": "Ngoai tuyen (Excel)", "icon": "file-spreadsheet" }
+    ],
+    "form_series": {
+      "QA":  [600, 900],
+      "PRO": [500],
+      "ENG": [300],
+      "SCM": [400],
+      "HR":  [800],
+      "EXE": [100],
+      "SAL": [200],
+      "WH":  [700],
+      "IT":  [100],
+      "EHS": [800]
+    },
+    "form_series_labels": {
+      "100": { "label": "QMS Governance & Management",   "label_vi": "Quan tri QMS & Quan ly",     "range": "FRM-101 to FRM-199" },
+      "200": { "label": "Sales & Estimation",            "label_vi": "Kinh doanh & Bao gia",       "range": "FRM-201 to FRM-299" },
+      "300": { "label": "Engineering & Process",         "label_vi": "Ky thuat & Quy trinh",       "range": "FRM-301 to FRM-399" },
+      "400": { "label": "Supply Chain & Purchasing",     "label_vi": "Chuoi cung ung & Mua hang",  "range": "FRM-401 to FRM-499" },
+      "500": { "label": "Production & Maintenance",      "label_vi": "San xuat & Bao tri",         "range": "FRM-501 to FRM-599" },
+      "600": { "label": "Quality Control & Calibration", "label_vi": "Kiem soat CL & Hieu chuan",  "range": "FRM-601 to FRM-699" },
+      "700": { "label": "Logistics & Shipping",          "label_vi": "Kho van & Giao hang",        "range": "FRM-701 to FRM-799" },
+      "800": { "label": "HR, Training & EHS",            "label_vi": "Nhan su, Dao tao & ATMT",    "range": "FRM-801 to FRM-899" },
+      "900": { "label": "Audit & Continuous Improvement", "label_vi": "Danh gia & Cai tien",       "range": "FRM-901 to FRM-999" }
+    },
+    "form_lookup_source": "form_control_registry",
+    "form_lookup_fields": ["form_code", "title", "title_vi", "revision", "online", "status"],
+    "filter_logic": "department → form_series → delivery_mode filters online/offline → form list from registry"
+  },
+
+  "record_id": {
+    "levels": ["department", "record_type"],
+    "department": {
+      "QA":  { "label": "Quality Assurance",       "label_vi": "Dam bao Chat luong",     "record_types": ["NCR", "CAPA", "FAI", "SCAR", "AUD", "CAL"] },
+      "PRO": { "label": "Production",              "label_vi": "San xuat",               "record_types": ["NCR", "IMP", "DOWNTIME"] },
+      "ENG": { "label": "Engineering",             "label_vi": "Ky thuat",               "record_types": ["ECR", "FAI"] },
+      "SCM": { "label": "Supply Chain",            "label_vi": "Chuoi cung ung",         "record_types": ["SCAR", "PO-EXCEPTION"] },
+      "HR":  { "label": "HR & Training",           "label_vi": "Nhan su & Dao tao",      "record_types": ["TRN"] },
+      "EXE": { "label": "Executive / Management",  "label_vi": "Ban Giam doc",           "record_types": ["MR", "RISK", "IMP"] },
+      "SAL": { "label": "Sales",                   "label_vi": "Kinh doanh",             "record_types": [] },
+      "WH":  { "label": "Warehouse / Logistics",   "label_vi": "Kho van",                "record_types": [] },
+      "IT":  { "label": "IT / Digital",             "label_vi": "Cong nghe thong tin",    "record_types": [] },
+      "EHS": { "label": "EHS / Safety",            "label_vi": "An toan & Moi truong",   "record_types": [] }
+    },
+    "record_type": {
+      "NCR":          { "label": "Non-Conformity Report",        "label_vi": "Phieu bao loi khong phu hop",          "digits": 3, "format": "NCR-{YYYY}-{NNN}",          "form": "FRM-631" },
+      "CAPA":         { "label": "Corrective Action",            "label_vi": "Hanh dong khac phuc phong ngua",       "digits": 3, "format": "CAPA-{YYYY}-{NNN}",         "form": "FRM-641" },
+      "FAI":          { "label": "First Article Inspection",     "label_vi": "Kiem tra san pham dau tien",           "digits": 3, "format": "FAI-{YYYY}-{NNN}",          "form": "FRM-311" },
+      "TRN":          { "label": "Training Event",               "label_vi": "Su kien dao tao",                     "digits": 3, "format": "TRN-{YYYY}-{NNN}",          "form": "FRM-802" },
+      "AUD":          { "label": "Audit",                        "label_vi": "Danh gia noi bo / ben ngoai",         "digits": 3, "format": "AUD-{YYYY}-IA{NN}",         "form": "FRM-913" },
+      "ECR":          { "label": "Engineering Change Request",   "label_vi": "Yeu cau thay doi ky thuat",           "digits": 3, "format": "ECR-{YYYY}-{NNN}",          "form": "FRM-161" },
+      "IMP":          { "label": "Improvement Project",          "label_vi": "Du an cai tien",                      "digits": 3, "format": "IMP-{YYYY}-{CODE}",         "form": null },
+      "MR":           { "label": "Management Review",            "label_vi": "Xem xet cua lanh dao",               "digits": 2, "format": "MR-{YYYY}-Q{N}",            "form": "FRM-911" },
+      "RISK":         { "label": "Risk Review",                  "label_vi": "Danh gia rui ro",                     "digits": 2, "format": "RISK-{YYYY}-R{NN}",         "form": "FRM-131" },
+      "CAL":          { "label": "Calibration Record",           "label_vi": "Ho so hieu chuan",                    "digits": 3, "format": "CAL-{EquipCode}-{NNN}",     "form": "FRM-601" },
+      "SCAR":         { "label": "Supplier Corrective Action",   "label_vi": "Hanh dong khac phuc nha cung cap",   "digits": 3, "format": "SCAR-{YYYY}-{NNN}",         "form": "FRM-403" },
+      "DOWNTIME":     { "label": "Downtime Record",              "label_vi": "Ghi nhan dung may",                   "digits": 3, "format": "DOWNTIME-{YYYY}-{NNN}",     "form": "FRM-512" },
+      "PO-EXCEPTION": { "label": "PO Exception",                 "label_vi": "Ngoai le don hang mua",              "digits": 3, "format": "PO-EXCEPTION-{YYYY}-{NNN}", "form": null }
+    },
+    "counter_source": "data/counters/_registry.json",
+    "auto_increment": true,
+    "year_reset": true
+  }
+}

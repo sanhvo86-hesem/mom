@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WI-602 - Gage Pre Use Verification and Status Control | HESEM MOM</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+<style>
+
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 960px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+<div class="fh-company">
+<a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Công việc hướng dẫn</span>
+</div>
+</div>
+<div class="title">
+<strong class="doc-name">Gage Pre Use Verification and Status Control</strong>
+</div>
+<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">WI-602</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="entity-code role-code">MCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trước mọi phép đo đạt/không đạt, CTQ, FAI, SPC, final phát hành hoặc bất kỳ phép đo nào ảnh hưởng quyết định chất lượng.</div>
+<h1>WI-602 - Gage Pre Use Verification and Status Control</h1>
+<div class="section"><h2>1. Mục đích và nguyên tắc sử dụng dụng cụ đo</h2>
+<p>WI này chuẩn hóa kiểm trước khi dùng dụng cụ đo tại điểm dùng. Mọi phép đo dùng để quyết định đạt/không đạt, set offset, release mẫu đầu (first piece), release final hoặc xác nhận CTQ đều phải đi qua cổng kiểm soát này. Không nhãn trạng thái, nhãn mờ, seal hỏng, gage vừa rơi hoặc không chứng minh được chuẩn so sánh thì coi như <span class="badge-red">HOLD</span>.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Sign-out mọi gage dùng liên công đoạn, chỉ đo CTQ bằng gage đã zero và xác minh, và khai báo ngay mọi sự cố rơi, va đập, pin yếu, màn hình lỗi hoặc reading bất thường.</div></div>
+<div class="section"><h2>2. Cổng kiểm soát kiểm trước khi dùng</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Cổng kiểm soát</th><th>Phải kiểm</th><th>đạt khi</th><th>hold khi</th></tr></thead><tbody>
+<tr><td>G2 — Nhận diện</td><td>Gage ID, số sê-ri, trạng thái CAL, Ngày hết hạn, người chịu trách nhiệm/vị trí cấp phát.</td><td>Nhãn rõ, đúng gage, còn hiệu lực.</td><td>Không nhãn, sai ID, quá hạn, không truy ra hồ sơ.</td></tr>
+<tr><td>G2 — Tình trạng vật lý</td><td>Mặt đo, mỏ đo, đầu dò, dây cáp, màn hình, pin, niêm phong, hộp bảo quản.</td><td>Không sứt mẻ, không rỉ, không bavia, không niêm phong hỏng / gãy.</td><td>Rơi/va đập, niêm phong hỏng, mặt đo trầy, ren dưỡng đo / đồng hồ đo mẻ, pin yếu gây mất ổn định.</td></tr>
+<tr><td>G3 — không / bằng không / tham chiếu</td><td>không / bằng không tại điều kiện dùng; kiểm bằng chuẩn tham chiếu hoặc chủ / gốc phù hợp.</td><td>không / bằng không ổn định, lặp lại tốt, chủ / gốc kiểm tra đạt.</td><td>không / bằng không trôi, lặp lại kém, sai trên chủ / gốc.</td></tr>
+<tr><td>G4 — Điều kiện đo</td><td>Nhiệt độ, sạch bề mặt, lực đo, đơn vị mm/inch, chế độ tuyệt đối/gia tăng.</td><td>Điều kiện đo phù hợp phương pháp và dụng cụ.</td><td>Chi tiết/gage còn nóng, bẩn, đơn vị sai, Operator không hiểu phương pháp.</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>3. Nhanh xác minh theo nhóm gage</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm gage</th><th>Kiểm trước khi dùng</th><th>Lưu ý thực chiến</th></tr></thead><tbody>
+<tr><td>thước cặp / height dưỡng đo / đồng hồ đo</td><td>không / bằng không, trượt êm, không hở mỏ, kiểm 1–2 chặn / khóa/tham chiếu điểm.</td><td>Không dùng thước cặp cho CTQ dung sai rất chặt nếu phương pháp đã yêu cầu panme / thước đo vi lượng/CMM.</td></tr>
+<tr><td>panme / thước đo vi lượng ngoài/trong</td><td>Vệ sinh mặt đo, không / bằng không bằng standard, kiểm cóc (ratchet)/lực, kiểm lặp lại 3 lần.</td><td>Nếu cảm giác siết khác thường hoặc mỏ đo trượt, dừng dùng ngay.</td></tr>
+<tr><td>lỗ khoan dưỡng đo / đồng hồ đo / air gage</td><td>Set bằng vòng / khuyên/cài đặt chủ / gốc đúng size, xác minh điểm không / bằng không và độ lặp lại.</td><td>Luôn ghi size chủ / gốc đã dùng. Sai chủ / gốc hoặc chủ / gốc chưa nhiệt ổn định là TẠM GIỮ.</td></tr>
+<tr><td>chỉ số / đồng hồ so test</td><td>Kiểm hành trình, độ trơn, kim về 0, đầu tiếp xúc không mẻ.</td><td>Không dùng chỉ số có trễ (hysteresis) rõ hoặc kim giật.</td></tr>
+<tr><td>Pin/ren nút bịt / vòng / khuyên dưỡng đo / đồng hồ đo</td><td>Kiểm tình trạng bề mặt, mã size/class, hướng GO/NO-GO, sạch phoi.</td><td>Không dùng pin/vòng / khuyên mòn không truy được lịch sử hoặc lẫn bộ.</td></tr>
+<tr><td>Bề mặt độ nhám / rò rỉ / đặc biệt test dụng cụ đo</td><td>Kiểm trạng thái CAL, tự-test, tham chiếu mẫu thử/không / bằng không chặn / khóa, phụ kiện đúng.</td><td>Nếu phương pháp yêu cầu ấm / làm nóng trước-up hoặc môi trường ổn định hóa thì phải chờ đủ thời gian.</td></tr>
+</tbody></table></div></div>
+<div class="section"><h2>4. Phản ứng khi gage nghi ngờ hoặc fail cổng kiểm soát</h2>
+<div class="step-list">
+<div class="step-item"><strong>Dừng dùng ngay.</strong><br>Đặt trạng thái TẠM GIỮ vật lý; không tiếp tục đo để "kiểm thử thêm".</div>
+<div class="step-item"><strong>Khóa ảnh hưởng.</strong><br>Xác định phép đo nào đã dùng gage này từ lần xác minh cuối cùng; nếu đã dùng cho CTQ/phát hành thì kích hoạt <a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
+<div class="step-item"><strong>Đổi phương pháp đo.</strong><br>Chuyển sang gage khác đã xác minh hoặc sang CMM/fixture/tham chiếu phương pháp được <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> phê duyệt.</div>
+<div class="step-item"><strong>Ghi nhận sự cố.</strong><br>Log sự cố phải có gage ID, hiện tượng, thời điểm, Người phát hiện, job liên quan và hành động tạm thời.</div>
+</div>
+<div class="callout-warn"><strong>Rule:</strong> Nếu gage fail trên chủ / gốc hoặc có niêm phong hỏng / gãy, mọi kết quả đang chờ phát hành dựa trên gage đó phải dừng lại đến khi có quyết định của QA/Đo lường.</div></div>
+<div class="section"><h2>5. Khi nào phải Mọi <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / Đo lường</h2>
+<div class="two-col">
+<div class="card"><h3>Phải escalation ngay</h3><ul class="tight" style="padding-left:18px;"><li>Gage đo CTQ/phát hành final bị fail nhanh xác minh.</li><li>Gage rơi, va đập, ngâm dầu/dung dịch hoặc nghi nhiễm bẩn.</li><li>Đọc số không lặp lại, sai chủ / gốc, hoặc khác nhau giữa hai gage vượt ngưỡng nội bộ.</li><li>Không tìm thấy standard/chủ / gốc hợp lệ để xác minh.</li></ul></div>
+<div class="card"><h3>Cho phép xử lý tại chỗ</h3><ul class="tight" style="padding-left:18px;"><li>Lau sạch bề mặt đo theo chuẩn.</li><li>Thay pin hoặc reset chế độ khi không ảnh hưởng tính toàn vẹn của thiết bị.</li><li>Thực hiện không / bằng không lại sau khi đã xác minh nguyên nhân là do vận hành.</li></ul></div>
+</div></div>
+<div class="section"><h2>6. Hồ sơ, KPI và tài liệu liên kết</h2>
+<div class="kpi-grid">
+<div class="kpi-box"><strong>KPI-WI602-01</strong><br>Tỷ lệ gage fail nhanh xác minh trên tổng số lần sử dụng.</div>
+<div class="kpi-box"><strong>KPI-WI602-02</strong><br>Số lô bị ảnh hưởng do dùng gage nghi ngờ/hết hạn/niêm phong hỏng / gãy.</div>
+<div class="kpi-box"><strong>KPI-WI602-03</strong><br>Tỷ lệ CTQ đo lường có bằng chứng xác minh đầy đủ trước khi đo.</div>
+<div class="kpi-box"><strong>KPI-WI602-04</strong><br>Số lần Operator phải đổi phương pháp đo do đo lường system không phù hợp.</div>
+</div>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu liên kết</th><th>Vai trò</th></tr></thead><tbody>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html">SOP-601</a></td><td>Quản lý hiệu chuẩn và vòng đời gage.</td></tr>
+<tr><td><a href="../../01-SOPs/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html">SOP-602</a></td><td>MSA, Gage R&amp;R và năng lực hệ thống đo.</td></tr>
+<tr><td><a href="../../03-Reference/06-ANNEX-600/annex-602-msa-acceptance-criteria.html">ANNEX-602</a></td><td>Tiêu chí chấp nhận MSA và hướng dẫn xác nhận gage.</td></tr>
+<tr><td><a href="wi-604-spc-chart-use-process-capability-and-reaction.html">WI-604</a></td><td>SPC/năng lực / khả năng chỉ hợp lệ khi đo lường system đạt.</td></tr>
+<tr><td><a href="wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a></td><td>Ngăn chặn khi đo lường kết quả không còn đáng tin.</td></tr>
+</tbody></table></div></div>
+<div data-support-control="true">
+<h2 class="h2" id="support-control-study-selection">Kiểm soát bổ sung — nghiên cứu lựa chọn hướng dẫn</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Khi nào</th><th>Dùng hồ sơ nào</th><th>Ranh giới</th></tr></thead><tbody>
+<tr><td>Pre-use kiểm tra / shift kiểm tra / sau sự kiện</td><td><a href="../../../mom/docs/forms/frm-600-inspection/FRM-602_Gage_Verification_Log.xlsx" download="">FRM-602</a></td><td>Không thay cho hiệu chuẩn hay MSA đầy đủ.</td></tr>
+<tr><td>Nghi ngờ Người đo + thiết bị biến thiên</td><td><a href="../../../mom/docs/forms/frm-600-inspection/FRM-611_GRR_Study_Form.xlsx" download="">FRM-611</a></td><td>Dùng khi quyết định cần nhìn độ lặp lại / độ tái lập.</td></tr>
+<tr><td>Nghi ngờ sai lệch hệ thống / độ tuyến tính / trôi / sai lệch</td><td><a href="../../../mom/docs/forms/frm-600-inspection/FRM-612_Bias_Linearity_Stability_Study_Form.xlsx" download="">FRM-612</a></td><td>Dùng khi GR&amp;R không trả lời đủ rủi ro.</td></tr>
+<tr><td>Trực quan đạt/không đạt hoặc CMM đánh giá năng lực</td><td><a href="../../../mom/docs/forms/frm-600-inspection/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx" download="">FRM-613</a></td><td>Khóa tính nhất quán của thuộc tính quyết định hoặc phát hành chương trình (program phát hành).</td></tr>
+</tbody></table></div>
+</div></div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>

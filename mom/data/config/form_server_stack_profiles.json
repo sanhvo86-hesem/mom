@@ -1,0 +1,56 @@
+{
+  "baseline_id": "HESEM-FRM-STACK-PROFILES-V0",
+  "active_profile": "download_only_desktop_excel",
+  "profiles": [
+    {
+      "stack": "apache_httpd",
+      "recommended_when": "Portal chạy trực tiếp trên Apache/httpd.",
+      "controls": [
+        "AllowOverride All cho mom/docs/forms",
+        "Content-Disposition attachment cho xlsx/xlsm/xls",
+        "X-Content-Type-Options nosniff",
+        "không preview inline workbook"
+      ],
+      "example_path": "mom/docs/forms/design-system/runtime-examples/apache-download-only-forms.conf.example",
+      "evidence": "server-delivery-rollout-checklist + smoke test download"
+    },
+    {
+      "stack": "nginx",
+      "recommended_when": "Dùng Nginx làm web server hoặc reverse proxy.",
+      "controls": [
+        "map MIME đúng cho xlsx/xlsm/xls",
+        "add_header Content-Disposition attachment always",
+        "nosniff",
+        "không strip header ở tầng proxy"
+      ],
+      "example_path": "mom/docs/forms/design-system/runtime-examples/nginx-download-only-forms.conf.example",
+      "evidence": "server-delivery-rollout-checklist + curl/header capture"
+    },
+    {
+      "stack": "iis",
+      "recommended_when": "Portal chạy trên Windows/IIS.",
+      "controls": [
+        "staticContent cho mime types",
+        "customHeaders hoặc outbound rules cho attachment",
+        "nosniff",
+        "không mở inline workbook"
+      ],
+      "example_path": "mom/docs/forms/design-system/runtime-examples/iis-download-only-forms.web.config.example",
+      "evidence": "server-delivery-rollout-checklist + browser download witness"
+    },
+    {
+      "stack": "reverse_proxy_or_cdn",
+      "recommended_when": "Có reverse proxy/CDN đứng trước application server.",
+      "controls": [
+        "edge không strip Content-Disposition",
+        "không transform xlsx thành preview",
+        "cache policy không làm sai workbook mới phát hành"
+      ],
+      "example_path": "mom/docs/forms/design-system/runtime-examples/reverse-proxy-cdn-download-policy.md",
+      "evidence": "edge policy review + smoke test qua public endpoint"
+    }
+  ],
+  "owner": "IT / QA-QMS",
+  "standard_ref": "mom/docs/operations/references/01-ANNEX-100/annex-136-excel-form-server-stack-download-delivery-profiles.html",
+  "updated_at": "2026-03-21"
+}

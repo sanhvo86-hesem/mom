@@ -1,0 +1,42 @@
+{
+  "baseline_id": "HESEM-FRM-PILOT-ENDPOINT-V0",
+  "active_profile": "download_only_desktop_excel",
+  "pilot_scope": {
+    "minimum_user_groups": [
+      "QA/QMS",
+      "Supply Chain / Warehouse",
+      "Production / Engineering",
+      "HR/Training or IT"
+    ],
+    "minimum_forms": [
+      "FRM-101",
+      "FRM-141",
+      "FRM-205",
+      "FRM-402",
+      "FRM-701",
+      "FRM-801",
+      "FRM-911"
+    ]
+  },
+  "checks": [
+    "Default app của .xlsx là desktop Excel",
+    "Người dùng hiểu Downloads chỉ là điểm nhận file tạm",
+    "Record save path đúng theo department rule",
+    "Không tự trust file/folder ngoài baseline IT-managed",
+    "Portal click và internal doc click đều tải đúng workbook active"
+  ],
+  "evidence": [
+    "pilot witness note",
+    "screenshot file association",
+    "download/open/save-path test",
+    "UAT result per representative form"
+  ],
+  "supporting_docs": {
+    "pack": "mom/docs/forms/design-system/pilot-endpoint-rollout-pack.html",
+    "desktop_baseline": "mom/docs/forms/design-system/desktop-excel-endpoint-baseline.html",
+    "uat_pack": "mom/docs/forms/design-system/production-acceptance-uat-pack.html",
+    "windows_endpoint_note": "mom/docs/forms/design-system/runtime-examples/windows-excel-endpoint-baseline.md"
+  },
+  "standard_ref": "mom/docs/operations/references/01-ANNEX-100/annex-137-excel-form-pilot-endpoint-rollout-and-save-path-control.html",
+  "updated_at": "2026-03-21"
+}

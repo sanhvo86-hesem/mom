@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>TRN-ACA-RMAP-01 - Role Roadmaps | HESEM MOM</title>
+<link href="../../assets/style.css" rel="stylesheet">
+<style>
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
+.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
+.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
+.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
+.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
+.link-list{list-style:none;margin:0;padding:0}
+.link-list li{padding:4px 0 4px 0;font-size:12px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
+.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
+.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
+.hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
+.hero p{font-size:13px;color:var(--ink2);margin:0}
+.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
+.chip{display:inline-flex;padding:3px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px;}
+.legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.legend-box .chip{margin:0}
+.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.notice-item{padding:10px 12px;border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
+.small{font-size:12px}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+@media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+
+.phase-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:#fff}
+.phase-card h3{font-size:15px;color:var(--navy);margin:0 0 8px}
+.phase-card p{margin:6px 0}
+.phase-card .gate{margin-top:8px;font-size:12px;color:var(--ink2)}
+
+</style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../mom/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"></a>
+<div class="fh-company">
+<a href="../../mom/portal.html">HESEM ENGINEERING</a>
+<span>Training Academy • Mẫu &amp; dụng cụ</span>
+</div>
+</div>
+<div class="title">
+<strong class="doc-name">Role Roadmaps</strong>
+<span class="sub-vn">Lộ trình triển khai theo nhóm sản phẩm vai trò sau khi đồng bộ JD, sổ tay, phó và chứng nhận</span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">TRN-ACA-RMAP-01</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="form-sheet">
+<div class="hero">
+<h1>TRN-ACA-RMAP-01 - Role Roadmaps</h1>
+<p>Lộ trình này nối <b>JD ↔ sổ tay ↔ gói / bó SOP/WI/FRM ↔ OJT ↔ chứng nhận</b> để tránh hội nhập nhân sự mới hoặc đào tạo chéo kiểu "đọc vài file rồi vào làm". Mỗi lộ trình là khung chuẩn; trưởng bộ phận vẫn phải điều chỉnh theo nhóm máy (machine nhóm sản phẩm), khách hàng yêu cầu và mức mức độ quan trọng thực tế.</p>
+</div>
+<div class="note"><b>Quy tắc dùng lộ trình</b><br>Mỗi lộ trình phải bám JD active, handbook phòng ban, <a href="../../mom/docs/system/organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">Ma trận thẩm quyền</a>, <a href="../../mom/docs/system/organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Deputy Matrix</a> và bundle vận hành mà vai trò trực tiếp sử dụng. Khi ranh giới trách nhiệm hoặc training cổng kiểm soát thay đổi, lộ trình liên quan phải được rà lại cùng <a href="certification-register.html">Certification Register</a>.</div>
+<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#rr1">1. Lộ trình theo family vai trò</a><a href="#rr2">2. Quy tắc triển khai</a><a href="#rr3">3. Khi dùng cho deputy / backup</a></div></div>
+<div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Material</b>.
+</div>
+<h2 class="h2" id="rr1">1. Lộ trình theo family vai trò</h2>
+<div class="link-grid">
+<div class="phase-card">
+<h3>Thương mại Tuyến đầu-end</h3>
+<p><b>Áp dụng cho:</b> Dịch vụ khách hàng; <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Hiểu RFQ/PO tính đầy đủ, rà soát hợp đồng, báo giá giả định, đơn hàng kiểm soát thay đổi và rule đã báo cáo vượt cấp khi tính khả thi chưa khóa.</td><td>Tự điều phối RFQ → báo giá → xác nhận đơn hàng đúng SSOT, mở/đóng log thay đổi và phối hợp khởi động theo rule.</td><td>Dẫn một luồng báo giá-to-đơn hàng end-to-end với bằng chứng đầy đủ, không còn không kiểm soát cam kết / không kiểm soát thay đổi.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> RFQ tính đầy đủ • giả định kỷ luật / chuyên ngành • khởi động mức sẵn sàng</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html">D-SCS</a> • <a href="../../mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a> • <a download="" href="../../mom/docs/forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202 — Bảng kiểm rà soát hợp đồng</a> • <a href="../../mom/docs/system/organization/01-Org-Chart/annex-org-001-org-chart-fullpage.html">ANNEX-ORG-001</a></p>
+</div>
+<div class="phase-card">
+<h3>Phát hành kỹ thuật</h3>
+<p><b>Áp dụng cho:</b> <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Ky su DFM)"><span class="entity-code role-code">DFM</span></a> Engineer; Quy trình Engineer; CAM/NC <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span>; Kỹ thuật Lead</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm drawing/spec/CTQ, tính khả thi phương pháp, lộ trình gia công khái niệm, NC/cấu hình control và bàn giao với QA/Sản xuất.</td><td>Phát hành DFM/lộ trình gia công/NC theo rule, xử lý kỹ thuật bất thường và yêu cầu thay đổi có log, giữ phiên bản tính toàn vẹn.</td><td>Dẫn một phát hành kỹ thuật / ECN / chứng minh-out hỗ trợ trọn gói cho nhóm sản phẩm được giao với bằng chứng đầy đủ.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> Phiên bản control • phát hành thẩm quyền • chứng minh-out / bất thường phản hồi</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html">D-ENG</a> • <a href="../../mom/docs/operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a> • <a href="../../mom/docs/operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-cam-nc.html">OJT CAM/NC</a></p>
+</div>
+<div class="phase-card">
+<h3>Kế hoạch &amp; IE</h3>
+<p><b>Áp dụng cho:</b> <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span>; <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html" title="Production Engineer / Industrial Engineer (Ky su san xuat / ky su cong nghiep)"><span class="entity-code role-code">PIE</span></a></p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Hiểu mức sẵn sàng logic, điều phối xuất hàng rule, WIP/tuổi tồn (lão hóa / cũ), nút thắt / điểm nghẽn data, standard time và escalation bậc thang năng lực.</td><td>Tự điều độ và theo dõi năng lực theo rule đã duyệt; mở hành động khi mức sẵn sàng hoặc luồng mất kiểm soát.</td><td>Dẫn một chu kỳ điều độ / cải tiến tái cân bằng có số liệu trước-sau và bàn giao rõ với phân xưởng.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> Mức sẵn sàng • điều phối xuất hàng kỷ luật / chuyên ngành • WIP escalation</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html">D-PROD</a> • <a href="../../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-planner-dispatcher.html">OJT PPL</a> • <a href="../../mom/docs/system/organization/04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html">KPI Phân tầng</a></p>
+</div>
+<div class="phase-card">
+<h3>Phân xưởng Lãnh đạo</h3>
+<p><b>Áp dụng cho:</b> <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a></span>; Workshop Manager; Shift Leader</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm khởi động kiểm tra, nhân lực/cell control, bất thường phản hồi, bàn giao, sản phẩm an toàn/FOD kỷ luật / chuyên ngành.</td><td>Điều hành ca/cell theo quản lý trực quan (Trực quan Quản lý), phản ứng rule và escalation đúng điểm, không "giữ lỗi trong ca".</td><td>Dẫn một chu kỳ vận hành ổn định với OTD/FPY/phản hồi đạt target nội bộ và bằng chứng quản trị đầy đủ.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> bất thường phản hồi • shift bàn giao • phát hành / escalation kỷ luật / chuyên ngành</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html">D-PROD</a> • <a href="../../mom/docs/system/organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">Ma trận thẩm quyền</a> • <a href="../../mom/docs/system/organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Phó Matrix</a> • <a href="../../mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></p>
+</div>
+<div class="phase-card">
+<h3>Setup &amp; CNC Vận hành</h3>
+<p><b>Áp dụng cho:</b> Setup Technician; CNC Operator; Team Lead</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm phiếu cài đặt, danh sách dao cụ, mẫu đầu (tiên chi tiết / sản phẩm) rule, machine kỷ luật / chuyên ngành, clean/FOD/truy xuất nguồn gốc cơ bản.</td><td>Thực hiện setup / vận hành độc lập trong scope cho phép, dùng biểu mẫu đúng, biết dừng khi cổng kiểm soát không đạt.</td><td>Duy trì vận hành ổn định theo nhóm sản phẩm máy được giao, có bằng chứng mẫu đầu/hồ sơ kỷ luật / chuyên ngành và hỗ trợ đào tạo L1/L2.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> Setup phát hành • mẫu đầu • phiên bản / truy xuất nguồn gốc • machine kỷ luật / chuyên ngành</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html">D-PROD</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-setup-teamlead.html">OJT Setup / Team Lead</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-operator.html">OJT Operator</a> • <a href="role-gate-tests.html">TRN-ACA-CỔNG KIỂM SOÁT (GATE)-01 — Vai trò Cổng kiểm soát Kiểm Nhiệm &amp;amp; Chứng nhận Logic</a></p>
+</div>
+<div class="phase-card">
+<h3>Quality System &amp; Quy trình Quality</h3>
+<p><b>Áp dụng cho:</b> <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> Manager; <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> Engineer; Quality Engineer</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> kiến trúc, kế hoạch kiểm soát, CAPA, khiếu nại, đánh giá/LPA, phát hành quản trị và KPI logic.</td><td>Tự dẫn dắt NCR/CAPA, đánh giá, khiếu nại phản hồi và lập kế hoạch chất lượng cho nhóm sản phẩm được giao.</td><td>Chốt và xác minh hiệu lực một chu kỳ cải tiến / đánh giá / CAPA hoàn chỉnh, đóng đúng với xem xét của lãnh đạo logic.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> Ngăn chặn • effectiveness xác minh • phát hành quản trị</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html">D-QUAL</a> • <a href="../../mom/docs/operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> • <a href="../../mom/docs/operations/sops/09-SOP-900/sop-902-management-review.html">SOP-902</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-qa-qms.html">OJT QA / QMS</a></p>
+</div>
+<div class="phase-card">
+<h3><a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> / CMM / Metrology</h3>
+<p><b>Áp dụng cho:</b> <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> Inspector; CMM / kiểm tra family</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Hiểu kế hoạch kiểm tra (plan), measurement discipline, bằng chứng traceability, tạm giữ/phê duyệt basics.</td><td>Thực hiện kiểm tra, ghi nhận và escalated bất thường đúng rule; không bỏ qua thiếu dữ liệu/thiếu chứng cứ.</td><td>Duy trì kiểm tra performance ổn định, zero uncontrolled release trong scope được giao.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> Measurement bằng chứng • tạm giữ/phê duyệt • abnormality response</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html">D-QUAL</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-qc-inspector.html">OJT QC Inspector</a> • <a href="../../mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a> • <a download="" href="../../mom/docs/forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651 NCR</a></p>
+</div>
+<div class="phase-card">
+<h3>Chuỗi cung ứng &amp; Lô giao hàng</h3>
+<p><b>Áp dụng cho:</b> Chuỗi cung ứng Manager; Nhân viên mua hàng; <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> / Nhận hàng; Hậu cần</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm nhà cung cấp luồng-xuống / Từng, cert rà soát, lot control, nhận hàng trạng thái, giao vận tài liệu, clean-pack/ship-ready rule.</td><td>Tự xử lý vòng PO → nhận hàng → vấn đề → điều phối xuất hàng với truy xuất nguồn gốc đầy đủ, không mất cert/lot/trạng thái.</td><td>Vận hành ổn định chuỗi nguồn cung / lô giao hàng cho nhóm sản phẩm job được giao mà không phát sinh không kiểm soát nguyên vật liệu trạng thái.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> Cert / lot control • nhà cung cấp bàn giao • bộ hồ sơ giao hàng (ship gói hồ sơ) mức sẵn sàng</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html">D-SCM</a> • <a href="../../mom/docs/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> • <a href="../../mom/docs/operations/sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-purchasing.html">OJT Mua hàng</a> • <a href="../02-Training-Content/02-OJT-Guides/ojt-role-warehouse-receiving.html">OJT WAR / D-WHS</a></p>
+</div>
+<div class="phase-card">
+<h3>People, An toàn &amp; Tuân thủ</h3>
+<p><b>Áp dụng cho:</b> <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> Manager; <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> Specialist; giảng viên; tuân thủ hỗ trợ</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm năng lực quản trị, chứng nhận cycle, sự cố/sự cố suýt xảy ra (Cần / suýt-thiếu / bỏ sót) rule, công việc môi trường and luật định cơ bản.</td><td>Tự vận hành một chu kỳ đào tạo/chứng nhận hoặc sự cố theo dõi tiếp với hồ sơ đầy đủ và bàn giao đúng người chịu trách nhiệm.</td><td>Chủ trì mức sẵn sàng rà soát cho phạm vi bao phủ nhân lực, chứng nhận hoặc <a class="entity-link role-link" href="../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> cải tiến trong phạm vi phụ trách.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> Training bằng chứng • chứng nhận tính toàn vẹn • sự cố / công việc-môi trường phản hồi</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html">D-HR</a> • <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html">D-EHS</a> • <a href="../../mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801</a> • <a href="../../mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a> • <a href="certification-register.html">Chứng nhận Sổ đăng ký</a></p>
+</div>
+<div class="phase-card">
+<h3>Digital &amp; ERP Governance</h3>
+<p><b>Áp dụng cho:</b> Governance viên hệ thống Epicor; IT Administrator; kinh doanh người chịu trách nhiệm hệ thống</p>
+<div class="table-card"><table class="table"><colgroup><col style="width:33%"><col style="width:33%"><col style="width:34%"></colgroup><thead><tr><th>30 ngày</th><th>60 ngày</th><th>90 ngày</th></tr></thead><tbody><tr><td>Nắm field sơ đồ ánh xạ, truy cập, luồng công việc, backup mốc chuẩn, vấn đề/kiểm soát thay đổi, data truy xuất nguồn gốc, system ranh giới.</td><td>Tự xử lý truy cập/thay đổi/sự cố theo rule, giữ data tính toàn vẹn và biết khi nào phải hold giao dịch hoặc hoàn tác / quay lại.</td><td>Dẫn một thay đổi hoặc phục hồi hệ thống với bằng chứng UAT, phê duyệt, backup, hoàn tác / quay lại và người chịu trách nhiệm ký-off đầy đủ.</td></tr></tbody></table></div>
+<p class="gate"><b>Cổng kiểm soát trọng yếu:</b> ít nhất quyền hạn • thay đổi tính toàn vẹn • dự phòng / bổ sung / thay thế</p>
+<p class="small"><b>Tài liệu chính:</b> <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html">D-IT</a> • <a href="../../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html">D-ERP</a> • <a href="../../mom/docs/operations/references/03-ANNEX-Digital/annex-it-001-role-based-access-map.html">ANNEX-IT-001</a> • <a href="../../mom/docs/operations/references/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a> • <a href="../../mom/docs/operations/references/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021</a></p>
+</div>
+</div>
+<h2 class="h2" id="rr2">2. Quy tắc triển khai</h2>
+<ul class="tight"><li>Lộ trình 30/60/90 Ngày là khung chuẩn; trưởng bộ phận phải cá thể hóa theo scope thực tế, ca làm việc, máy, sản phẩm hoặc khách hàng yêu cầu.</li><li>Mỗi mốc phải có bằng chứng: đào tạo / OJT / đánh giá / đầu ra thực tế và cập nhật về SSOT theo <a href="evidence-naming-rule.html">TRN-ACA-EVID-01 — Evidence Đặt tên Quy ước &amp; Lưu kho Quy tắc (SSOT) | HESEM OS</a>.</li><li>Không coi hoàn thành mốc 30/60/90 là đương nhiên đủ cấp chứng nhận; việc công nhận level phải đi qua <a download="" href="../../mom/docs/forms/frm-800-hr/FRM-804_Competence_Assessment.xlsx">FRM-804</a>, <a download="" href="../../mom/docs/forms/frm-800-hr/FRM-805_Skill_Level_Certificate.xlsx">FRM-805</a> và <a href="certification-register.html">Chứng nhận Sổ đăng ký</a>.</li><li>Khi xuất hiện cổng kiểm soát vi phạm, lộ trình phải bị điều chỉnh và học viên có thể bị chuyển trạng thái Hold/Có điều kiện trong sổ đăng ký chứng nhận.</li></ul>
+<h2 class="h2" id="rr3">3. Khi dùng cho phó / backup</h2>
+<p>Lộ trình là căn cứ để xây phạm vi bao phủ phó thực chất. Trước khi một Người được tính là backup cho vai trò quan trọng / nghiêm trọng, cần đối chiếu cả ba lớp: (1) vai trò nằm trong <a href="../../mom/docs/system/organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a>; (2) lộ trình/OJT/đánh giá đã đi đủ; (3) chứng nhận còn hiệu lực trong đúng scope. Chỉ hoàn thành đào tạo lớp hoặc "đã làm thay vài lần" không đủ để coi là phó hợp lệ.</p>
+<div class="footer-note">Lộ trình này là công cụ triển khai. Nguồn chuẩn cho quyết định phân quyền, phân vai và phạm vi bao phủ cuối cùng vẫn là sổ tay, JD, ma trận thẩm quyền và phó matrix đang hiệu lực.</div>
+</div>
+
+<h2>4. đã đào tạo ≠ đã chứng nhận ≠ được ủy quyền ≠ phó</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Trạng thái</th><th>Nói lên điều gì</th><th>Chưa cho phép điều gì</th></tr></thead><tbody>
+<tr><td>đã đào tạo</td><td>Đã học nội dung và có bằng chứng tham dự / OJT.</td><td>Không tự động được làm độc lập hoặc ký phát hành.</td></tr>
+<tr><td>đã chứng nhận</td><td>Đã vượt qua cổng kiểm soát / đánh giá cho một scope năng lực xác định.</td><td>Không tự động có phê duyệt thẩm quyền hoặc bố trí Người thay thế.</td></tr>
+<tr><td>Được ủy quyền</td><td>Được phép thực hiện / ký trong scope đã nêu và đang còn hiệu lực.</td><td>Không mặc định được làm ngoài khách hàng / machine / shift ranh giới đã cấp.</td></tr>
+<tr><td>Phó ready</td><td>Có thể kích hoạt backup cho vai trò quan trọng / nghiêm trọng khi đủ bằng chứng duy trì năng lực.</td><td>Không có hiệu lực nếu sổ đăng ký / matrix / Cần đây bằng chứng chưa cập nhật.</td></tr>
+</tbody></table></div>
+<div class="note"><b>Dùng cùng</b><br>Xem thêm <a href="authorization-library.html">ủy quyền Thư viện</a> để biến lộ trình thành quyền được phép làm có ranh giới rõ ràng.</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

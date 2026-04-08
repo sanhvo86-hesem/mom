@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-519 - Job Packet Quick Check and Pre Run Verification | HESEM MOM</title>
+<link rel="stylesheet" href="../../../assets/style.css">
+<style>
+.page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
+.page-body h2 { font-size: 18px; line-height: 1.4; margin: 18px 0 10px; color: var(--navy); }
+.page-body h3 { font-size: 14px; line-height: 1.5; margin: 12px 0 6px; color: var(--ink); }
+.meta .row { display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin: 4px 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { border: 1px solid var(--ln); border-radius: var(--r); padding: 12px; background: #fff; }
+.table-card { overflow-x: auto; }
+.callout-danger, .callout-warning, .callout-ok { padding: 12px 14px; border-radius: var(--r); margin: 10px 0; border: 1px solid var(--ln); background: #fff; }
+.callout-danger { background: #fff5f5; border-color: #ffc9c9; }
+.callout-warning { background: #fff9db; border-color: #ffe066; }
+.callout-ok { background: #ebfbee; border-color: #b2f2bb; }
+.doc-link-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.doc-link { display: inline-block; padding: 6px 10px; border: 1px solid var(--ln); border-radius: 999px; background: var(--bg2); font-size: 12px; font-weight: 600; color: var(--navy); }
+ul.tight li { margin: 4px 0; }
+@media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } .page-body { padding: 24px 18px 36px; } .meta .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+          <div class="fh-company">
+            <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+          </div>
+        </div>
+        <div class="title">
+<strong class="doc-name">Job Packet Quick Check and Pre Run Verification</strong>
+</div>
+        <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">WI-519</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V1</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+        </div>
+      
+
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ngay trước Cycle Start, sau setup, sau thay đổi ảnh hưởng CTQ, sau restart, sau đổi máy, đổi ca hoặc đổi người chạy. Đây là Gate-Execution WI tại checkpoint pre-run; family máy và role topology tra ở <a href="../../03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</div>
+      <h1>WI-519 - Job Packet Quick Check and Pre Run Verification</h1>
+
+      <section id="wi-s1" class="wi-section">
+        <h2>1. Mục đích</h2>
+        <ul class="tight">
+          <li>Chặn sai rev, sai lot, sai offset, sai fixture và sai điều kiện machine trước khi nhấn Cycle Start.</li>
+          <li>Buộc checkpoint pre-run có kết quả PASS hoặc HOLD nhìn thấy rõ trên record và tại máy.</li>
+          <li>Giữ một quyết định vận hành duy nhất trước first cut, không chạy thử “xem sao”.</li>
+        </ul>
+        <div class="callout-danger"><strong>STOP</strong><br>Nếu thiếu một bằng chứng tối thiểu hoặc có một điểm không giải thích được tại máy, job phải vào HOLD. Không được chạy machine để bù cho việc hồ sơ chưa sạch.</div>
+      </section>
+
+      <section id="wi-s2" class="wi-section">
+        <h2>2. Phạm vi & đối tượng áp dụng</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3>Mở WI-519 khi</h3>
+            <ul class="tight">
+              <li>Setup vừa hoàn tất và chuẩn bị first cut.</li>
+              <li>Tool, insert, fixture, WCS hoặc offset vừa thay đổi có ảnh hưởng đến kết quả chạy.</li>
+              <li>Machine vừa restart sau cảnh báo, mất điện, dừng dài hoặc đổi người nhận máy.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Người dùng chính</h3>
+            <ul class="tight">
+              <li><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a> và <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a>.</li>
+              <li><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a> và <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> khi phải cùng ký hoặc giải quyết HOLD.</li>
+              <li>Không dùng WI này thay cho WI-517 hoặc WI-302.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s3" class="wi-section">
+        <h2>3. Công cụ, vật tư & tài liệu cần thiết</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Hạng mục</th>
+                <th>Mô tả</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Job packet hiện hành</td>
+                <td>Traveler, setup sheet, program released, tool list, material tag và các yêu cầu đặc biệt của Job.</td>
+                <td>Phải là đúng released set đang dùng tại máy.</td>
+              </tr>
+              <tr>
+                <td>Record checkpoint</td>
+                <td><a href="../../../mom/docs/forms/frm-500-production/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx" download>FRM-519</a> và record part đầu khi áp dụng.</td>
+                <td><a href="../../../mom/docs/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" download>FRM-511</a> dùng khi checkpoint dẫn sang first piece hoặc restart có đo lại.</td>
+              </tr>
+              <tr>
+                <td>Machine state</td>
+                <td>WCS, ToolID, offset, fixture ID, coolant và vùng làm việc hiện tại.</td>
+                <td>Nếu có add-on theo family máy thì xem <a href="../../03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="wi-s4" class="wi-section">
+        <h2>4. Điều kiện tiên quyết</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Điểm khóa</th>
+                <th>Yêu cầu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Trigger</td>
+                <td>Checkpoint chỉ mở khi setup đã xong hoặc có thay đổi làm điều kiện chạy không còn giống trạng thái trước đó.</td>
+              </tr>
+              <tr>
+                <td>Evidence tối thiểu</td>
+                <td>Released set, material trace, machine state hiện tại và record checkpoint phải sẵn để ghi ngay tại máy.</td>
+              </tr>
+              <tr>
+                <td>Stop condition</td>
+                <td>Dừng khi thiếu tài liệu, thiếu trace lot, offset không giải thích được, fixture không chắc chắn, machine cảnh báo hoặc không chạy được prove-out an toàn.</td>
+              </tr>
+              <tr>
+                <td>Release authority</td>
+                <td>Người ký checkpoint theo rule tại Job và authority matrix; không dùng xác nhận miệng thay cho record.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="wi-s5" class="wi-section">
+        <h2>5. Các bước thực hiện</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th style="width:9%;">Bước</th>
+                <th style="width:33%;">Hành động</th>
+                <th style="width:22%;">Lý do</th>
+                <th style="width:18%;">PASS khi</th>
+                <th style="width:18%;">FAIL thì</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Xác định rõ vì sao checkpoint pre-run đang được mở: setup mới, restart, đổi tool, đổi máy hoặc đổi người chạy.</td>
+                <td>Ly do: trigger khác nhau dẫn đến mức giữ khác nhau.</td>
+                <td>Người ký biết rõ phạm vi checkpoint hiện tại.</td>
+                <td>Không ký khi chưa xác định được trigger.</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Đối chiếu released job packet tại máy để xác nhận đúng Job, đúng Part/Rev và đúng công đoạn hiện tại.</td>
+                <td>Ly do: chặn sai hồ sơ trước first cut.</td>
+                <td>Tài liệu tại máy khớp nhau và khớp với Job đang chạy.</td>
+                <td>Giữ job và thu hồi bộ hồ sơ sai.</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Xác nhận material tag, lot hoặc heat và tình trạng WIP đang gắn với đúng traveler.</td>
+                <td>Ly do: tránh chạy nhầm lot hoặc mất truy vết.</td>
+                <td>Lot, qty và trạng thái WIP nhìn thấy rõ và khớp.</td>
+                <td>Giữ lot và gọi kiểm tra traceability.</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Xác nhận ToolID, WCS, probe hoặc offset đang ở đúng trạng thái cho setup hiện tại.</td>
+                <td>Ly do: sai trạng thái machine gây scrap hoặc va chạm rất sớm.</td>
+                <td>ToolID và state machine giải thích được, không có giá trị lạ.</td>
+                <td>Dừng Cycle Start và quay lại WI-517 hoặc bảo trì khi cần.</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Xác nhận fixture orientation, vùng clamp, coolant, phoi và vùng làm việc đang sạch và sẵn để chạy.</td>
+                <td>Ly do: fixture sai hoặc FOD làm hỏng ngay part đầu.</td>
+                <td>Không còn nguy cơ nhìn thấy tại vùng làm việc.</td>
+                <td>Giữ machine và sửa điều kiện vật lý trước.</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Chạy prove-out, single block hoặc first-cut controlled move theo mức rủi ro của Job.</td>
+                <td>Ly do: đây là lớp chặn cuối trước cắt phôi thật.</td>
+                <td>Không có va chạm, cảnh báo hoặc tín hiệu bất thường.</td>
+                <td>Dừng machine, giữ part nghi ngờ và khoanh vùng nguyên nhân.</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Ghi FRM-519 với kết quả PASS hoặc HOLD và nêu rõ điểm giữ nếu có.</td>
+                <td>Ly do: quyết định pre-run phải để lại dấu vết.</td>
+                <td>Record đủ người ký, đủ thời điểm và đủ lý do.</td>
+                <td>Không cho mở cycle nếu record còn trống hoặc mơ hồ.</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>Mở Cycle Start chỉ sau khi checkpoint đã PASS và mọi người ký bắt buộc đã xác nhận.</td>
+                <td>Ly do: release phải theo record, không theo cảm tính.</td>
+                <td>Checkpoint đã đóng đúng rule của Job.</td>
+                <td>Giữ job cho tới khi đủ thẩm quyền release.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-519, machine hoặc được phép chạy theo một quyết định pre-run sạch, hoặc bị giữ với lý do và phạm vi rõ ràng để xử lý tiếp.</div>
+      </section>
+
+      <section id="wi-s6" class="wi-section">
+        <h2>6. Hồ sơ & bằng chứng</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Hồ sơ</th>
+                <th>Nội dung</th>
+                <th>Lưu trữ</th>
+                <th>Trách nhiệm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="../../../mom/docs/forms/frm-500-production/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx" download>FRM-519</a></td>
+                <td>Trigger checkpoint, kết quả PASS/HOLD, điểm giữ và người ký.</td>
+                <td>Hồ sơ Job có kiểm soát.</td>
+                <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a></td>
+              </tr>
+              <tr>
+                <td><a href="../../../mom/docs/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" download>FRM-511</a></td>
+                <td>Part đầu, prove-out hoặc restart cần đo lại sau checkpoint.</td>
+                <td>Hồ sơ first piece hoặc FAI.</td>
+                <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
+              </tr>
+              <tr>
+                <td>Hold log hoặc abnormality record</td>
+                <td>Machine hold, lot hold, nguyên nhân và quyết định gỡ hold.</td>
+                <td>Job dossier và hệ thống quản lý bất thường.</td>
+                <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="wi-s7" class="wi-section">
+        <h2>7. Tài liệu liên quan</h2>
+        <div class="doc-link-row">
+          <a class="doc-link" href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>
+          <a class="doc-link" href="../../03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>
+          <a class="doc-link" href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>
+          <a class="doc-link" href="wi-518-work-transfer-validation.html">WI-518</a>
+          <a class="doc-link" href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

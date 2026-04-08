@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<title>DI - Drill CAM Release Changecontrol | HESEM MOM</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+
+<style>
+ .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+ .tight li{
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+}
+</style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+</head>
+<body>
+
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">Drill CAM Release Changecontrol</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">DI</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">Bộ diễn tập</div>
+<h1 class="h1">DI - Drill CAM Release Changecontrol</h1>
+<p class="lead">
+ Diễn tập này biến "lập trình xong" thành <b>phát hành đúng hệ thống</b>: pack đầy đủ, có DCR hồ sơ, có xác minh và bàn giao bằng SSOT.
+ </p>
+</div>
+<div class="grid-2">
+<div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Material</b>.
+</div>
+<div class="card">
+<span class="badge">Mục tiêu</span>
+<ul class="tight">
+<li>Phát hành chương trình (program phát hành) có đủ pack và bằng chứng mô phỏng.</li>
+<li>Thay đổi REV không làm chạy sai chương trình.</li>
+<li>Pack cũ được lưu trữ và truy xuất nguồn gốc được.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Năng lực kích hoạt</span>
+<ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C17"><b>C17</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C10"><b>C10</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li></ul>
+</div>
+</div>
+<div class="card">
+<span class="badge">Chuẩn bị</span>
+<ul class="tight">
+<li>01 job có drawing/spec và có thay đổi REV và tạo thay đổi tình huống.</li>
+<li>Template mốc chuẩn pack tại 10_Engineering/.</li>
+<li>Quy tắc đặt tên: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Trình tự thực hiện</span>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Xác nhận đầu vào: drawing/spec đúng REV và CTQ list đã chốt.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Link đầu vào tập tin + REV xác nhận note</td><td>STOP</td></tr><tr><td>2</td><td>Tạo program + danh sách dao cụ + phiếu cài đặt theo template mốc chuẩn.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Program file + danh sách dao cụ + phiếu cài đặt</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Chạy mô phỏng/xác minh và lưu bằng chứng (ảnh hoặc báo cáo).</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Mô phỏng báo cáo/ảnh</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Gói phát hành: đặt tên file đúng chuẩn, tạo DCR hồ sơ (REV, date, lý do).</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Phát hành log + link pack</td><td>CHẶN</td></tr><tr><td>5</td><td>Phát hành: cập nhật Hồ sơ công việc (hồ sơ công việc)/10_Engineering/ và gửi link cho Setup/Sản xuất.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>SharePoint link + bàn giao log</td><td>FAIL</td></tr><tr><td>6</td><td>Thay đổi tình huống: nhận drawing REV mới → thu hồi pack cũ, lưu trữ, tạo pack mới và chạy xác minh lại.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Thay đổi thông báo + new pack + lưu trữ bằng chứng</td><td>CHẶN</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card danger">
+<span class="badge">Fail-nhanh</span>
+<ul class="tight">
+<li>Phát hành program khi chưa có mô phỏng/xác minh bằng chứng.</li>
+<li>Không có DCR hồ sơ khi thay đổi REV.</li>
+<li>Pack cũ không lưu trữ dẫn tới nhầm lẫn tại phân xưởng.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Tiêu chí đánh giá chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-nhanh.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
+<tbody>
+<tr><td><b>Đầu vào control</b></td><td>Đầu vào file được kiểm soát và đúng REV; CTQ list có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>Phát hành tính đầy đủ</b></td><td>Program + danh sách dao cụ + phiếu cài đặt + mô phỏng bằng chứng đầy đủ.</td><td>0/1/2</td></tr><tr><td><b>Thay đổi kỷ luật / chuyên ngành</b></td><td>Pack cũ được lưu trữ; pack mới có DCR hồ sơ và xác minh lại.</td><td>0/1/2</td></tr><tr><td><b>Bàn giao</b></td><td>Setup/Sản xuất nhận link SSOT; không gửi file đính kèm qua chat.</td><td>0/1/2</td></tr><tr><td><b>Hồ sơ chất lượng</b></td><td>Tên file đúng chuẩn; không có trùng tên/ghi đè.</td><td>0/1/2</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<span class="badge">MRR tối thiểu</span>
+<ul class="tight">
+<li>Program file + danh sách dao cụ + phiếu cài đặt theo đặt tên rule.</li>
+<li>Mô phỏng/xác minh bằng chứng.</li>
+<li>Phát hành log + DCR hồ sơ.</li>
+<li>bằng chứng lưu trữ pack cũ tại 90_Archive/ (link SSOT).</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>

@@ -1,18 +1,18 @@
 #!/bin/bash
 # ============================================================
-# HESEM QMS Data Backup Script
-# Run daily via cron: 0 2 * * * /path/to/backup-qms-data.sh
+# HESEM MOM Data Backup Script
+# Run daily via cron: 0 2 * * * /path/to/backup-data.sh
 # ============================================================
 
 set -euo pipefail
 
 # ── Configuration ──
-BACKUP_DIR="/backups/qms-data"
-SOURCE_DIR="/var/www/qms.hesem.com.vn/01-QMS-Portal/qms-data"
+BACKUP_DIR="/backups/data"
+SOURCE_DIR="/var/www/qms.hesem.com.vn/mom/data"
 LOG_FILE="${BACKUP_DIR}/backup-log.txt"
 KEEP_COUNT=30
 DATE=$(date +%Y%m%d_%H%M%S)
-ARCHIVE_NAME="qms-data_${DATE}.tar.gz"
+ARCHIVE_NAME="data_${DATE}.tar.gz"
 ARCHIVE_PATH="${BACKUP_DIR}/${ARCHIVE_NAME}"
 
 # ── Ensure backup directory exists ──
@@ -56,11 +56,11 @@ else
 fi
 
 # ── Rotate old backups (keep last N) ──
-TOTAL=$(ls -1t "${BACKUP_DIR}"/qms-data_*.tar.gz 2>/dev/null | wc -l)
+TOTAL=$(ls -1t "${BACKUP_DIR}"/data_*.tar.gz 2>/dev/null | wc -l)
 if [ "${TOTAL}" -gt "${KEEP_COUNT}" ]; then
     REMOVE_COUNT=$((TOTAL - KEEP_COUNT))
     log "Rotating: removing ${REMOVE_COUNT} old backup(s) (keeping ${KEEP_COUNT})"
-    ls -1t "${BACKUP_DIR}"/qms-data_*.tar.gz | tail -n "${REMOVE_COUNT}" | while read -r OLD; do
+    ls -1t "${BACKUP_DIR}"/data_*.tar.gz | tail -n "${REMOVE_COUNT}" | while read -r OLD; do
         rm -f "${OLD}"
         log "Removed: $(basename "${OLD}")"
     done

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CNC Form Template Study | HESEM MOM</title>
+  <style>
+    :root{--bg:#eef3f8;--paper:#fff;--ink:#102437;--muted:#617487;--line:#d2dbe5;--brand:#0c2d48;--blue:#1565c0;--shadow:0 24px 60px rgba(16,36,55,.08)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Segoe UI Variable","Segoe UI",sans-serif;background:radial-gradient(circle at top left, rgba(21,101,192,.14), transparent 32%),linear-gradient(180deg,#f5f8fb,var(--bg));color:var(--ink)}
+    .page{background-image:linear-gradient(rgba(12,45,72,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(12,45,72,.05) 1px,transparent 1px);background-size:28px 28px}
+    .wrap{width:min(1240px,calc(100% - 32px));margin:0 auto}
+    .hero{padding:28px 0 18px}.hero-box{padding:28px;border-radius:30px;color:#fff;background:linear-gradient(135deg,rgba(12,45,72,.98),rgba(13,56,94,.92) 48%,rgba(21,101,192,.86));box-shadow:var(--shadow)}
+    .brand{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.78);margin-bottom:24px}
+    .hero-grid{display:grid;grid-template-columns:1.15fr .9fr;gap:26px}.eyebrow{margin:0 0 12px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9fc6ef}
+    h1{margin:0;font-family:"Bahnschrift","Segoe UI Variable","Segoe UI",sans-serif;font-size:clamp(32px,5vw,56px);line-height:1.02;letter-spacing:-.03em;max-width:11ch}
+    .hero-copy p{margin:18px 0 0;max-width:60ch;color:rgba(255,255,255,.88);line-height:1.65}
+    .thesis{display:grid;gap:10px;margin-top:24px}.thesis div{display:grid;grid-template-columns:140px 1fr;gap:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}.thesis b{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#9fc6ef}.thesis span{line-height:1.55;color:rgba(255,255,255,.88)}
+    .poster{padding:18px;border:1px solid rgba(255,255,255,.15);border-radius:24px;background:rgba(8,18,31,.24)}.poster-top{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.mini{padding:14px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}.mini strong{display:block;font-size:24px;line-height:1}.mini span{display:block;margin-top:6px;font-size:12px;line-height:1.45;color:rgba(255,255,255,.72)}
+    .board{padding:14px;border-radius:20px;background:#f7fafc;color:var(--ink)}.chips,.lanes,.tokens,.pill-row{display:flex;flex-wrap:wrap;gap:8px}.chip,.token,.pill{padding:7px 10px;border-radius:999px;font-size:12px;font-weight:600}.chip,.pill{background:#fff;border:1px solid #cddaea}.token{background:#edf4fb;border:1px solid #cadef0;color:#27517b}
+    .lane{flex:1 1 120px;padding:12px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(180deg,#fff,#f8fbff)}.lane b{display:block;margin-bottom:6px;font-size:13px}.lane small{display:block;color:var(--muted);line-height:1.45}
+    section{padding:24px 0;border-top:1px solid rgba(12,45,72,.08)}.head{display:flex;justify-content:space-between;align-items:end;gap:16px 24px;margin-bottom:18px;flex-wrap:wrap}.head h2{margin:0;font-family:"Bahnschrift","Segoe UI Variable","Segoe UI",sans-serif;font-size:30px;letter-spacing:-.03em}.head p{margin:0;max-width:62ch;color:var(--muted);line-height:1.6}
+    .grid5,.grid4,.grid3{display:grid;gap:14px}.grid5{grid-template-columns:repeat(5,1fr)}.grid4{grid-template-columns:repeat(4,1fr)}.grid3{grid-template-columns:repeat(3,1fr)}
+    .card,.runtime-stage,.modules-stage,.examples-stage{padding:18px;border-radius:24px;border:1px solid var(--line);background:rgba(255,255,255,.86);box-shadow:0 18px 40px rgba(16,36,55,.04)}.card strong{display:block;margin-bottom:8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}.card span,.card p{display:block;margin:0;color:var(--muted);line-height:1.58;font-size:14px}
+    .runtime,.modules,.examples{display:grid;grid-template-columns:320px 1fr;gap:18px}.stack{display:grid;gap:10px}.stack button{width:100%;padding:15px 16px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.8);text-align:left;cursor:pointer;font:inherit;color:var(--ink)}.stack button.active{background:#fff;border-color:rgba(12,45,72,.4);box-shadow:0 18px 34px rgba(16,36,55,.08)}
+    .runtime-stage h3,.examples-stage h3{margin:0 0 8px;font-size:24px;letter-spacing:-.03em}.runtime-stage p,.examples-stage p{margin:0;color:var(--muted);line-height:1.65}
+    .meta2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.box{padding:14px;border:1px solid var(--line);border-radius:16px;background:#f8fbff}.box strong{display:block;margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--brand)}.box span{display:block;color:var(--muted);font-size:14px;line-height:1.5}
+    .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}.step{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fff}.step b{display:block;margin-bottom:8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--brand)}.step span{display:block;color:var(--muted);font-size:12px;line-height:1.5}
+    .wire{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff}.wire-top,.toolbar{padding:12px 16px;border-bottom:1px solid var(--line);background:#f5f8fc;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px}.wire-body,.canvas{padding:16px;display:grid;gap:12px;background:#f7fafc}
+    .block,.boxy{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fff}.block strong,.boxy h4{display:block;margin:0 0 10px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--brand)}.block.focus{border-color:rgba(21,101,192,.45);box-shadow:0 0 0 3px rgba(21,101,192,.14);transform:translateY(-1px)}
+    .line{height:12px;border-radius:999px;background:#e6eef7;margin-bottom:8px}.line.s{width:52%}.line.m{width:72%}.line.l{width:100%}.two{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.table,.measures{display:grid;gap:8px}.row{display:grid;grid-template-columns:44px 72px 1fr 110px 80px 90px;gap:6px}.row div{height:28px;border-radius:10px;background:#eef4fb}.row.head div,.mrow.head div{background:#d7e4f3}
+    .mrow{display:grid;grid-template-columns:1.4fr .65fr .65fr .8fr .85fr;gap:8px}.mrow div{padding:10px;border-radius:12px;background:#edf4fb;min-height:38px;font-size:12px;color:#35506a;display:flex;align-items:center}.mrow.head div{font-weight:700;text-transform:uppercase;font-size:11px}
+    .modules-detail,.source{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--muted);line-height:1.65}.modules-detail strong,.source strong{display:block;margin-bottom:6px;color:var(--ink);font-size:16px}
+    .sources{display:grid;gap:10px}.note{margin-top:18px;padding-top:18px;border-top:1px solid rgba(12,45,72,.08);color:var(--muted);font-size:13px;line-height:1.65}
+    @media (max-width:1120px){.hero-grid,.runtime,.modules,.examples{grid-template-columns:1fr}.grid5,.grid4,.grid3,.steps{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:760px){.wrap{width:min(100% - 20px,1240px)}.hero-box{padding:20px}.hero-grid,.grid5,.grid4,.grid3,.meta2,.steps,.two{grid-template-columns:1fr}.thesis div{grid-template-columns:1fr}.row{grid-template-columns:36px 56px 1fr}.row div:nth-child(n+4),.mrow div:nth-child(4),.mrow div:nth-child(5){display:none}.mrow{grid-template-columns:1.4fr .7fr .8fr}.head h2{font-size:26px}h1{max-width:none}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="wrap">
+        <div class="hero-box">
+          <div class="brand"><span>HESEM CNC Form Runtime Study</span><span>Online + Hybrid + Download-Controlled</span></div>
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">Form System Thesis</p>
+              <h1>Template form online cho job order CNC phải vận hành như một hệ điều khiển hồ sơ.</h1>
+              <p>Thiết kế này nối core standards nội bộ với chuẩn quốc tế về documented information, traceability, work instructions và audit trail để tạo một form system linh động cao nhưng vẫn giữ ngôn ngữ đồng bộ, chuyên nghiệp và revision-ready.</p>
+              <div class="thesis">
+                <div><b>Visual Thesis</b><span>Ngôn ngữ “precision traveler desk”: sáng, kỹ thuật, ít màu, nhấn vào control strip, section band và khối dữ liệu đang chạy trên bàn điều độ.</span></div>
+                <div><b>Content Plan</b><span>Mở bằng thesis, sau đó runtime mode, thư viện module, 2 form anchor cho CNC, editor module và mapping vào codebase hiện tại.</span></div>
+                <div><b>Interaction Thesis</b><span>Cho đổi runtime mode, chọn form mẫu và highlight từng module trên preview để thấy rõ form co giãn ra sao trên desktop và mobile.</span></div>
+              </div>
+            </div>
+            <div class="poster">
+              <div class="poster-top">
+                <div class="mini"><strong>3</strong><span>runtime mode thống nhất</span></div>
+                <div class="mini"><strong>8</strong><span>module lõi cho hầu hết form CNC</span></div>
+                <div class="mini"><strong>2</strong><span>anchor forms: FRM-519, FRM-511</span></div>
+              </div>
+              <div class="board">
+                <div class="chips" style="margin-bottom:10px">
+                  <div class="chip">Record ID</div><div class="chip">Job / WO</div><div class="chip">Part / Rev</div><div class="chip">Operation</div><div class="chip">Evidence Pack</div>
+                </div>
+                <div class="lanes">
+                  <div class="lane"><b>Online-native</b><small>Point-of-use, autosave, gate tức thời.</small></div>
+                  <div class="lane"><b>Hybrid workbook</b><small>Online shell + workbook controlled.</small></div>
+                  <div class="lane"><b>Download-controlled</b><small>Record ID, checksum, upload receipt.</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section>
+        <div class="head">
+          <h2>Core Standard Lens</h2>
+          <p>Form không nên “đẹp trước, kiểm soát sau”. Những nguyên tắc dưới đây là lớp xương sống để tránh tạo ra giao diện đẹp nhưng vô ích với shopfloor và audit.</p>
+        </div>
+        <div class="grid5">
+          <div class="card"><strong>Medium Agnostic</strong><span>Documented information có thể là giấy, điện tử, ảnh, mẫu chuẩn hay workbook. Template phải sinh được nhiều medium chứ không khóa vào một giao diện.</span></div>
+          <div class="card"><strong>Maintain + Retain</strong><span>Form phải vừa hỗ trợ thao tác đúng ở lúc chạy việc, vừa giữ được bản ghi để chứng minh về sau.</span></div>
+          <div class="card"><strong>Traceability</strong><span>Traceability chuẩn không chỉ là lot mà còn là material, human, machine, method, measurement, thời điểm và exception.</span></div>
+          <div class="card"><strong>Point-of-Use</strong><span>Work instructions mạnh nhất khi gắn đúng order, operation, machine, resource và revision đang chạy.</span></div>
+          <div class="card"><strong>Right-First-Time</strong><span>Giảm field thừa, khóa logic sai, gom evidence tại điểm sinh dữ liệu và cho phép review by exception.</span></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="head">
+          <h2>Runtime Mode</h2>
+          <p>Không phải form nào cũng nên lên online 100%. Kiến trúc đúng là cùng một schema nhưng có nhiều runtime mode tùy chiều rộng bảng, nhịp sử dụng và nhu cầu sign-off.</p>
+        </div>
+        <div class="runtime">
+          <div class="stack">
+            <button class="mode-btn active" data-mode="online"><strong>Online-native</strong><br><span>Checklist ngắn, gate verification, daily capture, escalation tại máy.</span></button>
+            <button class="mode-btn" data-mode="hybrid"><strong>Hybrid workbook</strong><br><span>Measurement-heavy, cần print hoặc ký nhưng vẫn phải có control shell online.</span></button>
+            <button class="mode-btn" data-mode="download"><strong>Download-controlled</strong><br><span>Workbook-first, logic rộng, nhưng blank file và return vẫn nằm trong kiểm soát.</span></button>
+          </div>
+          <div class="runtime-stage">
+            <h3 id="modeTitle">Online-native</h3>
+            <p id="modeSummary">Runtime này biến form thành bề mặt vận hành trực tiếp tại điểm dùng. Mọi field đều gắn validation, autosave, visibility rule, escalation logic và evidence capture ngay trong ca chạy.</p>
+            <div class="tokens" id="modeTokens"></div>
+            <div class="meta2">
+              <div class="box"><strong>Phù hợp nhất</strong><span id="modeFit"></span></div>
+              <div class="box"><strong>Kiểm soát bắt buộc</strong><span id="modeControl"></span></div>
+              <div class="box"><strong>Không nên dùng khi</strong><span id="modeAvoid"></span></div>
+              <div class="box"><strong>Tài sản sinh ra</strong><span id="modeOutput"></span></div>
+            </div>
+            <div class="steps" id="modeSteps"></div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="head">
+          <h2>Module Library</h2>
+          <p>Template nên được compose từ module đã chuẩn hóa chứ không thiết kế từng form như một cá thể riêng. Mỗi module có vai trò dữ liệu, vai trò audit và vai trò hiển thị.</p>
+        </div>
+        <div class="modules">
+          <div class="stack">
+            <button class="module-btn active" data-module="control"><strong>01. Control Shell</strong><br><span>Code, rev, effective date, owner, approver, Record ID, runtime badge.</span></button>
+            <button class="module-btn" data-module="context"><strong>02. Job Context Band</strong><br><span>Job / WO, part / rev, operation, machine, shift, operator, routing links.</span></button>
+            <button class="module-btn" data-module="check"><strong>03. Gate Checklist</strong><br><span>Type A, derived gate, inline hold / fail action.</span></button>
+            <button class="module-btn" data-module="measure"><strong>04. Measurement Grid</strong><br><span>Nominal, actual, limits, method, result, evidence.</span></button>
+            <button class="module-btn" data-module="decision"><strong>05. Decision &amp; Escalation</strong><br><span>Proceed, hold, owner, due date, rollback trigger.</span></button>
+            <button class="module-btn" data-module="evidence"><strong>06. Evidence Rail</strong><br><span>Ảnh, CMM, cert, CAM, traveler, WI, setup sheet.</span></button>
+            <button class="module-btn" data-module="approval"><strong>07. Approval &amp; Signature</strong><br><span>Prepared, reviewed, approved, timestamp, delegation.</span></button>
+            <button class="module-btn" data-module="files"><strong>08. Related Files &amp; Revision</strong><br><span>Workbook, superseded copy, checksum, release package.</span></button>
+          </div>
+          <div class="modules-stage">
+            <div class="wire">
+              <div class="wire-top"><span>Desktop Form Composition</span><span>Operator / QA / Supervisor</span></div>
+              <div class="wire-body">
+                <div class="block focus" data-block="control"><strong>Control Shell</strong><div class="two"><div class="line l"></div><div class="line s"></div><div class="line m"></div><div class="line s"></div></div></div>
+                <div class="block" data-block="context"><strong>Job Context Band</strong><div class="two"><div class="line l"></div><div class="line l"></div><div class="line m"></div><div class="line m"></div></div></div>
+                <div class="block" data-block="check"><strong>Gate Checklist</strong><div class="table"><div class="row head"><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="row"><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="row"><div></div><div></div><div></div><div></div><div></div><div></div></div></div></div>
+                <div class="block" data-block="measure"><strong>Measurement Grid</strong><div class="table"><div class="row head"><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="row"><div></div><div></div><div></div><div></div><div></div><div></div></div></div></div>
+                <div class="two">
+                  <div class="block" data-block="decision"><strong>Decision &amp; Escalation</strong><div class="line l"></div><div class="line m"></div><div class="line s"></div></div>
+                  <div class="block" data-block="evidence"><strong>Evidence Rail</strong><div class="line l"></div><div class="line l"></div><div class="line s"></div></div>
+                </div>
+                <div class="two">
+                  <div class="block" data-block="approval"><strong>Approval &amp; Signature</strong><div class="line m"></div><div class="line l"></div></div>
+                  <div class="block" data-block="files"><strong>Related Files &amp; Revision</strong><div class="line l"></div><div class="line m"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="modules-detail" id="moduleDetail"><strong>Control Shell</strong>Đây là lớp không được bỏ qua. Nó làm cho mọi form nhìn chuyên nghiệp ngay từ đầu và quan trọng hơn là luôn cho thấy mã form, revision, status phát hành, owner, approver, Record ID, runtime mode và export state ở một vùng cố định.</div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="head">
+          <h2>CNC Form Anchors</h2>
+          <p>Hai form dưới đây đại diện cho hai nhịp vận hành khác nhau: quick gate tại máy và setup / first-piece với dữ liệu đo, evidence và sign-off sâu hơn.</p>
+        </div>
+        <div class="examples">
+          <div class="stack">
+            <button class="example-btn active" data-example="frm519"><strong>FRM-519 · Pre-Run Verification</strong><br><span>Online-first, 2 phút max, scan-to-open, gate tức thời.</span></button>
+            <button class="example-btn" data-example="frm511"><strong>FRM-511 · Setup &amp; First-Piece</strong><br><span>Hybrid, measurement-heavy, ảnh setup, QA gate, signed return.</span></button>
+          </div>
+          <div class="examples-stage">
+            <h3 id="exampleTitle">FRM-519 nên chạy online-native</h3>
+            <p id="exampleSummary">Pre-run verification là bước kiểm cuối trước khi cắt phôi. Thời lượng ngắn, logic rõ, lặp lại nhiều theo order hoặc operation nên giao diện phải mở thẳng vào checklist, tự điền context từ job packet và cho kết quả Proceed / Hold ngay tại chỗ.</p>
+            <div class="tokens" id="exampleTokens"></div>
+            <div class="meta2">
+              <div class="box"><strong>Mục tiêu chính</strong><span id="exampleGoal"></span></div>
+              <div class="box"><strong>Runtime đề xuất</strong><span id="exampleMode"></span></div>
+              <div class="box"><strong>Điểm kiểm soát</strong><span id="exampleControl"></span></div>
+              <div class="box"><strong>Vì sao đúng chuẩn</strong><span id="exampleWhy"></span></div>
+            </div>
+            <div class="wire" style="margin-top:14px">
+              <div class="toolbar"><span id="toolbarLeft">FRM-519 · Operator Surface</span><span id="toolbarRight">Order-bound · Revision-aware · Evidence-linked</span></div>
+              <div class="canvas" id="exampleCanvas"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="head">
+          <h2>Editor Module</h2>
+          <p>“Có module để chỉnh sửa file” không nên chỉ là rich-text editor. Nó phải là schema studio có rules, workbook packaging và publish governance để form thay đổi mà không đứt kiểm soát.</p>
+        </div>
+        <div class="grid3">
+          <div class="card"><strong>Schema Library</strong><span>Chọn loại form A-F, runtime mode, ref fields tối thiểu, module được phép dùng, evidence contract và retention rule.</span></div>
+          <div class="card"><strong>Canvas Composer</strong><span>Kéo thả module, xem desktop/mobile preview, print-safe behavior và giới hạn chiều rộng trước khi phát hành.</span></div>
+          <div class="card"><strong>Rule Matrix</strong><span>Thiết lập PASS/HOLD/FAIL, derived gate, required evidence, signer roles, conditional visibility và filename rule.</span></div>
+          <div class="card"><strong>Workbook Packager</strong><span>Dùng cùng schema để sinh blank workbook, printable export, checksum và mapping về form control register.</span></div>
+          <div class="card"><strong>Release Gate</strong><span>Peer review, diff summary, effective date, approver, test cases và superseded visibility trước khi publish.</span></div>
+          <div class="card"><strong>Offline Safety</strong><span>Cache draft local cho online form; với hybrid/download thì cấp controlled blank và upload receipt khi có mạng.</span></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="head">
+          <h2>Fit With Current Repo</h2>
+          <p>Repo hiện đã có nhiều mảnh ghép tốt. Việc tiếp theo không phải thay toàn bộ mà là gắn chúng vào cùng một kiến trúc runtime.</p>
+        </div>
+        <div class="grid4">
+          <div class="card"><strong>09-online-forms.js</strong><span>Đang là renderer cơ bản; nên nâng thành runtime theo schema module, mode badge, evidence zone và revision context.</span></div>
+          <div class="card"><strong>03-editor-core.js</strong><span>Đã có block, table, approval, action, risk. Đây là nền để dựng template studio thay vì viết editor mới.</span></div>
+          <div class="card"><strong>form_engine.py</strong><span>Đang mạnh ở workbook-first logic. Nên trở thành nhánh output từ cùng schema cho hybrid/download modes.</span></div>
+          <div class="card"><strong>form-control-register</strong><span>Đang là SSOT release package. Runtime mới nên đọc đúng nguồn này để phân loại online, hybrid và download-controlled.</span></div>
+        </div>
+        <div class="grid3" style="margin-top:14px">
+          <div class="card"><strong>Wave 1</strong><span>Tạo schema chuẩn cho runtime mode, module registry, evidence contract và form classification map cho 111 form release.</span></div>
+          <div class="card"><strong>Wave 2</strong><span>Triển khai thật FRM-519 online-native và FRM-511 hybrid vì đây là cặp tốt nhất để test cả quick gate lẫn measurement + sign-off.</span></div>
+          <div class="card"><strong>Wave 3</strong><span>Gắn schema studio vào editor hiện có, thêm publish workflow, workbook sync và superseded visibility trước khi rollout rộng.</span></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="head">
+          <h2>Research Base</h2>
+          <p>Các nguồn dưới đây được kiểm tra trực tiếp ngày 27/03/2026 để chốt luận điểm về documented information, digital work instructions, traceability và audit-ready form runtime.</p>
+        </div>
+        <div class="sources">
+          <div class="source"><strong>ISO documented information</strong>Documented information có thể tồn tại ở nhiều medium; tổ chức vừa phải maintain để vận hành vừa retain để chứng minh thực hiện.<br><a href="https://www.iso.org/files/live/sites/isoorg/files/standards/docs/en/iso_9001_2015_guidance_documented_information.pdf">ISO guidance on documented information</a></div>
+          <div class="source"><strong>ISO quality principles</strong>Customer focus, process approach, evidence-based decision making và continual improvement là nền để form hỗ trợ quyết định thay vì chỉ lưu.<br><a href="https://www.iso.org/quality-management/principles">ISO quality management principles</a></div>
+          <div class="source"><strong>FDA Part 11 lens</strong>Hồ sơ điện tử cần tính đến tạo, sửa, lưu, archive, retrieve, transmit và khả năng tạo human-readable copy; đây là cơ sở tốt cho audit trail và export.<br><a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application">FDA Part 11 guidance</a></div>
+          <div class="source"><strong>Siemens traceability lens</strong>Traceability đầy đủ bao gồm material, human, machine, method, measurement, exceptions, rework, dates/times và electronic signatures.<br><a href="https://www.siemens.com/en-us/technology/lot-traceability/">Siemens lot traceability</a><br><a href="https://plm.sw.siemens.com/en-US/opcenter/quality-x-cloud-qms/">Siemens Opcenter X Quality</a></div>
+          <div class="source"><strong>SAP execution lens</strong>Work instructions và process data nên được gắn cho material, routing, order, activity và resource; digital manufacturing đặt trọng tâm vào control, scrap/rework và standardized execution.<br><a href="https://www.sap.com/products/scm/digital-manufacturing.html">SAP Digital Manufacturing</a><br><a href="https://help.sap.com/docs/sap-digital-manufacturing/execution/work-instructions">SAP work instructions</a></div>
+          <div class="source"><strong>Tulip + ProShop lens</strong>Digital forms phải hỗ trợ audit trail, electronic signatures, point-of-capture traceability; với CNC thì operator cần visual work instructions, CAM links, BOM, specs và revision history ngay trong job context.<br><a href="https://tulip.co/trust-center/compliance/">Tulip compliance</a><br><a href="https://tulip.co/traceability-and-compliance/">Tulip traceability &amp; compliance</a><br><a href="https://proshoperp.com/product/visual-work-instructions/">ProShop visual work instructions</a></div>
+        </div>
+        <div class="note">Kết luận của study này là: hệ form của HESEM không nên chia “online” và “Excel” thành hai thế giới tách biệt. Hướng mạnh hơn là một schema thống nhất có nhiều runtime mode. Điều đó vừa giữ tính đồng bộ chuyên nghiệp của bộ form, vừa cho phép mỗi form được đặt đúng medium để phục vụ job order CNC và audit theo chuẩn toàn cầu.</div>
+      </section>
+    </main>
+    <script>
+      const modes={
+        online:{title:"Online-native",summary:"Runtime này biến form thành bề mặt vận hành trực tiếp tại điểm dùng. Mọi field đều gắn validation, autosave, visibility rule, escalation logic và evidence capture ngay trong ca chạy.",fit:"FRM-519, FRM-204, FRM-208, checklist theo order, shift hoặc event.",control:"Revision visible, autosave draft, required evidence, approval state và export bản human-readable.",avoid:"Bảng quá rộng, cần ký tay tại xưởng hoặc workbook formula chuyên sâu.",output:"JSON record, PDF snapshot, evidence pack, audit trail, link dossier.",tokens:["point-of-use","autosave","derived gate","conditional logic","fast operator flow"],steps:[["Context preload","Lấy job, part, rev, operation, machine, shift và role từ packet hoặc barcode."],["Guided capture","Hiện đúng checklist, note, input và attachment theo bối cảnh."],["Derived decision","Tự tính Proceed / Hold / Escalate từ checklist và measurement."],["Evidence bind","Ảnh, file, comment, signer và timestamp gắn vào record."],["Human-readable export","Sinh PDF snapshot hoặc report để archive và review."]]},
+        hybrid:{title:"Hybrid workbook",summary:"Runtime này dùng online form làm control shell và structured capture, nhưng vẫn duy trì workbook hoặc bản in chuẩn cho những phần cần ký, layout rộng hoặc formula đang vận hành ổn định.",fit:"FRM-511, FRM-302, FAI, setup sheets, measurement-heavy forms.",control:"Same Record ID, same revision, workbook checksum, upload receipt và dossier link.",avoid:"Quick checks cực ngắn hoặc forms lặp nhiều lần trong ngày.",output:"Online header record, downloadable workbook, signed upload, evidence bundle.",tokens:["online shell","print-safe","checksum","upload return","evidence sync"],steps:[["Online shell","Tạo Record ID, khóa revision, prefill job context."],["Controlled download","Tải workbook đúng revision với checksum và filename rule."],["Execution","Điền measurement, setup notes, sign-off online hoặc offline."],["Return + verify","Upload workbook/PDF; hệ thống check filename và revision."],["Bind to dossier","Record online giữ index, status và final snapshot."]]},
+        download:{title:"Download-controlled",summary:"Runtime này chấp nhận workbook-first là mặt thi công chính, nhưng không cho nó sống ngoài kiểm soát. Portal đóng vai control tower cho blank file, revision, checksum, Record ID và submission receipt.",fit:"GR&R, statistical forms, label packs, workbook logic sâu.",control:"Blank file source of truth, controlled filename, superseded lock, submission receipt.",avoid:"Form cần alert, escalation real-time hoặc operator guidance theo step.",output:"Record ID, controlled blank, download log, upload receipt, archive pointer.",tokens:["workbook-first","release package","download log","receipt","archive trace"],steps:[["Issue blank","Portal cấp blank file đúng revision và checksum."],["Track download","Ghi ai lấy file nào, thời điểm nào, cho job nào."],["Offline completion","Người dùng điền workbook tại nơi phù hợp."],["Controlled return","Portal nhận file và tạo receipt."],["Retention control","Link file vào register và archive policy."]]}
+      };
+      const moduleText={
+        control:"Đây là lớp không được bỏ qua. Nó làm cho mọi form nhìn chuyên nghiệp ngay từ đầu và luôn cho thấy mã form, revision, status phát hành, owner, approver, Record ID, runtime mode và export state.",
+        context:"Form CNC không được bắt operator gõ lại những gì hệ thống đã biết. Job / WO, part / rev, routing, machine, shift, operator và links cần được prefill và khóa đúng chỗ.",
+        check:"Bám core standard Type A: checklist ngắn, category rõ, acceptance criteria gọn, gate suy ra từ checklist. Nếu HOLD hoặc FAIL thì action phải nằm ngay cạnh item phát sinh.",
+        measure:"Dùng cho setup, first-piece, FAI hoặc in-process checks. Bảng phải đủ chặt để nhập nominal, actual, limits, method, result và evidence nhưng vẫn đọc nhanh tại máy.",
+        decision:"Mọi form CNC đều cần nơi quyết định rõ: Proceed, Conditional Run, Hold hay Escalate. Khối này lưu hold reason, owner, due date, next action và rollback trigger.",
+        evidence:"Evidence không chỉ là file đính kèm. Nó phải có loại, nguồn, revision, checksum hoặc device reference nếu cần: ảnh setup, CMM, CAM output, cert, traveler, WI.",
+        approval:"Khối này tách rõ prepared, reviewed, approved, delegate, timestamp và mode ký. Nếu là electronic signature thì vẫn phải tạo human-readable record.",
+        files:"Một form không sống đơn độc. Nó kéo theo setup sheet, WI, SOP, blank workbook, superseded copy, evidence pack và audit export."
+      };
+      const examples={
+        frm519:{title:"FRM-519 nên chạy online-native",summary:"Pre-run verification là bước kiểm cuối trước khi cắt phôi. Thời lượng ngắn, logic rõ, lặp lại nhiều theo order hoặc operation nên giao diện phải mở thẳng vào checklist, tự điền context từ job packet và cho kết quả Proceed / Hold ngay tại chỗ.",goal:"Rút việc xác nhận packet về một bề mặt point-of-use, không ép operator tải workbook cho thao tác 2 phút.",mode:"Online-native với autosave draft và PDF snapshot cuối ca.",control:"Drawing rev, program rev, tooling, routing, material, run decision, escalation khi HOLD.",why:"Đúng với Type A lean checklist, derived gate và logic point-of-use của job order CNC.",tokens:["2-min max","scan-to-open","operator-first","derived gate","mobile-safe"],left:"FRM-519 · Operator Surface",right:"Order-bound · Revision-aware · Evidence-linked",canvas:`<div class="pill-row"><div class="pill">Scan job packet</div><div class="pill">Verify rev / tooling / material</div><div class="pill">Proceed or Hold</div></div><div class="boxy"><h4>Context</h4><div class="two"><div class="line l"></div><div class="line l"></div><div class="line m"></div><div class="line m"></div></div></div><div class="boxy"><h4>Quick Gate Checklist</h4><div class="measures"><div class="mrow head"><div>Check item</div><div>Cat</div><div>Result</div><div>Owner</div><div>Evidence</div></div><div class="mrow"><div>Drawing revision matches released packet</div><div>DOC</div><div>PASS</div><div>Operator</div><div>Auto-linked</div></div><div class="mrow"><div>Program revision matches setup sheet</div><div>SET</div><div>PASS</div><div>Operator</div><div>Program ID</div></div><div class="mrow"><div>Material matches specification</div><div>TEC</div><div>HOLD</div><div>Operator</div><div>Photo</div></div></div></div><div class="two"><div class="boxy"><h4>Decision</h4><div class="line l"></div><div class="line m"></div><div class="line s"></div></div><div class="boxy"><h4>Escalation</h4><div class="line l"></div><div class="line l"></div><div class="line s"></div></div></div>`},
+        frm511:{title:"FRM-511 nên chạy hybrid",summary:"Setup & first-piece có cả checklist, dữ liệu đo, abnormal note, ảnh setup, sign-off nhiều vai trò và khả năng in tại xưởng. Vì vậy tốt nhất là online shell + evidence + status, đi kèm workbook hoặc printable controlled sheet từ cùng schema.",goal:"Giữ chất lượng workbook-first của setup record nhưng đưa revision, evidence, upload return và dossier binding vào cùng một control plane.",mode:"Hybrid workbook với online shell, controlled download, upload return và final evidence pack.",control:"Setup baseline, tooling, gage status, first-piece dimensions, surface/GD&T, abnormal findings và release decision.",why:"Đúng với reality của setup record: cần print-safe layout, sign-off và evidence sâu hơn quick checklist.",tokens:["measurement-heavy","print-safe","signed return","evidence pack","qa gate"],left:"FRM-511 · Hybrid Setup Record",right:"Measurement + sign-off + workbook sync",canvas:`<div class="pill-row"><div class="pill">Create Record ID</div><div class="pill">Download controlled pack</div><div class="pill">Return signed evidence</div></div><div class="boxy"><h4>Setup Header</h4><div class="two"><div class="line l"></div><div class="line l"></div><div class="line m"></div><div class="line m"></div></div></div><div class="boxy"><h4>Setup &amp; First-Piece Verification</h4><div class="measures"><div class="mrow head"><div>Characteristic</div><div>Nominal</div><div>Actual</div><div>Method</div><div>Result</div></div><div class="mrow"><div>Fixture / datum baseline</div><div>Released</div><div>Match</div><div>Setup</div><div>PASS</div></div><div class="mrow"><div>Critical dimension A</div><div>12.500</div><div>12.498</div><div>CMM</div><div>PASS</div></div><div class="mrow"><div>Surface / edge break</div><div>Visual</div><div>Minor burr</div><div>QC</div><div>HOLD</div></div></div></div><div class="two"><div class="boxy"><h4>Evidence</h4><div class="line l"></div><div class="line l"></div><div class="line s"></div></div><div class="boxy"><h4>Release Gate</h4><div class="line m"></div><div class="line l"></div><div class="line s"></div></div></div>`}
+      };
+      function renderMode(key){const d=modes[key];document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===key));document.getElementById("modeTitle").textContent=d.title;document.getElementById("modeSummary").textContent=d.summary;document.getElementById("modeFit").textContent=d.fit;document.getElementById("modeControl").textContent=d.control;document.getElementById("modeAvoid").textContent=d.avoid;document.getElementById("modeOutput").textContent=d.output;document.getElementById("modeTokens").innerHTML=d.tokens.map(t=>`<div class="token">${t}</div>`).join("");document.getElementById("modeSteps").innerHTML=d.steps.map(s=>`<div class="step"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("")}
+      function renderModule(key){document.querySelectorAll(".module-btn").forEach(b=>b.classList.toggle("active",b.dataset.module===key));document.querySelectorAll("[data-block]").forEach(b=>b.classList.toggle("focus",b.dataset.block===key));document.getElementById("moduleDetail").innerHTML=`<strong>${document.querySelector(".module-btn.active strong").textContent.replace(/^[0-9]+\\. /,"")}</strong>${moduleText[key]}`}
+      function renderExample(key){const d=examples[key];document.querySelectorAll(".example-btn").forEach(b=>b.classList.toggle("active",b.dataset.example===key));document.getElementById("exampleTitle").textContent=d.title;document.getElementById("exampleSummary").textContent=d.summary;document.getElementById("exampleGoal").textContent=d.goal;document.getElementById("exampleMode").textContent=d.mode;document.getElementById("exampleControl").textContent=d.control;document.getElementById("exampleWhy").textContent=d.why;document.getElementById("exampleTokens").innerHTML=d.tokens.map(t=>`<div class="token">${t}</div>`).join("");document.getElementById("toolbarLeft").textContent=d.left;document.getElementById("toolbarRight").textContent=d.right;document.getElementById("exampleCanvas").innerHTML=d.canvas}
+      document.querySelectorAll(".mode-btn").forEach(b=>b.onclick=()=>renderMode(b.dataset.mode));
+      document.querySelectorAll(".module-btn").forEach(b=>b.onclick=()=>renderModule(b.dataset.module));
+      document.querySelectorAll(".example-btn").forEach(b=>b.onclick=()=>renderExample(b.dataset.example));
+      renderMode("online");renderModule("control");renderExample("frm519");
+    </script>
+  </body>
+</html>

@@ -17,7 +17,7 @@ const SKIP_DIR_PARTS = [
 ];
 
 const SKIP_FILES = new Set([
-  path.join(ROOT, '01-QMS-Portal', 'portal.html'),
+  path.join(ROOT, 'mom', 'portal.html'),
 ]);
 
 const KEYWORD_AUDIT = [

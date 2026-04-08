@@ -22,20 +22,25 @@ Options -Indexes
 
   # Keep internal work product and maintenance artifacts out of the public surface.
   RewriteRule ^(?:\.git|\.vscode|\.claude|tools|_build|_Deleted|_reports|__pycache__)/ - [F,L,NC]
-  RewriteRule ^01-QMS-Portal/docs/ - [F,L,NC]
-  RewriteRule ^01-QMS-Portal/SECURITY_OPERATIONS\.md$ - [F,L,NC]
+  RewriteRule ^mom/docs/.*(?<!\.html)(?<!\.xlsx)(?<!\.xlsm)(?<!\.xls)(?<!\.csv)$ - [F,L,NC]
+  RewriteRule ^mom/SECURITY_OPERATIONS\.md$ - [F,L,NC]
   RewriteRule \.(?:zip|sql|bak|old|md|py|ps1|log|sqlite|db|pem|key|dist|tmp)$ - [F,L,NC]
 
-  # Legacy entry pages were removed from the root tree; keep lightweight redirects
-  # for old bookmarks and older training materials that still hit the old URLs.
-  RewriteRule ^05-Processes/?$ 03-Tai-Lieu-Van-Hanh/01-SOPs/index.html [R=302,L,NC]
-  RewriteRule ^05-Processes/index\.html$ 03-Tai-Lieu-Van-Hanh/01-SOPs/index.html [R=302,L,NC]
-  RewriteRule ^07-Forms-Records/?$ 04-Bieu-Mau/index.html [R=302,L,NC]
-  RewriteRule ^07-Forms-Records/index\.html$ 04-Bieu-Mau/index.html [R=302,L,NC]
-  RewriteRule ^08-Organization/03-Job-Descriptions/?$ 02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html [R=302,L,NC]
-  RewriteRule ^08-Organization/03-Job-Descriptions/index\.html$ 02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html [R=302,L,NC]
+  # ── Legacy redirects (301 permanent — backward compat) ──
+  RewriteRule ^01-QMS-Portal/(.*)$ mom/$1 [R=301,L]
+  RewriteRule ^02-Tai-Lieu-He-Thong/(.*)$ mom/docs/system/$1 [R=301,L]
+  RewriteRule ^03-Tai-Lieu-Van-Hanh/(.*)$ mom/docs/operations/$1 [R=301,L]
+  RewriteRule ^04-Bieu-Mau/(.*)$ mom/docs/forms/$1 [R=301,L]
+  RewriteRule ^10-Training-Academy/(.*)$ mom/docs/training/$1 [R=301,L]
+  RewriteRule ^11-Glossary/(.*)$ mom/docs/glossary/$1 [R=301,L]
+  RewriteRule ^05-Processes/?$ mom/docs/operations/sops/index.html [R=302,L,NC]
+  RewriteRule ^05-Processes/index\.html$ mom/docs/operations/sops/index.html [R=302,L,NC]
+  RewriteRule ^07-Forms-Records/?$ mom/docs/forms/index.html [R=302,L,NC]
+  RewriteRule ^07-Forms-Records/index\.html$ mom/docs/forms/index.html [R=302,L,NC]
+  RewriteRule ^08-Organization/03-Job-Descriptions/?$ mom/docs/system/organization/03-Job-Descriptions/index.html [R=302,L,NC]
+  RewriteRule ^08-Organization/03-Job-Descriptions/index\.html$ mom/docs/system/organization/03-Job-Descriptions/index.html [R=302,L,NC]
 
   # Route controlled documents through the portal auth gate while preserving
   # the original URL path for relative links inside HTML documents.
-  RewriteRule ^(archive|02-Tai-Lieu-He-Thong|03-Tai-Lieu-Van-Hanh|04-Bieu-Mau|10-Training-Academy)/(.*)\.(html|xlsx|xlsm|xls|csv)$ 01-QMS-Portal/api.php?action=doc_stream&path=$1/$2.$3 [QSA,L,NC]
+  RewriteRule ^(archive|mom/docs/system|mom/docs/operations|mom/docs/forms|mom/docs/training)/(.*)\.(html|xlsx|xlsm|xls|csv)$ mom/api.php?action=doc_stream&path=$1/$2.$3 [QSA,L,NC]
 </IfModule>

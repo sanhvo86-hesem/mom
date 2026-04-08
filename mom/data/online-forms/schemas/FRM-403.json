@@ -1,0 +1,72 @@
+{
+  "form_code": "FRM-403",
+  "title": "Supplier Corrective Action Request (SCAR)",
+  "title_vi": "Yêu cầu hành động khắc phục nhà cung cấp (SCAR)",
+  "version": "V1",
+  "category": "quality",
+  "frequency": "per_event",
+  "online": false,
+  "delivery_mode": "offline",
+  "html_runtime_form_code": "FRM-403-SCAR",
+  "standalone_html": "mom/docs/forms/frm-400-quality/FRM-403-SCAR_Supplier_Corrective_Action_Request.html",
+  "sop_ref": "SOP-401",
+  "description": "Ghi nhận yêu cầu hành động khắc phục đối với nhà cung cấp khi phát hiện lỗi chất lượng hoặc giao hàng.",
+  "roles_allowed": ["admin", "qa_manager", "quality_engineer", "supply_chain_manager", "buyer"],
+  "fields": [
+    {"id": "scar_date", "type": "date", "label": "Ngày phát hành SCAR", "label_en": "SCAR Date", "required": true, "default": "today"},
+    {"id": "supplier_name", "type": "text", "label": "Tên nhà cung cấp", "label_en": "Supplier Name", "required": true},
+    {"id": "supplier_id", "type": "text", "label": "Mã nhà cung cấp", "label_en": "Supplier ID", "required": true},
+    {"id": "po_number", "type": "text", "label": "Số PO", "label_en": "PO Number", "required": true},
+    {"id": "part_number", "type": "text", "label": "Mã chi tiết", "label_en": "Part Number", "required": true},
+    {"id": "part_rev", "type": "text", "label": "Revision", "label_en": "Part Revision"},
+    {"id": "lot_number", "type": "text", "label": "Số lô", "label_en": "Lot Number", "placeholder": "Số lô / heat number"},
+    {"id": "quantity_received", "type": "number", "label": "Số lượng nhận", "label_en": "Quantity Received", "min": 1, "required": true},
+    {"id": "quantity_rejected", "type": "number", "label": "Số lượng loại bỏ", "label_en": "Quantity Rejected", "min": 0, "required": true},
+    {"id": "defect_type", "type": "text", "label": "Loại lỗi", "label_en": "Defect Type", "required": true, "placeholder": "VD: Dimensional, Surface, Packaging, Documentation"},
+    {"id": "defect_description", "type": "textarea", "label": "Mô tả lỗi", "label_en": "Defect Description", "rows": 4, "required": true, "placeholder": "Mô tả chi tiết lỗi phát hiện..."},
+    {
+      "id": "severity",
+      "type": "select",
+      "label": "Mức độ nghiêm trọng",
+      "label_en": "Severity",
+      "required": true,
+      "options": [
+        {"value": "minor", "label": "Nhẹ (Minor)", "color": "#2f9e44"},
+        {"value": "major", "label": "Nặng (Major)", "color": "#e67700"},
+        {"value": "critical", "label": "Nghiêm trọng (Critical)", "color": "#e03131"}
+      ]
+    },
+    {"id": "containment_action", "type": "textarea", "label": "Hành động ngăn chặn", "label_en": "Containment Action", "rows": 3, "required": true},
+    {"id": "root_cause_required", "type": "checkbox", "label": "Yêu cầu phân tích nguyên nhân gốc", "label_en": "Root Cause Required", "default": true},
+    {"id": "supplier_response_due_date", "type": "date", "label": "Hạn phản hồi nhà cung cấp", "label_en": "Supplier Response Due Date", "required": true},
+    {"id": "supplier_root_cause", "type": "textarea", "label": "Nguyên nhân gốc từ NCC", "label_en": "Supplier Root Cause", "rows": 3, "placeholder": "Phần nhà cung cấp điền..."},
+    {"id": "supplier_corrective_action", "type": "textarea", "label": "Hành động khắc phục NCC", "label_en": "Supplier Corrective Action", "rows": 3},
+    {"id": "supplier_preventive_action", "type": "textarea", "label": "Hành động phòng ngừa NCC", "label_en": "Supplier Preventive Action", "rows": 3},
+    {"id": "verification_method", "type": "text", "label": "Phương pháp xác nhận", "label_en": "Verification Method", "placeholder": "VD: IQC lô tiếp theo, audit tại chỗ"},
+    {"id": "verification_result", "type": "textarea", "label": "Kết quả xác nhận", "label_en": "Verification Result", "rows": 3},
+    {
+      "id": "scar_status",
+      "type": "select",
+      "label": "Trạng thái SCAR",
+      "label_en": "SCAR Status",
+      "required": true,
+      "default": "open",
+      "options": [
+        {"value": "open", "label": "Mở (Open)", "color": "#e03131"},
+        {"value": "awaiting_response", "label": "Chờ phản hồi NCC (Awaiting Response)", "color": "#e67700"},
+        {"value": "under_review", "label": "Đang xem xét (Under Review)", "color": "#1971c2"},
+        {"value": "verification", "label": "Đang xác nhận (Verification)", "color": "#862e9c"},
+        {"value": "closed", "label": "Đã đóng (Closed)", "color": "#2f9e44"}
+      ]
+    },
+    {"id": "issued_by", "type": "text", "label": "Người phát hành", "label_en": "Issued By", "required": true},
+    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By"},
+    {"id": "supplier_contact", "type": "text", "label": "Liên hệ nhà cung cấp", "label_en": "Supplier Contact", "placeholder": "Tên, email, SĐT người liên hệ NCC"}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_critical": ["qa_manager", "supply_chain_manager"],
+    "on_overdue": ["qa_manager", "supply_chain_manager"],
+    "on_submit": ["qa_manager", "supply_chain_manager"]
+  }
+}

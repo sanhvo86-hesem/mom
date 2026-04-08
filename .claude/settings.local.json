@@ -2,7 +2,31 @@
   "permissions": {
     "allow": [
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(rm -f \"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/.git/index.lock\")",
+      "Bash(mv mom/docs/forms/07-FRM-700 mom/docs/forms/frm-700-maintenance)",
+      "Bash(mv mom/docs/forms/08-FRM-800 mom/docs/forms/frm-800-hr)",
+      "Bash(mv mom/docs/forms/09-FRM-900 mom/docs/forms/frm-900-admin)",
+      "Bash(mv mom/docs/training/01-Competency-System mom/docs/training/competency)",
+      "Bash(mv mom/docs/training/02-Training-Content mom/docs/training/content)",
+      "Bash(mv mom/docs/training/03-System-Operations mom/docs/training/system-ops)",
+      "Bash(mv mom/docs/training/04-Templates-Tools mom/docs/training/templates)",
+      "Bash(find mom/api mom/database -name \"*.php\" -exec grep -l \"HESEM.QMS\" {} +)",
+      "Bash(find mom/api mom/database -name '*.php' -exec sed -i '' -e 's/namespace HESEM\\\\\\\\QMS/namespace MOM/g' -e 's/use HESEM\\\\\\\\QMS/use MOM/g' '{}' +)",
+      "Bash(find mom/api mom/database -name '*.php' -exec sed -i '' -e 's/HESEM\\\\\\\\\\\\\\\\QMS/MOM/g' '{}' +)",
+      "Bash(sed -i '' 's/HESEM\\\\\\\\\\\\\\\\QMS/MOM/g' mom/api.php)",
+      "Bash(find mom/ -name '*.php' -exec sed -i '' -e 's/HESEM QMS/HESEM MOM/g' -e s/HESEM-QMS/HESEM-MOM/g -e 's/@package HESEM\\\\\\\\QMS/@package MOM/g' -e 's/HESEM\\\\\\\\QMS namespace/MOM namespace/g' '{}' +)",
+      "Bash(find mom/ -name '*.php' -exec sed -i '' -e s/hesem_qms/mom/g -e s/qms_app/mom_app/g '{}' +)",
+      "Bash(find mom/ -name '*.sql' -exec sed -i '' -e s/hesem_qms/mom/g -e s/qms_app/mom_app/g '{}' +)",
+      "Bash(find mom/ -name '*.json' -exec sed -i '' -e s/hesem_qms/mom/g -e s/qms_app/mom_app/g '{}' +)",
+      "Bash(find mom/ '\\(' -name '*.php' -o -name '*.js' -o -name '*.json' '\\)' -exec sed -i '' -e 's|01-QMS-Portal/qms-data|mom/data|g' -e 's|01-QMS-Portal|mom|g' -e 's|qms-data|data|g' '{}' +)",
+      "Bash(find mom/ '\\(' -name '*.php' -o -name '*.js' -o -name '*.json' '\\)' -exec sed -i '' -e 's|02-Tai-Lieu-He-Thong/01-Quality-Manual|mom/docs/system/quality-manual|g' -e 's|02-Tai-Lieu-He-Thong/02-Policies-Objectives|mom/docs/system/policies|g' -e 's|02-Tai-Lieu-He-Thong/03-Organization|mom/docs/system/organization|g' -e 's|02-Tai-Lieu-He-Thong|mom/docs/system|g' -e 's|03-Tai-Lieu-Van-Hanh/01-SOPs|mom/docs/operations/sops|g' -e 's|03-Tai-Lieu-Van-Hanh/02-Work-Instructions|mom/docs/operations/work-instructions|g' -e 's|03-Tai-Lieu-Van-Hanh/03-Reference|mom/docs/operations/references|g' -e 's|03-Tai-Lieu-Van-Hanh|mom/docs/operations|g' -e 's|04-Bieu-Mau/00-FORM-DESIGN-SYSTEM|mom/docs/forms/design-system|g' -e 's|04-Bieu-Mau/01-FRM-100|mom/docs/forms/frm-100-sales|g' -e 's|04-Bieu-Mau/02-FRM-200|mom/docs/forms/frm-200-purchase|g' -e 's|04-Bieu-Mau/03-FRM-300|mom/docs/forms/frm-300-technical|g' -e 's|04-Bieu-Mau/04-FRM-400|mom/docs/forms/frm-400-quality|g' -e 's|04-Bieu-Mau/05-FRM-500|mom/docs/forms/frm-500-production|g' -e 's|04-Bieu-Mau/06-FRM-600|mom/docs/forms/frm-600-inspection|g' -e 's|04-Bieu-Mau/07-FRM-700|mom/docs/forms/frm-700-maintenance|g' -e 's|04-Bieu-Mau/08-FRM-800|mom/docs/forms/frm-800-hr|g' -e 's|04-Bieu-Mau/09-FRM-900|mom/docs/forms/frm-900-admin|g' -e 's|04-Bieu-Mau|mom/docs/forms|g' -e 's|10-Training-Academy/01-Competency-System|mom/docs/training/competency|g' -e 's|10-Training-Academy/02-Training-Content|mom/docs/training/content|g' -e 's|10-Training-Academy/03-System-Operations|mom/docs/training/system-ops|g' -e 's|10-Training-Academy/04-Templates-Tools|mom/docs/training/templates|g' -e 's|10-Training-Academy|mom/docs/training|g' -e 's|11-Glossary|mom/docs/glossary|g' '{}' +)",
+      "Bash(find mom/docs/ -name '*.html' -exec sed -i '' -e 's|02-Tai-Lieu-He-Thong/01-Quality-Manual|mom/docs/system/quality-manual|g' -e 's|02-Tai-Lieu-He-Thong/02-Policies-Objectives|mom/docs/system/policies|g' -e 's|02-Tai-Lieu-He-Thong/03-Organization|mom/docs/system/organization|g' -e 's|02-Tai-Lieu-He-Thong|mom/docs/system|g' -e 's|03-Tai-Lieu-Van-Hanh/01-SOPs|mom/docs/operations/sops|g' -e 's|03-Tai-Lieu-Van-Hanh/02-Work-Instructions|mom/docs/operations/work-instructions|g' -e 's|03-Tai-Lieu-Van-Hanh/03-Reference|mom/docs/operations/references|g' -e 's|03-Tai-Lieu-Van-Hanh|mom/docs/operations|g' -e 's|04-Bieu-Mau/00-FORM-DESIGN-SYSTEM|mom/docs/forms/design-system|g' -e 's|04-Bieu-Mau/01-FRM-100|mom/docs/forms/frm-100-sales|g' -e 's|04-Bieu-Mau/02-FRM-200|mom/docs/forms/frm-200-purchase|g' -e 's|04-Bieu-Mau/03-FRM-300|mom/docs/forms/frm-300-technical|g' -e 's|04-Bieu-Mau/04-FRM-400|mom/docs/forms/frm-400-quality|g' -e 's|04-Bieu-Mau/05-FRM-500|mom/docs/forms/frm-500-production|g' -e 's|04-Bieu-Mau/06-FRM-600|mom/docs/forms/frm-600-inspection|g' -e 's|04-Bieu-Mau/07-FRM-700|mom/docs/forms/frm-700-maintenance|g' -e 's|04-Bieu-Mau/08-FRM-800|mom/docs/forms/frm-800-hr|g' -e 's|04-Bieu-Mau/09-FRM-900|mom/docs/forms/frm-900-admin|g' -e 's|04-Bieu-Mau|mom/docs/forms|g' -e 's|10-Training-Academy/01-Competency-System|mom/docs/training/competency|g' -e 's|10-Training-Academy/02-Training-Content|mom/docs/training/content|g' -e 's|10-Training-Academy/03-System-Operations|mom/docs/training/system-ops|g' -e 's|10-Training-Academy/04-Templates-Tools|mom/docs/training/templates|g' -e 's|10-Training-Academy|mom/docs/training|g' -e 's|11-Glossary|mom/docs/glossary|g' -e 's|01-QMS-Portal|mom|g' '{}' +)",
+      "Bash(find mom/docs/forms/ -name '*.html' -exec sed -i '' -e 's|01-FRM-100|frm-100-sales|g' -e 's|02-FRM-200|frm-200-purchase|g' -e 's|03-FRM-300|frm-300-technical|g' -e 's|04-FRM-400|frm-400-quality|g' -e 's|05-FRM-500|frm-500-production|g' -e 's|06-FRM-600|frm-600-inspection|g' -e 's|07-FRM-700|frm-700-maintenance|g' -e 's|08-FRM-800|frm-800-hr|g' -e 's|09-FRM-900|frm-900-admin|g' -e 's|00-FORM-DESIGN-SYSTEM|design-system|g' '{}' +)",
+      "Bash(find mom/ -name '*.js' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' -e s/HESEM-QMS/HESEM-MOM/g '{}' +)",
+      "Bash(find mom/ -name '*.css' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' '{}' +)",
+      "Bash(find mom/ -name '*.html' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' '{}' +)",
+      "Bash(ls -1d mom/docs/*/)"
     ]
   }
 }

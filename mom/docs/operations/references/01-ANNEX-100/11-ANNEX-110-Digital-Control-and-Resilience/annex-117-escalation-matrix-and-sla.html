@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-117 - Escalation Matrix and SLA | HESEM MOM</title>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+ h1,h2,h3 { break-after: avoid; page-break-after: avoid; } }
+.page-body h1 {font-size:24px; line-height:1.35; margin:0 0 10px;}
+.page-body h2 {font-size:18px; line-height:1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size:14px; line-height:1.5; margin:12px 0 6px; color: var(--ink);}
+
+.small {font-size:12px;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius:var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+@media (max-width: 960px) { .two-col,.three-col,.kpi-grid {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} 
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../../mom/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Annex</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">Escalation Matrix and SLA</strong>
+</div>
+ <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-117</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ 
+
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi phát sinh sự kiện chất lượng, giao hàng, an toàn, máy móc, dữ liệu, khiếu nại, escalation sau giờ hoặc sự cố cần nâng cấp quyết định theo cấp.</div>
+ <h1>ANNEX-117 - Escalation Matrix and SLA</h1>
+
+ <div class="section">
+ <h2>1. Mục đích và phạm vi</h2>
+ <p>ANNEX này là ma trận escalation chính thức của HESEM để quyết định <b>khi nào phải nâng cấp thông tin</b>, <b>ai phải được gọi</b>, <b>trong bao lâu phải phản ứng</b>, <b>ai được quyền cho chạy lại / mở TẠM GIỮ / thông báo khách hàng</b> và <b>gói bằng chứng tối thiểu</b> phải có trước khi đóng sự kiện.</p>
+ <p>ANNEX này áp dụng cho mọi lệnh sản xuất, lot, lô giao hàng, thiết bị, hệ thống dữ liệu và sự kiện phát sinh ở phân xưởng, kho, <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>, Kỹ thuật, Kế hoạch, Mua hàng, Kinh doanh/Dịch vụ khách hàng, HSE và IT khi sự kiện có khả năng ảnh hưởng một trong các yếu tố sau: an toàn con Người, an toàn sản phẩm, phù hợp kỹ thuật, giao hàng, truy xuất nguồn gốc, clean-trạng thái, dữ liệu điều hành, uy tín khách hàng hoặc nghĩa vụ tuân thủ.</p>
+ <div class="callout"><strong>QUY TẮC CỨNG</strong>: sự kiện đạt ngưỡng escalation <b>PHẢI</b> được báo đúng cấp và đúng SLA. Không được tự ý "xử lý nội bộ cho êm", không được hạ mức sự kiện để né escalation, không được mở lại sản xuất / đóng kiện / giao hàng khi chưa đủ thẩm quyền phát hành.</div>
+ </div>
+
+ <div class="section">
+ <h2>2. Nguyên tắc vận hành bắt buộc</h2>
+ <div class="two-col">
+ <div class="keyline"><b>2.1 Một sự kiện – một người chịu trách nhiệm điều phối</b><br>Mỗi sự kiện chỉ có một Người điều phối chính để giữ log hành động, nhịp thông báo, quyết định họp war phòng và đóng sự kiện. Người điều phối không được đẩy trách nhiệm sang nhiều đầu mối song song.</div>
+ <div class="keyline"><b>2.2 Ngăn chặn đi trước phân tích</b><br>Khi sự kiện có nguy cơ lan rộng, ưu tiên đầu tiên là chặn lan rộng: TẠM GIỮ lot, cách ly part, dừng công đoạn, khóa lô giao hàng, đóng quyền truy cập, khóa phiên bản hoặc chặn use-to-tồn kho.</div>
+ <div class="keyline"><b>2.3 Escalation theo ngưỡng, không theo cảm tính</b><br>Nếu chạm ngưỡng của bảng kích hoạt thì escalation tự động có hiệu lực, kể cả khi người chịu trách nhiệm cho rằng "có thể tự xử lý".</div>
+ <div class="keyline"><b>2.4 Sau giờ vẫn phải xử lý</b><br>Sự kiện phát sinh ngoài giờ, Ngày nghỉ, Ngày lễ vẫn áp dụng SLA. Không được đợi đến sáng hôm sau nếu sự kiện chạm ngưỡng Quan trọng, ảnh hưởng lô giao hàng, an toàn, data tính toàn vẹn hoặc khách hàng-tiện mặt đầu (facing) cam kết.</div>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>3. Mã mức độ sự kiện và định nghĩa</h2>
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <thead><tr><th>Mức</th><th>Định nghĩa</th><th>Quyết định mặc định</th><th>Ví dụ điển hình</th></tr></thead>
+ <tbody>
+ <tr><td><span class="badge-green">L1</span></td><td>Sự kiện cục bộ, không lan rộng, không ảnh hưởng khách hàng, không ảnh hưởng an toàn/sự phù hợp nếu chặn ngay.</td><td>người chịu trách nhiệm tại công đoạn xử lý; escalation tối thiểu tới cấp lead nếu cần hỗ trợ.</td><td>Thiếu ảnh setup, nhãn nội bộ in sai nhưng chưa sử dụng, 1 gage hết tem trạng thái trước khi đo.</td></tr>
+ <tr><td><span class="badge-amber">L2</span></td><td>Sự kiện có nguy cơ ảnh hưởng lot/job hoặc làm trễ tiến độ nếu không chặn trong ca.</td><td>Hold cục bộ; báo QA/Kế hoạch/Ops theo nhóm sản phẩm.</td><td>tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn) vượt ngưỡng, thiếu MTR cho lot đầu vào / nhận hàng, CNC sự cố nghiêm trọng làm ngưng máy chính.</td></tr>
+ <tr><td><span class="badge-red">L3</span></td><td>Sự kiện ảnh hưởng sự phù hợp, giao hàng cam kết, clean-trạng thái, truy xuất nguồn gốc hoặc Người xử lý scope; có khả năng lan rộng sang nhiều lot/job.</td><td>Hold lot/job hoặc hold lô giao hàng; quản lý cấp chức năng phải vào cuộc.</td><td>Part fail CTQ sau mẫu đầu (tiên chi tiết / sản phẩm), lô giao hàng pack thiếu chứng từ phát hành, outsource Người xử lý hết scope hợp lệ.</td></tr>
+ <tr><td><span class="badge-red">L4</span></td><td>Sự kiện nghiêm trọng liên quan an toàn, thoát / bỏ qua, hàng giả / hàng nhái, mất truy xuất nguồn gốc lớn, data tính toàn vẹn, khách hàng stop, thu hồi hoặc nghĩa vụ pháp lý.</td><td>Dừng ngay, war phòng, báo lãnh đạo cao nhất, chuẩn bị khách hàng thông báo.</td><td>Thoát ra khách hàng, mất phả hệ truy xuất vật liệu cho hàng đã giao, phát hiện hàng giả / hàng nhái đã xác nhận, nhiễm bẩn/hỏng / lỗi có khả năng ảnh hưởng chân không ứng dụng.</td></tr>
+ </tbody>
+ </table></div>
+ </div>
+
+ <div class="section">
+ <h2>4. điều kiện kích hoạt escalation theo nhóm sản phẩm sự kiện</h2>
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <thead><tr><th>nhóm sản phẩm</th><th>Kích hoạt L2</th><th>Kích hoạt L3</th><th>Kích hoạt L4</th><th>người chịu trách nhiệm điều phối mặc định</th></tr></thead>
+ <tbody>
+ <tr><td>Quality / sự phù hợp</td><td>NCR lặp lại; fail mẫu đầu; sai khác ảnh hưởng lot hiện hành.</td><td>CTQ/OOS; hỗn hợp / lẫn lộn trạng thái; nghi ngờ thoát / bỏ qua; thiếu bắt buộc bằng chứng trước phát hành.</td><td>Thoát đã ship, nghi ngờ hàng giả / hàng nhái, mất truy xuất nguồn gốc vật liệu cho hàng đã giao.</td><td><span class="role-cluster"><a class="role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td></tr>
+ <tr><td>Giao hàng / Kế hoạch</td><td>tuổi tồn WIP (tuổi tồn / tuổi tồn) vượt ngưỡng đỏ; hot job không có người chịu trách nhiệm; cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) bị phá.</td><td>Nguy cơ thiếu / bỏ sót ship date đã cam kết; machine nút thắt / điểm nghẽn không có lộ trình gia công thay thế; giao hàng một phần chưa được phê duyệt.</td><td>Customer stop dòng / chuyền / phạt mức độ tiếp xúc / phơi nhiễm / lô giao hàng bị chặn ở cửa giao.</td><td>Kế hoạch / Ops</td></tr>
+ <tr><td>Machine / Tooling / tiện ích</td><td>Sự cố hỏng máy &gt; 30 phút ở công đoạn nút cổ chai; tuổi dao (tool tuổi thọ / vòng đời) vượt ngưỡng.</td><td>sự cố nghiêm trọng làm ảnh hưởng đường chạy dao/setup/part phả hệ truy xuất; tiện ích sự kiện làm dừng nhiều cell.</td><td>Sự kiện gây mất an toàn, cháy / hỏa hoạn rủi ro, điện mối nguy hoặc ảnh hưởng nhiều job trọng yếu.</td><td>Ops / <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span></td></tr>
+ <tr><td>Vệ sinh / FOD / Đóng gói</td><td>Giám sát vượt alert; phát hiện mở-pack không đúng quy tắc; dòng / chuyền thông quan / giải phóng fail.</td><td>hạt / phần tử xu hướng vượt hành động giới hạn; FOD phát hiện trong khu/pack; bảo quản cửa sổ / khung thời gian quá hạn.</td><td>Nhiễm bẩn có khả năng ảnh hưởng khách hàng ứng dụng; clean-trạng thái bị phá sau phát hành.</td><td><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / Ops</td></tr>
+ <tr><td>Supplier / External nhà cung cấp dịch vụ</td><td>Chậm cert, chậm Người xử lý khe / vị trí, thiếu bằng chứng khi phiếu nhận / biên nhận.</td><td>Người xử lý scope không phù hợp; công đoạn đặc biệt fail; đã phê duyệt trạng thái xuống thử việc.</td><td>NCC gây thoát / bỏ qua lớn, vi phạm pháp lý, mất cert/phê duyệt bắt buộc cho job đang chạy.</td><td><span class="role-cluster"><a class="role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a><span class="role-sep">/</span><a class="role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td></tr>
+ <tr><td>Data / System / Truy cập</td><td>Luồng công việc lỗi làm chậm phê duyệt; thư mục sai path; Người dùng truy cập không khớp cục bộ.</td><td>Data tính toàn vẹn rủi ro giữa Epicor và M365; hồ sơ không khôi phục được; quyền cao cấp cấp sai cho Người dùng đang active.</td><td>Mất dữ liệu phát hành/lô giao hàng; nghi ngờ an ninh mạng sự kiện; thay đổi trái phép ảnh hưởng quyết định chất lượng/giao hàng.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+ <tr><td>Customer / Khiếu nại / Thương mại</td><td>Khiếu nại cần phản hồi trong ngày; sai điều kiện giao hàng cần xác nhận lại.</td><td>RMA/bảo hành sự kiện; khiếu nại có nguy cơ lan sang nhiều lô giao hàng.</td><td>Thu hồi, stop-ship, khách hàng điều hành escalation, pháp lý mức độ tiếp xúc / phơi nhiễm.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td></tr>
+ <tr><td>An toàn / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></td><td>Sự cố suýt xảy ra (Cần / suýt-thiếu / bỏ sót) nghiêm trọng; PPE fail ở công việc nguy cơ cao.</td><td>có thể ghi nhận chấn thương, hóa chất tràn / đổ, nén-air lạm dụng, nâng sự kiện có nguy cơ tái diễn.</td><td>nghiêm trọng chấn thương, cháy / hỏa hoạn, sơ tán, cơ quan quản lý-tiện mặt đầu (facing) sự kiện.</td><td>HSE / Ops</td></tr>
+ </tbody>
+ </table></div>
+ </div>
+
+ <div class="section">
+ <h2>5. SLA phản ứng bắt buộc</h2>
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <thead><tr><th>Mốc</th><th>L2</th><th>L3</th><th>L4</th></tr></thead>
+ <tbody>
+ <tr><td>Ghi nhận ban đầu</td><td>≤ 30 phút</td><td>≤ 15 phút</td><td>Ngay lập tức</td></tr>
+ <tr><td>Ngăn chặn ban đầu</td><td>≤ 2 giờ</td><td>≤ 1 giờ</td><td>Ngay lập tức / dừng ngay</td></tr>
+ <tr><td>Escalation tới quản lý chức năng</td><td>≤ 2 giờ</td><td>≤ 30 phút</td><td>≤ 15 phút</td></tr>
+ <tr><td>Escalation tới cấp điều hành</td><td>Khi thiếu / bỏ sót SLA hoặc rủi ro tăng cấp</td><td>≤ 2 giờ</td><td>≤ 30 phút</td></tr>
+ <tr><td>Quyết định war phòng</td><td>Khi vấn đề chặn kéo dài &gt; 1 ca</td><td>≤ 4 giờ</td><td>Ngay khi xác nhận L4</td></tr>
+ <tr><td>Customer thông báo</td><td>Khi hợp đồng/CSR yêu cầu</td><td>≤ 24 giờ hoặc sớm hơn theo hợp đồng</td><td>bằng lời ngay khi đủ dữ kiện tối thiểu, email chính thức ≤ 24 giờ</td></tr>
+ <tr><td>Mở NCR / sự kiện hồ sơ</td><td>≤ 8 giờ làm việc</td><td>≤ 4 giờ</td><td>≤ 2 giờ</td></tr>
+ <tr><td>Nguyên nhân gốc sơ bộ</td><td>≤ 2 Ngày làm việc</td><td>≤ 1 Ngày làm việc</td><td>≤ 24 giờ</td></tr>
+ </tbody>
+ </table></div>
+ <div class="callout"><strong>RULE SAU GIỜ</strong>: ngoài giờ và Ngày nghỉ, nếu sự kiện thuộc L3/L4 thì Người phát hiện <b>PHẢI</b> Mọi trực tiếp cho Người cấp trên Cần nhất, không chỉ gửi Teams/email. Nếu sau 10 phút không bắt máy, chuyển ngay sang cấp kế tiếp trong liên hệ chuỗi.</div>
+ </div>
+
+ <div class="section">
+ <h2>6. liên hệ chuỗi và quyền quyết định</h2>
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <thead><tr><th>Quyết định</th><th>Người đề xuất</th><th>Người được quyền duyệt</th><th>Evidence tối thiểu trước khi duyệt</th></tr></thead>
+ <tbody>
+ <tr><td>Hold lot / hold job / stop machine</td><td>Lead / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / Ops / <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span></td><td><a class="entity-link bundle-link bundle-chip" data-bundle="DIRECT_LINE_MGRS" href="../../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-direct-line-mgrs" title="Direct Line Managers (Nhom quan ly truc tiep) — CEO / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA / WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">DIRECT_LINE_MGRS</span></a> hoặc <a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_OWNERS" href="../../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners" title="Functional Content Owners (Nhom so huu noi dung nghiep vu theo chuc nang) — CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_OWNERS</span></a>; escalation lên <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a> nếu &gt; 1 cell/job</td><td>Mã job/lot bị ảnh hưởng, phạm vi ảnh hưởng, lý do hold, thời điểm hold, Performer</td></tr>
+ <tr><td>Mở lại sản xuất sau sự kiện chất lượng/machine</td><td>người chịu trách nhiệm điều phối</td><td><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + Ops; thêm Kỹ thuật khi thay đổi program/setup/tool</td><td>Ngăn chặn hoàn tất, nguyên nhân sơ bộ, mẫu đầu/tái xác nhận hiệu lực nếu áp dụng, cập nhật Hồ sơ công việc (hồ sơ công việc)</td></tr>
+ <tr><td>Mở lô giao hàng / phát hành giao hàng</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a></span></td><td><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> Manager hoặc Người được ủy quyền theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Gói phát hành đủ, CoC đúng, label/SSCC đúng, số lượng đối soát, sai lệch/khách hàng phê duyệt nếu có</td></tr>
+ <tr><td>Customer thông báo chính thức</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Thương mại người chịu trách nhiệm + <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> + GM khi L4 hoặc hợp đồng yêu cầu</td><td>thực tế pack tối thiểu: part/job/lot, vấn đề báo cáo / tuyên bố, ngăn chặn, tác động đã biết/không xác định, next cập nhật time</td></tr>
+ <tr><td>War phòng</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></td><td><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a> hoặc người được ủy quyền theo ANNEX-123</td><td>Lý do kích hoạt, người chịu trách nhiệm, phòng nhịp độ / chu kỳ họp, hành động bảng, end điều kiện</td></tr>
+ </tbody>
+ </table></div>
+ <div class="two-col">
+ <div class="keyline"><b>Liên kết thẩm quyền</b><br>Mọi quyền duyệt cuối cùng phải phù hợp với <b><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></b> và quy tắc phó/backup của <b><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></b>. Không viện cớ "vắng Người ký" để mở dòng / chuyền hoặc giao hàng sai thẩm quyền.</div>
+ <div class="keyline"><b>Liên kết hằng ngày quản lý</b><br>Sự kiện L2/L3 kéo dài qua ca phải được đưa vào <b><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a></b> và bảng hành động của ca/ngày. Sự kiện không được biến mất khỏi biểu đồ biểu đồ radar chỉ vì đã chat xong trên Teams.</div>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>7. War phòng và khách hàng truyền đạt / giao tiếp</h2>
+ <div class="step-list">
+ <div class="step-item"><b>Kích hoạt war phòng</b> khi xảy ra L4, khi L3 kéo dài quá 1 Ngày mà chưa chặn được rủi ro giao hàng, hoặc khi một sự kiện tác động đồng thời tới chất lượng + giao hàng + khách hàng cam kết.</div>
+ <div class="step-item"><b>Thiết lập người chịu trách nhiệm và nhịp độ / chu kỳ họp</b>: chỉ định Sự cố người chịu trách nhiệm, Log Người giữ, khách hàng trọng tâm điểm, kỹ thuật trọng tâm điểm, next rà soát time và thoát / ra tiêu chí.</div>
+ <div class="step-item"><b>Customer thông báo</b> phải nhất quán một tiếng nói. Không để Kinh doanh, <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>, Kỹ thuật trả lời tách rời và mâu thuẫn nhau. Bản khách hàng thông báo phải nêu rõ thực tế hiện có, phần chưa biết, ngăn chặn đã áp dụng và thời gian cập nhật tiếp theo.</div>
+ <div class="step-item"><b>Đóng war phòng</b> chỉ khi ngăn chặn ổn định, công việc tồn đọng phát hành đã rõ, người chịu trách nhiệm hành động tồn và Ngày theo dõi tiếp sau war phòng đã được chốt.</div>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>8. Gói bằng chứng escalation bắt buộc</h2>
+ <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th></tr></thead>
+ <tbody>
+ <tr><td>Nhận dạng sự kiện</td><td>Sự kiện ID, Ngày giờ, job/WO/lot/part/rev, nhóm sản phẩm sự kiện, mức độ L1-L4, người chịu trách nhiệm điều phối.</td></tr>
+ <tr><td>Phạm vi ảnh hưởng</td><td>Cell/trung tâm gia công, số lượng bị ảnh hưởng, đã ship/chưa ship, khách hàng/program bị ảnh hưởng, lô giao hàng liên quan.</td></tr>
+ <tr><td>Ngăn chặn</td><td>TẠM GIỮ/cách ly/stop-machine/stop-ship/data-khóa đã áp dụng, lúc bắt đầu, Người xác nhận, trạng thái Current.</td></tr>
+ <tr><td>Escalation vết / nhật ký thay đổi</td><td>Ai đã được gọi, lúc nào, bằng kênh nào, phản hồi gì, escalation tiếp theo khi không bắt máy.</td></tr>
+ <tr><td>Quyết định</td><td>Quyết định khởi động lại/phát hành/khách hàng thông báo/war phòng, Người duyệt, căn cứ duyệt, điều kiện còn treo.</td></tr>
+ <tr><td>Kết thúc</td><td>Nguyên nhân gốc sơ bộ/cuối cùng, hành động khắc phục, hành động phòng ngừa, xác nhận hiệu lực, bài học kinh nghiệm.</td></tr>
+ </tbody>
+ </table></div>
+ <p class="small">Evidence sự kiện phải được liên kết vào Hồ sơ công việc / sự kiện pack tương ứng. Nếu có lô giao hàng liên quan, bộ bằng chứng phải liên kết tới <a href="../../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> và phát hành hồ sơ; nếu có chất lượng sự kiện, phải liên kết tới <a href="../../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a> và hồ sơ NCR/CAPA; nếu là mức sẵn sàng/lệnh sản xuất rủi ro cao, phải liên kết <a href="../../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>.</p>
+ </div>
+
+ <div class="section">
+ <h2>9. KPI hiệu lực của chương trình escalation</h2>
+ <div class="kpi-grid">
+ <div class="kpi-box"><b>KPI-1 — % sự kiện chạm ngưỡng được báo cáo vượt cấp đúng SLA</b><br>Mục tiêu: ≥ 95% / tháng</div>
+ <div class="kpi-box"><b>KPI-2 — % sự kiện log có đủ người chịu trách nhiệm + Ngày đến hạn + next hành động</b><br>Mục tiêu: 100%</div>
+ <div class="kpi-box"><b>KPI-3 — % L3/L4 có ngăn chặn xác nhận trong SLA</b><br>Mục tiêu: ≥ 95%</div>
+ <div class="kpi-box"><b>KPI-4 — % khách hàng thông báo phát hành đúng Người có thẩm quyền</b><br>Mục tiêu: 100%</div>
+ </div>
+ </div>
+
+ <div class="section">
+ <h2>10. Liên kết bắt buộc</h2>
+ <p><b>SOP liên đới:</b> <a href="../../../01-SOPs/01-SOP-100/sop-107-communication-management.html">SOP-107</a>, <a href="../../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>, <a href="../../../01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>, <a href="../../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>, <a href="../../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>, <a href="../../../01-SOPs/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a>.</p>
+ <p><b>WI liên đới:</b> <a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>, <a href="../../../02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>, <a href="../../../02-Work-Instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</p>
+ <p><b>ANNEX liên đới:</b> <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>, <a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a>, <a href="../../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a>.</p>
+ </div>
+ </div>
+ </div>
+</div>
+</body>
+</html>

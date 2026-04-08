@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ANNEX-602 - MSA Acceptance Criteria | HESEM MOM</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+<style>
+
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} 
+.kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 960px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+<div class="fh-company">
+<a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Annex</span>
+</div>
+</div>
+<div class="title">
+<strong class="doc-name">MSA Acceptance Criteria</strong>
+</div>
+<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-602</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="entity-code role-code">MCS</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng trước khi dùng hệ thống đo cho CTQ, FAI, SPC, capability study hoặc final release; áp dụng lại khi có thay đổi hoặc nghi ngờ ảnh hưởng độ tin cậy phép đo.</div>
+<h1>ANNEX-602 - MSA Acceptance Criteria</h1>
+<div class="section"><h2>1. Mục đích và điều kiện phải đánh giá MSA</h2><p>ANNEX này quy định tiêu chí chấp nhận hệ thống đo và quyết định hành động tương ứng trước khi dùng thiết bị đo cho CTQ, FAI, SPC capability hoặc final release. Không có MSA phù hợp thì kết quả đo chỉ được dùng tham khảo, không dùng để mở cổng kiểm soát chất lượng quan trọng.</p><ul><li>Đánh giá MSA khi đưa dụng cụ đo mới vào dùng cho CTQ.</li><li>Đánh giá lại khi đổi phương pháp đo, đổi đồ gá đo, đổi software/strategy CMM, sau va chạm, sau sửa chữa hoặc khi có drift nghi ngờ.</li><li>Đánh giá attribute agreement khi quyết định phụ thuộc nhiều vào judgement Người kiểm.</li></ul></div><div class="section"><h2>2. Tiêu chí chấp nhận Variable MSA</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Chỉ tiêu</th><th>Mức chấp nhận</th><th>Quyết định</th></tr></thead><tbody><tr><td>%GRR ≤ 10%</td><td>Chấp nhận</td><td>Dùng cho release và capability khi các điều kiện khác đạt</td></tr>
+<tr><td>10% &lt; %GRR ≤ 30%</td><td>Chấp nhận có điều kiện</td><td>Chỉ dùng khi đặc tính đủ dung lượng, có hành động cải thiện và được QA/Engineering chấp thuận</td></tr>
+<tr><td>%GRR &gt; 30%</td><td>PHẢI loại khỏi use-tình huống release</td><td>Không dùng cho cổng kiểm soát release hoặc capability khẳng định</td></tr>
+<tr><td>ndc ≥ 5</td><td>Đủ phân biệt</td><td>Được dùng để theo dõi xu hướng ở mức tối thiểu</td></tr>
+<tr><td>ndc &lt; 5</td><td>Không đủ phân biệt</td><td>Không dùng cho SPC/năng lực / khả năng; xem lại phương pháp đo hoặc đồ gá</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. sai lệch hệ thống, độ tuyến tính, độ ổn định và thuộc tính thỏa thuận</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại đánh giá</th><th>Yêu cầu tối thiểu</th><th>Hành động khi không đạt</th></tr></thead><tbody><tr><td>sai lệch hệ thống</td><td>Sai lệch có ý nghĩa phải được hiểu rõ và bù trừ có kiểm soát trước khi dùng</td><td>Không dùng cho CTQ phát hành cho tới khi xử lý xong</td></tr>
+<tr><td>độ tuyến tính</td><td>Độ lệch không được thay đổi theo dải đo đến mức làm sai quyết định</td><td>Giới hạn phạm vi dùng hoặc đổi thiết bị/phương pháp</td></tr>
+<tr><td>độ ổn định</td><td>Kiểm tra standard và lịch theo dõi phải chứng minh hệ đo ổn định theo thời gian</td><td>Tạm Từng dùng, kiểm lại các quyết định đã dựa vào giai đoạn nghi ngờ</td></tr>
+<tr><td>thuộc tính thỏa thuận</td><td>Tỷ lệ phù hợp giữa Người-Người, Người-chuẩn và lặp lại phải đạt ngưỡng đã phê duyệt</td><td>Training lại, làm rõ tiêu chuẩn lỗi, hoặc đổi phương pháp đo</td></tr>
+</tbody></table></div><div class="keyline"><strong>Quy tắc:</strong> nếu MSA chưa đạt nhưng vì lý do cấp bách vẫn cần đánh giá tạm thời, quyết định chỉ được dùng cho ngăn chặn nội bộ và phải có thẩm quyền phê duyệt rõ, không dùng để phát hành cuối.</div></div><div class="section"><h2>4. Thiết bị nghi ngờ và hồ sơ bắt buộc</h2><ul><li>Thiết bị đo nghi ngờ sau rơi, va đập, đầu dò (probe) hit, quá hạn hiệu chuẩn, sai lệch kiểm tra standard hoặc có dấu hiệu đọc thất thường phải gắn nhãn <span class="code">nghi ngờ</span> và tách khỏi khu dùng.</li><li>Khi một thiết bị bị đánh dấu nghi ngờ, phải truy ngược các quyết định chất lượng Cần nhất dùng thiết bị đó theo mức rủi ro/QPL.</li><li>Hồ sơ bắt buộc: mã thiết bị, phạm vi đặc tính, phương pháp, Người đánh giá, dữ liệu thô, kết quả, quyết định, hành động.</li></ul><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ thiết bị có MSA hợp lệ; số thiết bị nghi ngờ; thời gian đóng hành động MSA; số CTQ phát hành bị ảnh hưởng bởi hệ đo không đạt.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html">SOP-601</a>, <a href="../../01-SOPs/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html">SOP-602</a>, <a href="../../02-Work-Instructions/06-WI-600/wi-602-gage-pre-use-verification-and-status-control.html">WI-602</a>, <a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, <a href="../../02-Work-Instructions/06-WI-600/wi-604-spc-chart-use-process-capability-and-reaction.html">WI-604</a>, <a href="annex-604-control-plan-guide.html">ANNEX-604</a>.</div></div></div></div>
+<div data-support-control="true">
+<h2 class="h2" id="support-control-intended-use-note">Kiểm soát bổ sung — dự kiến / có chủ đích-use giải thích note</h2>
+<div class="note"><b>Giải thích áp dụng</b><br>Acceptance tiêu chí trong ANNEX này phải được diễn giải theo <b>dự kiến / có chủ đích use</b>. Hệ đo dùng cho setup, SPC, acceptance, final phát hành hoặc thuộc tính/CMM sẽ có mức rủi ro khác nhau. Vì vậy cần chọn đúng biểu mẫu: <a href="../../../mom/docs/forms/frm-600-inspection/FRM-611_GRR_Study_Form.xlsx" download="">FRM-611</a>, <a href="../../../mom/docs/forms/frm-600-inspection/FRM-612_Bias_Linearity_Stability_Study_Form.xlsx" download="">FRM-612</a> hoặc <a href="../../../mom/docs/forms/frm-600-inspection/FRM-613_Attribute_MSA_and_CMM_Qualification_Record.xlsx" download="">FRM-613</a>.</div>
+</div></div>
+</div>
+</div>
+</body>
+</html>

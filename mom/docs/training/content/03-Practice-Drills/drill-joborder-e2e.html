@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<title>DI - Drill Joborder E2E | HESEM MOM</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+
+<style>
+ .mono-block{font-family:var(--mono); font-size:.92rem; background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+ .tight li{
+ thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+}
+</style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+</head>
+<body>
+
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">Drill Joborder E2E</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">DI</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+<div class="cover">
+<div class="kicker">Bộ diễn tập</div>
+<h1 class="h1">DI - Drill Joborder E2E</h1>
+<p class="lead">
+ Diễn tập này mô phỏng chuỗi <b>RFQ → Cash</b> bằng 01 job thật: khóa REV, chốt CTQ, chạy cổng kiểm soát sản xuất, tạo bộ hồ sơ giao hàng và kiểm tra truy xuất 60 giây.
+ </p>
+</div>
+<div class="grid-2">
+<div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Material</b>.
+</div>
+<div class="card">
+<span class="badge">Mục tiêu</span>
+<ul class="tight">
+<li>Không nhảy cổng kiểm soát. Không giao hàng khi thiếu bộ hồ sơ giao hàng.</li>
+<li>MRR nằm đúng SSOT và truy xuất nguồn gốc ≤ 60 giây.</li>
+<li>Bàn giao rõ: ai nhận gì, ai bàn giao gì.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Năng lực kích hoạt</span>
+<ul class="tight"><li><a href="../../01-Competency-System/02-Levels/index.html#C02"><b>C02</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C03"><b>C03</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C04"><b>C04</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C08"><b>C08</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C09"><b>C09</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C10"><b>C10</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C13"><b>C13</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C14"><b>C14</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C15"><b>C15</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C16"><b>C16</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C17"><b>C17</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C18"><b>C18</b></a></li><li><a href="../../01-Competency-System/02-Levels/index.html#C11"><b>C11</b></a></li></ul>
+<p class="small muted" style="margin-top:8px;">Người hướng dẫn chấm theo hành vi + MRR, không chấm theo cảm tính.</p>
+</div>
+</div>
+<div class="card">
+<span class="badge">Chuẩn bị</span>
+<ul class="tight">
+<li>01 job thật đang chạy hoặc job vừa hoàn tất (có hồ sơ đủ: PO, drawing/spec, traveler, mốc chuẩn).</li>
+<li>Quy tắc đặt tên: <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.</li>
+<li>Các biểu mẫu liên quan: rà soát hợp đồng, Job Khởi động, IR/FAI, NCR/CAPA, bộ hồ sơ giao hàng.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Thời lượng</span>
+<ul class="tight">
+<li>Chuẩn bị hồ sơ: 15 phút</li>
+<li>Thực hiện diễn tập: 45–90 phút (theo quy mô job)</li>
+<li>họp rút kinh nghiệm (debrief): 10 phút</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Trình tự thực hiện (bắt buộc)</span>
+<div class="table-card">
+<table class="table">
+<thead>
+<tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR (bằng chứng)</th><th style="width:90px;">Cổng kiểm soát</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Mở Hồ sơ công việc (hồ sơ công việc), xác nhận JobNum/PartNo/REV và khóa phiên bản set.</td><td>Tất cả vai trò</td><td>Photos màn hình đường dẫn hồ sơ + REV tại thư mục name</td><td>STOP</td></tr><tr><td>2</td><td>Review hợp đồng/PO: chốt CTQ + chứng từ bắt buộc (FAI/MTR/CoC/pack).</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span> + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td><td>CR biểu mẫu + CTQ list (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>3</td><td>Khởi động: lộ trình gia công + điểm giữ + rủi ro xếp hạng / đánh giá + outsource nhu cầu.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>Job khởi động bảng kiểm + Traveler</td><td>TẠM GIỮ</td></tr><tr><td>4</td><td>Kỹ thuật mốc chuẩn: phát hành phiếu cài đặt + kế hoạch kiểm tra (plan) + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a> phát hành link.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Mốc chuẩn pack + phát hành log</td><td>CHẶN</td></tr><tr><td>5</td><td>Pre-start + an toàn: PPE/5S + xác nhận tool/gage trong hạn.</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + Setup</td><td>Pre-start bảng kiểm + ảnh setup</td><td>STOP</td></tr><tr><td>6</td><td>Setup + chạy mẫu đầu (tiên chi tiết / sản phẩm): đo CTQ và lập IR/FAI.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>IR/FAI ký + ảnh mẫu đầu</td><td>TẠM GIỮ</td></tr><tr><td>7</td><td>Trong quá trình: ghi IPQC log theo phản ứng plan.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>IPQC log (PDF)</td><td>TẠM GIỮ</td></tr><tr><td>8</td><td>Outsource (KHI có): đối soát spec + nhận cert + truy xuất nguồn gốc.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>PO note + Supplier cert + nhận hàng hồ sơ</td><td>TẠM GIỮ</td></tr><tr><td>9</td><td>Final + bộ hồ sơ giao hàng: CoC + final IR + đóng gói/label Photos.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Bộ hồ sơ giao hàng bảng kiểm + CoC + đóng gói Photos</td><td>TẠM GIỮ</td></tr><tr><td>10</td><td>bài diễn tập đánh giá 60 giây: Người hướng dẫn Mọi 01 hồ sơ bất kỳ và yêu cầu mở đúng file.</td><td>Người đánh giá</td><td>Link SSOT mở đúng ≤ 60s</td><td>FAIL</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card danger">
+<span class="badge">Fail-nhanh</span>
+<ul class="tight">
+<li>Sai REV hoặc không chứng minh được REV trong SSOT.</li>
+<li>Thiếu 01 hồ sơ bắt buộc tại cổng kiểm soát: CR, Traveler, Mốc chuẩn, IR/FAI, CoC/bộ hồ sơ giao hàng.</li>
+<li>Evidence đặt sai tên hoặc nằm ngoài hồ sơ.</li>
+</ul>
+</div>
+<div class="card">
+<span class="badge">Tiêu chí đánh giá chấm điểm (10 điểm)</span>
+<p class="muted" style="margin-top:10px;">Mỗi tiêu chí 0/1/2 điểm. đạt khi tổng ≥ 8/10 và không vi phạm fail-nhanh.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
+<tbody>
+<tr><td><b>Phiên bản control</b></td><td>Không dùng file rời; REV đúng; DCR hồ sơ có dấu vết.</td><td>0/1/2</td></tr><tr><td><b>CTQ bản dịch</b></td><td>CTQ rõ, có kiểm tra phương pháp và điểm giữ.</td><td>0/1/2</td></tr><tr><td><b>Evidence kỷ luật / chuyên ngành</b></td><td>MRR đủ, tên file đúng chuẩn, nằm đúng thư mục.</td><td>0/1/2</td></tr><tr><td><b>Cổng kiểm soát quyết định</b></td><td>STOP/TẠM GIỮ/CHẶN kích hoạt đúng khi thiếu hồ sơ hoặc lệch chuẩn.</td><td>0/1/2</td></tr><tr><td><b>Bàn giao chất lượng</b></td><td>Bàn giao bằng link SSOT + Người nhận xác nhận; không bàn giao bằng lời.</td><td>0/1/2</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<span class="badge">họp rút kinh nghiệm (debrief) (10 phút)</span>
+<ol style="margin:10px 0 0 0; padding-left:18px; line-height:1.75;">
+<li>Điểm gãy lớn nhất trong job nằm ở cổng kiểm soát nào? Owner là ai?</li>
+<li>MRR nào bị thiếu/sai tên? Nguyên nhân gốc thuộc Người hay hệ thống?</li>
+<li>Chốt 03 hành động chặn lặp (người chịu trách nhiệm + due trong ngày) và nộp vào SSOT.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>
