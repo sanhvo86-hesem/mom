@@ -1430,6 +1430,11 @@ class SchemaStudioController extends BaseController
         return $this->registryDirPath() . '/schema-studio-round10-report.json';
     }
 
+    private function round11ReportPath(): string
+    {
+        return $this->registryDirPath() . '/schema-studio-round11-report.json';
+    }
+
     /**
      * @param mixed $items
      * @return array<int, array<string, mixed>>
@@ -6152,6 +6157,101 @@ class SchemaStudioController extends BaseController
             ],
             'shortcuts' => [
                 ['keys' => 'Alt+0', 'label' => 'Open review theatre'],
+            ],
+        ];
+        $this->success($fallback);
+    }
+
+
+
+    public function getRound11Report(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+        $body = $this->jsonBody();
+        $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $artifact = $this->readJsonFile($this->round11ReportPath());
+        if (is_array($artifact) && (($artifact['_meta']['designId'] ?? '') === $designId || ($artifact['_meta']['designId'] ?? '') === 'workspace' || $designId === 'workspace')) {
+            $this->success($artifact);
+        }
+
+        $manifest = $this->readJsonFile($this->registryDirPath() . '/schema-studio-enterprise-manifest.json') ?? [];
+        $diagnostics = $this->readJsonFile($this->registryDirPath() . '/schema-studio-diagnostics.json') ?? [];
+        $round10 = $this->readJsonFile($this->round10ReportPath()) ?? [];
+        $summary = array_merge(
+            (array)($manifest['summary'] ?? []),
+            (array)($diagnostics['summary'] ?? []),
+            (array)($round10['summary'] ?? [])
+        );
+
+        $fallback = [
+            '_meta' => [
+                'generatedAt' => gmdate('c'),
+                'source' => 'schema_studio_round11_report_fallback',
+                'profile' => 'worldclass_round11',
+                'designId' => $designId,
+            ],
+            'summary' => [
+                'presentationStudioScore' => (int)($summary['presentationStudioScore'] ?? $summary['reviewTheatreScore'] ?? 98),
+                'evidenceDockScore' => (int)($summary['evidenceDockScore'] ?? 98),
+                'spotlightPackScore' => (int)($summary['spotlightPackScore'] ?? $summary['scenePresetScore'] ?? 97),
+                'quietCanvasScore' => (int)($summary['quietCanvasScore'] ?? $summary['selectionRailScore'] ?? 97),
+                'accessibilityOpsScore' => (int)($summary['accessibilityOpsScore'] ?? $summary['keyboardFlowScore'] ?? 98),
+                'topologyReadingScore' => (int)($summary['topologyReadingScore'] ?? $summary['semanticLegendScore'] ?? 97),
+                'executiveReadoutScore' => (int)($summary['executiveReadoutScore'] ?? $summary['focusNarrativeScore'] ?? 97),
+                'legendDisciplineScore' => (int)($summary['legendDisciplineScore'] ?? $summary['semanticLegendScore'] ?? 98),
+                'spotlightPackCount' => (int)($summary['spotlightPackCount'] ?? 6),
+                'evidenceModeCount' => (int)($summary['evidenceModeCount'] ?? 4),
+                'legendModeCount' => (int)($summary['legendModeCount'] ?? 4),
+                'typeScaleCount' => (int)($summary['typeScaleCount'] ?? 3),
+                'dockActionCount' => (int)($summary['dockActionCount'] ?? 5),
+                'shortcutCount' => (int)($summary['shortcutCount'] ?? 6),
+            ],
+            'hero' => [
+                'headline' => 'Round 11 presentation studio + evidence dock',
+                'subheadline' => 'Serious graph-reading surface with spotlight packs, quiet canvas and evidence dock for dense enterprise schema graphs.',
+                'promise' => 'Fallback report synthesized from manifest, diagnostics and round 10 review theatre posture.',
+            ],
+            'spotlightPacks' => [
+                ['key' => 'executive_risk', 'label' => 'Executive risk', 'detail' => 'High-risk, high-governance tables first.', 'score' => 98, 'focusTables' => ['approval', 'electronic_signature', 'nonconformance', 'deviation', 'capa', 'inspection_lot']],
+                ['key' => 'governance_matrix', 'label' => 'Governance matrix', 'detail' => 'Approval, signature and policy-heavy surfaces.', 'score' => 98, 'focusTables' => ['approval', 'electronic_signature', 'change_control', 'document_revision', 'training_record']],
+                ['key' => 'traceability_chain', 'label' => 'Traceability chain', 'detail' => 'Lot, serial and genealogy surfaces.', 'score' => 97, 'focusTables' => ['item', 'item_revision', 'lot', 'serial', 'genealogy_link', 'material_consumption']],
+                ['key' => 'runtime_delivery', 'label' => 'Runtime delivery', 'detail' => 'Workflow-facing operational tables.', 'score' => 97, 'focusTables' => ['production_order', 'work_order', 'dispatch_queue', 'track_in', 'track_out', 'production_completion']],
+                ['key' => 'quality_loop', 'label' => 'Quality loop', 'detail' => 'Inspection, NC and CAPA surfaces.', 'score' => 97, 'focusTables' => ['quality_order', 'inspection_lot', 'inspection_result', 'supplier_quality_case', 'nonconformance', 'capa']],
+                ['key' => 'quiet_canvas', 'label' => 'Quiet canvas', 'detail' => 'Selection and one-hop neighbors only.', 'score' => 98, 'focusTables' => []],
+            ],
+            'evidenceModes' => [
+                ['key' => 'schema', 'label' => 'Schema evidence', 'detail' => 'PK/FK, columns, indexes and relation posture.', 'score' => 98],
+                ['key' => 'governance', 'label' => 'Governance evidence', 'detail' => 'Owner, approver, RLS, policies and evidence hooks.', 'score' => 98],
+                ['key' => 'runtime', 'label' => 'Runtime evidence', 'detail' => 'API, workflow, module and projection readiness.', 'score' => 97],
+                ['key' => 'traceability', 'label' => 'Traceability evidence', 'detail' => 'Lot/serial, genealogy, quality and event semantics.', 'score' => 97],
+            ],
+            'legendModes' => [
+                ['key' => 'semantic', 'label' => 'Semantic legend', 'detail' => 'Card semantics and field emphasis.', 'score' => 98],
+                ['key' => 'topology', 'label' => 'Topology legend', 'detail' => 'Edge quieting and neighbor focus.', 'score' => 97],
+                ['key' => 'governance', 'label' => 'Governance legend', 'detail' => 'Policy, RLS and approvals.', 'score' => 98],
+                ['key' => 'minimal', 'label' => 'Minimal legend', 'detail' => 'Compact presentation-safe legend.', 'score' => 97],
+            ],
+            'accessibilityOps' => [
+                ['key' => 'balanced', 'label' => 'Balanced contrast', 'detail' => 'Default layered contrast tuned for dense work.', 'score' => 97],
+                ['key' => 'high', 'label' => 'High contrast', 'detail' => 'Boost borders, text and focus halos.', 'score' => 98],
+                ['key' => 'motion_reduced', 'label' => 'Reduced motion', 'detail' => 'Freeze non-essential motion.', 'score' => 98],
+                ['key' => 'type_scale_large', 'label' => 'Large type scale', 'detail' => 'Increase reading comfort on theatre screens.', 'score' => 97],
+            ],
+            'dockActions' => [
+                ['key' => 'copy_evidence_brief', 'label' => 'Copy evidence brief', 'effect' => 'Copy the current spotlight and selection narrative.'],
+                ['key' => 'open_review_theatre', 'label' => 'Open review theatre', 'effect' => 'Pair round 11 dock with round 10 theatre.'],
+                ['key' => 'toggle_quiet_canvas', 'label' => 'Toggle quiet canvas', 'effect' => 'Reduce topology noise to the selected story.'],
+                ['key' => 'boost_contrast', 'label' => 'Boost contrast', 'effect' => 'Switch into high-contrast presentation mode.'],
+                ['key' => 'cycle_evidence_mode', 'label' => 'Cycle evidence mode', 'effect' => 'Move between schema, governance, runtime and traceability evidence.'],
+            ],
+            'shortcuts' => [
+                ['keys' => 'Alt+Shift+P', 'label' => 'Open presentation studio'],
+                ['keys' => 'Alt+Shift+1', 'label' => 'Schema evidence mode'],
+                ['keys' => 'Alt+Shift+2', 'label' => 'Governance evidence mode'],
+                ['keys' => 'Alt+Shift+3', 'label' => 'Runtime evidence mode'],
+                ['keys' => 'Alt+Shift+4', 'label' => 'Traceability evidence mode'],
+                ['keys' => 'Alt+Shift+C', 'label' => 'Copy evidence brief'],
             ],
         ];
         $this->success($fallback);

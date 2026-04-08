@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T21:40:00Z",
+    "generatedAt": "2026-04-08T00:25:00Z",
     "source": "schema_studio_control_plane_defaults",
-    "profile": "worldclass_round10"
+    "profile": "worldclass_round11"
   },
   "visual": {
     "defaultTab": "operations",
@@ -42,11 +42,30 @@
       "scene_runtime",
       "scene_review",
       "selection_rail",
-      "semantic_legend"
+      "semantic_legend",
+      "presentation_studio",
+      "spotlight_executive_risk",
+      "spotlight_governance_matrix",
+      "spotlight_traceability_chain",
+      "spotlight_runtime_delivery",
+      "spotlight_quality_loop",
+      "spotlight_quiet_canvas",
+      "evidence_schema",
+      "evidence_governance",
+      "evidence_runtime",
+      "evidence_traceability",
+      "legend_semantic",
+      "legend_topology",
+      "legend_governance",
+      "legend_minimal",
+      "contrast_high",
+      "motion_reduced",
+      "type_scale_large",
+      "copy_evidence_brief"
     ],
-    "tableCardSystem": "round10_review_theatre_semantic_stage",
-    "edgeGrammar": "quiet_default_with_scene_presets_and_selection_rail",
-    "selectionFocusMode": "lane_plus_neighbor_highlight",
+    "tableCardSystem": "round11_presentation_studio_evidence_dock",
+    "edgeGrammar": "quiet_canvas_plus_spotlight_packs_with_evidence_dock",
+    "selectionFocusMode": "spotlight_pack_plus_neighbor_hush",
     "badgeBudget": 2,
     "zoomBands": [
       "atlas",
@@ -88,6 +107,15 @@
       "selectionRail": true,
       "laneTelemetry": true,
       "keyboardShortcut": "Alt+0"
+    },
+    "presentationStudio": {
+      "defaultSpotlight": "executive_risk",
+      "defaultEvidence": "schema",
+      "defaultContrast": "balanced",
+      "defaultMotion": "full",
+      "defaultTypeScale": "regular",
+      "defaultLegend": "semantic",
+      "keyboardShortcut": "Alt+Shift+P"
     }
   },
   "thresholds": {
@@ -125,7 +153,15 @@
     "laneTelemetryScore": 96,
     "semanticLegendScore": 95,
     "focusNarrativeScore": 94,
-    "keyboardFlowScore": 95
+    "keyboardFlowScore": 95,
+    "presentationStudioScore": 96,
+    "evidenceDockScore": 96,
+    "spotlightPackScore": 95,
+    "quietCanvasScore": 95,
+    "accessibilityOpsScore": 96,
+    "topologyReadingScore": 95,
+    "executiveReadoutScore": 95,
+    "legendDisciplineScore": 96
   },
   "storyboards": [
     {

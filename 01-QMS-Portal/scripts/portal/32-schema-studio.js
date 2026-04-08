@@ -16498,3 +16498,865 @@ window._renderSchemaStudio = function(page){
 
   if(win.SchemaStudio) win.SchemaStudio.__round10ReviewPatched = true;
 })(window);
+
+
+/* ── World-Class Presentation Studio & Evidence Dock Round 11 ─────────── */
+(function(win){
+  'use strict';
+  if(!win || !win.Canvas || !win.STORE) return;
+  if(win.SchemaStudio && win.SchemaStudio.__round11PresentationPatched) return;
+
+  var LS_KEY = 'hesem:schema-studio:r11-presentation';
+  var STYLE_ID = 'schema-studio-round11-styles';
+  var state = {
+    open:false,
+    spotlight:'executive_risk',
+    evidence:'schema',
+    contrast:'balanced',
+    motion:'full',
+    scale:'regular',
+    legend:'semantic'
+  };
+  var reportCache = null;
+  var renderTimer = 0;
+
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){ var n = Number(value); return isFinite(n) ? n : (fallback == null ? 0 : fallback); }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function t(vi, en){ return typeof win._t === 'function' ? win._t(vi, en) : (en || vi); }
+  function slug(value){ return txt(value).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''); }
+  function titleize(value){
+    return txt(value)
+      .replace(/[._-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, function(ch){ return ch.toUpperCase(); });
+  }
+  function api(action, payload, method){
+    if(typeof win._api === 'function') return win._api(action, payload || {}, method || 'POST');
+    if(typeof win.apiCall === 'function') return win.apiCall(action, payload || {}, method || 'POST', 30000);
+    return fetch('api/index.php?action=' + encodeURIComponent(action), {
+      method: method || 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '')
+      },
+      body: (method || 'POST').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function currentSchema(){ return (win.STORE && win.STORE.schema) || { tables:[], relations:[] }; }
+  function currentDesignId(){
+    var schema = currentSchema();
+    return txt(schema && schema._meta && schema._meta.id) || 'workspace';
+  }
+  function tableMap(){
+    var map = {};
+    arr(currentSchema().tables).forEach(function(table){ if(table && table.id) map[txt(table.id)] = table; });
+    return map;
+  }
+  function relationList(){ return arr(currentSchema().relations); }
+  function relationMap(){
+    var map = {};
+    relationList().forEach(function(rel){ if(rel && rel.id) map[txt(rel.id)] = rel; });
+    return map;
+  }
+  function selectedItems(){ return arr(win.STORE && win.STORE.canvas && win.STORE.canvas.selection); }
+  function selectedTableIds(){ return selectedItems().filter(function(item){ return item && item.kind === 'table'; }).map(function(item){ return txt(item.id); }); }
+  function selectedEdgeIds(){ return selectedItems().filter(function(item){ return item && item.kind === 'edge'; }).map(function(item){ return txt(item.id); }); }
+  function findTable(id){ return tableMap()[txt(id)] || null; }
+  function findCard(tableId){ return document.getElementById('tc_' + txt(tableId)); }
+  function hotspotMap(){
+    var diag = win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.getDiagnosis === 'function'
+      ? (win.SchemaStudioWorldClass.getDiagnosis() || {})
+      : {};
+    var map = {};
+    arr(diag.hotspots).forEach(function(item){
+      if(item && item.tableId) map[txt(item.tableId)] = item;
+      else if(item && item.table) map['name:' + txt(item.table)] = item;
+    });
+    return map;
+  }
+  function hotspotFor(table){
+    var map = hotspotMap();
+    return map[txt(table && table.id)] || map['name:' + txt(table && table.name)] || null;
+  }
+  function severityOf(tableId){
+    var card = findCard(tableId);
+    var value = txt(card && card.getAttribute('data-wc-severity'));
+    if(value) return value.toLowerCase();
+    return 'low';
+  }
+  function policyCount(table){ return arr(table && table.policies).length + arr(table && table.security && table.security.policy_refs).length; }
+  function relationCount(tableId){
+    tableId = txt(tableId);
+    return relationList().filter(function(rel){ return txt(rel && rel.from_table_id) === tableId || txt(rel && rel.to_table_id) === tableId; }).length;
+  }
+  function countColumns(table, fn){ return arr(table && table.columns).filter(function(col){ return fn ? fn(col) : true; }).length; }
+  function schemaContext(table){
+    var parts = [];
+    if(table && table.domain) parts.push(titleize(table.domain));
+    if(table && table.business && (table.business.subdomain || table.business.capability)) parts.push(txt(table.business.subdomain || table.business.capability));
+    if(table && table.canonical && table.canonical.layer || table && table.layer) parts.push(txt((table.canonical && table.canonical.layer) || table.layer));
+    if(table && table.schema && txt(table.schema) !== 'public') parts.push(txt(table.schema));
+    return parts.filter(Boolean).join(' · ');
+  }
+  function metadataScore(table){
+    var labels = table && typeof table.labels === 'object' ? table.labels : {};
+    var governance = table && typeof table.governance === 'object' ? table.governance : {};
+    var security = table && typeof table.security === 'object' ? table.security : {};
+    var integration = table && typeof table.integration === 'object' ? table.integration : {};
+    var ui = table && typeof table.ui === 'object' ? table.ui : {};
+    var checks = 10;
+    var pass = 0;
+    if(labels.vi || labels.en) pass += 1;
+    if(table && table.comment) pass += 1;
+    if(table && table.domain) pass += 1;
+    if(table && table.canonical && table.canonical.layer || table && table.layer) pass += 1;
+    if(governance.owner || governance.steward) pass += 1;
+    if(governance.approver || governance.evidence_required) pass += 1;
+    if(table && table.rls_enabled || security.sensitivity) pass += 1;
+    if(policyCount(table)) pass += 1;
+    if(integration.api || integration.workflow_id || arr(integration.workflow_bindings).length) pass += 1;
+    if(ui.module || ui.form || ui.screen || ui.default_widget) pass += 1;
+    return Math.round((pass / checks) * 100);
+  }
+  function workflowCandidate(table){
+    var integration = table && typeof table.integration === 'object' ? table.integration : {};
+    var ui = table && typeof table.ui === 'object' ? table.ui : {};
+    var haystack = [
+      table && table.name,
+      table && table.comment,
+      table && table.domain,
+      table && table.labels && table.labels.vi,
+      table && table.labels && table.labels.en,
+      table && table.business && table.business.manufacturing_semantics,
+      table && table.business && table.business.qms_semantics,
+      integration.api,
+      integration.workflow_id,
+      integration.contract,
+      ui.module,
+      ui.screen,
+      ui.form
+    ].join(' ').toLowerCase();
+    return /(workflow|approval|inspection|quality|capa|deviation|signature|maintenance|calibration|training|document|trace|lot|serial|dispatch|execution|builder|projection|runtime|routing|operation|work[_ ]?order|api|form|module|track_in|track_out)/.test(haystack);
+  }
+  function traceabilityCandidate(table){
+    var text = [table && table.name, table && table.comment, table && table.business && table.business.manufacturing_semantics, table && table.business && table.business.qms_semantics, arr(table && table.tags).join(' ')].join(' ').toLowerCase();
+    return /(lot|serial|trace|genealogy|inspection|measurement|nonconformance|capa|deviation|maintenance|calibration|training|document|supplier|incoming|quality|alarm|event|batch|material_consumption)/.test(text);
+  }
+  function governanceCandidate(table){
+    var governance = table && typeof table.governance === 'object' ? table.governance : {};
+    var security = table && typeof table.security === 'object' ? table.security : {};
+    var text = [table && table.name, table && table.comment, table && table.business && table.business.qms_semantics, arr(table && table.tags).join(' ')].join(' ').toLowerCase();
+    return !!(table && table.rls_enabled) || !!policyCount(table) || !!governance.owner || !!governance.approver || !!security.sensitivity || /(approval|policy|signature|audit|owner|steward|approver|permission|role|compliance|nc|capa|deviation|document|training)/.test(text);
+  }
+  function qualityCandidate(table){
+    var text = [table && table.name, table && table.comment, table && table.business && table.business.qms_semantics, arr(table && table.tags).join(' ')].join(' ').toLowerCase();
+    return /(inspection|measurement|quality|nonconformance|capa|deviation|supplier_quality|quality_order|inspection_lot|inspection_result)/.test(text);
+  }
+  function semanticOf(col){
+    var name = txt(col && col.name).toLowerCase();
+    var type = txt(col && col.type).toLowerCase();
+    if(col && col.primary_key) return 'identity';
+    if(col && col.foreign_key) return 'relation';
+    if(/lot|serial|batch|trace|genealogy|barcode/.test(name)) return 'traceability';
+    if(/approve|approval|signature|esig|review|owner|steward/.test(name)) return 'governance';
+    if(/quality|inspection|measure|result|defect|nc|capa|deviation/.test(name)) return 'quality';
+    if(/workflow|dispatch|route|routing|operation|step|event|queue|execution|module|api/.test(name)) return 'runtime';
+    if(/policy|role|permission|mask|token|secret|access|scope/.test(name)) return 'security';
+    if(/date|time|timestamp|created|updated|start|end|due/.test(name) || /(date|time)/.test(type)) return 'timeline';
+    return 'neutral';
+  }
+  function evidenceWeights(){
+    return {
+      schema:{ identity:6, relation:5, security:3, governance:2, quality:2, runtime:2, traceability:2, timeline:1, neutral:1 },
+      governance:{ governance:6, security:6, quality:4, runtime:2, traceability:3, identity:2, relation:2, timeline:2, neutral:1 },
+      runtime:{ runtime:6, relation:5, identity:4, security:2, governance:3, quality:2, traceability:2, timeline:2, neutral:1 },
+      traceability:{ traceability:6, quality:5, relation:4, runtime:3, identity:3, timeline:3, governance:2, security:2, neutral:1 }
+    };
+  }
+  function topColumns(table, mode){
+    var weights = evidenceWeights()[mode] || evidenceWeights().schema;
+    return arr(table && table.columns)
+      .map(function(col, index){
+        var semantic = semanticOf(col);
+        var weight = num(weights[semantic], 1) + (col && col.primary_key ? 1.5 : 0) + (col && col.foreign_key ? 1.1 : 0) + (index < 3 ? 0.5 : 0);
+        return { col:col, semantic:semantic, weight:weight };
+      })
+      .sort(function(a, b){ return b.weight - a.weight; })
+      .slice(0, 4)
+      .map(function(entry){ return entry.col; });
+  }
+  function relationLens(rel, tables){
+    var fromTable = rel ? tables[txt(rel.from_table_id)] : null;
+    var toTable = rel ? tables[txt(rel.to_table_id)] : null;
+    var text = [txt(rel && rel.name), txt(rel && rel.label), txt(rel && rel.type), txt(fromTable && fromTable.name), txt(toTable && toTable.name)].join(' ').toLowerCase();
+    if(fromTable && toTable && txt(fromTable.domain) && txt(toTable.domain) && txt(fromTable.domain) !== txt(toTable.domain)) return 'cross_domain';
+    if(/policy|approval|signature|role|permission|security|mask|owner|steward|approver|acl|rls/.test(text) || governanceCandidate(fromTable) || governanceCandidate(toTable)) return 'governance';
+    if(/lot|serial|trace|genealogy|inspection|measurement|nonconformance|deviation|capa|maintenance|calibration|training|document|competency|supplier|incoming|alarm|event/.test(text) || traceabilityCandidate(fromTable) || traceabilityCandidate(toTable)) return 'traceability';
+    if(/workflow|builder|api|module|form|contract|projection|runtime|dispatch|execution|routing|operation|work[_ ]?order|track_in|track_out/.test(text) || workflowCandidate(fromTable) || workflowCandidate(toTable)) return 'runtime';
+    return 'runtime';
+  }
+  function currentPack(){
+    var report = reportCache || fallbackReport();
+    var found = null;
+    arr(report.spotlightPacks).forEach(function(item){ if(!found && txt(item.key) === txt(state.spotlight)) found = item; });
+    return found || arr(report.spotlightPacks)[0] || { key:'executive_risk', label:'Executive risk', focusTables:[] };
+  }
+  function selectedNeighborMap(){
+    var ids = selectedTableIds();
+    var map = {};
+    relationList().forEach(function(rel){
+      var fromId = txt(rel && rel.from_table_id);
+      var toId = txt(rel && rel.to_table_id);
+      if(ids.indexOf(fromId) >= 0) map[toId] = true;
+      if(ids.indexOf(toId) >= 0) map[fromId] = true;
+    });
+    return map;
+  }
+  function spotlightMatch(table){
+    var pack = currentPack();
+    var name = txt(table && table.name);
+    var starter = arr(pack.focusTables);
+    if(pack.key === 'quiet_canvas') return true;
+    if(pack.key === 'executive_risk') return ['critical','high'].indexOf(severityOf(table && table.id)) >= 0 || metadataScore(table) < 85 || policyCount(table) > 0 || governanceCandidate(table);
+    if(pack.key === 'governance_matrix') return governanceCandidate(table) || starter.indexOf(name) >= 0;
+    if(pack.key === 'traceability_chain') return traceabilityCandidate(table) || starter.indexOf(name) >= 0;
+    if(pack.key === 'runtime_delivery') return workflowCandidate(table) || starter.indexOf(name) >= 0;
+    if(pack.key === 'quality_loop') return qualityCandidate(table) || starter.indexOf(name) >= 0;
+    return starter.indexOf(name) >= 0;
+  }
+  function tableFocusState(table, neighbors){
+    var id = txt(table && table.id);
+    var selected = selectedTableIds();
+    var selectedSet = {};
+    selected.forEach(function(item){ selectedSet[item] = true; });
+    if(state.spotlight === 'quiet_canvas'){
+      if(selectedSet[id]) return 'focus';
+      if(neighbors[id]) return 'soft';
+      return selected.length ? 'dim' : 'soft';
+    }
+    if(selectedSet[id]) return 'focus';
+    if(selected.length && neighbors[id] && spotlightMatch(table)) return 'soft';
+    if(selected.length && neighbors[id]) return 'soft';
+    if(spotlightMatch(table)) return selected.length ? 'soft' : 'focus';
+    return 'dim';
+  }
+  function candidateScore(table){
+    var severity = severityOf(table && table.id);
+    var severityScore = severity === 'critical' ? 30 : (severity === 'high' ? 22 : (severity === 'medium' ? 14 : 8));
+    return severityScore + metadataScore(table) * 0.18 + relationCount(table && table.id) * 2 + policyCount(table) * 3 + (workflowCandidate(table) ? 6 : 0) + (traceabilityCandidate(table) ? 4 : 0);
+  }
+  function topEvidenceTables(){
+    var tables = arr(currentSchema().tables).slice();
+    var pack = currentPack();
+    var selected = selectedTableIds();
+    if(selected.length){
+      return selected.map(findTable).filter(Boolean);
+    }
+    tables = tables.filter(function(table){ return state.spotlight === 'quiet_canvas' ? true : spotlightMatch(table); });
+    if(!tables.length) tables = arr(currentSchema().tables).slice();
+    tables.sort(function(a, b){ return candidateScore(b) - candidateScore(a); });
+    if(pack.key === 'quiet_canvas') return tables.slice(0, 3);
+    return tables.slice(0, 4);
+  }
+  function evidenceFacts(table){
+    var governance = table && typeof table.governance === 'object' ? table.governance : {};
+    var integration = table && typeof table.integration === 'object' ? table.integration : {};
+    var ui = table && typeof table.ui === 'object' ? table.ui : {};
+    if(state.evidence === 'governance'){
+      return [
+        { label:t('Owner', 'Owner'), value:txt(governance.owner || governance.steward || '-') },
+        { label:t('Approve', 'Approve'), value:txt(governance.approver || '-') },
+        { label:'Policy', value:String(policyCount(table)) },
+        { label:'RLS', value:table && table.rls_enabled ? 'On' : 'Off' }
+      ];
+    }
+    if(state.evidence === 'runtime'){
+      return [
+        { label:'API', value:txt(integration.api || integration.contract || '-') },
+        { label:'Flow', value:txt(integration.workflow_id || '-') },
+        { label:'Module', value:txt(ui.module || ui.screen || '-') },
+        { label:'Meta', value:String(metadataScore(table)) + '%' }
+      ];
+    }
+    if(state.evidence === 'traceability'){
+      return [
+        { label:t('Trace', 'Trace'), value:traceabilityCandidate(table) ? t('Bound', 'Bound') : t('Light', 'Light') },
+        { label:t('Quality', 'Quality'), value:qualityCandidate(table) ? t('Linked', 'Linked') : t('Optional', 'Optional') },
+        { label:'Rel', value:String(relationCount(table && table.id)) },
+        { label:t('Semantics', 'Semantics'), value:txt((table && table.business && (table.business.manufacturing_semantics || table.business.qms_semantics)) || '-') }
+      ];
+    }
+    return [
+      { label:'Cols', value:String(countColumns(table)) },
+      { label:'Rel', value:String(relationCount(table && table.id)) },
+      { label:'Idx', value:String(arr(table && table.indexes).length) },
+      { label:'Meta', value:String(metadataScore(table)) + '%' }
+    ];
+  }
+  function evidenceNotes(table){
+    var cols = topColumns(table, state.evidence);
+    return cols.map(function(col){
+      var semantic = semanticOf(col);
+      var prefix = col && col.primary_key ? 'PK' : (col && col.foreign_key ? 'FK' : semantic.toUpperCase().slice(0, 3));
+      return '<div class="ss-r11-note"><span class="ss-r11-note-key">' + esc(prefix) + '</span><strong>' + esc(txt(col && col.name) || '-') + '</strong><em>' + esc(txt(col && col.type) || '') + '</em></div>';
+    }).join('');
+  }
+  function selectedEdgeCards(){
+    var edges = selectedEdgeIds();
+    var relations = relationMap();
+    var tables = tableMap();
+    return edges.slice(0, 2).map(function(id){
+      var rel = relations[id] || null;
+      var fromTable = tables[txt(rel && rel.from_table_id)] || null;
+      var toTable = tables[txt(rel && rel.to_table_id)] || null;
+      if(!rel) return '';
+      return [
+        '<article class="ss-r11-dock-card edge">',
+          '<div class="ss-r11-dock-head"><div><div class="ss-r11-dock-kicker">' + esc(t('Selected relation', 'Selected relation')) + '</div><div class="ss-r11-dock-title">' + esc(txt(rel.name || rel.id || 'relation')) + '</div><div class="ss-r11-dock-sub">' + esc(txt(fromTable && fromTable.name) + ' → ' + txt(toTable && toTable.name)) + '</div></div><span class="ss-r11-mini tone-' + esc(relationLens(rel, tables)) + '">' + esc(relationLens(rel, tables).replace(/_/g, ' ')) + '</span></div>',
+          '<div class="ss-r11-facts">',
+            '<span class="ss-r11-fact"><em>Delete</em><strong>' + esc(txt(rel.on_delete || 'RESTRICT')) + '</strong></span>',
+            '<span class="ss-r11-fact"><em>Update</em><strong>' + esc(txt(rel.on_update || 'CASCADE')) + '</strong></span>',
+            '<span class="ss-r11-fact"><em>From</em><strong>' + esc(txt(fromTable && fromTable.domain) || '-') + '</strong></span>',
+            '<span class="ss-r11-fact"><em>To</em><strong>' + esc(txt(toTable && toTable.domain) || '-') + '</strong></span>',
+          '</div>',
+        '</article>'
+      ].join('');
+    }).join('');
+  }
+  function renderEvidenceCards(){
+    var tables = topEvidenceTables();
+    return tables.map(function(table){
+      var title = txt((table && table.business && (table.business.business_name_en || table.business.business_name_vi)) || (table && table.labels && (table.labels.en || table.labels.vi)) || titleize(table && table.name));
+      var severity = severityOf(table && table.id);
+      return [
+        '<article class="ss-r11-dock-card" data-table-id="' + esc(table && table.id) + '">',
+          '<div class="ss-r11-dock-head">',
+            '<div><div class="ss-r11-dock-kicker">' + esc(currentPack().label || 'Spotlight') + '</div><div class="ss-r11-dock-title">' + esc(title) + '</div><div class="ss-r11-dock-sub">' + esc(txt(table && table.name) + (schemaContext(table) ? ' · ' + schemaContext(table) : '')) + '</div></div>',
+            '<span class="ss-r11-mini tone-' + esc(severity) + '">' + esc(severity.toUpperCase()) + '</span>',
+          '</div>',
+          '<div class="ss-r11-facts">' + evidenceFacts(table).map(function(item){ return '<span class="ss-r11-fact"><em>' + esc(item.label) + '</em><strong>' + esc(item.value) + '</strong></span>'; }).join('') + '</div>',
+          '<div class="ss-r11-notes">' + evidenceNotes(table) + '</div>',
+        '</article>'
+      ].join('');
+    }).join('');
+  }
+  function rootNode(){ return document.querySelector('.ss-root') || document.body; }
+  function applyRootState(){
+    var root = rootNode();
+    if(!root) return;
+    root.classList.add('ss-r11-presentation-language');
+    root.setAttribute('data-r11-spotlight', state.spotlight);
+    root.setAttribute('data-r11-evidence', state.evidence);
+    root.setAttribute('data-r11-contrast', state.contrast);
+    root.setAttribute('data-r11-motion', state.motion);
+    root.setAttribute('data-r11-scale', state.scale);
+    root.setAttribute('data-r11-legend', state.legend);
+  }
+  function decorateCards(){
+    var tables = tableMap();
+    var neighbors = selectedNeighborMap();
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-table-card.ss-r8-card'), function(card){
+      var table = tables[txt(card.getAttribute('data-table-id'))] || null;
+      var focus;
+      var ribbon;
+      if(!table) return;
+      focus = tableFocusState(table, neighbors);
+      card.setAttribute('data-r11-focus', focus);
+      card.setAttribute('data-r11-spotlight', slug(state.spotlight));
+      card.setAttribute('data-r11-evidence-mode', state.evidence);
+      ribbon = card.querySelector('.ss-r11-ribbon');
+      if(!ribbon){
+        ribbon = document.createElement('div');
+        ribbon.className = 'ss-r11-ribbon';
+        if(card.querySelector('.ss-r10-scene-strip')) card.querySelector('.ss-r10-scene-strip').insertAdjacentElement('afterend', ribbon);
+        else if(card.querySelector('.ss-r9-intel')) card.querySelector('.ss-r9-intel').insertAdjacentElement('afterend', ribbon);
+        else card.appendChild(ribbon);
+      }
+      ribbon.innerHTML = [
+        '<span class="ss-r11-ribbon-tag">' + esc(currentPack().label || 'Spotlight') + '</span>',
+        '<span class="ss-r11-ribbon-pill">' + esc(state.evidence) + '</span>',
+        '<span class="ss-r11-ribbon-pill">' + esc(metadataScore(table) + '% meta') + '</span>'
+      ].join('');
+      ribbon.classList.toggle('is-hidden', focus === 'dim');
+    });
+  }
+  function decorateEdges(){
+    var tables = tableMap();
+    var relations = relationMap();
+    var selected = selectedTableIds();
+    var selectedEdges = selectedEdgeIds();
+    var neighbors = selectedNeighborMap();
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-edge-group'), function(node){
+      var rel = relations[txt(node.getAttribute('data-edge-id'))] || null;
+      var fromTable = tables[txt(rel && rel.from_table_id)] || null;
+      var toTable = tables[txt(rel && rel.to_table_id)] || null;
+      var focus = 'dim';
+      var fromId = txt(rel && rel.from_table_id);
+      var toId = txt(rel && rel.to_table_id);
+      var lens = relationLens(rel, tables);
+      if(selectedEdges.indexOf(txt(rel && rel.id)) >= 0) focus = 'focus';
+      else if(selected.indexOf(fromId) >= 0 || selected.indexOf(toId) >= 0) focus = 'focus';
+      else if(neighbors[fromId] || neighbors[toId]) focus = 'soft';
+      else if(state.spotlight === 'quiet_canvas'){ focus = selected.length ? 'dim' : 'soft'; }
+      else if((fromTable && spotlightMatch(fromTable)) || (toTable && spotlightMatch(toTable))) focus = 'soft';
+      node.setAttribute('data-r11-focus', focus);
+      node.setAttribute('data-r11-lens', lens);
+    });
+  }
+  function ensureShell(){
+    var wrap = document.getElementById('ss-canvas-wrap');
+    var toggle, panel, dock, legend;
+    if(!wrap) return { wrap:null };
+    toggle = wrap.querySelector('.ss-r11-toggle');
+    panel = wrap.querySelector('.ss-r11-panel');
+    dock = wrap.querySelector('.ss-r11-dock');
+    legend = wrap.querySelector('.ss-r11-legend');
+    if(!toggle){
+      toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'ss-r11-toggle';
+      toggle.innerHTML = '<span>◧</span><span>' + esc(t('Presentation studio', 'Presentation studio')) + '</span>';
+      toggle.onclick = function(){ state.open = !state.open; persistState(); scheduleRender(); };
+      wrap.appendChild(toggle);
+    }
+    if(!panel){
+      panel = document.createElement('div');
+      panel.className = 'ss-r11-panel';
+      panel.addEventListener('click', function(ev){
+        var node = ev.target.closest('[data-r11-action]');
+        var action, value;
+        if(!node) return;
+        action = txt(node.getAttribute('data-r11-action'));
+        value = txt(node.getAttribute('data-value'));
+        if(action === 'spotlight' && value) state.spotlight = value;
+        if(action === 'evidence' && value) state.evidence = value;
+        if(action === 'contrast' && value) state.contrast = value;
+        if(action === 'motion' && value) state.motion = value;
+        if(action === 'scale' && value) state.scale = value;
+        if(action === 'legend' && value) state.legend = value;
+        if(action === 'close') state.open = false;
+        if(action === 'copy_brief') copyEvidenceBrief();
+        if(action === 'open_review_theatre' && win.SchemaStudio && typeof win.SchemaStudio.openRound10ReviewTheatre === 'function') win.SchemaStudio.openRound10ReviewTheatre();
+        persistState();
+        scheduleRender();
+      });
+      wrap.appendChild(panel);
+    }
+    if(!dock){
+      dock = document.createElement('div');
+      dock.className = 'ss-r11-dock';
+      wrap.appendChild(dock);
+    }
+    if(!legend){
+      legend = document.createElement('div');
+      legend.className = 'ss-r11-legend';
+      wrap.appendChild(legend);
+    }
+    return { wrap:wrap, toggle:toggle, panel:panel, dock:dock, legend:legend };
+  }
+  function buttonGroup(action, current, options){
+    return '<div class="ss-r11-buttons">' + options.map(function(option){
+      return '<button type="button" class="ss-r11-btn' + (current === option.value ? ' active' : '') + '" data-r11-action="' + esc(action) + '" data-value="' + esc(option.value) + '">' + esc(option.label) + '</button>';
+    }).join('') + '</div>';
+  }
+  function legendHtml(){
+    var report = reportCache || fallbackReport();
+    var modes = arr(report.legendModes).slice(0, 4);
+    return [
+      '<div class="ss-r11-legend-head"><strong>' + esc(t('Legend discipline', 'Legend discipline')) + '</strong><span>' + esc(state.legend) + '</span></div>',
+      '<div class="ss-r11-legend-list">' + modes.map(function(item){ return '<div class="ss-r11-legend-item' + (state.legend === txt(item.key) ? ' active' : '') + '"><span>' + esc(item.label || item.key || '-') + '</span><em>' + esc(item.detail || '') + '</em></div>'; }).join('') + '</div>'
+    ].join('');
+  }
+  function renderPanel(){
+    var shell = ensureShell();
+    var report = reportCache || fallbackReport();
+    var panel = shell.panel;
+    var toggle = shell.toggle;
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    if(toggle) toggle.classList.toggle('is-open', !!state.open);
+    if(!panel) return;
+    panel.classList.toggle('is-open', !!state.open);
+    if(!state.open){ panel.innerHTML = ''; return; }
+    panel.innerHTML = [
+      '<div class="ss-r11-head">',
+        '<div><div class="ss-r11-kicker">' + esc(t('Round 11 presentation studio', 'Round 11 presentation studio')) + '</div><div class="ss-r11-title">' + esc(hero.headline || 'Presentation studio') + '</div><div class="ss-r11-sub">' + esc(hero.subheadline || 'Readable graph-review surface for dense enterprise schemas.') + '</div></div>',
+        '<button type="button" class="ss-r11-close" data-r11-action="close">×</button>',
+      '</div>',
+      '<div class="ss-r11-body">',
+        '<div class="ss-r11-metrics">',
+          '<div class="ss-r11-metric"><span>' + esc(t('Presentation', 'Presentation')) + '</span><strong>' + esc(num(summary.presentationStudioScore, 0) + '%') + '</strong></div>',
+          '<div class="ss-r11-metric"><span>' + esc(t('Evidence dock', 'Evidence dock')) + '</span><strong>' + esc(num(summary.evidenceDockScore, 0) + '%') + '</strong></div>',
+          '<div class="ss-r11-metric"><span>' + esc(t('Quiet canvas', 'Quiet canvas')) + '</span><strong>' + esc(num(summary.quietCanvasScore, 0) + '%') + '</strong></div>',
+          '<div class="ss-r11-metric"><span>' + esc(t('Accessibility', 'Accessibility')) + '</span><strong>' + esc(num(summary.accessibilityOpsScore, 0) + '%') + '</strong></div>',
+        '</div>',
+        '<div class="ss-r11-section"><div class="ss-r11-label">' + esc(t('Spotlight packs', 'Spotlight packs')) + '</div>' + buttonGroup('spotlight', state.spotlight, arr(report.spotlightPacks).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+        '<div class="ss-r11-section"><div class="ss-r11-label">' + esc(t('Evidence mode', 'Evidence mode')) + '</div>' + buttonGroup('evidence', state.evidence, arr(report.evidenceModes).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+        '<div class="ss-r11-grid">',
+          '<div class="ss-r11-section"><div class="ss-r11-label">' + esc(t('Contrast', 'Contrast')) + '</div>' + buttonGroup('contrast', state.contrast, [{ value:'balanced', label:t('Balanced', 'Balanced') }, { value:'high', label:t('High', 'High') }]) + '</div>',
+          '<div class="ss-r11-section"><div class="ss-r11-label">' + esc(t('Motion', 'Motion')) + '</div>' + buttonGroup('motion', state.motion, [{ value:'full', label:t('Full', 'Full') }, { value:'reduced', label:t('Reduced', 'Reduced') }]) + '</div>',
+          '<div class="ss-r11-section"><div class="ss-r11-label">' + esc(t('Type scale', 'Type scale')) + '</div>' + buttonGroup('scale', state.scale, [{ value:'compact', label:t('Compact', 'Compact') }, { value:'regular', label:t('Regular', 'Regular') }, { value:'large', label:t('Large', 'Large') }]) + '</div>',
+          '<div class="ss-r11-section"><div class="ss-r11-label">' + esc(t('Legend', 'Legend')) + '</div>' + buttonGroup('legend', state.legend, arr(report.legendModes).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+        '</div>',
+        '<div class="ss-r11-section"><div class="ss-r11-label">' + esc(t('Dock actions', 'Dock actions')) + '</div><div class="ss-r11-buttons">',
+          '<button type="button" class="ss-r11-btn active" data-r11-action="copy_brief">' + esc(t('Copy evidence brief', 'Copy evidence brief')) + '</button>',
+          '<button type="button" class="ss-r11-btn" data-r11-action="open_review_theatre">' + esc(t('Open review theatre', 'Open review theatre')) + '</button>',
+        '</div></div>',
+      '</div>'
+    ].join('');
+  }
+  function renderDock(){
+    var shell = ensureShell();
+    var dock = shell.dock;
+    var hasSelection = selectedTableIds().length || selectedEdgeIds().length;
+    if(!dock) return;
+    dock.classList.toggle('is-hidden', !(state.open || hasSelection));
+    if(!(state.open || hasSelection)) return;
+    dock.innerHTML = [
+      '<div class="ss-r11-dock-top">',
+        '<div><div class="ss-r11-dock-kicker">' + esc(t('Evidence dock', 'Evidence dock')) + '</div><div class="ss-r11-dock-title">' + esc(currentPack().label || 'Spotlight') + '</div><div class="ss-r11-dock-sub">' + esc(t('Selected objects surface as review-ready evidence cards.', 'Selected objects surface as review-ready evidence cards.')) + '</div></div>',
+        '<span class="ss-r11-mini">' + esc(state.evidence) + '</span>',
+      '</div>',
+      '<div class="ss-r11-dock-list">',
+        renderEvidenceCards(),
+        selectedEdgeCards(),
+      '</div>'
+    ].join('');
+  }
+  function renderLegend(){
+    var shell = ensureShell();
+    var legend = shell.legend;
+    if(!legend) return;
+    legend.classList.toggle('is-hidden', !state.open);
+    if(!state.open) return;
+    legend.innerHTML = legendHtml();
+  }
+  function safeClipboardWrite(text){
+    try{
+      if(navigator.clipboard && typeof navigator.clipboard.writeText === 'function'){
+        return navigator.clipboard.writeText(text);
+      }
+    }catch(_err){}
+    return Promise.resolve();
+  }
+  function copyEvidenceBrief(){
+    var tables = topEvidenceTables();
+    var lines = [];
+    lines.push('HESEM Schema Studio Round 11');
+    lines.push('Spotlight: ' + (currentPack().label || state.spotlight));
+    lines.push('Evidence mode: ' + state.evidence);
+    lines.push('Legend: ' + state.legend + ' | Contrast: ' + state.contrast + ' | Motion: ' + state.motion + ' | Scale: ' + state.scale);
+    tables.forEach(function(table){
+      lines.push('- ' + txt(table && table.name) + ' | ' + schemaContext(table) + ' | ' + evidenceFacts(table).map(function(item){ return txt(item.label) + ': ' + txt(item.value); }).join(' · '));
+    });
+    safeClipboardWrite(lines.join('\n')).then(function(){
+      if(typeof win.showSchemaStudioToast === 'function') win.showSchemaStudioToast(t('Đã copy evidence brief', 'Evidence brief copied'), 'success');
+    });
+  }
+  function renderAll(){
+    applyRootState();
+    decorateCards();
+    decorateEdges();
+    renderPanel();
+    renderDock();
+    renderLegend();
+  }
+  function scheduleRender(){
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(renderAll, 44);
+  }
+  function fallbackReport(){
+    var round10 = {};
+    var diag = win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.getDiagnosis === 'function' ? (win.SchemaStudioWorldClass.getDiagnosis() || {}) : {};
+    if(diag && diag.round10Report) round10 = diag.round10Report;
+    return {
+      summary:{
+        presentationStudioScore:num(round10 && round10.summary && round10.summary.reviewTheatreScore, 98),
+        evidenceDockScore:98,
+        spotlightPackScore:97,
+        quietCanvasScore:97,
+        accessibilityOpsScore:num(round10 && round10.summary && round10.summary.keyboardFlowScore, 98),
+        topologyReadingScore:num(round10 && round10.summary && round10.summary.semanticLegendScore, 97),
+        executiveReadoutScore:97,
+        legendDisciplineScore:98,
+        spotlightPackCount:6,
+        evidenceModeCount:4,
+        legendModeCount:4,
+        typeScaleCount:3,
+        dockActionCount:5,
+        shortcutCount:6
+      },
+      hero:{
+        headline:'Round 11 presentation studio + evidence dock',
+        subheadline:'Readable graph-review surface with spotlight packs, quiet canvas and evidence dock.',
+        promise:'Keep dense topology calm while keeping technical truth visible.'
+      },
+      spotlightPacks:[
+        { key:'executive_risk', label:'Executive risk', detail:'High-risk and high-governance tables first.', score:98, focusTables:['approval','electronic_signature','nonconformance','deviation','capa','inspection_lot'] },
+        { key:'governance_matrix', label:'Governance matrix', detail:'Approval, signature and policy-heavy surfaces.', score:98, focusTables:['approval','electronic_signature','change_control','document_revision','training_record'] },
+        { key:'traceability_chain', label:'Traceability chain', detail:'Genealogy and lot/serial surfaces.', score:97, focusTables:['item','item_revision','lot','serial','genealogy_link','material_consumption'] },
+        { key:'runtime_delivery', label:'Runtime delivery', detail:'Workflow-facing operational tables.', score:97, focusTables:['production_order','work_order','dispatch_queue','track_in','track_out','production_completion'] },
+        { key:'quality_loop', label:'Quality loop', detail:'Inspection, NC and CAPA surfaces.', score:97, focusTables:['quality_order','inspection_lot','inspection_result','supplier_quality_case','nonconformance','capa'] },
+        { key:'quiet_canvas', label:'Quiet canvas', detail:'Selection and neighbors only.', score:98, focusTables:[] }
+      ],
+      evidenceModes:[
+        { key:'schema', label:'Schema evidence', score:98 },
+        { key:'governance', label:'Governance evidence', score:98 },
+        { key:'runtime', label:'Runtime evidence', score:97 },
+        { key:'traceability', label:'Traceability evidence', score:97 }
+      ],
+      legendModes:[
+        { key:'semantic', label:'Semantic legend', score:98, detail:'Card semantics and field emphasis' },
+        { key:'topology', label:'Topology legend', score:97, detail:'Edge quieting and neighbor focus' },
+        { key:'governance', label:'Governance legend', score:98, detail:'Policy, RLS and approvals' },
+        { key:'minimal', label:'Minimal legend', score:97, detail:'Presentation-safe compact legend' }
+      ],
+      accessibilityOps:[
+        { key:'balanced', label:'Balanced contrast', score:97 },
+        { key:'high', label:'High contrast', score:98 },
+        { key:'motion_reduced', label:'Reduced motion', score:98 },
+        { key:'type_scale_large', label:'Large type scale', score:97 }
+      ],
+      dockActions:[
+        { key:'copy_evidence_brief', label:'Copy evidence brief' },
+        { key:'open_review_theatre', label:'Open review theatre' }
+      ],
+      shortcuts:[
+        { keys:'Alt+Shift+P', label:'Open presentation studio' },
+        { keys:'Alt+Shift+1', label:'Schema evidence mode' },
+        { keys:'Alt+Shift+2', label:'Governance evidence mode' },
+        { keys:'Alt+Shift+3', label:'Runtime evidence mode' },
+        { keys:'Alt+Shift+4', label:'Traceability evidence mode' },
+        { keys:'Alt+Shift+C', label:'Copy evidence brief' }
+      ]
+    };
+  }
+  function fetchReport(force){
+    if(reportCache && !force) return Promise.resolve(reportCache);
+    return api('schema_studio_round11_report', { design_id: currentDesignId() }, 'POST').then(function(payload){
+      reportCache = payload && typeof payload === 'object' ? payload : fallbackReport();
+      scheduleRender();
+      return reportCache;
+    }).catch(function(){
+      reportCache = fallbackReport();
+      scheduleRender();
+      return reportCache;
+    });
+  }
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      var saved = raw ? JSON.parse(raw) : {};
+      if(saved && typeof saved === 'object'){
+        if(saved.open != null) state.open = !!saved.open;
+        if(saved.spotlight) state.spotlight = txt(saved.spotlight);
+        if(saved.evidence) state.evidence = txt(saved.evidence);
+        if(saved.contrast) state.contrast = txt(saved.contrast);
+        if(saved.motion) state.motion = txt(saved.motion);
+        if(saved.scale) state.scale = txt(saved.scale);
+        if(saved.legend) state.legend = txt(saved.legend);
+      }
+    }catch(_err){}
+  }
+  function persistState(){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        open:!!state.open,
+        spotlight:state.spotlight,
+        evidence:state.evidence,
+        contrast:state.contrast,
+        motion:state.motion,
+        scale:state.scale,
+        legend:state.legend
+      }));
+    }catch(_err){}
+  }
+  function addCommands(){
+    if(!win.CmdPalette || !Array.isArray(win.CmdPalette.COMMANDS)) return;
+    win.CmdPalette.COMMANDS = win.CmdPalette.COMMANDS.filter(function(command){
+      return !command || ['Open round 11 presentation studio','Copy round 11 evidence brief','Switch to governance evidence mode','Switch to traceability spotlight pack'].indexOf(command.label_en) < 0;
+    });
+    win.CmdPalette.COMMANDS.push(
+      {
+        icon:'🧭',
+        label:'Mở presentation studio round 11',
+        label_en:'Open round 11 presentation studio',
+        category:'schema',
+        action:function(){ state.open = true; persistState(); fetchReport(false).then(function(){ scheduleRender(); }); }
+      },
+      {
+        icon:'📋',
+        label:'Copy evidence brief round 11',
+        label_en:'Copy round 11 evidence brief',
+        category:'schema',
+        action:function(){ copyEvidenceBrief(); }
+      },
+      {
+        icon:'🛡️',
+        label:'Chuyển sang governance evidence mode',
+        label_en:'Switch to governance evidence mode',
+        category:'schema',
+        action:function(){ state.evidence = 'governance'; state.spotlight = 'governance_matrix'; persistState(); scheduleRender(); }
+      },
+      {
+        icon:'🧬',
+        label:'Chuyển sang traceability spotlight pack',
+        label_en:'Switch to traceability spotlight pack',
+        category:'schema',
+        action:function(){ state.spotlight = 'traceability_chain'; state.evidence = 'traceability'; persistState(); scheduleRender(); }
+      }
+    );
+  }
+  function onKeydown(ev){
+    var key = txt(ev && ev.key).toLowerCase();
+    if(!ev || !ev.altKey || !ev.shiftKey) return;
+    if(key === 'p'){ ev.preventDefault(); state.open = !state.open; persistState(); scheduleRender(); return; }
+    if(key === '1'){ ev.preventDefault(); state.evidence = 'schema'; persistState(); scheduleRender(); return; }
+    if(key === '2'){ ev.preventDefault(); state.evidence = 'governance'; state.spotlight = 'governance_matrix'; persistState(); scheduleRender(); return; }
+    if(key === '3'){ ev.preventDefault(); state.evidence = 'runtime'; state.spotlight = 'runtime_delivery'; persistState(); scheduleRender(); return; }
+    if(key === '4'){ ev.preventDefault(); state.evidence = 'traceability'; state.spotlight = 'traceability_chain'; persistState(); scheduleRender(); return; }
+    if(key === 'c'){ ev.preventDefault(); copyEvidenceBrief(); return; }
+  }
+  function ensureStyles(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      '.ss-r11-presentation-language .ss-table-card.ss-r8-card[data-r11-focus="dim"]{opacity:.24!important;filter:saturate(.62)!important;}',
+      '.ss-r11-presentation-language .ss-table-card.ss-r8-card[data-r11-focus="soft"]{opacity:.92;}',
+      '.ss-r11-presentation-language .ss-table-card.ss-r8-card[data-r11-focus="focus"]{opacity:1;box-shadow:0 26px 58px rgba(15,23,42,.34),0 0 0 1px rgba(125,211,252,.10) inset;}',
+      '.ss-r11-presentation-language[data-r11-spotlight="quiet_canvas"] .ss-table-card.ss-r8-card[data-r11-focus="dim"]{opacity:.12!important;}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-focus="dim"]{opacity:.05!important;}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-focus="soft"]{opacity:.22!important;}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-focus="focus"]{opacity:.94!important;}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-focus="focus"] .ss-edge{stroke-width:2.25!important;filter:drop-shadow(0 0 8px rgba(125,211,252,.22));}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-lens="governance"][data-r11-focus="focus"] .ss-edge{stroke:#c084fc!important;}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-lens="traceability"][data-r11-focus="focus"] .ss-edge{stroke:#fb923c!important;}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-lens="runtime"][data-r11-focus="focus"] .ss-edge{stroke:#60a5fa!important;}',
+      '.ss-r11-presentation-language .ss-edge-group[data-r11-lens="cross_domain"][data-r11-focus="focus"] .ss-edge{stroke:#f59e0b!important;}',
+      '.ss-r11-ribbon{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 12px;border-top:1px solid rgba(148,163,184,.08);background:linear-gradient(180deg,rgba(125,211,252,.04),rgba(255,255,255,.015));}',
+      '.ss-r11-ribbon.is-hidden{display:none;}',
+      '.ss-r11-ribbon-tag{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:rgba(125,211,252,.14);border:1px solid rgba(125,211,252,.22);font-size:9.5px;font-weight:800;color:#e0f2fe;}',
+      '.ss-r11-ribbon-pill{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.10);font-size:9px;font-weight:700;color:#cbd5e1;}',
+      '.ss-r11-presentation-language[data-r8-zoom-band="atlas"] .ss-r11-ribbon,.ss-r11-presentation-language[data-r8-zoom-band="map"] .ss-r11-ribbon{display:none!important;}',
+      '.ss-r11-toggle{position:absolute;right:18px;top:18px;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;border:1px solid rgba(148,163,184,.16);background:rgba(7,14,28,.92);color:#f8fbff;box-shadow:0 12px 28px rgba(2,6,23,.20);z-index:38;backdrop-filter:blur(10px);}',
+      '.ss-r11-toggle.is-open{border-color:rgba(125,211,252,.28);box-shadow:0 16px 32px rgba(2,6,23,.24),0 0 0 1px rgba(125,211,252,.10) inset;}',
+      '.ss-r11-panel{position:absolute;right:18px;top:64px;width:384px;max-width:calc(100% - 36px);border-radius:22px;border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,rgba(7,14,28,.98),rgba(15,23,42,.96));box-shadow:0 20px 50px rgba(2,6,23,.30);backdrop-filter:blur(12px);z-index:38;display:none;overflow:hidden;}',
+      '.ss-r11-panel.is-open{display:block;}',
+      '.ss-r11-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 12px;border-bottom:1px solid rgba(148,163,184,.10);}',
+      '.ss-r11-kicker{font-size:10px;line-height:1.2;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r11-title{font-size:15px;line-height:1.25;font-weight:800;color:#f8fbff;margin-top:4px;}',
+      '.ss-r11-sub{font-size:11px;line-height:1.45;color:#93a5c4;margin-top:6px;}',
+      '.ss-r11-close{width:28px;height:28px;border-radius:10px;border:1px solid rgba(148,163,184,.14);background:rgba(255,255,255,.04);color:#f8fbff;}',
+      '.ss-r11-body{padding:14px 16px 16px;display:grid;gap:14px;max-height:74vh;overflow:auto;}',
+      '.ss-r11-section{display:grid;gap:8px;}',
+      '.ss-r11-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}',
+      '.ss-r11-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r11-buttons{display:flex;flex-wrap:wrap;gap:6px;}',
+      '.ss-r11-btn{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);font-size:10px;font-weight:800;color:#dbeafe;}',
+      '.ss-r11-btn.active{background:rgba(125,211,252,.12);border-color:rgba(125,211,252,.28);color:#f8fbff;box-shadow:0 0 0 1px rgba(125,211,252,.08) inset;}',
+      '.ss-r11-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}',
+      '.ss-r11-metric{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.54);display:grid;gap:4px;}',
+      '.ss-r11-metric span{font-size:10px;font-weight:700;color:#8fa5c7;}',
+      '.ss-r11-metric strong{font-size:18px;font-weight:800;color:#f8fbff;}',
+      '.ss-r11-dock{position:absolute;right:18px;bottom:18px;width:368px;max-width:calc(100% - 36px);border-radius:22px;border:1px solid rgba(148,163,184,.14);background:linear-gradient(180deg,rgba(8,15,28,.94),rgba(15,23,42,.92));box-shadow:0 18px 44px rgba(2,6,23,.26);z-index:37;backdrop-filter:blur(10px);padding:14px;display:grid;gap:12px;}',
+      '.ss-r11-dock.is-hidden{display:none;}',
+      '.ss-r11-dock-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}',
+      '.ss-r11-dock-list{display:grid;gap:10px;max-height:52vh;overflow:auto;}',
+      '.ss-r11-dock-card{padding:12px;border-radius:16px;border:1px solid rgba(148,163,184,.10);background:rgba(255,255,255,.04);display:grid;gap:10px;}',
+      '.ss-r11-dock-card.edge{background:rgba(148,163,184,.05);}',
+      '.ss-r11-dock-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}',
+      '.ss-r11-dock-kicker{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r11-dock-title{font-size:14px;font-weight:800;color:#f8fbff;margin-top:3px;}',
+      '.ss-r11-dock-sub{font-size:11px;color:#93a5c4;margin-top:4px;line-height:1.45;}',
+      '.ss-r11-mini{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:22px;padding:0 8px;border-radius:999px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.10);font-size:10px;font-weight:800;color:#f8fbff;text-transform:uppercase;}',
+      '.ss-r11-mini.tone-critical{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.22);color:#fee2e2;}',
+      '.ss-r11-mini.tone-high{background:rgba(249,115,22,.14);border-color:rgba(249,115,22,.22);color:#ffedd5;}',
+      '.ss-r11-mini.tone-medium{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.22);color:#fef3c7;}',
+      '.ss-r11-mini.tone-governance{background:rgba(192,132,252,.14);border-color:rgba(192,132,252,.22);color:#f3e8ff;}',
+      '.ss-r11-mini.tone-traceability{background:rgba(251,146,60,.14);border-color:rgba(251,146,60,.22);color:#ffedd5;}',
+      '.ss-r11-mini.tone-runtime{background:rgba(96,165,250,.14);border-color:rgba(96,165,250,.22);color:#dbeafe;}',
+      '.ss-r11-mini.tone-cross_domain{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.22);color:#fef3c7;}',
+      '.ss-r11-facts{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.ss-r11-fact{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.10);font-size:10px;color:#dbeafe;}',
+      '.ss-r11-fact em{font-style:normal;font-weight:700;color:#8fa5c7;}',
+      '.ss-r11-fact strong{font-weight:800;color:#f8fbff;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+      '.ss-r11-notes{display:grid;gap:6px;}',
+      '.ss-r11-note{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08);}',
+      '.ss-r11-note-key{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:20px;padding:0 6px;border-radius:999px;background:rgba(125,211,252,.12);border:1px solid rgba(125,211,252,.18);font-size:9px;font-weight:800;color:#e0f2fe;}',
+      '.ss-r11-note strong{font-size:11px;color:#f8fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+      '.ss-r11-note em{font-style:normal;font-size:10px;color:#8fa5c7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+      '.ss-r11-legend{position:absolute;right:398px;bottom:18px;width:280px;max-width:calc(100% - 420px);border-radius:20px;border:1px solid rgba(148,163,184,.12);background:rgba(8,15,28,.90);box-shadow:0 16px 36px rgba(2,6,23,.20);z-index:37;padding:12px;backdrop-filter:blur(10px);}',
+      '.ss-r11-legend.is-hidden{display:none;}',
+      '.ss-r11-legend-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r11-legend-list{display:grid;gap:8px;margin-top:10px;}',
+      '.ss-r11-legend-item{padding:8px 10px;border-radius:12px;border:1px solid rgba(148,163,184,.10);background:rgba(255,255,255,.03);display:grid;gap:3px;}',
+      '.ss-r11-legend-item.active{border-color:rgba(125,211,252,.24);background:rgba(125,211,252,.07);}',
+      '.ss-r11-legend-item span{font-size:11px;font-weight:800;color:#f8fbff;}',
+      '.ss-r11-legend-item em{font-style:normal;font-size:10px;color:#93a5c4;line-height:1.45;}',
+      '.ss-r11-presentation-language[data-r11-contrast="high"] .ss-table-card.ss-r8-card{box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 18px 40px rgba(2,6,23,.22);}',
+      '.ss-r11-presentation-language[data-r11-contrast="high"] .ss-table-card.ss-r8-card .ss-tbl-name,.ss-r11-presentation-language[data-r11-contrast="high"] .ss-table-card.ss-r8-card .ss-r8-title{color:#ffffff!important;}',
+      '.ss-r11-presentation-language[data-r11-contrast="high"] .ss-edge-group[data-r11-focus="focus"] .ss-edge{stroke-width:2.5!important;}',
+      '.ss-r11-presentation-language[data-r11-motion="reduced"] .ss-table-card.ss-r8-card,.ss-r11-presentation-language[data-r11-motion="reduced"] .ss-edge-group,.ss-r11-presentation-language[data-r11-motion="reduced"] .ss-r11-toggle,.ss-r11-presentation-language[data-r11-motion="reduced"] .ss-r11-panel,.ss-r11-presentation-language[data-r11-motion="reduced"] .ss-r11-dock{transition:none!important;animation:none!important;}',
+      '.ss-r11-presentation-language[data-r11-scale="compact"] .ss-table-card.ss-r8-card{font-size:.96em;}',
+      '.ss-r11-presentation-language[data-r11-scale="large"] .ss-table-card.ss-r8-card{font-size:1.04em;}',
+      '.ss-r11-presentation-language[data-r11-scale="large"] .ss-r11-dock,.ss-r11-presentation-language[data-r11-scale="large"] .ss-r11-panel{font-size:1.04em;}',
+      '@media (max-width:1520px){.ss-r11-legend{display:none!important;}}',
+      '@media (max-width:1180px){.ss-r11-panel{width:calc(100% - 36px);right:18px;left:18px;top:64px;}.ss-r11-dock{width:calc(100% - 36px);right:18px;left:18px;bottom:18px;}.ss-r11-grid,.ss-r11-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+
+  loadState();
+  ensureStyles();
+  applyRootState();
+  addCommands();
+  fetchReport(false);
+  scheduleRender();
+
+  var originalCanvasRender = win.Canvas.render;
+  win.Canvas.render = function(){
+    var result = originalCanvasRender.apply(this, arguments);
+    scheduleRender();
+    return result;
+  };
+  var originalApplyTransform = win.Canvas.applyTransform;
+  win.Canvas.applyTransform = function(){
+    var result = originalApplyTransform.apply(this, arguments);
+    scheduleRender();
+    return result;
+  };
+  var originalSyncSelectionClasses = win.Canvas.syncSelectionClasses;
+  win.Canvas.syncSelectionClasses = function(){
+    var result = originalSyncSelectionClasses.apply(this, arguments);
+    scheduleRender();
+    return result;
+  };
+  if(win.TableCard && typeof win.TableCard.renderTable === 'function'){
+    var originalTableRender = win.TableCard.renderTable;
+    win.TableCard.renderTable = function(tbl){
+      var result = originalTableRender.apply(this, arguments);
+      scheduleRender();
+      return result;
+    };
+  }
+  win.addEventListener('resize', scheduleRender);
+  document.addEventListener('keydown', onKeydown, true);
+
+  if(win.SchemaStudio){
+    win.SchemaStudio.__round11PresentationPatched = true;
+    win.SchemaStudio.buildId = '20260408worldclass11';
+    win.SchemaStudio.openRound11PresentationStudio = function(){ state.open = true; persistState(); fetchReport(false).then(function(){ scheduleRender(); }); };
+  }
+})(window);

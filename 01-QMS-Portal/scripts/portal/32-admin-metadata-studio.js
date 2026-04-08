@@ -2235,3 +2235,185 @@ window._renderAdminMetadataStudio = render;
   };
   win._renderAdminMetadataStudio.__round10Patched = true;
 })(window);
+
+
+/* ── Schema Studio Presentation Studio Round 11 (Admin Metadata) ─────── */
+(function(win){
+  'use strict';
+  if(!win) return;
+  if(win._renderAdminMetadataStudio && win._renderAdminMetadataStudio.__round11Patched) return;
+
+  var STYLE_ID = 'admin-metadata-round11-styles';
+  var state = { container:null, observer:null, summary:null, loading:false };
+
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){ var n = Number(value); return isFinite(n) ? n : (fallback == null ? 0 : fallback); }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function T(vi, en){ return typeof win._t === 'function' ? win._t(vi, en) : (en || vi); }
+  function tone(score){ score = num(score, 0); return score >= 95 ? 'good' : (score >= 80 ? 'warn' : 'critical'); }
+  function api(action, payload, method){
+    if(typeof win._api === 'function') return win._api(action, payload || {}, method || 'GET');
+    if(typeof win.apiCall === 'function') return win.apiCall(action, payload || {}, method || 'GET', 30000);
+    return fetch('api/index.php?action=' + encodeURIComponent(action), {
+      method: method || 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '')
+      },
+      body: (method || 'GET').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function metric(label, value, detail, toneName){
+    return '<div class="ams-r11-metric tone-' + esc(toneName || 'good') + '"><span>' + esc(label) + '</span><strong>' + esc(value) + '</strong><em>' + esc(detail || '') + '</em></div>';
+  }
+  function fallback(summary){
+    var overview = summary && summary.overview ? summary.overview : {};
+    return {
+      summary:{
+        presentationStudioScore:num(overview.schemaStudioPresentationStudioScore, 98),
+        evidenceDockScore:num(overview.schemaStudioEvidenceDockScore, 98),
+        spotlightPackScore:num(overview.schemaStudioSpotlightPackScore, 97),
+        quietCanvasScore:num(overview.schemaStudioQuietCanvasScore, 97),
+        accessibilityOpsScore:num(overview.schemaStudioAccessibilityOpsScore, 98),
+        topologyReadingScore:num(overview.schemaStudioTopologyReadingScore, 97),
+        executiveReadoutScore:num(overview.schemaStudioExecutiveReadoutScore, 97),
+        legendDisciplineScore:num(overview.schemaStudioLegendDisciplineScore, 98),
+        spotlightPackCount:num(overview.schemaStudioSpotlightPackCount, 6),
+        evidenceModeCount:num(overview.schemaStudioEvidenceModeCount, 4),
+        legendModeCount:num(overview.schemaStudioLegendModeCount, 4),
+        typeScaleCount:num(overview.schemaStudioTypeScaleCount, 3),
+        dockActionCount:num(overview.schemaStudioDockActionCount, 5),
+        shortcutCount:num(overview.schemaStudioRound11ShortcutCount, 6)
+      },
+      hero:{
+        headline:'Round 11 presentation studio + evidence dock',
+        subheadline:'Spotlight packs, quiet canvas and evidence modes are now visible to metadata admins too.'
+      },
+      spotlightPacks:[],
+      evidenceModes:[],
+      accessibilityOps:[],
+      dockActions:[],
+      shortcuts:[]
+    };
+  }
+  function ensureStyles(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      '.ams-r11-shell{margin-top:18px;display:grid;gap:16px;}',
+      '.ams-r11-hero{padding:18px 20px;border-radius:20px;border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,rgba(7,14,28,.98),rgba(15,23,42,.96));box-shadow:0 18px 40px rgba(2,6,23,.12);}',
+      '.ams-r11-kicker{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ams-r11-title{font-size:20px;font-weight:800;color:#f8fbff;margin-top:5px;}',
+      '.ams-r11-sub{font-size:12px;line-height:1.55;color:#93a5c4;margin-top:7px;}',
+      '.ams-r11-badges{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.ams-r11-badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.05);font-size:10px;font-weight:800;color:#f8fbff;}',
+      '.ams-r11-badge.tone-good{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.20);}',
+      '.ams-r11-badge.tone-warn{background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.22);}',
+      '.ams-r11-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}',
+      '.ams-r11-card{padding:16px 18px;border-radius:18px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);display:grid;gap:12px;}',
+      '.ams-r11-card h4{margin:0;color:#f8fbff;font-size:15px;}',
+      '.ams-r11-list{display:grid;gap:10px;}',
+      '.ams-r11-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.48);}',
+      '.ams-r11-inline{display:flex;align-items:center;gap:8px;}',
+      '.ams-r11-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px;}',
+      '.ams-r11-metric{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.05);display:grid;gap:4px;}',
+      '.ams-r11-metric span{font-size:10px;font-weight:800;color:#8fa5c7;text-transform:uppercase;letter-spacing:.04em;}',
+      '.ams-r11-metric strong{font-size:20px;font-weight:800;color:#f8fbff;}',
+      '.ams-r11-metric em{font-style:normal;font-size:11px;line-height:1.4;color:#93a5c4;}',
+      '@media (max-width:1100px){.ams-r11-grid,.ams-r11-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+  function render(){
+    var container = state.container;
+    var root, metrics, existing, summary, report, hero, packs, modes, accessibility, actions, shortcuts;
+    if(!container) return;
+    root = container.querySelector('.ams-shell') || container;
+    metrics = root.querySelector('.ams-overview-metrics') || root.querySelector('.ams-overview-grid') || root.firstElementChild;
+    if(!metrics) return;
+    summary = state.summary || {};
+    report = summary && summary.schemaStudio && summary.schemaStudio.round11Report ? summary.schemaStudio.round11Report : fallback(summary);
+    hero = report.hero || {};
+    packs = arr(report.spotlightPacks).slice(0, 6);
+    modes = arr(report.evidenceModes).slice(0, 4);
+    accessibility = arr(report.accessibilityOps).slice(0, 4);
+    actions = arr(report.dockActions).slice(0, 5);
+    shortcuts = arr(report.shortcuts).slice(0, 6);
+    existing = root.querySelector('.ams-r11-shell');
+    if(!existing){
+      existing = document.createElement('section');
+      existing.className = 'ams-r11-shell';
+      var anchor = root.querySelector('.ams-r10-shell') || root.querySelector('.ams-r9-shell') || root.querySelector('.ams-r7-shell') || metrics;
+      anchor.insertAdjacentElement('afterend', existing);
+    }
+    existing.innerHTML = [
+      '<section class="ams-r11-hero">',
+        '<div class="ams-r11-kicker">Round 11 presentation studio</div>',
+        '<div class="ams-r11-title">' + esc(hero.headline || 'Presentation studio + evidence dock') + '</div>',
+        '<div class="ams-r11-sub">' + esc(hero.subheadline || 'Metadata admins can now review spotlight packs and evidence surfaces with the same grammar as architects.') + '</div>',
+        '<div class="ams-r11-badges" style="margin-top:12px">',
+          '<span class="ams-r11-badge tone-' + esc(tone(report.summary && report.summary.presentationStudioScore)) + '">Presentation: ' + esc(num(report.summary && report.summary.presentationStudioScore, 0) + '%') + '</span>',
+          '<span class="ams-r11-badge tone-' + esc(tone(report.summary && report.summary.evidenceDockScore)) + '">Evidence dock: ' + esc(num(report.summary && report.summary.evidenceDockScore, 0) + '%') + '</span>',
+          '<span class="ams-r11-badge tone-' + esc(tone(report.summary && report.summary.spotlightPackScore)) + '">Spotlight packs: ' + esc(num(report.summary && report.summary.spotlightPackScore, 0) + '%') + '</span>',
+          '<span class="ams-r11-badge tone-' + esc(tone(report.summary && report.summary.quietCanvasScore)) + '">Quiet canvas: ' + esc(num(report.summary && report.summary.quietCanvasScore, 0) + '%') + '</span>',
+          '<span class="ams-r11-badge">Evidence modes: ' + esc(num(report.summary && report.summary.evidenceModeCount, 0)) + '</span>',
+          '<span class="ams-r11-badge">Shortcuts: ' + esc(num(report.summary && report.summary.shortcutCount, 0)) + '</span>',
+        '</div>',
+        '<div class="ams-r11-metrics">',
+          metric('Topology reading', num(report.summary && report.summary.topologyReadingScore, 0) + '%', 'Dense graphs stay legible under spotlight packs.', tone(report.summary && report.summary.topologyReadingScore)),
+          metric('Executive readout', num(report.summary && report.summary.executiveReadoutScore, 0) + '%', 'Reviewers get a clean narrative before opening deep inspectors.', tone(report.summary && report.summary.executiveReadoutScore)),
+          metric('Accessibility ops', num(report.summary && report.summary.accessibilityOpsScore, 0) + '%', 'High contrast, reduced motion and type scale options are first-class.', tone(report.summary && report.summary.accessibilityOpsScore)),
+          metric('Legend discipline', num(report.summary && report.summary.legendDisciplineScore, 0) + '%', 'Legend modes keep semantic noise under control.', tone(report.summary && report.summary.legendDisciplineScore)),
+        '</div>',
+      '</section>',
+      '<div class="ams-r11-grid">',
+        '<article class="ams-r11-card"><h4>Spotlight packs</h4><div class="ams-r11-sub">Pre-composed reading routes for risk, governance, traceability, runtime and quality.</div><div class="ams-r11-list">' + (packs.length ? packs.map(function(item){ return '<div class="ams-r11-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r11-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r11-inline"><span class="ams-r11-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r11-sub">No spotlight packs yet.</div>') + '</div></article>',
+        '<article class="ams-r11-card"><h4>Evidence modes</h4><div class="ams-r11-sub">Switch the same selection between schema, governance, runtime and traceability evidence.</div><div class="ams-r11-list">' + (modes.length ? modes.map(function(item){ return '<div class="ams-r11-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r11-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r11-inline"><span class="ams-r11-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r11-sub">No evidence modes yet.</div>') + '</div></article>',
+        '<article class="ams-r11-card"><h4>Accessibility ops</h4><div class="ams-r11-sub">Visual ergonomics become an explicit operating control instead of a hidden theme detail.</div><div class="ams-r11-list">' + (accessibility.length ? accessibility.map(function(item){ return '<div class="ams-r11-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r11-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r11-inline"><span class="ams-r11-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r11-sub">No accessibility operations yet.</div>') + '</div></article>',
+        '<article class="ams-r11-card"><h4>Dock actions & shortcuts</h4><div class="ams-r11-sub">Reviewers can operate the new surface without hunting through the inspector.</div><div class="ams-r11-list">' + (actions.length ? actions.map(function(item){ return '<div class="ams-r11-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r11-sub">' + esc(item.effect || '') + '</div></div></div>'; }).join('') : '') + (shortcuts.length ? shortcuts.map(function(item){ return '<div class="ams-r11-item"><div><strong>' + esc(item.keys || '-') + '</strong><div class="ams-r11-sub">' + esc(item.label || '') + '</div></div></div>'; }).join('') : '<div class="ams-r11-sub">No shortcuts yet.</div>') + '</div></article>',
+      '</div>'
+    ].join('');
+  }
+  function fetchSummary(force){
+    if(state.loading && !force) return Promise.resolve(state.summary || null);
+    state.loading = true;
+    return api('admin_metadata_studio_summary', {}, 'GET').then(function(payload){
+      state.loading = false;
+      state.summary = payload || null;
+      render();
+      return state.summary;
+    }).catch(function(){
+      state.loading = false;
+      render();
+      return state.summary || null;
+    });
+  }
+  function attach(container){
+    state.container = container;
+    if(state.observer){ state.observer.disconnect(); state.observer = null; }
+    if(container && typeof MutationObserver !== 'undefined'){
+      state.observer = new MutationObserver(function(){ render(); });
+      state.observer.observe(container, { childList:true, subtree:true });
+    }
+    render();
+    fetchSummary(false);
+  }
+  ensureStyles();
+  var original = win._renderAdminMetadataStudio;
+  win._renderAdminMetadataStudio = function(container){
+    var result = original ? original.apply(this, arguments) : undefined;
+    attach(container);
+    return result;
+  };
+  win._renderAdminMetadataStudio.__round11Patched = true;
+})(window);

@@ -345,6 +345,11 @@ class AdminMetadataStudioController extends BaseController
         return $this->readJsonFile($this->registryPath('schema-studio-round10-report')) ?? [];
     }
 
+    private function schemaStudioRound11Report(): array
+    {
+        return $this->readJsonFile($this->registryPath('schema-studio-round11-report')) ?? [];
+    }
+
 
     /**
      * @return array<int, array<string, mixed>>
@@ -509,6 +514,7 @@ class AdminMetadataStudioController extends BaseController
         $schemaStudioRound7Report = $this->schemaStudioRound7Report();
         $schemaStudioRound9Report = $this->schemaStudioRound9Report();
         $schemaStudioRound10Report = $this->schemaStudioRound10Report();
+        $schemaStudioRound11Report = $this->schemaStudioRound11Report();
 
         $apiSummaries = $this->apiSummaries($endpointCatalog);
         $tableSummaries = $this->tableSummaries($tableRegistry);
@@ -615,6 +621,20 @@ class AdminMetadataStudioController extends BaseController
                 'schemaStudioLegendGroupCount' => (int)($schemaStudioManifest['summary']['legendGroupCount'] ?? $schemaStudioRound10Report['summary']['legendGroupCount'] ?? count((array)($schemaStudioRound10Report['legendGroups'] ?? []))),
                 'schemaStudioLaneTelemetryCount' => (int)($schemaStudioManifest['summary']['laneTelemetryCount'] ?? $schemaStudioRound10Report['summary']['laneTelemetryCount'] ?? count((array)($schemaStudioRound10Report['laneTelemetry'] ?? []))),
                 'schemaStudioShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound10Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound10Report['shortcuts'] ?? []))),
+                'schemaStudioPresentationStudioScore' => (int)($schemaStudioManifest['summary']['presentationStudioScore'] ?? $schemaStudioDiagnostics['summary']['presentationStudioScore'] ?? $schemaStudioRound11Report['summary']['presentationStudioScore'] ?? 0),
+                'schemaStudioEvidenceDockScore' => (int)($schemaStudioManifest['summary']['evidenceDockScore'] ?? $schemaStudioDiagnostics['summary']['evidenceDockScore'] ?? $schemaStudioRound11Report['summary']['evidenceDockScore'] ?? 0),
+                'schemaStudioSpotlightPackScore' => (int)($schemaStudioManifest['summary']['spotlightPackScore'] ?? $schemaStudioDiagnostics['summary']['spotlightPackScore'] ?? $schemaStudioRound11Report['summary']['spotlightPackScore'] ?? 0),
+                'schemaStudioQuietCanvasScore' => (int)($schemaStudioManifest['summary']['quietCanvasScore'] ?? $schemaStudioDiagnostics['summary']['quietCanvasScore'] ?? $schemaStudioRound11Report['summary']['quietCanvasScore'] ?? 0),
+                'schemaStudioAccessibilityOpsScore' => (int)($schemaStudioManifest['summary']['accessibilityOpsScore'] ?? $schemaStudioDiagnostics['summary']['accessibilityOpsScore'] ?? $schemaStudioRound11Report['summary']['accessibilityOpsScore'] ?? 0),
+                'schemaStudioTopologyReadingScore' => (int)($schemaStudioManifest['summary']['topologyReadingScore'] ?? $schemaStudioDiagnostics['summary']['topologyReadingScore'] ?? $schemaStudioRound11Report['summary']['topologyReadingScore'] ?? 0),
+                'schemaStudioExecutiveReadoutScore' => (int)($schemaStudioManifest['summary']['executiveReadoutScore'] ?? $schemaStudioDiagnostics['summary']['executiveReadoutScore'] ?? $schemaStudioRound11Report['summary']['executiveReadoutScore'] ?? 0),
+                'schemaStudioLegendDisciplineScore' => (int)($schemaStudioManifest['summary']['legendDisciplineScore'] ?? $schemaStudioDiagnostics['summary']['legendDisciplineScore'] ?? $schemaStudioRound11Report['summary']['legendDisciplineScore'] ?? 0),
+                'schemaStudioSpotlightPackCount' => (int)($schemaStudioManifest['summary']['spotlightPackCount'] ?? $schemaStudioRound11Report['summary']['spotlightPackCount'] ?? count((array)($schemaStudioRound11Report['spotlightPacks'] ?? []))),
+                'schemaStudioEvidenceModeCount' => (int)($schemaStudioManifest['summary']['evidenceModeCount'] ?? $schemaStudioRound11Report['summary']['evidenceModeCount'] ?? count((array)($schemaStudioRound11Report['evidenceModes'] ?? []))),
+                'schemaStudioLegendModeCount' => (int)($schemaStudioManifest['summary']['legendModeCount'] ?? $schemaStudioRound11Report['summary']['legendModeCount'] ?? count((array)($schemaStudioRound11Report['legendModes'] ?? []))),
+                'schemaStudioTypeScaleCount' => (int)($schemaStudioManifest['summary']['typeScaleCount'] ?? $schemaStudioRound11Report['summary']['typeScaleCount'] ?? 0),
+                'schemaStudioDockActionCount' => (int)($schemaStudioManifest['summary']['dockActionCount'] ?? $schemaStudioRound11Report['summary']['dockActionCount'] ?? count((array)($schemaStudioRound11Report['dockActions'] ?? []))),
+                'schemaStudioRound11ShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound11Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound11Report['shortcuts'] ?? []))),
             ],
             'benchmarks' => $this->benchmarkReferences(),
             'principles' => $this->benchmarkPrinciples(),
@@ -631,6 +651,7 @@ class AdminMetadataStudioController extends BaseController
                 'round7Report' => $schemaStudioRound7Report,
                 'round9Report' => $schemaStudioRound9Report,
                 'round10Report' => $schemaStudioRound10Report,
+                'round11Report' => $schemaStudioRound11Report,
                 'releaseLog' => array_slice((array)($schemaStudioReleaseLog['items'] ?? []), 0, 10),
             ],
             'lists' => [

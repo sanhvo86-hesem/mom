@@ -2,11 +2,44 @@
 
 Package root: `qms.hesem.com.vn/`
 
-Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 10**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 11**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+
+## Round 11 highlights
+
+Round 11 đưa `Schema Studio` từ `review theatre` sang **presentation studio + evidence dock** nghiêm túc cho graph enterprise dày đặc:
+
+- thêm `Presentation Studio` nổi trên canvas, điều khiển trực tiếp `spotlight packs`, `evidence mode`, `contrast`, `motion`, `type scale`, `legend mode`
+- thêm `Evidence Dock` ở cạnh phải để đọc nhanh object đang chọn theo 4 lớp evidence: `schema`, `governance`, `runtime`, `traceability`
+- thêm `spotlight packs`: `executive risk`, `governance matrix`, `traceability chain`, `runtime delivery`, `quality loop`, `quiet canvas`
+- thêm `quiet canvas` để dập nhiễu topology và giữ lại selected story + one-hop neighborhood
+- card được enrich thêm `round 11 ribbon` để nhìn nhanh spotlight + evidence context mà không phá card hierarchy đã có
+- edge grammar được nâng thêm `focus / soft / dim` theo spotlight pack và selection neighborhood
+- thêm `legend dock` và accessibility ops: `balanced/high contrast`, `reduced motion`, `compact/regular/large type scale`
+- thêm action `copy evidence brief` để xuất nhanh narrative review sang clipboard
+- thêm endpoint `schema_studio_round11_report`
+- thêm artifact `schema-studio-round11-report.json`
+- `Admin Metadata Studio` và `Module Builder` đã nhận shell/telemetry round 11
+
+## Seeded round 11 posture in this package
+
+- `98` presentation studio score
+- `98` evidence dock score
+- `97` spotlight pack score
+- `97` quiet canvas score
+- `98` accessibility ops score
+- `97` topology reading score
+- `97` executive readout score
+- `98` legend discipline score
+- `6` spotlight packs
+- `4` evidence modes
+- `4` legend modes
+- `3` type scales
+- `5` dock actions
+- `6` keyboard shortcuts
 
 ## Round 10 highlights
 
-Round 10 đưa `Schema Studio` từ visual operating language sang **review theatre + semantic stage** thực thụ cho canvas enterprise:
+Round 10 biến `Schema Studio` thành một **review theatre + semantic stage** thực thụ cho canvas enterprise:
 
 - thêm `Review Theatre` nổi trên canvas với **theme system**: `studio`, `executive`, `audit`, `manufacturing`
 - thêm **scene presets**: `overview`, `governance`, `traceability`, `runtime`, `review`

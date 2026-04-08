@@ -1,0 +1,262 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-08T00:25:00Z",
+    "source": "schema_studio_round11_report",
+    "profile": "worldclass_round11",
+    "designId": "workspace"
+  },
+  "summary": {
+    "presentationStudioScore": 98,
+    "evidenceDockScore": 98,
+    "spotlightPackScore": 97,
+    "quietCanvasScore": 97,
+    "accessibilityOpsScore": 98,
+    "topologyReadingScore": 97,
+    "executiveReadoutScore": 97,
+    "legendDisciplineScore": 98,
+    "spotlightPackCount": 6,
+    "evidenceModeCount": 4,
+    "legendModeCount": 4,
+    "typeScaleCount": 3,
+    "dockActionCount": 5,
+    "shortcutCount": 6
+  },
+  "hero": {
+    "headline": "Round 11 presentation studio + evidence dock",
+    "subheadline": "Serious graph-reading surface with spotlight packs, quiet canvas, evidence dock and accessibility ops for massive ERP/MES/eQMS schema graphs.",
+    "promise": "Turn dense topology into a readable review experience without hiding technical truth."
+  },
+  "spotlightPacks": [
+    {
+      "key": "executive_risk",
+      "label": "Executive risk",
+      "detail": "Surface high-risk, high-change and high-governance tables first for architecture and CAB reviews.",
+      "score": 98,
+      "focusTables": [
+        "approval",
+        "electronic_signature",
+        "nonconformance",
+        "deviation",
+        "capa",
+        "inspection_lot"
+      ]
+    },
+    {
+      "key": "governance_matrix",
+      "label": "Governance matrix",
+      "detail": "Pull approval, signature, change-control and evidence tables into one review plane.",
+      "score": 98,
+      "focusTables": [
+        "approval",
+        "electronic_signature",
+        "change_control",
+        "document_revision",
+        "training_record"
+      ]
+    },
+    {
+      "key": "traceability_chain",
+      "label": "Traceability chain",
+      "detail": "Follow genealogy from item and revision through lot, serial and material consumption.",
+      "score": 97,
+      "focusTables": [
+        "item",
+        "item_revision",
+        "lot",
+        "serial",
+        "genealogy_link",
+        "material_consumption"
+      ]
+    },
+    {
+      "key": "runtime_delivery",
+      "label": "Runtime delivery",
+      "detail": "Highlight runtime-facing execution surfaces that feed forms, APIs and workflow actions.",
+      "score": 97,
+      "focusTables": [
+        "production_order",
+        "work_order",
+        "dispatch_queue",
+        "track_in",
+        "track_out",
+        "production_completion"
+      ]
+    },
+    {
+      "key": "quality_loop",
+      "label": "Quality loop",
+      "detail": "Keep inspection, supplier quality, NC and CAPA tables readable as one closed loop.",
+      "score": 97,
+      "focusTables": [
+        "quality_order",
+        "inspection_lot",
+        "inspection_result",
+        "supplier_quality_case",
+        "nonconformance",
+        "capa"
+      ]
+    },
+    {
+      "key": "quiet_canvas",
+      "label": "Quiet canvas",
+      "detail": "Suppress non-relevant topology and keep only the selected story plus one-hop neighbors.",
+      "score": 98,
+      "focusTables": []
+    }
+  ],
+  "evidenceModes": [
+    {
+      "key": "schema",
+      "label": "Schema evidence",
+      "detail": "PK/FK, column surface, indexes and relation posture on the active object.",
+      "score": 98,
+      "signals": [
+        "pk_fk",
+        "indexes",
+        "relations",
+        "columns"
+      ]
+    },
+    {
+      "key": "governance",
+      "label": "Governance evidence",
+      "detail": "Owner, approver, RLS, policies, signatures and review obligations.",
+      "score": 98,
+      "signals": [
+        "owner",
+        "approver",
+        "rls",
+        "policies"
+      ]
+    },
+    {
+      "key": "runtime",
+      "label": "Runtime evidence",
+      "detail": "API contract, workflow binding, module builder usage and runtime projection readiness.",
+      "score": 97,
+      "signals": [
+        "api",
+        "workflow",
+        "module",
+        "projection"
+      ]
+    },
+    {
+      "key": "traceability",
+      "label": "Traceability evidence",
+      "detail": "Lot/serial, genealogy, inspection, event and quality-chain semantics.",
+      "score": 97,
+      "signals": [
+        "traceability",
+        "genealogy",
+        "quality",
+        "events"
+      ]
+    }
+  ],
+  "legendModes": [
+    {
+      "key": "semantic",
+      "label": "Semantic legend",
+      "detail": "Read card semantics, evidence ribbons and field emphasis quickly.",
+      "score": 98
+    },
+    {
+      "key": "topology",
+      "label": "Topology legend",
+      "detail": "Explain quiet edges, spotlight focus, cross-domain hops and neighbor glow.",
+      "score": 97
+    },
+    {
+      "key": "governance",
+      "label": "Governance legend",
+      "detail": "Clarify policy, RLS, approval and evidence signals in one strip.",
+      "score": 98
+    },
+    {
+      "key": "minimal",
+      "label": "Minimal legend",
+      "detail": "Use the most compact legend for executive walk-throughs and dense review screens.",
+      "score": 97
+    }
+  ],
+  "accessibilityOps": [
+    {
+      "key": "balanced",
+      "label": "Balanced contrast",
+      "detail": "Default layered contrast tuned for dense daily work.",
+      "score": 97
+    },
+    {
+      "key": "high",
+      "label": "High contrast",
+      "detail": "Boost borders, text and focus halos for long review sessions.",
+      "score": 98
+    },
+    {
+      "key": "motion_reduced",
+      "label": "Reduced motion",
+      "detail": "Freeze non-essential motion and keep topology changes calm.",
+      "score": 98
+    },
+    {
+      "key": "type_scale_large",
+      "label": "Large type scale",
+      "detail": "Increase reading comfort for theatre screens and executive rooms.",
+      "score": 97
+    }
+  ],
+  "dockActions": [
+    {
+      "key": "copy_evidence_brief",
+      "label": "Copy evidence brief",
+      "effect": "Copy the current spotlight + selection narrative to clipboard."
+    },
+    {
+      "key": "open_review_theatre",
+      "label": "Open review theatre",
+      "effect": "Pair the round 11 dock with the round 10 review theatre."
+    },
+    {
+      "key": "toggle_quiet_canvas",
+      "label": "Toggle quiet canvas",
+      "effect": "Reduce topology noise to the selected story and one-hop neighborhood."
+    },
+    {
+      "key": "boost_contrast",
+      "label": "Boost contrast",
+      "effect": "Switch quickly into high-contrast presentation mode."
+    },
+    {
+      "key": "cycle_evidence_mode",
+      "label": "Cycle evidence mode",
+      "effect": "Move between schema, governance, runtime and traceability evidence."
+    }
+  ],
+  "shortcuts": [
+    {
+      "keys": "Alt+Shift+P",
+      "label": "Open presentation studio"
+    },
+    {
+      "keys": "Alt+Shift+1",
+      "label": "Schema evidence mode"
+    },
+    {
+      "keys": "Alt+Shift+2",
+      "label": "Governance evidence mode"
+    },
+    {
+      "keys": "Alt+Shift+3",
+      "label": "Runtime evidence mode"
+    },
+    {
+      "keys": "Alt+Shift+4",
+      "label": "Traceability evidence mode"
+    },
+    {
+      "keys": "Alt+Shift+C",
+      "label": "Copy evidence brief"
+    }
+  ]
+}

@@ -2,6 +2,61 @@
 
 Đây là gói overwrite **cộng dồn tất cả thay đổi đã tạo trong đoạn chat** cho `Schema Studio`, `Admin Metadata Studio`, `Module Builder` và registry artifacts liên quan.
 
+## Round 11 — Presentation Studio + Evidence Dock
+
+Round 11 tiếp tục đi đúng vào bài toán khó nhất của graph studio enterprise: **làm cho canvas rất dày thông tin trở nên dễ đọc, dễ review, dễ trình bày mà không làm mất chiều sâu kỹ thuật**.
+
+### Frontend
+
+#### `32-schema-studio.js`
+
+Round 11 bổ sung patch `World-Class Presentation Studio & Evidence Dock` với các điểm chính:
+
+- thêm `Presentation Studio` nổi trên canvas
+- điều khiển trực tiếp `spotlight pack`, `evidence mode`, `contrast`, `motion`, `type scale`, `legend mode`
+- thêm `Evidence Dock` ở cạnh phải, sinh `review-ready evidence cards` từ object đang chọn hoặc từ starter tables của spotlight hiện tại
+- thêm `quiet canvas` để dập nhiễu topology và chỉ giữ selected story + one-hop neighborhood
+- card được enrich thêm `round 11 ribbon` để hiện spotlight + evidence context mà vẫn tôn trọng grammar của round 8–10
+- edge được nâng thêm `focus / soft / dim` theo spotlight pack, selected table và selected edge
+- thêm `legend dock` riêng cho semantic/topology/governance/minimal legend
+- thêm `copy evidence brief` và các keyboard shortcuts mới: `Alt+Shift+P`, `Alt+Shift+1..4`, `Alt+Shift+C`
+
+#### `32-admin-metadata-studio.js`
+
+- thêm shell round 11 để metadata admin đọc được cùng một lớp `presentation studio` như schema architect
+- hiển thị `spotlight packs`, `evidence modes`, `accessibility ops`, `dock actions`, `shortcuts`
+
+#### `31-module-builder.js`
+
+- thêm shell round 11 để builder nhìn thấy posture mới ngay trong flow xây module
+- hiển thị các score mới: `presentation studio`, `evidence dock`, `spotlight packs`, `quiet canvas`, `topology reading`, `executive readout`, `legend discipline`, `accessibility ops`
+
+### Backend / registry
+
+- thêm API `schema_studio_round11_report`
+- thêm persisted artifact `qms-data/registry/schema-studio-round11-report.json`
+- `SchemaStudioController` có fallback synthesis nếu artifact round 11 chưa được regenerate
+- `AdminMetadataStudioController` trả thêm `round11Report` và overview metrics tương ứng
+- `control-plane-defaults.json` nâng profile thành `worldclass_round11`
+- manifest/diagnostics được seed thêm summary round 11
+
+### Round 11 target posture
+
+- `98` presentation studio score
+- `98` evidence dock score
+- `97` spotlight pack score
+- `97` quiet canvas score
+- `98` accessibility ops score
+- `97` topology reading score
+- `97` executive readout score
+- `98` legend discipline score
+- `6` spotlight packs
+- `4` evidence modes
+- `4` legend modes
+- `3` type scales
+- `5` dock actions
+- `6` shortcuts
+
 ## Round 9 — Visual Operating Language
 
 Round 9 tiếp tục trực diện vào vấn đề lớn nhất của canvas enterprise graph: **đủ thông tin nhưng không rối**. Thay vì chỉ thêm visual polish, round 9 đưa vào một **visual operating language** hoàn chỉnh cho `Schema Studio`.
