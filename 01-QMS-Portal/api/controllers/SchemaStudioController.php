@@ -1425,6 +1425,11 @@ class SchemaStudioController extends BaseController
         return $this->registryDirPath() . '/schema-studio-round9-report.json';
     }
 
+    private function round10ReportPath(): string
+    {
+        return $this->registryDirPath() . '/schema-studio-round10-report.json';
+    }
+
     /**
      * @param mixed $items
      * @return array<int, array<string, mixed>>
@@ -6081,6 +6086,72 @@ class SchemaStudioController extends BaseController
             'reviewGuides' => [
                 'Default topology should stay quiet until a table or lens is selected.',
                 'No card should expose more than two persistent semantic badges.',
+            ],
+        ];
+        $this->success($fallback);
+    }
+
+
+
+    public function getRound10Report(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+        $body = $this->jsonBody();
+        $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $artifact = $this->readJsonFile($this->round10ReportPath());
+        if (is_array($artifact) && (($artifact['_meta']['designId'] ?? '') === $designId || ($artifact['_meta']['designId'] ?? '') === 'workspace' || $designId === 'workspace')) {
+            $this->success($artifact);
+        }
+
+        $manifest = $this->readJsonFile($this->registryDirPath() . '/schema-studio-enterprise-manifest.json') ?? [];
+        $diagnostics = $this->readJsonFile($this->registryDirPath() . '/schema-studio-diagnostics.json') ?? [];
+        $round9 = $this->readJsonFile($this->round9ReportPath()) ?? [];
+        $summary = array_merge(
+            (array)($manifest['summary'] ?? []),
+            (array)($diagnostics['summary'] ?? []),
+            (array)($round9['summary'] ?? [])
+        );
+
+        $fallback = [
+            '_meta' => [
+                'generatedAt' => gmdate('c'),
+                'source' => 'schema_studio_round10_report_fallback',
+                'profile' => 'worldclass_round10',
+                'designId' => $designId,
+            ],
+            'summary' => [
+                'reviewTheatreScore' => (int)($summary['reviewTheatreScore'] ?? $summary['visualDirectorScore'] ?? 0),
+                'themeSystemScore' => (int)($summary['themeSystemScore'] ?? $summary['visualLanguageScore'] ?? 0),
+                'scenePresetScore' => (int)($summary['scenePresetScore'] ?? $summary['cardModeCoverageScore'] ?? 0),
+                'selectionRailScore' => (int)($summary['selectionRailScore'] ?? $summary['cardHierarchyScore'] ?? 0),
+                'laneTelemetryScore' => (int)($summary['laneTelemetryScore'] ?? $summary['laneReadabilityScore'] ?? 0),
+                'semanticLegendScore' => (int)($summary['semanticLegendScore'] ?? $summary['edgeLegibilityScore'] ?? 0),
+                'focusNarrativeScore' => (int)($summary['focusNarrativeScore'] ?? $summary['densityDisciplineScore'] ?? 0),
+                'keyboardFlowScore' => (int)($summary['keyboardFlowScore'] ?? $summary['accessibilityScore'] ?? 0),
+                'themeCount' => (int)($summary['themeCount'] ?? 4),
+                'scenePresetCount' => (int)($summary['scenePresetCount'] ?? 5),
+                'reviewRailActionCount' => (int)($summary['reviewRailActionCount'] ?? 5),
+                'legendGroupCount' => (int)($summary['legendGroupCount'] ?? 4),
+                'laneTelemetryCount' => (int)($summary['laneTelemetryCount'] ?? 5),
+                'shortcutCount' => (int)($summary['shortcutCount'] ?? 5),
+            ],
+            'hero' => [
+                'headline' => 'Round 10 review theatre + semantic stage',
+                'subheadline' => 'Themeable, scene-driven and selection-native review surface for enterprise schema graphs.',
+                'promise' => 'Fallback report synthesized from manifest, diagnostics and round 9 visuals.',
+            ],
+            'themes' => [],
+            'scenes' => [],
+            'legendGroups' => [],
+            'reviewRailActions' => [],
+            'laneTelemetry' => [],
+            'polishPrinciples' => [
+                'Selection rail should surface the object story in one glance.',
+                'Themes should rebalance emphasis, not rewrite information architecture.',
+            ],
+            'shortcuts' => [
+                ['keys' => 'Alt+0', 'label' => 'Open review theatre'],
             ],
         ];
         $this->success($fallback);

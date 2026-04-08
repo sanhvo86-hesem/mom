@@ -372,3 +372,17 @@ Artifact đi kèm gói overwrite hiện có:
 6. Kiểm tra `Admin Metadata Studio` hiển thị round 9 shell.
 7. Kiểm tra `Module Builder` health notice có round 9 telemetry.
 8. Chạy smoke test local trước khi commit/push.
+
+
+## Round 10 — Review theatre + semantic stage
+
+Round 10 adds a new visual-review layer on top of the round 8/9 card system:
+
+- theme system for `studio`, `executive`, `audit`, `manufacturing`
+- scene presets for `overview`, `governance`, `traceability`, `runtime`, `review`
+- selection rail that summarizes the active table/edge without forcing inspector-first navigation
+- lane telemetry baked into the lane overlays so domain reviewers can read risk/policy/RLS posture faster
+- scene strips on the cards to keep the current review intent visible at a glance
+- new `schema_studio_round10_report` artifact for admin/registry propagation
+
+This round does not replace the earlier world-class layers; it composes over them and keeps round 2–9 compatible.

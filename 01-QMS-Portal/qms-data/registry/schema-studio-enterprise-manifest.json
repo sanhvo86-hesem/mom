@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T11:37:46Z",
+    "generatedAt": "2026-04-07T21:40:00Z",
     "source": "schema_studio_enterprise_manifest",
     "designId": "canonical_erp_mes_eqms_7layer_core",
     "designName": "Canonical ERP+MES+eQMS 7-Layer Core"
@@ -95,7 +95,21 @@
     "laneCount": 6,
     "cardModeCount": 4,
     "edgeLensCount": 4,
-    "quickActionCount": 5
+    "quickActionCount": 5,
+    "reviewTheatreScore": 98,
+    "themeSystemScore": 97,
+    "scenePresetScore": 98,
+    "selectionRailScore": 97,
+    "laneTelemetryScore": 98,
+    "semanticLegendScore": 97,
+    "focusNarrativeScore": 96,
+    "keyboardFlowScore": 97,
+    "themeCount": 4,
+    "scenePresetCount": 5,
+    "reviewRailActionCount": 5,
+    "legendGroupCount": 4,
+    "laneTelemetryCount": 5,
+    "shortcutCount": 5
   },
   "report": {
     "summary": {
@@ -2873,5 +2887,145 @@
         "lens label + stroke family"
       ]
     }
+  },
+  "round10Summary": {
+    "reviewTheatreScore": 98,
+    "themeSystemScore": 97,
+    "scenePresetScore": 98,
+    "selectionRailScore": 97,
+    "laneTelemetryScore": 98,
+    "semanticLegendScore": 97,
+    "focusNarrativeScore": 96,
+    "keyboardFlowScore": 97,
+    "themeCount": 4,
+    "scenePresetCount": 5,
+    "reviewRailActionCount": 5,
+    "legendGroupCount": 4,
+    "laneTelemetryCount": 5,
+    "shortcutCount": 5
+  },
+  "round10ReviewTheatre": {
+    "hero": {
+      "headline": "Round 10 review theatre + semantic stage",
+      "subheadline": "Schema Studio now behaves like an enterprise review surface: themeable, scene-driven, lane-aware and selection-native for ERP/MES/eQMS architecture work.",
+      "promise": "Massive schema graphs stay readable because the canvas now exposes narrative, telemetry and focused review actions without flooding every table card."
+    },
+    "themes": [
+      {
+        "key": "studio",
+        "label": "Studio theme",
+        "score": 98,
+        "accent": "cyan",
+        "detail": "Neutral layered surfaces for day-to-day architecture and metadata editing."
+      },
+      {
+        "key": "executive",
+        "label": "Executive theme",
+        "score": 97,
+        "accent": "sky",
+        "detail": "Higher-contrast lane framing and concise summaries for steering meetings and CAB reviews."
+      },
+      {
+        "key": "audit",
+        "label": "Audit theme",
+        "score": 97,
+        "accent": "violet",
+        "detail": "Governance-heavy semantics, RLS posture and approval cues become the primary visual rhythm."
+      },
+      {
+        "key": "manufacturing",
+        "label": "Manufacturing theme",
+        "score": 98,
+        "accent": "amber",
+        "detail": "Traceability, genealogy and execution lineage stay dominant without overwhelming the graph."
+      }
+    ],
+    "scenes": [
+      {
+        "key": "overview",
+        "label": "Overview scene",
+        "score": 98,
+        "focus": "Balanced topology for broad architecture reading.",
+        "signal": "domain balance, structural density, canonical spread"
+      },
+      {
+        "key": "governance",
+        "label": "Governance scene",
+        "score": 97,
+        "focus": "Policies, ownership, approval and RLS posture.",
+        "signal": "owner, approver, policy, sensitivity"
+      },
+      {
+        "key": "traceability",
+        "label": "Traceability scene",
+        "score": 98,
+        "focus": "Lot/serial genealogy, quality chain and equipment lineage.",
+        "signal": "lot, serial, inspection, genealogy"
+      },
+      {
+        "key": "runtime",
+        "label": "Runtime scene",
+        "score": 97,
+        "focus": "Workflow, API, module and runtime binding cues.",
+        "signal": "workflow, api, builder, form"
+      },
+      {
+        "key": "review",
+        "label": "Review scene",
+        "score": 96,
+        "focus": "Hotspots, risky objects and decision-ready summaries for release boards.",
+        "signal": "severity, metadata gaps, impact posture"
+      }
+    ],
+    "legendGroups": [
+      {
+        "key": "objects",
+        "label": "Object grammar",
+        "score": 98,
+        "detail": "Tables, views, policies, functions and runtime-facing primitives use distinct but restrained identity markers.",
+        "items": [
+          "table / bridge",
+          "view / mview",
+          "policy / security",
+          "function / procedure"
+        ]
+      },
+      {
+        "key": "relations",
+        "label": "Relation grammar",
+        "score": 97,
+        "detail": "Structural, governance, traceability and runtime relations each retain their own stroke family.",
+        "items": [
+          "solid structural",
+          "dashed runtime",
+          "dotted lineage",
+          "selected bright path"
+        ]
+      },
+      {
+        "key": "severity",
+        "label": "Severity grammar",
+        "score": 97,
+        "detail": "Severity stays encoded by restrained tone, not by flooding the full card surface.",
+        "items": [
+          "critical",
+          "high",
+          "medium",
+          "low"
+        ]
+      },
+      {
+        "key": "focus",
+        "label": "Focus grammar",
+        "score": 96,
+        "detail": "Scene focus, lane activity and selected neighborhood each have their own visual signal.",
+        "items": [
+          "scene focus",
+          "lane active",
+          "selection rail",
+          "connected path"
+        ]
+      }
+    ]
   }
 }

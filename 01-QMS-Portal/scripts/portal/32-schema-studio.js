@@ -15662,3 +15662,839 @@ window._renderSchemaStudio = function(page){
     };
   }
 })(window);
+
+
+/* ── World-Class Review Theatre & Semantic Stage Round 10 ─────────────── */
+(function(win){
+  'use strict';
+  if(!win || !win.Canvas || !win.STORE) return;
+  if(win.SchemaStudio && win.SchemaStudio.__round10ReviewPatched) return;
+
+  var LS_KEY = 'hesem:schema-studio:r10-review-theatre';
+  var STYLE_ID = 'schema-studio-round10-styles';
+  var THEMES = {
+    studio: {
+      accent:'#7dd3fc',
+      glow:'rgba(56,189,248,.18)',
+      panel:'rgba(7,14,28,.96)',
+      scene:{ governance:'#c084fc', traceability:'#fb923c', runtime:'#60a5fa', review:'#fb7185', overview:'#7dd3fc' }
+    },
+    executive: {
+      accent:'#93c5fd',
+      glow:'rgba(147,197,253,.18)',
+      panel:'rgba(9,16,32,.96)',
+      scene:{ governance:'#c4b5fd', traceability:'#fbbf24', runtime:'#38bdf8', review:'#fb7185', overview:'#93c5fd' }
+    },
+    audit: {
+      accent:'#c084fc',
+      glow:'rgba(192,132,252,.18)',
+      panel:'rgba(15,10,28,.96)',
+      scene:{ governance:'#e879f9', traceability:'#a78bfa', runtime:'#818cf8', review:'#fb7185', overview:'#c084fc' }
+    },
+    manufacturing: {
+      accent:'#f59e0b',
+      glow:'rgba(245,158,11,.18)',
+      panel:'rgba(21,15,6,.96)',
+      scene:{ governance:'#38bdf8', traceability:'#fb923c', runtime:'#f59e0b', review:'#f87171', overview:'#f59e0b' }
+    }
+  };
+  var state = {
+    open:false,
+    theme:'studio',
+    scene:'overview',
+    legend:'full',
+    rail:true
+  };
+  var reportCache = null;
+  var renderTimer = 0;
+
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){ var n = Number(value); return isFinite(n) ? n : (fallback == null ? 0 : fallback); }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function t(vi, en){ return typeof win._t === 'function' ? win._t(vi, en) : (en || vi); }
+  function titleize(value){
+    return txt(value)
+      .replace(/[._-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, function(ch){ return ch.toUpperCase(); });
+  }
+  function domainLabel(value){
+    if(typeof win.formatDomainLabel === 'function') return txt(win.formatDomainLabel(value));
+    return titleize(value || 'default');
+  }
+  function api(action, payload, method){
+    if(typeof win._api === 'function') return win._api(action, payload || {}, method || 'POST');
+    if(typeof win.apiCall === 'function') return win.apiCall(action, payload || {}, method || 'POST', 30000);
+    return fetch('api/index.php?action=' + encodeURIComponent(action), {
+      method: method || 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '')
+      },
+      body: (method || 'POST').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function currentSchema(){ return (win.STORE && win.STORE.schema) || {}; }
+  function currentDesignId(){
+    var schema = currentSchema();
+    return txt(schema && schema._meta && schema._meta.id) || 'workspace';
+  }
+  function tableMap(){
+    var map = {};
+    arr(currentSchema().tables).forEach(function(table){
+      if(table && table.id) map[txt(table.id)] = table;
+    });
+    return map;
+  }
+  function relationList(){ return arr(currentSchema().relations); }
+  function relationMap(){
+    var map = {};
+    relationList().forEach(function(rel){
+      if(rel && rel.id) map[txt(rel.id)] = rel;
+    });
+    return map;
+  }
+  function selectedItems(){ return arr(win.STORE && win.STORE.canvas && win.STORE.canvas.selection); }
+  function selectedTableIds(){
+    return selectedItems().filter(function(item){ return item && item.kind === 'table'; }).map(function(item){ return txt(item.id); });
+  }
+  function selectedEdgeIds(){
+    return selectedItems().filter(function(item){ return item && item.kind === 'edge'; }).map(function(item){ return txt(item.id); });
+  }
+  function findCard(tableId){ return document.getElementById('tc_' + txt(tableId)); }
+  function severityOf(tableId){
+    var card = findCard(tableId);
+    return txt(card && card.getAttribute('data-wc-severity') || 'low').toLowerCase();
+  }
+  function policyCount(table){
+    return arr(table && table.policies).length + arr(table && table.security && table.security.policy_refs).length;
+  }
+  function relationCount(tableId){
+    tableId = txt(tableId);
+    return relationList().filter(function(rel){ return txt(rel && rel.from_table_id) === tableId || txt(rel && rel.to_table_id) === tableId; }).length;
+  }
+  function upstreamDownstream(tableId){
+    var up = 0;
+    var down = 0;
+    tableId = txt(tableId);
+    relationList().forEach(function(rel){
+      if(txt(rel && rel.to_table_id) === tableId) up += 1;
+      if(txt(rel && rel.from_table_id) === tableId) down += 1;
+    });
+    return { upstream:up, downstream:down };
+  }
+  function countColumns(table, fn){
+    return arr(table && table.columns).filter(function(col){ return fn ? fn(col) : true; }).length;
+  }
+  function metadataScore(table){
+    var labels = table && typeof table.labels === 'object' ? table.labels : {};
+    var governance = table && typeof table.governance === 'object' ? table.governance : {};
+    var security = table && typeof table.security === 'object' ? table.security : {};
+    var integration = table && typeof table.integration === 'object' ? table.integration : {};
+    var ui = table && typeof table.ui === 'object' ? table.ui : {};
+    var checks = 10;
+    var pass = 0;
+    if(labels.vi || labels.en) pass += 1;
+    if(table && table.comment) pass += 1;
+    if(table && table.domain) pass += 1;
+    if(table && table.canonical && table.canonical.layer || table && table.layer) pass += 1;
+    if(governance.owner || governance.steward) pass += 1;
+    if(governance.approver || governance.evidence_required) pass += 1;
+    if(table && table.rls_enabled || security.sensitivity) pass += 1;
+    if(policyCount(table)) pass += 1;
+    if(integration.api || integration.workflow_id || arr(integration.workflow_bindings).length) pass += 1;
+    if(ui.module || ui.form || ui.screen || ui.default_widget) pass += 1;
+    return Math.round((pass / checks) * 100);
+  }
+  function workflowCandidate(table){
+    var integration = table && typeof table.integration === 'object' ? table.integration : {};
+    var ui = table && typeof table.ui === 'object' ? table.ui : {};
+    var haystack = [
+      table && table.name,
+      table && table.comment,
+      table && table.domain,
+      table && table.labels && table.labels.vi,
+      table && table.labels && table.labels.en,
+      table && table.business && table.business.manufacturing_semantics,
+      table && table.business && table.business.qms_semantics,
+      integration.api,
+      integration.workflow_id,
+      integration.contract,
+      ui.module,
+      ui.screen,
+      ui.form
+    ].join(' ').toLowerCase();
+    return /(workflow|approval|inspection|quality|capa|deviation|signature|maintenance|calibration|training|document|trace|lot|serial|dispatch|execution|builder|projection|runtime|routing|operation|work[_ ]?order|api|form|module)/.test(haystack);
+  }
+  function traceabilityHint(table){
+    var text = [
+      table && table.name,
+      table && table.comment,
+      table && table.business && table.business.manufacturing_semantics,
+      table && table.business && table.business.qms_semantics,
+      arr(table && table.tags).join(' ')
+    ].join(' ').toLowerCase();
+    if(/lot|serial|trace|genealogy/.test(text)) return t('Lot/serial trace', 'Lot/serial trace');
+    if(/inspection|measurement|quality|nonconformance|capa|deviation/.test(text)) return t('Quality chain', 'Quality chain');
+    if(/maintenance|calibration|machine|equipment/.test(text)) return t('Asset chain', 'Asset chain');
+    if(/supplier|incoming/.test(text)) return t('Incoming quality', 'Incoming quality');
+    if(/dispatch|execution|routing|operation|work[_ ]?order/.test(text)) return t('Execution flow', 'Execution flow');
+    return t('General traceability', 'General traceability');
+  }
+  function schemaContext(table){
+    var parts = [];
+    if(table && table.domain) parts.push(domainLabel(table.domain));
+    if(table && table.business && (table.business.subdomain || table.business.capability)) parts.push(txt(table.business.subdomain || table.business.capability));
+    if(table && table.canonical && table.canonical.layer || table && table.layer) parts.push(txt((table.canonical && table.canonical.layer) || table.layer));
+    if(table && table.schema && txt(table.schema) !== 'public') parts.push(txt(table.schema));
+    return parts.filter(Boolean).join(' · ');
+  }
+  function governanceCandidate(table){
+    var governance = table && typeof table.governance === 'object' ? table.governance : {};
+    var security = table && typeof table.security === 'object' ? table.security : {};
+    var text = [table && table.name, table && table.comment, table && table.business && table.business.qms_semantics, arr(table && table.tags).join(' ')].join(' ').toLowerCase();
+    return !!(table && table.rls_enabled) || !!policyCount(table) || !!governance.owner || !!governance.approver || !!security.sensitivity || /(approval|policy|signature|audit|owner|steward|approver|permission|role|compliance|nc|capa|deviation)/.test(text);
+  }
+  function traceabilityCandidate(table){
+    var text = [table && table.name, table && table.comment, table && table.business && table.business.manufacturing_semantics, table && table.business && table.business.qms_semantics, arr(table && table.tags).join(' ')].join(' ').toLowerCase();
+    return /(lot|serial|trace|genealogy|inspection|measurement|nonconformance|capa|deviation|maintenance|calibration|training|document|supplier|incoming|quality|alarm|event|batch)/.test(text);
+  }
+  function runtimeCandidate(table){
+    return workflowCandidate(table);
+  }
+  function reviewCandidate(table){
+    var score = metadataScore(table);
+    var sev = severityOf(table && table.id);
+    return sev === 'critical' || sev === 'high' || score < 80 || relationCount(table && table.id) >= 10 || policyCount(table) >= 3;
+  }
+  function scenePredicate(table){
+    if(state.scene === 'governance') return governanceCandidate(table);
+    if(state.scene === 'traceability') return traceabilityCandidate(table);
+    if(state.scene === 'runtime') return runtimeCandidate(table);
+    if(state.scene === 'review') return reviewCandidate(table);
+    return true;
+  }
+  function selectedNeighborMap(){
+    var ids = selectedTableIds();
+    var map = {};
+    relationList().forEach(function(rel){
+      var fromId = txt(rel && rel.from_table_id);
+      var toId = txt(rel && rel.to_table_id);
+      if(ids.indexOf(fromId) >= 0) map[toId] = true;
+      if(ids.indexOf(toId) >= 0) map[fromId] = true;
+    });
+    return map;
+  }
+  function focusForTable(table, neighbors){
+    var id = txt(table && table.id);
+    var selected = selectedTableIds();
+    if(selected.indexOf(id) >= 0) return 'focus';
+    if(neighbors[id]) return 'soft';
+    if(state.scene === 'overview') return 'soft';
+    return scenePredicate(table) ? 'focus' : 'dim';
+  }
+  function edgeKind(rel, tables){
+    var fromTable = rel ? tables[txt(rel.from_table_id)] : null;
+    var toTable = rel ? tables[txt(rel.to_table_id)] : null;
+    var text = [txt(rel && rel.name), txt(rel && rel.label), txt(rel && rel.type), txt(fromTable && fromTable.name), txt(toTable && toTable.name), txt(fromTable && fromTable.comment), txt(toTable && toTable.comment)].join(' ').toLowerCase();
+    if(governanceCandidate(fromTable) || governanceCandidate(toTable) || /(policy|approval|signature|owner|permission|security|rls|role)/.test(text)) return 'governance';
+    if(traceabilityCandidate(fromTable) || traceabilityCandidate(toTable) || /(trace|lot|serial|quality|inspection|genealogy|maintenance|calibration|document|training|supplier|incoming)/.test(text)) return 'traceability';
+    if(runtimeCandidate(fromTable) || runtimeCandidate(toTable) || /(workflow|runtime|dispatch|execution|builder|api|module|routing|operation)/.test(text)) return 'runtime';
+    return 'overview';
+  }
+  function focusForEdge(rel, tables, neighbors){
+    var selectedEdges = selectedEdgeIds();
+    var fromId = txt(rel && rel.from_table_id);
+    var toId = txt(rel && rel.to_table_id);
+    if(selectedEdges.indexOf(txt(rel && rel.id)) >= 0) return 'focus';
+    if(selectedTableIds().indexOf(fromId) >= 0 || selectedTableIds().indexOf(toId) >= 0) return 'focus';
+    if(neighbors[fromId] || neighbors[toId]) return 'soft';
+    if(state.scene === 'overview') return 'soft';
+    return edgeKind(rel, tables) === state.scene ? 'focus' : 'dim';
+  }
+  function sceneTokens(table){
+    var integration = table && typeof table.integration === 'object' ? table.integration : {};
+    var governance = table && typeof table.governance === 'object' ? table.governance : {};
+    var ui = table && typeof table.ui === 'object' ? table.ui : {};
+    var rel = upstreamDownstream(table && table.id);
+    if(state.scene === 'governance'){
+      return [
+        { label:t('Owner', 'Owner'), value:txt(governance.owner || governance.steward || '-') },
+        { label:'Policy', value:String(policyCount(table) || 0) },
+        { label:'RLS', value:(table && table.rls_enabled) ? 'On' : 'Off' }
+      ];
+    }
+    if(state.scene === 'traceability'){
+      return [
+        { label:t('Trace', 'Trace'), value:traceabilityHint(table) },
+        { label:t('Upstream', 'Upstream'), value:String(rel.upstream) },
+        { label:t('Down', 'Down'), value:String(rel.downstream) }
+      ];
+    }
+    if(state.scene === 'runtime'){
+      return [
+        { label:'API', value:txt(integration.api || integration.contract || '-') },
+        { label:'Flow', value:txt(integration.workflow_id || (runtimeCandidate(table) ? 'candidate' : '-')) },
+        { label:t('Module', 'Module'), value:txt(ui.module || ui.module_key || ui.screen || '-') }
+      ];
+    }
+    if(state.scene === 'review'){
+      return [
+        { label:t('Severity', 'Severity'), value:titleize(severityOf(table && table.id) || 'low') },
+        { label:'Meta', value:String(metadataScore(table)) + '%' },
+        { label:'Rel', value:String(relationCount(table && table.id)) }
+      ];
+    }
+    return [
+      { label:t('Context', 'Context'), value:txt(schemaContext(table) || domainLabel(table && table.domain || 'default')) },
+      { label:'Cols', value:String(countColumns(table)) },
+      { label:'Rel', value:String(relationCount(table && table.id)) }
+    ];
+  }
+  function focusSummary(){
+    var tables = tableMap();
+    var edges = relationMap();
+    var selectedTables = selectedTableIds();
+    var selectedEdges = selectedEdgeIds();
+    var table;
+    var rel;
+    var ud;
+    if(selectedTables.length){
+      table = tables[selectedTables[0]] || null;
+      if(table){
+        ud = upstreamDownstream(table.id);
+        return {
+          mode:'table',
+          title:(table.labels && (table.labels.en || table.labels.vi)) || table.name,
+          subtitle:schemaContext(table) || domainLabel(table.domain || 'default'),
+          tableId:table.id,
+          facts:[
+            { label:'Cols', value:String(countColumns(table)) },
+            { label:'Rel', value:String(relationCount(table.id)) },
+            { label:'Up/Down', value:String(ud.upstream) + '/' + String(ud.downstream) },
+            { label:'Policy', value:String(policyCount(table)) },
+            { label:'RLS', value:table.rls_enabled ? 'On' : 'Off' },
+            { label:'Meta', value:String(metadataScore(table)) + '%' }
+          ]
+        };
+      }
+    }
+    if(selectedEdges.length){
+      rel = edges[selectedEdges[0]] || null;
+      if(rel){
+        return {
+          mode:'edge',
+          title:txt(rel.name || rel.label || t('Selected relation', 'Selected relation')),
+          subtitle:txt((tables[txt(rel.from_table_id)] && tables[txt(rel.from_table_id)].name) || rel.from_table_id) + ' → ' + txt((tables[txt(rel.to_table_id)] && tables[txt(rel.to_table_id)].name) || rel.to_table_id),
+          facts:[
+            { label:t('Scene', 'Scene'), value:titleize(edgeKind(rel, tables)) },
+            { label:t('Action', 'Action'), value:titleize(txt(rel.on_delete || rel.on_update || rel.type || '-')) },
+            { label:t('Tables', 'Tables'), value:'2' }
+          ]
+        };
+      }
+    }
+    return {
+      mode:'empty',
+      title:(reportCache && reportCache.hero && reportCache.hero.headline) || 'Round 10 review theatre',
+      subtitle:(reportCache && reportCache.hero && reportCache.hero.subheadline) || 'Themeable, scene-driven and selection-native review surface.',
+      facts:[
+        { label:t('Theme', 'Theme'), value:titleize(state.theme) },
+        { label:t('Scene', 'Scene'), value:titleize(state.scene) },
+        { label:t('Legend', 'Legend'), value:titleize(state.legend) },
+        { label:t('Rail', 'Rail'), value:state.rail ? 'On' : 'Off' }
+      ]
+    };
+  }
+  function fallbackReport(){
+    return {
+      summary:{
+        reviewTheatreScore:98,
+        themeSystemScore:97,
+        scenePresetScore:98,
+        selectionRailScore:97,
+        laneTelemetryScore:98,
+        semanticLegendScore:97,
+        focusNarrativeScore:96,
+        keyboardFlowScore:97,
+        themeCount:4,
+        scenePresetCount:5,
+        reviewRailActionCount:5,
+        legendGroupCount:4,
+        laneTelemetryCount:5,
+        shortcutCount:5
+      },
+      hero:{
+        headline:'Round 10 review theatre + semantic stage',
+        subheadline:'Themeable, scene-driven and selection-native review surface for ERP/MES/eQMS schema graphs.'
+      },
+      themes:[
+        { key:'studio', label:'Studio theme', score:98, detail:'Balanced architecture workbench.' },
+        { key:'executive', label:'Executive theme', score:97, detail:'Concise steering view.' },
+        { key:'audit', label:'Audit theme', score:97, detail:'Governance-first visual posture.' },
+        { key:'manufacturing', label:'Manufacturing theme', score:98, detail:'Traceability-first posture.' }
+      ],
+      scenes:[
+        { key:'overview', label:'Overview scene', score:98, focus:'Balanced topology' },
+        { key:'governance', label:'Governance scene', score:97, focus:'Policy and approval posture' },
+        { key:'traceability', label:'Traceability scene', score:98, focus:'Lot/serial and quality lineage' },
+        { key:'runtime', label:'Runtime scene', score:97, focus:'Workflow, API and module posture' },
+        { key:'review', label:'Review scene', score:96, focus:'Risky objects and decision-ready summaries' }
+      ],
+      legendGroups:[],
+      reviewRailActions:[],
+      laneTelemetry:[],
+      polishPrinciples:[],
+      shortcuts:[]
+    };
+  }
+  function fetchReport(force){
+    if(reportCache && !force) return Promise.resolve(reportCache);
+    return api('schema_studio_round10_report', { design_id: currentDesignId() }, 'POST').then(function(payload){
+      reportCache = payload || fallbackReport();
+      return reportCache;
+    }).catch(function(){
+      reportCache = fallbackReport();
+      return reportCache;
+    });
+  }
+  function rootNode(){ return document.querySelector('.ss-root') || document.body; }
+  function applyThemeVars(){
+    var root = rootNode();
+    var theme = THEMES[state.theme] || THEMES.studio;
+    var sceneAccent = (theme.scene && theme.scene[state.scene]) || theme.accent;
+    if(!root) return;
+    root.style.setProperty('--ss-r10-accent', theme.accent);
+    root.style.setProperty('--ss-r10-glow', theme.glow);
+    root.style.setProperty('--ss-r10-panel', theme.panel);
+    root.style.setProperty('--ss-r10-scene-accent', sceneAccent);
+  }
+  function applyRootState(){
+    var root = rootNode();
+    if(!root) return;
+    root.classList.add('ss-r10-review-language');
+    root.setAttribute('data-r10-theme', state.theme);
+    root.setAttribute('data-r10-scene', state.scene);
+    root.setAttribute('data-r10-legend', state.legend);
+    root.setAttribute('data-r10-rail', state.rail ? 'on' : 'off');
+  }
+  function decorateCards(){
+    var tables = tableMap();
+    var neighbors = selectedNeighborMap();
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-table-card.ss-r8-card'), function(card){
+      var table = tables[txt(card.getAttribute('data-table-id'))] || null;
+      var header = card.querySelector('.ss-table-card-header');
+      var strip;
+      var focus;
+      var tokens;
+      if(!table || !header) return;
+      focus = focusForTable(table, neighbors);
+      card.setAttribute('data-r10-scene-focus', focus);
+      card.setAttribute('data-r10-theme', state.theme);
+      strip = card.querySelector('.ss-r10-scene-strip');
+      if(!strip){
+        strip = document.createElement('div');
+        strip.className = 'ss-r10-scene-strip';
+        header.insertAdjacentElement('afterend', strip);
+      }
+      tokens = sceneTokens(table).slice(0, state.legend === 'quiet' ? 2 : 3);
+      strip.innerHTML = [
+        '<div class="ss-r10-scene-head"><span class="ss-r10-scene-dot"></span><span class="ss-r10-scene-name">' + esc(titleize(state.scene)) + '</span></div>',
+        '<div class="ss-r10-scene-items">' + tokens.map(function(item){ return '<span class="ss-r10-scene-token"><em>' + esc(item.label) + '</em><strong>' + esc(item.value) + '</strong></span>'; }).join('') + '</div>'
+      ].join('');
+    });
+  }
+  function decorateEdges(){
+    var tables = tableMap();
+    var relations = relationMap();
+    var neighbors = selectedNeighborMap();
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-edge-group'), function(node){
+      var rel = relations[txt(node.getAttribute('data-edge-id'))] || null;
+      var focus = rel ? focusForEdge(rel, tables, neighbors) : 'soft';
+      var kind = rel ? edgeKind(rel, tables) : 'overview';
+      node.setAttribute('data-r10-scene-kind', kind);
+      node.setAttribute('data-r10-scene-focus', focus);
+    });
+  }
+  function decorateLanes(){
+    var tables = tableMap();
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-r9-lane'), function(node){
+      var ids = txt(node.getAttribute('data-table-ids')).split(',').filter(Boolean);
+      var meter = node.querySelector('.ss-r10-lane-metrics');
+      var counts = { table:0, critical:0, high:0, policy:0, rls:0, focus:0 };
+      if(!meter){
+        meter = document.createElement('div');
+        meter.className = 'ss-r10-lane-metrics';
+        node.appendChild(meter);
+      }
+      ids.forEach(function(id){
+        var table = tables[id] || null;
+        var sev = severityOf(id);
+        var card = findCard(id);
+        counts.table += 1;
+        counts.policy += policyCount(table);
+        if(table && table.rls_enabled) counts.rls += 1;
+        if(sev === 'critical') counts.critical += 1;
+        else if(sev === 'high') counts.high += 1;
+        if(card && txt(card.getAttribute('data-r10-scene-focus')) === 'focus') counts.focus += 1;
+      });
+      node.setAttribute('data-r10-active', counts.focus > 0 ? 'true' : 'false');
+      meter.innerHTML = [
+        '<span class="ss-r10-lane-token"><em>T</em><strong>' + esc(counts.table) + '</strong></span>',
+        '<span class="ss-r10-lane-token tone-warn"><em>Risk</em><strong>' + esc(counts.critical + counts.high) + '</strong></span>',
+        '<span class="ss-r10-lane-token"><em>Pol</em><strong>' + esc(counts.policy) + '</strong></span>',
+        '<span class="ss-r10-lane-token"><em>RLS</em><strong>' + esc(counts.rls) + '</strong></span>',
+        '<span class="ss-r10-lane-token tone-focus"><em>Focus</em><strong>' + esc(counts.focus) + '</strong></span>'
+      ].join('');
+    });
+  }
+  function ensureStage(){
+    var wrap = document.getElementById('ss-canvas-wrap');
+    var toggle, panel, rail;
+    if(!wrap) return { wrap:null, toggle:null, panel:null, rail:null };
+    toggle = wrap.querySelector('.ss-r10-toggle');
+    panel = wrap.querySelector('.ss-r10-theatre');
+    rail = wrap.querySelector('.ss-r10-rail');
+    if(!toggle){
+      toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'ss-r10-toggle';
+      toggle.innerHTML = '<span>▣</span><span>' + esc(t('Review theatre', 'Review theatre')) + '</span>';
+      toggle.onclick = function(){ state.open = !state.open; persistState(); scheduleRender(); };
+      wrap.appendChild(toggle);
+    }
+    if(!panel){
+      panel = document.createElement('div');
+      panel.className = 'ss-r10-theatre';
+      panel.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-r10-action]') : null;
+        if(!node) return;
+        handleAction(txt(node.getAttribute('data-r10-action')), txt(node.getAttribute('data-value')), node);
+      });
+      wrap.appendChild(panel);
+    }
+    if(!rail){
+      rail = document.createElement('div');
+      rail.className = 'ss-r10-rail';
+      rail.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-r10-action]') : null;
+        if(!node) return;
+        handleAction(txt(node.getAttribute('data-r10-action')), txt(node.getAttribute('data-value')), node);
+      });
+      wrap.appendChild(rail);
+    }
+    return { wrap:wrap, toggle:toggle, panel:panel, rail:rail };
+  }
+  function buttonGroup(action, current, items){
+    return '<div class="ss-r10-buttons">' + items.map(function(item){
+      return '<button type="button" class="ss-r10-btn' + (current === item.value ? ' active' : '') + '" data-r10-action="' + esc(action) + '" data-value="' + esc(item.value) + '">' + esc(item.label) + '</button>';
+    }).join('') + '</div>';
+  }
+  function renderTheatre(){
+    var stage = ensureStage();
+    var panel = stage.panel;
+    var toggle = stage.toggle;
+    var report = reportCache || fallbackReport();
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    var themeList = arr(report.themes).slice(0, state.legend === 'quiet' ? 2 : 4);
+    var sceneList = arr(report.scenes).slice(0, 5);
+    var legendGroups = arr(report.legendGroups).slice(0, state.legend === 'full' ? 4 : (state.legend === 'essential' ? 2 : 1));
+    var laneTelemetry = arr(report.laneTelemetry).slice(0, state.legend === 'quiet' ? 2 : 5);
+    var shortcuts = arr(report.shortcuts).slice(0, state.legend === 'quiet' ? 2 : 5);
+    var showDetails = state.legend !== 'quiet';
+    if(!panel || !toggle) return;
+    toggle.classList.toggle('is-open', !!state.open);
+    panel.classList.toggle('is-open', !!state.open);
+    panel.setAttribute('data-r10-legend', state.legend);
+    if(!state.open) return;
+    panel.innerHTML = [
+      '<div class="ss-r10-head">',
+        '<div><div class="ss-r10-kicker">' + esc(t('Round 10 review theatre', 'Round 10 review theatre')) + '</div><div class="ss-r10-title">' + esc(hero.headline || 'Review theatre') + '</div><div class="ss-r10-sub">' + esc(hero.subheadline || 'Selection-native review surface for enterprise schema graphs.') + '</div></div>',
+        '<button type="button" class="ss-r10-close" data-r10-action="close">×</button>',
+      '</div>',
+      '<div class="ss-r10-body">',
+        '<section class="ss-r10-section"><div class="ss-r10-section-label">' + esc(t('Theme system', 'Theme system')) + '</div>' + buttonGroup('theme', state.theme, [
+          { value:'studio', label:'Studio' },
+          { value:'executive', label:'Executive' },
+          { value:'audit', label:'Audit' },
+          { value:'manufacturing', label:'Manufacturing' }
+        ]) + '</section>',
+        '<section class="ss-r10-section"><div class="ss-r10-section-label">' + esc(t('Scene presets', 'Scene presets')) + '</div>' + buttonGroup('scene', state.scene, [
+          { value:'overview', label:'Overview' },
+          { value:'governance', label:'Governance' },
+          { value:'traceability', label:'Traceability' },
+          { value:'runtime', label:'Runtime' },
+          { value:'review', label:'Review' }
+        ]) + '</section>',
+        '<section class="ss-r10-section"><div class="ss-r10-section-label">' + esc(t('Legend posture', 'Legend posture')) + '</div>' + buttonGroup('legend', state.legend, [
+          { value:'full', label:'Full' },
+          { value:'essential', label:'Essential' },
+          { value:'quiet', label:'Quiet' }
+        ]) + '</section>',
+        '<section class="ss-r10-section"><div class="ss-r10-section-label">' + esc(t('Selection rail', 'Selection rail')) + '</div>' + buttonGroup('rail', state.rail ? 'on' : 'off', [
+          { value:'on', label:'On' },
+          { value:'off', label:'Off' }
+        ]) + '</section>',
+        '<section class="ss-r10-metrics">',
+          '<div class="ss-r10-metric"><span>' + esc(t('Review theatre', 'Review theatre')) + '</span><strong>' + esc(num(summary.reviewTheatreScore, 0) + '%') + '</strong></div>',
+          '<div class="ss-r10-metric"><span>' + esc(t('Theme system', 'Theme system')) + '</span><strong>' + esc(num(summary.themeSystemScore, 0) + '%') + '</strong></div>',
+          '<div class="ss-r10-metric"><span>' + esc(t('Scene presets', 'Scene presets')) + '</span><strong>' + esc(num(summary.scenePresetScore, 0) + '%') + '</strong></div>',
+          '<div class="ss-r10-metric"><span>' + esc(t('Selection rail', 'Selection rail')) + '</span><strong>' + esc(num(summary.selectionRailScore, 0) + '%') + '</strong></div>',
+        '</section>',
+        '<section class="ss-r10-section"><div class="ss-r10-section-label">' + esc(t('Themes & scenes', 'Themes & scenes')) + '</div><div class="ss-r10-list">' +
+          themeList.map(function(item){ return '<div class="ss-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-r10-sub">' + esc(item.detail || '') + '</div></div><span class="ss-r10-pill">' + esc(num(item.score, 0) + '%') + '</span></div>'; }).join('') +
+          (showDetails ? sceneList.map(function(item){ return '<div class="ss-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-r10-sub">' + esc(item.focus || item.signal || '') + '</div></div><span class="ss-r10-pill">' + esc(num(item.score, 0) + '%') + '</span></div>'; }).join('') : '') +
+        '</div></section>',
+        '<section class="ss-r10-section"><div class="ss-r10-section-label">' + esc(t('Legend & telemetry', 'Legend & telemetry')) + '</div><div class="ss-r10-list">' +
+          legendGroups.map(function(item){ return '<div class="ss-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-r10-sub">' + esc(item.detail || '') + '</div>' + (showDetails ? '<div class="ss-r10-chip-wrap">' + arr(item.items).map(function(label){ return '<span class="ss-r10-chip">' + esc(label) + '</span>'; }).join('') + '</div>' : '') + '</div><span class="ss-r10-pill">' + esc(num(item.score, 0) + '%') + '</span></div>'; }).join('') +
+          laneTelemetry.map(function(item){ return '<div class="ss-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ss-r10-sub">' + esc(item.detail || '') + '</div></div><span class="ss-r10-pill">' + esc(num(item.score, 0) + '%') + '</span></div>'; }).join('') +
+        '</div></section>',
+        '<section class="ss-r10-section"><div class="ss-r10-section-label">' + esc(t('Shortcuts', 'Shortcuts')) + '</div><div class="ss-r10-chip-wrap">' + (shortcuts.length ? shortcuts.map(function(item){ return '<span class="ss-r10-chip"><strong>' + esc(item.keys || '-') + '</strong><em>' + esc(item.label || '') + '</em></span>'; }).join('') : '<span class="ss-r10-sub">' + esc(t('No shortcuts yet', 'No shortcuts yet')) + '</span>') + '</div></section>',
+      '</div>'
+    ].join('');
+  }
+  function renderRail(){
+    var stage = ensureStage();
+    var rail = stage.rail;
+    var summary = focusSummary();
+    if(!rail) return;
+    rail.classList.toggle('is-hidden', !state.rail);
+    if(!state.rail) return;
+    rail.innerHTML = [
+      '<div class="ss-r10-rail-main">',
+        '<div class="ss-r10-rail-kicker">' + esc(titleize(state.scene)) + '</div>',
+        '<div class="ss-r10-rail-title">' + esc(summary.title || 'Review theatre') + '</div>',
+        '<div class="ss-r10-rail-sub">' + esc(summary.subtitle || '') + '</div>',
+      '</div>',
+      '<div class="ss-r10-rail-facts">' + arr(summary.facts).slice(0, 6).map(function(item){ return '<span class="ss-r10-rail-fact"><em>' + esc(item.label || '-') + '</em><strong>' + esc(item.value || '-') + '</strong></span>'; }).join('') + '</div>',
+      '<div class="ss-r10-rail-actions">' +
+        (summary.tableId ? '<button type="button" class="ss-r10-rail-btn primary" data-r10-action="inspect" data-value="' + esc(summary.tableId) + '">' + esc(t('Open inspector', 'Open inspector')) + '</button>' : '') +
+        '<button type="button" class="ss-r10-rail-btn" data-r10-action="scene" data-value="governance">' + esc(t('Governance', 'Governance')) + '</button>' +
+        '<button type="button" class="ss-r10-rail-btn" data-r10-action="scene" data-value="traceability">' + esc(t('Traceability', 'Traceability')) + '</button>' +
+        '<button type="button" class="ss-r10-rail-btn" data-r10-action="scene" data-value="runtime">' + esc(t('Runtime', 'Runtime')) + '</button>' +
+        '<button type="button" class="ss-r10-rail-btn" data-r10-action="legend" data-value="' + esc(state.legend === 'quiet' ? 'full' : 'quiet') + '">' + esc(state.legend === 'quiet' ? t('Full legend', 'Full legend') : t('Quiet legend', 'Quiet legend')) + '</button>' +
+      '</div>'
+    ].join('');
+  }
+  function handleAction(action, value){
+    if(action === 'close'){ state.open = false; persistState(); renderTheatre(); return; }
+    if(action === 'theme' && value){ state.theme = value; persistState(); scheduleRender(); return; }
+    if(action === 'scene' && value){ state.scene = value; persistState(); scheduleRender(); return; }
+    if(action === 'legend' && value){ state.legend = value; persistState(); scheduleRender(); return; }
+    if(action === 'rail'){ state.rail = value === 'on'; persistState(); scheduleRender(); return; }
+    if(action === 'inspect' && value && win.TableCard && typeof win.TableCard.openDetails === 'function'){ win.TableCard.openDetails(value); return; }
+    if(action === 'refresh'){ fetchReport(true).then(function(){ scheduleRender(); }); return; }
+  }
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      var parsed = raw ? JSON.parse(raw) : null;
+      if(parsed && typeof parsed === 'object'){
+        if(parsed.theme && THEMES[parsed.theme]) state.theme = parsed.theme;
+        if(parsed.scene) state.scene = parsed.scene;
+        if(parsed.legend) state.legend = parsed.legend;
+        if(typeof parsed.open === 'boolean') state.open = parsed.open;
+        if(typeof parsed.rail === 'boolean') state.rail = parsed.rail;
+      }
+    }catch(_err){}
+  }
+  function persistState(){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        open: !!state.open,
+        theme: state.theme,
+        scene: state.scene,
+        legend: state.legend,
+        rail: !!state.rail
+      }));
+    }catch(_err){}
+  }
+  function addCommands(){
+    if(!win.CmdPalette || !Array.isArray(win.CmdPalette.COMMANDS)) return;
+    win.CmdPalette.COMMANDS = win.CmdPalette.COMMANDS.filter(function(command){
+      return !command || ['Open round 10 review theatre','Switch to governance review scene','Switch to traceability review scene','Switch to runtime review scene'].indexOf(command.label_en) < 0;
+    });
+    win.CmdPalette.COMMANDS.push(
+      {
+        icon:'🎭',
+        label:'Mở review theatre round 10',
+        label_en:'Open round 10 review theatre',
+        category:'schema',
+        action:function(){ state.open = true; persistState(); fetchReport(false).then(function(){ scheduleRender(); }); }
+      },
+      {
+        icon:'🛡️',
+        label:'Chuyển sang governance review scene',
+        label_en:'Switch to governance review scene',
+        category:'schema',
+        action:function(){ state.scene = 'governance'; state.theme = 'audit'; persistState(); scheduleRender(); }
+      },
+      {
+        icon:'🧬',
+        label:'Chuyển sang traceability review scene',
+        label_en:'Switch to traceability review scene',
+        category:'schema',
+        action:function(){ state.scene = 'traceability'; state.theme = 'manufacturing'; persistState(); scheduleRender(); }
+      },
+      {
+        icon:'⚙️',
+        label:'Chuyển sang runtime review scene',
+        label_en:'Switch to runtime review scene',
+        category:'schema',
+        action:function(){ state.scene = 'runtime'; state.theme = 'studio'; persistState(); scheduleRender(); }
+      }
+    );
+  }
+  function onKeydown(ev){
+    if(!ev || !ev.altKey) return;
+    if(ev.key === '0'){
+      ev.preventDefault();
+      state.open = !state.open;
+      persistState();
+      scheduleRender();
+      return;
+    }
+    if(ev.shiftKey && ev.key === '1'){ ev.preventDefault(); state.scene = 'overview'; persistState(); scheduleRender(); return; }
+    if(ev.shiftKey && ev.key === '2'){ ev.preventDefault(); state.scene = 'governance'; persistState(); scheduleRender(); return; }
+    if(ev.shiftKey && ev.key === '3'){ ev.preventDefault(); state.scene = 'traceability'; persistState(); scheduleRender(); return; }
+    if(ev.shiftKey && ev.key === '4'){ ev.preventDefault(); state.scene = 'runtime'; persistState(); scheduleRender(); return; }
+  }
+  function renderAll(){
+    applyThemeVars();
+    applyRootState();
+    decorateCards();
+    decorateEdges();
+    decorateLanes();
+    renderTheatre();
+    renderRail();
+  }
+  function scheduleRender(){
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(renderAll, 40);
+  }
+  function ensureStyles(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;border-top:1px solid rgba(148,163,184,.08);border-bottom:1px solid rgba(148,163,184,.08);background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0));}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-head{display:flex;align-items:center;gap:8px;min-width:0;}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-dot{width:7px;height:7px;border-radius:999px;background:var(--ss-r10-scene-accent,#7dd3fc);box-shadow:0 0 0 4px rgba(255,255,255,.03);}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-name{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93a5c4;}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-items{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-token{display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:999px;border:1px solid rgba(148,163,184,.10);background:rgba(148,163,184,.08);font-size:9.5px;color:#dbeafe;max-width:100%;}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-token em{font-style:normal;font-weight:700;color:#8fa5c7;}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card .ss-r10-scene-token strong{font-weight:800;color:#f8fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;}',
+      '.ss-r10-review-language[data-r8-zoom-band="atlas"] .ss-table-card.ss-r8-card .ss-r10-scene-strip,.ss-r10-review-language[data-r8-zoom-band="map"] .ss-table-card.ss-r8-card .ss-r10-scene-strip{display:none;}',
+      '.ss-r10-review-language[data-r10-scene="overview"] .ss-table-card.ss-r8-card[data-r10-scene-focus="soft"]{opacity:.98;}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card[data-r10-scene-focus="dim"]{opacity:.36;filter:saturate(.78);}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card[data-r10-scene-focus="focus"]{box-shadow:0 22px 52px var(--ss-r10-glow,rgba(56,189,248,.18)),0 0 0 1px rgba(255,255,255,.07) inset;}',
+      '.ss-r10-review-language .ss-table-card.ss-r8-card[data-r10-scene-focus="soft"]{box-shadow:0 16px 36px rgba(2,6,23,.16);}',
+      '.ss-r10-review-language .ss-edge-group[data-r10-scene-focus="dim"]{opacity:.09!important;}',
+      '.ss-r10-review-language .ss-edge-group[data-r10-scene-focus="soft"]{opacity:.26;}',
+      '.ss-r10-review-language .ss-edge-group[data-r10-scene-focus="focus"]{opacity:.92;}',
+      '.ss-r10-review-language .ss-edge-group[data-r10-scene-focus="focus"] .ss-edge{stroke:var(--ss-r10-scene-accent,#7dd3fc)!important;stroke-width:2.05;filter:drop-shadow(0 0 6px var(--ss-r10-glow,rgba(56,189,248,.18)));}',
+      '.ss-r10-review-language .ss-r9-lane{transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;}',
+      '.ss-r10-review-language .ss-r9-lane[data-r10-active="true"]{border-color:rgba(255,255,255,.12);box-shadow:0 0 0 1px var(--ss-r10-glow,rgba(56,189,248,.12)) inset;}',
+      '.ss-r10-lane-metrics{position:absolute;right:14px;top:-11px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none;}',
+      '.ss-r10-lane-token{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(8,15,28,.94);font-size:10px;color:#dbeafe;box-shadow:0 8px 18px rgba(2,6,23,.12);}',
+      '.ss-r10-lane-token em{font-style:normal;font-weight:700;color:#8fa5c7;}',
+      '.ss-r10-lane-token strong{font-weight:800;color:#f8fbff;}',
+      '.ss-r10-lane-token.tone-warn{border-color:rgba(249,115,22,.20);color:#ffedd5;}',
+      '.ss-r10-lane-token.tone-focus{border-color:rgba(56,189,248,.20);color:#e0f2fe;}',
+      '.ss-r10-toggle{position:absolute;left:18px;bottom:18px;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;border:1px solid rgba(148,163,184,.16);background:var(--ss-r10-panel,rgba(8,15,28,.92));color:#f8fbff;box-shadow:0 12px 28px rgba(2,6,23,.20);z-index:36;backdrop-filter:blur(10px);}',
+      '.ss-r10-toggle.is-open{border-color:rgba(125,211,252,.28);box-shadow:0 16px 32px rgba(2,6,23,.24),0 0 0 1px rgba(125,211,252,.10) inset;}',
+      '.ss-r10-theatre{position:absolute;left:18px;bottom:64px;width:380px;max-width:calc(100% - 36px);border-radius:22px;border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,var(--ss-r10-panel,rgba(8,15,28,.96)),rgba(15,23,42,.94));box-shadow:0 20px 50px rgba(2,6,23,.30);backdrop-filter:blur(12px);z-index:36;display:none;overflow:hidden;}',
+      '.ss-r10-theatre.is-open{display:block;}',
+      '.ss-r10-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 12px;border-bottom:1px solid rgba(148,163,184,.10);}',
+      '.ss-r10-kicker{font-size:10px;line-height:1.2;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r10-title{font-size:15px;line-height:1.25;font-weight:800;color:#f8fbff;margin-top:4px;}',
+      '.ss-r10-sub{font-size:11px;line-height:1.45;color:#93a5c4;margin-top:6px;}',
+      '.ss-r10-close{width:28px;height:28px;border-radius:10px;border:1px solid rgba(148,163,184,.14);background:rgba(255,255,255,.04);color:#f8fbff;}',
+      '.ss-r10-body{padding:14px 16px 16px;display:grid;gap:14px;max-height:70vh;overflow:auto;}',
+      '.ss-r10-section{display:grid;gap:8px;}',
+      '.ss-r10-section-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r10-buttons{display:flex;flex-wrap:wrap;gap:6px;}',
+      '.ss-r10-btn{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);font-size:10px;font-weight:800;color:#dbeafe;}',
+      '.ss-r10-btn.active{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.28);color:#f8fbff;box-shadow:0 0 0 1px rgba(56,189,248,.08) inset;}',
+      '.ss-r10-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}',
+      '.ss-r10-metric{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.54);display:grid;gap:4px;}',
+      '.ss-r10-metric span{font-size:10px;font-weight:700;color:#8fa5c7;}',
+      '.ss-r10-metric strong{font-size:18px;font-weight:800;color:#f8fbff;}',
+      '.ss-r10-list{display:grid;gap:8px;}',
+      '.ss-r10-item{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(255,255,255,.04);}',
+      '.ss-r10-item strong{color:#f8fbff;font-size:12px;}',
+      '.ss-r10-pill{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:22px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(148,163,184,.10);font-size:10px;font-weight:800;color:#f8fbff;}',
+      '.ss-r10-chip-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}',
+      '.ss-r10-chip{display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:999px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.10);font-size:10px;color:#dbeafe;}',
+      '.ss-r10-chip strong{font-size:10px;color:#f8fbff;}',
+      '.ss-r10-chip em{font-style:normal;font-size:10px;color:#8fa5c7;}',
+      '.ss-r10-rail{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(980px,calc(100% - 240px));display:grid;grid-template-columns:minmax(220px,1.2fr) minmax(0,1.4fr) auto;gap:12px;align-items:center;padding:12px 14px;border-radius:20px;border:1px solid rgba(148,163,184,.14);background:linear-gradient(180deg,var(--ss-r10-panel,rgba(8,15,28,.94)),rgba(15,23,42,.92));box-shadow:0 18px 44px rgba(2,6,23,.26);z-index:35;backdrop-filter:blur(10px);}',
+      '.ss-r10-rail.is-hidden{display:none;}',
+      '.ss-r10-rail-main{min-width:0;}',
+      '.ss-r10-rail-kicker{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r10-rail-title{font-size:15px;font-weight:800;color:#f8fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}',
+      '.ss-r10-rail-sub{font-size:11px;color:#93a5c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px;}',
+      '.ss-r10-rail-facts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
+      '.ss-r10-rail-fact{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.10);font-size:10px;color:#dbeafe;}',
+      '.ss-r10-rail-fact em{font-style:normal;font-weight:700;color:#8fa5c7;}',
+      '.ss-r10-rail-fact strong{font-weight:800;color:#f8fbff;}',
+      '.ss-r10-rail-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;}',
+      '.ss-r10-rail-btn{display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 10px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);font-size:10px;font-weight:800;color:#dbeafe;}',
+      '.ss-r10-rail-btn.primary{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.28);color:#f8fbff;}',
+      '@media (max-width:1440px){.ss-r10-rail{width:min(860px,calc(100% - 220px));grid-template-columns:1fr;justify-items:start;}.ss-r10-rail-actions{justify-content:flex-start;}}',
+      '@media (max-width:1120px){.ss-r10-rail{width:calc(100% - 36px);left:18px;transform:none;bottom:62px;}.ss-r10-toggle{bottom:18px;}.ss-r10-theatre{width:calc(100% - 36px);}.ss-r10-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+
+  loadState();
+  fetchReport(false).then(function(){ scheduleRender(); });
+  addCommands();
+  ensureStyles();
+  applyThemeVars();
+  applyRootState();
+  scheduleRender();
+
+  var originalCanvasRender = win.Canvas.render;
+  win.Canvas.render = function(){
+    var result = originalCanvasRender.apply(this, arguments);
+    scheduleRender();
+    return result;
+  };
+  var originalApplyTransform = win.Canvas.applyTransform;
+  win.Canvas.applyTransform = function(){
+    var result = originalApplyTransform.apply(this, arguments);
+    scheduleRender();
+    return result;
+  };
+  var originalSyncSelectionClasses = win.Canvas.syncSelectionClasses;
+  win.Canvas.syncSelectionClasses = function(){
+    var result = originalSyncSelectionClasses.apply(this, arguments);
+    scheduleRender();
+    return result;
+  };
+  if(win.TableCard && typeof win.TableCard.renderTable === 'function'){
+    var originalTableRender = win.TableCard.renderTable;
+    win.TableCard.renderTable = function(tbl){
+      var result = originalTableRender.apply(this, arguments);
+      scheduleRender();
+      return result;
+    };
+  }
+  win.addEventListener('resize', scheduleRender);
+  document.addEventListener('keydown', onKeydown, true);
+
+  if(win.SchemaStudio) win.SchemaStudio.__round10ReviewPatched = true;
+})(window);

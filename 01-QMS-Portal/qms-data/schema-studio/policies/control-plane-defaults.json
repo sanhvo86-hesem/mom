@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-07T20:10:00Z",
+    "generatedAt": "2026-04-07T21:40:00Z",
     "source": "schema_studio_control_plane_defaults",
-    "profile": "worldclass_round9"
+    "profile": "worldclass_round10"
   },
   "visual": {
     "defaultTab": "operations",
@@ -30,10 +30,22 @@
       "edge_lens_governance",
       "edge_lens_traceability",
       "edge_lens_runtime",
-      "lane_radar"
+      "lane_radar",
+      "review_theatre",
+      "theme_studio",
+      "theme_executive",
+      "theme_audit",
+      "theme_manufacturing",
+      "scene_overview",
+      "scene_governance",
+      "scene_traceability",
+      "scene_runtime",
+      "scene_review",
+      "selection_rail",
+      "semantic_legend"
     ],
-    "tableCardSystem": "round9_visual_operating_language",
-    "edgeGrammar": "quiet_default_with_role_aware_lenses",
+    "tableCardSystem": "round10_review_theatre_semantic_stage",
+    "edgeGrammar": "quiet_default_with_scene_presets_and_selection_rail",
     "selectionFocusMode": "lane_plus_neighbor_highlight",
     "badgeBudget": 2,
     "zoomBands": [
@@ -68,7 +80,15 @@
       "traceability",
       "runtime"
     ],
-    "laneOverlayMode": "domain_row_radar"
+    "laneOverlayMode": "domain_row_radar",
+    "reviewTheatre": {
+      "defaultTheme": "studio",
+      "defaultScene": "overview",
+      "defaultLegend": "full",
+      "selectionRail": true,
+      "laneTelemetry": true,
+      "keyboardShortcut": "Alt+0"
+    }
   },
   "thresholds": {
     "visualReadiness": 80,
@@ -97,7 +117,15 @@
     "accessibilityScore": 95,
     "densityDisciplineScore": 95,
     "cardModeCoverageScore": 96,
-    "visualDirectorScore": 95
+    "visualDirectorScore": 95,
+    "reviewTheatreScore": 95,
+    "themeSystemScore": 95,
+    "scenePresetScore": 96,
+    "selectionRailScore": 95,
+    "laneTelemetryScore": 96,
+    "semanticLegendScore": 95,
+    "focusNarrativeScore": 94,
+    "keyboardFlowScore": 95
   },
   "storyboards": [
     {

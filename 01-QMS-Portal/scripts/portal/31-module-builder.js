@@ -16079,6 +16079,1182 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R10__){
   if(window.__HM_MB_R9_TEST__) window.__HM_MB_R9_TEST__.round10 = window.__HM_MB_R10_TEST__;
 }
 
+
+
+/* ── MODULE BUILDER ULTRA ROUND 11 GLASS BOARDROOM PRO (2026-04-07 R11) ──── */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R11__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R11__ = '2026-04-07-r11-glass-boardroom-pro';
+  var _r11PrevRenderBuilder = _renderBuilder;
+  var _r11PrevRenderPreview = _renderPreview;
+  var _r11PrevHandleClick = _handleClick;
+  var _r11_MODES = [
+    { key:'executive-aura-pro', icon:'✨', titleVi:'Executive Aura Pro', titleEn:'Executive Aura Pro', subtitleVi:'giữ aura glass nhưng nét và tiết chế hơn', subtitleEn:'keep the glass aura, but crisper and more restrained' },
+    { key:'crystal-contrast', icon:'🧊', titleVi:'Crystal Contrast', titleEn:'Crystal Contrast', subtitleVi:'ưu tiên tương phản, scan path và độ rõ chữ', subtitleEn:'prioritise contrast, scan path, and text clarity' },
+    { key:'audit-ledger-glass', icon:'🧾', titleVi:'Audit Ledger Glass', titleEn:'Audit Ledger Glass', subtitleVi:'sạch, trung tính và sẵn sàng audit', subtitleEn:'clean, neutral, and audit-ready' },
+    { key:'night-command-pro', icon:'🌙', titleVi:'Night Command Pro', titleEn:'Night Command Pro', subtitleVi:'deep navy command cho control room', subtitleEn:'deep navy command for the control room' },
+    { key:'operator-clarity', icon:'🎯', titleVi:'Operator Clarity', titleEn:'Operator Clarity', subtitleVi:'tối đa hành động kế tiếp và giảm nhiễu', subtitleEn:'maximise next action clarity and reduce noise' }
+  ];
+  function _r11EnsureState(){
+    if(state.r11Mode == null) state.r11Mode = 'executive-aura-pro';
+    if(state.showR11Navigator == null) state.showR11Navigator = true;
+    if(state.showR11Signal == null) state.showR11Signal = true;
+    if(state.showR11Composition == null) state.showR11Composition = false;
+    if(state.showR11FocusCanvas == null) state.showR11FocusCanvas = false;
+    if(state.showR11CompactChrome == null) state.showR11CompactChrome = false;
+  }
+  function _r11Arr(v){ return Array.isArray(v) ? v : []; }
+  function _r11Text(v, fallback){
+    if(v == null) return fallback || '';
+    if(typeof v === 'string') return v;
+    if(_isObject(v)) return _t(v.vi || fallback || '', v.en || v.vi || fallback || '');
+    return String(v);
+  }
+  function _r11Clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  function _r11EnsureSchema(schema){
+    schema = schema || {};
+    if(!_isObject(schema)) return schema;
+    schema.moduleStudio = schema.moduleStudio || {};
+    schema.moduleStudio.patchVersion = '2026-04-07-r11';
+    schema.glassStudio = schema.glassStudio || {};
+    if(!schema.glassStudio.contrastTarget) schema.glassStudio.contrastTarget = 'AAA';
+    if(!schema.glassStudio.glareControl) schema.glassStudio.glareControl = 'controlled';
+    if(!schema.glassStudio.edgeContrast) schema.glassStudio.edgeContrast = 'crisp';
+    if(!schema.glassStudio.saturation) schema.glassStudio.saturation = 'restrained';
+    schema.glassExecutive = schema.glassExecutive || {};
+    if(!schema.glassExecutive.shell) schema.glassExecutive.shell = 'boardroom-pro';
+    if(!schema.glassExecutive.chrome) schema.glassExecutive.chrome = 'precision';
+    if(!schema.glassExecutive.noise) schema.glassExecutive.noise = 'low';
+    schema.typographyLab = schema.typographyLab || {};
+    if(!schema.typographyLab.scale) schema.typographyLab.scale = '14/20';
+    if(!schema.typographyLab.headings) schema.typographyLab.headings = 'semibold-tight';
+    if(!schema.typographyLab.labels) schema.typographyLab.labels = 'high-contrast';
+    if(!schema.typographyLab.captionTone) schema.typographyLab.captionTone = 'muted-strong';
+    if(!schema.typographyLab.numerics) schema.typographyLab.numerics = 'tabular';
+    schema.themeLab = schema.themeLab || {};
+    if(!schema.themeLab.surface) schema.themeLab.surface = 'glass-boardroom-pro';
+    if(!schema.themeLab.cardStyle) schema.themeLab.cardStyle = 'precision-frost';
+    if(!schema.themeLab.elevation) schema.themeLab.elevation = 'disciplined';
+    schema.visualQuality = schema.visualQuality || {};
+    if(!schema.visualQuality.scanPath) schema.visualQuality.scanPath = 'guided';
+    if(!schema.visualQuality.blockDensity) schema.visualQuality.blockDensity = 'balanced';
+    schema.round11Studio = schema.round11Studio || {};
+    if(!schema.round11Studio.mode) schema.round11Studio.mode = state.r11Mode || 'executive-aura-pro';
+    if(schema.round11Studio.focusCanvas == null) schema.round11Studio.focusCanvas = !!state.showR11FocusCanvas;
+    if(schema.round11Studio.compactChrome == null) schema.round11Studio.compactChrome = !!state.showR11CompactChrome;
+    if(!schema.round11Studio.commandSurface) schema.round11Studio.commandSurface = 'glass-boardroom-pro';
+    if(!schema.round11Studio.operatorReadability) schema.round11Studio.operatorReadability = 'high';
+    if(!schema.round11Studio.auditReadability) schema.round11Studio.auditReadability = 'high';
+    return schema;
+  }
+  function _r11Blocks(schema){
+    var rows = [];
+    _r11Arr(schema && schema.tabs).forEach(function(tab, tabIndex){
+      _r11Arr(tab && tab.blocks).forEach(function(block, blockIndex){
+        rows.push({ tabId: tab.tabId, tabIndex: tabIndex, tabLabel: _r11Text(tab && tab.title, tab && tab.tabId || 'tab'), block: block || {}, blockIndex: blockIndex });
+      });
+    });
+    return rows;
+  }
+  function _r11SignalOf(block){
+    var type = String(block && block.type || '').toLowerCase();
+    var out = { data:0, action:0, governance:0, narrative:0 };
+    if(/data|table|list|cards|timeline|matrix|chart|tree|gantt|heatmap|scorecard|spc|kanban|grid|detail/.test(type)) out.data = 1;
+    if(/action|form|wizard|toolbar|status|modal|command|dispatch|approval|create|edit|workflow/.test(type)) out.action = 1;
+    if(/audit|evidence|approval|signoff|govern|release|document|trace|custody|compliance|policy/.test(type)) out.governance = 1;
+    if(/banner|hero|kpi|story|insight|scorecard|readiness|brief|summary|executive/.test(type)) out.narrative = 1;
+    return out;
+  }
+  function _r11DominantSignal(counts){
+    var best = 'balanced';
+    var max = 0;
+    ['data','action','governance','narrative'].forEach(function(key){
+      if((counts[key] || 0) > max){ max = counts[key] || 0; best = key; }
+    });
+    return max ? best : 'empty';
+  }
+  function _r11FocusHint(key){
+    switch(key){
+      case 'data': return _t('ưu tiên insight, bảng và signal điều hành', 'prioritise insight, tables, and operational signals');
+      case 'action': return _t('ưu tiên hành động kế tiếp và throughput', 'prioritise next actions and throughput');
+      case 'governance': return _t('ưu tiên signoff, trace và compliance', 'prioritise signoff, trace, and compliance');
+      case 'narrative': return _t('ưu tiên hero, KPI và executive scan', 'prioritise hero, KPI, and executive scan');
+      default: return _t('tab còn trống, nên seed block dẫn dắt đầu tiên', 'tab is empty; seed a first guiding block');
+    }
+  }
+  function _r11NavigatorRows(schema){
+    return _r11Arr(schema && schema.tabs).map(function(tab, tabIndex){
+      var blocks = _r11Arr(tab && tab.blocks);
+      var counts = { data:0, action:0, governance:0, narrative:0 };
+      blocks.forEach(function(block){
+        var sig = _r11SignalOf(block);
+        counts.data += sig.data;
+        counts.action += sig.action;
+        counts.governance += sig.governance;
+        counts.narrative += sig.narrative;
+      });
+      var dominant = _r11DominantSignal(counts);
+      var status = blocks.length === 0 ? _t('trống', 'empty') : (blocks.length > 9 ? _t('dày', 'dense') : (blocks.length > 5 ? _t('bận', 'active') : _t('rõ', 'clear')));
+      return {
+        tabId: tab && tab.tabId,
+        label: _r11Text(tab && tab.title, 'Tab ' + (tabIndex + 1)),
+        count: blocks.length,
+        dominant: dominant,
+        status: status,
+        focus: _r11FocusHint(dominant),
+        active: state.activeTab === (tab && tab.tabId),
+        counts: counts
+      };
+    });
+  }
+  function _r11ComputeMetrics(schema){
+    var tabs = _r11Arr(schema && schema.tabs);
+    var blocks = _r11Blocks(schema);
+    var totalTabs = tabs.length || 1;
+    var emptyTabs = 0;
+    var dense = 0;
+    var signals = { data:0, action:0, governance:0, narrative:0 };
+    var gateCount = _r11Arr(schema && schema.releaseGov && schema.releaseGov.gates).length + _r11Arr(schema && schema.decisionDesk && schema.decisionDesk.signoffBoard).length;
+    var navigator = _r11NavigatorRows(schema);
+    navigator.forEach(function(row){
+      if(row.count === 0) emptyTabs += 1;
+      dense = Math.max(dense, row.count || 0);
+      signals.data += row.counts.data;
+      signals.action += row.counts.action;
+      signals.governance += row.counts.governance;
+      signals.narrative += row.counts.narrative;
+    });
+    var contrast = 80
+      + ((schema && schema.glassStudio && schema.glassStudio.contrastTarget) === 'AAA' ? 6 : 3)
+      + ((schema && schema.typographyLab && schema.typographyLab.labels) === 'high-contrast' ? 4 : 0)
+      + ((schema && schema.glassExecutive && schema.glassExecutive.noise) === 'low' ? 3 : 0)
+      + ((schema && schema.themeLab && schema.themeLab.cardStyle) === 'precision-frost' ? 3 : 0)
+      - (emptyTabs * 2)
+      - Math.max(0, dense - 8) * 2;
+    var scanPath = 74
+      + Math.round(((tabs.length - emptyTabs) / totalTabs) * 12)
+      + (signals.narrative ? 5 : 0)
+      + ((schema && schema.typographyLab && schema.typographyLab.headings) === 'semibold-tight' ? 4 : 0)
+      - Math.max(0, dense - 7) * 2;
+    var taskFocus = 72
+      + (signals.action ? 5 : 0)
+      + (state.showR11FocusCanvas ? 6 : 0)
+      + (state.showR11CompactChrome ? 4 : 0)
+      + ((schema && schema.round11Studio && schema.round11Studio.operatorReadability) === 'high' ? 4 : 0)
+      - Math.max(0, dense - 9) * 3;
+    var decision = 70
+      + Math.min(16, gateCount * 4)
+      + Math.min(8, signals.governance * 2)
+      + ((schema && schema.publish && schema.publish.releaseStrategy) ? 3 : 0)
+      + ((schema && schema.decisionDesk && schema.decisionDesk.releaseWindow) ? 3 : 0)
+      + ((schema && schema.publish && schema.publish.rollbackOwner) ? 2 : 0);
+    var composition = 76
+      + ((schema && schema.themeLab && schema.themeLab.surface) === 'glass-boardroom-pro' ? 4 : 0)
+      + ((schema && schema.themeLab && schema.themeLab.elevation) === 'disciplined' ? 4 : 0)
+      + ((schema && schema.glassStudio && schema.glassStudio.edgeContrast) === 'crisp' ? 4 : 0)
+      + ((schema && schema.glassStudio && schema.glassStudio.saturation) === 'restrained' ? 4 : 0)
+      + (state.showR11CompactChrome ? 3 : 0);
+    contrast = _r11Clamp(contrast, 48, 99);
+    scanPath = _r11Clamp(scanPath, 44, 99);
+    taskFocus = _r11Clamp(taskFocus, 40, 99);
+    decision = _r11Clamp(decision, 45, 99);
+    composition = _r11Clamp(composition, 50, 99);
+    var signalRows = [
+      { key:'data', label:_t('Data signal', 'Data signal'), count:signals.data, ratio:blocks.length ? Math.round((signals.data / blocks.length) * 100) : 0, note:_t('tables, charts, evidence views', 'tables, charts, evidence views') },
+      { key:'action', label:_t('Action signal', 'Action signal'), count:signals.action, ratio:blocks.length ? Math.round((signals.action / blocks.length) * 100) : 0, note:_t('forms, status actions, workflows', 'forms, status actions, workflows') },
+      { key:'governance', label:_t('Governance signal', 'Governance signal'), count:signals.governance, ratio:blocks.length ? Math.round((signals.governance / blocks.length) * 100) : 0, note:_t('signoff, audit, release control', 'signoff, audit, release control') },
+      { key:'narrative', label:_t('Narrative signal', 'Narrative signal'), count:signals.narrative, ratio:blocks.length ? Math.round((signals.narrative / blocks.length) * 100) : 0, note:_t('hero, KPI, brief, executive scan', 'hero, KPI, brief, executive scan') }
+    ];
+    var recommendations = [];
+    if(emptyTabs) recommendations.push(_t('Seed block điều hướng đầu tiên cho tab còn trống.', 'Seed a first guiding block into empty tabs.'));
+    if(contrast < 90) recommendations.push(_t('Tăng contrast cho chip/caption và giữ low noise.', 'Raise chip/caption contrast and keep low-noise chrome.'));
+    if(scanPath < 86) recommendations.push(_t('Siết hierarchy tiêu đề và giảm mật độ ở tab dày nhất.', 'Tighten heading hierarchy and reduce density in the densest tab.'));
+    if(taskFocus < 84) recommendations.push(_t('Bật focus canvas hoặc compact chrome để giảm phân tán.', 'Enable focus canvas or compact chrome to reduce distraction.'));
+    if(decision < 84) recommendations.push(_t('Bổ sung signoff owner, release window và rollback owner.', 'Add signoff owner, release window, and rollback owner.'));
+    if(composition >= 92) recommendations.push(_t('Giữ restraint: không tăng glow hoặc saturation thêm.', 'Preserve restraint: do not add more glow or saturation.'));
+    return {
+      totalTabs: tabs.length,
+      totalBlocks: blocks.length,
+      emptyTabs: emptyTabs,
+      dense: dense,
+      gateCount: gateCount,
+      navigator: navigator,
+      signals: signalRows,
+      contrast: contrast,
+      scanPath: scanPath,
+      taskFocus: taskFocus,
+      decision: decision,
+      composition: composition,
+      summary: _t('Glass boardroom giữ aura của round 7 nhưng ưu tiên contrast, discipline và task focus.', 'Glass boardroom keeps the round 7 aura while prioritising contrast, discipline, and task focus.'),
+      recommendations: recommendations
+    };
+  }
+  function _r11ModeButton(item, active){
+    return '<button class="mb-r11-mode' + (active ? ' is-active' : '') + '" data-action="r11-apply-mode" data-key="' + _esc(item.key) + '"><strong>' + _esc(item.icon + ' ' + _t(item.titleVi, item.titleEn)) + '</strong><small>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</small></button>';
+  }
+  function _r11RenderDeck(schema, metrics){
+    var mode = state.r11Mode || (schema && schema.round11Studio && schema.round11Studio.mode) || 'executive-aura-pro';
+    var title = schema && schema.title ? _t(schema.title.vi, schema.title.en) : _t('Module mới', 'New module');
+    var h = '<section class="mb-r11-command-deck">';
+    h += '<div class="mb-r11-deck-head"><div><div class="mb-r11-kicker">ROUND 11 · GLASS BOARDROOM PRO</div><h3>' + _esc(title) + '</h3><p>' + _esc(metrics.summary) + '</p><div class="mb-r11-chipline"><span>' + _esc(_t('Mode', 'Mode')) + ': ' + _esc(mode) + '</span><span>' + _esc(_t('Contrast target', 'Contrast target')) + ': ' + _esc((schema && schema.glassStudio && schema.glassStudio.contrastTarget) || 'AAA') + '</span><span>' + _esc(_t('Noise', 'Noise')) + ': ' + _esc((schema && schema.glassExecutive && schema.glassExecutive.noise) || 'low') + '</span><span>' + _esc(_t('Blocks', 'Blocks')) + ': ' + _esc(String(metrics.totalBlocks)) + '</span><span>' + _esc(_t('Empty tabs', 'Empty tabs')) + ': ' + _esc(String(metrics.emptyTabs)) + '</span></div></div>';
+    h += '<div class="mb-r11-stat-grid">';
+    h += '<div class="mb-r11-stat"><small>' + _esc(_t('Contrast', 'Contrast')) + '</small><strong>' + _esc(String(metrics.contrast)) + '%</strong><span>' + _esc(_t('glass without glare', 'glass without glare')) + '</span></div>';
+    h += '<div class="mb-r11-stat"><small>' + _esc(_t('Scan path', 'Scan path')) + '</small><strong>' + _esc(String(metrics.scanPath)) + '%</strong><span>' + _esc(_t('hero → rail → canvas', 'hero → rail → canvas')) + '</span></div>';
+    h += '<div class="mb-r11-stat"><small>' + _esc(_t('Task focus', 'Task focus')) + '</small><strong>' + _esc(String(metrics.taskFocus)) + '%</strong><span>' + _esc(_t('next action clarity', 'next action clarity')) + '</span></div>';
+    h += '<div class="mb-r11-stat"><small>' + _esc(_t('Decision', 'Decision')) + '</small><strong>' + _esc(String(metrics.decision)) + '%</strong><span>' + _esc(_t('release + signoff confidence', 'release + signoff confidence')) + '</span></div>';
+    h += '<div class="mb-r11-stat"><small>' + _esc(_t('Composition', 'Composition')) + '</small><strong>' + _esc(String(metrics.composition)) + '%</strong><span>' + _esc(_t('professional restraint', 'professional restraint')) + '</span></div>';
+    h += '</div></div>';
+    h += '<div class="mb-r11-mode-grid">' + _r11_MODES.map(function(item){ return _r11ModeButton(item, item.key === mode); }).join('') + '</div>';
+    h += '<div class="mb-r11-action-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r11-auto-polish">✨ ' + _esc(_t('Auto polish', 'Auto polish')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r11-export-ux-brief">🧾 ' + _esc(_t('UX brief', 'UX brief')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r11-toggle-focus">🎯 ' + _esc(state.showR11FocusCanvas ? _t('Tắt focus canvas', 'Disable focus canvas') : _t('Bật focus canvas', 'Enable focus canvas')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r11-toggle-compact">📏 ' + _esc(state.showR11CompactChrome ? _t('Chrome chuẩn', 'Normal chrome') : _t('Compact chrome', 'Compact chrome')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r11-toggle-navigator">🧭 ' + _esc(_t('Navigator board', 'Navigator board')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r11-toggle-signal">📡 ' + _esc(_t('Signal matrix', 'Signal matrix')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r11-toggle-composition">🎨 ' + _esc(_t('Composition board', 'Composition board')) + '</button></div>';
+    h += '</section>';
+    return h;
+  }
+  function _r11RenderNavigatorPanel(schema, metrics){
+    var h = '<section class="mb-r11-panel"><div class="mb-r11-panel-head"><strong>' + _esc(_t('Navigator board', 'Navigator board')) + '</strong><span>' + _esc(_t('jump tab nhanh và kiểm soát mật độ', 'jump tabs quickly and control density')) + '</span></div>';
+    if(!metrics.navigator.length){
+      h += '<div class="mb-r11-note">' + _esc(_t('Chưa có tab để dựng navigator.', 'No tabs yet to build the navigator.')) + '</div>';
+    } else {
+      h += '<div class="mb-r11-nav-list">';
+      metrics.navigator.forEach(function(row){
+        h += '<button class="mb-r11-nav-item' + (row.active ? ' is-active' : '') + '" data-action="r11-jump-tab" data-tab-id="' + _esc(row.tabId || '') + '"><strong>' + _esc(row.label) + '</strong><small>' + _esc(row.count + ' blocks · ' + row.status + ' · ' + row.dominant) + '</small><span>' + _esc(row.focus) + '</span></button>';
+      });
+      h += '</div>';
+    }
+    return h + '</section>';
+  }
+  function _r11RenderSignalPanel(schema, metrics){
+    var h = '<section class="mb-r11-panel"><div class="mb-r11-panel-head"><strong>' + _esc(_t('Signal matrix', 'Signal matrix')) + '</strong><span>' + _esc(_t('đủ data, action, governance và narrative', 'balance data, action, governance, and narrative')) + '</span></div>';
+    h += '<div class="mb-r11-signal-list">';
+    metrics.signals.forEach(function(row){
+      h += '<div class="mb-r11-signal-row"><div><strong>' + _esc(row.label) + '</strong><small>' + _esc(row.count + ' blocks · ' + row.note) + '</small></div><div class="mb-r11-bar"><span style="width:' + _esc(String(row.ratio)) + '%"></span></div><b>' + _esc(String(row.ratio)) + '%</b></div>';
+    });
+    h += '</div>';
+    h += '<ul class="mb-r11-list">';
+    metrics.recommendations.forEach(function(item){ h += '<li>' + _esc(item) + '</li>'; });
+    if(!metrics.recommendations.length) h += '<li>' + _esc(_t('Trạng thái tốt: giữ discipline và không tăng glow thêm.', 'Good state: preserve discipline and do not add more glow.')) + '</li>';
+    h += '</ul></section>';
+    return h;
+  }
+  function _r11RenderCompositionPanel(schema, metrics){
+    var h = '<section class="mb-r11-panel"><div class="mb-r11-panel-head"><strong>' + _esc(_t('Composition board', 'Composition board')) + '</strong><span>' + _esc(_t('glass recipe, chrome và độ rõ khối', 'glass recipe, chrome, and surface clarity')) + '</span></div>';
+    h += '<div class="mb-r11-line-grid">';
+    h += '<div><small>' + _esc(_t('Shell', 'Shell')) + '</small><strong>' + _esc((schema && schema.glassExecutive && schema.glassExecutive.shell) || 'boardroom-pro') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Chrome', 'Chrome')) + '</small><strong>' + _esc((schema && schema.glassExecutive && schema.glassExecutive.chrome) || 'precision') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Noise', 'Noise')) + '</small><strong>' + _esc((schema && schema.glassExecutive && schema.glassExecutive.noise) || 'low') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Surface', 'Surface')) + '</small><strong>' + _esc((schema && schema.themeLab && schema.themeLab.surface) || 'glass-boardroom-pro') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Card style', 'Card style')) + '</small><strong>' + _esc((schema && schema.themeLab && schema.themeLab.cardStyle) || 'precision-frost') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Edge contrast', 'Edge contrast')) + '</small><strong>' + _esc((schema && schema.glassStudio && schema.glassStudio.edgeContrast) || 'crisp') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Focus canvas', 'Focus canvas')) + '</small><strong>' + _esc(state.showR11FocusCanvas ? _t('bật', 'on') : _t('tắt', 'off')) + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Compact chrome', 'Compact chrome')) + '</small><strong>' + _esc(state.showR11CompactChrome ? _t('bật', 'on') : _t('tắt', 'off')) + '</strong></div>';
+    h += '</div>';
+    h += '<div class="mb-r11-meter"><span style="width:' + _esc(String(metrics.composition)) + '%"></span></div>';
+    h += '<div class="mb-r11-note">' + _esc(_t('Mục tiêu của round 11 là giữ cảm giác glass sang như round 7 nhưng text, border và hành động phải đọc ngay trong 1 lần quét mắt.', 'The round 11 goal is to preserve the elegant glass feel of round 7 while making text, borders, and actions readable in a single scan.')) + '</div>';
+    return h + '</section>';
+  }
+  function _r11RenderPanels(schema, metrics){
+    var parts = [];
+    if(state.showR11Navigator) parts.push(_r11RenderNavigatorPanel(schema, metrics));
+    if(state.showR11Signal) parts.push(_r11RenderSignalPanel(schema, metrics));
+    if(state.showR11Composition) parts.push(_r11RenderCompositionPanel(schema, metrics));
+    if(!parts.length) return '';
+    return '<div class="mb-r11-panel-grid">' + parts.join('') + '</div>';
+  }
+  function _r11ApplyMode(key){
+    var schema;
+    _r11EnsureState();
+    if(!state.schema) return;
+    schema = _r11EnsureSchema(state.schema);
+    state.r11Mode = key || 'executive-aura-pro';
+    schema.round11Studio.mode = state.r11Mode;
+    switch(state.r11Mode){
+      case 'crystal-contrast':
+        schema.glassExecutive.shell = 'crystal-contrast';
+        schema.glassExecutive.chrome = 'precision';
+        schema.glassExecutive.noise = 'low';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.glassStudio.saturation = 'restrained';
+        schema.themeLab.surface = 'glass-boardroom-pro';
+        schema.themeLab.cardStyle = 'precision-frost';
+        schema.typographyLab.scale = '14/20';
+        break;
+      case 'audit-ledger-glass':
+        schema.glassExecutive.shell = 'audit-ledger';
+        schema.glassExecutive.chrome = 'ledger-clean';
+        schema.glassExecutive.noise = 'minimal';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.glassStudio.saturation = 'neutral';
+        schema.themeLab.surface = 'audit-ledger-glass';
+        schema.themeLab.cardStyle = 'paper-frost';
+        schema.typographyLab.scale = '14/22';
+        break;
+      case 'night-command-pro':
+        schema.glassExecutive.shell = 'night-command';
+        schema.glassExecutive.chrome = 'midnight';
+        schema.glassExecutive.noise = 'low';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.glassStudio.saturation = 'controlled';
+        schema.themeLab.surface = 'night-command-pro';
+        schema.themeLab.cardStyle = 'deep-frost';
+        schema.typographyLab.scale = '14/20';
+        break;
+      case 'operator-clarity':
+        schema.glassExecutive.shell = 'operator-clarity';
+        schema.glassExecutive.chrome = 'compact';
+        schema.glassExecutive.noise = 'low';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.glassStudio.saturation = 'restrained';
+        schema.themeLab.surface = 'operator-clarity';
+        schema.themeLab.cardStyle = 'crisp-action';
+        schema.typographyLab.scale = '15/22';
+        state.showR11FocusCanvas = true;
+        state.showR11CompactChrome = true;
+        break;
+      default:
+        schema.glassExecutive.shell = 'executive-aura-pro';
+        schema.glassExecutive.chrome = 'precision';
+        schema.glassExecutive.noise = 'low';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.glassStudio.saturation = 'restrained';
+        schema.themeLab.surface = 'glass-boardroom-pro';
+        schema.themeLab.cardStyle = 'precision-frost';
+        schema.typographyLab.scale = '14/20';
+    }
+    schema.round11Studio.focusCanvas = !!state.showR11FocusCanvas;
+    schema.round11Studio.compactChrome = !!state.showR11CompactChrome;
+    _saveModule();
+    _paint();
+  }
+  function _r11AutoPolish(){
+    var schema, metrics, gates;
+    _r11EnsureState();
+    if(!state.schema) return;
+    schema = _r11EnsureSchema(state.schema);
+    metrics = _r11ComputeMetrics(schema);
+    schema.glassStudio.contrastTarget = 'AAA';
+    schema.glassStudio.glareControl = 'controlled';
+    schema.glassStudio.edgeContrast = 'crisp';
+    if(schema.glassExecutive.noise !== 'low') schema.glassExecutive.noise = 'low';
+    schema.glassExecutive.chrome = state.showR11CompactChrome ? 'compact' : 'precision';
+    schema.themeLab.surface = 'glass-boardroom-pro';
+    schema.themeLab.cardStyle = 'precision-frost';
+    schema.themeLab.elevation = 'disciplined';
+    schema.typographyLab.labels = 'high-contrast';
+    schema.typographyLab.headings = 'semibold-tight';
+    if(metrics.emptyTabs) schema.visualQuality.blockDensity = 'balanced';
+    schema.round11Studio.commandSurface = 'glass-boardroom-pro';
+    schema.round11Studio.focusCanvas = !!state.showR11FocusCanvas;
+    schema.round11Studio.compactChrome = !!state.showR11CompactChrome;
+    schema.round11Studio.operatorReadability = 'high';
+    schema.round11Studio.auditReadability = 'high';
+    schema.decisionDesk = schema.decisionDesk || {};
+    if(!schema.decisionDesk.releaseWindow) schema.decisionDesk.releaseWindow = 'weekly';
+    if(!schema.decisionDesk.signoffCadence) schema.decisionDesk.signoffCadence = 'formal';
+    schema.publish = schema.publish || {};
+    if(!schema.publish.releaseStrategy) schema.publish.releaseStrategy = 'gated';
+    if(!schema.publish.rollbackOwner) schema.publish.rollbackOwner = 'module-owner';
+    schema.releaseGov = schema.releaseGov || {};
+    gates = _r11Arr(schema.releaseGov.gates);
+    if(!gates.length) schema.releaseGov.gates = ['design-review','qa-signoff','release-approval'];
+    _saveModule();
+    _paint();
+  }
+  function _r11ToggleFocus(){
+    _r11EnsureState();
+    state.showR11FocusCanvas = !state.showR11FocusCanvas;
+    if(state.schema){
+      _r11EnsureSchema(state.schema);
+      state.schema.round11Studio.focusCanvas = !!state.showR11FocusCanvas;
+    }
+    _paint();
+  }
+  function _r11ToggleCompact(){
+    _r11EnsureState();
+    state.showR11CompactChrome = !state.showR11CompactChrome;
+    if(state.schema){
+      _r11EnsureSchema(state.schema);
+      state.schema.round11Studio.compactChrome = !!state.showR11CompactChrome;
+      state.schema.glassExecutive.chrome = state.showR11CompactChrome ? 'compact' : 'precision';
+    }
+    _paint();
+  }
+  function _r11BuildUxBrief(schema){
+    var metrics = _r11ComputeMetrics(_r11EnsureSchema(schema || {}));
+    var lines = [];
+    lines.push('# Module Builder Round 11 - Glass Boardroom Pro UX Brief');
+    lines.push('');
+    lines.push('## Readability metrics');
+    lines.push('- Contrast: ' + metrics.contrast + '%');
+    lines.push('- Scan path: ' + metrics.scanPath + '%');
+    lines.push('- Task focus: ' + metrics.taskFocus + '%');
+    lines.push('- Decision confidence: ' + metrics.decision + '%');
+    lines.push('- Composition: ' + metrics.composition + '%');
+    lines.push('');
+    lines.push('## Current mode');
+    lines.push('- Mode: ' + ((schema.round11Studio || {}).mode || state.r11Mode || 'executive-aura-pro'));
+    lines.push('- Focus canvas: ' + (state.showR11FocusCanvas ? 'on' : 'off'));
+    lines.push('- Compact chrome: ' + (state.showR11CompactChrome ? 'on' : 'off'));
+    lines.push('');
+    lines.push('## Navigator');
+    metrics.navigator.forEach(function(row){ lines.push('- ' + row.label + ': ' + row.count + ' blocks / ' + row.status + ' / ' + row.focus); });
+    if(!metrics.navigator.length) lines.push('- No tabs yet.');
+    lines.push('');
+    lines.push('## Signal matrix');
+    metrics.signals.forEach(function(row){ lines.push('- ' + row.label + ': ' + row.count + ' blocks / ' + row.ratio + '% / ' + row.note); });
+    lines.push('');
+    lines.push('## Glass recipe');
+    lines.push('- Shell: ' + ((schema.glassExecutive || {}).shell || 'boardroom-pro'));
+    lines.push('- Chrome: ' + ((schema.glassExecutive || {}).chrome || 'precision'));
+    lines.push('- Noise: ' + ((schema.glassExecutive || {}).noise || 'low'));
+    lines.push('- Surface: ' + ((schema.themeLab || {}).surface || 'glass-boardroom-pro'));
+    lines.push('- Card style: ' + ((schema.themeLab || {}).cardStyle || 'precision-frost'));
+    lines.push('- Contrast target: ' + ((schema.glassStudio || {}).contrastTarget || 'AAA'));
+    lines.push('');
+    lines.push('## Recommendations');
+    metrics.recommendations.forEach(function(item){ lines.push('- ' + item); });
+    if(!metrics.recommendations.length) lines.push('- Keep the current restraint and scan path.');
+    return lines.join('\n');
+  }
+  function _r11ExportUxBrief(){
+    if(!state.schema) return '';
+    return _r9DownloadText('module-builder-round11-glass-boardroom-pro-ux-brief.md', _r11BuildUxBrief(state.schema), 'text/markdown;charset=utf-8');
+  }
+  function _r11RemoveExisting(host){
+    if(!host || !host.querySelectorAll) return;
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r11-command-deck,.mb-r11-panel-grid,.mb-r10-executive-rail,.mb-r10-panel-grid,.mb-r9-glass-rail,.mb-r9-panel-grid'), function(node){ if(node && node.parentNode) node.parentNode.removeChild(node); });
+  }
+  function _r11AppendHtml(doc, parent, anchor, html){
+    var wrap;
+    if(!doc || !parent || !doc.createElement) return;
+    wrap = doc.createElement('div');
+    wrap.innerHTML = html;
+    while(wrap.firstChild){
+      if(anchor && anchor.parentNode === parent) parent.insertBefore(wrap.firstChild, anchor);
+      else parent.appendChild(wrap.firstChild);
+    }
+  }
+  function _r11DecorateHost(host, previewOnly){
+    var doc = host && host.ownerDocument ? host.ownerDocument : (typeof document !== 'undefined' ? document : null);
+    var shell = host && host.querySelector ? host.querySelector('.mb-r10-shell,.mb-r9-shell,.mb-r8-shell,.mb-r7-shell') : null;
+    var builderShell = host && host.querySelector ? host.querySelector('.mb-builder-shell') : null;
+    var mainPanel = host && host.querySelector ? host.querySelector('.mb-main-panel') : null;
+    var shellAnchor;
+    var metrics;
+    if(host && host.querySelectorAll){
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-side-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r11-side-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-rail-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r11-rail-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-block-card'), function(node){ if(node && node.classList) node.classList.add('mb-r11-block-card'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-canvas-root'), function(node){ if(node && node.classList) node.classList.add('mb-r11-canvas-root'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-main-panel>.mb-toolbar'), function(node){ if(node && node.classList) node.classList.add('mb-r11-toolbar'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-tab-pill'), function(node){ if(node && node.classList) node.classList.add('mb-r11-tab-pill'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r10-preview-shell,.mb-r9-preview-shell,.mb-r7-preview-shell'), function(node){ if(node && node.classList) node.classList.add('mb-r11-preview-shell'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r10-preview-ribbon,.mb-r9-preview-ribbon,.mb-r7-preview-ribbon'), function(node){ if(node && node.classList) node.classList.add('mb-r11-preview-ribbon'); });
+    }
+    if(builderShell && builderShell.classList){
+      builderShell.classList.add('mb-r11-builder-shell');
+      if(state.showR11FocusCanvas) builderShell.classList.add('is-focus-canvas'); else builderShell.classList.remove('is-focus-canvas');
+      if(state.showR11CompactChrome) builderShell.classList.add('is-compact-chrome'); else builderShell.classList.remove('is-compact-chrome');
+    }
+    if(mainPanel && mainPanel.classList) mainPanel.classList.add('mb-r11-main-panel');
+    if(shell && shell.classList) shell.classList.add('mb-r11-shell');
+    if(!shell || previewOnly || !state.schema) return;
+    _r11RemoveExisting(host);
+    _r11EnsureSchema(state.schema);
+    metrics = _r11ComputeMetrics(state.schema);
+    shellAnchor = shell.querySelector('.mb-r7-panel-grid,.mb-r8-panel-grid,.mb-r9-panel-grid,.mb-r10-panel-grid');
+    _r11AppendHtml(doc, shell, shellAnchor, _r11RenderDeck(state.schema, metrics) + _r11RenderPanels(state.schema, metrics));
+  }
+  function _r11NormalizeHtml(html, previewOnly){
+    var host;
+    html = String(html || '');
+    if(typeof document === 'undefined' || !document.createElement) return html;
+    host = document.createElement('div');
+    host.innerHTML = html;
+    _r11DecorateHost(host, !!previewOnly);
+    return host.innerHTML;
+  }
+  function _r11InjectStyles(){
+    var style;
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-module-builder-round11-style')) return;
+    style = document.createElement('style');
+    style.id = 'hm-module-builder-round11-style';
+    style.textContent = '' +
+      '.mb-r11-shell{position:relative;overflow:hidden;border-radius:24px;background:linear-gradient(135deg,rgba(7,12,22,.98) 0%,rgba(17,24,39,.96) 35%,rgba(30,41,59,.94) 68%,rgba(59,130,246,.22) 100%);border:1px solid rgba(255,255,255,.16);box-shadow:0 26px 58px rgba(2,6,23,.22)}' +
+      '.mb-r11-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 14% 0%,rgba(255,255,255,.12),transparent 28%),radial-gradient(circle at 100% 0%,rgba(56,189,248,.08),transparent 34%);pointer-events:none}' +
+      '.mb-r11-shell>*{position:relative;z-index:1}' +
+      '.mb-r11-shell .mb-r7-kicker{color:#c7d2fe}' +
+      '.mb-r11-shell .mb-r7-hero h3{font-size:31px;color:#fff;letter-spacing:-.02em;line-height:1.06}' +
+      '.mb-r11-shell .mb-r7-hero p{color:rgba(241,245,249,.92)}' +
+      '.mb-r11-shell .mb-r7-chip-row span,.mb-r11-shell .mb-r7-hero-stats div,.mb-r11-shell .mb-r7-card,.mb-r11-shell .mb-r7-panel,.mb-r11-shell .mb-r11-command-deck,.mb-r11-shell .mb-r11-panel{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}' +
+      '.mb-r11-shell .mb-r7-chip-row span{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.12);color:#f8fafc}' +
+      '.mb-r11-shell .mb-r7-hero-stats div{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.10));border:1px solid rgba(255,255,255,.14)}' +
+      '.mb-r11-shell .mb-r7-card{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.10));border:1px solid rgba(255,255,255,.15);box-shadow:0 16px 32px rgba(2,6,23,.16)}' +
+      '.mb-r11-shell .mb-r7-card small{color:#dbeafe}.mb-r11-shell .mb-r7-card-value,.mb-r11-shell .mb-r7-card-head strong{color:#fff}' +
+      '.mb-r11-shell .mb-r7-toolbar .hm-btn.hm-btn-primary{background:linear-gradient(135deg,#2563eb,#4f46e5);border-color:rgba(255,255,255,.14);box-shadow:0 12px 22px rgba(37,99,235,.18)}' +
+      '.mb-r11-shell .mb-r7-toolbar .hm-btn.hm-btn-secondary,.mb-r11-shell .mb-r7-toolbar .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.90);color:#0f172a;border:1px solid rgba(148,163,184,.18)}' +
+      '.mb-r11-command-deck{margin:14px 0 12px;padding:16px 16px 14px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.09));border:1px solid rgba(255,255,255,.16);box-shadow:0 14px 32px rgba(2,6,23,.16)}' +
+      '.mb-r11-deck-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:12px}.mb-r11-kicker{font-size:11px;letter-spacing:.18em;font-weight:700;color:#c4b5fd;margin-bottom:6px}.mb-r11-deck-head h3{margin:0 0 4px;font-size:28px;color:#fff;line-height:1.08}.mb-r11-deck-head p{margin:0;color:rgba(241,245,249,.88);max-width:760px;line-height:1.56}' +
+      '.mb-r11-chipline{display:flex;flex-wrap:wrap;gap:8px}.mb-r11-chipline span{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(15,23,42,.28);border:1px solid rgba(255,255,255,.12);color:#eff6ff;font-size:12px}' +
+      '.mb-r11-stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;min-width:460px}.mb-r11-stat{padding:12px;border-radius:16px;background:rgba(15,23,42,.26);border:1px solid rgba(255,255,255,.12);text-align:center}.mb-r11-stat small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r11-stat strong{display:block;color:#fff;font-size:22px;line-height:1.05;margin-bottom:3px}.mb-r11-stat span{display:block;color:#cbd5e1;font-size:11px}' +
+      '.mb-r11-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:12px}.mb-r11-mode{padding:12px;border-radius:16px;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease}.mb-r11-mode:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.12)}.mb-r11-mode.is-active{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.11));border-color:rgba(255,255,255,.24);box-shadow:0 10px 24px rgba(2,6,23,.18)}.mb-r11-mode strong{display:block;font-size:13px;margin-bottom:4px}.mb-r11-mode small{display:block;color:#dbeafe;line-height:1.45}' +
+      '.mb-r11-action-row{display:flex;flex-wrap:wrap;gap:8px}' +
+      '.mb-r11-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin:12px 0 0}.mb-r11-panel{padding:15px;border-radius:18px;background:linear-gradient(180deg,rgba(15,23,42,.34),rgba(15,23,42,.24));border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 26px rgba(2,6,23,.12)}' +
+      '.mb-r11-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.mb-r11-panel-head strong{color:#fff}.mb-r11-panel-head span{color:#bfdbfe;font-size:12px}' +
+      '.mb-r11-nav-list{display:grid;gap:10px}.mb-r11-nav-item{padding:12px 12px 11px;border-radius:14px;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);color:#fff;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease}.mb-r11-nav-item:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.20);background:rgba(255,255,255,.11)}.mb-r11-nav-item.is-active{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.11));border-color:rgba(255,255,255,.22)}.mb-r11-nav-item strong{display:block;font-size:13px;margin-bottom:4px}.mb-r11-nav-item small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r11-nav-item span{display:block;color:#e2e8f0;line-height:1.45}' +
+      '.mb-r11-signal-list{display:grid;gap:10px}.mb-r11-signal-row{display:grid;grid-template-columns:minmax(0,1fr) 120px 42px;gap:10px;align-items:center}.mb-r11-signal-row strong{display:block;color:#fff}.mb-r11-signal-row small{display:block;color:#bfdbfe}.mb-r11-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden}.mb-r11-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#818cf8,#38bdf8,#34d399)}.mb-r11-signal-row b{color:#fff;font-size:12px;text-align:right}' +
+      '.mb-r11-line-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}.mb-r11-line-grid>div{padding:12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10)}.mb-r11-line-grid small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r11-line-grid strong{display:block;color:#fff}' +
+      '.mb-r11-meter{height:10px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;margin:8px 0 10px}.mb-r11-meter span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#60a5fa,#22d3ee,#34d399)}' +
+      '.mb-r11-list{margin:10px 0 0;padding-left:18px;color:#e2e8f0}.mb-r11-list li{margin:6px 0;line-height:1.45}.mb-r11-note{margin-top:8px;color:#dbeafe;line-height:1.5}' +
+      '.mb-r11-builder-shell{gap:14px!important}.mb-r11-side-panel,.mb-r11-main-panel,.mb-r11-rail-panel{background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(247,249,252,.95));border:1px solid rgba(148,163,184,.20);box-shadow:0 18px 38px rgba(2,6,23,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}' +
+      '.mb-r11-main-panel>.mb-r11-toolbar,.mb-r11-main-panel>.mb-toolbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(255,255,255,.985),rgba(247,249,252,.95));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 24px rgba(2,6,23,.05);border-bottom:1px solid rgba(148,163,184,.14)}' +
+      '.mb-r11-canvas-root{background:radial-gradient(circle at 50% -24%,rgba(255,255,255,1),rgba(248,250,252,.995) 44%,rgba(241,245,249,.98) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.82)}' +
+      '.mb-r11-block-card{border-color:rgba(148,163,184,.22)!important;box-shadow:0 10px 22px rgba(2,6,23,.05)!important;background:linear-gradient(180deg,rgba(255,255,255,.99),rgba(247,249,252,.97))!important;transition:transform .15s ease,box-shadow .15s ease}.mb-r11-block-card:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(2,6,23,.08)!important}.mb-r11-block-card .mb-block-name,.mb-r11-block-card .mb-block-type{color:#0f172a}' +
+      '.mb-r11-main-panel .hm-btn.hm-btn-sm{border-radius:12px}.mb-r11-main-panel .hm-btn.hm-btn-primary{box-shadow:0 10px 18px rgba(37,99,235,.16)}.mb-r11-main-panel .hm-btn.hm-btn-ghost,.mb-r11-main-panel .hm-btn.hm-btn-secondary{background:rgba(255,255,255,.92)}' +
+      '.mb-r11-tab-pill{box-shadow:0 8px 18px rgba(2,6,23,.04);border:1px solid rgba(148,163,184,.16);background:rgba(255,255,255,.95)}' +
+      '.mb-r11-builder-shell.is-focus-canvas{grid-template-columns:minmax(0,1fr)!important}.mb-r11-builder-shell.is-focus-canvas .mb-r11-side-panel,.mb-r11-builder-shell.is-focus-canvas .mb-r11-rail-panel{display:none!important}.mb-r11-builder-shell.is-focus-canvas .mb-r11-main-panel{grid-column:1/-1}' +
+      '.mb-r11-builder-shell.is-compact-chrome .mb-r11-side-panel,.mb-r11-builder-shell.is-compact-chrome .mb-r11-main-panel,.mb-r11-builder-shell.is-compact-chrome .mb-r11-rail-panel{border-radius:16px}.mb-r11-builder-shell.is-compact-chrome .mb-r11-main-panel>.mb-r11-toolbar,.mb-r11-builder-shell.is-compact-chrome .mb-r11-main-panel>.mb-toolbar{padding-top:10px;padding-bottom:10px}.mb-r11-builder-shell.is-compact-chrome .mb-r11-block-card{padding-top:10px;padding-bottom:10px}' +
+      '.mb-r11-preview-shell .mb-r11-preview-ribbon,.mb-r11-preview-ribbon{background:linear-gradient(90deg,rgba(15,23,42,.96),rgba(30,64,175,.82),rgba(8,145,178,.72));border:1px solid rgba(255,255,255,.12)}.mb-r11-preview-ribbon span{background:rgba(255,255,255,.90);color:#0f172a}' +
+      '.mb-r11-shell .hm-btn.hm-btn-secondary,.mb-r11-shell .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.90);color:#0f172a;border:1px solid rgba(148,163,184,.18)}.mb-r11-shell .hm-btn.hm-btn-primary{background:linear-gradient(135deg,#2563eb,#4f46e5);border-color:rgba(255,255,255,.12);box-shadow:0 10px 20px rgba(37,99,235,.18)}' +
+      '@media (max-width: 1180px){.mb-r11-deck-head{flex-direction:column}.mb-r11-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr));min-width:0;width:100%}}' +
+      '@media (max-width: 920px){.mb-r11-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mb-r11-shell{padding:16px}}' +
+      '@media (max-width: 640px){.mb-r11-mode-grid,.mb-r11-panel-grid,.mb-r11-line-grid{grid-template-columns:1fr}.mb-r11-action-row{flex-direction:column;align-items:stretch}.mb-r11-signal-row{grid-template-columns:1fr}}';
+    document.head.appendChild(style);
+  }
+
+  _renderBuilder = function(){
+    var html;
+    _r11EnsureState();
+    if(state.schema) _r11EnsureSchema(state.schema);
+    _r11InjectStyles();
+    html = _r11PrevRenderBuilder();
+    return _r11NormalizeHtml(html, false);
+  };
+
+  _renderPreview = function(){
+    var html;
+    _r11EnsureState();
+    if(state.schema) _r11EnsureSchema(state.schema);
+    _r11InjectStyles();
+    html = _r11PrevRenderPreview();
+    return _r11NormalizeHtml(html, true);
+  };
+
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r11-auto-polish': _r11AutoPolish(); return;
+        case 'r11-export-ux-brief': _r11ExportUxBrief(); return;
+        case 'r11-toggle-navigator': state.showR11Navigator = !state.showR11Navigator; _paint(); return;
+        case 'r11-toggle-signal': state.showR11Signal = !state.showR11Signal; _paint(); return;
+        case 'r11-toggle-composition': state.showR11Composition = !state.showR11Composition; _paint(); return;
+        case 'r11-toggle-focus': _r11ToggleFocus(); return;
+        case 'r11-toggle-compact': _r11ToggleCompact(); return;
+        case 'r11-jump-tab': state.activeTab = btn.getAttribute('data-tab-id') || state.activeTab; state.selectedBlock = null; _paint(); return;
+        case 'r11-apply-mode': _r11ApplyMode(btn.getAttribute('data-key') || 'executive-aura-pro'); return;
+      }
+    }
+    return _r11PrevHandleClick(e);
+  };
+
+  window.__HM_MB_R11_TEST__ = {
+    version:'2026-04-07-r11-glass-boardroom-pro',
+    computeMetrics:function(schema){ _r11EnsureState(); return _r11ComputeMetrics(_r11EnsureSchema(schema || state.schema || {})); },
+    buildUxBrief:function(schema){ _r11EnsureState(); return _r11BuildUxBrief(_r11EnsureSchema(schema || state.schema || {})); },
+    renderDeck:function(schema){ _r11EnsureState(); schema = _r11EnsureSchema(schema || state.schema || {}); return _r11RenderDeck(schema, _r11ComputeMetrics(schema)); },
+    renderPanels:function(schema){ _r11EnsureState(); schema = _r11EnsureSchema(schema || state.schema || {}); return _r11RenderPanels(schema, _r11ComputeMetrics(schema)); },
+    normalizeHtml:function(html, previewOnly){ _r11EnsureState(); return _r11NormalizeHtml(html, !!previewOnly); }
+  };
+  if(window.__HM_MB_R10_TEST__) window.__HM_MB_R10_TEST__.round11 = window.__HM_MB_R11_TEST__;
+}
+
+/* ── MODULE BUILDER ULTRA ROUND 12 GLASS COMMAND ATELIER (2026-04-07 R12) ──── */
+if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R12__){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R12__ = '2026-04-07-r12-glass-command-atelier';
+  var _r12PrevRenderBuilder = _renderBuilder;
+  var _r12PrevRenderPreview = _renderPreview;
+  var _r12PrevHandleClick = _handleClick;
+  var _r12_MODES = [
+    { key:'boardroom-frost', icon:'🏛️', titleVi:'Boardroom Frost', titleEn:'Boardroom Frost', subtitleVi:'glass sáng kỷ luật, contrast cao', subtitleEn:'disciplined bright glass with high contrast' },
+    { key:'sapphire-ledger', icon:'💎', titleVi:'Sapphire Ledger', titleEn:'Sapphire Ledger', subtitleVi:'blue executive, số liệu rõ và sang', subtitleEn:'executive blue with polished numeric clarity' },
+    { key:'graphite-atelier', icon:'🧱', titleVi:'Graphite Atelier', titleEn:'Graphite Atelier', subtitleVi:'glass tối trung tính, ít glare', subtitleEn:'neutral dark glass with low glare' },
+    { key:'night-audit', icon:'🌙', titleVi:'Night Audit', titleEn:'Night Audit', subtitleVi:'night mode cho audit và command', subtitleEn:'night mode for audit and command' },
+    { key:'operator-ice', icon:'🧊', titleVi:'Operator Ice', titleEn:'Operator Ice', subtitleVi:'rõ thao tác, tập trung action', subtitleEn:'action-first surface for operators' }
+  ];
+  function _r12EnsureState(){
+    if(state.r12Mode == null) state.r12Mode = 'boardroom-frost';
+    if(state.showR12Contrast == null) state.showR12Contrast = true;
+    if(state.showR12Atlas == null) state.showR12Atlas = true;
+    if(state.showR12Surface == null) state.showR12Surface = true;
+    if(state.showR12Radar == null) state.showR12Radar = false;
+    if(state.showR12FocusCanvas == null) state.showR12FocusCanvas = !!state.showR11FocusCanvas;
+    if(state.showR12QuietChrome == null) state.showR12QuietChrome = !!state.showR11CompactChrome;
+  }
+  function _r12Arr(v){ return Array.isArray(v) ? v : []; }
+  function _r12Text(v, fallback){ return (v == null || v === '') ? String(fallback == null ? '' : fallback) : String(v); }
+  function _r12Clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  function _r12EnsureSchema(schema){
+    if(!schema || typeof schema !== 'object') schema = {};
+    schema.moduleStudio = schema.moduleStudio || {};
+    schema.moduleStudio.patchVersion = '2026-04-07-r12';
+    schema.glassExecutive = schema.glassExecutive || {};
+    schema.glassStudio = schema.glassStudio || {};
+    schema.themeLab = schema.themeLab || {};
+    schema.typographyLab = schema.typographyLab || {};
+    schema.visualQuality = schema.visualQuality || {};
+    schema.commandAtelier = schema.commandAtelier || {};
+    schema.round12Studio = schema.round12Studio || {};
+    if(!schema.round12Studio.mode) schema.round12Studio.mode = state.r12Mode || (schema.round11Studio && schema.round11Studio.mode) || 'boardroom-frost';
+    if(schema.round12Studio.focusCanvas == null) schema.round12Studio.focusCanvas = state.showR12FocusCanvas != null ? !!state.showR12FocusCanvas : !!(schema.round11Studio && schema.round11Studio.focusCanvas);
+    if(schema.round12Studio.quietChrome == null) schema.round12Studio.quietChrome = state.showR12QuietChrome != null ? !!state.showR12QuietChrome : !!(schema.round11Studio && schema.round11Studio.compactChrome);
+    if(!schema.round12Studio.commandSurface) schema.round12Studio.commandSurface = 'glass-command-atelier';
+    if(!schema.round12Studio.glareControl) schema.round12Studio.glareControl = 'professional-low';
+    if(!schema.round12Studio.toolbarLegibility) schema.round12Studio.toolbarLegibility = 'high';
+    if(!schema.round12Studio.surfaceDiscipline) schema.round12Studio.surfaceDiscipline = 'boardroom';
+    if(!schema.commandAtelier.recipe) schema.commandAtelier.recipe = 'boardroom-frost';
+    if(!schema.commandAtelier.glow) schema.commandAtelier.glow = 'restrained';
+    if(!schema.commandAtelier.edge) schema.commandAtelier.edge = 'crisp';
+    if(!schema.commandAtelier.noise) schema.commandAtelier.noise = 'minimal';
+    if(!schema.glassStudio.contrastTarget) schema.glassStudio.contrastTarget = 'AAA';
+    if(!schema.glassStudio.glareControl) schema.glassStudio.glareControl = 'controlled';
+    if(!schema.glassStudio.edgeContrast) schema.glassStudio.edgeContrast = 'crisp';
+    if(!schema.glassStudio.saturation) schema.glassStudio.saturation = 'restrained';
+    if(!schema.glassExecutive.shell) schema.glassExecutive.shell = 'boardroom-frost';
+    if(!schema.glassExecutive.chrome) schema.glassExecutive.chrome = 'disciplined';
+    if(!schema.glassExecutive.noise) schema.glassExecutive.noise = 'low';
+    if(!schema.themeLab.surface) schema.themeLab.surface = 'glass-command-atelier';
+    if(!schema.themeLab.cardStyle) schema.themeLab.cardStyle = 'frost-edge';
+    if(!schema.themeLab.elevation) schema.themeLab.elevation = 'controlled';
+    if(!schema.typographyLab.scale) schema.typographyLab.scale = '14/20';
+    if(!schema.typographyLab.labels) schema.typographyLab.labels = 'high-contrast';
+    if(!schema.typographyLab.headings) schema.typographyLab.headings = 'semibold-tight';
+    if(!schema.visualQuality.blockDensity) schema.visualQuality.blockDensity = 'balanced';
+    return schema;
+  }
+  function _r12SyncStateFromSchema(schema){
+    var studio;
+    if(!schema || typeof schema !== 'object') return;
+    studio = schema.round12Studio || {};
+    if(studio.mode) state.r12Mode = studio.mode;
+    if(studio.focusCanvas != null) state.showR12FocusCanvas = !!studio.focusCanvas;
+    if(studio.quietChrome != null) state.showR12QuietChrome = !!studio.quietChrome;
+  }
+  function _r12SignalOf(block){
+    var type = ((block && block.type) || '').toLowerCase();
+    if(/chart|kpi|timeline|table|matrix|radar|heat/.test(type)) return 'data';
+    if(/form|button|action|workflow|approval|signature|operator/.test(type)) return 'action';
+    if(/audit|govern|risk|signoff|release|compliance|trace/.test(type)) return 'governance';
+    return 'narrative';
+  }
+  function _r12Blocks(schema){
+    var rows = [];
+    _r12Arr(schema && schema.tabs).forEach(function(tab, tabIndex){
+      _r12Arr(tab && tab.blocks).forEach(function(block, blockIndex){
+        rows.push({
+          tabId: tab && tab.tabId,
+          tabIndex: tabIndex,
+          tabLabel: _r12Text(tab && tab.title, tab && tab.tabId || ('tab-' + (tabIndex + 1))),
+          block: block || {},
+          blockIndex: blockIndex
+        });
+      });
+    });
+    return rows;
+  }
+  function _r12NavigatorRows(schema){
+    return _r12Arr(schema && schema.tabs).map(function(tab, tabIndex){
+      var blocks = _r12Arr(tab && tab.blocks);
+      var counts = { data:0, action:0, governance:0, narrative:0 };
+      blocks.forEach(function(block){ counts[_r12SignalOf(block)] += 1; });
+      var dominant = 'narrative';
+      ['data','action','governance','narrative'].forEach(function(key){ if(counts[key] > counts[dominant]) dominant = key; });
+      return {
+        tabId: tab && tab.tabId,
+        index: tabIndex + 1,
+        label: _r12Text(tab && tab.title, 'Tab ' + (tabIndex + 1)),
+        count: blocks.length,
+        dominant: dominant,
+        status: blocks.length ? (blocks.length >= 6 ? 'dense' : 'active') : 'empty',
+        active: !!(state.activeTab && tab && tab.tabId && state.activeTab === tab.tabId),
+        hint: dominant === 'data' ? _t('ưu tiên scan số liệu', 'data scan first') : dominant === 'action' ? _t('ưu tiên hành động', 'action-first lane') : dominant === 'governance' ? _t('ưu tiên kiểm soát', 'control-first lane') : _t('ưu tiên dẫn dắt', 'story-first lane')
+      };
+    });
+  }
+  function _r12ComputeMetrics(schema){
+    var tabs = _r12Arr(schema && schema.tabs);
+    var blocks = _r12Blocks(schema);
+    var signalCounts = { data:0, action:0, governance:0, narrative:0 };
+    var atlas = _r12NavigatorRows(schema);
+    var gateCount = _r12Arr(schema && schema.releaseGov && schema.releaseGov.gates).length + _r12Arr(schema && schema.decisionDesk && schema.decisionDesk.signoffBoard).length;
+    var emptyTabs = 0;
+    var contrast;
+    var glareDiscipline;
+    var toolbarLegibility;
+    var surfaceDiscipline;
+    var canvasCalm;
+    var executiveRead;
+    var rec = [];
+    blocks.forEach(function(row){ signalCounts[_r12SignalOf(row.block)] += 1; });
+    atlas.forEach(function(row){ if(row.status === 'empty') emptyTabs += 1; });
+    contrast = 62
+      + (schema.glassStudio && schema.glassStudio.contrastTarget === 'AAA' ? 12 : 7)
+      + (schema.glassStudio && schema.glassStudio.edgeContrast === 'crisp' ? 8 : 3)
+      + (schema.typographyLab && schema.typographyLab.labels === 'high-contrast' ? 5 : 0)
+      + (state.showR12QuietChrome ? 4 : 0)
+      + (state.showR12FocusCanvas ? 3 : 0)
+      - (emptyTabs ? Math.min(6, emptyTabs * 2) : 0);
+    glareDiscipline = 58
+      + (schema.commandAtelier && schema.commandAtelier.glow === 'restrained' ? 10 : 4)
+      + (schema.commandAtelier && schema.commandAtelier.noise === 'minimal' ? 9 : 4)
+      + (schema.glassStudio && schema.glassStudio.glareControl === 'controlled' ? 10 : 4)
+      + (state.showR12QuietChrome ? 6 : 0);
+    toolbarLegibility = 56
+      + (schema.round12Studio && schema.round12Studio.toolbarLegibility === 'high' ? 12 : 6)
+      + (schema.typographyLab && schema.typographyLab.headings === 'semibold-tight' ? 7 : 3)
+      + (state.showR12FocusCanvas ? 5 : 0)
+      + (blocks.length ? 6 : 0);
+    surfaceDiscipline = 57
+      + (schema.round12Studio && schema.round12Studio.surfaceDiscipline === 'boardroom' ? 10 : 4)
+      + (schema.themeLab && schema.themeLab.elevation === 'controlled' ? 8 : 3)
+      + (schema.glassExecutive && schema.glassExecutive.chrome === 'disciplined' ? 9 : 3)
+      + (state.showR12QuietChrome ? 5 : 0)
+      - Math.min(4, Math.max(0, signalCounts.narrative - signalCounts.governance));
+    canvasCalm = 55
+      + (schema.visualQuality && schema.visualQuality.blockDensity === 'balanced' ? 10 : 4)
+      + (state.showR12FocusCanvas ? 10 : 0)
+      + (schema.commandAtelier && schema.commandAtelier.edge === 'crisp' ? 7 : 3)
+      + (atlas.length ? 4 : 0)
+      - Math.min(8, Math.max(0, blocks.length - 18));
+    executiveRead = 53
+      + Math.min(10, gateCount * 2)
+      + Math.min(8, atlas.length * 2)
+      + (signalCounts.data ? 7 : 0)
+      + (signalCounts.governance ? 7 : 0)
+      + (state.showR12Atlas ? 4 : 0)
+      + (state.showR12Surface ? 3 : 0);
+    contrast = _r12Clamp(contrast, 48, 99);
+    glareDiscipline = _r12Clamp(glareDiscipline, 45, 99);
+    toolbarLegibility = _r12Clamp(toolbarLegibility, 45, 99);
+    surfaceDiscipline = _r12Clamp(surfaceDiscipline, 45, 99);
+    canvasCalm = _r12Clamp(canvasCalm, 40, 99);
+    executiveRead = _r12Clamp(executiveRead, 40, 99);
+    if(contrast < 78) rec.push(_t('Tăng edge contrast, giữ typography labels ở high-contrast và bật quiet chrome.', 'Increase edge contrast, keep labels high-contrast, and enable quiet chrome.'));
+    if(glareDiscipline < 78) rec.push(_t('Giảm glow/noise về restrained/minimal để surface bớt chói.', 'Reduce glow and noise to restrained/minimal to cut glare.'));
+    if(toolbarLegibility < 76) rec.push(_t('Bật focus canvas hoặc tăng semibold heading để toolbar scan rõ hơn.', 'Enable focus canvas or tighten heading weight for clearer toolbar scanning.'));
+    if(emptyTabs) rec.push(_t('Có ' + emptyTabs + ' tab trống; nên seed blueprint hoặc gom lại để scan path gọn hơn.', 'There are ' + emptyTabs + ' empty tabs; seed a blueprint or consolidate tabs for a cleaner scan path.'));
+    if(signalCounts.governance < Math.max(1, Math.floor(tabs.length / 2))) rec.push(_t('Module còn thiếu lớp governance; thêm release gate, audit trace hoặc signoff wall.', 'Governance is thin; add release gates, audit trace, or a signoff wall.'));
+    return {
+      totalTabs: tabs.length,
+      totalBlocks: blocks.length,
+      emptyTabs: emptyTabs,
+      gateCount: gateCount,
+      signals: [
+        { key:'data', label:_t('Data', 'Data'), count:signalCounts.data, ratio: blocks.length ? Math.round(signalCounts.data / blocks.length * 100) : 0 },
+        { key:'action', label:_t('Action', 'Action'), count:signalCounts.action, ratio: blocks.length ? Math.round(signalCounts.action / blocks.length * 100) : 0 },
+        { key:'governance', label:_t('Governance', 'Governance'), count:signalCounts.governance, ratio: blocks.length ? Math.round(signalCounts.governance / blocks.length * 100) : 0 },
+        { key:'narrative', label:_t('Narrative', 'Narrative'), count:signalCounts.narrative, ratio: blocks.length ? Math.round(signalCounts.narrative / blocks.length * 100) : 0 }
+      ],
+      atlas: atlas,
+      contrast: contrast,
+      glareDiscipline: glareDiscipline,
+      toolbarLegibility: toolbarLegibility,
+      surfaceDiscipline: surfaceDiscipline,
+      canvasCalm: canvasCalm,
+      executiveRead: executiveRead,
+      summary: _t('Glass command surface kỷ luật hơn, ít glare hơn, scan path rõ hơn và phù hợp boardroom/operator.', 'A more disciplined glass command surface with lower glare, clearer scan paths, and better boardroom/operator fit.'),
+      recommendations: rec
+    };
+  }
+  function _r12ModeButton(item, active){
+    return '<button class="mb-r12-mode' + (active ? ' is-active' : '') + '" data-action="r12-apply-mode" data-key="' + _esc(item.key) + '"><strong>' + _esc(item.icon + ' ' + _t(item.titleVi, item.titleEn)) + '</strong><small>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</small></button>';
+  }
+  function _r12MeterRow(label, value, note){
+    return '<div class="mb-r12-meter-row"><div><strong>' + _esc(label) + '</strong><small>' + _esc(note) + '</small></div><div class="mb-r12-meter"><span style="width:' + _esc(String(value)) + '%"></span></div><b>' + _esc(String(value)) + '%</b></div>';
+  }
+  function _r12RenderDeck(schema, metrics){
+    var mode = state.r12Mode || (schema && schema.round12Studio && schema.round12Studio.mode) || 'boardroom-frost';
+    var title = _t('Glass Command Atelier', 'Glass Command Atelier');
+    var h = '<section class="mb-r12-command-deck">';
+    h += '<div class="mb-r12-deck-head"><div><div class="mb-r12-kicker">ROUND 12 · GLASS COMMAND ATELIER</div><h3>' + _esc(title) + '</h3><p>' + _esc(metrics.summary) + '</p><div class="mb-r12-chipline"><span>' + _esc(_t('Mode', 'Mode')) + ': ' + _esc(mode) + '</span><span>' + _esc(_t('Contrast target', 'Contrast target')) + ': ' + _esc((schema.glassStudio || {}).contrastTarget || 'AAA') + '</span><span>' + _esc(_t('Glow', 'Glow')) + ': ' + _esc((schema.commandAtelier || {}).glow || 'restrained') + '</span><span>' + _esc(_t('Noise', 'Noise')) + ': ' + _esc((schema.commandAtelier || {}).noise || 'minimal') + '</span><span>' + _esc(_t('Blocks', 'Blocks')) + ': ' + _esc(String(metrics.totalBlocks)) + '</span></div></div>';
+    h += '<div class="mb-r12-stat-grid">';
+    h += '<div class="mb-r12-stat"><small>' + _esc(_t('Contrast', 'Contrast')) + '</small><strong>' + _esc(String(metrics.contrast)) + '%</strong><span>' + _esc(_t('high readability glass', 'high readability glass')) + '</span></div>';
+    h += '<div class="mb-r12-stat"><small>' + _esc(_t('Glare discipline', 'Glare discipline')) + '</small><strong>' + _esc(String(metrics.glareDiscipline)) + '%</strong><span>' + _esc(_t('low flare / low bloom', 'low flare / low bloom')) + '</span></div>';
+    h += '<div class="mb-r12-stat"><small>' + _esc(_t('Toolbar', 'Toolbar')) + '</small><strong>' + _esc(String(metrics.toolbarLegibility)) + '%</strong><span>' + _esc(_t('quick command scan', 'quick command scan')) + '</span></div>';
+    h += '<div class="mb-r12-stat"><small>' + _esc(_t('Surface', 'Surface')) + '</small><strong>' + _esc(String(metrics.surfaceDiscipline)) + '%</strong><span>' + _esc(_t('professional restraint', 'professional restraint')) + '</span></div>';
+    h += '<div class="mb-r12-stat"><small>' + _esc(_t('Canvas calm', 'Canvas calm')) + '</small><strong>' + _esc(String(metrics.canvasCalm)) + '%</strong><span>' + _esc(_t('quiet working space', 'quiet working space')) + '</span></div>';
+    h += '<div class="mb-r12-stat"><small>' + _esc(_t('Executive read', 'Executive read')) + '</small><strong>' + _esc(String(metrics.executiveRead)) + '%</strong><span>' + _esc(_t('decision clarity', 'decision clarity')) + '</span></div>';
+    h += '</div></div>';
+    h += '<div class="mb-r12-mode-grid">' + _r12_MODES.map(function(item){ return _r12ModeButton(item, item.key === mode); }).join('') + '</div>';
+    h += '<div class="mb-r12-action-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r12-auto-refine">✨ ' + _esc(_t('Auto refine', 'Auto refine')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r12-export-design-pack">🧾 ' + _esc(_t('Design QA pack', 'Design QA pack')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r12-toggle-focus">🎯 ' + _esc(state.showR12FocusCanvas ? _t('Tắt focus canvas', 'Disable focus canvas') : _t('Bật focus canvas', 'Enable focus canvas')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r12-toggle-quiet">🪶 ' + _esc(state.showR12QuietChrome ? _t('Chrome chuẩn', 'Normal chrome') : _t('Quiet chrome', 'Quiet chrome')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r12-toggle-contrast">🌓 ' + _esc(_t('Contrast guard', 'Contrast guard')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r12-toggle-atlas">🗺️ ' + _esc(_t('Command atlas', 'Command atlas')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r12-toggle-surface">🧪 ' + _esc(_t('Surface QA', 'Surface QA')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r12-toggle-radar">📡 ' + _esc(_t('Signal radar', 'Signal radar')) + '</button></div>';
+    h += '</section>';
+    return h;
+  }
+  function _r12RenderContrastPanel(schema, metrics){
+    var h = '<section class="mb-r12-panel"><div class="mb-r12-panel-head"><strong>' + _esc(_t('Contrast guard', 'Contrast guard')) + '</strong><span>' + _esc(_t('kiểm soát đọc nhanh, glare thấp và toolbar rõ', 'keep readability high, glare low, and the toolbar crisp')) + '</span></div>';
+    h += _r12MeterRow(_t('Contrast', 'Contrast'), metrics.contrast, _t('text, icon, chip, badge', 'text, icon, chip, badge'));
+    h += _r12MeterRow(_t('Glare discipline', 'Glare discipline'), metrics.glareDiscipline, _t('glow, bloom, noise', 'glow, bloom, noise'));
+    h += _r12MeterRow(_t('Toolbar legibility', 'Toolbar legibility'), metrics.toolbarLegibility, _t('primary action + scan path', 'primary action + scan path'));
+    h += _r12MeterRow(_t('Canvas calm', 'Canvas calm'), metrics.canvasCalm, _t('low glare workspace', 'low glare workspace'));
+    h += '<ul class="mb-r12-list">';
+    h += '<li>' + _esc(_t('Target contrast nên ở AAA hoặc tương đương.', 'Target contrast should stay at AAA or equivalent.')) + '</li>';
+    h += '<li>' + _esc(_t('Glow nên restrained và noise nên minimal để nhìn chuyên nghiệp.', 'Glow should stay restrained and noise should stay minimal for a professional finish.')) + '</li>';
+    h += '<li>' + _esc(_t('Quiet chrome làm toolbar, tab và card bớt nhiễu.', 'Quiet chrome reduces noise across toolbars, tabs, and cards.')) + '</li>';
+    h += '</ul></section>';
+    return h;
+  }
+  function _r12RenderAtlasPanel(schema, metrics){
+    var h = '<section class="mb-r12-panel"><div class="mb-r12-panel-head"><strong>' + _esc(_t('Command atlas', 'Command atlas')) + '</strong><span>' + _esc(_t('nhảy tab nhanh và xem dominant signal', 'jump tabs quickly and inspect the dominant signal')) + '</span></div>';
+    if(!metrics.atlas.length){
+      h += '<div class="mb-r12-note">' + _esc(_t('Chưa có tab để dựng atlas.', 'No tabs yet to build the atlas.')) + '</div>';
+    } else {
+      h += '<div class="mb-r12-nav-list">';
+      metrics.atlas.forEach(function(row){
+        h += '<button class="mb-r12-nav-item' + (row.active ? ' is-active' : '') + '" data-action="r12-jump-tab" data-tab-id="' + _esc(row.tabId || '') + '"><strong>' + _esc(row.label) + '</strong><small>' + _esc(row.count + ' blocks · ' + row.status + ' · ' + row.dominant) + '</small><span>' + _esc(row.hint) + '</span></button>';
+      });
+      h += '</div>';
+    }
+    return h + '</section>';
+  }
+  function _r12RenderSurfacePanel(schema){
+    var h = '<section class="mb-r12-panel"><div class="mb-r12-panel-head"><strong>' + _esc(_t('Surface QA', 'Surface QA')) + '</strong><span>' + _esc(_t('recipe glass để đẹp nhưng không loá', 'glass recipe tuned to be beautiful without glare')) + '</span></div>';
+    h += '<div class="mb-r12-line-grid">';
+    h += '<div><small>' + _esc(_t('Shell', 'Shell')) + '</small><strong>' + _esc((schema.glassExecutive || {}).shell || 'boardroom-frost') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Chrome', 'Chrome')) + '</small><strong>' + _esc((schema.glassExecutive || {}).chrome || 'disciplined') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Glow', 'Glow')) + '</small><strong>' + _esc((schema.commandAtelier || {}).glow || 'restrained') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Noise', 'Noise')) + '</small><strong>' + _esc((schema.commandAtelier || {}).noise || 'minimal') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Card style', 'Card style')) + '</small><strong>' + _esc((schema.themeLab || {}).cardStyle || 'frost-edge') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Typography', 'Typography')) + '</small><strong>' + _esc((schema.typographyLab || {}).scale || '14/20') + '</strong></div>';
+    h += '</div>';
+    h += '<div class="mb-r12-note">' + _esc(_t('Boardroom shell dùng lớp nền sáng có blue tint rất nhẹ, còn card thì tăng border/edge để đọc nhanh và sang hơn round 7.', 'The boardroom shell uses a bright surface with a very light blue tint, while cards get sharper borders and edges for faster reading and a more polished result than round 7.')) + '</div>';
+    return h + '</section>';
+  }
+  function _r12RenderRadarPanel(metrics){
+    var h = '<section class="mb-r12-panel"><div class="mb-r12-panel-head"><strong>' + _esc(_t('Signal radar', 'Signal radar')) + '</strong><span>' + _esc(_t('cân bằng data, action, governance, narrative', 'balance data, action, governance, and narrative')) + '</span></div>';
+    h += '<div class="mb-r12-signal-list">';
+    metrics.signals.forEach(function(row){
+      h += '<div class="mb-r12-signal-row"><div><strong>' + _esc(row.label) + '</strong><small>' + _esc(row.count + ' blocks') + '</small></div><div class="mb-r12-bar"><span style="width:' + _esc(String(row.ratio)) + '%"></span></div><b>' + _esc(String(row.ratio)) + '%</b></div>';
+    });
+    h += '</div>';
+    h += '<ul class="mb-r12-list">';
+    metrics.recommendations.forEach(function(item){ h += '<li>' + _esc(item) + '</li>'; });
+    if(!metrics.recommendations.length) h += '<li>' + _esc(_t('Module đang có cấu trúc khá kỷ luật; giữ current recipe và tiếp tục tăng reusable package/governance.', 'The module is already fairly disciplined; keep the current recipe and keep pushing reusable packages and governance.')) + '</li>';
+    h += '</ul></section>';
+    return h;
+  }
+  function _r12RenderPanels(schema, metrics){
+    var sections = [];
+    if(state.showR12Contrast) sections.push(_r12RenderContrastPanel(schema, metrics));
+    if(state.showR12Atlas) sections.push(_r12RenderAtlasPanel(schema, metrics));
+    if(state.showR12Surface) sections.push(_r12RenderSurfacePanel(schema, metrics));
+    if(state.showR12Radar) sections.push(_r12RenderRadarPanel(metrics));
+    return sections.length ? '<div class="mb-r12-panel-grid">' + sections.join('') + '</div>' : '';
+  }
+  function _r12ApplyMode(key){
+    var schema;
+    _r12EnsureState();
+    if(!state.schema) return;
+    schema = _r12EnsureSchema(state.schema);
+    state.r12Mode = key || 'boardroom-frost';
+    schema.round12Studio.mode = state.r12Mode;
+    schema.commandAtelier.recipe = state.r12Mode;
+    switch(state.r12Mode){
+      case 'sapphire-ledger':
+        schema.glassExecutive.shell = 'sapphire-ledger';
+        schema.glassExecutive.chrome = 'disciplined';
+        schema.glassExecutive.noise = 'low';
+        schema.commandAtelier.glow = 'restrained';
+        schema.commandAtelier.edge = 'crisp';
+        schema.commandAtelier.noise = 'minimal';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.themeLab.surface = 'sapphire-ledger';
+        schema.themeLab.cardStyle = 'executive-frost';
+        schema.typographyLab.scale = '14/20';
+        break;
+      case 'graphite-atelier':
+        schema.glassExecutive.shell = 'graphite-atelier';
+        schema.glassExecutive.chrome = 'controlled';
+        schema.glassExecutive.noise = 'low';
+        schema.commandAtelier.glow = 'minimal';
+        schema.commandAtelier.edge = 'crisp';
+        schema.commandAtelier.noise = 'minimal';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.themeLab.surface = 'graphite-atelier';
+        schema.themeLab.cardStyle = 'graphite-edge';
+        schema.typographyLab.scale = '14/20';
+        break;
+      case 'night-audit':
+        schema.glassExecutive.shell = 'night-audit';
+        schema.glassExecutive.chrome = 'controlled';
+        schema.glassExecutive.noise = 'low';
+        schema.commandAtelier.glow = 'minimal';
+        schema.commandAtelier.edge = 'luminous';
+        schema.commandAtelier.noise = 'minimal';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.themeLab.surface = 'night-audit';
+        schema.themeLab.cardStyle = 'night-command';
+        schema.typographyLab.scale = '14/20';
+        break;
+      case 'operator-ice':
+        schema.glassExecutive.shell = 'operator-ice';
+        schema.glassExecutive.chrome = 'disciplined';
+        schema.glassExecutive.noise = 'low';
+        schema.commandAtelier.glow = 'restrained';
+        schema.commandAtelier.edge = 'crisp';
+        schema.commandAtelier.noise = 'minimal';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.themeLab.surface = 'operator-ice';
+        schema.themeLab.cardStyle = 'operator-edge';
+        schema.typographyLab.scale = '15/22';
+        state.showR12FocusCanvas = true;
+        state.showR12QuietChrome = true;
+        break;
+      default:
+        schema.glassExecutive.shell = 'boardroom-frost';
+        schema.glassExecutive.chrome = 'disciplined';
+        schema.glassExecutive.noise = 'low';
+        schema.commandAtelier.glow = 'restrained';
+        schema.commandAtelier.edge = 'crisp';
+        schema.commandAtelier.noise = 'minimal';
+        schema.glassStudio.contrastTarget = 'AAA';
+        schema.themeLab.surface = 'glass-command-atelier';
+        schema.themeLab.cardStyle = 'frost-edge';
+        schema.typographyLab.scale = '14/20';
+    }
+    schema.round12Studio.focusCanvas = !!state.showR12FocusCanvas;
+    schema.round12Studio.quietChrome = !!state.showR12QuietChrome;
+    _saveModule();
+    _paint();
+  }
+  function _r12AutoRefine(){
+    var schema;
+    var gates;
+    _r12EnsureState();
+    if(!state.schema) return;
+    schema = _r12EnsureSchema(state.schema);
+    schema.glassStudio.contrastTarget = 'AAA';
+    schema.glassStudio.glareControl = 'controlled';
+    schema.glassStudio.edgeContrast = 'crisp';
+    schema.glassExecutive.chrome = 'disciplined';
+    schema.glassExecutive.noise = 'low';
+    schema.commandAtelier.glow = 'restrained';
+    schema.commandAtelier.edge = 'crisp';
+    schema.commandAtelier.noise = 'minimal';
+    schema.themeLab.surface = 'glass-command-atelier';
+    schema.themeLab.cardStyle = 'frost-edge';
+    schema.themeLab.elevation = 'controlled';
+    schema.typographyLab.labels = 'high-contrast';
+    schema.typographyLab.headings = 'semibold-tight';
+    schema.visualQuality.blockDensity = 'balanced';
+    schema.round12Studio.commandSurface = 'glass-command-atelier';
+    schema.round12Studio.glareControl = 'professional-low';
+    schema.round12Studio.toolbarLegibility = 'high';
+    schema.round12Studio.surfaceDiscipline = 'boardroom';
+    schema.round12Studio.focusCanvas = !!state.showR12FocusCanvas;
+    schema.round12Studio.quietChrome = !!state.showR12QuietChrome;
+    schema.releaseGov = schema.releaseGov || {};
+    gates = _r12Arr(schema.releaseGov.gates);
+    if(!gates.length) schema.releaseGov.gates = ['design-review','contrast-qa','qa-signoff','release-approval'];
+    schema.decisionDesk = schema.decisionDesk || {};
+    if(!schema.decisionDesk.signoffCadence) schema.decisionDesk.signoffCadence = 'formal';
+    if(!schema.decisionDesk.releaseWindow) schema.decisionDesk.releaseWindow = 'weekly';
+    _saveModule();
+    _paint();
+  }
+  function _r12ToggleFocus(){
+    _r12EnsureState();
+    state.showR12FocusCanvas = !state.showR12FocusCanvas;
+    if(state.schema){
+      _r12EnsureSchema(state.schema);
+      state.schema.round12Studio.focusCanvas = !!state.showR12FocusCanvas;
+    }
+    _saveModule();
+    _paint();
+  }
+  function _r12ToggleQuiet(){
+    _r12EnsureState();
+    state.showR12QuietChrome = !state.showR12QuietChrome;
+    if(state.schema){
+      _r12EnsureSchema(state.schema);
+      state.schema.round12Studio.quietChrome = !!state.showR12QuietChrome;
+    }
+    _saveModule();
+    _paint();
+  }
+  function _r12BuildDesignPack(schema){
+    var metrics = _r12ComputeMetrics(_r12EnsureSchema(schema || {}));
+    var lines = [];
+    lines.push('# Module Builder Round 12 - Glass Command Atelier Design QA Pack');
+    lines.push('');
+    lines.push('## Visual metrics');
+    lines.push('- Contrast: ' + metrics.contrast + '%');
+    lines.push('- Glare discipline: ' + metrics.glareDiscipline + '%');
+    lines.push('- Toolbar legibility: ' + metrics.toolbarLegibility + '%');
+    lines.push('- Surface discipline: ' + metrics.surfaceDiscipline + '%');
+    lines.push('- Canvas calm: ' + metrics.canvasCalm + '%');
+    lines.push('- Executive read: ' + metrics.executiveRead + '%');
+    lines.push('');
+    lines.push('## Current recipe');
+    lines.push('- Mode: ' + ((schema.round12Studio || {}).mode || state.r12Mode || 'boardroom-frost'));
+    lines.push('- Shell: ' + ((schema.glassExecutive || {}).shell || 'boardroom-frost'));
+    lines.push('- Chrome: ' + ((schema.glassExecutive || {}).chrome || 'disciplined'));
+    lines.push('- Glow: ' + ((schema.commandAtelier || {}).glow || 'restrained'));
+    lines.push('- Noise: ' + ((schema.commandAtelier || {}).noise || 'minimal'));
+    lines.push('- Card style: ' + ((schema.themeLab || {}).cardStyle || 'frost-edge'));
+    lines.push('- Typography scale: ' + ((schema.typographyLab || {}).scale || '14/20'));
+    lines.push('');
+    lines.push('## Command atlas');
+    metrics.atlas.forEach(function(row){ lines.push('- ' + row.label + ': ' + row.count + ' blocks / ' + row.status + ' / ' + row.dominant); });
+    if(!metrics.atlas.length) lines.push('- No tabs yet.');
+    lines.push('');
+    lines.push('## Signal radar');
+    metrics.signals.forEach(function(row){ lines.push('- ' + row.label + ': ' + row.count + ' blocks / ' + row.ratio + '%'); });
+    lines.push('');
+    lines.push('## Recommendations');
+    metrics.recommendations.forEach(function(item){ lines.push('- ' + item); });
+    if(!metrics.recommendations.length) lines.push('- Current configuration is disciplined; continue scaling governance and reusable module patterns.');
+    return lines.join('\n');
+  }
+  function _r12ExportDesignPack(){
+    if(!state.schema) return '';
+    return _r9DownloadText('module-builder-round12-glass-command-atelier-design-pack.md', _r12BuildDesignPack(state.schema), 'text/markdown;charset=utf-8');
+  }
+  function _r12RemoveExisting(host){
+    if(!host || !host.querySelectorAll) return;
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r12-command-deck,.mb-r12-panel-grid,.mb-r11-command-deck,.mb-r11-panel-grid,.mb-r10-executive-rail,.mb-r10-panel-grid,.mb-r9-glass-rail,.mb-r9-panel-grid'), function(node){ if(node && node.parentNode) node.parentNode.removeChild(node); });
+  }
+  function _r12AppendHtml(doc, parent, anchor, html){
+    var wrap;
+    if(!doc || !parent || !doc.createElement) return;
+    wrap = doc.createElement('div');
+    wrap.innerHTML = html;
+    while(wrap.firstChild){
+      if(anchor && anchor.parentNode === parent) parent.insertBefore(wrap.firstChild, anchor);
+      else parent.appendChild(wrap.firstChild);
+    }
+  }
+  function _r12DecorateHost(host, previewOnly){
+    var doc = host && host.ownerDocument ? host.ownerDocument : (typeof document !== 'undefined' ? document : null);
+    var shell = host && host.querySelector ? host.querySelector('.mb-r11-shell,.mb-r10-shell,.mb-r9-shell,.mb-r8-shell,.mb-r7-shell') : null;
+    var builderShell = host && host.querySelector ? host.querySelector('.mb-builder-shell') : null;
+    var mainPanel = host && host.querySelector ? host.querySelector('.mb-main-panel') : null;
+    var metrics;
+    var anchor;
+    if(host && host.querySelectorAll){
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-side-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r12-side-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-rail-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r12-rail-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-main-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r12-main-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-block-card'), function(node){ if(node && node.classList) node.classList.add('mb-r12-block-card'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-canvas-root'), function(node){ if(node && node.classList) node.classList.add('mb-r12-canvas-root'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-main-panel>.mb-toolbar'), function(node){ if(node && node.classList) node.classList.add('mb-r12-toolbar'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-tab-pill'), function(node){ if(node && node.classList) node.classList.add('mb-r12-tab-pill'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r11-preview-shell,.mb-r10-preview-shell,.mb-r9-preview-shell,.mb-r7-preview-shell'), function(node){ if(node && node.classList) node.classList.add('mb-r12-preview-shell'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r11-preview-ribbon,.mb-r10-preview-ribbon,.mb-r9-preview-ribbon,.mb-r7-preview-ribbon'), function(node){ if(node && node.classList) node.classList.add('mb-r12-preview-ribbon'); });
+    }
+    if(builderShell && builderShell.classList){
+      builderShell.classList.add('mb-r12-builder-shell');
+      if(state.showR12FocusCanvas) builderShell.classList.add('is-focus-canvas'); else builderShell.classList.remove('is-focus-canvas');
+      if(state.showR12QuietChrome) builderShell.classList.add('is-quiet-chrome'); else builderShell.classList.remove('is-quiet-chrome');
+    }
+    if(mainPanel && mainPanel.classList) mainPanel.classList.add('mb-r12-main-panel');
+    if(shell && shell.classList) shell.classList.add('mb-r12-shell');
+    if(!shell || previewOnly || !state.schema) return;
+    _r12RemoveExisting(host);
+    _r12EnsureSchema(state.schema);
+    _r12SyncStateFromSchema(state.schema);
+    metrics = _r12ComputeMetrics(state.schema);
+    anchor = shell.querySelector('.mb-r11-panel-grid,.mb-r10-panel-grid,.mb-r9-panel-grid');
+    _r12AppendHtml(doc, shell, anchor, _r12RenderDeck(state.schema, metrics) + _r12RenderPanels(state.schema, metrics));
+  }
+  function _r12NormalizeHtml(html, previewOnly){
+    var host;
+    html = String(html || '');
+    if(typeof document === 'undefined' || !document.createElement) return html;
+    host = document.createElement('div');
+    host.innerHTML = html;
+    _r12DecorateHost(host, !!previewOnly);
+    return host.innerHTML;
+  }
+  function _r12InjectStyles(){
+    var style;
+    if(typeof document === 'undefined' || !document.getElementById || document.getElementById('mb-round12-style')) return;
+    style = document.createElement('style');
+    style.id = 'mb-round12-style';
+    style.textContent = '' +
+      '.mb-r12-shell{position:relative;display:grid;gap:14px;padding:18px;border-radius:24px;background:radial-gradient(circle at 100% 0%,rgba(96,165,250,.16),transparent 26%),radial-gradient(circle at 0% 0%,rgba(148,163,184,.16),transparent 28%),linear-gradient(180deg,#f7fbff 0%,#eef4fa 54%,#eaf1f8 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 24px 48px rgba(15,23,42,.06)}' +
+      '.mb-r12-command-deck{position:relative;overflow:hidden;padding:18px;border-radius:22px;background:linear-gradient(135deg,rgba(15,23,42,.94),rgba(30,41,59,.90) 52%,rgba(30,64,175,.78) 100%);border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 44px rgba(2,6,23,.18)}.mb-r12-command-deck:before{content:"";position:absolute;inset:-20% auto auto -10%;width:240px;height:240px;border-radius:999px;background:radial-gradient(circle,rgba(148,163,184,.22),transparent 72%);pointer-events:none}.mb-r12-kicker{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#dbeafe;margin-bottom:7px}.mb-r12-deck-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.mb-r12-deck-head h3{margin:0 0 6px;font-size:24px;line-height:1.12;color:#fff}.mb-r12-deck-head p{margin:0;color:#dbeafe;line-height:1.55;max-width:740px}.mb-r12-chipline{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}.mb-r12-chipline span{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);font-size:11px;color:#eff6ff}' +
+      '.mb-r12-stat-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;min-width:520px}.mb-r12-stat{padding:12px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.12);text-align:center}.mb-r12-stat small{display:block;color:#cbd5e1;margin-bottom:4px}.mb-r12-stat strong{display:block;color:#fff;font-size:22px;line-height:1.05;margin-bottom:3px}.mb-r12-stat span{display:block;color:#dbeafe;font-size:11px}' +
+      '.mb-r12-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}.mb-r12-mode{padding:12px;border-radius:16px;text-align:left;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease}.mb-r12-mode:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.22);background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.09))}.mb-r12-mode.is-active{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.12));border-color:rgba(255,255,255,.26);box-shadow:0 12px 28px rgba(2,6,23,.18)}.mb-r12-mode strong{display:block;font-size:13px;margin-bottom:4px}.mb-r12-mode small{display:block;color:#dbeafe;line-height:1.45}' +
+      '.mb-r12-action-row{display:flex;flex-wrap:wrap;gap:8px}.mb-r12-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:12px}.mb-r12-panel{padding:15px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(247,250,252,.93));border:1px solid rgba(148,163,184,.18);box-shadow:0 14px 30px rgba(15,23,42,.06)}.mb-r12-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.mb-r12-panel-head strong{color:#0f172a}.mb-r12-panel-head span{color:#475569;font-size:12px}' +
+      '.mb-r12-meter-row{display:grid;grid-template-columns:minmax(0,1fr) 140px 42px;gap:10px;align-items:center;margin:10px 0}.mb-r12-meter-row strong{display:block;color:#0f172a}.mb-r12-meter-row small{display:block;color:#64748b}.mb-r12-meter{height:10px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden}.mb-r12-meter span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#1d4ed8,#2563eb,#0ea5e9)}.mb-r12-meter-row b{color:#0f172a;font-size:12px;text-align:right}' +
+      '.mb-r12-nav-list{display:grid;gap:10px}.mb-r12-nav-item{padding:12px 12px 11px;border-radius:14px;text-align:left;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.95));border:1px solid rgba(148,163,184,.18);color:#0f172a;cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}.mb-r12-nav-item:hover{transform:translateY(-1px);border-color:rgba(59,130,246,.30);box-shadow:0 10px 24px rgba(37,99,235,.10)}.mb-r12-nav-item.is-active{border-color:rgba(37,99,235,.34);background:linear-gradient(180deg,rgba(239,246,255,.98),rgba(248,250,252,.95))}.mb-r12-nav-item strong{display:block;font-size:13px;margin-bottom:4px}.mb-r12-nav-item small{display:block;color:#475569;margin-bottom:4px}.mb-r12-nav-item span{display:block;color:#334155;line-height:1.45}' +
+      '.mb-r12-line-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}.mb-r12-line-grid>div{padding:12px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.95));border:1px solid rgba(148,163,184,.16)}.mb-r12-line-grid small{display:block;color:#64748b;margin-bottom:4px}.mb-r12-line-grid strong{display:block;color:#0f172a}' +
+      '.mb-r12-signal-list{display:grid;gap:10px}.mb-r12-signal-row{display:grid;grid-template-columns:minmax(0,1fr) 120px 42px;gap:10px;align-items:center}.mb-r12-signal-row strong{display:block;color:#0f172a}.mb-r12-signal-row small{display:block;color:#64748b}.mb-r12-bar{height:10px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden}.mb-r12-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#2563eb,#0ea5e9,#14b8a6)}.mb-r12-signal-row b{color:#0f172a;font-size:12px;text-align:right}' +
+      '.mb-r12-list{margin:10px 0 0;padding-left:18px;color:#334155}.mb-r12-list li{margin:6px 0;line-height:1.5}.mb-r12-note{margin-top:8px;color:#334155;line-height:1.55}' +
+      '.mb-r12-builder-shell{gap:14px!important}.mb-r12-side-panel,.mb-r12-main-panel,.mb-r12-rail-panel{background:linear-gradient(180deg,rgba(255,255,255,.985),rgba(247,250,252,.95));border:1px solid rgba(148,163,184,.18);box-shadow:0 18px 34px rgba(15,23,42,.05);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
+      '.mb-r12-main-panel>.mb-r12-toolbar,.mb-r12-main-panel>.mb-toolbar{position:sticky;top:0;z-index:35;background:linear-gradient(180deg,rgba(255,255,255,.99),rgba(247,250,252,.96));border-bottom:1px solid rgba(148,163,184,.14);box-shadow:0 10px 22px rgba(15,23,42,.04);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}' +
+      '.mb-r12-canvas-root{background:radial-gradient(circle at 50% -24%,rgba(255,255,255,1),rgba(248,250,252,.998) 48%,rgba(241,245,249,.99) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.88)}' +
+      '.mb-r12-block-card{border-color:rgba(148,163,184,.22)!important;box-shadow:0 10px 22px rgba(15,23,42,.05)!important;background:linear-gradient(180deg,rgba(255,255,255,1),rgba(248,250,252,.975))!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}.mb-r12-block-card:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(15,23,42,.08)!important;border-color:rgba(59,130,246,.24)!important}.mb-r12-block-card .mb-block-name,.mb-r12-block-card .mb-block-type{color:#0f172a}.mb-r12-block-card .mb-block-desc,.mb-r12-block-card .mb-meta{color:#475569}' +
+      '.mb-r12-tab-pill{box-shadow:0 8px 18px rgba(15,23,42,.04);border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94));color:#0f172a}.mb-r12-shell .hm-btn.hm-btn-secondary,.mb-r12-shell .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.94);color:#0f172a;border:1px solid rgba(148,163,184,.18)}.mb-r12-shell .hm-btn.hm-btn-primary{background:linear-gradient(135deg,#1d4ed8,#2563eb);border-color:rgba(255,255,255,.12);box-shadow:0 10px 20px rgba(37,99,235,.18)}' +
+      '.mb-r12-builder-shell.is-focus-canvas{grid-template-columns:minmax(0,1fr)!important}.mb-r12-builder-shell.is-focus-canvas .mb-r12-side-panel,.mb-r12-builder-shell.is-focus-canvas .mb-r12-rail-panel{display:none!important}.mb-r12-builder-shell.is-focus-canvas .mb-r12-main-panel{grid-column:1/-1}' +
+      '.mb-r12-builder-shell.is-quiet-chrome .mb-r12-side-panel,.mb-r12-builder-shell.is-quiet-chrome .mb-r12-main-panel,.mb-r12-builder-shell.is-quiet-chrome .mb-r12-rail-panel{box-shadow:0 12px 24px rgba(15,23,42,.04);border-radius:16px}.mb-r12-builder-shell.is-quiet-chrome .mb-r12-main-panel>.mb-r12-toolbar,.mb-r12-builder-shell.is-quiet-chrome .mb-r12-main-panel>.mb-toolbar{box-shadow:0 8px 18px rgba(15,23,42,.03)}.mb-r12-builder-shell.is-quiet-chrome .mb-r12-block-card{box-shadow:0 8px 16px rgba(15,23,42,.04)!important}' +
+      '.mb-r12-preview-shell .mb-r12-preview-ribbon,.mb-r12-preview-ribbon{background:linear-gradient(90deg,rgba(15,23,42,.96),rgba(30,64,175,.84),rgba(14,165,233,.68));border:1px solid rgba(255,255,255,.12)}.mb-r12-preview-ribbon span{background:rgba(255,255,255,.92);color:#0f172a}' +
+      '@media (max-width: 1220px){.mb-r12-deck-head{flex-direction:column}.mb-r12-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr));min-width:0;width:100%}}' +
+      '@media (max-width: 920px){.mb-r12-shell{padding:16px}.mb-r12-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}' +
+      '@media (max-width: 640px){.mb-r12-mode-grid,.mb-r12-panel-grid,.mb-r12-line-grid{grid-template-columns:1fr}.mb-r12-action-row{flex-direction:column;align-items:stretch}.mb-r12-meter-row,.mb-r12-signal-row{grid-template-columns:1fr}}';
+    document.head.appendChild(style);
+  }
+  _renderBuilder = function(){
+    var html;
+    _r12EnsureState();
+    if(state.schema){
+      _r12EnsureSchema(state.schema);
+      _r12SyncStateFromSchema(state.schema);
+    }
+    _r12InjectStyles();
+    html = _r12PrevRenderBuilder();
+    return _r12NormalizeHtml(html, false);
+  };
+  _renderPreview = function(){
+    var html;
+    _r12EnsureState();
+    if(state.schema){
+      _r12EnsureSchema(state.schema);
+      _r12SyncStateFromSchema(state.schema);
+    }
+    _r12InjectStyles();
+    html = _r12PrevRenderPreview();
+    return _r12NormalizeHtml(html, true);
+  };
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r12-auto-refine': _r12AutoRefine(); return;
+        case 'r12-export-design-pack': _r12ExportDesignPack(); return;
+        case 'r12-toggle-contrast': state.showR12Contrast = !state.showR12Contrast; _paint(); return;
+        case 'r12-toggle-atlas': state.showR12Atlas = !state.showR12Atlas; _paint(); return;
+        case 'r12-toggle-surface': state.showR12Surface = !state.showR12Surface; _paint(); return;
+        case 'r12-toggle-radar': state.showR12Radar = !state.showR12Radar; _paint(); return;
+        case 'r12-toggle-focus': _r12ToggleFocus(); return;
+        case 'r12-toggle-quiet': _r12ToggleQuiet(); return;
+        case 'r12-jump-tab': state.activeTab = btn.getAttribute('data-tab-id') || state.activeTab; state.selectedBlock = null; _paint(); return;
+        case 'r12-apply-mode': _r12ApplyMode(btn.getAttribute('data-key') || 'boardroom-frost'); return;
+      }
+    }
+    return _r12PrevHandleClick(e);
+  };
+  window.__HM_MB_R12_TEST__ = {
+    version:'2026-04-07-r12-glass-command-atelier',
+    computeMetrics:function(schema){ _r12EnsureState(); schema = _r12EnsureSchema(schema || state.schema || {}); _r12SyncStateFromSchema(schema); return _r12ComputeMetrics(schema); },
+    buildDesignPack:function(schema){ _r12EnsureState(); schema = _r12EnsureSchema(schema || state.schema || {}); _r12SyncStateFromSchema(schema); return _r12BuildDesignPack(schema); },
+    renderDeck:function(schema){ _r12EnsureState(); schema = _r12EnsureSchema(schema || state.schema || {}); _r12SyncStateFromSchema(schema); return _r12RenderDeck(schema, _r12ComputeMetrics(schema)); },
+    renderPanels:function(schema){ _r12EnsureState(); schema = _r12EnsureSchema(schema || state.schema || {}); _r12SyncStateFromSchema(schema); return _r12RenderPanels(schema, _r12ComputeMetrics(schema)); },
+    normalizeHtml:function(html, previewOnly){ _r12EnsureState(); return _r12NormalizeHtml(html, !!previewOnly); }
+  };
+  if(window.__HM_MB_R11_TEST__) window.__HM_MB_R11_TEST__.round12 = window.__HM_MB_R12_TEST__;
+}
+
+
 window._renderModuleBuilder = render;
 
 })();

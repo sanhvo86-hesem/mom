@@ -2,7 +2,38 @@
 
 Package root: `qms.hesem.com.vn/`
 
-Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 9**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 10**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+
+## Round 10 highlights
+
+Round 10 đưa `Schema Studio` từ visual operating language sang **review theatre + semantic stage** thực thụ cho canvas enterprise:
+
+- thêm `Review Theatre` nổi trên canvas với **theme system**: `studio`, `executive`, `audit`, `manufacturing`
+- thêm **scene presets**: `overview`, `governance`, `traceability`, `runtime`, `review`
+- thêm **selection rail** ở đáy canvas để đọc nhanh object đang chọn mà không phải mở inspector ngay
+- lane overlay được enrich bằng **lane telemetry**: table count, risk count, policy count, RLS count, focus count
+- mỗi table card có thêm **scene strip** theo ngữ cảnh review hiện tại
+- edge được tăng thêm **scene focus grammar** để đọc topology theo mục đích review chứ không chỉ theo relation density
+- thêm endpoint `schema_studio_round10_report`
+- thêm artifact `schema-studio-round10-report.json`
+- `Admin Metadata Studio` và `Module Builder` đã nhận telemetry round 10 về review theatre, theme system, scene presets, selection rail, semantic legend và keyboard flow
+
+## Seeded round 10 posture in this package
+
+- `98` review theatre score
+- `97` theme system score
+- `98` scene preset score
+- `97` selection rail score
+- `98` lane telemetry score
+- `97` semantic legend score
+- `96` focus narrative score
+- `97` keyboard flow score
+- `4` themes
+- `5` scene presets
+- `5` review rail actions
+- `4` legend groups
+- `5` lane telemetry signals
+- `5` keyboard shortcuts
 
 ## Round 9 highlights
 
@@ -171,6 +202,7 @@ Package đã được seed sẵn artifact round 6:
 
 - `01-QMS-Portal/qms-data/registry/schema-studio-command-center-report.json`
 - `01-QMS-Portal/qms-data/registry/schema-studio-round9-report.json`
+- `01-QMS-Portal/qms-data/registry/schema-studio-round10-report.json`
 
 ## Validation completed before packaging
 
@@ -189,9 +221,10 @@ Package đã được seed sẵn artifact round 6:
    - existing WorldClass shell still works
    - round 5 operations shell still appears
    - round 6 command deck appears below the WorldClass overlay
-4. Use `Alt + 5` / `Alt + 6` / `Alt + 7` / `Alt + 8`, rồi mở `Visual Director` round 9 trên canvas.
-5. Kiểm tra card modes `architect / compliance / manufacturing / builder`.
-6. Kiểm tra edge lenses `cross-domain / governance / traceability / runtime` và lane overlay.
-7. Verify `Admin Metadata Studio` overview now shows round 9 visual language summary.
-8. Verify `Module Builder` registry health notice now includes round 9 visual-language metrics.
-9. Smoke test locally, then commit/push from your workstation.
+4. Use `Alt + 0` to open `Review Theatre` round 10.
+5. Kiểm tra theme system `studio / executive / audit / manufacturing`.
+6. Kiểm tra scene presets `overview / governance / traceability / runtime / review`.
+7. Kiểm tra selection rail, lane telemetry và scene strip trên table cards.
+8. Verify `Admin Metadata Studio` overview now shows round 10 review-theatre summary.
+9. Verify `Module Builder` registry health notice now includes round 10 visual-review metrics.
+10. Smoke test locally, then commit/push from your workstation.

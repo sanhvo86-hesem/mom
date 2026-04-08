@@ -1,0 +1,17 @@
+HESEM QMS Module Builder Ultra Round 12 Smoke
+===========================================
+builderVersion=2026-04-07-r12-glass-command-atelier
+schemaVersion=2026-04-07-r12
+totalTemplates=180
+round12Templates=12
+contrast=94
+glareDiscipline=93
+toolbarLegibility=86
+surfaceDiscipline=89
+executiveRead=90
+atlasCount=3
+signalSummary=data:3,action:3,governance:1,narrative:1
+designPackLength=766
+deckHasRound12=True
+panelsContainContrast=True
+panelsContainAtlas=True

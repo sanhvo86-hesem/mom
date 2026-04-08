@@ -2041,3 +2041,197 @@ window._renderAdminMetadataStudio = render;
   };
   win._renderAdminMetadataStudio.__round9Patched = true;
 })(window);
+
+
+/* ── Admin Metadata Studio Round 10 Review Theatre Shell ──────────────── */
+(function(win){
+  'use strict';
+  if(!win || typeof win._renderAdminMetadataStudio !== 'function') return;
+  if(win._renderAdminMetadataStudio.__round10Patched) return;
+
+  var state = { container:null, summary:null, loading:false, observer:null };
+
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){ var n = Number(value); return isFinite(n) ? n : (fallback == null ? 0 : fallback); }
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function tone(score){
+    score = num(score, 0);
+    return score >= 95 ? 'good' : (score >= 85 ? 'warning' : 'critical');
+  }
+  function api(action, payload, method){
+    if(typeof window.apiCall === 'function') return window.apiCall(action, payload || {}, method || 'GET', 30000);
+    return fetch('api.php?action=' + encodeURIComponent(action), {
+      method: method || 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type':'application/json' },
+      body: (method || 'GET').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function ensureStyles(){
+    if(document.getElementById('ams-r10-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'ams-r10-styles';
+    style.textContent = [
+      '.ams-r10-shell{display:grid;gap:14px;margin-top:16px;}',
+      '.ams-r10-hero,.ams-r10-card{border:1px solid rgba(125,211,252,.16);background:linear-gradient(180deg,rgba(7,14,28,.97),rgba(10,18,34,.92));box-shadow:0 20px 48px rgba(2,6,23,.30);border-radius:24px;padding:18px;color:#eaf2ff;}',
+      '.ams-r10-kicker{color:#7dd3fc;font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:800;}',
+      '.ams-r10-title{font-size:24px;font-weight:800;line-height:1.18;color:#f8fbff;margin-top:4px;}',
+      '.ams-r10-sub{color:#93a3c7;font-size:12px;line-height:1.55;letter-spacing:.01em;}',
+      '.ams-r10-badges,.ams-r10-inline,.ams-r10-chip-wrap{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.ams-r10-grid,.ams-r10-metrics{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));}',
+      '.ams-r10-metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:14px;}',
+      '.ams-r10-badge,.ams-r10-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:12px;font-weight:700;color:#f5f8ff;}',
+      '.ams-r10-badge.tone-good{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.28);}',
+      '.ams-r10-badge.tone-warning{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.28);}',
+      '.ams-r10-badge.tone-critical{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.28);}',
+      '.ams-r10-chip{font-weight:600;color:#dbeafe;background:rgba(59,130,246,.14);}',
+      '.ams-r10-metric{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);display:grid;gap:6px;min-height:102px;}',
+      '.ams-r10-metric strong{font-size:28px;line-height:1;color:#f8fbff;}',
+      '.ams-r10-metric.tone-good{background:linear-gradient(180deg,rgba(18,83,53,.24),rgba(15,25,48,.66));}',
+      '.ams-r10-metric.tone-warning{background:linear-gradient(180deg,rgba(108,78,18,.24),rgba(15,25,48,.66));}',
+      '.ams-r10-metric.tone-critical{background:linear-gradient(180deg,rgba(109,31,42,.26),rgba(15,25,48,.66));}',
+      '.ams-r10-list{display:grid;gap:10px;}',
+      '.ams-r10-item{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);}',
+      '.ams-r10-item strong{color:#f8fbff;}',
+      '@media (max-width:1180px){.ams-r10-grid,.ams-r10-metrics{grid-template-columns:1fr;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+  function metric(label, value, hint, toneKey){
+    return '<div class="ams-r10-metric tone-' + esc(toneKey || 'warning') + '"><div class="ams-r10-kicker">' + esc(label) + '</div><strong>' + esc(value) + '</strong><div class="ams-r10-sub">' + esc(hint || '') + '</div></div>';
+  }
+  function normalize(summary){
+    var overview = summary && summary.overview ? summary.overview : {};
+    var report = summary && summary.schemaStudio && summary.schemaStudio.round10Report ? summary.schemaStudio.round10Report : {
+      summary: {
+        reviewTheatreScore: num(overview.schemaStudioReviewTheatreScore, 0),
+        themeSystemScore: num(overview.schemaStudioThemeSystemScore, 0),
+        scenePresetScore: num(overview.schemaStudioScenePresetScore, 0),
+        selectionRailScore: num(overview.schemaStudioSelectionRailScore, 0),
+        laneTelemetryScore: num(overview.schemaStudioLaneTelemetryScore, 0),
+        semanticLegendScore: num(overview.schemaStudioSemanticLegendScore, 0),
+        focusNarrativeScore: num(overview.schemaStudioFocusNarrativeScore, 0),
+        keyboardFlowScore: num(overview.schemaStudioKeyboardFlowScore, 0),
+        themeCount: num(overview.schemaStudioThemeCount, 0),
+        scenePresetCount: num(overview.schemaStudioScenePresetCount, 0),
+        reviewRailActionCount: num(overview.schemaStudioReviewRailActionCount, 0),
+        legendGroupCount: num(overview.schemaStudioLegendGroupCount, 0),
+        laneTelemetryCount: num(overview.schemaStudioLaneTelemetryCount, 0),
+        shortcutCount: num(overview.schemaStudioShortcutCount, 0)
+      },
+      hero: {
+        headline: 'Round 10 review theatre + semantic stage',
+        subheadline: 'Themeable, scene-driven and selection-native review surface for metadata admins and builders.'
+      },
+      themes: [],
+      scenes: [],
+      legendGroups: [],
+      reviewRailActions: [],
+      laneTelemetry: [],
+      polishPrinciples: [],
+      shortcuts: []
+    };
+    return { overview:overview, report:report };
+  }
+  function render(){
+    if(!state.container) return;
+    var root = state.container.querySelector('.ams');
+    if(!root) return;
+    var metrics = root.querySelector('.ams-metrics');
+    if(!metrics || !state.summary) return;
+    ensureStyles();
+    var data = normalize(state.summary);
+    var report = data.report;
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    var themes = arr(report.themes).slice(0, 4);
+    var scenes = arr(report.scenes).slice(0, 5);
+    var legend = arr(report.legendGroups).slice(0, 4);
+    var rail = arr(report.reviewRailActions).slice(0, 5);
+    var telemetry = arr(report.laneTelemetry).slice(0, 5);
+    var principles = arr(report.polishPrinciples).slice(0, 4);
+    var shortcuts = arr(report.shortcuts).slice(0, 5);
+    var existing = root.querySelector('.ams-r10-shell');
+    if(!existing){
+      existing = document.createElement('section');
+      existing.className = 'ams-r10-shell';
+      var anchor = root.querySelector('.ams-r9-shell') || root.querySelector('.ams-r7-shell') || metrics;
+      anchor.insertAdjacentElement('afterend', existing);
+    }
+    existing.innerHTML = [
+      '<section class="ams-r10-hero">',
+        '<div class="ams-r10-kicker">Round 10 review theatre</div>',
+        '<div class="ams-r10-title">' + esc(hero.headline || 'Semantic stage for enterprise schema reviews') + '</div>',
+        '<div class="ams-r10-sub">' + esc(hero.subheadline || 'Selection rail, theme system and scene presets now sit above the core canvas.') + '</div>',
+        '<div class="ams-r10-badges" style="margin-top:12px">',
+          '<span class="ams-r10-badge tone-' + esc(tone(summary.reviewTheatreScore)) + '">Review theatre: ' + esc(num(summary.reviewTheatreScore, 0) + '%') + '</span>',
+          '<span class="ams-r10-badge tone-' + esc(tone(summary.themeSystemScore)) + '">Themes: ' + esc(num(summary.themeSystemScore, 0) + '%') + '</span>',
+          '<span class="ams-r10-badge tone-' + esc(tone(summary.scenePresetScore)) + '">Scenes: ' + esc(num(summary.scenePresetScore, 0) + '%') + '</span>',
+          '<span class="ams-r10-badge tone-' + esc(tone(summary.selectionRailScore)) + '">Selection rail: ' + esc(num(summary.selectionRailScore, 0) + '%') + '</span>',
+          '<span class="ams-r10-badge">Legend groups: ' + esc(num(summary.legendGroupCount, 0)) + '</span>',
+          '<span class="ams-r10-badge">Shortcuts: ' + esc(num(summary.shortcutCount, 0)) + '</span>',
+        '</div>',
+        '<div class="ams-r10-metrics">',
+          metric('Lane telemetry', num(summary.laneTelemetryScore, 0) + '%', 'Lane chips now show table, risk, policy and RLS posture.', tone(summary.laneTelemetryScore)),
+          metric('Semantic legend', num(summary.semanticLegendScore, 0) + '%', 'Object, relation, severity and focus grammar stay explicit.', tone(summary.semanticLegendScore)),
+          metric('Focus narrative', num(summary.focusNarrativeScore, 0) + '%', 'Selection rail tells the story of the active object quickly.', tone(summary.focusNarrativeScore)),
+          metric('Keyboard flow', num(summary.keyboardFlowScore, 0) + '%', 'Scene switching and review theatre stay command-friendly.', tone(summary.keyboardFlowScore)),
+        '</div>',
+      '</section>',
+      '<div class="ams-r10-grid">',
+        '<article class="ams-r10-card"><h4>Themes & scenes</h4><div class="ams-r10-sub">Presentation posture can now change without breaking information architecture.</div><div class="ams-r10-list">' +
+          (themes.length ? themes.map(function(item){ return '<div class="ams-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r10-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r10-inline"><span class="ams-r10-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '') +
+          (scenes.length ? scenes.map(function(item){ return '<div class="ams-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r10-sub">' + esc(item.focus || item.signal || '') + '</div></div><div class="ams-r10-inline"><span class="ams-r10-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r10-sub">No scene presets yet.</div>') +
+        '</div></article>',
+        '<article class="ams-r10-card"><h4>Legend & lane telemetry</h4><div class="ams-r10-sub">Reviewers can now decode the graph without opening every card.</div><div class="ams-r10-list">' +
+          (legend.length ? legend.map(function(item){ return '<div class="ams-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r10-sub">' + esc(item.detail || '') + '</div><div class="ams-r10-chip-wrap" style="margin-top:8px">' + arr(item.items).map(function(token){ return '<span class="ams-r10-chip">' + esc(token) + '</span>'; }).join('') + '</div></div><div class="ams-r10-inline"><span class="ams-r10-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '') +
+          (telemetry.length ? telemetry.map(function(item){ return '<div class="ams-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r10-sub">' + esc(item.detail || '') + '</div></div><div class="ams-r10-inline"><span class="ams-r10-badge tone-' + esc(tone(item.score)) + '">' + esc(num(item.score, 0) + '%') + '</span></div></div>'; }).join('') : '<div class="ams-r10-sub">No lane telemetry yet.</div>') +
+        '</div></article>',
+        '<article class="ams-r10-card"><h4>Selection rail actions</h4><div class="ams-r10-sub">Metadata admins see the same guided actions available in the canvas review rail.</div><div class="ams-r10-list">' + (rail.length ? rail.map(function(item){ return '<div class="ams-r10-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r10-sub">' + esc(item.effect || '') + '</div></div></div>'; }).join('') : '<div class="ams-r10-sub">No review rail actions yet.</div>') + '</div></article>',
+        '<article class="ams-r10-card"><h4>Principles & shortcuts</h4><div class="ams-r10-sub">The new visual layer is still governed by readability-first rules.</div><div class="ams-r10-list">' +
+          (principles.length ? principles.map(function(item){ return '<div class="ams-r10-item"><div><strong>Principle</strong><div class="ams-r10-sub">' + esc(item) + '</div></div></div>'; }).join('') : '') +
+          (shortcuts.length ? shortcuts.map(function(item){ return '<div class="ams-r10-item"><div><strong>' + esc(item.keys || '-') + '</strong><div class="ams-r10-sub">' + esc(item.label || '') + '</div></div></div>'; }).join('') : '<div class="ams-r10-sub">No shortcuts yet.</div>') +
+        '</div></article>',
+      '</div>'
+    ].join('');
+  }
+  function fetchSummary(force){
+    if(state.loading && !force) return Promise.resolve(state.summary || null);
+    state.loading = true;
+    return api('admin_metadata_studio_summary', {}, 'GET').then(function(payload){
+      state.loading = false;
+      state.summary = payload || null;
+      render();
+      return state.summary;
+    }).catch(function(){
+      state.loading = false;
+      render();
+      return state.summary || null;
+    });
+  }
+  function attach(container){
+    state.container = container;
+    if(state.observer){ state.observer.disconnect(); state.observer = null; }
+    if(container && typeof MutationObserver !== 'undefined'){
+      state.observer = new MutationObserver(function(){ render(); });
+      state.observer.observe(container, { childList:true, subtree:true });
+    }
+    render();
+    fetchSummary(false);
+  }
+  var original = win._renderAdminMetadataStudio;
+  win._renderAdminMetadataStudio = function(container){
+    var result = original ? original.apply(this, arguments) : undefined;
+    attach(container);
+    return result;
+  };
+  win._renderAdminMetadataStudio.__round10Patched = true;
+})(window);
