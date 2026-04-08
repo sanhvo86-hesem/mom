@@ -76,6 +76,7 @@
       autoPopulate: null,     // { targetFieldName: 'sourceField', ... }
       debounceMs: 300,
       minChars: 0,            // min chars before showing dropdown
+      maxResults: 50,
       strictSelect: false,
       storeValueInHiddenField: false,
       lang: (document.documentElement.lang || 'en').toLowerCase().indexOf('vi') === 0 ? 'vi' : 'en'
@@ -111,6 +112,10 @@
 
     /* Register */
     if (this.config.fieldId) {
+      var existing = SearchableInput._registry[this.config.fieldId];
+      if (existing && existing !== this && typeof existing.destroy === 'function') {
+        existing.destroy();
+      }
       SearchableInput._registry[this.config.fieldId] = this;
     }
 
@@ -238,6 +243,7 @@
   /* ── Input handler ─────────────────────────────────── */
   SearchableInput.prototype._onInput = function (query) {
     var self = this;
+    var maxResults = Math.max(1, Number(this.config.maxResults || 50));
     query = (query || '').toLowerCase().trim();
 
     /* Filter by dependency */
@@ -259,9 +265,9 @@
         var value = String(item[self.config.valueField] || '').toLowerCase();
         var sub = self.config.subField ? String(item[self.config.subField] || '').toLowerCase() : '';
         return display.indexOf(query) !== -1 || value.indexOf(query) !== -1 || sub.indexOf(query) !== -1;
-      });
+      }).slice(0, maxResults);
     } else {
-      this._filtered = sourceData.slice(0, 50); // Show first 50 when empty
+      this._filtered = sourceData.slice(0, maxResults);
     }
 
     this._activeIndex = -1;
@@ -491,6 +497,23 @@
     this._setHiddenValue('');
     this._el.wrap.classList.remove('has-value');
     this._hideDropdown();
+  };
+
+  SearchableInput.prototype.destroy = function () {
+    clearTimeout(this._debounceTimer);
+    if (this.config.fieldId && SearchableInput._registry[this.config.fieldId] === this) {
+      delete SearchableInput._registry[this.config.fieldId];
+    }
+    if (this._el && this._el.container) {
+      this._el.container.innerHTML = '';
+    }
+    this._data = [];
+    this._filtered = [];
+    this._value = null;
+    this._selectedItem = null;
+    this._activeIndex = -1;
+    this._isOpen = false;
+    this._el = {};
   };
 
   SearchableInput.prototype._setHiddenValue = function (value) {

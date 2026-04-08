@@ -241,6 +241,40 @@ function _reloadRevisionDropdown(type, form, selectedPart){
     revTarget.innerHTML='<select class="sj-input" name="part_revision"><option value="">'+_t('Chọn','Select')+'</option>'+filteredRevs.map(function(x){ return '<option value="'+_esc(x.value)+'">'+_esc(x.label+(x.sub?' · '+x.sub:''))+'</option>'; }).join('')+'</select>';
   }
 }
+function _reloadCustomerSiteDropdowns(type, form, customerId, currentValues){
+  currentValues = currentValues || {};
+  ['customer_site_id','ship_to_site_id'].forEach(function(fieldKey){
+    var target = document.getElementById(_id+'-'+type+'-'+fieldKey);
+    if(!target) return;
+    var rows = _lookupRows('customer_sites', { customer_id: customerId || '' });
+    if(typeof SearchableInput==='function'){
+      new SearchableInput({
+        containerId:target.id,
+        fieldId:target.id+'-si',
+        name:fieldKey,
+        dataSource:rows,
+        displayField:'label',
+        valueField:'value',
+        subField:'sub',
+        placeholderVi:_t('Tìm và chọn','Search and select'),
+        placeholder:'Search and select',
+        strictSelect:true,
+        storeValueInHiddenField:true,
+        maxResults:40
+      });
+      if(currentValues[fieldKey]){
+        setTimeout(function(){
+          var si = SearchableInput.get(target.id+'-si');
+          if(si) si.setValue(currentValues[fieldKey]);
+        }, 0);
+      }
+    } else {
+      target.innerHTML='<select class="sj-input" name="'+fieldKey+'"><option value="">'+_t('Chọn','Select')+'</option>'+rows.map(function(x){ return '<option value="'+_esc(x.value)+'">'+_esc(x.label+(x.sub?' · '+x.sub:''))+'</option>'; }).join('')+'</select>';
+      var sel = target.querySelector('select');
+      if(sel && currentValues[fieldKey] != null) sel.value = currentValues[fieldKey] || '';
+    }
+  });
+}
 function _hasActiveFilters(){ return !!(_filters.search || _filters.type!=='all' || _filters.band!=='all' || _filters.phase!=='all'); }
 function _matchesFilters(item){ if(_filters.type!=='all' && _recordType(item)!==_filters.type) return false; if(_filters.band!=='all' && _recordBand(item)!==_filters.band) return false; if(_filters.phase!=='all' && _recordPhase(item)!==_filters.phase) return false; return true; }
 function _filteredRows(){ return _sortRows(_filterRows(_flat,_filters.search.trim().toLowerCase()).filter(_matchesFilters),_tableSort.key,_tableSort.dir); }
@@ -428,7 +462,7 @@ function _showFoundations(){
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_t('Bản đồ dữ liệu nền','Foundation map')+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><div class="sj-foundation-grid">'+groups.map(function(group){ return '<section class="sj-foundation-card"><h4>'+_esc(_t(group.titleVi,group.titleEn))+'</h4><strong>'+_esc(group.total)+'</strong><div class="sj-foundation-detail">'+group.detail.map(function(item){ return '<div class="sj-foundation-detail-row"><span>'+_esc(item.key)+'</span><strong>'+_esc(item.count)+'</strong></div>'; }).join('')+'</div>'+(group.missing.length?'<p>'+_t('Thiếu: ','Missing: ')+_esc(group.missing.join(', '))+'</p>':'<p>'+_t('Đã có tối thiểu dữ liệu nền cho nhóm này.','Baseline data is present for this group.')+'</p>')+'</section>'; }).join('')+'</div></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Đóng','Close')+'</button>'+(typeof window._mdOpenControl==='function'?'<button type="button" class="sj-btn accent" id="'+_id+'-foundation-open">'+_t('Mở dữ liệu nền','Open master data')+'</button>':'')+'</div>';
   overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
-  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay) close(); }; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
   var openBtn=modal.querySelector('#'+_id+'-foundation-open');
   if(openBtn) openBtn.onclick=function(){ close(); window._mdOpenControl(); };
@@ -441,7 +475,7 @@ function _showLinkModal(){
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_t('Liên kết hồ sơ','Link record')+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><label>'+_t('Mã hồ sơ','Record ID')+'</label><input id="'+_id+'-record-link" class="sj-input" placeholder="NCR-2026-001"></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-record-submit">'+_t('Liên kết','Link')+'</button></div>';
   overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
-  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay) close(); }; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
   var submitBtn=modal.querySelector('#'+_id+'-record-submit');
   submitBtn.onclick=function(){ var rid=(modal.querySelector('#'+_id+'-record-link').value||'').trim().toUpperCase(); if(!rid){ _toast(_t('Vui lòng nhập mã hồ sơ.','Please enter a record ID.'),'warn'); return; } _setSubmitLoading(submitBtn, true); _api('order_link_form',{ order_id:_selected.id, order_type:_selected.type, record_id:rid }).then(function(r){ _setSubmitLoading(submitBtn, false); if(r&&r.ok){ close(); _toast(_t('Đã liên kết hồ sơ.','Record linked.'),'success'); _showDetail(_selected.id,_selected.type); } else { _toast(_t('Không thể liên kết hồ sơ.','Unable to link record.'),'error'); } }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); }); };
@@ -482,7 +516,7 @@ function _showStatusTransition(type, orderId, currentStatus){
   modal.innerHTML=h;
   overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
-  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay) close(); }; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
   // Show/hide reason based on selected status
   var radios=modal.querySelectorAll('[name="next_status"]');
@@ -514,7 +548,7 @@ function _showCreateInContext(type, prefill){
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Tạo mới','Create'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-ctx-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-ctx-submit">'+_t('Tạo mới','Create')+'</button></div>';
   overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
-  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay) close(); }; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
   var form=modal.querySelector('#'+_id+'-ctx-form');
   _hydrateCreateForm(type, form);
@@ -551,7 +585,7 @@ function _showCreate(type){
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Tạo mới','Create'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-create-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-submit-create">'+_t('Tạo mới','Create')+'</button></div>';
   overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
-  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay) close(); }; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
   var form=modal.querySelector('#'+_id+'-create-form');
   _hydrateCreateForm(type,form);
@@ -576,7 +610,10 @@ function _hydrateCreateForm(type,form){
     var target=document.getElementById(_id+'-'+type+'-'+field.key);
     if(!target) return;
     if(typeof SearchableInput==='function'){
-      new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, onSelect:function(item){
+      new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, maxResults:40, onSelect:function(item){
+        if(type==='so' && field.key==='customer_id'){
+          _reloadCustomerSiteDropdowns(type, form, item && item.value ? item.value : '');
+        }
         if(type==='jo' && field.key==='part_number'){
           var desc=form.querySelector('[name="part_description"]'); if(desc) desc.value=item.description||'';
           _reloadRevisionDropdown(type, form, item.value);
@@ -588,8 +625,15 @@ function _hydrateCreateForm(type,form){
         var sel=target.querySelector('select');
         if(sel) sel.onchange=function(){ _reloadRevisionDropdown(type, form, sel.value); var desc=form.querySelector('[name="part_description"]'); if(desc){ var m=_master(); var p=(m.parts||[]).find(function(x){ return x.part_number===sel.value; }); desc.value=p?p.part_description||'':''; } };
       }
+      if(type==='so' && field.key==='customer_id'){
+        var customerSel=target.querySelector('select');
+        if(customerSel) customerSel.onchange=function(){ _reloadCustomerSiteDropdowns(type, form, customerSel.value || ''); };
+      }
     }
   });
+  if(type==='so'){
+    _reloadCustomerSiteDropdowns(type, form, '');
+  }
   ['order_date','requested_date','promise_date','commit_date','due_date','start_date','release_target_date'].forEach(function(k){ var el=form.querySelector('[name="'+k+'"]'); if(el&&!el.value) el.value=_today(); });
   var desc=form.querySelector('[name="part_description"]'); if(desc) desc.readOnly=true;
 }
@@ -617,7 +661,10 @@ function _hydrateEditForm(type, form, data){
       }
       if(type==='jo' && field.key==='part_number') _selectedPartForRev = value || '';
       if(typeof SearchableInput==='function'){
-        new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, onSelect:function(item){
+        new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, maxResults:40, onSelect:function(item){
+          if(type==='so' && field.key==='customer_id'){
+            _reloadCustomerSiteDropdowns(type, form, item && item.value ? item.value : '');
+          }
           if(type==='jo' && field.key==='part_number'){
             var desc=form.querySelector('[name="part_description"]'); if(desc) desc.value=item.description||'';
             _reloadRevisionDropdown(type, form, item.value);
@@ -630,6 +677,9 @@ function _hydrateEditForm(type, form, data){
         if(sel) sel.value = value || '';
         if(type==='jo' && field.key==='part_number' && sel){
           sel.onchange=function(){ _reloadRevisionDropdown(type, form, sel.value); var desc=form.querySelector('[name="part_description"]'); if(desc){ var m=_master(); var p=(m.parts||[]).find(function(x){ return x.part_number===sel.value; }); desc.value=p?p.part_description||'':''; } };
+        }
+        if(type==='so' && field.key==='customer_id' && sel){
+          sel.onchange=function(){ _reloadCustomerSiteDropdowns(type, form, sel.value || ''); };
         }
       }
       return;
@@ -646,6 +696,12 @@ function _hydrateEditForm(type, form, data){
       el.style.background = '#f1f5f9';
     }
   });
+  if(type==='so'){
+    _reloadCustomerSiteDropdowns(type, form, data.customer_id || '', {
+      customer_site_id: data.customer_site_id || '',
+      ship_to_site_id: data.ship_to_site_id || ''
+    });
+  }
 }
 
 function _showEdit(type, data){
@@ -655,7 +711,7 @@ function _showEdit(type, data){
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Chỉnh sửa','Edit'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-edit-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-submit-edit">'+_t('Lưu thay đổi','Save changes')+'</button></div>';
   overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
-  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  overlay.onclick=function(e){ if(e.target===overlay) close(); }; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
   var form=modal.querySelector('#'+_id+'-edit-form');
   _hydrateEditForm(type, form, data||{});

@@ -1640,10 +1640,8 @@ window._renderAdminMetadataStudio = render;
   function attach(container){
     state.container = container;
     if(state.observer){ state.observer.disconnect(); state.observer = null; }
-    if(container && typeof MutationObserver !== 'undefined'){
-      state.observer = new MutationObserver(function(){ render(); });
-      state.observer.observe(container, { childList:true, subtree:true });
-    }
+    // Do not observe our own render tree here: these addons mutate the same
+    // container they watch, which can create a render-observer feedback loop.
     render();
     fetchSummary(false);
   }
@@ -1836,10 +1834,8 @@ window._renderAdminMetadataStudio = render;
   function attach(container){
     state.container = container;
     if(state.observer){ state.observer.disconnect(); state.observer = null; }
-    if(container && typeof MutationObserver !== 'undefined'){
-      state.observer = new MutationObserver(function(){ render(); });
-      state.observer.observe(container, { childList:true, subtree:true });
-    }
+    // Avoid recursive repaint storms caused by observing a container that this
+    // module immediately rewrites during render().
     render();
     fetchSummary(false);
   }
@@ -2026,10 +2022,7 @@ window._renderAdminMetadataStudio = render;
   function attach(container){
     state.container = container;
     if(state.observer){ state.observer.disconnect(); state.observer = null; }
-    if(container && typeof MutationObserver !== 'undefined'){
-      state.observer = new MutationObserver(function(){ render(); });
-      state.observer.observe(container, { childList:true, subtree:true });
-    }
+    // Avoid observing childList/subtree changes on the same DOM we render into.
     render();
     fetchSummary(false);
   }
@@ -2220,10 +2213,8 @@ window._renderAdminMetadataStudio = render;
   function attach(container){
     state.container = container;
     if(state.observer){ state.observer.disconnect(); state.observer = null; }
-    if(container && typeof MutationObserver !== 'undefined'){
-      state.observer = new MutationObserver(function(){ render(); });
-      state.observer.observe(container, { childList:true, subtree:true });
-    }
+    // Observing this subtree causes self-triggered re-renders and can freeze
+    // the admin tab on large payloads.
     render();
     fetchSummary(false);
   }
@@ -2401,10 +2392,7 @@ window._renderAdminMetadataStudio = render;
   function attach(container){
     state.container = container;
     if(state.observer){ state.observer.disconnect(); state.observer = null; }
-    if(container && typeof MutationObserver !== 'undefined'){
-      state.observer = new MutationObserver(function(){ render(); });
-      state.observer.observe(container, { childList:true, subtree:true });
-    }
+    // Avoid render loops from observing the same subtree this round injects.
     render();
     fetchSummary(false);
   }
@@ -2542,10 +2530,8 @@ window._renderAdminMetadataStudio = render;
   function attach(container){
     state.container = container;
     if(state.observer){ state.observer.disconnect(); state.observer = null; }
-    if(container && typeof MutationObserver !== 'undefined'){
-      state.observer = new MutationObserver(function(){ render(); });
-      state.observer.observe(container, { childList:true, subtree:true });
-    }
+    // This addon writes into the same container, so observing subtree changes
+    // here can create an endless render cycle.
     render();
     fetchReport(false);
   }
