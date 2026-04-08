@@ -28,7 +28,7 @@ DEPLOY_USER="deploy"
 DB_NAME="mom"
 DB_USER="mom_app"
 DB_PASS=""  # Will be generated
-GIT_REPO="https://github.com/sanhvo86-hesem/mom.git"
+GIT_REPO="https://github.com/sanhvo86-hesem/MOM.git"
 GIT_BRANCH="main"
 ADMIN_EMAIL="admin@hesemeng.com"
 
