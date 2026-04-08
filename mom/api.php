@@ -126,7 +126,7 @@ function ensure_dir(string $dir): void {
   }
   // Try to ensure directory is writable (shared hosting / CGI setups)
   if (is_dir($dir) && !is_writable($dir)) {
-    @chmod($dir, 0775);
+    try { @chmod($dir, 0775); } catch (\Throwable $e) {}
   }
 }
 
@@ -16733,6 +16733,95 @@ if ($username === '') {
       // Always include numbered top-level folders (even empty — may be newly created)
       $tree[] = $topNode;
     }
+
+    // ═══ SCAN mom/docs/ DIRECTORIES (post-restructure layout) ═══
+    // Maps mom/docs/ subdirectories to virtual numbered top-level entries
+    $momDocsMap = [
+      'mom/docs/system/quality-manual'          => [2, 'Quality-Manual', 'MAN'],
+      'mom/docs/system/policies'                => [2, 'Policies-Objectives', 'POL'],
+      'mom/docs/system/organization'            => [2, 'Organization', 'ORG'],
+      'mom/docs/operations/sops'                => [3, 'SOPs', 'SOP'],
+      'mom/docs/operations/work-instructions'   => [3, 'Work-Instructions', 'WI'],
+      'mom/docs/operations/references'          => [3, 'Annexes-References', 'ANNEX'],
+      'mom/docs/forms'                          => [4, 'Forms-Records', 'FRM'],
+      'mom/docs/training'                       => [10, 'Training-Academy', 'TRN'],
+    ];
+
+    // Group by virtual top-level number to merge into tree nodes
+    $virtualTops = [];
+    foreach ($momDocsMap as $relPath => [$vNum, $vLabel, $vCat]) {
+      $absPath = $ROOT_DIR . '/' . $relPath;
+      if (!is_dir($absPath)) continue;
+      // Skip if already discovered via numbered folders
+      $alreadyScanned = false;
+      foreach ($tree as $tn) {
+        if (($tn['num'] ?? 0) === $vNum) { $alreadyScanned = true; break; }
+      }
+
+      // Build or reuse virtual top node keyed by vNum
+      if (!isset($virtualTops[$vNum])) {
+        $virtualTops[$vNum] = ['path' => $relPath, 'num' => $vNum, 'name' => $vLabel, 'cat' => $vCat, 'subs' => [], 'fileCount' => 0];
+      }
+      $vTop =& $virtualTops[$vNum];
+
+      // If the path has sub-subdirectories (e.g. system/organization/03-Job-Descriptions), scan them
+      $subDirs = @scandir($absPath);
+      if (!$subDirs) $subDirs = [];
+      sort($subDirs);
+
+      $hasSubDirs = false;
+      foreach ($subDirs as $subName) {
+        if ($subName[0] === '.' || $subName === '_Archive' || $subName === 'index.html' || $subName[0] === '_') continue;
+        $subAbs = $absPath . '/' . $subName;
+        if (is_dir($subAbs)) {
+          $hasSubDirs = true;
+          [$subNum, $subLabel] = parse_folder_num($subName);
+          $subCat = $vCat;
+          $subNode = ['path' => $relPath . '/' . $subName, 'num' => $subNum, 'name' => $subLabel ?? $subName, 'cat' => $subCat, 'fileCount' => 0];
+
+          // Scan files in sub-subdirectory
+          $subFiles = @scandir($subAbs);
+          if ($subFiles) foreach ($subFiles as $fn) {
+            if ($fn[0] === '.' || $fn === 'index.html' || $fn[0] === '_') continue;
+            if (scan_should_skip_filename($fn, $scanExclusions)) continue;
+            if (is_dir($subAbs . '/' . $fn)) continue;
+            $fileRelPath = $relPath . '/' . $subName . '/' . $fn;
+            if ($append_scanned_doc($subAbs . '/' . $fn, $fileRelPath, $subCat, $subName, $relPath . '/' . $subName)) {
+              $subNode['fileCount']++;
+              $vTop['fileCount']++;
+            }
+          }
+          $vTop['subs'][] = $subNode;
+        }
+      }
+
+      // If no subdirectories, scan files directly
+      if (!$hasSubDirs) {
+        foreach ($subDirs as $fn) {
+          if ($fn[0] === '.' || $fn === 'index.html' || $fn[0] === '_') continue;
+          if (scan_should_skip_filename($fn, $scanExclusions)) continue;
+          $fileAbs = $absPath . '/' . $fn;
+          if (is_dir($fileAbs)) continue;
+          $fileRelPath = $relPath . '/' . $fn;
+          if ($append_scanned_doc($fileAbs, $fileRelPath, $vCat, null, $relPath)) {
+            $vTop['fileCount']++;
+          }
+        }
+      }
+      unset($vTop);
+    }
+
+    // Merge virtual tops into tree (only if not already present)
+    foreach ($virtualTops as $vTop) {
+      if ($vTop['fileCount'] > 0) {
+        $exists = false;
+        foreach ($tree as $tn) { if (($tn['num'] ?? 0) === $vTop['num']) { $exists = true; break; } }
+        if (!$exists) $tree[] = $vTop;
+      }
+    }
+
+    // Re-sort tree by num
+    usort($tree, fn($a, $b) => ($a['num'] ?? 99) <=> ($b['num'] ?? 99));
 
     // ═══ POST-PROCESS: Fix doc categories based on folder context ═══
     // Files inside Organization folder should always be ORG (overrides filename-based cat)
