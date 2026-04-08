@@ -30,7 +30,7 @@ DB_USER="mom_app"
 DB_PASS=""  # Will be generated
 GIT_REPO="https://github.com/sanhvo86-hesem/MOM.git"
 GIT_BRANCH="main"
-ADMIN_EMAIL="admin@hesemeng.com"
+ADMIN_EMAIL="sanhvo86@gmail.com"
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 GREEN='\033[0;32m'
