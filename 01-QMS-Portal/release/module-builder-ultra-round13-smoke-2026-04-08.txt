@@ -1,0 +1,16 @@
+HESEM QMS Module Builder Ultra Round 13 Smoke
+============================================
+Version: 2026-04-08-r13-glass-command-theater
+Schema version: 2026-04-08-r13
+Total templates: 193
+Round 13 templates: 13
+Clarity: 83
+Command: 63
+Governance: 70
+Comfort: 83
+Finish: 73
+Atlas rows: 2
+Recommendations: 1
+Deck contains ROUND 13 marker: True
+Panels contain Contrast sentinel marker: True
+Brief length: 1076

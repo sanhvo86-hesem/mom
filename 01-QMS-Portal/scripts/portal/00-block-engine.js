@@ -12870,3 +12870,39 @@ Object.assign(window.HmBlockEngine, {
   BE.MODULE_BUILDER_GLASS_SCHEMA_VERSION = '2026-04-07-r12';
   BE.MODULE_BUILDER_ROUND12_TEMPLATES = Object.keys(ROUND12_TEMPLATES);
 })();
+
+
+/* ============================================================================
+ * HESEM QMS — Module Builder Ultra Round 13 Block Engine Patch
+ * Glass Command Theater · Contrast Sentinel · Professional Glass Discipline
+ * ============================================================================ */
+(function(){
+  if(!window.HmBlockEngine || window.HmBlockEngine.MODULE_BUILDER_GLASS_SCHEMA_VERSION === '2026-04-08-r13') return;
+  var BE = window.HmBlockEngine;
+  function _mergeRound13(target, source){ Object.keys(source || {}).forEach(function(key){ target[key] = source[key]; }); }
+  var ROUND13_TEMPLATES = {
+    'r13-glass-command-kpi': { type:'kpi-row', title:{ vi:'Glass Command KPIs', en:'Glass Command KPIs' }, config:{ dataSource:{ api:'module_glass_command', method:'GET' }, items:[ { label:'Clarity', labelEn:'Clarity', dataKey:'clarity', color:'var(--brand-2)', suffix:'%' }, { label:'Command', labelEn:'Command', dataKey:'command', color:'var(--green)', suffix:'%' }, { label:'Governance', labelEn:'Governance', dataKey:'governance', color:'var(--amber)', suffix:'%' }, { label:'Comfort', labelEn:'Comfort', dataKey:'comfort', color:'var(--red)', suffix:'%' } ] }, meta:{ module:'builder-round13', category:'glass' } },
+    'r13-contrast-sentinel-table': { type:'data-table', title:{ vi:'Contrast Sentinel Table', en:'Contrast Sentinel Table' }, config:{ pageSize:12, dataSource:{ api:'module_contrast_sentinel', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'surface', label:{vi:'Surface', en:'Surface'}, type:'text' }, { key:'contrast', label:{vi:'Contrast', en:'Contrast'}, type:'text' }, { key:'glare', label:{vi:'Glare', en:'Glare'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] }, meta:{ module:'builder-round13', category:'contrast' } },
+    'r13-atlas-command-board': { type:'data-cards', title:{ vi:'Atlas Command Board', en:'Atlas Command Board' }, config:{ columns:4, titleKey:'tab', subtitleKey:'focus', badgeKey:'status', dataSource:{ api:'module_atlas_command_board', method:'GET', dataKey:'items' } }, meta:{ module:'builder-round13', category:'atlas' } },
+    'r13-palette-discipline-gallery': { type:'data-cards', title:{ vi:'Palette Discipline Gallery', en:'Palette Discipline Gallery' }, config:{ columns:4, titleKey:'token', subtitleKey:'value', badgeKey:'role', dataSource:{ api:'module_palette_discipline_gallery', method:'GET', dataKey:'tokens' } }, meta:{ module:'builder-round13', category:'palette' } },
+    'r13-command-rail-table': { type:'data-table', title:{ vi:'Command Rail Table', en:'Command Rail Table' }, config:{ pageSize:10, dataSource:{ api:'module_command_rail_r13', method:'GET', dataKey:'actions' }, dataKey:'actions', columns:[ { key:'action', label:{vi:'Action', en:'Action'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'window', label:{vi:'Window', en:'Window'}, type:'text' }, { key:'priority', label:{vi:'Priority', en:'Priority'}, type:'badge' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] }, meta:{ module:'builder-round13', category:'action' } },
+    'r13-workflow-theater-timeline': { type:'data-timeline', title:{ vi:'Workflow Theater Timeline', en:'Workflow Theater Timeline' }, config:{ dataSource:{ api:'module_workflow_theater', method:'GET', dataKey:'events' }, dateKey:'stage', titleKey:'title', descKey:'description' }, meta:{ module:'builder-round13', category:'workflow' } },
+    'r13-audit-closing-ledger': { type:'data-table', title:{ vi:'Audit Closing Ledger', en:'Audit Closing Ledger' }, config:{ pageSize:12, dataSource:{ api:'module_audit_closing_ledger', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'trace_id', label:{vi:'Trace', en:'Trace'}, type:'text' }, { key:'headline', label:{vi:'Headline', en:'Headline'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'severity', label:{vi:'Severity', en:'Severity'}, type:'badge' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] }, meta:{ module:'builder-round13', category:'audit' } },
+    'r13-operator-clearpath-grid': { type:'data-cards', title:{ vi:'Operator Clearpath Grid', en:'Operator Clearpath Grid' }, config:{ columns:3, titleKey:'task', subtitleKey:'guidance', badgeKey:'status', dataSource:{ api:'module_operator_clearpath', method:'GET', dataKey:'items' } }, meta:{ module:'builder-round13', category:'operator' } },
+    'r13-release-discipline-table': { type:'data-table', title:{ vi:'Release Discipline Table', en:'Release Discipline Table' }, config:{ pageSize:12, dataSource:{ api:'module_release_discipline', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'gate', label:{vi:'Gate', en:'Gate'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'window', label:{vi:'Window', en:'Window'}, type:'text' }, { key:'risk', label:{vi:'Risk', en:'Risk'}, type:'badge' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] }, meta:{ module:'builder-round13', category:'release' } },
+    'r13-executive-story-cards': { type:'data-cards', title:{ vi:'Executive Story Cards', en:'Executive Story Cards' }, config:{ columns:4, titleKey:'headline', subtitleKey:'insight', badgeKey:'status', dataSource:{ api:'module_executive_story_cards', method:'GET', dataKey:'items' } }, meta:{ module:'builder-round13', category:'executive' } },
+    'r13-supplier-command-radar': { type:'data-table', title:{ vi:'Supplier Command Radar', en:'Supplier Command Radar' }, config:{ pageSize:12, dataSource:{ api:'module_supplier_command_radar', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'supplier', label:{vi:'Supplier', en:'Supplier'}, type:'text' }, { key:'issue', label:{vi:'Issue', en:'Issue'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'risk', label:{vi:'Risk', en:'Risk'}, type:'badge' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] }, meta:{ module:'builder-round13', category:'supplier' } },
+    'r13-surface-qa-table': { type:'data-table', title:{ vi:'Surface QA Table', en:'Surface QA Table' }, config:{ pageSize:12, dataSource:{ api:'module_surface_qa', method:'GET', dataKey:'items' }, dataKey:'items', columns:[ { key:'surface', label:{vi:'Surface', en:'Surface'}, type:'text' }, { key:'rule', label:{vi:'Rule', en:'Rule'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'severity', label:{vi:'Severity', en:'Severity'}, type:'badge' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] }, meta:{ module:'builder-round13', category:'quality' } },
+    'r13-typography-command-cards': { type:'data-cards', title:{ vi:'Typography Command Cards', en:'Typography Command Cards' }, config:{ columns:4, titleKey:'token', subtitleKey:'value', badgeKey:'group', dataSource:{ api:'module_typography_command_cards', method:'GET', dataKey:'items' } }, meta:{ module:'builder-round13', category:'typography' } }
+  };
+  BE.BLOCK_TEMPLATES = BE.BLOCK_TEMPLATES || {};
+  _mergeRound13(BE.BLOCK_TEMPLATES, ROUND13_TEMPLATES);
+  BE.EXTRA_TEMPLATES = BE.EXTRA_TEMPLATES || {};
+  _mergeRound13(BE.EXTRA_TEMPLATES, ROUND13_TEMPLATES);
+  BE.MODULE_BUILDER_ULTRA_SCHEMA_VERSION = '2026-04-08-r13';
+  BE.MODULE_BUILDER_ULTIMATE_SCHEMA_VERSION = '2026-04-08-r13';
+  BE.MODULE_BUILDER_SUPREME_SCHEMA_VERSION = '2026-04-08-r13';
+  BE.MODULE_BUILDER_CINEMA_SCHEMA_VERSION = '2026-04-08-r13';
+  BE.MODULE_BUILDER_GLASS_SCHEMA_VERSION = '2026-04-08-r13';
+  BE.MODULE_BUILDER_ROUND13_TEMPLATES = Object.keys(ROUND13_TEMPLATES);
+})();

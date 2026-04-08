@@ -17255,6 +17255,602 @@ if(!window.__HM_MODULE_BUILDER_ULTRA_PATCH_R12__){
 }
 
 
+
+/* ============================================================================
+ * HESEM QMS — Module Builder Ultra Round 13
+ * Glass Command Theater · High-Contrast Professional Glass · Persistent Studio State
+ * ============================================================================ */
+if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-command-theater'){
+  window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ = '2026-04-08-r13-glass-command-theater';
+  var _r13PrevRenderBuilder = _renderBuilder;
+  var _r13PrevRenderPreview = _renderPreview;
+  var _r13PrevHandleClick = _handleClick;
+  var _r13_MODES = [
+    { key:'executive-frost', icon:'💠', titleVi:'Executive Frost', titleEn:'Executive Frost', subtitleVi:'Boardroom glass sáng rõ, dành cho executive scan nhanh', subtitleEn:'Boardroom glass with disciplined clarity for executive scanning' },
+    { key:'discipline-crystal', icon:'🧊', titleVi:'Discipline Crystal', titleEn:'Discipline Crystal', subtitleVi:'Glass trung tính, viền rõ, độ tương phản cao', subtitleEn:'Neutral glass with crisp edges and high contrast' },
+    { key:'audit-midnight', icon:'🌘', titleVi:'Audit Midnight', titleEn:'Audit Midnight', subtitleVi:'Tone tối sâu, glare thấp, nhấn traceability', subtitleEn:'Deep low-glare mode with strong traceability cues' },
+    { key:'operator-clearpath', icon:'🎯', titleVi:'Operator Clearpath', titleEn:'Operator Clearpath', subtitleVi:'Ưu tiên thao tác, cue trực quan, đọc nhanh', subtitleEn:'Action-first mode with fast scanning and clear cues' },
+    { key:'theater-sapphire', icon:'🛰️', titleVi:'Theater Sapphire', titleEn:'Theater Sapphire', subtitleVi:'Glass sang trọng, depth vừa đủ, chuyên nghiệp', subtitleEn:'Premium sapphire glass with restrained depth' }
+  ];
+
+  function _r13Arr(v){ return Array.isArray(v) ? v : []; }
+  function _r13SafeObject(v){ return v && typeof v === 'object' && !Array.isArray(v) ? v : {}; }
+  function _r13Clamp(v, min, max){ v = Number(v) || 0; return Math.max(min, Math.min(max, v)); }
+  function _r13Text(v, fallback){ return String(v == null || v === '' ? (fallback == null ? '' : fallback) : v); }
+  function _r13ModeMeta(key){
+    var found = null;
+    _r13_MODES.forEach(function(item){ if(item.key === key) found = item; });
+    return found || _r13_MODES[1];
+  }
+  function _r13EnsureState(){
+    if(state.r13Mode == null) state.r13Mode = 'discipline-crystal';
+    if(state.showR13Atlas == null) state.showR13Atlas = true;
+    if(state.showR13Sentinel == null) state.showR13Sentinel = true;
+    if(state.showR13Palette == null) state.showR13Palette = false;
+    if(state.showR13Discipline == null) state.showR13Discipline = true;
+    if(state.showR13ClassicLabs == null) state.showR13ClassicLabs = false;
+    if(state.showR13Focus == null) state.showR13Focus = !!state.showR12Focus;
+    if(state.showR13Compact == null) state.showR13Compact = true;
+  }
+  function _r13EnsureSchema(schema){
+    _r13EnsureState();
+    schema = _r13SafeObject(schema);
+    schema.moduleStudio = _r13SafeObject(schema.moduleStudio);
+    schema.moduleStudio.patchVersion = '2026-04-08-r13';
+    schema.moduleStudio.builderVersion = '2026-04-08-r13-glass-command-theater';
+    schema.glassStudio = _r13SafeObject(schema.glassStudio);
+    schema.glassExecutive = _r13SafeObject(schema.glassExecutive);
+    schema.themeLab = _r13SafeObject(schema.themeLab);
+    schema.typographyLab = _r13SafeObject(schema.typographyLab);
+    schema.accessOps = _r13SafeObject(schema.accessOps);
+    schema.visualQuality = _r13SafeObject(schema.visualQuality);
+    schema.publish = _r13SafeObject(schema.publish);
+    schema.releaseGov = _r13SafeObject(schema.releaseGov);
+    schema.decisionDesk = _r13SafeObject(schema.decisionDesk);
+    schema.round13Studio = _r13SafeObject(schema.round13Studio);
+    schema.commandTheater = _r13SafeObject(schema.commandTheater);
+    schema.contrastSentinel = _r13SafeObject(schema.contrastSentinel);
+    schema.paletteDiscipline = _r13SafeObject(schema.paletteDiscipline);
+
+    if(schema.round13Studio.mode) state.r13Mode = schema.round13Studio.mode;
+    else schema.round13Studio.mode = state.r13Mode || 'discipline-crystal';
+
+    if(schema.round13Studio.showAtlas == null) schema.round13Studio.showAtlas = !!state.showR13Atlas; else state.showR13Atlas = !!schema.round13Studio.showAtlas;
+    if(schema.round13Studio.showSentinel == null) schema.round13Studio.showSentinel = !!state.showR13Sentinel; else state.showR13Sentinel = !!schema.round13Studio.showSentinel;
+    if(schema.round13Studio.showPalette == null) schema.round13Studio.showPalette = !!state.showR13Palette; else state.showR13Palette = !!schema.round13Studio.showPalette;
+    if(schema.round13Studio.showDiscipline == null) schema.round13Studio.showDiscipline = !!state.showR13Discipline; else state.showR13Discipline = !!schema.round13Studio.showDiscipline;
+    if(schema.round13Studio.showClassicLabs == null) schema.round13Studio.showClassicLabs = !!state.showR13ClassicLabs; else state.showR13ClassicLabs = !!schema.round13Studio.showClassicLabs;
+    if(schema.round13Studio.focusCanvas == null) schema.round13Studio.focusCanvas = !!state.showR13Focus; else state.showR13Focus = !!schema.round13Studio.focusCanvas;
+    if(schema.round13Studio.compactChrome == null) schema.round13Studio.compactChrome = !!state.showR13Compact; else state.showR13Compact = !!schema.round13Studio.compactChrome;
+    if(!schema.round13Studio.shell) schema.round13Studio.shell = 'glass-command-theater';
+    if(!schema.round13Studio.commandTone) schema.round13Studio.commandTone = 'professional-glass';
+
+    if(!schema.glassStudio.contrastTarget) schema.glassStudio.contrastTarget = 'AAA';
+    if(!schema.glassStudio.edgeContrast) schema.glassStudio.edgeContrast = 'crisp';
+    if(!schema.glassStudio.glareControl) schema.glassStudio.glareControl = 'restrained';
+    if(!schema.glassExecutive.shell) schema.glassExecutive.shell = 'glass-command-theater';
+    if(!schema.glassExecutive.chrome) schema.glassExecutive.chrome = state.showR13Compact ? 'command-tight' : 'command-air';
+    if(!schema.glassExecutive.noise) schema.glassExecutive.noise = 'restrained';
+    if(!schema.themeLab.surface) schema.themeLab.surface = 'professional-frost';
+    if(!schema.themeLab.cardStyle) schema.themeLab.cardStyle = 'glass-command-card';
+    if(!schema.themeLab.elevation) schema.themeLab.elevation = 'disciplined';
+    if(!schema.typographyLab.scale) schema.typographyLab.scale = '15/22';
+    if(!schema.typographyLab.labels) schema.typographyLab.labels = 'high-contrast';
+    if(!schema.typographyLab.headings) schema.typographyLab.headings = 'semibold-tight';
+    if(!schema.accessOps.profile) schema.accessOps.profile = 'clarity-pro';
+    if(!schema.accessOps.contrastMode) schema.accessOps.contrastMode = 'high';
+    if(!schema.accessOps.focusRing) schema.accessOps.focusRing = 'precise';
+    if(!schema.visualQuality.glareBudget) schema.visualQuality.glareBudget = 'low';
+    if(!schema.visualQuality.chromeDiscipline) schema.visualQuality.chromeDiscipline = 'tight';
+    if(!schema.visualQuality.noiseLevel) schema.visualQuality.noiseLevel = 'minimal';
+    if(!schema.publish.releaseStrategy) schema.publish.releaseStrategy = 'gated-boardroom';
+    if(!_r13Arr(schema.releaseGov.gates).length) schema.releaseGov.gates = ['design-review','qa-signoff','release-approval'];
+    if(!_r13Arr(schema.decisionDesk.signoffBoard).length) schema.decisionDesk.signoffBoard = ['module-owner','quality-lead'];
+    if(!schema.decisionDesk.releaseWindow) schema.decisionDesk.releaseWindow = 'weekly';
+    if(!schema.commandTheater.storyline) schema.commandTheater.storyline = 'scan → decide → act → signoff';
+    if(!schema.commandTheater.hierarchy) schema.commandTheater.hierarchy = 'hero → toolbar → canvas → evidence';
+    if(!schema.contrastSentinel.target) schema.contrastSentinel.target = 'AAA';
+    if(!schema.contrastSentinel.glarePolicy) schema.contrastSentinel.glarePolicy = 'restrained';
+    if(!schema.paletteDiscipline.mode) schema.paletteDiscipline.mode = 'professional-glass';
+
+    if(schema.round12Studio){
+      schema.round12Studio.focusCanvas = !!state.showR13Focus;
+      schema.round12Studio.compactChrome = !!state.showR13Compact;
+      schema.round12Studio.showClassicLabs = !!state.showR13ClassicLabs;
+    }
+    state.showR12Focus = !!state.showR13Focus;
+    state.showR12Compact = !!state.showR13Compact;
+    state.showR12ClassicLabs = !!state.showR13ClassicLabs;
+    return schema;
+  }
+  function _r13SignalOf(block){
+    var type = _r13Text(block && block.type, '').toLowerCase();
+    var meta = _r13SafeObject(block && block.meta);
+    var category = _r13Text(meta.category, '').toLowerCase();
+    if(type.indexOf('approval') >= 0 || category.indexOf('governance') >= 0 || category.indexOf('audit') >= 0 || category.indexOf('release') >= 0 || category.indexOf('evidence') >= 0) return 'governance';
+    if(type.indexOf('form') >= 0 || type.indexOf('button') >= 0 || type.indexOf('workflow') >= 0 || type.indexOf('command') >= 0 || category.indexOf('action') >= 0 || category.indexOf('operator') >= 0) return 'action';
+    if(type.indexOf('banner') >= 0 || type.indexOf('hero') >= 0 || type.indexOf('timeline') >= 0 || category.indexOf('story') >= 0 || category.indexOf('executive') >= 0 || category.indexOf('narrative') >= 0) return 'narrative';
+    if(type.indexOf('chart') >= 0 || type.indexOf('kpi') >= 0 || type.indexOf('table') >= 0 || type.indexOf('cards') >= 0 || type.indexOf('grid') >= 0 || category.indexOf('data') >= 0 || category.indexOf('quality') >= 0 || category.indexOf('supplier') >= 0) return 'data';
+    return 'structure';
+  }
+  function _r13SignalLabel(key){
+    switch(key){
+      case 'governance': return _t('Governance', 'Governance');
+      case 'action': return _t('Action', 'Action');
+      case 'narrative': return _t('Narrative', 'Narrative');
+      case 'data': return _t('Data', 'Data');
+      default: return _t('Structure', 'Structure');
+    }
+  }
+  function _r13FocusHint(key){
+    switch(key){
+      case 'governance': return _t('Nhấn signoff, gate và trace', 'Lean into signoff, gates, and traceability');
+      case 'action': return _t('Làm nổi thao tác chính và cue hành động', 'Elevate next action and execution cues');
+      case 'narrative': return _t('Giữ câu chuyện điều hành ngắn và rõ', 'Keep the executive narrative short and sharp');
+      case 'data': return _t('Ưu tiên scan số liệu và threshold', 'Prioritize metric scanning and thresholds');
+      default: return _t('Siết bố cục và nhịp đọc', 'Tighten structure and scan rhythm');
+    }
+  }
+  function _r13AtlasRows(schema){
+    return _r13Arr(schema && schema.tabs).map(function(tab, idx){
+      var blocks = _r13Arr(tab && tab.blocks);
+      var counts = { data:0, action:0, governance:0, narrative:0, structure:0 };
+      blocks.forEach(function(block){ counts[_r13SignalOf(block)] += 1; });
+      var dominant = 'structure';
+      Object.keys(counts).forEach(function(key){ if(counts[key] > counts[dominant]) dominant = key; });
+      var ratio = blocks.length ? Math.round((counts[dominant] / blocks.length) * 100) : 0;
+      return {
+        tabId: tab && tab.id,
+        active: !!tab && tab.id === state.activeTab,
+        label: _r13Text(tab && tab.title, 'Tab ' + (idx + 1)),
+        count: blocks.length,
+        density: blocks.length > 8 ? _t('dense', 'dense') : (blocks.length > 4 ? _t('balanced', 'balanced') : _t('light', 'light')),
+        dominant: dominant,
+        dominantLabel: _r13SignalLabel(dominant),
+        ratio: ratio,
+        focus: _r13FocusHint(dominant)
+      };
+    });
+  }
+  function _r13ComputeMetrics(schema){
+    var tabs = _r13Arr(schema && schema.tabs);
+    var atlas = _r13AtlasRows(schema);
+    var totalBlocks = 0;
+    var maxBlocks = 0;
+    var emptyTabs = 0;
+    var signals = { data:0, action:0, governance:0, narrative:0, structure:0 };
+    tabs.forEach(function(tab){
+      var blocks = _r13Arr(tab && tab.blocks);
+      totalBlocks += blocks.length;
+      if(blocks.length > maxBlocks) maxBlocks = blocks.length;
+      if(!blocks.length) emptyTabs += 1;
+      blocks.forEach(function(block){ signals[_r13SignalOf(block)] += 1; });
+    });
+    var gateCount = _r13Arr(schema && schema.releaseGov && schema.releaseGov.gates).length;
+    var signoffCount = _r13Arr(schema && schema.decisionDesk && schema.decisionDesk.signoffBoard).length;
+    var dataCount = signals.data;
+    var actionCount = signals.action;
+    var governanceCount = signals.governance;
+    var narrativeCount = signals.narrative;
+    var clarity = 70 + (tabs.length ? Math.min(12, tabs.length * 2) : 0) + (schema && schema.glassStudio && schema.glassStudio.contrastTarget === 'AAA' ? 6 : 0) - (emptyTabs * 4) + (state.showR13Compact ? 3 : 0);
+    var command = 58 + Math.min(18, actionCount * 3) + Math.min(10, dataCount * 2) + (state.showR13Focus ? 4 : 0);
+    var governance = 56 + Math.min(18, governanceCount * 2) + Math.min(12, gateCount * 3) + Math.min(8, signoffCount * 2);
+    var comfort = 64 + (schema && schema.visualQuality && schema.visualQuality.glareBudget === 'low' ? 9 : 0) + (state.showR13Compact ? 4 : 0) + (schema && schema.glassExecutive && schema.glassExecutive.noise === 'restrained' ? 6 : 0);
+    var craft = Math.round((clarity + command + governance + comfort + Math.min(100, 62 + narrativeCount * 4)) / 5);
+    clarity = _r13Clamp(clarity, 0, 100);
+    command = _r13Clamp(command, 0, 100);
+    governance = _r13Clamp(governance, 0, 100);
+    comfort = _r13Clamp(comfort, 0, 100);
+    craft = _r13Clamp(craft, 0, 100);
+    var recommendations = [];
+    if(emptyTabs) recommendations.push(_t('Có tab trống; nên seed block hoặc gộp tab để nhịp đọc gọn hơn.', 'Empty tabs detected; seed them or merge them to tighten the reading rhythm.'));
+    if(actionCount < 2) recommendations.push(_t('Module còn thiếu cue hành động; thêm command lane hoặc operator card.', 'The module is light on action cues; add a command lane or operator card.'));
+    if(governanceCount < 2) recommendations.push(_t('Governance còn mỏng; thêm gate, signoff, hoặc audit ledger.', 'Governance is still thin; add gates, signoff, or an audit ledger.'));
+    if(narrativeCount < 1) recommendations.push(_t('Nên có một narrative ribbon để executive scan nhanh hơn.', 'Add a narrative ribbon to support faster executive scanning.'));
+    if((schema && schema.glassExecutive && schema.glassExecutive.noise) !== 'restrained') recommendations.push(_t('Đang còn dư noise; chuyển sang restrained để giảm glare.', 'Noise is still too strong; switch to restrained to reduce glare.'));
+    return {
+      totalTabs: tabs.length,
+      totalBlocks: totalBlocks,
+      maxBlocks: maxBlocks,
+      emptyTabs: emptyTabs,
+      gateCount: gateCount,
+      signoffCount: signoffCount,
+      clarity: clarity,
+      command: command,
+      governance: governance,
+      comfort: comfort,
+      craft: craft,
+      atlas: atlas,
+      signals: [
+        { key:'data', label:_r13SignalLabel('data'), count:dataCount, ratio: totalBlocks ? Math.round(dataCount * 100 / totalBlocks) : 0, note:_t('Metric scan + dashboards', 'Metric scan + dashboards') },
+        { key:'action', label:_r13SignalLabel('action'), count:actionCount, ratio: totalBlocks ? Math.round(actionCount * 100 / totalBlocks) : 0, note:_t('Execution cues + next action', 'Execution cues + next action') },
+        { key:'governance', label:_r13SignalLabel('governance'), count:governanceCount, ratio: totalBlocks ? Math.round(governanceCount * 100 / totalBlocks) : 0, note:_t('Gates + signoff + traceability', 'Gates + signoff + traceability') },
+        { key:'narrative', label:_r13SignalLabel('narrative'), count:narrativeCount, ratio: totalBlocks ? Math.round(narrativeCount * 100 / totalBlocks) : 0, note:_t('Story, focus, context', 'Story, focus, context') },
+        { key:'structure', label:_r13SignalLabel('structure'), count:signals.structure, ratio: totalBlocks ? Math.round(signals.structure * 100 / totalBlocks) : 0, note:_t('Composition and spacing structure', 'Composition and spacing structure') }
+      ],
+      recommendations: recommendations,
+      summary: _t('Glass professional hơn, contrast cao hơn, glare thấp hơn và giữ scan path rõ cho executive, operator, audit.', 'A more professional glass shell with higher contrast, lower glare, and a sharper scan path for executive, operator, and audit use.')
+    };
+  }
+  function _r13ModeButton(item, active){
+    return '<button class="mb-r13-mode' + (active ? ' is-active' : '') + '" data-action="r13-apply-mode" data-key="' + _esc(item.key) + '"><strong>' + _esc(item.icon + ' ' + _t(item.titleVi, item.titleEn)) + '</strong><small>' + _esc(_t(item.subtitleVi, item.subtitleEn)) + '</small></button>';
+  }
+  function _r13RenderDeck(schema, metrics){
+    var mode = state.r13Mode || (schema && schema.round13Studio && schema.round13Studio.mode) || 'discipline-crystal';
+    var h = '<section class="mb-r13-command-deck"><div class="mb-r13-deck-head"><div><div class="mb-r13-kicker">ROUND 13 · GLASS COMMAND THEATER</div><h3>' + _esc(_t('Glass chuyên nghiệp, rõ ràng, đỡ chói hơn cho module builder', 'Professional glass with disciplined contrast and lower glare for the module builder')) + '</h3><p>' + _esc(metrics.summary) + '</p><div class="mb-r13-chipline"><span>' + _esc(_t('Mode', 'Mode')) + ': ' + _esc(mode) + '</span><span>' + _esc(_t('Package', 'Package')) + ': ' + _esc((schema && schema.publish && schema.publish.packageName) || schema.moduleId || 'module') + '</span><span>' + _esc(_t('Gates', 'Gates')) + ': ' + _esc(String(metrics.gateCount)) + '</span><span>' + _esc(_t('Signoff', 'Signoff')) + ': ' + _esc(String(metrics.signoffCount)) + '</span></div></div>';
+    h += '<div class="mb-r13-stat-grid">';
+    h += '<div class="mb-r13-stat"><small>' + _esc(_t('Clarity', 'Clarity')) + '</small><strong>' + _esc(String(metrics.clarity)) + '%</strong><span>' + _esc(_t('contrast + scan path', 'contrast + scan path')) + '</span></div>';
+    h += '<div class="mb-r13-stat"><small>' + _esc(_t('Command', 'Command')) + '</small><strong>' + _esc(String(metrics.command)) + '%</strong><span>' + _esc(_t('actions + density', 'actions + density')) + '</span></div>';
+    h += '<div class="mb-r13-stat"><small>' + _esc(_t('Governance', 'Governance')) + '</small><strong>' + _esc(String(metrics.governance)) + '%</strong><span>' + _esc(_t('gates + signoff', 'gates + signoff')) + '</span></div>';
+    h += '<div class="mb-r13-stat"><small>' + _esc(_t('Comfort', 'Comfort')) + '</small><strong>' + _esc(String(metrics.comfort)) + '%</strong><span>' + _esc(_t('glare + restraint', 'glare + restraint')) + '</span></div>';
+    h += '<div class="mb-r13-stat"><small>' + _esc(_t('Finish', 'Finish')) + '</small><strong>' + _esc(String(metrics.craft)) + '%</strong><span>' + _esc(_t('overall polish', 'overall polish')) + '</span></div>';
+    h += '</div></div>';
+    h += '<div class="mb-r13-mode-grid">';
+    _r13_MODES.forEach(function(item){ h += _r13ModeButton(item, item.key === mode); });
+    h += '</div>';
+    h += '<div class="mb-r13-action-row"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r13-auto-polish">✨ ' + _esc(_t('Auto polish', 'Auto polish')) + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r13-export-operating-brief">🧾 ' + _esc(_t('Operating brief', 'Operating brief')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r13-toggle-atlas">🧭 ' + _esc(_t('Atlas', 'Atlas')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r13-toggle-sentinel">◐ ' + _esc(_t('Contrast sentinel', 'Contrast sentinel')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r13-toggle-palette">🎨 ' + _esc(_t('Palette board', 'Palette board')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r13-toggle-discipline">🧱 ' + _esc(_t('Discipline board', 'Discipline board')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r13-toggle-classic">🧪 ' + _esc(_t('Classic labs', 'Classic labs')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r13-toggle-focus">🎯 ' + _esc(state.showR13Focus ? _t('Normal canvas', 'Normal canvas') : _t('Focus canvas', 'Focus canvas')) + '</button><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="r13-toggle-compact">📏 ' + _esc(state.showR13Compact ? _t('Normal chrome', 'Normal chrome') : _t('Compact chrome', 'Compact chrome')) + '</button></div>';
+    h += '</section>';
+    return h;
+  }
+  function _r13RenderAtlasPanel(schema, metrics){
+    var h = '<section class="mb-r13-panel"><div class="mb-r13-panel-head"><strong>' + _esc(_t('Atlas navigator', 'Atlas navigator')) + '</strong><span>' + _esc(_t('tab density + dominant signal', 'tab density + dominant signal')) + '</span></div><div class="mb-r13-atlas-list">';
+    metrics.atlas.forEach(function(row){ h += '<button class="mb-r13-atlas-item' + (row.active ? ' is-active' : '') + '" data-action="r13-jump-tab" data-tab-id="' + _esc(row.tabId || '') + '"><div><strong>' + _esc(row.label) + '</strong><small>' + _esc(row.count + ' blocks · ' + row.density) + '</small><span>' + _esc(row.focus) + '</span></div><div class="mb-r13-mini"><b>' + _esc(row.dominantLabel) + '</b><div class="mb-r13-bar"><span style="width:' + _esc(String(row.ratio)) + '%"></span></div></div></button>'; });
+    if(!metrics.atlas.length) h += '<div class="mb-r13-note">' + _esc(_t('Chưa có tab để dựng atlas navigator.', 'No tabs yet to build the atlas navigator.')) + '</div>';
+    h += '</div></section>';
+    return h;
+  }
+  function _r13RenderSentinelPanel(schema, metrics){
+    var h = '<section class="mb-r13-panel"><div class="mb-r13-panel-head"><strong>' + _esc(_t('Contrast sentinel', 'Contrast sentinel')) + '</strong><span>' + _esc(_t('glare discipline + typography control', 'glare discipline + typography control')) + '</span></div>';
+    h += '<div class="mb-r13-line-grid">';
+    h += '<div><small>' + _esc(_t('Contrast target', 'Contrast target')) + '</small><strong>' + _esc((schema.glassStudio || {}).contrastTarget || 'AAA') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Edge contrast', 'Edge contrast')) + '</small><strong>' + _esc((schema.glassStudio || {}).edgeContrast || 'crisp') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Glare policy', 'Glare policy')) + '</small><strong>' + _esc((schema.visualQuality || {}).glareBudget || (schema.glassStudio || {}).glareControl || 'low') + '</strong></div>';
+    h += '<div><small>' + _esc(_t('Chrome discipline', 'Chrome discipline')) + '</small><strong>' + _esc((schema.visualQuality || {}).chromeDiscipline || 'tight') + '</strong></div>';
+    h += '</div>';
+    h += '<div class="mb-r13-meter"><span style="width:' + _esc(String(Math.round((metrics.clarity + metrics.comfort) / 2))) + '%"></span></div>';
+    h += '<div class="mb-r13-note">' + _esc(_t('Contrast sentinel giúp giữ glass đẹp nhưng không bị washout khi làm việc lâu.', 'The contrast sentinel keeps the glass premium without turning washed out during long working sessions.')) + '</div>';
+    return h + '</section>';
+  }
+  function _r13RenderPalettePanel(schema, metrics){
+    var h = '<section class="mb-r13-panel"><div class="mb-r13-panel-head"><strong>' + _esc(_t('Palette discipline', 'Palette discipline')) + '</strong><span>' + _esc(_t('shell, surface, card, glow', 'shell, surface, card, glow')) + '</span></div>';
+    h += '<ul class="mb-r13-list">';
+    h += '<li><strong>' + _esc(_t('Shell', 'Shell')) + ':</strong> ' + _esc((schema.glassExecutive || {}).shell || 'glass-command-theater') + '</li>';
+    h += '<li><strong>' + _esc(_t('Chrome', 'Chrome')) + ':</strong> ' + _esc((schema.glassExecutive || {}).chrome || 'command-tight') + '</li>';
+    h += '<li><strong>' + _esc(_t('Noise', 'Noise')) + ':</strong> ' + _esc((schema.glassExecutive || {}).noise || 'restrained') + '</li>';
+    h += '<li><strong>' + _esc(_t('Surface', 'Surface')) + ':</strong> ' + _esc((schema.themeLab || {}).surface || 'professional-frost') + '</li>';
+    h += '<li><strong>' + _esc(_t('Card style', 'Card style')) + ':</strong> ' + _esc((schema.themeLab || {}).cardStyle || 'glass-command-card') + '</li>';
+    h += '</ul>';
+    h += '<div class="mb-r13-note">' + _esc(_t('Palette board siết số lượng hiệu ứng để giao diện sang mà vẫn chuyên nghiệp.', 'The palette board constrains decorative effects so the interface stays premium yet professional.')) + '</div>';
+    return h + '</section>';
+  }
+  function _r13RenderDisciplinePanel(schema, metrics){
+    var h = '<section class="mb-r13-panel"><div class="mb-r13-panel-head"><strong>' + _esc(_t('Operating discipline', 'Operating discipline')) + '</strong><span>' + _esc(_t('signal mix + recommendations', 'signal mix + recommendations')) + '</span></div>';
+    h += '<div class="mb-r13-line-grid">';
+    metrics.signals.slice(0,4).forEach(function(item){ h += '<div><small>' + _esc(item.label) + '</small><strong>' + _esc(String(item.ratio)) + '%</strong></div>'; });
+    h += '</div><ul class="mb-r13-list">';
+    metrics.recommendations.forEach(function(item){ h += '<li>' + _esc(item) + '</li>'; });
+    if(!metrics.recommendations.length) h += '<li>' + _esc(_t('Module đang khá cân bằng; giữ scan path hiện tại.', 'The module is already fairly balanced; preserve the current scan path.')) + '</li>';
+    h += '</ul></section>';
+    return h;
+  }
+  function _r13RenderPanels(schema, metrics){
+    var parts = [];
+    if(state.showR13Atlas) parts.push(_r13RenderAtlasPanel(schema, metrics));
+    if(state.showR13Sentinel) parts.push(_r13RenderSentinelPanel(schema, metrics));
+    if(state.showR13Palette) parts.push(_r13RenderPalettePanel(schema, metrics));
+    if(state.showR13Discipline) parts.push(_r13RenderDisciplinePanel(schema, metrics));
+    if(!parts.length) return '';
+    return '<div class="mb-r13-panel-grid">' + parts.join('') + '</div>';
+  }
+  function _r13SaveStudioState(){
+    if(state.schema){
+      _r13EnsureSchema(state.schema);
+      state.schema.round13Studio.mode = state.r13Mode || state.schema.round13Studio.mode || 'discipline-crystal';
+      state.schema.round13Studio.showAtlas = !!state.showR13Atlas;
+      state.schema.round13Studio.showSentinel = !!state.showR13Sentinel;
+      state.schema.round13Studio.showPalette = !!state.showR13Palette;
+      state.schema.round13Studio.showDiscipline = !!state.showR13Discipline;
+      state.schema.round13Studio.showClassicLabs = !!state.showR13ClassicLabs;
+      state.schema.round13Studio.focusCanvas = !!state.showR13Focus;
+      state.schema.round13Studio.compactChrome = !!state.showR13Compact;
+      if(typeof _r7SyncManifest === 'function') _r7SyncManifest(state.schema);
+      if(typeof _saveModule === 'function') _saveModule();
+    }
+  }
+  function _r13ApplyMode(key){
+    _r13EnsureState();
+    var meta = _r13ModeMeta(key);
+    state.r13Mode = meta.key;
+    if(state.schema){
+      _r13EnsureSchema(state.schema);
+      state.schema.round13Studio.mode = meta.key;
+      state.schema.round13Studio.commandTone = meta.key;
+      if(meta.key === 'audit-midnight'){
+        state.schema.glassExecutive.noise = 'minimal';
+        state.schema.glassExecutive.chrome = 'audit-tight';
+        state.schema.themeLab.surface = 'midnight-ice';
+      } else if(meta.key === 'operator-clearpath'){
+        state.schema.glassExecutive.noise = 'restrained';
+        state.schema.glassExecutive.chrome = 'operator-tight';
+        state.schema.themeLab.surface = 'clearpath-frost';
+      } else if(meta.key === 'executive-frost'){
+        state.schema.glassExecutive.noise = 'soft';
+        state.schema.glassExecutive.chrome = 'executive-tight';
+        state.schema.themeLab.surface = 'executive-frost';
+      } else if(meta.key === 'theater-sapphire'){
+        state.schema.glassExecutive.noise = 'restrained';
+        state.schema.glassExecutive.chrome = 'sapphire-tight';
+        state.schema.themeLab.surface = 'sapphire-frost';
+      } else {
+        state.schema.glassExecutive.noise = 'restrained';
+        state.schema.glassExecutive.chrome = 'command-tight';
+        state.schema.themeLab.surface = 'professional-frost';
+      }
+      _r13SaveStudioState();
+    }
+    _paint();
+  }
+  function _r13AutoPolish(){
+    if(!state.schema) return;
+    var schema = _r13EnsureSchema(state.schema);
+    var metrics = _r13ComputeMetrics(schema);
+    schema.round13Studio.mode = state.r13Mode || 'discipline-crystal';
+    schema.glassStudio.contrastTarget = 'AAA';
+    schema.glassStudio.edgeContrast = metrics.clarity >= 90 ? 'surgical' : 'crisp';
+    schema.glassStudio.glareControl = 'restrained';
+    schema.glassExecutive.shell = 'glass-command-theater';
+    schema.glassExecutive.chrome = state.showR13Compact ? 'command-tight' : 'command-air';
+    schema.glassExecutive.noise = metrics.totalBlocks > 14 ? 'minimal' : 'restrained';
+    schema.themeLab.surface = 'professional-frost';
+    schema.themeLab.cardStyle = 'glass-command-card';
+    schema.themeLab.elevation = 'disciplined';
+    schema.typographyLab.scale = metrics.totalBlocks > 10 ? '14/20' : '15/22';
+    schema.typographyLab.labels = 'high-contrast';
+    schema.typographyLab.headings = 'semibold-tight';
+    schema.accessOps.profile = 'clarity-pro';
+    schema.accessOps.contrastMode = 'high';
+    schema.accessOps.focusRing = 'precise';
+    schema.visualQuality.glareBudget = 'low';
+    schema.visualQuality.chromeDiscipline = 'tight';
+    schema.visualQuality.noiseLevel = 'minimal';
+    schema.commandTheater.storyline = 'scan → decide → act → signoff';
+    schema.commandTheater.hierarchy = 'hero → toolbar → canvas → evidence';
+    schema.contrastSentinel.target = 'AAA';
+    schema.contrastSentinel.glarePolicy = 'restrained';
+    schema.paletteDiscipline.mode = state.r13Mode || 'discipline-crystal';
+    if(!_r13Arr(schema.releaseGov.gates).length) schema.releaseGov.gates = ['design-review','qa-signoff','release-approval'];
+    if(!_r13Arr(schema.decisionDesk.signoffBoard).length) schema.decisionDesk.signoffBoard = ['module-owner','quality-lead'];
+    state.showR13Compact = true;
+    state.showR13ClassicLabs = false;
+    if(metrics.maxBlocks > 10 || metrics.emptyTabs === 0) state.showR13Focus = true;
+    state.showR13Atlas = true;
+    state.showR13Sentinel = true;
+    state.showR13Discipline = true;
+    _r13SaveStudioState();
+    _paint();
+  }
+  function _r13DownloadText(filename, text, mime){
+    if(typeof document === 'undefined' || typeof Blob === 'undefined' || !document.createElement || !(window.URL || window.webkitURL)) return text;
+    try {
+      var blob = new Blob([String(text == null ? '' : text)], { type: mime || 'text/plain;charset=utf-8' });
+      var url = (window.URL || window.webkitURL).createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      if(document.body && document.body.appendChild) document.body.appendChild(link);
+      if(link.click) link.click();
+      setTimeout(function(){
+        try { if(document.body && document.body.removeChild) document.body.removeChild(link); } catch(err){}
+        try { (window.URL || window.webkitURL).revokeObjectURL(url); } catch(err){}
+      }, 0);
+    } catch(err){ return text; }
+    return text;
+  }
+  function _r13BuildOperatingBrief(schema){
+    schema = _r13EnsureSchema(schema || {});
+    var metrics = _r13ComputeMetrics(schema);
+    var lines = [];
+    lines.push('# Module Builder Round 13 - Glass Command Theater Operating Brief');
+    lines.push('');
+    lines.push('- Module: ' + (schema.moduleId || 'module'));
+    lines.push('- Package: ' + ((schema.publish || {}).packageName || schema.moduleId || 'module-package'));
+    lines.push('- Mode: ' + ((schema.round13Studio || {}).mode || state.r13Mode || 'discipline-crystal'));
+    lines.push('- Focus canvas: ' + (state.showR13Focus ? 'on' : 'off'));
+    lines.push('- Compact chrome: ' + (state.showR13Compact ? 'on' : 'off'));
+    lines.push('- Classic labs: ' + (state.showR13ClassicLabs ? 'visible' : 'hidden'));
+    lines.push('');
+    lines.push('## Command scores');
+    lines.push('- Clarity: ' + metrics.clarity + '%');
+    lines.push('- Command: ' + metrics.command + '%');
+    lines.push('- Governance: ' + metrics.governance + '%');
+    lines.push('- Comfort: ' + metrics.comfort + '%');
+    lines.push('- Finish: ' + metrics.craft + '%');
+    lines.push('');
+    lines.push('## Atlas');
+    metrics.atlas.forEach(function(row){ lines.push('- ' + row.label + ': ' + row.count + ' blocks / ' + row.density + ' / ' + row.dominantLabel + ' / ' + row.focus); });
+    if(!metrics.atlas.length) lines.push('- No tabs yet.');
+    lines.push('');
+    lines.push('## Signal mix');
+    metrics.signals.forEach(function(item){ lines.push('- ' + item.label + ': ' + item.count + ' blocks / ' + item.ratio + '% / ' + item.note); });
+    lines.push('');
+    lines.push('## Contrast contract');
+    lines.push('- Shell: ' + ((schema.glassExecutive || {}).shell || 'glass-command-theater'));
+    lines.push('- Chrome: ' + ((schema.glassExecutive || {}).chrome || 'command-tight'));
+    lines.push('- Noise: ' + ((schema.glassExecutive || {}).noise || 'restrained'));
+    lines.push('- Surface: ' + ((schema.themeLab || {}).surface || 'professional-frost'));
+    lines.push('- Card style: ' + ((schema.themeLab || {}).cardStyle || 'glass-command-card'));
+    lines.push('- Contrast target: ' + ((schema.glassStudio || {}).contrastTarget || 'AAA'));
+    lines.push('- Glare control: ' + ((schema.glassStudio || {}).glareControl || 'restrained'));
+    lines.push('');
+    lines.push('## Recommendations');
+    metrics.recommendations.forEach(function(item){ lines.push('- ' + item); });
+    if(!metrics.recommendations.length) lines.push('- Preserve the current signal balance and restraint level.');
+    return lines.join('\n');
+  }
+  function _r13ExportOperatingBrief(){
+    if(!state.schema) return '';
+    return _r13DownloadText('module-builder-round13-glass-command-theater-operating-brief.md', _r13BuildOperatingBrief(state.schema), 'text/markdown;charset=utf-8');
+  }
+  function _r13SetFocus(flag){ _r13EnsureState(); state.showR13Focus = !!flag; _r13SaveStudioState(); _paint(); }
+  function _r13SetCompact(flag){ _r13EnsureState(); state.showR13Compact = !!flag; if(state.schema){ _r13EnsureSchema(state.schema); state.schema.glassExecutive.chrome = !!flag ? 'command-tight' : 'command-air'; } _r13SaveStudioState(); _paint(); }
+  function _r13ToggleClassic(){ _r13EnsureState(); state.showR13ClassicLabs = !state.showR13ClassicLabs; _r13SaveStudioState(); _paint(); }
+  function _r13TogglePanel(key){
+    _r13EnsureState();
+    if(key === 'atlas') state.showR13Atlas = !state.showR13Atlas;
+    if(key === 'sentinel') state.showR13Sentinel = !state.showR13Sentinel;
+    if(key === 'palette') state.showR13Palette = !state.showR13Palette;
+    if(key === 'discipline') state.showR13Discipline = !state.showR13Discipline;
+    _r13SaveStudioState();
+    _paint();
+  }
+  function _r13RemoveExisting(host){
+    if(!host || !host.querySelectorAll) return;
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r13-command-deck,.mb-r13-panel-grid,.mb-r12-command-deck,.mb-r12-panel-grid,.mb-r11-command-deck,.mb-r11-panel-grid,.mb-r10-executive-rail,.mb-r10-panel-grid,.mb-r9-glass-rail,.mb-r9-panel-grid'), function(node){ if(node && node.parentNode) node.parentNode.removeChild(node); });
+  }
+  function _r13AppendHtml(doc, parent, anchor, html){
+    var wrap;
+    if(!doc || !parent || !doc.createElement) return;
+    wrap = doc.createElement('div');
+    wrap.innerHTML = html;
+    while(wrap.firstChild){
+      if(anchor && anchor.parentNode === parent) parent.insertBefore(wrap.firstChild, anchor);
+      else parent.appendChild(wrap.firstChild);
+    }
+  }
+  function _r13DecorateHost(host, previewOnly){
+    var doc = host && host.ownerDocument ? host.ownerDocument : (typeof document !== 'undefined' ? document : null);
+    var shell = host && host.querySelector ? host.querySelector('.mb-r12-shell,.mb-r11-shell,.mb-r10-shell,.mb-r9-shell,.mb-r8-shell,.mb-r7-shell') : null;
+    var builderShell = host && host.querySelector ? host.querySelector('.mb-builder-shell') : null;
+    var mainPanel = host && host.querySelector ? host.querySelector('.mb-main-panel') : null;
+    var shellAnchor;
+    var metrics;
+    if(host && host.querySelectorAll){
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-side-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r13-side-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-rail-panel'), function(node){ if(node && node.classList) node.classList.add('mb-r13-rail-panel'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-block-card'), function(node){ if(node && node.classList) node.classList.add('mb-r13-block-card'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-canvas-root'), function(node){ if(node && node.classList) node.classList.add('mb-r13-canvas-root'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-main-panel>.mb-toolbar'), function(node){ if(node && node.classList) node.classList.add('mb-r13-toolbar'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-tab-pill'), function(node){ if(node && node.classList) node.classList.add('mb-r13-tab-pill'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r7-panel-grid,.mb-r12-classic-panels'), function(node){ if(node && node.classList){ node.classList.add('mb-r13-classic-panels'); if(state.showR13ClassicLabs) node.classList.add('is-visible'); else node.classList.remove('is-visible'); } });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r12-preview-shell,.mb-r11-preview-shell,.mb-r10-preview-shell,.mb-r9-preview-shell,.mb-r7-preview-shell'), function(node){ if(node && node.classList) node.classList.add('mb-r13-preview-shell'); });
+      Array.prototype.forEach.call(host.querySelectorAll('.mb-r12-preview-ribbon,.mb-r11-preview-ribbon,.mb-r10-preview-ribbon,.mb-r9-preview-ribbon,.mb-r7-preview-ribbon'), function(node){ if(node && node.classList) node.classList.add('mb-r13-preview-ribbon'); });
+    }
+    if(builderShell && builderShell.classList){
+      builderShell.classList.add('mb-r13-builder-shell');
+      if(state.showR13Focus) builderShell.classList.add('is-r13-focus'); else builderShell.classList.remove('is-r13-focus');
+      if(state.showR13Compact) builderShell.classList.add('is-r13-compact'); else builderShell.classList.remove('is-r13-compact');
+    }
+    if(mainPanel && mainPanel.classList) mainPanel.classList.add('mb-r13-main-panel');
+    if(shell && shell.classList) shell.classList.add('mb-r13-shell');
+    if(!shell || previewOnly || !state.schema) return;
+    _r13RemoveExisting(host);
+    _r13EnsureSchema(state.schema);
+    metrics = _r13ComputeMetrics(state.schema);
+    shellAnchor = shell.querySelector('.mb-r7-panel-grid,.mb-r12-classic-panels,.mb-r13-classic-panels');
+    _r13AppendHtml(doc, shell, shellAnchor, _r13RenderDeck(state.schema, metrics) + _r13RenderPanels(state.schema, metrics));
+  }
+  function _r13NormalizeHtml(html, previewOnly){
+    var host;
+    html = String(html || '');
+    if(typeof document === 'undefined' || !document.createElement) return html;
+    host = document.createElement('div');
+    host.innerHTML = html;
+    _r13DecorateHost(host, !!previewOnly);
+    return host.innerHTML;
+  }
+  function _r13InjectStyles(){
+    var style;
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-module-builder-round13-style')) return;
+    style = document.createElement('style');
+    style.id = 'hm-module-builder-round13-style';
+    style.textContent = [
+      '.mb-r13-shell{position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(145deg,rgba(7,12,24,.99) 0%,rgba(12,20,36,.985) 42%,rgba(21,31,52,.965) 78%,rgba(56,96,180,.20) 100%);border:1px solid rgba(255,255,255,.10);box-shadow:0 28px 72px rgba(2,6,23,.28)}',
+      '.mb-r13-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 0%,rgba(255,255,255,.08),transparent 30%),radial-gradient(circle at 100% 0%,rgba(59,130,246,.10),transparent 32%),linear-gradient(180deg,rgba(255,255,255,.025),transparent 34%);pointer-events:none}',
+      '.mb-r13-shell>*{position:relative;z-index:1}',
+      '.mb-r13-shell .mb-r12-command-deck,.mb-r13-shell .mb-r12-panel-grid,.mb-r13-shell .mb-r11-command-deck,.mb-r13-shell .mb-r11-panel-grid,.mb-r13-shell .mb-r10-executive-rail,.mb-r13-shell .mb-r10-panel-grid,.mb-r13-shell .mb-r9-glass-rail,.mb-r13-shell .mb-r9-panel-grid{display:none!important}',
+      '.mb-r13-command-deck,.mb-r13-panel{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}',
+      '.mb-r13-command-deck{padding:18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.14);box-shadow:0 16px 38px rgba(2,6,23,.18);margin:0 0 12px}',
+      '.mb-r13-deck-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:14px}',
+      '.mb-r13-kicker{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#93c5fd;margin-bottom:8px}',
+      '.mb-r13-command-deck h3{margin:0 0 8px;font-size:32px;line-height:1.04;letter-spacing:-.025em;color:#fff}',
+      '.mb-r13-command-deck p{margin:0;color:rgba(241,245,249,.90);max-width:820px;line-height:1.55}',
+      '.mb-r13-chipline{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.mb-r13-chipline span{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);color:#f8fafc;font-size:12px}',
+      '.mb-r13-stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;min-width:420px}.mb-r13-stat{padding:12px 14px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.12)}.mb-r13-stat small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r13-stat strong{display:block;color:#fff;font-size:22px;line-height:1.05;margin-bottom:3px}.mb-r13-stat span{display:block;color:#dbeafe;font-size:11px}',
+      '.mb-r13-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:12px}.mb-r13-mode{padding:12px;border-radius:16px;text-align:left;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:#fff;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease}.mb-r13-mode:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.20);background:rgba(255,255,255,.10)}.mb-r13-mode.is-active{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.10));border-color:rgba(255,255,255,.22);box-shadow:0 10px 22px rgba(2,6,23,.18)}.mb-r13-mode strong{display:block;font-size:13px;margin-bottom:4px}.mb-r13-mode small{display:block;color:#dbeafe;line-height:1.45}',
+      '.mb-r13-action-row{display:flex;flex-wrap:wrap;gap:8px}',
+      '.mb-r13-panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin:12px 0 0}.mb-r13-panel{padding:15px;border-radius:18px;background:linear-gradient(180deg,rgba(10,18,33,.34),rgba(10,18,33,.24));border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 28px rgba(2,6,23,.14)}',
+      '.mb-r13-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.mb-r13-panel-head strong{color:#fff}.mb-r13-panel-head span{color:#bfdbfe;font-size:12px}',
+      '.mb-r13-atlas-list{display:grid;gap:10px}.mb-r13-atlas-item{display:grid;grid-template-columns:minmax(0,1fr) 138px;gap:12px;align-items:center;padding:12px;border-radius:14px;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);color:#fff;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease}.mb-r13-atlas-item:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.20);background:rgba(255,255,255,.11)}.mb-r13-atlas-item.is-active{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.10));border-color:rgba(255,255,255,.22)}.mb-r13-atlas-item strong{display:block;font-size:13px;margin-bottom:4px}.mb-r13-atlas-item small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r13-atlas-item span{display:block;color:#e2e8f0;line-height:1.45}.mb-r13-mini{display:grid;gap:6px}.mb-r13-mini b{color:#fff;font-size:12px}',
+      '.mb-r13-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden}.mb-r13-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#60a5fa,#38bdf8,#34d399)}',
+      '.mb-r13-line-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}.mb-r13-line-grid>div{padding:12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10)}.mb-r13-line-grid small{display:block;color:#bfdbfe;margin-bottom:4px}.mb-r13-line-grid strong{display:block;color:#fff}',
+      '.mb-r13-meter{height:10px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;margin:8px 0 10px}.mb-r13-meter span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#60a5fa,#22d3ee,#34d399)}',
+      '.mb-r13-list{margin:10px 0 0;padding-left:18px;color:#e2e8f0}.mb-r13-list li{margin:6px 0;line-height:1.45}.mb-r13-note{margin-top:8px;color:#dbeafe;line-height:1.5}',
+      '.mb-r13-builder-shell{gap:14px!important}.mb-r13-side-panel,.mb-r13-main-panel,.mb-r13-rail-panel{background:linear-gradient(180deg,rgba(255,255,255,.99),rgba(248,250,252,.985));border:1px solid rgba(148,163,184,.20);box-shadow:0 18px 38px rgba(2,6,23,.06);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}',
+      '.mb-r13-main-panel>.mb-r13-toolbar,.mb-r13-main-panel>.mb-toolbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(255,255,255,.995),rgba(248,250,252,.985));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 24px rgba(2,6,23,.05);border-bottom:1px solid rgba(148,163,184,.16)}',
+      '.mb-r13-canvas-root{background:radial-gradient(circle at 50% -24%,rgba(255,255,255,1),rgba(249,250,252,.998) 44%,rgba(241,245,249,.99) 100%),linear-gradient(0deg,rgba(148,163,184,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);background-size:auto,26px 26px,26px 26px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}',
+      '.mb-r13-block-card{border-color:rgba(148,163,184,.22)!important;box-shadow:0 12px 24px rgba(2,6,23,.05)!important;background:linear-gradient(180deg,rgba(255,255,255,.998),rgba(248,250,252,.985))!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}.mb-r13-block-card:hover{transform:translateY(-1px);box-shadow:0 16px 30px rgba(2,6,23,.08)!important;border-color:rgba(96,165,250,.28)!important}.mb-r13-block-card .mb-block-name,.mb-r13-block-card .mb-block-type{color:#0f172a}',
+      '.mb-r13-main-panel .hm-btn.hm-btn-sm{border-radius:12px}.mb-r13-main-panel .hm-btn.hm-btn-primary{box-shadow:0 10px 18px rgba(37,99,235,.16)}.mb-r13-main-panel .hm-btn.hm-btn-ghost,.mb-r13-main-panel .hm-btn.hm-btn-secondary{background:rgba(255,255,255,.95)}',
+      '.mb-r13-tab-pill{box-shadow:0 8px 18px rgba(2,6,23,.04);border:1px solid rgba(148,163,184,.16);background:rgba(255,255,255,.97)}',
+      '.mb-r13-builder-shell.is-r13-focus{grid-template-columns:minmax(0,1fr)!important}.mb-r13-builder-shell.is-r13-focus .mb-r13-side-panel,.mb-r13-builder-shell.is-r13-focus .mb-r13-rail-panel{display:none!important}.mb-r13-builder-shell.is-r13-focus .mb-r13-main-panel{grid-column:1/-1}',
+      '.mb-r13-builder-shell.is-r13-compact .mb-r13-side-panel,.mb-r13-builder-shell.is-r13-compact .mb-r13-main-panel,.mb-r13-builder-shell.is-r13-compact .mb-r13-rail-panel{border-radius:16px}.mb-r13-builder-shell.is-r13-compact .mb-r13-main-panel>.mb-r13-toolbar,.mb-r13-builder-shell.is-r13-compact .mb-r13-main-panel>.mb-toolbar{padding-top:10px;padding-bottom:10px}.mb-r13-builder-shell.is-r13-compact .mb-r13-block-card{padding-top:10px;padding-bottom:10px}',
+      '.mb-r13-classic-panels:not(.is-visible){display:none!important}',
+      '.mb-r13-preview-shell .mb-r13-preview-ribbon,.mb-r13-preview-ribbon{background:linear-gradient(90deg,rgba(8,15,28,.96),rgba(30,64,175,.84),rgba(8,145,178,.72));border:1px solid rgba(255,255,255,.12)}.mb-r13-preview-ribbon span{background:rgba(255,255,255,.92);color:#0f172a}',
+      '.mb-r13-shell .hm-btn.hm-btn-secondary,.mb-r13-shell .hm-btn.hm-btn-ghost{background:rgba(255,255,255,.92);color:#0f172a;border:1px solid rgba(148,163,184,.18)}.mb-r13-shell .hm-btn.hm-btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:rgba(255,255,255,.12);box-shadow:0 10px 20px rgba(37,99,235,.18)}',
+      '@media (max-width:1180px){.mb-r13-deck-head{flex-direction:column}.mb-r13-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr));min-width:0;width:100%}}',
+      '@media (max-width:920px){.mb-r13-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mb-r13-shell{padding:16px}}',
+      '@media (max-width:640px){.mb-r13-mode-grid,.mb-r13-panel-grid,.mb-r13-line-grid{grid-template-columns:1fr}.mb-r13-action-row{flex-direction:column;align-items:stretch}.mb-r13-atlas-item{grid-template-columns:1fr}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  _renderBuilder = function(){
+    var html;
+    _r13EnsureState();
+    if(state.schema) _r13EnsureSchema(state.schema);
+    _r13InjectStyles();
+    html = _r13PrevRenderBuilder();
+    return _r13NormalizeHtml(html, false);
+  };
+  _renderPreview = function(){
+    var html;
+    _r13EnsureState();
+    if(state.schema) _r13EnsureSchema(state.schema);
+    _r13InjectStyles();
+    html = _r13PrevRenderPreview();
+    return _r13NormalizeHtml(html, true);
+  };
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r13-auto-polish': _r13AutoPolish(); return;
+        case 'r13-export-operating-brief': _r13ExportOperatingBrief(); return;
+        case 'r13-toggle-atlas': _r13TogglePanel('atlas'); return;
+        case 'r13-toggle-sentinel': _r13TogglePanel('sentinel'); return;
+        case 'r13-toggle-palette': _r13TogglePanel('palette'); return;
+        case 'r13-toggle-discipline': _r13TogglePanel('discipline'); return;
+        case 'r13-toggle-classic': _r13ToggleClassic(); return;
+        case 'r13-toggle-focus': _r13SetFocus(!state.showR13Focus); return;
+        case 'r13-toggle-compact': _r13SetCompact(!state.showR13Compact); return;
+        case 'r13-jump-tab': state.activeTab = btn.getAttribute('data-tab-id') || state.activeTab; state.selectedBlock = null; _paint(); return;
+        case 'r13-apply-mode': _r13ApplyMode(btn.getAttribute('data-key') || 'discipline-crystal'); return;
+      }
+    }
+    return _r13PrevHandleClick(e);
+  };
+
+  window.__HM_MB_R13_TEST__ = {
+    version:'2026-04-08-r13-glass-command-theater',
+    computeMetrics:function(schema){ _r13EnsureState(); return _r13ComputeMetrics(_r13EnsureSchema(schema || state.schema || {})); },
+    buildOperatingBrief:function(schema){ _r13EnsureState(); return _r13BuildOperatingBrief(_r13EnsureSchema(schema || state.schema || {})); },
+    renderDeck:function(schema){ _r13EnsureState(); schema = _r13EnsureSchema(schema || state.schema || {}); return _r13RenderDeck(schema, _r13ComputeMetrics(schema)); },
+    renderPanels:function(schema){ _r13EnsureState(); schema = _r13EnsureSchema(schema || state.schema || {}); return _r13RenderPanels(schema, _r13ComputeMetrics(schema)); },
+    normalizeHtml:function(html, previewOnly){ _r13EnsureState(); return _r13NormalizeHtml(html, !!previewOnly); }
+  };
+  if(window.__HM_MB_R12_TEST__) window.__HM_MB_R12_TEST__.round13 = window.__HM_MB_R13_TEST__;
+}
+
 window._renderModuleBuilder = render;
 
 })();
