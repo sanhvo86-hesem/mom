@@ -1,0 +1,22 @@
+{
+  "runtimeDesign": {
+    "preset": "executive-glass",
+    "surface": "glass",
+    "accent": "cyan",
+    "density": "comfortable",
+    "radius": "xl",
+    "depth": "soft",
+    "header": "hero",
+    "tabs": "pill",
+    "card": "glass",
+    "table": "clean",
+    "maxWidth": "1360",
+    "gap": "16"
+  },
+  "builderManifest": {
+    "presentationPreset": "executive-glass",
+    "presentationSurface": "glass",
+    "presentationDensity": "comfortable",
+    "presentationHeader": "hero"
+  }
+}
