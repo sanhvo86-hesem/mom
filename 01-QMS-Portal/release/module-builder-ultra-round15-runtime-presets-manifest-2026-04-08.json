@@ -1,0 +1,65 @@
+{
+  "patchVersion": "2026-04-08-r15-runtime-presets",
+  "builderVersion": "2026-04-08-r15-runtime-presets",
+  "root": "qms.hesem.com.vn",
+  "focus": "Runtime preset library and actual graphics for generated modules, not builder chrome.",
+  "changedFiles": [
+    "01-QMS-Portal/scripts/portal/00-block-engine.js",
+    "01-QMS-Portal/scripts/portal/31-module-builder.js",
+    "01-QMS-Portal/docs/module-builder-ultra-round15-runtime-presets-2026-04-08.md",
+    "01-QMS-Portal/release/module-builder-ultra-round15-runtime-presets-manifest-2026-04-08.json",
+    "01-QMS-Portal/release/module-builder-ultra-round15-runtime-presets-smoke-2026-04-08.json",
+    "01-QMS-Portal/release/module-builder-ultra-round15-sample-runtime-theme-pack-2026-04-08.json",
+    "OVERWRITE-MANIFEST-2026-04-08-R15-RUNTIME-PRESETS.md"
+  ],
+  "runtimePresetLibrary": [
+    "executive-glass",
+    "boardroom-crystal",
+    "planning-tower",
+    "quality-cleanroom",
+    "supplier-radar",
+    "audit-ledger",
+    "finance-ledger",
+    "compliance-paper",
+    "operator-command",
+    "shopfloor-signal",
+    "warehouse-handheld",
+    "customer-portal",
+    "night-ops",
+    "maintenance-night"
+  ],
+  "newRuntimeControls": [
+    "surface",
+    "accent",
+    "density",
+    "radius",
+    "depth",
+    "header",
+    "tabs",
+    "card",
+    "table",
+    "form",
+    "button",
+    "badge",
+    "kpi",
+    "frame",
+    "motion",
+    "fontScale",
+    "titleWeight",
+    "maxWidth",
+    "gap"
+  ],
+  "runtimeFixes": [
+    "Mapped block-level surfaceVariant options default/elevated/outlined/tinted/glass/solid to runtime CSS.",
+    "Mapped semanticTone default/brand/info/success/warning/danger to runtime border and emphasis states.",
+    "Mapped density comfortable/compact/dense and preserved relaxed/spacious runtime density.",
+    "Mapped themePreset, shellPreset, motionPreset, visualLanguage, heroMood, iconStyle, chartStyle, panelGlass, cssVars to runtime behavior.",
+    "Added module-level preset studio that edits schema.runtimeDesign and previews runtime output, not builder chrome.",
+    "Added auto-style for existing blocks so preset intent becomes visible even on legacy modules."
+  ],
+  "tests": [
+    "node --check 00-block-engine.js",
+    "node --check 31-module-builder.js",
+    "VM smoke for preset resolution, runtime render wrapper, block attribute mapping, builder export and probe schema"
+  ]
+}

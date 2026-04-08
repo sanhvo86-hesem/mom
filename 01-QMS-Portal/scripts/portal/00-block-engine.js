@@ -13347,3 +13347,500 @@ Object.assign(window.HmBlockEngine, {
     stageStyleText:function(schema){ return _r14StageStyleText(_r14ResolveRuntimeDesign(schema || {})); }
   };
 })();
+
+
+/* ============================================================================
+ * HESEM QMS — Runtime Preset Library (Round 15 Serious)
+ * Presets and block styling for generated modules.
+ * ============================================================================ */
+(function(){
+  if(window.__HM_BE_R15_RUNTIME_PRESETS__) return;
+  window.__HM_BE_R15_RUNTIME_PRESETS__ = true;
+
+  var BE = window.HmBlockEngine || {};
+  var _r15PrevRenderModuleFromSchema = renderModuleFromSchema;
+  var _r15PrevResolveRuntimeDesign = BE.resolveRuntimeDesign || BE.getRuntimeDesignTokens || function(){ return {}; };
+
+  function _r15Clone(value){ return value == null ? value : JSON.parse(JSON.stringify(value)); }
+  function _r15IsObject(value){ return !!value && typeof value === 'object' && !Array.isArray(value); }
+  function _r15Merge(target, source){
+    target = _r15IsObject(target) ? target : {};
+    Object.keys(source || {}).forEach(function(key){
+      var src = source[key];
+      if(_r15IsObject(src)){
+        if(!_r15IsObject(target[key])) target[key] = {};
+        _r15Merge(target[key], src);
+      } else if(src !== undefined){
+        target[key] = src;
+      }
+    });
+    return target;
+  }
+  function _r15Slug(value){ return String(value == null ? '' : value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'default'; }
+  function _r15WalkBlocks(list, out){
+    out = out || [];
+    (list || []).forEach(function(block){
+      if(!block) return;
+      out.push(block);
+      if(block.slots){ Object.keys(block.slots).forEach(function(slotKey){ _r15WalkBlocks(block.slots[slotKey] || [], out); }); }
+    });
+    return out;
+  }
+  function _r15BlockMap(schema){
+    var map = {};
+    (schema && schema.tabs ? schema.tabs : []).forEach(function(tab){
+      _r15WalkBlocks(tab.blocks || [], []).forEach(function(block){ map[String(block.id || block.blockId || '')] = block; });
+    });
+    return map;
+  }
+
+  var _r15AccentMap = {
+    blue:{ accent:'#2563eb', strong:'#1d4ed8', soft:'rgba(37,99,235,.14)', soft2:'rgba(37,99,235,.24)', text:'#dbeafe', focus:'rgba(37,99,235,.28)' },
+    cyan:{ accent:'#0891b2', strong:'#0e7490', soft:'rgba(8,145,178,.14)', soft2:'rgba(8,145,178,.24)', text:'#cffafe', focus:'rgba(8,145,178,.28)' },
+    emerald:{ accent:'#059669', strong:'#047857', soft:'rgba(5,150,105,.14)', soft2:'rgba(5,150,105,.24)', text:'#d1fae5', focus:'rgba(5,150,105,.28)' },
+    violet:{ accent:'#7c3aed', strong:'#6d28d9', soft:'rgba(124,58,237,.14)', soft2:'rgba(124,58,237,.24)', text:'#ede9fe', focus:'rgba(124,58,237,.28)' },
+    amber:{ accent:'#d97706', strong:'#b45309', soft:'rgba(217,119,6,.14)', soft2:'rgba(217,119,6,.24)', text:'#fef3c7', focus:'rgba(217,119,6,.28)' },
+    indigo:{ accent:'#4f46e5', strong:'#4338ca', soft:'rgba(79,70,229,.14)', soft2:'rgba(79,70,229,.24)', text:'#e0e7ff', focus:'rgba(79,70,229,.28)' },
+    teal:{ accent:'#0f766e', strong:'#115e59', soft:'rgba(15,118,110,.14)', soft2:'rgba(15,118,110,.24)', text:'#ccfbf1', focus:'rgba(15,118,110,.28)' },
+    slate:{ accent:'#334155', strong:'#1e293b', soft:'rgba(51,65,85,.12)', soft2:'rgba(51,65,85,.22)', text:'#e2e8f0', focus:'rgba(51,65,85,.24)' },
+    rose:{ accent:'#e11d48', strong:'#be123c', soft:'rgba(225,29,72,.14)', soft2:'rgba(225,29,72,.24)', text:'#ffe4e6', focus:'rgba(225,29,72,.28)' }
+  };
+  var _r15DensityMap = {
+    compact:{ block:'12px', header:'14px 16px', gap:'12', input:'10px 12px', title:'28px', kpiValue:'24px' },
+    comfortable:{ block:'16px', header:'18px 20px', gap:'18', input:'11px 13px', title:'30px', kpiValue:'28px' },
+    dense:{ block:'10px', header:'12px 14px', gap:'10', input:'8px 10px', title:'26px', kpiValue:'22px' },
+    relaxed:{ block:'20px', header:'22px 24px', gap:'22', input:'13px 15px', title:'34px', kpiValue:'30px' },
+    spacious:{ block:'20px', header:'22px 24px', gap:'22', input:'13px 15px', title:'34px', kpiValue:'30px' }
+  };
+  var _r15FontScaleMap = {
+    compact:{ base:'13px', titleMul:0.94, line:'1.45' },
+    comfortable:{ base:'14px', titleMul:1, line:'1.5' },
+    relaxed:{ base:'15px', titleMul:1.06, line:'1.58' }
+  };
+  var _r15MotionDuration = { none:'0ms', subtle:'120ms', standard:'180ms', expressive:'240ms' };
+  var _r15PresetLibrary = {
+    'executive-glass': { basePreset:'executive-glass', family:'executive', labelVi:'Executive Glass', labelEn:'Executive Glass', summaryVi:'Glass điều hành cho dashboard tổng quan', summaryEn:'Executive glass for overview dashboards', schema:{ surface:'glass', accent:'blue', density:'comfortable', radius:'xl', depth:'medium', header:'hero', tabs:'pill', card:'glass', table:'clean', button:'glass-primary', badge:'soft', kpi:'executive', form:'glass', frame:'air', motion:'subtle', fontScale:'comfortable', titleWeight:'700', maxWidth:'1360', gap:'18', themeFamily:'executive' } },
+    'boardroom-crystal': { basePreset:'executive-glass', family:'executive', labelVi:'Boardroom Crystal', labelEn:'Boardroom Crystal', summaryVi:'Boardroom sáng, rõ, kỷ luật và sang', summaryEn:'Bright, disciplined boardroom finish', schema:{ surface:'glass', accent:'indigo', density:'comfortable', radius:'xl', depth:'soft', header:'split', tabs:'cardbar', card:'glass', table:'clean', button:'clean', badge:'outline', kpi:'executive', form:'glass', frame:'board', motion:'subtle', fontScale:'comfortable', titleWeight:'700', maxWidth:'1360', gap:'18', themeFamily:'executive' } },
+    'planning-tower': { basePreset:'executive-glass', family:'enterprise', labelVi:'Planning Tower', labelEn:'Planning Tower', summaryVi:'Tower planning với tab card và KPI rõ', summaryEn:'Planning tower with card tabs and structured KPIs', schema:{ surface:'glass', accent:'indigo', density:'comfortable', radius:'xl', depth:'medium', header:'split', tabs:'cardbar', card:'tinted', table:'clean', button:'glass-primary', badge:'soft', kpi:'executive', form:'clean', frame:'board', motion:'subtle', fontScale:'comfortable', titleWeight:'700', maxWidth:'1440', gap:'18', themeFamily:'enterprise' } },
+    'quality-cleanroom': { basePreset:'quality-cleanroom', family:'lab', labelVi:'Quality Cleanroom', labelEn:'Quality Cleanroom', summaryVi:'Sạch, sáng, tương phản cao cho QMS', summaryEn:'Clean high-clarity mode for QMS', schema:{ surface:'glass', accent:'cyan', density:'comfortable', radius:'xl', depth:'soft', header:'banner', tabs:'underline', card:'glass', table:'clean', button:'clean', badge:'outline', kpi:'clean', form:'clean', frame:'board', motion:'subtle', fontScale:'comfortable', titleWeight:'700', maxWidth:'1360', gap:'16', themeFamily:'lab' } },
+    'supplier-radar': { basePreset:'quality-cleanroom', family:'lab', labelVi:'Supplier Radar', labelEn:'Supplier Radar', summaryVi:'Theo dõi supplier với table, badge và radar rõ', summaryEn:'Supplier tracking with clear tables and badges', schema:{ surface:'glass', accent:'rose', density:'comfortable', radius:'lg', depth:'soft', header:'split', tabs:'cardbar', card:'glass', table:'striped', button:'clean', badge:'soft', kpi:'clean', form:'clean', frame:'board', motion:'subtle', fontScale:'comfortable', titleWeight:'700', maxWidth:'1440', gap:'18', themeFamily:'lab' } },
+    'audit-ledger': { basePreset:'audit-ledger', family:'enterprise', labelVi:'Audit Ledger', labelEn:'Audit Ledger', summaryVi:'Ledger giấy cho audit, traceability, evidence', summaryEn:'Paper ledger for audit, traceability, and evidence', schema:{ surface:'paper', accent:'amber', density:'comfortable', radius:'md', depth:'flat', header:'minimal', tabs:'underline', card:'outline', table:'ledger', button:'ledger', badge:'solid', kpi:'ledger', form:'lined', frame:'paper', motion:'none', fontScale:'comfortable', titleWeight:'700', maxWidth:'1280', gap:'16', themeFamily:'enterprise' } },
+    'finance-ledger': { basePreset:'audit-ledger', family:'enterprise', labelVi:'Finance Ledger', labelEn:'Finance Ledger', summaryVi:'Ledger tài chính gọn, nghiêm túc, rõ số liệu', summaryEn:'Focused finance ledger with disciplined data emphasis', schema:{ surface:'paper', accent:'slate', density:'comfortable', radius:'md', depth:'flat', header:'split', tabs:'underline', card:'outline', table:'ledger', button:'ledger', badge:'outline', kpi:'ledger', form:'lined', frame:'paper', motion:'none', fontScale:'comfortable', titleWeight:'700', maxWidth:'1280', gap:'16', themeFamily:'enterprise' } },
+    'compliance-paper': { basePreset:'audit-ledger', family:'enterprise', labelVi:'Compliance Paper', labelEn:'Compliance Paper', summaryVi:'Paper mode trung tính cho compliance và signoff', summaryEn:'Neutral paper mode for compliance and signoff', schema:{ surface:'paper', accent:'amber', density:'comfortable', radius:'md', depth:'flat', header:'minimal', tabs:'underline', card:'outline', table:'ledger', button:'ledger', badge:'outline', kpi:'ledger', form:'lined', frame:'paper', motion:'none', fontScale:'comfortable', titleWeight:'700', maxWidth:'1280', gap:'16', themeFamily:'enterprise' } },
+    'operator-command': { basePreset:'operator-command', family:'industrial', labelVi:'Operator Command', labelEn:'Operator Command', summaryVi:'Gọn, rõ, ưu tiên thao tác và tốc độ', summaryEn:'Compact and operationally clear', schema:{ surface:'solid', accent:'emerald', density:'compact', radius:'lg', depth:'flat', header:'controlbar', tabs:'segment', card:'solid', table:'grid', button:'signal', badge:'solid', kpi:'signal', form:'compact', frame:'console', motion:'standard', fontScale:'compact', titleWeight:'700', maxWidth:'fluid', gap:'12', themeFamily:'industrial' } },
+    'shopfloor-signal': { basePreset:'operator-command', family:'shopfloor', labelVi:'Shopfloor Signal', labelEn:'Shopfloor Signal', summaryVi:'Shopfloor mạnh, tín hiệu rõ, hành động nhanh', summaryEn:'Shopfloor-forward signals and fast action cues', schema:{ surface:'solid', accent:'amber', density:'dense', radius:'lg', depth:'soft', header:'banner', tabs:'segment', card:'elevated', table:'grid', button:'signal', badge:'solid', kpi:'signal', form:'compact', frame:'console', motion:'expressive', fontScale:'compact', titleWeight:'800', maxWidth:'1440', gap:'12', themeFamily:'shopfloor' } },
+    'warehouse-handheld': { basePreset:'operator-command', family:'shopfloor', labelVi:'Warehouse Handheld', labelEn:'Warehouse Handheld', summaryVi:'Tối ưu handheld với spacing gọn và nút rõ', summaryEn:'Handheld-first density and touch clarity', schema:{ surface:'solid', accent:'teal', density:'dense', radius:'lg', depth:'soft', header:'banner', tabs:'pill', card:'solid', table:'grid', button:'signal', badge:'solid', kpi:'signal', form:'compact', frame:'board', motion:'standard', fontScale:'compact', titleWeight:'700', maxWidth:'fluid', gap:'12', themeFamily:'shopfloor' } },
+    'customer-portal': { basePreset:'executive-glass', family:'enterprise', labelVi:'Customer Portal', labelEn:'Customer Portal', summaryVi:'Portal sáng, thân thiện, có glass nhẹ', summaryEn:'Friendly portal with restrained glass surfaces', schema:{ surface:'glass', accent:'blue', density:'comfortable', radius:'xl', depth:'soft', header:'banner', tabs:'pill', card:'glass', table:'clean', button:'clean', badge:'soft', kpi:'clean', form:'clean', frame:'air', motion:'subtle', fontScale:'comfortable', titleWeight:'700', maxWidth:'1360', gap:'18', themeFamily:'enterprise' } },
+    'night-ops': { basePreset:'night-ops', family:'dark-ops', labelVi:'Night Ops', labelEn:'Night Ops', summaryVi:'Control tower đêm, tương phản cao', summaryEn:'High-contrast night control tower', schema:{ surface:'night', accent:'violet', density:'compact', radius:'lg', depth:'medium', header:'hero', tabs:'segment', card:'glass', table:'grid', button:'signal', badge:'soft', kpi:'signal', form:'solid', frame:'console', motion:'standard', fontScale:'comfortable', titleWeight:'700', maxWidth:'1440', gap:'14', themeFamily:'dark-ops' } },
+    'maintenance-night': { basePreset:'night-ops', family:'dark-ops', labelVi:'Maintenance Night', labelEn:'Maintenance Night', summaryVi:'Night mode cho maintenance và incident response', summaryEn:'Night mode for maintenance and incident response', schema:{ surface:'night', accent:'cyan', density:'compact', radius:'lg', depth:'medium', header:'split', tabs:'segment', card:'glass', table:'grid', button:'signal', badge:'solid', kpi:'signal', form:'solid', frame:'console', motion:'standard', fontScale:'comfortable', titleWeight:'700', maxWidth:'1440', gap:'14', themeFamily:'dark-ops' } }
+  };
+
+  function _r15CanonicalAccent(accent){ return /^(blue|cyan|emerald|violet|amber)$/.test(String(accent || '')) ? String(accent) : 'blue'; }
+  function _r15CanonicalDensity(density){ density = String(density || 'comfortable'); if(density === 'dense') return 'compact'; if(density === 'relaxed') return 'spacious'; return density; }
+  function _r15CanonicalHeader(header){ return header === 'split' ? 'hero' : (header === 'controlbar' ? 'banner' : header); }
+  function _r15CanonicalTabs(tabs){ return tabs === 'cardbar' ? 'segment' : tabs; }
+  function _r15CanonicalCard(card){ return card === 'tinted' || card === 'elevated' ? 'glass' : card; }
+  function _r15CanonicalTable(table){ return table === 'ledger' ? 'striped' : table; }
+  function _r15InferPreset(schema){
+    var raw = (((schema || {}).runtimeDesign) || {}).preset;
+    if(raw && _r15PresetLibrary[raw]) return raw;
+    var domain = ((((schema || {}).meta || {}).domain) || '').toLowerCase();
+    if(domain === 'production' || domain === 'warehouse') return 'operator-command';
+    if(domain === 'quality') return 'quality-cleanroom';
+    if(domain === 'audit' || domain === 'compliance') return 'audit-ledger';
+    if(domain === 'maintenance' || domain === 'mes') return 'maintenance-night';
+    return 'executive-glass';
+  }
+  function _r15PresetSchema(key){
+    var preset = _r15PresetLibrary[key] || _r15PresetLibrary['executive-glass'];
+    var schema = _r15Clone(preset.schema || {});
+    schema.preset = key in _r15PresetLibrary ? key : 'executive-glass';
+    return schema;
+  }
+  function _r15ResolveRuntimeDesign(schema){
+    var raw = _r15IsObject(schema && schema.runtimeDesign) ? _r15Clone(schema.runtimeDesign) : {};
+    var presetKey = raw.preset || _r15InferPreset(schema || {});
+    var preset = _r15PresetLibrary[presetKey] || _r15PresetLibrary['executive-glass'];
+    var design = _r15Merge(_r15PresetSchema(presetKey), raw);
+    if(design.density === 'spacious') design.density = 'relaxed';
+    var canonicalSchema = {
+      meta:_r15Clone(((schema || {}).meta) || {}),
+      runtimeDesign:{
+        preset:preset.basePreset || 'executive-glass',
+        surface:design.surface || 'glass',
+        accent:_r15CanonicalAccent(design.accent),
+        density:_r15CanonicalDensity(design.density),
+        radius:design.radius || 'lg',
+        depth:design.depth || 'medium',
+        header:_r15CanonicalHeader(design.header || 'hero'),
+        tabs:_r15CanonicalTabs(design.tabs || 'pill'),
+        card:_r15CanonicalCard(design.card || 'glass'),
+        table:_r15CanonicalTable(design.table || 'clean'),
+        maxWidth:design.maxWidth || '1360',
+        gap:design.gap || '18'
+      }
+    };
+    var base = _r15Clone(_r15PrevResolveRuntimeDesign(canonicalSchema) || {});
+    var accent = _r15AccentMap[design.accent] || _r15AccentMap.blue;
+    var density = _r15DensityMap[design.density] || _r15DensityMap.comfortable;
+    var fontScale = _r15FontScaleMap[design.fontScale] || _r15FontScaleMap.comfortable;
+    var titleBase = parseFloat(String(base.titleSize || '').replace('px','')) || 30;
+    base.preset = presetKey;
+    base.surface = design.surface || base.surface || 'glass';
+    base.accent = design.accent || base.accent || 'blue';
+    base.density = design.density || 'comfortable';
+    base.radius = design.radius || base.radius || 'lg';
+    base.depth = design.depth || base.depth || 'medium';
+    base.header = design.header || base.header || 'hero';
+    base.tabs = design.tabs || base.tabs || 'pill';
+    base.card = design.card || base.card || 'glass';
+    base.table = design.table || base.table || 'clean';
+    base.button = design.button || 'glass-primary';
+    base.badge = design.badge || 'soft';
+    base.kpi = design.kpi || 'executive';
+    base.form = design.form || 'glass';
+    base.frame = design.frame || 'air';
+    base.motion = design.motion || 'subtle';
+    base.fontScale = design.fontScale || 'comfortable';
+    base.titleWeight = String(design.titleWeight || '700');
+    base.themeFamily = design.themeFamily || preset.schema.themeFamily || preset.family || 'enterprise';
+    base.presetLabelVi = preset.labelVi || '';
+    base.presetLabelEn = preset.labelEn || '';
+    base.presetSummaryVi = preset.summaryVi || '';
+    base.presetSummaryEn = preset.summaryEn || '';
+    base.accentColor = accent.accent;
+    base.accentStrong = accent.strong;
+    base.accentSoft = accent.soft;
+    base.accentSoft2 = accent.soft2;
+    base.accentText = accent.text;
+    base.focus = accent.focus;
+    base.blockPadding = density.block;
+    base.headerPadding = density.header;
+    base.titleSize = Math.round(titleBase * fontScale.titleMul) + 'px';
+    base.gap = ((parseInt(design.gap, 10) || parseInt(density.gap, 10) || 18) + 'px');
+    base.inputPadding = density.input;
+    base.fontBase = fontScale.base;
+    base.lineHeight = fontScale.line;
+    base.kpiValueSize = density.kpiValue;
+    base.motionDuration = _r15MotionDuration[design.motion] || _r15MotionDuration.subtle;
+    if(design.radius === 'md') base.radiusPx = '16px';
+    else if(design.radius === 'lg') base.radiusPx = '20px';
+    else if(design.radius === 'xl') base.radiusPx = '24px';
+    if(design.frame === 'paper') base.blur = '0px';
+    if(design.frame === 'console'){ base.stageShadow = '0 22px 62px rgba(2,6,23,.32)'; }
+    if(design.frame === 'board'){ base.stageShadow = '0 18px 48px rgba(15,23,42,.10)'; }
+    return base;
+  }
+
+  function _r15SetStageVar(stage, key, value){ if(stage && stage.style && value != null) stage.style.setProperty(key, String(value)); }
+  function _r15ApplyStage(stage, vars){
+    if(!stage) return;
+    stage.setAttribute('data-rt-header', vars.header || 'hero');
+    stage.setAttribute('data-rt-tabs', vars.tabs || 'pill');
+    stage.setAttribute('data-rt-card', vars.card || 'glass');
+    stage.setAttribute('data-rt-table', vars.table || 'clean');
+    stage.setAttribute('data-rt-density', vars.density || 'comfortable');
+    stage.setAttribute('data-rt-button', vars.button || 'glass-primary');
+    stage.setAttribute('data-rt-badge', vars.badge || 'soft');
+    stage.setAttribute('data-rt-kpi', vars.kpi || 'executive');
+    stage.setAttribute('data-rt-form', vars.form || 'glass');
+    stage.setAttribute('data-rt-frame', vars.frame || 'air');
+    stage.setAttribute('data-rt-motion', vars.motion || 'subtle');
+    stage.setAttribute('data-rt-theme-family', vars.themeFamily || 'enterprise');
+    _r15SetStageVar(stage, '--hmrt-accent', vars.accentColor);
+    _r15SetStageVar(stage, '--hmrt-accent-strong', vars.accentStrong);
+    _r15SetStageVar(stage, '--hmrt-accent-soft', vars.accentSoft);
+    _r15SetStageVar(stage, '--hmrt-accent-soft-2', vars.accentSoft2);
+    _r15SetStageVar(stage, '--hmrt-accent-text', vars.accentText);
+    _r15SetStageVar(stage, '--hmrt-focus', vars.focus);
+    _r15SetStageVar(stage, '--hmrt-block-padding', vars.blockPadding);
+    _r15SetStageVar(stage, '--hmrt-header-padding', vars.headerPadding);
+    _r15SetStageVar(stage, '--hmrt-title-size', vars.titleSize);
+    _r15SetStageVar(stage, '--hmrt-gap', vars.gap);
+    _r15SetStageVar(stage, '--hmrt-input-padding', vars.inputPadding);
+    _r15SetStageVar(stage, '--hmrt-radius', vars.radiusPx);
+    _r15SetStageVar(stage, '--hmrt-font-base', vars.fontBase);
+    _r15SetStageVar(stage, '--hmrt-line-height', vars.lineHeight);
+    _r15SetStageVar(stage, '--hmrt-kpi-value-size', vars.kpiValueSize);
+    _r15SetStageVar(stage, '--hmrt-title-weight', vars.titleWeight || '700');
+    _r15SetStageVar(stage, '--hmrt-motion-duration', vars.motionDuration || '120ms');
+  }
+
+  function _r15NormalizeBlockDensity(value){
+    value = String(value || '').toLowerCase();
+    if(value === 'inherit' || value === 'default') return '';
+    if(value === 'dense') return 'dense';
+    if(value === 'compact') return 'compact';
+    if(value === 'comfortable') return 'comfortable';
+    if(value === 'spacious' || value === 'relaxed') return 'relaxed';
+    return '';
+  }
+  function _r15NormalizeSurfaceVariant(value){
+    value = String(value || '').toLowerCase();
+    if(value === 'default' || value === 'inherit') return '';
+    if(value === 'elevated') return 'elevated';
+    if(value === 'outlined') return 'outlined';
+    if(value === 'tinted') return 'tinted';
+    if(value === 'glass') return 'glass';
+    if(value === 'solid') return 'solid';
+    if(value === 'ghost') return 'outlined';
+    if(value === 'contrast') return 'tinted';
+    return '';
+  }
+  function _r15NormalizeTone(value){
+    value = String(value || '').toLowerCase();
+    if(value === 'default' || value === 'inherit') return '';
+    if(value === 'brand') return 'brand';
+    if(value === 'info') return 'info';
+    if(value === 'success' || value === 'positive') return 'success';
+    if(value === 'warning') return 'warning';
+    if(value === 'danger' || value === 'critical') return 'danger';
+    return '';
+  }
+  function _r15NormalizeMotion(value){
+    value = String(value || '').toLowerCase();
+    if(value === 'inherit' || value === 'default') return '';
+    if(value === 'none' || value === 'subtle' || value === 'standard' || value === 'expressive') return value;
+    return '';
+  }
+  function _r15NormalizeThemePreset(value){
+    value = String(value || '').toLowerCase();
+    if(value === 'inherit' || value === 'default') return '';
+    if(/^(enterprise|industrial|executive|shopfloor|lab|dark-ops)$/.test(value)) return value;
+    return '';
+  }
+  function _r15NormalizeShellPreset(value){
+    value = String(value || '').toLowerCase();
+    if(value === 'inherit' || value === 'default') return '';
+    if(/^(page|workspace|ops-center|executive-board)$/.test(value)) return value;
+    return '';
+  }
+  function _r15RecommendBlockDesign(block, vars){
+    var type = String((block && block.type) || '').toLowerCase();
+    var rec = {
+      themePreset: vars.themeFamily || 'enterprise',
+      motionPreset: vars.motion || 'subtle',
+      cardRadius: vars.radius || 'lg'
+    };
+    function cardToSurface(card){
+      if(card === 'outline') return 'outlined';
+      if(card === 'solid') return 'solid';
+      if(card === 'tinted') return 'tinted';
+      if(card === 'elevated') return 'elevated';
+      return 'glass';
+    }
+    rec.surfaceVariant = cardToSurface(vars.card || 'glass');
+    rec.semanticTone = vars.surface === 'night' ? 'info' : 'brand';
+    if(vars.density === 'dense') rec.density = 'dense';
+    else if(vars.density === 'compact') rec.density = 'compact';
+    else rec.density = 'comfortable';
+    if(type === 'info-banner' || type === 'alert-banner' || type === 'banner'){
+      rec.surfaceVariant = 'tinted';
+      rec.semanticTone = vars.surface === 'paper' ? 'warning' : 'brand';
+      rec.shellPreset = 'page';
+    } else if(type === 'kpi-row' || type === 'kpi-grid' || type === 'kpi-card'){
+      rec.surfaceVariant = vars.kpi === 'ledger' ? 'outlined' : (vars.kpi === 'signal' ? 'elevated' : 'glass');
+      rec.semanticTone = 'brand';
+      rec.shellPreset = 'workspace';
+      rec.density = vars.density === 'dense' ? 'compact' : rec.density;
+    } else if(type === 'data-table' || type === 'table' || type === 'record-detail'){
+      rec.surfaceVariant = vars.table === 'ledger' ? 'outlined' : (vars.card === 'solid' ? 'solid' : 'elevated');
+      rec.semanticTone = vars.surface === 'paper' ? 'warning' : 'info';
+      rec.shellPreset = vars.frame === 'board' ? 'executive-board' : 'workspace';
+      rec.density = vars.density === 'dense' ? 'compact' : rec.density;
+    } else if(type === 'filter-bar' || type === 'toolbar' || type === 'action-lane'){
+      rec.surfaceVariant = vars.form === 'lined' ? 'outlined' : (vars.form === 'solid' || vars.form === 'compact' ? 'solid' : 'glass');
+      rec.semanticTone = 'info';
+      rec.shellPreset = 'workspace';
+      rec.density = vars.density === 'relaxed' ? 'comfortable' : (vars.density || 'compact');
+    } else if(type.indexOf('form') >= 0){
+      rec.surfaceVariant = vars.form === 'lined' ? 'outlined' : (vars.form === 'solid' || vars.form === 'compact' ? 'solid' : 'glass');
+      rec.semanticTone = 'brand';
+      rec.shellPreset = vars.frame === 'console' ? 'ops-center' : 'workspace';
+      rec.density = vars.density === 'dense' ? 'compact' : rec.density;
+    } else if(type.indexOf('chart') >= 0 || type === 'heatmap' || type === 'timeline' || type === 'data-timeline'){
+      rec.surfaceVariant = vars.card === 'outline' ? 'outlined' : 'elevated';
+      rec.semanticTone = 'info';
+      rec.shellPreset = 'executive-board';
+    } else if(type.indexOf('kanban') >= 0 || type.indexOf('gantt') >= 0 || type.indexOf('workflow') >= 0){
+      rec.surfaceVariant = vars.card === 'solid' ? 'solid' : 'elevated';
+      rec.semanticTone = 'brand';
+      rec.shellPreset = 'ops-center';
+    }
+    return rec;
+  }
+  function _r15ApplyBlockDesign(stage, schema, vars){
+    var map = _r15BlockMap(schema || {});
+    if(!stage || !stage.querySelectorAll) return;
+    Array.prototype.forEach.call(stage.querySelectorAll('.hm-block[data-block-id]'), function(node){
+      var block = map[String(node.getAttribute('data-block-id') || '')] || {};
+      var design = (((block || {}).config || {}).design) || {};
+      var rec = _r15RecommendBlockDesign(block, vars || {});
+      var surfaceVariant = _r15NormalizeSurfaceVariant(design.surfaceVariant || rec.surfaceVariant);
+      var tone = _r15NormalizeTone(design.semanticTone || rec.semanticTone);
+      var density = _r15NormalizeBlockDensity(design.density || rec.density);
+      var themePreset = _r15NormalizeThemePreset(design.themePreset || rec.themePreset);
+      var shellPreset = _r15NormalizeShellPreset(design.shellPreset || rec.shellPreset);
+      var motionPreset = _r15NormalizeMotion(design.motionPreset || rec.motionPreset || vars.motion);
+      if(surfaceVariant) node.setAttribute('data-rt-surface-variant', surfaceVariant); else node.removeAttribute('data-rt-surface-variant');
+      if(tone) node.setAttribute('data-rt-tone', tone); else node.removeAttribute('data-rt-tone');
+      if(density) node.setAttribute('data-rt-density', density); else node.removeAttribute('data-rt-density');
+      if(themePreset) node.setAttribute('data-rt-theme-preset', _r15Slug(themePreset)); else node.removeAttribute('data-rt-theme-preset');
+      if(shellPreset) node.setAttribute('data-rt-shell-preset', shellPreset); else node.removeAttribute('data-rt-shell-preset');
+      if(motionPreset) node.setAttribute('data-rt-motion', motionPreset); else node.removeAttribute('data-rt-motion');
+      if(design.visualLanguage && String(design.visualLanguage).toLowerCase() !== 'inherit') node.setAttribute('data-rt-visual-language', _r15Slug(design.visualLanguage));
+      if(design.heroMood && String(design.heroMood).toLowerCase() !== 'inherit') node.setAttribute('data-rt-hero-mood', _r15Slug(design.heroMood));
+      if(design.iconStyle && String(design.iconStyle).toLowerCase() !== 'inherit') node.setAttribute('data-rt-icon-style', _r15Slug(design.iconStyle));
+      if(design.chartStyle && String(design.chartStyle).toLowerCase() !== 'inherit') node.setAttribute('data-rt-chart-style', _r15Slug(design.chartStyle));
+      if(design.accentTone && String(design.accentTone).toLowerCase() !== 'inherit'){
+        var accentKey = _r15Slug(design.accentTone);
+        var accentVars = _r15AccentMap[accentKey];
+        node.setAttribute('data-rt-accent-tone', accentKey);
+        if(accentVars){
+          node.style.setProperty('--hmrt-accent', accentVars.accent);
+          node.style.setProperty('--hmrt-accent-strong', accentVars.strong);
+          node.style.setProperty('--hmrt-accent-soft', accentVars.soft);
+          node.style.setProperty('--hmrt-accent-soft-2', accentVars.soft2);
+          node.style.setProperty('--hmrt-focus', accentVars.focus);
+        }
+      }
+      if(design.cardRadius && String(design.cardRadius).toLowerCase() !== 'inherit'){
+        if(design.cardRadius === 'md') node.style.setProperty('--hmrt-radius','16px');
+        else if(design.cardRadius === 'lg') node.style.setProperty('--hmrt-radius','20px');
+        else if(design.cardRadius === 'xl') node.style.setProperty('--hmrt-radius','24px');
+        else if(design.cardRadius === 'sm') node.style.setProperty('--hmrt-radius','12px');
+      }
+      if(design.panelGlass === true) node.setAttribute('data-rt-panel-glass', '1');
+      if(_r15IsObject(design.cssVars)){
+        Object.keys(design.cssVars).forEach(function(key){
+          if(/^--[a-zA-Z0-9_-]+$/.test(key)) node.style.setProperty(key, String(design.cssVars[key]));
+        });
+      }
+    });
+  }
+
+  function _r15EnsureRuntimeStyle(){
+    var style;
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-runtime-design-round15-style')) return;
+    style = document.createElement('style');
+    style.id = 'hm-runtime-design-round15-style';
+    style.textContent = [
+      '.hm-runtime-design-stage{font-size:var(--hmrt-font-base,14px);line-height:var(--hmrt-line-height,1.5)}',
+      '.hm-runtime-design-stage .hm-page-title{font-weight:var(--hmrt-title-weight,700)}',
+      '.hm-runtime-design-stage .hm-runtime-design-inner{display:grid;gap:var(--hmrt-gap)}',
+      '.hm-runtime-design-stage[data-rt-frame="board"]{padding:24px;background:linear-gradient(180deg,var(--hmrt-stage-bg),rgba(255,255,255,.64));}',
+      '.hm-runtime-design-stage[data-rt-frame="paper"]{padding:22px;background:linear-gradient(180deg,#fffcf5,#f7f1e7)}',
+      '.hm-runtime-design-stage[data-rt-frame="console"]{padding:18px;border-color:var(--hmrt-border-strong)}',
+      '.hm-runtime-design-stage[data-rt-header="split"] .hm-page-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end}',
+      '.hm-runtime-design-stage[data-rt-header="controlbar"] .hm-page-header{align-items:center;padding:12px 14px}.hm-runtime-design-stage[data-rt-header="controlbar"] .hm-page-title{font-size:calc(var(--hmrt-title-size) * .76)}',
+      '.hm-runtime-design-stage[data-rt-tabs="cardbar"] .hm-tab-bar{padding:0;border:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none}',
+      '.hm-runtime-design-stage[data-rt-tabs="cardbar"] .hm-tab{background:var(--hmrt-surface-bg);border:1px solid var(--hmrt-border);border-radius:16px;box-shadow:0 8px 18px rgba(15,23,42,.06)}',
+      '.hm-runtime-design-stage[data-rt-card="tinted"] .hm-block,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-card,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-kpi-card,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-chart-shell,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-record-detail,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-machine-card,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-gantt,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-kanban-column,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-kanban-card,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-filter-bar,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-form,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-banner,.hm-runtime-design-stage[data-rt-card="tinted"] .hm-table-wrapper{background:linear-gradient(180deg,var(--hmrt-accent-soft),var(--hmrt-surface-bg))}',
+      '.hm-runtime-design-stage[data-rt-card="elevated"] .hm-block,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-card,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-kpi-card,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-chart-shell,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-record-detail,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-machine-card,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-gantt,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-kanban-column,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-kanban-card,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-filter-bar,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-form,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-banner,.hm-runtime-design-stage[data-rt-card="elevated"] .hm-table-wrapper{box-shadow:0 18px 36px rgba(15,23,42,.10)}',
+      '.hm-runtime-design-stage[data-rt-table="ledger"] .hm-table{border-collapse:collapse}.hm-runtime-design-stage[data-rt-table="ledger"] .hm-table th{background:transparent;border-bottom:2px solid var(--hmrt-border-strong);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.hm-runtime-design-stage[data-rt-table="ledger"] .hm-table td{border-bottom:1px solid var(--hmrt-border)}',
+      '.hm-runtime-design-stage[data-rt-button="glass-primary"] .hm-btn-primary{background:linear-gradient(135deg,var(--hmrt-accent-soft),var(--hmrt-accent));color:#fff;box-shadow:0 12px 24px rgba(15,23,42,.12)}',
+      '.hm-runtime-design-stage[data-rt-button="clean"] .hm-btn{border-radius:12px;background:#fff}.hm-runtime-design-stage[data-rt-button="clean"] .hm-btn-primary{background:var(--hmrt-accent);color:#fff}',
+      '.hm-runtime-design-stage[data-rt-button="ledger"] .hm-btn{border-radius:10px;background:transparent;box-shadow:none}.hm-runtime-design-stage[data-rt-button="ledger"] .hm-btn-primary{background:transparent;color:var(--hmrt-accent);border-color:var(--hmrt-accent)}',
+      '.hm-runtime-design-stage[data-rt-button="signal"] .hm-btn{font-weight:700}.hm-runtime-design-stage[data-rt-button="signal"] .hm-btn-primary{background:linear-gradient(135deg,var(--hmrt-accent),var(--hmrt-accent-strong));box-shadow:0 10px 22px rgba(15,23,42,.18)}',
+      '.hm-runtime-design-stage[data-rt-badge="outline"] .hm-badge,.hm-runtime-design-stage[data-rt-badge="outline"] .hm-record-detail-chip,.hm-runtime-design-stage[data-rt-badge="outline"] .hm-record-detail-meta>span{background:transparent}',
+      '.hm-runtime-design-stage[data-rt-badge="solid"] .hm-badge,.hm-runtime-design-stage[data-rt-badge="solid"] .hm-record-detail-chip,.hm-runtime-design-stage[data-rt-badge="solid"] .hm-record-detail-meta>span{background:var(--hmrt-accent-soft);border-color:transparent}',
+      '.hm-runtime-design-stage[data-rt-kpi="executive"] .hm-kpi-card{background:linear-gradient(180deg,var(--hmrt-surface-bg),rgba(255,255,255,.92));box-shadow:0 18px 36px rgba(15,23,42,.08)}.hm-runtime-design-stage[data-rt-kpi="executive"] .hm-kpi-value{font-size:var(--hmrt-kpi-value-size);font-weight:800}',
+      '.hm-runtime-design-stage[data-rt-kpi="signal"] .hm-kpi-card{background:linear-gradient(180deg,var(--hmrt-surface-strong),var(--hmrt-surface-bg));border-color:var(--hmrt-accent-soft-2)}.hm-runtime-design-stage[data-rt-kpi="signal"] .hm-kpi-value{font-size:var(--hmrt-kpi-value-size);font-weight:800}',
+      '.hm-runtime-design-stage[data-rt-kpi="ledger"] .hm-kpi-card{background:transparent;box-shadow:none;border-style:dashed}.hm-runtime-design-stage[data-rt-kpi="ledger"] .hm-kpi-value{font-size:var(--hmrt-kpi-value-size);font-weight:700}',
+      '.hm-runtime-design-stage[data-rt-kpi="clean"] .hm-kpi-card{background:#fff;box-shadow:0 8px 18px rgba(15,23,42,.05)}',
+      '.hm-runtime-design-stage[data-rt-form="glass"] .hm-form,.hm-runtime-design-stage[data-rt-form="glass"] .hm-filter-bar{backdrop-filter:blur(calc(var(--hmrt-blur) * .75));-webkit-backdrop-filter:blur(calc(var(--hmrt-blur) * .75))}',
+      '.hm-runtime-design-stage[data-rt-form="lined"] .hm-form,.hm-runtime-design-stage[data-rt-form="lined"] .hm-filter-bar{background:transparent;box-shadow:none}.hm-runtime-design-stage[data-rt-form="lined"] .hm-input,.hm-runtime-design-stage[data-rt-form="lined"] .hm-select,.hm-runtime-design-stage[data-rt-form="lined"] .hm-textarea,.hm-runtime-design-stage[data-rt-form="lined"] input,.hm-runtime-design-stage[data-rt-form="lined"] select,.hm-runtime-design-stage[data-rt-form="lined"] textarea{background:transparent;border-color:var(--hmrt-border-strong)}',
+      '.hm-runtime-design-stage[data-rt-form="clean"] .hm-form,.hm-runtime-design-stage[data-rt-form="clean"] .hm-filter-bar{background:#fff}.hm-runtime-design-stage[data-rt-form="clean"] .hm-input,.hm-runtime-design-stage[data-rt-form="clean"] .hm-select,.hm-runtime-design-stage[data-rt-form="clean"] .hm-textarea,.hm-runtime-design-stage[data-rt-form="clean"] input,.hm-runtime-design-stage[data-rt-form="clean"] select,.hm-runtime-design-stage[data-rt-form="clean"] textarea{background:#fff}',
+      '.hm-runtime-design-stage[data-rt-form="solid"] .hm-form,.hm-runtime-design-stage[data-rt-form="solid"] .hm-filter-bar,.hm-runtime-design-stage[data-rt-form="compact"] .hm-form,.hm-runtime-design-stage[data-rt-form="compact"] .hm-filter-bar{background:var(--hmrt-surface-strong);backdrop-filter:none;-webkit-backdrop-filter:none}',
+      '.hm-runtime-design-stage[data-rt-form="compact"] .hm-input,.hm-runtime-design-stage[data-rt-form="compact"] .hm-select,.hm-runtime-design-stage[data-rt-form="compact"] .hm-textarea,.hm-runtime-design-stage[data-rt-form="compact"] input,.hm-runtime-design-stage[data-rt-form="compact"] select,.hm-runtime-design-stage[data-rt-form="compact"] textarea{padding:8px 10px}',
+      '.hm-runtime-design-stage[data-rt-density="dense"] .hm-block-content{padding:10px}.hm-runtime-design-stage[data-rt-density="dense"] .hm-page-header{padding:12px 14px}.hm-runtime-design-stage[data-rt-density="dense"] .hm-tab{padding:7px 10px}.hm-runtime-design-stage[data-rt-density="dense"] .hm-table th,.hm-runtime-design-stage[data-rt-density="dense"] .hm-table td{padding:8px 10px}',
+      '.hm-runtime-design-stage[data-rt-density="relaxed"] .hm-block-content{padding:22px}.hm-runtime-design-stage[data-rt-density="relaxed"] .hm-page-header{padding:24px 26px}.hm-runtime-design-stage[data-rt-density="relaxed"] .hm-tab{padding:12px 16px}.hm-runtime-design-stage[data-rt-density="relaxed"] .hm-table th,.hm-runtime-design-stage[data-rt-density="relaxed"] .hm-table td{padding:14px 16px}',
+      '.hm-runtime-design-stage[data-rt-motion="none"] .hm-block,.hm-runtime-design-stage[data-rt-motion="none"] .hm-card,.hm-runtime-design-stage[data-rt-motion="none"] .hm-btn,.hm-runtime-design-stage[data-rt-motion="none"] .hm-tab{transition:none!important}',
+      '.hm-runtime-design-stage[data-rt-motion="subtle"] .hm-block,.hm-runtime-design-stage[data-rt-motion="subtle"] .hm-card,.hm-runtime-design-stage[data-rt-motion="subtle"] .hm-btn,.hm-runtime-design-stage[data-rt-motion="subtle"] .hm-tab,.hm-runtime-design-stage[data-rt-motion="standard"] .hm-block,.hm-runtime-design-stage[data-rt-motion="standard"] .hm-card,.hm-runtime-design-stage[data-rt-motion="standard"] .hm-btn,.hm-runtime-design-stage[data-rt-motion="standard"] .hm-tab,.hm-runtime-design-stage[data-rt-motion="expressive"] .hm-block,.hm-runtime-design-stage[data-rt-motion="expressive"] .hm-card,.hm-runtime-design-stage[data-rt-motion="expressive"] .hm-btn,.hm-runtime-design-stage[data-rt-motion="expressive"] .hm-tab{transition:transform var(--hmrt-motion-duration) ease,box-shadow var(--hmrt-motion-duration) ease,border-color var(--hmrt-motion-duration) ease,background var(--hmrt-motion-duration) ease}',
+      '.hm-runtime-design-stage[data-rt-motion="standard"] .hm-block:hover,.hm-runtime-design-stage[data-rt-motion="standard"] .hm-card:hover,.hm-runtime-design-stage[data-rt-motion="standard"] .hm-btn:hover{transform:translateY(-1px)}',
+      '.hm-runtime-design-stage[data-rt-motion="expressive"] .hm-block:hover,.hm-runtime-design-stage[data-rt-motion="expressive"] .hm-card:hover,.hm-runtime-design-stage[data-rt-motion="expressive"] .hm-btn:hover{transform:translateY(-2px);box-shadow:0 20px 42px rgba(15,23,42,.16)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-surface-variant="elevated"]{box-shadow:0 18px 36px rgba(15,23,42,.10);background:var(--hmrt-surface-bg)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-surface-variant="outlined"]{background:transparent;box-shadow:none;border-color:var(--hmrt-border-strong)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-surface-variant="tinted"]{background:linear-gradient(180deg,var(--hmrt-accent-soft),var(--hmrt-surface-bg));border-color:var(--hmrt-accent-soft-2)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-surface-variant="glass"]{background:var(--hmrt-surface-bg);backdrop-filter:blur(calc(var(--hmrt-blur) * .9));-webkit-backdrop-filter:blur(calc(var(--hmrt-blur) * .9))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-surface-variant="solid"]{background:var(--hmrt-surface-strong);backdrop-filter:none;-webkit-backdrop-filter:none}',
+      '.hm-runtime-design-stage .hm-block[data-rt-tone="brand"]{border-color:var(--hmrt-accent-soft-2)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-tone="info"]{border-color:rgba(14,165,233,.32)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-tone="success"]{border-color:rgba(5,150,105,.32)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-tone="warning"]{border-color:rgba(217,119,6,.32)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-tone="danger"]{border-color:rgba(220,38,38,.32)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-density="dense"] .hm-block-content{padding:8px!important}.hm-runtime-design-stage .hm-block[data-rt-density="compact"] .hm-block-content{padding:10px!important}.hm-runtime-design-stage .hm-block[data-rt-density="relaxed"] .hm-block-content{padding:22px!important}',
+      '.hm-runtime-design-stage .hm-block[data-rt-shell-preset="workspace"] .hm-block-header{background:linear-gradient(180deg,var(--hmrt-header-bg),rgba(255,255,255,0))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-shell-preset="ops-center"]{border-top:3px solid var(--hmrt-accent)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-shell-preset="executive-board"]{background:linear-gradient(180deg,var(--hmrt-accent-soft),var(--hmrt-surface-bg))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-theme-preset="industrial"]{--hmrt-accent:var(--hmrt-accent-strong);--hmrt-border-strong:rgba(217,119,6,.34)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-theme-preset="executive"]{--hmrt-border-strong:rgba(79,70,229,.32)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-theme-preset="shopfloor"]{--hmrt-border-strong:rgba(5,150,105,.34)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-theme-preset="lab"]{--hmrt-border-strong:rgba(8,145,178,.34)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-theme-preset="dark-ops"]{background:linear-gradient(180deg,rgba(15,23,42,.94),rgba(15,23,42,.82));color:#eff6ff}',
+      '.hm-runtime-design-stage .hm-block[data-rt-visual-language="precision-clean"]{backdrop-filter:none;-webkit-backdrop-filter:none;background:#fff}',
+      '.hm-runtime-design-stage .hm-block[data-rt-visual-language="industrial-glass"]{background:linear-gradient(180deg,var(--hmrt-accent-soft),var(--hmrt-surface-bg))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-visual-language="executive-premium"]{background:linear-gradient(180deg,var(--hmrt-accent-soft),rgba(255,255,255,.92));box-shadow:0 18px 36px rgba(15,23,42,.12)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-visual-language="dark-ops"]{background:linear-gradient(180deg,rgba(15,23,42,.94),rgba(15,23,42,.82));color:#eff6ff}',
+      '.hm-runtime-design-stage .hm-block[data-rt-visual-language="warehouse-neon"]{border-color:var(--hmrt-accent);box-shadow:0 0 0 1px var(--hmrt-accent-soft-2),0 14px 30px rgba(15,23,42,.10)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-hero-mood="aurora"] .hm-block-header{background:linear-gradient(135deg,var(--hmrt-accent-soft),rgba(255,255,255,0))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-hero-mood="cinematic"] .hm-block-header{background:linear-gradient(135deg,rgba(15,23,42,.08),var(--hmrt-accent-soft))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-hero-mood="clear-day"] .hm-block-header{background:linear-gradient(135deg,rgba(255,255,255,.94),var(--hmrt-accent-soft))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-hero-mood="focused"] .hm-block-header{background:linear-gradient(180deg,var(--hmrt-surface-strong),var(--hmrt-surface-bg))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-hero-mood="night-shift"] .hm-block-header{background:linear-gradient(135deg,rgba(15,23,42,.92),rgba(15,23,42,.78));color:#eff6ff}',
+      '.hm-runtime-design-stage .hm-block[data-rt-icon-style="filled"] .hm-banner-icon{background:var(--hmrt-accent-soft);border-radius:10px;padding:6px}',
+      '.hm-runtime-design-stage .hm-block[data-rt-icon-style="duotone"] .hm-banner-icon{filter:drop-shadow(0 6px 14px rgba(15,23,42,.10))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-chart-style="balanced"] .hm-chart-shell{background:var(--hmrt-surface-bg)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-chart-style="executive"] .hm-chart-shell{background:linear-gradient(180deg,var(--hmrt-accent-soft),var(--hmrt-surface-bg))}',
+      '.hm-runtime-design-stage .hm-block[data-rt-chart-style="realtime"] .hm-chart-shell{box-shadow:0 0 0 1px var(--hmrt-accent-soft-2),0 16px 32px rgba(15,23,42,.12)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-chart-style="clean-room"] .hm-chart-shell{background:#fff;box-shadow:none}',
+      '.hm-runtime-design-stage .hm-block[data-rt-motion="none"]{transition:none!important}',
+      '.hm-runtime-design-stage .hm-block[data-rt-motion="subtle"],.hm-runtime-design-stage .hm-block[data-rt-motion="standard"],.hm-runtime-design-stage .hm-block[data-rt-motion="expressive"]{transition:transform var(--hmrt-motion-duration) ease,box-shadow var(--hmrt-motion-duration) ease,border-color var(--hmrt-motion-duration) ease,background var(--hmrt-motion-duration) ease}',
+      '.hm-runtime-design-stage .hm-block[data-rt-motion="standard"]:hover{transform:translateY(-1px)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-motion="expressive"]:hover{transform:translateY(-2px);box-shadow:0 20px 42px rgba(15,23,42,.16)}',
+      '.hm-runtime-design-stage .hm-block[data-rt-panel-glass="1"]{backdrop-filter:blur(calc(var(--hmrt-blur) * 1.1));-webkit-backdrop-filter:blur(calc(var(--hmrt-blur) * 1.1))}',
+      '@media (max-width: 920px){.hm-runtime-design-stage[data-rt-header="split"] .hm-page-header{grid-template-columns:1fr}.hm-runtime-design-stage[data-rt-tabs="cardbar"] .hm-tab{width:auto}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  renderModuleFromSchema = function(container, schema, options){
+    var result = _r15PrevRenderModuleFromSchema(container, schema, options);
+    var stage = container && container.querySelector ? container.querySelector('.hm-runtime-design-stage[data-hm-runtime-stage="1"]') : null;
+    var vars = _r15ResolveRuntimeDesign(schema || {});
+    _r15EnsureRuntimeStyle();
+    _r15ApplyStage(stage, vars);
+    _r15ApplyBlockDesign(stage, schema || {}, vars);
+    return result;
+  };
+  BE.renderModuleFromSchema = renderModuleFromSchema;
+  BE.resolveRuntimeDesign = _r15ResolveRuntimeDesign;
+  BE.getRuntimeDesignTokens = _r15ResolveRuntimeDesign;
+  BE.RUNTIME_PRESET_LIBRARY = _r15PresetLibrary;
+
+  var ROUND15_TEMPLATES = {
+    'r15-boardroom-hero-banner': { type:'info-banner', title:{ vi:'Boardroom Hero Banner', en:'Boardroom Hero Banner' }, config:{ type:'info', icon:'🧭', text:'Boardroom headline with decision context and confidence.', textEn:'Boardroom headline with decision context and confidence.' }, meta:{ module:'builder-round15', category:'presentation' } },
+    'r15-command-filter-lane': { type:'filter-bar', title:{ vi:'Command Filter Lane', en:'Command Filter Lane' }, config:{ filters:[ { key:'keyword', type:'search', placeholder:{ vi:'Tìm mã / lệnh / khách hàng', en:'Search code / order / customer' } }, { key:'status', type:'select' }, { key:'owner', type:'select' }, { key:'window', type:'select' } ] }, meta:{ module:'builder-round15', category:'presentation' } },
+    'r15-ledger-table': { type:'data-table', title:{ vi:'Ledger Table', en:'Ledger Table' }, config:{ pageSize:8, columns:[ { key:'trace_id', label:{vi:'Trace', en:'Trace'}, type:'text' }, { key:'headline', label:{vi:'Headline', en:'Headline'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] }, meta:{ module:'builder-round15', category:'presentation' } },
+    'r15-signal-kpi-strip': { type:'kpi-row', title:{ vi:'Signal KPI Strip', en:'Signal KPI Strip' }, config:{ items:[ { label:{vi:'Ready', en:'Ready'}, color:'var(--green)' }, { label:{vi:'Risk', en:'Risk'}, color:'var(--amber)' }, { label:{vi:'Escalation', en:'Escalation'}, color:'var(--red)' }, { label:{vi:'Flow', en:'Flow'}, color:'var(--brand-2)' } ] }, meta:{ module:'builder-round15', category:'presentation' } },
+    'r15-customer-touch-table': { type:'data-table', title:{ vi:'Customer Touch Table', en:'Customer Touch Table' }, config:{ pageSize:6, columns:[ { key:'customer', label:{vi:'Khách hàng', en:'Customer'}, type:'text' }, { key:'journey', label:{vi:'Journey', en:'Journey'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'sla', label:{vi:'SLA', en:'SLA'}, type:'badge' } ] }, meta:{ module:'builder-round15', category:'presentation' } },
+    'r15-compliance-note-banner': { type:'info-banner', title:{ vi:'Compliance Note Banner', en:'Compliance Note Banner' }, config:{ type:'warning', icon:'🧾', text:'Evidence, signoff and expiry windows are visible on this page.', textEn:'Evidence, signoff and expiry windows are visible on this page.' }, meta:{ module:'builder-round15', category:'presentation' } }
+  };
+  BE.BLOCK_TEMPLATES = BE.BLOCK_TEMPLATES || {};
+  BE.EXTRA_TEMPLATES = BE.EXTRA_TEMPLATES || {};
+  Object.keys(ROUND15_TEMPLATES).forEach(function(key){
+    BE.BLOCK_TEMPLATES[key] = ROUND15_TEMPLATES[key];
+    BE.EXTRA_TEMPLATES[key] = ROUND15_TEMPLATES[key];
+  });
+
+  BE.MODULE_BUILDER_RUNTIME_DESIGN_VERSION = '2026-04-08-r15-runtime-presets';
+  BE.MODULE_BUILDER_ROUND15_TEMPLATES = Object.keys(ROUND15_TEMPLATES);
+  window.__HM_BE_R15_TEST__ = {
+    version:'2026-04-08-r15-runtime-presets',
+    listPresets:function(){ return Object.keys(_r15PresetLibrary); },
+    presetSchema:function(key){ return _r15PresetSchema(key || 'executive-glass'); },
+    resolveRuntimeDesign:function(schema){ return _r15ResolveRuntimeDesign(schema || {}); },
+    recommendBlockDesign:function(block, vars){ return _r15RecommendBlockDesign(block || {}, vars || _r15ResolveRuntimeDesign({})); },
+    runtimeTemplates:function(){ return Object.keys(ROUND15_TEMPLATES); }
+  };
+})();

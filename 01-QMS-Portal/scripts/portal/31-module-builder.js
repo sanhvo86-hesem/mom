@@ -18228,6 +18228,448 @@ if(window.__HM_MODULE_BUILDER_ULTRA_PATCH_R13__ !== '2026-04-08-r13-glass-comman
   };
 })();
 
+
+/* ============================================================================
+ * HESEM QMS — Runtime Preset Studio (Round 15 Serious)
+ * Focus on generated module graphics, not builder chrome.
+ * ============================================================================ */
+(function(){
+  if(window.__HM_MB_R15_RUNTIME_PRESETS__) return;
+  window.__HM_MB_R15_RUNTIME_PRESETS__ = true;
+
+  var _r15PrevRenderBuilder = _renderBuilder;
+  var _r15PrevRenderPreview = _renderPreview;
+  var _r15PrevPaint = _paint;
+  var _r15PrevHandleClick = _handleClick;
+  var _r15PrevHandleInput = _handleInput;
+  var _r15PrevCreateBlankModule = _createBlankModule;
+  var _r15PrevOpenSavedModule = _openSavedModule;
+  var _r15PrevDraftFromSchema = (typeof _ngModuleStudioDraftFromSchema === 'function') ? _ngModuleStudioDraftFromSchema : function(schema){ return _clone(schema || {}); };
+  var _r15PrevApplyDraft = (typeof _ngApplyModuleStudioDraft === 'function') ? _ngApplyModuleStudioDraft : function(schema, draft){ return _merge(schema || {}, draft || {}); };
+  var _r15PrevSyncManifest = (typeof _ngSyncModuleBuilderManifest === 'function') ? _ngSyncModuleBuilderManifest : function(){};
+
+  function _r15Clone(value){ return value == null ? value : JSON.parse(JSON.stringify(value)); }
+  function _r15IsObject(value){ return !!value && typeof value === 'object' && !Array.isArray(value); }
+  function _r15Merge(target, source){
+    target = _r15IsObject(target) ? target : {};
+    Object.keys(source || {}).forEach(function(key){
+      var src = source[key];
+      if(_r15IsObject(src)){
+        if(!_r15IsObject(target[key])) target[key] = {};
+        _r15Merge(target[key], src);
+      } else if(src !== undefined){
+        target[key] = src;
+      }
+    });
+    return target;
+  }
+  function _r15PresetLibrary(){ return (window.HmBlockEngine && window.HmBlockEngine.RUNTIME_PRESET_LIBRARY) || {}; }
+  function _r15PresetKeys(){ return Object.keys(_r15PresetLibrary()); }
+  function _r15InferPreset(schema){
+    var raw = (((schema || {}).runtimeDesign) || {}).preset;
+    if(raw && _r15PresetLibrary()[raw]) return raw;
+    var domain = ((((schema || {}).meta || {}).domain) || '').toLowerCase();
+    if(domain === 'production' || domain === 'warehouse') return 'operator-command';
+    if(domain === 'quality') return 'quality-cleanroom';
+    if(domain === 'audit' || domain === 'compliance') return 'audit-ledger';
+    if(domain === 'maintenance' || domain === 'mes') return 'maintenance-night';
+    return 'executive-glass';
+  }
+  function _r15PresetSchema(key){
+    var item = _r15PresetLibrary()[key] || _r15PresetLibrary()['executive-glass'] || { schema:{} };
+    var schema = _r15Clone(item.schema || {});
+    schema.preset = (key && _r15PresetLibrary()[key]) ? key : 'executive-glass';
+    return schema;
+  }
+  function _r15EditableRuntimeDesign(schemaOrDraft){
+    var source = _r15Clone(_getByPath(schemaOrDraft || {}, 'runtimeDesign') || {});
+    var preset = source.preset || _r15InferPreset(schemaOrDraft || {});
+    return _r15Merge(_r15PresetSchema(preset), source);
+  }
+  function _r15ResolvedRuntimeDesign(schemaOrDraft){
+    var projected = _r15Clone(schemaOrDraft || {});
+    projected.runtimeDesign = _r15EditableRuntimeDesign(schemaOrDraft || {});
+    return window.HmBlockEngine && window.HmBlockEngine.resolveRuntimeDesign ? window.HmBlockEngine.resolveRuntimeDesign(projected) : projected.runtimeDesign;
+  }
+  function _r15EnsureSchema(schema){
+    if(!schema) return schema;
+    schema.runtimeDesign = _r15EditableRuntimeDesign(schema || {});
+    return schema;
+  }
+  function _r15ProjectedSchema(){
+    var projected = _r15Clone(state.schema || {});
+    if(state.moduleStudioDraft) _ngApplyModuleStudioDraft(projected, state.moduleStudioDraft);
+    return _r15EnsureSchema(projected);
+  }
+  function _r15CommitDraftToSchema(){
+    if(!state.schema) return;
+    if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+    _ngApplyModuleStudioDraft(state.schema, state.moduleStudioDraft);
+    _r15EnsureSchema(state.schema);
+    _ngSyncModuleBuilderManifest(state.schema);
+  }
+  function _r15WalkBlocks(list, cb){
+    (list || []).forEach(function(block){
+      if(!block) return;
+      cb(block);
+      if(block.slots){ Object.keys(block.slots).forEach(function(slotKey){ _r15WalkBlocks(block.slots[slotKey] || [], cb); }); }
+    });
+  }
+  function _r15CountBlocks(schema){
+    var total = 0;
+    (schema && schema.tabs ? schema.tabs : []).forEach(function(tab){ _r15WalkBlocks(tab.blocks || [], function(){ total += 1; }); });
+    return total;
+  }
+  function _r15StripRemoteData(schema){
+    (schema && schema.tabs ? schema.tabs : []).forEach(function(tab){
+      _r15WalkBlocks(tab.blocks || [], function(block){ if(block && block.config && block.config.dataSource) delete block.config.dataSource; });
+    });
+    return schema;
+  }
+  function _r15ProbeSchema(schema){
+    var probe = {
+      moduleId:'probe-runtime-r15',
+      title:{ vi:'Probe Runtime', en:'Probe Runtime' },
+      subtitle:{ vi:'Xem preset tác động thật tới module runtime', en:'See the preset affect the runtime module' },
+      icon:'🎨',
+      runtimeDesign:_r15EditableRuntimeDesign(schema || {}),
+      tabs:[{ tabId:'overview', label:{ vi:'Tổng quan', en:'Overview' }, blocks:[
+        { id:'probe-banner', type:'info-banner', title:{ vi:'Tín hiệu điều hành', en:'Executive signal' }, config:{ type:'info', icon:'🧭', text:'Preset đang tác động vào header, tabs, cards, tables và forms.', textEn:'The preset now affects headers, tabs, cards, tables, and forms.' } },
+        { id:'probe-kpi', type:'kpi-row', title:{ vi:'KPI', en:'KPI' }, config:{ items:[ { label:{vi:'Ready', en:'Ready'}, default:12, color:'var(--green)' }, { label:{vi:'Risk', en:'Risk'}, default:3, color:'var(--amber)' }, { label:{vi:'Review', en:'Review'}, default:5, color:'var(--brand-2)' }, { label:{vi:'Escalation', en:'Escalation'}, default:1, color:'var(--red)' } ] } },
+        { id:'probe-filter', type:'filter-bar', title:{ vi:'Bộ lọc', en:'Filters' }, config:{ filters:[ { key:'keyword', type:'search', placeholder:{ vi:'Tìm mã / khách hàng / PO', en:'Search code / customer / PO' } }, { key:'status', type:'select' }, { key:'owner', type:'select' } ] } },
+        { id:'probe-table', type:'data-table', title:{ vi:'Danh sách', en:'List' }, config:{ pageSize:6, columns:[ { key:'code', label:{vi:'Mã', en:'Code'}, type:'text' }, { key:'headline', label:{vi:'Headline', en:'Headline'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] } }
+      ] }]
+    };
+    return _r15StripRemoteData(probe);
+  }
+  function _r15LivePreviewSchema(schema){
+    var projected = _r15StripRemoteData(_r15Clone(schema || _r15ProjectedSchema()));
+    if(!_r15CountBlocks(projected)) return _r15ProbeSchema(projected);
+    return projected;
+  }
+  function _r15PresentationSummary(schema){
+    var design = _r15ResolvedRuntimeDesign(schema || {});
+    return {
+      preset: design.preset || 'executive-glass',
+      blocks: _r15CountBlocks(schema),
+      header: design.header || 'hero',
+      tabs: design.tabs || 'pill',
+      card: design.card || 'glass',
+      table: design.table || 'clean'
+    };
+  }
+  function _r15RuntimeThemeExport(schema){
+    var projected = _r15Clone(schema || _r15ProjectedSchema());
+    var design = _r15EditableRuntimeDesign(projected);
+    return {
+      version:'2026-04-08-r15-runtime-presets',
+      moduleId: projected.moduleId || '',
+      route: projected.route || '',
+      title: projected.title || {},
+      runtimeDesign: design,
+      runtimeResolved: _r15ResolvedRuntimeDesign(projected),
+      blockCount: _r15CountBlocks(projected)
+    };
+  }
+  function _r15RecommendBlockDesign(block, vars){
+    if(window.__HM_BE_R15_TEST__ && typeof window.__HM_BE_R15_TEST__.recommendBlockDesign === 'function') return window.__HM_BE_R15_TEST__.recommendBlockDesign(block || {}, vars || _r15ResolvedRuntimeDesign({}));
+    return { themePreset:'enterprise', motionPreset:'subtle', cardRadius:'lg', surfaceVariant:'glass', semanticTone:'brand', density:'comfortable', shellPreset:'page' };
+  }
+  function _r15PolishSchemaBlocks(schema){
+    var vars = _r15ResolvedRuntimeDesign(schema || {});
+    (schema && schema.tabs ? schema.tabs : []).forEach(function(tab){
+      _r15WalkBlocks(tab.blocks || [], function(block){
+        var rec = _r15RecommendBlockDesign(block, vars);
+        block.config = block.config || {};
+        block.config.design = block.config.design || {};
+        ['themePreset','motionPreset','cardRadius','surfaceVariant','semanticTone','density','shellPreset'].forEach(function(key){
+          if(rec[key] != null) block.config.design[key] = rec[key];
+        });
+        if(block.config.design.surfaceVariant === 'glass') block.config.design.panelGlass = true;
+      });
+    });
+    return schema;
+  }
+  function _r15RenderPresetButtons(schema){
+    var design = _r15EditableRuntimeDesign(schema || {});
+    var h = '<div class="mb-r15-preset-grid">';
+    _r15PresetKeys().forEach(function(key){
+      var item = _r15PresetLibrary()[key] || {};
+      h += '<button class="mb-r15-preset' + (design.preset === key ? ' is-active' : '') + '" data-action="r15-apply-preset" data-key="' + _esc(key) + '"><strong>' + _esc(_t(item.labelVi || key, item.labelEn || key)) + '</strong><small>' + _esc(_t(item.summaryVi || '', item.summaryEn || item.summaryVi || '')) + '</small><span>' + _esc(key) + '</span></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+  var _r15StarterKits = {
+    executive:{ labelVi:'Executive overview', labelEn:'Executive overview', blocks:[
+      { type:'info-banner', preConfig:{ type:'info', icon:'🧭', text:'Executive context with confidence and next move.', textEn:'Executive context with confidence and next move.' } },
+      { type:'kpi-row', preConfig:{ items:[ { label:'Quality', labelEn:'Quality', default:98, suffix:'%' }, { label:'Delivery', labelEn:'Delivery', default:94, suffix:'%' }, { label:'Risk', labelEn:'Risk', default:3 }, { label:'Escalation', labelEn:'Escalation', default:1 } ] } },
+      { type:'data-table', preConfig:{ pageSize:8, columns:[ { key:'headline', label:{vi:'Headline', en:'Headline'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] } }
+    ]},
+    operator:{ labelVi:'Operator command', labelEn:'Operator command', blocks:[
+      { type:'filter-bar', preConfig:{ filters:[ { key:'keyword', type:'search', placeholder:{ vi:'Tìm lệnh / mã / máy', en:'Search order / code / machine' } }, { key:'status', type:'select' }, { key:'owner', type:'select' } ] } },
+      { type:'kpi-row', preConfig:{ items:[ { label:'Ready', labelEn:'Ready', default:12 }, { label:'Blocked', labelEn:'Blocked', default:2 }, { label:'Downtime', labelEn:'Downtime', default:18, suffix:'m' }, { label:'Escalation', labelEn:'Escalation', default:1 } ] } },
+      { type:'data-table', preConfig:{ pageSize:10, columns:[ { key:'code', label:{vi:'Mã', en:'Code'}, type:'text' }, { key:'task', label:{vi:'Nhiệm vụ', en:'Task'}, type:'text' }, { key:'owner', label:{vi:'Phụ trách', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] } }
+    ]},
+    audit:{ labelVi:'Audit evidence', labelEn:'Audit evidence', blocks:[
+      { type:'info-banner', preConfig:{ type:'warning', icon:'🧾', text:'Evidence and signoff window for audit / compliance.', textEn:'Evidence and signoff window for audit / compliance.' } },
+      { type:'data-table', preConfig:{ pageSize:8, columns:[ { key:'trace_id', label:{vi:'Trace', en:'Trace'}, type:'text' }, { key:'headline', label:{vi:'Headline', en:'Headline'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] } },
+      { type:'data-timeline', preConfig:{ dateKey:'stage', titleKey:'title', descKey:'description' } }
+    ]},
+    portal:{ labelVi:'Customer portal', labelEn:'Customer portal', blocks:[
+      { type:'info-banner', preConfig:{ type:'success', icon:'🤝', text:'Customer-facing summary, SLA and next step.', textEn:'Customer-facing summary, SLA and next step.' } },
+      { type:'filter-bar', preConfig:{ filters:[ { key:'keyword', type:'search', placeholder:{ vi:'Tìm đơn / ticket / yêu cầu', en:'Search order / ticket / request' } }, { key:'status', type:'select' } ] } },
+      { type:'data-table', preConfig:{ pageSize:8, columns:[ { key:'request', label:{vi:'Yêu cầu', en:'Request'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'sla', label:{vi:'SLA', en:'SLA'}, type:'badge' } ] } }
+    ]},
+    planning:{ labelVi:'Planning tower', labelEn:'Planning tower', blocks:[
+      { type:'info-banner', preConfig:{ type:'info', icon:'🗓️', text:'Capacity, constraint, review window and next release decision.', textEn:'Capacity, constraint, review window and next release decision.' } },
+      { type:'kpi-row', preConfig:{ items:[ { label:'Demand', labelEn:'Demand', default:124 }, { label:'Capacity', labelEn:'Capacity', default:118 }, { label:'Gap', labelEn:'Gap', default:6 }, { label:'Late risk', labelEn:'Late risk', default:2 } ] } },
+      { type:'data-table', preConfig:{ pageSize:8, columns:[ { key:'item', label:{vi:'Hạng mục', en:'Item'}, type:'text' }, { key:'window', label:{vi:'Window', en:'Window'}, type:'text' }, { key:'owner', label:{vi:'Owner', en:'Owner'}, type:'text' }, { key:'status', label:{vi:'Status', en:'Status'}, type:'badge' } ] } }
+    ]}
+  };
+  function _r15RenderStarterButtons(){
+    var h = '<div class="mb-r15-kit-grid">';
+    Object.keys(_r15StarterKits).forEach(function(key){
+      var item = _r15StarterKits[key];
+      h += '<button class="mb-r15-kit" data-action="r15-seed-starter" data-key="' + _esc(key) + '">✨ <strong>' + _esc(_t(item.labelVi, item.labelEn)) + '</strong></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+  function _r15RenderControls(schema){
+    var design = _r15EditableRuntimeDesign(schema || {});
+    var h = '<div class="mb-r15-controls">';
+    h += _ngRenderStudioField({ labelVi:'Surface', labelEn:'Surface', path:'runtimeDesign.surface', type:'select', value:design.surface, repaintOnChange:true, selectOptions:['glass','solid','paper','night'] });
+    h += _ngRenderStudioField({ labelVi:'Accent', labelEn:'Accent', path:'runtimeDesign.accent', type:'select', value:design.accent, repaintOnChange:true, selectOptions:['blue','cyan','emerald','violet','amber','indigo','teal','slate','rose'] });
+    h += _ngRenderStudioField({ labelVi:'Density', labelEn:'Density', path:'runtimeDesign.density', type:'select', value:design.density, repaintOnChange:true, selectOptions:['compact','comfortable','dense','relaxed'] });
+    h += _ngRenderStudioField({ labelVi:'Corner radius', labelEn:'Corner radius', path:'runtimeDesign.radius', type:'select', value:design.radius, repaintOnChange:true, selectOptions:['md','lg','xl'] });
+    h += _ngRenderStudioField({ labelVi:'Depth', labelEn:'Depth', path:'runtimeDesign.depth', type:'select', value:design.depth, repaintOnChange:true, selectOptions:['flat','soft','medium','deep'] });
+    h += _ngRenderStudioField({ labelVi:'Header style', labelEn:'Header style', path:'runtimeDesign.header', type:'select', value:design.header, repaintOnChange:true, selectOptions:['minimal','banner','hero','split','controlbar'] });
+    h += _ngRenderStudioField({ labelVi:'Tab style', labelEn:'Tab style', path:'runtimeDesign.tabs', type:'select', value:design.tabs, repaintOnChange:true, selectOptions:['pill','underline','segment','cardbar'] });
+    h += _ngRenderStudioField({ labelVi:'Card style', labelEn:'Card style', path:'runtimeDesign.card', type:'select', value:design.card, repaintOnChange:true, selectOptions:['glass','solid','outline','tinted','elevated'] });
+    h += _ngRenderStudioField({ labelVi:'Table style', labelEn:'Table style', path:'runtimeDesign.table', type:'select', value:design.table, repaintOnChange:true, selectOptions:['clean','striped','grid','ledger'] });
+    h += _ngRenderStudioField({ labelVi:'Form style', labelEn:'Form style', path:'runtimeDesign.form', type:'select', value:design.form, repaintOnChange:true, selectOptions:['glass','lined','clean','solid','compact'] });
+    h += _ngRenderStudioField({ labelVi:'Button style', labelEn:'Button style', path:'runtimeDesign.button', type:'select', value:design.button, repaintOnChange:true, selectOptions:['glass-primary','clean','ledger','signal'] });
+    h += _ngRenderStudioField({ labelVi:'Badge style', labelEn:'Badge style', path:'runtimeDesign.badge', type:'select', value:design.badge, repaintOnChange:true, selectOptions:['soft','solid','outline'] });
+    h += _ngRenderStudioField({ labelVi:'KPI style', labelEn:'KPI style', path:'runtimeDesign.kpi', type:'select', value:design.kpi, repaintOnChange:true, selectOptions:['executive','signal','ledger','clean'] });
+    h += _ngRenderStudioField({ labelVi:'Frame style', labelEn:'Frame style', path:'runtimeDesign.frame', type:'select', value:design.frame, repaintOnChange:true, selectOptions:['air','board','paper','console'] });
+    h += _ngRenderStudioField({ labelVi:'Motion', labelEn:'Motion', path:'runtimeDesign.motion', type:'select', value:design.motion, repaintOnChange:true, selectOptions:['none','subtle','standard','expressive'] });
+    h += _ngRenderStudioField({ labelVi:'Font scale', labelEn:'Font scale', path:'runtimeDesign.fontScale', type:'select', value:design.fontScale, repaintOnChange:true, selectOptions:['compact','comfortable','relaxed'] });
+    h += _ngRenderStudioField({ labelVi:'Title weight', labelEn:'Title weight', path:'runtimeDesign.titleWeight', type:'select', value:String(design.titleWeight), repaintOnChange:true, selectOptions:[ { value:'600', label:'600' }, { value:'700', label:'700' }, { value:'800', label:'800' } ] });
+    h += _ngRenderStudioField({ labelVi:'Max width', labelEn:'Max width', path:'runtimeDesign.maxWidth', type:'select', value:String(design.maxWidth), repaintOnChange:true, selectOptions:['fluid','1280','1360','1440'] });
+    h += _ngRenderStudioField({ labelVi:'Block gap', labelEn:'Block gap', path:'runtimeDesign.gap', type:'select', value:String(design.gap), repaintOnChange:true, selectOptions:[ { value:'12', label:'12' }, { value:'14', label:'14' }, { value:'16', label:'16' }, { value:'18', label:'18' }, { value:'20', label:'20' }, { value:'24', label:'24' } ] });
+    h += '</div>';
+    return h;
+  }
+  function _r15RenderDesignStudio(schema){
+    var projected = schema || _r15ProjectedSchema();
+    var summary = _r15PresentationSummary(projected);
+    var h = '<section class="mb-r15-studio">';
+    h += '<div class="mb-r15-head"><div><div class="mb-r15-kicker">RUNTIME PRESET STUDIO</div><h3>' + _esc(_t('Preset đồ hoạ cho module được tạo ra', 'Runtime presets for the generated module')) + '</h3><p>' + _esc(_t('Preset và control dưới đây tác động trực tiếp vào module runtime: header, tabs, cards, KPI, buttons, tables, forms và block surfaces. Không phải preset cho giao diện builder.', 'These presets and controls directly affect the runtime module: headers, tabs, cards, KPIs, buttons, tables, forms, and block surfaces. They are not builder-UI presets.')) + '</p></div>';
+    h += '<div class="mb-r15-summary"><span><b>' + _esc(summary.preset) + '</b><small>' + _esc(_t('preset', 'preset')) + '</small></span><span><b>' + _esc(String(summary.blocks)) + '</b><small>' + _esc(_t('blocks', 'blocks')) + '</small></span><span><b>' + _esc(summary.header + ' / ' + summary.tabs) + '</b><small>' + _esc(_t('header / tabs', 'header / tabs')) + '</small></span><span><b>' + _esc(summary.card + ' / ' + summary.table) + '</b><small>' + _esc(_t('card / table', 'card / table')) + '</small></span></div></div>';
+    h += '<div class="mb-r15-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="r15-apply-design-now">💾 ' + _t('Áp dụng vào schema', 'Apply to schema') + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r15-auto-style-blocks">🪄 ' + _t('Polish tất cả block', 'Polish all blocks') + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r15-export-runtime-json">⬇ ' + _t('Xuất theme JSON', 'Export theme JSON') + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r15-preview-now">◉ ' + _t('Mở preview runtime', 'Open runtime preview') + '</button><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="r15-reset-design">↺ ' + _t('Reset preset', 'Reset preset') + '</button></div>';
+    h += '<div class="mb-r15-grid">';
+    h += '<div class="mb-r15-panel"><div class="mb-r15-panel-head"><strong>' + _esc(_t('Preset library', 'Preset library')) + '</strong><span>' + _esc(_t('mỗi preset tác động trực tiếp vào module runtime', 'each preset directly affects the runtime module')) + '</span></div>' + _r15RenderPresetButtons(projected) + '<div class="mb-r15-subhead">' + _esc(_t('Starter kits cho trang trắng', 'Starter kits for blank pages')) + '</div>' + _r15RenderStarterButtons() + '</div>';
+    h += '<div class="mb-r15-panel"><div class="mb-r15-panel-head"><strong>' + _esc(_t('Runtime controls', 'Runtime controls')) + '</strong><span>' + _esc(_t('header · tabs · cards · tables · forms · KPI · buttons', 'header · tabs · cards · tables · forms · KPI · buttons')) + '</span></div>' + _r15RenderControls(projected) + '</div>';
+    h += '<div class="mb-r15-panel mb-r15-preview-panel"><div class="mb-r15-panel-head"><strong>' + _esc(_t('Preset probe preview', 'Preset probe preview')) + '</strong><span>' + _esc(_t('mẫu chuẩn để xem preset đổi thật', 'canonical sample to verify real preset changes')) + '</span></div><div id="mb-r15-probe-preview" class="mb-r15-preview-box"></div></div>';
+    h += '<div class="mb-r15-panel mb-r15-preview-panel"><div class="mb-r15-panel-head"><strong>' + _esc(_t('Current module runtime preview', 'Current module runtime preview')) + '</strong><span>' + _esc(_t('preview runtime hiện tại sau khi áp preset', 'current runtime preview after applying the preset')) + '</span></div><div id="mb-r15-live-module-preview" class="mb-r15-preview-box"></div></div>';
+    h += '</div></section>';
+    return h;
+  }
+  function _r15RemovePriorStudios(host){
+    Array.prototype.forEach.call(host.querySelectorAll('.mb-r14-studio,.mb-r13-command-deck,.mb-r13-panel-grid,.mb-r12-command-deck,.mb-r12-panel-grid,.mb-r11-command-deck,.mb-r11-panel-grid,.mb-r10-executive-rail,.mb-r10-panel-grid,.mb-r9-glass-rail,.mb-r9-panel-grid'), function(node){ if(node && node.parentNode) node.parentNode.removeChild(node); });
+  }
+  function _r15InjectStyles(){
+    var style;
+    if(typeof document === 'undefined' || !document.createElement || document.getElementById('hm-module-builder-round15-style')) return;
+    style = document.createElement('style');
+    style.id = 'hm-module-builder-round15-style';
+    style.textContent = [
+      '.mb-r15-studio{margin:0 0 16px;padding:18px;border-radius:22px;background:linear-gradient(180deg,#ffffff,#f8fafc);border:1px solid rgba(148,163,184,.18);box-shadow:0 16px 36px rgba(15,23,42,.06)}',
+      '.mb-r15-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}.mb-r15-kicker{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#1d4ed8;margin-bottom:6px}.mb-r15-head h3{margin:0 0 6px;font-size:28px;line-height:1.08;color:#0f172a}.mb-r15-head p{margin:0;max-width:860px;color:#475569;line-height:1.55}',
+      '.mb-r15-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:320px}.mb-r15-summary span{padding:12px 14px;border-radius:16px;background:linear-gradient(180deg,#eff6ff,#ffffff);border:1px solid rgba(96,165,250,.18)}.mb-r15-summary b{display:block;color:#0f172a;font-size:17px;line-height:1.05;margin-bottom:4px}.mb-r15-summary small{display:block;color:#64748b}',
+      '.mb-r15-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}',
+      '.mb-r15-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.mb-r15-panel{padding:14px;border-radius:18px;background:linear-gradient(180deg,#ffffff,#f8fafc);border:1px solid rgba(148,163,184,.16);box-shadow:0 8px 20px rgba(15,23,42,.04)}.mb-r15-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.mb-r15-panel-head strong{color:#0f172a}.mb-r15-panel-head span{color:#64748b;font-size:12px}',
+      '.mb-r15-preview-box{min-height:380px;border-radius:18px;border:1px solid rgba(148,163,184,.18);background:linear-gradient(180deg,#eef4fb,#f8fafc);padding:12px;overflow:auto}',
+      '.mb-r15-preview-box .hm-page-actions{display:none!important}',
+      '.mb-r15-preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.mb-r15-preset{padding:12px;border-radius:16px;text-align:left;border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,#ffffff,#f8fafc);cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}.mb-r15-preset:hover{transform:translateY(-1px);border-color:rgba(37,99,235,.28);box-shadow:0 10px 22px rgba(37,99,235,.08)}.mb-r15-preset.is-active{border-color:rgba(37,99,235,.32);background:linear-gradient(180deg,#eff6ff,#f8fafc);box-shadow:0 12px 24px rgba(37,99,235,.10)}.mb-r15-preset strong{display:block;color:#0f172a;margin-bottom:4px}.mb-r15-preset small{display:block;color:#475569;line-height:1.45;min-height:38px}.mb-r15-preset span{display:block;margin-top:8px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em}',
+      '.mb-r15-subhead{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin:14px 0 10px}.mb-r15-kit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.mb-r15-kit{padding:11px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.16);background:#fff;color:#0f172a;text-align:left;cursor:pointer;transition:border-color .15s ease,transform .15s ease,box-shadow .15s ease}.mb-r15-kit:hover{transform:translateY(-1px);border-color:rgba(37,99,235,.28);box-shadow:0 10px 22px rgba(37,99,235,.08)}.mb-r15-kit strong{font-size:13px}',
+      '.mb-r15-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.mb-r15-panel .hm-label{font-weight:700;color:#334155}',
+      '@media (max-width:1180px){.mb-r15-grid{grid-template-columns:1fr}.mb-r15-summary{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0;width:100%}.mb-r15-controls{grid-template-columns:1fr 1fr}}',
+      '@media (max-width:760px){.mb-r15-head{flex-direction:column}.mb-r15-summary,.mb-r15-controls{grid-template-columns:1fr}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+  function _r15NormalizeHtml(html, previewOnly){
+    var host, builderShell, builderHero, panelWrap, panel;
+    html = String(html || '');
+    if(typeof document === 'undefined' || !document.createElement) return html;
+    host = document.createElement('div');
+    host.innerHTML = html;
+    _r15RemovePriorStudios(host);
+    _r15InjectStyles();
+    if(!previewOnly && state.step === 'build' && state.schema){
+      builderShell = host.querySelector('.mb-builder-shell');
+      builderHero = host.querySelector('.mb-builder-hero');
+      panelWrap = document.createElement('div');
+      panelWrap.innerHTML = _r15RenderDesignStudio(_r15ProjectedSchema());
+      panel = panelWrap.firstChild;
+      if(builderShell && builderShell.parentNode) builderShell.parentNode.insertBefore(panel, builderShell);
+      else if(builderHero && builderHero.parentNode) builderHero.parentNode.appendChild(panel);
+      else host.insertBefore(panel, host.firstChild || null);
+    }
+    return host.innerHTML;
+  }
+  function _r15HydratePreviews(){
+    var projected, probeEl, liveEl;
+    if(typeof document === 'undefined' || !state || !state.container || state.step !== 'build' || !state.schema || !window.HmBlockEngine || !window.HmBlockEngine.renderModuleFromSchema) return;
+    projected = _r15ProjectedSchema();
+    probeEl = state.container.querySelector('#mb-r15-probe-preview');
+    liveEl = state.container.querySelector('#mb-r15-live-module-preview');
+    if(probeEl) window.HmBlockEngine.renderModuleFromSchema(probeEl, _r15ProbeSchema(projected));
+    if(liveEl) window.HmBlockEngine.renderModuleFromSchema(liveEl, _r15LivePreviewSchema(projected));
+  }
+  function _r15ScheduleHydrate(){
+    if(typeof window === 'undefined' || !window.setTimeout) return;
+    if(state._r15HydrateTimer) window.clearTimeout(state._r15HydrateTimer);
+    state._r15HydrateTimer = window.setTimeout(function(){
+      state._r15HydrateTimer = null;
+      try { _r15HydratePreviews(); } catch(err){ try { console.warn('[ModuleBuilder][R15] preview hydrate failed', err); } catch(inner){} }
+    }, 0);
+  }
+  function _r15ApplyPreset(key){
+    if(!state.schema) return;
+    if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+    state.moduleStudioDraft.runtimeDesign = _r15PresetSchema(key || 'executive-glass');
+    _paint();
+  }
+  function _r15ResetDesign(){
+    if(!state.schema) return;
+    if(!state.moduleStudioDraft) state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+    state.moduleStudioDraft.runtimeDesign = _r15PresetSchema(_r15InferPreset(state.schema));
+    _paint();
+  }
+  function _r15SeedStarter(key){
+    var kit = _r15StarterKits[key] || _r15StarterKits.executive;
+    var tab;
+    if(!state.schema) return;
+    _r15CommitDraftToSchema();
+    _mutateSchema(_t('Seed runtime starter kit', 'Seed runtime starter kit'), function(){
+      tab = _getActiveTab();
+      if(!tab) return;
+      (kit.blocks || []).forEach(function(def){ _insertBlockAtTarget(def.type, def.preConfig || {}, { tabId:tab.tabId, parentId:null, slotKey:'default', insertIndex:null }); });
+      _ngSyncModuleBuilderManifest(state.schema);
+    });
+  }
+  function _r15AutoStyleBlocks(){
+    if(!state.schema) return;
+    _r15CommitDraftToSchema();
+    _mutateSchema(_t('Polish runtime block styles', 'Polish runtime block styles'), function(){
+      _r15PolishSchemaBlocks(state.schema);
+      _ngSyncModuleBuilderManifest(state.schema);
+    });
+    if(window.HmBlockEngine && window.HmBlockEngine.toast) window.HmBlockEngine.toast(_t('Đã áp preset đồ hoạ vào tất cả block', 'Applied runtime preset styling to all blocks'), 'success');
+  }
+  function _r15ExportRuntimeJson(){
+    var payload = _r15RuntimeThemeExport(_r15ProjectedSchema());
+    var filename = 'module-runtime-theme-' + (payload.moduleId || 'module') + '-2026-04-08-r15.json';
+    if(typeof _r6DownloadJson === 'function') _r6DownloadJson(filename, payload);
+    return payload;
+  }
+
+  _ngModuleStudioDraftFromSchema = function(schema){
+    var draft = _r15PrevDraftFromSchema(schema);
+    draft.runtimeDesign = _r15EditableRuntimeDesign(schema || {});
+    return draft;
+  };
+  _ngApplyModuleStudioDraft = function(schema, draft){
+    _r15PrevApplyDraft(schema, draft);
+    _r15EnsureSchema(schema);
+    if(draft && _r15IsObject(draft.runtimeDesign)) schema.runtimeDesign = _r15EditableRuntimeDesign(draft);
+    return schema;
+  };
+  _ngSyncModuleBuilderManifest = function(schema){
+    _r15PrevSyncManifest(schema);
+    if(!schema) return;
+    _r15EnsureSchema(schema);
+    schema.builderManifest = schema.builderManifest || {};
+    schema.builderManifest.presentationPreset = schema.runtimeDesign.preset || '';
+    schema.builderManifest.presentationHeader = schema.runtimeDesign.header || '';
+    schema.builderManifest.presentationTabs = schema.runtimeDesign.tabs || '';
+    schema.builderManifest.presentationCard = schema.runtimeDesign.card || '';
+    schema.builderManifest.presentationTable = schema.runtimeDesign.table || '';
+    schema.builderManifest.presentationForm = schema.runtimeDesign.form || '';
+    schema.builderManifest.presentationButton = schema.runtimeDesign.button || '';
+    schema.builderManifest.presentationFrame = schema.runtimeDesign.frame || '';
+    schema.builderManifest.presentationMotion = schema.runtimeDesign.motion || '';
+  };
+  _createBlankModule = function(){
+    var result = _r15PrevCreateBlankModule();
+    if(state.schema){
+      _r15EnsureSchema(state.schema);
+      state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+      state.showModuleStudio = false;
+    }
+    return result;
+  };
+  _openSavedModule = function(moduleId){
+    var result = _r15PrevOpenSavedModule(moduleId);
+    setTimeout(function(){
+      if(state.schema){
+        _r15EnsureSchema(state.schema);
+        state.moduleStudioDraft = _ngModuleStudioDraftFromSchema(state.schema);
+        state.showModuleStudio = false;
+        _paint();
+      }
+    }, 0);
+    return result;
+  };
+
+  _renderBuilder = function(){ return _r15NormalizeHtml(_r15PrevRenderBuilder(), false); };
+  _renderPreview = function(){ if(state.schema && state.moduleStudioDraft) _r15CommitDraftToSchema(); return _r15NormalizeHtml(_r15PrevRenderPreview(), true); };
+  _paint = function(){ _r15PrevPaint(); _r15ScheduleHydrate(); };
+  _handleClick = function(e){
+    var btn = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+    var action = btn ? btn.getAttribute('data-action') : '';
+    if(btn){
+      switch(action){
+        case 'r15-apply-preset': _r15ApplyPreset(btn.getAttribute('data-key') || 'executive-glass'); return;
+        case 'r15-seed-starter': _r15SeedStarter(btn.getAttribute('data-key') || 'executive'); return;
+        case 'r15-apply-design-now': _r15CommitDraftToSchema(); _saveBuilderSnapshotLocal(); if(window.HmBlockEngine && window.HmBlockEngine.toast) window.HmBlockEngine.toast(_t('Đã áp dụng preset runtime vào schema', 'Applied runtime preset to schema'), 'success'); _paint(); return;
+        case 'r15-auto-style-blocks': _r15AutoStyleBlocks(); return;
+        case 'r15-export-runtime-json': _r15ExportRuntimeJson(); return;
+        case 'r15-reset-design': _r15ResetDesign(); return;
+        case 'r15-preview-now': _r15CommitDraftToSchema(); state.step = 'preview'; _paint(); return;
+        case 'save-module':
+        case 'preview-module':
+          _r15CommitDraftToSchema();
+          break;
+      }
+    }
+    return _r15PrevHandleClick(e);
+  };
+  _handleInput = function(e){
+    var target = e && e.target ? e.target : null;
+    var path = target && target.getAttribute ? target.getAttribute('data-module-path') : '';
+    var result = _r15PrevHandleInput(e);
+    if(path && path.indexOf('runtimeDesign.') === 0) _r15ScheduleHydrate();
+    return result;
+  };
+
+  window.__HM_MB_R15_TEST__ = {
+    version:'2026-04-08-r15-runtime-presets',
+    listPresets:function(){ return _r15PresetKeys(); },
+    presetSchema:function(key){ return _r15PresetSchema(key || 'executive-glass'); },
+    runtimeDesign:function(schema){ return _r15EditableRuntimeDesign(schema || {}); },
+    resolvedRuntimeDesign:function(schema){ return _r15ResolvedRuntimeDesign(schema || {}); },
+    presentationSummary:function(schema){ return _r15PresentationSummary(schema || {}); },
+    probeSchema:function(schema){ return _r15ProbeSchema(schema || {}); },
+    runtimeThemeExport:function(schema){ return _r15RuntimeThemeExport(schema || {}); },
+    recommendBlockDesign:function(block, schema){ return _r15RecommendBlockDesign(block || {}, _r15ResolvedRuntimeDesign(schema || {})); },
+    normalizeHtml:function(html, previewOnly){ return _r15NormalizeHtml(html, !!previewOnly); }
+  };
+})();
+
 window._renderModuleBuilder = render;
 
 })();

@@ -1,0 +1,34 @@
+{
+  "version": "2026-04-08-r15-runtime-presets",
+  "moduleId": "sample-quality-dashboard",
+  "title": {
+    "vi": "Dashboard chất lượng",
+    "en": "Quality dashboard"
+  },
+  "runtimeDesign": {
+    "preset": "quality-cleanroom",
+    "surface": "glass",
+    "accent": "cyan",
+    "density": "comfortable",
+    "radius": "xl",
+    "depth": "soft",
+    "header": "banner",
+    "tabs": "underline",
+    "card": "glass",
+    "table": "clean",
+    "form": "clean",
+    "button": "clean",
+    "badge": "outline",
+    "kpi": "clean",
+    "frame": "board",
+    "motion": "subtle",
+    "fontScale": "comfortable",
+    "titleWeight": "700",
+    "maxWidth": "1360",
+    "gap": "16"
+  },
+  "notes": [
+    "Apply this JSON to schema.runtimeDesign to restyle the generated runtime module.",
+    "Use Polish all blocks after applying the preset if the module contains older blocks without design config."
+  ]
+}
