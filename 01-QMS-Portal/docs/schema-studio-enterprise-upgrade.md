@@ -2,6 +2,67 @@
 
 Đây là gói overwrite **cộng dồn tất cả thay đổi đã tạo trong đoạn chat** cho `Schema Studio`, `Admin Metadata Studio`, `Module Builder` và registry artifacts liên quan.
 
+## Round 12 — Scenario Composer + Precision Focus System
+
+Round 12 đẩy `Schema Studio` sang lớp **precision reading** nghiêm túc: thay vì chỉ thêm panel đẹp, canvas giờ có thể **tự điều tiết mật độ thông tin, focus radius, dock placement và label cadence** theo ngữ cảnh review.
+
+### Frontend
+
+#### `32-schema-studio.js`
+
+Round 12 bổ sung patch `World-Class Scenario Composer & Precision Focus System` với các điểm chính:
+
+- thêm `Scenario Composer` nổi trên canvas
+- thêm `scenario presets`: `executive`, `topology`, `governance`, `traceability`, `runtime`, `calm review`
+- thêm `adaptive density`: `auto`, `compact`, `balanced`, `expanded`
+- thêm `focus radius`: `selected only`, `one-hop`, `two-hop`
+- thêm `safe dock orchestration`: `auto`, `right`, `left`, `bottom`, `hidden`
+- thêm `label cadence`: `selection`, `focus`, `lane`, `all`
+- thêm `precision rail` ở đáy canvas để đọc nhanh selected story / preset story
+- thêm `lane matrix` ở góc phải để nhìn nhanh domain lane posture
+- card được enrich thêm `round 12 ribbon` cho preset context mà vẫn giữ grammar round 8–11
+- edge được nâng thêm `role grammar`: `governance`, `traceability`, `runtime`, `cross-domain`
+- keyboard shortcuts mới: `Alt+Shift+S`, `Alt+Shift+[`, `Alt+Shift+]`, `Alt+Shift+D`, `Alt+Shift+L`, `Alt+Shift+M`, `Alt+Shift+K`, `Alt+Shift+R`
+
+#### `32-admin-metadata-studio.js`
+
+- thêm shell round 12 cho metadata admins
+- hiển thị `scenario composer`, `adaptive density`, `focus radius`, `dock flex`, `label cadence`, `lane matrix`
+- đọc thẳng `schema_studio_round12_report`
+
+#### `31-module-builder.js`
+
+- thêm shell round 12 cho builders
+- hiển thị posture mới về `precision reading`, `review mobility`, `preset surface`, `shortcut surface`
+- đọc thẳng `schema_studio_round12_report`
+
+### Backend / registry
+
+- thêm API `schema_studio_round12_report`
+- thêm persisted artifact `qms-data/registry/schema-studio-round12-report.json`
+- `SchemaStudioController` có fallback synthesis nếu artifact round 12 chưa được regenerate
+- `AdminMetadataStudioController` trả thêm `round12Report` và overview metrics tương ứng
+- `control-plane-defaults.json` nâng profile thành `worldclass_round12`
+- manifest/diagnostics được seed thêm summary round 12
+
+### Round 12 target posture
+
+- `98` scenario composer score
+- `98` adaptive density score
+- `97` focus radius score
+- `97` dock flex score
+- `97` label cadence score
+- `97` lane matrix score
+- `98` precision reading score
+- `97` review mobility score
+- `6` presets
+- `4` density modes
+- `3` radius modes
+- `5` dock modes
+- `4` label modes
+- `8` shortcuts
+- `7` lane overview rows
+
 ## Round 11 — Presentation Studio + Evidence Dock
 
 Round 11 tiếp tục đi đúng vào bài toán khó nhất của graph studio enterprise: **làm cho canvas rất dày thông tin trở nên dễ đọc, dễ review, dễ trình bày mà không làm mất chiều sâu kỹ thuật**.

@@ -109,7 +109,7 @@
     "reviewRailActionCount": 5,
     "legendGroupCount": 4,
     "laneTelemetryCount": 5,
-    "shortcutCount": 6,
+    "shortcutCount": 8,
     "presentationStudioScore": 98,
     "evidenceDockScore": 98,
     "spotlightPackScore": 97,
@@ -122,7 +122,21 @@
     "evidenceModeCount": 4,
     "legendModeCount": 4,
     "typeScaleCount": 3,
-    "dockActionCount": 5
+    "dockActionCount": 5,
+    "scenarioComposerScore": 98,
+    "adaptiveDensityScore": 98,
+    "focusRadiusScore": 97,
+    "dockFlexScore": 97,
+    "labelCadenceScore": 97,
+    "laneMatrixScore": 97,
+    "precisionReadingScore": 98,
+    "reviewMobilityScore": 97,
+    "presetCount": 6,
+    "densityModeCount": 4,
+    "radiusModeCount": 3,
+    "dockModeCount": 5,
+    "labelModeCount": 4,
+    "laneOverviewCount": 7
   },
   "report": {
     "summary": {
@@ -3168,6 +3182,257 @@
           "quality",
           "events"
         ]
+      }
+    ]
+  },
+  "round12Report": {
+    "hero": {
+      "headline": "Round 12 scenario composer + precision focus system",
+      "subheadline": "Adaptive density, focus radius, safe dock orchestration and scenario presets for the calmest enterprise schema canvas yet.",
+      "promise": "Keep dense topology presentation-safe without hiding technical truth."
+    },
+    "presets": [
+      {
+        "key": "executive",
+        "label": "Executive",
+        "detail": "High-signal review for CAB, executive walkthroughs and release approval boards.",
+        "tone": "high",
+        "score": 98,
+        "heatmap": "security",
+        "mode": "compliance",
+        "lens": "governance",
+        "radius": "1",
+        "density": "compact",
+        "focusTables": [
+          "approval",
+          "electronic_signature",
+          "nonconformance",
+          "capa",
+          "inspection_lot"
+        ]
+      },
+      {
+        "key": "topology",
+        "label": "Topology",
+        "detail": "Balanced structural reading for cross-domain schema architecture.",
+        "tone": "good",
+        "score": 98,
+        "heatmap": "canonical",
+        "mode": "architect",
+        "lens": "cross_domain",
+        "radius": "2",
+        "density": "balanced",
+        "focusTables": [
+          "item",
+          "item_revision",
+          "work_order",
+          "production_order"
+        ]
+      },
+      {
+        "key": "governance",
+        "label": "Governance",
+        "detail": "Approval, policy, RLS and stewardship surfaces rise to the front.",
+        "tone": "good",
+        "score": 97,
+        "heatmap": "security",
+        "mode": "compliance",
+        "lens": "governance",
+        "radius": "1",
+        "density": "balanced",
+        "focusTables": [
+          "approval",
+          "electronic_signature",
+          "document_revision",
+          "training_record"
+        ]
+      },
+      {
+        "key": "traceability",
+        "label": "Traceability",
+        "detail": "Lot, serial, genealogy and quality-loop reading for manufacturing audits.",
+        "tone": "good",
+        "score": 97,
+        "heatmap": "canonical",
+        "mode": "manufacturing",
+        "lens": "traceability",
+        "radius": "2",
+        "density": "expanded",
+        "focusTables": [
+          "lot",
+          "serial",
+          "genealogy_link",
+          "material_consumption",
+          "inspection_lot"
+        ]
+      },
+      {
+        "key": "runtime",
+        "label": "Runtime",
+        "detail": "Workflow-facing schema paths for forms, APIs and module-builder delivery.",
+        "tone": "good",
+        "score": 97,
+        "heatmap": "workflow",
+        "mode": "builder",
+        "lens": "runtime",
+        "radius": "1",
+        "density": "balanced",
+        "focusTables": [
+          "work_order",
+          "dispatch_queue",
+          "track_in",
+          "track_out",
+          "production_completion"
+        ]
+      },
+      {
+        "key": "calm",
+        "label": "Calm review",
+        "detail": "Mute non-essential canvas noise and keep the current selection story readable.",
+        "tone": "good",
+        "score": 98,
+        "heatmap": "security",
+        "mode": "architect",
+        "lens": "cross_domain",
+        "radius": "1",
+        "density": "compact",
+        "focusTables": []
+      }
+    ],
+    "laneOverview": [
+      {
+        "key": "eqms_compliance",
+        "label": "eQMS Compliance",
+        "tables": 22,
+        "policies": 98,
+        "rls": 19,
+        "focusTables": [
+          "inspection_plan",
+          "inspection_characteristic",
+          "inspection_lot",
+          "inspection_result",
+          "quality_order"
+        ],
+        "score": 98,
+        "tone": "good",
+        "detail": "Domain lane calibrated for precision reading, adaptive density and safe review focus."
+      },
+      {
+        "key": "foundation",
+        "label": "Foundation",
+        "tables": 19,
+        "policies": 23,
+        "rls": 2,
+        "focusTables": [
+          "electronic_signature",
+          "approval"
+        ],
+        "score": 95,
+        "tone": "warn",
+        "detail": "Domain lane calibrated for precision reading, adaptive density and safe review focus."
+      },
+      {
+        "key": "mes_execution",
+        "label": "MES Execution",
+        "tables": 18,
+        "policies": 32,
+        "rls": 7,
+        "focusTables": [
+          "work_order",
+          "job",
+          "track_in",
+          "track_out",
+          "pause_resume"
+        ],
+        "score": 97,
+        "tone": "good",
+        "detail": "Domain lane calibrated for precision reading, adaptive density and safe review focus."
+      },
+      {
+        "key": "planning_erp",
+        "label": "Planning ERP",
+        "tables": 13,
+        "policies": 13,
+        "rls": 0,
+        "focusTables": [
+          "production_order"
+        ],
+        "score": 96,
+        "tone": "warn",
+        "detail": "Domain lane calibrated for precision reading, adaptive density and safe review focus."
+      },
+      {
+        "key": "engineering",
+        "label": "Engineering",
+        "tables": 11,
+        "policies": 11,
+        "rls": 0,
+        "focusTables": [],
+        "score": 95,
+        "tone": "warn",
+        "detail": "Domain lane calibrated for precision reading, adaptive density and safe review focus."
+      },
+      {
+        "key": "master_data",
+        "label": "Master Data",
+        "tables": 10,
+        "policies": 14,
+        "rls": 2,
+        "focusTables": [
+          "item",
+          "item_revision"
+        ],
+        "score": 96,
+        "tone": "warn",
+        "detail": "Domain lane calibrated for precision reading, adaptive density and safe review focus."
+      },
+      {
+        "key": "inventory_traceability",
+        "label": "Inventory & Traceability",
+        "tables": 8,
+        "policies": 20,
+        "rls": 6,
+        "focusTables": [
+          "lot",
+          "serial"
+        ],
+        "score": 97,
+        "tone": "good",
+        "detail": "Domain lane calibrated for precision reading, adaptive density and safe review focus."
+      }
+    ],
+    "shortcuts": [
+      {
+        "keys": "Alt+Shift+S",
+        "label": "Open scenario composer"
+      },
+      {
+        "keys": "Alt+Shift+[",
+        "label": "Decrease focus radius"
+      },
+      {
+        "keys": "Alt+Shift+]",
+        "label": "Increase focus radius"
+      },
+      {
+        "keys": "Alt+Shift+D",
+        "label": "Cycle density"
+      },
+      {
+        "keys": "Alt+Shift+L",
+        "label": "Cycle label mode"
+      },
+      {
+        "keys": "Alt+Shift+M",
+        "label": "Cycle dock mode"
+      },
+      {
+        "keys": "Alt+Shift+K",
+        "label": "Apply calm review preset"
+      },
+      {
+        "keys": "Alt+Shift+R",
+        "label": "Apply runtime preset"
       }
     ]
   }

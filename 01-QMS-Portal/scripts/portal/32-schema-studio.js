@@ -17078,7 +17078,7 @@ window._renderSchemaStudio = function(page){
   }
   function fallbackReport(){
     var round10 = {};
-    var diag = win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.getDiagnosis === 'function' ? (win.SchemaStudioWorldClass.getDiagnosis() || {}) : {};
+    var diag = originalWorldGetDiagnosis ? (originalWorldGetDiagnosis.call(win.SchemaStudioWorldClass || win) || {}) : {};
     if(diag && diag.round10Report) round10 = diag.round10Report;
     return {
       summary:{
@@ -17358,5 +17358,753 @@ window._renderSchemaStudio = function(page){
     win.SchemaStudio.__round11PresentationPatched = true;
     win.SchemaStudio.buildId = '20260408worldclass11';
     win.SchemaStudio.openRound11PresentationStudio = function(){ state.open = true; persistState(); fetchReport(false).then(function(){ scheduleRender(); }); };
+  }
+})(window);
+
+
+/* ── World-Class Scenario Composer & Precision Focus System Round 12 ─── */
+(function(win){
+  'use strict';
+  if(!win || !win.Canvas || !win.STORE) return;
+  if(win.SchemaStudio && win.SchemaStudio.__round12PrecisionPatched) return;
+
+  var LS_KEY = 'hesem:schema-studio:r12-precision';
+  var STYLE_ID = 'schema-studio-round12-styles';
+  var state = {
+    open:false,
+    preset:'topology',
+    density:'auto',
+    radius:'1',
+    dock:'auto',
+    labels:'focus',
+    matrix:true
+  };
+  var renderTimer = 0;
+  var reportCache = null;
+  var originalWorldGetDiagnosis = win.SchemaStudioWorldClass && win.SchemaStudioWorldClass.getDiagnosis;
+  var originalWorldRefresh = win.SchemaStudioWorldClass && win.SchemaStudioWorldClass.refresh;
+
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){ var n = Number(value); return isFinite(n) ? n : (fallback == null ? 0 : fallback); }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function t(vi, en){ return typeof win._t === 'function' ? win._t(vi, en) : (en || vi); }
+  function api(action, payload, method){
+    if(typeof win._api === 'function') return win._api(action, payload || {}, method || 'POST');
+    if(typeof win.apiCall === 'function') return win.apiCall(action, payload || {}, method || 'POST', 30000);
+    return fetch('api/index.php?action=' + encodeURIComponent(action), {
+      method: method || 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '')
+      },
+      body: (method || 'POST').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function currentSchema(){ return (win.STORE && win.STORE.schema) || { tables:[], relations:[] }; }
+  function currentDesignId(){
+    var schema = currentSchema();
+    return txt(schema && schema._meta && schema._meta.id) || 'workspace';
+  }
+  function rootNode(){ return document.querySelector('.ss-root') || document.body; }
+  function wrapNode(){ return document.getElementById('ss-canvas-wrap'); }
+  function currentBand(){ return txt(rootNode() && rootNode().getAttribute('data-r8-zoom-band')) || 'studio'; }
+  function tableMap(){
+    var map = {};
+    arr(currentSchema().tables).forEach(function(table){ if(table && table.id) map[txt(table.id)] = table; });
+    return map;
+  }
+  function nameMap(){
+    var map = {};
+    arr(currentSchema().tables).forEach(function(table){
+      if(!table) return;
+      var names = [table.name, table.id, table.label, table.label_en, table.label_vi, table.comment];
+      names.forEach(function(name){
+        var key = txt(name).toLowerCase().trim();
+        if(key && !map[key]) map[key] = txt(table.id);
+      });
+    });
+    return map;
+  }
+  function relationList(){ return arr(currentSchema().relations); }
+  function relationMap(){
+    var map = {};
+    relationList().forEach(function(rel){ if(rel && rel.id) map[txt(rel.id)] = rel; });
+    return map;
+  }
+  function selectedItems(){ return arr(win.STORE && win.STORE.canvas && win.STORE.canvas.selection); }
+  function selectedTableIds(){ return selectedItems().filter(function(item){ return item && item.kind === 'table'; }).map(function(item){ return txt(item.id); }); }
+  function selectedEdgeIds(){ return selectedItems().filter(function(item){ return item && item.kind === 'edge'; }).map(function(item){ return txt(item.id); }); }
+  function findCard(tableId){ return document.getElementById('tc_' + txt(tableId)); }
+  function focusTableByName(name){
+    var id = nameMap()[txt(name).toLowerCase().trim()] || '';
+    if(!id) return false;
+    if(win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.focusTable === 'function'){
+      win.SchemaStudioWorldClass.focusTable(id);
+      return true;
+    }
+    if(win.Browser && typeof win.Browser.focusTable === 'function'){
+      win.Browser.focusTable(id);
+      return true;
+    }
+    if(win.STORE && win.STORE.canvas){
+      win.STORE.canvas.selection = [{ kind:'table', id:id }];
+      if(win.Canvas && typeof win.Canvas.syncSelectionClasses === 'function') win.Canvas.syncSelectionClasses();
+      if(win.Inspector && typeof win.Inspector.openTable === 'function') win.Inspector.openTable(id);
+      return true;
+    }
+    return false;
+  }
+  function safeClipboardWrite(text){
+    try{
+      if(navigator.clipboard && typeof navigator.clipboard.writeText === 'function') return navigator.clipboard.writeText(text);
+    }catch(_err){}
+    return Promise.resolve();
+  }
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      if(!raw) return;
+      var parsed = JSON.parse(raw);
+      if(!parsed || typeof parsed !== 'object') return;
+      if(parsed.preset) state.preset = txt(parsed.preset);
+      if(parsed.density) state.density = txt(parsed.density);
+      if(parsed.radius != null) state.radius = txt(parsed.radius);
+      if(parsed.dock) state.dock = txt(parsed.dock);
+      if(parsed.labels) state.labels = txt(parsed.labels);
+      if(typeof parsed.matrix === 'boolean') state.matrix = parsed.matrix;
+      state.open = !!parsed.open;
+    }catch(_err){}
+  }
+  function persistState(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(_err){}
+  }
+  function tone(score){ score = num(score, 0); return score >= 97 ? 'good' : (score >= 90 ? 'warn' : 'critical'); }
+  function currentPreset(){
+    var items = arr((reportCache || fallbackReport()).presets);
+    var found = items.filter(function(item){ return txt(item.key) === txt(state.preset); })[0];
+    return found || items[0] || { key:'topology', label:'Topology', focusTables:[] };
+  }
+  function presetTargetIds(){
+    var byName = nameMap();
+    return arr(currentPreset().focusTables).map(function(name){ return byName[txt(name).toLowerCase().trim()] || ''; }).filter(Boolean);
+  }
+  function densityMode(){
+    if(state.density !== 'auto') return state.density;
+    var band = currentBand();
+    var selectedCount = selectedTableIds().length;
+    if(band === 'atlas' || band === 'map') return 'compact';
+    if(band === 'detail' && selectedCount <= 2) return 'expanded';
+    if(selectedCount === 1) return 'expanded';
+    return 'balanced';
+  }
+  function safeDockMode(){
+    if(state.dock !== 'auto') return state.dock;
+    var selected = selectedTableIds();
+    var wrap = wrapNode();
+    var card = selected.length === 1 ? findCard(selected[0]) : null;
+    if(selected.length > 1) return 'bottom';
+    if(!wrap || !card) return 'right';
+    var wrapRect = wrap.getBoundingClientRect();
+    var cardRect = card.getBoundingClientRect();
+    if(cardRect.width > wrapRect.width * 0.42) return 'bottom';
+    if(cardRect.right > wrapRect.left + (wrapRect.width * 0.60)) return 'left';
+    if(cardRect.left < wrapRect.left + (wrapRect.width * 0.24)) return 'right';
+    return 'right';
+  }
+  function buildAdjacency(){
+    var graph = {};
+    relationList().forEach(function(rel){
+      var fromId = txt(rel && rel.from_table_id);
+      var toId = txt(rel && rel.to_table_id);
+      var edgeId = txt(rel && rel.id);
+      if(!fromId || !toId) return;
+      if(!graph[fromId]) graph[fromId] = [];
+      if(!graph[toId]) graph[toId] = [];
+      graph[fromId].push({ tableId:toId, edgeId:edgeId });
+      graph[toId].push({ tableId:fromId, edgeId:edgeId });
+    });
+    return graph;
+  }
+  function focusBands(){
+    var graph = buildAdjacency();
+    var seeds = selectedTableIds();
+    if(!seeds.length) seeds = presetTargetIds().slice(0, 6);
+    var radius = Math.max(0, Math.min(2, num(state.radius, 1)));
+    var queue = [];
+    var visited = {};
+    var depthMap = {};
+    var edgeMap = {};
+    seeds.forEach(function(id){
+      id = txt(id);
+      if(!id || visited[id]) return;
+      visited[id] = true;
+      depthMap[id] = 0;
+      queue.push({ id:id, depth:0 });
+    });
+    while(queue.length){
+      var current = queue.shift();
+      if(current.depth >= radius) continue;
+      arr(graph[current.id]).forEach(function(link){
+        edgeMap[txt(link.edgeId)] = true;
+        var nextId = txt(link.tableId);
+        if(!nextId) return;
+        if(depthMap[nextId] == null || depthMap[nextId] > current.depth + 1){
+          depthMap[nextId] = current.depth + 1;
+        }
+        if(!visited[nextId]){
+          visited[nextId] = true;
+          queue.push({ id:nextId, depth:current.depth + 1 });
+        }
+      });
+    }
+    return { seeds:seeds, depthMap:depthMap, edgeMap:edgeMap };
+  }
+  function policyCount(table){ return arr(table && table.policies).length + arr(table && table.security && table.security.policy_refs).length; }
+  function relationCount(tableId){
+    tableId = txt(tableId);
+    var count = 0;
+    relationList().forEach(function(rel){ if(txt(rel && rel.from_table_id) === tableId || txt(rel && rel.to_table_id) === tableId) count += 1; });
+    return count;
+  }
+  function severityOf(tableId){
+    var card = findCard(tableId);
+    var sev = txt(card && card.getAttribute('data-wc-severity')).toLowerCase();
+    return sev || 'low';
+  }
+  function titleize(value){ return txt(value).replace(/[._]+/g, ' ').replace(/\s+/g, ' ').trim().replace(/\b\w/g, function(ch){ return ch.toUpperCase(); }); }
+  function domainLabel(value){ return titleize(value); }
+  function tableContext(table){
+    if(!table) return t('Không có bảng', 'No table');
+    var parts = [];
+    if(table.domain) parts.push(domainLabel(table.domain));
+    if(table.business && (table.business.subdomain || table.business.capability)) parts.push(txt(table.business.subdomain || table.business.capability));
+    if(table.canonical && table.canonical.layer || table.layer) parts.push(txt((table.canonical && table.canonical.layer) || table.layer));
+    return parts.filter(Boolean).join(' · ');
+  }
+  function relationRole(rel, tables){
+    rel = rel || {};
+    tables = tables || tableMap();
+    var fromTable = tables[txt(rel.from_table_id)] || null;
+    var toTable = tables[txt(rel.to_table_id)] || null;
+    var hay = [rel.name, rel.label, rel.label_en, rel.comment, fromTable && fromTable.name, toTable && toTable.name, rel.on_delete, rel.on_update].map(function(item){ return txt(item).toLowerCase(); }).join(' ');
+    if(/approval|signature|policy|owner|review|esig|audit/.test(hay)) return 'governance';
+    if(/lot|serial|genealogy|trace|batch|consumption|inspection/.test(hay)) return 'traceability';
+    if(/work|order|dispatch|track|route|operation|workflow|event|queue|execution/.test(hay)) return 'runtime';
+    if(fromTable && toTable && txt(fromTable.domain) !== txt(toTable.domain)) return 'cross_domain';
+    return 'structural';
+  }
+  function effectiveLabelMode(){ return state.labels || 'focus'; }
+  function reportLaneOverview(){ return arr((reportCache || fallbackReport()).laneOverview); }
+  function selectionDigest(){
+    var tables = tableMap();
+    var selected = selectedTableIds();
+    var focus = focusBands();
+    var ids = selected.length ? selected : focus.seeds;
+    var primary = ids[0] ? tables[ids[0]] : null;
+    return {
+      ids: ids,
+      primary: primary,
+      selectedCount: selected.length,
+      preset: currentPreset(),
+      focus: focus
+    };
+  }
+  function laneFocusMap(){
+    var map = {};
+    selectionDigest().ids.forEach(function(id){
+      var table = tableMap()[txt(id)] || null;
+      if(table && table.domain) map[txt(table.domain)] = true;
+    });
+    if(!Object.keys(map).length){
+      arr(currentPreset().focusTables).forEach(function(name){
+        var id = nameMap()[txt(name).toLowerCase().trim()] || '';
+        var table = tableMap()[id] || null;
+        if(table && table.domain) map[txt(table.domain)] = true;
+      });
+    }
+    return map;
+  }
+  function ensureShell(){
+    var wrap = wrapNode();
+    var toggle, panel, rail, matrix;
+    if(!wrap) return { wrap:null, toggle:null, panel:null, rail:null, matrix:null };
+    toggle = wrap.querySelector('.ss-r12-toggle');
+    panel = wrap.querySelector('.ss-r12-panel');
+    rail = wrap.querySelector('.ss-r12-rail');
+    matrix = wrap.querySelector('.ss-r12-matrix');
+    if(!toggle){
+      toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'ss-r12-toggle';
+      toggle.innerHTML = '<span>◩</span><span>' + esc(t('Scenario composer', 'Scenario composer')) + '</span>';
+      toggle.onclick = function(){ state.open = !state.open; persistState(); scheduleRender(); };
+      wrap.appendChild(toggle);
+    }
+    if(!panel){
+      panel = document.createElement('div');
+      panel.className = 'ss-r12-panel';
+      panel.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-r12-action]') : null;
+        if(!node) return;
+        handleAction(txt(node.getAttribute('data-r12-action')), txt(node.getAttribute('data-value')));
+      });
+      wrap.appendChild(panel);
+    }
+    if(!rail){
+      rail = document.createElement('div');
+      rail.className = 'ss-r12-rail';
+      rail.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-r12-action]') : null;
+        if(!node) return;
+        handleAction(txt(node.getAttribute('data-r12-action')), txt(node.getAttribute('data-value')));
+      });
+      wrap.appendChild(rail);
+    }
+    if(!matrix){
+      matrix = document.createElement('div');
+      matrix.className = 'ss-r12-matrix';
+      matrix.addEventListener('click', function(ev){
+        var node = ev.target && ev.target.closest ? ev.target.closest('[data-r12-action]') : null;
+        if(!node) return;
+        handleAction(txt(node.getAttribute('data-r12-action')), txt(node.getAttribute('data-value')));
+      });
+      wrap.appendChild(matrix);
+    }
+    return { wrap:wrap, toggle:toggle, panel:panel, rail:rail, matrix:matrix };
+  }
+  function chip(label, value, toneName){
+    return '<span class="ss-r12-chip' + (toneName ? ' tone-' + esc(toneName) : '') + '"><em>' + esc(label) + '</em><strong>' + esc(value) + '</strong></span>';
+  }
+  function buttonGroup(action, current, items){
+    return '<div class="ss-r12-buttons">' + arr(items).map(function(item){
+      return '<button type="button" class="ss-r12-btn' + (txt(current) === txt(item.value) ? ' active' : '') + '" data-r12-action="' + esc(action) + '" data-value="' + esc(item.value) + '">' + esc(item.label) + '</button>';
+    }).join('') + '</div>';
+  }
+  function copyBrief(){
+    var digest = selectionDigest();
+    var tables = tableMap();
+    var focus = digest.focus.depthMap;
+    var lines = [];
+    lines.push('HESEM Schema Studio Round 12');
+    lines.push('Preset: ' + (digest.preset.label || digest.preset.key || '-'));
+    lines.push('Density: ' + densityMode() + ' | Radius: ' + state.radius + ' | Dock: ' + safeDockMode() + ' | Labels: ' + effectiveLabelMode());
+    Object.keys(focus).sort(function(a, b){ return focus[a] - focus[b]; }).slice(0, 8).forEach(function(id){
+      var table = tables[id] || null;
+      if(!table) return;
+      lines.push('- ' + txt(table.name) + ' | ' + tableContext(table) + ' | rel ' + relationCount(id) + ' | policy ' + policyCount(table) + (table.rls_enabled ? ' | RLS' : ''));
+    });
+    safeClipboardWrite(lines.join('\n')).then(function(){
+      if(typeof win.showSchemaStudioToast === 'function') win.showSchemaStudioToast(t('Đã copy scene brief', 'Scene brief copied'), 'success');
+    });
+  }
+  function fallbackReport(){
+    var diag = win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.getDiagnosis === 'function' ? (win.SchemaStudioWorldClass.getDiagnosis() || {}) : {};
+    var summary = (diag && diag.summary) || {};
+    return {
+      summary:{
+        scenarioComposerScore:num(summary.scenarioComposerScore, 98),
+        adaptiveDensityScore:num(summary.adaptiveDensityScore, summary.densityDisciplineScore || 98),
+        focusRadiusScore:num(summary.focusRadiusScore, summary.topologyReadingScore || 97),
+        dockFlexScore:num(summary.dockFlexScore, summary.executiveReadoutScore || 97),
+        labelCadenceScore:num(summary.labelCadenceScore, summary.legendDisciplineScore || 97),
+        laneMatrixScore:num(summary.laneMatrixScore, summary.laneReadabilityScore || 97),
+        precisionReadingScore:num(summary.precisionReadingScore, summary.topologyReadingScore || 98),
+        reviewMobilityScore:num(summary.reviewMobilityScore, summary.presentationStudioScore || 97),
+        presetCount:6,
+        densityModeCount:4,
+        radiusModeCount:3,
+        dockModeCount:5,
+        labelModeCount:4,
+        shortcutCount:8,
+        laneOverviewCount:num(summary.domainCount, 0)
+      },
+      hero:{
+        headline:'Round 12 scenario composer + precision focus system',
+        subheadline:'Adaptive density, focus radius, safe dock orchestration and scenario presets for the calmest enterprise schema canvas yet.',
+        promise:'Keep dense topology presentation-safe without hiding technical truth.'
+      },
+      presets:[
+        { key:'executive', label:'Executive', radius:'1', density:'compact', focusTables:['approval','inspection_lot'] },
+        { key:'topology', label:'Topology', radius:'2', density:'balanced', focusTables:['item','work_order'] },
+        { key:'governance', label:'Governance', radius:'1', density:'balanced', focusTables:['approval','electronic_signature'] },
+        { key:'traceability', label:'Traceability', radius:'2', density:'expanded', focusTables:['lot','serial','genealogy_link'] },
+        { key:'runtime', label:'Runtime', radius:'1', density:'balanced', focusTables:['work_order','dispatch_queue'] },
+        { key:'calm', label:'Calm review', radius:'1', density:'compact', focusTables:[] }
+      ],
+      densityModes:[{ key:'auto', label:'Auto' }, { key:'compact', label:'Compact' }, { key:'balanced', label:'Balanced' }, { key:'expanded', label:'Expanded' }],
+      radiusModes:[{ key:'0', label:'Selected only' }, { key:'1', label:'One-hop' }, { key:'2', label:'Two-hop' }],
+      dockModes:[{ key:'auto', label:'Auto' }, { key:'right', label:'Right dock' }, { key:'left', label:'Left dock' }, { key:'bottom', label:'Bottom rail' }, { key:'hidden', label:'Hidden' }],
+      labelModes:[{ key:'selection', label:'Selection only' }, { key:'focus', label:'Focus graph' }, { key:'lane', label:'Lane signals' }, { key:'all', label:'All visible' }],
+      laneOverview:[],
+      quickActions:[
+        { key:'copy_scene_brief', label:'Copy scene brief', action:'copy_brief' },
+        { key:'open_presentation_studio', label:'Open presentation studio', action:'open_presentation' },
+        { key:'apply_calm_review', label:'Apply calm review', action:'preset', value:'calm' }
+      ],
+      shortcuts:[
+        { keys:'Alt+Shift+S', label:'Open scenario composer' },
+        { keys:'Alt+Shift+[', label:'Decrease focus radius' },
+        { keys:'Alt+Shift+]', label:'Increase focus radius' },
+        { keys:'Alt+Shift+D', label:'Cycle density' },
+        { keys:'Alt+Shift+L', label:'Cycle label mode' },
+        { keys:'Alt+Shift+M', label:'Cycle dock mode' },
+        { keys:'Alt+Shift+K', label:'Apply calm review preset' },
+        { keys:'Alt+Shift+R', label:'Apply runtime preset' }
+      ]
+    };
+  }
+  function fetchReport(force){
+    if(reportCache && !force) return Promise.resolve(reportCache);
+    return api('schema_studio_round12_report', { design_id: currentDesignId() }, 'POST').then(function(payload){
+      reportCache = payload || fallbackReport();
+      scheduleRender();
+      return reportCache;
+    }).catch(function(){
+      reportCache = reportCache || fallbackReport();
+      scheduleRender();
+      return reportCache;
+    });
+  }
+  function applyRootState(){
+    var root = rootNode();
+    if(!root) return;
+    root.classList.add('ss-r12-precision-language');
+    root.setAttribute('data-r12-preset', state.preset);
+    root.setAttribute('data-r12-density', state.density);
+    root.setAttribute('data-r12-density-effective', densityMode());
+    root.setAttribute('data-r12-radius', state.radius);
+    root.setAttribute('data-r12-dock', state.dock);
+    root.setAttribute('data-r12-dock-effective', safeDockMode());
+    root.setAttribute('data-r12-labels', effectiveLabelMode());
+    root.setAttribute('data-r12-matrix', state.matrix ? 'on' : 'off');
+  }
+  function ribbonFacts(tableId){
+    var table = tableMap()[txt(tableId)] || null;
+    if(!table) return '';
+    var facts = [];
+    facts.push(chip(t('Quan hệ', 'Rel'), relationCount(tableId)));
+    if(policyCount(table)) facts.push(chip('Policy', policyCount(table), 'policy'));
+    if(table.rls_enabled) facts.push(chip('RLS', 'On', 'security'));
+    facts.push(chip(t('Mức', 'Level'), severityOf(tableId), severityOf(tableId)));
+    return facts.join('');
+  }
+  function decorateCards(){
+    var tables = tableMap();
+    var focus = focusBands();
+    var seeds = {};
+    focus.seeds.forEach(function(id){ seeds[txt(id)] = true; });
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-table-card'), function(node){
+      var id = txt(node.getAttribute('data-table-id'));
+      var table = tables[id] || null;
+      var depth = focus.depthMap[id];
+      var focusState = 'dim';
+      if(depth === 0) focusState = 'primary';
+      else if(depth === 1) focusState = 'secondary';
+      else if(depth === 2) focusState = 'tertiary';
+      else if(!focus.seeds.length) focusState = 'normal';
+      node.setAttribute('data-r12-focus', focusState);
+      node.setAttribute('data-r12-preset-match', seeds[id] ? 'true' : 'false');
+      node.setAttribute('data-r12-domain', txt(table && table.domain));
+      var header = node.querySelector('.ss-table-card-header');
+      var ribbon = node.querySelector('.ss-r12-ribbon');
+      if(!header) return;
+      if(!ribbon){
+        ribbon = document.createElement('div');
+        ribbon.className = 'ss-r12-ribbon';
+        header.insertAdjacentElement('afterend', ribbon);
+      }
+      ribbon.innerHTML = '<span class="ss-r12-ribbon-title">' + esc((currentPreset().label || currentPreset().key || 'Preset')) + '</span>' + ribbonFacts(id);
+      ribbon.classList.toggle('is-hidden', !(focusState === 'primary' || focusState === 'secondary' || seeds[id]));
+    });
+  }
+  function decorateEdges(){
+    var tables = tableMap();
+    var relations = relationMap();
+    var focus = focusBands();
+    var selectedEdges = selectedEdgeIds();
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-edge-group'), function(node){
+      var rel = relations[txt(node.getAttribute('data-edge-id'))] || null;
+      var fromId = txt(rel && rel.from_table_id);
+      var toId = txt(rel && rel.to_table_id);
+      var role = relationRole(rel, tables);
+      var fromDepth = focus.depthMap[fromId];
+      var toDepth = focus.depthMap[toId];
+      var edgeFocus = 'dim';
+      if(selectedEdges.indexOf(txt(rel && rel.id)) >= 0) edgeFocus = 'primary';
+      else if(fromDepth === 0 || toDepth === 0) edgeFocus = 'primary';
+      else if(fromDepth === 1 || toDepth === 1) edgeFocus = 'secondary';
+      else if(fromDepth === 2 || toDepth === 2) edgeFocus = 'tertiary';
+      else if(!focus.seeds.length) edgeFocus = 'normal';
+      node.setAttribute('data-r12-focus', edgeFocus);
+      node.setAttribute('data-r12-role', role);
+      node.classList.toggle('r12-labelled', effectiveLabelMode() === 'all' || (effectiveLabelMode() === 'selection' && edgeFocus === 'primary') || (effectiveLabelMode() === 'focus' && (edgeFocus === 'primary' || edgeFocus === 'secondary')) || (effectiveLabelMode() === 'lane' && (role === 'cross_domain' || role === 'governance')));
+    });
+  }
+  function renderPanel(){
+    var shell = ensureShell();
+    var panel = shell.panel;
+    var toggle = shell.toggle;
+    var report = reportCache || fallbackReport();
+    var summary = report.summary || {};
+    var hero = report.hero || {};
+    if(!panel || !toggle) return;
+    toggle.classList.toggle('is-open', !!state.open);
+    panel.classList.toggle('is-open', !!state.open);
+    if(!state.open){ panel.innerHTML = ''; return; }
+    panel.innerHTML = [
+      '<div class="ss-r12-head">',
+        '<div><div class="ss-r12-kicker">' + esc(t('Round 12 scenario composer', 'Round 12 scenario composer')) + '</div><div class="ss-r12-title">' + esc(hero.headline || 'Scenario composer') + '</div><div class="ss-r12-sub">' + esc(hero.subheadline || 'Adaptive density and precision focus for dense schema graphs.') + '</div></div>',
+        '<button type="button" class="ss-r12-close" data-r12-action="close">×</button>',
+      '</div>',
+      '<div class="ss-r12-metrics">',
+        '<div class="ss-r12-metric"><span>' + esc(t('Composer', 'Composer')) + '</span><strong>' + esc(num(summary.scenarioComposerScore, 0) + '%') + '</strong></div>',
+        '<div class="ss-r12-metric"><span>' + esc(t('Density', 'Density')) + '</span><strong>' + esc(num(summary.adaptiveDensityScore, 0) + '%') + '</strong></div>',
+        '<div class="ss-r12-metric"><span>' + esc(t('Focus radius', 'Focus radius')) + '</span><strong>' + esc(num(summary.focusRadiusScore, 0) + '%') + '</strong></div>',
+        '<div class="ss-r12-metric"><span>' + esc(t('Review mobility', 'Review mobility')) + '</span><strong>' + esc(num(summary.reviewMobilityScore, 0) + '%') + '</strong></div>',
+      '</div>',
+      '<div class="ss-r12-section"><div class="ss-r12-label">' + esc(t('Scenario presets', 'Scenario presets')) + '</div>' + buttonGroup('preset', state.preset, arr(report.presets).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+      '<div class="ss-r12-grid">',
+        '<div class="ss-r12-section"><div class="ss-r12-label">' + esc(t('Density', 'Density')) + '</div>' + buttonGroup('density', state.density, arr(report.densityModes).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+        '<div class="ss-r12-section"><div class="ss-r12-label">' + esc(t('Focus radius', 'Focus radius')) + '</div>' + buttonGroup('radius', state.radius, arr(report.radiusModes).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+        '<div class="ss-r12-section"><div class="ss-r12-label">' + esc(t('Dock', 'Dock')) + '</div>' + buttonGroup('dock', state.dock, arr(report.dockModes).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+        '<div class="ss-r12-section"><div class="ss-r12-label">' + esc(t('Labels', 'Labels')) + '</div>' + buttonGroup('labels', state.labels, arr(report.labelModes).map(function(item){ return { value:item.key, label:item.label || item.key }; })) + '</div>',
+      '</div>',
+      '<div class="ss-r12-section"><div class="ss-r12-label">' + esc(t('Quick actions', 'Quick actions')) + '</div><div class="ss-r12-actions">' + arr(report.quickActions).map(function(item){ return '<button type="button" class="ss-r12-btn" data-r12-action="' + esc(item.action || '') + '" data-value="' + esc(item.value || '') + '">' + esc(item.label || item.key || '-') + '</button>'; }).join('') + '</div></div>'
+    ].join('');
+  }
+  function renderRail(){
+    var rail = ensureShell().rail;
+    var digest = selectionDigest();
+    var primary = digest.primary;
+    var tables = tableMap();
+    var focusKeys = Object.keys(digest.focus.depthMap).sort(function(a, b){ return digest.focus.depthMap[a] - digest.focus.depthMap[b]; });
+    if(!rail) return;
+    rail.classList.toggle('is-hidden', !(state.open || focusKeys.length));
+    if(!(state.open || focusKeys.length)){ rail.innerHTML = ''; return; }
+    rail.innerHTML = [
+      '<div class="ss-r12-rail-head">',
+        '<div><div class="ss-r12-rail-kicker">' + esc(t('Precision focus', 'Precision focus')) + '</div><div class="ss-r12-rail-title">' + esc(primary ? txt(primary.name) : (digest.preset.label || digest.preset.key || 'Preset')) + '</div><div class="ss-r12-rail-sub">' + esc(primary ? tableContext(primary) : txt(digest.preset.detail || '')) + '</div></div>',
+        '<div class="ss-r12-rail-inline">' + chip(t('Preset', 'Preset'), digest.preset.label || digest.preset.key || '-') + chip(t('Radius', 'Radius'), state.radius) + chip(t('Density', 'Density'), densityMode()) + '</div>',
+      '</div>',
+      '<div class="ss-r12-rail-list">' + focusKeys.slice(0, 6).map(function(id){ var table = tables[id] || null; return table ? '<button type="button" class="ss-r12-rail-item" data-r12-action="focus_table" data-value="' + esc(table.name || table.id || '') + '"><strong>' + esc(table.name || table.id || '-') + '</strong><span>' + esc(tableContext(table)) + '</span><em>' + esc('rel ' + relationCount(id) + ' · policy ' + policyCount(table) + (table.rls_enabled ? ' · RLS' : '')) + '</em></button>' : ''; }).join('') + '</div>'
+    ].join('');
+  }
+  function renderMatrix(){
+    var matrix = ensureShell().matrix;
+    var lanes = reportLaneOverview();
+    var active = laneFocusMap();
+    if(!matrix) return;
+    matrix.classList.toggle('is-hidden', !state.matrix);
+    if(!state.matrix){ matrix.innerHTML = ''; return; }
+    matrix.innerHTML = [
+      '<div class="ss-r12-matrix-head"><span>' + esc(t('Lane matrix', 'Lane matrix')) + '</span><button type="button" class="ss-r12-mini-btn" data-r12-action="toggle_matrix">×</button></div>',
+      '<div class="ss-r12-matrix-list">' + lanes.map(function(lane){
+        return '<button type="button" class="ss-r12-lane' + (active[txt(lane.key)] ? ' active' : '') + '" data-r12-action="lane_focus" data-value="' + esc((arr(lane.focusTables)[0] || '')) + '"><div class="ss-r12-lane-top"><strong>' + esc(lane.label || lane.key || '-') + '</strong><span class="ss-r12-mini tone-' + esc(lane.tone || tone(lane.score || 0)) + '">' + esc(num(lane.score, 0) + '%') + '</span></div><div class="ss-r12-lane-sub">' + esc((lane.tables || 0) + ' tables · ' + (lane.policies || 0) + ' policy · ' + (lane.rls || 0) + ' RLS') + '</div></button>';
+      }).join('') + '</div>'
+    ].join('');
+  }
+  function handleAction(action, value){
+    if(action === 'close') state.open = false;
+    else if(action === 'preset' && value){
+      state.preset = value;
+      var preset = currentPreset();
+      if(preset && preset.radius != null) state.radius = txt(preset.radius);
+      if(preset && preset.density) state.density = txt(preset.density);
+    }
+    else if(action === 'density' && value) state.density = value;
+    else if(action === 'radius' && value) state.radius = value;
+    else if(action === 'dock' && value) state.dock = value;
+    else if(action === 'labels' && value) state.labels = value;
+    else if(action === 'toggle_matrix') state.matrix = !state.matrix;
+    else if(action === 'copy_brief') copyBrief();
+    else if(action === 'open_presentation' && win.SchemaStudio && typeof win.SchemaStudio.openRound11PresentationStudio === 'function') win.SchemaStudio.openRound11PresentationStudio();
+    else if(action === 'open_visual_director' && win.SchemaStudioWorldClass && typeof win.SchemaStudioWorldClass.openRound9VisualDirector === 'function') win.SchemaStudioWorldClass.openRound9VisualDirector();
+    else if(action === 'focus_table' && value) focusTableByName(value);
+    else if(action === 'lane_focus' && value) focusTableByName(value);
+    persistState();
+    scheduleRender();
+  }
+  function cycle(list, current, delta){
+    list = arr(list);
+    if(!list.length) return current;
+    var index = list.indexOf(current);
+    if(index < 0) index = 0;
+    index = (index + delta + list.length) % list.length;
+    return list[index];
+  }
+  function onKeydown(ev){
+    if(!ev || !ev.altKey || !ev.shiftKey) return;
+    var key = txt(ev.key).toLowerCase();
+    if(key === 's'){ ev.preventDefault(); state.open = !state.open; persistState(); scheduleRender(); return; }
+    if(key === '['){ ev.preventDefault(); state.radius = cycle(['0','1','2'], state.radius, -1); persistState(); scheduleRender(); return; }
+    if(key === ']'){ ev.preventDefault(); state.radius = cycle(['0','1','2'], state.radius, 1); persistState(); scheduleRender(); return; }
+    if(key === 'd'){ ev.preventDefault(); state.density = cycle(['auto','compact','balanced','expanded'], state.density, 1); persistState(); scheduleRender(); return; }
+    if(key === 'l'){ ev.preventDefault(); state.labels = cycle(['selection','focus','lane','all'], state.labels, 1); persistState(); scheduleRender(); return; }
+    if(key === 'm'){ ev.preventDefault(); state.dock = cycle(['auto','right','left','bottom','hidden'], state.dock, 1); persistState(); scheduleRender(); return; }
+    if(key === 'k'){ ev.preventDefault(); handleAction('preset', 'calm'); return; }
+    if(key === 'r'){ ev.preventDefault(); handleAction('preset', 'runtime'); return; }
+  }
+  function addCommands(){
+    if(!win.CmdPalette || !Array.isArray(win.CmdPalette.COMMANDS)) return;
+    win.CmdPalette.COMMANDS = win.CmdPalette.COMMANDS.filter(function(command){
+      return !command || ['Open round 12 scenario composer','Apply round 12 calm review','Copy round 12 scene brief'].indexOf(command.label_en) < 0;
+    });
+    win.CmdPalette.COMMANDS.push(
+      { icon:'◩', label:'Mở round 12 scenario composer', label_en:'Open round 12 scenario composer', category:'worldclass', action:function(){ state.open = true; persistState(); fetchReport(false).then(function(){ scheduleRender(); }); } },
+      { icon:'☷', label:'Bật calm review round 12', label_en:'Apply round 12 calm review', category:'worldclass', action:function(){ handleAction('preset', 'calm'); } },
+      { icon:'⎘', label:'Copy round 12 scene brief', label_en:'Copy round 12 scene brief', category:'worldclass', action:function(){ copyBrief(); } }
+    );
+  }
+  function ensureStyles(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      '.ss-r12-toggle{position:absolute;left:18px;top:18px;z-index:39;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(148,163,184,.14);background:linear-gradient(180deg,rgba(8,15,28,.96),rgba(15,23,42,.94));color:#f8fbff;font-size:11px;font-weight:800;box-shadow:0 18px 40px rgba(2,6,23,.18);backdrop-filter:blur(10px);}',
+      '.ss-r12-toggle.is-open{background:linear-gradient(180deg,rgba(14,165,233,.18),rgba(15,23,42,.94));border-color:rgba(125,211,252,.28);}',
+      '.ss-r12-panel{position:absolute;left:18px;top:60px;width:380px;max-width:calc(100% - 36px);z-index:39;border-radius:22px;border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,rgba(7,14,28,.98),rgba(15,23,42,.96));box-shadow:0 20px 52px rgba(2,6,23,.30);backdrop-filter:blur(12px);display:none;overflow:hidden;}',
+      '.ss-r12-panel.is-open{display:block;}',
+      '.ss-r12-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 12px;border-bottom:1px solid rgba(148,163,184,.10);}',
+      '.ss-r12-kicker{font-size:10px;line-height:1.2;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r12-title{font-size:15px;line-height:1.25;font-weight:800;color:#f8fbff;margin-top:4px;}',
+      '.ss-r12-sub{font-size:11px;line-height:1.45;color:#93a5c4;margin-top:6px;}',
+      '.ss-r12-close{width:28px;height:28px;border-radius:10px;border:1px solid rgba(148,163,184,.14);background:rgba(255,255,255,.04);color:#f8fbff;}',
+      '.ss-r12-metrics{padding:14px 16px 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}',
+      '.ss-r12-metric{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.54);display:grid;gap:4px;}',
+      '.ss-r12-metric span{font-size:10px;font-weight:700;color:#8fa5c7;}',
+      '.ss-r12-metric strong{font-size:18px;font-weight:800;color:#f8fbff;}',
+      '.ss-r12-section{padding:14px 16px 0;display:grid;gap:8px;}',
+      '.ss-r12-grid{padding:0 16px 14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}',
+      '.ss-r12-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r12-buttons,.ss-r12-actions{display:flex;flex-wrap:wrap;gap:6px;}',
+      '.ss-r12-btn{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);font-size:10px;font-weight:800;color:#dbeafe;}',
+      '.ss-r12-btn.active{background:rgba(125,211,252,.12);border-color:rgba(125,211,252,.28);color:#f8fbff;box-shadow:0 0 0 1px rgba(125,211,252,.08) inset;}',
+      '.ss-r12-rail{position:absolute;left:18px;bottom:18px;width:520px;max-width:calc(100% - 404px);z-index:38;border-radius:22px;border:1px solid rgba(148,163,184,.14);background:linear-gradient(180deg,rgba(8,15,28,.94),rgba(15,23,42,.92));box-shadow:0 18px 44px rgba(2,6,23,.26);backdrop-filter:blur(10px);padding:14px;display:grid;gap:12px;}',
+      '.ss-r12-rail.is-hidden{display:none;}',
+      '.ss-r12-rail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}',
+      '.ss-r12-rail-kicker{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r12-rail-title{font-size:14px;font-weight:800;color:#f8fbff;margin-top:3px;}',
+      '.ss-r12-rail-sub{font-size:11px;color:#93a5c4;margin-top:4px;line-height:1.45;}',
+      '.ss-r12-rail-inline{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;}',
+      '.ss-r12-rail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}',
+      '.ss-r12-rail-item{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(255,255,255,.04);display:grid;gap:4px;text-align:left;color:#f8fbff;}',
+      '.ss-r12-rail-item span,.ss-r12-rail-item em{font-style:normal;font-size:10px;color:#93a5c4;line-height:1.45;}',
+      '.ss-r12-chip{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;border:1px solid rgba(148,163,184,.10);background:rgba(148,163,184,.08);font-size:10px;color:#dbeafe;}',
+      '.ss-r12-chip em{font-style:normal;font-weight:700;color:#8fa5c7;}',
+      '.ss-r12-chip strong{font-weight:800;color:#f8fbff;}',
+      '.ss-r12-chip.tone-critical{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.22);}',
+      '.ss-r12-chip.tone-high{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.22);}',
+      '.ss-r12-chip.tone-policy{background:rgba(168,85,247,.12);border-color:rgba(192,132,252,.22);}',
+      '.ss-r12-chip.tone-security{background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.22);}',
+      '.ss-r12-ribbon{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 12px;border-bottom:1px solid rgba(148,163,184,.08);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));}',
+      '.ss-r12-ribbon.is-hidden{display:none;}',
+      '.ss-r12-ribbon-title{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8fa5c7;margin-right:2px;}',
+      '.ss-r12-matrix{position:absolute;right:18px;top:18px;width:300px;max-width:calc(100% - 404px);z-index:38;border-radius:20px;border:1px solid rgba(148,163,184,.12);background:rgba(8,15,28,.90);box-shadow:0 16px 36px rgba(2,6,23,.20);padding:12px;backdrop-filter:blur(10px);display:grid;gap:10px;}',
+      '.ss-r12-matrix.is-hidden{display:none;}',
+      '.ss-r12-matrix-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ss-r12-mini-btn{width:24px;height:24px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);color:#f8fbff;}',
+      '.ss-r12-matrix-list{display:grid;gap:8px;max-height:46vh;overflow:auto;}',
+      '.ss-r12-lane{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(255,255,255,.04);display:grid;gap:4px;text-align:left;}',
+      '.ss-r12-lane.active{border-color:rgba(125,211,252,.24);background:rgba(125,211,252,.08);}',
+      '.ss-r12-lane-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}',
+      '.ss-r12-lane-top strong{font-size:12px;color:#f8fbff;}',
+      '.ss-r12-lane-sub{font-size:10px;color:#93a5c4;line-height:1.45;}',
+      '.ss-r12-mini{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:20px;padding:0 6px;border-radius:999px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.10);font-size:9px;font-weight:800;color:#f8fbff;text-transform:uppercase;}',
+      '.ss-r12-mini.tone-good{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.20);}',
+      '.ss-r12-mini.tone-warn{background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.22);}',
+      '.ss-r12-mini.tone-critical{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.22);}',
+      '.ss-r12-precision-language .ss-table-card[data-r12-focus="primary"]{opacity:1!important;box-shadow:0 22px 56px rgba(56,189,248,.22),0 0 0 1px rgba(125,211,252,.24) inset!important;z-index:10;}',
+      '.ss-r12-precision-language .ss-table-card[data-r12-focus="secondary"]{opacity:.92!important;box-shadow:0 18px 42px rgba(15,23,42,.18),0 0 0 1px rgba(125,211,252,.12) inset!important;z-index:7;}',
+      '.ss-r12-precision-language .ss-table-card[data-r12-focus="tertiary"]{opacity:.74!important;box-shadow:0 12px 28px rgba(15,23,42,.14)!important;z-index:4;}',
+      '.ss-r12-precision-language .ss-table-card[data-r12-focus="dim"]{opacity:.18!important;filter:saturate(.66) blur(.02px);transform:none!important;z-index:1;}',
+      '.ss-r12-precision-language[data-r12-preset="calm"] .ss-table-card[data-r12-focus="dim"]{opacity:.10!important;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-focus="primary"]{opacity:.96!important;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-focus="secondary"]{opacity:.62!important;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-focus="tertiary"]{opacity:.38!important;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-focus="dim"]{opacity:.08!important;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-role="governance"] .ss-edge{stroke:rgba(192,132,252,.72)!important;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-role="traceability"] .ss-edge{stroke:rgba(251,146,60,.72)!important;stroke-dasharray:7 4;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-role="runtime"] .ss-edge{stroke:rgba(96,165,250,.72)!important;}',
+      '.ss-r12-precision-language .ss-edge-group[data-r12-role="cross_domain"] .ss-edge{stroke-dasharray:7 4;}',
+      '.ss-r12-precision-language[data-r12-labels="selection"] .ss-edge-group .ss-edge-label{display:none!important;}',
+      '.ss-r12-precision-language[data-r12-labels="selection"] .ss-edge-group[data-r12-focus="primary"] .ss-edge-label{display:block!important;}',
+      '.ss-r12-precision-language[data-r12-labels="focus"] .ss-edge-group .ss-edge-label{display:none!important;}',
+      '.ss-r12-precision-language[data-r12-labels="focus"] .ss-edge-group[data-r12-focus="primary"] .ss-edge-label,.ss-r12-precision-language[data-r12-labels="focus"] .ss-edge-group[data-r12-focus="secondary"] .ss-edge-label{display:block!important;}',
+      '.ss-r12-precision-language[data-r12-labels="lane"] .ss-edge-group .ss-edge-label{display:none!important;}',
+      '.ss-r12-precision-language[data-r12-labels="lane"] .ss-edge-group[data-r12-role="cross_domain"] .ss-edge-label,.ss-r12-precision-language[data-r12-labels="lane"] .ss-edge-group[data-r12-role="governance"] .ss-edge-label{display:block!important;}',
+      '.ss-r12-precision-language[data-r12-labels="all"] .ss-edge-group .ss-edge-label,.ss-r12-precision-language .ss-edge-group.r12-labelled .ss-edge-label{display:block!important;}',
+      '.ss-r12-precision-language[data-r12-density-effective="compact"] .ss-table-card .ss-col-item:nth-child(n+3){display:none!important;}',
+      '.ss-r12-precision-language[data-r12-density-effective="compact"] .ss-table-card .ss-table-footer .ss-r8-footer-right{display:none!important;}',
+      '.ss-r12-precision-language[data-r12-density-effective="balanced"] .ss-table-card .ss-col-item:nth-child(n+4){display:none!important;}',
+      '.ss-r12-precision-language[data-r12-density-effective="expanded"] .ss-table-card .ss-col-item:nth-child(n+6){display:none!important;}',
+      '.ss-r12-precision-language[data-r12-preset="governance"] .ss-table-card .ss-col-item[data-r8-semantic="governance"],.ss-r12-precision-language[data-r12-preset="governance"] .ss-table-card .ss-col-item[data-r8-semantic="security"]{background:linear-gradient(90deg,rgba(192,132,252,.14),rgba(192,132,252,0))!important;}',
+      '.ss-r12-precision-language[data-r12-preset="traceability"] .ss-table-card .ss-col-item[data-r8-semantic="traceability"],.ss-r12-precision-language[data-r12-preset="traceability"] .ss-table-card .ss-col-item[data-r8-semantic="timeline"]{background:linear-gradient(90deg,rgba(251,146,60,.14),rgba(251,146,60,0))!important;}',
+      '.ss-r12-precision-language[data-r12-preset="runtime"] .ss-table-card .ss-col-item[data-r8-semantic="workflow"],.ss-r12-precision-language[data-r12-preset="runtime"] .ss-table-card .ss-col-item[data-r8-semantic="status"]{background:linear-gradient(90deg,rgba(96,165,250,.14),rgba(96,165,250,0))!important;}',
+      '.ss-r12-precision-language[data-r12-preset="executive"] .ss-table-card[data-wc-severity="critical"],.ss-r12-precision-language[data-r12-preset="executive"] .ss-table-card[data-wc-severity="high"]{box-shadow:0 24px 62px rgba(249,115,22,.20),0 0 0 1px rgba(251,146,60,.20) inset!important;}',
+      '.ss-r12-precision-language[data-r12-dock-effective="left"] .ss-r11-dock{left:18px;right:auto;}',
+      '.ss-r12-precision-language[data-r12-dock-effective="left"] .ss-r11-legend{right:18px;left:auto;}',
+      '.ss-r12-precision-language[data-r12-dock-effective="bottom"] .ss-r11-dock{left:50%;right:auto;transform:translateX(-50%);width:min(920px,calc(100% - 36px));}',
+      '.ss-r12-precision-language[data-r12-dock-effective="bottom"] .ss-r12-rail{bottom:calc(18px + min(52vh,460px) + 18px);max-width:calc(100% - 36px);}',
+      '.ss-r12-precision-language[data-r12-dock-effective="hidden"] .ss-r11-dock,.ss-r12-precision-language[data-r12-dock-effective="hidden"] .ss-r11-legend{display:none!important;}',
+      '.ss-r12-precision-language[data-r12-matrix="off"] .ss-r12-matrix{display:none!important;}',
+      '@media (max-width:1520px){.ss-r12-matrix{display:none!important;}.ss-r12-rail{max-width:calc(100% - 36px);}}',
+      '@media (max-width:1180px){.ss-r12-panel{width:calc(100% - 36px);}.ss-r12-grid,.ss-r12-metrics,.ss-r12-rail-list{grid-template-columns:repeat(2,minmax(0,1fr));}.ss-r12-rail{width:calc(100% - 36px);max-width:calc(100% - 36px);}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+  function renderAll(){
+    applyRootState();
+    decorateCards();
+    decorateEdges();
+    renderPanel();
+    renderRail();
+    renderMatrix();
+  }
+  function scheduleRender(){ clearTimeout(renderTimer); renderTimer = setTimeout(renderAll, 44); }
+
+  loadState();
+  ensureStyles();
+  applyRootState();
+  addCommands();
+  fetchReport(false);
+  scheduleRender();
+
+  var originalCanvasRender = win.Canvas.render;
+  win.Canvas.render = function(){ var result = originalCanvasRender.apply(this, arguments); scheduleRender(); return result; };
+  var originalApplyTransform = win.Canvas.applyTransform;
+  win.Canvas.applyTransform = function(){ var result = originalApplyTransform.apply(this, arguments); scheduleRender(); return result; };
+  var originalSyncSelectionClasses = win.Canvas.syncSelectionClasses;
+  win.Canvas.syncSelectionClasses = function(){ var result = originalSyncSelectionClasses.apply(this, arguments); scheduleRender(); return result; };
+  win.addEventListener('resize', scheduleRender);
+  document.addEventListener('keydown', onKeydown, true);
+
+  if(win.SchemaStudioWorldClass && !win.SchemaStudioWorldClass.__round12Patched){
+    win.SchemaStudioWorldClass.getDiagnosis = function(){
+      var diag = originalWorldGetDiagnosis ? originalWorldGetDiagnosis.apply(this, arguments) : {};
+      if(!diag || typeof diag !== 'object') diag = {};
+      diag.round12Report = reportCache || fallbackReport();
+      return diag;
+    };
+    win.SchemaStudioWorldClass.refresh = function(){
+      var result = originalWorldRefresh ? originalWorldRefresh.apply(this, arguments) : Promise.resolve(win.SchemaStudioWorldClass.getDiagnosis());
+      return Promise.resolve(result).then(function(payload){ return fetchReport(true).then(function(){ scheduleRender(); return payload; }); });
+    };
+    win.SchemaStudioWorldClass.getRound12Report = function(){ return reportCache || fallbackReport(); };
+    win.SchemaStudioWorldClass.__round12Patched = true;
+  }
+  if(win.SchemaStudio){
+    win.SchemaStudio.__round12PrecisionPatched = true;
+    win.SchemaStudio.buildId = '20260408worldclass12';
+    win.SchemaStudio.openRound12ScenarioComposer = function(){ state.open = true; persistState(); fetchReport(false).then(function(){ scheduleRender(); }); };
+    win.SchemaStudio.copyRound12SceneBrief = copyBrief;
   }
 })(window);

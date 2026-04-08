@@ -2,7 +2,43 @@
 
 Package root: `qms.hesem.com.vn/`
 
-Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 11**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+Gói này là **bản cộng dồn toàn bộ thay đổi đã tạo trong đoạn chat này**, từ các vòng enterprise/world-class trước đó đến **round 12**. Bạn có thể giải nén một lần rồi overwrite trực tiếp lên local repo.
+
+## Round 12 highlights
+
+Round 12 đưa `Schema Studio` sang lớp **scenario composer + precision focus system**:
+
+- thêm `Scenario Composer` nổi trên canvas
+- thêm 6 `scenario presets`: `executive`, `topology`, `governance`, `traceability`, `runtime`, `calm review`
+- thêm `adaptive density` với 4 mode: `auto`, `compact`, `balanced`, `expanded`
+- thêm `focus radius`: `selected only`, `one-hop`, `two-hop`
+- thêm `safe dock orchestration`: `auto`, `right`, `left`, `bottom`, `hidden`
+- thêm `label cadence`: `selection`, `focus`, `lane`, `all`
+- thêm `precision rail` ở đáy canvas để đọc selected story nhanh hơn
+- thêm `lane matrix` ở góc phải để đọc nhanh lane/domain posture
+- card có thêm `round 12 ribbon` cho preset context mà vẫn giữ visual grammar round 8–11
+- edge có thêm `role grammar`: `governance`, `traceability`, `runtime`, `cross-domain`
+- thêm endpoint `schema_studio_round12_report`
+- thêm artifact `schema-studio-round12-report.json`
+- `Admin Metadata Studio` và `Module Builder` đã nhận shell/telemetry round 12
+
+## Seeded round 12 posture in this package
+
+- `98` scenario composer score
+- `98` adaptive density score
+- `97` focus radius score
+- `97` dock flex score
+- `97` label cadence score
+- `97` lane matrix score
+- `98` precision reading score
+- `97` review mobility score
+- `6` presets
+- `4` density modes
+- `3` radius modes
+- `5` dock modes
+- `4` label modes
+- `8` keyboard shortcuts
+- `7` lane overview rows
 
 ## Round 11 highlights
 

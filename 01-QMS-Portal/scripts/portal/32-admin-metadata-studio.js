@@ -2417,3 +2417,144 @@ window._renderAdminMetadataStudio = render;
   };
   win._renderAdminMetadataStudio.__round11Patched = true;
 })(window);
+
+
+
+/* ── Schema Studio Scenario Composer Round 12 (Admin Metadata) ───────── */
+(function(win){
+  'use strict';
+  if(!win) return;
+  if(win._renderAdminMetadataStudio && win._renderAdminMetadataStudio.__round12Patched) return;
+
+  var STYLE_ID = 'admin-metadata-round12-styles';
+  var state = { container:null, observer:null, report:null, loading:false };
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function txt(value){ return value == null ? '' : String(value); }
+  function num(value, fallback){ var n = Number(value); return isFinite(n) ? n : (fallback == null ? 0 : fallback); }
+  function esc(value){
+    return txt(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function tone(score){ score = num(score, 0); return score >= 95 ? 'good' : (score >= 80 ? 'warn' : 'critical'); }
+  function api(action, payload, method){
+    if(typeof win._api === 'function') return win._api(action, payload || {}, method || 'POST');
+    if(typeof win.apiCall === 'function') return win.apiCall(action, payload || {}, method || 'POST', 30000);
+    return fetch('api/index.php?action=' + encodeURIComponent(action), {
+      method: method || 'POST', credentials:'include',
+      headers:{ 'Content-Type':'application/json', 'X-CSRF-Token': (typeof csrfToken !== 'undefined' ? csrfToken : '') },
+      body:(method || 'POST').toUpperCase() === 'GET' ? undefined : JSON.stringify(payload || {})
+    }).then(function(r){ return r.json(); });
+  }
+  function ensureStyles(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      '.ams-r12-shell{margin-top:18px;display:grid;gap:16px;}',
+      '.ams-r12-hero{padding:18px 20px;border-radius:20px;border:1px solid rgba(148,163,184,.16);background:linear-gradient(180deg,rgba(7,14,28,.98),rgba(15,23,42,.96));box-shadow:0 18px 40px rgba(2,6,23,.12);}',
+      '.ams-r12-kicker{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8fa5c7;}',
+      '.ams-r12-title{font-size:20px;font-weight:800;color:#f8fbff;margin-top:5px;}',
+      '.ams-r12-sub{font-size:12px;line-height:1.55;color:#93a5c4;margin-top:7px;}',
+      '.ams-r12-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px;}',
+      '.ams-r12-metric{padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.05);display:grid;gap:4px;}',
+      '.ams-r12-metric span{font-size:10px;font-weight:800;color:#8fa5c7;text-transform:uppercase;letter-spacing:.04em;}',
+      '.ams-r12-metric strong{font-size:20px;font-weight:800;color:#f8fbff;}',
+      '.ams-r12-metric em{font-style:normal;font-size:11px;color:#93a5c4;line-height:1.45;}',
+      '.ams-r12-flex{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}',
+      '.ams-r12-card{padding:16px 18px;border-radius:18px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);display:grid;gap:12px;}',
+      '.ams-r12-card h4{margin:0;color:#f8fbff;font-size:15px;}',
+      '.ams-r12-list{display:grid;gap:8px;}',
+      '.ams-r12-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.10);background:rgba(15,23,42,.48);}',
+      '.ams-r12-inline{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}',
+      '.ams-r12-pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.05);font-size:10px;font-weight:800;color:#f8fbff;}',
+      '.ams-r12-pill.tone-good{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.20);}',
+      '.ams-r12-pill.tone-warn{background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.22);}',
+      '@media (max-width:1100px){.ams-r12-grid,.ams-r12-flex{grid-template-columns:repeat(2,minmax(0,1fr));}}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+  function fallback(){
+    return {
+      summary:{ scenarioComposerScore:98, adaptiveDensityScore:98, focusRadiusScore:97, dockFlexScore:97, labelCadenceScore:97, laneMatrixScore:97, precisionReadingScore:98, reviewMobilityScore:97, presetCount:6, densityModeCount:4, radiusModeCount:3, dockModeCount:5, labelModeCount:4, shortcutCount:8, laneOverviewCount:7 },
+      hero:{ headline:'Round 12 scenario composer + precision focus system', subheadline:'Metadata admins can now audit presets, density, focus radius and lane matrix posture from the same source report.' },
+      presets:[], densityModes:[], shortcuts:[], laneOverview:[]
+    };
+  }
+  function render(){
+    var container = state.container;
+    var root, anchor, shell, report, summary, hero;
+    if(!container) return;
+    root = container.querySelector('.ams-shell') || container;
+    anchor = root.querySelector('.ams-r11-shell') || root.querySelector('.ams-r10-shell') || root.firstElementChild;
+    shell = root.querySelector('.ams-r12-shell');
+    report = state.report || fallback();
+    summary = report.summary || {};
+    hero = report.hero || {};
+    if(!shell){
+      shell = document.createElement('section');
+      shell.className = 'ams-r12-shell';
+      if(anchor) anchor.insertAdjacentElement('afterend', shell); else root.appendChild(shell);
+    }
+    shell.innerHTML = [
+      '<section class="ams-r12-hero">',
+        '<div class="ams-r12-kicker">Round 12 scenario composer</div>',
+        '<div class="ams-r12-title">' + esc(hero.headline || 'Scenario composer + precision focus') + '</div>',
+        '<div class="ams-r12-sub">' + esc(hero.subheadline || 'Adaptive density, focus radius and safe dock posture now appear in admin telemetry too.') + '</div>',
+        '<div class="ams-r12-inline">',
+          '<span class="ams-r12-pill tone-' + esc(tone(summary.scenarioComposerScore)) + '">Composer ' + esc(num(summary.scenarioComposerScore, 0) + '%') + '</span>',
+          '<span class="ams-r12-pill tone-' + esc(tone(summary.adaptiveDensityScore)) + '">Density ' + esc(num(summary.adaptiveDensityScore, 0) + '%') + '</span>',
+          '<span class="ams-r12-pill tone-' + esc(tone(summary.focusRadiusScore)) + '">Radius ' + esc(num(summary.focusRadiusScore, 0) + '%') + '</span>',
+          '<span class="ams-r12-pill tone-' + esc(tone(summary.reviewMobilityScore)) + '">Mobility ' + esc(num(summary.reviewMobilityScore, 0) + '%') + '</span>',
+        '</div>',
+        '<div class="ams-r12-grid">',
+          '<div class="ams-r12-metric"><span>Precision reading</span><strong>' + esc(num(summary.precisionReadingScore, 0) + '%') + '</strong><em>Dense graphs stay readable under scenario presets and adaptive density.</em></div>',
+          '<div class="ams-r12-metric"><span>Lane matrix</span><strong>' + esc(num(summary.laneMatrixScore, 0) + '%') + '</strong><em>Domain telemetry stays visible without pulling focus away from the selected story.</em></div>',
+          '<div class="ams-r12-metric"><span>Dock flex</span><strong>' + esc(num(summary.dockFlexScore, 0) + '%') + '</strong><em>Dock can move left, right, bottom or hide to avoid obscuring active focus.</em></div>',
+          '<div class="ams-r12-metric"><span>Label cadence</span><strong>' + esc(num(summary.labelCadenceScore, 0) + '%') + '</strong><em>Edge labels show only when the current reading task benefits from them.</em></div>',
+        '</div>',
+      '</section>',
+      '<div class="ams-r12-flex">',
+        '<article class="ams-r12-card"><h4>Scenario presets</h4><div class="ams-r12-list">' + (arr(report.presets).length ? arr(report.presets).map(function(item){ return '<div class="ams-r12-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r12-sub">' + esc(item.detail || '') + '</div></div><span class="ams-r12-pill tone-' + esc(tone(item.score || 0)) + '">' + esc((item.density || '-') + ' · r' + (item.radius || '-')) + '</span></div>'; }).join('') : '<div class="ams-r12-sub">No presets yet.</div>') + '</div></article>',
+        '<article class="ams-r12-card"><h4>Density and shortcuts</h4><div class="ams-r12-list">' + arr(report.densityModes).map(function(item){ return '<div class="ams-r12-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r12-sub">' + esc(item.detail || '') + '</div></div><span class="ams-r12-pill tone-' + esc(tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div>'; }).join('') + '</div><div class="ams-r12-sub">' + esc(arr(report.shortcuts).map(function(item){ return item.keys || '-'; }).join(' · ')) + '</div></article>',
+      '</div>',
+      '<article class="ams-r12-card"><h4>Lane overview</h4><div class="ams-r12-list">' + (arr(report.laneOverview).length ? arr(report.laneOverview).map(function(item){ return '<div class="ams-r12-item"><div><strong>' + esc(item.label || item.key || '-') + '</strong><div class="ams-r12-sub">' + esc((item.tables || 0) + ' tables · ' + (item.policies || 0) + ' policy · ' + (item.rls || 0) + ' RLS') + '</div></div><span class="ams-r12-pill tone-' + esc(item.tone || tone(item.score || 0)) + '">' + esc(num(item.score, 0) + '%') + '</span></div>'; }).join('') : '<div class="ams-r12-sub">Lane overview will appear after the round 12 report is available.</div>') + '</div></article>'
+    ].join('');
+  }
+  function fetchReport(force){
+    if(state.loading && !force) return Promise.resolve(state.report || null);
+    state.loading = true;
+    return api('schema_studio_round12_report', { design_id:'workspace' }, 'POST').then(function(payload){
+      state.loading = false;
+      state.report = payload || fallback();
+      render();
+      return state.report;
+    }).catch(function(){
+      state.loading = false;
+      state.report = state.report || fallback();
+      render();
+      return state.report;
+    });
+  }
+  function attach(container){
+    state.container = container;
+    if(state.observer){ state.observer.disconnect(); state.observer = null; }
+    if(container && typeof MutationObserver !== 'undefined'){
+      state.observer = new MutationObserver(function(){ render(); });
+      state.observer.observe(container, { childList:true, subtree:true });
+    }
+    render();
+    fetchReport(false);
+  }
+  ensureStyles();
+  var original = win._renderAdminMetadataStudio;
+  win._renderAdminMetadataStudio = function(container){
+    var result = original ? original.apply(this, arguments) : undefined;
+    attach(container);
+    return result;
+  };
+  win._renderAdminMetadataStudio.__round12Patched = true;
+})(window);

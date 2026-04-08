@@ -586,6 +586,7 @@ $router->actions([
     'schema_studio_round9_report'   => [SchemaStudioController::class, 'getRound9Report'],
     'schema_studio_round10_report'  => [SchemaStudioController::class, 'getRound10Report'],
     'schema_studio_round11_report'  => [SchemaStudioController::class, 'getRound11Report'],
+    'schema_studio_round12_report'  => [SchemaStudioController::class, 'getRound12Report'],
     'schema_studio_export'          => [SchemaStudioController::class, 'export'],
 ]);
 

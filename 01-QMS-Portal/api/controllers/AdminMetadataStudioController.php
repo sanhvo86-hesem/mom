@@ -351,6 +351,12 @@ class AdminMetadataStudioController extends BaseController
     }
 
 
+    private function schemaStudioRound12Report(): array
+    {
+        return $this->readJsonFile($this->registryPath('schema-studio-round12-report')) ?? [];
+    }
+
+
     /**
      * @return array<int, array<string, mixed>>
      */
@@ -499,39 +505,23 @@ class AdminMetadataStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireAdmin($user);
 
-        // --- Lightweight load: only files needed for counts/summaries ---
-        // Heavy files (endpoint-catalog 17MB, table-registry 3.4MB, runtime-projections 688KB,
-        // and 8 report files) are NOT fully loaded here. The manifest already carries all
-        // score/count fields in its summary section, so individual reports are not needed.
-        $schemaStudioManifest = $this->schemaStudioManifest(); // ~83KB, has all summary scores
-        $schemaStudioReleaseLog = $this->schemaStudioReleaseLog(); // ~1KB
-        $dataFieldsIndex = $this->dataFieldsIndex();
-
-        // Use only summary sub-objects from reports (zero-cost when manifest covers them).
-        // These are small arrays derived from the manifest so no large file is loaded.
-        $mSum = is_array($schemaStudioManifest['summary'] ?? null) ? $schemaStudioManifest['summary'] : [];
-
-        // For lists (dropdown options), load only the counts metadata without the full files.
-        $endpointCount = (int)($schemaStudioManifest['summary']['endpointCount']
-            ?? $dataFieldsIndex['_meta']['generatedEndpointCount']
-            ?? $dataFieldsIndex['_meta']['sourceEndpointCount']
-            ?? 0);
-        $tableCount = (int)($schemaStudioManifest['summary']['tableCount']
-            ?? $schemaStudioManifest['summary']['projectionCount']
-            ?? 0);
-
-        // Lazy-load lists only when counts are small enough to be safe (<= 500 items).
-        // For very large catalogs, return empty lists so the UI doesn't crash — details
-        // are accessible via admin_metadata_studio_detail.
-        $maxListSize = 500;
-        $endpointCatalog = $endpointCount <= $maxListSize
-            ? ($this->readJsonFile($this->registryPath('endpoint-catalog')) ?? [])
-            : [];
-        $tableRegistry = $tableCount <= $maxListSize
-            ? ($this->readJsonFile($this->registryPath('table-registry')) ?? [])
-            : [];
+        $endpointCatalog = $this->readJsonFile($this->registryPath('endpoint-catalog')) ?? [];
+        $tableRegistry = $this->readJsonFile($this->registryPath('table-registry')) ?? [];
         $schemaLibrary = $this->readJsonFile($this->registryPath('schema-library')) ?? [];
+        $dataFieldsIndex = $this->dataFieldsIndex();
         $variableLibrary = $this->readJsonFile($this->configPath('variable_library.json')) ?? [];
+        $schemaStudioManifest = $this->schemaStudioManifest();
+        $schemaStudioRuntimeProjection = $this->schemaStudioRuntimeProjection();
+        $schemaStudioReleaseLog = $this->schemaStudioReleaseLog();
+        $schemaStudioDiagnostics = $this->schemaStudioDiagnostics();
+        $schemaStudioExperienceReport = $this->schemaStudioExperienceReport();
+        $schemaStudioOperationsReport = $this->schemaStudioOperationsReport();
+        $schemaStudioCommandCenterReport = $this->schemaStudioCommandCenterReport();
+        $schemaStudioRound7Report = $this->schemaStudioRound7Report();
+        $schemaStudioRound9Report = $this->schemaStudioRound9Report();
+        $schemaStudioRound10Report = $this->schemaStudioRound10Report();
+        $schemaStudioRound11Report = $this->schemaStudioRound11Report();
+        $schemaStudioRound12Report = $this->schemaStudioRound12Report();
 
         $apiSummaries = $this->apiSummaries($endpointCatalog);
         $tableSummaries = $this->tableSummaries($tableRegistry);
@@ -540,132 +530,157 @@ class AdminMetadataStudioController extends BaseController
 
         $this->success([
             'overview' => [
-                'endpointCount'                        => count($apiSummaries) ?: $endpointCount,
-                'tableCount'                           => count($tableSummaries) ?: $tableCount,
-                'schemaCount'                          => count($schemaSummaries),
-                'variableCategoryCount'                => count($variableSummaries),
-                'variableCount'                        => $this->countVariables($variableLibrary),
-                'dataFieldEndpointCount'               => (int)($dataFieldsIndex['_meta']['generatedEndpointCount'] ?? $dataFieldsIndex['_meta']['sourceEndpointCount'] ?? count($this->dataFieldsParts($dataFieldsIndex))),
-                // All scores read directly from manifest summary — no heavy report files needed.
-                'schemaStudioProjectionCount'          => (int)($mSum['projectionCount'] ?? 0),
-                'schemaStudioReleaseCount'             => (int)($mSum['releaseCount'] ?? count((array)($schemaStudioReleaseLog['items'] ?? []))),
-                'schemaStudioPolicyCount'              => (int)($mSum['policyCount'] ?? 0),
-                'schemaStudioCanonicalCoverage'        => (int)($mSum['canonicalCoveragePercent'] ?? 0),
-                'schemaStudioCriticalGaps'             => (int)($mSum['criticalCanonicalGaps'] ?? 0),
-                'schemaStudioVisualReadiness'          => (int)($mSum['visualReadinessScore'] ?? 0),
-                'schemaStudioMetadataCompleteness'     => (int)($mSum['metadataCompletenessPercent'] ?? 0),
-                'schemaStudioGraphDensity'             => (int)($mSum['graphDensityScore'] ?? 0),
-                'schemaStudioWorkflowCoverage'         => (int)($mSum['workflowBindingCoveragePercent'] ?? 0),
-                'schemaStudioOrphanRisk'               => (int)($mSum['orphanRelationRiskCount'] ?? 0),
-                'schemaStudioHotspots'                 => (int)($mSum['hotspotCount'] ?? 0),
-                'schemaStudioGovernanceCoverage'       => (int)($mSum['governanceCoveragePercent'] ?? 0),
-                'schemaStudioJourneyReadiness'         => (int)($mSum['journeyReadinessScore'] ?? 0),
-                'schemaStudioDomainReadiness'          => (int)($mSum['domainReadinessScore'] ?? 0),
-                'schemaStudioReleaseRadar'             => (int)($mSum['releaseRadarScore'] ?? 0),
-                'schemaStudioBlockers'                 => (int)($mSum['blockerCount'] ?? 0),
-                'schemaStudioDomainCount'              => (int)($mSum['domainCount'] ?? 0),
-                'schemaStudioLayerCount'               => (int)($mSum['layerCount'] ?? 0),
-                'schemaStudioStoryboardCount'          => (int)($mSum['storyboardCount'] ?? 0),
-                'schemaStudioPolicyCoverage'           => (int)($mSum['policyCoveragePercent'] ?? 0),
-                'schemaStudioPerformancePosture'       => (int)($mSum['performancePostureScore'] ?? 0),
-                'schemaStudioRegistrySync'             => (int)($mSum['registrySyncScore'] ?? 0),
-                'schemaStudioComplianceReadiness'      => (int)($mSum['complianceReadinessScore'] ?? 0),
-                'schemaStudioAICopilotReadiness'       => (int)($mSum['aiCopilotReadinessScore'] ?? 0),
-                'schemaStudioExperienceScore'          => (int)($mSum['experienceScore'] ?? 0),
-                'schemaStudioOperationsScore'          => (int)($mSum['operationsScore'] ?? 0),
-                'schemaStudioPromotionReadiness'       => (int)($mSum['promotionReadinessScore'] ?? 0),
-                'schemaStudioFirewallScore'            => (int)($mSum['firewallScore'] ?? 0),
-                'schemaStudioObservabilityScore'       => (int)($mSum['observabilityScore'] ?? 0),
-                'schemaStudioCommandCenterScore'       => (int)($mSum['commandCenterScore'] ?? 0),
-                'schemaStudioPersonaCount'             => (int)($mSum['personaCount'] ?? 0),
-                'schemaStudioPlaybookCount'            => (int)($mSum['playbookCount'] ?? 0),
-                'schemaStudioReleaseLaneCount'         => (int)($mSum['releaseLaneCount'] ?? 0),
-                'schemaStudioCopilotSuggestionCount'   => (int)($mSum['copilotSuggestionCount'] ?? 0),
-                'schemaStudioFocusDeckCount'           => (int)($mSum['focusDeckCount'] ?? 0),
-                'schemaStudioBranchCount'              => (int)($mSum['branchCount'] ?? 0),
-                'schemaStudioEnvironmentCount'         => (int)($mSum['environmentCount'] ?? 0),
-                'schemaStudioStageCount'               => (int)($mSum['stageCount'] ?? 0),
-                'schemaStudioEventRailCount'           => (int)($mSum['eventRailCount'] ?? 0),
-                'schemaStudioOrchestrationScore'       => (int)($mSum['orchestrationScore'] ?? 0),
-                'schemaStudioNarrativeCoverage'        => (int)($mSum['narrativeCoverageScore'] ?? 0),
-                'schemaStudioReviewWallScore'          => (int)($mSum['reviewWallScore'] ?? 0),
-                'schemaStudioAtlasReadiness'           => (int)($mSum['atlasReadinessScore'] ?? 0),
-                'schemaStudioLivePulseScore'           => (int)($mSum['livePulseScore'] ?? 0),
-                'schemaStudioCollaborationReadiness'   => (int)($mSum['collaborationReadinessScore'] ?? 0),
-                'schemaStudioVisualPolish'             => (int)($mSum['visualPolishScore'] ?? 0),
-                'schemaStudioSceneCount'               => (int)($mSum['sceneCount'] ?? 0),
-                'schemaStudioSpotlightCount'           => (int)($mSum['spotlightCount'] ?? 0),
-                'schemaStudioReviewLaneCount'          => (int)($mSum['reviewLaneCount'] ?? 0),
-                'schemaStudioAtlasCount'               => (int)($mSum['atlasCount'] ?? 0),
-                'schemaStudioAtlasMeshScore'           => (int)($mSum['atlasMeshScore'] ?? 0),
-                'schemaStudioPhysicalCoverage'         => (int)($mSum['physicalCoverageScore'] ?? 0),
-                'schemaStudioReviewOpsScore'           => (int)($mSum['reviewOpsScore'] ?? 0),
-                'schemaStudioExportSurfaceScore'       => (int)($mSum['exportSurfaceScore'] ?? 0),
-                'schemaStudioInteroperabilityScore'    => (int)($mSum['interoperabilityScore'] ?? 0),
-                'schemaStudioRoleModeScore'            => (int)($mSum['roleModeScore'] ?? 0),
-                'schemaStudioTraceabilityAtlasScore'   => (int)($mSum['traceabilityAtlasScore'] ?? 0),
-                'schemaStudioBeautySystemScore'        => (int)($mSum['beautySystemScore'] ?? 0),
-                'schemaStudioObjectSurfaceCount'       => (int)($mSum['objectSurfaceCount'] ?? 0),
-                'schemaStudioRoleModeCount'            => (int)($mSum['roleModeCount'] ?? 0),
-                'schemaStudioReviewBoardCount'         => (int)($mSum['reviewBoardCount'] ?? 0),
-                'schemaStudioExportBundleCount'        => (int)($mSum['exportBundleCount'] ?? 0),
-                'schemaStudioVisualLanguageScore'      => (int)($mSum['visualLanguageScore'] ?? 0),
-                'schemaStudioCardHierarchy'            => (int)($mSum['cardHierarchyScore'] ?? 0),
-                'schemaStudioEdgeLegibility'           => (int)($mSum['edgeLegibilityScore'] ?? 0),
-                'schemaStudioLaneReadability'          => (int)($mSum['laneReadabilityScore'] ?? 0),
-                'schemaStudioAccessibilityScore'       => (int)($mSum['accessibilityScore'] ?? 0),
-                'schemaStudioDensityDiscipline'        => (int)($mSum['densityDisciplineScore'] ?? 0),
-                'schemaStudioCardModeCoverage'         => (int)($mSum['cardModeCoverageScore'] ?? 0),
-                'schemaStudioVisualDirectorScore'      => (int)($mSum['visualDirectorScore'] ?? 0),
-                'schemaStudioVisualLaneCount'          => (int)($mSum['laneCount'] ?? 0),
-                'schemaStudioVisualModeCount'          => (int)($mSum['cardModeCount'] ?? 0),
-                'schemaStudioEdgeLensCount'            => (int)($mSum['edgeLensCount'] ?? 0),
-                'schemaStudioVisualQuickActionCount'   => (int)($mSum['quickActionCount'] ?? 0),
-                'schemaStudioReviewTheatreScore'       => (int)($mSum['reviewTheatreScore'] ?? 0),
-                'schemaStudioThemeSystemScore'         => (int)($mSum['themeSystemScore'] ?? 0),
-                'schemaStudioScenePresetScore'         => (int)($mSum['scenePresetScore'] ?? 0),
-                'schemaStudioSelectionRailScore'       => (int)($mSum['selectionRailScore'] ?? 0),
-                'schemaStudioLaneTelemetryScore'       => (int)($mSum['laneTelemetryScore'] ?? 0),
-                'schemaStudioSemanticLegendScore'      => (int)($mSum['semanticLegendScore'] ?? 0),
-                'schemaStudioFocusNarrativeScore'      => (int)($mSum['focusNarrativeScore'] ?? 0),
-                'schemaStudioKeyboardFlowScore'        => (int)($mSum['keyboardFlowScore'] ?? 0),
-                'schemaStudioThemeCount'               => (int)($mSum['themeCount'] ?? 0),
-                'schemaStudioScenePresetCount'         => (int)($mSum['scenePresetCount'] ?? 0),
-                'schemaStudioReviewRailActionCount'    => (int)($mSum['reviewRailActionCount'] ?? 0),
-                'schemaStudioLegendGroupCount'         => (int)($mSum['legendGroupCount'] ?? 0),
-                'schemaStudioLaneTelemetryCount'       => (int)($mSum['laneTelemetryCount'] ?? 0),
-                'schemaStudioShortcutCount'            => (int)($mSum['shortcutCount'] ?? 0),
-                'schemaStudioPresentationStudioScore'  => (int)($mSum['presentationStudioScore'] ?? 0),
-                'schemaStudioEvidenceDockScore'        => (int)($mSum['evidenceDockScore'] ?? 0),
-                'schemaStudioSpotlightPackScore'       => (int)($mSum['spotlightPackScore'] ?? 0),
-                'schemaStudioQuietCanvasScore'         => (int)($mSum['quietCanvasScore'] ?? 0),
-                'schemaStudioAccessibilityOpsScore'    => (int)($mSum['accessibilityOpsScore'] ?? 0),
-                'schemaStudioTopologyReadingScore'     => (int)($mSum['topologyReadingScore'] ?? 0),
-                'schemaStudioExecutiveReadoutScore'    => (int)($mSum['executiveReadoutScore'] ?? 0),
-                'schemaStudioLegendDisciplineScore'    => (int)($mSum['legendDisciplineScore'] ?? 0),
-                'schemaStudioSpotlightPackCount'       => (int)($mSum['spotlightPackCount'] ?? 0),
-                'schemaStudioEvidenceModeCount'        => (int)($mSum['evidenceModeCount'] ?? 0),
-                'schemaStudioLegendModeCount'          => (int)($mSum['legendModeCount'] ?? 0),
-                'schemaStudioTypeScaleCount'           => (int)($mSum['typeScaleCount'] ?? 0),
-                'schemaStudioDockActionCount'          => (int)($mSum['dockActionCount'] ?? 0),
-                'schemaStudioRound11ShortcutCount'     => (int)($mSum['shortcutCount'] ?? 0),
+                'endpointCount' => count($apiSummaries),
+                'tableCount' => count($tableSummaries),
+                'schemaCount' => count($schemaSummaries),
+                'variableCategoryCount' => count($variableSummaries),
+                'variableCount' => $this->countVariables($variableLibrary),
+                'dataFieldEndpointCount' => (int)(
+                    $dataFieldsIndex['_meta']['generatedEndpointCount']
+                    ?? $dataFieldsIndex['_meta']['sourceEndpointCount']
+                    ?? count($this->dataFieldsParts($dataFieldsIndex))
+                ),
+                'schemaStudioProjectionCount' => (int)($schemaStudioManifest['summary']['projectionCount'] ?? count((array)($schemaStudioRuntimeProjection['tables'] ?? []))),
+                'schemaStudioReleaseCount' => (int)($schemaStudioManifest['summary']['releaseCount'] ?? count((array)($schemaStudioReleaseLog['items'] ?? []))),
+                'schemaStudioPolicyCount' => (int)($schemaStudioManifest['summary']['policyCount'] ?? 0),
+                'schemaStudioCanonicalCoverage' => (int)($schemaStudioManifest['summary']['canonicalCoveragePercent'] ?? 0),
+                'schemaStudioCriticalGaps' => (int)($schemaStudioManifest['summary']['criticalCanonicalGaps'] ?? 0),
+                'schemaStudioVisualReadiness' => (int)($schemaStudioManifest['summary']['visualReadinessScore'] ?? $schemaStudioDiagnostics['summary']['visualReadinessScore'] ?? 0),
+                'schemaStudioMetadataCompleteness' => (int)($schemaStudioManifest['summary']['metadataCompletenessPercent'] ?? $schemaStudioDiagnostics['summary']['metadataCompletenessPercent'] ?? 0),
+                'schemaStudioGraphDensity' => (int)($schemaStudioManifest['summary']['graphDensityScore'] ?? $schemaStudioDiagnostics['summary']['graphDensityScore'] ?? 0),
+                'schemaStudioWorkflowCoverage' => (int)($schemaStudioManifest['summary']['workflowBindingCoveragePercent'] ?? $schemaStudioDiagnostics['summary']['workflowBindingCoveragePercent'] ?? 0),
+                'schemaStudioOrphanRisk' => (int)($schemaStudioManifest['summary']['orphanRelationRiskCount'] ?? $schemaStudioDiagnostics['summary']['orphanRelationRiskCount'] ?? 0),
+                'schemaStudioHotspots' => (int)($schemaStudioManifest['summary']['hotspotCount'] ?? count((array)($schemaStudioDiagnostics['hotspots'] ?? []))),
+                'schemaStudioGovernanceCoverage' => (int)($schemaStudioManifest['summary']['governanceCoveragePercent'] ?? $schemaStudioDiagnostics['summary']['governanceCoveragePercent'] ?? 0),
+                'schemaStudioJourneyReadiness' => (int)($schemaStudioManifest['summary']['journeyReadinessScore'] ?? $schemaStudioDiagnostics['summary']['journeyReadinessScore'] ?? 0),
+                'schemaStudioDomainReadiness' => (int)($schemaStudioManifest['summary']['domainReadinessScore'] ?? $schemaStudioDiagnostics['summary']['domainReadinessScore'] ?? 0),
+                'schemaStudioReleaseRadar' => (int)($schemaStudioManifest['summary']['releaseRadarScore'] ?? $schemaStudioDiagnostics['summary']['releaseRadarScore'] ?? 0),
+                'schemaStudioBlockers' => (int)($schemaStudioManifest['summary']['blockerCount'] ?? count((array)($schemaStudioDiagnostics['blockers'] ?? []))),
+                'schemaStudioDomainCount' => (int)($schemaStudioManifest['summary']['domainCount'] ?? count((array)($schemaStudioDiagnostics['domains'] ?? []))),
+                'schemaStudioLayerCount' => (int)($schemaStudioManifest['summary']['layerCount'] ?? count((array)($schemaStudioDiagnostics['layers'] ?? []))),
+                'schemaStudioStoryboardCount' => (int)($schemaStudioManifest['summary']['storyboardCount'] ?? count((array)($schemaStudioDiagnostics['storyboards'] ?? []))),
+                'schemaStudioPolicyCoverage' => (int)($schemaStudioManifest['summary']['policyCoveragePercent'] ?? $schemaStudioDiagnostics['summary']['policyCoveragePercent'] ?? 0),
+                'schemaStudioPerformancePosture' => (int)($schemaStudioManifest['summary']['performancePostureScore'] ?? $schemaStudioDiagnostics['summary']['performancePostureScore'] ?? $schemaStudioExperienceReport['summary']['performancePostureScore'] ?? 0),
+                'schemaStudioRegistrySync' => (int)($schemaStudioManifest['summary']['registrySyncScore'] ?? $schemaStudioDiagnostics['summary']['registrySyncScore'] ?? $schemaStudioExperienceReport['summary']['registrySyncScore'] ?? 0),
+                'schemaStudioComplianceReadiness' => (int)($schemaStudioManifest['summary']['complianceReadinessScore'] ?? $schemaStudioDiagnostics['summary']['complianceReadinessScore'] ?? $schemaStudioExperienceReport['summary']['complianceReadinessScore'] ?? 0),
+                'schemaStudioAICopilotReadiness' => (int)($schemaStudioManifest['summary']['aiCopilotReadinessScore'] ?? $schemaStudioDiagnostics['summary']['aiCopilotReadinessScore'] ?? $schemaStudioExperienceReport['summary']['aiCopilotReadinessScore'] ?? 0),
+                'schemaStudioExperienceScore' => (int)($schemaStudioManifest['summary']['experienceScore'] ?? $schemaStudioDiagnostics['summary']['experienceScore'] ?? $schemaStudioExperienceReport['summary']['experienceScore'] ?? 0),
+                'schemaStudioOperationsScore' => (int)($schemaStudioManifest['summary']['operationsScore'] ?? $schemaStudioDiagnostics['summary']['operationsScore'] ?? $schemaStudioExperienceReport['summary']['operationsScore'] ?? $schemaStudioOperationsReport['summary']['operationsScore'] ?? 0),
+                'schemaStudioPromotionReadiness' => (int)($schemaStudioManifest['summary']['promotionReadinessScore'] ?? $schemaStudioDiagnostics['summary']['promotionReadinessScore'] ?? $schemaStudioExperienceReport['summary']['promotionReadinessScore'] ?? $schemaStudioOperationsReport['summary']['promotionReadinessScore'] ?? 0),
+                'schemaStudioFirewallScore' => (int)($schemaStudioManifest['summary']['firewallScore'] ?? $schemaStudioDiagnostics['summary']['firewallScore'] ?? $schemaStudioExperienceReport['summary']['firewallScore'] ?? $schemaStudioOperationsReport['summary']['firewallScore'] ?? 0),
+                'schemaStudioObservabilityScore' => (int)($schemaStudioManifest['summary']['observabilityScore'] ?? $schemaStudioDiagnostics['summary']['observabilityScore'] ?? $schemaStudioExperienceReport['summary']['observabilityScore'] ?? $schemaStudioOperationsReport['summary']['observabilityScore'] ?? 0),
+                'schemaStudioCommandCenterScore' => (int)($schemaStudioManifest['summary']['commandCenterScore'] ?? $schemaStudioDiagnostics['summary']['commandCenterScore'] ?? $schemaStudioExperienceReport['summary']['commandCenterScore'] ?? $schemaStudioOperationsReport['summary']['commandCenterScore'] ?? 0),
+                'schemaStudioPersonaCount' => (int)($schemaStudioManifest['summary']['personaCount'] ?? count((array)($schemaStudioDiagnostics['personas'] ?? [])) ?: count((array)($schemaStudioExperienceReport['personas'] ?? []))),
+                'schemaStudioPlaybookCount' => (int)($schemaStudioManifest['summary']['playbookCount'] ?? count((array)($schemaStudioDiagnostics['playbooks'] ?? [])) ?: count((array)($schemaStudioExperienceReport['playbooks'] ?? []))),
+                'schemaStudioReleaseLaneCount' => (int)($schemaStudioManifest['summary']['releaseLaneCount'] ?? count((array)($schemaStudioDiagnostics['releaseLanes'] ?? [])) ?: count((array)($schemaStudioExperienceReport['releaseLanes'] ?? []))),
+                'schemaStudioCopilotSuggestionCount' => (int)($schemaStudioManifest['summary']['copilotSuggestionCount'] ?? count((array)($schemaStudioDiagnostics['aiCopilot'] ?? [])) ?: count((array)($schemaStudioExperienceReport['aiCopilot'] ?? []))),
+                'schemaStudioFocusDeckCount' => (int)($schemaStudioManifest['summary']['focusDeckCount'] ?? $schemaStudioDiagnostics['summary']['focusDeckCount'] ?? $schemaStudioExperienceReport['summary']['focusDeckCount'] ?? $schemaStudioOperationsReport['summary']['focusDeckCount'] ?? count((array)($schemaStudioDiagnostics['focusDeck'] ?? []))),
+                'schemaStudioBranchCount' => (int)($schemaStudioManifest['summary']['branchCount'] ?? $schemaStudioDiagnostics['summary']['branchCount'] ?? $schemaStudioExperienceReport['summary']['branchCount'] ?? $schemaStudioOperationsReport['summary']['branchCount'] ?? count((array)($schemaStudioDiagnostics['branchTopology'] ?? []))),
+                'schemaStudioEnvironmentCount' => (int)($schemaStudioManifest['summary']['environmentCount'] ?? $schemaStudioDiagnostics['summary']['environmentCount'] ?? $schemaStudioOperationsReport['summary']['environmentCount'] ?? count((array)($schemaStudioDiagnostics['environments'] ?? []))),
+                'schemaStudioStageCount' => (int)($schemaStudioManifest['summary']['stageCount'] ?? $schemaStudioDiagnostics['summary']['stageCount'] ?? $schemaStudioOperationsReport['summary']['stageCount'] ?? count((array)($schemaStudioDiagnostics['promotionBoard'] ?? []))),
+                'schemaStudioEventRailCount' => (int)($schemaStudioManifest['summary']['eventRailCount'] ?? $schemaStudioDiagnostics['summary']['eventRailCount'] ?? $schemaStudioOperationsReport['summary']['eventRailCount'] ?? count((array)($schemaStudioDiagnostics['eventRail'] ?? []))),
+                'schemaStudioOrchestrationScore' => (int)($schemaStudioManifest['summary']['orchestrationScore'] ?? $schemaStudioCommandCenterReport['summary']['orchestrationScore'] ?? 0),
+                'schemaStudioNarrativeCoverage' => (int)($schemaStudioManifest['summary']['narrativeCoverageScore'] ?? $schemaStudioCommandCenterReport['summary']['narrativeCoverageScore'] ?? 0),
+                'schemaStudioReviewWallScore' => (int)($schemaStudioManifest['summary']['reviewWallScore'] ?? $schemaStudioCommandCenterReport['summary']['reviewWallScore'] ?? 0),
+                'schemaStudioAtlasReadiness' => (int)($schemaStudioManifest['summary']['atlasReadinessScore'] ?? $schemaStudioCommandCenterReport['summary']['atlasReadinessScore'] ?? 0),
+                'schemaStudioLivePulseScore' => (int)($schemaStudioManifest['summary']['livePulseScore'] ?? $schemaStudioCommandCenterReport['summary']['livePulseScore'] ?? 0),
+                'schemaStudioCollaborationReadiness' => (int)($schemaStudioManifest['summary']['collaborationReadinessScore'] ?? $schemaStudioCommandCenterReport['summary']['collaborationReadinessScore'] ?? 0),
+                'schemaStudioVisualPolish' => (int)($schemaStudioManifest['summary']['visualPolishScore'] ?? $schemaStudioCommandCenterReport['summary']['visualPolishScore'] ?? 0),
+                'schemaStudioSceneCount' => (int)($schemaStudioManifest['summary']['sceneCount'] ?? $schemaStudioCommandCenterReport['summary']['sceneCount'] ?? count((array)($schemaStudioCommandCenterReport['scenes'] ?? []))),
+                'schemaStudioSpotlightCount' => (int)($schemaStudioManifest['summary']['spotlightCount'] ?? $schemaStudioCommandCenterReport['summary']['spotlightCount'] ?? count((array)($schemaStudioCommandCenterReport['spotlight'] ?? []))),
+                'schemaStudioReviewLaneCount' => (int)($schemaStudioManifest['summary']['reviewLaneCount'] ?? $schemaStudioCommandCenterReport['summary']['reviewLaneCount'] ?? count((array)($schemaStudioCommandCenterReport['reviewWall']['lanes'] ?? []))),
+                'schemaStudioAtlasCount' => (int)($schemaStudioManifest['summary']['atlasCount'] ?? $schemaStudioCommandCenterReport['summary']['atlasCount'] ?? count((array)($schemaStudioCommandCenterReport['atlas'] ?? []))),
+                'schemaStudioAtlasMeshScore' => (int)($schemaStudioManifest['summary']['atlasMeshScore'] ?? $schemaStudioDiagnostics['summary']['atlasMeshScore'] ?? $schemaStudioRound7Report['summary']['atlasMeshScore'] ?? 0),
+                'schemaStudioPhysicalCoverage' => (int)($schemaStudioManifest['summary']['physicalCoverageScore'] ?? $schemaStudioDiagnostics['summary']['physicalCoverageScore'] ?? $schemaStudioRound7Report['summary']['physicalCoverageScore'] ?? 0),
+                'schemaStudioReviewOpsScore' => (int)($schemaStudioManifest['summary']['reviewOpsScore'] ?? $schemaStudioDiagnostics['summary']['reviewOpsScore'] ?? $schemaStudioRound7Report['summary']['reviewOpsScore'] ?? 0),
+                'schemaStudioExportSurfaceScore' => (int)($schemaStudioManifest['summary']['exportSurfaceScore'] ?? $schemaStudioDiagnostics['summary']['exportSurfaceScore'] ?? $schemaStudioRound7Report['summary']['exportSurfaceScore'] ?? 0),
+                'schemaStudioInteroperabilityScore' => (int)($schemaStudioManifest['summary']['interoperabilityScore'] ?? $schemaStudioDiagnostics['summary']['interoperabilityScore'] ?? $schemaStudioRound7Report['summary']['interoperabilityScore'] ?? 0),
+                'schemaStudioRoleModeScore' => (int)($schemaStudioManifest['summary']['roleModeScore'] ?? $schemaStudioDiagnostics['summary']['roleModeScore'] ?? $schemaStudioRound7Report['summary']['roleModeScore'] ?? 0),
+                'schemaStudioTraceabilityAtlasScore' => (int)($schemaStudioManifest['summary']['traceabilityAtlasScore'] ?? $schemaStudioDiagnostics['summary']['traceabilityAtlasScore'] ?? $schemaStudioRound7Report['summary']['traceabilityAtlasScore'] ?? 0),
+                'schemaStudioBeautySystemScore' => (int)($schemaStudioManifest['summary']['beautySystemScore'] ?? $schemaStudioDiagnostics['summary']['beautySystemScore'] ?? $schemaStudioRound7Report['summary']['beautySystemScore'] ?? 0),
+                'schemaStudioObjectSurfaceCount' => (int)($schemaStudioManifest['summary']['objectSurfaceCount'] ?? $schemaStudioRound7Report['summary']['objectSurfaceCount'] ?? count((array)($schemaStudioRound7Report['atlas']['objectSurfaces'] ?? []))),
+                'schemaStudioRoleModeCount' => (int)($schemaStudioManifest['summary']['roleModeCount'] ?? $schemaStudioRound7Report['summary']['roleModeCount'] ?? count((array)($schemaStudioRound7Report['roleModes'] ?? []))),
+                'schemaStudioReviewBoardCount' => (int)($schemaStudioManifest['summary']['reviewBoardCount'] ?? $schemaStudioRound7Report['summary']['reviewBoardCount'] ?? count((array)($schemaStudioRound7Report['reviewBoards'] ?? []))),
+                'schemaStudioExportBundleCount' => (int)($schemaStudioManifest['summary']['exportBundleCount'] ?? $schemaStudioRound7Report['summary']['exportBundleCount'] ?? count((array)($schemaStudioRound7Report['exports'] ?? []))),
+                'schemaStudioVisualLanguageScore' => (int)($schemaStudioManifest['summary']['visualLanguageScore'] ?? $schemaStudioRound9Report['summary']['visualLanguageScore'] ?? 0),
+                'schemaStudioCardHierarchy' => (int)($schemaStudioManifest['summary']['cardHierarchyScore'] ?? $schemaStudioRound9Report['summary']['cardHierarchyScore'] ?? 0),
+                'schemaStudioEdgeLegibility' => (int)($schemaStudioManifest['summary']['edgeLegibilityScore'] ?? $schemaStudioRound9Report['summary']['edgeLegibilityScore'] ?? 0),
+                'schemaStudioLaneReadability' => (int)($schemaStudioManifest['summary']['laneReadabilityScore'] ?? $schemaStudioRound9Report['summary']['laneReadabilityScore'] ?? 0),
+                'schemaStudioAccessibilityScore' => (int)($schemaStudioManifest['summary']['accessibilityScore'] ?? $schemaStudioRound9Report['summary']['accessibilityScore'] ?? 0),
+                'schemaStudioDensityDiscipline' => (int)($schemaStudioManifest['summary']['densityDisciplineScore'] ?? $schemaStudioRound9Report['summary']['densityDisciplineScore'] ?? 0),
+                'schemaStudioCardModeCoverage' => (int)($schemaStudioManifest['summary']['cardModeCoverageScore'] ?? $schemaStudioRound9Report['summary']['cardModeCoverageScore'] ?? 0),
+                'schemaStudioVisualDirectorScore' => (int)($schemaStudioManifest['summary']['visualDirectorScore'] ?? $schemaStudioRound9Report['summary']['visualDirectorScore'] ?? 0),
+                'schemaStudioVisualLaneCount' => (int)($schemaStudioManifest['summary']['laneCount'] ?? $schemaStudioRound9Report['summary']['laneCount'] ?? count((array)($schemaStudioRound9Report['laneGuides'] ?? []))),
+                'schemaStudioVisualModeCount' => (int)($schemaStudioManifest['summary']['cardModeCount'] ?? $schemaStudioRound9Report['summary']['cardModeCount'] ?? count((array)($schemaStudioRound9Report['cardModes'] ?? []))),
+                'schemaStudioEdgeLensCount' => (int)($schemaStudioManifest['summary']['edgeLensCount'] ?? $schemaStudioRound9Report['summary']['edgeLensCount'] ?? count((array)($schemaStudioRound9Report['edgeLenses'] ?? []))),
+                'schemaStudioVisualQuickActionCount' => (int)($schemaStudioManifest['summary']['quickActionCount'] ?? $schemaStudioRound9Report['summary']['quickActionCount'] ?? count((array)($schemaStudioRound9Report['quickActions'] ?? []))),
+                'schemaStudioReviewTheatreScore' => (int)($schemaStudioManifest['summary']['reviewTheatreScore'] ?? $schemaStudioRound10Report['summary']['reviewTheatreScore'] ?? 0),
+                'schemaStudioThemeSystemScore' => (int)($schemaStudioManifest['summary']['themeSystemScore'] ?? $schemaStudioRound10Report['summary']['themeSystemScore'] ?? 0),
+                'schemaStudioScenePresetScore' => (int)($schemaStudioManifest['summary']['scenePresetScore'] ?? $schemaStudioRound10Report['summary']['scenePresetScore'] ?? 0),
+                'schemaStudioSelectionRailScore' => (int)($schemaStudioManifest['summary']['selectionRailScore'] ?? $schemaStudioRound10Report['summary']['selectionRailScore'] ?? 0),
+                'schemaStudioLaneTelemetryScore' => (int)($schemaStudioManifest['summary']['laneTelemetryScore'] ?? $schemaStudioRound10Report['summary']['laneTelemetryScore'] ?? 0),
+                'schemaStudioSemanticLegendScore' => (int)($schemaStudioManifest['summary']['semanticLegendScore'] ?? $schemaStudioRound10Report['summary']['semanticLegendScore'] ?? 0),
+                'schemaStudioFocusNarrativeScore' => (int)($schemaStudioManifest['summary']['focusNarrativeScore'] ?? $schemaStudioRound10Report['summary']['focusNarrativeScore'] ?? 0),
+                'schemaStudioKeyboardFlowScore' => (int)($schemaStudioManifest['summary']['keyboardFlowScore'] ?? $schemaStudioRound10Report['summary']['keyboardFlowScore'] ?? 0),
+                'schemaStudioThemeCount' => (int)($schemaStudioManifest['summary']['themeCount'] ?? $schemaStudioRound10Report['summary']['themeCount'] ?? count((array)($schemaStudioRound10Report['themes'] ?? []))),
+                'schemaStudioScenePresetCount' => (int)($schemaStudioManifest['summary']['scenePresetCount'] ?? $schemaStudioRound10Report['summary']['scenePresetCount'] ?? count((array)($schemaStudioRound10Report['scenes'] ?? []))),
+                'schemaStudioReviewRailActionCount' => (int)($schemaStudioManifest['summary']['reviewRailActionCount'] ?? $schemaStudioRound10Report['summary']['reviewRailActionCount'] ?? count((array)($schemaStudioRound10Report['reviewRailActions'] ?? []))),
+                'schemaStudioLegendGroupCount' => (int)($schemaStudioManifest['summary']['legendGroupCount'] ?? $schemaStudioRound10Report['summary']['legendGroupCount'] ?? count((array)($schemaStudioRound10Report['legendGroups'] ?? []))),
+                'schemaStudioLaneTelemetryCount' => (int)($schemaStudioManifest['summary']['laneTelemetryCount'] ?? $schemaStudioRound10Report['summary']['laneTelemetryCount'] ?? count((array)($schemaStudioRound10Report['laneTelemetry'] ?? []))),
+                'schemaStudioShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound10Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound10Report['shortcuts'] ?? []))),
+                'schemaStudioPresentationStudioScore' => (int)($schemaStudioManifest['summary']['presentationStudioScore'] ?? $schemaStudioDiagnostics['summary']['presentationStudioScore'] ?? $schemaStudioRound11Report['summary']['presentationStudioScore'] ?? 0),
+                'schemaStudioEvidenceDockScore' => (int)($schemaStudioManifest['summary']['evidenceDockScore'] ?? $schemaStudioDiagnostics['summary']['evidenceDockScore'] ?? $schemaStudioRound11Report['summary']['evidenceDockScore'] ?? 0),
+                'schemaStudioSpotlightPackScore' => (int)($schemaStudioManifest['summary']['spotlightPackScore'] ?? $schemaStudioDiagnostics['summary']['spotlightPackScore'] ?? $schemaStudioRound11Report['summary']['spotlightPackScore'] ?? 0),
+                'schemaStudioQuietCanvasScore' => (int)($schemaStudioManifest['summary']['quietCanvasScore'] ?? $schemaStudioDiagnostics['summary']['quietCanvasScore'] ?? $schemaStudioRound11Report['summary']['quietCanvasScore'] ?? 0),
+                'schemaStudioAccessibilityOpsScore' => (int)($schemaStudioManifest['summary']['accessibilityOpsScore'] ?? $schemaStudioDiagnostics['summary']['accessibilityOpsScore'] ?? $schemaStudioRound11Report['summary']['accessibilityOpsScore'] ?? 0),
+                'schemaStudioTopologyReadingScore' => (int)($schemaStudioManifest['summary']['topologyReadingScore'] ?? $schemaStudioDiagnostics['summary']['topologyReadingScore'] ?? $schemaStudioRound11Report['summary']['topologyReadingScore'] ?? 0),
+                'schemaStudioExecutiveReadoutScore' => (int)($schemaStudioManifest['summary']['executiveReadoutScore'] ?? $schemaStudioDiagnostics['summary']['executiveReadoutScore'] ?? $schemaStudioRound11Report['summary']['executiveReadoutScore'] ?? 0),
+                'schemaStudioLegendDisciplineScore' => (int)($schemaStudioManifest['summary']['legendDisciplineScore'] ?? $schemaStudioDiagnostics['summary']['legendDisciplineScore'] ?? $schemaStudioRound11Report['summary']['legendDisciplineScore'] ?? 0),
+                'schemaStudioSpotlightPackCount' => (int)($schemaStudioManifest['summary']['spotlightPackCount'] ?? $schemaStudioRound11Report['summary']['spotlightPackCount'] ?? count((array)($schemaStudioRound11Report['spotlightPacks'] ?? []))),
+                'schemaStudioEvidenceModeCount' => (int)($schemaStudioManifest['summary']['evidenceModeCount'] ?? $schemaStudioRound11Report['summary']['evidenceModeCount'] ?? count((array)($schemaStudioRound11Report['evidenceModes'] ?? []))),
+                'schemaStudioLegendModeCount' => (int)($schemaStudioManifest['summary']['legendModeCount'] ?? $schemaStudioRound11Report['summary']['legendModeCount'] ?? count((array)($schemaStudioRound11Report['legendModes'] ?? []))),
+                'schemaStudioTypeScaleCount' => (int)($schemaStudioManifest['summary']['typeScaleCount'] ?? $schemaStudioRound11Report['summary']['typeScaleCount'] ?? 0),
+                'schemaStudioDockActionCount' => (int)($schemaStudioManifest['summary']['dockActionCount'] ?? $schemaStudioRound11Report['summary']['dockActionCount'] ?? count((array)($schemaStudioRound11Report['dockActions'] ?? []))),
+                'schemaStudioRound11ShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound11Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound11Report['shortcuts'] ?? []))),
+                'schemaStudioScenarioComposerScore' => (int)($schemaStudioManifest['summary']['scenarioComposerScore'] ?? $schemaStudioDiagnostics['summary']['scenarioComposerScore'] ?? $schemaStudioRound12Report['summary']['scenarioComposerScore'] ?? 0),
+                'schemaStudioAdaptiveDensityScore' => (int)($schemaStudioManifest['summary']['adaptiveDensityScore'] ?? $schemaStudioDiagnostics['summary']['adaptiveDensityScore'] ?? $schemaStudioRound12Report['summary']['adaptiveDensityScore'] ?? 0),
+                'schemaStudioFocusRadiusScore' => (int)($schemaStudioManifest['summary']['focusRadiusScore'] ?? $schemaStudioDiagnostics['summary']['focusRadiusScore'] ?? $schemaStudioRound12Report['summary']['focusRadiusScore'] ?? 0),
+                'schemaStudioDockFlexScore' => (int)($schemaStudioManifest['summary']['dockFlexScore'] ?? $schemaStudioDiagnostics['summary']['dockFlexScore'] ?? $schemaStudioRound12Report['summary']['dockFlexScore'] ?? 0),
+                'schemaStudioLabelCadenceScore' => (int)($schemaStudioManifest['summary']['labelCadenceScore'] ?? $schemaStudioDiagnostics['summary']['labelCadenceScore'] ?? $schemaStudioRound12Report['summary']['labelCadenceScore'] ?? 0),
+                'schemaStudioLaneMatrixScore' => (int)($schemaStudioManifest['summary']['laneMatrixScore'] ?? $schemaStudioDiagnostics['summary']['laneMatrixScore'] ?? $schemaStudioRound12Report['summary']['laneMatrixScore'] ?? 0),
+                'schemaStudioPrecisionReadingScore' => (int)($schemaStudioManifest['summary']['precisionReadingScore'] ?? $schemaStudioDiagnostics['summary']['precisionReadingScore'] ?? $schemaStudioRound12Report['summary']['precisionReadingScore'] ?? 0),
+                'schemaStudioReviewMobilityScore' => (int)($schemaStudioManifest['summary']['reviewMobilityScore'] ?? $schemaStudioDiagnostics['summary']['reviewMobilityScore'] ?? $schemaStudioRound12Report['summary']['reviewMobilityScore'] ?? 0),
+                'schemaStudioPresetCount' => (int)($schemaStudioManifest['summary']['presetCount'] ?? $schemaStudioRound12Report['summary']['presetCount'] ?? count((array)($schemaStudioRound12Report['presets'] ?? []))),
+                'schemaStudioDensityModeCount' => (int)($schemaStudioManifest['summary']['densityModeCount'] ?? $schemaStudioRound12Report['summary']['densityModeCount'] ?? count((array)($schemaStudioRound12Report['densityModes'] ?? []))),
+                'schemaStudioRadiusModeCount' => (int)($schemaStudioManifest['summary']['radiusModeCount'] ?? $schemaStudioRound12Report['summary']['radiusModeCount'] ?? count((array)($schemaStudioRound12Report['radiusModes'] ?? []))),
+                'schemaStudioDockModeCount' => (int)($schemaStudioManifest['summary']['dockModeCount'] ?? $schemaStudioRound12Report['summary']['dockModeCount'] ?? count((array)($schemaStudioRound12Report['dockModes'] ?? []))),
+                'schemaStudioLabelModeCount' => (int)($schemaStudioManifest['summary']['labelModeCount'] ?? $schemaStudioRound12Report['summary']['labelModeCount'] ?? count((array)($schemaStudioRound12Report['labelModes'] ?? []))),
+                'schemaStudioRound12ShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound12Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound12Report['shortcuts'] ?? []))),
+                'schemaStudioLaneOverviewCount' => (int)($schemaStudioManifest['summary']['laneOverviewCount'] ?? $schemaStudioRound12Report['summary']['laneOverviewCount'] ?? count((array)($schemaStudioRound12Report['laneOverview'] ?? []))),
             ],
             'benchmarks' => $this->benchmarkReferences(),
             'principles' => $this->benchmarkPrinciples(),
             'schemaStudio' => [
-                // Only the manifest summary is returned — no full report objects.
-                // JS patches (round6–round11) have built-in fallbacks to overview.* fields.
-                'manifest' => ['summary' => $mSum],
+                'manifest' => $schemaStudioManifest,
                 'runtimeProjection' => [
-                    'tableCount'    => (int)($mSum['projectionCount'] ?? 0),
-                    'relationCount' => (int)($mSum['relationCount'] ?? 0),
+                    'tableCount' => count((array)($schemaStudioRuntimeProjection['tables'] ?? [])),
+                    'relationCount' => count((array)($schemaStudioRuntimeProjection['relations'] ?? [])),
                 ],
+                'diagnostics' => $schemaStudioDiagnostics,
+                'experienceReport' => $schemaStudioExperienceReport,
+                'operationsReport' => $schemaStudioOperationsReport,
+                'commandCenterReport' => $schemaStudioCommandCenterReport,
+                'round7Report' => $schemaStudioRound7Report,
+                'round9Report' => $schemaStudioRound9Report,
+                'round10Report' => $schemaStudioRound10Report,
+                'round11Report' => $schemaStudioRound11Report,
+                'round12Report' => $schemaStudioRound12Report,
                 'releaseLog' => array_slice((array)($schemaStudioReleaseLog['items'] ?? []), 0, 10),
             ],
             'lists' => [
-                'apis'      => $apiSummaries,
-                'tables'    => $tableSummaries,
-                'schemas'   => $schemaSummaries,
+                'apis' => $apiSummaries,
+                'tables' => $tableSummaries,
+                'schemas' => $schemaSummaries,
                 'variables' => $variableSummaries,
             ],
         ]);
