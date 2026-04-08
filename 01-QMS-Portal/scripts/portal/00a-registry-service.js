@@ -59,6 +59,10 @@ function _workflowMap(raw){
   return _isObject(raw && raw.workflows) ? raw.workflows : (raw || {});
 }
 
+function _tableMap(raw){
+  return _isObject(raw && raw.tables) ? raw.tables : (raw || {});
+}
+
 function _formulaMap(raw){
   return _isObject(raw && raw.formulas) ? raw.formulas : (raw || {});
 }
@@ -126,6 +130,27 @@ function _esc(v){
   var d = document.createElement('div');
   d.appendChild(document.createTextNode(v == null ? '' : String(v)));
   return d.innerHTML;
+}
+
+function _pushUnique(list, value){
+  var text = String(value == null ? '' : value).replace(/^\s+|\s+$/g, '');
+  if(!text || list.indexOf(text) >= 0) return;
+  list.push(text);
+}
+
+function _optionObjects(list){
+  return (list || []).map(function(opt){
+    if(opt && typeof opt === 'object' && !Array.isArray(opt)){
+      return {
+        value: opt.value,
+        label: opt.label != null ? opt.label : opt.value,
+        labelEn: opt.labelEn != null ? opt.labelEn : (opt.label != null ? opt.label : opt.value),
+        color: opt.color || '',
+        icon: opt.icon || ''
+      };
+    }
+    return { value: opt, label: opt, labelEn: opt, color: '', icon: '' };
+  });
 }
 
 /* ── Registry File Paths ───────────────────────────────────────────────── */
@@ -414,6 +439,107 @@ function fieldLabel(endpoint, fieldKey){
  */
 function fieldTypes(){
   return _cache['field-types'] || _ensure('field-types') || {};
+}
+
+/**
+ * Get table registry metadata for a database table.
+ * @param {string} tableName
+ * @returns {Object|null}
+ */
+function table(tableName){
+  var tables = _tableMap(_cache['table-registry']);
+  if(!tables){
+    tables = _ensure('table-registry');
+  }
+  tables = _tableMap(tables);
+  if(!tables || !tableName) return null;
+  return tables[tableName] || null;
+}
+
+/**
+ * Get column metadata from table-registry.
+ * @param {string} tableName
+ * @param {string} columnName
+ * @returns {Object|null}
+ */
+function column(tableName, columnName){
+  var t = table(tableName);
+  if(!t || !t.columns || !columnName) return null;
+  return t.columns[columnName] || null;
+}
+
+/**
+ * Alias for generic enum / option sets stored in status-options.json.
+ * @param {string} setKey
+ * @returns {Array<{value,label,labelEn,color,icon}>}
+ */
+function optionSet(setKey){
+  return statusSet(setKey);
+}
+
+/**
+ * Get all enum / option set keys.
+ * @returns {Array<string>}
+ */
+function optionSetKeys(){
+  return statusSetKeys();
+}
+
+/**
+ * Resolve dropdown options from the single registry source.
+ * Supports field-level keys, table/column metadata, and explicit optionSet/statusSet references.
+ * @param {Object} meta
+ * @returns {Array<{value,label,labelEn,color,icon}>}
+ */
+function selectOptions(meta){
+  var fieldMeta = meta && meta.field ? meta.field : (meta || {});
+  var tableName = meta && meta.table ? meta.table : (fieldMeta.table || fieldMeta.dbTable || '');
+  var fieldKey = meta && meta.fieldKey ? meta.fieldKey : (fieldMeta.fieldKey || fieldMeta.dbColumn || fieldMeta.column || fieldMeta.key || '');
+  var colMeta = null;
+  var tableMeta = null;
+  var keys = [];
+  var options = [];
+
+  _pushUnique(keys, meta && meta.optionSet);
+  _pushUnique(keys, meta && meta.statusSet);
+  _pushUnique(keys, fieldMeta.optionSet);
+  _pushUnique(keys, fieldMeta.statusSet);
+  _pushUnique(keys, fieldMeta.registryKey);
+  _pushUnique(keys, fieldMeta.enumRef);
+  _pushUnique(keys, fieldMeta.constraints && fieldMeta.constraints.enumRef);
+
+  if(tableName && fieldKey){
+    tableMeta = table(tableName);
+    colMeta = column(tableName, fieldKey);
+    if(colMeta){
+      _pushUnique(keys, colMeta.optionSet);
+      _pushUnique(keys, colMeta.statusSet);
+      _pushUnique(keys, colMeta.enumRef);
+      if(colMeta.uiType === 'reference' || colMeta.references) return [];
+    }
+    if(tableMeta && tableMeta.statusColumn === fieldKey){
+      _pushUnique(keys, tableMeta.statusSet);
+    }
+    _pushUnique(keys, tableName + '_' + fieldKey);
+    _pushUnique(keys, tableName + '_' + fieldKey + '_set');
+  }
+
+  if(fieldKey){
+    _pushUnique(keys, fieldKey);
+    _pushUnique(keys, fieldKey + '_status');
+    _pushUnique(keys, fieldKey + '_set');
+  }
+
+  keys.some(function(key){
+    options = statusSet(key);
+    return !!(options && options.length);
+  });
+  if(options && options.length) return _optionObjects(options);
+
+  if(Array.isArray(fieldMeta.options) && fieldMeta.options.length){
+    return _optionObjects(fieldMeta.options);
+  }
+  return [];
 }
 
 /* ── WORKFLOW API ──────────────────────────────────────────────────────── */
@@ -806,6 +932,11 @@ window.HmRegistry = {
   field: field,
   fieldLabel: fieldLabel,
   fieldTypes: fieldTypes,
+  table: table,
+  column: column,
+  optionSet: optionSet,
+  optionSetKeys: optionSetKeys,
+  selectOptions: selectOptions,
 
   // Workflow
   workflow: workflow,

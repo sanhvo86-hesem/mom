@@ -15,18 +15,14 @@ var FORM_COLORS = {
   other:       { bg:'#f1f5f9', icon:'EC' }
 };
 
-var DEPARTMENTS = [
-  { value:'QA',  label:'Đảm bảo chất lượng', labelEn:'Quality Assurance' },
-  { value:'PRO', label:'Sản xuất', labelEn:'Production' },
-  { value:'ENG', label:'Kỹ thuật', labelEn:'Engineering' },
-  { value:'SCM', label:'Chuỗi cung ứng', labelEn:'Supply Chain' },
-  { value:'HR',  label:'Nhân sự và Đào tạo', labelEn:'HR & Training' },
-  { value:'EXE', label:'Ban giám đốc', labelEn:'Executive / Management' },
-  { value:'SAL', label:'Kinh doanh', labelEn:'Sales' },
-  { value:'WH',  label:'Kho vận', labelEn:'Warehouse / Logistics' },
-  { value:'IT',  label:'Công nghệ thông tin', labelEn:'IT / Digital' },
-  { value:'EHS', label:'An toàn và Môi trường', labelEn:'EHS / Safety' }
-];
+function _registryOptions(setKey){
+  if(!window.HmRegistry || typeof HmRegistry.selectOptions !== 'function') return [];
+  return HmRegistry.selectOptions({ optionSet:setKey }).map(function(opt){
+    return { value:opt.value, label:opt.label, labelEn:opt.labelEn || opt.label };
+  });
+}
+
+var DEPARTMENTS = _registryOptions('department_code');
 
 var state = {
   forms: [],
@@ -2075,13 +2071,7 @@ function buildNewFormSchema(opts){
     ],
     fields: [
       { id: 'record_date', type: 'date', label: 'Record Date', label_vi: 'Ngày ghi nhận', required: true, default: 'today', audit_tracked: true },
-      { id: 'department', type: 'select', label: 'Department', label_vi: 'Phòng ban', required: true, options: [
-        { value: 'QA', label: 'Chất lượng (QA)' },
-        { value: 'PRO', label: 'Sản xuất (Production)' },
-        { value: 'ENG', label: 'Kỹ thuật (Engineering)' },
-        { value: 'SCM', label: 'Chuỗi cung ứng (SCM)' },
-        { value: 'HR', label: 'Nhân sự (HR)' }
-      ], audit_tracked: true },
+      { id: 'department', type: 'select', label: 'Department', label_vi: 'Phòng ban', required: true, options: _registryOptions('department_code'), audit_tracked: true },
       { id: 'description_field', type: 'textarea', label: 'Description', label_vi: 'Mô tả', width: 'full', required: true, audit_tracked: true }
     ],
     signature_blocks: [
@@ -2104,11 +2094,7 @@ function buildNewFormSchema(opts){
     });
     schema.fields.push(
       { id: 'finding_description', type: 'textarea', label: 'Finding Description', label_vi: 'Mô tả phát hiện', width: 'full', required: true, audit_tracked: true },
-      { id: 'severity', type: 'select', label: 'Severity', label_vi: 'Mức độ', required: true, options: [
-        { value: 'minor', label: 'Nhẹ (Minor)' },
-        { value: 'major', label: 'Nặng (Major)' },
-        { value: 'critical', label: 'Nghiêm trọng (Critical)' }
-      ], audit_tracked: true },
+      { id: 'severity', type: 'select', label: 'Severity', label_vi: 'Muc do', required: true, options: _registryOptions('default_severity'), audit_tracked: true },
       { id: 'containment_action', type: 'textarea', label: 'Containment Action', label_vi: 'Hành động ngăn chặn', width: 'full', required: true, audit_tracked: true }
     );
     schema.sections.push({

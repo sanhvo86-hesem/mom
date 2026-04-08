@@ -8263,8 +8263,40 @@ function _managedFieldPlaceholder(field){
   return _t(field && field.placeholder || '', field && (field.placeholderEn || field.placeholder) || '');
 }
 
-function _managedFieldOptions(field){
-  return field && Array.isArray(field.options) ? field.options : [];
+function _fieldSelectOptions(field, currentValue, context){
+  var opts = [];
+  var normalizedValue = currentValue == null ? '' : String(currentValue);
+  var registryMeta;
+  if(window.HmRegistry && typeof HmRegistry.selectOptions === 'function'){
+    registryMeta = {
+      field: field || {},
+      table: (context && context.table) || (field && (field.table || field.dbTable)) || ''
+    };
+    opts = HmRegistry.selectOptions(registryMeta) || [];
+  }
+  if((!opts || !opts.length) && field && Array.isArray(field.options)){
+    opts = field.options.map(function(opt){
+      return opt && typeof opt === 'object'
+        ? opt
+        : { value: opt, label: opt, labelEn: opt };
+    });
+  }
+  if(normalizedValue && opts && opts.length){
+    var found = false;
+    opts.forEach(function(opt){
+      var value = opt && typeof opt === 'object' ? opt.value : opt;
+      if(String(value) === normalizedValue) found = true;
+    });
+    if(!found){
+      opts = opts.slice();
+      opts.push({ value: normalizedValue, label: normalizedValue, labelEn: normalizedValue });
+    }
+  }
+  return opts || [];
+}
+
+function _managedFieldOptions(field, currentValue){
+  return _fieldSelectOptions(field, currentValue, null);
 }
 
 function _renderManagedField(field, value, error, blockId){
@@ -8283,7 +8315,7 @@ function _renderManagedField(field, value, error, blockId){
   } else if(type === 'select'){
     html += '<select class="hm-input hm-select'+(invalid ? ' hm-field-invalid' : '')+'" role="combobox"'+attrs+'>';
     html += '<option value="">'+_t('Chọn...', 'Select...')+'</option>';
-    _managedFieldOptions(field).forEach(function(opt){
+    _managedFieldOptions(field, value).forEach(function(opt){
       var optionValue = opt && typeof opt === 'object' ? opt.value : opt;
       var optionLabel = opt && typeof opt === 'object' ? _t(opt.label && opt.label.vi || opt.label || String(optionValue), opt.label && opt.label.en || opt.labelEn || opt.label || String(optionValue)) : String(opt);
       html += '<option value="'+_esc(optionValue)+'"'+(String(value) === String(optionValue) ? ' selected' : '')+'>'+_esc(optionLabel)+'</option>';
@@ -9164,9 +9196,10 @@ function renderFormStandard(config, data, reactiveCtx, block){
     if(f.type==='textarea'){
       html += '<textarea class="hm-input hm-textarea'+(error ? ' hm-field-invalid' : '')+'" name="'+_esc(f.key)+'" rows="'+(f.rows||3)+'"'+attrs+(placeholder ? ' placeholder="'+_esc(placeholder)+'"' : '')+'>'+_esc(val)+'</textarea>';
     } else if(f.type==='select'){
+      var resolvedOptions = _fieldSelectOptions(f, val, { table: config && config.table });
       html += '<select class="hm-input hm-select'+(error ? ' hm-field-invalid' : '')+'" name="'+_esc(f.key)+'"'+attrs+'>';
       html += '<option value="">'+_t('Chon...','Select...')+'</option>';
-      (f.options||[]).forEach(function(opt){
+      resolvedOptions.forEach(function(opt){
         var sel = String(val)===String(opt.value) ? ' selected' : '';
         html += '<option value="'+_esc(opt.value)+'"'+sel+'>'+_esc(_t(opt.label && opt.label.vi || opt.label || '', opt.label && opt.label.en || opt.labelEn || opt.label || ''))+'</option>';
       });

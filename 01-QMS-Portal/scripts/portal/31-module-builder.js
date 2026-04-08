@@ -103,6 +103,15 @@ function _deleteByPath(obj, path){
 var _legacySaveModule;
 var _legacyOpenSavedModule;
 var _legacyDeleteSavedModule;
+// Later Module Builder rounds override these helpers; predeclare them for strict-mode safe reassignment.
+var _ngEnsureModuleBuilderMetadata;
+var _ngModuleStudioDraftFromSchema;
+var _ngApplyModuleStudioDraft;
+var _ngSyncModuleBuilderManifest;
+var _ngRenderModuleStudioPanel;
+var _ngExportBuilderJson;
+var _ngExportRuntimeJson;
+var _ngDuplicateCurrentModule;
 var _heroTooltipEl = null;
 var _heroTooltipTarget = null;
 

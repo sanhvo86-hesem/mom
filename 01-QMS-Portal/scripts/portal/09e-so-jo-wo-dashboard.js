@@ -63,23 +63,6 @@ var FOUNDATION_GROUPS = [
   { key:'quality', titleVi:'Nền chất lượng & giao hàng', titleEn:'Quality and fulfillment foundations', items:['quality_gate_profiles','customer_item_approvals','supplier_process_approvals','warehouse_locations'] }
 ];
 
-var SELECT_OPTIONS = {
-  priority:['normal','high','urgent','aog'],
-  contract_review_status:['pending','in_review','approved','rejected','blocked'],
-  fulfillment_status:['planning','pick_pack','pack_prep','ready_to_ship','completed','blocked'],
-  engineering_release_status:['pending','released','warning','blocked','expired'],
-  material_ready_status:['pending','planned','ready','warning','blocked'],
-  quality_plan_status:['pending','planned','ready','warning','blocked'],
-  source_inspection_status:['not_required','pending','scheduled','ready','completed','blocked'],
-  outside_processing_status:['not_required','pending','scheduled','in_progress','completed','blocked'],
-  dispatch_priority:['low','normal','high','urgent'],
-  quality_gate_status:['pending','in_progress','approved','on_hold','rejected','not_required'],
-  first_piece_status:['pending','approved','rejected','not_required'],
-  handover_status:['pending','ready','done','blocked'],
-  traveler_status:['pending','released','verified','attached','blocked'],
-  material_cert_status:['pending','verified','approved','on_hold','rejected']
-};
-
 var FIELDS = {
   so: [
     { key:'so_number', labelVi:'Số SO thủ công (tùy chọn)', labelEn:'Manual SO Number (Optional)' },
@@ -94,13 +77,13 @@ var FIELDS = {
     { key:'due_date', labelVi:'Ngày giao hàng', labelEn:'Due Date', type:'date', required:true },
     { key:'total_qty', labelVi:'Tổng số lượng', labelEn:'Total Qty', type:'integer', required:true },
     { key:'total_value', labelVi:'Giá trị đơn hàng (USD)', labelEn:'Order Value (USD)', type:'number' },
-    { key:'priority', labelVi:'Mức ưu tiên', labelEn:'Priority', type:'select', options:SELECT_OPTIONS.priority },
+    { key:'priority', labelVi:'Mức ưu tiên', labelEn:'Priority', type:'select', optionSet:'priority' },
     { key:'incoterm_code', labelVi:'Incoterm', labelEn:'Incoterm', lookup:'incoterms' },
     { key:'shipping_method_id', labelVi:'Phương thức giao', labelEn:'Shipping Method', lookup:'shipping_methods' },
     { key:'payment_term_code', labelVi:'Điều khoản thanh toán', labelEn:'Payment Term', lookup:'payment_terms' },
     { key:'contract_review', labelVi:'Mã xem xét hợp đồng', labelEn:'Contract Review Ref' },
-    { key:'contract_review_status', labelVi:'Trạng thái contract review', labelEn:'Contract Review Status', type:'select', options:SELECT_OPTIONS.contract_review_status },
-    { key:'fulfillment_status', labelVi:'Trạng thái fulfillment', labelEn:'Fulfillment Status', type:'select', options:SELECT_OPTIONS.fulfillment_status },
+    { key:'contract_review_status', labelVi:'Trạng thái contract review', labelEn:'Contract Review Status', type:'select', optionSet:'contract_review_status' },
+    { key:'fulfillment_status', labelVi:'Trạng thái fulfillment', labelEn:'Fulfillment Status', type:'select', optionSet:'fulfillment_status' },
     { key:'special_requirements', labelVi:'Yêu cầu đặc biệt', labelEn:'Special Requirements', type:'textarea', span:'wide' }
   ],
   jo: [
@@ -119,11 +102,11 @@ var FIELDS = {
     { key:'control_plan_id', labelVi:'Control Plan', labelEn:'Control Plan', lookup:'control_plans' },
     { key:'inspection_plan_id', labelVi:'Inspection Plan', labelEn:'Inspection Plan', lookup:'inspection_plans' },
     { key:'traveler_template_id', labelVi:'Traveler template', labelEn:'Traveler Template', lookup:'traveler_templates' },
-    { key:'engineering_release_status', labelVi:'Phát hành kỹ thuật', labelEn:'Engineering Release', type:'select', options:SELECT_OPTIONS.engineering_release_status },
-    { key:'material_ready_status', labelVi:'Sẵn sàng vật tư', labelEn:'Material Readiness', type:'select', options:SELECT_OPTIONS.material_ready_status },
-    { key:'quality_plan_status', labelVi:'Kế hoạch chất lượng', labelEn:'Quality Plan', type:'select', options:SELECT_OPTIONS.quality_plan_status },
-    { key:'source_inspection_status', labelVi:'Source inspection', labelEn:'Source Inspection', type:'select', options:SELECT_OPTIONS.source_inspection_status },
-    { key:'outside_processing_status', labelVi:'Outside processing', labelEn:'Outside Processing', type:'select', options:SELECT_OPTIONS.outside_processing_status },
+    { key:'engineering_release_status', labelVi:'Phát hành kỹ thuật', labelEn:'Engineering Release', type:'select', optionSet:'engineering_release_status' },
+    { key:'material_ready_status', labelVi:'Sẵn sàng vật tư', labelEn:'Material Readiness', type:'select', optionSet:'material_ready_status' },
+    { key:'quality_plan_status', labelVi:'Kế hoạch chất lượng', labelEn:'Quality Plan', type:'select', optionSet:'quality_plan_status' },
+    { key:'source_inspection_status', labelVi:'Source inspection', labelEn:'Source Inspection', type:'select', optionSet:'source_inspection_status' },
+    { key:'outside_processing_status', labelVi:'Outside processing', labelEn:'Outside Processing', type:'select', optionSet:'outside_processing_status' },
     { key:'fai_required', labelVi:'Yêu cầu FAI', labelEn:'FAI Required', type:'boolean' },
     { key:'customer_source_inspection', labelVi:'Khách hàng witness / source inspection', labelEn:'Customer Source Inspection', type:'boolean' },
     { key:'special_process', labelVi:'Công đoạn đặc biệt', labelEn:'Special Process' },
@@ -137,21 +120,21 @@ var FIELDS = {
     { key:'machine_id', labelVi:'Mã máy', labelEn:'Machine ID', lookup:'machines', required:true },
     { key:'work_center_id', labelVi:'Mã work center', labelEn:'Work Center ID', lookup:'work_centers', required:true },
     { key:'operator_id', labelVi:'Người vận hành', labelEn:'Operator', lookup:'operators' },
-    { key:'dispatch_priority', labelVi:'Ưu tiên dispatch', labelEn:'Dispatch Priority', type:'select', options:SELECT_OPTIONS.dispatch_priority },
+    { key:'dispatch_priority', labelVi:'Ưu tiên dispatch', labelEn:'Dispatch Priority', type:'select', optionSet:'dispatch_priority' },
     { key:'nc_program_id', labelVi:'Mã chương trình NC', labelEn:'NC Program ID' },
     { key:'setup_time_est', labelVi:'Setup kế hoạch (phút)', labelEn:'Estimated Setup (min)', type:'number' },
     { key:'run_time_est', labelVi:'Run kế hoạch (phút)', labelEn:'Estimated Run (min)', type:'number' },
     { key:'scheduled_start', labelVi:'Bắt đầu kế hoạch', labelEn:'Scheduled Start', type:'datetime' },
     { key:'scheduled_end', labelVi:'Kết thúc kế hoạch', labelEn:'Scheduled End', type:'datetime' },
     { key:'fixture_id', labelVi:'Mã đồ gá', labelEn:'Fixture ID' },
-    { key:'quality_gate_status', labelVi:'Quality gate', labelEn:'Quality Gate', type:'select', options:SELECT_OPTIONS.quality_gate_status },
-    { key:'first_piece_status', labelVi:'First piece', labelEn:'First Piece', type:'select', options:SELECT_OPTIONS.first_piece_status },
-    { key:'handover_status', labelVi:'Bàn giao', labelEn:'Handover', type:'select', options:SELECT_OPTIONS.handover_status },
+    { key:'quality_gate_status', labelVi:'Quality gate', labelEn:'Quality Gate', type:'select', optionSet:'quality_gate_status' },
+    { key:'first_piece_status', labelVi:'First piece', labelEn:'First Piece', type:'select', optionSet:'first_piece_status' },
+    { key:'handover_status', labelVi:'Bàn giao', labelEn:'Handover', type:'select', optionSet:'handover_status' },
     { key:'material_lot_number', labelVi:'Số lô vật liệu', labelEn:'Material Lot Number' },
     { key:'heat_number', labelVi:'Số heat / melt', labelEn:'Heat Number' },
     { key:'traveler_number', labelVi:'Mã traveler', labelEn:'Traveler Number' },
-    { key:'traveler_status', labelVi:'Trạng thái traveler', labelEn:'Traveler Status', type:'select', options:SELECT_OPTIONS.traveler_status },
-    { key:'material_cert_status', labelVi:'Trạng thái chứng chỉ vật liệu', labelEn:'Material Certificate Status', type:'select', options:SELECT_OPTIONS.material_cert_status }
+    { key:'traveler_status', labelVi:'Trạng thái traveler', labelEn:'Traveler Status', type:'select', optionSet:'traveler_status' },
+    { key:'material_cert_status', labelVi:'Trạng thái chứng chỉ vật liệu', labelEn:'Material Certificate Status', type:'select', optionSet:'material_cert_status' }
   ]
 };
 
@@ -226,6 +209,21 @@ function _lookupRows(kind, filterContext){
   if(kind==='so') return _flat.filter(function(x){ return _recordType(x)==='so'; }).map(function(x){ return { value:x.so_number, label:x.so_number, sub:_recordTitle(x) }; });
   if(kind==='jo') return _flat.filter(function(x){ return _recordType(x)==='jo'; }).map(function(x){ return { value:x.jo_number, label:x.jo_number, sub:_partRev(x.part_number,x.part_revision) }; });
   return [];
+}
+function _fieldSelectOptions(field, currentValue){
+  var opts = [];
+  var valueText = currentValue == null ? '' : String(currentValue);
+  if(window.HmRegistry && typeof HmRegistry.selectOptions === 'function'){
+    opts = HmRegistry.selectOptions({ field:field || {} }) || [];
+  }
+  if((!opts || !opts.length) && Array.isArray(field && field.options)){
+    opts = field.options.map(function(opt){ return { value:opt, label:opt, labelEn:opt }; });
+  }
+  if(valueText && opts && opts.length && !opts.some(function(opt){ return String(opt.value) === valueText; })){
+    opts = opts.slice();
+    opts.push({ value:valueText, label:valueText, labelEn:valueText });
+  }
+  return opts || [];
 }
 function _partRev(part, rev){ if(!part) return '-'; return part + (rev ? ' / ' + rev : ''); }
 function _reloadRevisionDropdown(type, form, selectedPart){
@@ -573,8 +571,8 @@ function _renderField(field,type){
   var wide=field.span==='wide'?' wide':'';
   if(field.lookup) return '<div class="sj-form-field'+wide+'"><label>'+_esc(label)+'</label><div id="'+_id+'-'+type+'-'+field.key+'"></div></div>';
   if(field.type==='textarea') return '<div class="sj-form-field'+wide+'"><label>'+_esc(label)+'</label><textarea class="sj-input" name="'+field.key+'"'+req+(field.readonly?' readonly':'')+'></textarea></div>';
-  if(field.type==='select') return '<div class="sj-form-field'+wide+'"><label>'+_esc(label)+'</label><select class="sj-input" name="'+field.key+'"><option value="">'+_t('Chọn','Select')+'</option>'+field.options.map(function(x){ return '<option value="'+_esc(x)+'">'+_esc(x)+'</option>'; }).join('')+'</select></div>';
-  if(field.type==='boolean') return '<div class="sj-form-field'+wide+'"><label>'+_esc(label)+'</label><select class="sj-input" name="'+field.key+'"><option value="">'+_t('Chọn','Select')+'</option><option value="true">'+_t('Có','Yes')+'</option><option value="false">'+_t('Không','No')+'</option></select></div>';
+  if(field.type==='select') return '<div class="sj-form-field'+wide+'"><label>'+_esc(label)+'</label><select class="sj-input" name="'+field.key+'"><option value="">'+_t('Chọn','Select')+'</option>'+_fieldSelectOptions(field).map(function(opt){ return '<option value="'+_esc(opt.value)+'">'+_esc(_t(opt.label,opt.labelEn||opt.label))+'</option>'; }).join('')+'</select></div>';
+  if(field.type==='boolean') return '<div class="sj-form-field'+wide+'"><label>'+_esc(label)+'</label><select class="sj-input" name="'+field.key+'"><option value="">'+_t('Chọn','Select')+'</option>'+_fieldSelectOptions({ optionSet:'boolean_true_false' }).map(function(opt){ return '<option value="'+_esc(opt.value)+'">'+_esc(_t(opt.label,opt.labelEn||opt.label))+'</option>'; }).join('')+'</select></div>';
   return '<div class="sj-form-field'+wide+'"><label>'+_esc(label)+'</label><input class="sj-input" name="'+field.key+'" type="'+(field.type==='date'?'date':field.type==='datetime'?'datetime-local':field.type==='number'||field.type==='integer'?'number':'text')+'"'+req+(field.readonly?' readonly':'')+(field.type==='number'?' step="any"':'')+'></div>';
 }
 

@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-05T13:32:47.256Z",
-    "enumCount": 536
+    "generatedAt": "2026-04-08T10:32:15.543Z",
+    "enumCount": 588
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -25172,6 +25172,2186 @@
         "color": "#3b82f6",
         "icon": "Clock",
         "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "engineering_release_status": {
+    "label": "Engineering Release Status",
+    "labelEn": "Engineering Release Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "released",
+        "label": "Released",
+        "labelEn": "Released",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "warning",
+        "label": "Warning",
+        "labelEn": "Warning",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "expired",
+        "label": "Expired",
+        "labelEn": "Expired",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "material_ready_status": {
+    "label": "Material Ready Status",
+    "labelEn": "Material Ready Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "planned",
+        "label": "Planned",
+        "labelEn": "Planned",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ready",
+        "label": "Ready",
+        "labelEn": "Ready",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "warning",
+        "label": "Warning",
+        "labelEn": "Warning",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "quality_plan_status": {
+    "label": "Quality Plan Status",
+    "labelEn": "Quality Plan Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "planned",
+        "label": "Planned",
+        "labelEn": "Planned",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ready",
+        "label": "Ready",
+        "labelEn": "Ready",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "warning",
+        "label": "Warning",
+        "labelEn": "Warning",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "source_inspection_status": {
+    "label": "Source Inspection Status",
+    "labelEn": "Source Inspection Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "not_required",
+        "label": "Not Required",
+        "labelEn": "Not Required",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "scheduled",
+        "label": "Scheduled",
+        "labelEn": "Scheduled",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ready",
+        "label": "Ready",
+        "labelEn": "Ready",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "completed",
+        "label": "Completed",
+        "labelEn": "Completed",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "outside_processing_status": {
+    "label": "Outside Processing Status",
+    "labelEn": "Outside Processing Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "not_required",
+        "label": "Not Required",
+        "labelEn": "Not Required",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "scheduled",
+        "label": "Scheduled",
+        "labelEn": "Scheduled",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "in_progress",
+        "label": "In Progress",
+        "labelEn": "In Progress",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "completed",
+        "label": "Completed",
+        "labelEn": "Completed",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "dispatch_priority": {
+    "label": "Dispatch Priority",
+    "labelEn": "Dispatch Priority",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "low",
+        "label": "Low",
+        "labelEn": "Low",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "normal",
+        "label": "Normal",
+        "labelEn": "Normal",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "high",
+        "label": "High",
+        "labelEn": "High",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "urgent",
+        "label": "Urgent",
+        "labelEn": "Urgent",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "quality_gate_status": {
+    "label": "Quality Gate Status",
+    "labelEn": "Quality Gate Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "in_progress",
+        "label": "In Progress",
+        "labelEn": "In Progress",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "approved",
+        "label": "Approved",
+        "labelEn": "Approved",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "on_hold",
+        "label": "On Hold",
+        "labelEn": "On Hold",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "rejected",
+        "label": "Rejected",
+        "labelEn": "Rejected",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "not_required",
+        "label": "Not Required",
+        "labelEn": "Not Required",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "first_piece_status": {
+    "label": "First Piece Status",
+    "labelEn": "First Piece Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "approved",
+        "label": "Approved",
+        "labelEn": "Approved",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "rejected",
+        "label": "Rejected",
+        "labelEn": "Rejected",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "not_required",
+        "label": "Not Required",
+        "labelEn": "Not Required",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "handover_status": {
+    "label": "Handover Status",
+    "labelEn": "Handover Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ready",
+        "label": "Ready",
+        "labelEn": "Ready",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "done",
+        "label": "Done",
+        "labelEn": "Done",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "traveler_status": {
+    "label": "Traveler Status",
+    "labelEn": "Traveler Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "released",
+        "label": "Released",
+        "labelEn": "Released",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "verified",
+        "label": "Verified",
+        "labelEn": "Verified",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "attached",
+        "label": "Attached",
+        "labelEn": "Attached",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "material_cert_status": {
+    "label": "Material Certificate Status",
+    "labelEn": "Material Certificate Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Pending",
+        "labelEn": "Pending",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "verified",
+        "label": "Verified",
+        "labelEn": "Verified",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "approved",
+        "label": "Approved",
+        "labelEn": "Approved",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "on_hold",
+        "label": "On Hold",
+        "labelEn": "On Hold",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "rejected",
+        "label": "Rejected",
+        "labelEn": "Rejected",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "customer_type": {
+    "label": "Customer Type",
+    "labelEn": "Customer Type",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "OEM",
+        "label": "OEM",
+        "labelEn": "OEM",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "Tier 1",
+        "label": "Tier 1",
+        "labelEn": "Tier 1",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "Tier 2",
+        "label": "Tier 2",
+        "labelEn": "Tier 2",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "Internal",
+        "label": "N?i b?",
+        "labelEn": "Internal",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "supplier_type": {
+    "label": "Supplier Type",
+    "labelEn": "Supplier Type",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "raw_material",
+        "label": "Raw Material",
+        "labelEn": "Raw Material",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "special_process",
+        "label": "Special Process",
+        "labelEn": "Special Process",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "calibration",
+        "label": "Calibration",
+        "labelEn": "Calibration",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "outsource",
+        "label": "Outsource",
+        "labelEn": "Outsource",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "service",
+        "label": "Service",
+        "labelEn": "Service",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "traceability_level": {
+    "label": "Traceability Level",
+    "labelEn": "Traceability Level",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "not_required",
+        "label": "Not Required",
+        "labelEn": "Not Required",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "lot",
+        "label": "Lot",
+        "labelEn": "Lot",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "lot_heat",
+        "label": "Lot Heat",
+        "labelEn": "Lot Heat",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "yes_no": {
+    "label": "Yes / No",
+    "labelEn": "Yes / No",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "yes",
+        "label": "C?",
+        "labelEn": "Yes",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "no",
+        "label": "Kh?ng",
+        "labelEn": "No",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "no_yes": {
+    "label": "No / Yes",
+    "labelEn": "No / Yes",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "no",
+        "label": "Kh?ng",
+        "labelEn": "No",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "yes",
+        "label": "C?",
+        "labelEn": "Yes",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "boolean_true_false": {
+    "label": "True / False",
+    "labelEn": "True / False",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "true",
+        "label": "C?",
+        "labelEn": "Yes",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "false",
+        "label": "Kh?ng",
+        "labelEn": "No",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "machine_family": {
+    "label": "Machine Family",
+    "labelEn": "Machine Family",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "5-axis",
+        "label": "5-axis",
+        "labelEn": "5-axis",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "3-axis",
+        "label": "3-axis",
+        "labelEn": "3-axis",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "turning",
+        "label": "Turning",
+        "labelEn": "Turning",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "mill-turn",
+        "label": "Mill-turn",
+        "labelEn": "Mill-turn",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "cmm",
+        "label": "Cmm",
+        "labelEn": "Cmm",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "multi",
+        "label": "Multi",
+        "labelEn": "Multi",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "machine_type_legacy": {
+    "label": "Machine Type Legacy",
+    "labelEn": "Machine Type Legacy",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "5-axis",
+        "label": "5-axis",
+        "labelEn": "5-axis",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "3-axis",
+        "label": "3-axis",
+        "labelEn": "3-axis",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "turning",
+        "label": "Turning",
+        "labelEn": "Turning",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "mill-turn",
+        "label": "Mill-turn",
+        "labelEn": "Mill-turn",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "cmm",
+        "label": "Cmm",
+        "labelEn": "Cmm",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "washing",
+        "label": "Washing",
+        "labelEn": "Washing",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "support",
+        "label": "Support",
+        "labelEn": "Support",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "adapter_type": {
+    "label": "Adapter Type",
+    "labelEn": "Adapter Type",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "mtconnect",
+        "label": "Mtconnect",
+        "labelEn": "Mtconnect",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "opcua",
+        "label": "Opcua",
+        "labelEn": "Opcua",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "dnc",
+        "label": "Dnc",
+        "labelEn": "Dnc",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "manual_bridge",
+        "label": "Manual Bridge",
+        "labelEn": "Manual Bridge",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "auth_mode": {
+    "label": "Authentication Mode",
+    "labelEn": "Authentication Mode",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "service_account",
+        "label": "Service Account",
+        "labelEn": "Service Account",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "certificate",
+        "label": "Certificate",
+        "labelEn": "Certificate",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "session_user",
+        "label": "Session User",
+        "labelEn": "Session User",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "none",
+        "label": "None",
+        "labelEn": "None",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "alarm_severity": {
+    "label": "Alarm Severity",
+    "labelEn": "Alarm Severity",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "WARNING",
+        "label": "C?nh b?o",
+        "labelEn": "Warning",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ALARM",
+        "label": "Alarm",
+        "labelEn": "Alarm",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "CRITICAL",
+        "label": "Nghi?m tr?ng",
+        "labelEn": "Critical",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "EMERGENCY",
+        "label": "Kh?n c?p",
+        "labelEn": "Emergency",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "downtime_category": {
+    "label": "Downtime Category",
+    "labelEn": "Downtime Category",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "breakdown",
+        "label": "Breakdown",
+        "labelEn": "Breakdown",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "planned_pm",
+        "label": "Planned Pm",
+        "labelEn": "Planned Pm",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "setup",
+        "label": "Setup",
+        "labelEn": "Setup",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "material_wait",
+        "label": "Material Wait",
+        "labelEn": "Material Wait",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "quality_hold",
+        "label": "Quality Hold",
+        "labelEn": "Quality Hold",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "tool_change",
+        "label": "Tool Change",
+        "labelEn": "Tool Change",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "utility",
+        "label": "Utility",
+        "labelEn": "Utility",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "other",
+        "label": "Other",
+        "labelEn": "Other",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "department_code_core": {
+    "label": "Department Code Core",
+    "labelEn": "Department Code Core",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "PRO",
+        "label": "S?n xu?t",
+        "labelEn": "Production",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "QA",
+        "label": "Ch?t l??ng",
+        "labelEn": "Quality",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ENG",
+        "label": "K? thu?t",
+        "labelEn": "Engineering",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "SCM",
+        "label": "Chu?i cung ?ng",
+        "labelEn": "Supply Chain",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "MNT",
+        "label": "B?o tr?",
+        "labelEn": "Maintenance",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "department_code": {
+    "label": "Department Code",
+    "labelEn": "Department Code",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "QA",
+        "label": "Ch?t l??ng",
+        "labelEn": "Quality Assurance",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "PRO",
+        "label": "S?n xu?t",
+        "labelEn": "Production",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ENG",
+        "label": "K? thu?t",
+        "labelEn": "Engineering",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "SCM",
+        "label": "Chu?i cung ?ng",
+        "labelEn": "Supply Chain",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "HR",
+        "label": "Nh?n s?",
+        "labelEn": "HR & Training",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "EXE",
+        "label": "Ban gi?m ??c",
+        "labelEn": "Executive / Management",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "SAL",
+        "label": "Kinh doanh",
+        "labelEn": "Sales",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "WH",
+        "label": "Kho v?n",
+        "labelEn": "Warehouse / Logistics",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "IT",
+        "label": "C?ng ngh? th?ng tin",
+        "labelEn": "IT / Digital",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "EHS",
+        "label": "An to?n v? M?i tr??ng",
+        "labelEn": "EHS / Safety",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "process_family": {
+    "label": "Process Family",
+    "labelEn": "Process Family",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "3-axis",
+        "label": "3-axis",
+        "labelEn": "3-axis",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "5-axis",
+        "label": "5-axis",
+        "labelEn": "5-axis",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "turning",
+        "label": "Turning",
+        "labelEn": "Turning",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inspection",
+        "label": "Inspection",
+        "labelEn": "Inspection",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "maintenance",
+        "label": "Maintenance",
+        "labelEn": "Maintenance",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "grinding",
+        "label": "Grinding",
+        "labelEn": "Grinding",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "telemetry_mode": {
+    "label": "Telemetry Mode",
+    "labelEn": "Telemetry Mode",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "machine",
+        "label": "Machine",
+        "labelEn": "Machine",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "manual",
+        "label": "Manual",
+        "labelEn": "Manual",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "disabled",
+        "label": "Disabled",
+        "labelEn": "Disabled",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "connector_type": {
+    "label": "Connector Type",
+    "labelEn": "Connector Type",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "mtconnect",
+        "label": "Mtconnect",
+        "labelEn": "Mtconnect",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "opcua",
+        "label": "Opcua",
+        "labelEn": "Opcua",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "dnc",
+        "label": "Dnc",
+        "labelEn": "Dnc",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "manual_bridge",
+        "label": "Manual Bridge",
+        "labelEn": "Manual Bridge",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "disabled",
+        "label": "Disabled",
+        "labelEn": "Disabled",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "operator_role": {
+    "label": "Operator Role",
+    "labelEn": "Operator Role",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "operator",
+        "label": "Operator",
+        "labelEn": "Operator",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "qc_inspector",
+        "label": "Qc Inspector",
+        "labelEn": "Qc Inspector",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "shift_leader",
+        "label": "Shift Leader",
+        "labelEn": "Shift Leader",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "maintenance_tech",
+        "label": "Maintenance Tech",
+        "labelEn": "Maintenance Tech",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "planner",
+        "label": "Planner",
+        "labelEn": "Planner",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "engineer",
+        "label": "Engineer",
+        "labelEn": "Engineer",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "shift_assignment": {
+    "label": "Shift Assignment",
+    "labelEn": "Shift Assignment",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "1",
+        "label": "1",
+        "labelEn": "1",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "2",
+        "label": "2",
+        "labelEn": "2",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "3",
+        "label": "3",
+        "labelEn": "3",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "day",
+        "label": "Day",
+        "labelEn": "Day",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "night",
+        "label": "Night",
+        "labelEn": "Night",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "office",
+        "label": "Office",
+        "labelEn": "Office",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "qualification_status": {
+    "label": "Qualification Status",
+    "labelEn": "Qualification Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "expiring",
+        "label": "Expiring",
+        "labelEn": "Expiring",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "expired",
+        "label": "Expired",
+        "labelEn": "Expired",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "suspended",
+        "label": "Suspended",
+        "labelEn": "Suspended",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "tooling_type": {
+    "label": "Tooling Type",
+    "labelEn": "Tooling Type",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "endmill",
+        "label": "Endmill",
+        "labelEn": "Endmill",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "drill",
+        "label": "Drill",
+        "labelEn": "Drill",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "insert",
+        "label": "Insert",
+        "labelEn": "Insert",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "tap",
+        "label": "Tap",
+        "labelEn": "Tap",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "reamer",
+        "label": "Reamer",
+        "labelEn": "Reamer",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "probe",
+        "label": "Probe",
+        "labelEn": "Probe",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "holder",
+        "label": "Holder",
+        "labelEn": "Holder",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "fixture",
+        "label": "Fixture",
+        "labelEn": "Fixture",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "reason_group": {
+    "label": "Reason Group",
+    "labelEn": "Reason Group",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "machine",
+        "label": "Machine",
+        "labelEn": "Machine",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "tooling",
+        "label": "Tooling",
+        "labelEn": "Tooling",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "program",
+        "label": "Program",
+        "labelEn": "Program",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "quality",
+        "label": "Quality",
+        "labelEn": "Quality",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "material",
+        "label": "Material",
+        "labelEn": "Material",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "maintenance",
+        "label": "Maintenance",
+        "labelEn": "Maintenance",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "utility",
+        "label": "Utility",
+        "labelEn": "Utility",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "other",
+        "label": "Other",
+        "labelEn": "Other",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "default_severity": {
+    "label": "Default Severity",
+    "labelEn": "Default Severity",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "minor",
+        "label": "Nh?",
+        "labelEn": "Minor",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "major",
+        "label": "N?ng",
+        "labelEn": "Major",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "critical",
+        "label": "Nghi?m tr?ng",
+        "labelEn": "Critical",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "resolution_group": {
+    "label": "Resolution Group",
+    "labelEn": "Resolution Group",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "reset",
+        "label": "Reset",
+        "labelEn": "Reset",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "temporary_fix",
+        "label": "Temporary Fix",
+        "labelEn": "Temporary Fix",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "tooling",
+        "label": "Tooling",
+        "labelEn": "Tooling",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "program",
+        "label": "Program",
+        "labelEn": "Program",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "parts_wait",
+        "label": "Parts Wait",
+        "labelEn": "Parts Wait",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "maintenance",
+        "label": "Maintenance",
+        "labelEn": "Maintenance",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "quality",
+        "label": "Quality",
+        "labelEn": "Quality",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "other",
+        "label": "Other",
+        "labelEn": "Other",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "transport_mode": {
+    "label": "Transport Mode",
+    "labelEn": "Transport Mode",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "air",
+        "label": "Air",
+        "labelEn": "Air",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "sea",
+        "label": "Sea",
+        "labelEn": "Sea",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "ground",
+        "label": "Ground",
+        "labelEn": "Ground",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "courier",
+        "label": "Courier",
+        "labelEn": "Courier",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "pickup",
+        "label": "Pickup",
+        "labelEn": "Pickup",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "review_frequency": {
+    "label": "Review Frequency",
+    "labelEn": "Review Frequency",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "daily",
+        "label": "Daily",
+        "labelEn": "Daily",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "weekly",
+        "label": "Weekly",
+        "labelEn": "Weekly",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "monthly",
+        "label": "Monthly",
+        "labelEn": "Monthly",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "quarterly",
+        "label": "Quarterly",
+        "labelEn": "Quarterly",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "warehouse_type": {
+    "label": "Warehouse Type",
+    "labelEn": "Warehouse Type",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "rm",
+        "label": "Rm",
+        "labelEn": "Rm",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "wip",
+        "label": "Wip",
+        "labelEn": "Wip",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "fg",
+        "label": "Fg",
+        "labelEn": "Fg",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "quarantine",
+        "label": "Quarantine",
+        "labelEn": "Quarantine",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "tooling",
+        "label": "Tooling",
+        "labelEn": "Tooling",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "consumable",
+        "label": "Consumable",
+        "labelEn": "Consumable",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "defect_group": {
+    "label": "Defect Group",
+    "labelEn": "Defect Group",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "dimensional",
+        "label": "Dimensional",
+        "labelEn": "Dimensional",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "surface",
+        "label": "Surface",
+        "labelEn": "Surface",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "packaging",
+        "label": "Packaging",
+        "labelEn": "Packaging",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "documentation",
+        "label": "Documentation",
+        "labelEn": "Documentation",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "material",
+        "label": "Material",
+        "labelEn": "Material",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "traceability",
+        "label": "Traceability",
+        "labelEn": "Traceability",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "visual",
+        "label": "Visual",
+        "labelEn": "Visual",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "other",
+        "label": "Other",
+        "labelEn": "Other",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "active_inactive_blocked": {
+    "label": "Active / Inactive / Blocked",
+    "labelEn": "Active / Inactive / Blocked",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inactive",
+        "label": "Inactive",
+        "labelEn": "Inactive",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "approved_conditional_blocked_inactive": {
+    "label": "Approved / Conditional / Blocked / Inactive",
+    "labelEn": "Approved / Conditional / Blocked / Inactive",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "approved",
+        "label": "Approved",
+        "labelEn": "Approved",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "conditional",
+        "label": "Conditional",
+        "labelEn": "Conditional",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inactive",
+        "label": "Inactive",
+        "labelEn": "Inactive",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "active_inactive_obsolete": {
+    "label": "Active / Inactive / Obsolete",
+    "labelEn": "Active / Inactive / Obsolete",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inactive",
+        "label": "Inactive",
+        "labelEn": "Inactive",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "obsolete",
+        "label": "Obsolete",
+        "labelEn": "Obsolete",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "draft_released_superseded_obsolete": {
+    "label": "Draft / Released / Superseded / Obsolete",
+    "labelEn": "Draft / Released / Superseded / Obsolete",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Draft",
+        "labelEn": "Draft",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "released",
+        "label": "Released",
+        "labelEn": "Released",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "superseded",
+        "label": "Superseded",
+        "labelEn": "Superseded",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "obsolete",
+        "label": "Obsolete",
+        "labelEn": "Obsolete",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "draft_released_superseded_blocked_obsolete": {
+    "label": "Draft / Released / Superseded / Blocked / Obsolete",
+    "labelEn": "Draft / Released / Superseded / Blocked / Obsolete",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Draft",
+        "labelEn": "Draft",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "released",
+        "label": "Released",
+        "labelEn": "Released",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "superseded",
+        "label": "Superseded",
+        "labelEn": "Superseded",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "obsolete",
+        "label": "Obsolete",
+        "labelEn": "Obsolete",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "active_paused_retired": {
+    "label": "Active / Paused / Retired",
+    "labelEn": "Active / Paused / Retired",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "paused",
+        "label": "Paused",
+        "labelEn": "Paused",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "retired",
+        "label": "Retired",
+        "labelEn": "Retired",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "active_inactive": {
+    "label": "Active / Inactive",
+    "labelEn": "Active / Inactive",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inactive",
+        "label": "Inactive",
+        "labelEn": "Inactive",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "open_in_progress_closed_cancelled": {
+    "label": "Open / In Progress / Closed / Cancelled",
+    "labelEn": "Open / In Progress / Closed / Cancelled",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "open",
+        "label": "Open",
+        "labelEn": "Open",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "in_progress",
+        "label": "In Progress",
+        "labelEn": "In Progress",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "closed",
+        "label": "Closed",
+        "labelEn": "Closed",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "cancelled",
+        "label": "Cancelled",
+        "labelEn": "Cancelled",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "machine_runtime_status": {
+    "label": "Machine Runtime Status",
+    "labelEn": "Machine Runtime Status",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "idle",
+        "label": "Idle",
+        "labelEn": "Idle",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "maintenance",
+        "label": "Maintenance",
+        "labelEn": "Maintenance",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "down",
+        "label": "Down",
+        "labelEn": "Down",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "retired",
+        "label": "Retired",
+        "labelEn": "Retired",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "active_inactive_training_blocked": {
+    "label": "Active / Inactive / Training / Blocked",
+    "labelEn": "Active / Inactive / Training / Blocked",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inactive",
+        "label": "Inactive",
+        "labelEn": "Inactive",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "training",
+        "label": "Training",
+        "labelEn": "Training",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "active_quarantine_retired": {
+    "label": "Active / Quarantine / Retired",
+    "labelEn": "Active / Quarantine / Retired",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "quarantine",
+        "label": "Quarantine",
+        "labelEn": "Quarantine",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "retired",
+        "label": "Retired",
+        "labelEn": "Retired",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "draft_active_inactive_blocked_obsolete": {
+    "label": "Draft / Active / Inactive / Blocked / Obsolete",
+    "labelEn": "Draft / Active / Inactive / Blocked / Obsolete",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Draft",
+        "labelEn": "Draft",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inactive",
+        "label": "Inactive",
+        "labelEn": "Inactive",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "obsolete",
+        "label": "Obsolete",
+        "labelEn": "Obsolete",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      }
+    ]
+  },
+  "draft_active_inactive_obsolete": {
+    "label": "Draft / Active / Inactive / Obsolete",
+    "labelEn": "Draft / Active / Inactive / Obsolete",
+    "source": "registry",
+    "standard": "hesem_registry",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Draft",
+        "labelEn": "Draft",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "active",
+        "label": "Active",
+        "labelEn": "Active",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "inactive",
+        "label": "Inactive",
+        "labelEn": "Inactive",
+        "color": "#64748b",
+        "icon": "fa-circle"
+      },
+      {
+        "value": "obsolete",
+        "label": "Obsolete",
+        "labelEn": "Obsolete",
+        "color": "#64748b",
+        "icon": "fa-circle"
       }
     ]
   }
