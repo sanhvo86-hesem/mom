@@ -195,9 +195,9 @@ function _loadOfflineQueue(){
 /* TAB 1: My Queue                                               */
 /* ============================================================= */
 function _renderQueueTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
-  html+='<h3 style="margin:0;font-size:20px">'+_t('Hang doi hom nay','My Queue Today')+' '+_syncBadge()+'</h3>';
-  html+='<button class="ms-btn ms-btn-secondary" data-action="refresh-queue" style="padding:8px 16px;font-size:.875rem">'+_t('Lam moi','Refresh')+'</button>';
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3,12px)">';
+  html+='<h3 style="margin:0;font-size:var(--text-xl,20px)">'+_t('Hang doi hom nay','My Queue Today')+' '+_syncBadge()+'</h3>';
+  html+='<button class="ms-btn ms-btn-secondary" data-action="refresh-queue" style="padding:var(--space-2,8px) var(--space-4,16px);font-size:var(--text-sm,.875rem)">'+_t('Lam moi','Refresh')+'</button>';
   html+='</div>';
 
   if(!state.queue.length) return html+'<div class="ms-empty">'+_t('Khong co cong viec','No tasks in queue')+'</div>';
@@ -206,15 +206,15 @@ function _renderQueueTab(){
     var isActive=state.currentTask&&state.currentTask.id===task.id;
     html+='<div class="ms-queue-card'+(isActive?' active-task':'')+'" style="padding-left:22px">';
     html+='<div class="ms-priority-bar" style="background:'+_priorityColor(task.priority)+'"></div>';
-    html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-2,8px)">';
     html+='<div>';
-    html+='<div style="font-size:18px;font-weight:800">'+_esc(task.wo_number||'-')+'</div>';
-    html+='<div style="font-size:14px;color:var(--text-secondary,#64748b);margin-top:2px">'+_esc(task.operation||'-')+' | '+_esc(task.machine||'-')+'</div>';
+    html+='<div style="font-size:var(--text-lg,18px);font-weight:var(--font-display-weight,800)">'+_esc(task.wo_number||'-')+'</div>';
+    html+='<div style="font-size:var(--text-base,14px);color:var(--text-secondary,#64748b);margin-top:2px">'+_esc(task.operation||'-')+' | '+_esc(task.machine||'-')+'</div>';
     html+='</div>';
     html+='<div style="text-align:right">';
-    html+='<div style="font-size:14px;font-weight:600">'+_esc(task.est_time||'-')+'</div>';
-    var syncColor=task.synced?'#22c55e':'#f59e0b';
-    html+='<span class="ms-sync-dot" style="background:'+syncColor+';margin-top:4px" title="'+(task.synced?'Synced':'Pending sync')+'"></span>';
+    html+='<div style="font-size:var(--text-base,14px);font-weight:var(--font-heading-weight,600)">'+_esc(task.est_time||'-')+'</div>';
+    var syncColor=task.synced?'var(--green-light,#22c55e)':'var(--amber-light,#f59e0b)';
+    html+='<span class="ms-sync-dot" style="background:'+syncColor+';margin-top:var(--space-1,4px)" title="'+(task.synced?'Synced':'Pending sync')+'"></span>';
     html+='</div></div>';
     if(isActive){
       html+='<button class="ms-btn ms-btn-success ms-btn-full" data-action="complete-task" data-id="'+_esc(task.id)+'">'+_t('HOAN THANH','COMPLETE')+'</button>';
@@ -234,26 +234,26 @@ function _renderClockTab(){
 
   if(state.clockedIn){
     var elapsed=Date.now()-(state.clockStartTime||Date.now());
-    html+='<div class="ms-status" style="background:rgba(34,197,94,.1);color:#166534">'+_t('DANG LAM VIEC','CLOCKED IN')+'</div>';
+    html+='<div class="ms-status" style="background:rgba(34,197,94,.1);color:var(--green-dark,#166534)">'+_t('DANG LAM VIEC','CLOCKED IN')+'</div>';
     html+='<div class="ms-card" style="text-align:center">';
-    html+='<div style="font-size:16px;color:var(--text-secondary,#64748b);margin-bottom:4px">'+_esc(state.clockedIn.wo_number||'-')+' '+_esc(state.clockedIn.operation||'-')+' on '+_esc(state.clockedIn.machine||'-')+'</div>';
+    html+='<div style="font-size:var(--text-lg,16px);color:var(--text-secondary,#64748b);margin-bottom:var(--space-1,4px)">'+_esc(state.clockedIn.wo_number||'-')+' '+_esc(state.clockedIn.operation||'-')+' on '+_esc(state.clockedIn.machine||'-')+'</div>';
     html+='<div class="ms-timer" id="ms-timer-display">'+_formatDuration(elapsed)+'</div>';
 
     /* labor type selector */
-    html+='<div class="ms-label" style="text-align:left;margin-top:8px">'+_t('Loai lao dong','Labor Type')+'</div>';
+    html+='<div class="ms-label" style="text-align:left;margin-top:var(--space-2,8px)">'+_t('Loai lao dong','Labor Type')+'</div>';
     html+='<div class="ms-labor-grid">';
     LABOR_TYPES.forEach(function(lt){
       html+='<div class="ms-labor-btn'+(state.laborType===lt.key?' active':'')+'" data-action="set-labor" data-type="'+lt.key+'">'+_esc(_t(lt.vi,lt.en))+'</div>';
     });
     html+='</div>';
 
-    html+='<button class="ms-btn ms-btn-danger ms-btn-full ms-btn-lg" data-action="clock-out" style="margin-top:16px">'+_t('KET THUC','CLOCK OUT')+'</button>';
+    html+='<button class="ms-btn ms-btn-danger ms-btn-full ms-btn-lg" data-action="clock-out" style="margin-top:var(--space-4,16px)">'+_t('KET THUC','CLOCK OUT')+'</button>';
     html+='</div>';
   } else {
-    html+='<div class="ms-status" style="background:rgba(148,163,184,.1);color:#64748b">'+_t('CHUA CHAM CONG','NOT CLOCKED IN')+'</div>';
+    html+='<div class="ms-status" style="background:rgba(148,163,184,.1);color:var(--text-secondary,#64748b)">'+_t('CHUA CHAM CONG','NOT CLOCKED IN')+'</div>';
     if(state.currentTask){
       html+='<div class="ms-card" style="text-align:center">';
-      html+='<div style="font-size:16px;margin-bottom:12px">'+_t('Cong viec hien tai','Current Task')+': <strong>'+_esc(state.currentTask.wo_number)+'</strong></div>';
+      html+='<div style="font-size:var(--text-lg,16px);margin-bottom:var(--space-3,12px)">'+_t('Cong viec hien tai','Current Task')+': <strong>'+_esc(state.currentTask.wo_number)+'</strong></div>';
       html+='<button class="ms-btn ms-btn-primary ms-btn-full ms-btn-lg" data-action="clock-in">'+_t('BAT DAU CHAM CONG','CLOCK IN')+'</button>';
       html+='</div>';
     } else {
@@ -263,11 +263,11 @@ function _renderClockTab(){
 
   /* today's time entries */
   if(state.timeEntries.length){
-    html+='<div class="ms-time-list"><h4 style="font-size:16px;margin:0 0 8px">'+_t('Hom nay','Today')+'</h4>';
+    html+='<div class="ms-time-list"><h4 style="font-size:var(--text-lg,16px);margin:0 0 var(--space-2,8px)">'+_t('Hom nay','Today')+'</h4>';
     state.timeEntries.forEach(function(te){
       html+='<div class="ms-time-entry">';
       html+='<div><strong>'+_esc(te.wo_number||'-')+'</strong> '+_esc(te.operation||'-')+'</div>';
-      html+='<div style="display:flex;align-items:center;gap:8px">';
+      html+='<div style="display:flex;align-items:center;gap:var(--space-2,8px)">';
       html+='<span class="ms-badge" style="background:var(--brand,#1565c0)">'+_esc(te.labor_type||'run')+'</span>';
       html+='<span style="font-weight:700">'+_esc(te.duration||'-')+'</span>';
       html+='</div></div>';
@@ -281,14 +281,14 @@ function _renderClockTab(){
 /* TAB 3: First Piece                                            */
 /* ============================================================= */
 function _renderFirstPieceTab(){
-  var html='<h3 style="margin:0 0 12px;font-size:20px">'+_t('Kiem tra First Piece','First Piece Inspection')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-3,12px);font-size:var(--text-xl,20px)">'+_t('Kiem tra First Piece','First Piece Inspection')+'</h3>';
 
   if(!state.currentTask){
     return html+'<div class="ms-empty">'+_t('Bat dau cong viec truoc','Start a task from queue first')+'</div>';
   }
 
   html+='<div class="ms-card">';
-  html+='<div style="font-size:16px;font-weight:700;margin-bottom:8px">'+_esc(state.currentTask.wo_number)+' - '+_esc(state.currentTask.operation||'-')+'</div>';
+  html+='<div style="font-size:var(--text-lg,16px);font-weight:var(--font-display-weight,700);margin-bottom:var(--space-2,8px)">'+_esc(state.currentTask.wo_number)+' - '+_esc(state.currentTask.operation||'-')+'</div>';
 
   if(!state.inspectionPlan.length){
     html+='<button class="ms-btn ms-btn-primary ms-btn-full" data-action="load-inspection">'+_t('Tai ke hoach kiem tra','Load Inspection Plan')+'</button>';
@@ -297,7 +297,7 @@ function _renderFirstPieceTab(){
   }
 
   html+=_renderMeasurementTable('first');
-  html+='<div style="display:flex;gap:8px;margin-top:12px">';
+  html+='<div style="display:flex;gap:var(--space-2,8px);margin-top:var(--space-3,12px)">';
   html+='<button class="ms-btn ms-btn-secondary" data-action="camera-first" style="flex:1">'+_t('Chup anh','Camera')+'</button>';
   html+='<button class="ms-btn ms-btn-success" data-action="submit-first" style="flex:2">'+_t('NOP KET QUA','SUBMIT')+'</button>';
   html+='</div></div>';
@@ -308,16 +308,16 @@ function _renderFirstPieceTab(){
 /* TAB 4: In-Process Check                                       */
 /* ============================================================= */
 function _renderInProcessTab(){
-  var html='<h3 style="margin:0 0 12px;font-size:20px">'+_t('Kiem tra trong QT','In-Process Check')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-3,12px);font-size:var(--text-xl,20px)">'+_t('Kiem tra trong QT','In-Process Check')+'</h3>';
 
   if(!state.currentTask){
     return html+'<div class="ms-empty">'+_t('Bat dau cong viec truoc','Start a task from queue first')+'</div>';
   }
 
   html+='<div class="ms-card">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
-  html+='<div style="font-size:16px;font-weight:700">'+_esc(state.currentTask.wo_number)+'</div>';
-  html+='<div style="font-size:14px;font-weight:600;color:var(--brand,#1565c0)">'+_t('Mau','Sample')+' '+(state.sampleIndex+1)+' / '+state.sampleTotal+'</div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3,12px)">';
+  html+='<div style="font-size:var(--text-lg,16px);font-weight:var(--font-display-weight,700)">'+_esc(state.currentTask.wo_number)+'</div>';
+  html+='<div style="font-size:var(--text-base,14px);font-weight:var(--font-heading-weight,600);color:var(--brand,#1565c0)">'+_t('Mau','Sample')+' '+(state.sampleIndex+1)+' / '+state.sampleTotal+'</div>';
   html+='</div>';
 
   if(!state.inspectionPlan.length){
@@ -339,13 +339,13 @@ function _renderInProcessTab(){
     var chartRange=ucl-lcl||1;
     state.spcData.forEach(function(v){
       var h=Math.max(4,Math.round(((v-lcl)/chartRange)*50));
-      var col=v>ucl||v<lcl?'#ef4444':'#3b82f6';
+      var col=v>ucl||v<lcl?'var(--red-light,#ef4444)':'var(--blue-light,#3b82f6)';
       html+='<div class="ms-spc-bar" style="height:'+h+'px;background:'+col+'" title="'+v+'"></div>';
     });
     html+='</div></div>';
   }
 
-  html+='<div style="display:flex;gap:8px;margin-top:12px">';
+  html+='<div style="display:flex;gap:var(--space-2,8px);margin-top:var(--space-3,12px)">';
   html+='<button class="ms-btn ms-btn-success" data-action="submit-inprocess" style="flex:2">'+_t('LUU MAU','SAVE SAMPLE')+'</button>';
   html+='<button class="ms-btn ms-btn-secondary" data-action="next-sample" style="flex:1">'+_t('Mau tiep','Next')+'</button>';
   html+='</div></div>';
@@ -361,7 +361,7 @@ function _renderMeasurementTable(prefix){
   html+='</tr></thead><tbody>';
   plan.forEach(function(c, idx){
     html+='<tr>';
-    html+='<td style="font-weight:600;font-size:14px">'+_esc(c.name||'-')+'</td>';
+    html+='<td style="font-weight:var(--font-heading-weight,600);font-size:var(--text-base,14px)">'+_esc(c.name||'-')+'</td>';
     html+='<td style="text-align:center">'+_esc(c.nominal||'-')+'</td>';
     html+='<td style="text-align:center">'+_esc(c.tol_minus||'-')+'</td>';
     html+='<td style="text-align:center">'+_esc(c.tol_plus||'-')+'</td>';
@@ -385,13 +385,13 @@ function _renderMeasurementTable(prefix){
 /* TAB 5: Quick NCR                                              */
 /* ============================================================= */
 function _renderNcrTab(){
-  var html='<h3 style="margin:0 0 12px;font-size:20px">'+_t('Bao cao NCR nhanh','Quick NCR Report')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-3,12px);font-size:var(--text-xl,20px)">'+_t('Bao cao NCR nhanh','Quick NCR Report')+'</h3>';
 
   html+='<div class="ms-card">';
   /* auto-populated fields */
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-  html+='<div><div class="ms-label">'+_t('WO','WO')+'</div><input type="text" class="ms-input" id="ms-ncr-wo" value="'+_esc(state.currentTask?state.currentTask.wo_number:'')+'" readonly style="background:#f1f5f9"></div>';
-  html+='<div><div class="ms-label">'+_t('May','Machine')+'</div><input type="text" class="ms-input" id="ms-ncr-machine" value="'+_esc(state.currentTask?state.currentTask.machine:'')+'" readonly style="background:#f1f5f9"></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3,10px);margin-bottom:var(--space-3,12px)">';
+  html+='<div><div class="ms-label">'+_t('WO','WO')+'</div><input type="text" class="ms-input" id="ms-ncr-wo" value="'+_esc(state.currentTask?state.currentTask.wo_number:'')+'" readonly style="background:var(--bg-surface-alt,#f1f5f9)"></div>';
+  html+='<div><div class="ms-label">'+_t('May','Machine')+'</div><input type="text" class="ms-input" id="ms-ncr-machine" value="'+_esc(state.currentTask?state.currentTask.machine:'')+'" readonly style="background:var(--bg-surface-alt,#f1f5f9)"></div>';
   html+='</div>';
 
   /* defect type grid */
@@ -406,15 +406,15 @@ function _renderNcrTab(){
   html+='</div>';
 
   /* severity slider */
-  html+='<div class="ms-label" style="margin-top:12px">'+_t('Muc do','Severity')+': <strong id="ms-sev-val">'+state.ncrSeverity+'</strong> / 10</div>';
+  html+='<div class="ms-label" style="margin-top:var(--space-3,12px)">'+_t('Muc do','Severity')+': <strong id="ms-sev-val">'+state.ncrSeverity+'</strong> / 10</div>';
   html+='<input type="range" class="ms-slider" id="ms-ncr-severity" min="1" max="10" value="'+state.ncrSeverity+'" data-action="severity-change">';
 
   /* description */
-  html+='<div class="ms-label" style="margin-top:12px">'+_t('Mo ta','Description')+'</div>';
+  html+='<div class="ms-label" style="margin-top:var(--space-3,12px)">'+_t('Mo ta','Description')+'</div>';
   html+='<textarea class="ms-input" id="ms-ncr-desc" style="height:80px;padding:12px;resize:vertical" placeholder="'+_t('Mo ta loi...','Describe the defect...')+'"></textarea>';
 
   /* camera + submit */
-  html+='<div style="display:flex;gap:8px;margin-top:12px">';
+  html+='<div style="display:flex;gap:var(--space-2,8px);margin-top:var(--space-3,12px)">';
   html+='<button class="ms-btn ms-btn-secondary" data-action="camera-ncr" style="flex:1">'+_t('Chup anh','Camera')+'</button>';
   html+='<button class="ms-btn ms-btn-danger" data-action="submit-ncr" style="flex:2">'+_t('TAO NCR','SUBMIT NCR')+'</button>';
   html+='</div></div>';
@@ -426,27 +426,27 @@ function _renderNcrTab(){
 /* ============================================================= */
 function _renderSyncTab(){
   var online=_isOnline();
-  var html='<h3 style="margin:0 0 12px;font-size:20px">'+_t('Trang thai dong bo','Sync Status')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-3,12px);font-size:var(--text-xl,20px)">'+_t('Trang thai dong bo','Sync Status')+'</h3>';
 
   /* connection indicator */
-  html+='<div class="ms-status" style="background:'+(online?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)')+';color:'+(online?'#166534':'#991b1b')+'">';
-  html+='<span class="ms-sync-dot '+(online?'ms-sync-online':'ms-sync-offline')+'" style="margin-right:8px"></span>';
+  html+='<div class="ms-status" style="background:'+(online?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)')+';color:'+(online?'var(--green-dark,#166534)':'#991b1b')+'">';
+  html+='<span class="ms-sync-dot '+(online?'ms-sync-online':'ms-sync-offline')+'" style="margin-right:var(--space-2,8px)"></span>';
   html+=(online?_t('TRUC TUYEN','ONLINE'):_t('NGOAI TUYEN','OFFLINE'));
   html+='</div>';
 
   /* pending items */
   html+='<div class="ms-card">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
-  html+='<div><div style="font-size:14px;color:var(--text-secondary,#64748b)">'+_t('Muc cho dong bo','Pending Items')+'</div>';
-  html+='<div style="font-size:28px;font-weight:800">'+state.offlineQueue.length+'</div></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3,12px)">';
+  html+='<div><div style="font-size:var(--text-base,14px);color:var(--text-secondary,#64748b)">'+_t('Muc cho dong bo','Pending Items')+'</div>';
+  html+='<div style="font-size:28px;font-weight:var(--font-display-weight,800)">'+state.offlineQueue.length+'</div></div>';
   html+='<button class="ms-btn ms-btn-primary" data-action="sync-now"'+(online&&state.offlineQueue.length?'':' disabled style="opacity:.4"')+'>'+_t('DONG BO','SYNC NOW')+'</button>';
   html+='</div>';
 
   if(state.offlineQueue.length){
     state.offlineQueue.forEach(function(item, idx){
-      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border,#f1f5f9);font-size:14px">';
-      html+='<div><span class="ms-sync-dot ms-sync-pending" style="margin-right:6px"></span>'+_esc(item.action||'-')+'</div>';
-      html+='<div style="font-size:12px;color:var(--text-secondary,#94a3b8)">'+_fmtTime(item.timestamp)+'</div>';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-2,8px) 0;border-top:1px solid var(--border,#f1f5f9);font-size:var(--text-base,14px)">';
+      html+='<div><span class="ms-sync-dot ms-sync-pending" style="margin-right:var(--space-2,6px)"></span>'+_esc(item.action||'-')+'</div>';
+      html+='<div style="font-size:var(--text-xs,12px);color:var(--text-secondary,#94a3b8)">'+_fmtTime(item.timestamp)+'</div>';
       html+='</div>';
     });
   }
@@ -455,13 +455,13 @@ function _renderSyncTab(){
   /* conflict resolution */
   var conflicts=(state.syncHistory||[]).filter(function(h){return h.conflict;});
   if(conflicts.length){
-    html+='<div class="ms-card"><h4 style="margin:0 0 8px;font-size:16px;color:#ef4444">'+_t('Xung dot','Conflicts')+'</h4>';
+    html+='<div class="ms-card"><h4 style="margin:0 0 var(--space-2,8px);font-size:var(--text-lg,16px);color:var(--red-light,#ef4444)">'+_t('Xung dot','Conflicts')+'</h4>';
     conflicts.forEach(function(c){
       html+='<div style="padding:8px 0;border-bottom:1px solid var(--border,#f1f5f9)">';
-      html+='<div style="font-size:14px;font-weight:600">'+_esc(c.description||'-')+'</div>';
-      html+='<div style="display:flex;gap:8px;margin-top:6px">';
-      html+='<button class="ms-btn ms-btn-primary" style="padding:8px 16px;font-size:.8125rem" data-action="resolve-conflict" data-id="'+_esc(c.id)+'" data-resolution="server">'+_t('Nhan Server','Accept Server')+'</button>';
-      html+='<button class="ms-btn ms-btn-secondary" style="padding:8px 16px;font-size:.8125rem" data-action="resolve-conflict" data-id="'+_esc(c.id)+'" data-resolution="client">'+_t('Giu Client','Keep Client')+'</button>';
+      html+='<div style="font-size:var(--text-base,14px);font-weight:var(--font-heading-weight,600)">'+_esc(c.description||'-')+'</div>';
+      html+='<div style="display:flex;gap:var(--space-2,8px);margin-top:var(--space-2,6px)">';
+      html+='<button class="ms-btn ms-btn-primary" style="padding:var(--space-2,8px) var(--space-4,16px);font-size:var(--text-sm,.8125rem)" data-action="resolve-conflict" data-id="'+_esc(c.id)+'" data-resolution="server">'+_t('Nhan Server','Accept Server')+'</button>';
+      html+='<button class="ms-btn ms-btn-secondary" style="padding:var(--space-2,8px) var(--space-4,16px);font-size:var(--text-sm,.8125rem)" data-action="resolve-conflict" data-id="'+_esc(c.id)+'" data-resolution="client">'+_t('Giu Client','Keep Client')+'</button>';
       html+='</div></div>';
     });
     html+='</div>';
@@ -470,11 +470,11 @@ function _renderSyncTab(){
   /* sync history */
   var hist=(state.syncHistory||[]).filter(function(h){return !h.conflict;}).slice(0,20);
   if(hist.length){
-    html+='<div class="ms-card"><h4 style="margin:0 0 8px;font-size:16px">'+_t('Lich su dong bo','Sync History')+'</h4>';
+    html+='<div class="ms-card"><h4 style="margin:0 0 var(--space-2,8px);font-size:var(--text-lg,16px)">'+_t('Lich su dong bo','Sync History')+'</h4>';
     hist.forEach(function(h){
-      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border,#f1f5f9);font-size:14px">';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-2,6px) 0;border-bottom:1px solid var(--border,#f1f5f9);font-size:var(--text-base,14px)">';
       html+='<span>'+_esc(h.description||h.action||'-')+'</span>';
-      html+='<span style="font-size:12px;color:var(--text-secondary,#94a3b8)">'+_fmtTime(h.timestamp)+'</span>';
+      html+='<span style="font-size:var(--text-xs,12px);color:var(--text-secondary,#94a3b8)">'+_fmtTime(h.timestamp)+'</span>';
       html+='</div>';
     });
     html+='</div>';

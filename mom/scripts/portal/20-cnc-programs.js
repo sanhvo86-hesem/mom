@@ -150,7 +150,7 @@ function _kpiCard(label, value, color){
 
 /* ── tab: program library ────────────────────────────── */
 function _renderListTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Thu vien chuong trinh NC','NC Program Library')+'</h3>'
     +'<button class="nc-btn nc-btn-primary" data-action="create-program">+ '+_t('Tao moi','New Program')+'</button>'
   +'</div>';
@@ -169,7 +169,7 @@ function _renderListTab(){
   html+='<table class="nc-table"><thead><tr><th>'+_t('Ma CT','Program #')+'</th><th>'+_t('Part','Part')+'</th><th>'+_t('May','Machine')+'</th><th>'+_t('Trang thai','Status')+'</th><th>'+_t('Phien ban','Version')+'</th><th>'+_t('Cycle Time','Cycle Time')+'</th><th></th></tr></thead><tbody>';
   state.programs.forEach(function(p){
     html+='<tr><td><strong>'+_esc(p.program_number)+'</strong></td><td>'+_esc(p.part_number||'-')+'</td><td>'+_esc(p.machine||'-')+'</td><td>'+_statusBadge(p.status)+'</td><td>v'+_esc(p.current_version||1)+'</td><td>'+_esc(p.cycle_time?p.cycle_time+' min':'-')+'</td>'
-      +'<td><button class="nc-btn nc-btn-secondary" style="padding:4px 8px;font-size:.75rem" data-action="select-program" data-id="'+_esc(p.id)+'">'+_t('Chi tiet','Detail')+'</button></td></tr>';
+      +'<td><button class="nc-btn nc-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="select-program" data-id="'+_esc(p.id)+'">'+_t('Chi tiet','Detail')+'</button></td></tr>';
   });
   html+='</tbody></table>';
   html+=_renderPaging();
@@ -181,33 +181,33 @@ function _renderDetailTab(){
   var prog=state.selectedProgram;
   if(!prog) return '<div class="nc-empty">'+_t('Chon chuong trinh tu thu vien','Select a program from the library')+'</div>';
 
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_esc(prog.program_number)+' - '+_esc(prog.part_number||'')+'</h3>'
-    +'<div style="display:flex;gap:8px">'
+    +'<div style="display:flex;gap:var(--space-2,8px)">'
       +_statusBadge(prog.status)
       +'<button class="nc-btn nc-btn-secondary" data-action="back-to-list">'+_t('Quay lai','Back')+'</button>'
     +'</div>'
   +'</div>';
 
   /* metadata */
-  html+='<div class="nc-card"><h4 style="margin:0 0 12px">'+_t('Thong tin','Metadata')+'</h4>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:.8125rem">';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('May','Machine')+':</span> '+_esc(prog.machine||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Part','Part')+':</span> '+_esc(prog.part_number||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Phien ban','Version')+':</span> v'+_esc(prog.current_version||1)+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Cycle Time','Cycle Time')+':</span> '+_esc(prog.cycle_time?prog.cycle_time+' min':'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Nguoi tao','Author')+':</span> '+_esc(prog.author||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Ngay tao','Created')+':</span> '+_fmtDate(prog.created_at)+'</div>';
+  html+='<div class="nc-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Thong tin','Metadata')+'</h4>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-3,10px);font-size:var(--text-sm,.8125rem)">';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('May','Machine')+':</span> '+_esc(prog.machine||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Part','Part')+':</span> '+_esc(prog.part_number||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Phien ban','Version')+':</span> v'+_esc(prog.current_version||1)+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Cycle Time','Cycle Time')+':</span> '+_esc(prog.cycle_time?prog.cycle_time+' min':'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Nguoi tao','Author')+':</span> '+_esc(prog.author||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Ngay tao','Created')+':</span> '+_fmtDate(prog.created_at)+'</div>';
   html+='</div></div>';
 
   /* version history */
   var versions=prog.versions||[];
-  html+='<div class="nc-card"><h4 style="margin:0 0 12px">'+_t('Lich su phien ban','Version History')+'</h4>';
+  html+='<div class="nc-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Lich su phien ban','Version History')+'</h4>';
   if(versions.length){
     html+='<table class="nc-table"><thead><tr><th>'+_t('Phien ban','Version')+'</th><th>'+_t('Ngay','Date')+'</th><th>'+_t('Nguoi sua','Author')+'</th><th>'+_t('Ghi chu','Notes')+'</th><th>'+_t('Trang thai','Status')+'</th><th></th></tr></thead><tbody>';
     versions.forEach(function(v){
       html+='<tr><td>v'+_esc(v.version)+'</td><td>'+_fmtDate(v.date)+'</td><td>'+_esc(v.author||'-')+'</td><td>'+_esc(v.notes||'-')+'</td><td>'+_statusBadge(v.status)+'</td>'
-        +'<td><button class="nc-btn nc-btn-secondary" style="padding:2px 8px;font-size:.6875rem" data-action="compare-version" data-version="'+_esc(v.version)+'">'+_t('So sanh','Compare')+'</button></td></tr>';
+        +'<td><button class="nc-btn nc-btn-secondary" style="padding:2px var(--space-2,8px);font-size:var(--text-xs,.6875rem)" data-action="compare-version" data-version="'+_esc(v.version)+'">'+_t('So sanh','Compare')+'</button></td></tr>';
     });
     html+='</tbody></table>';
   } else { html+='<div class="nc-empty">-</div>'; }
@@ -216,7 +216,7 @@ function _renderDetailTab(){
   /* approval timeline */
   var approvals=prog.approvals||[];
   if(approvals.length){
-    html+='<div class="nc-card"><h4 style="margin:0 0 12px">'+_t('Quy trinh duyet','Approval Workflow')+'</h4>';
+    html+='<div class="nc-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Quy trinh duyet','Approval Workflow')+'</h4>';
     html+='<div class="nc-timeline">';
     approvals.forEach(function(a){
       var color=(APPROVAL_RESULT[a.result]||{color:'#64748b'}).color;
@@ -225,7 +225,7 @@ function _renderDetailTab(){
           +'<strong>'+_esc(a.approver||'-')+'</strong>'
           +(a.result?_approvalBadge(a.result):'<span class="nc-badge" style="background:#94a3b8">'+_t('Cho','Pending')+'</span>')
         +'</div>'
-        +'<div style="font-size:.75rem;color:var(--text-secondary,#64748b);margin-top:4px">'+_fmtDateTime(a.date)+' - '+_esc(a.comments||'')+'</div>'
+        +'<div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);margin-top:var(--space-1,4px)">'+_fmtDateTime(a.date)+' - '+_esc(a.comments||'')+'</div>'
       +'</div>';
     });
     html+='</div></div>';
@@ -235,7 +235,7 @@ function _renderDetailTab(){
   if(prog.setup_sheet_id){
     html+='<div class="nc-card"><div style="display:flex;justify-content:space-between;align-items:center">'
       +'<h4 style="margin:0">'+_t('Setup Sheet lien ket','Linked Setup Sheet')+'</h4>'
-      +'<button class="nc-btn nc-btn-secondary" style="padding:4px 10px;font-size:.75rem" data-action="view-setup" data-id="'+_esc(prog.setup_sheet_id)+'">'+_t('Xem','View')+'</button>'
+      +'<button class="nc-btn nc-btn-secondary" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem)" data-action="view-setup" data-id="'+_esc(prog.setup_sheet_id)+'">'+_t('Xem','View')+'</button>'
     +'</div></div>';
   }
 
@@ -248,18 +248,18 @@ function _renderCompareTab(){
   if(!prog) return '<div class="nc-empty">'+_t('Chon chuong trinh truoc','Select a program first')+'</div>';
 
   var versions=prog.versions||[];
-  var html='<h3 style="margin:0 0 16px">'+_t('So sanh phien ban','Version Compare')+' - '+_esc(prog.program_number)+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('So sanh phien ban','Version Compare')+' - '+_esc(prog.program_number)+'</h3>';
 
   html+='<div class="nc-filters">';
-  html+='<label style="font-size:.8125rem;font-weight:600">'+_t('Phien ban A','Version A')+': </label>';
+  html+='<label style="font-size:var(--text-sm,.8125rem);font-weight:var(--font-heading-weight,600)">'+_t('Phien ban A','Version A')+': </label>';
   html+='<select data-filter="compare_a">';
   versions.forEach(function(v){ html+='<option value="'+_esc(v.version)+'"'+(state.compareVersions.a==v.version?' selected':'')+'>v'+_esc(v.version)+'</option>'; });
   html+='</select>';
-  html+='<label style="font-size:.8125rem;font-weight:600;margin-left:16px">'+_t('Phien ban B','Version B')+': </label>';
+  html+='<label style="font-size:var(--text-sm,.8125rem);font-weight:var(--font-heading-weight,600);margin-left:var(--space-4,16px)">'+_t('Phien ban B','Version B')+': </label>';
   html+='<select data-filter="compare_b">';
   versions.forEach(function(v){ html+='<option value="'+_esc(v.version)+'"'+(state.compareVersions.b==v.version?' selected':'')+'>v'+_esc(v.version)+'</option>'; });
   html+='</select>';
-  html+='<button class="nc-btn nc-btn-primary" style="margin-left:12px" data-action="run-compare">'+_t('So sanh','Compare')+'</button>';
+  html+='<button class="nc-btn nc-btn-primary" style="margin-left:var(--space-3,12px)" data-action="run-compare">'+_t('So sanh','Compare')+'</button>';
   html+='</div>';
 
   /* diff view */
@@ -284,7 +284,7 @@ function _renderCompareTab(){
   }
 
   /* upload new version */
-  html+='<div class="nc-card" style="margin-top:16px"><h4 style="margin:0 0 12px">'+_t('Tai len phien ban moi','Upload New Version')+'</h4>';
+  html+='<div class="nc-card" style="margin-top:var(--space-4,16px)"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Tai len phien ban moi','Upload New Version')+'</h4>';
   html+='<div class="nc-form">';
   html+='<div style="grid-column:1/-1"><label>'+_t('Ghi chu','Notes')+'</label><textarea id="nc-f-version-notes"></textarea></div>';
   html+='</div>';
@@ -296,7 +296,7 @@ function _renderCompareTab(){
 
 /* ── tab: setup sheets ───────────────────────────────── */
 function _renderSetupTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Setup Sheets','Setup Sheets')+'</h3>'
     +'<button class="nc-btn nc-btn-primary" data-action="create-setup">+ '+_t('Tao moi','New Setup Sheet')+'</button>'
   +'</div>';
@@ -306,9 +306,9 @@ function _renderSetupTab(){
 
   state.setupSheets.forEach(function(ss){
     html+='<div class="nc-card">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3,10px)">'
         +'<div><strong>'+_esc(ss.title||ss.id)+'</strong> - '+_esc(ss.program_number||'-')+'</div>'
-        +'<button class="nc-btn nc-btn-secondary" style="padding:4px 8px;font-size:.75rem" data-action="edit-setup" data-id="'+_esc(ss.id)+'">'+_t('Sua','Edit')+'</button>'
+        +'<button class="nc-btn nc-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="edit-setup" data-id="'+_esc(ss.id)+'">'+_t('Sua','Edit')+'</button>'
       +'</div>';
 
     /* photos */
@@ -324,7 +324,7 @@ function _renderSetupTab(){
     /* tool list */
     var tools=ss.tools||[];
     if(tools.length){
-      html+='<h5 style="margin:10px 0 6px;font-size:.75rem;text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Danh sach dao cu','Tool List')+'</h5>';
+      html+='<h5 style="margin:var(--space-3,10px) 0 var(--space-2,6px);font-size:var(--text-xs,.75rem);text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Danh sach dao cu','Tool List')+'</h5>';
       html+='<table class="nc-table"><thead><tr><th>T#</th><th>'+_t('Dao','Tool')+'</th><th>'+_t('Offset','Offset')+'</th><th>'+_t('Ghi chu','Notes')+'</th></tr></thead><tbody>';
       tools.forEach(function(tool){
         html+='<tr><td>T'+_esc(tool.slot||tool.number)+'</td><td>'+_esc(tool.description||'-')+'</td><td>'+_esc(tool.offset||'-')+'</td><td>'+_esc(tool.notes||'-')+'</td></tr>';
@@ -335,7 +335,7 @@ function _renderSetupTab(){
     /* fixture */
     var fixtures=ss.fixtures||[];
     if(fixtures.length){
-      html+='<h5 style="margin:10px 0 6px;font-size:.75rem;text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Fixture','Fixtures')+'</h5>';
+      html+='<h5 style="margin:var(--space-3,10px) 0 var(--space-2,6px);font-size:var(--text-xs,.75rem);text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Fixture','Fixtures')+'</h5>';
       html+='<ul style="font-size:.8125rem;margin:0;padding-left:20px">';
       fixtures.forEach(function(f){ html+='<li>'+_esc(f.description||f)+'</li>'; });
       html+='</ul>';
@@ -344,7 +344,7 @@ function _renderSetupTab(){
     /* steps */
     var steps=ss.steps||[];
     if(steps.length){
-      html+='<h5 style="margin:10px 0 6px;font-size:.75rem;text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Cac buoc','Steps')+'</h5>';
+      html+='<h5 style="margin:var(--space-3,10px) 0 var(--space-2,6px);font-size:var(--text-xs,.75rem);text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Cac buoc','Steps')+'</h5>';
       html+='<ol style="font-size:.8125rem;margin:0;padding-left:20px">';
       steps.forEach(function(st){ html+='<li>'+_esc(st.text||st)+'</li>'; });
       html+='</ol>';
@@ -356,7 +356,7 @@ function _renderSetupTab(){
 
 /* ── tab: approval queue ─────────────────────────────── */
 function _renderApprovalTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Hang doi duyet','Approval Queue')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Hang doi duyet','Approval Queue')+'</h3>';
 
   if(!state.approvalQueue.length) return html+'<div class="nc-empty">'+_t('Khong co chuong trinh cho duyet','No programs pending approval')+'</div>';
 
@@ -366,19 +366,19 @@ function _renderApprovalTab(){
         +'<div><strong>'+_esc(item.program_number)+'</strong> v'+_esc(item.version)+' - '+_esc(item.part_number||'-')+'</div>'
         +_statusBadge(item.status)
       +'</div>'
-      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:6px">'
+      +'<div style="font-size:var(--text-sm,.8125rem);color:var(--text-secondary,#64748b);margin-top:var(--space-2,6px)">'
         +_t('May','Machine')+': '+_esc(item.machine||'-')
         +' | '+_t('Gui boi','Submitted by')+': '+_esc(item.submitted_by||'-')
         +' | '+_fmtDate(item.submitted_at)
       +'</div>'
-      +'<div style="font-size:.8125rem;margin-top:6px">'+_esc(item.notes||'-')+'</div>'
-      +'<div style="margin-top:10px"><label style="font-size:.75rem;font-weight:600;color:var(--text-secondary,#64748b)">'+_t('Nhan xet','Comments')+'</label>'
-        +'<textarea class="nc-approval-comment" data-program-id="'+_esc(item.id)+'" style="width:100%;padding:6px 8px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:.8125rem;min-height:40px;resize:vertical;margin-top:4px"></textarea>'
+      +'<div style="font-size:var(--text-sm,.8125rem);margin-top:var(--space-2,6px)">'+_esc(item.notes||'-')+'</div>'
+      +'<div style="margin-top:var(--space-3,10px)"><label style="font-size:var(--text-xs,.75rem);font-weight:var(--font-heading-weight,600);color:var(--text-secondary,#64748b)">'+_t('Nhan xet','Comments')+'</label>'
+        +'<textarea class="nc-approval-comment" data-program-id="'+_esc(item.id)+'" style="width:100%;padding:var(--space-2,6px) var(--space-2,8px);border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,6px);font-size:var(--text-sm,.8125rem);min-height:40px;resize:vertical;margin-top:var(--space-1,4px)"></textarea>'
       +'</div>'
-      +'<div style="display:flex;gap:6px;margin-top:10px">'
-        +'<button class="nc-btn nc-btn-success" style="padding:6px 14px" data-action="approve-program" data-id="'+_esc(item.id)+'">'+_t('Duyet','Approve')+'</button>'
-        +'<button class="nc-btn nc-btn-danger" style="padding:6px 14px" data-action="reject-program" data-id="'+_esc(item.id)+'">'+_t('Tu choi','Reject')+'</button>'
-        +'<button class="nc-btn" style="padding:6px 14px;background:#f59e0b;color:#fff" data-action="conditional-program" data-id="'+_esc(item.id)+'">'+_t('Co dieu kien','Conditional')+'</button>'
+      +'<div style="display:flex;gap:var(--space-2,6px);margin-top:var(--space-3,10px)">'
+        +'<button class="nc-btn nc-btn-success" style="padding:var(--space-2,6px) var(--space-4,14px)" data-action="approve-program" data-id="'+_esc(item.id)+'">'+_t('Duyet','Approve')+'</button>'
+        +'<button class="nc-btn nc-btn-danger" style="padding:var(--space-2,6px) var(--space-4,14px)" data-action="reject-program" data-id="'+_esc(item.id)+'">'+_t('Tu choi','Reject')+'</button>'
+        +'<button class="nc-btn" style="padding:var(--space-2,6px) var(--space-4,14px);background:var(--amber-light,#f59e0b);color:var(--text-inverse,#fff)" data-action="conditional-program" data-id="'+_esc(item.id)+'">'+_t('Co dieu kien','Conditional')+'</button>'
       +'</div>'
     +'</div>';
   });
@@ -401,7 +401,7 @@ function _renderPaging(){
 function _showProgramForm(){
   var el=state.container.querySelector('#nc-program-form');
   if(!el) return;
-  el.innerHTML='<div class="nc-card"><h4 style="margin:0 0 12px">'+_t('Tao chuong trinh moi','New CNC Program')+'</h4>'
+  el.innerHTML='<div class="nc-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Tao chuong trinh moi','New CNC Program')+'</h4>'
     +'<div class="nc-form">'
       +'<div><label>'+_t('Ma chuong trinh','Program Number')+'</label><input type="text" id="nc-f-number"></div>'
       +'<div><label>'+_t('Part','Part Number')+'</label><input type="text" id="nc-f-part"></div>'
@@ -409,7 +409,7 @@ function _showProgramForm(){
       +'<div><label>'+_t('Cycle Time (min)','Cycle Time (min)')+'</label><input type="number" id="nc-f-cycle" step="0.1"></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Ghi chu','Notes')+'</label><textarea id="nc-f-notes"></textarea></div>'
     +'</div>'
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-3,12px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="nc-btn nc-btn-primary" data-action="submit-program">'+_t('Luu','Save')+'</button>'
       +'<button class="nc-btn nc-btn-secondary" data-action="cancel-form">'+_t('Huy','Cancel')+'</button>'
     +'</div></div>';
@@ -418,13 +418,13 @@ function _showProgramForm(){
 function _showSetupForm(){
   var el=state.container.querySelector('#nc-setup-form');
   if(!el) return;
-  el.innerHTML='<div class="nc-card"><h4 style="margin:0 0 12px">'+_t('Tao Setup Sheet','New Setup Sheet')+'</h4>'
+  el.innerHTML='<div class="nc-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Tao Setup Sheet','New Setup Sheet')+'</h4>'
     +'<div class="nc-form">'
       +'<div><label>'+_t('Tieu de','Title')+'</label><input type="text" id="nc-f-ss-title"></div>'
       +'<div><label>'+_t('Chuong trinh','Program')+'</label><input type="text" id="nc-f-ss-program" placeholder="'+_t('Ma chuong trinh','Program number')+'"></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Huong dan','Instructions')+'</label><textarea id="nc-f-ss-instructions"></textarea></div>'
     +'</div>'
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-3,12px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="nc-btn nc-btn-primary" data-action="submit-setup">'+_t('Luu','Save')+'</button>'
       +'<button class="nc-btn nc-btn-secondary" data-action="cancel-form">'+_t('Huy','Cancel')+'</button>'
     +'</div></div>';

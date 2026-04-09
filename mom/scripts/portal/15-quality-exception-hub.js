@@ -123,7 +123,7 @@ function _ensureStyles(){
     '.qeh-table tr:hover td{background:var(--surface,#f8fafc)}',
     '.qeh-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.6875rem;font-weight:700;color:#fff;white-space:nowrap}',
     '.qeh-type-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;font-size:.6875rem;font-weight:700;color:#fff}',
-    '.qeh-aging{height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden;min-width:60px}',
+    '.qeh-aging{height:6px;border-radius:3px;background:var(--bg-hover,#e2e8f0);overflow:hidden;min-width:60px}',
     '.qeh-aging-fill{height:100%;border-radius:3px;transition:width .3s}',
     '.qeh-card{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:18px;margin-bottom:12px;cursor:pointer;transition:box-shadow .15s}',
     '.qeh-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}',
@@ -139,15 +139,15 @@ function _ensureStyles(){
     '.qeh-btn-primary{background:var(--brand,#1565c0);color:#fff}',
     '.qeh-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
     '.qeh-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
-    '.qeh-btn-secondary:hover{background:#e2e8f0}',
-    '.qeh-btn-danger{background:#ef4444;color:#fff}',
+    '.qeh-btn-secondary:hover{background:var(--bg-hover,#e2e8f0)}',
+    '.qeh-btn-danger{background:var(--red-light,#ef4444);color:var(--text-inverse,#fff)}',
     '.qeh-btn-danger:hover{background:#dc2626}',
     '.qeh-d8-wizard{margin-top:16px}',
     '.qeh-d8-step{border:1px solid var(--border,#e2e8f0);border-radius:8px;margin-bottom:8px;overflow:hidden}',
     '.qeh-d8-step-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;font-weight:700;font-size:.8125rem;background:var(--surface,#f8fafc);transition:background .15s}',
-    '.qeh-d8-step-header:hover{background:#e2e8f0}',
+    '.qeh-d8-step-header:hover{background:var(--bg-hover,#e2e8f0)}',
     '.qeh-d8-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;background:var(--brand,#1565c0);flex-shrink:0}',
-    '.qeh-d8-num.done{background:#22c55e}',
+    '.qeh-d8-num.done{background:var(--green-light,#22c55e)}',
     '.qeh-d8-body{padding:16px;border-top:1px solid var(--border,#e2e8f0);display:none}',
     '.qeh-d8-body.open{display:block}',
     '.qeh-mrb-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}',
@@ -158,7 +158,7 @@ function _ensureStyles(){
     '.qeh-pareto{margin-top:16px}',
     '.qeh-pareto-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}',
     '.qeh-pareto-name{width:120px;font-size:.75rem;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
-    '.qeh-pareto-bar{flex:1;height:18px;background:#e2e8f0;border-radius:4px;overflow:hidden}',
+    '.qeh-pareto-bar{flex:1;height:18px;background:var(--bg-hover,#e2e8f0);border-radius:var(--radius-sm,4px);overflow:hidden}',
     '.qeh-pareto-fill{height:100%;border-radius:4px;background:var(--brand,#1565c0);transition:width .3s}',
     '.qeh-pareto-val{width:60px;font-size:.75rem;font-weight:700}',
     '.qeh-detail{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:20px;margin-bottom:16px}',
@@ -179,19 +179,19 @@ function _renderSeverityBadge(severity){
 }
 
 function _renderTypeBadge(type){
-  var m=EXC_TYPES[type]||{vi:type,en:type,color:'#64748b',icon:''};
+  var m=EXC_TYPES[type]||{vi:type,en:type,color:'var(--text-secondary,#64748b)',icon:''};
   return '<span class="qeh-type-badge" style="background:'+m.color+'">'+m.icon+' '+_esc(_t(m.vi,m.en))+'</span>';
 }
 
 function _renderStatusBadge(status){
-  var m=STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="qeh-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 
 function _renderAgingIndicator(days, maxDays){
   var max=maxDays||30;
   var pct=Math.min(100, Math.round((days/max)*100));
-  var color=pct<50?'#22c55e':pct<80?'#f59e0b':'#ef4444';
+  var color=pct<50?'var(--green-light,#22c55e)':pct<80?'var(--amber-light,#f59e0b)':'var(--red-light,#ef4444)';
   return '<div class="qeh-aging"><div class="qeh-aging-fill" style="width:'+pct+'%;background:'+color+'"></div></div>';
 }
 
@@ -209,7 +209,7 @@ function _renderExceptionCard(item){
       +'<span>'+_t('Phụ trách','Assigned')+': '+_esc(item.assigned_to||'-')+'</span>'
       +(item.linked_order?'<span>'+_t('Liên kết','Linked')+': '+_esc(item.linked_order)+'</span>':'')
     +'</div>'
-    +'<div style="margin-top:8px">'+_renderAgingIndicator(age, sla)+'</div>'
+    +'<div style="margin-top:var(--space-2,8px)">'+_renderAgingIndicator(age, sla)+'</div>'
   +'</div>';
 }
 
@@ -217,21 +217,21 @@ function _renderExceptionDetail(item){
   if(!item) return '<div class="qeh-empty">'+_t('Chọn một exception','Select an exception')+'</div>';
   var age=_daysBetween(item.created_at);
   var html='<div class="qeh-detail">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-2,8px)">'
       +'<h3>'+_esc(item.subject||item.title||'-')+'</h3>'
       +'<div>'+_renderTypeBadge(item.type)+' '+_renderSeverityBadge(item.severity)+' '+_renderStatusBadge(item.status)+'</div>'
     +'</div>'
-    +'<div class="qeh-card-meta" style="margin-bottom:12px">'
+    +'<div class="qeh-card-meta" style="margin-bottom:var(--space-3,12px)">'
       +'<span>ID: '+_esc(item.id)+'</span>'
       +'<span>'+_t('Ngày tạo','Created')+': '+_fmtDate(item.created_at)+'</span>'
       +'<span>'+_t('Tuổi','Age')+': '+age+_t(' ngày',' days')+'</span>'
       +'<span>'+_t('Phụ trách','Assigned')+': '+_esc(item.assigned_to||'-')+'</span>'
       +'<span>'+_t('Bộ phận','Dept')+': '+_esc(item.department||'-')+'</span>'
     +'</div>'
-    +'<div style="margin-bottom:12px"><strong>'+_t('Mô tả','Description')+':</strong><br>'+_esc(item.description||'-')+'</div>';
-  if(item.root_cause) html+='<div style="margin-bottom:12px"><strong>'+_t('Nguyên nhân gốc','Root Cause')+':</strong><br>'+_esc(item.root_cause)+'</div>';
-  if(item.corrective_action) html+='<div style="margin-bottom:12px"><strong>'+_t('Hành động khắc phục','Corrective Action')+':</strong><br>'+_esc(item.corrective_action)+'</div>';
-  html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">';
+    +'<div style="margin-bottom:var(--space-3,12px)"><strong>'+_t('Mô tả','Description')+':</strong><br>'+_esc(item.description||'-')+'</div>';
+  if(item.root_cause) html+='<div style="margin-bottom:var(--space-3,12px)"><strong>'+_t('Nguyên nhân gốc','Root Cause')+':</strong><br>'+_esc(item.root_cause)+'</div>';
+  if(item.corrective_action) html+='<div style="margin-bottom:var(--space-3,12px)"><strong>'+_t('Hành động khắc phục','Corrective Action')+':</strong><br>'+_esc(item.corrective_action)+'</div>';
+  html+='<div style="display:flex;gap:var(--space-2,8px);flex-wrap:wrap;margin-top:var(--space-3,12px)">';
   var sts=STATUS;
   Object.keys(sts).forEach(function(k){
     if(k===item.status) return;
@@ -245,11 +245,11 @@ function _renderExceptionDetail(item){
 function _renderDashboardTab(){
   var k=state.kpi;
   var html='<div class="qeh-kpis">'
-    +_kpiCard(_t('NCR đang mở','Open NCRs'), k.open_ncrs||0, '#ef4444')
-    +_kpiCard(_t('CAPA đang mở','Open CAPAs'), k.open_capas||0, '#3b82f6')
-    +_kpiCard(_t('Khiếu nại mở','Open Complaints'), k.open_complaints||0, '#f59e0b')
-    +_kpiCard('COPQ MTD', k.copq_mtd?'$'+Number(k.copq_mtd).toLocaleString():'$0', '#8b5cf6')
-    +_kpiCard(_t('Tuổi TB (ngày)','Avg Age (days)'), k.avg_age_days||0, '#06b6d4')
+    +_kpiCard(_t('NCR đang mở','Open NCRs'), k.open_ncrs||0, 'var(--red-light,#ef4444)')
+    +_kpiCard(_t('CAPA đang mở','Open CAPAs'), k.open_capas||0, 'var(--blue-light,#3b82f6)')
+    +_kpiCard(_t('Khiếu nại mở','Open Complaints'), k.open_complaints||0, 'var(--amber-light,#f59e0b)')
+    +_kpiCard('COPQ MTD', k.copq_mtd?'$'+Number(k.copq_mtd).toLocaleString():'$0', 'var(--purple-light,#8b5cf6)')
+    +_kpiCard(_t('Tuổi TB (ngày)','Avg Age (days)'), k.avg_age_days||0, 'var(--cyan-light,#06b6d4)')
   +'</div>';
 
   html+=_renderFilters();
@@ -257,7 +257,7 @@ function _renderDashboardTab(){
   if(state.selectedId){
     var sel=state.exceptions.find(function(e){return e.id===state.selectedId;});
     html+=_renderExceptionDetail(sel);
-    html+='<button class="qeh-btn qeh-btn-secondary" data-action="deselect" style="margin-bottom:16px">'+_t('Quay lại danh sách','Back to list')+'</button>';
+    html+='<button class="qeh-btn qeh-btn-secondary" data-action="deselect" style="margin-bottom:var(--space-4,16px)">'+_t('Quay lại danh sách','Back to list')+'</button>';
   } else {
     html+=_renderExceptionTable();
     html+=_renderPaging();
@@ -306,7 +306,7 @@ function _renderExceptionTable(){
       +'<td>'+_esc(item.subject||item.title||'-')+'</td>'
       +'<td>'+_renderSeverityBadge(item.severity)+'</td>'
       +'<td>'+_renderStatusBadge(item.status)+'</td>'
-      +'<td><div style="display:flex;align-items:center;gap:6px"><span>'+age+_t('d','d')+'</span>'+_renderAgingIndicator(age, sla)+'</div></td>'
+      +'<td><div style="display:flex;align-items:center;gap:var(--space-2,6px)"><span>'+age+_t('d','d')+'</span>'+_renderAgingIndicator(age, sla)+'</div></td>'
       +'<td>'+_esc(item.assigned_to||'-')+'</td>'
       +'<td>'+_esc(item.linked_order||'-')+'</td>'
     +'</tr>';
@@ -327,11 +327,11 @@ function _renderPaging(){
 }
 
 function _renderCreateTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Tạo exception mới','Create New Exception')+'</h3>';
-  html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Tạo exception mới','Create New Exception')+'</h3>';
+  html+='<div style="display:flex;gap:var(--space-3,10px);flex-wrap:wrap;margin-bottom:var(--space-5,20px)">';
   Object.keys(EXC_TYPES).forEach(function(k){
     var m=EXC_TYPES[k];
-    html+='<button class="qeh-btn" style="background:'+m.color+';color:#fff" data-action="open-create" data-type="'+k+'">'+m.icon+' '+_esc(_t(m.vi,m.en))+'</button>';
+    html+='<button class="qeh-btn" style="background:'+m.color+';color:var(--text-inverse,#fff)" data-action="open-create" data-type="'+k+'">'+m.icon+' '+_esc(_t(m.vi,m.en))+'</button>';
   });
   html+='</div>';
   html+='<div id="qeh-create-form"></div>';
@@ -354,7 +354,7 @@ function _openCreateDialog(type){
       +'<div><label>'+_t('SLA (ngày)','SLA (days)')+'</label><input type="number" id="qeh-f-sla" value="30"></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Mô tả','Description')+'</label><textarea id="qeh-f-desc"></textarea></div>'
     +'</div>'
-    +'<div style="margin-top:14px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-4,14px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="qeh-btn qeh-btn-primary" data-action="submit-create" data-type="'+type+'">'+_t('Lưu','Save')+'</button>'
       +'<button class="qeh-btn qeh-btn-secondary" data-action="cancel-create">'+_t('Hủy','Cancel')+'</button>'
     +'</div></div>';
@@ -364,7 +364,7 @@ function _render8dTab(){
   if(!state.selectedId){
     var complaints=state.exceptions.filter(function(e){return e.type==='complaint';});
     if(!complaints.length) return '<div class="qeh-empty">'+_t('Chưa có khiếu nại để tạo 8D','No complaints available for 8D')+'</div>';
-    var html='<h3 style="margin:0 0 16px">'+_t('Chọn khiếu nại cho báo cáo 8D','Select Complaint for 8D Report')+'</h3>';
+    var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Chọn khiếu nại cho báo cáo 8D','Select Complaint for 8D Report')+'</h3>';
     html+='<table class="qeh-table"><thead><tr><th>ID</th><th>'+_t('Tiêu đề','Subject')+'</th><th>'+_t('Trạng thái','Status')+'</th><th></th></tr></thead><tbody>';
     complaints.forEach(function(c){
       html+='<tr><td>'+_esc(c.id)+'</td><td>'+_esc(c.subject||'-')+'</td><td>'+_renderStatusBadge(c.status)+'</td>'
@@ -388,11 +388,11 @@ function _render8dTab(){
       +'<div class="qeh-d8-step-header" data-action="toggle-d8" data-step="'+step.key+'">'
         +'<div class="qeh-d8-num'+(done?' done':'')+'">D'+(idx+1)+'</div>'
         +'<span>'+_esc(_t(step.vi,step.en))+'</span>'
-        +(done?'<span style="margin-left:auto;color:#22c55e;font-size:.75rem">'+_t('Hoàn thành','Done')+'</span>':'')
+        +(done?'<span style="margin-left:auto;color:var(--green-light,#22c55e);font-size:var(--text-xs,.75rem)">'+_t('Hoàn thành','Done')+'</span>':'')
       +'</div>'
       +'<div class="qeh-d8-body" id="qeh-d8-'+step.key+'">'
-        +'<textarea id="qeh-d8-val-'+step.key+'" style="width:100%;min-height:80px;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:.8125rem" placeholder="'+_esc(_t(step.vi,step.en))+'">'+_esc(val)+'</textarea>'
-        +'<button class="qeh-btn qeh-btn-primary" style="margin-top:8px" data-action="save-d8" data-step="'+step.key+'" data-id="'+_esc(item.id)+'">'+_t('Lưu','Save')+'</button>'
+        +'<textarea id="qeh-d8-val-'+step.key+'" style="width:100%;min-height:80px;padding:var(--space-2,8px);border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,6px);font-size:var(--text-sm,.8125rem)" placeholder="'+_esc(_t(step.vi,step.en))+'">'+_esc(val)+'</textarea>'
+        +'<button class="qeh-btn qeh-btn-primary" style="margin-top:var(--space-2,8px)" data-action="save-d8" data-step="'+step.key+'" data-id="'+_esc(item.id)+'">'+_t('Lưu','Save')+'</button>'
       +'</div>'
     +'</div>';
   });
@@ -403,16 +403,16 @@ function _render8dTab(){
 function _renderMrbTab(){
   var mrbItems=state.exceptions.filter(function(e){return e.type==='mrb' && e.status!=='closed';});
   if(!mrbItems.length) return '<div class="qeh-empty">'+_t('Không có item chờ MRB','No items pending MRB')+'</div>';
-  var html='<h3 style="margin:0 0 16px">'+_t('Vật phẩm chờ MRB','Items Pending MRB')+' ('+mrbItems.length+')</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Vật phẩm chờ MRB','Items Pending MRB')+' ('+mrbItems.length+')</h3>';
   mrbItems.forEach(function(item){
     html+='<div class="qeh-card">'
       +'<div class="qeh-card-header"><div class="qeh-card-title">'+_esc(item.subject||item.id)+'</div>'+_renderSeverityBadge(item.severity)+'</div>'
       +'<div class="qeh-card-meta"><span>'+_t('Bộ phận','Dept')+': '+_esc(item.department||'-')+'</span><span>'+_t('Ngày tạo','Created')+': '+_fmtDate(item.created_at)+'</span></div>'
-      +(item.description?'<div style="font-size:.8125rem;margin-top:8px">'+_esc(item.description)+'</div>':'')
+      +(item.description?'<div style="font-size:var(--text-sm,.8125rem);margin-top:var(--space-2,8px)">'+_esc(item.description)+'</div>':'')
       +'<div class="qeh-mrb-actions">';
     Object.keys(MRB_DISPOSITIONS).forEach(function(dk){
       var d=MRB_DISPOSITIONS[dk];
-      html+='<button class="qeh-btn" style="background:'+d.color+';color:#fff" data-action="mrb-disposition" data-id="'+_esc(item.id)+'" data-disposition="'+dk+'">'+_esc(_t(d.vi,d.en))+'</button>';
+      html+='<button class="qeh-btn" style="background:'+d.color+';color:var(--text-inverse,#fff)" data-action="mrb-disposition" data-id="'+_esc(item.id)+'" data-disposition="'+dk+'">'+_esc(_t(d.vi,d.en))+'</button>';
     });
     html+='</div></div>';
   });
@@ -423,14 +423,14 @@ function _renderCopqTab(){
   var c=state.copq;
   var periods=c.periods||[];
   var categories=c.categories||['Internal Failure','External Failure','Appraisal','Prevention'];
-  var catColors=['#ef4444','#f59e0b','#3b82f6','#22c55e'];
+  var catColors=['var(--red-light,#ef4444)','var(--amber-light,#f59e0b)','var(--blue-light,#3b82f6)','var(--green-light,#22c55e)'];
   var maxVal=1;
   periods.forEach(function(p){ var s=0; (p.values||[]).forEach(function(v){s+=v;}); if(s>maxVal) maxVal=s; });
 
-  var html='<h3 style="margin:0 0 16px">'+_t('Chi phí chất lượng kém','Cost of Poor Quality')+'</h3>';
-  html+='<div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Chi phí chất lượng kém','Cost of Poor Quality')+'</h3>';
+  html+='<div style="display:flex;gap:var(--space-3,12px);margin-bottom:var(--space-3,12px);flex-wrap:wrap">';
   categories.forEach(function(cat, i){
-    html+='<span style="display:inline-flex;align-items:center;gap:4px;font-size:.75rem"><span style="width:12px;height:12px;border-radius:3px;background:'+catColors[i%catColors.length]+'"></span>'+_esc(cat)+'</span>';
+    html+='<span style="display:inline-flex;align-items:center;gap:var(--space-1,4px);font-size:var(--text-xs,.75rem)"><span style="width:var(--space-3,12px);height:var(--space-3,12px);border-radius:var(--radius-sm,3px);background:'+catColors[i%catColors.length]+'"></span>'+_esc(cat)+'</span>';
   });
   html+='</div>';
 
@@ -455,7 +455,7 @@ function _renderCopqTab(){
   var pareto=c.pareto||[];
   if(pareto.length){
     var paretoMax=pareto[0]?pareto[0].count:1;
-    html+='<div class="qeh-pareto"><h4 style="margin:16px 0 10px">'+_t('Pareto theo loại lỗi','Pareto by Defect Type')+'</h4>';
+    html+='<div class="qeh-pareto"><h4 style="margin:var(--space-4,16px) 0 var(--space-3,10px)">'+_t('Pareto theo loại lỗi','Pareto by Defect Type')+'</h4>';
     pareto.forEach(function(item){
       var pct=Math.round((item.count/paretoMax)*100);
       html+='<div class="qeh-pareto-row">'
@@ -471,13 +471,13 @@ function _renderCopqTab(){
 
 function _renderTrendsTab(){
   var t_data=state.trends;
-  var html='<h3 style="margin:0 0 16px">'+_t('Xu hướng chất lượng','Quality Trends')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Xu hướng chất lượng','Quality Trends')+'</h3>';
 
   /* Pareto chart */
   var pareto=t_data.pareto||[];
   if(pareto.length){
     var pMax=pareto[0]?pareto[0].count:1;
-    html+='<div class="qeh-detail"><h4 style="margin:0 0 10px">'+_t('Pareto nguyên nhân','Pareto by Cause')+'</h4>';
+    html+='<div class="qeh-detail"><h4 style="margin:0 0 var(--space-3,10px)">'+_t('Pareto nguyên nhân','Pareto by Cause')+'</h4>';
     pareto.forEach(function(item){
       var pct=Math.round((item.count/pMax)*100);
       html+='<div class="qeh-pareto-row">'
@@ -491,17 +491,17 @@ function _renderTrendsTab(){
 
   /* Control chart placeholder */
   var control=t_data.control_chart||[];
-  html+='<div class="qeh-detail"><h4 style="margin:0 0 10px">'+_t('Biểu đồ kiểm soát','Control Chart')+'</h4>';
+  html+='<div class="qeh-detail"><h4 style="margin:0 0 var(--space-3,10px)">'+_t('Biểu đồ kiểm soát','Control Chart')+'</h4>';
   if(!control.length){
     html+='<div class="qeh-empty">'+_t('Chưa có dữ liệu','No data available')+'</div>';
   } else {
     var cMax=0; control.forEach(function(p){if(p.value>cMax) cMax=p.value;});
     if(cMax===0) cMax=1;
     var ucl=t_data.ucl||cMax*0.9, lcl=t_data.lcl||0, cl=t_data.cl||cMax*0.5;
-    html+='<div style="position:relative;height:180px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;padding:4px">';
-    html+='<div style="position:absolute;left:0;right:0;top:'+Math.round((1-ucl/cMax)*100)+'%;border-top:1px dashed #ef4444;font-size:.625rem;color:#ef4444;padding-left:4px">UCL</div>';
-    html+='<div style="position:absolute;left:0;right:0;top:'+Math.round((1-cl/cMax)*100)+'%;border-top:1px dashed #3b82f6;font-size:.625rem;color:#3b82f6;padding-left:4px">CL</div>';
-    html+='<div style="position:absolute;left:0;right:0;top:'+Math.round((1-lcl/cMax)*100)+'%;border-top:1px dashed #22c55e;font-size:.625rem;color:#22c55e;padding-left:4px">LCL</div>';
+    html+='<div style="position:relative;height:180px;border:1px solid var(--bg-hover,#e2e8f0);border-radius:var(--radius-md,6px);overflow:hidden;padding:var(--space-1,4px)">';
+    html+='<div style="position:absolute;left:0;right:0;top:'+Math.round((1-ucl/cMax)*100)+'%;border-top:1px dashed var(--red-light,#ef4444);font-size:.625rem;color:var(--red-light,#ef4444);padding-left:var(--space-1,4px)">UCL</div>';
+    html+='<div style="position:absolute;left:0;right:0;top:'+Math.round((1-cl/cMax)*100)+'%;border-top:1px dashed var(--blue-light,#3b82f6);font-size:.625rem;color:var(--blue-light,#3b82f6);padding-left:var(--space-1,4px)">CL</div>';
+    html+='<div style="position:absolute;left:0;right:0;top:'+Math.round((1-lcl/cMax)*100)+'%;border-top:1px dashed var(--green-light,#22c55e);font-size:.625rem;color:var(--green-light,#22c55e);padding-left:var(--space-1,4px)">LCL</div>';
     html+='<svg style="width:100%;height:100%" viewBox="0 0 '+control.length*30+' 180" preserveAspectRatio="none">';
     var pts=control.map(function(p,i){ return (i*30+15)+','+Math.round((1-p.value/cMax)*170+5); });
     html+='<polyline fill="none" stroke="var(--brand,#1565c0)" stroke-width="2" points="'+pts.join(' ')+'"/>';
@@ -511,16 +511,16 @@ function _renderTrendsTab(){
   html+='</div>';
 
   /* Heatmap placeholder */
-  html+='<div class="qeh-detail"><h4 style="margin:0 0 10px">'+_t('Bản đồ nhiệt','Heatmap')+'</h4>';
+  html+='<div class="qeh-detail"><h4 style="margin:0 0 var(--space-3,10px)">'+_t('Bản đồ nhiệt','Heatmap')+'</h4>';
   var heatmap=t_data.heatmap||[];
   if(!heatmap.length){
     html+='<div class="qeh-empty">'+_t('Chưa có dữ liệu heatmap','No heatmap data')+'</div>';
   } else {
-    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:4px">';
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:var(--space-1,4px)">';
     heatmap.forEach(function(cell){
       var intensity=Math.min(1,cell.value/(t_data.heatmap_max||10));
       var bg='rgba(239,68,68,'+intensity.toFixed(2)+')';
-      html+='<div style="padding:8px;text-align:center;border-radius:4px;font-size:.625rem;background:'+bg+';color:'+(intensity>0.5?'#fff':'#0f172a')+'">'+_esc(cell.label||'')+'<br>'+_esc(cell.value)+'</div>';
+      html+='<div style="padding:var(--space-2,8px);text-align:center;border-radius:var(--radius-sm,4px);font-size:.625rem;background:'+bg+';color:'+(intensity>0.5?'var(--text-inverse,#fff)':'#0f172a')+'">'+_esc(cell.label||'')+'<br>'+_esc(cell.value)+'</div>';
     });
     html+='</div>';
   }

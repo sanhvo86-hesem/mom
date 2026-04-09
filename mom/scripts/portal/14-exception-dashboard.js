@@ -598,7 +598,7 @@ function buildShell(){
     '    </article>',
     '    <div class="excx-side">',
     '      <article class="excx-card excx-clock">',
-    '        <div class="excx-side-top"><div><div class="excx-kicker" style="color:#64748b">' + esc(t('Snapshot', 'Snapshot')) + '</div><strong id="excx-stamp">' + esc(currentStamp()) + '</strong><small>' + esc(t('Dashboard này dùng cùng nguồn dữ liệu với MES, Order Control và Evidence Control.', 'This dashboard shares the same data sources as MES, Order Control, and Evidence Control.')) + '</small></div></div>',
+    '        <div class="excx-side-top"><div><div class="excx-kicker" style="color:var(--text-secondary,#64748b)">' + esc(t('Snapshot', 'Snapshot')) + '</div><strong id="excx-stamp">' + esc(currentStamp()) + '</strong><small>' + esc(t('Dashboard này dùng cùng nguồn dữ liệu với MES, Order Control và Evidence Control.', 'This dashboard shares the same data sources as MES, Order Control, and Evidence Control.')) + '</small></div></div>',
     '      </article>',
     '      <article class="excx-card">',
     '        <div class="excx-kpi-grid">',

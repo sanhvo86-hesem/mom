@@ -42,11 +42,11 @@ var TRANSITIONS = {
 };
 
 var BAND_META = {
-  critical:{ vi:'Chặn', en:'Blocked', color:'#b42318', bg:'rgba(180,35,24,.10)' },
-  warning:{ vi:'Theo dõi', en:'Watch', color:'#b9691f', bg:'rgba(185,105,31,.12)' },
-  ready:{ vi:'Ổn định', en:'Stable', color:'#0f766e', bg:'rgba(15,118,110,.10)' },
-  not_required:{ vi:'Không yêu cầu', en:'Not required', color:'#667085', bg:'rgba(102,112,133,.10)' },
-  info:{ vi:'Thông tin', en:'Info', color:'#2978b5', bg:'rgba(41,120,181,.10)' }
+  critical:{ vi:'Chặn', en:'Blocked', color:'var(--red-light,#b42318)', bg:'rgba(180,35,24,.10)' },
+  warning:{ vi:'Theo dõi', en:'Watch', color:'var(--amber-light,#b9691f)', bg:'rgba(185,105,31,.12)' },
+  ready:{ vi:'Ổn định', en:'Stable', color:'var(--green-dark,#0f766e)', bg:'rgba(15,118,110,.10)' },
+  not_required:{ vi:'Không yêu cầu', en:'Not required', color:'var(--text-secondary,#667085)', bg:'rgba(102,112,133,.10)' },
+  info:{ vi:'Thông tin', en:'Info', color:'var(--blue-light,#2978b5)', bg:'rgba(41,120,181,.10)' }
 };
 
 var PHASE_META = {
@@ -154,7 +154,7 @@ function _safeDate(v){ if(!v) return null; if(typeof v==='string' && /^\d{4}-\d{
 function _fmtDate(v){ if(!v) return ''; var d=_safeDate(v); return !d?String(v):String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
 function _fmtDateTime(v){ if(!v) return ''; var d=_safeDate(v); return !d?String(v):_fmtDate(d)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function _today(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function _status(type, key){ var s=((STATUS[type]||{})[key]||{ vi:key||'-', en:key||'-', color:'#94a3b8' }); return { text:_t(s.vi,s.en), color:s.color }; }
+function _status(type, key){ var s=((STATUS[type]||{})[key]||{ vi:key||'-', en:key||'-', color:'var(--text-secondary,#94a3b8)' }); return { text:_t(s.vi,s.en), color:s.color }; }
 function _rgba(hex,a){ var r=parseInt(hex.slice(1,3),16)||148, g=parseInt(hex.slice(3,5),16)||163, b=parseInt(hex.slice(5,7),16)||184; return 'rgba('+r+','+g+','+b+','+a+')'; }
 function _api(action, payload, method){ if(typeof apiCall==='function') return apiCall(action, payload||{}, method||'POST', 30000); return fetch('api.php?action='+encodeURIComponent(action), { method:method||'POST', credentials:'include', headers:{'Content-Type':'application/json', ...(typeof csrfToken!=='undefined'&&csrfToken?{'X-CSRF-Token':csrfToken}:{})}, body:(method||'POST')==='GET'?undefined:JSON.stringify(payload||{}) }).then(function(r){ return r.json(); }); }
 function _toast(msg, type){ var box=document.createElement('div'); box.className='sj-toast '+(type||'info'); box.textContent=msg; document.body.appendChild(box); requestAnimationFrame(function(){ box.classList.add('show'); }); setTimeout(function(){ box.classList.remove('show'); setTimeout(function(){ if(box.parentNode) box.remove(); }, 180); }, 3200); }
@@ -435,7 +435,7 @@ function _loadLinkedFormsPanel(orderId, orderType) {
     forms.forEach(function(f) {
       var st = f.alloc_status || f.status || 'linked';
       var stLabel = { linked: _t('Đã liên kết', 'Linked'), allocated: _t('Đã cấp phát', 'Allocated'), submitted: _t('Đã nộp', 'Submitted'), downloaded: _t('Đã tải', 'Downloaded'), received: _t('Đã nhận', 'Received'), void: _t('Đã hủy', 'Void') };
-      var stColor = { linked: '#3b82f6', allocated: '#94a3b8', submitted: '#10b981', downloaded: '#f59e0b', received: '#8b5cf6', void: '#ef4444' };
+      var stColor = { linked: 'var(--blue-light,#3b82f6)', allocated: 'var(--text-secondary,#94a3b8)', submitted: 'var(--green-light,#10b981)', downloaded: 'var(--amber-light,#f59e0b)', received: 'var(--purple-light,#8b5cf6)', void: 'var(--red-light,#ef4444)' };
       var displaySt = stLabel[st] || _esc(st);
       var color = stColor[st] || '#94a3b8';
       var dateStr = _fmtDateTime(f.created_at || f.linked_at || '');
@@ -447,7 +447,7 @@ function _loadLinkedFormsPanel(orderId, orderType) {
         + '<td><span class="sj-tag" style="background:' + _rgba(color, 0.12) + ';color:' + color + '">' + displaySt + '</span></td>'
         + '<td>' + _esc(dateStr) + '</td>'
         + '<td>' + _esc(who) + '</td>'
-        + '<td><span class="sj-tag" style="background:' + (f.auto_linked ? _rgba('#10b981', 0.12) : _rgba('#3b82f6', 0.12)) + ';color:' + (f.auto_linked ? '#10b981' : '#3b82f6') + '">' + src + '</span></td>'
+        + '<td><span class="sj-tag" style="background:' + (f.auto_linked ? _rgba('#10b981', 0.12) : _rgba('#3b82f6', 0.12)) + ';color:' + (f.auto_linked ? 'var(--green-light,#10b981)' : 'var(--blue-light,#3b82f6)') + '">' + src + '</span></td>'
         + '</tr>';
     });
     h += '</tbody></table>';
@@ -555,7 +555,7 @@ function _showCreateInContext(type, prefill){
   var form=modal.querySelector('#'+_id+'-ctx-form');
   _hydrateCreateForm(type, form);
   // Prefill parent fields and make them readonly
-  if(prefill){ Object.keys(prefill).forEach(function(k){ var inp=form.querySelector('[name="'+k+'"]'); if(inp){ inp.value=prefill[k]; inp.readOnly=true; inp.style.background='#f1f5f9'; } var siWrap=document.getElementById(_id+'-'+type+'-'+k); if(siWrap){ siWrap.innerHTML='<input class="sj-input" name="'+k+'" value="'+_esc(prefill[k])+'" readonly style="background:#f1f5f9"/>'; } }); }
+  if(prefill){ Object.keys(prefill).forEach(function(k){ var inp=form.querySelector('[name="'+k+'"]'); if(inp){ inp.value=prefill[k]; inp.readOnly=true; inp.style.background='var(--bg-surface-alt,#f1f5f9)'; } var siWrap=document.getElementById(_id+'-'+type+'-'+k); if(siWrap){ siWrap.innerHTML='<input class="sj-input" name="'+k+'" value="'+_esc(prefill[k])+'" readonly style="background:var(--bg-surface-alt,#f1f5f9)"/>'; } }); }
   var submitBtn=document.getElementById(_id+'-ctx-submit');
   submitBtn.onclick=function(){
     if(!form.checkValidity()){ form.reportValidity(); return; }
@@ -658,7 +658,7 @@ function _hydrateEditForm(type, form, data){
     if(field.lookup){
       if(!target) return;
       if(!canEdit){
-        target.innerHTML = '<input class="sj-input" name="'+field.key+'" value="'+_esc(value==null?'':value)+'" readonly style="background:#f1f5f9">';
+        target.innerHTML = '<input class="sj-input" name="'+field.key+'" value="'+_esc(value==null?'':value)+'" readonly style="background:var(--bg-surface-alt,#f1f5f9)">';
         return;
       }
       if(type==='jo' && field.key==='part_number') _selectedPartForRev = value || '';
@@ -695,7 +695,7 @@ function _hydrateEditForm(type, form, data){
     if(!canEdit || field.readonly){
       if(el.tagName === 'SELECT'){ el.disabled = true; }
       else { el.readOnly = true; }
-      el.style.background = '#f1f5f9';
+      el.style.background = 'var(--bg-surface-alt,#f1f5f9)';
     }
   });
   if(type==='so'){

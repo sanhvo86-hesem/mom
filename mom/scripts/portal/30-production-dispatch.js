@@ -22,7 +22,7 @@ function _today(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMont
 function _addDays(iso, n){ var d=new Date(iso); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _shortDate(iso){ if(!iso) return ''; var p=iso.split('-'); return p[2]+'/'+p[1]; }
 function _pct(a,b){ if(!b) return 0; return Math.round(a/b*1000)/10; }
-function _achieveColor(pct){ if(pct>=100) return '#22c55e'; if(pct>=90) return '#16a34a'; if(pct>=70) return '#f59e0b'; return '#ef4444'; }
+function _achieveColor(pct){ if(pct>=100) return 'var(--green-light,#22c55e)'; if(pct>=90) return 'var(--green-light,#16a34a)'; if(pct>=70) return 'var(--amber-light,#f59e0b)'; return 'var(--red-light,#ef4444)'; }
 function _achieveBg(pct){ if(pct>=90) return 'rgba(34,197,94,.08)'; if(pct>=70) return 'rgba(245,158,11,.08)'; return 'rgba(239,68,68,.08)'; }
 
 /* -- constants ------------------------------------------------ */
@@ -229,9 +229,9 @@ function _renderTimeline(){
   var h='';
   /* controls */
   h+='<div class="pd-controls">';
-  h+='<label style="font-size:.82rem;font-weight:600">'+_t('Từ','From')+'</label>';
+  h+='<label style="font-size:var(--text-sm,.82rem);font-weight:var(--font-heading-weight,600)">'+_t('Từ','From')+'</label>';
   h+='<input type="date" id="pd-date-start" value="'+_esc(state.dateRange.start)+'">';
-  h+='<label style="font-size:.82rem;font-weight:600">'+_t('Đến','To')+'</label>';
+  h+='<label style="font-size:var(--text-sm,.82rem);font-weight:var(--font-heading-weight,600)">'+_t('Đến','To')+'</label>';
   h+='<input type="date" id="pd-date-end" value="'+_esc(state.dateRange.end)+'">';
   h+='<select id="pd-filter-machine"><option value="">'+_t('Tất cả máy','All Machines')+'</option>';
   (state.machines||[]).forEach(function(m){ h+='<option value="'+_esc(m.id)+'"'+(state.filterMachine==m.id?' selected':'')+'>'+_esc(m.name)+'</option>'; });
@@ -310,9 +310,9 @@ function _renderTimeline(){
   });
   h+='</table></div>';
   /* legend */
-  h+='<div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;font-size:.75rem">';
+  h+='<div style="display:flex;gap:var(--space-4,14px);margin-top:var(--space-3,10px);flex-wrap:wrap;font-size:var(--text-xs,.75rem)">';
   Object.keys(STATUS_COLORS).forEach(function(s){
-    h+='<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:'+STATUS_COLORS[s]+';display:inline-block"></span>'+_esc(s)+'</span>';
+    h+='<span style="display:inline-flex;align-items:center;gap:var(--space-1,4px)"><span style="width:14px;height:14px;border-radius:var(--radius-sm,3px);background:'+STATUS_COLORS[s]+';display:inline-block"></span>'+_esc(s)+'</span>';
   });
   h+='</div>';
   return h;
@@ -331,7 +331,7 @@ function _findTarget(targets, date, shiftKey){
 /* ============================================================= */
 function _renderDispatch(){
   var h='';
-  h+='<h3 style="margin:0 0 14px;font-size:1.1rem">'+_t('Tạo lệnh sản xuất','Create Shift Target')+'</h3>';
+  h+='<h3 style="margin:0 0 var(--space-4,14px);font-size:var(--text-lg,1.1rem)">'+_t('Tạo lệnh sản xuất','Create Shift Target')+'</h3>';
   h+='<div class="pd-form">';
   h+='<div class="pd-form-row">';
   /* WO */
@@ -394,11 +394,11 @@ function _renderDispatch(){
   h+='<textarea class="pd-textarea" id="pd-notes" placeholder="'+_t("Ghi chú thêm...","Additional notes...")+'"></textarea></div>';
   h+='</div>';
 
-  h+='<button class="pd-btn pd-btn-primary" data-action="create-target" style="margin-top:6px">'+_t('Tạo lệnh','Create Target')+'</button>';
+  h+='<button class="pd-btn pd-btn-primary" data-action="create-target" style="margin-top:var(--space-2,6px)">'+_t('Tạo lệnh','Create Target')+'</button>';
   h+='</div>';
 
   /* today's planned targets */
-  h+='<h3 style="margin:14px 0 10px;font-size:1rem">'+_t('Lệnh hôm nay (chưa gửi)','Today\'s Planned Targets')+'</h3>';
+  h+='<h3 style="margin:var(--space-4,14px) 0 var(--space-3,10px);font-size:var(--text-base,1rem)">'+_t('Lệnh hôm nay (chưa gửi)','Today\'s Planned Targets')+'</h3>';
   var planned=(state.targets||[]).filter(function(t){ return t.target_date===_today() && t.status==='planned'; });
   if(!planned.length){
     h+='<div class="pd-empty">'+_t('Không có lệnh nào','No targets')+'</div>';
@@ -429,9 +429,9 @@ function _renderDispatch(){
 function _renderMyTasks(){
   var h='';
   var shift=_currentShift();
-  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">';
-  h+='<h3 style="margin:0;font-size:1.15rem">'+_t('Lệnh sản xuất hôm nay','Today\'s Production Orders')+'</h3>';
-  h+='<span class="pd-shift-badge" style="background:'+(shift.color||'#64748b')+'">'+_t(shift.vi,shift.en)+'</span>';
+  h+='<div style="display:flex;align-items:center;gap:var(--space-3,10px);margin-bottom:var(--space-4,16px);flex-wrap:wrap">';
+  h+='<h3 style="margin:0;font-size:var(--text-lg,1.15rem)">'+_t('Lệnh sản xuất hôm nay','Today\'s Production Orders')+'</h3>';
+  h+='<span class="pd-shift-badge" style="background:'+(shift.color||'var(--text-secondary,#64748b)')+'">'+_t(shift.vi,shift.en)+'</span>';
   h+='<button class="pd-btn pd-btn-secondary pd-btn-sm" data-action="refresh-mytasks">'+_t('Làm mới','Refresh')+'</button>';
   h+='</div>';
 
@@ -451,7 +451,7 @@ function _renderMyTasks(){
     h+='<div class="pd-task-card" data-task-idx="'+idx+'">';
     /* header */
     h+='<div class="pd-task-header">';
-    h+='<span style="background:var(--brand,#1565c0);color:#fff;padding:2px 8px;border-radius:4px;font-size:.78rem">'+(idx+1)+'</span> ';
+    h+='<span style="background:var(--brand,#1565c0);color:var(--text-inverse,#fff);padding:2px var(--space-2,8px);border-radius:var(--radius-sm,4px);font-size:var(--text-sm,.78rem)">'+(idx+1)+'</span> ';
     h+=_esc(task.wo_number)+' &middot; '+_esc(task.machine_id)+' &middot; ';
     h+='<span class="pd-shift-badge" style="background:'+shInfo.color+'">Ca '+_t(shInfo.vi,shInfo.en)+'</span>';
     h+='</div>';
@@ -463,11 +463,11 @@ function _renderMyTasks(){
 
     /* quantity inputs */
     h+='<div class="pd-qty-row">';
-    h+='<div class="pd-qty-box"><div class="pd-qty-label" style="color:#16a34a">'+_t('SL Tốt','Good')+'</div>';
+    h+='<div class="pd-qty-box"><div class="pd-qty-label" style="color:var(--green-light,#16a34a)">'+_t('SL Tốt','Good')+'</div>';
     h+='<input type="number" min="0" class="pd-qty-input" id="pd-good-'+idx+'" value="'+(good||'')+'" data-field="qty_good" data-idx="'+idx+'"></div>';
-    h+='<div class="pd-qty-box"><div class="pd-qty-label" style="color:#ef4444">'+_t('SL NG','NG')+'</div>';
+    h+='<div class="pd-qty-box"><div class="pd-qty-label" style="color:var(--red-light,#ef4444)">'+_t('SL NG','NG')+'</div>';
     h+='<input type="number" min="0" class="pd-qty-input" id="pd-ng-'+idx+'" value="'+(ng||'')+'" data-field="qty_ng" data-idx="'+idx+'"></div>';
-    h+='<div class="pd-qty-box"><div class="pd-qty-label" style="color:#f59e0b">'+_t('SL Rework','Rework')+'</div>';
+    h+='<div class="pd-qty-box"><div class="pd-qty-label" style="color:var(--amber-light,#f59e0b)">'+_t('SL Rework','Rework')+'</div>';
     h+='<input type="number" min="0" class="pd-qty-input" id="pd-rework-'+idx+'" value="'+(rework||'')+'" data-field="qty_rework" data-idx="'+idx+'"></div>';
     h+='</div>';
 
@@ -486,7 +486,7 @@ function _renderMyTasks(){
 
     /* NG detail (expandable) */
     h+='<div class="pd-ng-detail'+(state.expandedNG[idx]?' open':'')+'" id="pd-ng-detail-'+idx+'">';
-    h+='<div style="font-weight:700;margin-bottom:8px;font-size:.88rem">'+_t('Phan loai NG','NG Breakdown')+'</div>';
+    h+='<div style="font-weight:var(--font-display-weight,700);margin-bottom:var(--space-2,8px);font-size:var(--text-sm,.88rem)">'+_t('Phan loai NG','NG Breakdown')+'</div>';
     h+='<div class="pd-ng-grid">';
     DEFECT_TYPES.forEach(function(dt){
       var v=(task.ng_breakdown&&task.ng_breakdown[dt.key])||'';
@@ -494,7 +494,7 @@ function _renderMyTasks(){
       h+='<input type="number" min="0" value="'+v+'" data-ng-type="'+dt.key+'" data-idx="'+idx+'"></div>';
     });
     h+='</div>';
-    h+='<div style="margin-top:8px;font-size:.78rem;color:var(--text-secondary,#64748b)">'+_t('Tong NG phai bang SL NG o tren','Total must equal NG quantity above')+'</div>';
+    h+='<div style="margin-top:var(--space-2,8px);font-size:var(--text-sm,.78rem);color:var(--text-secondary,#64748b)">'+_t('Tong NG phai bang SL NG o tren','Total must equal NG quantity above')+'</div>';
     h+='</div>';
     h+='</div>';
   });
@@ -515,7 +515,7 @@ function _currentShift(){
 function _renderSummary(){
   var h='';
   h+='<div class="pd-controls">';
-  h+='<label style="font-size:.82rem;font-weight:600">'+_t('Ngày','Date')+'</label>';
+  h+='<label style="font-size:var(--text-sm,.82rem);font-weight:var(--font-heading-weight,600)">'+_t('Ngày','Date')+'</label>';
   h+='<input type="date" id="pd-summary-date" value="'+_today()+'">';
   h+='<button class="pd-btn pd-btn-primary" data-action="refresh-summary">'+_t('Làm mới','Refresh')+'</button>';
   h+='</div>';
@@ -536,7 +536,7 @@ function _renderSummary(){
   h+='</div>';
 
   /* per-machine table */
-  h+='<h3 style="margin:16px 0 10px;font-size:1rem">'+_t('Theo máy','Per Machine')+'</h3>';
+  h+='<h3 style="margin:var(--space-4,16px) 0 var(--space-3,10px);font-size:var(--text-base,1rem)">'+_t('Theo máy','Per Machine')+'</h3>';
   var mach=d.by_machine||[];
   if(!mach.length){
     h+='<div class="pd-empty">'+_t('Không có dữ liệu','No data')+'</div>';
@@ -552,18 +552,18 @@ function _renderSummary(){
       h+='<td>'+_esc(r.wo_number)+'</td>';
       h+='<td>'+_esc(r.part_number)+'</td>';
       h+='<td>'+_esc(r.target_qty)+'</td>';
-      h+='<td style="color:#16a34a;font-weight:700">'+_esc(r.qty_good||0)+'</td>';
-      h+='<td style="color:#ef4444;font-weight:700">'+_esc(r.qty_ng||0)+'</td>';
-      h+='<td style="color:#f59e0b;font-weight:700">'+_esc(r.qty_rework||0)+'</td>';
+      h+='<td style="color:var(--green-light,#16a34a);font-weight:var(--font-display-weight,700)">'+_esc(r.qty_good||0)+'</td>';
+      h+='<td style="color:var(--red-light,#ef4444);font-weight:var(--font-display-weight,700)">'+_esc(r.qty_ng||0)+'</td>';
+      h+='<td style="color:var(--amber-light,#f59e0b);font-weight:var(--font-display-weight,700)">'+_esc(r.qty_rework||0)+'</td>';
       h+='<td style="color:'+_achieveColor(pct)+';font-weight:700">'+_fmtNum(pct,1)+'%'+(pct>=100?' \uD83C\uDF89':'')+'</td>';
-      h+='<td style="color:'+(ngPct>5?'#ef4444':'inherit')+'">'+_fmtNum(ngPct,1)+'%</td>';
+      h+='<td style="color:'+(ngPct>5?'var(--red-light,#ef4444)':'inherit')+'">'+_fmtNum(ngPct,1)+'%</td>';
       h+='</tr>';
     });
     h+='</tbody></table>';
   }
 
   /* per-operator table */
-  h+='<h3 style="margin:16px 0 10px;font-size:1rem">'+_t('Theo người vận hành','Per Operator')+'</h3>';
+  h+='<h3 style="margin:var(--space-4,16px) 0 var(--space-3,10px);font-size:var(--text-base,1rem)">'+_t('Theo người vận hành','Per Operator')+'</h3>';
   var ops=d.by_operator||[];
   if(!ops.length){
     h+='<div class="pd-empty">'+_t('Không có dữ liệu','No data')+'</div>';
@@ -579,8 +579,8 @@ function _renderSummary(){
       h+='<td><span class="pd-shift-badge" style="background:'+shInfo.color+'">'+_t(shInfo.vi,shInfo.en)+'</span></td>';
       h+='<td>'+_esc(r.machine_name)+'</td>';
       h+='<td>'+_esc(r.target_qty)+'</td>';
-      h+='<td style="color:#16a34a;font-weight:700">'+_esc(r.qty_good||0)+'</td>';
-      h+='<td style="color:#ef4444;font-weight:700">'+_esc(r.qty_ng||0)+'</td>';
+      h+='<td style="color:var(--green-light,#16a34a);font-weight:var(--font-display-weight,700)">'+_esc(r.qty_good||0)+'</td>';
+      h+='<td style="color:var(--red-light,#ef4444);font-weight:var(--font-display-weight,700)">'+_esc(r.qty_ng||0)+'</td>';
       h+='<td style="color:'+_achieveColor(pct)+';font-weight:700">'+_fmtNum(pct,1)+'%</td>';
       h+='</tr>';
     });
@@ -647,7 +647,7 @@ function _renderList(){
     h+='<td>'+_esc(r.target_qty)+'</td>';
     h+='<td>'+_esc(r.qty_good||0)+'</td>';
     h+='<td style="color:'+_achieveColor(pct)+';font-weight:700">'+_fmtNum(pct,1)+'%</td>';
-    h+='<td style="color:'+(ngPct>5?'#ef4444':'inherit')+'">'+_fmtNum(ngPct,1)+'%</td>';
+    h+='<td style="color:'+(ngPct>5?'var(--red-light,#ef4444)':'inherit')+'">'+_fmtNum(ngPct,1)+'%</td>';
     h+='<td><span class="pd-status" style="background:'+sc+'">'+_esc(r.status)+'</span></td>';
     h+='</tr>';
   });
@@ -668,7 +668,7 @@ function _renderList(){
 /* ============================================================= */
 function _renderSettings(){
   var h='';
-  h+='<h3 style="margin:0 0 14px;font-size:1.1rem">'+_t('Cài đặt ca & máy','Shift & Machine Settings')+'</h3>';
+  h+='<h3 style="margin:0 0 var(--space-4,14px);font-size:var(--text-lg,1.1rem)">'+_t('Cài đặt ca & máy','Shift & Machine Settings')+'</h3>';
 
   /* shift definitions */
   h+='<div class="pd-setting-card">';
@@ -700,9 +700,9 @@ function _renderSettings(){
   /* defect types reference */
   h+='<div class="pd-setting-card">';
   h+='<h3>'+_t('Loai loi NG','NG Defect Types')+'</h3>';
-  h+='<div style="display:flex;flex-wrap:wrap;gap:8px">';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:var(--space-2,8px)">';
   DEFECT_TYPES.forEach(function(dt){
-    h+='<span style="padding:4px 12px;background:var(--bg-alt,#f1f5f9);border-radius:6px;font-size:.82rem">'+_t(dt.vi,dt.en)+'</span>';
+    h+='<span style="padding:var(--space-1,4px) var(--space-3,12px);background:var(--bg-alt,#f1f5f9);border-radius:var(--radius-md,6px);font-size:var(--text-sm,.82rem)">'+_t(dt.vi,dt.en)+'</span>';
   });
   h+='</div></div>';
   return h;

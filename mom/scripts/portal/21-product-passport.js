@@ -89,7 +89,7 @@ function _ensureStyles(){
     '.pp-kpi{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}',
     '.pp-kpi-label{font-size:.6875rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary,#64748b);font-weight:700;margin-bottom:4px}',
     '.pp-kpi-value{font-size:1.75rem;font-weight:800;letter-spacing:-.02em}',
-    '.pp-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}',
+    '.pp-filters{display:flex;gap:var(--space-3,10px);flex-wrap:wrap;margin-bottom:16px;align-items:center}',
     '.pp-filters select,.pp-filters input{height:34px;padding:0 10px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:.8125rem;background:var(--surface,#fff);color:var(--text,#0f172a)}',
     '.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}',
     '.pp-card{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:16px;cursor:pointer;transition:box-shadow .15s}',
@@ -103,7 +103,7 @@ function _ensureStyles(){
     '.pp-btn-primary{background:var(--brand,#1565c0);color:#fff}',
     '.pp-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
     '.pp-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
-    '.pp-btn-secondary:hover{background:#e2e8f0}',
+    '.pp-btn-secondary:hover{background:var(--bg-hover,#e2e8f0)}',
     '.pp-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}',
     '.pp-form label{display:block;font-size:.75rem;font-weight:600;margin-bottom:4px;color:var(--text-secondary,#64748b)}',
     '.pp-form input,.pp-form select,.pp-form textarea{width:100%;padding:8px 10px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:.8125rem}',
@@ -130,7 +130,7 @@ function _ensureStyles(){
 /* ── badge / KPI helpers ─────────────────────────────── */
 function _statusBadge(status){
   if(window.HmRegistry) return HmRegistry.badge('dpp_status', status);
-  var m=STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="pp-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _kpiCard(label, value, color){
@@ -167,9 +167,9 @@ function _renderBrowseTab(){
   state.passports.forEach(function(p){ counts[p.status]=(counts[p.status]||0)+1; });
   var html='<div class="pp-kpis">'
     +_kpiCard(_t('Tong passport','Total Passports'), state.pagination.total||state.passports.length, 'inherit')
-    +_kpiCard(_t('Hoat dong','Active'), counts.active||0, '#3b82f6')
-    +_kpiCard(_t('Da giao','Shipped'), counts.shipped||0, '#10b981')
-    +_kpiCard(_t('Thu hoi','Recalled'), counts.recalled||0, '#ef4444')
+    +_kpiCard(_t('Hoat dong','Active'), counts.active||0, 'var(--blue-light,#3b82f6)')
+    +_kpiCard(_t('Da giao','Shipped'), counts.shipped||0, 'var(--green-light,#10b981)')
+    +_kpiCard(_t('Thu hoi','Recalled'), counts.recalled||0, 'var(--red-light,#ef4444)')
   +'</div>';
 
   html+='<div class="pp-filters">';
@@ -184,12 +184,12 @@ function _renderBrowseTab(){
   html+='<div class="pp-grid">';
   state.passports.forEach(function(p){
     html+='<div class="pp-card" data-action="select-passport" data-id="'+_esc(p.id)+'">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-        +'<strong style="font-size:.875rem">'+_esc(p.passport_number)+'</strong>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2,8px)">'
+        +'<strong style="font-size:var(--text-sm,.875rem)">'+_esc(p.passport_number)+'</strong>'
         +_statusBadge(p.status)
       +'</div>'
-      +'<div style="font-size:.8125rem;margin-bottom:4px">'+_t('Part','Part')+': '+_esc(p.part_number||'-')+'</div>'
-      +'<div style="font-size:.8125rem;margin-bottom:4px">'+_t('Serial','Serial')+': '+_esc(p.serial_number||'-')+'</div>'
+      +'<div style="font-size:var(--text-sm,.8125rem);margin-bottom:var(--space-1,4px)">'+_t('Part','Part')+': '+_esc(p.part_number||'-')+'</div>'
+      +'<div style="font-size:var(--text-sm,.8125rem);margin-bottom:var(--space-1,4px)">'+_t('Serial','Serial')+': '+_esc(p.serial_number||'-')+'</div>'
       +'<div style="font-size:.75rem;color:var(--text-secondary,#64748b);display:flex;justify-content:space-between">'
         +'<span>'+_fmtDate(p.created_at)+'</span>'
         +'<span>'+_esc(p.event_count||0)+' '+_t('su kien','events')+'</span>'
@@ -206,30 +206,30 @@ function _renderDetailTab(){
   var pp=state.selectedPassport;
   if(!pp) return '<div class="pp-empty">'+_t('Chon passport tu danh sach','Select a passport from the list')+'</div>';
 
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_esc(pp.passport_number)+'</h3>'
-    +'<div style="display:flex;gap:8px">'
+    +'<div style="display:flex;gap:var(--space-2,8px)">'
       +_statusBadge(pp.status)
       +'<button class="pp-btn pp-btn-secondary" data-action="back-to-browse">'+_t('Quay lai','Back')+'</button>'
     +'</div>'
   +'</div>';
 
   /* header info + QR */
-  html+='<div class="pp-detail" style="display:grid;grid-template-columns:1fr auto;gap:20px">';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.8125rem">';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Part','Part')+':</span> '+_esc(pp.part_number||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Serial','Serial')+':</span> '+_esc(pp.serial_number||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Lot','Lot')+':</span> '+_esc(pp.lot_number||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Khach hang','Customer')+':</span> '+_esc(pp.customer_name||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">SO:</span> '+_esc(pp.so_number||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Ngay tao','Created')+':</span> '+_fmtDate(pp.created_at)+'</div>';
+  html+='<div class="pp-detail" style="display:grid;grid-template-columns:1fr auto;gap:var(--space-5,20px)">';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3,10px);font-size:.8125rem">';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Part','Part')+':</span> '+_esc(pp.part_number||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Serial','Serial')+':</span> '+_esc(pp.serial_number||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Lot','Lot')+':</span> '+_esc(pp.lot_number||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Khach hang','Customer')+':</span> '+_esc(pp.customer_name||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">SO:</span> '+_esc(pp.so_number||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Ngay tao','Created')+':</span> '+_fmtDate(pp.created_at)+'</div>';
   html+='</div>';
   html+='<div class="pp-qr">'+(pp.qr_url?'<img src="'+_esc(pp.qr_url)+'" style="width:100%;height:100%;object-fit:contain">':'QR Code<br>'+_esc(pp.passport_number))+'</div>';
   html+='</div>';
 
   /* event timeline */
   var events=pp.events||state.events||[];
-  html+='<div class="pp-detail"><h4 style="margin:0 0 8px">'+_t('Dong thoi gian','Timeline')+'</h4>';
+  html+='<div class="pp-detail"><h4 style="margin:0 0 var(--space-2,8px)">'+_t('Dong thoi gian','Timeline')+'</h4>';
   if(events.length){
     html+='<div class="pp-timeline">';
     events.forEach(function(ev){
@@ -238,16 +238,16 @@ function _renderDetailTab(){
         +'<div class="pp-timeline-icon">'+evType.icon+'</div>'
         +'<div style="display:flex;justify-content:space-between;align-items:center">'
           +'<strong>'+_esc(_t(evType.vi,evType.en))+'</strong>'
-          +'<span style="font-size:.75rem;color:var(--text-secondary,#64748b)">'+_fmtDateTime(ev.date)+'</span>'
+          +'<span style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b)">'+_fmtDateTime(ev.date)+'</span>'
         +'</div>'
-        +'<div style="font-size:.75rem;color:var(--text-secondary,#64748b);margin-top:4px">';
+        +'<div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);margin-top:var(--space-1,4px)">';
       if(ev.operator) html+=_t('Nhan vien','Operator')+': '+_esc(ev.operator)+' ';
       if(ev.machine) html+='| '+_t('May','Machine')+': '+_esc(ev.machine)+' ';
       html+='</div>';
-      if(ev.measurement_data) html+='<div style="font-size:.75rem;margin-top:4px;font-family:monospace;background:#f8fafc;padding:4px 8px;border-radius:4px">'+_esc(ev.measurement_data)+'</div>';
+      if(ev.measurement_data) html+='<div style="font-size:var(--text-xs,.75rem);margin-top:var(--space-1,4px);font-family:var(--font-mono,monospace);background:#f8fafc;padding:var(--space-1,4px) var(--space-2,8px);border-radius:var(--radius-sm,4px)">'+_esc(ev.measurement_data)+'</div>';
       if(ev.photos&&ev.photos.length){
-        html+='<div style="display:flex;gap:6px;margin-top:6px">';
-        ev.photos.forEach(function(ph){ html+='<div style="width:60px;height:60px;border-radius:6px;background:#e2e8f0;overflow:hidden">'+(ph.url?'<img src="'+_esc(ph.url)+'" style="width:100%;height:100%;object-fit:cover">':'\ud83d\udcf7')+'</div>'; });
+        html+='<div style="display:flex;gap:var(--space-2,6px);margin-top:var(--space-2,6px)">';
+        ev.photos.forEach(function(ph){ html+='<div style="width:60px;height:60px;border-radius:var(--radius-md,6px);background:var(--bg-hover,#e2e8f0);overflow:hidden">'+(ph.url?'<img src="'+_esc(ph.url)+'" style="width:100%;height:100%;object-fit:cover">':'\ud83d\udcf7')+'</div>'; });
         html+='</div>';
       }
       html+='</div>';
@@ -259,18 +259,18 @@ function _renderDetailTab(){
   /* status transitions */
   var nextStates=_nextStatuses(pp.status);
   if(nextStates.length){
-    html+='<div class="pp-detail"><h4 style="margin:0 0 8px">'+_t('Chuyen trang thai','Status Transition')+'</h4>';
-    html+='<div style="display:flex;gap:6px">';
+    html+='<div class="pp-detail"><h4 style="margin:0 0 var(--space-2,8px)">'+_t('Chuyen trang thai','Status Transition')+'</h4>';
+    html+='<div style="display:flex;gap:var(--space-2,6px)">';
     nextStates.forEach(function(ns){
-      var m=STATUS[ns]||{vi:ns,en:ns,color:'#64748b'};
-      html+='<button class="pp-btn" style="padding:6px 14px;background:'+m.color+';color:#fff" data-action="transition-passport" data-status="'+ns+'">'+_esc(_t(m.vi,m.en))+'</button>';
+      var m=STATUS[ns]||{vi:ns,en:ns,color:'var(--text-secondary,#64748b)'};
+      html+='<button class="pp-btn" style="padding:var(--space-2,6px) var(--space-4,14px);background:'+m.color+';color:var(--text-inverse,#fff)" data-action="transition-passport" data-status="'+ns+'">'+_esc(_t(m.vi,m.en))+'</button>';
     });
     html+='</div></div>';
   }
 
   /* linked documents */
   var docs=pp.documents||[];
-  html+='<div class="pp-detail"><h4 style="margin:0 0 8px">'+_t('Tai lieu lien ket','Linked Documents')+'</h4>';
+  html+='<div class="pp-detail"><h4 style="margin:0 0 var(--space-2,8px)">'+_t('Tai lieu lien ket','Linked Documents')+'</h4>';
   if(docs.length){
     html+='<div class="pp-doc-chips">';
     docs.forEach(function(doc){
@@ -278,7 +278,7 @@ function _renderDetailTab(){
       html+='<div class="pp-doc-chip" data-action="view-doc" data-id="'+_esc(doc.id)+'">'+_esc(_t(label.vi,label.en))+': '+_esc(doc.title||doc.filename)+'</div>';
     });
     html+='</div>';
-  } else { html+='<div style="font-size:.8125rem;color:#94a3b8">'+_t('Chua co tai lieu','No documents')+'</div>'; }
+  } else { html+='<div style="font-size:var(--text-sm,.8125rem);color:var(--text-secondary,#94a3b8)">'+_t('Chua co tai lieu','No documents')+'</div>'; }
   html+='</div>';
 
   return html;
@@ -286,7 +286,7 @@ function _renderDetailTab(){
 
 /* ── tab: create passport ────────────────────────────── */
 function _renderCreateTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Tao Passport moi','Create New Passport')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Tao Passport moi','Create New Passport')+'</h3>';
   html+='<div class="pp-detail">';
   html+='<div class="pp-form">';
   html+='<div><label>'+_t('Part','Part Number')+'</label><input type="text" id="pp-f-part"></div>';
@@ -297,7 +297,7 @@ function _renderCreateTab(){
   html+='<div><label>'+_t('Tham chieu JO','Job Reference')+'</label><input type="text" id="pp-f-job"></div>';
   html+='<div style="grid-column:1/-1"><label>'+_t('Ghi chu','Notes')+'</label><textarea id="pp-f-notes"></textarea></div>';
   html+='</div>';
-  html+='<div style="margin-top:14px"><button class="pp-btn pp-btn-primary" data-action="submit-passport">'+_t('Tao Passport','Create Passport')+'</button></div>';
+  html+='<div style="margin-top:var(--space-4,14px)"><button class="pp-btn pp-btn-primary" data-action="submit-passport">'+_t('Tao Passport','Create Passport')+'</button></div>';
   html+='</div>';
   return html;
 }
@@ -307,7 +307,7 @@ function _renderEventTab(){
   var pp=state.selectedPassport;
   if(!pp) return '<div class="pp-empty">'+_t('Chon passport truoc','Select a passport first')+'</div>';
 
-  var html='<h3 style="margin:0 0 16px">'+_t('Them su kien','Add Event')+' - '+_esc(pp.passport_number)+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Them su kien','Add Event')+' - '+_esc(pp.passport_number)+'</h3>';
   html+='<div class="pp-detail">';
   html+='<div class="pp-form">';
   html+='<div><label>'+_t('Loai su kien','Event Type')+'</label><select id="pp-f-event-type">';
@@ -319,14 +319,14 @@ function _renderEventTab(){
   html+='<div style="grid-column:1/-1"><label>'+_t('Du lieu do luong','Measurement Data')+'</label><textarea id="pp-f-event-measurement" placeholder="'+_t('JSON hoac text','JSON or text')+'"></textarea></div>';
   html+='<div style="grid-column:1/-1"><label>'+_t('Ghi chu','Notes')+'</label><textarea id="pp-f-event-notes"></textarea></div>';
   html+='</div>';
-  html+='<div style="margin-top:14px"><button class="pp-btn pp-btn-primary" data-action="submit-event">'+_t('Them su kien','Add Event')+'</button></div>';
+  html+='<div style="margin-top:var(--space-4,14px)"><button class="pp-btn pp-btn-primary" data-action="submit-event">'+_t('Them su kien','Add Event')+'</button></div>';
   html+='</div>';
   return html;
 }
 
 /* ── tab: trace ──────────────────────────────────────── */
 function _renderTraceTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Truy xuat nguon goc','Genealogy Trace')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Truy xuat nguon goc','Genealogy Trace')+'</h3>';
 
   html+='<div class="pp-detail">';
   html+='<div class="pp-filters" style="margin-bottom:0">';
@@ -339,7 +339,7 @@ function _renderTraceTab(){
   if(result){
     /* backward: where did material come from */
     if(result.backward&&result.backward.length){
-      html+='<div class="pp-detail"><h4 style="margin:0 0 12px">'+_t('Nguon goc (Lui)','Origin (Backward)')+'</h4>';
+      html+='<div class="pp-detail"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Nguon goc (Lui)','Origin (Backward)')+'</h4>';
       html+='<div class="pp-tree">';
       result.backward.forEach(function(node){ html+=_renderTreeNode(node, 0); });
       html+='</div></div>';
@@ -355,7 +355,7 @@ function _renderTraceTab(){
 
     /* forward: where did part go */
     if(result.forward&&result.forward.length){
-      html+='<div class="pp-detail"><h4 style="margin:0 0 12px">'+_t('Dich den (Tien)','Destination (Forward)')+'</h4>';
+      html+='<div class="pp-detail"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Dich den (Tien)','Destination (Forward)')+'</h4>';
       html+='<div class="pp-tree">';
       result.forward.forEach(function(node){ html+=_renderTreeNode(node, 0); });
       html+='</div></div>';

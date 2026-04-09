@@ -32,15 +32,15 @@ var TABS = [
 ];
 
 var SEVERITY_COLORS = {
-  info:     '#3b82f6',
-  watch:    '#f59e0b',
+  info:     'var(--blue-light,#3b82f6)',
+  watch:    'var(--amber-light,#f59e0b)',
   warning:  '#f97316',
-  critical: '#ef4444'
+  critical: 'var(--red-light,#ef4444)'
 };
 
 var SLOT_COLORS = {
-  production:  '#3b82f6',
-  setup:       '#f59e0b',
+  production:  'var(--blue-light,#3b82f6)',
+  setup:       'var(--amber-light,#f59e0b)',
   maintenance: '#9ca3af',
   idle:        '#e5e7eb'
 };
@@ -97,11 +97,11 @@ function _ensureStyles(){
       '.aq-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.6875rem;font-weight:700;color:#fff;white-space:nowrap}',
       '.aq-card{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:16px;margin-bottom:12px;transition:box-shadow .15s}',
       '.aq-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.06)}',
-      '.aq-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:6px;font-size:.8125rem;font-weight:600;cursor:pointer;transition:background .15s}',
+      '.aq-btn{display:inline-flex;align-items:center;gap:var(--space-2,6px);padding:8px 16px;border:none;border-radius:6px;font-size:.8125rem;font-weight:600;cursor:pointer;transition:background .15s}',
       '.aq-btn-primary{background:var(--brand,#1565c0);color:#fff}',
       '.aq-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
       '.aq-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
-      '.aq-btn-secondary:hover{background:#e2e8f0}',
+      '.aq-btn-secondary:hover{background:var(--bg-hover,#e2e8f0)}',
       '.aq-empty{text-align:center;padding:40px;color:var(--text-secondary,#94a3b8);font-size:.875rem}',
       '.aq-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}',
       '.aq-filters select,.aq-filters input{height:34px;padding:0 10px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:.8125rem;background:var(--surface,#fff);color:var(--text,#0f172a)}',
@@ -111,12 +111,12 @@ function _ensureStyles(){
       '.aq-table tr:hover td{background:var(--surface,#f8fafc)}',
       '.aq-spc-chart{display:flex;align-items:flex-end;gap:2px;height:80px;padding:4px 0;position:relative}',
       '.aq-spc-bar{flex:1;min-width:3px;border-radius:2px 2px 0 0;transition:height .2s}',
-      '.aq-spc-limit{position:absolute;left:0;right:0;border-top:1px dashed #ef4444;font-size:.6rem;color:#ef4444}',
-      '.aq-spc-center{position:absolute;left:0;right:0;border-top:1px solid #22c55e;font-size:.6rem;color:#22c55e}',
+      '.aq-spc-limit{position:absolute;left:0;right:0;border-top:1px dashed var(--red-light,#ef4444);font-size:.6rem;color:var(--red-light,#ef4444)}',
+      '.aq-spc-center{position:absolute;left:0;right:0;border-top:1px solid var(--green-light,#22c55e);font-size:.6rem;color:var(--green-light,#22c55e)}',
       '.aq-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}',
       '.aq-form label{display:block;font-size:.75rem;font-weight:600;margin-bottom:4px;color:var(--text-secondary,#64748b)}',
       '.aq-form input,.aq-form select,.aq-form textarea{width:100%;padding:8px 10px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:.8125rem}',
-      '.aq-toolwear-bar{height:12px;border-radius:6px;background:#e2e8f0;overflow:hidden;position:relative}',
+      '.aq-toolwear-bar{height:12px;border-radius:var(--radius-md,6px);background:var(--bg-hover,#e2e8f0);overflow:hidden;position:relative}',
       '.aq-toolwear-fill{height:100%;border-radius:6px;transition:width .3s}'
     ].join('\n');
     document.head.appendChild(s);
@@ -129,10 +129,10 @@ function _ensureStyles(){
       '.sc-gantt-label{min-width:140px;max-width:140px;padding:8px 12px;font-size:.75rem;font-weight:700;color:var(--text-secondary,#64748b);border-right:1px solid var(--border,#e2e8f0);position:sticky;left:0;background:inherit;z-index:3}',
       '.sc-gantt-row{display:flex;border-bottom:1px solid var(--border,#f1f5f9);min-height:36px;position:relative}',
       '.sc-gantt-cell{min-width:60px;border-right:1px solid var(--border,#f1f5f9);position:relative}',
-      '.sc-gantt-bar{position:absolute;top:4px;bottom:4px;border-radius:4px;cursor:pointer;font-size:.6rem;color:#fff;display:flex;align-items:center;padding:0 6px;overflow:hidden;white-space:nowrap;z-index:1}',
-      '.sc-gantt-bar.conflict{border:2px solid #ef4444}',
-      '.sc-gantt-today{position:absolute;top:0;bottom:0;width:2px;background:#ef4444;z-index:2}',
-      '.sc-gantt-today::before{content:"Today";position:absolute;top:-14px;left:-14px;font-size:.6rem;color:#ef4444;font-weight:700}',
+      '.sc-gantt-bar{position:absolute;top:4px;bottom:4px;border-radius:var(--radius-sm,4px);cursor:pointer;font-size:.6rem;color:var(--text-inverse,#fff);display:flex;align-items:center;padding:0 6px;overflow:hidden;white-space:nowrap;z-index:1}',
+      '.sc-gantt-bar.conflict{border:2px solid var(--red-light,#ef4444)}',
+      '.sc-gantt-today{position:absolute;top:0;bottom:0;width:2px;background:var(--red-light,#ef4444);z-index:2}',
+      '.sc-gantt-today::before{content:"Today";position:absolute;top:-14px;left:-14px;font-size:.6rem;color:var(--red-light,#ef4444);font-weight:700}',
       '.sc-heatmap{display:grid;gap:2px;font-size:.6875rem}',
       '.sc-heatmap-cell{padding:8px;text-align:center;border-radius:4px;font-weight:700;cursor:pointer;min-height:40px;display:flex;align-items:center;justify-content:center}',
       '.sc-heatmap-header{font-weight:700;color:var(--text-secondary,#64748b);padding:8px;text-align:center;font-size:.6875rem}',
@@ -147,7 +147,7 @@ function _ensureStyles(){
 
 /* ── badge / KPI helpers ─────────────────────────────── */
 function _sevBadge(severity){
-  var color=SEVERITY_COLORS[severity]||'#64748b';
+  var color=SEVERITY_COLORS[severity]||'var(--text-secondary,#64748b)';
   return '<span class="aq-badge" style="background:'+color+'">'+_esc(severity)+'</span>';
 }
 function _kpiCard(label, value, color, sub){
@@ -161,35 +161,35 @@ function _kpiCard(label, value, color, sub){
 function _renderPredictionsTab(){
   var k=state.kpi;
   var html='<div class="aq-kpis">'
-    +_kpiCard(_t('Du doan hoat dong','Active Predictions'), k.active_predictions||0, '#3b82f6')
-    +_kpiCard(_t('Do chinh xac','Accuracy Rate'), (k.accuracy_rate||0)+'%', '#22c55e')
-    +_kpiCard(_t('Loi da ngan','Prevented Defects'), k.prevented_defects||0, '#8b5cf6')
-    +_kpiCard(_t('Chi phi tiet kiem','Cost Saved'), '$'+_esc(k.cost_saved||0), '#10b981')
+    +_kpiCard(_t('Du doan hoat dong','Active Predictions'), k.active_predictions||0, 'var(--blue-light,#3b82f6)')
+    +_kpiCard(_t('Do chinh xac','Accuracy Rate'), (k.accuracy_rate||0)+'%', 'var(--green-light,#22c55e)')
+    +_kpiCard(_t('Loi da ngan','Prevented Defects'), k.prevented_defects||0, 'var(--purple-light,#8b5cf6)')
+    +_kpiCard(_t('Chi phi tiet kiem','Cost Saved'), '$'+_esc(k.cost_saved||0), 'var(--green-light,#10b981)')
   +'</div>';
 
   if(!state.predictions.length) return html+'<div class="aq-empty">'+_t('Khong co du doan','No active predictions')+'</div>';
 
   state.predictions.forEach(function(pred){
-    var sevColor=SEVERITY_COLORS[pred.severity]||'#64748b';
+    var sevColor=SEVERITY_COLORS[pred.severity]||'var(--text-secondary,#64748b)';
     html+='<div class="aq-card" style="border-left:4px solid '+sevColor+'">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:12px">'
-        +'<div style="display:flex;align-items:center;gap:8px">'
-          +'<span style="font-size:1.25rem">'+_esc(pred.icon||'\u26a0\ufe0f')+'</span>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3,12px)">'
+        +'<div style="display:flex;align-items:center;gap:var(--space-2,8px)">'
+          +'<span style="font-size:var(--text-lg,1.25rem)">'+_esc(pred.icon||'\u26a0\ufe0f')+'</span>'
           +'<strong>'+_esc(pred.title||pred.type||'-')+'</strong>'
         +'</div>'
-        +'<div style="display:flex;gap:6px;align-items:center">'
+        +'<div style="display:flex;gap:var(--space-2,6px);align-items:center">'
           +_sevBadge(pred.severity)
           +'<span class="aq-badge" style="background:var(--brand,#1565c0)">'+_esc(pred.confidence||0)+'%</span>'
         +'</div>'
       +'</div>'
-      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:6px">'
+      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:var(--space-2,6px)">'
         +_esc(pred.item||'-')+' | '+_esc(pred.machine||'-')+' | '+_esc(pred.operator||'-')
       +'</div>'
-      +'<div style="font-size:.8125rem;margin-top:6px">'+_esc(pred.recommendation||'-')+'</div>'
-      +'<div style="display:flex;gap:6px;margin-top:10px">'
-        +'<button class="aq-btn aq-btn-secondary" style="padding:4px 10px;font-size:.75rem" data-action="acknowledge-pred" data-id="'+_esc(pred.id)+'">'+_t('Xac nhan','Acknowledge')+'</button>'
-        +'<button class="aq-btn" style="padding:4px 10px;font-size:.75rem;background:#22c55e;color:#fff" data-action="resolve-pred" data-id="'+_esc(pred.id)+'">'+_t('Giai quyet','Resolve')+'</button>'
-        +'<button class="aq-btn" style="padding:4px 10px;font-size:.75rem;background:#94a3b8;color:#fff" data-action="false-positive" data-id="'+_esc(pred.id)+'">'+_t('Bao dong gia','False Positive')+'</button>'
+      +'<div style="font-size:.8125rem;margin-top:var(--space-2,6px)">'+_esc(pred.recommendation||'-')+'</div>'
+      +'<div style="display:flex;gap:var(--space-2,6px);margin-top:var(--space-3,10px)">'
+        +'<button class="aq-btn aq-btn-secondary" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem)" data-action="acknowledge-pred" data-id="'+_esc(pred.id)+'">'+_t('Xac nhan','Acknowledge')+'</button>'
+        +'<button class="aq-btn" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem);background:var(--green-light,#22c55e);color:var(--text-inverse,#fff)" data-action="resolve-pred" data-id="'+_esc(pred.id)+'">'+_t('Giai quyet','Resolve')+'</button>'
+        +'<button class="aq-btn" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem);background:var(--text-secondary,#94a3b8);color:var(--text-inverse,#fff)" data-action="false-positive" data-id="'+_esc(pred.id)+'">'+_t('Bao dong gia','False Positive')+'</button>'
       +'</div>'
     +'</div>';
   });
@@ -198,19 +198,19 @@ function _renderPredictionsTab(){
 
 /* ── tab: SPC anomaly monitor ────────────────────────── */
 function _renderSpcTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Giam sat SPC','SPC Anomaly Monitor')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Giam sat SPC','SPC Anomaly Monitor')+'</h3>';
 
   if(!state.spcViolations.length) return html+'<div class="aq-empty">'+_t('Khong co vi pham SPC','No SPC violations')+'</div>';
 
   state.spcViolations.forEach(function(v){
     var rule=SPC_RULES[v.rule_code]||{label:v.rule_code,severity:'info'};
-    var sevColor=SEVERITY_COLORS[rule.severity]||'#64748b';
+    var sevColor=SEVERITY_COLORS[rule.severity]||'var(--text-secondary,#64748b)';
     html+='<div class="aq-card" style="border-left:4px solid '+sevColor+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:center">'
         +'<div><strong>'+_esc(v.rule_code)+'</strong> - '+_esc(rule.label)+'</div>'
         +_sevBadge(rule.severity)
       +'</div>'
-      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:4px">'
+      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:var(--space-1,4px)">'
         +_t('Dac tinh','Characteristic')+': '+_esc(v.characteristic||'-')
         +' | '+_t('May','Machine')+': '+_esc(v.machine||'-')
         +' | '+_fmtDateTime(v.detected_at)
@@ -220,7 +220,7 @@ function _renderSpcTab(){
     var points=v.last_points||[];
     if(points.length){
       var maxVal=Math.max.apply(null, points.map(function(p){return Math.abs(p.value||0);}))||1;
-      html+='<div class="aq-spc-chart" style="margin-top:8px">';
+      html+='<div class="aq-spc-chart" style="margin-top:var(--space-2,8px)">';
       points.forEach(function(pt, idx){
         var h=Math.round(Math.abs(pt.value||0)/maxVal*70)+10;
         var barColor=pt.violation?sevColor:'var(--brand,#1565c0)';
@@ -229,7 +229,7 @@ function _renderSpcTab(){
       html+='</div>';
     }
 
-    html+='<div style="font-size:.8125rem;margin-top:6px"><strong>'+_t('Khuyen nghi','Recommendation')+':</strong> '+_esc(v.recommended_action||'-')+'</div>'
+    html+='<div style="font-size:.8125rem;margin-top:var(--space-2,6px)"><strong>'+_t('Khuyen nghi','Recommendation')+':</strong> '+_esc(v.recommended_action||'-')+'</div>'
     +'</div>';
   });
   return html;
@@ -237,26 +237,26 @@ function _renderSpcTab(){
 
 /* ── tab: tool wear predictions ──────────────────────── */
 function _renderToolWearTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Du doan hao mon dao','Tool Wear Predictions')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Du doan hao mon dao','Tool Wear Predictions')+'</h3>';
 
   if(!state.toolWear.length) return html+'<div class="aq-empty">'+_t('Khong co du lieu','No data')+'</div>';
 
   html+='<table class="aq-table"><thead><tr><th>'+_t('May','Machine')+'</th><th>'+_t('Dao','Tool')+'</th><th>'+_t('Con lai','Remaining')+'</th><th>'+_t('Do chinh xac','Accuracy')+'</th><th>'+_t('Trang thai','Status')+'</th></tr></thead><tbody>';
   state.toolWear.forEach(function(tw){
     var pct=Math.min(100,Math.max(0, (tw.remaining_min||0)/(tw.total_life_min||1)*100));
-    var color=pct<=20?'#ef4444':pct<=40?'#f59e0b':'#22c55e';
+    var color=pct<=20?'var(--red-light,#ef4444)':pct<=40?'var(--amber-light,#f59e0b)':'var(--green-light,#22c55e)';
     var alert=tw.remaining_min<30;
-    html+='<tr'+(alert?' style="background:#fef2f2"':'')+'>'
+    html+='<tr'+(alert?' style="background:var(--red-light-bg,#fef2f2)"':'')+'>'
       +'<td>'+_esc(tw.machine||'-')+'</td>'
       +'<td>'+_esc(tw.tool_name||'-')+'</td>'
       +'<td>'
-        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<div style="display:flex;align-items:center;gap:var(--space-2,8px)">'
           +'<div class="aq-toolwear-bar" style="width:120px"><div class="aq-toolwear-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'
           +'<span style="font-weight:700;color:'+color+'">'+_esc(tw.remaining_min||0)+' '+_t('phut','min')+'</span>'
         +'</div>'
       +'</td>'
       +'<td>'+_esc((tw.prediction_accuracy||0)+'%')+'</td>'
-      +'<td>'+(alert?'<span class="aq-badge" style="background:#ef4444">'+_t('Canh bao','Alert')+'</span>':'<span class="aq-badge" style="background:#22c55e">OK</span>')+'</td>'
+      +'<td>'+(alert?'<span class="aq-badge" style="background:var(--red-light,#ef4444)">'+_t('Canh bao','Alert')+'</span>':'<span class="aq-badge" style="background:var(--green-light,#22c55e)">OK</span>')+'</td>'
     +'</tr>';
   });
   html+='</tbody></table>';
@@ -265,7 +265,7 @@ function _renderToolWearTab(){
 
 /* ── tab: Gantt schedule ─────────────────────────────── */
 function _renderGanttTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Lich trinh Gantt','Gantt Schedule')+'</h3>'
     +'<div class="aq-filters" style="margin-bottom:0">'
       +'<input type="date" data-filter="gantt_start" value="'+_esc(state.dateRange.start)+'">'
@@ -289,7 +289,7 @@ function _renderGanttTab(){
   /* header */
   html+='<div class="sc-gantt-header"><div class="sc-gantt-label">'+_t('May','Machine')+'</div>';
   days.forEach(function(day){
-    html+='<div class="sc-gantt-cell" style="min-width:60px;padding:4px;text-align:center;font-size:.6875rem;font-weight:600">'
+    html+='<div class="sc-gantt-cell" style="min-width:60px;padding:var(--space-1,4px);text-align:center;font-size:.6875rem;font-weight:var(--font-heading-weight,600)">'
       +String(day.getDate()).padStart(2,'0')+'/'+String(day.getMonth()+1).padStart(2,'0')
     +'</div>';
   });
@@ -297,7 +297,7 @@ function _renderGanttTab(){
 
   /* rows */
   machines.forEach(function(m){
-    html+='<div class="sc-gantt-row"><div class="sc-gantt-label" style="font-size:.75rem;display:flex;align-items:center">'+_esc(m.machine_name||'-')+'</div>';
+    html+='<div class="sc-gantt-row"><div class="sc-gantt-label" style="font-size:var(--text-xs,.75rem);display:flex;align-items:center">'+_esc(m.machine_name||'-')+'</div>';
     days.forEach(function(){ html+='<div class="sc-gantt-cell"></div>'; });
 
     /* slots/bars */
@@ -325,18 +325,18 @@ function _renderGanttTab(){
   html+='</div>';
 
   /* legend */
-  html+='<div style="display:flex;gap:16px;margin-top:10px;font-size:.75rem">';
+  html+='<div style="display:flex;gap:var(--space-4,16px);margin-top:var(--space-3,10px);font-size:var(--text-xs,.75rem)">';
   Object.keys(SLOT_COLORS).forEach(function(k){
-    html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:14px;border-radius:3px;background:'+SLOT_COLORS[k]+'"></div>'+_esc(k)+'</div>';
+    html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);background:'+SLOT_COLORS[k]+'"></div>'+_esc(k)+'</div>';
   });
-  html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:14px;border-radius:3px;border:2px solid #ef4444"></div>'+_t('Xung dot','Conflict')+'</div>';
+  html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);border:2px solid var(--red-light,#ef4444)"></div>'+_t('Xung dot','Conflict')+'</div>';
   html+='</div>';
   return html;
 }
 
 /* ── tab: capacity heatmap ───────────────────────────── */
 function _renderHeatmapTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Ban do cong suat','Capacity Heatmap')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Ban do cong suat','Capacity Heatmap')+'</h3>';
 
   var cap=state.capacity;
   var machines=cap.machines||[];
@@ -359,8 +359,8 @@ function _renderHeatmapTab(){
       var util=(cap.utilization||{})[key];
       var pct=util!=null?util:null;
       var bg,fg;
-      if(pct===null){ bg='#f1f5f9'; fg='#94a3b8'; }
-      else if(pct<=70){ bg='#dcfce7'; fg='#166534'; }
+      if(pct===null){ bg='var(--bg-surface-alt,#f1f5f9)'; fg='var(--text-secondary,#94a3b8)'; }
+      else if(pct<=70){ bg='#dcfce7'; fg='var(--green-dark,#166534)'; }
       else if(pct<=90){ bg='#fef3c7'; fg='#92400e'; }
       else { bg='#fecaca'; fg='#991b1b'; }
       html+='<div class="sc-heatmap-cell" style="background:'+bg+';color:'+fg+'" data-action="heatmap-cell" data-machine="'+_esc(m.id)+'" data-day="'+_esc(day.date)+'">'
@@ -371,18 +371,18 @@ function _renderHeatmapTab(){
   html+='</div>';
 
   /* legend */
-  html+='<div style="display:flex;gap:16px;margin-top:12px;font-size:.75rem">';
-  html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:14px;border-radius:3px;background:#dcfce7"></div>&le;70%</div>';
-  html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:14px;border-radius:3px;background:#fef3c7"></div>70-90%</div>';
-  html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:14px;border-radius:3px;background:#fecaca"></div>&gt;90%</div>';
-  html+='<div style="display:flex;align-items:center;gap:4px"><div style="width:14px;height:14px;border-radius:3px;background:#f1f5f9"></div>'+_t('Khong co DL','No data')+'</div>';
+  html+='<div style="display:flex;gap:var(--space-4,16px);margin-top:var(--space-3,12px);font-size:var(--text-xs,.75rem)">';
+  html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);background:#dcfce7"></div>&le;70%</div>';
+  html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);background:#fef3c7"></div>70-90%</div>';
+  html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);background:#fecaca"></div>&gt;90%</div>';
+  html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);background:var(--bg-surface-alt,#f1f5f9)"></div>'+_t('Khong co DL','No data')+'</div>';
   html+='</div>';
   return html;
 }
 
 /* ── tab: promise calculator ─────────────────────────── */
 function _renderPromiseTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Tinh ngay hen giao','Promise Calculator')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Tinh ngay hen giao','Promise Calculator')+'</h3>';
 
   html+='<div class="sc-promise">';
   html+='<div class="aq-form">';
@@ -392,15 +392,15 @@ function _renderPromiseTab(){
     +(function(){ var optHtml=''; if(window.HmRegistry){ var opts=HmRegistry.statusSet('machine_type'); if(opts&&opts.length) opts.forEach(function(o){ optHtml+='<option value="'+o.value+'">'+((typeof lang!=='undefined'&&lang==='en')?(o.labelEn||o.label):o.label)+'</option>'; }); } if(!optHtml) console.warn('[AQ] Registry key "machine_type" trống — machine type dropdown sẽ bị thiếu.'); return optHtml; })()
   +'</select></div>';
   html+='</div>';
-  html+='<div style="margin-top:12px"><button class="aq-btn aq-btn-primary" data-action="calculate-promise">'+_t('Tinh toan','Calculate')+'</button></div>';
+  html+='<div style="margin-top:var(--space-3,12px)"><button class="aq-btn aq-btn-primary" data-action="calculate-promise">'+_t('Tinh toan','Calculate')+'</button></div>';
 
   var result=state.promiseResult;
   if(result){
-    html+='<div class="sc-promise-result" style="border-left:4px solid '+(result.confidence>=80?'#22c55e':result.confidence>=50?'#f59e0b':'#ef4444')+'">';
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">';
-    html+='<div><div style="font-size:.6875rem;text-transform:uppercase;color:var(--text-secondary,#64748b);font-weight:700">'+_t('Ngay hen','Promise Date')+'</div><div style="font-size:1.25rem;font-weight:800">'+_fmtDate(result.promise_date)+'</div></div>';
-    html+='<div><div style="font-size:.6875rem;text-transform:uppercase;color:var(--text-secondary,#64748b);font-weight:700">'+_t('May','Machine')+'</div><div style="font-size:1.25rem;font-weight:800">'+_esc(result.machine_name||'-')+'</div></div>';
-    html+='<div><div style="font-size:.6875rem;text-transform:uppercase;color:var(--text-secondary,#64748b);font-weight:700">'+_t('Do tin cay','Confidence')+'</div><div style="font-size:1.25rem;font-weight:800;color:'+(result.confidence>=80?'#22c55e':'#f59e0b')+'">'+_esc(result.confidence||0)+'%</div></div>';
+    html+='<div class="sc-promise-result" style="border-left:var(--space-1,4px) solid '+(result.confidence>=80?'var(--green-light,#22c55e)':result.confidence>=50?'var(--amber-light,#f59e0b)':'var(--red-light,#ef4444)')+'">';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-3,12px)">';
+    html+='<div><div style="font-size:.6875rem;text-transform:uppercase;color:var(--text-secondary,#64748b);font-weight:700">'+_t('Ngay hen','Promise Date')+'</div><div style="font-size:1.25rem;font-weight:var(--font-display-weight,800)">'+_fmtDate(result.promise_date)+'</div></div>';
+    html+='<div><div style="font-size:.6875rem;text-transform:uppercase;color:var(--text-secondary,#64748b);font-weight:700">'+_t('May','Machine')+'</div><div style="font-size:1.25rem;font-weight:var(--font-display-weight,800)">'+_esc(result.machine_name||'-')+'</div></div>';
+    html+='<div><div style="font-size:.6875rem;text-transform:uppercase;color:var(--text-secondary,#64748b);font-weight:700">'+_t('Do tin cay','Confidence')+'</div><div style="font-size:1.25rem;font-weight:800;color:'+(result.confidence>=80?'var(--green-light,#22c55e)':'var(--amber-light,#f59e0b)')+'">'+_esc(result.confidence||0)+'%</div></div>';
     html+='</div>';
 
     /* mini timeline */
@@ -408,17 +408,17 @@ function _renderPromiseTab(){
       html+='<div class="sc-promise-timeline">';
       (result.timeline||[]).forEach(function(slot){
         var color=SLOT_COLORS[slot.type]||'#e5e7eb';
-        html+='<div class="sc-promise-slot" style="background:'+color+';color:#fff">'+_esc(slot.label||slot.type)+'</div>';
+        html+='<div class="sc-promise-slot" style="background:'+color+';color:var(--text-inverse,#fff)">'+_esc(slot.label||slot.type)+'</div>';
         html+='<div style="font-size:.75rem;color:var(--text-secondary,#94a3b8)">\u2192</div>';
       });
-      html+='<div class="sc-promise-slot" style="background:#22c55e;color:#fff">'+_t('Xong','Done')+'</div>';
+      html+='<div class="sc-promise-slot" style="background:var(--green-light,#22c55e);color:var(--text-inverse,#fff)">'+_t('Xong','Done')+'</div>';
       html+='</div>';
     }
 
     /* alternatives */
     var alts=result.alternatives||[];
     if(alts.length){
-      html+='<h5 style="margin:14px 0 8px;font-size:.75rem;text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Lua chon thay the','Alternative Options')+'</h5>';
+      html+='<h5 style="margin:var(--space-4,14px) 0 var(--space-2,8px);font-size:var(--text-xs,.75rem);text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Lua chon thay the','Alternative Options')+'</h5>';
       html+='<table class="aq-table"><thead><tr><th>'+_t('May','Machine')+'</th><th>'+_t('Ngay','Date')+'</th><th>'+_t('Do tin cay','Confidence')+'</th></tr></thead><tbody>';
       alts.forEach(function(a){
         html+='<tr><td>'+_esc(a.machine_name||'-')+'</td><td>'+_fmtDate(a.promise_date)+'</td><td>'+_esc(a.confidence||0)+'%</td></tr>';

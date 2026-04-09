@@ -134,13 +134,13 @@ function _renderUsersTab(){
     else if(u.status==='deactivated'||u.status==='locked') deactivated++;
   });
   var html='<div class="cp-kpis">'
-    +_kpiCard(_t('Hoat dong','Active'), active, '#22c55e')
-    +_kpiCard(_t('Cho xac nhan','Pending'), pending, '#f59e0b')
-    +_kpiCard(_t('Vo hieu hoa','Deactivated'), deactivated, '#94a3b8')
+    +_kpiCard(_t('Hoat dong','Active'), active, 'var(--green-light,#22c55e)')
+    +_kpiCard(_t('Cho xac nhan','Pending'), pending, 'var(--amber-light,#f59e0b)')
+    +_kpiCard(_t('Vo hieu hoa','Deactivated'), deactivated, 'var(--text-secondary,#94a3b8)')
     +_kpiCard(_t('Tong cong','Total'), state.portalUsers.length, 'inherit')
   +'</div>';
 
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Quản lý người dùng portal','Portal User Management')+'</h3>'
     +'<button class="cp-btn cp-btn-primary" data-action="create-user">+ '+_t('Tạo người dùng','New User')+'</button>'
   +'</div>';
@@ -157,15 +157,15 @@ function _renderUsersTab(){
   html+='<table class="cp-table"><thead><tr><th>Email</th><th>'+_t('Khách hàng','Customer')+'</th><th>'+_t('Trạng thái','Status')+'</th><th>'+_t('Lần đăng nhập cuối','Last Login')+'</th><th>'+_t('Đơn hàng','Orders')+'</th><th></th></tr></thead><tbody>';
   state.portalUsers.forEach(function(u){
     html+='<tr><td>'+_esc(u.email)+'</td><td>'+_esc(u.customer_name||'-')+'</td><td>'+_userBadge(u.status)+'</td><td>'+_fmtDateTime(u.last_login)+'</td><td>'+_esc(u.order_count||0)+'</td>'
-      +'<td style="display:flex;gap:4px">'
-        +'<button class="cp-btn cp-btn-secondary" style="padding:4px 8px;font-size:.75rem" data-action="edit-user" data-id="'+_esc(u.id)+'">'+_t('Sửa','Edit')+'</button>';
+      +'<td style="display:flex;gap:var(--space-1,4px)">'
+        +'<button class="cp-btn cp-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="edit-user" data-id="'+_esc(u.id)+'">'+_t('Sửa','Edit')+'</button>';
     if(u.status==='active'){
-      html+='<button class="cp-btn cp-btn-danger" style="padding:4px 8px;font-size:.75rem" data-action="deactivate-user" data-id="'+_esc(u.id)+'">'+_t('Vô hiệu','Deactivate')+'</button>';
+      html+='<button class="cp-btn cp-btn-danger" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="deactivate-user" data-id="'+_esc(u.id)+'">'+_t('Vô hiệu','Deactivate')+'</button>';
     } else if(u.status==='deactivated'||u.status==='locked'){
-      html+='<button class="cp-btn cp-btn-success" style="padding:4px 8px;font-size:.75rem" data-action="activate-user" data-id="'+_esc(u.id)+'">'+_t('Kích hoạt','Activate')+'</button>';
+      html+='<button class="cp-btn cp-btn-success" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="activate-user" data-id="'+_esc(u.id)+'">'+_t('Kích hoạt','Activate')+'</button>';
     }
     if(u.status==='pending'){
-      html+='<button class="cp-btn" style="padding:4px 8px;font-size:.75rem;background:#3b82f6;color:#fff" data-action="resend-verify" data-id="'+_esc(u.id)+'">'+_t('Gửi lại','Resend')+'</button>';
+      html+='<button class="cp-btn" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem);background:var(--blue-light,#3b82f6);color:var(--text-inverse,#fff)" data-action="resend-verify" data-id="'+_esc(u.id)+'">'+_t('Gửi lại','Resend')+'</button>';
     }
     html+='</td></tr>';
   });
@@ -180,23 +180,23 @@ function _showUserDetail(userId){
   if(!user) return;
   var el=state.container.querySelector('#cp-user-form');
   if(!el) return;
-  var html='<div class="cp-card"><h4 style="margin:0 0 12px">'+_t('Chi tiet nguoi dung','User Detail')+' - '+_esc(user.email)+'</h4>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:.8125rem;margin-bottom:12px">';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Ten','Name')+':</span> '+_esc(user.name||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">Email:</span> '+_esc(user.email)+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Khach hang','Customer')+':</span> '+_esc(user.customer_name||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Dien thoai','Phone')+':</span> '+_esc(user.phone||'-')+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Trang thai','Status')+':</span> '+_userBadge(user.status)+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Dang nhap cuoi','Last Login')+':</span> '+_fmtDateTime(user.last_login)+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Ngay tao','Created')+':</span> '+_fmtDate(user.created_at)+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('So don hang','Orders')+':</span> '+_esc(user.order_count||0)+'</div>';
-  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:600">'+_t('Khieu nai','Complaints')+':</span> '+_esc(user.complaint_count||0)+'</div>';
+  var html='<div class="cp-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Chi tiet nguoi dung','User Detail')+' - '+_esc(user.email)+'</h4>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-3,10px);font-size:var(--text-sm,.8125rem);margin-bottom:var(--space-3,12px)">';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Ten','Name')+':</span> '+_esc(user.name||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">Email:</span> '+_esc(user.email)+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Khach hang','Customer')+':</span> '+_esc(user.customer_name||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Dien thoai','Phone')+':</span> '+_esc(user.phone||'-')+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Trang thai','Status')+':</span> '+_userBadge(user.status)+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Dang nhap cuoi','Last Login')+':</span> '+_fmtDateTime(user.last_login)+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Ngay tao','Created')+':</span> '+_fmtDate(user.created_at)+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('So don hang','Orders')+':</span> '+_esc(user.order_count||0)+'</div>';
+  html+='<div><span style="color:var(--text-secondary,#64748b);font-weight:var(--font-heading-weight,600)">'+_t('Khieu nai','Complaints')+':</span> '+_esc(user.complaint_count||0)+'</div>';
   html+='</div>';
 
   /* login history */
   var history=user.login_history||[];
   if(history.length){
-    html+='<h5 style="margin:12px 0 6px;font-size:.75rem;text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Lich su dang nhap','Login History')+'</h5>';
+    html+='<h5 style="margin:var(--space-3,12px) 0 var(--space-2,6px);font-size:var(--text-xs,.75rem);text-transform:uppercase;color:var(--text-secondary,#64748b)">'+_t('Lich su dang nhap','Login History')+'</h5>';
     html+='<table class="cp-table"><thead><tr><th>'+_t('Thoi gian','Time')+'</th><th>IP</th><th>'+_t('Thiet bi','Device')+'</th></tr></thead><tbody>';
     history.slice(0,10).forEach(function(h){
       html+='<tr><td>'+_fmtDateTime(h.timestamp)+'</td><td>'+_esc(h.ip||'-')+'</td><td>'+_esc(h.device||'-')+'</td></tr>';
@@ -204,38 +204,38 @@ function _showUserDetail(userId){
     html+='</tbody></table>';
   }
 
-  html+='<div style="margin-top:12px"><button class="cp-btn cp-btn-secondary" data-action="cancel-form">'+_t('Dong','Close')+'</button></div>';
+  html+='<div style="margin-top:var(--space-3,12px)"><button class="cp-btn cp-btn-secondary" data-action="cancel-form">'+_t('Dong','Close')+'</button></div>';
   html+='</div>';
   el.innerHTML=html;
 }
 
 /* ── tab: access management ──────────────────────────── */
 function _renderAccessTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Quản lý quyền truy cập SO','SO Access Management')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Quản lý quyền truy cập SO','SO Access Management')+'</h3>';
 
   if(!state.orderViews.length) return html+'<div class="cp-empty">'+_t('Chưa có cấp quyền','No access grants')+'</div>';
 
   html+='<div class="cp-access-grid">';
   state.orderViews.forEach(function(grant){
     html+='<div class="cp-card">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2,8px)">'
         +'<strong>'+_esc(grant.user_email)+'</strong>'
         +_userBadge(grant.user_status||'active')
       +'</div>'
-      +'<div style="font-size:.75rem;color:var(--text-secondary,#64748b);margin-bottom:10px">'+_esc(grant.customer_name||'-')+'</div>';
+      +'<div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);margin-bottom:var(--space-3,10px)">'+_esc(grant.customer_name||'-')+'</div>';
 
     var orders=grant.orders||[];
     if(orders.length){
-      html+='<table class="cp-table" style="margin-bottom:8px"><thead><tr><th>SO#</th><th>'+_t('Trạng thái','Status')+'</th><th></th></tr></thead><tbody>';
+      html+='<table class="cp-table" style="margin-bottom:var(--space-2,8px)"><thead><tr><th>SO#</th><th>'+_t('Trạng thái','Status')+'</th><th></th></tr></thead><tbody>';
       orders.forEach(function(o){
         html+='<tr><td>'+_esc(o.so_number)+'</td><td>'+_esc(o.status||'-')+'</td>'
-          +'<td><button class="cp-btn cp-btn-danger" style="padding:2px 8px;font-size:.6875rem" data-action="revoke-access" data-user="'+_esc(grant.user_id)+'" data-so="'+_esc(o.so_id)+'">'+_t('Thu hồi','Revoke')+'</button></td></tr>';
+          +'<td><button class="cp-btn cp-btn-danger" style="padding:2px var(--space-2,8px);font-size:var(--text-xs,.6875rem)" data-action="revoke-access" data-user="'+_esc(grant.user_id)+'" data-so="'+_esc(o.so_id)+'">'+_t('Thu hồi','Revoke')+'</button></td></tr>';
       });
       html+='</tbody></table>';
     } else {
-      html+='<div style="font-size:.8125rem;color:#94a3b8">'+_t('Chưa cấp SO','No SO grants')+'</div>';
+      html+='<div style="font-size:var(--text-sm,.8125rem);color:var(--text-secondary,#94a3b8)">'+_t('Chưa cấp SO','No SO grants')+'</div>';
     }
-    html+='<button class="cp-btn cp-btn-primary" style="padding:4px 10px;font-size:.75rem" data-action="grant-access" data-user="'+_esc(grant.user_id)+'">+ '+_t('Cấp SO','Grant SO')+'</button>';
+    html+='<button class="cp-btn cp-btn-primary" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem)" data-action="grant-access" data-user="'+_esc(grant.user_id)+'">+ '+_t('Cấp SO','Grant SO')+'</button>';
     html+='</div>';
   });
   html+='</div>';
@@ -244,7 +244,7 @@ function _renderAccessTab(){
 
 /* ── tab: complaint inbox ────────────────────────────── */
 function _renderComplaintsTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Hộp thư khiếu nại','Complaint Inbox')+'</h3>'
   +'</div>';
 
@@ -257,22 +257,22 @@ function _renderComplaintsTab(){
 
   state.complaints.forEach(function(c){
     html+='<div class="cp-card" style="cursor:default">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:12px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3,12px)">'
         +'<div><strong>'+_esc(c.complaint_number||c.id)+'</strong> - '+_esc(c.subject||'-')+'</div>'
         +_complaintBadge(c.status)
       +'</div>'
-      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:6px">'
+      +'<div style="font-size:var(--text-sm,.8125rem);color:var(--text-secondary,#64748b);margin-top:var(--space-2,6px)">'
         +_t('Khách hàng','Customer')+': '+_esc(c.customer_name||'-')
         +' | '+_t('Ngày gửi','Submitted')+': '+_fmtDateTime(c.submitted_at)
       +'</div>'
-      +'<div style="font-size:.8125rem;margin-top:8px">'+_esc(c.description||'-')+'</div>'
-      +'<div style="display:flex;gap:6px;margin-top:10px">';
+      +'<div style="font-size:var(--text-sm,.8125rem);margin-top:var(--space-2,8px)">'+_esc(c.description||'-')+'</div>'
+      +'<div style="display:flex;gap:var(--space-2,6px);margin-top:var(--space-3,10px)">';
     if(c.status==='new'){
-      html+='<button class="cp-btn" style="padding:4px 10px;font-size:.75rem;background:#f59e0b;color:#fff" data-action="acknowledge-complaint" data-id="'+_esc(c.id)+'">'+_t('Xác nhận','Acknowledge')+'</button>';
+      html+='<button class="cp-btn" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem);background:var(--amber-light,#f59e0b);color:var(--text-inverse,#fff)" data-action="acknowledge-complaint" data-id="'+_esc(c.id)+'">'+_t('Xác nhận','Acknowledge')+'</button>';
     }
     if(c.status!=='closed'&&c.status!=='resolved'){
-      html+='<button class="cp-btn cp-btn-primary" style="padding:4px 10px;font-size:.75rem" data-action="link-8d" data-id="'+_esc(c.id)+'">'+_t('Liên kết 8D','Link to 8D')+'</button>';
-      html+='<button class="cp-btn cp-btn-success" style="padding:4px 10px;font-size:.75rem" data-action="resolve-complaint" data-id="'+_esc(c.id)+'">'+_t('Giải quyết','Resolve')+'</button>';
+      html+='<button class="cp-btn cp-btn-primary" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem)" data-action="link-8d" data-id="'+_esc(c.id)+'">'+_t('Liên kết 8D','Link to 8D')+'</button>';
+      html+='<button class="cp-btn cp-btn-success" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem)" data-action="resolve-complaint" data-id="'+_esc(c.id)+'">'+_t('Giải quyết','Resolve')+'</button>';
     }
     html+='</div></div>';
   });
@@ -282,14 +282,14 @@ function _renderComplaintsTab(){
 
 /* ── tab: document access ────────────────────────────── */
 function _renderDocumentsTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Tài liệu đã chia sẻ','Shared Documents')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Tài liệu đã chia sẻ','Shared Documents')+'</h3>';
 
   if(!state.documents.length) return html+'<div class="cp-empty">'+_t('Chưa có tài liệu','No shared documents')+'</div>';
 
   html+='<table class="cp-table"><thead><tr><th>'+_t('Tài liệu','Document')+'</th><th>'+_t('Loại','Type')+'</th><th>'+_t('Khách hàng','Customer')+'</th><th>'+_t('Chia sẻ bởi','Shared By')+'</th><th>'+_t('Ngày','Date')+'</th><th>'+_t('Tải xuống','Downloads')+'</th><th></th></tr></thead><tbody>';
   state.documents.forEach(function(doc){
     html+='<tr><td>'+_esc(doc.title||doc.filename)+'</td><td>'+_esc(doc.doc_type||'-')+'</td><td>'+_esc(doc.customer_name||'-')+'</td><td>'+_esc(doc.shared_by||'-')+'</td><td>'+_fmtDate(doc.shared_at)+'</td><td>'+_esc(doc.download_count||0)+'</td>'
-      +'<td><button class="cp-btn cp-btn-danger" style="padding:4px 8px;font-size:.75rem" data-action="revoke-doc" data-id="'+_esc(doc.id)+'">'+_t('Thu hồi','Revoke')+'</button></td></tr>';
+      +'<td><button class="cp-btn cp-btn-danger" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="revoke-doc" data-id="'+_esc(doc.id)+'">'+_t('Thu hồi','Revoke')+'</button></td></tr>';
   });
   html+='</tbody></table>';
   html+=_renderPaging();
@@ -300,16 +300,16 @@ function _renderDocumentsTab(){
 function _renderAnalyticsTab(){
   var k=state.analytics;
   var html='<div class="cp-kpis">'
-    +_kpiCard(_t('Người dùng hoạt động','Active Users'), k.active_users||0, '#22c55e')
-    +_kpiCard(_t('Đăng nhập tháng này','Logins This Month'), k.logins_this_month||0, '#3b82f6')
-    +_kpiCard(_t('Tài liệu tải xuống','Documents Downloaded'), k.docs_downloaded||0, '#8b5cf6')
-    +_kpiCard(_t('Khiếu nại gửi','Complaints Submitted'), k.complaints_submitted||0, '#f59e0b')
+    +_kpiCard(_t('Người dùng hoạt động','Active Users'), k.active_users||0, 'var(--green-light,#22c55e)')
+    +_kpiCard(_t('Đăng nhập tháng này','Logins This Month'), k.logins_this_month||0, 'var(--blue-light,#3b82f6)')
+    +_kpiCard(_t('Tài liệu tải xuống','Documents Downloaded'), k.docs_downloaded||0, 'var(--purple-light,#8b5cf6)')
+    +_kpiCard(_t('Khiếu nại gửi','Complaints Submitted'), k.complaints_submitted||0, 'var(--amber-light,#f59e0b)')
     +_kpiCard(_t('Tổng người dùng','Total Users'), k.total_users||0, 'inherit')
   +'</div>';
 
   /* recent activity */
   var activity=k.recent_activity||[];
-  html+='<div class="cp-card"><h4 style="margin:0 0 12px">'+_t('Hoạt động gần đây','Recent Activity')+'</h4>';
+  html+='<div class="cp-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Hoạt động gần đây','Recent Activity')+'</h4>';
   if(activity.length){
     html+='<table class="cp-table"><thead><tr><th>'+_t('Thời gian','Time')+'</th><th>'+_t('Người dùng','User')+'</th><th>'+_t('Hành động','Action')+'</th><th>'+_t('Chi tiết','Detail')+'</th></tr></thead><tbody>';
     activity.forEach(function(a){
@@ -322,14 +322,14 @@ function _renderAnalyticsTab(){
   /* login trend */
   var trend=k.login_trend||[];
   if(trend.length){
-    html+='<div class="cp-card"><h4 style="margin:0 0 12px">'+_t('Xu hướng đăng nhập','Login Trend')+'</h4>';
-    html+='<div style="display:flex;align-items:flex-end;gap:4px;height:120px">';
+    html+='<div class="cp-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Xu hướng đăng nhập','Login Trend')+'</h4>';
+    html+='<div style="display:flex;align-items:flex-end;gap:var(--space-1,4px);height:120px">';
     var maxVal=Math.max.apply(null, trend.map(function(t){return t.count||0;}))||1;
     trend.forEach(function(t){
       var pct=Math.round(((t.count||0)/maxVal)*100);
       html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">'
-        +'<span style="font-size:.6875rem;font-weight:700">'+_esc(t.count||0)+'</span>'
-        +'<div style="width:100%;background:var(--brand,#1565c0);border-radius:4px 4px 0 0;height:'+pct+'%"></div>'
+        +'<span style="font-size:var(--text-xs,.6875rem);font-weight:var(--font-display-weight,700)">'+_esc(t.count||0)+'</span>'
+        +'<div style="width:100%;background:var(--brand,#1565c0);border-radius:var(--radius-sm,4px) var(--radius-sm,4px) 0 0;height:'+pct+'%"></div>'
         +'<span style="font-size:.6rem;color:var(--text-secondary,#64748b)">'+_esc(t.label||'')+'</span>'
       +'</div>';
     });
@@ -354,14 +354,14 @@ function _renderPaging(){
 function _showUserForm(){
   var el=state.container.querySelector('#cp-user-form');
   if(!el) return;
-  el.innerHTML='<div class="cp-card"><h4 style="margin:0 0 12px">'+_t('Tạo người dùng portal','New Portal User')+'</h4>'
+  el.innerHTML='<div class="cp-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Tạo người dùng portal','New Portal User')+'</h4>'
     +'<div class="cp-form">'
       +'<div><label>Email</label><input type="email" id="cp-f-email"></div>'
       +'<div><label>'+_t('Tên','Name')+'</label><input type="text" id="cp-f-name"></div>'
       +'<div><label>'+_t('Khách hàng','Customer')+'</label><input type="text" id="cp-f-customer"></div>'
       +'<div><label>'+_t('Điện thoại','Phone')+'</label><input type="text" id="cp-f-phone"></div>'
     +'</div>'
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-3,12px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="cp-btn cp-btn-primary" data-action="submit-user">'+_t('Tạo & gửi xác nhận','Create & Send Verification')+'</button>'
       +'<button class="cp-btn cp-btn-secondary" data-action="cancel-form">'+_t('Huy','Cancel')+'</button>'
     +'</div></div>';

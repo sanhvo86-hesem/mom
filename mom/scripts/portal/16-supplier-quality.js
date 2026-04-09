@@ -132,8 +132,8 @@ function _ensureStyles(){
     '.sq-btn-primary{background:var(--brand,#1565c0);color:#fff}',
     '.sq-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
     '.sq-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
-    '.sq-btn-secondary:hover{background:#e2e8f0}',
-    '.sq-btn-danger{background:#ef4444;color:#fff}',
+    '.sq-btn-secondary:hover{background:var(--bg-hover,#e2e8f0)}',
+    '.sq-btn-danger{background:var(--red-light,#ef4444);color:var(--text-inverse,#fff)}',
     '.sq-card{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:18px;margin-bottom:12px}',
     '.sq-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}',
     '.sq-form label{display:block;font-size:.75rem;font-weight:600;margin-bottom:4px;color:var(--text-secondary,#64748b)}',
@@ -145,36 +145,36 @@ function _ensureStyles(){
     '.sq-paging button{padding:6px 12px;border:1px solid var(--border,#d1d5db);border-radius:6px;background:var(--surface,#fff);cursor:pointer;font-size:.8125rem}',
     '.sq-paging button:disabled{opacity:.4;cursor:default}',
     '.sq-empty{text-align:center;padding:40px;color:var(--text-secondary,#94a3b8);font-size:.875rem}',
-    '.sq-score-bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden;min-width:80px}',
+    '.sq-score-bar{height:8px;border-radius:var(--radius-sm,4px);background:var(--bg-hover,#e2e8f0);overflow:hidden;min-width:80px}',
     '.sq-score-fill{height:100%;border-radius:4px;transition:width .3s}',
     '.sq-timeline{position:relative;padding-left:28px}',
     '.sq-timeline::before{content:"";position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border,#e2e8f0)}',
     '.sq-timeline-item{position:relative;margin-bottom:16px;padding:10px 14px;background:var(--surface,#f8fafc);border-radius:8px;border:1px solid var(--border,#e2e8f0)}',
-    '.sq-timeline-item::before{content:"";position:absolute;left:-22px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--brand,#1565c0);border:2px solid #fff}'
+    '.sq-timeline-item::before{content:"";position:absolute;left:-22px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--brand,#1565c0);border:2px solid var(--text-inverse,#fff)}'
   ].join('\n');
   document.head.appendChild(s);
 }
 
 /* ── badge helpers ────────────────────────────────────── */
 function _ratingBadge(rating){
-  var m=RATING[rating]||{vi:rating,en:rating,color:'#64748b'};
+  var m=RATING[rating]||{vi:rating,en:rating,color:'var(--text-secondary,#64748b)'};
   return '<span class="sq-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _scarBadge(status){
-  var m=SCAR_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=SCAR_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="sq-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _auditBadge(status){
-  var m=AUDIT_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=AUDIT_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="sq-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _inspBadge(status){
-  var m=INSPECTION_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=INSPECTION_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="sq-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _scoreFill(score){
   var pct=Math.min(100,Math.max(0,score));
-  var color=pct>=80?'#22c55e':pct>=60?'#f59e0b':'#ef4444';
+  var color=pct>=80?'var(--green-light,#22c55e)':pct>=60?'var(--amber-light,#f59e0b)':'var(--red-light,#ef4444)';
   return '<div class="sq-score-bar"><div class="sq-score-fill" style="width:'+pct+'%;background:'+color+'"></div></div>';
 }
 
@@ -198,7 +198,7 @@ function _renderRadar(scores){
       var a=-Math.PI/2+i*angleStep;
       pts.push(Math.round(cx+r*f*Math.cos(a))+','+Math.round(cy+r*f*Math.sin(a)));
     }
-    gridLines+='<polygon points="'+pts.join(' ')+'" fill="none" stroke="#e2e8f0" stroke-width="1"/>';
+    gridLines+='<polygon points="'+pts.join(' ')+'" fill="none" stroke="var(--bg-hover,#e2e8f0)" stroke-width="1"/>';
   });
 
   var dataPts=[];
@@ -209,7 +209,7 @@ function _renderRadar(scores){
     dataPts.push(Math.round(cx+r*val*Math.cos(a))+','+Math.round(cy+r*val*Math.sin(a)));
     var lx=Math.round(cx+(r+18)*Math.cos(a));
     var ly=Math.round(cy+(r+18)*Math.sin(a));
-    labels+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#64748b">'+_esc(_t(axis.vi,axis.en))+'</text>';
+    labels+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--text-secondary,#64748b)">'+_esc(_t(axis.vi,axis.en))+'</text>';
     labels+='<text x="'+lx+'" y="'+(ly+12)+'" text-anchor="middle" font-size="9" font-weight="700" fill="#0f172a">'+((scores||{})[axis.key]||0)+'</text>';
   }
   svgPoly='<polygon points="'+dataPts.join(' ')+'" fill="rgba(21,101,192,.15)" stroke="var(--brand,#1565c0)" stroke-width="2"/>';
@@ -221,29 +221,29 @@ function _renderRadar(scores){
 function _renderDashboardTab(){
   var k=state.kpi;
   var html='<div class="sq-kpis">'
-    +_kpiCard(_t('Điểm TB','Avg Score'), (k.avg_score||0)+'%', k.avg_score>=80?'#22c55e':'#f59e0b')
-    +_kpiCard(_t('Nhà CC rủi ro','At-Risk Suppliers'), k.at_risk||0, '#ef4444')
-    +_kpiCard(_t('SCAR đang mở','Open SCARs'), k.open_scars||0, '#f59e0b')
-    +_kpiCard(_t('Tỷ lệ từ chối','Incoming Reject %'), (k.reject_rate||0)+'%', '#ef4444')
+    +_kpiCard(_t('Điểm TB','Avg Score'), (k.avg_score||0)+'%', k.avg_score>=80?'var(--green-light,#22c55e)':'var(--amber-light,#f59e0b)')
+    +_kpiCard(_t('Nhà CC rủi ro','At-Risk Suppliers'), k.at_risk||0, 'var(--red-light,#ef4444)')
+    +_kpiCard(_t('SCAR đang mở','Open SCARs'), k.open_scars||0, 'var(--amber-light,#f59e0b)')
+    +_kpiCard(_t('Tỷ lệ từ chối','Incoming Reject %'), (k.reject_rate||0)+'%', 'var(--red-light,#ef4444)')
   +'</div>';
 
   /* top / bottom suppliers */
   var top=k.top_suppliers||[];
   var bottom=k.bottom_suppliers||[];
 
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
-  html+='<div class="sq-card"><h4 style="margin:0 0 10px">'+_t('Top nhà cung cấp','Top Suppliers')+'</h4>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4,16px)">';
+  html+='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,10px)">'+_t('Top nhà cung cấp','Top Suppliers')+'</h4>';
   if(top.length){
     html+='<table class="sq-table"><thead><tr><th>'+_t('Nhà CC','Vendor')+'</th><th>'+_t('Điểm','Score')+'</th><th>'+_t('Đánh giá','Rating')+'</th></tr></thead><tbody>';
-    top.forEach(function(v){ html+='<tr><td>'+_esc(v.name)+'</td><td><div style="display:flex;align-items:center;gap:6px"><span>'+_esc(v.score)+'</span>'+_scoreFill(v.score)+'</div></td><td>'+_ratingBadge(v.rating)+'</td></tr>'; });
+    top.forEach(function(v){ html+='<tr><td>'+_esc(v.name)+'</td><td><div style="display:flex;align-items:center;gap:var(--space-2,6px)"><span>'+_esc(v.score)+'</span>'+_scoreFill(v.score)+'</div></td><td>'+_ratingBadge(v.rating)+'</td></tr>'; });
     html+='</tbody></table>';
   } else { html+='<div class="sq-empty">-</div>'; }
   html+='</div>';
 
-  html+='<div class="sq-card"><h4 style="margin:0 0 10px">'+_t('Nhà CC cần cải thiện','Needs Improvement')+'</h4>';
+  html+='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,10px)">'+_t('Nhà CC cần cải thiện','Needs Improvement')+'</h4>';
   if(bottom.length){
     html+='<table class="sq-table"><thead><tr><th>'+_t('Nhà CC','Vendor')+'</th><th>'+_t('Điểm','Score')+'</th><th>'+_t('Đánh giá','Rating')+'</th></tr></thead><tbody>';
-    bottom.forEach(function(v){ html+='<tr><td>'+_esc(v.name)+'</td><td><div style="display:flex;align-items:center;gap:6px"><span>'+_esc(v.score)+'</span>'+_scoreFill(v.score)+'</div></td><td>'+_ratingBadge(v.rating)+'</td></tr>'; });
+    bottom.forEach(function(v){ html+='<tr><td>'+_esc(v.name)+'</td><td><div style="display:flex;align-items:center;gap:var(--space-2,6px)"><span>'+_esc(v.score)+'</span>'+_scoreFill(v.score)+'</div></td><td>'+_ratingBadge(v.rating)+'</td></tr>'; });
     html+='</tbody></table>';
   } else { html+='<div class="sq-empty">-</div>'; }
   html+='</div></div>';
@@ -255,25 +255,25 @@ function _renderScorecardsTab(){
   if(state.selectedVendor){
     var v=state.scorecards.find(function(s){return s.id===state.selectedVendor;});
     if(!v) return '<div class="sq-empty">'+_t('Không tìm thấy','Not found')+'</div>';
-    var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
       +'<h3 style="margin:0">'+_esc(v.name)+' - Scorecard</h3>'
       +'<button class="sq-btn sq-btn-secondary" data-action="deselect-vendor">'+_t('Quay lại','Back')+'</button>'
     +'</div>';
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4,16px)">';
     html+='<div class="sq-card">'+_renderRadar(v.scores||{})+'</div>';
-    html+='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Chi tiết','Details')+'</h4>';
+    html+='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Chi tiết','Details')+'</h4>';
     html+='<table class="sq-table"><tbody>';
     RADAR_AXES.forEach(function(a){
       var val=(v.scores||{})[a.key]||0;
-      html+='<tr><td style="font-weight:600">'+_esc(_t(a.vi,a.en))+'</td><td><div style="display:flex;align-items:center;gap:8px"><span>'+val+'%</span>'+_scoreFill(val)+'</div></td></tr>';
+      html+='<tr><td style="font-weight:var(--font-heading-weight,600)">'+_esc(_t(a.vi,a.en))+'</td><td><div style="display:flex;align-items:center;gap:var(--space-2,8px)"><span>'+val+'%</span>'+_scoreFill(val)+'</div></td></tr>';
     });
-    html+='<tr><td style="font-weight:600">'+_t('Tổng','Overall')+'</td><td><span style="font-size:1.25rem;font-weight:800">'+(v.overall_score||0)+'%</span></td></tr>';
-    html+='<tr><td style="font-weight:600">'+_t('Đánh giá','Rating')+'</td><td>'+_ratingBadge(v.rating)+'</td></tr>';
+    html+='<tr><td style="font-weight:var(--font-heading-weight,600)">'+_t('Tổng','Overall')+'</td><td><span style="font-size:var(--text-lg,1.25rem);font-weight:var(--font-display-weight,800)">'+(v.overall_score||0)+'%</span></td></tr>';
+    html+='<tr><td style="font-weight:var(--font-heading-weight,600)">'+_t('Đánh giá','Rating')+'</td><td>'+_ratingBadge(v.rating)+'</td></tr>';
     html+='</tbody></table></div></div>';
 
     var hist=v.history||[];
     if(hist.length){
-      html+='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Lịch sử điểm','Score History')+'</h4>';
+      html+='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Lịch sử điểm','Score History')+'</h4>';
       html+='<table class="sq-table"><thead><tr><th>'+_t('Kỳ','Period')+'</th><th>'+_t('Điểm','Score')+'</th><th>'+_t('Đánh giá','Rating')+'</th></tr></thead><tbody>';
       hist.forEach(function(h){ html+='<tr><td>'+_esc(h.period)+'</td><td>'+_esc(h.score)+'%</td><td>'+_ratingBadge(h.rating)+'</td></tr>'; });
       html+='</tbody></table></div>';
@@ -290,7 +290,7 @@ function _renderScorecardsTab(){
   if(!state.scorecards.length) return html+'<div class="sq-empty">'+_t('Chưa có dữ liệu','No data')+'</div>';
   html+='<table class="sq-table"><thead><tr><th>'+_t('Nhà CC','Vendor')+'</th><th>'+_t('Điểm','Score')+'</th><th>'+_t('Đánh giá','Rating')+'</th><th>'+_t('SCAR','SCARs')+'</th><th></th></tr></thead><tbody>';
   state.scorecards.forEach(function(v){
-    html+='<tr><td>'+_esc(v.name)+'</td><td><div style="display:flex;align-items:center;gap:6px"><span>'+_esc(v.overall_score||0)+'</span>'+_scoreFill(v.overall_score||0)+'</div></td><td>'+_ratingBadge(v.rating)+'</td><td>'+_esc(v.open_scars||0)+'</td>'
+    html+='<tr><td>'+_esc(v.name)+'</td><td><div style="display:flex;align-items:center;gap:var(--space-2,6px)"><span>'+_esc(v.overall_score||0)+'</span>'+_scoreFill(v.overall_score||0)+'</div></td><td>'+_ratingBadge(v.rating)+'</td><td>'+_esc(v.open_scars||0)+'</td>'
       +'<td><button class="sq-btn sq-btn-secondary" data-action="select-vendor" data-id="'+_esc(v.id)+'">'+_t('Chi tiết','Detail')+'</button></td></tr>';
   });
   html+='</tbody></table>';
@@ -300,7 +300,7 @@ function _renderScorecardsTab(){
 
 /* ── tab: incoming ────────────────────────────────────── */
 function _renderIncomingTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Kiểm tra hàng nhận','Incoming Inspection')+'</h3>'
     +'<button class="sq-btn sq-btn-primary" data-action="create-incoming">+ '+_t('Tạo mới','New')+'</button>'
   +'</div>';
@@ -309,9 +309,9 @@ function _renderIncomingTab(){
   html+='<table class="sq-table"><thead><tr><th>ID</th><th>'+_t('Nhà CC','Vendor')+'</th><th>'+_t('Vật tư','Material')+'</th><th>'+_t('SL','Qty')+'</th><th>'+_t('Ngày','Date')+'</th><th>'+_t('Kết quả','Result')+'</th><th></th></tr></thead><tbody>';
   state.incoming.forEach(function(item){
     html+='<tr><td>'+_esc(item.id)+'</td><td>'+_esc(item.vendor_name||'-')+'</td><td>'+_esc(item.material||'-')+'</td><td>'+_esc(item.qty||'-')+'</td><td>'+_fmtDate(item.date)+'</td><td>'+_inspBadge(item.status)+'</td>'
-      +'<td style="display:flex;gap:4px">'
-        +'<button class="sq-btn sq-btn-secondary" style="padding:4px 8px;font-size:.75rem" data-action="insp-pass" data-id="'+_esc(item.id)+'">'+_t('Đạt','Pass')+'</button>'
-        +'<button class="sq-btn sq-btn-danger" style="padding:4px 8px;font-size:.75rem" data-action="insp-fail" data-id="'+_esc(item.id)+'">'+_t('Loại','Fail')+'</button>'
+      +'<td style="display:flex;gap:var(--space-1,4px)">'
+        +'<button class="sq-btn sq-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="insp-pass" data-id="'+_esc(item.id)+'">'+_t('Đạt','Pass')+'</button>'
+        +'<button class="sq-btn sq-btn-danger" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="insp-fail" data-id="'+_esc(item.id)+'">'+_t('Loại','Fail')+'</button>'
       +'</td></tr>';
   });
   html+='</tbody></table>';
@@ -321,7 +321,7 @@ function _renderIncomingTab(){
 
 /* ── tab: ASL ─────────────────────────────────────────── */
 function _renderAslTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Danh sách nhà CC đã duyệt','Approved Supplier List')+'</h3>'
     +'<button class="sq-btn sq-btn-primary" data-action="create-asl">+ '+_t('Thêm','Add')+'</button>'
   +'</div>';
@@ -330,8 +330,8 @@ function _renderAslTab(){
   html+='<table class="sq-table"><thead><tr><th>'+_t('Nhà CC','Vendor')+'</th><th>'+_t('Loại','Type')+'</th><th>'+_t('Đánh giá','Rating')+'</th><th>'+_t('Ngày duyệt','Approved Date')+'</th><th>'+_t('Hết hạn','Expiry')+'</th><th></th></tr></thead><tbody>';
   state.asl.forEach(function(item){
     html+='<tr><td>'+_esc(item.vendor_name||'-')+'</td><td>'+_esc(item.type||'-')+'</td><td>'+_ratingBadge(item.rating)+'</td><td>'+_fmtDate(item.approved_date)+'</td><td>'+_fmtDate(item.expiry_date)+'</td>'
-      +'<td><button class="sq-btn sq-btn-secondary" style="padding:4px 8px;font-size:.75rem" data-action="edit-asl" data-id="'+_esc(item.id)+'">'+_t('Sửa','Edit')+'</button>'
-      +' <button class="sq-btn" style="padding:4px 8px;font-size:.75rem;background:#f59e0b;color:#fff" data-action="suspend-asl" data-id="'+_esc(item.id)+'">'+_t('Đình chỉ','Suspend')+'</button></td></tr>';
+      +'<td><button class="sq-btn sq-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="edit-asl" data-id="'+_esc(item.id)+'">'+_t('Sửa','Edit')+'</button>'
+      +' <button class="sq-btn" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem);background:var(--amber-light,#f59e0b);color:var(--text-inverse,#fff)" data-action="suspend-asl" data-id="'+_esc(item.id)+'">'+_t('Đình chỉ','Suspend')+'</button></td></tr>';
   });
   html+='</tbody></table>';
   return html;
@@ -339,7 +339,7 @@ function _renderAslTab(){
 
 /* ── tab: SCAR ────────────────────────────────────────── */
 function _renderScarTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Quản lý SCAR','SCAR Management')+'</h3>'
     +'<button class="sq-btn sq-btn-primary" data-action="create-scar">+ '+_t('Tạo SCAR','New SCAR')+'</button>'
   +'</div>';
@@ -353,15 +353,15 @@ function _renderScarTab(){
   state.scar.forEach(function(item){
     var nextStates=_scarNextStates(item.status);
     html+='<div class="sq-card">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:12px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3,12px)">'
         +'<div><strong>'+_esc(item.id)+'</strong> - '+_esc(item.vendor_name||'-')+'</div>'
         +_scarBadge(item.status)
       +'</div>'
-      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:6px">'+_esc(item.description||'-')+'</div>'
+      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:var(--space-2,6px)">'+_esc(item.description||'-')+'</div>'
       +'<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">';
     nextStates.forEach(function(ns){
-      var m=SCAR_STATUS[ns]||{vi:ns,en:ns,color:'#64748b'};
-      html+='<button class="sq-btn" style="padding:4px 10px;font-size:.75rem;background:'+m.color+';color:#fff" data-action="scar-transition" data-id="'+_esc(item.id)+'" data-status="'+ns+'">'+_esc(_t(m.vi,m.en))+'</button>';
+      var m=SCAR_STATUS[ns]||{vi:ns,en:ns,color:'var(--text-secondary,#64748b)'};
+      html+='<button class="sq-btn" style="padding:var(--space-1,4px) var(--space-3,10px);font-size:var(--text-xs,.75rem);background:'+m.color+';color:var(--text-inverse,#fff)" data-action="scar-transition" data-id="'+_esc(item.id)+'" data-status="'+ns+'">'+_esc(_t(m.vi,m.en))+'</button>';
     });
     html+='</div></div>';
   });
@@ -376,7 +376,7 @@ function _scarNextStates(current){
 
 /* ── tab: audits ──────────────────────────────────────── */
 function _renderAuditsTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Lịch đánh giá nhà CC','Supplier Audit Schedule')+'</h3>'
     +'<button class="sq-btn sq-btn-primary" data-action="create-audit">+ '+_t('Tạo mới','New Audit')+'</button>'
   +'</div>';
@@ -385,7 +385,7 @@ function _renderAuditsTab(){
   html+='<table class="sq-table"><thead><tr><th>ID</th><th>'+_t('Nhà CC','Vendor')+'</th><th>'+_t('Loại','Type')+'</th><th>'+_t('Ngày','Date')+'</th><th>'+_t('Trạng thái','Status')+'</th><th>'+_t('Điểm','Score')+'</th><th></th></tr></thead><tbody>';
   state.audits.forEach(function(item){
     html+='<tr><td>'+_esc(item.id)+'</td><td>'+_esc(item.vendor_name||'-')+'</td><td>'+_esc(item.audit_type||'-')+'</td><td>'+_fmtDate(item.audit_date)+'</td><td>'+_auditBadge(item.status)+'</td><td>'+_esc(item.score||'-')+'</td>'
-      +'<td><button class="sq-btn sq-btn-secondary" style="padding:4px 8px;font-size:.75rem" data-action="edit-audit" data-id="'+_esc(item.id)+'">'+_t('Sửa','Edit')+'</button></td></tr>';
+      +'<td><button class="sq-btn sq-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="edit-audit" data-id="'+_esc(item.id)+'">'+_t('Sửa','Edit')+'</button></td></tr>';
   });
   html+='</tbody></table>';
   return html;
@@ -407,7 +407,7 @@ function _renderPaging(){
 function _showIncomingForm(){
   var el=state.container.querySelector('#sq-incoming-form');
   if(!el) return;
-  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Kiểm tra hàng nhận mới','New Incoming Inspection')+'</h4>'
+  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Kiểm tra hàng nhận mới','New Incoming Inspection')+'</h4>'
     +'<div class="sq-form">'
       +'<div><label>'+_t('Nhà CC','Vendor')+'</label><input type="text" id="sq-f-vendor"></div>'
       +'<div><label>'+_t('Vật tư','Material')+'</label><input type="text" id="sq-f-material"></div>'
@@ -415,7 +415,7 @@ function _showIncomingForm(){
       +'<div><label>'+_t('Ngày','Date')+'</label><input type="date" id="sq-f-date"></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Ghi chú','Notes')+'</label><textarea id="sq-f-notes"></textarea></div>'
     +'</div>'
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-3,12px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="sq-btn sq-btn-primary" data-action="submit-incoming">'+_t('Lưu','Save')+'</button>'
       +'<button class="sq-btn sq-btn-secondary" data-action="cancel-form">'+_t('Hủy','Cancel')+'</button>'
     +'</div></div>';
@@ -424,13 +424,13 @@ function _showIncomingForm(){
 function _showScarForm(){
   var el=state.container.querySelector('#sq-scar-form');
   if(!el) return;
-  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Tạo SCAR mới','New SCAR')+'</h4>'
+  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Tạo SCAR mới','New SCAR')+'</h4>'
     +'<div class="sq-form">'
       +'<div><label>'+_t('Nhà CC','Vendor')+'</label><input type="text" id="sq-f-scar-vendor"></div>'
       +'<div><label>'+_t('Loại NC','NC Type')+'</label><select id="sq-f-scar-type">' + _buildRegistryOptions('scar_nc_type') + '</select></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Mô tả','Description')+'</label><textarea id="sq-f-scar-desc"></textarea></div>'
     +'</div>'
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-3,12px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="sq-btn sq-btn-primary" data-action="submit-scar">'+_t('Lưu','Save')+'</button>'
       +'<button class="sq-btn sq-btn-secondary" data-action="cancel-form">'+_t('Hủy','Cancel')+'</button>'
     +'</div></div>';
@@ -439,21 +439,21 @@ function _showScarForm(){
 function _showAslForm(){
   var el=state.container.querySelector('#sq-asl-form');
   if(!el) return;
-  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Thêm nhà CC vào ASL','Add Vendor to ASL')+'</h4>'
+  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Thêm nhà CC vào ASL','Add Vendor to ASL')+'</h4>'
     +'<div class="sq-form">'
       +'<div><label>'+_t('Nhà CC','Vendor')+'</label><input type="text" id="sq-f-asl-vendor"></div>'
       +'<div><label>'+_t('Loại','Type')+'</label><input type="text" id="sq-f-asl-type"></div>'
       +'<div><label>'+_t('Đánh giá','Rating')+'</label><select id="sq-f-asl-rating">';
   Object.keys(RATING).forEach(function(k){var m=RATING[k]; el.innerHTML; }); // build inline
   var opts=''; Object.keys(RATING).forEach(function(k){var m=RATING[k]; opts+='<option value="'+k+'">'+_t(m.vi,m.en)+'</option>';});
-  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Thêm nhà CC vào ASL','Add Vendor to ASL')+'</h4>'
+  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Thêm nhà CC vào ASL','Add Vendor to ASL')+'</h4>'
     +'<div class="sq-form">'
       +'<div><label>'+_t('Nhà CC','Vendor')+'</label><input type="text" id="sq-f-asl-vendor"></div>'
       +'<div><label>'+_t('Loại','Type')+'</label><input type="text" id="sq-f-asl-type"></div>'
       +'<div><label>'+_t('Đánh giá','Rating')+'</label><select id="sq-f-asl-rating">'+opts+'</select></div>'
       +'<div><label>'+_t('Ngày hết hạn','Expiry')+'</label><input type="date" id="sq-f-asl-expiry"></div>'
     +'</div>'
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-3,12px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="sq-btn sq-btn-primary" data-action="submit-asl">'+_t('Lưu','Save')+'</button>'
       +'<button class="sq-btn sq-btn-secondary" data-action="cancel-form">'+_t('Hủy','Cancel')+'</button>'
     +'</div></div>';
@@ -462,7 +462,7 @@ function _showAslForm(){
 function _showAuditForm(){
   var el=state.container.querySelector('#sq-audit-form');
   if(!el) return;
-  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Tạo audit mới','New Audit')+'</h4>'
+  el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 var(--space-3,12px)">'+_t('Tạo audit mới','New Audit')+'</h4>'
     +'<div class="sq-form">'
       +'<div><label>'+_t('Nhà CC','Vendor')+'</label><input type="text" id="sq-f-aud-vendor"></div>'
       +'<div><label>'+_t('Loại','Type')+'</label><select id="sq-f-aud-type">' + _buildRegistryOptions('supplier_audit_type') + '</select></div>'
@@ -470,7 +470,7 @@ function _showAuditForm(){
       +'<div><label>'+_t('Người đánh giá','Auditor')+'</label><input type="text" id="sq-f-aud-auditor"></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Ghi chú','Notes')+'</label><textarea id="sq-f-aud-notes"></textarea></div>'
     +'</div>'
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<div style="margin-top:var(--space-3,12px);display:flex;gap:var(--space-2,8px)">'
       +'<button class="sq-btn sq-btn-primary" data-action="submit-audit">'+_t('Lưu','Save')+'</button>'
       +'<button class="sq-btn sq-btn-secondary" data-action="cancel-form">'+_t('Hủy','Cancel')+'</button>'
     +'</div></div>';
