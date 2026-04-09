@@ -125,7 +125,35 @@ register_shutdown_function(function () {
 
 set_exception_handler(function (Throwable $e) {
   @error_log('[API] Uncaught: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-  api_json(['ok' => false, 'error' => 'server_error'], 500);
+  // ExitException is the MVC router's structured response mechanism.
+  // When it escapes (e.g. from within the Router's emitResponse path or from
+  // within this very handler), emit its payload directly rather than calling
+  // api_json(), which would re-throw ExitException when API_THROW_RESPONSES
+  // is true (test mode), causing a fatal "Uncaught ExitException" loop.
+  if ($e instanceof \MOM\Api\Controllers\ExitException) {
+    if (!headers_sent()) {
+      http_response_code($e->getStatusCode());
+      foreach ($e->getHeaders() as $name => $value) {
+        header($name . ': ' . $value);
+      }
+    }
+    $body = $e->getBody();
+    if ($body !== '') {
+      echo $body;
+    }
+    exit;
+  }
+  // For all other uncaught exceptions, send a plain server_error JSON response.
+  // Use echo+exit directly here to avoid the ExitException re-throw loop that
+  // would occur if api_json() is called while API_THROW_RESPONSES is true.
+  if (!headers_sent()) {
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('X-Content-Type-Options: nosniff');
+  }
+  echo json_encode(['ok' => false, 'error' => 'server_error', 'server_time' => gmdate('c')], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  exit;
 });
 
 set_error_handler(function (int $severity, string $message, string $file, int $line) {
@@ -229,7 +257,7 @@ function migrate_role(string $role): string {
 }
 
 function admin_roles(): array {
-  return ['it_admin', 'ceo', 'qa_manager',
+  return ['admin', 'it_admin', 'ceo', 'qa_manager',
           // Legacy names (pre-v10)
           'general_director', 'qms_supervisor', 'doc_controller'];
 }
@@ -405,6 +433,139 @@ function scan_classify_doc_cat(string $topCat, ?string $subName, string $fn): st
     return scan_cat_from_subfolder((string)$subName) ?? scan_cat_from_filename($fn) ?? $topCat;
   }
   return $topCat !== '' ? $topCat : (scan_cat_from_filename($fn) ?? 'SOP');
+}
+
+function portal_doc_legacy_to_canonical_prefix_map(): array {
+  static $map = [
+    '10-Training-Academy/01-Competency-System/' => 'mom/docs/training/competency/',
+    '10-Training-Academy/02-Training-Content/' => 'mom/docs/training/content/',
+    '10-Training-Academy/03-System-Operations/' => 'mom/docs/training/system-ops/',
+    '10-Training-Academy/04-Templates/' => 'mom/docs/training/templates/',
+    '02-Tai-Lieu-He-Thong/01-Quality-Manual/' => 'mom/docs/system/quality-manual/',
+    '02-Tai-Lieu-He-Thong/02-Policies-Objectives/' => 'mom/docs/system/policies/',
+    '02-Tai-Lieu-He-Thong/03-Organization/' => 'mom/docs/system/organization/',
+    '03-Tai-Lieu-Van-Hanh/01-SOPs/' => 'mom/docs/operations/sops/',
+    '03-Tai-Lieu-Van-Hanh/02-Work-Instructions/' => 'mom/docs/operations/work-instructions/',
+    '03-Tai-Lieu-Van-Hanh/03-Reference/' => 'mom/docs/operations/references/',
+    '04-Bieu-Mau/' => 'mom/docs/forms/',
+    '10-Training-Academy/' => 'mom/docs/training/',
+    '01-QMS-Portal/' => 'mom/',
+  ];
+  return $map;
+}
+
+function portal_doc_canonical_to_legacy_prefix_map(): array {
+  static $map = [
+    'mom/docs/training/competency/' => '10-Training-Academy/01-Competency-System/',
+    'mom/docs/training/content/' => '10-Training-Academy/02-Training-Content/',
+    'mom/docs/training/system-ops/' => '10-Training-Academy/03-System-Operations/',
+    'mom/docs/training/templates/' => '10-Training-Academy/04-Templates/',
+    'mom/docs/system/quality-manual/' => '02-Tai-Lieu-He-Thong/01-Quality-Manual/',
+    'mom/docs/system/policies/' => '02-Tai-Lieu-He-Thong/02-Policies-Objectives/',
+    'mom/docs/system/organization/' => '02-Tai-Lieu-He-Thong/03-Organization/',
+    'mom/docs/operations/sops/' => '03-Tai-Lieu-Van-Hanh/01-SOPs/',
+    'mom/docs/operations/work-instructions/' => '03-Tai-Lieu-Van-Hanh/02-Work-Instructions/',
+    'mom/docs/operations/references/' => '03-Tai-Lieu-Van-Hanh/03-Reference/',
+    'mom/docs/forms/' => '04-Bieu-Mau/',
+    'mom/docs/training/' => '10-Training-Academy/',
+    'mom/' => '01-QMS-Portal/',
+  ];
+  return $map;
+}
+
+function portal_apply_prefix_map(string $path, array $map): string {
+  $normalized = ltrim(str_replace('\\', '/', trim($path)), '/');
+  foreach ($map as $from => $to) {
+    $from = ltrim((string)$from, '/');
+    $to = ltrim((string)$to, '/');
+    $fromTrimmed = rtrim($from, '/');
+    $toTrimmed = rtrim($to, '/');
+    if ($normalized === $fromTrimmed) return $toTrimmed;
+    if (str_starts_with($normalized, $from)) return $to . substr($normalized, strlen($from));
+  }
+  return $normalized;
+}
+
+function portal_map_legacy_doc_path_to_canonical(string $path): string {
+  return portal_apply_prefix_map($path, portal_doc_legacy_to_canonical_prefix_map());
+}
+
+function portal_map_canonical_doc_path_to_legacy(string $path): string {
+  return portal_apply_prefix_map($path, portal_doc_canonical_to_legacy_prefix_map());
+}
+
+function portal_normalize_rel_like_path(string $path): string {
+  $path = str_replace('\\', '/', trim($path));
+  $absolute = str_starts_with($path, '/');
+  $parts = explode('/', $path);
+  $stack = [];
+  foreach ($parts as $part) {
+    $part = trim($part);
+    if ($part === '' || $part === '.') continue;
+    if ($part === '..') {
+      if (!empty($stack)) array_pop($stack);
+      continue;
+    }
+    $stack[] = $part;
+  }
+  $normalized = implode('/', $stack);
+  if ($absolute) return '/' . $normalized;
+  return $normalized;
+}
+
+function portal_resolve_relative_doc_path(string $baseDir, string $path): string {
+  $baseDir = trim(str_replace('\\', '/', $baseDir), '/');
+  $path = str_replace('\\', '/', trim($path));
+  if ($path === '') return $baseDir;
+  if (str_starts_with($path, '/')) return ltrim(portal_normalize_rel_like_path($path), '/');
+  return portal_normalize_rel_like_path($baseDir === '' ? $path : ($baseDir . '/' . $path));
+}
+
+function portal_doc_url_is_passthrough(string $url): bool {
+  $url = trim($url);
+  if ($url === '' || $url[0] === '#') return true;
+  if (str_starts_with($url, '//')) return true;
+  return preg_match('/^[a-z][a-z0-9+.-]*:/i', $url) === 1;
+}
+
+function portal_doc_url_looks_root_relative(string $path): bool {
+  return preg_match('#^(assets/|mom/|01-QMS-Portal/|02-Tai-Lieu-He-Thong/|03-Tai-Lieu-Van-Hanh/|04-Bieu-Mau/|10-Training-Academy/)#', $path) === 1;
+}
+
+function portal_normalize_streamed_doc_url(string $docRelPath, string $url): string {
+  $url = trim($url);
+  if (portal_doc_url_is_passthrough($url)) return $url;
+
+  if (!preg_match('/^([^?#]*)([?#].*)?$/', $url, $matches)) return $url;
+  $pathPart = trim((string)($matches[1] ?? ''));
+  $suffix = (string)($matches[2] ?? '');
+  if ($pathPart === '') return $url;
+
+  if (str_starts_with($pathPart, '/')) {
+    $resolved = ltrim($pathPart, '/');
+  } elseif (portal_doc_url_looks_root_relative($pathPart)) {
+    $resolved = $pathPart;
+  } else {
+    $legacyAlias = portal_map_canonical_doc_path_to_legacy($docRelPath);
+    $resolved = portal_resolve_relative_doc_path(dirname($legacyAlias), $pathPart);
+  }
+
+  $canonical = portal_map_legacy_doc_path_to_canonical($resolved);
+  if ($canonical === '') return $url;
+  return '/' . ltrim($canonical, '/') . $suffix;
+}
+
+function portal_rewrite_streamed_html(string $html, string $docRelPath): string {
+  $rewritten = preg_replace_callback('/\b(href|src)=("|\')(.*?)\2/i', function(array $matches) use ($docRelPath): string {
+    $attr = (string)($matches[1] ?? '');
+    $quote = (string)($matches[2] ?? '"');
+    $value = (string)($matches[3] ?? '');
+    $normalized = portal_normalize_streamed_doc_url($docRelPath, html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    if ($normalized === $value) return $matches[0];
+    return $attr . '=' . $quote . htmlspecialchars($normalized, ENT_QUOTES | ENT_HTML5, 'UTF-8') . $quote;
+  }, $html);
+
+  return is_string($rewritten) ? $rewritten : $html;
 }
 
 function rrmdir(string $dir): bool {
@@ -16675,14 +16836,19 @@ if ($username === '') {
     if (!$topDirs) $topDirs = [];
     sort($topDirs);
 
-    // Inject mom/docs/ subdirectories as virtual top-level entries
-    // These map the restructured layout to the same scan pipeline
+    // Inject mom/docs/ category roots as virtual top-level entries.
+    // The MOM layout nests real categories below system/operations containers,
+    // so scanning the container roots directly would stop one level too early.
     $momDocsVirtualMap = []; // topName => [absPath, num, label, cat]
     $momDocsContainers = [
-      'mom/docs/system'     => [2, 'Tai-Lieu-He-Thong', 'SYS'],
-      'mom/docs/operations' => [3, 'Tai-Lieu-Van-Hanh', 'OPS'],
-      'mom/docs/forms'      => [4, 'Bieu-Mau', 'FRM'],
-      'mom/docs/training'   => [10, 'Training-Academy', 'TRN'],
+      'mom/docs/system/quality-manual'           => [201, 'Quality Manual', 'MAN'],
+      'mom/docs/system/policies'                 => [202, 'Policies', 'POL'],
+      'mom/docs/system/organization'             => [203, 'Organization', 'ORG'],
+      'mom/docs/operations/sops'                 => [301, 'SOPs', 'SOP'],
+      'mom/docs/operations/work-instructions'    => [302, 'Work Instructions', 'WI'],
+      'mom/docs/operations/references'           => [303, 'References', 'ANNEX'],
+      'mom/docs/forms'                           => [400, 'Bieu-Mau', 'FRM'],
+      'mom/docs/training'                        => [1000, 'Training-Academy', 'TRN'],
     ];
     foreach ($momDocsContainers as $relPath => [$vNum, $vLabel, $vCat]) {
       $vAbs = $ROOT_DIR . '/' . $relPath;
@@ -17121,6 +17287,15 @@ if ($username === '') {
       header('Content-Disposition: attachment; filename="' . rawurlencode(basename($relPath)) . '"');
     } else {
       header('Content-Disposition: inline; filename="' . rawurlencode(basename($relPath)) . '"');
+    }
+    if ($ext === 'html' && !$asAttachment) {
+      $html = @file_get_contents($absPath);
+      if ($html !== false) {
+        $html = portal_rewrite_streamed_html((string)$html, $relPath);
+        header('Content-Length: ' . (string)strlen($html));
+        echo $html;
+        exit;
+      }
     }
     $size = @filesize($absPath);
     if ($size !== false) header('Content-Length: ' . (string)$size);

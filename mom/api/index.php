@@ -26,9 +26,16 @@ $BASE_DIR = dirname(__DIR__); // mom
 $ROOT_DIR = realpath($BASE_DIR . '/..') ?: dirname($BASE_DIR);
 
 $DATA_DIR_ENV = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
-$DATA_DIR = $DATA_DIR_ENV !== ''
-    ? rtrim(str_replace('\\', '/', $DATA_DIR_ENV), '/\\')
-    : $BASE_DIR . '/data';
+
+// When api/index.php is required from api.php, $DATA_DIR is already resolved
+// using the smart legacy-detection logic in api.php (resolve_runtime_data_dir).
+// Reusing it avoids a path mismatch where QMS_DATA_DIR still points to the
+// legacy qms-data directory while the actual runtime data lives in mom/data.
+if (!isset($DATA_DIR) || $DATA_DIR === '') {
+    $DATA_DIR = $DATA_DIR_ENV !== ''
+        ? rtrim(str_replace('\\', '/', $DATA_DIR_ENV), '/\\')
+        : $BASE_DIR . '/data';
+}
 
 $LOG_FILE = $DATA_DIR . '/php_error.log';
 @ini_set('error_log', $LOG_FILE);
@@ -74,7 +81,6 @@ if (!function_exists('api_json')) {
     // The API_HELPERS_ONLY guard prevents the boot section and switch statement
     // from executing, so we can bootstrap the MVC router ourselves.
     define('API_HELPERS_ONLY', true);
-    define('API_THROW_RESPONSES', true);
     require_once $BASE_DIR . '/api.php';
 }
 
@@ -123,6 +129,7 @@ use MOM\Api\Controllers\ComplianceReportController;
 use MOM\Api\Controllers\KnowledgeController;
 use MOM\Api\Controllers\CiController;
 use MOM\Api\Controllers\EnergyController;
+use MOM\Api\Controllers\VpsController;
 use MOM\Api\Controllers\GenericCrudController;
 use MOM\Api\Controllers\ModuleSchemaController;
 use MOM\Api\Controllers\SchemaStudioController;
@@ -266,6 +273,16 @@ $router->actions([
     'spc_chart'            => [DashboardController::class, 'spcChart'],
     'spc_summary'          => [DashboardController::class, 'spcSummary'],
     'spc_alerts'           => [DashboardController::class, 'spcAlerts'],
+]);
+
+// VPS Control Tower
+$router->actions([
+    'vps_control_overview' => [VpsController::class, 'overview'],
+    'vps_control_host'     => [VpsController::class, 'host'],
+    'vps_control_action'   => [VpsController::class, 'runAction'],
+    'vps_control_asset'    => [VpsController::class, 'asset'],
+    'vps_terminal_auth'    => [VpsController::class, 'terminalAuth'],
+    'vps_observability_auth' => [VpsController::class, 'observabilityAuth'],
 ]);
 
 // Orders (SO/JO/WO)
@@ -862,6 +879,13 @@ $router->get('/api/dashboard/production', DashboardController::class, 'productio
 $router->get('/api/dashboard/supplier', DashboardController::class, 'supplier');
 $router->get('/api/dashboard/department', DashboardController::class, 'department');
 $router->get('/api/dashboard/widget', DashboardController::class, 'widget');
+
+// VPS Control Tower
+$router->get('/api/vps/overview', VpsController::class, 'overview');
+$router->get('/api/vps/host', VpsController::class, 'host');
+$router->post('/api/vps/action', VpsController::class, 'runAction');
+$router->get('/api/vps/terminal/auth', VpsController::class, 'terminalAuth');
+$router->get('/api/vps/observability/auth', VpsController::class, 'observabilityAuth');
 
 // KPI
 $router->get('/api/kpi/alerts', DashboardController::class, 'kpiAlerts');
