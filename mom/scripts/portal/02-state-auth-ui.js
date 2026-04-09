@@ -360,6 +360,43 @@ function isPortalSidebarCoreVisible(id){
   return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_core_items || []).includes(key));
 }
 
+function canAccessVpsControlTower(){
+  return !!currentUser && isAdmin();
+}
+
+function canAccessPurchasingWorkspace(){
+  if(!currentUser) return false;
+  const legacyMap = {
+    general_director:'ceo',
+    purchasing_officer:'buyer',
+    procurement_manager:'supply_chain_manager',
+    warehouse_staff:'warehouse_clerk',
+    warehouse_lead:'supply_chain_manager',
+    planning_manager:'production_planner',
+    production_manager:'cnc_workshop_manager',
+    qms_supervisor:'qms_engineer',
+    doc_controller:'qms_engineer'
+  };
+  const rawRole = String(currentUser.role || '').trim().toLowerCase();
+  const role = legacyMap[rawRole] || rawRole;
+  return [
+    'admin',
+    'it_admin',
+    'ceo',
+    'qa_manager',
+    'quality_manager',
+    'qms_engineer',
+    'quality_engineer',
+    'qc_inspector',
+    'supply_chain_manager',
+    'buyer',
+    'warehouse_clerk',
+    'tool_storekeeper',
+    'logistics_coordinator',
+    'production_planner'
+  ].includes(role);
+}
+
 function isPortalSidebarSectionVisible(id){
   const key = String(id||'').toLowerCase();
   return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_sections || []).includes(key));
@@ -1234,6 +1271,11 @@ function renderSidebar(){
       <button class="nav-item ${currentPage==='mobile-shopfloor'?'active':''}" onclick="navigateTo('mobile-shopfloor')"><span class="icon">📱</span><span>${lang==='en'?'Operator Mobile':'Công nhân di động'}</span></button>
       <button class="nav-item ${currentPage==='quoting'?'active':''}" onclick="navigateTo('quoting')"><span class="icon">💰</span><span>${lang==='en'?'Quoting':'Báo giá'}</span></button>
     </div>`;
+    if(canAccessPurchasingWorkspace()){
+      html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'SUPPLY CHAIN':'CHUỖI CUNG ỨNG'}</div>
+        <button class="nav-item ${currentPage==='purchasing'?'active':''}" onclick="navigateTo('purchasing')"><span class="icon">🧾</span><span>${lang==='en'?'Purchasing & IQC':'Mua hàng & IQC'}</span></button>
+      </div>`;
+    }
     // ── CHẤT LƯỢNG ──
     html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'QUALITY':'CHẤT LƯỢNG'}</div>
       <button class="nav-item ${['quality-exceptions','exceptions'].indexOf(currentPage)>=0?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Nonconformance':'Sự không phù hợp'}</span></button>
@@ -1439,6 +1481,20 @@ function renderModuleBuilderPage(){
 }
 
 function navigateTo(page, filter, bypassGuard){
+  if(page === 'vps-control'){
+    if(isAdmin()){
+      adminTab = 'infrastructure';
+      page = 'admin';
+      filter = undefined;
+    }else{
+      page = 'dashboard';
+      filter = undefined;
+    }
+  }
+  if(page === 'admin' && !isAdmin()){
+    page = 'dashboard';
+    filter = undefined;
+  }
   if(!bypassGuard && typeof window._ecBeforePortalNavigate === 'function'){
     try{
       if(window._ecBeforePortalNavigate({ page:page, filter:filter })) return;
@@ -1456,11 +1512,11 @@ function navigateTo(page, filter, bypassGuard){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng','schema-studio':'Schema Studio'};
+  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành','vps-control':'VPS Control Tower',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',purchasing:'Mua hàng & IQC',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   pageTitles['module-builder'] = 'Module Builder';
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành','vps-control':'VPS Control Tower',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',purchasing:lang==='en'?'Purchasing & IQC':'Mua hàng & IQC',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   titles['template-demo'] = 'Master Module Template';
   titles['module-builder'] = 'Module Builder';
   // Reset header breadcrumb for non-documents pages
@@ -1479,6 +1535,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='mes' && typeof window._renderMesControlCenter==='function'){ var mp=document.getElementById('page-mes'); if(mp) window._renderMesControlCenter(mp); }
   if(page==='exceptions' && typeof window._renderExceptionDashboard==='function'){ var xp=document.getElementById('page-exceptions'); if(xp) window._renderExceptionDashboard(xp); }
   if(page==='orders' && typeof window._renderSoJoWoDashboard==='function'){ var op=document.getElementById('page-orders'); if(op) window._renderSoJoWoDashboard(null,null,op); }
+  if(page==='purchasing' && typeof window._renderPurchasingWorkspace==='function'){ var pp=document.getElementById('page-purchasing'); if(pp) window._renderPurchasingWorkspace(pp); }
   if(page==='forms' && typeof renderOnlineForms==='function') renderOnlineForms();
   if(page==='quality-exceptions' && typeof window._renderQualityExceptionHub==='function'){ var qep=document.getElementById('page-quality-exceptions'); if(qep) window._renderQualityExceptionHub(qep); }
   if(page==='supplier-quality' && typeof window._renderSupplierQuality==='function'){ var sqp=document.getElementById('page-supplier-quality'); if(sqp) window._renderSupplierQuality(sqp); }
@@ -5339,6 +5396,16 @@ function renderAdminVersionControl(){
   el.innerHTML = renderAdminSyncPanelV2();
 }
 
+function renderAdminInfrastructure(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderVpsControlTower === 'function'){
+    window._renderVpsControlTower(el);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">' + (lang==='en' ? 'Loading VPS infrastructure module...' : 'Đang tải module hạ tầng VPS...') + '</div>';
+}
+
 function renderAdmin(){
   if(!isAdmin()){
     document.getElementById('page-admin').innerHTML='<div style="text-align:center;padding:60px;color:var(--text-3)">\u26A0 '+T('no_docs')+'</div>';
@@ -5363,6 +5430,7 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()"><span class="admin-tab-icon">🔐</span><span class="admin-tab-label">${T('admin_perms')}</span></button>
       <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}><span class="admin-tab-icon">📊</span><span class="admin-tab-label">${lang==='en'?'Activity Log':'Kiểm soát hành vi'}</span><span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()"><span class="admin-tab-icon">📄</span><span class="admin-tab-label">${T('admin_effective_docs')}</span></button>
+      <button class="admin-tab-v2 ${adminTab==='infrastructure'?'active':''}" onclick="adminTab='infrastructure';renderAdmin()"><span class="admin-tab-icon">🖥</span><span class="admin-tab-label">${lang==='en'?'VPS Infrastructure':'Hạ tầng VPS'}</span></button>
       <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()"><span class="admin-tab-icon">🔄</span><span class="admin-tab-label">${lang==='en'?'Version Control':'Điều khiển phiên bản'}</span></button>
       <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()"><span class="admin-tab-icon">🧭</span><span class="admin-tab-label">${lang==='en'?'Portal display':'Hiển thị portal'}</span></button>
       <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()"><span class="admin-tab-icon">📋</span><span class="admin-tab-label">${lang==='en'?'Retention':'Lưu giữ'}</span></button>
@@ -5383,6 +5451,7 @@ function renderAdmin(){
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
   if(adminTab==='docs') renderAdminEffectiveDocs();
+  if(adminTab==='infrastructure') renderAdminInfrastructure();
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
   if(adminTab==='data_sources') renderAdminDataSources();
   if(adminTab==='metadata_studio') renderAdminMetadataStudio();

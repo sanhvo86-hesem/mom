@@ -20,6 +20,22 @@ function _fmtDate(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTim
 function _fmtDateTime(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):_fmtDate(v)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function _fmtCurrency(v){ if(v==null) return '-'; return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(v); }
 function _pct(v){ return (v==null?0:v).toFixed(1)+'%'; }
+function _incomingOutcome(record){
+  var result = String((record && (record.result || record.status || '')) || '').toLowerCase();
+  if(['accepted','pass'].indexOf(result) >= 0) return 'accepted';
+  if(['rejected','fail'].indexOf(result) >= 0) return 'rejected';
+  if(['waived','conditional'].indexOf(result) >= 0) return result;
+  return 'pending';
+}
+function _incomingOutcomeMeta(outcome){
+  switch(String(outcome||'')){
+    case 'accepted': return { label:_t('Đạt','Accepted'), color:'var(--green,#22c55e)' };
+    case 'rejected': return { label:_t('Không đạt','Rejected'), color:'var(--red,#ef4444)' };
+    case 'waived': return { label:_t('Miễn kiểm','Waived'), color:'var(--purple,#8b5cf6)' };
+    case 'conditional': return { label:_t('Có điều kiện','Conditional'), color:'var(--amber,#f59e0b)' };
+    default: return { label:_t('Chưa kết luận','Pending'), color:'var(--slate,#94a3b8)' };
+  }
+}
 
 /* ── constants ────────────────────────────────────────── */
 var STYLE_ID = 'cr-styles';
@@ -507,15 +523,20 @@ function _renderSupplierTab(){
   html+='<div class="cr-section"><h3>'+_t('Ki\u1ec3m tra nh\u1eadp h\u00e0ng','Incoming Inspection')+' ('+incoming.length+')</h3>';
   if(incoming.length>0){
     var passCount=0,failCount=0;
-    incoming.forEach(function(i){ if(i.result==='pass'||i.status==='pass') passCount++; else failCount++; });
+    incoming.forEach(function(i){
+      var outcome=_incomingOutcome(i);
+      if(outcome==='accepted') passCount++;
+      else if(outcome==='rejected') failCount++;
+    });
     html+='<div style="display:flex;gap:16px;margin-bottom:12px">';
-    html+=_kpiCard(_t('\u0110\u1ea1t','Pass'),String(passCount),'var(--green,#22c55e)');
-    html+=_kpiCard(_t('Kh\u00f4ng \u0111\u1ea1t','Fail'),String(failCount),'var(--red,#ef4444)');
+    html+=_kpiCard(_t('\u0110\u1ea1t','Accepted'),String(passCount),'var(--green,#22c55e)');
+    html+=_kpiCard(_t('Kh\u00f4ng \u0111\u1ea1t','Rejected'),String(failCount),'var(--red,#ef4444)');
     html+='</div>';
     html+='<table class="cr-table"><thead><tr><th>PO</th><th>'+_t('Ng\u00e0y','Date')+'</th><th>'+_t('K\u1ebft qu\u1ea3','Result')+'</th></tr></thead><tbody>';
     incoming.slice(0,10).forEach(function(i){
-      var color=i.result==='pass'||i.status==='pass'?'var(--green,#22c55e)':'var(--red,#ef4444)';
-      html+='<tr><td>'+_esc(i.po_number||i.lot||'-')+'</td><td>'+_fmtDate(i.date)+'</td><td>'+_statusBadge(i.result||i.status||'-',color)+'</td></tr>';
+      var outcome=_incomingOutcome(i);
+      var meta=_incomingOutcomeMeta(outcome);
+      html+='<tr><td>'+_esc(i.po_number||i.lot||'-')+'</td><td>'+_fmtDate(i.date||i.received_date)+'</td><td>'+_statusBadge(meta.label,meta.color)+'</td></tr>';
     });
     html+='</tbody></table>';
   } else {
@@ -856,4 +877,3 @@ function render(container){
 window._renderComplianceReports = render;
 
 })();
-

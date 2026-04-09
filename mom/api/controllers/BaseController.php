@@ -218,6 +218,86 @@ abstract class BaseController
     }
 
     /**
+     * Send an empty response body.
+     *
+     * @param int                    $code    HTTP status code.
+     * @param array<string, string>  $headers Extra response headers.
+     * @return never
+     */
+    protected function emptyResponse(int $code = 204, array $headers = []): never
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
+
+        $headers = array_merge([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'SAMEORIGIN',
+            'Referrer-Policy' => 'same-origin',
+        ], $headers);
+
+        if (defined('API_THROW_RESPONSES') && API_THROW_RESPONSES) {
+            throw ExitException::empty($code, $headers);
+        }
+
+        http_response_code($code);
+        foreach ($headers as $name => $value) {
+            header($name . ': ' . $value);
+        }
+        exit;
+    }
+
+    /**
+     * Send a raw response body.
+     *
+     * @param string                 $body    Raw response body.
+     * @param int                    $code    HTTP status code.
+     * @param array<string, string>  $headers Extra response headers.
+     * @return never
+     */
+    protected function rawResponse(string $body, int $code = 200, array $headers = []): never
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
+
+        $headers = array_merge([
+            'Content-Type' => 'text/plain; charset=utf-8',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'SAMEORIGIN',
+            'Referrer-Policy' => 'same-origin',
+        ], $headers);
+
+        if (defined('API_THROW_RESPONSES') && API_THROW_RESPONSES) {
+            throw ExitException::raw($body, $code, $headers);
+        }
+
+        http_response_code($code);
+        foreach ($headers as $name => $value) {
+            header($name . ': ' . $value);
+        }
+        echo $body;
+        exit;
+    }
+
+    /**
+     * Send an HTML response body.
+     *
+     * @param string                 $html    HTML body.
+     * @param int                    $code    HTTP status code.
+     * @param array<string, string>  $headers Extra response headers.
+     * @return never
+     */
+    protected function htmlResponse(string $html, int $code = 200, array $headers = []): never
+    {
+        $this->rawResponse($html, $code, array_merge([
+            'Content-Type' => 'text/html; charset=utf-8',
+        ], $headers));
+    }
+
+    /**
      * Send an error response.
      *
      * @param string      $error  Error code.

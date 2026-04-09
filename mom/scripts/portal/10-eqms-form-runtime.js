@@ -668,7 +668,7 @@ function renderField(field, value, readOnly){
   var labelEn = field.label || field.label_en || field.id;
   var labelVi = field.label_vi || '';
   var label = esc(labelEn) + (labelVi ? '<span class="eqms-label-vi">' + esc(labelVi) + '</span>' : '');
-  var required = field.required ? '<span style="color:#dc2626">*</span>' : '';
+  var required = field.required ? '<span style="color:var(--red-light,#dc2626)">*</span>' : '';
   var disabled = readOnly ? ' disabled' : '';
   var cls = 'eqms-field' + (field.width === 'full' || field.type === 'textarea' || field.type === 'table' ? ' full' : field.width === 'third' ? ' third' : '');
 
@@ -1757,7 +1757,7 @@ window.openEqmsForm = function(formCode, container, options){
       runtime.innerHTML = '<div class="eqms-empty">' +
         '<div style="font-size:32px;margin-bottom:12px">📋</div>' +
         '<h3>' + esc(t('Không tìm thấy định nghĩa biểu mẫu', 'Form schema not found')) + '</h3>' +
-        '<p style="color:#64748b;font-size:13px">' + esc(t('Mã form: ', 'Form code: ') + formCode) + '</p>' +
+        '<p style="color:var(--text-secondary,#64748b);font-size:13px">' + esc(t('Mã form: ', 'Form code: ') + formCode) + '</p>' +
       '</div>';
       console.warn('[eQMS] Schema not found for:', formCode);
       if(options.onError && typeof options.onError === 'function') options.onError(new Error('Schema not found: ' + formCode));
@@ -1872,7 +1872,7 @@ window.openEqmsForm = function(formCode, container, options){
     runtime.innerHTML = '<div class="eqms-empty">' +
       '<div style="font-size:32px;margin-bottom:12px">⚠</div>' +
       '<h3>' + esc(t('Không thể tải biểu mẫu', 'Could not load form')) + '</h3>' +
-      '<p style="color:#64748b;font-size:13px">' + esc(errMsg) + '</p>' +
+      '<p style="color:var(--text-secondary,#64748b);font-size:13px">' + esc(errMsg) + '</p>' +
       '<button class="eqms-btn secondary" onclick="window.openEqmsForm(\'' + esc(formCode) + '\',this.closest(\'.eqms-runtime\').parentNode,' + esc(JSON.stringify(options)) + ')">' + esc(t('Thử lại', 'Retry')) + '</button>' +
     '</div>';
     console.error('[eQMS] Form load failed:', formCode, err);

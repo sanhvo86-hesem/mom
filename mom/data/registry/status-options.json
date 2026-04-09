@@ -6210,41 +6210,51 @@
     "statusColumn": "status",
     "options": [
       {
-        "value": "pending",
-        "label": "Chờ kiểm",
-        "labelEn": "Pending",
-        "color": "#94a3b8",
-        "icon": "fa-clock",
+        "value": "queued",
+        "label": "Chờ kiểm tra",
+        "labelEn": "Queued",
+        "color": "#3b82f6",
+        "icon": "fa-inbox",
         "allowedTransitionsFrom": []
       },
       {
-        "value": "pass",
+        "value": "in_progress",
+        "label": "Đang kiểm tra",
+        "labelEn": "In Progress",
+        "color": "#f59e0b",
+        "icon": "fa-microscope",
+        "allowedTransitionsFrom": [
+          "queued"
+        ]
+      },
+      {
+        "value": "accepted",
         "label": "Đạt",
-        "labelEn": "Pass",
+        "labelEn": "Accepted",
         "color": "#22c55e",
         "icon": "fa-check-circle",
         "allowedTransitionsFrom": [
-          "pending"
+          "in_progress"
         ]
       },
       {
-        "value": "fail",
+        "value": "rejected",
         "label": "Không đạt",
-        "labelEn": "Fail",
+        "labelEn": "Rejected",
         "color": "#ef4444",
         "icon": "fa-times-circle",
         "allowedTransitionsFrom": [
-          "pending"
+          "in_progress"
         ]
       },
       {
-        "value": "conditional",
-        "label": "Có điều kiện",
-        "labelEn": "Conditional",
-        "color": "#f59e0b",
-        "icon": "fa-exclamation-triangle",
+        "value": "waived",
+        "label": "Miễn kiểm",
+        "labelEn": "Waived",
+        "color": "#8b5cf6",
+        "icon": "fa-forward",
         "allowedTransitionsFrom": [
-          "pending"
+          "queued"
         ]
       }
     ]

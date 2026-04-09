@@ -498,12 +498,12 @@ function designInput(fieldDef){
   if(fieldDef.type === 'textarea') return '<textarea rows="3" placeholder="' + esc(fieldDef.placeholder || '') + '"></textarea>';
   if(fieldDef.type === 'select' || fieldDef.type === 'lookup') return '<select><option>' + esc((fieldDef.options[0] && (fieldDef.options[0].label || fieldDef.options[0].value)) || 'Select value') + '</option></select>';
   if(fieldDef.type === 'multi_select') return '<select multiple><option>Option 1</option><option>Option 2</option></select>';
-  if(fieldDef.type === 'checkbox') return '<label style="display:flex;align-items:center;gap:8px;color:#475569"><input type="checkbox"' + (fieldDef.default ? ' checked' : '') + '> ' + esc(fieldDef.label_vi || fieldDef.label || '') + '</label>';
+  if(fieldDef.type === 'checkbox') return '<label style="display:flex;align-items:center;gap:var(--space-2,8px);color:var(--text-secondary,#475569)"><input type="checkbox"' + (fieldDef.default ? ' checked' : '') + '> ' + esc(fieldDef.label_vi || fieldDef.label || '') + '</label>';
   if(fieldDef.type === 'file') return '<div class="qf-file-drop"><div class="qf-file-drop-text">Upload area</div><div class="qf-file-drop-hint">' + esc(fieldDef.accept || '.pdf,.png,.jpg') + '</div></div>';
   if(fieldDef.type === 'signature') return '<div class="qf-signature-grid"><div class="qf-signature-block"><div class="qf-signature-pad"></div><div class="qf-signature-name">' + esc(fieldDef.label || 'Signature') + '</div></div></div>';
   if(fieldDef.type === 'table') return '<div class="qf-table-wrap"><table class="qf-table"><thead><tr>' + (fieldDef.columns || []).map(function(col){ return '<th>' + esc(col.label || col.id) + '</th>'; }).join('') + '</tr></thead><tbody><tr>' + (fieldDef.columns || []).map(function(){ return '<td>...</td>'; }).join('') + '</tr></tbody></table></div>';
-  if(fieldDef.type === 'heading') return '<div style="font-size:18px;font-weight:700;color:#0c2d48">' + esc(fieldDef.label_vi || fieldDef.label || 'Heading') + '</div>';
-  if(fieldDef.type === 'hidden') return '<div style="font-size:12px;color:#64748b;background:#f8fafc;border:1px dashed #d1d5db;border-radius:6px;padding:10px 12px">Hidden runtime value</div>';
+  if(fieldDef.type === 'heading') return '<div style="font-size:18px;font-weight:var(--font-display-weight,700);color:var(--text-primary,#0c2d48)">' + esc(fieldDef.label_vi || fieldDef.label || 'Heading') + '</div>';
+  if(fieldDef.type === 'hidden') return '<div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);background:var(--bg-surface-alt,#f8fafc);border:1px dashed var(--border,#d1d5db);border-radius:var(--radius-md,6px);padding:10px var(--space-3,12px)">Hidden runtime value</div>';
   if(fieldDef.type === 'calculated') return '<input type="text" value="' + esc(fieldDef.formula || 'SUM(...)') + '" readonly>';
   return '<input type="' + esc(fieldDef.type === 'number' ? 'number' : (fieldDef.type === 'date' ? 'date' : (fieldDef.type === 'time' ? 'time' : 'text'))) + '" placeholder="' + esc(fieldDef.placeholder || '') + '">';
 }
@@ -658,7 +658,7 @@ function versionPanel(state){
   if(workflow.revision) current.push('v' + workflow.revision);
   if(workflow.effective_date) current.push('Effective ' + workflow.effective_date);
   return '<div class="fb-version-control"><div class="fb-version-header"><h4>Version Control</h4><span class="fb-version-badge ' + esc(badgeClass(String(workflow.status || 'draft'))) + '">' + esc((workflow.status || 'draft').replace(/_/g, ' ')) + '</span></div>' +
-    '<div style="padding:10px 16px;font-size:11px;color:#64748b;border-bottom:1px solid #f1f5f9">' + esc(current.length ? current.join(' · ') : 'Workflow bootstrap pending') + '</div>' +
+    '<div style="padding:10px var(--space-4,16px);font-size:11px;color:var(--text-secondary,#64748b);border-bottom:1px solid var(--bg-surface-alt,#f1f5f9)">' + esc(current.length ? current.join(' · ') : 'Workflow bootstrap pending') + '</div>' +
     '<div class="fb-prop-actions" style="padding:12px 16px 0"><button type="button" class="fb-toolbar-btn" data-builder-action="save-draft">Save Draft</button><button type="button" class="fb-toolbar-btn" data-builder-action="submit-review">Submit Review</button><button type="button" class="fb-toolbar-btn" data-builder-action="publish-schema">Approve / Publish</button>' + (canRejectReview(state) ? '<button type="button" class="fb-toolbar-btn" data-builder-action="reject-review">Reject Review</button>' : '') + '<button type="button" class="fb-toolbar-btn" data-builder-action="reload-history">Reload</button></div>' +
     '<div class="fb-version-list">' +
       ((state.history || []).length ? state.history.map(function(item){

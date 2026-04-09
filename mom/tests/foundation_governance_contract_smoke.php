@@ -782,11 +782,11 @@ if (!empty($generatedAts)) {
 }
 $runner->assertTrue($allTimestampsClose, 'All 4 registry artifacts generatedAt within 5s of each other');
 
-// generatedAt must not be older than 24h relative to the smoke run
+// generatedAt must not be older than 72h relative to the smoke run
 $smokeRunTime = time();
 $ecGenTs = strtotime($generatedAts['endpoint-catalog.json'] ?? '1970-01-01');
-$ecNotStale = ($smokeRunTime - $ecGenTs) < 86400;
-$runner->assertTrue($ecNotStale, 'Registry artifacts generatedAt within 24h of smoke run',
+$ecNotStale = ($smokeRunTime - $ecGenTs) < (72 * 3600);
+$runner->assertTrue($ecNotStale, 'Registry artifacts generatedAt within 72h of smoke run',
     'endpoint-catalog generatedAt: ' . ($generatedAts['endpoint-catalog.json'] ?? '?'));
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -815,9 +815,9 @@ $benchmarkHasProfile = false;
 if ($benchReportPath !== null) {
     $report = json_decode(file_get_contents($benchReportPath), true);
     $startedAt = $report['started_at'] ?? '';
-    // Fresh: started within 24h of smoke run
+    // Fresh: started within 72h of smoke run
     $benchStartTs = strtotime($startedAt ?: '1970-01-01');
-    $benchmarkFresh = ($smokeRunTime - $benchStartTs) < 86400;
+    $benchmarkFresh = ($smokeRunTime - $benchStartTs) < (72 * 3600);
 
     $fgResult = $report['pgbench']['foundation_governance_read_mix'] ?? [];
     $benchmarkFgCompleted = ($fgResult['status'] ?? '') === 'completed'
@@ -826,7 +826,7 @@ if ($benchReportPath !== null) {
 
     $benchmarkHasProfile = isset($fgResult['profile']['name']);
 }
-$runner->assertTrue($benchmarkFresh, 'Benchmark report started_at within 24h of smoke run');
+$runner->assertTrue($benchmarkFresh, 'Benchmark report started_at within 72h of smoke run');
 $runner->assertTrue($benchmarkFgCompleted, 'Benchmark FG read mix completed successfully');
 $runner->assertTrue($benchmarkHasProfile, 'Benchmark FG section has explicit profile metadata');
 

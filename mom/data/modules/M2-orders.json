@@ -1,14 +1,31 @@
 {
   "moduleId": "M2-orders",
   "title": { "vi": "Đơn hàng", "en": "Orders" },
-  "subtitle": { "vi": "Quản lý SO → JO → WO, hợp đồng, giao hàng", "en": "Manage SO → JO → WO, contracts, shipping" },
+  "subtitle": {
+    "vi": "Chuẩn hóa commercial promise, release JO/WO và shipment readiness trên một luồng thống nhất",
+    "en": "Standardize commercial promise, JO/WO release, and shipment readiness in one governed flow"
+  },
   "icon": "📦",
   "route": "/orders",
-  "roles": ["ceo", "sales_manager", "estimator", "qa_manager", "production_director", "planner", "it_admin"],
-  "version": 1,
+  "roles": [
+    "admin",
+    "it_admin",
+    "ceo",
+    "production_director",
+    "sales_manager",
+    "estimator",
+    "customer_service",
+    "quality_manager",
+    "planning_manager",
+    "production_planner",
+    "cnc_workshop_manager",
+    "engineering_manager",
+    "supply_chain_manager"
+  ],
+  "version": 2,
   "createdBy": "system",
   "createdAt": "2026-04-02T00:00:00+07:00",
-  "updatedAt": "2026-04-02T00:00:00+07:00",
+  "updatedAt": "2026-04-09T00:00:00+07:00",
   "tabs": [
     {
       "tabId": "overview",
@@ -20,14 +37,15 @@
           "type": "kpi-row",
           "visible": true,
           "order": 1,
-          "title": { "vi": "Chỉ số đơn hàng", "en": "Order KPIs" },
+          "title": { "vi": "Chỉ số điều hành đơn hàng", "en": "Order Control KPIs" },
           "config": {
+            "dataSource": { "api": "order_dashboard_kpi", "method": "GET", "dataKey": "kpi" },
             "items": [
-              { "label": { "vi": "SO hoạt động", "en": "Active SOs" }, "dataSource": { "api": "order_dashboard_kpi", "method": "GET", "field": "active_so_count" }, "color": "var(--brand-2)", "format": "number" },
-              { "label": { "vi": "OTD %", "en": "OTD %" }, "dataSource": { "api": "order_dashboard_kpi", "method": "GET", "field": "on_time_pct" }, "color": "var(--green)", "suffix": "%", "format": "number" },
-              { "label": { "vi": "Quá hạn", "en": "Overdue" }, "dataSource": { "api": "order_dashboard_kpi", "method": "GET", "field": "overdue_count" }, "color": "var(--red)", "format": "number" },
-              { "label": { "vi": "Đang hold", "en": "On Hold" }, "dataSource": { "api": "order_dashboard_kpi", "method": "GET", "field": "active_holds" }, "color": "var(--amber)", "format": "number" },
-              { "label": { "vi": "Hoàn thành", "en": "Completed" }, "dataSource": { "api": "order_dashboard_kpi", "method": "GET", "field": "completed_total" }, "color": "var(--green)", "format": "number" }
+              { "label": { "vi": "SO hoạt động", "en": "Active SOs" }, "dataKey": "active_so_count", "color": "var(--brand-2)" },
+              { "label": { "vi": "JO hoạt động", "en": "Active JOs" }, "dataKey": "active_jo_count", "color": "var(--green)" },
+              { "label": { "vi": "OTD", "en": "OTD" }, "dataKey": "on_time_pct", "color": "var(--green)", "suffix": "%" },
+              { "label": { "vi": "Backlog", "en": "Backlog" }, "dataKey": "backlog_value", "color": "var(--amber)", "suffix": " USD" },
+              { "label": { "vi": "Đang hold", "en": "On Hold" }, "dataKey": "active_holds", "color": "var(--red)" }
             ]
           }
         },
@@ -39,17 +57,24 @@
           "config": {
             "filters": [
               { "key": "search", "type": "search", "placeholder": { "vi": "Tìm SO, khách hàng, PO...", "en": "Search SO, customer, PO..." } },
-              { "key": "status", "type": "select", "allLabel": { "vi": "Tất cả trạng thái", "en": "All statuses" }, "options": [
-                { "value": "draft", "label": "Draft" },
-                { "value": "confirmed", "label": "Confirmed" },
-                { "value": "in_production", "label": "In Production" },
-                { "value": "shipped", "label": "Shipped" },
-                { "value": "closed", "label": "Closed" }
-              ]},
+              {
+                "key": "status",
+                "type": "select",
+                "allLabel": { "vi": "Tất cả trạng thái", "en": "All statuses" },
+                "options": [
+                  { "value": "draft", "label": { "vi": "Nháp", "en": "Draft" } },
+                  { "value": "quoted", "label": { "vi": "Đã báo giá", "en": "Quoted" } },
+                  { "value": "confirmed", "label": { "vi": "Đã xác nhận", "en": "Confirmed" } },
+                  { "value": "in_production", "label": { "vi": "Đang sản xuất", "en": "In Production" } },
+                  { "value": "shipped", "label": { "vi": "Đã giao", "en": "Shipped" } },
+                  { "value": "closed", "label": { "vi": "Đã đóng", "en": "Closed" } },
+                  { "value": "cancelled", "label": { "vi": "Đã hủy", "en": "Cancelled" } }
+                ]
+              },
               { "key": "date_from", "type": "date" },
               { "key": "date_to", "type": "date" }
             ],
-            "showRefresh": true
+            "showApply": true
           }
         },
         {
@@ -57,17 +82,36 @@
           "type": "data-table",
           "visible": true,
           "order": 3,
-          "title": { "vi": "Danh sách đơn hàng", "en": "Sales Orders" },
+          "title": { "vi": "Danh sách Sales Order", "en": "Sales Order List" },
           "config": {
-            "dataSource": { "api": "order_so_list", "method": "GET", "dataKey": "sales_orders" },
+            "dataSource": {
+              "api": "order_so_list",
+              "method": "GET",
+              "dataKey": "sales_orders",
+              "params": {
+                "search": "{{ filters.search }}",
+                "status": "{{ filters.status }}",
+                "date_from": "{{ filters.date_from }}",
+                "date_to": "{{ filters.date_to }}"
+              }
+            },
             "columns": [
               { "key": "so_number", "label": { "vi": "Số SO", "en": "SO#" }, "sortable": true, "filterable": true, "width": "130px", "pinned": "left" },
               { "key": "customer_name", "label": { "vi": "Khách hàng", "en": "Customer" }, "sortable": true, "filterable": true },
               { "key": "customer_po", "label": { "vi": "PO khách", "en": "Customer PO" }, "sortable": true },
               { "key": "order_date", "label": { "vi": "Ngày đặt", "en": "Order Date" }, "type": "date", "sortable": true },
-              { "key": "due_date", "label": { "vi": "Hạn giao", "en": "Due Date" }, "type": "date", "sortable": true, "conditionalFormat": [
-                { "condition": "{{ new Date(value) < new Date() && row.status !== 'shipped' && row.status !== 'closed' }}", "style": { "color": "var(--red)", "fontWeight": "700" } }
-              ]},
+              {
+                "key": "due_date",
+                "label": { "vi": "Hạn giao", "en": "Due Date" },
+                "type": "date",
+                "sortable": true,
+                "conditionalFormat": [
+                  {
+                    "condition": "{{ new Date(value) < new Date() && row.status !== 'shipped' && row.status !== 'closed' && row.status !== 'cancelled' }}",
+                    "style": { "color": "var(--red)", "fontWeight": "700" }
+                  }
+                ]
+              },
               { "key": "total_qty", "label": { "vi": "SL", "en": "Qty" }, "type": "number", "align": "right", "sortable": true },
               { "key": "priority", "label": { "vi": "Ưu tiên", "en": "Priority" }, "type": "badge", "sortable": true },
               { "key": "status", "label": { "vi": "Trạng thái", "en": "Status" }, "type": "badge", "sortable": true, "filterable": true }
@@ -95,6 +139,8 @@
           "config": {
             "buttons": [
               { "label": { "vi": "+ Tạo SO", "en": "+ Create SO" }, "action": "navigate-tab", "tab": "create-so", "variant": "primary", "icon": "➕" },
+              { "label": { "vi": "+ Phát hành JO", "en": "+ Release JO" }, "action": "navigate-tab", "tab": "release-jo", "variant": "secondary", "icon": "🧭" },
+              { "label": { "vi": "+ Phát hành WO", "en": "+ Release WO" }, "action": "navigate-tab", "tab": "release-wo", "variant": "secondary", "icon": "🛠" },
               { "label": { "vi": "Xem cây đơn", "en": "View Hierarchy" }, "action": "navigate-tab", "tab": "hierarchy", "variant": "secondary", "icon": "🌳" }
             ]
           }
@@ -111,38 +157,202 @@
           "type": "form-standard",
           "visible": true,
           "order": 1,
-          "title": { "vi": "Tạo đơn hàng mới", "en": "Create New Sales Order" },
+          "title": { "vi": "Tạo Sales Order mới", "en": "Create New Sales Order" },
           "config": {
             "columns": 2,
             "submitApi": { "action": "order_so_create", "method": "POST" },
-            "onSuccess": { "type": "chain", "actions": [
-              { "type": "toast", "message": "{{ _t('Tạo SO thành công!', 'SO created!') }}", "toastType": "success" },
-              { "type": "navigate", "tab": "overview" },
-              { "type": "refresh", "blocks": ["blk-table-so", "blk-kpi-orders"] }
-            ]},
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Tạo SO thành công.', 'Sales order created successfully.') }}", "toastType": "success" },
+                { "type": "navigate", "tab": "overview" },
+                { "type": "refresh", "blocks": ["blk-table-so", "blk-kpi-orders", "blk-tree-hierarchy"] }
+              ]
+            },
             "fields": [
-              { "key": "customer_id", "label": { "vi": "Khách hàng", "en": "Customer" }, "type": "text", "validation": { "required": true }, "placeholder": { "vi": "Mã khách hàng", "en": "Customer ID" } },
+              { "key": "customer_id", "label": { "vi": "Mã khách hàng", "en": "Customer ID" }, "type": "text", "validation": { "required": true } },
               { "key": "customer_name", "label": { "vi": "Tên khách hàng", "en": "Customer Name" }, "type": "text", "validation": { "required": true } },
               { "key": "customer_po", "label": { "vi": "PO khách hàng", "en": "Customer PO" }, "type": "text", "validation": { "required": true } },
-              { "key": "order_date", "label": { "vi": "Ngày đặt hàng", "en": "Order Date" }, "type": "date", "defaultValue": "{{new Date().toISOString().substring(0,10)}}", "validation": { "required": true } },
-              { "key": "due_date", "label": { "vi": "Ngày giao hàng", "en": "Due Date" }, "type": "date", "validation": { "required": true } },
-              { "key": "requested_date", "label": { "vi": "Ngày KH cần", "en": "Requested Date" }, "type": "date" },
+              { "key": "order_date", "label": { "vi": "Ngày đặt hàng", "en": "Order Date" }, "type": "date", "defaultValue": "{{ new Date().toISOString().substring(0,10) }}", "validation": { "required": true } },
+              { "key": "due_date", "label": { "vi": "Ngày giao cam kết", "en": "Committed Due Date" }, "type": "date", "validation": { "required": true } },
+              { "key": "requested_date", "label": { "vi": "Ngày khách yêu cầu", "en": "Requested Date" }, "type": "date" },
               { "key": "total_qty", "label": { "vi": "Tổng số lượng", "en": "Total Quantity" }, "type": "number", "validation": { "required": true, "min": 1 } },
-              { "key": "total_value", "label": { "vi": "Giá trị (USD)", "en": "Value (USD)" }, "type": "number" },
-              { "key": "priority", "label": { "vi": "Mức ưu tiên", "en": "Priority" }, "type": "select", "options": [
-                { "value": "normal", "label": "Normal" },
-                { "value": "high", "label": "High" },
-                { "value": "urgent", "label": "Urgent" },
-                { "value": "aog", "label": "AOG" }
-              ], "defaultValue": "normal" },
-              { "key": "incoterm_code", "label": { "vi": "Incoterm", "en": "Incoterm" }, "type": "select", "options": [
-                { "value": "EXW", "label": "EXW" },
-                { "value": "FCA", "label": "FCA" },
-                { "value": "FOB", "label": "FOB" },
-                { "value": "CIF", "label": "CIF" },
-                { "value": "DDP", "label": "DDP" }
-              ]},
+              { "key": "total_value", "label": { "vi": "Giá trị (USD)", "en": "Order Value (USD)" }, "type": "number" },
+              {
+                "key": "priority",
+                "label": { "vi": "Mức ưu tiên", "en": "Priority" },
+                "type": "select",
+                "options": [
+                  { "value": "normal", "label": { "vi": "Bình thường", "en": "Normal" } },
+                  { "value": "high", "label": { "vi": "Cao", "en": "High" } },
+                  { "value": "urgent", "label": { "vi": "Khẩn", "en": "Urgent" } },
+                  { "value": "aog", "label": { "vi": "AOG", "en": "AOG" } }
+                ],
+                "defaultValue": "normal"
+              },
+              {
+                "key": "incoterm_code",
+                "label": { "vi": "Incoterm", "en": "Incoterm" },
+                "type": "select",
+                "options": [
+                  { "value": "EXW", "label": "EXW" },
+                  { "value": "FCA", "label": "FCA" },
+                  { "value": "FOB", "label": "FOB" },
+                  { "value": "CIF", "label": "CIF" },
+                  { "value": "DDP", "label": "DDP" }
+                ]
+              },
               { "key": "special_requirements", "label": { "vi": "Yêu cầu đặc biệt", "en": "Special Requirements" }, "type": "textarea", "span": "full" }
+            ],
+            "cancelAction": { "type": "navigate", "tab": "overview" }
+          }
+        }
+      ]
+    },
+    {
+      "tabId": "release-jo",
+      "title": { "vi": "Phát hành JO", "en": "Release JO" },
+      "icon": "🧭",
+      "blocks": [
+        {
+          "blockId": "blk-info-jo-release",
+          "type": "info-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "text": {
+              "vi": "JO chỉ được phát hành khi có SO hợp lệ. Ưu tiên chọn SO từ danh sách trước rồi mới phát hành để giữ digital thread chuẩn.",
+              "en": "Release JO only against a valid SO. Select the SO first to preserve a clean digital thread."
+            },
+            "type": "info",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-form-jo",
+          "type": "form-standard",
+          "visible": true,
+          "order": 2,
+          "title": { "vi": "Phát hành Job Order từ SO", "en": "Release Job Order from SO" },
+          "config": {
+            "columns": 2,
+            "submitApi": { "action": "order_jo_create", "method": "POST" },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Phát hành JO thành công.', 'Job order released successfully.') }}", "toastType": "success" },
+                { "type": "navigate", "tab": "hierarchy" },
+                { "type": "refresh", "blocks": ["blk-tree-hierarchy", "blk-kpi-orders"] }
+              ]
+            },
+            "fields": [
+              { "key": "so_number", "label": { "vi": "SO cha", "en": "Parent SO" }, "type": "text", "defaultValue": "{{ state.selectedId }}", "validation": { "required": true } },
+              { "key": "part_number", "label": { "vi": "Mã part", "en": "Part Number" }, "type": "text", "validation": { "required": true } },
+              { "key": "part_revision", "label": { "vi": "Revision", "en": "Revision" }, "type": "text" },
+              { "key": "part_description", "label": { "vi": "Mô tả part", "en": "Part Description" }, "type": "text" },
+              { "key": "material_spec", "label": { "vi": "Spec vật liệu", "en": "Material Spec" }, "type": "text" },
+              { "key": "qty_ordered", "label": { "vi": "Số lượng", "en": "Ordered Qty" }, "type": "number", "validation": { "required": true, "min": 1 } },
+              { "key": "start_date", "label": { "vi": "Ngày bắt đầu kế hoạch", "en": "Planned Start Date" }, "type": "date", "defaultValue": "{{ new Date().toISOString().substring(0,10) }}" },
+              { "key": "due_date", "label": { "vi": "Hạn JO", "en": "JO Due Date" }, "type": "date", "validation": { "required": true } },
+              { "key": "routing_id", "label": { "vi": "Routing", "en": "Routing ID" }, "type": "text" },
+              { "key": "bom_id", "label": { "vi": "BOM", "en": "BOM ID" }, "type": "text" },
+              { "key": "control_plan_id", "label": { "vi": "Control Plan", "en": "Control Plan ID" }, "type": "text" },
+              { "key": "inspection_plan_id", "label": { "vi": "Inspection Plan", "en": "Inspection Plan ID" }, "type": "text" },
+              { "key": "fai_required", "label": { "vi": "Yêu cầu FAI", "en": "FAI Required" }, "type": "checkbox", "checkLabel": { "vi": "Bật yêu cầu FAI", "en": "Require FAI" } }
+            ],
+            "cancelAction": { "type": "navigate", "tab": "overview" }
+          }
+        }
+      ]
+    },
+    {
+      "tabId": "release-wo",
+      "title": { "vi": "Phát hành WO", "en": "Release WO" },
+      "icon": "🛠",
+      "blocks": [
+        {
+          "blockId": "blk-info-wo-release",
+          "type": "info-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "text": {
+              "vi": "WO chỉ được phát hành theo JO cha. Không tạo WO rời rạc để tránh đứt routing, dispatch và evidence traceability.",
+              "en": "Release WO only under its parent JO. Avoid standalone WO creation to protect routing, dispatch, and evidence traceability."
+            },
+            "type": "warning",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-wo-jo-picker",
+          "type": "data-table",
+          "visible": true,
+          "order": 2,
+          "title": { "vi": "Chọn JO cha", "en": "Select Parent JO" },
+          "config": {
+            "dataSource": {
+              "api": "order_jo_list",
+              "method": "GET",
+              "dataKey": "job_orders",
+              "params": { "so_number": "{{ state.selectedId }}" }
+            },
+            "columns": [
+              { "key": "jo_number", "label": { "vi": "JO", "en": "JO" }, "sortable": true, "width": "140px" },
+              { "key": "so_number", "label": { "vi": "SO cha", "en": "Parent SO" }, "sortable": true, "width": "140px" },
+              { "key": "part_number", "label": { "vi": "Mã part", "en": "Part Number" }, "sortable": true },
+              { "key": "part_description", "label": { "vi": "Mô tả", "en": "Description" } },
+              { "key": "due_date", "label": { "vi": "Hạn JO", "en": "JO Due Date" }, "type": "date", "sortable": true },
+              { "key": "status", "label": { "vi": "Trạng thái", "en": "Status" }, "type": "badge", "sortable": true }
+            ],
+            "pagination": true,
+            "pageSize": 8,
+            "rowClick": { "action": "set-state", "passField": "jo_number", "stateKey": "selectedJoId" },
+            "emptyMessage": { "vi": "Chưa có JO để phát hành WO", "en": "No JO available for WO release" },
+            "emptyIcon": "🧭"
+          }
+        },
+        {
+          "blockId": "blk-form-wo",
+          "type": "form-standard",
+          "visible": true,
+          "order": 3,
+          "title": { "vi": "Phát hành Work Order từ JO", "en": "Release Work Order from JO" },
+          "config": {
+            "columns": 2,
+            "submitApi": { "action": "order_wo_create", "method": "POST" },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Phát hành WO thành công.', 'Work order released successfully.') }}", "toastType": "success" },
+                { "type": "navigate", "tab": "hierarchy" },
+                { "type": "refresh", "blocks": ["blk-tree-hierarchy"] }
+              ]
+            },
+            "fields": [
+              { "key": "jo_number", "label": { "vi": "JO cha", "en": "Parent JO" }, "type": "text", "defaultValue": "{{ state.selectedJoId }}", "validation": { "required": true } },
+              { "key": "operation_number", "label": { "vi": "Công đoạn", "en": "Operation Number" }, "type": "number", "defaultValue": 10, "validation": { "required": true, "min": 1 } },
+              { "key": "operation_desc", "label": { "vi": "Mô tả công đoạn", "en": "Operation Description" }, "type": "text" },
+              { "key": "machine_id", "label": { "vi": "Máy", "en": "Machine ID" }, "type": "text", "validation": { "required": true } },
+              { "key": "work_center_id", "label": { "vi": "Work Center", "en": "Work Center ID" }, "type": "text", "validation": { "required": true } },
+              { "key": "operator_id", "label": { "vi": "Operator", "en": "Operator ID" }, "type": "text" },
+              { "key": "nc_program_id", "label": { "vi": "NC Program", "en": "NC Program ID" }, "type": "text" },
+              { "key": "setup_time_est", "label": { "vi": "Setup est. (h)", "en": "Setup Est. (h)" }, "type": "number" },
+              { "key": "run_time_est", "label": { "vi": "Run est. (h)", "en": "Run Est. (h)" }, "type": "number" },
+              { "key": "scheduled_start", "label": { "vi": "Ngày bắt đầu", "en": "Scheduled Start" }, "type": "date" },
+              { "key": "scheduled_end", "label": { "vi": "Ngày kết thúc", "en": "Scheduled End" }, "type": "date" },
+              {
+                "key": "dispatch_priority",
+                "label": { "vi": "Ưu tiên dispatch", "en": "Dispatch Priority" },
+                "type": "select",
+                "options": [
+                  { "value": "normal", "label": { "vi": "Bình thường", "en": "Normal" } },
+                  { "value": "high", "label": { "vi": "Cao", "en": "High" } },
+                  { "value": "urgent", "label": { "vi": "Khẩn", "en": "Urgent" } },
+                  { "value": "aog", "label": { "vi": "AOG", "en": "AOG" } }
+                ],
+                "defaultValue": "normal"
+              }
             ],
             "cancelAction": { "type": "navigate", "tab": "overview" }
           }
@@ -180,7 +390,10 @@
           "visible": true,
           "order": 1,
           "config": {
-            "text": { "vi": "12 hạng mục xem xét hợp đồng theo AS9100D 8.2.3", "en": "12 contract review items per AS9100D 8.2.3" },
+            "text": {
+              "vi": "Chuẩn AS9100D 8.2.3: chọn SO trước khi xem tiến độ contract review và sign-off liên phòng ban.",
+              "en": "AS9100D 8.2.3: select an SO first to review contract progress and cross-functional sign-off."
+            },
             "type": "info",
             "dismissable": false
           }
@@ -191,8 +404,14 @@
           "visible": true,
           "order": 2,
           "config": {
+            "dataSource": {
+              "api": "order_contract_review",
+              "method": "GET",
+              "dataKey": "review",
+              "params": { "so_number": "{{ state.selectedId }}" }
+            },
             "items": [
-              { "label": { "vi": "Tiến độ review", "en": "Review Progress" }, "dataSource": { "api": "order_contract_review", "method": "GET", "field": "completion_pct" }, "color": "var(--brand-2)", "suffix": "%" }
+              { "label": { "vi": "Tiến độ review", "en": "Review Progress" }, "dataKey": "completion_pct", "color": "var(--brand-2)", "suffix": "%" }
             ]
           }
         }
@@ -204,20 +423,44 @@
       "icon": "🚚",
       "blocks": [
         {
+          "blockId": "blk-info-shipping",
+          "type": "info-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "text": {
+              "vi": "Shipment gate và packing list phải gắn đúng SO đã chọn để tránh phát hành sai lô giao hàng.",
+              "en": "Shipment gate and packing list must be tied to the selected SO to avoid releasing the wrong shipment lot."
+            },
+            "type": "warning",
+            "dismissable": false
+          }
+        },
+        {
           "blockId": "blk-shipment-gate",
           "type": "data-table",
           "visible": true,
-          "order": 1,
+          "order": 2,
           "title": { "vi": "Shipment Readiness Gate", "en": "Shipment Readiness Gate" },
           "config": {
-            "dataSource": { "api": "order_shipment_gate", "method": "GET", "dataKey": "shipment_gate.items" },
+            "dataSource": {
+              "api": "order_shipment_gate",
+              "method": "GET",
+              "dataKey": "shipment_gate.items",
+              "params": { "so_number": "{{ state.selectedId }}" }
+            },
             "columns": [
               { "key": "code", "label": { "vi": "Mã", "en": "Code" }, "width": "80px" },
               { "key": "label", "label": { "vi": "Hạng mục", "en": "Item" } },
-              { "key": "status", "label": { "vi": "Kết quả", "en": "Result" }, "type": "badge", "conditionalFormat": [
-                { "condition": "{{ value === 'pass' }}", "style": { "background": "var(--green-bg)", "color": "var(--green)" } },
-                { "condition": "{{ value === 'fail' }}", "style": { "background": "var(--red-bg)", "color": "var(--red)" } }
-              ]}
+              {
+                "key": "status",
+                "label": { "vi": "Kết quả", "en": "Result" },
+                "type": "badge",
+                "conditionalFormat": [
+                  { "condition": "{{ value === 'pass' }}", "style": { "background": "var(--green-bg)", "color": "var(--green)" } },
+                  { "condition": "{{ value === 'fail' }}", "style": { "background": "var(--red-bg)", "color": "var(--red)" } }
+                ]
+              }
             ],
             "pagination": false,
             "features": { "columnResize": false, "export": [] }
@@ -227,10 +470,15 @@
           "blockId": "blk-packing",
           "type": "data-table",
           "visible": true,
-          "order": 2,
+          "order": 3,
           "title": { "vi": "Packing List", "en": "Packing Lists" },
           "config": {
-            "dataSource": { "api": "packing_list", "method": "GET", "dataKey": "packing_lists" },
+            "dataSource": {
+              "api": "packing_list",
+              "method": "GET",
+              "dataKey": "packing_lists",
+              "params": { "so_number": "{{ state.selectedId }}" }
+            },
             "columns": [
               { "key": "packing_number", "label": { "vi": "Số PK", "en": "PK#" }, "sortable": true },
               { "key": "so_number", "label": { "vi": "SO", "en": "SO" } },
@@ -246,22 +494,33 @@
           "blockId": "blk-toolbar-packing",
           "type": "action-toolbar",
           "visible": true,
-          "order": 3,
+          "order": 4,
           "config": {
             "buttons": [
-              { "label": { "vi": "+ Tạo Packing List", "en": "+ Create Packing List" }, "variant": "primary", "icon": "📦",
-                "events": { "onClick": { "type": "openModal", "modalConfig": {
-                  "title": { "vi": "Tạo Packing List", "en": "Create Packing List" },
-                  "fields": [
-                    { "key": "so_number", "label": { "vi": "Số SO", "en": "SO Number" }, "type": "text", "validation": { "required": true } },
-                    { "key": "packing_date", "label": { "vi": "Ngày đóng gói", "en": "Packing Date" }, "type": "date" }
-                  ],
-                  "submitApi": { "action": "packing_create", "method": "POST" },
-                  "onSuccess": { "type": "chain", "actions": [
-                    { "type": "toast", "message": "Đã tạo packing list" },
-                    { "type": "refresh", "blocks": ["blk-packing"] }
-                  ]}
-                }}}
+              {
+                "label": { "vi": "+ Tạo Packing List", "en": "+ Create Packing List" },
+                "variant": "primary",
+                "icon": "📦",
+                "events": {
+                  "onClick": {
+                    "type": "openModal",
+                    "modalConfig": {
+                      "title": { "vi": "Tạo Packing List", "en": "Create Packing List" },
+                      "fields": [
+                        { "key": "so_number", "label": { "vi": "Số SO", "en": "SO Number" }, "type": "text", "defaultValue": "{{ state.selectedId }}", "validation": { "required": true } },
+                        { "key": "packing_date", "label": { "vi": "Ngày đóng gói", "en": "Packing Date" }, "type": "date" }
+                      ],
+                      "submitApi": { "action": "packing_create", "method": "POST" },
+                      "onSuccess": {
+                        "type": "chain",
+                        "actions": [
+                          { "type": "toast", "message": "{{ _t('Đã tạo packing list.', 'Packing list created.') }}", "toastType": "success" },
+                          { "type": "refresh", "blocks": ["blk-packing"] }
+                        ]
+                      }
+                    }
+                  }
+                }
               }
             ]
           }
@@ -279,7 +538,12 @@
           "visible": true,
           "order": 1,
           "config": {
-            "dataSource": { "api": "order_so_detail", "method": "GET", "dataKey": "sales_order", "params": { "so_number": "{{ state.selectedId }}" } },
+            "dataSource": {
+              "api": "order_so_detail",
+              "method": "GET",
+              "dataKey": "sales_order",
+              "params": { "so_number": "{{ state.selectedId }}" }
+            },
             "layout": "grid",
             "fields": [
               { "key": "so_number", "label": { "vi": "Số SO", "en": "SO Number" } },
@@ -288,6 +552,7 @@
               { "key": "status", "label": { "vi": "Trạng thái", "en": "Status" }, "type": "badge" },
               { "key": "order_date", "label": { "vi": "Ngày đặt", "en": "Order Date" }, "type": "date" },
               { "key": "due_date", "label": { "vi": "Hạn giao", "en": "Due Date" }, "type": "date" },
+              { "key": "requested_date", "label": { "vi": "Ngày khách yêu cầu", "en": "Requested Date" }, "type": "date" },
               { "key": "total_qty", "label": { "vi": "Số lượng", "en": "Quantity" }, "type": "number" },
               { "key": "total_value", "label": { "vi": "Giá trị", "en": "Value" }, "type": "number" },
               { "key": "priority", "label": { "vi": "Ưu tiên", "en": "Priority" }, "type": "badge" },
@@ -297,33 +562,80 @@
           }
         },
         {
-          "blockId": "blk-status-flow",
-          "type": "action-status-flow",
+          "blockId": "blk-detail-toolbar",
+          "type": "action-toolbar",
           "visible": true,
           "order": 2,
           "config": {
-            "statusField": "status",
-            "transitions": {
-              "draft": ["confirmed", "cancelled"],
-              "confirmed": ["in_production", "cancelled"],
-              "in_production": ["shipped", "cancelled"],
-              "shipped": ["closed"]
+            "buttons": [
+              { "label": { "vi": "Phát hành JO", "en": "Release JO" }, "action": "navigate-tab", "tab": "release-jo", "variant": "secondary", "icon": "🧭" },
+              { "label": { "vi": "Xem xét HĐ", "en": "Contract Review" }, "action": "navigate-tab", "tab": "contract-review", "variant": "secondary", "icon": "📝" },
+              { "label": { "vi": "Shipment Gate", "en": "Shipment Gate" }, "action": "navigate-tab", "tab": "shipping", "variant": "secondary", "icon": "🚚" }
+            ]
+          }
+        },
+        {
+          "blockId": "blk-status-flow",
+          "type": "action-status-flow",
+          "visible": true,
+          "order": 3,
+          "config": {
+            "workflow": {
+              "entity": "sales_order",
+              "stateField": "status",
+              "showDiagram": true,
+              "states": [
+                { "id": "draft", "label": { "vi": "Nháp", "en": "Draft" } },
+                { "id": "quoted", "label": { "vi": "Đã báo giá", "en": "Quoted" } },
+                { "id": "confirmed", "label": { "vi": "Đã xác nhận", "en": "Confirmed" } },
+                { "id": "in_production", "label": { "vi": "Đang sản xuất", "en": "In Production" } },
+                { "id": "shipped", "label": { "vi": "Đã giao", "en": "Shipped" } },
+                { "id": "closed", "label": { "vi": "Đã đóng", "en": "Closed" } },
+                { "id": "cancelled", "label": { "vi": "Đã hủy", "en": "Cancelled" } }
+              ],
+              "transitions": [
+                { "from": "draft", "to": "quoted", "label": { "vi": "Chuyển sang Báo giá", "en": "Move to Quoted" }, "variant": "secondary" },
+                { "from": "draft", "to": "cancelled", "label": { "vi": "Hủy SO", "en": "Cancel SO" }, "variant": "danger" },
+                { "from": "quoted", "to": "confirmed", "label": { "vi": "Xác nhận đơn", "en": "Confirm Order" }, "variant": "primary" },
+                { "from": "quoted", "to": "cancelled", "label": { "vi": "Hủy SO", "en": "Cancel SO" }, "variant": "danger" },
+                { "from": "confirmed", "to": "in_production", "label": { "vi": "Mở sản xuất", "en": "Release to Production" }, "variant": "primary" },
+                { "from": "confirmed", "to": "cancelled", "label": { "vi": "Hủy SO", "en": "Cancel SO" }, "variant": "danger" },
+                { "from": "in_production", "to": "shipped", "label": { "vi": "Cho phép giao hàng", "en": "Release Shipment" }, "variant": "primary" },
+                { "from": "in_production", "to": "cancelled", "label": { "vi": "Hủy SO", "en": "Cancel SO" }, "variant": "danger" },
+                { "from": "shipped", "to": "closed", "label": { "vi": "Đóng SO", "en": "Close SO" }, "variant": "secondary" }
+              ]
             },
-            "transitionApi": { "action": "order_transition", "method": "POST", "bodyTemplate": { "order_type": "so", "order_id": "{{ state.selectedId }}", "target_status": "{{ targetStatus }}" } },
-            "onSuccess": { "type": "chain", "actions": [
-              { "type": "toast", "message": "Đã chuyển trạng thái" },
-              { "type": "refresh", "blocks": ["blk-detail-so", "blk-kpi-orders"] }
-            ]}
+            "transitionApi": {
+              "action": "order_transition",
+              "method": "POST",
+              "bodyTemplate": {
+                "order_type": "so",
+                "order_id": "{{ state.selectedId }}",
+                "target_status": "{{ targetStatus }}"
+              }
+            },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Đã chuyển trạng thái SO.', 'Sales order status updated.') }}", "toastType": "success" },
+                { "type": "refresh", "blocks": ["blk-detail-so", "blk-table-so", "blk-kpi-orders", "blk-tree-hierarchy"] }
+              ]
+            }
           }
         },
         {
           "blockId": "blk-notes",
           "type": "data-timeline",
           "visible": true,
-          "order": 3,
+          "order": 4,
           "title": { "vi": "Ghi chú & Lịch sử", "en": "Notes & History" },
           "config": {
-            "dataSource": { "api": "order_timeline", "method": "GET", "dataKey": "timeline", "params": { "so_number": "{{ state.selectedId }}" } },
+            "dataSource": {
+              "api": "order_timeline",
+              "method": "GET",
+              "dataKey": "timeline",
+              "params": { "so_number": "{{ state.selectedId }}" }
+            },
             "dateKey": "event_date",
             "titleKey": "event_label",
             "descKey": "details",

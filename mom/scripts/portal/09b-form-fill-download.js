@@ -1052,7 +1052,7 @@ function loadVersionHistory(form){
     }
     el.innerHTML = '<div class="ec-timeline">' + versions.map(function(v, i){
       var isCurrent = i === 0;
-      var statusBadge = (window.HmRegistry ? (function(){ var s=HmRegistry.status('doc_status',v.status); return s.color==='#16a34a'?'pass':s.color==='#f59e0b'?'info':s.color==='#94a3b8'?'neutral':'warn'; })() : (v.status === 'approved' ? 'pass' : v.status === 'draft' ? 'info' : v.status === 'superseded' ? 'neutral' : 'warn'));
+      var statusBadge = (window.HmRegistry ? (function(){ var s=HmRegistry.status('doc_status',v.status); return s.color===('var(--green-dark,#16a34a)')||s.color==='#16a34a'?'pass':s.color===('var(--amber-light,#f59e0b)')||s.color==='#f59e0b'?'info':s.color===('var(--text-secondary,#94a3b8)')||s.color==='#94a3b8'?'neutral':'warn'; })() : (v.status === 'approved' ? 'pass' : v.status === 'draft' ? 'info' : v.status === 'superseded' ? 'neutral' : 'warn'));
       return '<div class="ec-timeline-item' + (isCurrent ? ' current' : '') + '">' +
         '<div class="ec-timeline-dot"></div>' +
         '<div class="ec-timeline-content">' +
@@ -1132,7 +1132,7 @@ window._renderWorkspace = function(form, allocation, container){
 function renderWorkspace(form, allocation, container){
   try {
   var isOnline = form.online !== false;
-  var meta = { quality:{bg:'#dcfce7',icon:'\uD83D\uDD0E'}, production:{bg:'#fef3c7',icon:'\uD83C\uDFED'}, maintenance:{bg:'#fff9db',icon:'\uD83D\uDD27'}, hr:{bg:'#f3e8ff',icon:'\uD83D\uDC65'}, other:{bg:'#f1f5f9',icon:'\uD83D\uDDC2'} };
+  var meta = { quality:{bg:'var(--green-bg,#dcfce7)',icon:'\uD83D\uDD0E'}, production:{bg:'var(--amber-bg,#fef3c7)',icon:'\uD83C\uDFED'}, maintenance:{bg:'var(--amber-bg,#fff9db)',icon:'\uD83D\uDD27'}, hr:{bg:'var(--purple-bg,#f3e8ff)',icon:'\uD83D\uDC65'}, other:{bg:'var(--bg-surface-alt,#f1f5f9)',icon:'\uD83D\uDDC2'} };
   var catMeta = meta[form.category] || meta.other;
 
   var html = '';
@@ -2277,7 +2277,7 @@ function renderApprovalBarLegacy(allocation){
     html+='<div class="ec-approval-text" style="color:var(--ec-warning)">'+esc(t('Chứng cứ đã nộp — sẵn sàng gửi duyệt','Evidence submitted — ready for review'))+'</div>';
     html+='<button class="ec-btn primary" id="ec-submit-review" style="background:var(--ec-warning)">'+esc(t('Gửi duyệt','Submit for review'))+'</button>';
   } else if(status==='in_review'){
-    html+='<div class="ec-approval-text" style="color:#c2410c">'+esc(t('Đang chờ xem xét và phê duyệt','Pending review and approval'))+'</div>';
+    html+='<div class="ec-approval-text" style="color:var(--amber-dark,#c2410c)">'+esc(t('Đang chờ xem xét và phê duyệt','Pending review and approval'))+'</div>';
     if(canApprove){
       html+='<button class="ec-btn danger" id="ec-reject">'+esc(t('Từ chối','Reject'))+'</button>';
       html+='<button class="ec-btn success" id="ec-approve">'+esc(t('Duyệt','Approve'))+'</button>';
@@ -2334,7 +2334,7 @@ function renderApprovalBar(form, allocation){
     html+=progressBadges+approverList+'</div>';
     html+='<button class="ec-btn primary" id="ec-submit-review" style="background:var(--ec-warning)">'+esc(t('Gửi duyệt','Submit for review'))+'</button>';
   } else if(status==='in_review'){
-    html+='<div class="ec-approval-text" style="color:#c2410c">'+esc(isParallel ? (review.remainingApprovals > 0 ? t('Đang chờ đủ số phê duyệt bắt buộc để hoàn tất hồ sơ','Waiting for the required approvals to complete the record') : t('Đã đủ số phê duyệt, hệ thống đang chốt hồ sơ','Required approvals collected, finalizing the record')) : t('Đang chờ xem xét và phê duyệt','Pending review and approval'))+'</div>';
+    html+='<div class="ec-approval-text" style="color:var(--amber-dark,#c2410c)">'+esc(isParallel ? (review.remainingApprovals > 0 ? t('Đang chờ đủ số phê duyệt bắt buộc để hoàn tất hồ sơ','Waiting for the required approvals to complete the record') : t('Đã đủ số phê duyệt, hệ thống đang chốt hồ sơ','Required approvals collected, finalizing the record')) : t('Đang chờ xem xét và phê duyệt','Pending review and approval'))+'</div>';
     html+=progressBadges+approverList+'</div>';
     if(canApprove){
       html+='<button class="ec-btn danger" id="ec-reject">'+esc(t('Từ chối','Reject'))+'</button>';

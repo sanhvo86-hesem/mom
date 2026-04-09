@@ -1,0 +1,661 @@
+{
+  "moduleId": "M4-purchasing",
+  "title": { "vi": "Mua hàng", "en": "Purchasing" },
+  "subtitle": {
+    "vi": "Chuẩn hóa supplier PO, PO line và receiving/IQC trên cùng một digital thread có truy xuất nguồn",
+    "en": "Standardize supplier PO, PO lines, and receiving/IQC on one traceable digital thread"
+  },
+  "icon": "🧾",
+  "route": "/purchasing",
+  "roles": [
+    "admin",
+    "it_admin",
+    "ceo",
+    "qa_manager",
+    "quality_manager",
+    "qms_engineer",
+    "quality_engineer",
+    "qc_inspector",
+    "supply_chain_manager",
+    "buyer",
+    "warehouse_clerk",
+    "tool_storekeeper",
+    "logistics_coordinator",
+    "production_planner"
+  ],
+  "version": 1,
+  "createdBy": "system",
+  "createdAt": "2026-04-09T00:00:00+07:00",
+  "updatedAt": "2026-04-09T00:00:00+07:00",
+  "tabs": [
+    {
+      "tabId": "overview",
+      "title": { "vi": "Tổng quan PO", "en": "PO Overview" },
+      "icon": "📋",
+      "blocks": [
+        {
+          "blockId": "blk-purchasing-standard",
+          "type": "info-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "text": {
+              "vi": "Chuẩn nhập liệu: Customer PO đi vào SO qua quote conversion hoặc tạo SO thủ công. Supplier PO được phát hành tại workspace Mua hàng này từ context SO/JO/WO hoặc từ nhu cầu mua trực tiếp. Supplier Quality giữ scorecard/SCAR và không phải nơi tạo PO giao dịch. Không trộn customer PO và supplier PO vào cùng một trường.",
+              "en": "Data standard: Customer PO enters the Sales Order through quote conversion or manual SO creation. Supplier PO is issued in this Purchasing workspace from SO/JO/WO context or direct buy demand. Supplier Quality remains the scorecard/SCAR surface, not the transactional PO workspace. Do not overload customer PO and supplier PO into the same field."
+            },
+            "type": "info",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-purchasing-context",
+          "type": "info-banner",
+          "visible": true,
+          "order": 2,
+          "config": {
+            "text": "{{ state.sourceRecordId ? _t('Nguồn đang chọn: ' + state.sourceRecordId + '. PO mới sẽ giữ traceability về record nguồn này qua source_record_id.', 'Selected source: ' + state.sourceRecordId + '. New POs will preserve traceability back to this source record via source_record_id.') : _t('Không có source record đang chọn. Buyer có thể tạo PO trực tiếp hoặc mở workspace này từ SO/JO/WO để tự điền source_record_id.', 'No source record is selected. Buyers can create a PO directly or open this workspace from SO/JO/WO to prefill source_record_id.') }}",
+            "type": "success",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-po-filters",
+          "type": "filter-bar",
+          "visible": true,
+          "order": 3,
+          "config": {
+            "filters": [
+              { "key": "search", "type": "search", "placeholder": { "vi": "Tìm PO, nhà cung cấp, source record...", "en": "Search PO, vendor, source record..." } },
+              {
+                "key": "status",
+                "type": "select",
+                "allLabel": { "vi": "Tất cả trạng thái", "en": "All statuses" },
+                "options": [
+                  { "value": "draft", "label": { "vi": "Nháp", "en": "Draft" } },
+                  { "value": "pending_approval", "label": { "vi": "Chờ phê duyệt", "en": "Pending Approval" } },
+                  { "value": "approved", "label": { "vi": "Đã phê duyệt", "en": "Approved" } },
+                  { "value": "released", "label": { "vi": "Đã phát hành", "en": "Released" } },
+                  { "value": "partial", "label": { "vi": "Nhận một phần", "en": "Partial" } },
+                  { "value": "received", "label": { "vi": "Đã nhận", "en": "Received" } },
+                  { "value": "closed", "label": { "vi": "Đã đóng", "en": "Closed" } }
+                ]
+              }
+            ],
+            "showApply": true
+          }
+        },
+        {
+          "blockId": "blk-po-table",
+          "type": "data-table",
+          "visible": true,
+          "order": 4,
+          "title": { "vi": "Danh sách Purchase Order", "en": "Purchase Order Register" },
+          "config": {
+            "dataSource": {
+              "api": "purchasing.purchase_orders.list",
+              "method": "GET",
+              "dataKey": "records",
+              "params": {
+                "search": "{{ filters.search }}",
+                "status": "{{ filters.status }}"
+              }
+            },
+            "columns": [
+              { "key": "po_number", "label": { "vi": "Số PO", "en": "PO#" }, "sortable": true, "filterable": true, "width": "160px", "pinned": "left" },
+              { "key": "vendor_lookup_name", "label": { "vi": "Nhà cung cấp", "en": "Vendor" }, "sortable": true, "filterable": true },
+              { "key": "vendor_id", "label": { "vi": "Mã NCC", "en": "Vendor ID" }, "sortable": true },
+              { "key": "source_record_id", "label": { "vi": "Nguồn", "en": "Source" }, "sortable": true },
+              { "key": "po_date", "label": { "vi": "Ngày PO", "en": "PO Date" }, "type": "date", "sortable": true },
+              { "key": "need_by_date", "label": { "vi": "Need By", "en": "Need By" }, "type": "date", "sortable": true },
+              { "key": "promise_date", "label": { "vi": "Promise", "en": "Promise" }, "type": "date", "sortable": true },
+              { "key": "po_status", "label": { "vi": "Trạng thái", "en": "Status" }, "type": "badge", "sortable": true }
+            ],
+            "pagination": true,
+            "pageSize": 20,
+            "features": {
+              "columnResize": true,
+              "multiSort": true,
+              "columnFilter": true,
+              "globalSearch": true,
+              "rowSelection": false,
+              "export": ["csv"]
+            },
+            "rowClick": {
+              "action": "navigate-tab",
+              "tab": "overview",
+              "stateMap": {
+                "selectedPoId": "po_id",
+                "selectedPoNumber": "po_number",
+                "selectedVendorId": "vendor_id",
+                "selectedSourceRecordId": "source_record_id"
+              }
+            }
+          }
+        },
+        {
+          "blockId": "blk-po-selection-hint",
+          "type": "info-banner",
+          "visible": true,
+          "visibleWhen": "{{ !state.selectedPoId }}",
+          "order": 5,
+          "config": {
+            "text": {
+              "vi": "Chọn một PO từ bảng phía trên để xem header, chuyển trạng thái và giữ cùng digital thread cho PO line hoặc receiving/IQC.",
+              "en": "Select a PO from the register above to review the header, execute workflow transitions, and preserve the same digital thread for PO lines or receiving/IQC."
+            },
+            "type": "info",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-po-detail",
+          "type": "data-detail",
+          "visible": true,
+          "visibleWhen": "{{ !!state.selectedPoId }}",
+          "order": 6,
+          "title": { "vi": "PO header", "en": "PO Header" },
+          "config": {
+            "dataSource": {
+              "api": "purchasing.purchase_orders.detail",
+              "method": "GET",
+              "dataKey": "record",
+              "params": {
+                "po_id": "{{ state.selectedPoId || '' }}"
+              }
+            },
+            "detail": {
+              "titleField": "po_number",
+              "subtitleField": "vendor_lookup_name",
+              "statusField": "po_status",
+              "ownerField": "buyer_id",
+              "updatedAtField": "updated_at"
+            },
+            "layout": "grid",
+            "fields": [
+              { "key": "po_number", "label": { "vi": "Số PO", "en": "PO Number" } },
+              { "key": "vendor_lookup_name", "label": { "vi": "Nhà cung cấp", "en": "Vendor" } },
+              { "key": "vendor_id", "label": { "vi": "Mã NCC", "en": "Vendor ID" } },
+              { "key": "source_record_id", "label": { "vi": "Source record", "en": "Source Record" } },
+              { "key": "po_type", "label": { "vi": "Loại PO", "en": "PO Type" } },
+              { "key": "po_date", "label": { "vi": "Ngày PO", "en": "PO Date" }, "type": "date" },
+              { "key": "need_by_date", "label": { "vi": "Need By", "en": "Need By Date" }, "type": "date" },
+              { "key": "promise_date", "label": { "vi": "Promise", "en": "Promise Date" }, "type": "date" },
+              { "key": "currency_code", "label": { "vi": "Tiền tệ", "en": "Currency" } },
+              { "key": "payment_terms", "label": { "vi": "Điều khoản thanh toán", "en": "Payment Terms" } },
+              { "key": "incoterms", "label": { "vi": "Incoterms", "en": "Incoterms" } },
+              { "key": "ship_via", "label": { "vi": "Ship Via", "en": "Ship Via" } },
+              { "key": "buyer_id", "label": { "vi": "Buyer", "en": "Buyer" } },
+              { "key": "release_number", "label": { "vi": "Release number", "en": "Release Number" } },
+              { "key": "vendor_quote_ref", "label": { "vi": "Ref báo giá NCC", "en": "Vendor Quote Ref" } },
+              { "key": "requisition_id", "label": { "vi": "Requisition", "en": "Requisition ID" } },
+              { "key": "updated_at", "label": { "vi": "Cập nhật", "en": "Updated At" }, "type": "datetime" }
+            ]
+          }
+        },
+        {
+          "blockId": "blk-po-status-flow",
+          "type": "action-status-flow",
+          "visible": true,
+          "visibleWhen": "{{ !!state.selectedPoId }}",
+          "order": 7,
+          "title": { "vi": "Lifecycle PO", "en": "PO Lifecycle" },
+          "config": {
+            "dataSource": {
+              "api": "purchasing.purchase_orders.detail",
+              "method": "GET",
+              "dataKey": "record",
+              "params": {
+                "po_id": "{{ state.selectedPoId || '' }}"
+              }
+            },
+            "workflow": {
+              "entity": "purchase_orders",
+              "stateField": "po_status",
+              "showDiagram": true,
+              "states": [
+                { "id": "draft", "label": { "vi": "Nháp", "en": "Draft" } },
+                { "id": "pending_approval", "label": { "vi": "Chờ phê duyệt", "en": "Pending Approval" } },
+                { "id": "approved", "label": { "vi": "Đã phê duyệt", "en": "Approved" } },
+                { "id": "released", "label": { "vi": "Đã phát hành", "en": "Released" } },
+                { "id": "partial", "label": { "vi": "Nhận một phần", "en": "Partial" } },
+                { "id": "received", "label": { "vi": "Đã nhận", "en": "Received" } },
+                { "id": "closed", "label": { "vi": "Đã đóng", "en": "Closed" } }
+              ],
+              "transitions": [
+                { "from": "draft", "to": "pending_approval", "label": { "vi": "Trình phê duyệt", "en": "Submit for Approval" }, "variant": "secondary" },
+                { "from": "pending_approval", "to": "approved", "label": { "vi": "Phê duyệt", "en": "Approve" }, "variant": "primary" },
+                { "from": "approved", "to": "released", "label": { "vi": "Phát hành PO", "en": "Release PO" }, "variant": "primary" },
+                { "from": "released", "to": "partial", "label": { "vi": "Ghi nhận nhận một phần", "en": "Receive Partial" }, "variant": "secondary" },
+                { "from": "released", "to": "received", "label": { "vi": "Ghi nhận nhận đủ", "en": "Receive Full" }, "variant": "secondary" },
+                { "from": "partial", "to": "received", "label": { "vi": "Hoàn tất nhận hàng", "en": "Complete Receiving" }, "variant": "primary" },
+                { "from": "received", "to": "closed", "label": { "vi": "Đóng PO", "en": "Close PO" }, "variant": "secondary" }
+              ],
+              "digitalThread": {
+                "upstreamTriggers": [
+                  "SO/JO/WO buy signal",
+                  "supplier quote",
+                  "approved demand"
+                ],
+                "downstreamEffects": [
+                  "PO line fulfillment",
+                  "receiving",
+                  "incoming inspection"
+                ]
+              }
+            },
+            "transitionApi": {
+              "action": "purchasing.purchase_orders.transition",
+              "method": "POST",
+              "bodyTemplate": {
+                "po_id": "{{ blocks.blk_po_status_flow.data.po_id || state.selectedPoId || '' }}",
+                "row_version": "{{ blocks.blk_po_status_flow.data.row_version || 0 }}",
+                "to_status": "{{ targetStatus }}",
+                "transition_note": ""
+              }
+            },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Đã cập nhật trạng thái PO.', 'Purchase order status updated.') }}", "toastType": "success" },
+                { "type": "refresh", "blocks": ["blk-po-table", "blk-po-detail", "blk-po-status-flow", "blk-po-line-table", "blk-iqc-table"] }
+              ]
+            }
+          }
+        },
+        {
+          "blockId": "blk-po-actions",
+          "type": "action-toolbar",
+          "visible": true,
+          "order": 8,
+          "config": {
+            "buttons": [
+              { "label": { "vi": "+ Tạo PO", "en": "+ Create PO" }, "action": "navigate-tab", "tab": "create-po", "variant": "primary", "icon": "➕" },
+              { "label": { "vi": "Quản lý PO line", "en": "Manage PO Lines" }, "action": "navigate-tab", "tab": "po-lines", "variant": "secondary", "icon": "🧩" },
+              { "label": { "vi": "Receiving / IQC", "en": "Receiving / IQC" }, "action": "navigate-tab", "tab": "receiving", "variant": "secondary", "icon": "🧪" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tabId": "create-po",
+      "title": { "vi": "Tạo PO", "en": "Create PO" },
+      "icon": "➕",
+      "blocks": [
+        {
+          "blockId": "blk-po-create-banner",
+          "type": "info-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "text": "{{ state.sourceRecordId ? _t('PO này sẽ được liên kết với nguồn ' + state.sourceRecordId + '. Hãy giữ source_record_id để đảm bảo digital thread giữa Orders và Purchasing.', 'This PO will be linked to source ' + state.sourceRecordId + '. Keep source_record_id populated to preserve the Orders-to-Purchasing digital thread.') : _t('Nếu PO phát sinh từ SO/JO/WO, hãy mở Purchasing từ record nguồn để source_record_id được điền sẵn.', 'If the PO originates from SO/JO/WO, open Purchasing from the source record so source_record_id is prefilled.') }}",
+            "type": "warning",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-po-create-form",
+          "type": "form-standard",
+          "visible": true,
+          "order": 2,
+          "title": { "vi": "Phát hành Purchase Order", "en": "Issue Purchase Order" },
+          "config": {
+            "table": "purchase_orders",
+            "columns": 2,
+            "submitApi": { "action": "purchasing.purchase_orders.create", "method": "POST" },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Tạo PO thành công.', 'Purchase order created successfully.') }}", "toastType": "success" },
+                { "type": "navigate", "tab": "overview" },
+                { "type": "refresh", "blocks": ["blk-po-table", "blk-po-line-table", "blk-iqc-table"] }
+              ]
+            },
+            "fields": [
+              { "key": "source_record_id", "label": { "vi": "Source record", "en": "Source Record" }, "type": "text", "defaultValue": "{{ state.sourceRecordId || state.selectedSourceRecordId || '' }}" },
+              { "key": "po_number", "label": { "vi": "Số PO", "en": "PO Number" }, "type": "text", "validation": { "required": true } },
+              { "key": "vendor_id", "label": { "vi": "Nhà cung cấp", "en": "Vendor" }, "type": "select", "defaultValue": "{{ state.preferredVendorId || state.selectedVendorId || '' }}", "validation": { "required": true } },
+              {
+                "key": "po_type",
+                "label": { "vi": "Loại PO", "en": "PO Type" },
+                "type": "select",
+                "defaultValue": "standard",
+                "options": [
+                  { "value": "standard", "label": { "vi": "Tiêu chuẩn", "en": "Standard" } },
+                  { "value": "subcontract", "label": { "vi": "Gia công ngoài", "en": "Subcontract" } },
+                  { "value": "blanket", "label": { "vi": "Blanket", "en": "Blanket" } }
+                ]
+              },
+              { "key": "po_date", "label": { "vi": "Ngày PO", "en": "PO Date" }, "type": "date", "defaultValue": "{{ new Date().toISOString().substring(0,10) }}", "validation": { "required": true } },
+              { "key": "need_by_date", "label": { "vi": "Need By", "en": "Need By Date" }, "type": "date" },
+              { "key": "promise_date", "label": { "vi": "Promise", "en": "Promise Date" }, "type": "date" },
+              { "key": "currency_code", "label": { "vi": "Tiền tệ", "en": "Currency" }, "type": "select", "defaultValue": "USD", "options": ["USD", "VND", "EUR", "JPY"] },
+              { "key": "payment_terms", "label": { "vi": "Điều khoản thanh toán", "en": "Payment Terms" }, "type": "text" },
+              { "key": "incoterms", "label": { "vi": "Incoterms", "en": "Incoterms" }, "type": "text" },
+              { "key": "ship_via", "label": { "vi": "Ship Via", "en": "Ship Via" }, "type": "text" },
+              { "key": "buyer_id", "label": { "vi": "Buyer", "en": "Buyer ID" }, "type": "text", "defaultValue": "{{ currentUser.username || currentUser.user || currentUser.employee_id || '' }}" },
+              { "key": "release_number", "label": { "vi": "Release number", "en": "Release Number" }, "type": "text" },
+              { "key": "vendor_quote_ref", "label": { "vi": "Ref báo giá NCC", "en": "Vendor Quote Ref" }, "type": "text" },
+              { "key": "requisition_id", "label": { "vi": "Requisition", "en": "Requisition ID" }, "type": "text" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tabId": "po-lines",
+      "title": { "vi": "PO line", "en": "PO Lines" },
+      "icon": "🧩",
+      "blocks": [
+        {
+          "blockId": "blk-po-lines-context",
+          "type": "info-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "text": "{{ state.selectedPoNumber ? _t('PO đang chọn: ' + state.selectedPoNumber + '. Hãy thêm line vào đúng po_id để giữ link header-line-IQC.', 'Selected PO: ' + state.selectedPoNumber + '. Add lines against the same po_id to preserve the header-line-IQC thread.') : _t('Chọn một PO từ tab Tổng quan trước khi thêm PO line.', 'Select a PO from the Overview tab before adding PO lines.') }}",
+            "type": "info",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-po-line-table",
+          "type": "data-table",
+          "visible": true,
+          "order": 2,
+          "title": { "vi": "Danh sách PO line", "en": "PO Line Register" },
+          "config": {
+            "dataSource": {
+              "api": "purchasing.purchase_order_lines.list",
+              "method": "GET",
+              "dataKey": "records",
+              "params": {
+                "po_id": "{{ state.selectedPoId || '' }}"
+              }
+            },
+            "columns": [
+              { "key": "line_number", "label": { "vi": "Line", "en": "Line" }, "sortable": true, "width": "90px" },
+              { "key": "item_id", "label": { "vi": "Item ID", "en": "Item ID" }, "sortable": true },
+              { "key": "item_customer_part_number", "label": { "vi": "Mã part KH", "en": "Customer Part" }, "sortable": true },
+              { "key": "order_qty", "label": { "vi": "SL đặt", "en": "Order Qty" }, "type": "number", "sortable": true, "align": "right" },
+              { "key": "received_qty", "label": { "vi": "SL nhận", "en": "Received Qty" }, "type": "number", "sortable": true, "align": "right" },
+              { "key": "rejected_qty", "label": { "vi": "SL loại", "en": "Rejected Qty" }, "type": "number", "sortable": true, "align": "right" },
+              { "key": "unit_cost", "label": { "vi": "Đơn giá", "en": "Unit Cost" }, "type": "number", "sortable": true, "align": "right" },
+              { "key": "incoming_inspection_plan", "label": { "vi": "Kế hoạch IQC", "en": "IQC Plan" }, "sortable": true }
+            ],
+            "pagination": true,
+            "pageSize": 20,
+            "rowClick": {
+              "action": "navigate-tab",
+              "tab": "receiving",
+              "stateMap": {
+                "selectedPoLineId": "po_line_id",
+                "selectedPoId": "po_id",
+                "selectedItemId": "item_id",
+                "selectedInspectionPlan": "incoming_inspection_plan",
+                "selectedLotNumberVendor": "lot_number_vendor"
+              }
+            }
+          }
+        },
+        {
+          "blockId": "blk-po-line-form",
+          "type": "form-standard",
+          "visible": true,
+          "order": 3,
+          "title": { "vi": "Thêm PO line", "en": "Add PO Line" },
+          "config": {
+            "table": "purchase_order_lines",
+            "columns": 2,
+            "submitApi": { "action": "purchasing.purchase_order_lines.create", "method": "POST" },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Tạo PO line thành công.', 'PO line created successfully.') }}", "toastType": "success" },
+                { "type": "refresh", "blocks": ["blk-po-line-table", "blk-iqc-table"] }
+              ]
+            },
+            "fields": [
+              { "key": "po_id", "label": { "vi": "PO ID", "en": "PO ID" }, "type": "text", "defaultValue": "{{ state.selectedPoId || '' }}", "validation": { "required": true } },
+              { "key": "line_number", "label": { "vi": "Số line", "en": "Line Number" }, "type": "number", "validation": { "required": true, "min": 1 } },
+              { "key": "item_id", "label": { "vi": "Item ID", "en": "Item ID" }, "type": "select", "defaultValue": "{{ state.preferredItemId || state.selectedItemId || '' }}", "validation": { "required": true } },
+              { "key": "order_qty", "label": { "vi": "Số lượng đặt", "en": "Order Qty" }, "type": "number", "validation": { "required": true, "min": 0.01 } },
+              { "key": "unit_cost", "label": { "vi": "Đơn giá", "en": "Unit Cost" }, "type": "number", "validation": { "required": true, "min": 0 } },
+              { "key": "incoming_inspection_plan", "label": { "vi": "Kế hoạch IQC", "en": "Incoming Inspection Plan" }, "type": "text" },
+              { "key": "lot_number_vendor", "label": { "vi": "Lot của NCC", "en": "Vendor Lot Number" }, "type": "text" },
+              { "key": "coc_required", "label": { "vi": "Yêu cầu CoC", "en": "CoC Required" }, "type": "checkbox" },
+              { "key": "material_cert_required", "label": { "vi": "Yêu cầu cert vật liệu", "en": "Material Cert Required" }, "type": "checkbox" },
+              { "key": "source_inspection_required", "label": { "vi": "Yêu cầu source inspection", "en": "Source Inspection Required" }, "type": "checkbox" },
+              { "key": "test_report_required", "label": { "vi": "Yêu cầu test report", "en": "Test Report Required" }, "type": "checkbox" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tabId": "receiving",
+      "title": { "vi": "Receiving / IQC", "en": "Receiving / IQC" },
+      "icon": "🧪",
+      "blocks": [
+        {
+          "blockId": "blk-receiving-context",
+          "type": "info-banner",
+          "visible": true,
+          "order": 1,
+          "config": {
+            "text": "{{ state.selectedPoNumber ? _t('Đang ghi nhận receiving/IQC cho PO ' + state.selectedPoNumber + '. Ưu tiên chọn PO line để tự điền item và source_record_id.', 'Receiving/IQC is being recorded against PO ' + state.selectedPoNumber + '. Select a PO line first to prefill item and source_record_id.') : _t('Chọn PO và tốt nhất là chọn đúng PO line trước khi tạo incoming inspection.', 'Select a PO, and preferably the exact PO line, before creating an incoming inspection.') }}",
+            "type": "warning",
+            "dismissable": false
+          }
+        },
+        {
+          "blockId": "blk-iqc-table",
+          "type": "data-table",
+          "visible": true,
+          "order": 2,
+          "title": { "vi": "Incoming inspection theo PO", "en": "Incoming Inspection by PO" },
+          "config": {
+            "dataSource": {
+              "api": "quality_management.incoming_inspections.list",
+              "method": "GET",
+              "dataKey": "records",
+              "params": {
+                "po_number": "{{ state.selectedPoNumber || '' }}"
+              }
+            },
+            "columns": [
+              { "key": "inspection_number", "label": { "vi": "Số IQC", "en": "IQC#" }, "sortable": true, "width": "150px" },
+              { "key": "po_number", "label": { "vi": "PO", "en": "PO" }, "sortable": true, "width": "150px" },
+              { "key": "vendor_lookup_name", "label": { "vi": "Nhà cung cấp", "en": "Vendor" }, "sortable": true },
+              { "key": "item_customer_part_number", "label": { "vi": "Part", "en": "Part" }, "sortable": true },
+              { "key": "qty_received", "label": { "vi": "SL nhận", "en": "Received Qty" }, "type": "number", "sortable": true, "align": "right" },
+              { "key": "result", "label": { "vi": "Kết quả", "en": "Result" }, "type": "badge", "sortable": true },
+              { "key": "status", "label": { "vi": "Trạng thái", "en": "Status" }, "type": "badge", "sortable": true },
+              { "key": "received_date", "label": { "vi": "Ngày nhận", "en": "Received Date" }, "type": "date", "sortable": true }
+            ],
+            "pagination": true,
+            "pageSize": 20,
+            "rowClick": {
+              "action": "navigate-tab",
+              "tab": "receiving",
+              "stateMap": {
+                "selectedInspectionId": "inspection_id",
+                "selectedInspectionSourceRecordId": "source_record_id",
+                "selectedInspectionVendorId": "vendor_id",
+                "selectedInspectionItemId": "item_id"
+              }
+            }
+          }
+        },
+        {
+          "blockId": "blk-iqc-detail",
+          "type": "data-detail",
+          "visible": true,
+          "visibleWhen": "{{ !!state.selectedInspectionId }}",
+          "order": 3,
+          "title": { "vi": "Chi tiết incoming inspection", "en": "Incoming Inspection Detail" },
+          "config": {
+            "dataSource": {
+              "api": "quality_management.incoming_inspections.detail",
+              "method": "GET",
+              "dataKey": "record",
+              "params": {
+                "inspection_id": "{{ state.selectedInspectionId || '' }}"
+              }
+            },
+            "detail": {
+              "titleField": "inspection_number",
+              "subtitleField": "po_number",
+              "statusField": "status",
+              "ownerField": "inspector_id",
+              "updatedAtField": "updated_at"
+            },
+            "layout": "grid",
+            "fields": [
+              { "key": "inspection_number", "label": { "vi": "Số IQC", "en": "IQC Number" } },
+              { "key": "po_number", "label": { "vi": "PO", "en": "PO Number" } },
+              { "key": "vendor_lookup_name", "label": { "vi": "Nhà cung cấp", "en": "Vendor" } },
+              { "key": "vendor_id", "label": { "vi": "Mã NCC", "en": "Vendor ID" } },
+              { "key": "item_id", "label": { "vi": "Item ID", "en": "Item ID" } },
+              { "key": "inspection_plan_id", "label": { "vi": "Inspection plan", "en": "Inspection Plan" } },
+              { "key": "received_date", "label": { "vi": "Ngày nhận", "en": "Received Date" }, "type": "date" },
+              { "key": "qty_received", "label": { "vi": "SL nhận", "en": "Qty Received" }, "type": "number" },
+              { "key": "qty_accepted", "label": { "vi": "SL đạt", "en": "Qty Accepted" }, "type": "number" },
+              { "key": "qty_rejected", "label": { "vi": "SL loại", "en": "Qty Rejected" }, "type": "number" },
+              { "key": "result", "label": { "vi": "Kết quả", "en": "Result" }, "type": "badge" },
+              { "key": "status", "label": { "vi": "Trạng thái", "en": "Status" }, "type": "badge" },
+              { "key": "lot_number", "label": { "vi": "Lot number", "en": "Lot Number" } },
+              { "key": "defects_found", "label": { "vi": "Số lỗi", "en": "Defects Found" }, "type": "number" },
+              { "key": "source_record_id", "label": { "vi": "Source record", "en": "Source Record" } },
+              { "key": "updated_at", "label": { "vi": "Cập nhật", "en": "Updated At" }, "type": "datetime" }
+            ]
+          }
+        },
+        {
+          "blockId": "blk-iqc-status-flow",
+          "type": "action-status-flow",
+          "visible": true,
+          "visibleWhen": "{{ !!state.selectedInspectionId }}",
+          "order": 4,
+          "title": { "vi": "Lifecycle IQC", "en": "IQC Lifecycle" },
+          "config": {
+            "dataSource": {
+              "api": "quality_management.incoming_inspections.detail",
+              "method": "GET",
+              "dataKey": "record",
+              "params": {
+                "inspection_id": "{{ state.selectedInspectionId || '' }}"
+              }
+            },
+            "workflow": {
+              "entity": "incoming_inspections",
+              "stateField": "status",
+              "showDiagram": true,
+              "states": [
+                { "id": "queued", "label": { "vi": "Chờ kiểm tra", "en": "Queued" } },
+                { "id": "in_progress", "label": { "vi": "Đang kiểm tra", "en": "In Progress" } },
+                { "id": "accepted", "label": { "vi": "Đạt", "en": "Accepted" } },
+                { "id": "rejected", "label": { "vi": "Không đạt", "en": "Rejected" } },
+                { "id": "waived", "label": { "vi": "Miễn kiểm", "en": "Waived" } }
+              ],
+              "transitions": [
+                { "from": "queued", "to": "in_progress", "label": { "vi": "Bắt đầu kiểm tra", "en": "Start Inspection" }, "variant": "secondary" },
+                { "from": "in_progress", "to": "accepted", "label": { "vi": "Chấp nhận", "en": "Accept" }, "variant": "primary" },
+                { "from": "in_progress", "to": "rejected", "label": { "vi": "Từ chối", "en": "Reject" }, "variant": "danger" },
+                { "from": "queued", "to": "waived", "label": { "vi": "Miễn kiểm", "en": "Waive" }, "variant": "secondary" }
+              ],
+              "digitalThread": {
+                "upstreamTriggers": [
+                  "released PO",
+                  "received material",
+                  "PO line inspection plan"
+                ],
+                "downstreamEffects": [
+                  "stock disposition",
+                  "supplier quality",
+                  "SCAR escalation"
+                ]
+              }
+            },
+            "transitionApi": {
+              "action": "quality_management.incoming_inspections.transition",
+              "method": "POST",
+              "bodyTemplate": {
+                "inspection_id": "{{ blocks.blk_iqc_status_flow.data.inspection_id || state.selectedInspectionId || '' }}",
+                "row_version": "{{ blocks.blk_iqc_status_flow.data.row_version || 0 }}",
+                "to_status": "{{ targetStatus }}",
+                "transition_note": ""
+              }
+            },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Đã cập nhật trạng thái incoming inspection.', 'Incoming inspection status updated.') }}", "toastType": "success" },
+                { "type": "refresh", "blocks": ["blk-iqc-table", "blk-iqc-detail", "blk-iqc-status-flow"] }
+              ]
+            }
+          }
+        },
+        {
+          "blockId": "blk-iqc-form",
+          "type": "form-standard",
+          "visible": true,
+          "order": 5,
+          "title": { "vi": "Tạo incoming inspection", "en": "Create Incoming Inspection" },
+          "config": {
+            "table": "incoming_inspections",
+            "columns": 2,
+            "submitApi": { "action": "quality_management.incoming_inspections.create", "method": "POST" },
+            "onSuccess": {
+              "type": "chain",
+              "actions": [
+                { "type": "toast", "message": "{{ _t('Tạo incoming inspection thành công.', 'Incoming inspection created successfully.') }}", "toastType": "success" },
+                { "type": "refresh", "blocks": ["blk-iqc-table"] }
+              ]
+            },
+            "fields": [
+              { "key": "source_record_id", "label": { "vi": "Source record", "en": "Source Record" }, "type": "text", "defaultValue": "{{ state.selectedPoLineId || state.selectedPoId || state.sourceRecordId || state.selectedSourceRecordId || '' }}" },
+              { "key": "vendor_id", "label": { "vi": "Nhà cung cấp", "en": "Vendor" }, "type": "select", "defaultValue": "{{ state.selectedVendorId || state.preferredVendorId || '' }}", "validation": { "required": true } },
+              { "key": "item_id", "label": { "vi": "Item ID", "en": "Item ID" }, "type": "select", "defaultValue": "{{ state.selectedItemId || state.preferredItemId || '' }}" },
+              { "key": "po_number", "label": { "vi": "PO number", "en": "PO Number" }, "type": "text", "defaultValue": "{{ state.selectedPoNumber || '' }}" },
+              { "key": "inspection_number", "label": { "vi": "Số IQC", "en": "Inspection Number" }, "type": "text" },
+              { "key": "inspection_plan_id", "label": { "vi": "Inspection plan", "en": "Inspection Plan" }, "type": "select", "defaultValue": "{{ state.selectedInspectionPlan || '' }}" },
+              { "key": "received_date", "label": { "vi": "Ngày nhận", "en": "Received Date" }, "type": "date", "defaultValue": "{{ new Date().toISOString().substring(0,10) }}" },
+              { "key": "qty_received", "label": { "vi": "SL nhận", "en": "Qty Received" }, "type": "number", "validation": { "required": true, "min": 0.01 } },
+              { "key": "qty_accepted", "label": { "vi": "SL đạt", "en": "Qty Accepted" }, "type": "number", "validation": { "min": 0 } },
+              { "key": "qty_rejected", "label": { "vi": "SL loại", "en": "Qty Rejected" }, "type": "number", "validation": { "min": 0 } },
+              { "key": "lot_number", "label": { "vi": "Lot number", "en": "Lot Number" }, "type": "text", "defaultValue": "{{ state.selectedLotNumberVendor || '' }}" },
+              {
+                "key": "status",
+                "label": { "vi": "Trạng thái workflow", "en": "Workflow Status" },
+                "type": "select",
+                "defaultValue": "queued",
+                "options": [
+                  { "value": "queued", "label": { "vi": "Chờ xử lý", "en": "Queued" } },
+                  { "value": "in_progress", "label": { "vi": "Đang kiểm", "en": "In Progress" } },
+                  { "value": "accepted", "label": { "vi": "Đạt", "en": "Accepted" } },
+                  { "value": "rejected", "label": { "vi": "Không đạt", "en": "Rejected" } },
+                  { "value": "waived", "label": { "vi": "Miễn kiểm", "en": "Waived" } }
+                ]
+              },
+              {
+                "key": "result",
+                "label": { "vi": "Kết quả", "en": "Result" },
+                "type": "select",
+                "options": [
+                  { "value": "", "label": { "vi": "Chưa kết luận", "en": "Pending" } },
+                  { "value": "accepted", "label": { "vi": "Đạt", "en": "Accepted" } },
+                  { "value": "rejected", "label": { "vi": "Không đạt", "en": "Rejected" } },
+                  { "value": "waived", "label": { "vi": "Miễn kiểm", "en": "Waived" } }
+                ]
+              },
+              { "key": "coc_received", "label": { "vi": "Đã nhận CoC", "en": "CoC Received" }, "type": "checkbox" },
+              { "key": "material_cert_received", "label": { "vi": "Đã nhận cert vật liệu", "en": "Material Cert Received" }, "type": "checkbox" },
+              { "key": "test_report_received", "label": { "vi": "Đã nhận test report", "en": "Test Report Received" }, "type": "checkbox" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

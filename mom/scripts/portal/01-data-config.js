@@ -936,7 +936,7 @@ function expandPatternToDocCodes(pattern, docs){
 }
 
 // Immutable admin whitelist — UI edits to ROLES cannot bypass this
-const ADMIN_ROLES = Object.freeze(['ceo','qa_manager','it_admin']);
+const ADMIN_ROLES = Object.freeze(['admin','ceo','qa_manager','it_admin']);
 function isAdmin(){ return currentUser && ADMIN_ROLES.includes(currentUser.role); }
 
 // Permission overrides stored per user (from admin panel)

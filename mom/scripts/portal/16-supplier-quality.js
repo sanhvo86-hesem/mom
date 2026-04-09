@@ -16,6 +16,24 @@ function _api(action, payload, method){
 }
 function _toast(msg, type){ if(typeof showToast==='function') return showToast(msg, type); var box=document.createElement('div'); box.className='sj-toast '+(type||'info'); box.textContent=msg; document.body.appendChild(box); requestAnimationFrame(function(){ box.classList.add('show'); }); setTimeout(function(){ box.classList.remove('show'); setTimeout(function(){ if(box.parentNode) box.remove(); },180); },3200); }
 function _fmtDate(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+function _openPurchasingIncoming(item){
+  var ctx = { targetTab:'receiving' };
+  var record = item && typeof item === 'object' ? item : {};
+  if(record.po_number) ctx.selectedPoNumber = record.po_number;
+  if(record.vendor_id || record.vendor) ctx.selectedVendorId = record.vendor_id || record.vendor;
+  if(record.item_id || record.material_id) ctx.selectedItemId = record.item_id || record.material_id;
+  if(record.source_record_id) ctx.sourceRecordId = record.source_record_id;
+  if(record.inspection_id || record.id) ctx.selectedInspectionId = record.inspection_id || record.id;
+  if(typeof window._openPurchasingWorkspace === 'function'){
+    window._openPurchasingWorkspace(ctx);
+    return true;
+  }
+  if(typeof navigateTo === 'function'){
+    navigateTo('purchasing');
+    return true;
+  }
+  return false;
+}
 function _buildRegistryOptions(regKey){
   var html = '<option value="">— '+_t('Chọn','Select')+' —</option>';
   if(window.HmRegistry){
@@ -302,16 +320,16 @@ function _renderScorecardsTab(){
 function _renderIncomingTab(){
   var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
     +'<h3 style="margin:0">'+_t('Kiểm tra hàng nhận','Incoming Inspection')+'</h3>'
-    +'<button class="sq-btn sq-btn-primary" data-action="create-incoming">+ '+_t('Tạo mới','New')+'</button>'
+    +'<button class="sq-btn sq-btn-primary" data-action="create-incoming">'+_t('Mở Purchasing / IQC','Open Purchasing / IQC')+'</button>'
   +'</div>';
+  html+='<div class="sq-card" style="border-left:4px solid var(--brand,#1565c0)"><strong>'+_t('Chuẩn vận hành mới','Standardized operating path')+'</strong><div style="margin-top:6px;color:var(--text-secondary,#64748b)">'+_t('Receiving và incoming inspection giao dịch đã được chuẩn hóa tại workspace Mua hàng & IQC. Tab này chỉ còn phục vụ review lịch sử NCC và điều hướng sang luồng chuẩn.', 'Transactional receiving and incoming inspection are now standardized in the Purchasing & IQC workspace. This tab remains for supplier review history and routes users into the canonical flow.')+'</div></div>';
   html+='<div id="sq-incoming-form"></div>';
   if(!state.incoming.length) return html+'<div class="sq-empty">'+_t('Chưa có dữ liệu','No data')+'</div>';
   html+='<table class="sq-table"><thead><tr><th>ID</th><th>'+_t('Nhà CC','Vendor')+'</th><th>'+_t('Vật tư','Material')+'</th><th>'+_t('SL','Qty')+'</th><th>'+_t('Ngày','Date')+'</th><th>'+_t('Kết quả','Result')+'</th><th></th></tr></thead><tbody>';
   state.incoming.forEach(function(item){
     html+='<tr><td>'+_esc(item.id)+'</td><td>'+_esc(item.vendor_name||'-')+'</td><td>'+_esc(item.material||'-')+'</td><td>'+_esc(item.qty||'-')+'</td><td>'+_fmtDate(item.date)+'</td><td>'+_inspBadge(item.status)+'</td>'
       +'<td style="display:flex;gap:var(--space-1,4px)">'
-        +'<button class="sq-btn sq-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="insp-pass" data-id="'+_esc(item.id)+'">'+_t('Đạt','Pass')+'</button>'
-        +'<button class="sq-btn sq-btn-danger" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="insp-fail" data-id="'+_esc(item.id)+'">'+_t('Loại','Fail')+'</button>'
+        +'<button class="sq-btn sq-btn-secondary" style="padding:var(--space-1,4px) var(--space-2,8px);font-size:var(--text-xs,.75rem)" data-action="open-purchasing-incoming" data-id="'+_esc(item.id)+'" data-po="'+_esc(item.po_number||'')+'" data-vendor="'+_esc(item.vendor_id||item.vendor||'')+'" data-item="'+_esc(item.item_id||item.material_id||'')+'" data-source="'+_esc(item.source_record_id||'')+'">'+_t('Mở luồng chuẩn','Open canonical flow')+'</button>'
       +'</td></tr>';
   });
   html+='</tbody></table>';
@@ -540,7 +558,9 @@ function _bind(){
         state.selectedVendor=null;
         _paint();
         break;
-      case 'create-incoming': _showIncomingForm(); break;
+      case 'create-incoming':
+        _openPurchasingIncoming(null);
+        break;
       case 'create-scar': _showScarForm(); break;
       case 'create-asl': _showAslForm(); break;
       case 'create-audit': _showAuditForm(); break;
@@ -550,13 +570,10 @@ function _bind(){
         });
         break;
       case 'submit-incoming':
-        _api('supplier_incoming_create',{
-          vendor:(state.container.querySelector('#sq-f-vendor')||{}).value||'',
-          material:(state.container.querySelector('#sq-f-material')||{}).value||'',
-          qty:parseInt((state.container.querySelector('#sq-f-qty')||{}).value)||0,
-          date:(state.container.querySelector('#sq-f-date')||{}).value||'',
-          notes:(state.container.querySelector('#sq-f-notes')||{}).value||''
-        }).then(function(r){ if(r&&r.ok){_toast(_t('Tạo thành công','Created'),'success');_loadData();} else {_toast(_t('Lỗi','Error'),'error');} });
+        _openPurchasingIncoming({
+          vendor_id:(state.container.querySelector('#sq-f-vendor')||{}).value||'',
+          item_id:(state.container.querySelector('#sq-f-material')||{}).value||''
+        });
         break;
       case 'submit-scar':
         _api('supplier_scar_create',{
@@ -582,14 +599,13 @@ function _bind(){
           notes:(state.container.querySelector('#sq-f-aud-notes')||{}).value||''
         }).then(function(r){ if(r&&r.ok){_toast(_t('Audit tạo thành công','Audit created'),'success');_loadData();} else {_toast(_t('Lỗi','Error'),'error');} });
         break;
-      case 'insp-pass':
-        _api('supplier_incoming_disposition',{id:t.getAttribute('data-id'),status:'pass'}).then(function(r){
-          if(r&&r.ok){_toast(_t('Đạt','Passed'),'success');_loadData();} else {_toast(_t('Lỗi','Error'),'error');}
-        });
-        break;
-      case 'insp-fail':
-        _api('supplier_incoming_disposition',{id:t.getAttribute('data-id'),status:'fail'}).then(function(r){
-          if(r&&r.ok){_toast(_t('Đã từ chối','Failed'),'success');_loadData();} else {_toast(_t('Lỗi','Error'),'error');}
+      case 'open-purchasing-incoming':
+        _openPurchasingIncoming({
+          id:t.getAttribute('data-id')||'',
+          po_number:t.getAttribute('data-po')||'',
+          vendor_id:t.getAttribute('data-vendor')||'',
+          item_id:t.getAttribute('data-item')||'',
+          source_record_id:t.getAttribute('data-source')||''
         });
         break;
       case 'suspend-asl':

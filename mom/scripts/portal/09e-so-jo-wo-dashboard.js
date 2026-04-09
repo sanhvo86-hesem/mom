@@ -164,6 +164,24 @@ function _bandRank(key){ return ({ critical:0, warning:1, ready:2, info:3, not_r
 function _phaseMeta(key){ return PHASE_META[key] || { vi:key||'-', en:key||'-' }; }
 function _migrateRole(role){ var map={ general_director:'ceo', deputy_director:'production_director', prod_manager:'cnc_workshop_manager', prod_supervisor:'shift_leader', cnc_setup:'setup_technician', cnc_programmer:'cam_nc_programmer', qms_supervisor:'qms_engineer', doc_controller:'qms_engineer', purchasing_officer:'buyer', procurement_manager:'supply_chain_manager', sales_officer:'estimator', planning_officer:'production_planner', hse_officer:'ehs_specialist', maintenance_tech:'maintenance_technician', finance_officer:'gl_payroll_accountant', warehouse_staff:'warehouse_clerk', warehouse_lead:'supply_chain_manager', supervisor:'shift_leader', operator:'cnc_operator', planning_manager:'production_planner', production_manager:'cnc_workshop_manager' }; return map[String(role||'').trim()] || String(role||'').trim(); }
 function _permission(type, action){ var cfg={ so:{create:['sales_manager','estimator','customer_service'],edit:['sales_manager','estimator','customer_service','supply_chain_manager']}, jo:{create:['cnc_workshop_manager','production_planner','engineering_manager','quality_manager'],edit:['cnc_workshop_manager','production_planner','engineering_manager','quality_manager','supply_chain_manager']}, wo:{create:['cnc_workshop_manager','production_planner','shift_leader'],edit:['cnc_workshop_manager','production_planner','shift_leader','setup_technician','cnc_operator','quality_engineer','qc_inspector']} }; var role=(typeof currentUser!=='undefined'&&currentUser)?_migrateRole(currentUser.role||''):''; if(!role) return true; if(['admin','it_admin','ceo','qa_manager'].indexOf(role)>=0) return true; return ((cfg[type]||{})[action]||[]).indexOf(role)>=0; }
+function _canAccessPurchasing(){ var role=(typeof currentUser!=='undefined'&&currentUser)?_migrateRole(currentUser.role||''):''; if(!role) return true; return ['admin','it_admin','ceo','qa_manager','quality_manager','qms_engineer','quality_engineer','qc_inspector','supply_chain_manager','buyer','warehouse_clerk','tool_storekeeper','logistics_coordinator','production_planner'].indexOf(role)>=0; }
+function _purchasingContext(record, type){
+  var data=record||{};
+  var sourceId=data.source_record_id || (type==='so'?data.so_number:(type==='jo'?data.jo_number:data.wo_number)) || '';
+  var preferredVendorId=data.special_process_supplier_id || (data.job_order&&data.job_order.special_process_supplier_id) || (data.parent_job_order&&data.parent_job_order.special_process_supplier_id) || '';
+  var ctx={ targetTab:'create-po' };
+  if(sourceId){ ctx.sourceRecordId=sourceId; ctx.selectedSourceRecordId=sourceId; }
+  if(preferredVendorId){ ctx.preferredVendorId=preferredVendorId; ctx.selectedVendorId=preferredVendorId; }
+  return ctx;
+}
+function _openPurchasingFromSelection(){
+  if(!_canAccessPurchasing() || typeof window._openPurchasingWorkspace!=='function') return;
+  if(_selected && _selected.data){
+    window._openPurchasingWorkspace(_purchasingContext(_selected.data, _selected.type));
+    return;
+  }
+  window._openPurchasingWorkspace({ targetTab:'overview' });
+}
 function _master(){ return (typeof window._mdGetSnapshot==='function' ? (window._mdGetSnapshot()||{}) : {}); }
 function _recordType(item){ if(item&&item._type) return item._type; if(item&&item.so_number) return 'so'; if(item&&item.jo_number) return 'jo'; return 'wo'; }
 function _recordId(item){ var type=_recordType(item); return String(type==='so'?(item.so_number||''):(type==='jo'?(item.jo_number||''):(item.wo_number||''))); }
@@ -304,7 +322,7 @@ function _renderView(){ if(_view==='table') return _renderTableView(); if(_view=
 
 function _render(){
   var h='<div class="sj-wrap">';
-  h+='<header class="sj-topbar"><div class="sj-title-group"><small class="sj-eyebrow">'+_t('Order Control Tower','Order Control Tower')+'</small><h1>'+_t('Quản lý đơn hàng tích hợp','Integrated Order Management')+'</h1><p>'+_t('Bám promise/commit thương mại, readiness kỹ thuật, launch gate MES và bộ chứng từ giao hàng trên cùng một mặt điều hành.','Track commercial promise and commit, engineering readiness, MES launch gates, and shipment documents in one operating surface.')+'</p></div><div class="sj-toolbar"><div class="sj-toolbar-note">'+_t('Lần làm mới','Refreshed')+': <strong>'+_esc(_lastRefreshAt?_fmtDateTime(_lastRefreshAt):'-')+'</strong></div><div class="sj-actions"><button type="button" class="sj-btn" id="'+_id+'-refresh">'+_t('Làm mới','Refresh')+'</button>'+( _permission('so','create')?'<button type="button" class="sj-btn accent" id="'+_id+'-new-so">+ SO</button>':'' )+( _permission('jo','create')?'<button type="button" class="sj-btn accent-2" id="'+_id+'-new-jo">+ JO</button>':'' )+( _permission('wo','create')?'<button type="button" class="sj-btn accent-3" id="'+_id+'-new-wo">+ WO</button>':'' )+'</div><div class="sj-switch"><button class="'+(_view==='hierarchy'?'active':'')+'" data-view="hierarchy">'+_t('Chuỗi đơn','Portfolio')+'</button><button class="'+(_view==='pipeline'?'active':'')+'" data-view="pipeline">'+_t('Điều phối','Dispatch')+'</button><button class="'+(_view==='table'?'active':'')+'" data-view="table">'+_t('Đăng ký','Register')+'</button></div></div></header>';
+  h+='<header class="sj-topbar"><div class="sj-title-group"><small class="sj-eyebrow">'+_t('Order Control Tower','Order Control Tower')+'</small><h1>'+_t('Quản lý đơn hàng tích hợp','Integrated Order Management')+'</h1><p>'+_t('Bám promise/commit thương mại, readiness kỹ thuật, launch gate MES và bộ chứng từ giao hàng trên cùng một mặt điều hành.','Track commercial promise and commit, engineering readiness, MES launch gates, and shipment documents in one operating surface.')+'</p></div><div class="sj-toolbar"><div class="sj-toolbar-note">'+_t('Lần làm mới','Refreshed')+': <strong>'+_esc(_lastRefreshAt?_fmtDateTime(_lastRefreshAt):'-')+'</strong></div><div class="sj-actions"><button type="button" class="sj-btn" id="'+_id+'-refresh">'+_t('Làm mới','Refresh')+'</button>'+(_canAccessPurchasing()?'<button type="button" class="sj-btn subtle" id="'+_id+'-open-po">'+_t('PO / IQC','PO / IQC')+'</button>':'')+( _permission('so','create')?'<button type="button" class="sj-btn accent" id="'+_id+'-new-so">+ SO</button>':'' )+( _permission('jo','create')?'<button type="button" class="sj-btn accent-2" id="'+_id+'-new-jo">+ JO</button>':'' )+( _permission('wo','create')?'<button type="button" class="sj-btn accent-3" id="'+_id+'-new-wo">+ WO</button>':'' )+'</div><div class="sj-switch"><button class="'+(_view==='hierarchy'?'active':'')+'" data-view="hierarchy">'+_t('Chuỗi đơn','Portfolio')+'</button><button class="'+(_view==='pipeline'?'active':'')+'" data-view="pipeline">'+_t('Điều phối','Dispatch')+'</button><button class="'+(_view==='table'?'active':'')+'" data-view="table">'+_t('Đăng ký','Register')+'</button></div></div></header>';
   h+='<section class="sj-overview"><div class="sj-overview-main">'+_renderMetricDeck()+'</div><div class="sj-overview-side">'+_renderPhaseBoard()+_renderGovernanceBoard()+'</div></section>';
   h+='<section class="sj-layout"><aside class="sj-aside">'+_renderExceptionRadar()+_renderFoundationMini()+'</aside><main class="sj-workspace">'+_renderFilters()+_renderView()+'</main></section>';
   h+='<div class="sj-overlay" id="'+_id+'-overlay"></div><aside class="sj-detail" id="'+_id+'-detail"><div class="sj-detail-head"><div><small class="sj-eyebrow">'+_t('Inspector','Inspector')+'</small><h2>'+_t('Chi tiết đơn hàng','Order inspector')+'</h2></div><button type="button" id="'+_id+'-close-detail">×</button></div><div class="sj-detail-body" id="'+_id+'-detail-body"></div><div class="sj-detail-actions" id="'+_id+'-detail-actions"></div></aside></div>';
@@ -401,11 +419,13 @@ function _showDetail(id,type){
     var actHtml='';
     if(next.length){ actHtml+='<button type="button" class="sj-btn" id="'+_id+'-change-status">'+_t('Chuyển trạng thái','Change status')+'</button>'; }
     if(_permission(type,'edit')){ actHtml+='<button type="button" class="sj-btn subtle" id="'+_id+'-edit-order">'+_t('Chỉnh sửa','Edit')+'</button>'; }
+    if(_canAccessPurchasing()){ actHtml+='<button type="button" class="sj-btn subtle" id="'+_id+'-open-purchasing-detail">'+_t('PO / IQC','PO / IQC')+'</button>'; }
     if(type==='so' && _permission('jo','create')){ actHtml+='<button type="button" class="sj-btn accent-2" id="'+_id+'-add-jo">+ JO</button>'; }
     if(type==='jo' && _permission('wo','create')){ actHtml+='<button type="button" class="sj-btn accent-3" id="'+_id+'-add-wo">+ WO</button>'; }
     actions.innerHTML=actHtml;
     var statusBtn=document.getElementById(_id+'-change-status'); if(statusBtn) statusBtn.onclick=function(){ _showStatusTransition(type,_selected.id,o.status||''); };
     var editBtn=document.getElementById(_id+'-edit-order'); if(editBtn) editBtn.onclick=function(){ _showEdit(type, _selected.data||o); };
+    var openPurchasingBtn=document.getElementById(_id+'-open-purchasing-detail'); if(openPurchasingBtn) openPurchasingBtn.onclick=function(){ if(typeof window._openPurchasingWorkspace==='function') window._openPurchasingWorkspace(_purchasingContext(_selected.data||o, type)); };
     var addJoBtn=document.getElementById(_id+'-add-jo'); if(addJoBtn) addJoBtn.onclick=function(){ _showCreateInContext('jo',{ so_number:_selected.id }); };
     var addWoBtn=document.getElementById(_id+'-add-wo'); if(addWoBtn) addWoBtn.onclick=function(){ _showCreateInContext('wo',{ jo_number:_selected.id }); };
     var linkBtn=document.getElementById(_id+'-link-form'); if(linkBtn) linkBtn.onclick=_showLinkModal;
@@ -750,6 +770,7 @@ function _bind(){
   var md=document.getElementById(_id+'-md'); if(md) md.onclick=function(){ if(typeof window._mdOpenControl==='function') window._mdOpenControl(); };
   var foundations=document.getElementById(_id+'-foundations'); if(foundations) foundations.onclick=_showFoundations;
   var refresh=document.getElementById(_id+'-refresh'); if(refresh) refresh.onclick=_refresh;
+  var openPo=document.getElementById(_id+'-open-po'); if(openPo) openPo.onclick=_openPurchasingFromSelection;
   var nso=document.getElementById(_id+'-new-so'); if(nso) nso.onclick=function(){ _showCreate('so'); };
   var njo=document.getElementById(_id+'-new-jo'); if(njo) njo.onclick=function(){ _showCreate('jo'); };
   var nwo=document.getElementById(_id+'-new-wo'); if(nwo) nwo.onclick=function(){ _showCreate('wo'); };

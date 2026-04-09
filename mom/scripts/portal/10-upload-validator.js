@@ -129,10 +129,10 @@ window.validateFilename = function(filename){
 window.renderFilenameBadge = function(filename){
   var v = validateFilename(filename);
   var colors = {
-    PASS: {bg:'#d3f9d8', color:'#2b8a3e', icon:'✓'},
-    FAIL: {bg:'#ffe3e3', color:'#c92a2a', icon:'✗'},
-    FLAG: {bg:'#fff3bf', color:'#e67700', icon:'⚠'},
-    WARN: {bg:'#fff9db', color:'#e67700', icon:'!'}
+    PASS: {bg:'var(--green-bg,#d3f9d8)', color:'var(--green-dark,#2b8a3e)', icon:'✓'},
+    FAIL: {bg:'var(--red-bg,#ffe3e3)', color:'var(--red-dark,#c92a2a)', icon:'✗'},
+    FLAG: {bg:'var(--amber-bg,#fff3bf)', color:'var(--amber-dark,#e67700)', icon:'⚠'},
+    WARN: {bg:'var(--amber-bg,#fff9db)', color:'var(--amber-dark,#e67700)', icon:'!'}
   };
   var c = colors[v.status] || colors.FAIL;
   var html = '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:6px;background:' + c.bg + ';color:' + c.color + ';font-weight:600">';
@@ -140,7 +140,7 @@ window.renderFilenameBadge = function(filename){
   if(v.pattern) html += ' <span style="font-weight:400;opacity:.7">(' + v.pattern + ')</span>';
   html += '</span>';
   if(v.issues.length > 0){
-    html += '<ul style="margin:4px 0 0;padding-left:18px;font-size:11px;color:#6b7280">';
+    html += '<ul style="margin:var(--space-1,4px) 0 0;padding-left:18px;font-size:11px;color:var(--text-secondary,#6b7280)">';
     v.issues.forEach(function(i){ html += '<li>' + i + '</li>'; });
     html += '</ul>';
   }

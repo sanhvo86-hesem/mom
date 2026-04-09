@@ -33,15 +33,25 @@ function httpRequest(string $url, string $method = 'GET', array $headers = [], ?
         $opts['http']['content'] = $body;
     }
     $ctx = stream_context_create($opts);
-    $response = @file_get_contents($url, false, $ctx);
-    if ($response === false) {
+    $handle = @fopen($url, 'rb', false, $ctx);
+    if (!is_resource($handle)) {
         return ['status' => 0, 'headers' => '', 'body' => '', 'error' => 'Connection failed'];
     }
+
+    $meta = stream_get_meta_data($handle);
+    $response = stream_get_contents($handle);
+    fclose($handle);
+
+    if ($response === false) {
+        return ['status' => 0, 'headers' => '', 'body' => '', 'error' => 'Read failed'];
+    }
+
     $httpCode = 0;
     $responseHeaders = '';
-    if (isset($http_response_header) && is_array($http_response_header)) {
-        $responseHeaders = implode("\r\n", $http_response_header);
-        if (preg_match('/HTTP\/[\d.]+ (\d+)/', $http_response_header[0], $m)) {
+    $rawHeaders = is_array($meta['wrapper_data'] ?? null) ? $meta['wrapper_data'] : [];
+    if (is_array($rawHeaders) && $rawHeaders !== []) {
+        $responseHeaders = implode("\r\n", $rawHeaders);
+        if (preg_match('/HTTP\/[\d.]+ (\d+)/', $rawHeaders[0], $m)) {
             $httpCode = (int)$m[1];
         }
     }
@@ -136,6 +146,18 @@ if ($serverUp) {
     // Test governance routes
     $r = httpRequest("{$baseUrl}/api/v1/governance/approval-groups");
     check('GET /approval-groups returns 200 or 401', in_array($r['status'], [200, 401]));
+
+    // VPS Control Tower endpoints must exist and enforce auth at the HTTP layer.
+    foreach ([
+        '/api.php?action=vps_control_overview',
+        '/api.php?action=vps_control_host&host_id=hesem-vps-01',
+        '/api.php?action=vps_terminal_auth&host_id=hesem-vps-01&terminal_id=readonly',
+        '/api.php?action=vps_observability_auth&host_id=hesem-vps-01&panel_id=netdata',
+        '/api.php?action=vps_control_asset&path=./docs/system/vps-terminal-gateway-setup-2026-04-09.md',
+    ] as $path) {
+        $r = httpRequest("{$baseUrl}{$path}");
+        check("VPS endpoint {$path} enforces auth", in_array($r['status'], [401, 403]));
+    }
 
     // Test write route without CSRF (should fail)
     $r = httpRequest("{$baseUrl}/api/v1/governance/attachments", 'POST', ['Content-Type: application/json'], '{}');

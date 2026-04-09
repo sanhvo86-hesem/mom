@@ -484,7 +484,9 @@ function _bind(){
         break;
       case 'convert-to-so':
         var cId=t.getAttribute('data-id');
-        _api('quote_convert_to_so',{id:cId}).then(function(r){
+        var poPrompt = window.prompt(_t('Nhập Customer PO để chuyển sang SO (có thể để trống nếu quote đã có PO).','Enter the Customer PO before converting to SO (leave blank if the quote already carries a PO).'),'');
+        if(poPrompt === null) break;
+        _api('quote_convert_to_so',{id:cId, po_number:(poPrompt||'').trim()}).then(function(r){
           if(r&&r.ok){_toast(_t('Đã chuyển thành SO','Converted to SO'),'success');_loadQuotes();}
           else {_toast(r&&r.message?r.message:_t('Lỗi','Error'),'error');}
         }).catch(function(){_toast(_t('Lỗi kết nối','Connection error'),'error');});

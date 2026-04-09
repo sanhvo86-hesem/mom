@@ -1962,6 +1962,7 @@
         "qa_manager",
         "quality_manager",
         "supply_chain_manager",
+        "buyer",
         "qms_engineer"
       ],
       "update": [
@@ -1970,6 +1971,7 @@
         "qa_manager",
         "quality_manager",
         "supply_chain_manager",
+        "buyer",
         "qms_engineer"
       ],
       "transition": [
@@ -1978,6 +1980,9 @@
         "qa_manager",
         "quality_manager",
         "supply_chain_manager",
+        "buyer",
+        "warehouse_clerk",
+        "logistics_coordinator",
         "qms_engineer"
       ],
       "delete": [
@@ -4557,16 +4562,36 @@
     },
     "purchase_order_lines": {
       "list": [
-        "authenticated"
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "supply_chain_manager",
+        "buyer",
+        "warehouse_clerk",
+        "tool_storekeeper",
+        "logistics_coordinator",
+        "qms_engineer"
       ],
       "detail": [
-        "authenticated"
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "supply_chain_manager",
+        "buyer",
+        "warehouse_clerk",
+        "tool_storekeeper",
+        "logistics_coordinator",
+        "qms_engineer"
       ],
       "create": [
         "it_admin",
         "ceo",
         "qa_manager",
         "quality_manager",
+        "supply_chain_manager",
+        "buyer",
         "qms_engineer"
       ],
       "update": [
@@ -4574,6 +4599,8 @@
         "ceo",
         "qa_manager",
         "quality_manager",
+        "supply_chain_manager",
+        "buyer",
         "qms_engineer"
       ],
       "transition": [
@@ -4581,7 +4608,69 @@
         "ceo",
         "qa_manager",
         "quality_manager",
+        "supply_chain_manager",
+        "buyer",
         "qms_engineer"
+      ],
+      "delete": []
+    },
+    "incoming_inspections": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer",
+        "quality_engineer",
+        "qc_inspector",
+        "warehouse_clerk",
+        "logistics_coordinator",
+        "supply_chain_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer",
+        "quality_engineer",
+        "qc_inspector",
+        "warehouse_clerk",
+        "logistics_coordinator",
+        "supply_chain_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer",
+        "quality_engineer",
+        "qc_inspector",
+        "warehouse_clerk",
+        "supply_chain_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer",
+        "quality_engineer",
+        "qc_inspector",
+        "warehouse_clerk",
+        "supply_chain_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer",
+        "quality_engineer",
+        "qc_inspector",
+        "warehouse_clerk",
+        "supply_chain_manager"
       ],
       "delete": []
     },

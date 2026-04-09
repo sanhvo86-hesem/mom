@@ -36,6 +36,21 @@ function _apiErrorMessage(resp, fallbackVi, fallbackEn){
   }
   return _t(fallbackVi, fallbackEn);
 }
+function _readDataPath(source, path){
+  var current = source;
+  var parts;
+  var i;
+  if(!path) return source;
+  if(source == null) return undefined;
+  if(typeof path !== 'string') return source[path];
+  if(Object.prototype.hasOwnProperty.call(source, path)) return source[path];
+  parts = path.split('.');
+  for(i = 0; i < parts.length; i++){
+    if(current == null) return undefined;
+    current = current[parts[i]];
+  }
+  return current;
+}
 
 /** Internal API wrapper — delegates to global apiCall() when available */
 function _api(action, payload, method){
@@ -4027,7 +4042,10 @@ function fetchBlockData(block, moduleId){
 
   p = _api(ds.api, params||{}, ds.method||'GET').then(function(resp){
     if(!resp) return null;
-    if(ds.dataKey) return resp[ds.dataKey] !== undefined ? resp[ds.dataKey] : resp.data;
+    if(ds.dataKey){
+      var extracted = _readDataPath(resp, ds.dataKey);
+      return extracted !== undefined ? extracted : resp.data;
+    }
     return resp.data || resp;
   }).catch(function(err){
     console.warn('[BlockEngine] fetch failed:', ds.api, err);
@@ -4481,7 +4499,16 @@ function _attachModuleEvents(container, moduleId){
           var rowClick = rowBlock.config.rowClick || {};
           state.customState = state.customState || {};
           if(rowClick.passField && rowData[rowClick.passField] !== undefined){
-            state.customState.selectedId = rowData[rowClick.passField];
+            state.customState[rowClick.stateKey || 'selectedId'] = rowData[rowClick.passField];
+          }
+          if(rowClick.stateMap && typeof rowClick.stateMap === 'object'){
+            Object.keys(rowClick.stateMap).forEach(function(stateKey){
+              var rowField = rowClick.stateMap[stateKey];
+              if(typeof rowField !== 'string' || rowField === '') return;
+              if(rowData[rowField] !== undefined){
+                state.customState[stateKey] = rowData[rowField];
+              }
+            });
           }
           if(rowClick.action === 'navigate-tab' && rowClick.tab){
             state.activeTab = rowClick.tab;
@@ -4717,6 +4744,10 @@ function _attachModuleEvents(container, moduleId){
     if(el.hasAttribute('data-table-filter')){
       var blockEl = el.closest('.hm-block');
       if(blockEl) _handleColumnFilter(container, moduleId, blockEl.getAttribute('data-block-id'));
+    }
+    if(el.hasAttribute('data-filter')){
+      var blockEl3 = el.closest('.hm-block');
+      if(blockEl3) _handleFilterChange(container, moduleId, blockEl3.getAttribute('data-block-id'));
     }
   };
   container.addEventListener('change', container._hmChange);
@@ -5115,6 +5146,7 @@ function _renderBlockInner(block, data, state, reactiveCtx){
   switch(renderType){
     case 'kpi-row':         return renderKpiRow(resolvedConfig, data);
     case 'data-table':      return renderAdvancedTableV3(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx);
+    case 'data-tree':       return renderDataTree(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx);
     case 'filter-bar':      return renderFilterBar(resolvedConfig, data, state);
     case 'section-header':  return renderSectionHeader(resolvedConfig);
     case 'spacer':          return '<div style="height:'+(resolvedConfig.height||16)+'px"></div>';
@@ -6107,6 +6139,63 @@ function renderFilterBar(config, data, state){
   }
   html += '</div>';
   return html;
+}
+
+function _treeChildKeys(config, node){
+  var seen = {};
+  var keys = [];
+  function addKey(key){
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    keys.push(key);
+  }
+  if(Array.isArray(config.childKeys)){
+    config.childKeys.forEach(addKey);
+  }
+  addKey(config.childrenKey);
+  ['children', 'job_orders', 'work_orders', 'nodes', 'items'].forEach(function(key){
+    if(node && Array.isArray(node[key])) addKey(key);
+  });
+  return keys;
+}
+
+function _treeChildren(config, node){
+  var children = [];
+  _treeChildKeys(config, node).forEach(function(key){
+    (node && Array.isArray(node[key]) ? node[key] : []).forEach(function(child){
+      if(child && typeof child === 'object') children.push(child);
+    });
+  });
+  return children;
+}
+
+function renderDataTree(config, data, state, blockId, reactiveCtx){
+  var rows = Array.isArray(data) ? data : ((data && data[config.dataKey || 'items']) || []);
+  var expandLevel = Number(config.expandLevel || 0);
+  if(!rows.length) return '<div class="hm-empty">'+_t('Không có dữ liệu cây', 'No tree data')+'</div>';
+
+  function renderNode(node, level){
+    var context = {};
+    var children = _treeChildren(config, node);
+    var summaryText;
+    if(reactiveCtx){
+      Object.keys(reactiveCtx).forEach(function(key){ context[key] = reactiveCtx[key]; });
+    }
+    context.node = node;
+    context.row = node;
+    context.record = node;
+    context.data = node;
+    context.level = level;
+    summaryText = config.nodeTemplate ? resolveBindings(config.nodeTemplate, context) : (node.label || node.name || node.so_number || node.jo_number || node.wo_number || '');
+
+    if(children.length){
+      return '<li class="hm-tree-item" data-tree-level="'+level+'"><details'+(level < expandLevel ? ' open' : '')+'><summary class="hm-tree-summary">'+_esc(summaryText)+'</summary><ul class="hm-tree-children">'+children.map(function(child){ return renderNode(child, level + 1); }).join('')+'</ul></details></li>';
+    }
+
+    return '<li class="hm-tree-item hm-tree-leaf" data-tree-level="'+level+'"><div class="hm-tree-summary">'+_esc(summaryText)+'</div></li>';
+  }
+
+  return '<div class="hm-tree"><ul class="hm-tree-root">'+rows.map(function(node){ return renderNode(node, 0); }).join('')+'</ul></div>';
 }
 
 /* --- Bar Chart --- */

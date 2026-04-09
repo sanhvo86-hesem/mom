@@ -20239,8 +20239,8 @@
             {
               "type": "role",
               "roles": [
-                "quality_engineer",
-                "quality_manager",
+                "buyer",
+                "supply_chain_manager",
                 "production_planner"
               ]
             },
@@ -20278,9 +20278,9 @@
             {
               "type": "role",
               "roles": [
-                "quality_engineer",
-                "quality_manager",
-                "production_planner"
+                "supply_chain_manager",
+                "finance_manager",
+                "ceo"
               ]
             },
             {
@@ -20317,9 +20317,8 @@
             {
               "type": "role",
               "roles": [
-                "quality_engineer",
-                "quality_manager",
-                "production_planner"
+                "buyer",
+                "supply_chain_manager"
               ]
             },
             {
@@ -20356,9 +20355,11 @@
             {
               "type": "role",
               "roles": [
+                "warehouse_clerk",
+                "logistics_coordinator",
                 "quality_engineer",
-                "quality_manager",
-                "production_planner"
+                "qc_inspector",
+                "supply_chain_manager"
               ]
             },
             {
@@ -20395,9 +20396,11 @@
             {
               "type": "role",
               "roles": [
+                "warehouse_clerk",
+                "logistics_coordinator",
                 "quality_engineer",
-                "quality_manager",
-                "production_planner"
+                "qc_inspector",
+                "supply_chain_manager"
               ]
             },
             {
@@ -20434,9 +20437,9 @@
             {
               "type": "role",
               "roles": [
-                "quality_engineer",
+                "supply_chain_manager",
                 "quality_manager",
-                "production_planner"
+                "finance_manager"
               ]
             },
             {

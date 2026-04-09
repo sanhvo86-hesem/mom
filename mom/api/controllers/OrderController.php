@@ -103,12 +103,70 @@ class OrderController extends BaseController
     private function hasOrderPermission(array $user, string $permission): bool
     {
         $config = $this->loadOrderConfig();
-        $roles  = $config['roles'] ?? [];
-        $role   = (string)($user['role'] ?? 'viewer');
+        $role   = $this->normalizeOrderRole((string)($user['role'] ?? 'viewer'));
 
-        $perms = $roles[$role] ?? $roles['viewer'] ?? [];
+        if (in_array($role, ['admin', 'it_admin', 'ceo', 'qa_manager', 'quality_manager'], true)) {
+            return true;
+        }
 
-        return in_array($permission, $perms, true);
+        $legacyRoles = $config['roles'] ?? [];
+        if (is_array($legacyRoles) && $legacyRoles !== []) {
+            $perms = $legacyRoles[$role] ?? $legacyRoles['viewer'] ?? [];
+            return in_array($permission, $perms, true);
+        }
+
+        $permissionMap = [
+            'so_read' => ['node' => 'sales_order', 'keys' => ['roles_view', 'roles_edit', 'roles_create', 'roles_delete']],
+            'so_write' => ['node' => 'sales_order', 'keys' => ['roles_edit', 'roles_create', 'roles_delete']],
+            'jo_read' => ['node' => 'job_order', 'keys' => ['roles_view', 'roles_edit', 'roles_create', 'roles_delete']],
+            'jo_write' => ['node' => 'job_order', 'keys' => ['roles_edit', 'roles_create', 'roles_delete']],
+            'wo_read' => ['node' => 'work_order', 'keys' => ['roles_view', 'roles_edit', 'roles_create', 'roles_delete']],
+            'wo_write' => ['node' => 'work_order', 'keys' => ['roles_edit', 'roles_create', 'roles_delete']],
+        ];
+
+        if ($permission === 'link_form') {
+            foreach (['jo_read', 'jo_write', 'wo_read', 'wo_write'] as $derivedPermission) {
+                if ($this->hasOrderPermission($user, $derivedPermission)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        $meta = $permissionMap[$permission] ?? null;
+        if ($meta === null) {
+            return false;
+        }
+
+        $node = $config[$meta['node']] ?? [];
+        $allowedRoles = [];
+        foreach ($meta['keys'] as $key) {
+            foreach ((array)($node[$key] ?? []) as $allowedRole) {
+                $allowedRoles[] = $this->normalizeOrderRole((string)$allowedRole);
+            }
+        }
+
+        return in_array($role, array_values(array_unique($allowedRoles)), true);
+    }
+
+    /**
+     * Normalize legacy/runtime role names to the canonical order role set.
+     */
+    private function normalizeOrderRole(string $role): string
+    {
+        static $map = [
+            'general_director' => 'ceo',
+            'deputy_director' => 'production_director',
+            'prod_manager' => 'cnc_workshop_manager',
+            'prod_supervisor' => 'shift_leader',
+            'qms_supervisor' => 'qms_engineer',
+            'doc_controller' => 'qms_engineer',
+            'planning_officer' => 'production_planner',
+            'planner' => 'production_planner',
+            'qa_manager' => 'quality_manager',
+        ];
+
+        return $map[$role] ?? $role;
     }
 
     /**
@@ -134,7 +192,8 @@ class OrderController extends BaseController
      *
      * Query params:
      *   - status    (string, optional): Filter by SO status.
-     *   - customer  (string, optional): Filter by customer name (partial match).
+     *   - search    (string, optional): Filter by SO number, customer name, or customer PO.
+     *   - customer  (string, optional): Legacy alias for `search`.
      *   - date_from (string, optional): Start date (YYYY-MM-DD).
      *   - date_to   (string, optional): End date (YYYY-MM-DD).
      *   - offset    (int, optional):    Pagination offset (default 0).
@@ -154,9 +213,12 @@ class OrderController extends BaseController
             $filters['status'] = strtoupper($status);
         }
 
-        $customer = $this->query('customer');
-        if ($customer !== null && $customer !== '') {
-            $filters['customer'] = $customer;
+        $search = $this->query('search');
+        if ($search === null || $search === '') {
+            $search = $this->query('customer');
+        }
+        if ($search !== null && $search !== '') {
+            $filters['search'] = $search;
         }
 
         $dateFrom = $this->query('date_from');
@@ -436,17 +498,22 @@ class OrderController extends BaseController
             'so_number'      => $this->orderService()->generateOrderNumber('so'),
             'customer_id'    => trim((string)($body['customer_id'] ?? '')),
             'customer_name'  => trim((string)($body['customer_name'] ?? '')),
-            'customer_po'    => trim((string)($body['customer_po'] ?? '')),
+            'customer_site_id' => trim((string)($body['customer_site_id'] ?? '')),
+            'ship_to_site_id' => trim((string)($body['ship_to_site_id'] ?? '')),
+            'customer_po'    => trim((string)($body['customer_po'] ?? $body['customer_po_number'] ?? '')),
+            'customer_po_number' => trim((string)($body['customer_po_number'] ?? $body['customer_po'] ?? '')),
             'order_date'     => (string)($body['order_date'] ?? ''),
             'requested_date' => (string)($body['requested_date'] ?? ''),
             'promise_date'   => (string)($body['promise_date'] ?? ''),
+            'commit_date'    => (string)($body['commit_date'] ?? ''),
             'due_date'       => (string)($body['due_date'] ?? ''),
             'total_qty'      => (int)($body['total_qty'] ?? 0),
             'total_value'    => (float)($body['total_value'] ?? 0),
             'priority'       => (string)($body['priority'] ?? 'normal'),
             'incoterm_code'  => (string)($body['incoterm_code'] ?? ''),
             'payment_term_code' => (string)($body['payment_term_code'] ?? ''),
-            'shipping_method_code' => (string)($body['shipping_method_code'] ?? ''),
+            'shipping_method_id' => (string)($body['shipping_method_id'] ?? $body['shipping_method_code'] ?? ''),
+            'shipping_method_code' => (string)($body['shipping_method_code'] ?? $body['shipping_method_id'] ?? ''),
             'special_requirements' => (string)($body['special_requirements'] ?? ''),
             'status'         => 'draft',
             'lines'          => is_array($body['lines'] ?? null) ? $body['lines'] : [],
@@ -531,12 +598,22 @@ class OrderController extends BaseController
             'material_spec'   => trim((string)($body['material_spec'] ?? '')),
             'qty_ordered'     => (int)($body['qty_ordered'] ?? 0),
             'start_date'      => (string)($body['start_date'] ?? ''),
+            'release_target_date' => (string)($body['release_target_date'] ?? ''),
             'due_date'        => (string)($body['due_date'] ?? ''),
             'routing_id'      => (string)($body['routing_id'] ?? ''),
             'bom_id'          => (string)($body['bom_id'] ?? ''),
             'control_plan_id' => (string)($body['control_plan_id'] ?? ''),
             'inspection_plan_id' => (string)($body['inspection_plan_id'] ?? ''),
+            'traveler_template_id' => (string)($body['traveler_template_id'] ?? ''),
+            'engineering_release_status' => (string)($body['engineering_release_status'] ?? ''),
+            'material_ready_status' => (string)($body['material_ready_status'] ?? ''),
+            'quality_plan_status' => (string)($body['quality_plan_status'] ?? ''),
+            'source_inspection_status' => (string)($body['source_inspection_status'] ?? ''),
+            'outside_processing_status' => (string)($body['outside_processing_status'] ?? ''),
             'fai_required'    => (bool)($body['fai_required'] ?? false),
+            'customer_source_inspection' => (bool)($body['customer_source_inspection'] ?? false),
+            'special_process' => (string)($body['special_process'] ?? ''),
+            'special_process_supplier_id' => (string)($body['special_process_supplier_id'] ?? ''),
             'status'          => 'planned',
             'created_by'      => $uid,
             'created_at'      => $now,
@@ -625,6 +702,14 @@ class OrderController extends BaseController
             'scheduled_end'    => (string)($body['scheduled_end'] ?? ''),
             'fixture_id'       => (string)($body['fixture_id'] ?? ''),
             'dispatch_priority'=> (string)($body['dispatch_priority'] ?? 'normal'),
+            'quality_gate_status' => (string)($body['quality_gate_status'] ?? ''),
+            'first_piece_status' => (string)($body['first_piece_status'] ?? ''),
+            'handover_status' => (string)($body['handover_status'] ?? ''),
+            'material_lot_number' => (string)($body['material_lot_number'] ?? ''),
+            'heat_number' => (string)($body['heat_number'] ?? ''),
+            'traveler_number' => (string)($body['traveler_number'] ?? ''),
+            'traveler_status' => (string)($body['traveler_status'] ?? ''),
+            'material_cert_status' => (string)($body['material_cert_status'] ?? ''),
             'status'           => 'scheduled',
             'created_by'       => $uid,
             'created_at'       => $now,
@@ -735,6 +820,31 @@ class OrderController extends BaseController
     public function contractReview(): never
     {
         $user = $this->requireAuth();
+        $isRead = $this->method() === 'GET';
+
+        if ($isRead) {
+            $this->requireOrderPermission($user, 'so_read');
+            $soNumber = trim((string)($this->query('so_number') ?? ''));
+            if ($soNumber === '') {
+                $this->error('missing_so_number', 400);
+            }
+
+            try {
+                $reviewFile = $this->dataDir . '/orders/reviews/' . preg_replace('/[^A-Za-z0-9\-_]/', '_', $soNumber) . '.json';
+                $review = $this->readJsonFile($reviewFile) ?? [
+                    'so_number' => $soNumber,
+                    'items' => [],
+                    'history' => [],
+                    'completion_pct' => 0,
+                    'all_approved' => false,
+                ];
+                $this->success(['review' => $review]);
+            } catch (Throwable $e) {
+                $this->rethrowResponse($e);
+                $this->error('contract_review_failed', 500, $e->getMessage());
+            }
+        }
+
         $this->requireCsrf();
         $this->requireOrderPermission($user, 'so_write');
 
@@ -787,7 +897,6 @@ class OrderController extends BaseController
             $existing['history'][] = ['user' => $uid, 'timestamp' => $now, 'action' => 'review_updated', 'items_count' => count($items)];
             $existing['updated_at'] = $now;
 
-            // Calculate completion
             $total    = count($existing['items']);
             $approved = 0;
             foreach ($existing['items'] as $it) {

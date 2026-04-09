@@ -40,7 +40,7 @@ class AdminMetadataStudioController extends BaseController
         return trim($value, $separator);
     }
 
-    private function nowIso(): string
+    protected function nowIso(): string
     {
         return gmdate('c');
     }

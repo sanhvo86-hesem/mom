@@ -1,10 +1,10 @@
 {
-    "release_candidate_run_id": "2e2e1882685de737",
-    "generatedAt": "2026-04-07T09:07:38+00:00",
-    "server_url": "http:\/\/127.0.0.1:8080\/api\/index.php",
+    "release_candidate_run_id": "e1200d4f79c0c760",
+    "generatedAt": "2026-04-09T05:59:45+00:00",
+    "server_url": "http:\/\/127.0.0.1:8080",
     "server_reachable": true,
-    "total": 29,
-    "passed": 29,
+    "total": 34,
+    "passed": 34,
     "failed": 0,
     "skipped": 0,
     "results": [
@@ -105,6 +105,31 @@
         },
         {
             "name": "GET \/approval-groups returns 200 or 401",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "name": "VPS endpoint \/api.php?action=vps_control_overview enforces auth",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "name": "VPS endpoint \/api.php?action=vps_control_host&host_id=hesem-vps-01 enforces auth",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "name": "VPS endpoint \/api.php?action=vps_terminal_auth&host_id=hesem-vps-01&terminal_id=readonly enforces auth",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "name": "VPS endpoint \/api.php?action=vps_observability_auth&host_id=hesem-vps-01&panel_id=netdata enforces auth",
+            "status": "PASS",
+            "detail": ""
+        },
+        {
+            "name": "VPS endpoint \/api.php?action=vps_control_asset&path=.\/docs\/system\/vps-terminal-gateway-setup-2026-04-09.md enforces auth",
             "status": "PASS",
             "detail": ""
         },

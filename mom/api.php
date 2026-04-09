@@ -12198,15 +12198,39 @@ function password_policy(string $pw): array {
   return [true, ''];
 }
 
+function normalize_session_dir(string $path): string {
+  $path = trim($path);
+  if ($path === '') return '';
+  if (strpos($path, ';') !== false) {
+    $parts = explode(';', $path);
+    $path = (string)end($parts);
+  }
+  return rtrim($path, "/\\");
+}
+
+function session_dir_candidates(): array {
+  global $DATA_DIR;
+
+  $candidates = [
+    $DATA_DIR . '/sessions',
+    normalize_session_dir((string)session_save_path()),
+    '/var/lib/php/sessions',
+    sys_get_temp_dir() . '/hesem-sessions',
+  ];
+
+  $unique = [];
+  foreach ($candidates as $candidate) {
+    $candidate = normalize_session_dir((string)$candidate);
+    if ($candidate === '' || in_array($candidate, $unique, true)) continue;
+    $unique[] = $candidate;
+  }
+
+  return $unique;
+}
+
 // ---------- Session + Cookies ----------
 function session_init(): void {
-  global $DATA_DIR;
   if (session_status() === PHP_SESSION_ACTIVE) return;
-
-  // Use an application-owned session directory to avoid server session.save_path issues
-  $sessDir = $DATA_DIR . '/sessions';
-  ensure_dir($sessDir);
-  @session_save_path($sessDir);
 
   $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https')
@@ -12232,6 +12256,31 @@ function session_init(): void {
     'httponly' => true,
     'samesite' => 'Lax',
   ]);
+
+  $lastError = null;
+  foreach (session_dir_candidates() as $sessDir) {
+    ensure_dir($sessDir);
+    if (!is_dir($sessDir) || !is_writable($sessDir)) {
+      continue;
+    }
+
+    @session_save_path($sessDir);
+
+    try {
+      session_start();
+      return;
+    } catch (\Throwable $e) {
+      $lastError = $e;
+      if (session_status() === PHP_SESSION_ACTIVE) {
+        @session_write_close();
+      }
+    }
+  }
+
+  if ($lastError instanceof \Throwable) {
+    throw $lastError;
+  }
+
   session_start();
 }
 

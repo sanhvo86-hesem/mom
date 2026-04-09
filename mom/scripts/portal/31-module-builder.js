@@ -6176,28 +6176,47 @@ _openSavedModule = function(moduleId){
     _paint();
     return true;
   }
-  var raw = null;
-  var runtimeLocal = null;
-  try { raw = localStorage.getItem(_builderStorageKey(moduleId)); } catch(err){}
-  if(raw){
-    try {
-      if(applySchema(JSON.parse(raw))) return Promise.resolve(true);
-    } catch(err){}
-  }
-  runtimeLocal = _readRuntimeSchemaLocal(moduleId);
-  if(runtimeLocal && applySchema(runtimeLocal)){
-    return Promise.resolve(true);
-  }
-  if(typeof apiCall !== 'function') return Promise.resolve(false);
-  return apiCall('module_schema_get', { id: moduleId }, 'GET', 10000).then(function(resp){
-    if(!resp || resp.ok === false || !resp.schema){
-      throw new Error((resp && (resp.detail || resp.error)) || 'not_found');
-    }
-    _writeRuntimeSchemaLocal(moduleId, resp.schema);
-    return applySchema(resp.schema);
-  }).catch(function(){
-    if(BE.toast) BE.toast(_t('Không mở được module đã lưu', 'Unable to open saved module'), 'error');
+  function tryLocalAll(){
+    var raw = null;
+    try { raw = localStorage.getItem(_builderStorageKey(moduleId)); } catch(_e){}
+    if(raw){ try { if(applySchema(JSON.parse(raw))) return true; } catch(_e){} }
+    var rt = _readRuntimeSchemaLocal(moduleId);
+    if(rt){ try { if(applySchema(rt)) return true; } catch(_e){} }
     return false;
+  }
+  if(tryLocalAll()) return Promise.resolve(true);
+  if(typeof apiCall !== 'function') return Promise.resolve(false);
+  function doApiLoad(){
+    return apiCall('module_schema_get', { id: moduleId }, 'GET', 10000).then(function(resp){
+      if(!resp || resp.ok === false || !resp.schema){
+        throw new Error((resp && (resp.detail || resp.error)) || 'not_found');
+      }
+      _writeRuntimeSchemaLocal(moduleId, resp.schema);
+      return applySchema(resp.schema);
+    });
+  }
+  // If module_schema_list is still in-flight it may hold the PHP session lock.
+  // Adding a small head-start avoids the resulting timeout on the first attempt.
+  var initialDelay = state.savedModulesLoading ? 800 : 0;
+  function startLoad(resolve){
+    doApiLoad().then(resolve).catch(function(){
+      // First attempt failed — re-check localStorage (may have been written while request was in flight)
+      if(tryLocalAll()){ resolve(true); return; }
+      // Retry API once after a short delay (handles session/concurrency issues on first load)
+      setTimeout(function(){
+        doApiLoad().then(resolve).catch(function(){
+          if(tryLocalAll()){ resolve(true); return; }
+          if(BE.toast) BE.toast(_t('Không mở được module đã lưu', 'Unable to open saved module'), 'error');
+          resolve(false);
+        });
+      }, 1200);
+    });
+  }
+  if(!initialDelay){
+    return new Promise(startLoad);
+  }
+  return new Promise(function(resolve){
+    setTimeout(function(){ startLoad(resolve); }, initialDelay);
   });
 };
 

@@ -107,10 +107,36 @@
         ]
     },
     "quality_engineer": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "quality_management.incoming_inspections.read",
+            "quality_management.incoming_inspections.create",
+            "quality_management.incoming_inspections.update",
+            "quality_management.incoming_inspections.transition"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "qc_inspector": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "quality_management.incoming_inspections.read",
+            "quality_management.incoming_inspections.create",
+            "quality_management.incoming_inspections.update",
+            "quality_management.incoming_inspections.transition"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "qms_engineer": {
         "canCreateDocs": true,
@@ -157,16 +183,63 @@
         ]
     },
     "buyer": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "inventory.*.read",
+            "purchasing.*",
+            "supplier_relationship.*",
+            "warehouse_management.*.read"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "warehouse_clerk": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "inventory.*",
+            "purchasing.purchase_orders.read",
+            "purchasing.purchase_orders.detail",
+            "purchasing.purchase_orders.transition",
+            "purchasing.purchase_order_lines.read",
+            "purchasing.purchase_order_lines.detail",
+            "quality_management.incoming_inspections.read",
+            "quality_management.incoming_inspections.create",
+            "quality_management.incoming_inspections.update",
+            "quality_management.incoming_inspections.transition",
+            "warehouse_management.*"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "tool_storekeeper": {
         "canCreateDocs": false
     },
     "logistics_coordinator": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "purchasing.purchase_orders.read",
+            "purchasing.purchase_orders.detail",
+            "purchasing.purchase_orders.transition",
+            "shipping_compliance.*",
+            "transportation.*"
+        ],
+        "denies": [
+            "master_data_governance.*",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*"
+        ]
     },
     "estimator": {
         "canCreateDocs": false

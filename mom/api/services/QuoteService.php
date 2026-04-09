@@ -225,7 +225,7 @@ final class QuoteService
     /**
      * Transition a quote to a new status.
      */
-    public function transition(string $quoteId, string $target, string $userId): array
+    public function transition(string $quoteId, string $target, string $userId, string $comment = ''): array
     {
         $quotes = $this->loadQuotes();
         $now    = $this->nowIso();
@@ -254,6 +254,7 @@ final class QuoteService
                 'to'        => $target,
                 'timestamp' => $now,
                 'user'      => $userId,
+                'reason'    => trim($comment),
             ];
             $quotes[$idx]['status_history'] = $history;
 
@@ -368,7 +369,7 @@ final class QuoteService
      * @param string $userId  Acting user.
      * @return array Result with created SO reference.
      */
-    public function convertToSalesOrder(string $quoteId, string $userId): array
+    public function convertToSalesOrder(string $quoteId, string $customerPo = '', string $userId = ''): array
     {
         $quotes = $this->loadQuotes();
         $now    = $this->nowIso();
@@ -391,15 +392,26 @@ final class QuoteService
             throw new RuntimeException("Only accepted quotes can be converted. Current status: " . ($quote['status'] ?? ''));
         }
 
-        // Generate SO number
-        $soNumber = $this->generateSoNumber();
+        $actingUser = trim($userId) !== '' ? trim($userId) : 'system';
+        $resolvedCustomerPo = trim($customerPo);
+        if ($resolvedCustomerPo === '') {
+            $resolvedCustomerPo = trim((string)($quote['customer_po'] ?? $quote['customer_po_number'] ?? $quote['po_number'] ?? ''));
+        }
+
+        $orderService = new OrderService($this->dataDir);
+        $soNumber = $orderService->generateOrderNumber('so');
 
         $soRecord = [
             'so_number'    => $soNumber,
             'quote_id'     => $quoteId,
             'customer'     => $quote['customer'] ?? $quote['customer_name'] ?? '',
             'customer_id'  => $quote['customer_id'] ?? '',
+            'customer_name' => $quote['customer_name'] ?? $quote['customer'] ?? '',
+            'customer_po'  => $resolvedCustomerPo,
+            'customer_po_number' => $resolvedCustomerPo,
             'order_date'   => date('Y-m-d'),
+            'requested_date' => $quote['required_date'] ?? $quote['requested_date'] ?? '',
+            'promise_date' => $quote['promise_date'] ?? '',
             'due_date'     => $quote['required_date'] ?? '',
             'total_value'  => $quote['total_value'] ?? 0,
             'total_qty'    => $quote['total_qty'] ?? 0,
@@ -407,36 +419,40 @@ final class QuoteService
             'priority'     => $quote['priority'] ?? 'normal',
             'lines'        => $quote['lines'] ?? [],
             'created_at'   => $now,
-            'created_by'   => $userId,
+            'created_by'   => $actingUser,
             'updated_at'   => $now,
-            'updated_by'   => $userId,
+            'updated_by'   => $actingUser,
+            'status_history' => [[
+                'status' => 'draft',
+                'from' => '',
+                'to' => 'draft',
+                'timestamp' => $now,
+                'user' => $actingUser,
+                'reason' => 'Created from quote conversion',
+            ]],
+            'change_history' => [],
+            'source_record_id' => $quoteId,
             'source'       => 'quote_conversion',
         ];
 
-        // Save SO into orders
-        $ordersFile = $this->dataDir . '/orders/orders.json';
-        $orders     = $this->readJson($ordersFile) ?? [
-            'sales_orders' => [],
-            'job_orders'   => [],
-            'work_orders'  => [],
-        ];
-
-        $orders['sales_orders'][] = $soRecord;
-        $this->writeJson($ordersFile, $orders);
+        $createdSo = $orderService->createSalesOrder($soRecord);
 
         // Transition quote to converted
         $quotes[$qIdx]['status']         = 'converted';
         $quotes[$qIdx]['converted_at']   = $now;
         $quotes[$qIdx]['converted_to']   = $soNumber;
         $quotes[$qIdx]['updated_at']     = $now;
-        $quotes[$qIdx]['updated_by']     = $userId;
+        $quotes[$qIdx]['updated_by']     = $actingUser;
+        if ($resolvedCustomerPo !== '') {
+            $quotes[$qIdx]['customer_po'] = $resolvedCustomerPo;
+        }
 
         $history   = (array)($quotes[$qIdx]['status_history'] ?? []);
         $history[] = [
             'from'      => 'accepted',
             'to'        => 'converted',
             'timestamp' => $now,
-            'user'      => $userId,
+            'user'      => $actingUser,
             'reason'    => "Converted to SO {$soNumber}",
         ];
         $quotes[$qIdx]['status_history'] = $history;
@@ -446,7 +462,9 @@ final class QuoteService
         return [
             'quote_id'  => $quoteId,
             'so_number' => $soNumber,
-            'so_record' => $soRecord,
+            'quote'     => $quotes[$qIdx],
+            'so_record' => $createdSo,
+            'sales_order' => $createdSo,
         ];
     }
 
