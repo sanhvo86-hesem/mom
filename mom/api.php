@@ -310,13 +310,20 @@ function scan_cat_from_filename(string $fn): ?string {
 
 function scan_cat_from_subfolder(string $subName): ?string {
   $map = [
-    'Quality-Manual' => 'MAN', 'Policies-Objectives' => 'POL',
-    'SOPs' => 'SOP', 'Work-Instructions' => 'WI', 'Reference' => 'ANNEX',
+    'Quality-Manual' => 'MAN', 'quality-manual' => 'MAN',
+    'Policies-Objectives' => 'POL', 'policies' => 'POL',
+    'SOPs' => 'SOP', 'sops' => 'SOP',
+    'Work-Instructions' => 'WI', 'work-instructions' => 'WI',
+    'Reference' => 'ANNEX', 'references' => 'ANNEX',
     'ANNEX-System' => 'ANNEX', 'ANNEX-Standards' => 'ANNEX', 'ANNEX-Digital' => 'ANNEX',
-    'Organization' => 'ORG', 'Org-Chart' => 'ORG', 'Department-Handbooks' => 'ORG',
-    'Job-Descriptions' => 'ORG', 'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
+    'Organization' => 'ORG', 'organization' => 'ORG', 'Org-Chart' => 'ORG',
+    'Department-Handbooks' => 'ORG', 'Job-Descriptions' => 'ORG',
+    'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
     'Bieu-Mau' => 'FRM',
-    'Competency-System' => 'TRN', 'Training-Content' => 'TRN', 'System-Operations' => 'TRN',
+    'Competency-System' => 'TRN', 'competency' => 'TRN',
+    'Training-Content' => 'TRN', 'content' => 'TRN',
+    'System-Operations' => 'TRN', 'system-ops' => 'TRN',
+    'templates' => 'TRN',
   ];
   foreach ($map as $k => $v) {
     if (stripos($subName, $k) !== false) return $v;
@@ -16484,13 +16491,20 @@ if ($username === '') {
     // Smart cat from subfolder name — for container folders
     function cat_from_subfolder(string $subName): ?string {
       $map = [
-        'Quality-Manual' => 'MAN', 'Policies-Objectives' => 'POL',
-        'SOPs' => 'SOP', 'Work-Instructions' => 'WI', 'Reference' => 'ANNEX',
+        'Quality-Manual' => 'MAN', 'quality-manual' => 'MAN',
+        'Policies-Objectives' => 'POL', 'policies' => 'POL',
+        'SOPs' => 'SOP', 'sops' => 'SOP',
+        'Work-Instructions' => 'WI', 'work-instructions' => 'WI',
+        'Reference' => 'ANNEX', 'references' => 'ANNEX',
         'ANNEX-System' => 'ANNEX', 'ANNEX-Standards' => 'ANNEX', 'ANNEX-Digital' => 'ANNEX',
-        'Organization' => 'ORG', 'Org-Chart' => 'ORG', 'Department-Handbooks' => 'ORG',
-        'Job-Descriptions' => 'ORG', 'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
+        'Organization' => 'ORG', 'organization' => 'ORG', 'Org-Chart' => 'ORG',
+        'Department-Handbooks' => 'ORG', 'Job-Descriptions' => 'ORG',
+        'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
         'Bieu-Mau' => 'FRM',
-        'Competency-System' => 'TRN', 'Training-Content' => 'TRN', 'System-Operations' => 'TRN',
+        'Competency-System' => 'TRN', 'competency' => 'TRN',
+        'Training-Content' => 'TRN', 'content' => 'TRN',
+        'System-Operations' => 'TRN', 'system-ops' => 'TRN',
+        'templates' => 'TRN',
       ];
       foreach ($map as $k => $v) {
         if (stripos($subName, $k) !== false) return $v;
@@ -16607,21 +16621,58 @@ if ($username === '') {
     };
 
     // ═══ SCAN TOP-LEVEL FOLDERS ═══
+    // Build scan list: real numbered dirs + virtual mom/docs entries
     $topDirs = @scandir($ROOT_DIR);
     if (!$topDirs) $topDirs = [];
     sort($topDirs);
 
+    // Inject mom/docs/ subdirectories as virtual top-level entries
+    // These map the restructured layout to the same scan pipeline
+    $momDocsVirtualMap = []; // topName => [absPath, num, label, cat]
+    $momDocsContainers = [
+      'mom/docs/system'     => [2, 'Tai-Lieu-He-Thong', 'SYS'],
+      'mom/docs/operations' => [3, 'Tai-Lieu-Van-Hanh', 'OPS'],
+      'mom/docs/forms'      => [4, 'Bieu-Mau', 'FRM'],
+      'mom/docs/training'   => [10, 'Training-Academy', 'TRN'],
+    ];
+    foreach ($momDocsContainers as $relPath => [$vNum, $vLabel, $vCat]) {
+      $vAbs = $ROOT_DIR . '/' . $relPath;
+      if (!is_dir($vAbs)) continue;
+      $virtualName = '_mom_' . sprintf('%02d', $vNum) . '_' . basename($relPath);
+      $momDocsVirtualMap[$virtualName] = ['abs' => $vAbs, 'rel' => $relPath, 'num' => $vNum, 'label' => $vLabel, 'cat' => $vCat];
+      $topDirs[] = $virtualName;
+    }
+    sort($topDirs);
+
     foreach ($topDirs as $topName) {
       if ($topName[0] === '.' || in_array($topName, $SKIP_DIRS)) continue;
-      $topAbs = $ROOT_DIR . '/' . $topName;
-      if (!is_dir($topAbs)) continue;
 
-      [$topNum, $topLabel] = parse_folder_num($topName);
-      if ($topNum === null) continue; // Skip unnumbered folders
-      if ($topNum < 2) continue; // 01=Portal, >50=hidden
+      // Determine if this is a real dir or a virtual mom/docs entry
+      $isVirtual = isset($momDocsVirtualMap[$topName]);
+      if ($isVirtual) {
+        $v = $momDocsVirtualMap[$topName];
+        $topAbs = $v['abs'];
+        $topNum = $v['num'];
+        $topLabel = $v['label'];
+        $catCode = $v['cat'];
+        $topRelPath = $v['rel'];
+      } else {
+        $topAbs = $ROOT_DIR . '/' . $topName;
+        if (!is_dir($topAbs)) continue;
+        [$topNum, $topLabel] = parse_folder_num($topName);
+        if ($topNum === null) continue; // Skip unnumbered folders
+        if ($topNum < 2) continue; // 01=Portal, >50=hidden
+        $catCode = scan_derive_cat($topLabel);
+        $topRelPath = $topName;
+      }
 
-      $catCode = scan_derive_cat($topLabel);
-      $topNode = ['path' => $topName, 'num' => $topNum, 'name' => $topLabel, 'cat' => $catCode, 'subs' => [], 'fileCount' => 0];
+      // Skip if this virtual num already found via real numbered dir
+      if ($isVirtual) {
+        $numExists = false;
+        foreach ($tree as $tn) { if (($tn['num'] ?? 0) === $topNum) { $numExists = true; break; } }
+        if ($numExists) continue;
+      }
+      $topNode = ['path' => $topRelPath, 'num' => $topNum, 'name' => $topLabel, 'cat' => $catCode, 'subs' => [], 'fileCount' => 0];
 
       // Scan subfolders
       $subDirs = @scandir($topAbs);
@@ -16635,9 +16686,15 @@ if ($username === '') {
         if (!is_dir($subAbs)) continue;
 
         [$subNum, $subLabel] = parse_folder_num($subName);
+        // For virtual mom/docs entries, also accept unnumbered subdirs (quality-manual, sops, etc.)
+        if ($subNum === null && $isVirtual) {
+          static $vSubAutoNum = 1;
+          $subNum = $vSubAutoNum++;
+          $subLabel = ucwords(str_replace('-', ' ', $subName));
+        }
         if ($subNum !== null && $subNum >= 1) {
           $hasNumberedSubs = true;
-          $subNode = ['path' => $topName . '/' . $subName, 'num' => $subNum, 'name' => $subLabel, 'fileCount' => 0];
+          $subNode = ['path' => $topRelPath . '/' . $subName, 'num' => $subNum, 'name' => $subLabel, 'fileCount' => 0];
 
           // Scan for deeper numbered subdirs (e.g., 08-Organization/03-Job-Descriptions/01-JD-EXE/)
           $deepDirs = @scandir($subAbs);
@@ -16652,15 +16709,15 @@ if ($username === '') {
               [$deepNum, $deepLabel] = parse_folder_num($deepName);
               if ($deepNum !== null && $deepNum >= 1) {
                 $hasDeepSubs = true;
-                $deepNode = ['path' => $topName.'/'.$subName.'/'.$deepName, 'num' => $deepNum, 'name' => $deepLabel, 'fileCount' => 0];
+                $deepNode = ['path' => $topRelPath.'/'.$subName.'/'.$deepName, 'num' => $deepNum, 'name' => $deepLabel, 'fileCount' => 0];
                 // Scan files in deep dir
                 $deepFiles = @scandir($deepAbs);
                 if ($deepFiles) foreach ($deepFiles as $fn) {
                   if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
                   if (scan_should_skip_filename($fn, $scanExclusions)) continue;
                   if (is_dir($deepAbs.'/'.$fn)) continue;
-                  $relPath = $topName.'/'.$subName.'/'.$deepName.'/'.$fn;
-                  if ($append_scanned_doc($deepAbs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName.'/'.$deepName)) {
+                  $relPath = $topRelPath.'/'.$subName.'/'.$deepName.'/'.$fn;
+                  if ($append_scanned_doc($deepAbs.'/'.$fn, $relPath, $catCode, $subName, $topRelPath.'/'.$subName.'/'.$deepName)) {
                     $deepNode['fileCount']++;
                     $subNode['fileCount']++;
                     $topNode['fileCount']++;
@@ -16673,14 +16730,14 @@ if ($username === '') {
                   if (!is_dir($l4Abs)) continue;
                   [$l4Num, $l4Label] = parse_folder_num($l4Name);
                   if ($l4Num === null) continue;
-                  $l4Node = ['path' => $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name, 'num' => $l4Num, 'name' => $l4Label, 'fileCount' => 0];
+                  $l4Node = ['path' => $topRelPath.'/'.$subName.'/'.$deepName.'/'.$l4Name, 'num' => $l4Num, 'name' => $l4Label, 'fileCount' => 0];
                   $l4Files = @scandir($l4Abs);
                   if ($l4Files) foreach ($l4Files as $fn) {
                     if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
                     if (scan_should_skip_filename($fn, $scanExclusions)) continue;
                     if (is_dir($l4Abs.'/'.$fn)) continue;
-                    $relPath = $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name.'/'.$fn;
-                    if ($append_scanned_doc($l4Abs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name)) {
+                    $relPath = $topRelPath.'/'.$subName.'/'.$deepName.'/'.$l4Name.'/'.$fn;
+                    if ($append_scanned_doc($l4Abs.'/'.$fn, $relPath, $catCode, $subName, $topRelPath.'/'.$subName.'/'.$deepName.'/'.$l4Name)) {
                       $l4Node['fileCount']++;
                       $deepNode['fileCount']++;
                       $subNode['fileCount']++;
@@ -16705,8 +16762,8 @@ if ($username === '') {
             if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
             if (scan_should_skip_filename($fn, $scanExclusions)) continue;
             if (is_dir($subAbs.'/'.$fn)) continue;
-            $relPath = $topName.'/'.$subName.'/'.$fn;
-            if ($append_scanned_doc($subAbs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName)) {
+            $relPath = $topRelPath.'/'.$subName.'/'.$fn;
+            if ($append_scanned_doc($subAbs.'/'.$fn, $relPath, $catCode, $subName, $topRelPath.'/'.$subName)) {
               $subNode['fileCount']++;
               $topNode['fileCount']++;
             }
@@ -16723,8 +16780,8 @@ if ($username === '') {
           if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
           if (scan_should_skip_filename($fn, $scanExclusions)) continue;
           if (is_dir($topAbs.'/'.$fn)) continue;
-          $relPath = $topName.'/'.$fn;
-          if ($append_scanned_doc($topAbs.'/'.$fn, $relPath, $catCode, null, $topName)) {
+          $relPath = $topRelPath.'/'.$fn;
+          if ($append_scanned_doc($topAbs.'/'.$fn, $relPath, $catCode, null, $topRelPath)) {
             $topNode['fileCount']++;
           }
         }
@@ -16733,95 +16790,6 @@ if ($username === '') {
       // Always include numbered top-level folders (even empty — may be newly created)
       $tree[] = $topNode;
     }
-
-    // ═══ SCAN mom/docs/ DIRECTORIES (post-restructure layout) ═══
-    // Maps mom/docs/ subdirectories to virtual numbered top-level entries
-    $momDocsMap = [
-      'mom/docs/system/quality-manual'          => [2, 'Quality-Manual', 'MAN'],
-      'mom/docs/system/policies'                => [2, 'Policies-Objectives', 'POL'],
-      'mom/docs/system/organization'            => [2, 'Organization', 'ORG'],
-      'mom/docs/operations/sops'                => [3, 'SOPs', 'SOP'],
-      'mom/docs/operations/work-instructions'   => [3, 'Work-Instructions', 'WI'],
-      'mom/docs/operations/references'          => [3, 'Annexes-References', 'ANNEX'],
-      'mom/docs/forms'                          => [4, 'Forms-Records', 'FRM'],
-      'mom/docs/training'                       => [10, 'Training-Academy', 'TRN'],
-    ];
-
-    // Group by virtual top-level number to merge into tree nodes
-    $virtualTops = [];
-    foreach ($momDocsMap as $relPath => [$vNum, $vLabel, $vCat]) {
-      $absPath = $ROOT_DIR . '/' . $relPath;
-      if (!is_dir($absPath)) continue;
-      // Skip if already discovered via numbered folders
-      $alreadyScanned = false;
-      foreach ($tree as $tn) {
-        if (($tn['num'] ?? 0) === $vNum) { $alreadyScanned = true; break; }
-      }
-
-      // Build or reuse virtual top node keyed by vNum
-      if (!isset($virtualTops[$vNum])) {
-        $virtualTops[$vNum] = ['path' => $relPath, 'num' => $vNum, 'name' => $vLabel, 'cat' => $vCat, 'subs' => [], 'fileCount' => 0];
-      }
-      $vTop =& $virtualTops[$vNum];
-
-      // If the path has sub-subdirectories (e.g. system/organization/03-Job-Descriptions), scan them
-      $subDirs = @scandir($absPath);
-      if (!$subDirs) $subDirs = [];
-      sort($subDirs);
-
-      $hasSubDirs = false;
-      foreach ($subDirs as $subName) {
-        if ($subName[0] === '.' || $subName === '_Archive' || $subName === 'index.html' || $subName[0] === '_') continue;
-        $subAbs = $absPath . '/' . $subName;
-        if (is_dir($subAbs)) {
-          $hasSubDirs = true;
-          [$subNum, $subLabel] = parse_folder_num($subName);
-          $subCat = $vCat;
-          $subNode = ['path' => $relPath . '/' . $subName, 'num' => $subNum, 'name' => $subLabel ?? $subName, 'cat' => $subCat, 'fileCount' => 0];
-
-          // Scan files in sub-subdirectory
-          $subFiles = @scandir($subAbs);
-          if ($subFiles) foreach ($subFiles as $fn) {
-            if ($fn[0] === '.' || $fn === 'index.html' || $fn[0] === '_') continue;
-            if (scan_should_skip_filename($fn, $scanExclusions)) continue;
-            if (is_dir($subAbs . '/' . $fn)) continue;
-            $fileRelPath = $relPath . '/' . $subName . '/' . $fn;
-            if ($append_scanned_doc($subAbs . '/' . $fn, $fileRelPath, $subCat, $subName, $relPath . '/' . $subName)) {
-              $subNode['fileCount']++;
-              $vTop['fileCount']++;
-            }
-          }
-          $vTop['subs'][] = $subNode;
-        }
-      }
-
-      // If no subdirectories, scan files directly
-      if (!$hasSubDirs) {
-        foreach ($subDirs as $fn) {
-          if ($fn[0] === '.' || $fn === 'index.html' || $fn[0] === '_') continue;
-          if (scan_should_skip_filename($fn, $scanExclusions)) continue;
-          $fileAbs = $absPath . '/' . $fn;
-          if (is_dir($fileAbs)) continue;
-          $fileRelPath = $relPath . '/' . $fn;
-          if ($append_scanned_doc($fileAbs, $fileRelPath, $vCat, null, $relPath)) {
-            $vTop['fileCount']++;
-          }
-        }
-      }
-      unset($vTop);
-    }
-
-    // Merge virtual tops into tree (only if not already present)
-    foreach ($virtualTops as $vTop) {
-      if ($vTop['fileCount'] > 0) {
-        $exists = false;
-        foreach ($tree as $tn) { if (($tn['num'] ?? 0) === $vTop['num']) { $exists = true; break; } }
-        if (!$exists) $tree[] = $vTop;
-      }
-    }
-
-    // Re-sort tree by num
-    usort($tree, fn($a, $b) => ($a['num'] ?? 99) <=> ($b['num'] ?? 99));
 
     // ═══ POST-PROCESS: Fix doc categories based on folder context ═══
     // Files inside Organization folder should always be ORG (overrides filename-based cat)
