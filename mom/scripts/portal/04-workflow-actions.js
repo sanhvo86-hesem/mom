@@ -1311,7 +1311,7 @@ function submitForReview(code){
             </div>
           </div>
 
-          <div style="font-size:11px;font-weight:600;color:#475569;margin-bottom:8px">${T('sm_update_type')} <span style="color:#dc2626">*</span></div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-secondary,#475569);margin-bottom:8px">${T('sm_update_type')} <span style="color:var(--red-light,#dc2626)">*</span></div>
           <div class="sm-type-grid">
             <div class="sm-type-card" id="sm-card-minor" onclick="selectSubmitType('minor')">
               <div class="sm-check" id="sm-check-minor"></div>
@@ -1936,19 +1936,19 @@ function loadDocContent(code){
       <head>
         <meta charset="utf-8">
         <style>
-          body{margin:0;background:#f8fafc;font-family:Segoe UI,Arial,sans-serif;color:#0f172a}
+          body{margin:0;background:var(--bg-surface-alt,#f8fafc);font-family:Segoe UI,Arial,sans-serif;color:var(--text-primary,#0f172a)}
           .wrap{padding:24px}
-          .card{background:#fff;border:1px solid #dbe3ef;border-radius:18px;padding:24px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
-          .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#475569;margin-bottom:8px}
+          .card{background:var(--bg-surface,#fff);border:1px solid var(--border,#dbe3ef);border-radius:18px;padding:24px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
+          .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary,#475569);margin-bottom:8px}
           h1{margin:0 0 8px;font-size:28px;line-height:1.2}
-          .sub{font-size:14px;color:#475569;margin-bottom:18px}
+          .sub{font-size:14px;color:var(--text-secondary,#475569);margin-bottom:18px}
           .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0 22px}
-          .meta{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#f8fafc}
-          .meta b{display:block;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+          .meta{border:1px solid var(--border,#e2e8f0);border-radius:12px;padding:12px 14px;background:var(--bg-surface-alt,#f8fafc)}
+          .meta b{display:block;font-size:11px;color:var(--text-secondary,#64748b);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
           .meta span{font-size:14px;font-weight:600}
           .cta{display:flex;flex-wrap:wrap;gap:12px}
-          .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;font:inherit}
-          .btn.primary{background:#0f766e;color:#fff;border-color:#0f766e}
+          .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid var(--border,#cbd5e1);background:var(--bg-surface,#fff);color:var(--text-primary,#0f172a);cursor:pointer;font:inherit}
+          .btn.primary{background:var(--green-dark,#0f766e);color:var(--text-inverse,#fff);border-color:var(--green-dark,#0f766e)}
           .note{margin-top:18px;padding:14px 16px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-size:13px;line-height:1.6}
         </style>
       </head>

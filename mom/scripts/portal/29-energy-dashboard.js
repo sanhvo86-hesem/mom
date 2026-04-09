@@ -30,12 +30,12 @@ var TABS = [
 ];
 
 var MACHINE_CATEGORIES = {
-  cnc_3axis:  { vi:'CNC 3-truc',  en:'CNC 3-Axis',  color:'#3b82f6' },
-  cnc_5axis:  { vi:'CNC 5-truc',  en:'CNC 5-Axis',  color:'#8b5cf6' },
-  turning:    { vi:'Tien',        en:'Turning',      color:'#f59e0b' },
-  grinding:   { vi:'Mai',         en:'Grinding',     color:'#ef4444' },
-  edm:        { vi:'EDM',         en:'EDM',          color:'#06b6d4' },
-  other:      { vi:'Khac',        en:'Other',        color:'#6b7280' }
+  cnc_3axis:  { vi:'CNC 3-truc',  en:'CNC 3-Axis',  color:'var(--blue-light,#3b82f6)' },
+  cnc_5axis:  { vi:'CNC 5-truc',  en:'CNC 5-Axis',  color:'var(--purple-light,#8b5cf6)' },
+  turning:    { vi:'Tien',        en:'Turning',      color:'var(--amber-light,#f59e0b)' },
+  grinding:   { vi:'Mai',         en:'Grinding',     color:'var(--red-light,#ef4444)' },
+  edm:        { vi:'EDM',         en:'EDM',          color:'var(--cyan-light,#06b6d4)' },
+  other:      { vi:'Khac',        en:'Other',        color:'var(--text-secondary,#6b7280)' }
 };
 
 /* -- state ---------------------------------------------------- */
@@ -60,70 +60,70 @@ function _ensureStyles(){
   if(document.getElementById(STYLE_ID)) return;
   var s=document.createElement('style'); s.id=STYLE_ID;
   s.textContent=[
-    '.en{padding:16px;max-width:1200px;margin:0 auto;font-family:var(--font-sans,system-ui,sans-serif);color:var(--text,#0f172a)}',
-    '.en-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}',
-    '.en-tab{padding:8px 16px;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:8px;border:2px solid var(--border,#e2e8f0);color:var(--text-secondary,#64748b);transition:all .15s}',
+    '.en{padding:var(--space-4,16px);max-width:1200px;margin:0 auto;font-family:var(--font-sans,system-ui,sans-serif);color:var(--text,#0f172a)}',
+    '.en-tabs{display:flex;gap:var(--space-2,6px);margin-bottom:var(--space-4,16px);flex-wrap:wrap}',
+    '.en-tab{padding:var(--space-2,8px) var(--space-4,16px);font-size:var(--text-sm,.82rem);font-weight:var(--font-heading-weight,600);cursor:pointer;border-radius:var(--radius-lg,8px);border:2px solid var(--border,#e2e8f0);color:var(--text-secondary,#64748b);transition:all .15s}',
     '.en-tab:hover{border-color:var(--brand,#1565c0);color:var(--brand,#1565c0)}',
-    '.en-tab.active{border-color:var(--brand,#1565c0);background:var(--brand,#1565c0);color:#fff}',
+    '.en-tab.active{border-color:var(--brand,#1565c0);background:var(--brand,#1565c0);color:var(--text-inverse,#fff)}',
     /* KPI row */
-    '.en-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}',
-    '.en-kpi{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:16px;text-align:center}',
-    '.en-kpi-val{font-size:1.6rem;font-weight:800;color:var(--brand,#1565c0)}',
-    '.en-kpi-label{font-size:.75rem;color:var(--text-secondary,#64748b);margin-top:2px}',
-    '.en-kpi-sub{font-size:.7rem;color:var(--text-secondary,#64748b)}',
+    '.en-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-3,12px);margin-bottom:var(--space-5,20px)}',
+    '.en-kpi{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:var(--radius-lg,10px);padding:var(--space-4,16px);text-align:center}',
+    '.en-kpi-val{font-size:var(--text-xl,1.6rem);font-weight:var(--font-display-weight,800);color:var(--brand,#1565c0)}',
+    '.en-kpi-label{font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);margin-top:2px}',
+    '.en-kpi-sub{font-size:var(--text-xs,.7rem);color:var(--text-secondary,#64748b)}',
     /* horizontal bar chart */
-    '.en-hbar-chart{display:flex;flex-direction:column;gap:8px;margin-top:12px}',
-    '.en-hbar-row{display:flex;align-items:center;gap:8px;font-size:.82rem}',
-    '.en-hbar-label{width:160px;text-align:right;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.en-hbar{height:24px;border-radius:4px;min-width:4px;transition:width .3s;position:relative}',
-    '.en-hbar-val{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:.72rem;font-weight:700;color:#fff}',
-    '.en-hbar-val-out{font-weight:700;font-size:.75rem;color:var(--text-secondary,#64748b);margin-left:6px}',
+    '.en-hbar-chart{display:flex;flex-direction:column;gap:var(--space-2,8px);margin-top:var(--space-3,12px)}',
+    '.en-hbar-row{display:flex;align-items:center;gap:var(--space-2,8px);font-size:var(--text-sm,.82rem)}',
+    '.en-hbar-label{width:160px;text-align:right;font-weight:var(--font-heading-weight,600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.en-hbar{height:24px;border-radius:var(--radius-sm,4px);min-width:4px;transition:width .3s;position:relative}',
+    '.en-hbar-val{position:absolute;right:var(--space-2,6px);top:50%;transform:translateY(-50%);font-size:var(--text-xs,.72rem);font-weight:var(--font-display-weight,700);color:var(--text-inverse,#fff)}',
+    '.en-hbar-val-out{font-weight:var(--font-display-weight,700);font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);margin-left:var(--space-2,6px)}',
     /* daily chart (vertical bars) */
-    '.en-day-chart{display:flex;align-items:flex-end;gap:4px;height:180px;margin:16px 0;padding:0 4px}',
-    '.en-day-bar{flex:1;min-width:12px;max-width:40px;border-radius:4px 4px 0 0;transition:height .3s;cursor:pointer;position:relative}',
+    '.en-day-chart{display:flex;align-items:flex-end;gap:var(--space-1,4px);height:180px;margin:var(--space-4,16px) 0;padding:0 var(--space-1,4px)}',
+    '.en-day-bar{flex:1;min-width:var(--space-3,12px);max-width:40px;border-radius:var(--radius-sm,4px) var(--radius-sm,4px) 0 0;transition:height .3s;cursor:pointer;position:relative}',
     '.en-day-bar:hover{opacity:.85}',
-    '.en-day-label{text-align:center;font-size:.6rem;color:var(--text-secondary,#64748b);margin-top:2px}',
+    '.en-day-label{text-align:center;font-size:var(--text-xs,.6rem);color:var(--text-secondary,#64748b);margin-top:2px}',
     '.en-day-tooltip{position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:var(--tooltip-bg,#1a1a1a);color:var(--tooltip-color,#fff);padding:var(--tooltip-padding-y,4px) var(--tooltip-padding-x,8px);border-radius:var(--tooltip-radius,4px);font-size:var(--tooltip-font-size,.7rem);max-width:var(--tooltip-max-width,280px);white-space:nowrap;display:none;z-index:10}',
     '.en-day-bar:hover .en-day-tooltip{display:block}',
     /* split bar (idle vs production) */
-    '.en-split-wrap{display:flex;gap:20px;margin:16px 0;flex-wrap:wrap}',
-    '.en-split-box{flex:1;min-width:200px;background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:14px;text-align:center}',
-    '.en-split-bar{height:20px;border-radius:4px;display:flex;overflow:hidden;margin-top:8px}',
+    '.en-split-wrap{display:flex;gap:var(--space-5,20px);margin:var(--space-4,16px) 0;flex-wrap:wrap}',
+    '.en-split-box{flex:1;min-width:200px;background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:var(--radius-lg,10px);padding:var(--space-4,14px);text-align:center}',
+    '.en-split-bar{height:var(--space-5,20px);border-radius:var(--radius-sm,4px);display:flex;overflow:hidden;margin-top:var(--space-2,8px)}',
     '.en-split-seg{height:100%;transition:width .3s}',
     /* table */
-    '.en-table{width:100%;border-collapse:collapse;font-size:.82rem}',
-    '.en-table th,.en-table td{padding:8px 10px;border-bottom:1px solid var(--border,#e2e8f0);text-align:left}',
-    '.en-table th{background:var(--bg-alt,#f8fafc);font-weight:700;position:sticky;top:0}',
+    '.en-table{width:100%;border-collapse:collapse;font-size:var(--text-sm,.82rem)}',
+    '.en-table th,.en-table td{padding:var(--space-2,8px) var(--space-3,10px);border-bottom:1px solid var(--border,#e2e8f0);text-align:left}',
+    '.en-table th{background:var(--bg-alt,#f8fafc);font-weight:var(--font-display-weight,700);position:sticky;top:0}',
     '.en-table tr:hover td{background:rgba(59,130,246,.03)}',
     '.en-table .sort{cursor:pointer;user-select:none}',
     /* month chart */
-    '.en-month-chart{display:flex;align-items:flex-end;gap:6px;height:200px;margin:16px 0;padding:0 4px}',
-    '.en-month-bar{flex:1;min-width:20px;border-radius:4px 4px 0 0;transition:height .3s;position:relative;cursor:pointer}',
+    '.en-month-chart{display:flex;align-items:flex-end;gap:var(--space-2,6px);height:200px;margin:var(--space-4,16px) 0;padding:0 var(--space-1,4px)}',
+    '.en-month-bar{flex:1;min-width:var(--space-5,20px);border-radius:var(--radius-sm,4px) var(--radius-sm,4px) 0 0;transition:height .3s;position:relative;cursor:pointer}',
     '.en-month-bar:hover{opacity:.85}',
-    '.en-month-label{text-align:center;font-size:.65rem;color:var(--text-secondary,#64748b);margin-top:2px}',
+    '.en-month-label{text-align:center;font-size:var(--text-xs,.65rem);color:var(--text-secondary,#64748b);margin-top:2px}',
     '.en-month-tooltip{position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:var(--tooltip-bg,#1a1a1a);color:var(--tooltip-color,#fff);padding:var(--tooltip-padding-y,4px) var(--tooltip-padding-x,8px);border-radius:var(--tooltip-radius,4px);font-size:var(--tooltip-font-size,.7rem);max-width:var(--tooltip-max-width,280px);white-space:nowrap;display:none;z-index:10}',
     '.en-month-bar:hover .en-month-tooltip{display:block}',
     /* category cost bars */
-    '.en-cat-bars{display:flex;flex-direction:column;gap:8px;max-width:600px;margin-top:12px}',
-    '.en-cat-row{display:flex;align-items:center;gap:8px;font-size:.82rem}',
-    '.en-cat-label{width:120px;text-align:right;font-weight:600}',
-    '.en-cat-bar{height:24px;border-radius:4px;min-width:4px;transition:width .3s}',
-    '.en-cat-val{font-weight:700;font-size:.75rem;color:var(--text-secondary,#64748b)}',
+    '.en-cat-bars{display:flex;flex-direction:column;gap:var(--space-2,8px);max-width:600px;margin-top:var(--space-3,12px)}',
+    '.en-cat-row{display:flex;align-items:center;gap:var(--space-2,8px);font-size:var(--text-sm,.82rem)}',
+    '.en-cat-label{width:120px;text-align:right;font-weight:var(--font-heading-weight,600)}',
+    '.en-cat-bar{height:24px;border-radius:var(--radius-sm,4px);min-width:4px;transition:width .3s}',
+    '.en-cat-val{font-weight:var(--font-display-weight,700);font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b)}',
     /* recommendation cards */
-    '.en-rec{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:14px;margin-bottom:8px}',
-    '.en-rec-title{font-weight:700;font-size:.88rem;margin-bottom:4px}',
-    '.en-rec-body{font-size:.82rem;color:var(--text-secondary,#64748b);line-height:1.5}',
-    '.en-rec-savings{font-weight:700;color:#22c55e;font-size:.82rem;margin-top:4px}',
+    '.en-rec{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:var(--radius-lg,10px);padding:var(--space-4,14px);margin-bottom:var(--space-2,8px)}',
+    '.en-rec-title{font-weight:var(--font-display-weight,700);font-size:var(--text-sm,.88rem);margin-bottom:var(--space-1,4px)}',
+    '.en-rec-body{font-size:var(--text-sm,.82rem);color:var(--text-secondary,#64748b);line-height:1.5}',
+    '.en-rec-savings{font-weight:var(--font-display-weight,700);color:var(--green-light,#22c55e);font-size:var(--text-sm,.82rem);margin-top:var(--space-1,4px)}',
     /* machine select */
-    '.en-machine-select{margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}',
-    '.en-machine-select select{padding:8px 12px;border-radius:8px;border:1px solid var(--border,#e2e8f0);font-size:.85rem;background:var(--surface,#fff)}',
-    '.en-empty{text-align:center;padding:40px 20px;color:var(--text-secondary,#64748b);font-size:.9rem}',
-    '.en-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700}',
+    '.en-machine-select{margin-bottom:var(--space-4,16px);display:flex;gap:var(--space-3,10px);align-items:center;flex-wrap:wrap}',
+    '.en-machine-select select{padding:var(--space-2,8px) var(--space-3,12px);border-radius:var(--radius-lg,8px);border:1px solid var(--border,#e2e8f0);font-size:var(--text-sm,.85rem);background:var(--surface,#fff)}',
+    '.en-empty{text-align:center;padding:40px var(--space-5,20px);color:var(--text-secondary,#64748b);font-size:var(--text-sm,.9rem)}',
+    '.en-badge{display:inline-block;padding:2px var(--space-2,8px);border-radius:var(--radius-xl,20px);font-size:var(--text-xs,.7rem);font-weight:var(--font-display-weight,700)}',
     /* efficiency score */
-    '.en-eff{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700}',
-    '.en-eff-good{background:rgba(34,197,94,.1);color:#22c55e}',
-    '.en-eff-ok{background:rgba(245,158,11,.1);color:#f59e0b}',
-    '.en-eff-bad{background:rgba(239,68,68,.1);color:#ef4444}'
+    '.en-eff{display:inline-block;padding:2px var(--space-3,10px);border-radius:var(--radius-xl,20px);font-size:var(--text-xs,.75rem);font-weight:var(--font-display-weight,700)}',
+    '.en-eff-good{background:rgba(34,197,94,.1);color:var(--green-light,#22c55e)}',
+    '.en-eff-ok{background:rgba(245,158,11,.1);color:var(--amber-light,#f59e0b)}',
+    '.en-eff-bad{background:rgba(239,68,68,.1);color:var(--red-light,#ef4444)}'
   ].join('\n');
   document.head.appendChild(s);
 }
@@ -135,25 +135,25 @@ function _ensureStyles(){
 /* -- Overview ------------------------------------------------- */
 function _renderOverviewTab(){
   var o=state.overview||{};
-  var html='<h3 style="margin:0 0 16px">'+_t('Tong quan nang luong','Energy Overview')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Tong quan nang luong','Energy Overview')+'</h3>';
 
   /* KPI cards */
   html+='<div class="en-kpi-row">';
   html+='<div class="en-kpi"><div class="en-kpi-val">'+_esc(_fmtNum(o.total_kwh_today,1))+'</div><div class="en-kpi-label">kWh '+_t('Hom nay','Today')+'</div></div>';
-  html+='<div class="en-kpi"><div class="en-kpi-val" style="font-size:1.2rem">'+_esc(_fmtVND(o.cost_today||0))+'</div><div class="en-kpi-label">VND '+_t('Hom nay','Today')+'</div></div>';
+  html+='<div class="en-kpi"><div class="en-kpi-val" style="font-size:var(--text-lg,1.2rem)">'+_esc(_fmtVND(o.cost_today||0))+'</div><div class="en-kpi-label">VND '+_t('Hom nay','Today')+'</div></div>';
   html+='<div class="en-kpi"><div class="en-kpi-val">'+_esc(_fmtNum(o.kwh_per_part,2))+'</div><div class="en-kpi-label">kWh/'+_t('San pham','Part')+' (avg)</div></div>';
-  html+='<div class="en-kpi"><div class="en-kpi-val" style="color:'+(Number(o.idle_waste_pct)>25?'#ef4444':'#f59e0b')+'">'+_esc(_fmtNum(o.idle_waste_pct,1))+'%</div><div class="en-kpi-label">'+_t('Lang phi idle','Idle Energy Waste')+'</div></div>';
+  html+='<div class="en-kpi"><div class="en-kpi-val" style="color:'+(Number(o.idle_waste_pct)>25?'var(--red-light,#ef4444)':'var(--amber-light,#f59e0b)')+'">'+_esc(_fmtNum(o.idle_waste_pct,1))+'%</div><div class="en-kpi-label">'+_t('Lang phi idle','Idle Energy Waste')+'</div></div>';
   html+='</div>';
 
   /* per-machine horizontal bars */
   var machines=o.machine_energy||[];
   if(machines.length){
-    html+='<h4 style="margin:16px 0 8px">'+_t('Tieu thu theo may','Energy by Machine')+'</h4>';
+    html+='<h4 style="margin:var(--space-4,16px) 0 var(--space-2,8px)">'+_t('Tieu thu theo may','Energy by Machine')+'</h4>';
     var maxKwh=Math.max.apply(null,machines.map(function(m){return m.kwh||0;}))||1;
     html+='<div class="en-hbar-chart">';
     machines.forEach(function(m){
       var pct=Math.round(((m.kwh||0)/maxKwh)*100);
-      var color=m.kwh>(maxKwh*0.8)?'#ef4444':m.kwh>(maxKwh*0.5)?'#f59e0b':'#3b82f6';
+      var color=m.kwh>(maxKwh*0.8)?'var(--red-light,#ef4444)':m.kwh>(maxKwh*0.5)?'var(--amber-light,#f59e0b)':'var(--blue-light,#3b82f6)';
       html+='<div class="en-hbar-row">';
       html+='<span class="en-hbar-label">'+_esc(m.name)+'</span>';
       html+='<div class="en-hbar" style="width:'+Math.max(pct,3)+'%;background:'+color+'"><span class="en-hbar-val">'+_esc(_fmtNum(m.kwh,1))+'</span></div>';
@@ -165,10 +165,10 @@ function _renderOverviewTab(){
   /* top 5 consumers */
   var top5=o.top_consumers||(machines.slice().sort(function(a,b){return(b.kwh||0)-(a.kwh||0);}).slice(0,5));
   if(top5.length){
-    html+='<h4 style="margin:20px 0 8px">'+_t('Top 5 tieu thu nhieu','Top 5 Energy Consumers')+'</h4>';
+    html+='<h4 style="margin:var(--space-5,20px) 0 var(--space-2,8px)">'+_t('Top 5 tieu thu nhieu','Top 5 Energy Consumers')+'</h4>';
     html+='<div style="overflow-x:auto"><table class="en-table"><thead><tr><th>#</th><th>'+_t('May','Machine')+'</th><th style="text-align:right">kWh</th><th style="text-align:right">'+_t('Chi phi','Cost')+' (VND)</th></tr></thead><tbody>';
     top5.forEach(function(m,i){
-      html+='<tr><td>'+(i+1)+'</td><td>'+_esc(m.name)+'</td><td style="text-align:right;font-weight:700">'+_esc(_fmtNum(m.kwh,1))+'</td><td style="text-align:right">'+_esc(_fmtVND(m.cost||0))+'</td></tr>';
+      html+='<tr><td>'+(i+1)+'</td><td>'+_esc(m.name)+'</td><td style="text-align:right;font-weight:var(--font-display-weight,700)">'+_esc(_fmtNum(m.kwh,1))+'</td><td style="text-align:right">'+_esc(_fmtVND(m.cost||0))+'</td></tr>';
     });
     html+='</tbody></table></div>';
   }
@@ -177,12 +177,12 @@ function _renderOverviewTab(){
 
 /* -- Machine Detail ------------------------------------------- */
 function _renderMachineTab(){
-  var html='<h3 style="margin:0 0 12px">'+_t('Chi tiet nang luong may','Machine Energy Detail')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-3,12px)">'+_t('Chi tiet nang luong may','Machine Energy Detail')+'</h3>';
 
   /* machine selector */
   var machines=state.machines.length?state.machines:((state.overview||{}).machine_energy||[]);
   html+='<div class="en-machine-select">';
-  html+='<label style="font-weight:600;font-size:.85rem">'+_t('Chon may:','Select Machine:')+'</label>';
+  html+='<label style="font-weight:var(--font-heading-weight,600);font-size:var(--text-sm,.85rem)">'+_t('Chon may:','Select Machine:')+'</label>';
   html+='<select data-bind="select-machine">';
   html+='<option value="">-- '+_t('Chon','Select')+' --</option>';
   machines.forEach(function(m){
@@ -199,12 +199,12 @@ function _renderMachineTab(){
   /* daily energy bar chart */
   var daily=md.daily||[];
   if(daily.length){
-    html+='<h4 style="margin:12px 0 6px">'+_t('Tieu thu hang ngay (30 ngay)','Daily Consumption (30 days)')+'</h4>';
+    html+='<h4 style="margin:var(--space-3,12px) 0 var(--space-2,6px)">'+_t('Tieu thu hang ngay (30 ngay)','Daily Consumption (30 days)')+'</h4>';
     var maxDay=Math.max.apply(null,daily.map(function(d){return d.kwh||0;}))||1;
     html+='<div class="en-day-chart">';
     daily.forEach(function(d){
       var h=Math.max(Math.round(((d.kwh||0)/maxDay)*160),4);
-      var color=(d.kwh||0)>(maxDay*0.8)?'#ef4444':(d.kwh||0)>(maxDay*0.5)?'#f59e0b':'#3b82f6';
+      var color=(d.kwh||0)>(maxDay*0.8)?'var(--red-light,#ef4444)':(d.kwh||0)>(maxDay*0.5)?'var(--amber-light,#f59e0b)':'var(--blue-light,#3b82f6)';
       html+='<div style="flex:1;text-align:center"><div class="en-day-bar" style="height:'+h+'px;background:'+color+'"><div class="en-day-tooltip">'+_esc(d.date)+': '+_esc(_fmtNum(d.kwh,1))+' kWh</div></div><div class="en-day-label">'+_esc((d.date||'').substring(8))+'</div></div>';
     });
     html+='</div>';
@@ -212,10 +212,10 @@ function _renderMachineTab(){
 
   /* peak demand times */
   if(md.peak_hours&&md.peak_hours.length){
-    html+='<h4 style="margin:16px 0 6px">'+_t('Gio cao diem','Peak Demand Hours')+'</h4>';
-    html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    html+='<h4 style="margin:var(--space-4,16px) 0 var(--space-2,6px)">'+_t('Gio cao diem','Peak Demand Hours')+'</h4>';
+    html+='<div style="display:flex;gap:var(--space-2,6px);flex-wrap:wrap">';
     md.peak_hours.forEach(function(h){
-      html+='<span class="en-badge" style="background:rgba(239,68,68,.1);color:#ef4444">'+_esc(h)+':00</span>';
+      html+='<span class="en-badge" style="background:rgba(239,68,68,.1);color:var(--red-light,#ef4444)">'+_esc(h)+':00</span>';
     });
     html+='</div>';
   }
@@ -224,17 +224,17 @@ function _renderMachineTab(){
   var idlePct=md.idle_pct||0;
   var prodPct=md.production_pct||(100-idlePct);
   html+='<div class="en-split-wrap">';
-  html+='<div class="en-split-box"><div style="font-weight:700;font-size:.85rem">'+_t('Idle vs San xuat','Idle vs Production')+'</div>';
-  html+='<div class="en-split-bar"><div class="en-split-seg" style="width:'+prodPct+'%;background:#3b82f6" title="Production '+_esc(_fmtNum(prodPct,1))+'%"></div><div class="en-split-seg" style="width:'+idlePct+'%;background:#ef4444" title="Idle '+_esc(_fmtNum(idlePct,1))+'%"></div></div>';
-  html+='<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-top:4px;color:var(--text-secondary,#64748b)"><span style="color:#3b82f6;font-weight:700">'+_t('San xuat','Production')+' '+_esc(_fmtNum(prodPct,1))+'%</span><span style="color:#ef4444;font-weight:700">Idle '+_esc(_fmtNum(idlePct,1))+'%</span></div>';
+  html+='<div class="en-split-box"><div style="font-weight:var(--font-display-weight,700);font-size:var(--text-sm,.85rem)">'+_t('Idle vs San xuat','Idle vs Production')+'</div>';
+  html+='<div class="en-split-bar"><div class="en-split-seg" style="width:'+prodPct+'%;background:var(--blue-light,#3b82f6)" title="Production '+_esc(_fmtNum(prodPct,1))+'%"></div><div class="en-split-seg" style="width:'+idlePct+'%;background:var(--red-light,#ef4444)" title="Idle '+_esc(_fmtNum(idlePct,1))+'%"></div></div>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:var(--text-xs,.72rem);margin-top:var(--space-1,4px);color:var(--text-secondary,#64748b)"><span style="color:var(--blue-light,#3b82f6);font-weight:var(--font-display-weight,700)">'+_t('San xuat','Production')+' '+_esc(_fmtNum(prodPct,1))+'%</span><span style="color:var(--red-light,#ef4444);font-weight:var(--font-display-weight,700)">Idle '+_esc(_fmtNum(idlePct,1))+'%</span></div>';
   html+='</div>';
 
   /* cost breakdown */
-  html+='<div class="en-split-box"><div style="font-weight:700;font-size:.85rem">'+_t('Chi phi','Cost Breakdown')+'</div>';
-  html+='<div style="margin-top:8px;font-size:.85rem">';
-  html+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border,#e2e8f0)"><span>'+_t('San xuat','Production')+'</span><strong>'+_esc(_fmtVND(md.cost_production||0))+' VND</strong></div>';
-  html+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border,#e2e8f0)"><span>Idle</span><strong style="color:#ef4444">'+_esc(_fmtVND(md.cost_idle||0))+' VND</strong></div>';
-  html+='<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:700"><span>'+_t('Tong','Total')+'</span><span>'+_esc(_fmtVND(md.cost_total||0))+' VND</span></div>';
+  html+='<div class="en-split-box"><div style="font-weight:var(--font-display-weight,700);font-size:var(--text-sm,.85rem)">'+_t('Chi phi','Cost Breakdown')+'</div>';
+  html+='<div style="margin-top:var(--space-2,8px);font-size:var(--text-sm,.85rem)">';
+  html+='<div style="display:flex;justify-content:space-between;padding:var(--space-1,4px) 0;border-bottom:1px solid var(--border,#e2e8f0)"><span>'+_t('San xuat','Production')+'</span><strong>'+_esc(_fmtVND(md.cost_production||0))+' VND</strong></div>';
+  html+='<div style="display:flex;justify-content:space-between;padding:var(--space-1,4px) 0;border-bottom:1px solid var(--border,#e2e8f0)"><span>Idle</span><strong style="color:var(--red-light,#ef4444)">'+_esc(_fmtVND(md.cost_idle||0))+' VND</strong></div>';
+  html+='<div style="display:flex;justify-content:space-between;padding:var(--space-1,4px) 0;font-weight:var(--font-display-weight,700)"><span>'+_t('Tong','Total')+'</span><span>'+_esc(_fmtVND(md.cost_total||0))+' VND</span></div>';
   html+='</div></div></div>';
 
   return html;
@@ -242,7 +242,7 @@ function _renderMachineTab(){
 
 /* -- Per-Part Energy ------------------------------------------ */
 function _renderPerPartTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Nang luong tren san pham','Per-Part Energy')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Nang luong tren san pham','Per-Part Energy')+'</h3>';
   var data=state.perPartData||[];
   if(!data.length){
     html+='<div class="en-empty">'+_t('Chua co du lieu.','No data available.')+'</div>';
@@ -274,12 +274,12 @@ function _renderPerPartTab(){
 
 /* -- Cost Analysis -------------------------------------------- */
 function _renderCostTab(){
-  var html='<h3 style="margin:0 0 16px">'+_t('Phan tich chi phi nang luong','Energy Cost Analysis')+'</h3>';
+  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Phan tich chi phi nang luong','Energy Cost Analysis')+'</h3>';
 
   /* 12-month trend bar chart */
   var trend=state.costTrend||[];
   if(trend.length){
-    html+='<h4 style="margin:12px 0 6px">'+_t('Chi phi 12 thang','12-Month Cost Trend')+'</h4>';
+    html+='<h4 style="margin:var(--space-3,12px) 0 var(--space-2,6px)">'+_t('Chi phi 12 thang','12-Month Cost Trend')+'</h4>';
     var maxMonth=Math.max.apply(null,trend.map(function(m){return m.cost||0;}))||1;
     html+='<div class="en-month-chart">';
     trend.forEach(function(m){
@@ -292,7 +292,7 @@ function _renderCostTab(){
   /* cost by machine category */
   var cats=state.costByCategory||[];
   if(cats.length){
-    html+='<h4 style="margin:20px 0 8px">'+_t('Chi phi theo loai may','Cost by Machine Category')+'</h4>';
+    html+='<h4 style="margin:var(--space-5,20px) 0 var(--space-2,8px)">'+_t('Chi phi theo loai may','Cost by Machine Category')+'</h4>';
     var maxCat=Math.max.apply(null,cats.map(function(c){return c.cost||0;}))||1;
     html+='<div class="en-cat-bars">';
     cats.forEach(function(c){
@@ -306,7 +306,7 @@ function _renderCostTab(){
   /* cost optimization recommendations */
   var recs=state.recommendations||[];
   if(recs.length){
-    html+='<h4 style="margin:20px 0 8px">'+_t('Khuyen nghi toi uu','Optimization Recommendations')+'</h4>';
+    html+='<h4 style="margin:var(--space-5,20px) 0 var(--space-2,8px)">'+_t('Khuyen nghi toi uu','Optimization Recommendations')+'</h4>';
     recs.forEach(function(r){
       html+='<div class="en-rec">';
       html+='<div class="en-rec-title">'+_esc(r.title)+'</div>';

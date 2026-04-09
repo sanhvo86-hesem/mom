@@ -583,13 +583,13 @@
     var borderW=Math.max(0,Math.min(12,parseInt(cs.borderTopWidth,10)||1));
     var borderStyle=String(cs.borderTopStyle||'solid').toLowerCase();
     if(['solid','dashed','dotted'].indexOf(borderStyle)<0) borderStyle='solid';
-    var borderColor=_toHexColor(cs.borderTopColor,'#cbd5e1');
+    var borderColor=_toHexColor(cs.borderTopColor,'var(--border,#cbd5e1)');
     var html='';
     html+='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal">';
     html+='<h4>'+(vi?'Table Border':'Table Border')+'</h4>';
     html+='<div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">';
     [0,1,2,3,4].forEach(function(w){
-      html+='<button style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblBorder('+w+')">'+(w===0?'None':(w+'px'))+'</button>';
+      html+='<button style="padding:6px 10px;border:1px solid var(--border,#ddd);border-radius:var(--radius-sm,4px);background:var(--bg-surface,#fff);cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblBorder('+w+')">'+(w===0?'None':(w+'px'))+'</button>';
     });
     html+='</div>';
     html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">';
@@ -652,7 +652,7 @@
     html+='<h4>'+(vi?'Table Radius':'Table Radius')+'</h4>';
     html+='<div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap">';
     [0,4,8,12,16,20].forEach(function(r){
-      html+='<button style="width:56px;height:40px;border:2px solid #1967d2;border-radius:'+r+'px;background:#e8f0fe;cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblRadius('+r+')">'+r+'px</button>';
+      html+='<button style="width:56px;height:40px;border:2px solid var(--brand,#1967d2);border-radius:'+r+'px;background:var(--bg-surface-alt,#e8f0fe);cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblRadius('+r+')">'+r+'px</button>';
     });
     html+='</div>';
     html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Close':'Close')+'</button></div>';
@@ -670,7 +670,7 @@
       table.style.borderCollapse='separate';
       table.style.borderSpacing=table.style.borderSpacing||'0';
       if(!table.style.border||table.style.border==='none'){
-        table.style.border='1px solid #cbd5e1';
+        table.style.border='1px solid var(--border,#cbd5e1)';
       }
     }else{
       table.style.overflow='';
@@ -733,7 +733,7 @@
     var borderW=Math.max(0,Math.min(12,parseInt(cs.borderTopWidth,10)||1));
     var borderStyle=String(cs.borderTopStyle||'solid').toLowerCase();
     if(['solid','dashed','dotted','double','none'].indexOf(borderStyle)<0) borderStyle='solid';
-    var borderColor=_toHexColor(cs.borderTopColor || (firstCell?getComputedStyle(firstCell).borderTopColor:''), '#cbd5e1');
+    var borderColor=_toHexColor(cs.borderTopColor || (firstCell?getComputedStyle(firstCell).borderTopColor:''), 'var(--border,#cbd5e1)');
     var pad=Math.max(0,Math.min(60,parseInt(ccs?ccs.paddingTop:'8',10)||8));
     var space=Math.max(0,Math.min(30,parseInt(table.style.borderSpacing||'0',10)||0));
     var caption=table.caption?String(table.caption.textContent||''):'';
@@ -775,7 +775,7 @@
     var fitVal=String(document.getElementById('ed-tp-fit').value||'none').toLowerCase();
     var borderW=Math.max(0,Math.min(12,parseInt(document.getElementById('ed-tp-border').value,10)||0));
     var borderStyle=String(document.getElementById('ed-tp-bs').value||'solid').toLowerCase();
-    var borderColor=_toHexColor(document.getElementById('ed-tp-bc').value,'#cbd5e1');
+    var borderColor=_toHexColor(document.getElementById('ed-tp-bc').value,'var(--border,#cbd5e1)');
     var pad=Math.max(0,Math.min(60,parseInt(document.getElementById('ed-tp-pad').value,10)||0));
     var space=Math.max(0,Math.min(30,parseInt(document.getElementById('ed-tp-space').value,10)||0));
     var caption=String(document.getElementById('ed-tp-cap').value||'').trim();

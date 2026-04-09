@@ -30,20 +30,20 @@ var TABS = [
 ];
 
 var PDCA_PHASES = {
-  plan:   { vi:'Plan',  en:'Plan',   color:'#3b82f6', bg:'rgba(59,130,246,.08)' },
-  do:     { vi:'Do',    en:'Do',     color:'#f59e0b', bg:'rgba(245,158,11,.08)' },
-  check:  { vi:'Check', en:'Check',  color:'#8b5cf6', bg:'rgba(139,92,246,.08)' },
-  act:    { vi:'Act',   en:'Act',    color:'#10b981', bg:'rgba(16,185,129,.08)' },
-  closed: { vi:'Dong',  en:'Closed', color:'#6b7280', bg:'rgba(107,114,128,.08)' }
+  plan:   { vi:'Plan',  en:'Plan',   color:'var(--blue-light,#3b82f6)', bg:'rgba(59,130,246,.08)' },
+  do:     { vi:'Do',    en:'Do',     color:'var(--amber-light,#f59e0b)', bg:'rgba(245,158,11,.08)' },
+  check:  { vi:'Check', en:'Check',  color:'var(--purple-light,#8b5cf6)', bg:'rgba(139,92,246,.08)' },
+  act:    { vi:'Act',   en:'Act',    color:'var(--green-light,#10b981)', bg:'rgba(16,185,129,.08)' },
+  closed: { vi:'Dong',  en:'Closed', color:'var(--text-secondary,#6b7280)', bg:'rgba(107,114,128,.08)' }
 };
 var PDCA_ORDER = ['plan','do','check','act','closed'];
 
 var SUGGESTION_CATEGORIES = {
-  quality:      { vi:'Chat luong',   en:'Quality',      color:'#3b82f6' },
-  productivity: { vi:'Nang suat',    en:'Productivity',  color:'#10b981' },
-  safety:       { vi:'An toan',      en:'Safety',        color:'#ef4444' },
-  cost:         { vi:'Chi phi',      en:'Cost',          color:'#f59e0b' },
-  ergonomics:   { vi:'Ergonomics',   en:'Ergonomics',    color:'#8b5cf6' }
+  quality:      { vi:'Chat luong',   en:'Quality',      color:'var(--blue-light,#3b82f6)' },
+  productivity: { vi:'Nang suat',    en:'Productivity',  color:'var(--green-light,#10b981)' },
+  safety:       { vi:'An toan',      en:'Safety',        color:'var(--red-light,#ef4444)' },
+  cost:         { vi:'Chi phi',      en:'Cost',          color:'var(--amber-light,#f59e0b)' },
+  ergonomics:   { vi:'Ergonomics',   en:'Ergonomics',    color:'var(--purple-light,#8b5cf6)' }
 };
 
 /* SUG_STATUS — đọc từ HmRegistry → 'suggestion_status' */
@@ -76,7 +76,7 @@ function _ensureStyles(){
     '.ci-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}',
     '.ci-tab{padding:8px 16px;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:8px;border:2px solid var(--border,#e2e8f0);color:var(--text-secondary,#64748b);transition:all .15s}',
     '.ci-tab:hover{border-color:var(--brand,#1565c0);color:var(--brand,#1565c0)}',
-    '.ci-tab.active{border-color:var(--brand,#1565c0);background:var(--brand,#1565c0);color:#fff}',
+    '.ci-tab.active{border-color:var(--brand,#1565c0);background:var(--brand,#1565c0);color:var(--text-inverse,#fff)}',
     /* KPI row */
     '.ci-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}',
     '.ci-kpi{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:16px;text-align:center}',
@@ -100,7 +100,7 @@ function _ensureStyles(){
     '.ci-proj-card-meta{color:var(--text-secondary,#64748b);font-size:.75rem}',
     '.ci-transition{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}',
     '.ci-trans-btn{padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600;cursor:pointer;border:1px solid var(--border,#e2e8f0);background:var(--surface,#fff);transition:all .12s}',
-    '.ci-trans-btn:hover{background:var(--brand,#1565c0);color:#fff;border-color:var(--brand,#1565c0)}',
+    '.ci-trans-btn:hover{background:var(--brand,#1565c0);color:var(--text-inverse,#fff);border-color:var(--brand,#1565c0)}',
     /* form */
     '.ci-form{display:grid;gap:14px;max-width:700px}',
     '.ci-form label{display:block;font-weight:600;font-size:.82rem;margin-bottom:4px}',
@@ -108,7 +108,7 @@ function _ensureStyles(){
     '.ci-form textarea{min-height:100px;resize:vertical}',
     /* buttons */
     '.ci-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:all .15s}',
-    '.ci-btn-primary{background:var(--brand,#1565c0);color:#fff}',
+    '.ci-btn-primary{background:var(--brand,#1565c0);color:var(--text-inverse,#fff)}',
     '.ci-btn-primary:hover{opacity:.9}',
     '.ci-btn-secondary{background:var(--bg-alt,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#e2e8f0)}',
     /* A3 template */
@@ -172,7 +172,7 @@ function _renderDashboardTab(){
     });
     html+='<div class="ci-donut" style="background:conic-gradient('+gradient+')"><div class="ci-donut-center">'+total+'</div></div>';
   } else {
-    html+='<div class="ci-donut" style="background:#e2e8f0"><div class="ci-donut-center">0</div></div>';
+    html+='<div class="ci-donut" style="background:var(--border,#e2e8f0)"><div class="ci-donut-center">0</div></div>';
   }
   html+='<div class="ci-donut-legend">';
   PDCA_ORDER.forEach(function(k){
@@ -229,7 +229,7 @@ function _renderBoardTab(){
       html+='<div class="ci-proj-card" data-action="select-project" data-id="'+_esc(proj.id)+'">';
       html+='<div class="ci-proj-card-title">'+_esc(proj.title)+'</div>';
       html+='<div class="ci-proj-card-meta">'+_esc(proj.owner||'---')+' &middot; '+_esc(_fmtDate(proj.target_date))+'</div>';
-      if(proj.cost_impact) html+='<div style="font-size:.72rem;color:#22c55e;font-weight:700;margin-top:2px">'+_esc(_fmtVND(proj.cost_impact))+' VND</div>';
+      if(proj.cost_impact) html+='<div style="font-size:.72rem;color:var(--green-light,#22c55e);font-weight:700;margin-top:2px">'+_esc(_fmtVND(proj.cost_impact))+' VND</div>';
       /* transition buttons */
       html+='<div class="ci-transition">';
       var idx=PDCA_ORDER.indexOf(phase);
@@ -340,7 +340,7 @@ function _renderRoiTab(){
     html+='<tr>';
     html+='<td>'+_esc(p.title)+'</td>';
     html+='<td style="text-align:right">'+_esc(_fmtVND(cost))+'</td>';
-    html+='<td style="text-align:right;color:#22c55e;font-weight:700">'+_esc(_fmtVND(savings))+'</td>';
+    html+='<td style="text-align:right;color:var(--green-light,#22c55e);font-weight:700">'+_esc(_fmtVND(savings))+'</td>';
     html+='<td style="text-align:right;font-weight:700">'+_esc(roi)+'%</td>';
     html+='<td style="text-align:right">'+_esc(payback)+'</td>';
     html+='<td><span class="ci-badge" style="background:rgba(0,0,0,.06);color:'+cat.color+'">'+_esc(_t(cat.vi,cat.en))+'</span></td>';
@@ -348,7 +348,7 @@ function _renderRoiTab(){
   });
   html+='</tbody></table></div>';
 
-  html+='<div style="margin-top:14px;font-weight:700;font-size:.95rem">'+_t('Tong tiet kiem hang nam:','Total Annual Savings:')+' <span style="color:#22c55e">'+_esc(_fmtVND(totalSaved))+' VND</span></div>';
+  html+='<div style="margin-top:14px;font-weight:700;font-size:.95rem">'+_t('Tong tiet kiem hang nam:','Total Annual Savings:')+' <span style="color:var(--green-light,#22c55e)">'+_esc(_fmtVND(totalSaved))+' VND</span></div>';
 
   /* savings by category bar chart */
   var catKeys=Object.keys(savingsByCategory);

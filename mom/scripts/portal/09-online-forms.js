@@ -6,13 +6,13 @@
 'use strict';
 
 var FORM_COLORS = {
-  production:  { bg:'#fef3c7', icon:'PR' },
-  quality:     { bg:'#dcfce7', icon:'QA' },
-  maintenance: { bg:'#fff9db', icon:'MT' },
-  hr:          { bg:'#f3e8ff', icon:'HR' },
-  logistics:   { bg:'#fff4e6', icon:'LG' },
-  safety:      { bg:'#fee2e2', icon:'HS' },
-  other:       { bg:'#f1f5f9', icon:'EC' }
+  production:  { bg:'var(--amber-bg,#fef3c7)', icon:'PR' },
+  quality:     { bg:'var(--green-bg,#dcfce7)', icon:'QA' },
+  maintenance: { bg:'var(--amber-bg,#fff9db)', icon:'MT' },
+  hr:          { bg:'var(--purple-bg,#f3e8ff)', icon:'HR' },
+  logistics:   { bg:'var(--amber-bg,#fff4e6)', icon:'LG' },
+  safety:      { bg:'var(--red-bg,#fee2e2)', icon:'HS' },
+  other:       { bg:'var(--bg-surface-alt,#f1f5f9)', icon:'EC' }
 };
 
 function _registryOptions(setKey){
@@ -1933,7 +1933,7 @@ function openEqmsFormCreator(){
         '<button type="button" class="ec-modal-close" data-action="close">&times;</button>' +
       '</div>' +
       '<div class="ec-modal-body">' +
-        '<p style="color:#64748b;font-size:13px;margin:0 0 16px">' + esc(t('Điền thông tin cơ bản để tạo JSON schema mới. Sau đó thêm sections và fields qua form builder.', 'Fill in basic info to generate a new JSON schema. Then add sections and fields via the form builder.')) + '</p>' +
+        '<p style="color:var(--text-secondary,#64748b);font-size:13px;margin:0 0 var(--space-4,16px)">' + esc(t('Điền thông tin cơ bản để tạo JSON schema mới. Sau đó thêm sections và fields qua form builder.', 'Fill in basic info to generate a new JSON schema. Then add sections and fields via the form builder.')) + '</p>' +
         '<div style="display:grid;gap:14px;grid-template-columns:1fr 1fr">' +
           '<div><label class="ec-field-label">' + esc(t('Mã form', 'Form Code')) + ' *</label><input id="ec-fc-code" class="ec-input" placeholder="VD: FRM-701-AUDIT" style="font-family:monospace"></div>' +
           '<div><label class="ec-field-label">' + esc(t('Phiên bản', 'Version')) + '</label><input id="ec-fc-version" class="ec-input" value="V1"></div>' +
@@ -1945,8 +1945,8 @@ function openEqmsFormCreator(){
           '<div><label class="ec-field-label">' + esc(t('Chủ sở hữu', 'Owner')) + '</label><input id="ec-fc-owner" class="ec-input" placeholder="VD: QA / ENG"></div>' +
           '<div style="grid-column:1/-1"><label class="ec-field-label">' + esc(t('Mô tả (EN)', 'Description (EN)')) + '</label><textarea id="ec-fc-desc" class="ec-input" rows="2" placeholder="Brief description of the form purpose"></textarea></div>' +
         '</div>' +
-        '<div style="margin-top:16px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">' +
-          '<div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:8px">' + esc(t('Template khởi tạo', 'Starter Template')) + '</div>' +
+        '<div style="margin-top:var(--space-4,16px);padding:14px;background:var(--bg-surface-alt,#f8fafc);border-radius:10px;border:1px solid var(--border,#e2e8f0)">' +
+          '<div style="font-size:var(--text-xs,.75rem);font-weight:var(--font-display-weight,700);color:var(--text-secondary,#334155);margin-bottom:var(--space-2,8px)">' + esc(t('Template khởi tạo', 'Starter Template')) + '</div>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
             '<label class="ec-radio-card"><input type="radio" name="ec-fc-template" value="blank" checked> ' + esc(t('Trống', 'Blank')) + '</label>' +
             '<label class="ec-radio-card"><input type="radio" name="ec-fc-template" value="scar"> SCAR (FRM-403)</label>' +
@@ -2065,7 +2065,7 @@ function buildNewFormSchema(opts){
         title_vi: 'Thông tin chung',
         description: 'Basic record identification and context.',
         description_vi: 'Nhận diện hồ sơ và ngữ cảnh cơ bản.',
-        color: '#1971c2',
+        color: 'var(--blue-light,#1971c2)',
         field_ids: ['record_date', 'department', 'description_field']
       }
     ],
@@ -2089,7 +2089,7 @@ function buildNewFormSchema(opts){
       id: 'findings',
       title: 'Findings & Containment',
       title_vi: 'Phát hiện và ngăn chặn',
-      color: '#e03131',
+      color: 'var(--red-light,#e03131)',
       field_ids: ['finding_description', 'severity', 'containment_action']
     });
     schema.fields.push(
@@ -2101,7 +2101,7 @@ function buildNewFormSchema(opts){
       id: 'root_cause',
       title: 'Root Cause & Corrective Action',
       title_vi: 'Nguyên nhân gốc và hành động khắc phục',
-      color: '#d97706',
+      color: 'var(--amber-light,#d97706)',
       field_ids: ['root_cause_analysis', 'corrective_action', 'preventive_action']
     });
     schema.fields.push(
@@ -2113,7 +2113,7 @@ function buildNewFormSchema(opts){
       id: 'verification',
       title: 'Verification & Closeout',
       title_vi: 'Xác nhận và đóng hồ sơ',
-      color: '#2f9e44',
+      color: 'var(--green-dark,#2f9e44)',
       field_ids: ['verification_method', 'verification_result']
     });
     schema.fields.push(

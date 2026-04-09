@@ -31,8 +31,8 @@ var TABS = [
 ];
 
 var FMEA_TYPE = {
-  dfmea: { vi:'DFMEA', en:'DFMEA', color:'#3b82f6' },
-  pfmea: { vi:'PFMEA', en:'PFMEA', color:'#8b5cf6' }
+  dfmea: { vi:'DFMEA', en:'DFMEA', color:'var(--blue-light,#3b82f6)' },
+  pfmea: { vi:'PFMEA', en:'PFMEA', color:'var(--purple-light,#8b5cf6)' }
 };
 
 /* FMEA_STATUS — đọc từ HmRegistry → 'fmea_status' */
@@ -44,38 +44,38 @@ var FMEA_STATUS = (function(){
 })();
 
 var AP_LEVEL = {
-  HIGH:   { vi:'CAO',          en:'HIGH',   color:'#ef4444', text:'#fff' },
-  MEDIUM: { vi:'TRUNG BÌNH',   en:'MEDIUM', color:'#f59e0b', text:'#1a1a1a' },
-  LOW:    { vi:'THẤP',         en:'LOW',    color:'#22c55e', text:'#fff' }
+  HIGH:   { vi:'CAO',          en:'HIGH',   color:'var(--red-light,#ef4444)', text:'#fff' },
+  MEDIUM: { vi:'TRUNG BÌNH',   en:'MEDIUM', color:'var(--amber-light,#f59e0b)', text:'#1a1a1a' },
+  LOW:    { vi:'THẤP',         en:'LOW',    color:'var(--green-light,#22c55e)', text:'#fff' }
 };
 
 /* ACTION_STATUS — đọc từ HmRegistry → 'fmea_action_status' */
 var ACTION_STATUS = (function(){
   var map = {};
   if(window.HmRegistry){ HmRegistry.statusSet('fmea_action_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
-  if(!Object.keys(map).length){ map = {open:{vi:'Mở',en:'Open',color:'#ef4444'},in_progress:{vi:'Đang thực hiện',en:'In Progress',color:'#f59e0b'},completed:{vi:'Hoàn thành',en:'Completed',color:'#22c55e'},overdue:{vi:'Quá hạn',en:'Overdue',color:'#dc2626'}}; }
+  if(!Object.keys(map).length){ map = {open:{vi:'Mở',en:'Open',color:'var(--red-light,#ef4444)'},in_progress:{vi:'Đang thực hiện',en:'In Progress',color:'var(--amber-light,#f59e0b)'},completed:{vi:'Hoàn thành',en:'Completed',color:'var(--green-light,#22c55e)'},overdue:{vi:'Quá hạn',en:'Overdue',color:'var(--red-light,#dc2626)'}}; }
   return map;
 })();
 
 var CP_TYPE = {
-  prototype:  { vi:'Prototype',   en:'Prototype',   color:'#3b82f6' },
-  prelaunch:  { vi:'Pre-launch',  en:'Pre-launch',  color:'#f59e0b' },
-  production: { vi:'Production',  en:'Production',  color:'#22c55e' }
+  prototype:  { vi:'Prototype',   en:'Prototype',   color:'var(--blue-light,#3b82f6)' },
+  prelaunch:  { vi:'Pre-launch',  en:'Pre-launch',  color:'var(--amber-light,#f59e0b)' },
+  production: { vi:'Production',  en:'Production',  color:'var(--green-light,#22c55e)' }
 };
 
 /* CP_STATUS — đọc từ HmRegistry → 'control_plan_status' */
 var CP_STATUS = (function(){
   var map = {};
   if(window.HmRegistry){ HmRegistry.statusSet('control_plan_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
-  if(!Object.keys(map).length){ map = {draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'},active:{vi:'Hoạt động',en:'Active',color:'#22c55e'},archived:{vi:'Lưu trữ',en:'Archived',color:'#6b7280'}}; }
+  if(!Object.keys(map).length){ map = {draft:{vi:'Nháp',en:'Draft',color:'var(--text-secondary,#94a3b8)'},active:{vi:'Hoạt động',en:'Active',color:'var(--green-light,#22c55e)'},archived:{vi:'Lưu trữ',en:'Archived',color:'var(--text-secondary,#6b7280)'}}; }
   return map;
 })();
 
 var CLASSIFICATION = {
-  CC: { vi:'CC', en:'CC', color:'#ef4444', bg:'#fef2f2' },
-  SC: { vi:'SC', en:'SC', color:'#f59e0b', bg:'#fffbeb' },
+  CC: { vi:'CC', en:'CC', color:'var(--red-light,#ef4444)', bg:'#fef2f2' },
+  SC: { vi:'SC', en:'SC', color:'var(--amber-light,#f59e0b)', bg:'#fffbeb' },
   HI: { vi:'HI', en:'HI', color:'#ca8a04', bg:'#fefce8' },
-  YC: { vi:'YC', en:'YC', color:'#3b82f6', bg:'#eff6ff' }
+  YC: { vi:'YC', en:'YC', color:'var(--blue-light,#3b82f6)', bg:'#eff6ff' }
 };
 
 /* -- state ---------------------------------------------------- */
@@ -115,13 +115,13 @@ function _ensureStyles(){
     '.fm-table th{text-align:left;padding:10px 12px;font-weight:700;border-bottom:2px solid var(--border,#e2e8f0);white-space:nowrap;color:var(--text-secondary,#64748b);font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em}',
     '.fm-table td{padding:10px 12px;border-bottom:1px solid var(--border,#f1f5f9);vertical-align:middle}',
     '.fm-table tr:hover td{background:var(--surface,#f8fafc)}',
-    '.fm-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.6875rem;font-weight:700;color:#fff;white-space:nowrap}',
+    '.fm-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.6875rem;font-weight:700;color:var(--text-inverse,#fff);white-space:nowrap}',
     '.fm-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:6px;font-size:.8125rem;font-weight:600;cursor:pointer;transition:background .15s}',
-    '.fm-btn-primary{background:var(--brand,#1565c0);color:#fff}',
+    '.fm-btn-primary{background:var(--brand,#1565c0);color:var(--text-inverse,#fff)}',
     '.fm-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
     '.fm-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
-    '.fm-btn-secondary:hover{background:#e2e8f0}',
-    '.fm-btn-danger{background:#ef4444;color:#fff}',
+    '.fm-btn-secondary:hover{background:var(--border,#e2e8f0)}',
+    '.fm-btn-danger{background:var(--red-light,#ef4444);color:var(--text-inverse,#fff)}',
     '.fm-btn-sm{padding:4px 10px;font-size:.75rem}',
     '.fm-card{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:18px;margin-bottom:12px}',
     '.fm-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}',
@@ -159,29 +159,29 @@ function _ensureStyles(){
 
 /* -- badge helpers -------------------------------------------- */
 function _typeBadge(type){
-  var m=FMEA_TYPE[type]||{vi:type,en:type,color:'#64748b'};
+  var m=FMEA_TYPE[type]||{vi:type,en:type,color:'var(--text-secondary,#64748b)'};
   return '<span class="fm-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _statusBadge(status){
   if(window.HmRegistry) return HmRegistry.badge('fmea_status', status);
   /* legacy fallback below */
-  var m=FMEA_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=FMEA_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="fm-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _apBadge(level){
-  var m=AP_LEVEL[level]||{vi:level,en:level,color:'#64748b',text:'#fff'};
+  var m=AP_LEVEL[level]||{vi:level,en:level,color:'var(--text-secondary,#64748b)',text:'#fff'};
   return '<span class="fm-badge" style="background:'+m.color+';color:'+m.text+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _actionBadge(status){
-  var m=ACTION_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=ACTION_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="fm-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _cpTypeBadge(type){
-  var m=CP_TYPE[type]||{vi:type,en:type,color:'#64748b'};
+  var m=CP_TYPE[type]||{vi:type,en:type,color:'var(--text-secondary,#64748b)'};
   return '<span class="fm-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _cpStatusBadge(status){
-  var m=CP_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=CP_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="fm-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _classBadge(cls){
@@ -379,7 +379,7 @@ function _renderActionsTab(){
     } else {
       /* show improvement */
       var oldRpn=a.old_rpn||0, newRpn=a.new_rpn||0;
-      if(oldRpn && newRpn) html+='<span style="font-size:.75rem;color:#22c55e">RPN '+oldRpn+' &rarr; '+newRpn+'</span>';
+      if(oldRpn && newRpn) html+='<span style="font-size:.75rem;color:var(--green-light,#22c55e)">RPN '+oldRpn+' &rarr; '+newRpn+'</span>';
     }
     html+='</td></tr>';
   });
@@ -486,14 +486,14 @@ function _renderAnalyticsTab(){
       var hAfter=Math.round(((m.rpn_after||0)/maxRpn)*160);
       html+='<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:0">'
         +'<div style="display:flex;align-items:flex-end;gap:1px;height:160px">'
-        +'<div class="fm-bar" style="height:'+hBefore+'px;background:#ef4444;min-width:6px" title="'+_t('Truoc','Before')+': '+_esc(m.rpn_before)+'"></div>'
-        +'<div class="fm-bar" style="height:'+hAfter+'px;background:#22c55e;min-width:6px" title="'+_t('Sau','After')+': '+_esc(m.rpn_after)+'"></div>'
+        +'<div class="fm-bar" style="height:'+hBefore+'px;background:var(--red-light,#ef4444);min-width:6px" title="'+_t('Truoc','Before')+': '+_esc(m.rpn_before)+'"></div>'
+        +'<div class="fm-bar" style="height:'+hAfter+'px;background:var(--green-light,#22c55e);min-width:6px" title="'+_t('Sau','After')+': '+_esc(m.rpn_after)+'"></div>'
         +'</div>'
         +'<div class="fm-bar-label" title="'+_esc(m.name)+'">'+_esc(m.name)+'</div>'
         +'</div>';
     });
     html+='</div>';
-    html+='<div class="fm-legend"><span><span class="fm-legend-dot" style="background:#ef4444"></span>'+_t('Truoc','Before')+'</span><span><span class="fm-legend-dot" style="background:#22c55e"></span>'+_t('Sau','After')+'</span></div>';
+    html+='<div class="fm-legend"><span><span class="fm-legend-dot" style="background:var(--red-light,#ef4444)"></span>'+_t('Truoc','Before')+'</span><span><span class="fm-legend-dot" style="background:var(--green-light,#22c55e)"></span>'+_t('Sau','After')+'</span></div>';
   } else {
     html+='<div class="fm-empty">'+_t('Chua co du lieu','No data')+'</div>';
   }
@@ -506,13 +506,13 @@ function _renderAnalyticsTab(){
     var pHigh=Math.round((dist.HIGH/total)*100);
     var pMedium=Math.round((dist.MEDIUM/total)*100);
     var pLow=100-pHigh-pMedium;
-    html+='<div class="fm-donut" style="background:conic-gradient(#ef4444 0% '+pHigh+'%, #f59e0b '+pHigh+'% '+(pHigh+pMedium)+'%, #22c55e '+(pHigh+pMedium)+'% 100%)">';
+    html+='<div class="fm-donut" style="background:conic-gradient(var(--red-light,#ef4444) 0% '+pHigh+'%, var(--amber-light,#f59e0b) '+pHigh+'% '+(pHigh+pMedium)+'%, var(--green-light,#22c55e) '+(pHigh+pMedium)+'% 100%)">';
     html+='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;border-radius:50%;background:var(--surface,#fff);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem">'+total+'</div>';
     html+='</div>';
     html+='<div class="fm-legend">';
-    html+='<span><span class="fm-legend-dot" style="background:#ef4444"></span>HIGH: '+dist.HIGH+'</span>';
-    html+='<span><span class="fm-legend-dot" style="background:#f59e0b"></span>MEDIUM: '+dist.MEDIUM+'</span>';
-    html+='<span><span class="fm-legend-dot" style="background:#22c55e"></span>LOW: '+dist.LOW+'</span>';
+    html+='<span><span class="fm-legend-dot" style="background:var(--red-light,#ef4444)"></span>HIGH: '+dist.HIGH+'</span>';
+    html+='<span><span class="fm-legend-dot" style="background:var(--amber-light,#f59e0b)"></span>MEDIUM: '+dist.MEDIUM+'</span>';
+    html+='<span><span class="fm-legend-dot" style="background:var(--green-light,#22c55e)"></span>LOW: '+dist.LOW+'</span>';
     html+='</div>';
   } else {
     html+='<div class="fm-empty">'+_t('Chua co du lieu','No data')+'</div>';

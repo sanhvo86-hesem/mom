@@ -442,7 +442,7 @@ function buildEditorToolbar(){
       ${btn(EI.code,'_code',v?'Mã':'Code')}
       ${btn(EI.pageBreak,'_pageBreak',v?'Ngắt trang':'Page Break')}
       <div class="ed-sep"></div>
-      <span style="font-size:8px;color:#94a3b8;font-weight:700;letter-spacing:.3px;padding:0 1px">${v?'CHÈN':'INS'}</span>
+      <span style="font-size:8px;color:var(--text-secondary,#94a3b8);font-weight:700;letter-spacing:.3px;padding:0 1px">${v?'CHÈN':'INS'}</span>
       ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><text x="4.5" y="11" font-size="8.5" font-weight="700" fill="currentColor" stroke="none">T</text></svg>','_textbox',v?'Hộp văn bản':'Text Box')}
       ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="3" width="6" height="6" rx=".5" fill="#60a5fa" stroke="#2563eb" stroke-width=".8"/><circle cx="12" cy="5" r="3" fill="#4ade80" stroke="#16a34a" stroke-width=".8"/><polygon points="11,10 15,15 7,15" fill="#fbbf24" stroke="#d97706" stroke-width=".8"/></svg>','_shape',v?'Hình dạng':'Shapes')}
       ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="2.5" y="5" width="2.5" height="9" rx=".4" fill="#3b82f6"/><rect x="6.5" y="2" width="2.5" height="12" rx=".4" fill="#22c55e"/><rect x="10.5" y="7" width="2.5" height="7" rx=".4" fill="#f59e0b"/></svg>','_chart',v?'Biểu đồ':'Chart')}
@@ -468,7 +468,7 @@ function buildEditorToolbar(){
 
       <div class="ed-sep"></div>
       ${btn(EI.zoomOut,'_zoomOut',v?'Thu nhỏ':'Zoom out')}
-      <span style="font-size:10px;font-weight:600;color:#666;min-width:30px;text-align:center;flex-shrink:0" id="ed-zoom-label">100%</span>
+      <span style="font-size:10px;font-weight:var(--font-heading-weight,600);color:var(--text-secondary,#666);min-width:30px;text-align:center;flex-shrink:0" id="ed-zoom-label">100%</span>
       ${btn(EI.zoomIn,'_zoomIn','+')}
       ${btn(EI.fullscreen,'_fullscreen',v?'Toàn màn hình':'Fullscreen')}
     </div>
@@ -617,11 +617,11 @@ function edColorPalette(onPick,currentColor){
   for(var i=0;i<colors.length;i++){
     var c=colors[i];
     var sel=c===currentColor?' outline:2px solid #1967d2;outline-offset:1px;':'';
-    html+='<button style="width:20px;height:20px;border:1px solid '+(c==='#ffffff'?'#ddd':'transparent')+';border-radius:2px;background:'+c+';cursor:pointer;padding:0;'+sel+'" data-color="'+c+'"></button>';
+    html+='<button style="width:20px;height:20px;border:1px solid '+(c==='#ffffff'?'var(--border,#ddd)':'transparent')+';border-radius:2px;background:'+c+';cursor:pointer;padding:0;'+sel+'" data-color="'+c+'"></button>';
   }
   html+='</div>';
-  html+='<div style="display:flex;gap:4px;align-items:center;margin-top:6px;padding:0 4px"><label style="font-size:10px;color:#666">Custom:</label><input type="color" value="'+(currentColor||'#000000')+'" style="width:28px;height:22px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0" data-custom="1"><button style="font-size:10px;padding:2px 8px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer" data-apply="1">OK</button>';
-  if(currentColor){html+='<button style="font-size:10px;padding:2px 6px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;color:#dc2626" data-clear="1">✕</button>';}
+  html+='<div style="display:flex;gap:4px;align-items:center;margin-top:6px;padding:0 4px"><label style="font-size:10px;color:#666">Custom:</label><input type="color" value="'+(currentColor||'#000000')+'" style="width:28px;height:22px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0" data-custom="1"><button style="font-size:10px;padding:2px 8px;border:1px solid #ddd;border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer" data-apply="1">OK</button>';
+  if(currentColor){html+='<button style="font-size:10px;padding:2px 6px;border:1px solid var(--border,#ddd);border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;color:var(--red-light,#dc2626)" data-clear="1">✕</button>';}
   html+='</div>';
   var div=document.createElement('div');
   div.innerHTML=html;
@@ -641,7 +641,7 @@ function edShowColorPopup(target,callback){
   var old=document.getElementById('ed-color-popup');if(old)old.remove();
   var popup=document.createElement('div');
   popup.id='ed-color-popup';
-  popup.style.cssText='position:fixed;background:#fff;border:1px solid #d1d5db;border-radius:8px;padding:8px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:1000001';
+  popup.style.cssText='position:fixed;background:var(--bg-surface,#fff);border:1px solid var(--border,#d1d5db);border-radius:var(--radius-lg,8px);padding:var(--space-2,8px);box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:1000001';
   var rect=target.getBoundingClientRect();
   var popTop=rect.bottom+4;
   var popLeft=Math.min(rect.left,window.innerWidth-240);
@@ -925,7 +925,7 @@ function edInsertChecklist(){
   const items=[vi?'Mục 1':'Item 1',vi?'Mục 2':'Item 2',vi?'Mục 3':'Item 3'];
   let html='';
   items.forEach(t=>{
-    html+='<div class="ed-check-item" style="display:flex;align-items:center;gap:8px;margin:4px 0;padding:2px 0"><input type="checkbox" style="width:16px;height:16px;accent-color:#1967d2;flex-shrink:0"><span contenteditable="true" style="flex:1;outline:none">'+t+'</span></div>';
+    html+='<div class="ed-check-item" style="display:flex;align-items:center;gap:8px;margin:4px 0;padding:2px 0"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--brand,#1967d2);flex-shrink:0"><span contenteditable="true" style="flex:1;outline:none">'+t+'</span></div>';
   });
   edExecCommand('insertHTML',false,html+'<p><br></p>');
   edMarkModified();
@@ -941,7 +941,7 @@ function edToggleFullscreen(){
     var dvh=document.getElementById('doc-viewer-header');if(dvh)dvh.style.display='none';
     var main=document.getElementById('content');if(main){main.style.padding='0';main.style.margin='0';}
     var app=document.getElementById('app');if(app)app.style.overflow='hidden';
-    var dv=document.getElementById('doc-viewer');if(dv){dv.style.position='fixed';dv.style.inset='0';dv.style.zIndex='9990';dv.style.background='#fff';}
+    var dv=document.getElementById('doc-viewer');if(dv){dv.style.position='fixed';dv.style.inset='0';dv.style.zIndex='9990';dv.style.background='var(--bg-surface,#fff)';}
   }else{
     delete document.body.dataset.edFs;
     document.getElementById('sidebar').style.display='';
@@ -1583,9 +1583,9 @@ function edBuildQmsTemplateHtml(kind){
       '<section class="qf-section qf-section--success">'
       +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">S</span> Electronic Signatures</div><div class="qf-section-subtitle">Giải thích tiếng Việt có dấu cho quy tắc ký điện tử của biểu mẫu.</div></div></div>'
       +'<div class="qf-section-body"><div class="qf-grid qf-grid--3">'
-      +'<div class="qf-field"><label class="qf-label">ORIGINATOR<span class="qf-label-vi">Người phát hành</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
-      +'<div class="qf-field"><label class="qf-label">REVIEWER<span class="qf-label-vi">Người xem xét</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
-      +'<div class="qf-field"><label class="qf-label">APPROVER<span class="qf-label-vi">Người phê duyệt</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">ORIGINATOR<span class="qf-label-vi">Người phát hành</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:var(--text-secondary,#64748b)">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">REVIEWER<span class="qf-label-vi">Người xem xét</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:var(--text-secondary,#64748b)">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">APPROVER<span class="qf-label-vi">Người phê duyệt</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:var(--text-secondary,#64748b)">Chưa ký</div></div>'
       +'</div></div></section>',
     docControl:
       '<div class="card"><div class="card-title">'+(vi?'Thông tin kiểm soát tài liệu':'Document Control Information')+'</div><table class="form-table"><tbody>'
@@ -2502,7 +2502,7 @@ function edShowCellColorDialog(scope){
   html+='<div style="display:flex;gap:4px;margin-bottom:10px">';
   ['cell','row','col'].forEach(s=>{
     const lbl={cell:vi?'🔲 Ô':'🔲 Cell',row:vi?'☰ Hàng':'☰ Row',col:vi?'▥ Cột':'▥ Col'}[s];
-    html+='<button style="flex:1;padding:6px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid '+(s===scope?'#1967d2':'#ddd')+';background:'+(s===scope?'#e8f0fe':'#fff')+';color:'+(s===scope?'#1967d2':'#666')+';cursor:pointer" onclick="edShowCellColorDialog(\''+s+'\')">'+lbl+'</button>';
+    html+='<button style="flex:1;padding:6px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid '+(s===scope?'var(--brand,#1967d2)':'var(--border,#ddd)')+';background:'+(s===scope?'var(--bg-hover,#e8f0fe)':'var(--bg-surface,#fff)')+';color:'+(s===scope?'var(--brand,#1967d2)':'var(--text-secondary,#666)')+';cursor:pointer" onclick="edShowCellColorDialog(\''+s+'\')">'+lbl+'</button>';
   });
   html+='</div>';
   html+='<div class="ed-cpick-grid" style="margin:8px 0">';
@@ -3320,7 +3320,7 @@ function edShowTableBar(table){
   document.querySelectorAll('.ed-tbl-float-bar').forEach(function(b){b.remove();});
   var bar=document.createElement('div');bar.className='ed-tbl-float-bar';bar.contentEditable='false';
   bar.setAttribute('data-no-edit','true');
-  bar.style.cssText='position:fixed;display:flex;gap:5px;background:#fff;border:1px solid #c9cdd3;border-radius:8px;padding:6px 10px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:999990;align-items:center;flex-wrap:wrap;max-width:92vw;user-select:none';
+  bar.style.cssText='position:fixed;display:flex;gap:5px;background:var(--bg-surface,#fff);border:1px solid var(--border,#c9cdd3);border-radius:var(--radius-lg,8px);padding:6px 10px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:999990;align-items:center;flex-wrap:wrap;max-width:92vw;user-select:none';
 
   // Remember defaults for Reset / restore colgroup (ONLY once per session)
   edTableRememberDefaults(table);
@@ -3334,17 +3334,17 @@ function edShowTableBar(table){
   var vi=lang!=='en';
 
   // === Helper: separator ===
-  function mkSep(){var s=document.createElement('span');s.style.cssText='width:1px;height:18px;background:#d1d5db;margin:0 3px;flex-shrink:0';return s;}
+  function mkSep(){var s=document.createElement('span');s.style.cssText='width:1px;height:18px;background:var(--border,#d1d5db);margin:0 3px;flex-shrink:0';return s;}
 
   // === Helper: label ===
-  function mkLbl(txt){var l=document.createElement('span');l.textContent=txt;l.style.cssText='font-weight:700;font-size:10px;color:#475569;white-space:nowrap';return l;}
+  function mkLbl(txt){var l=document.createElement('span');l.textContent=txt;l.style.cssText='font-weight:700;font-size:10px;color:var(--text-secondary,#475569);white-space:nowrap';return l;}
 
   // === Helper: button ===
   function mkBtn(label,tip,fn,extraCSS){
     var b=document.createElement('button');b.type='button';b.textContent=label;b.title=tip||label;
-    b.style.cssText='height:26px;min-width:26px;padding:0 7px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;color:#475569;white-space:nowrap;'+(extraCSS||'');
-    b.onmouseover=function(){this.style.background='#e0ecff';};
-    b.onmouseout=function(){this.style.background=extraCSS&&extraCSS.indexOf('background')>=0?'':'#f8fafc';};
+    b.style.cssText='height:26px;min-width:26px;padding:0 7px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f8fafc);border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;color:var(--text-secondary,#475569);white-space:nowrap;'+(extraCSS||'');
+    b.onmouseover=function(){this.style.background='var(--bg-hover,#e0ecff)';};
+    b.onmouseout=function(){this.style.background=extraCSS&&extraCSS.indexOf('background')>=0?'':'var(--bg-surface-alt,#f8fafc)';};
     b.onclick=function(ev){ev.preventDefault();fn();};
     return b;
   }
@@ -3353,7 +3353,7 @@ function edShowTableBar(table){
   function mkNumInput(val,w,tip,onChange){
     var inp=document.createElement('input');inp.type='number';inp.value=val;inp.min=20;
     inp.title=tip||'';
-    inp.style.cssText='width:'+(w||50)+'px;height:26px;padding:0 4px;border:1px solid #d1d5db;border-radius:4px;font-size:11px;text-align:center;background:#fff;outline:none;-moz-appearance:textfield';
+    inp.style.cssText='width:'+(w||50)+'px;height:26px;padding:0 4px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-sm,4px);font-size:11px;text-align:center;background:var(--bg-surface,#fff);outline:none;-moz-appearance:textfield';
     inp.onfocus=function(){this.select();};
     inp.onchange=function(){onChange(this);};
     return inp;
@@ -3372,7 +3372,7 @@ function edShowTableBar(table){
 
   // Width mode select: %, px
   var wModeSel=document.createElement('select');
-  wModeSel.style.cssText='height:26px;padding:0 2px;border:1px solid #d1d5db;border-radius:4px;font-size:11px;cursor:pointer;background:#fff;outline:none';
+  wModeSel.style.cssText='height:26px;padding:0 2px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-sm,4px);font-size:11px;cursor:pointer;background:var(--bg-surface,#fff);outline:none';
 
   var wModes=[{v:'100',t:'100%'},{v:'90',t:'90%'},{v:'80',t:'80%'},{v:'70',t:'70%'},{v:'60',t:'60%'},{v:'50',t:'50%'},{v:'px',t:'px'}];
   wModes.forEach(function(m){
@@ -3420,7 +3420,7 @@ function edShowTableBar(table){
   bar.appendChild(mkLbl(vi?'Chữ:':'Font:'));
   var curFs=Math.round(parseFloat(getComputedStyle(table).fontSize))||12;
   var fsSel=document.createElement('select');
-  fsSel.style.cssText='height:26px;padding:0 4px;border:1px solid #d1d5db;border-radius:4px;font-size:11px;cursor:pointer;background:#fff;outline:none';
+  fsSel.style.cssText='height:26px;padding:0 4px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-sm,4px);font-size:11px;cursor:pointer;background:var(--bg-surface,#fff);outline:none';
   [7,8,9,10,11,12,13,14,16,18].forEach(function(s){
     var o=document.createElement('option');o.value=s;o.textContent=s+'px';
     if(s===curFs)o.selected=true;
@@ -3473,7 +3473,7 @@ function edShowTableBar(table){
     edTableRestoreDefaults(table);
     edMarkModified();
     edShowTableBar(table); // rebuild UI + refresh values
-  },'color:#dc2626;border-color:#fca5a5;background:#fef2f2'));
+  },'color:var(--red-light,#dc2626);border-color:var(--red-light,#fca5a5);background:var(--bg-danger,#fef2f2)'));
 
   // ═══ Position bar above table ═══
   document.body.appendChild(bar);
@@ -3532,9 +3532,9 @@ function edShowTableMenu(x,y,cell){
   const tr=cell.closest('tr');
   const cellIdx=Array.from(tr.children).indexOf(cell);
   
-  const _b=function(cmd,ico,tip,danger){return '<button onclick="'+cmd+'" title="'+tip+'" style="width:28px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:none;cursor:pointer;padding:0;font-size:13px'+(danger?';color:#dc2626':'')+'"onmouseover="this.style.background=\''+(danger?'#fee2e2':'#e8f0fe')+'\'"onmouseout="this.style.background=\'none\'">'+ico+'</button>';};
-  const _s='<span style="width:1px;height:18px;background:#e2e8f0;margin:0 1px;flex-shrink:0"></span>';
-  const _g=function(l){return '<span style="font-size:7px;color:#94a3b8;padding:0 2px;font-weight:700;letter-spacing:.5px">'+l+'</span>';};
+  const _b=function(cmd,ico,tip,danger){return '<button onclick="'+cmd+'" title="'+tip+'" style="width:28px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:none;cursor:pointer;padding:0;font-size:13px'+(danger?';color:var(--red-light,#dc2626)':'')+'"onmouseover="this.style.background=\''+(danger?'var(--bg-danger,#fee2e2)':'var(--bg-hover,#e8f0fe)')+'\'"onmouseout="this.style.background=\'none\'">'+ico+'</button>';};
+  const _s='<span style="width:1px;height:18px;background:var(--border,#e2e8f0);margin:0 1px;flex-shrink:0"></span>';
+  const _g=function(l){return '<span style="font-size:7px;color:var(--text-secondary,#94a3b8);padding:0 2px;font-weight:700;letter-spacing:.5px">'+l+'</span>';};
   menu.style.minWidth='auto';menu.style.width='auto';menu.style.padding='0';menu.style.borderRadius='8px';
   menu.innerHTML=`<div style="display:flex;align-items:center;gap:1px;padding:5px 6px;flex-wrap:wrap;max-width:400px">
     ${_g(vi?'HG':'ROW')}${_b("edTblAddRow('above')","↑",vi?'Thêm hàng trên':'Row above')}${_b("edTblAddRow('below')","↓",vi?'Thêm hàng dưới':'Row below')}${_b("edTblDelRow()","✕",vi?'Xóa hàng':'Del row',1)}${_s}${_g(vi?'CT':'COL')}${_b("edTblAddCol('before')","←",vi?'Thêm cột trái':'Col left')}${_b("edTblAddCol('after')","→",vi?'Thêm cột phải':'Col right')}${_b("edTblDelCol()","✕",vi?'Xóa cột':'Del col',1)}${_s}${_g(vi?'CĂN':'AL')}${_b("edTblCellAlign('left')","◧",vi?'Trái':'Left')}${_b("edTblCellAlign('center')","◫",vi?'Giữa':'Center')}${_b("edTblCellAlign('right')","◨",vi?'Phải':'Right')}${_b("edTblVertAlign('top')","⬆",vi?'Trên':'Top')}${_b("edTblVertAlign('middle')","⬌",vi?'Giữa dọc':'Mid')}${_s}${_g(vi?'GỘP':'MG')}${_b("edTblMergeRight()","⇥",vi?'Gộp phải':'Merge →')}${_b("edTblMergeDown()","⇩",vi?'Gộp dưới':'Merge ↓')}${_b("edTblSplitCell()","⊞",vi?'Tách':'Split')}${_s}${_g(vi?'MÀU':'CLR')}${_b("edTblCellBg()","🎨",vi?'Màu ô':'Cell')}${_b("edTblRowBgPicker()","☰",vi?'Màu hàng':'Row')}${_b("edTblColBgPicker()","▥",vi?'Màu cột':'Col')}${_s}${_b("edTblBorderPicker()","▢",vi?'Viền':'Border')}${_b("edTblRadiusPicker()","◔",vi?'Bo góc':'Radius')}${_b("edTblProperties()","⚙",vi?'Thuộc tính':'Props')}${_b("edTblDelete()","🗑",vi?'Xóa bảng':'Del table',1)}
@@ -3702,15 +3702,15 @@ function edTblBorderPicker(){
   let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>▢ '+(vi?'Đường viền bảng':'Table Border')+'</h4>';
   html+='<div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">';
   [{w:'0',l:vi?'Không':'None'},{w:'1',l:'1px'},{w:'2',l:'2px'},{w:'3',l:'3px'}].forEach(o=>{
-    html+='<button style="padding:6px 12px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblBorder(\''+o.w+'\')">'+o.l+'</button>';
+    html+='<button style="padding:6px 12px;border:1px solid var(--border,#ddd);border-radius:4px;background:var(--bg-surface,#fff);cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblBorder(\''+o.w+'\')">'+o.l+'</button>';
   });
-  html+='</div><label style="font-size:11px;color:#666">'+(vi?'Màu viền':'Border Color')+'</label>';
+  html+='</div><label style="font-size:11px;color:var(--text-secondary,#666)">'+(vi?'Màu viền':'Border Color')+'</label>';
   html+='<div class="ed-cpick-grid" style="margin:6px 0;grid-template-columns:repeat(8,1fr)">';
   colors.forEach(co=>{
     const st=co==='#transparent'?'background:linear-gradient(135deg,#fff 45%,#f00 45%,#f00 55%,#fff 55%)':'background:'+co;
     html+='<button style="'+st+';width:24px;height:24px" onclick="edApplyTblBorderColor(\''+co+'\')"></button>';
   });
-  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'Tùy chỉnh':'Custom')+'</label><input type="color" id="ed-tbl-bc" value="#cbd5e1"><button onclick="edApplyTblBorderColor(document.getElementById(\'ed-tbl-bc\').value)">OK</button></div>';
+  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'Tùy chỉnh':'Custom')+'</label><input type="color" id="ed-tbl-bc" value="var(--border,#cbd5e1)"><button onclick="edApplyTblBorderColor(document.getElementById(\'ed-tbl-bc\').value)">OK</button></div>';
   html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Đóng':'Close')+'</button></div></div></div>';
   root.innerHTML=html;root._tblBorderTarget=table;
 }
@@ -3718,7 +3718,7 @@ function edApplyTblBorder(w){
   if(_edTableModuleCall('applyBorder',[w])!==null)return;
   const table=edGetModalRoot()._tblBorderTarget;if(!table)return;
   if(w==='0'){table.style.border='none';table.querySelectorAll('td,th').forEach(c=>c.style.border='none');}
-  else{table.style.border=w+'px solid '+(table._borderColor||'#cbd5e1');table.querySelectorAll('td,th').forEach(c=>c.style.border=w+'px solid '+(table._borderColor||'#cbd5e1'));}
+  else{table.style.border=w+'px solid '+(table._borderColor||'var(--border,#cbd5e1)');table.querySelectorAll('td,th').forEach(c=>c.style.border=w+'px solid '+(table._borderColor||'var(--border,#cbd5e1)'));}
   edMarkModified();
 }
 function edApplyTblBorderColor(color){
@@ -3735,7 +3735,7 @@ function edTblRadiusPicker(){
   let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>◔ '+(vi?'Bo góc bảng':'Table Border Radius')+'</h4>';
   html+='<div style="display:flex;gap:8px;margin:12px 0">';
   [0,4,8,12,16,20].forEach(r=>{
-    html+='<button style="width:50px;height:40px;border:2px solid #1967d2;border-radius:'+r+'px;background:#e8f0fe;cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblRadius('+r+')">'+r+'px</button>';
+    html+='<button style="width:50px;height:40px;border:2px solid var(--brand,#1967d2);border-radius:'+r+'px;background:var(--bg-hover,#e8f0fe);cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblRadius('+r+')">'+r+'px</button>';
   });
   html+='</div><div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Đóng':'Close')+'</button></div></div></div>';
   root.innerHTML=html;root._tblRadiusTarget=table;
@@ -3770,12 +3770,12 @@ function edApplyTblRadius(r){
     table.style.borderSpacing='0';
     // Make sure outer border is visible
     if(!table.style.border||table.style.border==='none'){
-      table.style.border='1px solid #cbd5e1';
+      table.style.border='1px solid var(--border,#cbd5e1)';
     }
     // Remove individual cell borders that conflict
     table.querySelectorAll('td,th').forEach(function(c){
       c.style.borderLeft='none';c.style.borderTop='none';
-      c.style.borderRight='1px solid #e2e8f0';c.style.borderBottom='1px solid #e2e8f0';
+      c.style.borderRight='1px solid var(--border,#e2e8f0)';c.style.borderBottom='1px solid var(--border,#e2e8f0)';
     });
   }
   edMarkModified();edCloseModal();
@@ -3797,7 +3797,7 @@ function edTblProperties(){
   html+='<div><label>'+( vi?'Chiều rộng':'Width')+'</label><input id="ed-tp-w" value="'+(table.style.width||'100%')+'"></div>';
   html+='<div><label>'+(vi?'Căn chỉnh':'Alignment')+'</label><select id="ed-tp-align"><option value="">'+( vi?'Mặc định':'Default')+'</option><option value="center"'+(table.style.margin==='0px auto'?' selected':'')+'>'+( vi?'Giữa':'Center')+'</option><option value="left">'+( vi?'Trái':'Left')+'</option></select></div>';
   html+='<div><label>'+(vi?'Viền':'Border')+'</label><input id="ed-tp-border" value="1" type="number" min="0" max="5"></div>';
-  html+='<div><label>'+(vi?'Màu viền':'Border Color')+'</label><input id="ed-tp-bc" type="color" value="#cbd5e1"></div>';
+  html+='<div><label>'+(vi?'Màu viền':'Border Color')+'</label><input id="ed-tp-bc" type="color" value="var(--border,#cbd5e1)"></div>';
   html+='<div><label>'+(vi?'Padding ô':'Cell Padding')+'</label><input id="ed-tp-pad" value="8" type="number" min="0" max="30"></div>';
   html+='<div><label>'+(vi?'Spacing':'Spacing')+'</label><input id="ed-tp-space" value="0" type="number" min="0" max="10"></div>';
   html+='</div>';
@@ -3842,19 +3842,19 @@ function edToggleListDD(type){
   if(type==='ul'){
     dd.innerHTML='<h5>'+(vi?'Kiểu dấu đầu dòng':'Bullet Style')+'</h5>'+
       '<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'disc\')">● '+(vi?'Tròn đặc':'Disc')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'circle\')">○ '+(vi?'Tròn rỗng':'Circle')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'square\')">■ '+(vi?'Vuông':'Square')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'none\')">— '+(vi?'Không dấu':'None')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'disc\')">● '+(vi?'Tròn đặc':'Disc')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'circle\')">○ '+(vi?'Tròn rỗng':'Circle')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'square\')">■ '+(vi?'Vuông':'Square')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'none\')">— '+(vi?'Không dấu':'None')+'</button>'+
       '</div>';
   }else{
     dd.innerHTML='<h5>'+(vi?'Kiểu đánh số':'Number Style')+'</h5>'+
       '<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'decimal\')">1. 2. 3. '+(vi?'Số':'Decimal')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-alpha\')">a. b. c. '+(vi?'Chữ thường':'Lower Alpha')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-alpha\')">A. B. C. '+(vi?'Chữ hoa':'Upper Alpha')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-roman\')">i. ii. iii. '+(vi?'La Mã thường':'Lower Roman')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-roman\')">I. II. III. '+(vi?'La Mã hoa':'Upper Roman')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'decimal\')">1. 2. 3. '+(vi?'Số':'Decimal')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-alpha\')">a. b. c. '+(vi?'Chữ thường':'Lower Alpha')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-alpha\')">A. B. C. '+(vi?'Chữ hoa':'Upper Alpha')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-roman\')">i. ii. iii. '+(vi?'La Mã thường':'Lower Roman')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid var(--border,#eee);border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-roman\')">I. II. III. '+(vi?'La Mã hoa':'Upper Roman')+'</button>'+
       '</div>';
   }
   dd.classList.add('open');
@@ -4069,23 +4069,23 @@ function edInsertMath(){
     {label:'log',text:'log?(x)',html:'log<sub>2</sub>(x)'}
   ];
   var html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:520px"><h4>∑ '+(vi?'Chèn công thức toán':'Insert Math')+'</h4>';
-  html+='<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:#666;margin-bottom:4px">'+(vi?'Mẫu có sẵn — click chèn vào ô soạn':'Templates — click to insert into editor below')+'</div>';
+  html+='<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:var(--text-secondary,#666);margin-bottom:4px">'+(vi?'Mẫu có sẵn — click chèn vào ô soạn':'Templates — click to insert into editor below')+'</div>';
   html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">';
   for(var i=0;i<tpls.length;i++){
     var t=tpls[i];
-    html+='<button style="padding:6px 4px;border:1px solid #e2e8f0;border-radius:6px;background:#fafafa;cursor:pointer;font-size:15px;font-family:serif;text-align:center;line-height:1.3" onclick="edInsertMathTpl('+i+')" title="'+t.label+'">'+(t.html||t.text||t.label)+'</button>';
+    html+='<button style="padding:6px 4px;border:1px solid var(--border,#e2e8f0);border-radius:6px;background:#fafafa;cursor:pointer;font-size:15px;font-family:serif;text-align:center;line-height:1.3" onclick="edInsertMathTpl('+i+')" title="'+t.label+'">'+(t.html||t.text||t.label)+'</button>';
   }
   html+='</div></div>';
-  html+='<div style="border-top:1px solid #e2e8f0;padding-top:10px;margin-top:4px">';
-  html+='<div style="font-size:10px;font-weight:600;color:#666;margin-bottom:4px">'+(vi?'Nhập trực tiếp (click ký tự bên dưới)':'Type directly (click symbols below)')+'</div>';
+  html+='<div style="border-top:1px solid var(--border,#e2e8f0);padding-top:10px;margin-top:4px">';
+  html+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary,#666);margin-bottom:4px">'+(vi?'Nhập trực tiếp (click ký tự bên dưới)':'Type directly (click symbols below)')+'</div>';
   html+='<div style="display:flex;gap:3px;margin-bottom:6px;flex-wrap:wrap">';
   var syms=['²','³','ⁿ','₁','√','π','Δ','∑','∏','∫','∂','∞','→','↔','≤','≥','≠','≈','±','×','÷','∙','≡','∝','⊂','⊃','∈','∉','∪','∩','α','β','γ','δ','ε','θ','λ','σ','φ','ω'];
   for(var j=0;j<syms.length;j++){
-    html+='<button style="width:26px;height:26px;border:1px solid #e2e8f0;border-radius:4px;background:#fff;cursor:pointer;font-size:14px;font-family:serif;padding:0" onclick="edMathInsertSym(this.textContent)" title="'+syms[j]+'">'+syms[j]+'</button>';
+    html+='<button style="width:26px;height:26px;border:1px solid var(--border,#e2e8f0);border-radius:4px;background:var(--bg-surface,#fff);cursor:pointer;font-size:14px;font-family:serif;padding:0" onclick="edMathInsertSym(this.textContent)" title="'+syms[j]+'">'+syms[j]+'</button>';
   }
   html+='</div>';
-  html+='<div contenteditable="true" id="ed-math-input" style="width:100%;min-height:36px;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:16px;font-family:serif;outline:none;box-sizing:border-box;background:#fff" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"></div>';
-  html+='<div id="ed-math-preview" style="margin-top:4px;padding:6px;background:#f8f9fa;border-radius:6px;min-height:28px;font-size:18px;font-family:serif;text-align:center;color:#1e293b"></div>';
+  html+='<div contenteditable="true" id="ed-math-input" style="width:100%;min-height:36px;padding:8px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:16px;font-family:serif;outline:none;box-sizing:border-box;background:var(--bg-surface,#fff)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"></div>';
+  html+='<div id="ed-math-preview" style="margin-top:4px;padding:6px;background:var(--bg-surface-alt,#f8f9fa);border-radius:6px;min-height:28px;font-size:18px;font-family:serif;text-align:center;color:var(--text-primary,#1e293b)"></div>';
   html+='</div>';
   html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edInsertMathOK()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
   root.innerHTML=html;
@@ -4152,7 +4152,7 @@ function edInsertMathOK(){
   });
   if(!mathHtml) return;
   edFocusAndRestore();
-  edExecCommand('insertHTML',false,'<span class="ed-math" style="font-family:serif;font-size:15px;padding:0 4px;background:#f0f4ff;border-radius:3px" contenteditable="true">'+mathHtml+'</span>&nbsp;');
+  edExecCommand('insertHTML',false,'<span class="ed-math" style="font-family:serif;font-size:15px;padding:0 var(--space-1,4px);background:var(--bg-surface-alt,#f0f4ff);border-radius:var(--radius-sm,3px)" contenteditable="true">'+mathHtml+'</span>&nbsp;');
   edMarkModified();edCloseModal();
 }
 
@@ -4352,29 +4352,29 @@ function edSelectTextbox(el){
   bar.onclick=function(ev){ev.stopPropagation();};
   var vi=lang!=='en';
   // Text color button  
-  var btnTC=document.createElement('button');btnTC.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;padding:0;font-size:12px;font-weight:700;color:'+(el.querySelector('.ed-tb-content')?el.querySelector('.ed-tb-content').style.color||'#333':'#333');
+  var btnTC=document.createElement('button');btnTC.style.cssText='width:22px;height:22px;border:1px solid var(--border,#ddd);border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;padding:0;font-size:12px;font-weight:700;color:'+(el.querySelector('.ed-tb-content')?el.querySelector('.ed-tb-content').style.color||'#333':'#333');
   btnTC.textContent='A';btnTC.title=vi?'Màu chữ':'Text color';
   btnTC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){var cnt=el.querySelector('.ed-tb-content');if(cnt){cnt.style.color=c;btnTC.style.color=c;}edMarkModified();});});
   bar.appendChild(btnTC);
   // Border color button
-  var btnBC=document.createElement('button');btnBC.style.cssText='width:22px;height:22px;border:2px solid '+(_rgb2hex(el.style.borderColor)||'#1967d2')+';border-radius:3px;background:#fff;cursor:pointer;padding:0;font-size:9px';
+  var btnBC=document.createElement('button');btnBC.style.cssText='width:22px;height:22px;border:2px solid '+(_rgb2hex(el.style.borderColor)||'var(--brand,#1967d2)')+';border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;padding:0;font-size:9px';
   btnBC.textContent='B';btnBC.title=vi?'Màu viền':'Border';
   btnBC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){el.style.borderColor=c;btnBC.style.borderColor=c;edMarkModified();});});
   bar.appendChild(btnBC);
   // Fill color button
-  var btnFC=document.createElement('button');btnFC.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:'+(_rgb2hex(el.style.backgroundColor)||'#fff')+';cursor:pointer;padding:0;font-size:9px';
+  var btnFC=document.createElement('button');btnFC.style.cssText='width:22px;height:22px;border:1px solid var(--border,#ddd);border-radius:3px;background:'+(_rgb2hex(el.style.backgroundColor)||'#fff')+';cursor:pointer;padding:0;font-size:9px';
   btnFC.textContent='F';btnFC.title=vi?'Nền':'Fill';
   btnFC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){if(c==='transparent'){el.style.backgroundColor='';btnFC.style.background='#fff';}else{el.style.backgroundColor=c;btnFC.style.background=c;}edMarkModified();});});
   bar.appendChild(btnFC);
   // Border width
   var selW=document.createElement('select');selW.title=vi?'Bề rộng viền':'Border width';
-  selW.style.cssText='width:36px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
+  selW.style.cssText='width:36px;font-size:9px;border:1px solid var(--border,#ddd);border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
   ['0','1','2','3','4'].forEach(function(v){var o=document.createElement('option');o.value=v+'px';o.textContent=v;if(el.style.borderWidth===v+'px')o.selected=true;selW.appendChild(o);});
   selW.addEventListener('change',function(){el.style.borderWidth=this.value;edMarkModified();});
   bar.appendChild(selW);
   // Border style
   var selS=document.createElement('select');selS.title=vi?'Kiểu viền':'Border style';
-  selS.style.cssText='width:42px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
+  selS.style.cssText='width:42px;font-size:9px;border:1px solid var(--border,#ddd);border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
   [{v:'solid',l:'\u2500\u2500'},{v:'dashed',l:'- -'},{v:'dotted',l:'\u00b7\u00b7'},{v:'double',l:'\u2550\u2550'},{v:'none',l:'\u2715'}].forEach(function(o){
     var opt=document.createElement('option');opt.value=o.v;opt.textContent=o.l;if(el.style.borderStyle===o.v)opt.selected=true;selS.appendChild(opt);
   });
@@ -4382,13 +4382,13 @@ function edSelectTextbox(el){
   bar.appendChild(selS);
   // Border radius
   var selR=document.createElement('select');selR.title=vi?'Bo góc':'Radius';
-  selR.style.cssText='width:32px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
+  selR.style.cssText='width:32px;font-size:9px;border:1px solid var(--border,#ddd);border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
   ['0','4','8','12','50%'].forEach(function(v){var o=document.createElement('option');o.value=v==='50%'?v:v+'px';o.textContent=v;selR.appendChild(o);});
   selR.addEventListener('change',function(){el.style.borderRadius=this.value;edMarkModified();});
   bar.appendChild(selR);
   // Delete
   var btnDel=document.createElement('button');btnDel.textContent='\u2717';btnDel.title=vi?'Xóa':'Del';
-  btnDel.style.cssText='width:22px;height:22px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:14px;color:#dc2626';
+  btnDel.style.cssText='width:22px;height:22px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:14px;color:var(--red-light,#dc2626)';
   btnDel.addEventListener('click',function(){el.remove();edMarkModified();});
   bar.appendChild(btnDel);
   el.appendChild(bar);
@@ -4600,27 +4600,27 @@ function edInsertShape(){
   var root=edGetModalRoot();
   var html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:580px;max-height:85vh;display:flex;flex-direction:column"><h4 style="margin:0 0 8px;font-size:15px">'+(vi?'Chèn Hình Dạng':'Insert Shape')+'</h4>';
   // Settings bar
-  html+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;padding:6px 8px;background:#f8f9fa;border-radius:6px;font-size:11px">';
-  html+='<label style="color:#666">W:</label><input id="ed-sh-w" type="number" value="120" min="30" max="800" style="width:48px;padding:2px 4px;border:1px solid #ddd;border-radius:4px;font-size:11px">';
-  html+='<label style="color:#666">H:</label><input id="ed-sh-h" type="number" value="80" min="20" max="600" style="width:48px;padding:2px 4px;border:1px solid #ddd;border-radius:4px;font-size:11px">';
-  html+='<label style="color:#666">'+(vi?'Nền':'Fill')+':</label><input type="color" id="ed-sh-fill" value="#4285f4" style="width:22px;height:20px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0">';
-  html+='<label style="color:#666">'+(vi?'Viền':'Stroke')+':</label><input type="color" id="ed-sh-stroke" value="#1a73e8" style="width:22px;height:20px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0">';
-  html+='<select id="ed-sh-sw" style="height:20px;font-size:10px;border:1px solid #ddd;border-radius:3px"><option value="0">0px</option><option value="1">1px</option><option value="1.5" selected>1.5px</option><option value="2">2px</option><option value="3">3px</option></select>';
-  html+='<label style="color:#666;margin-left:4px"><input type="checkbox" id="ed-sh-text"> '+(vi?'Có text':'Text')+'</label>';
+  html+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;padding:6px 8px;background:var(--bg-surface-alt,#f8f9fa);border-radius:6px;font-size:11px">';
+  html+='<label style="color:var(--text-secondary,#666)">W:</label><input id="ed-sh-w" type="number" value="120" min="30" max="800" style="width:48px;padding:2px 4px;border:1px solid var(--border,#ddd);border-radius:4px;font-size:11px">';
+  html+='<label style="color:var(--text-secondary,#666)">H:</label><input id="ed-sh-h" type="number" value="80" min="20" max="600" style="width:48px;padding:2px 4px;border:1px solid var(--border,#ddd);border-radius:4px;font-size:11px">';
+  html+='<label style="color:var(--text-secondary,#666)">'+(vi?'Nền':'Fill')+':</label><input type="color" id="ed-sh-fill" value="#4285f4" style="width:22px;height:20px;border:1px solid var(--border,#ddd);border-radius:3px;cursor:pointer;padding:0">';
+  html+='<label style="color:var(--text-secondary,#666)">'+(vi?'Viền':'Stroke')+':</label><input type="color" id="ed-sh-stroke" value="#1a73e8" style="width:22px;height:20px;border:1px solid var(--border,#ddd);border-radius:3px;cursor:pointer;padding:0">';
+  html+='<select id="ed-sh-sw" style="height:20px;font-size:10px;border:1px solid var(--border,#ddd);border-radius:3px"><option value="0">0px</option><option value="1">1px</option><option value="1.5" selected>1.5px</option><option value="2">2px</option><option value="3">3px</option></select>';
+  html+='<label style="color:var(--text-secondary,#666);margin-left:4px"><input type="checkbox" id="ed-sh-text"> '+(vi?'Có text':'Text')+'</label>';
   html+='</div>';
   // Category sections — grid of SVG previews like Word
   html+='<div style="overflow-y:auto;flex:1;padding-right:4px">';
   ED_SHAPE_CATS.forEach(function(cat){
     var shapes=Object.keys(ED_SHAPES).filter(function(k){return ED_SHAPES[k].cat===cat.id;});
     if(!shapes.length) return;
-    html+='<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:#555;margin-bottom:4px;border-bottom:1px solid #e5e7eb;padding-bottom:2px">'+(vi?cat.nameVi:cat.name)+'</div>';
+    html+='<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:var(--text-secondary,#555);margin-bottom:4px;border-bottom:1px solid var(--border,#e5e7eb);padding-bottom:2px">'+(vi?cat.nameVi:cat.name)+'</div>';
     html+='<div style="display:flex;flex-wrap:wrap;gap:2px">';
     shapes.forEach(function(k){
       var s=ED_SHAPES[k];
       try{
         var svgContent=s.svg(26,20);
         var isLine=cat.id==='lines'||cat.id==='equation';
-        html+='<button onmousedown="event.preventDefault()" onclick="edDoInsertShape(\''+k+'\',event)" title="'+s.name+'" style="width:32px;height:28px;border:1px solid #e5e7eb;border-radius:3px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:1px;transition:all .1s" onmouseenter="this.style.background=\'#e8f0fe\';this.style.borderColor=\'#1a73e8\'" onmouseleave="this.style.background=\'#fff\';this.style.borderColor=\'#e5e7eb\'">';
+        html+='<button onmousedown="event.preventDefault()" onclick="edDoInsertShape(\''+k+'\',event)" title="'+s.name+'" style="width:32px;height:28px;border:1px solid #e5e7eb;border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:1px;transition:all .1s" onmouseenter="this.style.background=\'#e8f0fe\';this.style.borderColor=\'#1a73e8\'" onmouseleave="this.style.background=\'#fff\';this.style.borderColor=\'#e5e7eb\'">';
         html+='<svg width="26" height="20" viewBox="0 0 26 20"><g fill="'+(isLine?'none':'#90b4f8')+'" stroke="#1a73e8" stroke-width="1"'+(isLine?' stroke-linecap="round"':'')+'>'+svgContent+'</g></svg>';
         html+='</button>';
       }catch(e2){}
@@ -4972,18 +4972,18 @@ function edSelectShape(el){
   var vi=lang!=='en';
   var fill=el.dataset.fill||'#4285f4';var stroke=el.dataset.stroke||'#1a73e8';
   // Fill color
-  var btnF=document.createElement('button');btnF.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:'+fill+';cursor:pointer;padding:0';
+  var btnF=document.createElement('button');btnF.style.cssText='width:22px;height:22px;border:1px solid var(--border,#ddd);border-radius:3px;background:'+fill+';cursor:pointer;padding:0';
   btnF.title=vi?'Màu nền':'Fill';
   btnF.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){edRecolorShape(el,c,null);btnF.style.background=c;});});
   bar.appendChild(btnF);
   // Stroke color
-  var btnS=document.createElement('button');btnS.style.cssText='width:22px;height:22px;border:3px solid '+stroke+';border-radius:3px;background:#fff;cursor:pointer;padding:0';
+  var btnS=document.createElement('button');btnS.style.cssText='width:22px;height:22px;border:3px solid '+stroke+';border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;padding:0';
   btnS.title=vi?'Màu viền':'Stroke';
   btnS.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){edRecolorShape(el,null,c);btnS.style.borderColor=c;});});
   bar.appendChild(btnS);
   // Stroke width
   var selSW=document.createElement('select');selSW.title=vi?'Bề rộng viền':'Width';
-  selSW.style.cssText='height:22px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;cursor:pointer';
+  selSW.style.cssText='height:22px;font-size:9px;border:1px solid var(--border,#ddd);border-radius:3px;padding:0 1px;cursor:pointer';
   ['0','0.5','1','1.5','2','3','4'].forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v+'px';if(v===(el.dataset.sw||'1.5'))o.selected=true;selSW.appendChild(o);});
   selSW.addEventListener('change',function(){el.dataset.sw=this.value;var g=el.querySelector('svg g');if(g)g.setAttribute('stroke-width',this.value);edMarkModified();});
   bar.appendChild(selSW);
@@ -4992,7 +4992,7 @@ function edSelectShape(el){
   var btnTxt=document.createElement('button');
   btnTxt.textContent=shText?'A̲':'A';
   btnTxt.title=vi?'Thêm/Xóa text':'Toggle text';
-  btnTxt.style.cssText='height:22px;font-size:11px;font-weight:700;border:1px solid #ddd;border-radius:3px;background:'+(shText?'#e8f0fe':'#fff')+';cursor:pointer;padding:0 5px;color:#1a73e8';
+  btnTxt.style.cssText='height:22px;font-size:11px;font-weight:700;border:1px solid var(--border,#ddd);border-radius:3px;background:'+(shText?'var(--bg-hover,#e8f0fe)':'#fff')+';cursor:pointer;padding:0 5px;color:var(--brand,#1a73e8)';
   btnTxt.addEventListener('click',function(ev){
     ev.stopPropagation();
     var txt=el.querySelector('.ed-sh-text');
@@ -5000,21 +5000,21 @@ function edSelectShape(el){
     else{
       var nd=document.createElement('div');nd.className='ed-sh-text';nd.contentEditable='true';
       nd.textContent='Text';
-      el.appendChild(nd);btnTxt.style.background='#e8f0fe';btnTxt.textContent='A̲';
+      el.appendChild(nd);btnTxt.style.background='var(--bg-hover,#e8f0fe)';btnTxt.textContent='A̲';
     }
     edMarkModified();
   });
   bar.appendChild(btnTxt);
   // Text color
   if(shText){
-    var btnTC=document.createElement('button');btnTC.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;padding:0;font-size:12px;font-weight:700;color:'+(shText.style.color||'#333');
+    var btnTC=document.createElement('button');btnTC.style.cssText='width:22px;height:22px;border:1px solid var(--border,#ddd);border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;padding:0;font-size:12px;font-weight:700;color:'+(shText.style.color||'#333');
     btnTC.textContent='T';btnTC.title=vi?'Màu chữ':'Text color';
     btnTC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){var t=el.querySelector('.ed-sh-text');if(t)t.style.color=c;btnTC.style.color=c;edMarkModified();});});
     bar.appendChild(btnTC);
   }
   // Duplicate
   var btnDup=document.createElement('button');btnDup.textContent='⧉';btnDup.title=vi?'Nhân bản':'Duplicate';
-  btnDup.style.cssText='height:22px;font-size:13px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;padding:0 4px';
+  btnDup.style.cssText='height:22px;font-size:13px;border:1px solid var(--border,#ddd);border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;padding:0 4px';
   btnDup.addEventListener('click',function(ev){
     ev.stopPropagation();
     var clone=el.cloneNode(true);
@@ -5027,7 +5027,7 @@ function edSelectShape(el){
   bar.appendChild(btnDup);
   // Delete
   var btnDel=document.createElement('button');btnDel.textContent='🗑';btnDel.title=vi?'Xóa':'Delete';
-  btnDel.style.cssText='height:22px;font-size:12px;border:1px solid #fca5a5;border-radius:3px;background:#fff;cursor:pointer;padding:0 4px;color:#dc2626';
+  btnDel.style.cssText='height:22px;font-size:12px;border:1px solid var(--red-light,#fca5a5);border-radius:3px;background:var(--bg-surface,#fff);cursor:pointer;padding:0 4px;color:var(--red-light,#dc2626)';
   btnDel.addEventListener('click',function(ev){ev.stopPropagation();el.remove();window._edActiveSh=null;edMarkModified();});
   bar.appendChild(btnDel);
   el.appendChild(bar);
@@ -5290,16 +5290,16 @@ function edInsertChart(){
   // Chart type picker
   html+='<div style="display:flex;gap:8px;margin-bottom:12px">';
   [{t:'bar',icon:'📊',l:vi?'Cột':'Bar'},{t:'line',icon:'📈',l:vi?'Đường':'Line'},{t:'pie',icon:'🥧',l:vi?'Tròn':'Pie'},{t:'hbar',icon:'📊',l:vi?'Ngang':'H-Bar'}].forEach((c,i)=>{
-    html+='<button onclick="edChartType=\''+c.t+'\';edChartPreview();this.parentElement.querySelectorAll(\'button\').forEach(b=>b.style.outline=\'none\');this.style.outline=\'2px solid #1967d2\'" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px'+(i===0?';outline:2px solid #1967d2':'')+'"><span style="font-size:20px">'+c.icon+'</span>'+c.l+'</button>';
+    html+='<button onclick="edChartType=\''+c.t+'\';edChartPreview();this.parentElement.querySelectorAll(\'button\').forEach(b=>b.style.outline=\'none\');this.style.outline=\'2px solid var(--brand,#1967d2)\'" style="flex:1;padding:8px;border:1px solid var(--border,#ddd);border-radius:6px;background:var(--bg-surface,#fff);cursor:pointer;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px'+(i===0?';outline:2px solid var(--brand,#1967d2)':'')+'"><span style="font-size:20px">'+c.icon+'</span>'+c.l+'</button>';
   });
   html+='</div>';
   // Data editor
-  html+='<label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Dữ liệu (mỗi dòng: Nhãn, Giá trị)':'Data (each line: Label, Value)')+'</label>';
-  html+='<textarea id="ed-chart-data" rows="5" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:monospace;outline:none;resize:none;margin-top:4px" oninput="edChartPreview()">'+(vi?'Quý 1, 35\nQuý 2, 50\nQuý 3, 42\nQuý 4, 68':'Q1, 35\nQ2, 50\nQ3, 42\nQ4, 68')+'</textarea>';
-  html+='<div style="display:flex;gap:8px;margin:8px 0;align-items:center"><label style="font-size:11px;color:#666">'+(vi?'Tiêu đề:':'Title:')+'</label><input id="ed-chart-title" value="'+(vi?'Doanh thu':'Revenue')+'" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px" oninput="edChartPreview()">';
-  html+='<label style="font-size:11px;color:#666">'+(vi?'Màu:':'Color:')+'</label><input type="color" id="ed-chart-color" value="#4285f4" style="width:28px;height:24px;border:1px solid #ddd;border-radius:4px" onchange="edChartPreview()"></div>';
+  html+='<label style="font-size:11px;font-weight:600;color:var(--text-secondary,#666)">'+(vi?'Dữ liệu (mỗi dòng: Nhãn, Giá trị)':'Data (each line: Label, Value)')+'</label>';
+  html+='<textarea id="ed-chart-data" rows="5" style="width:100%;padding:8px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:12px;font-family:monospace;outline:none;resize:none;margin-top:4px" oninput="edChartPreview()">'+(vi?'Quý 1, 35\nQuý 2, 50\nQuý 3, 42\nQuý 4, 68':'Q1, 35\nQ2, 50\nQ3, 42\nQ4, 68')+'</textarea>';
+  html+='<div style="display:flex;gap:8px;margin:8px 0;align-items:center"><label style="font-size:11px;color:var(--text-secondary,#666)">'+(vi?'Tiêu đề:':'Title:')+'</label><input id="ed-chart-title" value="'+(vi?'Doanh thu':'Revenue')+'" style="flex:1;padding:4px 8px;border:1px solid var(--border,#d1d5db);border-radius:4px;font-size:12px" oninput="edChartPreview()">';
+  html+='<label style="font-size:11px;color:var(--text-secondary,#666)">'+(vi?'Màu:':'Color:')+'</label><input type="color" id="ed-chart-color" value="#4285f4" style="width:28px;height:24px;border:1px solid var(--border,#ddd);border-radius:4px" onchange="edChartPreview()"></div>';
   // Preview
-  html+='<div id="ed-chart-preview" style="background:#f8f9fa;border-radius:6px;padding:8px;min-height:120px;display:flex;align-items:center;justify-content:center"></div>';
+  html+='<div id="ed-chart-preview" style="background:var(--bg-surface-alt,#f8f9fa);border-radius:6px;padding:8px;min-height:120px;display:flex;align-items:center;justify-content:center"></div>';
   html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edDoInsertChart()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
   root.innerHTML=html;
   window.edChartType='bar';
@@ -5490,7 +5490,7 @@ function edEditChart(el){
     // Highlight correct type
     var btns=document.querySelectorAll('.ed-modal button[onclick*="edChartType"]');
     btns.forEach(function(b){
-      if(b.getAttribute('onclick'))b.style.outline=b.getAttribute('onclick').indexOf("'"+type+"'")>=0?'2px solid #1967d2':'none';
+      if(b.getAttribute('onclick'))b.style.outline=b.getAttribute('onclick').indexOf("'"+type+"'")>=0?'2px solid var(--brand,#1967d2)':'none';
     });
     edChartPreview();
   },100);
@@ -6545,28 +6545,28 @@ function edInsertTable(){
   const root=edGetModalRoot();
   let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>'+(vi?'Chèn bảng':'Insert Table')+'</h4>';
   // Grid picker
-  html+='<div style="margin-bottom:12px"><label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Chọn kích thước (kéo chuột)':'Pick size (hover)')+'</label>';
-  html+='<div id="ed-tbl-grid" style="display:inline-grid;grid-template-columns:repeat(10,22px);gap:2px;margin:8px 0;padding:4px;background:#f8f9fa;border-radius:6px">';
+  html+='<div style="margin-bottom:12px"><label style="font-size:11px;font-weight:600;color:var(--text-secondary,#666)">'+(vi?'Chọn kích thước (kéo chuột)':'Pick size (hover)')+'</label>';
+  html+='<div id="ed-tbl-grid" style="display:inline-grid;grid-template-columns:repeat(10,22px);gap:2px;margin:8px 0;padding:4px;background:var(--bg-surface-alt,#f8f9fa);border-radius:6px">';
   for(let r=0;r<8;r++)for(let c=0;c<10;c++){
-    html+='<div data-r="'+(r+1)+'" data-c="'+(c+1)+'" style="width:20px;height:16px;border:1px solid #d1d5db;border-radius:2px;cursor:pointer;transition:background .05s" onmouseover="edTblGridHover(this)" onclick="edTblGridPick(this)"></div>';
+    html+='<div data-r="'+(r+1)+'" data-c="'+(c+1)+'" style="width:20px;height:16px;border:1px solid var(--border,#d1d5db);border-radius:2px;cursor:pointer;transition:background .05s" onmouseover="edTblGridHover(this)" onclick="edTblGridPick(this)"></div>';
   }
-  html+='</div><div id="ed-tbl-grid-label" style="font-size:11px;color:#666;margin-bottom:8px">0 × 0</div></div>';
+  html+='</div><div id="ed-tbl-grid-label" style="font-size:11px;color:var(--text-secondary,#666);margin-bottom:8px">0 × 0</div></div>';
   // Or manual input
-  html+='<div style="display:flex;gap:8px;align-items:center"><label style="font-size:11px;color:#666">'+(vi?'Hoặc:':'Or:')+'</label>';
-  html+='<input id="ed-tbl-rows" type="number" value="3" min="1" max="50" style="width:50px;padding:4px;border:1px solid #d1d5db;border-radius:4px;font-size:12px"> × ';
-  html+='<input id="ed-tbl-cols" type="number" value="3" min="1" max="20" style="width:50px;padding:4px;border:1px solid #d1d5db;border-radius:4px;font-size:12px">';
-  html+='<label style="font-size:11px;color:#666;margin-left:8px"><input type="checkbox" id="ed-tbl-header" checked> '+(vi?'Tiêu đề':'Header')+'</label></div>';
-  html+='<div style="margin-top:10px"><label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Kiểu bảng':'Table Style')+'</label>';
+  html+='<div style="display:flex;gap:8px;align-items:center"><label style="font-size:11px;color:var(--text-secondary,#666)">'+(vi?'Hoặc:':'Or:')+'</label>';
+  html+='<input id="ed-tbl-rows" type="number" value="3" min="1" max="50" style="width:50px;padding:4px;border:1px solid var(--border,#d1d5db);border-radius:4px;font-size:12px"> × ';
+  html+='<input id="ed-tbl-cols" type="number" value="3" min="1" max="20" style="width:50px;padding:4px;border:1px solid var(--border,#d1d5db);border-radius:4px;font-size:12px">';
+  html+='<label style="font-size:11px;color:var(--text-secondary,#666);margin-left:8px"><input type="checkbox" id="ed-tbl-header" checked> '+(vi?'Tiêu đề':'Header')+'</label></div>';
+  html+='<div style="margin-top:10px"><label style="font-size:11px;font-weight:600;color:var(--text-secondary,#666)">'+(vi?'Kiểu bảng':'Table Style')+'</label>';
   html+='<div style="display:flex;gap:6px;margin-top:4px">';
   const styles=[
-    {name:vi?'Cơ bản':'Basic',border:'#cbd5e1',headerBg:'#f1f5f9',stripe:''},
+    {name:vi?'Cơ bản':'Basic',border:'var(--border,#cbd5e1)',headerBg:'var(--bg-surface-alt,#f1f5f9)',stripe:''},
     {name:vi?'Xanh':'Blue',border:'#93c5fd',headerBg:'#1d4ed8',headerColor:'#fff',stripe:'#eff6ff'},
-    {name:vi?'Xanh lá':'Green',border:'#86efac',headerBg:'#15803d',headerColor:'#fff',stripe:'#f0fdf4'},
-    {name:vi?'Tím':'Purple',border:'#c4b5fd',headerBg:'#7c3aed',headerColor:'#fff',stripe:'#faf5ff'},
-    {name:vi?'Không viền':'Minimal',border:'transparent',headerBg:'#f8fafc',stripe:'#f8fafc'}
+    {name:vi?'Xanh lá':'Green',border:'#86efac',headerBg:'var(--green-dark,#15803d)',headerColor:'#fff',stripe:'var(--bg-surface-alt,#f0fdf4)'},
+    {name:vi?'Tím':'Purple',border:'#c4b5fd',headerBg:'var(--purple-light,#7c3aed)',headerColor:'#fff',stripe:'#faf5ff'},
+    {name:vi?'Không viền':'Minimal',border:'transparent',headerBg:'var(--bg-surface-alt,#f8fafc)',stripe:'var(--bg-surface-alt,#f8fafc)'}
   ];
   styles.forEach((s,i)=>{
-    html+='<button onclick="document.getElementById(\'ed-modal-root\')._tblStyle='+i+';this.parentElement.querySelectorAll(\'button\').forEach(b=>b.style.outline=\'none\');this.style.outline=\'2px solid #1967d2\'" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;font-size:10px;background:#fff;cursor:pointer;font-weight:600'+(i===0?';outline:2px solid #1967d2':'')+'" title="'+s.name+'">'+s.name+'</button>';
+    html+='<button onclick="document.getElementById(\'ed-modal-root\')._tblStyle='+i+';this.parentElement.querySelectorAll(\'button\').forEach(b=>b.style.outline=\'none\');this.style.outline=\'2px solid var(--brand,#1967d2)\'" style="padding:6px 10px;border:1px solid var(--border,#ddd);border-radius:4px;font-size:10px;background:var(--bg-surface,#fff);cursor:pointer;font-weight:600'+(i===0?';outline:2px solid var(--brand,#1967d2)':'')+'" title="'+s.name+'">'+s.name+'</button>';
   });
   html+='</div></div>';
   html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edDoInsertTable()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
@@ -6799,7 +6799,7 @@ function _edActivateFindMatch(index,scrollIntoView){
   marks.forEach(function(mark,i){
     mark.classList.toggle('ed-hl-active',i===next);
     if(i===next){
-      mark.style.background='#f59e0b';
+      mark.style.background='var(--amber-light,#f59e0b)';
       mark.style.color='#111827';
     }else{
       mark.style.background='#fde047';
@@ -6987,7 +6987,7 @@ function edSetZoom(z){
 function edPrint(){
   var cleanHtml=edCleanHTML();
   var win=window.open('','_blank');
-  win.document.write('<html><head><title>Print</title><style>body{font-family:Segoe UI,sans-serif;padding:40px;line-height:1.8;font-size:14px}h1,h2,h3{color:#1e40af}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px}th{background:#f1f5f9}.ed-textbox{border:2px solid #1967d2;border-radius:4px;padding:10px;display:inline-block}.ed-shape{display:inline-block;position:relative}.ed-chart{display:inline-block}@media print{body{padding:0}}</style></head><body>'+cleanHtml+'</body></html>');
+  win.document.write('<html><head><title>Print</title><style>body{font-family:Segoe UI,sans-serif;padding:40px;line-height:1.8;font-size:14px}h1,h2,h3{color:#1e40af}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px}th{background:var(--bg-surface-alt,#f1f5f9)}.ed-textbox{border:2px solid var(--brand,#1967d2);border-radius:4px;padding:10px;display:inline-block}.ed-shape{display:inline-block;position:relative}.ed-chart{display:inline-block}@media print{body{padding:0}}</style></head><body>'+cleanHtml+'</body></html>');
   win.document.close();
   win.print();
 }

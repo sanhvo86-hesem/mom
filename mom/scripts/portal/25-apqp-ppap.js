@@ -30,26 +30,26 @@ var TABS = [
 ];
 
 var PHASES = [
-  { num:1, vi:'Lap ke hoach',       en:'Plan & Define',    color:'#3b82f6' },
-  { num:2, vi:'Thiet ke SP',        en:'Product Design',   color:'#8b5cf6' },
-  { num:3, vi:'Thiet ke QT',        en:'Process Design',   color:'#f59e0b' },
-  { num:4, vi:'Xac nhan SP & QT',   en:'Validation',       color:'#10b981' },
-  { num:5, vi:'San xuat',           en:'Production',       color:'#6b7280' }
+  { num:1, vi:'Lap ke hoach',       en:'Plan & Define',    color:'var(--blue-light,#3b82f6)' },
+  { num:2, vi:'Thiet ke SP',        en:'Product Design',   color:'var(--purple-light,#8b5cf6)' },
+  { num:3, vi:'Thiet ke QT',        en:'Process Design',   color:'var(--amber-light,#f59e0b)' },
+  { num:4, vi:'Xac nhan SP & QT',   en:'Validation',       color:'var(--green-light,#10b981)' },
+  { num:5, vi:'San xuat',           en:'Production',       color:'var(--text-secondary,#6b7280)' }
 ];
 
 /* PROJECT_STATUS — đọc từ HmRegistry → 'apqp_project_status' */
 var PROJECT_STATUS = (function(){
   var map = {};
   if(window.HmRegistry){ HmRegistry.statusSet('apqp_project_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
-  if(!Object.keys(map).length){ map = {active:{vi:'Hoạt động',en:'Active',color:'#22c55e'},on_hold:{vi:'Tạm dừng',en:'On Hold',color:'#f59e0b'},completed:{vi:'Hoàn thành',en:'Completed',color:'#3b82f6'},cancelled:{vi:'Đã hủy',en:'Cancelled',color:'#94a3b8'}}; }
+  if(!Object.keys(map).length){ map = {active:{vi:'Hoạt động',en:'Active',color:'var(--green-light,#22c55e)'},on_hold:{vi:'Tạm dừng',en:'On Hold',color:'var(--amber-light,#f59e0b)'},completed:{vi:'Hoàn thành',en:'Completed',color:'var(--blue-light,#3b82f6)'},cancelled:{vi:'Đã hủy',en:'Cancelled',color:'var(--text-secondary,#94a3b8)'}}; }
   return map;
 })();
 
 var GATE_DECISION = {
-  approved:    { vi:'Duyệt',         en:'Approved',    color:'#22c55e' },
-  conditional: { vi:'Có điều kiện',  en:'Conditional', color:'#f59e0b' },
-  rejected:    { vi:'Từ chối',       en:'Rejected',    color:'#ef4444' },
-  pending:     { vi:'Chờ duyệt',     en:'Pending',     color:'#94a3b8' }
+  approved:    { vi:'Duyệt',         en:'Approved',    color:'var(--green-light,#22c55e)' },
+  conditional: { vi:'Có điều kiện',  en:'Conditional', color:'var(--amber-light,#f59e0b)' },
+  rejected:    { vi:'Từ chối',       en:'Rejected',    color:'var(--red-light,#ef4444)' },
+  pending:     { vi:'Chờ duyệt',     en:'Pending',     color:'var(--text-secondary,#94a3b8)' }
 };
 
 var PPAP_ELEMENTS = [
@@ -119,15 +119,15 @@ function _ensureStyles(){
     '.ap-table th{text-align:left;padding:10px 12px;font-weight:700;border-bottom:2px solid var(--border,#e2e8f0);white-space:nowrap;color:var(--text-secondary,#64748b);font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em}',
     '.ap-table td{padding:10px 12px;border-bottom:1px solid var(--border,#f1f5f9);vertical-align:middle}',
     '.ap-table tr:hover td{background:var(--surface,#f8fafc)}',
-    '.ap-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.6875rem;font-weight:700;color:#fff;white-space:nowrap}',
+    '.ap-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.6875rem;font-weight:700;color:var(--text-inverse,#fff);white-space:nowrap}',
     '.ap-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:6px;font-size:.8125rem;font-weight:600;cursor:pointer;transition:background .15s}',
-    '.ap-btn-primary{background:var(--brand,#1565c0);color:#fff}',
+    '.ap-btn-primary{background:var(--brand,#1565c0);color:var(--text-inverse,#fff)}',
     '.ap-btn-primary:hover{background:var(--brand-2,#0d47a1)}',
     '.ap-btn-secondary{background:var(--surface,#f1f5f9);color:var(--text,#0f172a);border:1px solid var(--border,#d1d5db)}',
-    '.ap-btn-secondary:hover{background:#e2e8f0}',
-    '.ap-btn-danger{background:#ef4444;color:#fff}',
-    '.ap-btn-success{background:#22c55e;color:#fff}',
-    '.ap-btn-warning{background:#f59e0b;color:#fff}',
+    '.ap-btn-secondary:hover{background:var(--border,#e2e8f0)}',
+    '.ap-btn-danger{background:var(--red-light,#ef4444);color:var(--text-inverse,#fff)}',
+    '.ap-btn-success{background:var(--green-light,#22c55e);color:var(--text-inverse,#fff)}',
+    '.ap-btn-warning{background:var(--amber-light,#f59e0b);color:var(--text-inverse,#fff)}',
     '.ap-btn-sm{padding:4px 10px;font-size:.75rem}',
     '.ap-card{background:var(--surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:10px;padding:18px;margin-bottom:12px;transition:box-shadow .15s}',
     '.ap-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.06)}',
@@ -139,12 +139,12 @@ function _ensureStyles(){
     '.ap-empty{text-align:center;padding:40px;color:var(--text-secondary,#94a3b8);font-size:.875rem}',
     /* phase timeline */
     '.ap-phase-bar{display:flex;align-items:center;gap:0;margin:20px 0}',
-    '.ap-phase-node{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;border:3px solid var(--border,#d1d5db);background:#fff;color:var(--text-secondary,#94a3b8);position:relative;z-index:1;flex-shrink:0}',
-    '.ap-phase-node.completed{border-color:#22c55e;background:#22c55e;color:#fff}',
-    '.ap-phase-node.active{border-color:var(--brand,#1565c0);background:var(--brand,#1565c0);color:#fff;box-shadow:0 0 0 6px rgba(21,101,192,.2);animation:ap-pulse 2s ease-in-out infinite}',
+    '.ap-phase-node{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;border:3px solid var(--border,#d1d5db);background:var(--bg-surface,#fff);color:var(--text-secondary,#94a3b8);position:relative;z-index:1;flex-shrink:0}',
+    '.ap-phase-node.completed{border-color:var(--green-light,#22c55e);background:var(--green-light,#22c55e);color:var(--text-inverse,#fff)}',
+    '.ap-phase-node.active{border-color:var(--brand,#1565c0);background:var(--brand,#1565c0);color:var(--text-inverse,#fff);box-shadow:0 0 0 6px rgba(21,101,192,.2);animation:ap-pulse 2s ease-in-out infinite}',
     '@keyframes ap-pulse{0%,100%{box-shadow:0 0 0 4px rgba(21,101,192,.15)}50%{box-shadow:0 0 0 8px rgba(21,101,192,.25)}}',
     '.ap-phase-line{flex:1;height:3px;background:var(--border,#d1d5db)}',
-    '.ap-phase-line.completed{background:#22c55e}',
+    '.ap-phase-line.completed{background:var(--green-light,#22c55e)}',
     '.ap-phase-labels{display:flex;align-items:flex-start;gap:0;margin-top:6px}',
     '.ap-phase-label{flex:1;text-align:center;font-size:.625rem;color:var(--text-secondary,#64748b)}',
     /* checklist */
@@ -155,9 +155,9 @@ function _ensureStyles(){
     /* PPAP elements grid */
     '.ap-ppap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:16px 0}',
     '.ap-ppap-element{border:1px solid var(--border,#e2e8f0);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}',
-    '.ap-ppap-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6875rem;font-weight:800;color:#fff;background:var(--brand,#1565c0);flex-shrink:0}',
+    '.ap-ppap-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6875rem;font-weight:800;color:var(--text-inverse,#fff);background:var(--brand,#1565c0);flex-shrink:0}',
     /* progress bar */
-    '.ap-progress{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden}',
+    '.ap-progress{height:8px;border-radius:4px;background:var(--border,#e2e8f0);overflow:hidden}',
     '.ap-progress-fill{height:100%;border-radius:4px;transition:width .3s}',
     /* PSW section */
     '.ap-psw{border:2px solid var(--border,#e2e8f0);border-radius:10px;padding:16px;margin-top:16px}',
@@ -172,15 +172,15 @@ function _ensureStyles(){
 function _statusBadge(status){
   if(window.HmRegistry) return HmRegistry.badge('apqp_project_status', status);
   /* legacy fallback below */
-  var m=PROJECT_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=PROJECT_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="ap-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _gateBadge(decision){
-  var m=GATE_DECISION[decision]||{vi:decision,en:decision,color:'#64748b'};
+  var m=GATE_DECISION[decision]||{vi:decision,en:decision,color:'var(--text-secondary,#64748b)'};
   return '<span class="ap-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _elemBadge(status){
-  var m=ELEMENT_STATUS[status]||{vi:status,en:status,color:'#64748b'};
+  var m=ELEMENT_STATUS[status]||{vi:status,en:status,color:'var(--text-secondary,#64748b)'};
   return '<span class="ap-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _phaseBadge(num){
@@ -219,9 +219,9 @@ function _renderPhaseTimeline(currentPhase){
 function _renderDashboardTab(){
   var k=state.kpi;
   var html='<div class="ap-kpis">';
-  html+=_kpiCard(_t('Du an hoat dong','Active Projects'), k.active_count||0, '#22c55e');
-  html+=_kpiCard(_t('Gate qua han','Overdue Gates'), k.overdue_gates||0, '#ef4444');
-  html+=_kpiCard(_t('PPAP cho duyet','PPAP Pending'), k.ppap_pending||0, '#f59e0b');
+  html+=_kpiCard(_t('Du an hoat dong','Active Projects'), k.active_count||0, 'var(--green-light,#22c55e)');
+  html+=_kpiCard(_t('Gate qua han','Overdue Gates'), k.overdue_gates||0, 'var(--red-light,#ef4444)');
+  html+=_kpiCard(_t('PPAP cho duyet','PPAP Pending'), k.ppap_pending||0, 'var(--amber-light,#f59e0b)');
 
   /* phase distribution mini bar */
   var dist=k.phase_distribution||{1:0,2:0,3:0,4:0,5:0};
@@ -345,7 +345,7 @@ function _renderGateTab(){
 
   /* Progress bar */
   html+='<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:.75rem;font-weight:600;margin-bottom:4px"><span>'+_t('Tien do','Progress')+'</span><span>'+pct+'%</span></div>';
-  html+='<div class="ap-progress" style="height:12px"><div class="ap-progress-fill" style="width:'+pct+'%;background:'+(pct>=100?'#22c55e':pct>=50?'#f59e0b':'#ef4444')+'"></div></div></div>';
+  html+='<div class="ap-progress" style="height:12px"><div class="ap-progress-fill" style="width:'+pct+'%;background:'+(pct>=100?'var(--green-light,#22c55e)':pct>=50?'var(--amber-light,#f59e0b)':'var(--red-light,#ef4444)')+'"></div></div></div>';
 
   /* Deliverables checklist */
   html+='<h4 style="margin:0 0 8px">'+_t('San pham ban giao','Deliverables')+'</h4>';
@@ -354,7 +354,7 @@ function _renderGateTab(){
     var done=delivStatus[cp+'_'+i];
     html+='<li><input type="checkbox" class="ap-deliv-check" data-phase="'+cp+'" data-idx="'+i+'"'+(done?' checked':'')+'>';
     html+='<span class="'+(done?'ap-check-done':'')+'">'+_esc(d)+'</span>';
-    html+='<span class="ap-badge" style="background:'+(done?'#22c55e':'#94a3b8')+';margin-left:auto">'+(done?'OK':'Pending')+'</span>';
+    html+='<span class="ap-badge" style="background:'+(done?'var(--green-light,#22c55e)':'var(--text-secondary,#94a3b8)')+';margin-left:auto">'+(done?'OK':'Pending')+'</span>';
     html+='</li>';
   });
   html+='</ul>';
@@ -366,8 +366,8 @@ function _renderGateTab(){
     html+='<div style="display:flex;gap:12px;flex-wrap:wrap">';
     reviewers.forEach(function(r){
       html+='<div style="display:flex;align-items:center;gap:6px;font-size:.8125rem">'
-        +'<span style="width:10px;height:10px;border-radius:50%;background:'+(r.signed?'#22c55e':'#94a3b8')+'"></span>'
-        +_esc(r.name)+' '+(r.signed?'<span style="color:#22c55e;font-size:.75rem">Signed</span>':'')
+        +'<span style="width:10px;height:10px;border-radius:50%;background:'+(r.signed?'var(--green-light,#22c55e)':'var(--text-secondary,#94a3b8)')+'"></span>'
+        +_esc(r.name)+' '+(r.signed?'<span style="color:var(--green-light,#22c55e);font-size:.75rem">Signed</span>':'')
         +'</div>';
     });
     html+='</div>';
@@ -416,7 +416,7 @@ function _renderPpapTab(){
   html+='<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:4px">'+_t('Tien do','Progress')+': '+approvedCount+'/'+totalRequired+' ('+overallPct+'%)</div></div>';
   html+='<button class="ap-btn ap-btn-secondary" data-action="back-dashboard">'+_t('Quay lai','Back')+'</button></div>';
 
-  html+='<div class="ap-progress" style="height:10px;margin-bottom:16px"><div class="ap-progress-fill" style="width:'+overallPct+'%;background:'+(overallPct>=100?'#22c55e':'var(--brand,#1565c0)')+'"></div></div>';
+  html+='<div class="ap-progress" style="height:10px;margin-bottom:16px"><div class="ap-progress-fill" style="width:'+overallPct+'%;background:'+(overallPct>=100?'var(--green-light,#22c55e)':'var(--brand,#1565c0)')+'"></div></div>';
 
   /* Elements table */
   html+='<table class="ap-table"><thead><tr>';

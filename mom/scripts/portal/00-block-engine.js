@@ -24,6 +24,18 @@
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 function _t(vi,en){ return (typeof lang!=='undefined'&&lang==='en')?en:vi; }
 function _esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(v==null?'':String(v))); return d.innerHTML; }
+function _textLabel(label, labelEn){
+  if(label && typeof label === 'object') return _t(label.vi || label.label || '', label.en || label.labelEn || label.vi || '');
+  return _t(label || '', labelEn || label || '');
+}
+function _apiErrorMessage(resp, fallbackVi, fallbackEn){
+  if(resp && typeof resp === 'object'){
+    if(resp.detail) return String(resp.detail);
+    if(resp.message) return String(resp.message);
+    if(resp.error) return String(resp.error);
+  }
+  return _t(fallbackVi, fallbackEn);
+}
 
 /** Internal API wrapper — delegates to global apiCall() when available */
 function _api(action, payload, method){
@@ -4461,7 +4473,24 @@ function _attachModuleEvents(container, moduleId){
     rowEl = btn.closest('.hm-table-row[data-row-abs]');
     if(rowEl && btn === rowEl){
       _activateTableRow(container, moduleId, rowEl);
-      if(action === 'hm-table-row-click') return;
+      if(action === 'hm-table-row-click'){
+        var rowBlockId = rowEl.getAttribute('data-block-id');
+        var rowBlock = _findBlockById(state._schema, rowBlockId);
+        var rowData = rowBlockId ? state.activeRows[rowBlockId] : null;
+        if(rowBlock && rowBlock.config && rowBlock.config.rowClick && rowData){
+          var rowClick = rowBlock.config.rowClick || {};
+          state.customState = state.customState || {};
+          if(rowClick.passField && rowData[rowClick.passField] !== undefined){
+            state.customState.selectedId = rowData[rowClick.passField];
+          }
+          if(rowClick.action === 'navigate-tab' && rowClick.tab){
+            state.activeTab = rowClick.tab;
+            renderModuleFromSchema(container, state._schema);
+            return;
+          }
+        }
+        return;
+      }
     }
 
     switch(action){
@@ -4471,6 +4500,10 @@ function _attachModuleEvents(container, moduleId){
         break;
       case 'hm-switch-tab':
         state.activeTab = btn.getAttribute('data-tab');
+        renderModuleFromSchema(container, state._schema);
+        break;
+      case 'navigate-tab':
+        state.activeTab = btn.getAttribute('data-tab') || state.activeTab;
         renderModuleFromSchema(container, state._schema);
         break;
       case 'hm-add-block':
@@ -4875,6 +4908,12 @@ function _handleFormSubmit(container, moduleId, formEl){
   var context = _buildReactiveContext(moduleId);
   var validationResult = { valid:true, errors:{} };
   var submitConfig;
+  var successContext;
+  function finalizeSubmit(payload){
+    ms.blockData[blockId] = payload && payload.data ? payload.data : payload;
+    ms.formErrors[blockId] = {};
+    renderModuleFromSchema(container, ms._schema);
+  }
   if(!block) return;
   context._moduleId = moduleId;
   context._container = container;
@@ -4889,18 +4928,37 @@ function _handleFormSubmit(container, moduleId, formEl){
     toast(_t('Biểu mẫu còn lỗi validation.', 'The form still has validation errors.'), 'danger');
     return;
   }
-  submitConfig = block.config.submit || {};
+  submitConfig = _normalizeSubmitConfig(block.config || {}, block.type === 'form-modal' ? 'modal' : '');
   if(!submitConfig.api){
     toast(_t('Biểu mẫu hợp lệ và đã được lưu trong phiên làm việc.', 'The form is valid and has been stored in the current session.'), 'success');
-    renderModuleFromSchema(container, ms._schema);
+    finalizeSubmit(formData);
     return;
   }
   _api(submitConfig.api, formData, submitConfig.method || 'POST').then(function(resp){
-    ms.blockData[blockId] = resp && resp.data ? resp.data : formData;
-    ms.formErrors[blockId] = {};
-    toast(_t('Đã gửi biểu mẫu thành công.', 'Form submitted successfully.'), 'success');
+    if(resp && resp.ok === false){
+      toast(_apiErrorMessage(resp, 'Gửi biểu mẫu thất bại.', 'Form submission failed.'), 'danger');
+      return;
+    }
     invalidateCache(submitConfig.api);
-    renderModuleFromSchema(container, ms._schema);
+    finalizeSubmit(resp || formData);
+    successContext = _buildReactiveContext(moduleId);
+    successContext._moduleId = moduleId;
+    successContext._container = container;
+    successContext.block = block;
+    successContext.formData = formData;
+    successContext.result = resp || {};
+    successContext.response = resp || {};
+    successContext.record = resp && (resp.data || resp.sales_order || resp.job_order || resp.work_order || resp.review || resp.shipment_gate)
+      ? (resp.data || resp.sales_order || resp.job_order || resp.work_order || resp.review || resp.shipment_gate)
+      : formData;
+    successContext._lastResult = resp || {};
+    if(block.config && block.config.onSuccess && block.config.onSuccess.type === 'chain' && Array.isArray(block.config.onSuccess.actions)){
+      executeChain(block.config.onSuccess.actions, successContext).catch(function(err){
+        console.warn('[BlockEngine] onSuccess chain failed', err);
+      });
+      return;
+    }
+    toast(_t('Đã gửi biểu mẫu thành công.', 'Form submitted successfully.'), 'success');
   }).catch(function(err){
     toast(_t('Gửi biểu mẫu thất bại.', 'Form submission failed.'), 'danger');
     console.warn('[BlockEngine] form submit failed', err);
@@ -4913,7 +4971,16 @@ function _handleStatusTransition(container, moduleId, btn){
   var transitionIndex = parseInt(btn.getAttribute('data-transition-index'), 10);
   var block = _findBlockById(ms._schema, blockId);
   var workflow = block && block.config ? (block.config.workflow || {}) : {};
+  var stateField = workflow.stateField || (block && block.config && block.config.statusField) || 'status';
+  var currentRecord = ms.blockData[blockId] || {};
+  var currentState = currentRecord[stateField] || '';
   var transitions = workflow.transitions || [];
+  var legacyTransitionApi = block && block.config ? (block.config.transitionApi || null) : null;
+  if(!transitions.length && block && block.config && block.config.transitions){
+    transitions = ((block.config.transitions[currentState] || []) || []).map(function(to){
+      return { from: currentState, to: to, label: to };
+    });
+  }
   var transition = transitions[transitionIndex];
   var formBlock = _findCompanionFormBlock(moduleId, workflow.entity);
   var formEl = formBlock ? container.querySelector('[data-hm-form-block="'+formBlock.id+'"]') : null;
@@ -4926,6 +4993,7 @@ function _handleStatusTransition(container, moduleId, btn){
   context._moduleId = moduleId;
   context._container = container;
   context.block = block;
+  context.targetStatus = transition.to;
   if(formBlock && !(formBlock.config && formBlock.config.validation && formBlock.config.validation.autoApply === false)){
     validationResult = validateForm(formBlock.config.fields || [], formData, context);
     ms.formErrors[formBlock.id] = validationResult.errors || {};
@@ -4950,26 +5018,44 @@ function _handleStatusTransition(container, moduleId, btn){
     return;
   }
   if(transition.confirmMessage && !confirm(_t(transition.confirmMessage, transition.confirmMessageEn || transition.confirmMessage))) return;
-  payload = {
-    from: transition.from,
-    to: transition.to,
-    entity: workflow.entity || '',
-    data: formData
-  };
-  if(formData && workflow.stateField) formData[workflow.stateField] = transition.to;
+  if(legacyTransitionApi){
+    payload = legacyTransitionApi.bodyTemplate ? _resolveBindings(legacyTransitionApi.bodyTemplate, context) : {};
+  } else {
+    payload = {
+      from: transition.from,
+      to: transition.to,
+      entity: workflow.entity || '',
+      data: formData
+    };
+  }
+  if(formData && stateField) formData[stateField] = transition.to;
   if(formBlock) ms.formDrafts[formBlock.id] = formData;
   function applyLocalTransition(){
-    if(ms.blockData[blockId] && typeof ms.blockData[blockId] === 'object' && workflow.stateField){
-      ms.blockData[blockId][workflow.stateField] = transition.to;
+    if(ms.blockData[blockId] && typeof ms.blockData[blockId] === 'object' && stateField){
+      ms.blockData[blockId][stateField] = transition.to;
     }
     toast(_t('Đã chuyển trạng thái sang ', 'Transitioned to ') + transition.to, 'success');
     refreshDependents(moduleId, blockId);
     renderModuleFromSchema(container, ms._schema);
   }
-  if(transition.endpoint){
-    _api(transition.endpoint, payload, transition.method || 'POST').then(function(){
-      invalidateCache(transition.endpoint);
+  if(transition.endpoint || legacyTransitionApi){
+    var endpoint = transition.endpoint || legacyTransitionApi.action || legacyTransitionApi.api;
+    var method = transition.method || legacyTransitionApi.method || 'POST';
+    _api(endpoint, payload, method).then(function(resp){
+      if(resp && resp.ok === false){
+        toast(_apiErrorMessage(resp, 'Chuyển trạng thái thất bại.', 'Transition failed.'), 'danger');
+        return;
+      }
+      invalidateCache(endpoint);
       applyLocalTransition();
+      if(block.config && block.config.onSuccess && block.config.onSuccess.type === 'chain' && Array.isArray(block.config.onSuccess.actions)){
+        context.result = resp || {};
+        context.response = resp || {};
+        context._lastResult = resp || {};
+        executeChain(block.config.onSuccess.actions, context).catch(function(err){
+          console.warn('[BlockEngine] status transition onSuccess failed', err);
+        });
+      }
     }).catch(function(err){
       toast(_t('Chuyển trạng thái thất bại.', 'Transition failed.'), 'danger');
       console.warn('[BlockEngine] transition failed', err);
@@ -5029,7 +5115,7 @@ function _renderBlockInner(block, data, state, reactiveCtx){
   switch(renderType){
     case 'kpi-row':         return renderKpiRow(resolvedConfig, data);
     case 'data-table':      return renderAdvancedTableV3(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx);
-    case 'filter-bar':      return renderFilterBar(resolvedConfig, data);
+    case 'filter-bar':      return renderFilterBar(resolvedConfig, data, state);
     case 'section-header':  return renderSectionHeader(resolvedConfig);
     case 'spacer':          return '<div style="height:'+(resolvedConfig.height||16)+'px"></div>';
     case 'info-banner':     return renderInfoBanner(resolvedConfig);
@@ -5079,7 +5165,7 @@ function renderKpiRow(config, data){
     var color = item.accentColor || item.color || 'var(--brand-2)';
     html += '<div class="hm-kpi-card" style="border-left:3px solid '+color+'">';
     html += '<div class="hm-kpi-value" style="color:'+color+'">'+_esc(typeof val==='number'?_fmt(val):String(val))+(item.suffix||'')+'</div>';
-    html += '<div class="hm-kpi-label">'+_esc(_t(item.label||'', item.labelEn||''))+'</div>';
+    html += '<div class="hm-kpi-label">'+_esc(_textLabel(item.label, item.labelEn))+'</div>';
     if(item.trend){
       var up = item.trend > 0;
       html += '<div class="hm-kpi-trend hm-kpi-trend-'+(up?'up':'down')+'">'+(up?'&#9650;':'&#9660;')+' '+Math.abs(item.trend)+'%</div>';
@@ -5938,6 +6024,21 @@ function _handleTablePageSize(container, moduleId, btn){
 
 function _handleFilterChange(container, moduleId, blockId){
   var ms = getModuleState(moduleId);
+  var blockEl = container.querySelector('[data-block-id="'+blockId+'"]');
+  if(!ms.filterValues) ms.filterValues = {};
+  if(blockEl){
+    blockEl.querySelectorAll('[data-filter]').forEach(function(el){
+      var key = el.getAttribute('data-filter');
+      var value;
+      if(!key) return;
+      value = el.type === 'checkbox' ? !!el.checked : el.value;
+      if(value === '' || value === null || value === undefined || value === false){
+        delete ms.filterValues[key];
+      } else {
+        ms.filterValues[key] = value;
+      }
+    });
+  }
   invalidateCache();
   renderModuleFromSchema(container, ms._schema);
 }
@@ -5973,26 +6074,31 @@ function _handleColumnFilter(container, moduleId, blockId){
 }
 
 /* --- Filter Bar --- */
-function renderFilterBar(config, data){
+function renderFilterBar(config, data, state){
   var filters = config.filters || [];
+  var values = state && state.filterValues ? state.filterValues : {};
   var html = '<div class="hm-filter-bar">';
   filters.forEach(function(f){
+    var value = values[f.key];
     if(f.type==='search'){
-      html += '<input type="text" class="hm-input" placeholder="'+_esc(_t(f.placeholder||'Tim kiem...',f.placeholderEn||'Search...'))+'" data-filter="'+_esc(f.key)+'">';
+      html += '<input type="text" class="hm-input" placeholder="'+_esc(_t(f.placeholder||'Tim kiem...',f.placeholderEn||'Search...'))+'" data-filter="'+_esc(f.key)+'" value="'+_esc(value != null ? value : '')+'">';
     } else if(f.type==='select'){
       html += '<select class="hm-input hm-select" data-filter="'+_esc(f.key)+'">';
       html += '<option value="">'+_esc(_t(f.allLabel||'Tat ca',f.allLabelEn||'All'))+'</option>';
       (f.options||[]).forEach(function(opt){
-        html += '<option value="'+_esc(opt.value)+'">'+_esc(_t(opt.label,opt.labelEn||opt.label))+'</option>';
+        var selected = String(value != null ? value : '') === String(opt.value) ? ' selected' : '';
+        html += '<option value="'+_esc(opt.value)+'"'+selected+'>'+_esc(_textLabel(opt.label, opt.labelEn))+'</option>';
       });
       html += '</select>';
     } else if(f.type==='date'){
-      html += '<input type="date" class="hm-input" data-filter="'+_esc(f.key)+'" style="width:auto">';
+      html += '<input type="date" class="hm-input" data-filter="'+_esc(f.key)+'" style="width:auto" value="'+_esc(value != null ? value : '')+'">';
     } else if(f.type==='daterange'){
+      var fromValue = values[f.key+'_from'];
+      var toValue = values[f.key+'_to'];
       html += '<span class="hm-filter-daterange">';
-      html += '<input type="date" class="hm-input" data-filter="'+_esc(f.key)+'_from" style="width:auto">';
+      html += '<input type="date" class="hm-input" data-filter="'+_esc(f.key)+'_from" style="width:auto" value="'+_esc(fromValue != null ? fromValue : '')+'">';
       html += '<span class="hm-filter-sep">-</span>';
-      html += '<input type="date" class="hm-input" data-filter="'+_esc(f.key)+'_to" style="width:auto">';
+      html += '<input type="date" class="hm-input" data-filter="'+_esc(f.key)+'_to" style="width:auto" value="'+_esc(toValue != null ? toValue : '')+'">';
       html += '</span>';
     }
   });
@@ -6174,12 +6280,12 @@ function renderGaugeChart(config, data, state, blockId, block){
     html += '<div class="hm-donut-ring" style="background:conic-gradient(' + gradientParts.join(',') + ')">';
     html += '<div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--brand-2) 0 ' + Math.round(pct * 1000) / 10 + '%, rgba(255,255,255,0) ' + Math.round(pct * 1000) / 10 + '% 100%);mix-blend-mode:multiply"></div>';
     if(payload.showTarget && targetText){
-      html += '<span style="position:absolute;left:50%;top:50%;width:2px;height:44%;background:#0f172a;border-radius:999px;transform-origin:bottom center;transform:translate(-50%, -100%) rotate(' + ((targetPct * 360) - 180) + 'deg)"></span>';
+      html += '<span style="position:absolute;left:50%;top:50%;width:2px;height:44%;background:var(--text-primary,#0f172a);border-radius:999px;transform-origin:bottom center;transform:translate(-50%, -100%) rotate(' + ((targetPct * 360) - 180) + 'deg)"></span>';
     }
     html += '<div class="hm-donut-hole" style="width:62%;height:62%"><div><strong>' + _esc(String(Math.round(pct * 100))) + '%</strong><div style="font-size:11px;color:var(--text-secondary)">' + _esc(valueText) + '</div></div></div>';
     html += '</div><div class="hm-donut-legend">';
-    if(payload.showTarget && targetText) html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:#0f172a"></span><span>Target: <b>' + _esc(targetText) + '</b></span></div>';
-    if(payload.showDelta && delta != null) html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:' + (delta >= 0 ? '#16a34a' : '#ef4444') + '"></span><span>Delta: <b>' + _esc((delta >= 0 ? '+' : '') + _chartFormatValue(delta, 'number') + payload.unit) + '</b></span></div>';
+    if(payload.showTarget && targetText) html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:var(--text-primary,#0f172a)"></span><span>Target: <b>' + _esc(targetText) + '</b></span></div>';
+    if(payload.showDelta && delta != null) html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:' + (delta >= 0 ? 'var(--green-dark,#16a34a)' : 'var(--red-light,#ef4444)') + '"></span><span>Delta: <b>' + _esc((delta >= 0 ? '+' : '') + _chartFormatValue(delta, 'number') + payload.unit) + '</b></span></div>';
     html += '</div></div>';
     return html;
   }
@@ -6187,13 +6293,13 @@ function renderGaugeChart(config, data, state, blockId, block){
   html += '<div style="display:grid;grid-template-columns:minmax(180px, 220px) 1fr;gap:18px;align-items:center">';
   html += '<div style="position:relative;width:100%;max-width:220px;height:120px;margin:0 auto;overflow:hidden">';
   html += '<div style="position:absolute;left:50%;top:0;width:220px;height:220px;border-radius:50%;transform:translateX(-50%);background:conic-gradient(' + gradientParts.join(',') + ')"></div>';
-  html += '<div style="position:absolute;left:50%;top:26px;width:156px;height:156px;border-radius:50%;background:#fff;transform:translateX(-50%)"></div>';
+  html += '<div style="position:absolute;left:50%;top:26px;width:156px;height:156px;border-radius:50%;background:var(--bg-surface,#fff);transform:translateX(-50%)"></div>';
   html += '<div style="position:absolute;left:50%;bottom:16px;transform:translateX(-50%);text-align:center"><div style="font-size:30px;font-weight:800;color:var(--text-primary)">' + _esc(valueText) + '</div><div style="font-size:11px;color:var(--text-secondary)">Range: ' + _esc(_chartFormatValue(payload.min, 'number') + payload.unit + ' - ' + _chartFormatValue(payload.max, 'number') + payload.unit) + '</div></div>';
-  html += '<div style="position:absolute;left:50%;bottom:28px;width:2px;height:74px;background:#0f172a;border-radius:999px;transform-origin:bottom center;transform:translateX(-50%) rotate(' + ((pct * 180) - 90) + 'deg)"></div>';
-  html += '<div style="position:absolute;left:50%;bottom:22px;width:14px;height:14px;border-radius:50%;background:#0f172a;transform:translateX(-50%)"></div>';
+  html += '<div style="position:absolute;left:50%;bottom:28px;width:2px;height:74px;background:var(--text-primary,#0f172a);border-radius:999px;transform-origin:bottom center;transform:translateX(-50%) rotate(' + ((pct * 180) - 90) + 'deg)"></div>';
+  html += '<div style="position:absolute;left:50%;bottom:22px;width:14px;height:14px;border-radius:50%;background:var(--text-primary,#0f172a);transform:translateX(-50%)"></div>';
   html += '</div><div>';
   if(payload.showTarget && targetText) html += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">Target: <strong style="color:var(--text-primary)">' + _esc(targetText) + '</strong></div>';
-  if(payload.showDelta && delta != null) html += '<div style="font-size:12px;color:' + (delta >= 0 ? '#16a34a' : '#ef4444') + ';font-weight:700;margin-bottom:12px">Delta: ' + _esc((delta >= 0 ? '+' : '') + _chartFormatValue(delta, 'number') + payload.unit) + '</div>';
+  if(payload.showDelta && delta != null) html += '<div style="font-size:12px;color:' + (delta >= 0 ? 'var(--green-dark,#16a34a)' : 'var(--red-light,#ef4444)') + ';font-weight:700;margin-bottom:12px">Delta: ' + _esc((delta >= 0 ? '+' : '') + _chartFormatValue(delta, 'number') + payload.unit) + '</div>';
   html += '<div class="hm-donut-legend">';
   segments.forEach(function(segment, index){
     html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:' + _esc(segment.color || _chartColor(index)) + '"></span><span>' + _esc(_chartText(segment, 'Band ' + (index + 1), 'Band ' + (index + 1))) + '</span></div>';
@@ -6258,7 +6364,7 @@ function renderDonutChart(config, data, state, blockId, reactiveCtx, block){
   html += '<div class="hm-donut-legend">';
   items.forEach(function(item){
     html += '<div class="hm-donut-legend-item">';
-    html += '<span class="hm-donut-swatch" style="background:'+(item.color||'#94a3b8')+'"></span>';
+    html += '<span class="hm-donut-swatch" style="background:'+(item.color||'var(--text-secondary,#94a3b8)')+'"></span>';
     html += '<span>'+_esc(_t(item.label||'',item.labelEn||''))+': <b>'+_fmt(item.value||0)+'</b></span>';
     html += '</div>';
   });
@@ -7771,7 +7877,7 @@ function renderSpcChart(config, data, state, blockId){
       svg += '<text x="'+x.toFixed(2)+'" y="'+(top + plotHeight + 18)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(series.labels[index])+'</text>';
     });
     svg += '</svg>';
-    svg += '<div class="hm-chart-legend"><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#ef4444"></span><span>UCL / LCL</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#64748b"></span><span>CL</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#f59e0b"></span><span>'+_esc(_t('Chuỗi cảnh báo', 'Run warning'))+'</span></span></div>';
+    svg += '<div class="hm-chart-legend"><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:var(--red-light,#ef4444)"></span><span>UCL / LCL</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:var(--text-secondary,#64748b)"></span><span>CL</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:var(--amber-light,#f59e0b)"></span><span>'+_esc(_t('Chuỗi cảnh báo', 'Run warning'))+'</span></span></div>';
     svg += '</div></div>';
     return svg;
   } catch(err){
@@ -7933,7 +8039,7 @@ function renderParetoChart(config, data, state, blockId){
       var y = top + plotHeight - ((item.cumulativePct / 100) * plotHeight);
       return x.toFixed(2) + ',' + y.toFixed(2);
     }).join(' ')+'" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>';
-    svg += '</svg><div class="hm-chart-legend"><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#2563eb"></span><span>'+_esc(_t('Giá trị lỗi', 'Defect value'))+'</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#f97316"></span><span>'+_esc(_t('Tỷ lệ lũy kế', 'Cumulative %'))+'</span></span></div></div></div>';
+    svg += '</svg><div class="hm-chart-legend"><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:var(--blue-light,#2563eb)"></span><span>'+_esc(_t('Giá trị lỗi', 'Defect value'))+'</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:var(--amber-light,#f97316)"></span><span>'+_esc(_t('Tỷ lệ lũy kế', 'Cumulative %'))+'</span></span></div></div></div>';
     return svg;
   } catch(err){
     return _chartError('pareto', err);
@@ -9045,9 +9151,9 @@ function renderToolbar(config, data){
   buttons.forEach(function(btn){
     var cls = 'hm-btn hm-btn-'+(btn.variant||'secondary');
     if(btn.size) cls += ' hm-btn-'+btn.size;
-    html += '<button class="'+cls+'" data-action="'+_esc(btn.action||'')+'">';
+    html += '<button class="'+cls+'" data-action="'+_esc(btn.action||'')+'"'+(btn.tab ? ' data-tab="'+_esc(btn.tab)+'"' : '')+'>';
     if(btn.icon) html += '<span class="hm-btn-icon">'+btn.icon+'</span> ';
-    html += _esc(_t(btn.label||'',btn.labelEn||''));
+    html += _esc(_textLabel(btn.label, btn.labelEn));
     html += '</button>';
   });
   html += '</div>';
@@ -9056,14 +9162,28 @@ function renderToolbar(config, data){
 
 function renderStatusFlow(config, data, state, blockId, reactiveCtx){
   var workflow = config.workflow || {};
+  var stateField = workflow.stateField || config.statusField || 'status';
   var transitions = workflow.transitions || [];
   var states = workflow.states || [];
   var moduleId = state && state._schema ? state._schema.moduleId : '';
   var ms = moduleId ? getModuleState(moduleId) : null;
   var companionForm = moduleId ? _findCompanionFormBlock(moduleId, workflow.entity) : null;
   var formData = companionForm && ms ? (ms.formDrafts[companionForm.id] || ms.blockData[companionForm.id] || {}) : {};
-  var stateField = workflow.stateField || 'status';
   var currentState = formData[stateField] || (data && data[stateField]) || (states[0] && (states[0].id || states[0].value)) || '';
+  if(!transitions.length && config.transitions){
+    transitions = ((config.transitions[currentState] || []) || []).map(function(to){
+      return { from: currentState, to: to, label: to };
+    });
+    if(!states.length){
+      var seen = {};
+      Object.keys(config.transitions || {}).forEach(function(from){
+        if(!seen[from]){ states.push({ id: from, label: from }); seen[from] = true; }
+        (config.transitions[from] || []).forEach(function(to){
+          if(!seen[to]){ states.push({ id: to, label: to }); seen[to] = true; }
+        });
+      });
+    }
+  }
   var html = '<div class="hm-status-flow" style="display:grid;gap:14px">';
   if(!transitions.length){
     return '<div class="hm-empty">'+_t('Chưa cấu hình workflow cho block này', 'No workflow has been configured for this block')+'</div>';
@@ -9105,7 +9225,7 @@ function renderStatusFlow(config, data, state, blockId, reactiveCtx){
   }
   if(config.workflow && config.workflow.showDigitalThread !== false && workflow.digitalThread){
     html += '<div style="padding:12px 14px;border:1px solid rgba(15,118,110,0.22);border-radius:16px;background:rgba(15,118,110,0.05)">';
-    html += '<div style="font-weight:700;color:#0f766e;margin-bottom:6px">'+_t('Digital thread', 'Digital thread')+'</div>';
+    html += '<div style="font-weight:var(--font-display-weight,700);color:var(--green-dark,#0f766e);margin-bottom:var(--space-2,6px)">'+_t('Digital thread', 'Digital thread')+'</div>';
     if((workflow.digitalThread.upstreamTriggers || []).length){
       html += '<div style="font-size:12px;color:var(--text-secondary)"><strong>'+_t('Upstream', 'Upstream')+':</strong> '+_esc(workflow.digitalThread.upstreamTriggers.join(', '))+'</div>';
     }
@@ -9179,7 +9299,7 @@ function renderFormStandard(config, data, reactiveCtx, block){
   fields.forEach(function(f){
     var span = f.span === 'full' ? '1 / -1' : ('span ' + (f.span === 'half' ? 1 : (parseInt(f.span, 10) || 1)));
     var validation = config.validation && config.validation.autoApply === false ? {} : (f.validation || {});
-    var val = formData[f.key] != null ? formData[f.key] : (f.default || '');
+    var val = formData[f.key] != null ? formData[f.key] : (f.defaultValue != null ? f.defaultValue : (f.default || ''));
     var placeholder = '';
     var attrs = '';
     var error = errors[f.key];
@@ -9441,7 +9561,7 @@ function showBlockLibrary(callback){
   var templateKeys = Object.keys(BLOCK_TEMPLATES);
   if(templateKeys.length){
     html += '<div class="hm-lib-category">';
-    html += '<h4 class="hm-lib-cat-title" style="color:#6366f1">'+_t('Mau co san','Templates')+'</h4>';
+    html += '<h4 class="hm-lib-cat-title" style="color:var(--purple-light,#6366f1)">'+_t('Mau co san','Templates')+'</h4>';
     html += '<div class="hm-lib-grid">';
     templateKeys.forEach(function(key){
       var tpl = BLOCK_TEMPLATES[key];
@@ -9853,7 +9973,22 @@ function _executeSingleAction(action, context) {
       });
 
     case 'refresh':
-      (action.blocks || []).forEach(function (bid) { invalidateCache(bid); });
+      (action.blocks || []).forEach(function (bid) {
+        if(context && context._moduleId){
+          var ms = getModuleState(context._moduleId);
+          var block = _findBlockById(ms._schema, bid);
+          if(block && block.config && block.config.dataSource && block.config.dataSource.api){
+            invalidateCache(block.config.dataSource.api);
+          } else {
+            invalidateCache(bid);
+          }
+        } else {
+          invalidateCache(bid);
+        }
+      });
+      if (context && context._container && context._moduleId) {
+        renderModuleFromSchema(context._container, getModuleState(context._moduleId)._schema);
+      }
       return Promise.resolve();
 
     case 'toast':
@@ -9861,7 +9996,9 @@ function _executeSingleAction(action, context) {
       return Promise.resolve();
 
     case 'navigate':
-      if (action.url) {
+      if (action.tab && context && context._moduleId) {
+        EVENT_TYPES.navigate({ tab: action.tab, pass: action.pass || null }, context);
+      } else if (action.url) {
         var url = resolveBindings(action.url, context);
         window.location.href = url;
       }

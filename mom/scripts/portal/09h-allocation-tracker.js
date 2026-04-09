@@ -26,13 +26,13 @@ function _uid(){
 /* ── status palette ──────────────────────────────────────────────── */
 
 var STATUS_CONFIG = {
-  allocated:  { color:'#1565c0', bg:'#e3f2fd', label:'Đã cấp mã',      labelEn:'Allocated',   icon:'\u{1F4CB}', terminal:false },
-  downloaded: { color:'#d97706', bg:'#fef3c7', label:'Đã tải form',     labelEn:'Downloaded',  icon:'\u2B07',    terminal:false },
-  submitted:  { color:'#7c3aed', bg:'#f3e8ff', label:'Đã nộp',          labelEn:'Submitted',   icon:'\u{1F4DD}', terminal:false },
-  received:   { color:'#059669', bg:'#d1fae5', label:'Đã tiếp nhận',    labelEn:'Received',    icon:'\u{1F4E5}', terminal:true  },
-  void:       { color:'#64748b', bg:'#f1f5f9', label:'Đã hủy',          labelEn:'Void',        icon:'\u26D4',    terminal:true  },
-  rejected:   { color:'#dc2626', bg:'#fef2f2', label:'Bị từ chối',      labelEn:'Rejected',    icon:'\u2717',    terminal:false },
-  error:      { color:'#dc2626', bg:'#fef2f2', label:'Lỗi',             labelEn:'Error',       icon:'\u2715',    terminal:false }
+  allocated:  { color:'var(--brand-2,#1565c0)', bg:'#e3f2fd', label:'Đã cấp mã',      labelEn:'Allocated',   icon:'\u{1F4CB}', terminal:false },
+  downloaded: { color:'var(--amber-light,#d97706)', bg:'#fef3c7', label:'Đã tải form',     labelEn:'Downloaded',  icon:'\u2B07',    terminal:false },
+  submitted:  { color:'var(--purple-light,#7c3aed)', bg:'#f3e8ff', label:'Đã nộp',          labelEn:'Submitted',   icon:'\u{1F4DD}', terminal:false },
+  received:   { color:'var(--green-dark,#059669)', bg:'#d1fae5', label:'Đã tiếp nhận',    labelEn:'Received',    icon:'\u{1F4E5}', terminal:true  },
+  void:       { color:'var(--text-secondary,#64748b)', bg:'var(--bg-surface-alt,#f1f5f9)', label:'Đã hủy',          labelEn:'Void',        icon:'\u26D4',    terminal:true  },
+  rejected:   { color:'var(--red-light,#dc2626)', bg:'#fef2f2', label:'Bị từ chối',      labelEn:'Rejected',    icon:'\u2717',    terminal:false },
+  error:      { color:'var(--red-light,#dc2626)', bg:'#fef2f2', label:'Lỗi',             labelEn:'Error',       icon:'\u2715',    terminal:false }
 };
 
 /* ── inject stylesheet once ──────────────────────────────────────── */
@@ -46,37 +46,37 @@ function _injectStyles(){
     '.at-status-icon{font-size:13px}' +
     '.at-table-wrap{overflow-x:auto;margin-top:8px}' +
     '.at-table{width:100%;border-collapse:collapse;font-size:13px}' +
-    '.at-table th{background:#f8fafc;color:#475569;font-weight:600;text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;cursor:pointer;user-select:none;white-space:nowrap}' +
-    '.at-table th:hover{background:#f1f5f9}' +
+    '.at-table th{background:var(--bg-surface-alt,#f8fafc);color:var(--text-secondary,#475569);font-weight:600;text-align:left;padding:8px 10px;border-bottom:2px solid var(--border,#e2e8f0);cursor:pointer;user-select:none;white-space:nowrap}' +
+    '.at-table th:hover{background:var(--bg-surface-alt,#f1f5f9)}' +
     '.at-table th .at-sort-arrow{margin-left:4px;font-size:10px;opacity:.5}' +
     '.at-table th.at-sorted .at-sort-arrow{opacity:1}' +
-    '.at-table td{padding:6px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}' +
-    '.at-table tbody tr:hover{background:#f8fafc}' +
-    '.at-record-id{font-family:monospace;font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px}' +
-    '.at-type-badge{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#475569}' +
+    '.at-table td{padding:6px 10px;border-bottom:1px solid var(--bg-surface-alt,#f1f5f9);vertical-align:middle}' +
+    '.at-table tbody tr:hover{background:var(--bg-surface-alt,#f8fafc)}' +
+    '.at-record-id{font-family:monospace;font-size:12px;background:var(--bg-surface-alt,#f1f5f9);padding:2px 6px;border-radius:4px}' +
+    '.at-type-badge{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-secondary,#475569)}' +
     '.at-cell-actions{display:flex;gap:4px;flex-wrap:nowrap}' +
     '.at-copy-btn,.at-action-btn{border:none;cursor:pointer;border-radius:4px;font-size:12px;padding:3px 8px;transition:background .15s}' +
-    '.at-copy-btn{background:#f1f5f9;color:#475569}.at-copy-btn:hover{background:#e2e8f0}' +
-    '.at-btn-void{background:#fef2f2;color:#dc2626}.at-btn-void:hover{background:#fee2e2}' +
-    '.at-btn-download{background:#f0fdf4;color:#059669}.at-btn-download:hover{background:#dcfce7}' +
+    '.at-copy-btn{background:var(--bg-surface-alt,#f1f5f9);color:var(--text-secondary,#475569)}.at-copy-btn:hover{background:var(--border,#e2e8f0)}' +
+    '.at-btn-void{background:#fef2f2;color:var(--red-light,#dc2626)}.at-btn-void:hover{background:#fee2e2}' +
+    '.at-btn-download{background:var(--bg-surface-alt,#f0fdf4);color:var(--green-dark,#059669)}.at-btn-download:hover{background:#dcfce7}' +
     '.at-table-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}' +
-    '.at-search{flex:1;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;transition:border-color .2s}' +
-    '.at-search:focus{border-color:#3b82f6}' +
-    '.at-empty{text-align:center;padding:32px 16px;color:#94a3b8}.at-empty-icon{font-size:32px;margin-bottom:8px}' +
+    '.at-search{flex:1;padding:6px 10px;border:1px solid var(--border,#e2e8f0);border-radius:6px;font-size:13px;outline:none;transition:border-color .2s}' +
+    '.at-search:focus{border-color:var(--blue-light,#3b82f6)}' +
+    '.at-empty{text-align:center;padding:32px 16px;color:var(--text-secondary,#94a3b8)}.at-empty-icon{font-size:32px;margin-bottom:8px}' +
     '.at-page-controls{display:flex;gap:var(--pagination-gap,4px);justify-content:center;margin-top:12px}' +
     '.at-page-btn{min-width:var(--pagination-btn-size,32px);height:var(--pagination-btn-size,32px);border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);color:var(--text-secondary,#475569);padding:0 10px;border-radius:var(--pagination-btn-radius,4px);cursor:pointer;font-size:var(--pagination-font-size,12px);line-height:1;transition:all .15s}' +
-    '.at-page-btn:hover:not(:disabled){background:var(--bg-hover,#f1f5f9);border-color:#cbd5e1}' +
+    '.at-page-btn:hover:not(:disabled){background:var(--bg-hover,#f1f5f9);border-color:var(--border,#cbd5e1)}' +
     '.at-page-btn:disabled{opacity:.4;cursor:not-allowed}' +
     '.at-page-active{background:var(--brand-2,#3b82f6)!important;color:var(--text-inverse,#fff)!important;border-color:var(--brand-2,#3b82f6)!important}' +
-    '.at-toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:99999;opacity:0;transform:translateY(8px);transition:all .25s ease}' +
+    '.at-toast{position:fixed;bottom:24px;right:24px;background:var(--text-primary,#1e293b);color:var(--text-inverse,#fff);padding:10px 18px;border-radius:8px;font-size:13px;z-index:99999;opacity:0;transform:translateY(8px);transition:all .25s ease}' +
     '.at-toast.at-toast-show{opacity:1;transform:translateY(0)}' +
     '.at-void-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:99998}' +
-    '.at-void-dialog{background:#fff;border-radius:12px;padding:24px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2)}' +
+    '.at-void-dialog{background:var(--bg-surface,#fff);border-radius:12px;padding:24px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2)}' +
     '.at-void-dialog h3{margin:0 0 12px;font-size:16px;color:#1e293b}' +
-    '.at-void-dialog textarea{width:100%;min-height:60px;border:1px solid #e2e8f0;border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box}' +
+    '.at-void-dialog textarea{width:100%;min-height:60px;border:1px solid var(--border,#e2e8f0);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box}' +
     '.at-void-dialog .at-void-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}' +
-    '.at-void-dialog .at-void-cancel{border:1px solid #e2e8f0;background:#fff;padding:6px 14px;border-radius:6px;cursor:pointer}' +
-    '.at-void-dialog .at-void-confirm{border:none;background:#dc2626;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer}';
+    '.at-void-dialog .at-void-cancel{border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);padding:6px 14px;border-radius:6px;cursor:pointer}' +
+    '.at-void-dialog .at-void-confirm{border:none;background:var(--red-light,#dc2626);color:var(--text-inverse,#fff);padding:6px 14px;border-radius:6px;cursor:pointer}';
   var style = document.createElement('style');
   style.textContent = css;
   document.head.appendChild(style);
@@ -375,13 +375,13 @@ var AllocationTracker = {
 
     if(windowStart > 1){
       html += '<button type="button" class="at-page-btn" data-page="1">1</button>';
-      if(windowStart > 2) html += '<span style="padding:0 4px;color:#94a3b8">\u2026</span>';
+      if(windowStart > 2) html += '<span style="padding:0 4px;color:var(--text-secondary,#94a3b8)">\u2026</span>';
     }
     for(var p = windowStart; p <= windowEnd; p++){
       html += '<button type="button" class="at-page-btn' + (p === currentPage ? ' at-page-active' : '') + '" data-page="' + p + '">' + p + '</button>';
     }
     if(windowEnd < totalPages){
-      if(windowEnd < totalPages - 1) html += '<span style="padding:0 4px;color:#94a3b8">\u2026</span>';
+      if(windowEnd < totalPages - 1) html += '<span style="padding:0 4px;color:var(--text-secondary,#94a3b8)">\u2026</span>';
       html += '<button type="button" class="at-page-btn" data-page="' + totalPages + '">' + totalPages + '</button>';
     }
 
@@ -740,7 +740,7 @@ var AllocationTracker = {
     overlay.innerHTML =
       '<div class="at-void-dialog">' +
         '<h3>' + _escHtml(_t('X\u00E1c nh\u1EADn h\u1EE7y m\u00E3 h\u1ED3 s\u01A1', 'Confirm Void Allocation')) + '</h3>' +
-        '<p style="font-size:13px;color:#64748b;margin:0 0 8px">' +
+        '<p style="font-size:13px;color:var(--text-secondary,#64748b);margin:0 0 8px">' +
           _escHtml(_t('Vui l\u00F2ng nh\u1EADp l\u00FD do h\u1EE7y. H\u00E0nh \u0111\u1ED9ng n\u00E0y kh\u00F4ng th\u1EC3 ho\u00E0n t\u00E1c.',
                        'Please enter a reason. This action cannot be undone.')) + '</p>' +
         '<textarea class="at-void-reason" placeholder="' +
@@ -760,7 +760,7 @@ var AllocationTracker = {
     overlay.querySelector('.at-void-confirm').onclick = function(){
       var reason = (reasonInput.value || '').trim();
       if(!reason){
-        reasonInput.style.borderColor = '#dc2626';
+        reasonInput.style.borderColor = 'var(--red-light,#dc2626)';
         reasonInput.focus();
         return;
       }

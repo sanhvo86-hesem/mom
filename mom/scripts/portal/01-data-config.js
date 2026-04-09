@@ -112,14 +112,14 @@ async function loadUsersFromServerIfAdmin(){
 
 const ROLES = {
   // ═══ EXECUTIVE (EXE) ═══
-  ceo:                          {level:0,approve:true,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Giám Đốc Điều Hành (CEO)",labelEn:"Chief Executive Officer (CEO)",color:"#7c3aed",icon:"👔",dept:"EXE"},
-  production_director:          {level:1,approve:true,admin:false,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:false,label:"Giám Đốc Sản Xuất",labelEn:"Production Director",color:"#6d28d9",icon:"🎖️",dept:"EXE"},
+  ceo:                          {level:0,approve:true,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Giám Đốc Điều Hành (CEO)",labelEn:"Chief Executive Officer (CEO)",color:"var(--purple-light,#7c3aed)",icon:"👔",dept:"EXE"},
+  production_director:          {level:1,approve:true,admin:false,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:false,label:"Giám Đốc Sản Xuất",labelEn:"Production Director",color:"var(--purple-light,#6d28d9)",icon:"🎖️",dept:"EXE"},
   // ═══ PRODUCTION (PRO) ═══
-  cnc_workshop_manager:         {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:false,canViewActivity:false,canExportUsers:false,label:"Quản Đốc Xưởng CNC",labelEn:"CNC Workshop Manager",color:"#059669",icon:"🏭",dept:"PRO"},
-  shift_leader:                 {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Ca",labelEn:"Shift Leader",color:"#16a34a",icon:"📋",dept:"PRO"},
-  setup_technician:             {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kỹ Thuật Viên Setup",labelEn:"Setup Technician",color:"#22c55e",icon:"🛠️",dept:"PRO"},
+  cnc_workshop_manager:         {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:false,canViewActivity:false,canExportUsers:false,label:"Quản Đốc Xưởng CNC",labelEn:"CNC Workshop Manager",color:"var(--green-dark,#059669)",icon:"🏭",dept:"PRO"},
+  shift_leader:                 {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Ca",labelEn:"Shift Leader",color:"var(--green-dark,#16a34a)",icon:"📋",dept:"PRO"},
+  setup_technician:             {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kỹ Thuật Viên Setup",labelEn:"Setup Technician",color:"var(--green-light,#22c55e)",icon:"🛠️",dept:"PRO"},
   cnc_operator:                 {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Thợ Vận Hành CNC",labelEn:"CNC Operator",color:"#4ade80",icon:"🔩",dept:"PRO"},
-  deburr_team_lead:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Nhóm Deburr",labelEn:"Deburr Team Lead",color:"#10b981",icon:"🧽",dept:"PRO"},
+  deburr_team_lead:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Nhóm Deburr",labelEn:"Deburr Team Lead",color:"var(--green-light,#10b981)",icon:"🧽",dept:"PRO"},
   deburr_technician:            {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kỹ Thuật Viên Deburr",labelEn:"Deburr Technician",color:"#34d399",icon:"🧹",dept:"PRO"},
   production_planner:           {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Kế Hoạch SX",labelEn:"Production Planner",color:"#14b8a6",icon:"📅",dept:"PRO"},
   cleaning_packaging_supervisor:{level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Giám Sát Vệ Sinh & Đóng Gói",labelEn:"Cleaning & Packaging Supervisor",color:"#0d9488",icon:"🧼",dept:"PRO"},
@@ -128,9 +128,9 @@ const ROLES = {
   // ═══ ENGINEERING (ENG) ═══
   engineering_lead:             {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:false,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Kỹ Thuật",labelEn:"Engineering Lead / Manager",color:"#0369a1",icon:"⚙️",dept:"ENG"},
   process_engineer:             {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Kỹ Sư Quy Trình",labelEn:"Process Engineer",color:"#0284c7",icon:"🧠",dept:"ENG"},
-  cam_nc_programmer:            {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Lập Trình CAM/NC",labelEn:"CAM/NC Programmer",color:"#0891b2",icon:"💻",dept:"ENG"},
+  cam_nc_programmer:            {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Lập Trình CAM/NC",labelEn:"CAM/NC Programmer",color:"var(--cyan-light,#0891b2)",icon:"💻",dept:"ENG"},
   // ═══ QUALITY (QA) ═══
-  qa_manager:                   {level:1,approve:true,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Trưởng Phòng Chất Lượng",labelEn:"QA Manager",color:"#dc2626",icon:"🛡️",dept:"QA"},
+  qa_manager:                   {level:1,approve:true,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Trưởng Phòng Chất Lượng",labelEn:"QA Manager",color:"var(--red-light,#dc2626)",icon:"🛡️",dept:"QA"},
   quality_engineer:             {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Kỹ Sư Chất Lượng",labelEn:"Quality Engineer",color:"#e11d48",icon:"🔬",dept:"QA"},
   qc_inspector:                 {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"QC / Lập Trình CMM",labelEn:"QC Inspector / CMM Programmer-Operator",color:"#f43f5e",icon:"🔍",dept:"QA"},
   qms_engineer:                 {level:2,approve:false,admin:false,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:false,label:"Kỹ Sư QMS / Document Controller",labelEn:"QMS Engineer",color:"#be123c",icon:"📋",dept:"QA"},
@@ -140,21 +140,21 @@ const ROLES = {
   buyer:                        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Mua Hàng",labelEn:"Buyer / Purchasing",color:"#a3e635",icon:"🛍️",dept:"SCM"},
   warehouse_clerk:              {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Kho",labelEn:"Warehouse Clerk",color:"#65a30d",icon:"📦",dept:"SCM"},
   tool_storekeeper:             {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Thủ Kho Dụng Cụ",labelEn:"Tool Crib / Tool Storekeeper",color:"#4d7c0f",icon:"🧰",dept:"SCM"},
-  logistics_coordinator:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Điều Phối Giao Nhận",labelEn:"Logistics & Shipping Coordinator",color:"#16a34a",icon:"🚚",dept:"SCM"},
+  logistics_coordinator:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Điều Phối Giao Nhận",labelEn:"Logistics & Shipping Coordinator",color:"var(--green-dark,#16a34a)",icon:"🚚",dept:"SCM"},
   // ═══ SALES (SAL) ═══
-  estimator:                    {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Báo Giá",labelEn:"Estimator",color:"#f59e0b",icon:"📊",dept:"SAL"},
+  estimator:                    {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Báo Giá",labelEn:"Estimator",color:"var(--amber-light,#f59e0b)",icon:"📊",dept:"SAL"},
   customer_service:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Dịch Vụ Khách Hàng",labelEn:"Customer Service",color:"#fbbf24",icon:"🤝",dept:"SAL"},
   // ═══ FINANCE (FIN) ═══
   finance_manager:              {level:2,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Tài Chính",labelEn:"Finance Manager",color:"#a21caf",icon:"🏦",dept:"FIN"},
   gl_payroll_accountant:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kế Toán Tổng Hợp & Lương",labelEn:"General Ledger & Payroll Accountant",color:"#c026d3",icon:"💰",dept:"FIN"},
   ap_ar_accountant:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Kế Toán Công Nợ",labelEn:"AP/AR & Payments Accountant",color:"#d946ef",icon:"💳",dept:"FIN"},
   // ═══ HR ═══
-  hr_manager:                   {level:2,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Nhân Sự",labelEn:"HR Manager",color:"#8b5cf6",icon:"👥",dept:"HR"},
+  hr_manager:                   {level:2,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Trưởng Phòng Nhân Sự",labelEn:"HR Manager",color:"var(--purple-light,#8b5cf6)",icon:"👥",dept:"HR"},
   // ═══ EHS ═══
   ehs_specialist:               {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Chuyên Viên An Toàn - Môi Trường",labelEn:"EHS Specialist",color:"#ea580c",icon:"🦺",dept:"EHS"},
   // ═══ IT ═══
-  it_admin:                     {level:2,approve:false,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Quản Trị Hệ Thống IT",labelEn:"IT Admin",color:"#6366f1",icon:"🖥️",dept:"IT"},
-  epicor_admin:                 {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Quản Trị Epicor ERP",labelEn:"Epicor System Administrator",color:"#4f46e5",icon:"⚡",dept:"IT"}
+  it_admin:                     {level:2,approve:false,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Quản Trị Hệ Thống IT",labelEn:"IT Admin",color:"var(--purple-light,#6366f1)",icon:"🖥️",dept:"IT"},
+  epicor_admin:                 {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Quản Trị Epicor ERP",labelEn:"Epicor System Administrator",color:"var(--purple-light,#4f46e5)",icon:"⚡",dept:"IT"}
 };
 
 // ═══════════════════════════════════════════════════
@@ -178,24 +178,24 @@ function hmBadge(setKey, value){
   // Fallback nếu HmRegistry chưa load
   var color = '#6b7280';
   var label = value || '';
-  return '<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:' + color + '">' + label + '</span>';
+  return '<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:var(--text-inverse,#fff);background:' + color + '">' + label + '</span>';
 }
 
 // ═══════════════════════════════════════════════════
 // DEPARTMENTS & TITLES (Admin-managed)
 // ═══════════════════════════════════════════════════
 const DEFAULT_DEPARTMENTS = [
-  {code:'EXE',label:'Ban Giám Đốc',labelEn:'Executive',color:'#7c3aed'},
-  {code:'PRO',label:'Phòng Sản Xuất',labelEn:'Production',color:'#059669'},
+  {code:'EXE',label:'Ban Giám Đốc',labelEn:'Executive',color:'var(--purple-light,#7c3aed)'},
+  {code:'PRO',label:'Phòng Sản Xuất',labelEn:'Production',color:'var(--green-dark,#059669)'},
   {code:'ENG',label:'Phòng Kỹ Thuật',labelEn:'Engineering',color:'#0369a1'},
-  {code:'QA',label:'Phòng Chất Lượng',labelEn:'Quality',color:'#dc2626'},
+  {code:'QA',label:'Phòng Chất Lượng',labelEn:'Quality',color:'var(--red-light,#dc2626)'},
   {code:'SCM',label:'Phòng Cung Ứng',labelEn:'Supply Chain',color:'#84cc16'},
-  {code:'SAL',label:'Phòng Kinh Doanh',labelEn:'Sales',color:'#f59e0b'},
+  {code:'SAL',label:'Phòng Kinh Doanh',labelEn:'Sales',color:'var(--amber-light,#f59e0b)'},
   {code:'FIN',label:'Phòng Tài Chính',labelEn:'Finance',color:'#a21caf'},
-  {code:'HR',label:'Phòng Nhân Sự',labelEn:'Human Resources',color:'#8b5cf6'},
-  {code:'EHS',label:'Phòng An Toàn',labelEn:'EHS',color:'#16a34a'},
-  {code:'IT',label:'Phòng CNTT',labelEn:'IT',color:'#0f172a'},
-  {code:'GEN',label:'Khác',labelEn:'General',color:'#94a3b8'}
+  {code:'HR',label:'Phòng Nhân Sự',labelEn:'Human Resources',color:'var(--purple-light,#8b5cf6)'},
+  {code:'EHS',label:'Phòng An Toàn',labelEn:'EHS',color:'var(--green-dark,#16a34a)'},
+  {code:'IT',label:'Phòng CNTT',labelEn:'IT',color:'var(--text-primary,#0f172a)'},
+  {code:'GEN',label:'Khác',labelEn:'General',color:'var(--text-secondary,#94a3b8)'}
 ];
 const DEFAULT_DEPT_TITLES = {
   EXE:[
@@ -358,7 +358,7 @@ function toggleDataSetting(key,val){
       const on=DATA_SETTINGS_DRAFT[k];
       const track=el.querySelector('.ds-track');
       const knob=el.querySelector('.ds-knob');
-      if(track) track.style.background=on?'#10b981':'#d1d5db';
+      if(track) track.style.background=on?'var(--green-light,#10b981)':'var(--border,#d1d5db)';
       if(knob) knob.style.left=on?'22px':'3px';
       const cb=el.querySelector('input[type=checkbox]');
       if(cb) cb.checked=on;
@@ -517,7 +517,7 @@ function showConsentDialog(){
             <b>(c)</b> Kiểm toán nội bộ và đánh giá tuân thủ;
             <b>(d)</b> Phục vụ điều tra khi có dấu hiệu vi phạm quy chế bảo mật.
           </p>
-          <div class="warn-note" style="background:#f0f7ff;border-color:#93c5fd;color:#1e40af">
+          <div class="warn-note" style="background:var(--bg-surface-alt,#f0f7ff);border-color:var(--blue-light,#93c5fd);color:var(--brand,#1e40af)">
             📌 <b>ĐIỀU 4 — Quyền và nghĩa vụ:</b> Công ty bảo lưu toàn quyền sử dụng dữ liệu phiên làm việc đã thu thập theo quy định pháp luật hiện hành.
             Người dùng có nghĩa vụ cung cấp thông tin vị trí chính xác tại thời điểm truy cập. Việc cố tình che giấu, giả mạo thông tin truy cập có thể bị xử lý kỷ luật theo Nội quy Công ty.
             <br><br>
@@ -954,13 +954,13 @@ loadRoleDocsFromStorage();
 const CATEGORIES = [
   // ── Tài liệu hệ thống ── (mom/docs/system)
   {id:"MAN",icon:"📘",label:"Sổ tay QMS (Manual)",color:"#1e40af",dept:"QMS",section:"system"},
-  {id:"POL",icon:"📜",label:"Chính sách (Policy)",color:"#7c3aed",dept:"QMS",section:"system"},
-  {id:"ORG",icon:"🏢",label:"Tổ chức & Nhân sự",color:"#475569",dept:"ORG",section:"system"},
+  {id:"POL",icon:"📜",label:"Chính sách (Policy)",color:"var(--purple-light,#7c3aed)",dept:"QMS",section:"system"},
+  {id:"ORG",icon:"🏢",label:"Tổ chức & Nhân sự",color:"var(--text-secondary,#475569)",dept:"ORG",section:"system"},
   // ── Tài liệu vận hành ── (mom/docs/operations + mom/docs/forms)
   {id:"SOP",icon:"📋",label:"Quy trình (SOP)",color:"#0369a1",dept:"QMS",section:"ops"},
-  {id:"WI",icon:"📖",label:"Hướng dẫn công việc (WI)",color:"#059669",dept:"OPS",section:"ops"},
-  {id:"ANNEX",icon:"📚",label:"Phụ lục (ANNEX)",color:"#6366f1",dept:"QMS",section:"ops"},
-  {id:"FRM",icon:"📝",label:"Biểu mẫu & Hồ sơ (Forms)",color:"#d97706",dept:"FRM",section:"ops"},
+  {id:"WI",icon:"📖",label:"Hướng dẫn công việc (WI)",color:"var(--green-dark,#059669)",dept:"OPS",section:"ops"},
+  {id:"ANNEX",icon:"📚",label:"Phụ lục (ANNEX)",color:"var(--purple-light,#6366f1)",dept:"QMS",section:"ops"},
+  {id:"FRM",icon:"📝",label:"Biểu mẫu & Hồ sơ (Forms)",color:"var(--amber-light,#d97706)",dept:"FRM",section:"ops"},
   // ── Đào tạo & Năng lực ── (10)
   {id:"TRN",icon:"🎓",label:"Đào tạo & Năng lực (Training)",color:"#9333ea",dept:"TRN",section:"train"},
   // ── Ẩn ──
@@ -1209,8 +1209,8 @@ function showIconPicker(targetType, targetId, callback){
       <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:6px;text-transform:uppercase">${catLabels[catKey]||catKey}</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px">
         ${icons.map(ic=>`<button class="icon-pick-btn" onclick="selectIconFromPicker('${targetType}','${escapeHtml(targetId)}','${ic.icon}')" title="${ic.label}"
-          style="width:38px;height:38px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s"
-          onmouseenter="this.style.background='#eff6ff';this.style.borderColor='#60a5fa'" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0'"
+          style="width:38px;height:38px;border-radius:8px;border:1.5px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s"
+          onmouseenter="this.style.background='#eff6ff';this.style.borderColor='#60a5fa'" onmouseleave="this.style.background='#fff';this.style.borderColor='var(--border,#e2e8f0)'"
         >${ic.icon}</button>`).join('')}
       </div>
     </div>`;
@@ -1222,7 +1222,7 @@ function showIconPicker(targetType, targetId, callback){
       <div class="modal-body" style="max-height:450px;overflow-y:auto">
         <div style="margin-bottom:12px;font-size:11px;color:var(--text-3)">
           ${lang==='en'?'Target':'Đối tượng'}: <b>${escapeHtml(targetId)}</b>
-          ${CUSTOM_ICONS[targetType+':'+targetId]?' · <a href="#" onclick="resetCustomIcon(\''+targetType+'\',\''+escapeHtml(targetId)+'\');return false" style="color:#dc2626">'+(lang==='en'?'Reset':'Mặc định')+'</a>':''}
+          ${CUSTOM_ICONS[targetType+':'+targetId]?' · <a href="#" onclick="resetCustomIcon(\''+targetType+'\',\''+escapeHtml(targetId)+'\');return false" style="color:var(--red-light,#dc2626)">'+(lang==='en'?'Reset':'Mặc định')+'</a>':''}
         </div>
         ${gridHtml}
       </div>
@@ -1893,16 +1893,16 @@ function renderFolderTreeHtml(node, mode, options, depth){
         const dAllChecked = hasChildDocs && dAccess === allChildDocs.length;
         const subPath = child.path.split('/').pop() || child.name;
         const folderControl = isFullAccess
-          ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+          ? '<span style="color:var(--green-dark,#16a34a);font-weight:700;width:16px;display:inline-block">✓</span>'
           : (hasChildDocs
               ? '<input type="checkbox" '+(dAllChecked?'checked':'')+' onchange="toggleSubfolderPerms(this,\''+escapeHtml(options.catId)+'\',\''+escapeHtml(subPath)+'\',\''+role+'\')" style="margin:0">'
-              : '<span style="color:#94a3b8;font-weight:700;width:16px;display:inline-block">•</span>');
+              : '<span style="color:var(--text-secondary,#94a3b8);font-weight:700;width:16px;display:inline-block">•</span>');
         const folderMeta = hasChildDocs
           ? `${dAccess}/${allChildDocs.length}`
           : (lang==='en' ? 'Empty folder' : 'Thư mục trống');
 
         html += `<div style="margin:4px 0 2px ${indent}px;padding:4px 8px;background:${depth>0?'var(--bg-1,#fff)':'var(--bg-2,#f8fafc)'};border-radius:8px;border:1px solid var(--border-light,#e2e8f0)">
-          <div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:${depth>0?'11':'12'}px;font-weight:600;color:#475569">
+          <div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:${depth>0?'11':'12'}px;font-weight:600;color:var(--text-secondary,#475569)">
             ${folderControl}
             📁 ${escapeHtml(getSubfolderLabel(child.path.split('/').pop()||child.name))}
             <span style="font-weight:400;font-size:10px;color:var(--text-3);margin-left:auto">${folderMeta}</span>
@@ -1918,7 +1918,7 @@ function renderFolderTreeHtml(node, mode, options, depth){
           html += `<div class="perm-doc-row" style="padding-left:${20 + depth*8}px">
             <label>
               ${isFullAccess
-                ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+                ? '<span style="color:var(--green-dark,#16a34a);font-weight:700;width:16px;display:inline-block">✓</span>'
                 : '<input type="checkbox" data-doc="'+d.code+'" '+(has?'checked':'')+' onchange="toggleRoleDoc(this,\''+role+'\')">'}
               <span class="doc-code">${d.code}</span>
               ${d.title.substring(0,50)}${d.title.length>50?'...':''}
@@ -1991,7 +1991,7 @@ function renderFolderTreeHtml(node, mode, options, depth){
         html += `<div class="perm-doc-row" style="padding-left:${indent}px">
           <label>
             ${options.isFullAccess
-              ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+              ? '<span style="color:var(--green-dark,#16a34a);font-weight:700;width:16px;display:inline-block">✓</span>'
               : '<input type="checkbox" data-doc="'+d.code+'" '+(has?'checked':'')+' onchange="toggleRoleDoc(this,\''+options.role+'\')">'}
             <span class="doc-code">${d.code}</span>
             ${d.title.substring(0,50)}${d.title.length>50?'...':''}
