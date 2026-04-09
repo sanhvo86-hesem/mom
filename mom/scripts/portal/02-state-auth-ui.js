@@ -182,6 +182,76 @@ async function saveDocVisibilityToServer(){
   return await apiCall('admin_docs_visibility_save', {hidden});
 }
 
+let userDocOverridesHydrated = false;
+let userDocOverridesLoadPromise = null;
+
+function userPermOverrideKey(user){
+  if(!user || typeof user !== 'object') return '';
+  const username = String(user.username || '').trim().toLowerCase();
+  if(username) return username;
+  const employeeId = String(user.employee_id || user.id || '').trim();
+  return employeeId.toLowerCase();
+}
+
+function normalizeUserDocOverrideEntry(entry){
+  const safe = (entry && typeof entry === 'object') ? entry : {};
+  const grant = Array.from(new Set((Array.isArray(safe.grant) ? safe.grant : []).map(code => String(code||'').trim().toUpperCase()).filter(Boolean)));
+  const deny = Array.from(new Set((Array.isArray(safe.deny) ? safe.deny : []).map(code => String(code||'').trim().toUpperCase()).filter(Boolean)));
+  return {grant, deny};
+}
+
+function normalizeUserDocOverridesMap(map){
+  const normalized = {};
+  if(!map || typeof map !== 'object') return normalized;
+  Object.keys(map).forEach(key => {
+    const safeKey = String(key || '').trim().toLowerCase();
+    if(!safeKey) return;
+    const row = normalizeUserDocOverrideEntry(map[key]);
+    if(!row.grant.length && !row.deny.length) return;
+    normalized[safeKey] = row;
+  });
+  return normalized;
+}
+
+async function loadUserDocOverridesFromServer(options={}){
+  if(!currentUser) return PERM_OVERRIDES;
+  if(userDocOverridesLoadPromise && !options.force) return userDocOverridesLoadPromise;
+  if(userDocOverridesHydrated && !options.force) return PERM_OVERRIDES;
+
+  userDocOverridesLoadPromise = (async ()=>{
+    try{
+      const res = await apiCall('user_doc_overrides_get', null, 'GET');
+      if(res && res.ok){
+        PERM_OVERRIDES = normalizeUserDocOverridesMap(res.overrides || {});
+        userDocOverridesHydrated = true;
+        try{ savePermOverrides(); }catch(e){}
+      }else if(!options.silent){
+        showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en' ? 'user_doc_overrides_load_failed' : 'Không tải được override quyền tài liệu')));
+      }
+    }catch(e){
+      if(!options.silent){
+        showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'user_doc_overrides_load_failed' : 'Không tải được override quyền tài liệu')));
+      }
+    }finally{
+      userDocOverridesLoadPromise = null;
+    }
+    return PERM_OVERRIDES;
+  })();
+
+  return userDocOverridesLoadPromise;
+}
+
+async function saveUserDocOverridesToServer(){
+  const overrides = normalizeUserDocOverridesMap(PERM_OVERRIDES);
+  const res = await apiCall('admin_user_doc_overrides_save', {overrides});
+  if(res && res.ok){
+    PERM_OVERRIDES = normalizeUserDocOverridesMap(res.overrides || overrides);
+    userDocOverridesHydrated = true;
+    try{ savePermOverrides(); }catch(e){}
+  }
+  return res;
+}
+
 const PORTAL_DISPLAY_BUILTIN_EXTENSIONS = Object.freeze(['html','pdf','doc','docx','docm','xls','xlsx','xlsm','xlsb','csv','ppt','pptx','pptm']);
 let PORTAL_DISPLAY_CONFIG = createDefaultPortalDisplayConfig();
 let PORTAL_DISPLAY_CONFIG_DRAFT = null;
@@ -325,6 +395,293 @@ async function loadPortalDisplayConfigFromServer(options={}){
   return portalDisplayConfigLoadPromise;
 }
 
+const ACCESS_ROLE_LEGACY_MAP = Object.freeze({
+  general_director:'ceo',
+  purchasing_officer:'buyer',
+  procurement_manager:'supply_chain_manager',
+  warehouse_staff:'warehouse_clerk',
+  warehouse_lead:'supply_chain_manager',
+  planning_manager:'production_planner',
+  production_manager:'cnc_workshop_manager',
+  qms_supervisor:'qms_engineer',
+  doc_controller:'qms_engineer'
+});
+
+const PURCHASING_MODULE_DEFAULT_ROLES = Object.freeze([
+  'admin',
+  'it_admin',
+  'ceo',
+  'qa_manager',
+  'quality_manager',
+  'qms_engineer',
+  'quality_engineer',
+  'qc_inspector',
+  'supply_chain_manager',
+  'buyer',
+  'warehouse_clerk',
+  'tool_storekeeper',
+  'logistics_coordinator',
+  'production_planner'
+]);
+
+let MODULE_ACCESS_CONFIG = createDefaultModuleAccessConfig();
+let MODULE_ACCESS_CONFIG_DRAFT = null;
+let moduleAccessConfigDirty = false;
+let moduleAccessConfigHydrated = false;
+let moduleAccessConfigLoadPromise = null;
+
+function normalizeAccessRole(value){
+  const token = String(value || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '');
+  if(!token) return '';
+  return ACCESS_ROLE_LEGACY_MAP[token] || token;
+}
+
+function normalizeAccessRoleList(values){
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(values) ? values : []).forEach(value => {
+    const token = normalizeAccessRole(value);
+    if(!token || seen.has(token)) return;
+    seen.add(token);
+    out.push(token);
+  });
+  return out;
+}
+
+function normalizedUserAccessRoles(user){
+  if(!user || typeof user !== 'object') return [];
+  const rawRoles = Array.isArray(user.roles) && user.roles.length ? user.roles : [user.role];
+  return normalizeAccessRoleList(rawRoles);
+}
+
+function isAdminUser(user){
+  if(!user) return false;
+  return normalizedUserAccessRoles(user).some(role => ADMIN_ROLES.includes(role));
+}
+
+function moduleAccessPortalCatalog(){
+  return [
+    {id:'dashboard', group:'core', icon:'🏠', labelEn:'Dashboard', labelVi:'Dashboard', noteEn:'Landing workspace and operational summary.', noteVi:'Màn hình tổng quan và điều hành chung.', defaultAccess:'all'},
+    {id:'documents', group:'core', icon:'📁', labelEn:'All documents', labelVi:'Tất cả tài liệu', noteEn:'Governed document library.', noteVi:'Thư viện tài liệu được kiểm soát.', defaultAccess:'all'},
+    {id:'search', group:'core', icon:'🔍', labelEn:'Search', labelVi:'Tìm kiếm', noteEn:'Portal-wide search.', noteVi:'Tìm kiếm toàn portal.', defaultAccess:'all'},
+    {id:'dictionary', group:'core', icon:'📖', labelEn:'Dictionary', labelVi:'Từ điển thuật ngữ', noteEn:'Shared terminology and definitions.', noteVi:'Thuật ngữ và định nghĩa dùng chung.', defaultAccess:'all'},
+    {id:'access', group:'core', icon:'📋', labelEn:'Access matrix', labelVi:'Ma trận phân quyền', noteEn:'Personal access and permission matrix view.', noteVi:'Xem ma trận quyền truy cập cá nhân.', defaultAccess:'all'},
+    {id:'deploy', group:'core', icon:'🚀', labelEn:'Operations deploy', labelVi:'Triển khai vận hành', noteEn:'Deployment overview entry.', noteVi:'Điểm vào cho điều phối triển khai.', defaultAccess:'all'},
+    {id:'exceptions', group:'quality', icon:'⚠️', labelEn:'Exception dashboard', labelVi:'Bảng ngoại lệ', noteEn:'Legacy exception dashboard entry.', noteVi:'Điểm vào bảng ngoại lệ cũ.', defaultAccess:'all'},
+    {id:'orders', group:'production', icon:'📦', labelEn:'Orders', labelVi:'Đơn hàng', noteEn:'Sales / job / work order coordination.', noteVi:'Điều phối SO / JO / WO.', defaultAccess:'all'},
+    {id:'dispatch', group:'production', icon:'📋', labelEn:'Production dispatch', labelVi:'Phân công sản xuất', noteEn:'Dispatching and production assignment.', noteVi:'Phân công và điều phối sản xuất.', defaultAccess:'all'},
+    {id:'mes', group:'production', icon:'🏭', labelEn:'Shop floor', labelVi:'Xưởng sản xuất', noteEn:'Execution workspace for production.', noteVi:'Không gian thực thi sản xuất.', defaultAccess:'all'},
+    {id:'mobile-shopfloor', group:'production', icon:'📱', labelEn:'Operator mobile', labelVi:'Công nhân di động', noteEn:'Mobile operator workflow.', noteVi:'Quy trình cho công nhân di động.', defaultAccess:'all'},
+    {id:'quoting', group:'production', icon:'💰', labelEn:'Quoting', labelVi:'Báo giá', noteEn:'Quoting and estimation workflow.', noteVi:'Quy trình báo giá và ước tính.', defaultAccess:'all'},
+    {id:'purchasing', group:'supply', icon:'🧾', labelEn:'Purchasing & IQC', labelVi:'Mua hàng & IQC', noteEn:'Purchasing, incoming quality and warehouse touchpoints.', noteVi:'Mua hàng, chất lượng đầu vào và kho.', defaultAccess:'roles', defaultRoles:[...PURCHASING_MODULE_DEFAULT_ROLES]},
+    {id:'quality-exceptions', group:'quality', icon:'🔴', labelEn:'Nonconformance', labelVi:'Sự không phù hợp', noteEn:'Exception and NCR workflow.', noteVi:'Quy trình ngoại lệ và NCR.', defaultAccess:'all'},
+    {id:'supplier-quality', group:'quality', icon:'🏪', labelEn:'Supplier quality', labelVi:'Chất lượng NCC', noteEn:'Supplier quality assurance.', noteVi:'Đảm bảo chất lượng nhà cung cấp.', defaultAccess:'all'},
+    {id:'fmea', group:'quality', icon:'⚡', labelEn:'FMEA & Control Plan', labelVi:'FMEA & Control Plan', noteEn:'Risk analysis and control planning.', noteVi:'Phân tích rủi ro và kế hoạch kiểm soát.', defaultAccess:'all'},
+    {id:'apqp-ppap', group:'quality', icon:'🎯', labelEn:'APQP / PPAP', labelVi:'APQP / PPAP', noteEn:'APQP and PPAP governance.', noteVi:'Điều hành APQP và PPAP.', defaultAccess:'all'},
+    {id:'ai-scheduling', group:'quality', icon:'🤖', labelEn:'AI quality', labelVi:'AI Chất lượng', noteEn:'AI-assisted quality tooling.', noteVi:'Công cụ chất lượng có hỗ trợ AI.', defaultAccess:'all'},
+    {id:'forms', group:'records', icon:'📋', labelEn:'Evidence control', labelVi:'Kiểm soát chứng cứ', noteEn:'Controlled forms and evidence capture.', noteVi:'Biểu mẫu kiểm soát và thu thập chứng cứ.', defaultAccess:'all'},
+    /* 'evidence' nav removed — Evidence Vault is now inside "Kiểm soát chứng cứ" (forms module), Chứng cứ tab */
+    {id:'compliance-reports', group:'records', icon:'📊', labelEn:'Reports', labelVi:'Báo cáo', noteEn:'Compliance and operational reporting.', noteVi:'Báo cáo tuân thủ và vận hành.', defaultAccess:'all'},
+    {id:'continuous-improvement', group:'records', icon:'🔄', labelEn:'Improvement', labelVi:'Cải tiến liên tục', noteEn:'Improvement tracking and follow-up.', noteVi:'Theo dõi cải tiến và hành động.', defaultAccess:'all'},
+    {id:'knowledge-base', group:'records', icon:'💡', labelEn:'Knowledge base', labelVi:'Kho kiến thức', noteEn:'Governed know-how workspace.', noteVi:'Không gian tri thức được kiểm soát.', defaultAccess:'all'},
+    {id:'cnc-programs', group:'tools', icon:'⚙', labelEn:'CNC programs', labelVi:'Chương trình CNC', noteEn:'CNC program management.', noteVi:'Quản lý chương trình CNC.', defaultAccess:'all'},
+    {id:'product-passport', group:'tools', icon:'🔗', labelEn:'Product passport', labelVi:'Hộ chiếu sản phẩm', noteEn:'Digital product passport workspace.', noteVi:'Không gian hộ chiếu sản phẩm số.', defaultAccess:'all'},
+    {id:'schema-studio', group:'tools', icon:'🗄', labelEn:'Schema studio', labelVi:'Schema Studio', noteEn:'Schema and metadata tooling.', noteVi:'Công cụ schema và metadata.', defaultAccess:'all'},
+    {id:'energy-dashboard', group:'tools', icon:'⚡', labelEn:'Energy', labelVi:'Năng lượng', noteEn:'Energy and utility dashboards.', noteVi:'Dashboard năng lượng và tiện ích.', defaultAccess:'all'},
+    {id:'customer-portal', group:'tools', icon:'🌐', labelEn:'Customer portal', labelVi:'Cổng khách hàng', noteEn:'Customer-facing workspace administration.', noteVi:'Quản trị không gian khách hàng.', defaultAccess:'all'},
+    {id:'admin', group:'admin', icon:'⚙', labelEn:'Admin', labelVi:'Admin', noteEn:'System administration shell for the portal.', noteVi:'Không gian quản trị hệ thống portal.', defaultAccess:'admin', locked:true},
+    {id:'template-demo', group:'admin', icon:'🧩', labelEn:'Master module template', labelVi:'Master Module Template', noteEn:'Template lab preview workspace.', noteVi:'Không gian xem trước template lab.', defaultAccess:'admin'},
+    {id:'module-builder', group:'admin', icon:'➕', labelEn:'Module builder', labelVi:'Tạo Module mới', noteEn:'Module creation workspace.', noteVi:'Không gian tạo module mới.', defaultAccess:'admin'}
+  ];
+}
+
+function moduleAccessAdminTabCatalog(){
+  return [
+    {id:'users', group:'identity', icon:'👥', labelEn:'Users', labelVi:'Người dùng', noteEn:'User account administration.', noteVi:'Quản trị tài khoản người dùng.', defaultAccess:'admin'},
+    {id:'dept_title', group:'identity', icon:'🏢', labelEn:'Dept & Titles', labelVi:'Phòng ban & Chức danh', noteEn:'Departments and job titles.', noteVi:'Phòng ban và chức danh.', defaultAccess:'admin'},
+    {id:'roles', group:'governance', icon:'🛡', labelEn:'Roles', labelVi:'Vai trò', noteEn:'Role model definition.', noteVi:'Định nghĩa mô hình vai trò.', defaultAccess:'admin'},
+    {id:'orgchart', group:'identity', icon:'🏗', labelEn:'Org chart', labelVi:'Sơ đồ tổ chức', noteEn:'Organisation structure view.', noteVi:'Sơ đồ cấu trúc tổ chức.', defaultAccess:'admin'},
+    {id:'perms', group:'governance', icon:'🔐', labelEn:'Permissions', labelVi:'Phân quyền tài liệu', noteEn:'Document and workflow permissions.', noteVi:'Phân quyền tài liệu và workflow.', defaultAccess:'admin'},
+    {id:'module_access', group:'governance', icon:'🧭', labelEn:'Module access', labelVi:'Phân quyền module', noteEn:'Central visibility and access control for portal modules.', noteVi:'Điều khiển tập trung việc hiển thị và truy cập module.', defaultAccess:'admin', locked:true},
+    {id:'activity', group:'governance', icon:'📊', labelEn:'Activity log', labelVi:'Kiểm soát hành vi', noteEn:'Audit and activity review.', noteVi:'Rà soát audit và hành vi.', defaultAccess:'admin'},
+    {id:'docs', group:'content', icon:'📄', labelEn:'Effective docs', labelVi:'Tài liệu hiệu lực', noteEn:'Effective document administration.', noteVi:'Quản trị tài liệu hiệu lực.', defaultAccess:'admin'},
+    {id:'portal_display', group:'content', icon:'🧭', labelEn:'Portal display', labelVi:'Hiển thị portal', noteEn:'Portal file and sidebar display control.', noteVi:'Điều khiển hiển thị file và sidebar portal.', defaultAccess:'admin'},
+    {id:'retention', group:'content', icon:'📋', labelEn:'Retention', labelVi:'Lưu giữ', noteEn:'Retention policies and controlled evidence lifecycle.', noteVi:'Chính sách lưu giữ và vòng đời chứng cứ.', defaultAccess:'admin'},
+    {id:'data_sources', group:'data', icon:'🗄', labelEn:'Data sources', labelVi:'Nguồn dữ liệu', noteEn:'Runtime data sources and integration status.', noteVi:'Nguồn dữ liệu runtime và trạng thái tích hợp.', defaultAccess:'admin'},
+    {id:'metadata_studio', group:'data', icon:'🧬', labelEn:'Data Schema', labelVi:'Data Schema', noteEn:'Schema, metadata and data contract tooling.', noteVi:'Công cụ schema, metadata và data contract.', defaultAccess:'admin'},
+    {id:'infrastructure', group:'data', icon:'🖥', labelEn:'VPS infrastructure', labelVi:'Hạ tầng VPS', noteEn:'Terminal, observability and host control plane.', noteVi:'Control plane cho host, terminal và observability.', defaultAccess:'admin'},
+    {id:'manual_runtime', group:'operations', icon:'🧾', labelEn:'Manual runtime', labelVi:'Nhập tay vận hành', noteEn:'Manual runtime fallback workspace.', noteVi:'Không gian fallback nhập tay vận hành.', defaultAccess:'admin'},
+    {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
+    {id:'mfa', group:'security', icon:'🔑', labelEn:'MFA security', labelVi:'Bảo mật MFA', noteEn:'MFA policy and enrollment status.', noteVi:'Chính sách MFA và trạng thái kích hoạt.', defaultAccess:'admin'},
+    {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
+  ];
+}
+
+function moduleAccessCatalog(scope){
+  return scope === 'admin_tabs' ? moduleAccessAdminTabCatalog() : moduleAccessPortalCatalog();
+}
+
+function moduleAccessMeta(scope, id){
+  const target = String(id || '').trim().toLowerCase();
+  return moduleAccessCatalog(scope).find(item => String(item.id || '').toLowerCase() === target) || null;
+}
+
+function createDefaultModuleAccessConfig(){
+  const config = { portal_modules:{}, admin_tabs:{} };
+  moduleAccessPortalCatalog().forEach(meta => {
+    config.portal_modules[meta.id] = {
+      enabled: true,
+      access: meta.defaultAccess || 'all',
+      roles: normalizeAccessRoleList(meta.defaultRoles || [])
+    };
+  });
+  moduleAccessAdminTabCatalog().forEach(meta => {
+    config.admin_tabs[meta.id] = {
+      enabled: true,
+      access: meta.defaultAccess || 'admin',
+      roles: normalizeAccessRoleList(meta.defaultRoles || [])
+    };
+  });
+  return config;
+}
+
+function sanitizeModuleAccessPolicy(policy, meta){
+  const defaultPolicy = {
+    enabled: true,
+    access: String(meta && meta.defaultAccess || 'all').toLowerCase(),
+    roles: normalizeAccessRoleList(meta && meta.defaultRoles || [])
+  };
+  if(meta && meta.locked){
+    return defaultPolicy;
+  }
+  const access = ['all','admin','roles'].includes(String(policy && policy.access || '').toLowerCase())
+    ? String(policy.access).toLowerCase()
+    : defaultPolicy.access;
+  return {
+    enabled: Object.prototype.hasOwnProperty.call(policy || {}, 'enabled') ? !!policy.enabled : defaultPolicy.enabled,
+    access,
+    roles: normalizeAccessRoleList(policy && policy.roles || defaultPolicy.roles)
+  };
+}
+
+function sanitizeModuleAccessConfig(config){
+  const next = { portal_modules:{}, admin_tabs:{} };
+  moduleAccessPortalCatalog().forEach(meta => {
+    next.portal_modules[meta.id] = sanitizeModuleAccessPolicy(config && config.portal_modules && config.portal_modules[meta.id], meta);
+  });
+  moduleAccessAdminTabCatalog().forEach(meta => {
+    next.admin_tabs[meta.id] = sanitizeModuleAccessPolicy(config && config.admin_tabs && config.admin_tabs[meta.id], meta);
+  });
+  return next;
+}
+
+function moduleAccessConfigFingerprint(config){
+  try{ return JSON.stringify(sanitizeModuleAccessConfig(config)); }catch(e){ return String(Date.now()); }
+}
+
+function applyModuleAccessConfig(config, options={}){
+  const next = sanitizeModuleAccessConfig(config);
+  MODULE_ACCESS_CONFIG = next;
+  moduleAccessConfigHydrated = true;
+  if(!moduleAccessConfigDirty || options.forceDraftSync){
+    MODULE_ACCESS_CONFIG_DRAFT = sanitizeModuleAccessConfig(next);
+    moduleAccessConfigDirty = false;
+  }
+  return next;
+}
+
+function ensureModuleAccessConfigDraft(){
+  if(!MODULE_ACCESS_CONFIG_DRAFT){
+    MODULE_ACCESS_CONFIG_DRAFT = sanitizeModuleAccessConfig(MODULE_ACCESS_CONFIG);
+  }
+  return MODULE_ACCESS_CONFIG_DRAFT;
+}
+
+function normalizeModuleAccessPageId(page){
+  const key = String(page || '').trim().toLowerCase();
+  if(key === 'vps-control') return 'admin';
+  return key;
+}
+
+function moduleAccessPolicy(scope, id, config){
+  const safeConfig = (config && typeof config === 'object') ? config : MODULE_ACCESS_CONFIG;
+  const key = String(id || '').trim().toLowerCase();
+  return scope === 'admin_tabs'
+    ? (safeConfig.admin_tabs[key] || null)
+    : (safeConfig.portal_modules[normalizeModuleAccessPageId(key)] || null);
+}
+
+function canUserAccessPolicy(policy, user=currentUser){
+  if(!user || !policy || policy.enabled === false) return false;
+  if(policy.access === 'all') return true;
+  if(policy.access === 'admin') return isAdminUser(user);
+  if(policy.access === 'roles'){
+    const allowedRoles = Array.isArray(policy.roles) ? policy.roles : [];
+    return isAdminUser(user) || normalizedUserAccessRoles(user).some(role => allowedRoles.includes(role));
+  }
+  return false;
+}
+
+function canUserAccessModule(moduleId, user=currentUser, config=MODULE_ACCESS_CONFIG){
+  return canUserAccessPolicy(moduleAccessPolicy('portal_modules', moduleId, config), user);
+}
+
+function canUserAccessAdminTab(tabId, user=currentUser, config=MODULE_ACCESS_CONFIG){
+  return canUserAccessPolicy(moduleAccessPolicy('admin_tabs', tabId, config), user);
+}
+
+function firstAccessiblePortalModule(user=currentUser, config=MODULE_ACCESS_CONFIG){
+  const catalog = moduleAccessPortalCatalog();
+  for(let i=0;i<catalog.length;i+=1){
+    const id = catalog[i] && catalog[i].id;
+    if(id && canUserAccessModule(id, user, config)) return id;
+  }
+  return 'dashboard';
+}
+
+function firstAccessibleAdminTab(user=currentUser, config=MODULE_ACCESS_CONFIG){
+  const catalog = moduleAccessAdminTabCatalog();
+  for(let i=0;i<catalog.length;i+=1){
+    const id = catalog[i] && catalog[i].id;
+    if(id && canUserAccessAdminTab(id, user, config)) return id;
+  }
+  return 'users';
+}
+
+async function loadModuleAccessConfigFromServer(options={}){
+  if(!currentUser) return MODULE_ACCESS_CONFIG;
+  if(moduleAccessConfigLoadPromise && !options.force){
+    return moduleAccessConfigLoadPromise;
+  }
+  if(moduleAccessConfigHydrated && !options.force){
+    return MODULE_ACCESS_CONFIG;
+  }
+  const shouldSyncDraft = !!options.forceDraftSync || !moduleAccessConfigDirty;
+  moduleAccessConfigLoadPromise = (async () => {
+    try{
+      const res = await apiCall('module_access_get', null, 'GET');
+      if(res && res.ok && res.config){
+        applyModuleAccessConfig(res.config, {forceDraftSync: shouldSyncDraft});
+        if(currentPage === 'admin' && adminTab === 'module_access'){
+          renderAdminModuleAccess();
+        }else{
+          try{ renderSidebar(); }catch(e){}
+        }
+      }else if(!options.silent){
+        showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en' ? 'module_access_load_failed' : 'Không tải được cấu hình phân quyền module')));
+      }
+    }catch(e){
+      if(!options.silent){
+        showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'module_access_load_failed' : 'Không tải được cấu hình phân quyền module')));
+      }
+    }finally{
+      moduleAccessConfigLoadPromise = null;
+    }
+    return MODULE_ACCESS_CONFIG;
+  })();
+  return moduleAccessConfigLoadPromise;
+}
+
 function portalSidebarCoreItems(){
   return [
     {id:'dashboard', icon:'🏠', label:lang==='en'?'Dashboard':'Dashboard'},
@@ -361,40 +718,11 @@ function isPortalSidebarCoreVisible(id){
 }
 
 function canAccessVpsControlTower(){
-  return !!currentUser && isAdmin();
+  return !!currentUser && canUserAccessModule('admin') && canUserAccessAdminTab('infrastructure');
 }
 
 function canAccessPurchasingWorkspace(){
-  if(!currentUser) return false;
-  const legacyMap = {
-    general_director:'ceo',
-    purchasing_officer:'buyer',
-    procurement_manager:'supply_chain_manager',
-    warehouse_staff:'warehouse_clerk',
-    warehouse_lead:'supply_chain_manager',
-    planning_manager:'production_planner',
-    production_manager:'cnc_workshop_manager',
-    qms_supervisor:'qms_engineer',
-    doc_controller:'qms_engineer'
-  };
-  const rawRole = String(currentUser.role || '').trim().toLowerCase();
-  const role = legacyMap[rawRole] || rawRole;
-  return [
-    'admin',
-    'it_admin',
-    'ceo',
-    'qa_manager',
-    'quality_manager',
-    'qms_engineer',
-    'quality_engineer',
-    'qc_inspector',
-    'supply_chain_manager',
-    'buyer',
-    'warehouse_clerk',
-    'tool_storekeeper',
-    'logistics_coordinator',
-    'production_planner'
-  ].includes(role);
+  return !!currentUser && canUserAccessModule('purchasing');
 }
 
 function isPortalSidebarSectionVisible(id){
@@ -567,6 +895,46 @@ async function refreshDocFromServer(code){
   return null;
 }
 
+function normalizeClientRoleDocsMap(raw, fallback){
+  const base = (fallback && typeof fallback === 'object') ? fallback : {};
+  const source = (raw && typeof raw === 'object') ? raw : {};
+  const normalized = {};
+  Object.keys(base).forEach(role=>{
+    const entry = base[role];
+    if(entry === 'ALL'){
+      normalized[role] = 'ALL';
+      return;
+    }
+    if(Array.isArray(entry)){
+      normalized[role] = Array.from(new Set(entry.map(pattern => String(pattern||'').trim().toUpperCase()).filter(Boolean)));
+    }
+  });
+  Object.keys(source).forEach(role=>{
+    const safeRole = String(role || '').trim();
+    if(!safeRole) return;
+    const entry = source[role];
+    if(String(entry || '').trim().toUpperCase() === 'ALL'){
+      normalized[safeRole] = 'ALL';
+      return;
+    }
+    if(!Array.isArray(entry)) return;
+    normalized[safeRole] = Array.from(new Set(entry.map(pattern => String(pattern||'').trim().toUpperCase()).filter(Boolean)));
+  });
+  return normalized;
+}
+
+function applyAuthoritativeRoleDocs(raw){
+  const next = normalizeClientRoleDocsMap(raw, ROLE_DOCS);
+  Object.keys(ROLE_DOCS).forEach(role => { delete ROLE_DOCS[role]; });
+  Object.keys(next).forEach(role => {
+    ROLE_DOCS[role] = next[role] === 'ALL' ? 'ALL' : [...next[role]];
+  });
+}
+
+function exportAuthoritativeRoleDocs(){
+  return normalizeClientRoleDocsMap(ROLE_DOCS);
+}
+
 async function loadRolePermsFromServer(){
   try{
     const res = await apiCall('role_perms_get', null, 'GET');
@@ -577,6 +945,9 @@ async function loadRolePermsFromServer(){
           ROLES[r].canCreateDocs = !!res.perms[r].canCreateDocs;
         }
       });
+      if(res.role_docs && typeof res.role_docs === 'object'){
+        applyAuthoritativeRoleDocs(res.role_docs);
+      }
     }
   }catch(e){ /* ignore */ }
 }
@@ -586,7 +957,30 @@ async function saveRolePermsToServer(){
   Object.keys(ROLES).forEach(r=>{
     perms[r]={ canCreateDocs: !!ROLES[r].canCreateDocs };
   });
-  return await apiCall('admin_role_perms_save',{perms});
+  const res = await apiCall('admin_role_perms_save',{
+    perms,
+    role_docs: exportAuthoritativeRoleDocs()
+  });
+  if(res && res.ok){
+    if(res.perms && typeof res.perms === 'object'){
+      Object.keys(res.perms).forEach(r=>{
+        if(!ROLES[r]) return;
+        if(res.perms[r] && typeof res.perms[r].canCreateDocs!=='undefined'){
+          ROLES[r].canCreateDocs = !!res.perms[r].canCreateDocs;
+        }
+      });
+    }
+    if(res.role_docs && typeof res.role_docs === 'object'){
+      applyAuthoritativeRoleDocs(res.role_docs);
+    }
+  }
+  return res;
+}
+
+async function resetAuthoritativeRoleDocsEditor(){
+  await loadRolePermsFromServer();
+  adminUnsaved = false;
+  renderAdminPerms();
 }
 
 async function loadCustomDocsFromServer(){
@@ -691,6 +1085,489 @@ async function apiCallFormData(action, formData, timeoutMs=120000){
   }finally{
     if(timer) clearTimeout(timer);
   }
+}
+
+const ADMIN_AUTH_STATE = {
+  org: {loaded:false, loading:false, error:'', orgUnits:[], positions:[], employees:[], lastLoadedAt:0},
+  roles: {loaded:false, loading:false, error:'', items:[], byCode:{}, lastLoadedAt:0},
+  audit: {loaded:false, loading:false, error:'', events:[], lastLoadedAt:0}
+};
+
+function apiRequest(path, options={}){
+  const method = (options.method || 'GET').toUpperCase();
+  const payload = Object.prototype.hasOwnProperty.call(options, 'payload') ? options.payload : null;
+  const timeoutMs = Number.isFinite(Number(options.timeoutMs)) ? Number(options.timeoutMs) : 45000;
+  const headers = Object.assign({}, options.headers || {});
+  const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const opts = {method, credentials:'include', headers};
+  if(controller) opts.signal = controller.signal;
+  let url = path;
+  if(!/^https?:\/\//i.test(url) && !url.startsWith('/')){
+    url = url.replace(/^\.?\//, '');
+  }
+  if(payload && method === 'GET'){
+    const params = new URLSearchParams();
+    Object.keys(payload).forEach(key => {
+      const value = payload[key];
+      if(value === undefined || value === null || value === '') return;
+      params.append(key, (typeof value === 'object') ? JSON.stringify(value) : String(value));
+    });
+    const query = params.toString();
+    if(query){
+      url += (url.includes('?') ? '&' : '?') + query;
+    }
+  }else if(payload && method !== 'GET'){
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(payload);
+  }
+  if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
+
+  let timer = null;
+  return (async ()=>{
+    try{
+      if(controller && timeoutMs > 0){
+        timer = setTimeout(()=>{ try{ controller.abort(); }catch(e){} }, timeoutMs);
+      }
+      const res = await fetch(url, opts);
+      let data = null;
+      try{ data = await res.json(); }catch(e){}
+      if(!data) throw new Error('Invalid server response');
+      return data;
+    }finally{
+      if(timer) clearTimeout(timer);
+    }
+  })();
+}
+
+function runtimeApiPath(domain, table, recordId=''){
+  const base = `api/runtime/${encodeURIComponent(domain)}/${encodeURIComponent(table)}`;
+  return recordId ? `${base}/${encodeURIComponent(recordId)}` : base;
+}
+
+function runtimeErrorMessage(res, fallbackKey){
+  if(res && typeof res.error === 'string' && res.error.trim()) return res.error.trim();
+  return fallbackKey || 'runtime_request_failed';
+}
+
+async function runtimeList(domain, table, query, options={}){
+  const timeoutMs = Number.isFinite(Number(options.timeoutMs)) ? Number(options.timeoutMs) : 12000;
+  return await apiRequest(runtimeApiPath(domain, table), {method:'GET', payload:query||null, timeoutMs});
+}
+
+async function runtimeCreate(domain, table, data){
+  return await apiRequest(runtimeApiPath(domain, table), {
+    method:'POST',
+    payload:Object.assign({}, data || {}, {request_id:`${table}_create_${Date.now()}`})
+  });
+}
+
+async function runtimeUpdate(domain, table, recordId, data, rowVersion=null){
+  const payload = Object.assign({}, data || {});
+  if(rowVersion !== null && rowVersion !== undefined && rowVersion !== ''){
+    payload.expected_row_version = rowVersion;
+  }
+  return await apiRequest(runtimeApiPath(domain, table, recordId), {method:'PUT', payload});
+}
+
+function safeJsonObject(value){
+  return (value && typeof value === 'object' && !Array.isArray(value)) ? value : {};
+}
+
+function defaultDepartmentColor(code){
+  const fallback = (DEFAULT_DEPARTMENTS || []).find(d => String(d.code||'') === String(code||''));
+  if(fallback && fallback.color) return fallback.color;
+  const palette = ['#2563eb','#16a34a','#dc2626','#7c3aed','#0f766e','#d97706','#0891b2','#a21caf','#65a30d','#475569'];
+  const seed = String(code||'GEN').split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  return palette[seed % palette.length];
+}
+
+function orgUnitTypeWeight(type){
+  const order = {company:0, division:1, department:2, section:3, team:4};
+  return Object.prototype.hasOwnProperty.call(order, type) ? order[type] : 99;
+}
+
+function roleRecordUi(roleCode, roleRow){
+  const legacy = ROLES[roleCode] || {};
+  const permissions = safeJsonObject(roleRow && roleRow.permissions);
+  const labelVi = String((roleRow && (roleRow.role_label_vi || roleRow.role_label)) || legacy.label || roleCode || '');
+  const labelEn = String((roleRow && roleRow.role_label) || legacy.labelEn || labelVi || roleCode || '');
+  return {
+    level: Number.isFinite(Number(permissions.level)) ? Number(permissions.level) : Number(legacy.level || 5),
+    approve: (typeof permissions.approve === 'boolean') ? permissions.approve : !!legacy.approve,
+    admin: !!legacy.admin,
+    canEditDocs: (typeof permissions.canEditDocs === 'boolean') ? permissions.canEditDocs : !!legacy.canEditDocs,
+    canCreateDocs: (typeof permissions.canCreateDocs === 'boolean') ? permissions.canCreateDocs : !!legacy.canCreateDocs,
+    canViewActivity: (typeof permissions.canViewActivity === 'boolean') ? permissions.canViewActivity : !!legacy.canViewActivity,
+    canExportUsers: (typeof permissions.canExportUsers === 'boolean') ? permissions.canExportUsers : !!legacy.canExportUsers,
+    label: labelVi,
+    labelEn: labelEn,
+    color: String(permissions.color || legacy.color || defaultDepartmentColor((roleRow && roleRow.dept_code) || legacy.dept || roleCode)),
+    icon: String(permissions.icon || legacy.icon || '👤'),
+    dept: String((roleRow && roleRow.dept_code) || legacy.dept || '')
+  };
+}
+
+function hydrateAuthoritativeRoleProjection(){
+  const byCode = {};
+  (ADMIN_AUTH_STATE.roles.items || []).forEach(row => {
+    const roleCode = String((row && row.role_code) || '').trim();
+    if(!roleCode) return;
+    const ui = roleRecordUi(roleCode, row);
+    const target = ROLES[roleCode] || {};
+    Object.assign(target, ui, {
+      roleId: String(row.role_id || target.roleId || ''),
+      description: String(row.description || target.description || ''),
+      isActive: row.is_active !== false
+    });
+    ROLES[roleCode] = target;
+    byCode[roleCode] = row;
+  });
+  ADMIN_AUTH_STATE.roles.byCode = byCode;
+}
+
+function hydrateAuthoritativeOrgProjection(){
+  const activeUnits = (ADMIN_AUTH_STATE.org.orgUnits || []).filter(unit => String(unit.status || 'active') !== 'inactive');
+  const activePositions = (ADMIN_AUTH_STATE.org.positions || []).filter(position => String(position.status || 'active') !== 'inactive');
+  const departments = activeUnits
+    .slice()
+    .sort((a,b)=>{
+      const typeCmp = orgUnitTypeWeight(String(a.org_unit_type||'')) - orgUnitTypeWeight(String(b.org_unit_type||''));
+      if(typeCmp !== 0) return typeCmp;
+      return String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||''));
+    })
+    .map(unit=>{
+      const metadata = safeJsonObject(unit.metadata);
+      return {
+        code: String(unit.org_unit_code || ''),
+        label: String(unit.org_unit_name || unit.org_unit_code || ''),
+        labelEn: String(metadata.label_en || unit.org_unit_name || unit.org_unit_code || ''),
+        color: String(metadata.color || defaultDepartmentColor(unit.org_unit_code)),
+        orgUnitId: String(unit.hcm_org_unit_id || ''),
+        orgUnitType: String(unit.org_unit_type || 'department'),
+        parentOrgUnitId: String(unit.parent_org_unit_id || ''),
+        managerEmployeeId: String(unit.manager_employee_id || ''),
+        costCenter: String(unit.cost_center || ''),
+        status: String(unit.status || 'active')
+      };
+    })
+    .filter(item => item.code);
+  DEPARTMENTS = departments;
+  const titlesByDept = {};
+  const deptCodeById = {};
+  departments.forEach(dept=>{
+    titlesByDept[dept.code] = [];
+    deptCodeById[dept.orgUnitId] = dept.code;
+  });
+  activePositions.forEach(position=>{
+    const deptCode = deptCodeById[String(position.hcm_org_unit_id || '')];
+    if(!deptCode) return;
+    const title = String(position.position_title || '').trim();
+    if(!title) return;
+    if(!titlesByDept[deptCode].includes(title)){
+      titlesByDept[deptCode].push(title);
+    }
+  });
+  Object.keys(titlesByDept).forEach(code=>{
+    titlesByDept[code].sort((a,b)=>a.localeCompare(b));
+  });
+  DEPT_TITLES = titlesByDept;
+  syncTitlesFromDept();
+  syncUsersWithAuthoritativeOrg();
+}
+
+function resolveAuthoritativeUserAssignment(selection={}){
+  const requestedDeptCode = String(selection.dept || '').trim().toUpperCase();
+  const requestedTitle = String(selection.title || '').trim();
+  const requestedOrgUnitId = String(selection.hcm_org_unit_id || '').trim();
+  const requestedPositionId = String(selection.hcm_position_id || '').trim();
+  const orgUnits = (ADMIN_AUTH_STATE.org.orgUnits || []).slice();
+  const positions = (ADMIN_AUTH_STATE.org.positions || []).slice();
+  const orgUnitById = {};
+  const orgUnitByCode = {};
+  const positionById = {};
+  orgUnits.forEach(unit=>{
+    const id = String(unit.hcm_org_unit_id || '');
+    const code = String(unit.org_unit_code || '').trim().toUpperCase();
+    if(id) orgUnitById[id] = unit;
+    if(code && !orgUnitByCode[code]) orgUnitByCode[code] = unit;
+  });
+  positions.forEach(position=>{
+    const id = String(position.hcm_position_id || '');
+    if(id) positionById[id] = position;
+  });
+
+  let orgUnit = requestedOrgUnitId ? (orgUnitById[requestedOrgUnitId] || null) : null;
+  if(!orgUnit && requestedDeptCode) orgUnit = orgUnitByCode[requestedDeptCode] || null;
+
+  let position = requestedPositionId ? (positionById[requestedPositionId] || null) : null;
+  if(!position && requestedTitle){
+    const normalizedTitle = requestedTitle.toLowerCase();
+    position = positions.find(item=>{
+      if(String(item.position_title || '').trim().toLowerCase() !== normalizedTitle) return false;
+      if(!orgUnit) return true;
+      return String(item.hcm_org_unit_id || '') === String(orgUnit.hcm_org_unit_id || '');
+    }) || null;
+    if(!position && orgUnit){
+      position = positions.find(item=>String(item.position_title || '').trim().toLowerCase() === normalizedTitle) || null;
+    }
+  }
+
+  if(position && !orgUnit){
+    orgUnit = orgUnitById[String(position.hcm_org_unit_id || '')] || null;
+  }
+  if(position){
+    const positionOrgUnit = orgUnitById[String(position.hcm_org_unit_id || '')] || null;
+    if(positionOrgUnit) orgUnit = positionOrgUnit;
+  }
+
+  return {
+    orgUnit,
+    position,
+    orgUnitId: String((orgUnit && orgUnit.hcm_org_unit_id) || ''),
+    positionId: String((position && position.hcm_position_id) || ''),
+    deptCode: String((orgUnit && orgUnit.org_unit_code) || requestedDeptCode || ''),
+    positionTitle: String((position && position.position_title) || requestedTitle || '')
+  };
+}
+
+function syncUsersWithAuthoritativeOrg(){
+  if(!Array.isArray(USERS) || !USERS.length) return;
+  const employeesByEmployeeId = {};
+  (ADMIN_AUTH_STATE.org.employees || []).forEach(employee=>{
+    const employeeId = String(employee.employee_id || '');
+    if(employeeId) employeesByEmployeeId[employeeId] = employee;
+  });
+  USERS = USERS.map(user=>{
+    const employee = employeesByEmployeeId[String(user.employee_id || '')] || null;
+    const resolved = resolveAuthoritativeUserAssignment({
+      dept: user.dept,
+      title: user.title,
+      hcm_org_unit_id: String(user.hcm_org_unit_id || (employee && employee.hcm_org_unit_id) || ''),
+      hcm_position_id: String(user.hcm_position_id || (employee && employee.hcm_position_id) || '')
+    });
+    if(!resolved.orgUnitId && !resolved.positionId) return user;
+    const next = Object.assign({}, user, {
+      hcm_org_unit_id: resolved.orgUnitId,
+      hcm_position_id: resolved.positionId
+    });
+    if(resolved.deptCode) next.dept = resolved.deptCode;
+    if(resolved.positionTitle) next.title = resolved.positionTitle;
+    return next;
+  });
+}
+
+function rolesForAdminGrid(){
+  const seen = new Set();
+  const list = [];
+  (ADMIN_AUTH_STATE.roles.items || []).forEach(row=>{
+    const code = String((row && row.role_code) || '').trim();
+    if(!code || seen.has(code)) return;
+    seen.add(code);
+    list.push(row);
+  });
+  return list.sort((a,b)=>{
+    const aUi = roleRecordUi(a.role_code, a);
+    const bUi = roleRecordUi(b.role_code, b);
+    if(aUi.level !== bUi.level) return aUi.level - bUi.level;
+    return String(a.role_code||'').localeCompare(String(b.role_code||''));
+  });
+}
+
+async function loadAuthoritativeOrgCatalog(options={}){
+  if(ADMIN_AUTH_STATE.org.loading) return;
+  const force = !!options.force;
+  if((ADMIN_AUTH_STATE.org.loaded || ADMIN_AUTH_STATE.org.error) && !force) return;
+  ADMIN_AUTH_STATE.org.loading = true;
+  ADMIN_AUTH_STATE.org.error = '';
+  try{
+    const [orgUnitsRes, positionsRes, employeesRes] = await Promise.all([
+      runtimeList('hcm_workforce', 'hcm_org_units', {limit:500, direction:'asc', sort:'org_unit_code'}, {timeoutMs:9000}),
+      runtimeList('hcm_workforce', 'hcm_positions', {limit:500, direction:'asc', sort:'position_code'}, {timeoutMs:9000}),
+      runtimeList('hcm_workforce', 'hcm_employees', {limit:500, direction:'asc', sort:'employee_id'}, {timeoutMs:9000})
+    ]);
+    if(!(orgUnitsRes && orgUnitsRes.ok && Array.isArray(orgUnitsRes.records))) throw new Error(runtimeErrorMessage(orgUnitsRes, 'org_units_load_failed'));
+    if(!(positionsRes && positionsRes.ok && Array.isArray(positionsRes.records))) throw new Error(runtimeErrorMessage(positionsRes, 'positions_load_failed'));
+    if(!(employeesRes && employeesRes.ok && Array.isArray(employeesRes.records))) throw new Error(runtimeErrorMessage(employeesRes, 'employees_load_failed'));
+    ADMIN_AUTH_STATE.org.orgUnits = orgUnitsRes.records;
+    ADMIN_AUTH_STATE.org.positions = positionsRes.records;
+    ADMIN_AUTH_STATE.org.employees = employeesRes.records;
+    ADMIN_AUTH_STATE.org.loaded = true;
+    ADMIN_AUTH_STATE.org.lastLoadedAt = Date.now();
+    hydrateAuthoritativeOrgProjection();
+  }catch(e){
+    ADMIN_AUTH_STATE.org.error = (e && e.message) ? e.message : 'org_catalog_load_failed';
+  }finally{
+    ADMIN_AUTH_STATE.org.loading = false;
+    if(currentPage === 'admin' && ['users','dept_title','orgchart'].includes(adminTab)) renderAdmin();
+  }
+}
+
+async function loadAuthoritativeRoleCatalog(options={}){
+  if(ADMIN_AUTH_STATE.roles.loading) return;
+  const force = !!options.force;
+  if((ADMIN_AUTH_STATE.roles.loaded || ADMIN_AUTH_STATE.roles.error) && !force) return;
+  ADMIN_AUTH_STATE.roles.loading = true;
+  ADMIN_AUTH_STATE.roles.error = '';
+  try{
+    const res = await runtimeList('core_system', 'roles', {limit:500, direction:'asc', sort:'role_code'}, {timeoutMs:9000});
+    if(!(res && res.ok && Array.isArray(res.records))) throw new Error(runtimeErrorMessage(res, 'roles_load_failed'));
+    ADMIN_AUTH_STATE.roles.items = res.records;
+    ADMIN_AUTH_STATE.roles.loaded = true;
+    ADMIN_AUTH_STATE.roles.lastLoadedAt = Date.now();
+    hydrateAuthoritativeRoleProjection();
+  }catch(e){
+    ADMIN_AUTH_STATE.roles.error = (e && e.message) ? e.message : 'roles_load_failed';
+  }finally{
+    ADMIN_AUTH_STATE.roles.loading = false;
+    if(currentPage === 'admin' && ['roles','users','activity'].includes(adminTab)) renderAdmin();
+  }
+}
+
+async function loadAuthoritativeAuditTrail(options={}){
+  if(ADMIN_AUTH_STATE.audit.loading) return;
+  const force = !!options.force;
+  if((ADMIN_AUTH_STATE.audit.loaded || ADMIN_AUTH_STATE.audit.error) && !force) return;
+  ADMIN_AUTH_STATE.audit.loading = true;
+  ADMIN_AUTH_STATE.audit.error = '';
+  try{
+    const res = await apiCall('admin_audit_trail_list', {limit:200}, 'GET', 9000);
+    if(!(res && res.ok && Array.isArray(res.events))) throw new Error(runtimeErrorMessage(res, 'audit_trail_load_failed'));
+    ADMIN_AUTH_STATE.audit.events = res.events;
+    ADMIN_AUTH_STATE.audit.loaded = true;
+    ADMIN_AUTH_STATE.audit.lastLoadedAt = Date.now();
+  }catch(e){
+    ADMIN_AUTH_STATE.audit.error = (e && e.message) ? e.message : 'audit_trail_load_failed';
+  }finally{
+    ADMIN_AUTH_STATE.audit.loading = false;
+    if(currentPage === 'admin' && adminTab === 'activity') renderAdminActivity();
+  }
+}
+
+function authoritativeLoadSummaryHtml(kind){
+  const state = ADMIN_AUTH_STATE[kind];
+  if(!state) return '';
+  if(state.error){
+    return '<div class="hm-empty">⚠ ' + escapeHtml(state.error) + '</div>';
+  }
+  if(state.loading || !state.loaded) return '<div class="hm-empty">'+(lang==='en'?'Loading authoritative data...':'Đang tải dữ liệu authoritative...')+'</div>';
+  return '';
+}
+
+function legacyRolesForAdminGrid(){
+  return Object.keys(ROLES || {}).map(code => {
+    const ui = ROLES[code] || {};
+    return {
+      role_code: code,
+      role_id: '',
+      role_label: ui.labelEn || ui.label || code,
+      role_label_vi: ui.label || ui.labelEn || code,
+      dept_code: ui.dept || '',
+      description: ui.description || '',
+      is_active: true,
+      permissions: {
+        level: Number(ui.level || 5),
+        approve: !!ui.approve,
+        canEditDocs: !!ui.canEditDocs,
+        canCreateDocs: !!ui.canCreateDocs,
+        canViewActivity: !!ui.canViewActivity,
+        canExportUsers: !!ui.canExportUsers,
+        icon: ui.icon || '👤',
+        color: ui.color || defaultDepartmentColor(ui.dept || code)
+      }
+    };
+  }).sort((a,b)=>{
+    const aUi = roleRecordUi(a.role_code, a);
+    const bUi = roleRecordUi(b.role_code, b);
+    if(aUi.level !== bUi.level) return aUi.level - bUi.level;
+    return String(a.role_code || '').localeCompare(String(b.role_code || ''));
+  });
+}
+
+function legacyOrgCatalogSnapshot(){
+  const units = (DEPARTMENTS || []).map(dept => ({
+    hcm_org_unit_id: String(dept.orgUnitId || dept.code || ''),
+    org_unit_code: String(dept.code || ''),
+    org_unit_name: String(dept.label || dept.labelEn || dept.code || ''),
+    org_unit_type: String(dept.orgUnitType || 'department'),
+    parent_org_unit_id: String(dept.parentOrgUnitId || ''),
+    manager_employee_id: String(dept.managerEmployeeId || ''),
+    cost_center: String(dept.costCenter || ''),
+    status: String(dept.status || 'active'),
+    metadata: {label_en: String(dept.labelEn || dept.label || ''), color: String(dept.color || defaultDepartmentColor(dept.code))}
+  })).filter(unit => unit.org_unit_code);
+  const positions = [];
+  units.forEach(unit => {
+    const deptCode = String(unit.org_unit_code || '');
+    const titles = Array.isArray(DEPT_TITLES && DEPT_TITLES[deptCode]) ? DEPT_TITLES[deptCode] : [];
+    titles.forEach((title, idx) => {
+      const safeTitle = String(title || '').trim();
+      if(!safeTitle) return;
+      positions.push({
+        hcm_position_id: `${deptCode}::${idx}::${safeTitle}`.replace(/\s+/g, '_'),
+        position_code: `${deptCode}-${String(idx + 1).padStart(2, '0')}`,
+        position_title: safeTitle,
+        hcm_org_unit_id: unit.hcm_org_unit_id,
+        reports_to_position_id: '',
+        required_headcount: 1,
+        employment_type: 'full_time',
+        status: 'active'
+      });
+    });
+  });
+  return {orgUnits: units, positions, employees: []};
+}
+
+function legacyAuditEventsForAdmin(){
+  return (ACTIVITY_LOG || []).map(session => ({
+    recorded_at: String(session.last_activity || session.login_time || ''),
+    actor_name: String(session.name || session.user || 'user'),
+    event_type: 'portal_session',
+    aggregate_type: 'browser_session',
+    aggregate_id: String(session.login_time || session.user || ''),
+    ip_address: String(session.ip || '—'),
+    payload: session
+  })).sort((a,b)=>String(b.recorded_at || '').localeCompare(String(a.recorded_at || '')));
+}
+
+async function upsertAuthoritativeRole(roleCode, patch={}){
+  const row = ADMIN_AUTH_STATE.roles.byCode[roleCode];
+  if(!row || !row.role_id){
+    showToast('⚠ ' + (lang==='en' ? 'Role not found in authoritative catalog' : 'Không tìm thấy vai trò trong catalog authoritative'), 'error');
+    return null;
+  }
+  const ui = roleRecordUi(roleCode, row);
+  const permissions = Object.assign({}, safeJsonObject(row.permissions), {
+    level: Number.isFinite(Number(patch.level)) ? Number(patch.level) : ui.level,
+    approve: typeof patch.approve === 'boolean' ? patch.approve : ui.approve,
+    canEditDocs: typeof patch.canEditDocs === 'boolean' ? patch.canEditDocs : ui.canEditDocs,
+    canCreateDocs: typeof patch.canCreateDocs === 'boolean' ? patch.canCreateDocs : ui.canCreateDocs,
+    canViewActivity: typeof patch.canViewActivity === 'boolean' ? patch.canViewActivity : ui.canViewActivity,
+    canExportUsers: typeof patch.canExportUsers === 'boolean' ? patch.canExportUsers : ui.canExportUsers,
+    icon: String(patch.icon || ui.icon || '👤'),
+    color: String(patch.color || ui.color || defaultDepartmentColor(patch.dept_code || row.dept_code || roleCode))
+  });
+  const payload = {
+    role_label: String(patch.role_label || row.role_label || ui.labelEn || roleCode),
+    role_label_vi: String(patch.role_label_vi || row.role_label_vi || ui.label || row.role_label || roleCode),
+    dept_code: String((Object.prototype.hasOwnProperty.call(patch, 'dept_code') ? patch.dept_code : row.dept_code) || ''),
+    description: String((Object.prototype.hasOwnProperty.call(patch, 'description') ? patch.description : row.description) || ''),
+    is_active: Object.prototype.hasOwnProperty.call(patch, 'is_active') ? !!patch.is_active : (row.is_active !== false),
+    permissions
+  };
+  const res = await runtimeUpdate('core_system', 'roles', row.role_id, payload, row.row_version || null);
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en' ? 'Role save failed' : 'Lưu vai trò thất bại'), 'error');
+    return null;
+  }
+  if(Object.prototype.hasOwnProperty.call(patch, 'canCreateDocs')){
+    if(ROLES[roleCode]) ROLES[roleCode].canCreateDocs = !!payload.permissions.canCreateDocs;
+    const rolePermRes = await saveRolePermsToServer();
+    if(!(rolePermRes && rolePermRes.ok)){
+      showToast('⚠ ' + runtimeErrorMessage(rolePermRes, lang==='en' ? 'Role permission sync failed' : 'Đồng bộ quyền tạo tài liệu thất bại'), 'error');
+    }
+  }
+  await loadAuthoritativeRoleCatalog({force:true});
+  return res.record;
 }
 
 function showLoginError(msg){
@@ -987,10 +1864,10 @@ function canAccessDoc(docCode){
   const doc=DOCS.find(d=>d.code===docCode);
   if(doc && (doc.path||'').includes('Job-Descriptions')) return canAccessJD(doc);
   // Check user-specific overrides first
-  const uid = currentUser.id;
-  if(PERM_OVERRIDES[uid]){
-    if(PERM_OVERRIDES[uid].grant && PERM_OVERRIDES[uid].grant.includes(docCode)) return true;
-    if(PERM_OVERRIDES[uid].deny && PERM_OVERRIDES[uid].deny.includes(docCode)) return false;
+  const userKey = userPermOverrideKey(currentUser);
+  if(userKey && PERM_OVERRIDES[userKey]){
+    if(PERM_OVERRIDES[userKey].grant && PERM_OVERRIDES[userKey].grant.includes(docCode)) return true;
+    if(PERM_OVERRIDES[userKey].deny && PERM_OVERRIDES[userKey].deny.includes(docCode)) return false;
   }
   const perms = ROLE_DOCS[currentUser.role];
   if(!perms) return false;
@@ -1229,8 +2106,10 @@ async function showApp(){
 
   await loadFolderDescriptions();
   await loadRolePermsFromServer();
+  await loadModuleAccessConfigFromServer({silent:true});
   await loadCustomDocsFromServer();
   await loadDocVisibilityFromServer();
+  await loadUserDocOverridesFromServer({silent:true});
   await refreshAllDocStatesFromServer();
 
   renderSidebar();
@@ -1240,6 +2119,19 @@ async function showApp(){
   try{ if(typeof startLiveDocsSync==='function') startLiveDocsSync(); }catch(e){}
 }
 
+function portalNavButtonHtml(page, icon, label, options={}){
+  const active = !!options.active;
+  const badge = options.badge ? `<span class="badge">${options.badge}</span>` : '';
+  const extraAttrs = options.extraAttrs ? ` ${options.extraAttrs}` : '';
+  return `<button class="nav-item ${active?'active':''}" onclick="navigateTo('${page}')"${extraAttrs}><span class="icon">${icon}</span><span>${label}</span>${badge}</button>`;
+}
+
+function portalNavSectionHtml(title, buttons){
+  return Array.isArray(buttons) && buttons.length
+    ? `<div class="nav-section"><div class="nav-section-title">${title}</div>${buttons.join('')}</div>`
+    : '';
+}
+
 function renderSidebar(){
   const nav = document.getElementById('sidebar-nav');
   const VDOCS = getVisibleDocs();
@@ -1247,70 +2139,70 @@ function renderSidebar(){
   const SIDEBAR_SECTIONS = portalSidebarSections();
   const coreButtons = [];
 
-  if(isPortalSidebarCoreVisible('dashboard')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="navigateTo('dashboard')"><span class="icon">🏠</span><span>${T('dashboard')}</span></button>`);
+  if(isPortalSidebarCoreVisible('dashboard') && canUserAccessModule('dashboard')){
+    coreButtons.push(portalNavButtonHtml('dashboard', '🏠', T('dashboard'), {active: currentPage==='dashboard'}));
   }
-  if(isPortalSidebarCoreVisible('documents')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='documents'?'active':''}" onclick="navigateTo('documents')"><span class="icon">📁</span><span>${T('all_docs')}</span><span class="badge">${VDOCS.length}</span></button>`);
+  if(isPortalSidebarCoreVisible('documents') && canUserAccessModule('documents')){
+    coreButtons.push(portalNavButtonHtml('documents', '📁', T('all_docs'), {active: currentPage==='documents', badge: VDOCS.length}));
   }
-  if(isPortalSidebarCoreVisible('search')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">🔍</span><span>${T('search')}</span></button>`);
+  if(isPortalSidebarCoreVisible('search') && canUserAccessModule('search')){
+    coreButtons.push(portalNavButtonHtml('search', '🔍', T('search'), {active: currentPage==='search'}));
   }
-  if(isPortalSidebarCoreVisible('dictionary')){
-    coreButtons.push(`<button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">📖</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>`);
+  if(isPortalSidebarCoreVisible('dictionary') && canUserAccessModule('dictionary')){
+    coreButtons.push(portalNavButtonHtml('dictionary', '📖', T('dictionary'), {active: currentPage==='dictionary', badge: dictData ? dictData.length.toLocaleString() : '...'}));
   }
 
   let html = coreButtons.length ? `<div class="nav-section">${coreButtons.join('')}</div>` : '';
 
   if(isPortalSidebarCoreVisible('deploy')){
-    // ── SẢN XUẤT ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'PRODUCTION':'SẢN XUẤT'}</div>
-      <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Orders':'Đơn hàng'}</span></button>
-      <button class="nav-item ${currentPage==='dispatch'?'active':''}" onclick="navigateTo('dispatch')"><span class="icon">📋</span><span>${lang==='en'?'Production Dispatch':'Phân công sản xuất'}</span></button>
-      <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">🏭</span><span>${lang==='en'?'Shop Floor':'Xưởng sản xuất'}</span></button>
-      <button class="nav-item ${currentPage==='mobile-shopfloor'?'active':''}" onclick="navigateTo('mobile-shopfloor')"><span class="icon">📱</span><span>${lang==='en'?'Operator Mobile':'Công nhân di động'}</span></button>
-      <button class="nav-item ${currentPage==='quoting'?'active':''}" onclick="navigateTo('quoting')"><span class="icon">💰</span><span>${lang==='en'?'Quoting':'Báo giá'}</span></button>
-    </div>`;
+    const productionButtons = [];
+    if(canUserAccessModule('orders')) productionButtons.push(portalNavButtonHtml('orders', '📦', lang==='en'?'Orders':'Đơn hàng', {active: currentPage==='orders'}));
+    if(canUserAccessModule('dispatch')) productionButtons.push(portalNavButtonHtml('dispatch', '📋', lang==='en'?'Production Dispatch':'Phân công sản xuất', {active: currentPage==='dispatch'}));
+    if(canUserAccessModule('mes')) productionButtons.push(portalNavButtonHtml('mes', '🏭', lang==='en'?'Shop Floor':'Xưởng sản xuất', {active: currentPage==='mes'}));
+    if(canUserAccessModule('mobile-shopfloor')) productionButtons.push(portalNavButtonHtml('mobile-shopfloor', '📱', lang==='en'?'Operator Mobile':'Công nhân di động', {active: currentPage==='mobile-shopfloor'}));
+    if(canUserAccessModule('quoting')) productionButtons.push(portalNavButtonHtml('quoting', '💰', lang==='en'?'Quoting':'Báo giá', {active: currentPage==='quoting'}));
+    html += portalNavSectionHtml(lang==='en'?'PRODUCTION':'SẢN XUẤT', productionButtons);
+
+    const supplyButtons = [];
     if(canAccessPurchasingWorkspace()){
-      html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'SUPPLY CHAIN':'CHUỖI CUNG ỨNG'}</div>
-        <button class="nav-item ${currentPage==='purchasing'?'active':''}" onclick="navigateTo('purchasing')"><span class="icon">🧾</span><span>${lang==='en'?'Purchasing & IQC':'Mua hàng & IQC'}</span></button>
-      </div>`;
+      supplyButtons.push(portalNavButtonHtml('purchasing', '🧾', lang==='en'?'Purchasing & IQC':'Mua hàng & IQC', {active: currentPage==='purchasing'}));
     }
-    // ── CHẤT LƯỢNG ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'QUALITY':'CHẤT LƯỢNG'}</div>
-      <button class="nav-item ${['quality-exceptions','exceptions'].indexOf(currentPage)>=0?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Nonconformance':'Sự không phù hợp'}</span></button>
-      <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏪</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
-      <button class="nav-item ${currentPage==='fmea'?'active':''}" onclick="navigateTo('fmea')"><span class="icon">⚡</span><span>${lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan'}</span></button>
-      <button class="nav-item ${currentPage==='apqp-ppap'?'active':''}" onclick="navigateTo('apqp-ppap')"><span class="icon">🎯</span><span>${lang==='en'?'APQP / PPAP':'APQP / PPAP'}</span></button>
-      <button class="nav-item ${currentPage==='ai-scheduling'?'active':''}" onclick="navigateTo('ai-scheduling')"><span class="icon">🤖</span><span>${lang==='en'?'AI Quality':'AI Chất lượng'}</span></button>
-    </div>`;
-    // ── HỒ SƠ & BÁO CÁO ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'RECORDS & REPORTS':'HỒ SƠ & BÁO CÁO'}</div>
-      <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
-      <button class="nav-item ${currentPage==='evidence'?'active':''}" onclick="navigateTo('evidence')"><span class="icon">🔒</span><span>${lang==='en'?'Evidence Vault':'Kho chứng cứ'}</span></button>
-      <button class="nav-item ${currentPage==='compliance-reports'?'active':''}" onclick="navigateTo('compliance-reports')"><span class="icon">📊</span><span>${lang==='en'?'Reports':'Báo cáo'}</span></button>
-      <button class="nav-item ${currentPage==='continuous-improvement'?'active':''}" onclick="navigateTo('continuous-improvement')"><span class="icon">🔄</span><span>${lang==='en'?'Improvement':'Cải tiến liên tục'}</span></button>
-      <button class="nav-item ${currentPage==='knowledge-base'?'active':''}" onclick="navigateTo('knowledge-base')"><span class="icon">💡</span><span>${lang==='en'?'Knowledge Base':'Kho kiến thức'}</span></button>
-    </div>`;
-    // ── CÔNG CỤ ──
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TOOLS':'CÔNG CỤ'}</div>
-      <button class="nav-item ${currentPage==='cnc-programs'?'active':''}" onclick="navigateTo('cnc-programs')"><span class="icon">⚙</span><span>${lang==='en'?'CNC Programs':'Chương trình CNC'}</span></button>
-      <button class="nav-item ${currentPage==='product-passport'?'active':''}" onclick="navigateTo('product-passport')"><span class="icon">🔗</span><span>${lang==='en'?'Product Passport':'Hộ chiếu sản phẩm'}</span></button>
-      <button class="nav-item ${currentPage==='schema-studio'?'active':''}" onclick="navigateTo('schema-studio')"><span class="icon">🗄</span><span>${lang==='en'?'Schema Studio':'Schema Studio'}</span></button>
-      <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy':'Năng lượng'}</span></button>
-      <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Deploy':'Triển khai'}</span></button>
-      <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
-    </div>`;
-    // Nút + Tạo Module mới (luôn hiện cho admin)
-    if(isAdmin()){
+    html += portalNavSectionHtml(lang==='en'?'SUPPLY CHAIN':'CHUỖI CUNG ỨNG', supplyButtons);
+
+    const qualityButtons = [];
+    if(canUserAccessModule('quality-exceptions')) qualityButtons.push(portalNavButtonHtml('quality-exceptions', '🔴', lang==='en'?'Nonconformance':'Sự không phù hợp', {active: ['quality-exceptions','exceptions'].indexOf(currentPage)>=0}));
+    if(canUserAccessModule('supplier-quality')) qualityButtons.push(portalNavButtonHtml('supplier-quality', '🏪', lang==='en'?'Supplier Quality':'Chất lượng NCC', {active: currentPage==='supplier-quality'}));
+    if(canUserAccessModule('fmea')) qualityButtons.push(portalNavButtonHtml('fmea', '⚡', lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan', {active: currentPage==='fmea'}));
+    if(canUserAccessModule('apqp-ppap')) qualityButtons.push(portalNavButtonHtml('apqp-ppap', '🎯', lang==='en'?'APQP / PPAP':'APQP / PPAP', {active: currentPage==='apqp-ppap'}));
+    if(canUserAccessModule('ai-scheduling')) qualityButtons.push(portalNavButtonHtml('ai-scheduling', '🤖', lang==='en'?'AI Quality':'AI Chất lượng', {active: currentPage==='ai-scheduling'}));
+    html += portalNavSectionHtml(lang==='en'?'QUALITY':'CHẤT LƯỢNG', qualityButtons);
+
+    const recordButtons = [];
+    if(canUserAccessModule('forms')) recordButtons.push(portalNavButtonHtml('forms', '📋', lang==='en'?'Evidence Control':'Kiểm soát chứng cứ', {active: currentPage==='forms'}));
+    /* 'evidence' nav removed — merged into forms module Evidence tab */
+    if(canUserAccessModule('compliance-reports')) recordButtons.push(portalNavButtonHtml('compliance-reports', '📊', lang==='en'?'Reports':'Báo cáo', {active: currentPage==='compliance-reports'}));
+    if(canUserAccessModule('continuous-improvement')) recordButtons.push(portalNavButtonHtml('continuous-improvement', '🔄', lang==='en'?'Improvement':'Cải tiến liên tục', {active: currentPage==='continuous-improvement'}));
+    if(canUserAccessModule('knowledge-base')) recordButtons.push(portalNavButtonHtml('knowledge-base', '💡', lang==='en'?'Knowledge Base':'Kho kiến thức', {active: currentPage==='knowledge-base'}));
+    html += portalNavSectionHtml(lang==='en'?'RECORDS & REPORTS':'HỒ SƠ & BÁO CÁO', recordButtons);
+
+    const toolButtons = [];
+    if(canUserAccessModule('cnc-programs')) toolButtons.push(portalNavButtonHtml('cnc-programs', '⚙', lang==='en'?'CNC Programs':'Chương trình CNC', {active: currentPage==='cnc-programs'}));
+    if(canUserAccessModule('product-passport')) toolButtons.push(portalNavButtonHtml('product-passport', '🔗', lang==='en'?'Product Passport':'Hộ chiếu sản phẩm', {active: currentPage==='product-passport'}));
+    if(canUserAccessModule('schema-studio')) toolButtons.push(portalNavButtonHtml('schema-studio', '🗄', lang==='en'?'Schema Studio':'Schema Studio', {active: currentPage==='schema-studio'}));
+    if(canUserAccessModule('energy-dashboard')) toolButtons.push(portalNavButtonHtml('energy-dashboard', '⚡', lang==='en'?'Energy':'Năng lượng', {active: currentPage==='energy-dashboard'}));
+    if(canUserAccessModule('deploy')) toolButtons.push(portalNavButtonHtml('deploy', '🚀', lang==='en'?'Deploy':'Triển khai', {active: currentPage==='deploy'}));
+    if(canUserAccessModule('customer-portal')) toolButtons.push(portalNavButtonHtml('customer-portal', '🌐', lang==='en'?'Customer Portal':'Cổng khách hàng', {active: currentPage==='customer-portal'}));
+    html += portalNavSectionHtml(lang==='en'?'TOOLS':'CÔNG CỤ', toolButtons);
+
+    if(canUserAccessModule('module-builder')){
       html += `<div class="nav-section" style="padding:0 8px"><button class="nav-item" onclick="navigateTo('module-builder')" style="border:1px dashed rgba(255,255,255,0.3);justify-content:center;opacity:0.7"><span class="icon">➕</span><span>${lang==='en'?'Create Module':'Tạo Module mới'}</span></button></div>`;
     }
   }
-  if(isAdmin() && isPortalSidebarCoreVisible('admin')){
+  if(isPortalSidebarCoreVisible('admin') && canUserAccessModule('admin')){
     html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
   }
 
-  if(isAdmin()){
+  if(canUserAccessModule('template-demo')){
     html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TEMPLATE LAB':'TEMPLATE LAB'}</div>
       <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')"><span class="icon">🧩</span><span>${lang==='en'?'Master Module Template':'Master Module Template'}</span></button>
     </div>`;
@@ -1482,17 +2374,29 @@ function renderModuleBuilderPage(){
 
 function navigateTo(page, filter, bypassGuard){
   if(page === 'vps-control'){
-    if(isAdmin()){
+    if(canUserAccessModule('admin') && canUserAccessAdminTab('infrastructure')){
       adminTab = 'infrastructure';
       page = 'admin';
       filter = undefined;
     }else{
-      page = 'dashboard';
+      page = firstAccessiblePortalModule();
       filter = undefined;
     }
   }
-  if(page === 'admin' && !isAdmin()){
-    page = 'dashboard';
+  if(page === 'admin'){
+    if(!canUserAccessModule('admin')){
+      page = firstAccessiblePortalModule();
+      filter = undefined;
+    }else if(!canUserAccessAdminTab(adminTab)){
+      adminTab = firstAccessibleAdminTab();
+    }
+  }
+  if(page !== 'admin' && !canUserAccessModule(page)){
+    const fallbackPage = firstAccessiblePortalModule();
+    if(!bypassGuard && page !== fallbackPage){
+      showToast(lang==='en' ? 'You do not have access to that module.' : 'Bạn không có quyền truy cập module đó.');
+    }
+    page = fallbackPage;
     filter = undefined;
   }
   if(!bypassGuard && typeof window._ecBeforePortalNavigate === 'function'){
@@ -1540,7 +2444,12 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='quality-exceptions' && typeof window._renderQualityExceptionHub==='function'){ var qep=document.getElementById('page-quality-exceptions'); if(qep) window._renderQualityExceptionHub(qep); }
   if(page==='supplier-quality' && typeof window._renderSupplierQuality==='function'){ var sqp=document.getElementById('page-supplier-quality'); if(sqp) window._renderSupplierQuality(sqp); }
   if(page==='quoting' && typeof window._renderQuotingEngine==='function'){ var qtp=document.getElementById('page-quoting'); if(qtp) window._renderQuotingEngine(qtp); }
-  if(page==='evidence' && typeof window._renderEvidenceVault==='function'){ var evp=document.getElementById('page-evidence'); if(evp) window._renderEvidenceVault(evp); }
+  if(page==='evidence'){
+    /* Legacy: redirect to Evidence Control (forms page, Chứng cứ tab) */
+    if(typeof window._fhState !== 'undefined') window._fhState.workspaceMode = 'evidence';
+    if(typeof renderOnlineForms === 'function') renderOnlineForms();
+    else navigateTo('forms');
+  }
   if(page==='customer-portal' && typeof window._renderCustomerPortalAdmin==='function'){ var cpp=document.getElementById('page-customer-portal'); if(cpp) window._renderCustomerPortalAdmin(cpp); }
   if(page==='cnc-programs' && typeof window._renderCncPrograms==='function'){ var cnp=document.getElementById('page-cnc-programs'); if(cnp) window._renderCncPrograms(cnp); }
   if(page==='product-passport' && typeof window._renderProductPassport==='function'){ var ppp=document.getElementById('page-product-passport'); if(ppp) window._renderProductPassport(ppp); }
@@ -1560,7 +2469,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
   if(page==='module-builder'){ renderModuleBuilderPage(); }
   if(page==='schema-studio' && typeof window._renderSchemaStudio==='function'){ var ssp=document.getElementById('page-schema-studio'); if(ssp) window._renderSchemaStudio(ssp); }
-  if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
+  if(page==='admin'){ if(!canUserAccessModule('admin')){navigateTo(firstAccessiblePortalModule());return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');
   renderSidebar();
@@ -4461,12 +5370,6 @@ async function adminReloadLatestPortal(){
 }
 
 async function adminSaveAll(){
-  // Local saves (client-side)
-  saveRoleDocsToStorage();
-  savePermOverrides();
-  saveUsersToStorage();
-  saveDepartments();
-  saveTitles();
   saveRetentionPolicy(getRetentionPolicy());
 
   // Server-backed settings
@@ -4479,6 +5382,11 @@ async function adminSaveAll(){
     const resDocs = await saveDocVisibilityToServer();
     if(!(resDocs && resDocs.ok)){
       showToast((resDocs && resDocs.error) ? ('⚠ '+resDocs.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
+      return;
+    }
+    const resOverrides = await saveUserDocOverridesToServer();
+    if(!(resOverrides && resOverrides.ok)){
+      showToast((resOverrides && resOverrides.error) ? ('⚠ '+resOverrides.error) : (lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
       return;
     }
   }catch(e){
@@ -5406,13 +6314,75 @@ function renderAdminInfrastructure(){
   el.innerHTML = '<div class="hm-empty">' + (lang==='en' ? 'Loading VPS infrastructure module...' : 'Đang tải module hạ tầng VPS...') + '</div>';
 }
 
+function adminTabLabel(meta){
+  if(!meta) return '';
+  if(meta.id === 'metadata_studio') return 'Data Schema';
+  return lang==='en' ? meta.labelEn : meta.labelVi;
+}
+
+function adminTabGroupCatalog(){
+  return [
+    {id:'identity', labelEn:'Identity & org', labelVi:'Nhân sự & tổ chức'},
+    {id:'governance', labelEn:'Governance', labelVi:'Quản trị điều hành'},
+    {id:'content', labelEn:'Content & experience', labelVi:'Nội dung & trải nghiệm'},
+    {id:'data', labelEn:'Data platform', labelVi:'Nền tảng dữ liệu'},
+    {id:'operations', labelEn:'Operations', labelVi:'Vận hành'},
+    {id:'security', labelEn:'Security', labelVi:'Bảo mật'}
+  ];
+}
+
+function adminTabBadgeValue(tabId){
+  if(tabId === 'users') return USERS.length;
+  if(tabId === 'activity') return canViewActivityLog() ? ADMIN_AUTH_STATE.audit.events.length : '';
+  return '';
+}
+
+function renderAdminTabNavigation(){
+  const sections = adminTabGroupCatalog().map(group => {
+    const items = moduleAccessAdminTabCatalog().filter(meta => meta.group === group.id).filter(meta => {
+      if(meta.id === 'activity' && !canViewActivityLog()) return false;
+      return canUserAccessAdminTab(meta.id);
+    });
+    if(!items.length) return '';
+    const buttons = items.map(meta => {
+      const badge = adminTabBadgeValue(meta.id);
+      return `<button class="admin-tab-v2 ${adminTab===meta.id?'active':''}" onclick="adminTab='${meta.id}';renderAdmin()">
+        <span class="admin-tab-icon">${escapeHtml(meta.icon || '•')}</span>
+        <span class="admin-tab-label">${escapeHtml(adminTabLabel(meta))}</span>
+        ${badge !== '' ? `<span class="tab-badge">${escapeHtml(String(badge))}</span>` : ''}
+      </button>`;
+    }).join('');
+    return `<section class="admin-nav-group">
+      <div class="admin-nav-group-title">${escapeHtml(lang==='en' ? group.labelEn : group.labelVi)}</div>
+      <div class="admin-nav-group-list">${buttons}</div>
+    </section>`;
+  }).filter(Boolean).join('');
+
+  return `<div class="admin-nav-panel">
+    <div class="admin-nav-panel-head">
+      <div class="portal-display-kicker">${lang==='en' ? 'Admin console' : 'Bảng điều khiển Admin'}</div>
+      <h3>${lang==='en' ? 'System control, grouped by domain' : 'Điều khiển hệ thống theo từng miền chức năng'}</h3>
+      <p>${lang==='en'
+        ? 'Data Schema sits directly above VPS Infrastructure, and every workspace in this rail is governed by the same access matrix.'
+        : 'Data Schema nằm ngay phía trên Hạ tầng VPS, và toàn bộ workspace trong rail này đi qua cùng một ma trận phân quyền.'}</p>
+    </div>
+    <div class="admin-nav-groups">${sections}</div>
+  </div>`;
+}
+
 function renderAdmin(){
-  if(!isAdmin()){
+  if(!canUserAccessModule('admin')){
     document.getElementById('page-admin').innerHTML='<div style="text-align:center;padding:60px;color:var(--text-3)">\u26A0 '+T('no_docs')+'</div>';
     return;
   }
+  if(!canUserAccessAdminTab(adminTab)){
+    adminTab = firstAccessibleAdminTab();
+  }
   const el = document.getElementById('page-admin');
   const activeUsers = USERS.filter(u=>u.active).length;
+  if(['users','dept_title','orgchart'].includes(adminTab)) loadAuthoritativeOrgCatalog({silent:true});
+  if(['users','roles','activity'].includes(adminTab)) loadAuthoritativeRoleCatalog({silent:true});
+  if(adminTab === 'activity') loadAuthoritativeAuditTrail({silent:true});
   el.innerHTML = `
     <h2 style="font-size:18px;font-weight:700;margin-bottom:16px">${T('admin_panel')}</h2>
     <div class="admin-stat-row">
@@ -5422,25 +6392,15 @@ function renderAdmin(){
       <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">● LIVE</span></div></div>
       <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
     </div>
-    <div class="admin-tabs-v2">
-      <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()"><span class="admin-tab-icon">👥</span><span class="admin-tab-label">${T('admin_users')}</span><span class="tab-badge">${USERS.length}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()"><span class="admin-tab-icon">🏢</span><span class="admin-tab-label">${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='roles'?'active':''}" onclick="adminTab='roles';renderAdmin()"><span class="admin-tab-icon">🛡</span><span class="admin-tab-label">${T('admin_roles')}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='orgchart'?'active':''}" onclick="adminTab='orgchart';renderAdmin()"><span class="admin-tab-icon">🏗</span><span class="admin-tab-label">${lang==='en'?'Org Chart':'Sơ đồ tổ chức'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()"><span class="admin-tab-icon">🔐</span><span class="admin-tab-label">${T('admin_perms')}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}><span class="admin-tab-icon">📊</span><span class="admin-tab-label">${lang==='en'?'Activity Log':'Kiểm soát hành vi'}</span><span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()"><span class="admin-tab-icon">📄</span><span class="admin-tab-label">${T('admin_effective_docs')}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='infrastructure'?'active':''}" onclick="adminTab='infrastructure';renderAdmin()"><span class="admin-tab-icon">🖥</span><span class="admin-tab-label">${lang==='en'?'VPS Infrastructure':'Hạ tầng VPS'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()"><span class="admin-tab-icon">🔄</span><span class="admin-tab-label">${lang==='en'?'Version Control':'Điều khiển phiên bản'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()"><span class="admin-tab-icon">🧭</span><span class="admin-tab-label">${lang==='en'?'Portal display':'Hiển thị portal'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()"><span class="admin-tab-icon">📋</span><span class="admin-tab-label">${lang==='en'?'Retention':'Lưu giữ'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()"><span class="admin-tab-icon">🧾</span><span class="admin-tab-label">${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()"><span class="admin-tab-icon">🗄</span><span class="admin-tab-label">${lang==='en'?'Data sources':'Nguồn dữ liệu'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='metadata_studio'?'active':''}" onclick="adminTab='metadata_studio';renderAdmin()"><span class="admin-tab-label">API &amp; DB Studio</span></button>
-      <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()"><span class="admin-tab-icon">🔑</span><span class="admin-tab-label">${lang==='en'?'MFA Security':'Bảo mật MFA'}</span></button>
-      <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()"><span class="admin-tab-icon">🎨</span><span class="admin-tab-label">${lang==='en'?'Appearance':'Giao diện'}</span></button>
+    <div class="admin-console-shell">
+      <aside class="admin-console-rail">
+        ${renderAdminTabNavigation()}
+      </aside>
+      <div class="admin-console-main">
+        <div class="admin-panel" id="admin-content"></div>
+      </div>
     </div>
-    <div class="admin-panel" id="admin-content"></div>`;
+  `;
   if(adminTab==='version_control' && !gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
     loadGitRepoStatus({silent:true});
   }
@@ -5450,6 +6410,10 @@ function renderAdmin(){
   if(adminTab==='roles') renderAdminRoles();
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
+  if(adminTab==='module_access'){
+    renderAdminModuleAccess();
+    loadModuleAccessConfigFromServer({silent:true});
+  }
   if(adminTab==='docs') renderAdminEffectiveDocs();
   if(adminTab==='infrastructure') renderAdminInfrastructure();
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
@@ -5475,7 +6439,7 @@ function renderAdminMetadataStudio(){
     window._renderAdminMetadataStudio(el);
     return;
   }
-  el.innerHTML='<div class="hm-empty">'+(lang==='en'?'Loading API & DB Studio...':'Dang tai API & DB Studio...')+'</div>';
+  el.innerHTML='<div class="hm-empty">'+(lang==='en'?'Loading Data Schema...':'Dang tai Data Schema...')+'</div>';
   var existing=document.getElementById('admin-metadata-studio-script');
   if(existing){
     var tries=0;
@@ -5489,20 +6453,20 @@ function renderAdminMetadataStudio(){
         setTimeout(waitForStudio, 150);
         return;
       }
-      el.innerHTML='<div class="hm-empty">Failed to initialize metadata studio.</div>';
+      el.innerHTML='<div class="hm-empty">Failed to initialize Data Schema.</div>';
     })();
     return;
   }
   var script=document.createElement('script');
   script.id='admin-metadata-studio-script';
-  script.src='scripts/portal/32-admin-metadata-studio.js?v=20260403';
+  script.src='scripts/portal/32-admin-metadata-studio.js?v=20260409i';
   script.onload=function(){
     if(typeof window._renderAdminMetadataStudio === 'function'){
       window._renderAdminMetadataStudio(el);
     }
   };
   script.onerror=function(){
-    el.innerHTML='<div class="hm-empty">Failed to load metadata studio. Check 32-admin-metadata-studio.js</div>';
+    el.innerHTML='<div class="hm-empty">Failed to load Data Schema. Check 32-admin-metadata-studio.js</div>';
   };
   document.head.appendChild(script);
 }
@@ -5654,6 +6618,240 @@ function renderAdminMfa(){
       });
     });
   });
+}
+
+function setModuleAccessConfigDirty(value){
+  moduleAccessConfigDirty = !!value;
+  const bar = document.getElementById('module-access-save-bar');
+  if(bar) bar.style.display = moduleAccessConfigDirty ? 'flex' : 'none';
+}
+
+function moduleAccessRoleOptions(){
+  const out = [];
+  const seen = new Set();
+  const candidateRoles = [
+    ...ADMIN_ROLES,
+    ...Object.keys(ROLES || {}),
+    ...(Array.isArray(USERS) ? USERS.map(user => user && user.role) : []),
+    ...PURCHASING_MODULE_DEFAULT_ROLES
+  ];
+  candidateRoles.forEach(role => {
+    const id = normalizeAccessRole(role);
+    if(!id || seen.has(id)) return;
+    seen.add(id);
+    const meta = ROLES[id] || {};
+    out.push({
+      id,
+      label: lang==='en' ? (meta.labelEn || meta.label || id) : (meta.label || meta.labelEn || id),
+      group: ADMIN_ROLES.includes(id) ? 'admin' : 'ops'
+    });
+  });
+  return out.sort((a, b) => {
+    if(a.group !== b.group) return a.group === 'admin' ? -1 : 1;
+    return String(a.label).localeCompare(String(b.label), lang==='en' ? 'en' : 'vi');
+  });
+}
+
+function updateModuleAccessDraft(scope, id, updater){
+  const draft = ensureModuleAccessConfigDraft();
+  const bucket = scope === 'admin_tabs' ? draft.admin_tabs : draft.portal_modules;
+  const meta = moduleAccessMeta(scope, id);
+  if(!bucket || !meta || !bucket[id] || meta.locked) return;
+  const current = sanitizeModuleAccessPolicy(bucket[id], meta);
+  bucket[id] = sanitizeModuleAccessPolicy(typeof updater === 'function' ? updater(current) : current, meta);
+  setModuleAccessConfigDirty(true);
+  renderAdminModuleAccess();
+}
+
+function setModuleAccessEnabled(scope, id, enabled){
+  updateModuleAccessDraft(scope, id, current => Object.assign({}, current, {enabled: !!enabled}));
+}
+
+function setModuleAccessMode(scope, id, mode){
+  updateModuleAccessDraft(scope, id, current => Object.assign({}, current, {
+    access: ['all','admin','roles'].includes(String(mode || '').toLowerCase()) ? String(mode).toLowerCase() : current.access
+  }));
+}
+
+function toggleModuleAccessRole(scope, id, role, enabled){
+  const safeRole = normalizeAccessRole(role);
+  if(!safeRole) return;
+  updateModuleAccessDraft(scope, id, current => {
+    const roles = new Set(Array.isArray(current.roles) ? current.roles : []);
+    if(enabled) roles.add(safeRole);
+    else roles.delete(safeRole);
+    return Object.assign({}, current, {roles: Array.from(roles)});
+  });
+}
+
+function resetModuleAccessConfigDraft(){
+  MODULE_ACCESS_CONFIG_DRAFT = sanitizeModuleAccessConfig(MODULE_ACCESS_CONFIG);
+  setModuleAccessConfigDirty(false);
+  renderAdminModuleAccess();
+}
+
+async function saveModuleAccessConfig(){
+  if(!isAdmin()) return;
+  const draft = sanitizeModuleAccessConfig(ensureModuleAccessConfigDraft());
+  const current = sanitizeModuleAccessConfig(MODULE_ACCESS_CONFIG);
+  if(moduleAccessConfigFingerprint(draft) === moduleAccessConfigFingerprint(current)){
+    showToast(lang==='en' ? 'No module access changes to save.' : 'Không có thay đổi phân quyền module để lưu.');
+    return;
+  }
+  try{
+    const res = await apiCall('admin_module_access_save', {config: draft});
+    if(!(res && res.ok && res.config)){
+      showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en' ? 'Save failed.' : 'Lưu cấu hình thất bại.')));
+      return;
+    }
+    applyModuleAccessConfig(res.config, {forceDraftSync:true});
+    setModuleAccessConfigDirty(false);
+    if(currentPage === 'admin' && !canUserAccessAdminTab(adminTab)){
+      adminTab = firstAccessibleAdminTab();
+    }
+    renderSidebar();
+    renderAdmin();
+    showToast(lang==='en' ? 'Module access updated.' : 'Đã cập nhật phân quyền module.');
+  }catch(e){
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'Save failed.' : 'Lưu cấu hình thất bại.')));
+  }
+}
+
+function moduleAccessGroupLabel(scope, group){
+  const groups = scope === 'admin_tabs'
+    ? {
+        identity: lang==='en' ? 'Identity & org' : 'Nhân sự & tổ chức',
+        governance: lang==='en' ? 'Governance' : 'Quản trị điều hành',
+        content: lang==='en' ? 'Content & portal' : 'Nội dung & portal',
+        data: lang==='en' ? 'Data & infrastructure' : 'Dữ liệu & hạ tầng',
+        operations: lang==='en' ? 'Operations' : 'Vận hành',
+        security: lang==='en' ? 'Security' : 'Bảo mật'
+      }
+    : {
+        core: lang==='en' ? 'Core portal' : 'Portal lõi',
+        production: lang==='en' ? 'Production' : 'Sản xuất',
+        supply: lang==='en' ? 'Supply chain' : 'Chuỗi cung ứng',
+        quality: lang==='en' ? 'Quality' : 'Chất lượng',
+        records: lang==='en' ? 'Records & reporting' : 'Hồ sơ & báo cáo',
+        tools: lang==='en' ? 'Tools' : 'Công cụ',
+        admin: 'Admin'
+      };
+  return groups[group] || group;
+}
+
+function renderModuleAccessScope(scope, roleOptions){
+  const draft = ensureModuleAccessConfigDraft();
+  const bucket = scope === 'admin_tabs' ? draft.admin_tabs : draft.portal_modules;
+  const grouped = {};
+  moduleAccessCatalog(scope).forEach(meta => {
+    const group = String(meta.group || 'other');
+    if(!grouped[group]) grouped[group] = [];
+    grouped[group].push(meta);
+  });
+  return Object.keys(grouped).map(group => {
+    const rows = grouped[group].map(meta => {
+      const policy = sanitizeModuleAccessPolicy(bucket[meta.id], meta);
+      const roleChecks = roleOptions.map(role => {
+        const checked = Array.isArray(policy.roles) && policy.roles.includes(role.id) ? 'checked' : '';
+        return `<label class="module-access-role-chip ${checked ? 'is-active' : ''}">
+          <input type="checkbox" ${checked} onchange="toggleModuleAccessRole('${scope}','${meta.id}','${role.id}', this.checked)">
+          <span>${escapeHtml(role.label)}</span>
+        </label>`;
+      }).join('');
+      return `<article class="module-access-row ${policy.enabled ? '' : 'is-disabled'}">
+        <div class="module-access-row-main">
+          <label class="module-access-toggle">
+            <input type="checkbox" ${policy.enabled ? 'checked' : ''} ${meta.locked ? 'disabled' : ''} onchange="setModuleAccessEnabled('${scope}','${meta.id}', this.checked)">
+            <span class="module-access-toggle-copy">
+              <b>${escapeHtml(meta.icon || '•')} ${escapeHtml(lang==='en' ? meta.labelEn : meta.labelVi)}</b>
+              <small>${escapeHtml(lang==='en' ? meta.noteEn : meta.noteVi)}</small>
+            </span>
+          </label>
+        </div>
+        <div class="module-access-row-side">
+          <select class="portal-display-input module-access-select" ${meta.locked ? 'disabled' : ''} onchange="setModuleAccessMode('${scope}','${meta.id}', this.value)">
+            <option value="all" ${policy.access==='all' ? 'selected' : ''}>${lang==='en' ? 'All logged-in users' : 'Mọi người dùng đã đăng nhập'}</option>
+            <option value="admin" ${policy.access==='admin' ? 'selected' : ''}>${lang==='en' ? 'Admin roles only' : 'Chỉ nhóm admin'}</option>
+            <option value="roles" ${policy.access==='roles' ? 'selected' : ''}>${lang==='en' ? 'Selected roles' : 'Vai trò chỉ định'}</option>
+          </select>
+          ${meta.locked ? `<span class="portal-display-chip is-static">${lang==='en' ? 'Locked' : 'Cố định'}</span>` : ''}
+        </div>
+        ${policy.access === 'roles' ? `<div class="module-access-roles">${roleChecks}</div>` : ''}
+      </article>`;
+    }).join('');
+    return `<section class="module-access-scope-card">
+      <div class="module-access-scope-head">
+        <h4>${escapeHtml(moduleAccessGroupLabel(scope, group))}</h4>
+        <small>${scope === 'admin_tabs'
+          ? escapeHtml(lang==='en' ? 'Admin workspaces governed from the same access matrix.' : 'Các workspace trong Admin được quản bởi cùng một ma trận quyền.')
+          : escapeHtml(lang==='en' ? 'Portal modules exposed in left navigation and direct routes.' : 'Các module portal hiển thị ở menu trái và route trực tiếp.')}</small>
+      </div>
+      <div class="module-access-scope-body">${rows}</div>
+    </section>`;
+  }).join('');
+}
+
+function renderAdminModuleAccess(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  const draft = ensureModuleAccessConfigDraft();
+  const isLoadingConfig = !moduleAccessConfigHydrated && !!moduleAccessConfigLoadPromise;
+  const portalEnabled = Object.values(draft.portal_modules || {}).filter(policy => policy && policy.enabled !== false).length;
+  const adminEnabled = Object.values(draft.admin_tabs || {}).filter(policy => policy && policy.enabled !== false).length;
+  const roleOptions = moduleAccessRoleOptions();
+
+  el.innerHTML = `
+    <div class="module-access-admin">
+      <div class="module-access-hero">
+        <div>
+          <div class="portal-display-kicker">${lang==='en' ? 'Module governance' : 'Quản trị module'}</div>
+          <h3>${lang==='en' ? 'One permission matrix for the whole portal' : 'Một ma trận quyền cho toàn bộ portal'}</h3>
+          <p>${lang==='en'
+            ? 'Admin controls sidebar visibility and direct page access from one place. Critical governance shells stay locked so the recovery path cannot disappear.'
+            : 'Admin điều khiển cả menu trái lẫn quyền vào trang trực tiếp từ một nơi. Các shell quản trị trọng yếu được khóa để không mất đường khôi phục quản trị.'}</p>
+          ${isLoadingConfig ? `<div class="portal-display-loading-note">${lang==='en' ? 'Loading saved module access policy from server...' : 'Đang tải cấu hình phân quyền module từ server...'}</div>` : ''}
+        </div>
+        <div class="module-access-hero-stats">
+          <div class="module-access-hero-stat"><strong>${portalEnabled}</strong><span>${lang==='en' ? 'Portal modules enabled' : 'Module portal đang bật'}</span></div>
+          <div class="module-access-hero-stat"><strong>${adminEnabled}</strong><span>${lang==='en' ? 'Admin workspaces enabled' : 'Workspace admin đang bật'}</span></div>
+          <div class="module-access-hero-stat"><strong>${roleOptions.length}</strong><span>${lang==='en' ? 'Roles available' : 'Vai trò khả dụng'}</span></div>
+        </div>
+      </div>
+
+      <div class="module-access-grid">
+        <section class="module-access-card">
+          <div class="portal-display-card-head">
+            <div>
+              <h4>${lang==='en' ? 'Portal modules' : 'Module portal'}</h4>
+              <p>${lang==='en'
+                ? 'These rules drive left navigation and direct route access for production, quality, records, tools and customer-facing workspaces.'
+                : 'Các quy tắc này điều khiển menu trái và route trực tiếp cho sản xuất, chất lượng, hồ sơ, công cụ và workspace hướng khách hàng.'}</p>
+            </div>
+          </div>
+          <div class="module-access-stack">${renderModuleAccessScope('portal_modules', roleOptions)}</div>
+        </section>
+
+        <section class="module-access-card">
+          <div class="portal-display-card-head">
+            <div>
+              <h4>${lang==='en' ? 'Admin workspaces' : 'Workspace trong Admin'}</h4>
+              <p>${lang==='en'
+                ? 'Sensitive workspaces such as metadata, infrastructure and Git control now live behind the same matrix instead of custom one-off guards.'
+                : 'Các workspace nhạy cảm như metadata, hạ tầng và điều khiển Git giờ nằm sau cùng một ma trận quyền thay vì guard rời rạc từng nơi.'}</p>
+            </div>
+          </div>
+          <div class="module-access-stack">${renderModuleAccessScope('admin_tabs', roleOptions)}</div>
+        </section>
+      </div>
+
+      <div class="admin-save-bar" id="module-access-save-bar" style="${moduleAccessConfigDirty ? 'display:flex' : 'display:none'}">
+        <span class="save-hint">${moduleAccessConfigDirty
+          ? `<b>⚠ ${lang==='en' ? 'Unsaved module access changes' : 'Có thay đổi phân quyền module chưa lưu'}</b>`
+          : (lang==='en' ? 'Adjust the matrix, then click Save.' : 'Điều chỉnh ma trận quyền rồi nhấn Lưu.')}</span>
+        <button class="btn-admin secondary" onclick="resetModuleAccessConfigDraft()">↩ ${lang==='en' ? 'Reset draft' : 'Khôi phục bản nháp'}</button>
+        <button class="btn-admin primary" onclick="saveModuleAccessConfig()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en' ? 'SAVE' : 'LƯU'}</button>
+      </div>
+    </div>`;
 }
 
 function renderAdminPortalDisplay(){
@@ -6402,6 +7600,17 @@ function renderAdminUsers(){
     </div>`;
   }
 
+  const orgNotice = !ADMIN_AUTH_STATE.org.loaded ? `<div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
+    ${ADMIN_AUTH_STATE.org.loading
+      ? (lang==='en'
+          ? 'Loading HCM organization catalog in the background. You can still inspect users now; changing department/title will unlock after the catalog finishes loading.'
+          : 'Catalog tổ chức HCM đang tải nền. Anh vẫn xem được user ngay; thao tác đổi phòng ban/chức danh sẽ mở lại khi catalog tải xong.')
+      : (lang==='en'
+          ? 'HCM organization catalog is currently unavailable. Identity/contact edits still work, but changing department/title requires the runtime catalog to come back.'
+          : 'Catalog tổ chức HCM hiện chưa sẵn sàng. Các chỉnh sửa thông tin định danh/liên hệ vẫn lưu được, nhưng đổi phòng ban/chức danh cần runtime catalog hoạt động lại.')}
+    ${ADMIN_AUTH_STATE.org.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.org.error)}</div>` : ''}
+  </div>` : '';
+
   el.innerHTML = `
     <div class="admin-toolbar">
       <input type="text" placeholder="${lang==='en'?'Search users...':'Tìm người dùng...'}" oninput="filterAdminUserCards(this.value)" id="admin-user-search">
@@ -6419,6 +7628,7 @@ function renderAdminUsers(){
       </label>
       ` : ''}
     </div>
+    ${orgNotice}
     ${usersHtml}`;
 }
 
@@ -6687,11 +7897,18 @@ async function doHardDeleteUser(userId,username,name){
 
 function showUserModal(userId){
   const isEdit = !!userId;
-  const u0 = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:''};
-  if(isEdit && !u0){
+  const seedUser = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',hcm_org_unit_id:'',hcm_position_id:''};
+  if(isEdit && !seedUser){
     showToast(lang==='en'?'⚠ User not found':'⚠ Không tìm thấy người dùng');
     return;
   }
+  const assignment = resolveAuthoritativeUserAssignment(seedUser || {});
+  const u0 = Object.assign({}, seedUser || {}, {
+    hcm_org_unit_id: assignment.orgUnitId || String((seedUser && seedUser.hcm_org_unit_id) || ''),
+    hcm_position_id: assignment.positionId || String((seedUser && seedUser.hcm_position_id) || ''),
+    dept: assignment.deptCode || String((seedUser && seedUser.dept) || ''),
+    title: assignment.positionTitle || String((seedUser && seedUser.title) || '')
+  });
 
   closeModal();
 
@@ -6854,6 +8071,7 @@ function showUserModal(userId){
 async function saveUserFromModal(userId){
   try{
     const isEdit = !!userId;
+    const existingUser = isEdit ? (USERS.find(x=>String(x.id)===String(userId)) || null) : null;
     const name = String(document.getElementById('um-name')?.value||'').trim();
     const username = String(document.getElementById('um-username')?.value||'').trim().toLowerCase();
     const dept = String(document.getElementById('um-dept')?.value||'').trim();
@@ -6874,7 +8092,64 @@ async function saveUserFromModal(userId){
       return;
     }
 
-    const payload = { username, name, dept, title, role, active, cccd, phone, personal_email };
+    const deptChanged = String(existingUser && existingUser.dept || '') !== dept;
+    const titleChanged = String(existingUser && existingUser.title || '') !== title;
+    const assignmentChanged = !isEdit ? !!(dept || title) : (deptChanged || titleChanged);
+    const preserveExistingAssignment = existingUser ? {
+      orgUnitId: String(existingUser.hcm_org_unit_id || ''),
+      positionId: String(existingUser.hcm_position_id || ''),
+      deptCode: dept || String(existingUser.dept || ''),
+      positionTitle: title || String(existingUser.title || '')
+    } : {orgUnitId:'', positionId:'', deptCode:dept, positionTitle:title};
+
+    if(assignmentChanged && (dept || title) && !ADMIN_AUTH_STATE.org.loaded){
+      await loadAuthoritativeOrgCatalog({force:!!ADMIN_AUTH_STATE.org.error});
+    }
+
+    let assignment = preserveExistingAssignment;
+    if(ADMIN_AUTH_STATE.org.loaded){
+      const resolvedAssignment = resolveAuthoritativeUserAssignment({
+        dept,
+        title,
+        hcm_org_unit_id: preserveExistingAssignment.orgUnitId,
+        hcm_position_id: preserveExistingAssignment.positionId
+      });
+      const mustEnforceOrg = !isEdit || deptChanged || !preserveExistingAssignment.orgUnitId;
+      const mustEnforcePosition = !isEdit || titleChanged || !preserveExistingAssignment.positionId;
+      if(dept && !resolvedAssignment.orgUnitId && mustEnforceOrg){
+        showToast(lang==='en'?'⚠ Department must exist in the HCM organization catalog':'⚠ Phòng ban phải tồn tại trong danh mục HCM');
+        return;
+      }
+      if(title && !resolvedAssignment.positionId && mustEnforcePosition){
+        showToast(lang==='en'?'⚠ Title must map to an HCM position before saving':'⚠ Chức danh phải được khai báo trong vị trí HCM trước khi lưu');
+        return;
+      }
+      assignment = {
+        orgUnitId: resolvedAssignment.orgUnitId || preserveExistingAssignment.orgUnitId || '',
+        positionId: resolvedAssignment.positionId || preserveExistingAssignment.positionId || '',
+        deptCode: resolvedAssignment.deptCode || preserveExistingAssignment.deptCode || dept,
+        positionTitle: resolvedAssignment.positionTitle || preserveExistingAssignment.positionTitle || title
+      };
+    }else if(assignmentChanged && (dept || title)){
+      showToast(lang==='en'
+        ?'⚠ Cannot change department/title while the HCM organization runtime is unavailable'
+        :'⚠ Không thể đổi phòng ban/chức danh khi runtime tổ chức HCM chưa sẵn sàng');
+      return;
+    }
+
+    const payload = {
+      username,
+      name,
+      dept: assignment.deptCode || dept,
+      title: assignment.positionTitle || title,
+      role,
+      active,
+      cccd,
+      phone,
+      personal_email,
+      hcm_org_unit_id: assignment.orgUnitId || '',
+      hcm_position_id: assignment.positionId || ''
+    };
     if(password) payload.password = password;
 
     const res = await apiCall('admin_user_upsert', payload);
@@ -7084,7 +8359,8 @@ async function pauseUser(userId){
 function editUserPerms(userId){
   const u=USERS.find(x=>String(x.id)===String(userId));
   if(!u)return;
-  const overrides=PERM_OVERRIDES[u.id]||{grant:[],deny:[]};
+  const overrideKey = userPermOverrideKey(u);
+  const overrides=(overrideKey && PERM_OVERRIDES[overrideKey]) ? PERM_OVERRIDES[overrideKey] : {grant:[],deny:[]};
   const roleDocs=ROLE_DOCS[u.role];
   
   const modal=document.createElement('div');
@@ -7105,7 +8381,7 @@ function editUserPerms(userId){
       const isOverride=granted||denied;
       catHtml+=`<div class="perm-doc-row">
         <label${isOverride?' style="font-weight:600"':''}>
-          <input type="checkbox" data-doc="${d.code}" data-base="${baseAccess}" ${checked?'checked':''} onchange="handlePermChange(this,'${u.id}')">
+          <input type="checkbox" data-doc="${d.code}" data-base="${baseAccess}" ${checked?'checked':''} onchange="handlePermChange(this,'${u.id}','${escapeHtml(overrideKey)}')">
           <span class="doc-code">${d.code}</span>
           ${d.title.substring(0,50)}${d.title.length>50?'...':''}
         </label>
@@ -7125,7 +8401,7 @@ function editUserPerms(userId){
       ${catHtml}
     </div>
     <div class="modal-actions">
-      <button class="btn-admin danger" onclick="resetUserPerms('${u.id}')">↩ Reset</button>
+      <button class="btn-admin danger" onclick="resetUserPerms('${u.id}','${escapeHtml(overrideKey)}')">↩ Reset</button>
       <button class="btn-admin secondary" onclick="closeModal()">✕ ${T('admin_cancel')}</button>
       <button class="btn-admin primary" onclick="closeModal();renderAdmin()">✓ OK</button>
     </div>
@@ -7134,11 +8410,18 @@ function editUserPerms(userId){
   modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
 }
 
-function handlePermChange(cb, userId){
+async function handlePermChange(cb, userId, overrideKey){
   const docCode=cb.dataset.doc;
   const baseAccess=cb.dataset.base==='true';
-  if(!PERM_OVERRIDES[userId])PERM_OVERRIDES[userId]={grant:[],deny:[]};
-  const ov=PERM_OVERRIDES[userId];
+  const key = String(overrideKey || '').trim().toLowerCase();
+  if(!key){
+    showToast('⚠ ' + (lang==='en' ? 'Missing user override key' : 'Thiếu khóa override người dùng'), 'error');
+    cb.checked = !cb.checked;
+    return;
+  }
+  const snapshot = JSON.stringify(PERM_OVERRIDES);
+  if(!PERM_OVERRIDES[key])PERM_OVERRIDES[key]={grant:[],deny:[]};
+  const ov=PERM_OVERRIDES[key];
   // Remove from both lists
   ov.grant=ov.grant.filter(c=>c!==docCode);
   ov.deny=ov.deny.filter(c=>c!==docCode);
@@ -7148,7 +8431,23 @@ function handlePermChange(cb, userId){
     ov.deny.push(docCode); // Deny override
   }
   // Clean empty overrides
-  if(!ov.grant.length&&!ov.deny.length)delete PERM_OVERRIDES[userId];
+  if(!ov.grant.length&&!ov.deny.length)delete PERM_OVERRIDES[key];
+
+  try{
+    const res = await saveUserDocOverridesToServer();
+    if(!(res && res.ok)){
+      PERM_OVERRIDES = normalizeUserDocOverridesMap(JSON.parse(snapshot || '{}'));
+      cb.checked = !cb.checked;
+      showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en' ? 'Save override failed' : 'Lưu override thất bại')), 'error');
+      return;
+    }
+  }catch(e){
+    PERM_OVERRIDES = normalizeUserDocOverridesMap(JSON.parse(snapshot || '{}'));
+    cb.checked = !cb.checked;
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'Save override failed' : 'Lưu override thất bại')), 'error');
+    return;
+  }
+
   savePermOverrides();
   // Update override label
   const row=cb.closest('.perm-doc-row');
@@ -7163,8 +8462,23 @@ function handlePermChange(cb, userId){
   }
 }
 
-function resetUserPerms(userId){
-  delete PERM_OVERRIDES[userId];
+async function resetUserPerms(userId, overrideKey){
+  const key = String(overrideKey || '').trim().toLowerCase();
+  if(!key) return;
+  const snapshot = JSON.stringify(PERM_OVERRIDES);
+  delete PERM_OVERRIDES[key];
+  try{
+    const res = await saveUserDocOverridesToServer();
+    if(!(res && res.ok)){
+      PERM_OVERRIDES = normalizeUserDocOverridesMap(JSON.parse(snapshot || '{}'));
+      showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en' ? 'Reset override failed' : 'Reset override thất bại')), 'error');
+      return;
+    }
+  }catch(e){
+    PERM_OVERRIDES = normalizeUserDocOverridesMap(JSON.parse(snapshot || '{}'));
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'Reset override failed' : 'Reset override thất bại')), 'error');
+    return;
+  }
   savePermOverrides();
   closeModal();
   renderAdmin();
@@ -7251,7 +8565,7 @@ function renderAdminPerms(){
     </div>
     <div class="admin-save-bar" id="admin-save-bar">
       <span class="save-hint">${adminUnsaved?'<b>⚠ '+(lang==='en'?'Unsaved changes':'Có thay đổi chưa lưu')+'</b>':lang==='en'?'Edit permissions then click Save':'Chỉnh phân quyền rồi nhấn Lưu'}</span>
-      <button class="btn-admin secondary" onclick="sessionStorage.removeItem('hesem_role_docs');location.reload()">↩ Reset</button>
+      <button class="btn-admin secondary" onclick="resetAuthoritativeRoleDocsEditor()">↩ Reset</button>
       <button class="btn-admin primary" onclick="adminSaveAll()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
     </div>`;
 }
@@ -7280,7 +8594,6 @@ function toggleRoleDoc(cb, role){
       }
     });
   }
-  saveRoleDocsToStorage();
   markUnsaved();
   // Update header count
   renderAdminPerms();
@@ -7301,13 +8614,17 @@ function toggleCatPerms(cb, catId, role){
       ROLE_DOCS[role]=ROLE_DOCS[role].filter(p=>(typeof docCodeMatchesPattern==='function' ? !docCodeMatchesPattern(d.code,p) : !(p.endsWith('*') && d.code.startsWith(p.slice(0,-1)))));
     }
   });
-  saveRoleDocsToStorage();
   markUnsaved();
   renderAdminPerms();
 }
 
-function saveRoleDocsToStorage(){try{sessionStorage.setItem('hesem_role_docs',JSON.stringify(ROLE_DOCS));}catch(e){}}
-function loadRoleDocsFromStorage(){try{const s=sessionStorage.getItem('hesem_role_docs');if(s){const loaded=JSON.parse(s);if(loaded&&typeof loaded==='object')Object.assign(ROLE_DOCS,loaded);}}catch(e){}}
+function saveRoleDocsToStorage(){
+  try{ sessionStorage.removeItem('hesem_role_docs'); }catch(e){}
+  return true;
+}
+function loadRoleDocsFromStorage(){
+  try{ sessionStorage.removeItem('hesem_role_docs'); }catch(e){}
+}
 
 // ═══════════════════════════════════════════════════
 // DOM HELPER: el(tag, attrs, children) — lightweight DOM builder
@@ -7335,114 +8652,307 @@ function el(tag, attrs, children) {
 }
 Object.defineProperty(window, 'adminPanel', { get: function() { return document.getElementById('admin-content'); } });
 
+function renderAdminDeptTitleFallback(){
+  const panel = document.getElementById('admin-content');
+  if(!panel) return;
+  const deptCards = (DEPARTMENTS || []).slice().sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''))).map(dept => {
+    const titles = (titlesForDept(dept.code) || []).slice().sort((a,b)=>String(a).localeCompare(String(b)));
+    const deptUsers = USERS.filter(user => String(user.dept || '') === String(dept.code || ''));
+    return `<article style="border:1px solid var(--border);border-radius:14px;background:var(--bg-surface,#fff);padding:14px">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:800;color:${escapeHtml(dept.color || defaultDepartmentColor(dept.code))}">${escapeHtml(String(dept.code || ''))}</div>
+          <div style="font-size:14px;font-weight:700">${escapeHtml(String(lang==='en' ? (dept.labelEn || dept.label || dept.code) : (dept.label || dept.labelEn || dept.code)))}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3)">${titles.length} ${lang==='en'?'titles':'chức danh'} • ${deptUsers.length} ${lang==='en'?'users':'user'}</div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+        ${titles.length ? titles.map(title => {
+          const count = USERS.filter(user => String(user.dept || '') === String(dept.code || '') && String(user.title || '') === String(title || '')).length;
+          return `<span style="font-size:10px;padding:4px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));color:var(--brand-2)">${escapeHtml(String(title))} • ${count}</span>`;
+        }).join('') : `<span class="muted">${lang==='en'?'No title in cached projection':'Chưa có chức danh trong projection hiện có'}</span>`}
+      </div>
+    </article>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <div>
+        <h3 style="font-size:14px;font-weight:700;margin:0">🏢 ${lang==='en'?'Organization units and titles':'Phòng ban & Chức danh'}</h3>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
+          ? 'HCM runtime is unavailable, so this tab is showing the current portal projection instead of blocking the screen.'
+          : 'Runtime HCM hiện chưa sẵn sàng, nên tab này đang hiển thị projection hiện có của portal thay vì khóa trắng màn hình.'}</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Retry runtime':'Thử lại runtime'}</button>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
+      ${ADMIN_AUTH_STATE.org.loading
+        ? (lang==='en'?'Authoritative organization catalog is still loading in the background. Create/update actions will unlock after runtime responds.':'Catalog tổ chức authoritative vẫn đang tải nền. Các thao tác tạo/cập nhật sẽ mở lại sau khi runtime phản hồi.')
+        : (lang==='en'?'Authoritative create/update actions are temporarily disabled until the HCM runtime responds.':'Các thao tác tạo/cập nhật authoritative đang tạm khóa cho tới khi runtime HCM phản hồi lại.')}
+      ${ADMIN_AUTH_STATE.org.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.org.error)}</div>` : ''}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+      ${deptCards || `<div class="hm-empty">${lang==='en'?'No department projection available.':'Chưa có projection phòng ban khả dụng.'}</div>`}
+    </div>`;
+}
+
+function renderAdminOrgChartFallback(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  const blocks = (DEPARTMENTS || []).slice().sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''))).map(dept => {
+    const deptUsers = USERS.filter(user => String(user.dept || '') === String(dept.code || '') && user.active !== false);
+    const titles = {};
+    deptUsers.forEach(user => {
+      const title = String(user.title || (lang==='en' ? 'Unassigned' : 'Chưa gán'));
+      if(!titles[title]) titles[title] = [];
+      titles[title].push(user);
+    });
+    const titleHtml = Object.keys(titles).sort((a,b)=>String(a).localeCompare(String(b))).map(title => {
+      return `<div style="border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--bg-surface,#fff)">
+        <div style="font-weight:700">${escapeHtml(title)}</div>
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${titles[title].map(user=>`<span style="font-size:10px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb, var(--cyan) 10%, var(--bg-surface,#fff));color:var(--cyan-dark,#0f766e);border:1px solid color-mix(in srgb, var(--cyan) 22%, var(--border))">@${escapeHtml(String(user.username || ''))}</span>`).join('')}</div>
+      </div>`;
+    }).join('');
+    return `<section style="border:1px solid var(--border);border-radius:14px;background:var(--bg-surface-alt,#fafbfc);overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc))">
+        <div style="font-weight:800;color:${escapeHtml(dept.color || defaultDepartmentColor(dept.code))}">${escapeHtml(String(dept.code || ''))}</div>
+        <div style="font-size:14px;font-weight:700">${escapeHtml(String(lang==='en' ? (dept.labelEn || dept.label || dept.code) : (dept.label || dept.labelEn || dept.code)))}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${deptUsers.length} ${lang==='en'?'active portal users':'user portal đang hoạt động'}</div>
+      </div>
+      <div style="padding:12px;display:grid;gap:8px">
+        ${titleHtml || `<div class="muted">${lang==='en'?'No active portal user assigned to this department.':'Chưa có user portal hoạt động trong đơn vị này.'}</div>`}
+      </div>
+    </section>`;
+  }).join('');
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <div>
+        <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization chart':'Sơ đồ tổ chức'}</h3>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
+          ? 'Showing the current portal organization projection while HCM runtime is unavailable.'
+          : 'Đang hiển thị projection tổ chức hiện có của portal trong lúc runtime HCM chưa sẵn sàng.'}</div>
+      </div>
+      <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Retry runtime':'Thử lại runtime'}</button>
+    </div>
+    <div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
+      ${ADMIN_AUTH_STATE.org.error ? escapeHtml(ADMIN_AUTH_STATE.org.error) : (lang==='en'?'The authoritative HCM org chart is still loading.':'Sơ đồ tổ chức HCM authoritative vẫn đang tải.')}
+    </div>
+    <div style="display:grid;gap:12px">${blocks || `<div class="hm-empty">${lang==='en'?'No portal organization projection available.':'Chưa có projection tổ chức portal khả dụng.'}</div>`}</div>`;
+}
+
+function renderAdminRolesFallback(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  const rows = legacyRolesForAdminGrid();
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <div>
+        <h3 style="font-size:14px;font-weight:700;margin:0">🛡 ${lang==='en'?'Role catalog':'Catalog vai trò'}</h3>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
+          ? 'Showing the current portal role projection while core_system.roles is unavailable.'
+          : 'Đang hiển thị projection vai trò hiện có của portal trong lúc core_system.roles chưa sẵn sàng.'}</div>
+      </div>
+      <button class="btn-admin secondary" onclick="loadAuthoritativeRoleCatalog({force:true})">🔄 ${lang==='en'?'Retry runtime':'Thử lại runtime'}</button>
+    </div>
+    <div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
+      ${lang==='en'
+        ? 'The tab is available for inspection immediately. Authoritative create/update actions will re-enable automatically when the role runtime responds.'
+        : 'Tab vẫn mở để kiểm tra ngay. Các thao tác tạo/cập nhật authoritative sẽ tự mở lại khi runtime vai trò phản hồi.'}
+      ${ADMIN_AUTH_STATE.roles.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.roles.error)}</div>` : ''}
+    </div>
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead><tr>
+          <th></th><th>${lang==='en'?'Role':'Vai trò'}</th><th>Code</th><th>Dept</th><th>Level</th><th>${lang==='en'?'Members':'Thành viên'}</th><th>${lang==='en'?'Mode':'Chế độ'}</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(row => {
+            const code = String(row.role_code || '');
+            const ui = roleRecordUi(code, row);
+            const members = USERS.filter(user => String(user.role || '') === code && user.active !== false);
+            return `<tr>
+              <td style="font-size:16px">${escapeHtml(ui.icon || '👤')}</td>
+              <td><b style="color:${escapeHtml(ui.color)}">${escapeHtml(ui.label || code)}</b><br><span style="font-size:10px;color:var(--text-3)">${escapeHtml(ui.labelEn || code)}</span></td>
+              <td style="font-family:var(--mono);font-size:11px">${escapeHtml(code)}</td>
+              <td>${escapeHtml(row.dept_code || ui.dept || '—')}</td>
+              <td style="text-align:center">${escapeHtml(String(ui.level))}</td>
+              <td style="font-size:11px">${members.length ? escapeHtml(members.map(user => user.name).slice(0,4).join(', ')) + (members.length > 4 ? `<div style="font-size:10px;color:var(--text-3)">+${members.length - 4} khác</div>` : '') : `<span style="color:var(--text-3)">${lang==='en'?'No active member':'Chưa có thành viên hoạt động'}</span>`}</td>
+              <td><span style="font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff));color:var(--amber-dark,#b45309)">${lang==='en'?'Fallback read-only':'Fallback chỉ xem'}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderAdminActivityFallback(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  const auditEvents = legacyAuditEventsForAdmin();
+  const uniqueUsers = [...new Set(auditEvents.map(item => item.actor_name).filter(Boolean))];
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'Activity fallback view':'Kiểm soát hành vi (fallback)'}</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">
+          <option value="">${lang==='en'?'All actors':'Tất cả actor'}</option>
+          ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('')}
+        </select>
+        <button class="btn-admin secondary" onclick="loadAuthoritativeAuditTrail({force:true})">🔄 ${lang==='en'?'Retry runtime':'Thử lại runtime'}</button>
+        <button class="btn-admin secondary" onclick="exportActivityCSV()">📥 CSV</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--amber-dark,#b45309);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
+      ${lang==='en'
+        ? 'Server-side audit trail is temporarily unavailable. This tab is showing browser-side session telemetry so you can still investigate recent activity.'
+        : 'Audit trail phía server đang tạm unavailable. Tab này đang hiển thị telemetry phiên trên trình duyệt để anh vẫn kiểm tra được hoạt động gần đây.'}
+      ${ADMIN_AUTH_STATE.audit.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.audit.error)}</div>` : ''}
+    </div>
+    <div id="activity-sessions-list" style="max-height:550px;overflow-y:auto">
+      ${auditEvents.length === 0
+        ? `<div style="text-align:center;padding:40px;color:var(--text-3)">${lang==='en'?'No local session telemetry recorded yet':'Chưa có telemetry phiên cục bộ nào được ghi lại'}</div>`
+        : auditEvents.map((event, idx) => {
+          const recorded = event.recorded_at ? new Date(event.recorded_at) : null;
+          const dateStr = recorded && !Number.isNaN(recorded.getTime())
+            ? recorded.toLocaleDateString('vi-VN') + ' ' + recorded.toLocaleTimeString('vi-VN')
+            : '—';
+          const contextText = escapeHtml(JSON.stringify(event.payload || {}, null, 2));
+          return `<div class="al-session" data-user="${escapeHtml(event.actor_name || '')}" data-idx="${idx}">
+            <div class="al-header">
+              <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap">
+                <span style="font-weight:700;font-size:12px;color:var(--text)">${escapeHtml(event.actor_name || 'user')}</span>
+                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff));color:var(--amber-dark,#b45309)">${escapeHtml(event.event_type || 'event')}</span>
+                <span style="font-size:10px;color:var(--text-2)">🕐 ${dateStr}</span>
+              </div>
+              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('▾')?'▴ Thu gọn':'▾ Chi tiết'">
+                ▾ ${lang==='en'?'Detail':'Chi tiết'}
+              </button>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:var(--bg-surface-alt,#f8fafc);border-radius:6px">
+              <span>🧩 <b>Aggregate:</b> ${escapeHtml(event.aggregate_type || 'browser_session')}</span>
+              <span>🔑 <b>ID:</b> ${escapeHtml(event.aggregate_id || '—')}</span>
+              <span>🌐 <b>IP:</b> ${escapeHtml(event.ip_address || '—')}</span>
+            </div>
+            <div class="al-detail" style="display:none">
+              <pre style="margin:0;padding:10px;border-radius:8px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);font-size:10px;line-height:1.45;white-space:pre-wrap;word-break:break-word">${contextText}</pre>
+            </div>
+          </div>`;
+        }).join('')}
+    </div>`;
+}
+
 // ═══════════════════════════════════════════════════
 // ADMIN TAB: DEPARTMENTS & TITLES
 // ═══════════════════════════════════════════════════
 function renderAdminDeptTitle(){
   adminPanel.innerHTML='';
-  const totalTitles = Object.values(DEPT_TITLES||{}).reduce((n,list)=>n+(Array.isArray(list)?list.length:0),0);
+  if(!ADMIN_AUTH_STATE.org.loaded){
+    if(!ADMIN_AUTH_STATE.org.loading && !ADMIN_AUTH_STATE.org.error){
+      loadAuthoritativeOrgCatalog({silent:true});
+    }
+    if((DEPARTMENTS && DEPARTMENTS.length) || (DEPT_TITLES && Object.keys(DEPT_TITLES).length)){
+      renderAdminDeptTitleFallback();
+      return;
+    }
+    adminPanel.innerHTML = authoritativeLoadSummaryHtml('org');
+    return;
+  }
+
+  const orgUnits = (ADMIN_AUTH_STATE.org.orgUnits || []).slice().sort((a,b)=>{
+    const typeCmp = orgUnitTypeWeight(String(a.org_unit_type||'')) - orgUnitTypeWeight(String(b.org_unit_type||''));
+    if(typeCmp !== 0) return typeCmp;
+    return String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||''));
+  });
+  const positions = (ADMIN_AUTH_STATE.org.positions || []).slice();
+  const positionsByUnit = {};
+  const usersByDeptTitle = {};
+  USERS.forEach(u=>{
+    const dept = String(u.dept||'');
+    const title = String(u.title||'');
+    const key = `${dept}__${title}`;
+    usersByDeptTitle[key] = (usersByDeptTitle[key] || 0) + 1;
+  });
+  positions.forEach(position=>{
+    const unitId = String(position.hcm_org_unit_id || '');
+    if(!positionsByUnit[unitId]) positionsByUnit[unitId] = [];
+    positionsByUnit[unitId].push(position);
+  });
+  Object.keys(positionsByUnit).forEach(unitId=>{
+    positionsByUnit[unitId].sort((a,b)=>String(a.position_title||'').localeCompare(String(b.position_title||'')));
+  });
+
+  const totalPositions = positions.length;
+  const activeUnits = orgUnits.filter(unit => String(unit.status || 'active') !== 'inactive').length;
+  const activePositions = positions.filter(position => String(position.status || 'active') !== 'inactive').length;
+
   const card=el('div',{class:'card'},[]);
   const header=el('div',{style:'display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;'},[
     el('div',{},[
-      el('div',{style:'font-weight:800;font-size:16px;line-height:1.2;'},'Phòng ban → Chức danh (JD Tree)'),
-      el('div',{class:'muted',style:'margin-top:4px;'},'Một cửa sổ duy nhất mô phỏng đúng cấu trúc thư mục JD. Chức danh nằm bên trong phòng ban; khi sửa người dùng, danh sách chức danh sẽ tự lọc theo phòng ban và ô Vai trò sẽ tự nhận theo chức danh.')
+      el('div',{style:'font-weight:800;font-size:16px;line-height:1.2;'},'Cơ cấu tổ chức & vị trí công việc'),
+      el('div',{class:'muted',style:'margin-top:4px;'},'Nguồn authoritative của tab này là HCM runtime: `hcm_org_units` và `hcm_positions`. Mọi thay đổi được ghi trực tiếp vào hệ thống thay vì session browser.')
     ]),
     el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;align-items:center;'},[
-      el('div',{class:'muted',style:'font-size:12px;'},`${DEPARTMENTS.length} phòng ban • ${totalTitles} chức danh`),
+      el('div',{class:'muted',style:'font-size:12px;'},`${activeUnits}/${orgUnits.length} đơn vị hoạt động • ${activePositions}/${totalPositions} vị trí hoạt động`),
+      el('button',{class:'btn',onclick:()=>loadAuthoritativeOrgCatalog({force:true})},lang==='en'?'Refresh':'Làm mới'),
+      el('button',{class:'btn',onclick:()=>promptCreateAuthoritativeOrgUnit()},'Thêm đơn vị'),
       el('button',{class:'btn',onclick:()=>{
-        if(!confirm('Reset Phòng ban & Chức danh theo SSOT (mặc định)?'))return;
-        DEPARTMENTS=JSON.parse(JSON.stringify(DEFAULT_DEPARTMENTS));
-        DEPT_TITLES=JSON.parse(JSON.stringify(DEFAULT_DEPT_TITLES));
-        syncTitlesFromDept();
-        saveDepartments();saveDeptTitles();saveTitles();
-        renderAdminDeptTitle();
-      }},'Reset theo JD SSOT'),
-      el('button',{class:'btn',onclick:()=>{
-        const code=(prompt('Mã phòng ban (VD: ENG, PRO, QA, ...):','')||'').trim().toUpperCase();
-        if(!code)return;
-        if(DEPARTMENTS.some(d=>d.code===code)){alert('Mã phòng ban đã tồn tại.');return;}
-        const label=(prompt('Tên phòng ban (VN):','')||'').trim();
-        if(!label)return;
-        const labelEn=(prompt('Tên phòng ban (EN):','')||'').trim()||label;
-        DEPARTMENTS.push({code,label,labelEn,color:'#94a3b8'});
-        DEPT_TITLES[code]=DEPT_TITLES[code]||[];
-        syncTitlesFromDept();saveDepartments();saveDeptTitles();saveTitles();
-        renderAdminDeptTitle();
-      }},'Thêm phòng ban')
+        const code = (prompt('Nhập mã đơn vị cha để thêm vị trí (ví dụ QA, PRO, ENG):','') || '').trim().toUpperCase();
+        if(!code) return;
+        const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(x=>String(x.org_unit_code||'').toUpperCase() === code);
+        if(!unit){ showToast('⚠ Không tìm thấy đơn vị', 'error'); return; }
+        promptCreateAuthoritativePosition(unit.hcm_org_unit_id);
+      }},'Thêm vị trí')
     ])
   ]);
 
   const body=el('div',{style:'margin-top:12px;border:1px solid var(--border,var(--ln));border-radius:14px;background:var(--bg-surface,#fff);overflow:hidden;'},[]);
   const tree=el('div',{style:'padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg-surface-alt,#f8fafc);'},[]);
 
-  DEPARTMENTS.forEach(d=>{
-    const titles=titlesForDept(d.code)||[];
-    const usersInDept = USERS.filter(u=>u.dept===d.code).length;
-    const folder=el('details',{open:true,class:'fm-folder',style:`border:1px solid color-mix(in srgb, ${d.color} 24%, var(--border));background:var(--bg-surface,#fff);border-radius:12px;overflow:hidden;`},[]);
+  orgUnits.forEach(unit=>{
+    const deptColor = defaultDepartmentColor(unit.org_unit_code);
+    const unitPositions = positionsByUnit[String(unit.hcm_org_unit_id || '')] || [];
+    const assignedUsers = USERS.filter(u=>String(u.dept||'') === String(unit.org_unit_code||'')).length;
+    const active = String(unit.status || 'active') !== 'inactive';
+    const folder=el('details',{open:active,class:'fm-folder',style:`border:1px solid color-mix(in srgb, ${deptColor} 24%, var(--border));background:var(--bg-surface,#fff);border-radius:12px;overflow:hidden;${active?'':'opacity:.72;'}`},[]);
     const summary=el('summary',{style:'list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc));'},[
       el('div',{style:'display:flex;align-items:center;gap:10px;'},[
-        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${d.color}18;border:1px solid color-mix(in srgb, ${d.color} 28%, var(--border));display:flex;align-items:center;justify-content:center;font-size:18px;color:${d.color};`},'📁'),
+        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${deptColor}18;border:1px solid color-mix(in srgb, ${deptColor} 28%, var(--border));display:flex;align-items:center;justify-content:center;font-size:18px;color:${deptColor};`},active?'🏢':'📁'),
         el('div',{},[
-          el('div',{style:'font-weight:800;'},`${d.code} — ${d.label}`),
-          el('div',{class:'muted',style:'margin-top:2px;font-size:11px;'},`${titles.length} chức danh • ${usersInDept} người dùng`)
+          el('div',{style:'font-weight:800;'},`${unit.org_unit_code} — ${unit.org_unit_name}`),
+          el('div',{class:'muted',style:'margin-top:2px;font-size:11px;'},`${unit.org_unit_type || 'department'} • ${unitPositions.length} vị trí • ${assignedUsers} user portal`)
         ])
       ]),
       el('div',{style:'display:flex;gap:6px;flex-wrap:wrap;align-items:center;'},[
-        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-          const t=(prompt(`Thêm chức danh cho ${d.code}:`,'')||'').trim();
-          if(!t)return;
-          DEPT_TITLES[d.code]=DEPT_TITLES[d.code]||[];
-          if(DEPT_TITLES[d.code].includes(t)){alert('Chức danh đã tồn tại trong phòng ban này.');return;}
-          DEPT_TITLES[d.code].push(t);
-          syncTitlesFromDept();saveDeptTitles();saveTitles();
-          renderAdminDeptTitle();
-        }},'Thêm chức danh'),
-        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-          const nl=(prompt(`Đổi tên phòng ban ${d.code}:`,d.label)||'').trim();
-          if(!nl)return;
-          d.label=nl; saveDepartments(); renderAdminDeptTitle();
-        }},'Sửa'),
-        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-          if(!confirm(`Xóa phòng ban ${d.code}? (Người dùng thuộc phòng ban này sẽ bị xóa mapping phòng ban/chức danh)`))return;
-          DEPARTMENTS=DEPARTMENTS.filter(x=>x.code!==d.code);
-          delete DEPT_TITLES[d.code];
-          USERS.forEach(u=>{if(u.dept===d.code){u.dept='';u.title='';}});
-          syncTitlesFromDept();saveDepartments();saveDeptTitles();saveTitles();
-          renderAdminDeptTitle(); renderAdminUsers();
-        }},'Xóa')
+        el('span',{style:`font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb, ${deptColor} 28%, var(--border));background:${active?'color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff))':'color-mix(in srgb, var(--amber) 14%, var(--bg-surface,#fff))'};color:${active?'var(--green-dark,#15803d)':'var(--amber-dark,#b45309)'}`},active?'active':'inactive'),
+        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();promptCreateAuthoritativePosition(unit.hcm_org_unit_id);}},'Thêm vị trí'),
+        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();promptEditAuthoritativeOrgUnit(unit.hcm_org_unit_id);}},'Sửa'),
+        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();setAuthoritativeOrgUnitActive(unit.hcm_org_unit_id, !active);}},active?'Ngừng dùng':'Kích hoạt')
       ])
     ]);
     folder.appendChild(summary);
 
     const list=el('div',{style:'padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;background:var(--bg-surface,#fff);'},[]);
-    if(!titles.length){
-      list.appendChild(el('div',{class:'muted',style:'padding:8px 10px;'},'Chưa có chức danh trong phòng ban này.'));
+    if(!unitPositions.length){
+      list.appendChild(el('div',{class:'muted',style:'padding:8px 10px;'},'Chưa có vị trí trong đơn vị này.'));
     }else{
-      titles.forEach(t=>{
-        const count = USERS.filter(u=>u.dept===d.code && u.title===t).length;
+      unitPositions.forEach(position=>{
+        const activePosition = String(position.status || 'active') !== 'inactive';
+        const count = usersByDeptTitle[`${unit.org_unit_code}__${position.position_title}`] || 0;
         const row=el('div',{class:'fm-file-row',style:'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border,var(--ln));border-radius:10px;background:var(--bg-surface-alt,#f8fafc);'},[
           el('div',{style:'display:flex;align-items:center;gap:10px;min-width:0;'},[
-            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));border-radius:8px;font-size:15px;'},'📄'),
+            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));border-radius:8px;font-size:15px;'},activePosition?'📄':'📁'),
             el('div',{style:'min-width:0;'},[
-              el('div',{style:'font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'},t),
-              el('div',{class:'muted',style:'font-size:11px;margin-top:1px;'},`${d.code}/${t}`)
+              el('div',{style:'font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'},String(position.position_title || '')),
+              el('div',{class:'muted',style:'font-size:11px;margin-top:1px;'},`${position.position_code || 'NO-CODE'} • HC ${position.required_headcount || 1} • ${position.employment_type || 'full_time'}`)
             ])
           ]),
           el('div',{style:'display:flex;align-items:center;gap:6px;flex-wrap:wrap;'},[
             el('span',{style:'font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2);border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));'},`${count} user`+(count===1?'':'s')),
-            el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-              const nt=(prompt('Đổi tên chức danh:',t)||'').trim();
-              if(!nt||nt===t)return;
-              DEPT_TITLES[d.code]=DEPT_TITLES[d.code].map(x=>x===t?nt:x);
-              USERS.forEach(u=>{if(u.dept===d.code && u.title===t)u.title=nt;});
-              syncTitlesFromDept();saveDeptTitles();saveTitles(); renderAdminDeptTitle(); renderAdminUsers();
-            }},'Sửa'),
-            el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
-              if(!confirm(`Xóa chức danh "${t}" khỏi ${d.code}?`))return;
-              DEPT_TITLES[d.code]=DEPT_TITLES[d.code].filter(x=>x!==t);
-              USERS.forEach(u=>{if(u.dept===d.code && u.title===t)u.title='';});
-              syncTitlesFromDept();saveDeptTitles();saveTitles(); renderAdminDeptTitle(); renderAdminUsers();
-            }},'Xóa')
+            el('span',{style:`font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:${activePosition?'var(--bg-surface,#fff)':'color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff))'};color:${activePosition?'var(--text-2,#475569)':'var(--amber-dark,#b45309)'}`},activePosition?'active':'inactive'),
+            el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();promptEditAuthoritativePosition(position.hcm_position_id);}},'Sửa'),
+            el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();setAuthoritativePositionActive(position.hcm_position_id, !activePosition);}},activePosition?'Ngừng dùng':'Kích hoạt')
           ])
         ]);
         list.appendChild(row);
@@ -7456,6 +8966,157 @@ function renderAdminDeptTitle(){
   card.appendChild(header);
   card.appendChild(body);
   adminPanel.appendChild(card);
+}
+
+async function promptCreateAuthoritativeOrgUnit(){
+  const code = (prompt('Mã đơn vị tổ chức (ví dụ QA, PRO, ENG):','') || '').trim().toUpperCase();
+  if(!code) return;
+  const name = (prompt('Tên đơn vị:','') || '').trim();
+  if(!name) return;
+  const typeRaw = (prompt('Loại đơn vị: company / division / department / section / team','department') || '').trim().toLowerCase();
+  const orgUnitType = ['company','division','department','section','team'].includes(typeRaw) ? typeRaw : 'department';
+  const parentCode = (prompt('Mã đơn vị cha (để trống nếu là cấp gốc):','') || '').trim().toUpperCase();
+  const parentUnit = parentCode
+    ? (ADMIN_AUTH_STATE.org.orgUnits || []).find(unit => String(unit.org_unit_code||'').toUpperCase() === parentCode)
+    : null;
+  const res = await runtimeCreate('hcm_workforce', 'hcm_org_units', {
+    org_unit_code: code,
+    org_unit_name: name,
+    org_unit_type: orgUnitType,
+    parent_org_unit_id: parentUnit ? parentUnit.hcm_org_unit_id : null,
+    status: 'active',
+    metadata: {color: defaultDepartmentColor(code)}
+  });
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create org unit failed':'Tạo đơn vị thất bại'), 'error');
+    return;
+  }
+  showToast('✅ Đã tạo đơn vị tổ chức');
+  await loadAuthoritativeOrgCatalog({force:true});
+}
+
+async function promptEditAuthoritativeOrgUnit(orgUnitId){
+  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(orgUnitId||''));
+  if(!unit) return;
+  const nextName = (prompt(`Tên mới cho ${unit.org_unit_code}:`, unit.org_unit_name || '') || '').trim();
+  if(!nextName) return;
+  const nextTypeRaw = (prompt('Loại đơn vị: company / division / department / section / team', unit.org_unit_type || 'department') || '').trim().toLowerCase();
+  const nextType = ['company','division','department','section','team'].includes(nextTypeRaw) ? nextTypeRaw : (unit.org_unit_type || 'department');
+  const nextParentCode = (prompt('Mã đơn vị cha mới (để trống nếu giữ/cấp gốc):', (() => {
+    const parent = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(unit.parent_org_unit_id||''));
+    return parent ? parent.org_unit_code : '';
+  })()) || '').trim().toUpperCase();
+  const nextParent = nextParentCode
+    ? (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.org_unit_code||'').toUpperCase() === nextParentCode)
+    : null;
+  const metadata = Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)});
+  const res = await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
+    org_unit_name: nextName,
+    org_unit_type: nextType,
+    parent_org_unit_id: nextParent ? nextParent.hcm_org_unit_id : null,
+    metadata
+  }, unit.row_version || null);
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Update org unit failed':'Cập nhật đơn vị thất bại'), 'error');
+    return;
+  }
+  showToast('✅ Đã cập nhật đơn vị tổ chức');
+  await loadAuthoritativeOrgCatalog({force:true});
+}
+
+async function setAuthoritativeOrgUnitActive(orgUnitId, active){
+  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(orgUnitId||''));
+  if(!unit) return;
+  const confirmed = confirm(active ? `Kích hoạt lại đơn vị ${unit.org_unit_code}?` : `Ngừng sử dụng đơn vị ${unit.org_unit_code}?`);
+  if(!confirmed) return;
+  const res = await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
+    status: active ? 'active' : 'inactive',
+    metadata: Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)})
+  }, unit.row_version || null);
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Org unit status update failed':'Cập nhật trạng thái đơn vị thất bại'), 'error');
+    return;
+  }
+  showToast(active ? '✅ Đã kích hoạt lại đơn vị' : '✅ Đã ngừng dùng đơn vị');
+  await loadAuthoritativeOrgCatalog({force:true});
+}
+
+async function promptCreateAuthoritativePosition(orgUnitId){
+  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(orgUnitId||''));
+  if(!unit) return;
+  const code = (prompt(`Mã vị trí cho ${unit.org_unit_code}:`,'') || '').trim().toUpperCase();
+  if(!code) return;
+  const title = (prompt('Tên vị trí:','') || '').trim();
+  if(!title) return;
+  const headcountRaw = (prompt('Headcount yêu cầu:', '1') || '').trim();
+  const headcount = Math.max(1, Number(headcountRaw) || 1);
+  const employmentTypeRaw = (prompt('Loại việc làm: full_time / part_time / contractor / intern','full_time') || '').trim().toLowerCase();
+  const employmentType = ['full_time','part_time','contractor','intern'].includes(employmentTypeRaw) ? employmentTypeRaw : 'full_time';
+  const reportsToCode = (prompt('Mã vị trí báo cáo lên (để trống nếu không có):','') || '').trim().toUpperCase();
+  const reportsTo = reportsToCode
+    ? (ADMIN_AUTH_STATE.org.positions || []).find(position => String(position.position_code||'').toUpperCase() === reportsToCode)
+    : null;
+  const res = await runtimeCreate('hcm_workforce', 'hcm_positions', {
+    position_code: code,
+    position_title: title,
+    hcm_org_unit_id: unit.hcm_org_unit_id,
+    required_headcount: headcount,
+    employment_type: employmentType,
+    reports_to_position_id: reportsTo ? reportsTo.hcm_position_id : null,
+    status: 'active'
+  });
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create position failed':'Tạo vị trí thất bại'), 'error');
+    return;
+  }
+  showToast('✅ Đã tạo vị trí');
+  await loadAuthoritativeOrgCatalog({force:true});
+}
+
+async function promptEditAuthoritativePosition(positionId){
+  const position = (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.hcm_position_id||'') === String(positionId||''));
+  if(!position) return;
+  const nextTitle = (prompt('Tên vị trí:', position.position_title || '') || '').trim();
+  if(!nextTitle) return;
+  const headcountRaw = (prompt('Headcount yêu cầu:', String(position.required_headcount || 1)) || '').trim();
+  const nextHeadcount = Math.max(1, Number(headcountRaw) || Number(position.required_headcount || 1) || 1);
+  const nextEmploymentTypeRaw = (prompt('Loại việc làm: full_time / part_time / contractor / intern', position.employment_type || 'full_time') || '').trim().toLowerCase();
+  const nextEmploymentType = ['full_time','part_time','contractor','intern'].includes(nextEmploymentTypeRaw) ? nextEmploymentTypeRaw : (position.employment_type || 'full_time');
+  const nextReportsToCode = (prompt('Mã vị trí báo cáo lên:', (() => {
+    const parent = (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.hcm_position_id||'') === String(position.reports_to_position_id||''));
+    return parent ? parent.position_code : '';
+  })()) || '').trim().toUpperCase();
+  const nextReportsTo = nextReportsToCode
+    ? (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.position_code||'').toUpperCase() === nextReportsToCode)
+    : null;
+  const res = await runtimeUpdate('hcm_workforce', 'hcm_positions', position.hcm_position_id, {
+    position_title: nextTitle,
+    required_headcount: nextHeadcount,
+    employment_type: nextEmploymentType,
+    reports_to_position_id: nextReportsTo ? nextReportsTo.hcm_position_id : null
+  }, position.row_version || null);
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Update position failed':'Cập nhật vị trí thất bại'), 'error');
+    return;
+  }
+  showToast('✅ Đã cập nhật vị trí');
+  await loadAuthoritativeOrgCatalog({force:true});
+}
+
+async function setAuthoritativePositionActive(positionId, active){
+  const position = (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.hcm_position_id||'') === String(positionId||''));
+  if(!position) return;
+  const confirmed = confirm(active ? `Kích hoạt lại vị trí ${position.position_code}?` : `Ngừng sử dụng vị trí ${position.position_code}?`);
+  if(!confirmed) return;
+  const res = await runtimeUpdate('hcm_workforce', 'hcm_positions', position.hcm_position_id, {
+    status: active ? 'active' : 'inactive'
+  }, position.row_version || null);
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Position status update failed':'Cập nhật trạng thái vị trí thất bại'), 'error');
+    return;
+  }
+  showToast(active ? '✅ Đã kích hoạt lại vị trí' : '✅ Đã ngừng dùng vị trí');
+  await loadAuthoritativeOrgCatalog({force:true});
 }
 
 function addDept(){
@@ -7530,84 +9191,124 @@ function deleteTitle(idx){
 // ═══════════════════════════════════════════════════
 function renderAdminOrgChart(){
   const el = document.getElementById('admin-content');
-  
-  // Build hierarchy from ROLES levels and actual users
-  const levelGroups = {};
-  USERS.filter(u=>u.active!==false).forEach(u=>{
-    const r = ROLES[u.role];
-    const level = r ? r.level : 5;
-    if(!levelGroups[level]) levelGroups[level] = [];
-    levelGroups[level].push(u);
-  });
-  
-  const levels = Object.keys(levelGroups).sort((a,b)=>Number(a)-Number(b));
-  const deptMap = {};
-  DEPARTMENTS.forEach(d=>deptMap[d.code]=d);
-  
-  let chartHtml = '<div class="org-chart-container"><div style="text-align:center">';
-  
-  levels.forEach((lv,li)=>{
-    const users = levelGroups[lv];
-    const levelLabel = lv==='0' ? 'Ban Giám Đốc' : lv==='1' ? 'Quản lý cấp cao' : lv==='2' ? 'Trưởng phòng' : lv==='3' ? 'Chuyên viên / Nhân viên' : lv==='4' ? 'Nhân viên' : 'Thực tập';
-    
-    chartHtml += `<div style="margin-bottom:8px">
-      <div style="font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">Level ${lv} — ${levelLabel}</div>
-      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:4px">`;
-    
-    // Group users by dept within this level
-    const deptGrouped = {};
-    users.forEach(u=>{
-      if(!deptGrouped[u.dept]) deptGrouped[u.dept] = [];
-      deptGrouped[u.dept].push(u);
-    });
-    
-    Object.entries(deptGrouped).forEach(([dept, dUsers])=>{
-      const dc = deptMap[dept];
-      const borderColor = dc ? dc.color : '#94a3b8';
-      dUsers.forEach(u=>{
-        const r = ROLES[u.role];
-        chartHtml += `<div class="org-node" style="border-color:${borderColor}" title="${escapeHtml(u.username)}">
-          <div style="font-size:16px">${r?r.icon:'👤'}</div>
-          <div class="on-name">${escapeHtml(u.name)}</div>
-          <div class="on-title">${escapeHtml(u.title)}</div>
-          <div class="on-dept" style="background:${borderColor}15;color:${borderColor}">${escapeHtml(u.dept)}</div>
-        </div>`;
-      });
-    });
-    
-    chartHtml += '</div>';
-    
-    // Connector line between levels
-    if(li < levels.length - 1){
-      chartHtml += '<div style="width:2px;height:20px;background:var(--border);margin:0 auto"></div>';
+  if(!ADMIN_AUTH_STATE.org.loaded){
+    if(!ADMIN_AUTH_STATE.org.loading && !ADMIN_AUTH_STATE.org.error){
+      loadAuthoritativeOrgCatalog({silent:true});
     }
-    
-    chartHtml += '</div>';
+    if((DEPARTMENTS && DEPARTMENTS.length) || USERS.length){
+      renderAdminOrgChartFallback();
+      return;
+    }
+    el.innerHTML = authoritativeLoadSummaryHtml('org');
+    return;
+  }
+
+  const orgUnits = (ADMIN_AUTH_STATE.org.orgUnits || []).slice().sort((a,b)=>{
+    const typeCmp = orgUnitTypeWeight(String(a.org_unit_type||'')) - orgUnitTypeWeight(String(b.org_unit_type||''));
+    if(typeCmp !== 0) return typeCmp;
+    return String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||''));
   });
-  
-  chartHtml += '</div></div>';
-  
+  const positions = (ADMIN_AUTH_STATE.org.positions || []).slice();
+  const hcmEmployees = (ADMIN_AUTH_STATE.org.employees || []).slice();
+  const childrenByParent = {};
+  const positionsByUnit = {};
+  const employeesByPosition = {};
+  const portalUsersByDeptTitle = {};
+
+  orgUnits.forEach(unit=>{
+    const parentId = String(unit.parent_org_unit_id || '');
+    if(!childrenByParent[parentId]) childrenByParent[parentId] = [];
+    childrenByParent[parentId].push(unit);
+  });
+  positions.forEach(position=>{
+    const unitId = String(position.hcm_org_unit_id || '');
+    if(!positionsByUnit[unitId]) positionsByUnit[unitId] = [];
+    positionsByUnit[unitId].push(position);
+  });
+  hcmEmployees.forEach(employee=>{
+    const positionId = String(employee.hcm_position_id || '');
+    if(!employeesByPosition[positionId]) employeesByPosition[positionId] = [];
+    employeesByPosition[positionId].push(employee);
+  });
+  USERS.filter(u=>u.active!==false).forEach(user=>{
+    const key = `${String(user.dept||'')}__${String(user.title||'')}`;
+    if(!portalUsersByDeptTitle[key]) portalUsersByDeptTitle[key] = [];
+    portalUsersByDeptTitle[key].push(user);
+  });
+
+  function renderOrgUnitNode(unit, depth){
+    const color = defaultDepartmentColor(unit.org_unit_code);
+    const unitId = String(unit.hcm_org_unit_id || '');
+    const unitPositions = (positionsByUnit[unitId] || []).slice().sort((a,b)=>String(a.position_title||'').localeCompare(String(b.position_title||'')));
+    const childUnits = (childrenByParent[unitId] || []).slice().sort((a,b)=>String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||'')));
+    const active = String(unit.status || 'active') !== 'inactive';
+    const unitUsers = USERS.filter(u=>String(u.dept||'') === String(unit.org_unit_code||'') && u.active !== false);
+    const marginLeft = depth * 18;
+    return `
+      <div style="margin-left:${marginLeft}px;border:1px solid color-mix(in srgb, ${color} 24%, var(--border));border-radius:14px;background:var(--bg-surface,#fff);overflow:hidden">
+        <div style="padding:12px 14px;background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc));border-bottom:1px solid color-mix(in srgb, ${color} 24%, var(--border));display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-weight:800;color:${color}">${escapeHtml(String(unit.org_unit_code||''))}</span>
+              <span style="font-weight:700">${escapeHtml(String(unit.org_unit_name||''))}</span>
+              <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${active?'color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff))':'color-mix(in srgb, var(--amber) 14%, var(--bg-surface,#fff))'};border:1px solid color-mix(in srgb, ${color} 18%, var(--border));color:${active?'var(--green-dark,#15803d)':'var(--amber-dark,#b45309)'}">${escapeHtml(String(unit.org_unit_type||'department'))}</span>
+            </div>
+            <div class="muted" style="margin-top:4px;font-size:11px">
+              ${unitPositions.length} vị trí • ${unitUsers.length} user portal • ${childUnits.length} đơn vị con
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-3)">
+            Manager employee: <b>${escapeHtml(String(unit.manager_employee_id || '—'))}</b>
+          </div>
+        </div>
+        <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--bg-surface-alt,#f8fafc)">
+          ${unitPositions.length ? unitPositions.map(position=>{
+            const activePosition = String(position.status || 'active') !== 'inactive';
+            const assignedEmployees = employeesByPosition[String(position.hcm_position_id || '')] || [];
+            const portalUsers = portalUsersByDeptTitle[`${String(unit.org_unit_code||'')}__${String(position.position_title||'')}`] || [];
+            return `<div style="border:1px solid var(--border);border-radius:10px;background:var(--bg-surface,#fff);padding:10px 12px">
+              <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                <div>
+                  <div style="font-weight:700">${escapeHtml(String(position.position_title || ''))}</div>
+                  <div class="muted" style="font-size:11px;margin-top:2px">${escapeHtml(String(position.position_code || ''))} • reports-to ${escapeHtml(String(position.reports_to_position_title || '—'))}</div>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:${activePosition?'var(--bg-surface,#fff)':'color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff))'};color:${activePosition?'var(--text-2,#475569)':'var(--amber-dark,#b45309)'}">${activePosition?'active':'inactive'}</span>
+                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));color:var(--brand-2)">HC ${escapeHtml(String(position.required_headcount || 1))}</span>
+                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 24%, var(--border));color:var(--green-dark,#15803d)">HCM ${assignedEmployees.length}</span>
+                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--cyan) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--cyan) 24%, var(--border));color:var(--cyan-dark,#0f766e)">Portal ${portalUsers.length}</span>
+                </div>
+              </div>
+              ${(assignedEmployees.length || portalUsers.length) ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                ${assignedEmployees.map(emp=>`<span style="font-size:10px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));color:var(--green-dark,#166534);border:1px solid color-mix(in srgb, var(--green) 22%, var(--border))">${escapeHtml(String(emp.employee_lookup_name || emp.employee_id || 'employee'))}</span>`).join('')}
+                ${portalUsers.map(user=>`<span style="font-size:10px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb, var(--cyan) 10%, var(--bg-surface,#fff));color:var(--cyan-dark,#0f766e);border:1px solid color-mix(in srgb, var(--cyan) 22%, var(--border))">@${escapeHtml(String(user.username || ''))}</span>`).join('')}
+              </div>` : '<div class="muted" style="margin-top:8px;font-size:11px">Chưa có gán nhân sự cho vị trí này.</div>'}
+            </div>`;
+          }).join('') : '<div class="muted" style="padding:10px 12px;background:var(--bg-surface,#fff);border:1px dashed var(--border);border-radius:10px">Đơn vị này chưa có vị trí nào trong HCM runtime.</div>'}
+          ${childUnits.map(child => renderOrgUnitNode(child, depth + 1)).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  const roots = (childrenByParent[''] || []).length ? (childrenByParent[''] || []) : orgUnits.filter(unit => !unit.parent_org_unit_id);
+  const html = roots.map(root => renderOrgUnitNode(root, 0)).join('');
+
   el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization Chart':'Sơ đồ Tổ chức Công ty'}</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization chart':'Sơ đồ tổ chức authoritative'}</h3>
       <div style="display:flex;gap:8px">
-        <button class="btn-admin secondary" onclick="exportOrgChartSVG()">📥 ${lang==='en'?'Export SVG':'Xuất SVG'}</button>
+        <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
         <button class="btn-admin secondary" onclick="window.print()">🖨 ${lang==='en'?'Print':'In'}</button>
       </div>
     </div>
     <div style="font-size:11px;color:var(--text-3);margin-bottom:16px">
       ${lang==='en'
-        ?'Auto-generated from user database. Grouped by role level and department.'
-        :'Tự động tạo từ cơ sở dữ liệu người dùng. Nhóm theo cấp vai trò và phòng ban.'}
+        ?'Generated from HCM org units and positions, then cross-checked against portal users. This replaces the old synthetic role-level diagram.'
+        :'Dựng từ HCM org units và positions, sau đó đối chiếu với user portal. Đây là projection authoritative thay cho sơ đồ suy diễn theo level vai trò.'}
     </div>
-    <div style="border:1px solid var(--border);border-radius:10px;overflow:auto;background:var(--bg-surface-alt,#fafbfc);max-height:600px">
-      ${chartHtml}
-    </div>
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-      ${DEPARTMENTS.map(d=>`<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:6px;background:${d.color}10;color:${d.color};border:1px solid ${d.color}30">
-        <span style="width:8px;height:8px;border-radius:50%;background:${d.color}"></span>
-        ${d.code} — ${lang==='en'?d.labelEn:d.label}
-      </span>`).join('')}
+    <div style="border:1px solid var(--border);border-radius:12px;overflow:auto;background:var(--bg-surface-alt,#fafbfc);max-height:680px;padding:12px;display:flex;flex-direction:column;gap:10px">
+      ${html || '<div class="hm-empty">Chưa có dữ liệu org unit authoritative.</div>'}
     </div>`;
 }
 
@@ -7620,30 +9321,34 @@ function exportOrgChartSVG(){
 // ═══════════════════════════════════════════════════
 function renderAdminActivity(){
   const el = document.getElementById('admin-content');
-  
-  // Permission check
   if(!canViewActivityLog()){
     el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-3)">⛔ '+(lang==='en'?'You do not have permission to view this tab. Contact the General Manager (EXE-01).':'Bạn không có quyền xem tab này. Liên hệ General Manager (EXE-01).')+'</div>';
     return;
   }
-  
-  // Sort by most recent first
-  const logs = [...ACTIVITY_LOG].reverse();
-  
-  const uniqueUsers = [...new Set(logs.map(l=>l.user))];
-  
+
+  if(!ADMIN_AUTH_STATE.audit.loaded){
+    if(!ADMIN_AUTH_STATE.audit.loading && !ADMIN_AUTH_STATE.audit.error){
+      loadAuthoritativeAuditTrail({silent:true});
+    }
+    renderAdminActivityFallback();
+    return;
+  }
+
+  const auditEvents = (ADMIN_AUTH_STATE.audit.events || []).slice().sort((a,b)=>String(b.recorded_at||'').localeCompare(String(a.recorded_at||'')));
+  const uniqueUsers = [...new Set(auditEvents.map(item => item.actor_name).filter(Boolean))];
+
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'User Activity Monitor':'Kiểm soát Hành vi Người dùng'}</h3>
+      <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'Administrative audit trail':'Kiểm soát hành vi & audit trail'}</h3>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn-admin secondary" onclick="document.getElementById('ds-panel').style.display=document.getElementById('ds-panel').style.display==='none'?'':'none'">⚙️ ${lang==='en'?'Settings':'Cài đặt'}</button>
       <div style="display:flex;gap:8px;align-items:center">
         <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">
-          <option value="">${lang==='en'?'All users':'Tất cả'}</option>
+          <option value="">${lang==='en'?'All actors':'Tất cả actor'}</option>
           ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('')}
         </select>
+        <button class="btn-admin secondary" onclick="loadAuthoritativeAuditTrail({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
         <button class="btn-admin secondary" onclick="exportActivityCSV()">📥 CSV</button>
-        <button class="btn-admin danger" onclick="clearActivityLog()">🗑 ${lang==='en'?'Clear':'Xóa log'}</button>
       </div>
     </div>
     <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
@@ -7678,93 +9383,49 @@ function renderAdminActivity(){
       </div>
       <div style="padding:10px 14px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--brand-2)">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
     </div>
-    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
-      🛡 <b>${lang==='en'?'Security Audit Log':'Nhật ký Kiểm toán Bảo mật'}:</b> 
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 28%, var(--border));border-radius:8px">
+      🛡 <b>${lang==='en'?'Authoritative audit trail':'Audit trail authoritative'}:</b> 
       ${lang==='en'
-        ?'Records session data: login time, IP, GPS coordinates, device fingerprint, detailed page-by-page navigation with exact timestamps and viewing duration.'
-        :'Ghi nhận dữ liệu phiên: thời gian đăng nhập, IP, tọa độ GPS, vân tay thiết bị, điều hướng chi tiết từng trang với thời điểm chính xác và thời lượng xem.'}
+        ?'Server-side administrative actions are sourced from the system audit layer. This tab no longer relies on browser-local telemetry for governance decisions.'
+        :'Các hành động quản trị phía server được lấy từ lớp audit hệ thống. Tab này không còn dựa vào telemetry cục bộ của trình duyệt cho quyết định quản trị.'}
     </div>
     <div id="activity-sessions-list" style="max-height:550px;overflow-y:auto">
-      ${logs.length === 0 
-        ? '<div style="text-align:center;padding:40px;color:var(--text-3)">'+( lang==='en'?'No activity recorded yet':'Chưa có hoạt động nào được ghi')+'</div>'
-        : logs.map((s,si)=>{
-          const loginDate = new Date(s.login_time);
-          const dateStr = loginDate.toLocaleDateString('vi-VN') + ' ' + loginDate.toLocaleTimeString('vi-VN');
-          const totalPages = (s.pages||[]).length;
-          const totalTime = (s.pages||[]).reduce((sum,p)=>sum+(p.duration_sec||0),0);
-          return `<div class="al-session" data-user="${escapeHtml(s.user)}" data-idx="${si}">
+      ${auditEvents.length === 0
+        ? '<div style="text-align:center;padding:40px;color:var(--text-3)">'+( lang==='en'?'No authoritative audit event recorded yet':'Chưa có audit event authoritative nào')+'</div>'
+        : auditEvents.map((event,idx)=>{
+          const recorded = event.recorded_at ? new Date(event.recorded_at) : null;
+          const dateStr = recorded && !Number.isNaN(recorded.getTime())
+            ? recorded.toLocaleDateString('vi-VN') + ' ' + recorded.toLocaleTimeString('vi-VN')
+            : '—';
+          const context = (event.payload && typeof event.payload === 'object') ? (event.payload.context || event.payload) : {};
+          const contextText = escapeHtml(JSON.stringify(context || {}, null, 2));
+          return `<div class="al-session" data-user="${escapeHtml(event.actor_name || '')}" data-idx="${idx}">
             <div class="al-header">
               <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap">
-                <span style="font-weight:700;font-size:12px;color:var(--text)">${escapeHtml(s.name||s.user)}</span>
-                <span style="font-family:var(--mono);font-size:10px;color:var(--text-3)">@${escapeHtml(s.user)}</span>
-                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2)">${escapeHtml(s.role||'')}</span>
+                <span style="font-weight:700;font-size:12px;color:var(--text)">${escapeHtml(event.actor_name || 'system')}</span>
+                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2)">${escapeHtml(event.event_type || 'event')}</span>
                 <span style="font-size:10px;color:var(--text-2)">🕐 ${dateStr}</span>
               </div>
               <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('▾')?'▴ Thu gọn':'▾ Chi tiết'">
                 ▾ ${lang==='en'?'Detail':'Chi tiết'}
               </button>
             </div>
-            <!-- Summary row -->
             <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:var(--bg-surface-alt,#f8fafc);border-radius:6px">
-              <span>🌐 <b>IP:</b> ${escapeHtml(s.ip||'—')}</span>
-              <span>📍 <b>GPS:</b> ${escapeHtml(s.location||'—')} ${s.location_accuracy&&s.location_accuracy!=='—'?'(±'+escapeHtml(s.location_accuracy)+')':''}</span>
-              <span>📱 <b>${lang==='en'?'Device':'Thiết bị'}:</b> ${escapeHtml(s.device_short||s.platform||'—')}</span>
-              <span>🖥 <b>${lang==='en'?'Screen':'Màn hình'}:</b> ${escapeHtml(s.screen||'—')}</span>
-              <span>🔲 <b>Viewport:</b> ${escapeHtml(s.viewport||'—')}</span>
-              <span>🌍 <b>TZ:</b> ${escapeHtml(s.timezone||'—')}</span>
-              <span>📶 <b>Net:</b> ${escapeHtml(s.connection_type||'—')}</span>
-              <span>📄 <b>${totalPages}</b> ${lang==='en'?'pages':'trang'} · <b>${formatDuration(totalTime)}</b></span>
+              <span>🧩 <b>Aggregate:</b> ${escapeHtml(event.aggregate_type || 'api_action')}</span>
+              <span>🔑 <b>ID:</b> ${escapeHtml(event.aggregate_id || '—')}</span>
+              <span>🌐 <b>IP:</b> ${escapeHtml(event.ip_address || '—')}</span>
             </div>
-            <!-- Detailed page-by-page log (hidden by default) -->
             <div class="al-detail" style="display:none">
               <div style="font-size:10px;font-weight:700;margin:8px 0 6px;color:var(--text-2);border-bottom:1px solid var(--border);padding-bottom:4px">
-                📋 ${lang==='en'?'Page-by-page navigation log':'Nhật ký điều hướng từng trang'} (${totalPages} ${lang==='en'?'entries':'mục'})
+                ${lang==='en'?'Payload context':'Ngữ cảnh payload'}
               </div>
-              <table style="width:100%;border-collapse:collapse;font-size:10px">
-                <thead><tr style="background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff))">
-                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">#</th>
-                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Page / Document':'Trang / Tài liệu'}</th>
-                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Started viewing':'Bắt đầu xem'}</th>
-                  <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Left at':'Rời lúc'}</th>
-                  <th style="text-align:right;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Duration':'Thời lượng'}</th>
-                </tr></thead>
-                <tbody>
-                ${(s.pages||[]).map((p,pi)=>{
-                  const entered = new Date(p.entered_at);
-                  const enteredStr = entered.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-                  const leftStr = p.left_at ? new Date(p.left_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
-                  const isDoc = (p.page_id||p.page||'').startsWith('doc/');
-                  const durColor = (p.duration_sec||0) > 300 ? '#dc2626' : (p.duration_sec||0) > 60 ? '#d97706' : '#16a34a';
-                  return `<tr style="border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent)">
-                    <td style="padding:3px 8px;color:var(--text-3)">${pi+1}</td>
-                    <td style="padding:3px 8px">
-                      ${isDoc?'📄':'📁'} <b>${escapeHtml(p.page_title||p.page_id||p.page||'—')}</b>
-                      <span style="font-family:var(--mono);font-size:9px;color:var(--text-3);margin-left:4px">${escapeHtml(p.page_id||p.page||'')}</span>
-                    </td>
-                    <td style="padding:3px 8px;font-family:var(--mono)">${enteredStr}</td>
-                    <td style="padding:3px 8px;font-family:var(--mono)">${leftStr}</td>
-                    <td style="padding:3px 8px;text-align:right;font-weight:600;color:${durColor}">${formatDuration(p.duration_sec||0)}</td>
-                  </tr>`;
-                }).join('')}
-                </tbody>
-              </table>
-              <div style="margin-top:8px;font-size:9px;color:var(--text-3);padding:6px 8px;background:var(--bg-surface-alt,#f8fafc);border-radius:4px">
-                <b>Full User-Agent:</b> ${escapeHtml(s.device||'—')}<br>
-                <b>Language:</b> ${escapeHtml(s.language||'—')} · <b>Cookies:</b> ${s.cookies_enabled?'Yes':'No'} · <b>Online:</b> ${s.online?'Yes':'No'}
-              </div>
+              <pre style="margin:0;padding:10px;border-radius:8px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);font-size:10px;line-height:1.45;white-space:pre-wrap;word-break:break-word">${contextText}</pre>
             </div>
           </div>`;
         }).join('')
       }
     </div>`;
-}
 
-function formatDuration(sec){
-  if(!sec || sec < 1) return '< 1s';
-  if(sec < 60) return sec+'s';
-  const m = Math.floor(sec/60);
-  const s = sec%60;
-  return m+'m'+( s>0?' '+s+'s':'');
 }
 
 function filterActivityLog(){
@@ -7776,28 +9437,20 @@ function filterActivityLog(){
 }
 
 function exportActivityCSV(){
-  let csv = 'User,Name,Role,Dept,Login Time,IP,GPS Location,GPS Accuracy,Device,Screen,Viewport,Timezone,Connection,Page ID,Page Title,Started At,Left At,Duration (s)\n';
-  ACTIVITY_LOG.forEach(s=>{
-    (s.pages||[]).forEach(p=>{
-      csv += `"${s.user}","${s.name}","${s.role||''}","${s.dept||''}","${s.login_time}","${s.ip||''}","${s.location||''}","${s.location_accuracy||''}","${(s.device_short||s.platform||'').replace(/"/g,"'")}","${s.screen||''}","${s.viewport||''}","${s.timezone||''}","${s.connection_type||''}","${p.page_id||p.page||''}","${(p.page_title||'').replace(/"/g,"'")}","${p.entered_at||''}","${p.left_at||''}",${p.duration_sec||0}\n`;
-    });
+  const events = ADMIN_AUTH_STATE.audit.loaded ? (ADMIN_AUTH_STATE.audit.events || []) : legacyAuditEventsForAdmin();
+  let csv = 'Recorded At,Actor,Event Type,Aggregate Type,Aggregate ID,IP,Payload\n';
+  events.forEach(event=>{
+    const payload = JSON.stringify(event.payload || {}).replace(/"/g, '\'');
+    csv += `"${event.recorded_at||''}","${event.actor_name||''}","${event.event_type||''}","${event.aggregate_type||''}","${event.aggregate_id||''}","${event.ip_address||''}","${payload}"\n`;
   });
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'hesem_activity_log_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download = 'hesem_audit_trail_'+new Date().toISOString().slice(0,10)+'.csv';
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},0);
   showToast('✅ '+(lang==='en'?'Exported':'Đã xuất'));
-}
-
-function clearActivityLog(){
-  if(!confirm(lang==='en'?'Clear all activity log?':'Xóa toàn bộ log hoạt động?')) return;
-  ACTIVITY_LOG.length = 0;
-  saveActivityLog();
-  showToast('✅ '+(lang==='en'?'Cleared':'Đã xóa'));
-  renderAdminActivity();
 }
 
 // ═══════════════════════════════════════════════════
@@ -7805,86 +9458,180 @@ function clearActivityLog(){
 // ═══════════════════════════════════════════════════
 function renderAdminRoles(){
   const el=document.getElementById('admin-content');
-  const roleOpts=Object.entries(ROLES).map(([k,v])=>'<option value="'+k+'">'+v.icon+' '+v.label+'</option>').join('');
+  if(!ADMIN_AUTH_STATE.roles.loaded){
+    if(!ADMIN_AUTH_STATE.roles.loading && !ADMIN_AUTH_STATE.roles.error){
+      loadAuthoritativeRoleCatalog({silent:true});
+    }
+    if(Object.keys(ROLES || {}).length){
+      renderAdminRolesFallback();
+      return;
+    }
+    el.innerHTML = authoritativeLoadSummaryHtml('roles');
+    return;
+  }
+  const rows = rolesForAdminGrid();
   el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <div>
+        <h3 style="font-size:14px;font-weight:700;margin:0">🛡 ${lang==='en'?'Authoritative role catalog':'Catalog vai trò authoritative'}</h3>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
+          ?'Role definitions are sourced from core_system.roles. Backend admin status remains immutable and is not governed by this grid.'
+          :'Định nghĩa vai trò lấy từ core_system.roles. Trạng thái admin backend là bất biến và không bị chỉnh trong bảng này.'}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-admin secondary" onclick="loadAuthoritativeRoleCatalog({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
+        <button class="btn-admin primary" onclick="promptCreateSystemRole()">＋ ${lang==='en'?'Create role':'Tạo vai trò'}</button>
+      </div>
+    </div>
     <div style="overflow-x:auto">
       <table class="admin-table">
         <thead><tr>
-          <th></th><th>${lang==='en'?'Role':'Vai trò'}</th><th>Level</th>
-          <th>${lang==='en'?'Edit':'Sửa'}</th>
-          <th>${lang==='en'?'Create':'Tạo mới'}</th>
-          <th>${lang==='en'?'Approve':'Duyệt'}</th><th>Admin</th>
-          <th title="${lang==='en'?'Can view Activity Log tab':'Xem được tab Kiểm soát hành vi'}">👁 ${lang==='en'?'Activity':'Hành vi'}</th>
-          <th title="${lang==='en'?'Can export/import user Excel':'Xuất/nhập Excel người dùng'}">📥 Excel</th>
-          <th>${lang==='en'?'Documents':'Tài liệu'}</th>
+          <th></th>
+          <th>${lang==='en'?'Role':'Vai trò'}</th>
+          <th>Code</th>
+          <th>Dept</th>
+          <th>Level</th>
+          <th>${lang==='en'?'Edit docs':'Sửa tài liệu'}</th>
+          <th>${lang==='en'?'Create docs':'Tạo tài liệu'}</th>
+          <th>${lang==='en'?'Approve':'Duyệt'}</th>
+          <th>${lang==='en'?'Activity':'Hành vi'}</th>
+          <th>Excel</th>
+          <th>${lang==='en'?'Backend admin':'Admin backend'}</th>
           <th>${lang==='en'?'Members':'Thành viên'}</th>
+          <th>${lang==='en'?'Status':'Trạng thái'}</th>
+          <th>${lang==='en'?'Actions':'Thao tác'}</th>
         </tr></thead>
         <tbody>
-          ${Object.entries(ROLES).map(([k,v])=>{
-            const cnt=ROLE_DOCS[k]==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,k)).length;
-            const roleUsers=USERS.filter(u=>u.role===k&&u.active);
-            const pct=Math.round(cnt/DOCS.length*100);
+          ${rows.map(row=>{
+            const code = String(row.role_code || '');
+            const codeJs = JSON.stringify(code);
+            const ui = roleRecordUi(code, row);
+            const members = USERS.filter(user => String(user.role||'') === code && user.active !== false);
+            const active = row.is_active !== false;
             return `<tr>
-              <td>${v.icon}</td>
+              <td style="font-size:16px">${escapeHtml(ui.icon || '👤')}</td>
               <td>
-                <b style="color:${v.color}">${v.label}</b><br>
-                <span style="font-size:10px;color:var(--text-3)">${v.labelEn}</span>
+                <b style="color:${escapeHtml(ui.color)}">${escapeHtml(ui.label || code)}</b><br>
+                <span style="font-size:10px;color:var(--text-3)">${escapeHtml(ui.labelEn || row.role_label || code)}</span>
+                ${row.description ? `<div style="font-size:10px;color:var(--text-3);margin-top:4px">${escapeHtml(row.description)}</div>` : ''}
               </td>
-              <td style="text-align:center">${v.level}</td>
-              <td style="text-align:center">
-                <input type="checkbox" ${v.canEditDocs?'checked':''} onchange="ROLES['${k}'].canEditDocs=this.checked;markUnsaved();renderAdminRoles()">
+              <td style="font-family:var(--mono);font-size:11px">${escapeHtml(code)}</td>
+              <td>${escapeHtml(row.dept_code || ui.dept || '—')}</td>
+              <td style="text-align:center">${escapeHtml(String(ui.level))}</td>
+              <td style="text-align:center"><input type="checkbox" ${ui.canEditDocs?'checked':''} onchange="toggleSystemRoleFlag(${codeJs},'canEditDocs',this.checked)"></td>
+              <td style="text-align:center"><input type="checkbox" ${ui.canCreateDocs?'checked':''} onchange="toggleSystemRoleFlag(${codeJs},'canCreateDocs',this.checked)"></td>
+              <td style="text-align:center"><input type="checkbox" ${ui.approve?'checked':''} onchange="toggleSystemRoleFlag(${codeJs},'approve',this.checked)"></td>
+              <td style="text-align:center"><input type="checkbox" ${ui.canViewActivity?'checked':''} onchange="toggleSystemRoleFlag(${codeJs},'canViewActivity',this.checked)"></td>
+              <td style="text-align:center"><input type="checkbox" ${ui.canExportUsers?'checked':''} onchange="toggleSystemRoleFlag(${codeJs},'canExportUsers',this.checked)"></td>
+              <td style="text-align:center">${ROLES[code] && ROLES[code].admin ? '<span title="Immutable backend admin flag">🔒</span>' : '<span style="color:var(--text-3)">—</span>'}</td>
+              <td style="min-width:140px">
+                ${members.length
+                  ? members.slice(0,4).map(user=>`<div style="font-size:10px;padding:2px 0">${escapeHtml(user.name)}</div>`).join('') + (members.length > 4 ? `<div style="font-size:10px;color:var(--text-3)">+${members.length - 4} khác</div>` : '')
+                  : `<span style="font-size:10px;color:var(--text-3);font-style:italic">${lang==='en'?'No portal users':'Chưa có user portal'}</span>`}
               </td>
               <td style="text-align:center">
-                <input type="checkbox" ${v.canCreateDocs?'checked':''} onchange="ROLES['${k}'].canCreateDocs=this.checked;markUnsaved();renderAdminRoles()">
-              </td>
-              <td style="text-align:center">
-                <input type="checkbox" ${v.approve?'checked':''} onchange="ROLES['${k}'].approve=this.checked;markUnsaved();renderAdminRoles()">
-              </td>
-              <td style="text-align:center">
-                <input type="checkbox" ${v.admin?'checked':''} onchange="ROLES['${k}'].admin=this.checked;markUnsaved();renderAdminRoles()">
-              </td>
-              <td style="text-align:center">
-                <input type="checkbox" ${v.canViewActivity?'checked':''} onchange="ROLES['${k}'].canViewActivity=this.checked;markUnsaved();renderAdminRoles()" title="${lang==='en'?'Allow this role to view Activity Log':'Cho phép vai trò này xem Kiểm soát hành vi'}">
-              </td>
-              <td style="text-align:center">
-                <input type="checkbox" ${v.canExportUsers?'checked':''} onchange="ROLES['${k}'].canExportUsers=this.checked;markUnsaved();renderAdminRoles()" title="${lang==='en'?'Allow this role to export/import user Excel':'Cho phép vai trò này xuất/nhập Excel người dùng'}">
+                <span style="font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:${active?'color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff))':'color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff))'};color:${active?'var(--green-dark,#15803d)':'var(--amber-dark,#b45309)'}">${active?'active':'inactive'}</span>
               </td>
               <td>
-                <div style="display:flex;align-items:center;gap:6px">
-                  <div style="flex:1;background:var(--bg-surface-alt,#e2e8f0);border:1px solid color-mix(in srgb, var(--border) 65%, transparent);border-radius:3px;height:8px;overflow:hidden">
-                    <div style="width:${pct}%;height:100%;background:${v.color};border-radius:3px"></div>
-                  </div>
-                  <span style="font-size:10px;font-family:var(--mono);min-width:50px">${cnt}/${DOCS.length}</span>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <button class="btn-admin secondary sm" onclick="promptEditSystemRole(${codeJs})">${lang==='en'?'Edit':'Sửa'}</button>
+                  <button class="btn-admin secondary sm" onclick="setSystemRoleActive(${codeJs}, ${active?'false':'true'})">${active?(lang==='en'?'Deactivate':'Ngừng dùng'):(lang==='en'?'Activate':'Kích hoạt')}</button>
                 </div>
-              </td>
-              <td style="min-width:160px">
-                ${roleUsers.length>0
-                  ? roleUsers.map(u=>'<div style="font-size:10px;padding:2px 0"><span style="color:var(--text-3)">'+u.id+'</span> '+u.name+'</div>').join('')
-                  : '<span style="font-size:10px;color:var(--text-3);font-style:italic">'+(lang==='en'?'No members':'Chưa có')+'</span>'}
               </td>
             </tr>`;
           }).join('')}
         </tbody>
       </table>
     </div>
-    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
-      <h3 style="font-size:13px;font-weight:700;margin-bottom:10px">${lang==='en'?'Reassign User Role':'Thay đổi vai trò người dùng'}</h3>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="role-reassign-user" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
-          ${USERS.filter(u=>u.active).map(u=>'<option value="'+u.id+'">'+u.name+' ('+u.role+')</option>').join('')}
-        </select>
-        <span style="font-size:11px;color:var(--text-3)">→</span>
-        <select id="role-reassign-role" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
-          ${roleOpts}
-        </select>
-        <button class="btn-admin primary" onclick="reassignUserRole()">${lang==='en'?'Apply':'Áp dụng'}</button>
-      </div>
-    </div>
-    <div class="admin-save-bar">
-      <span class="save-hint">${adminUnsaved?'<b>⚠ '+(lang==='en'?'Unsaved changes':'Có thay đổi chưa lưu')+'</b>':lang==='en'?'Make changes then click Save':'Thay đổi rồi nhấn Lưu'}</span>
-      <button class="btn-admin secondary" onclick="sessionStorage.clear();location.reload()">↩ Reset All</button>
-      <button class="btn-admin primary" onclick="adminSaveAll()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+    <div style="margin-top:16px;font-size:11px;color:var(--text-3);padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
+      ${lang==='en'
+        ?'User-to-role assignment should be managed in the user account workflow, not by directly mutating the role catalog grid.'
+        :'Gán user vào role cần được quản lý trong quy trình tài khoản người dùng, không nên sửa trực tiếp trong grid catalog vai trò.'}
     </div>`;
+}
+
+async function toggleSystemRoleFlag(roleCode, key, value){
+  const patch = {};
+  patch[key] = value;
+  const saved = await upsertAuthoritativeRole(roleCode, patch);
+  if(saved){
+    showToast('✅ ' + (lang==='en' ? 'Role updated' : 'Đã cập nhật vai trò'));
+    renderAdminRoles();
+  }
+}
+
+async function promptCreateSystemRole(){
+  const code = (prompt('Mã vai trò (ví dụ qa_manager, process_engineer):','') || '').trim();
+  if(!code) return;
+  const labelVi = (prompt('Tên vai trò (VI):','') || '').trim();
+  if(!labelVi) return;
+  const labelEn = (prompt('Tên vai trò (EN):', labelVi) || '').trim() || labelVi;
+  const deptCode = (prompt('Dept code (để trống nếu không gắn):','') || '').trim().toUpperCase();
+  const description = (prompt('Mô tả vai trò:','') || '').trim();
+  const level = Math.max(0, Number((prompt('Level vai trò:', '4') || '').trim()) || 4);
+  const res = await runtimeCreate('core_system', 'roles', {
+    role_code: code,
+    role_label: labelEn,
+    role_label_vi: labelVi,
+    dept_code: deptCode || null,
+    description,
+    is_active: true,
+    permissions: {
+      level,
+      approve: false,
+      canEditDocs: false,
+      canCreateDocs: false,
+      canViewActivity: false,
+      canExportUsers: false,
+      icon: '👤',
+      color: defaultDepartmentColor(deptCode || code)
+    }
+  });
+  if(!(res && res.ok && res.record)){
+    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create role failed':'Tạo vai trò thất bại'), 'error');
+    return;
+  }
+  await loadAuthoritativeRoleCatalog({force:true});
+  showToast('✅ ' + (lang==='en' ? 'Role created' : 'Đã tạo vai trò'));
+}
+
+async function promptEditSystemRole(roleCode){
+  const row = ADMIN_AUTH_STATE.roles.byCode[roleCode];
+  if(!row) return;
+  const ui = roleRecordUi(roleCode, row);
+  const labelVi = (prompt('Tên vai trò (VI):', row.role_label_vi || ui.label || '') || '').trim();
+  if(!labelVi) return;
+  const labelEn = (prompt('Tên vai trò (EN):', row.role_label || ui.labelEn || '') || '').trim() || labelVi;
+  const deptCode = (prompt('Dept code:', row.dept_code || ui.dept || '') || '').trim().toUpperCase();
+  const description = (prompt('Mô tả vai trò:', row.description || '') || '').trim();
+  const level = Math.max(0, Number((prompt('Level vai trò:', String(ui.level || 4)) || '').trim()) || ui.level || 4);
+  const icon = (prompt('Biểu tượng role:', ui.icon || '👤') || '').trim() || (ui.icon || '👤');
+  const color = (prompt('Màu role (hex hoặc token CSS):', ui.color || defaultDepartmentColor(deptCode || roleCode)) || '').trim() || (ui.color || defaultDepartmentColor(deptCode || roleCode));
+  const saved = await upsertAuthoritativeRole(roleCode, {
+    role_label_vi: labelVi,
+    role_label: labelEn,
+    dept_code: deptCode || null,
+    description,
+    level,
+    icon,
+    color
+  });
+  if(saved){
+    showToast('✅ ' + (lang==='en' ? 'Role updated' : 'Đã cập nhật vai trò'));
+    renderAdminRoles();
+  }
+}
+
+async function setSystemRoleActive(roleCode, active){
+  const row = ADMIN_AUTH_STATE.roles.byCode[roleCode];
+  if(!row) return;
+  const confirmed = confirm(active ? `Kích hoạt lại vai trò ${roleCode}?` : `Ngừng sử dụng vai trò ${roleCode}?`);
+  if(!confirmed) return;
+  const saved = await upsertAuthoritativeRole(roleCode, {is_active: active});
+  if(saved){
+    showToast(active ? '✅ Đã kích hoạt vai trò' : '✅ Đã ngừng dùng vai trò');
+    renderAdminRoles();
+  }
 }
 
 function reassignUserRole(){

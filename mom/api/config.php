@@ -43,7 +43,7 @@ return [
             'http://127.0.0.1:5173',
         ]),
         'allowed_methods' => $envList('QMS_API_ALLOWED_METHODS', ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
-        'allowed_headers' => $envList('QMS_API_ALLOWED_HEADERS', ['Content-Type', 'X-CSRF-Token', 'X-Requested-With', 'Authorization', 'If-Match', 'X-Row-Version']),
+        'allowed_headers' => $envList('QMS_API_ALLOWED_HEADERS', ['Content-Type', 'X-CSRF-Token', 'X-Requested-With', 'Authorization', 'If-Match', 'X-Row-Version', 'Idempotency-Key']),
         'max_age' => max(0, (int)(getenv('QMS_API_CORS_MAX_AGE') ?: 86400)),
         'allow_credentials' => $envBool('QMS_API_ALLOW_CREDENTIALS', true),
     ],
@@ -65,5 +65,10 @@ return [
     ],
     'observability' => [
         'emit_backend_headers' => $envBool('QMS_API_EMIT_BACKEND_HEADERS', true),
+    ],
+    'idempotency' => [
+        'enabled' => $envBool('QMS_API_IDEMPOTENCY_ENABLED', true),
+        'ttl_seconds' => max(300, (int)(getenv('QMS_API_IDEMPOTENCY_TTL_SECONDS') ?: 86400)),
+        'retry_window_seconds' => max(15, (int)(getenv('QMS_API_IDEMPOTENCY_RETRY_WINDOW_SECONDS') ?: 120)),
     ],
 ];

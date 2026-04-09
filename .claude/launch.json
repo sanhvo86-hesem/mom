@@ -4,7 +4,7 @@
     {
       "name": "mom-platform",
       "runtimeExecutable": "php",
-      "runtimeArgs": ["-S", "localhost:8080", "-t", "."],
+      "runtimeArgs": ["-S", "localhost:8080", "-t", "mom", "mom/ops/local-runtime/router.php"],
       "port": 8080
     }
   ]

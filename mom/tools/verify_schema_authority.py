@@ -10,6 +10,17 @@ import re
 import sys
 import glob
 
+
+def resolve_registry_dir(base: str) -> str:
+    candidates = [
+        os.path.join(base, "data", "registry"),
+        os.path.join(base, "qms-data", "registry"),
+    ]
+    for candidate in candidates:
+        if os.path.isdir(candidate):
+            return candidate
+    return candidates[0]
+
 def main():
     base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     results = []
@@ -49,10 +60,11 @@ def main():
         m = re.match(r"(\d{3})_", os.path.basename(f))
         if m:
             mig_nums.add(int(m.group(1)))
-    expected_migs = set(range(1, 80))
+    max_mig = max(mig_nums) if mig_nums else 0
+    expected_migs = set(range(1, max_mig + 1)) if max_mig else set()
     missing_migs = expected_migs - mig_nums
-    check("All 79 migrations present", not missing_migs,
-          f"missing: {sorted(missing_migs)}" if missing_migs else f"{len(mig_nums)} migrations found")
+    check("Sequential migration chain present", not missing_migs and bool(mig_nums),
+          f"missing: {sorted(missing_migs)}" if missing_migs else f"{len(mig_nums)} migrations found (001-{max_mig:03d})")
 
     # 4. build_schema_snapshot.php exists
     snap_builder = os.path.join(base, "database", "build_schema_snapshot.php")
@@ -72,7 +84,7 @@ def main():
         check("Blueprint/spec SQL classified as non-authoritative", False, "no authority data")
 
     # 6. table-registry.json table count
-    reg_path = os.path.join(base, "qms-data", "registry", "table-registry.json")
+    reg_path = os.path.join(resolve_registry_dir(base), "table-registry.json")
     try:
         with open(reg_path, "r", encoding="utf-8") as f:
             reg = json.load(f)

@@ -19,6 +19,7 @@ spl_autoload_register(static function (string $class) use ($baseDir): void {
         'MOM\\Api\\Controllers\\' => $baseDir . '/api/controllers/',
         'MOM\\Api\\Middleware\\' => $baseDir . '/api/middleware/',
         'MOM\\Api\\Validators\\' => $baseDir . '/api/validators/',
+        'MOM\\Api\\Services\\' => $baseDir . '/api/services/',
         'MOM\\Services\\' => $baseDir . '/api/services/',
         'MOM\\Api\\' => $baseDir . '/api/',
         'MOM\\Database\\' => $baseDir . '/database/',
@@ -61,4 +62,3 @@ function smoke_assert(bool $condition, string $message): void
         throw new RuntimeException($message);
     }
 }
-

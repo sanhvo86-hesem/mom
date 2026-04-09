@@ -552,6 +552,47 @@ abstract class BaseController
         $logFile = $this->dataDir . '/audit.log';
         $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
+
+        try {
+            $aggregateId = '';
+            foreach (['aggregate_id', 'id', 'username', 'code', 'record_id'] as $key) {
+                if (!isset($context[$key]) || !is_scalar($context[$key])) {
+                    continue;
+                }
+                $candidate = trim((string)$context[$key]);
+                if ($candidate === '') {
+                    continue;
+                }
+                $aggregateId = $candidate;
+                break;
+            }
+            if ($aggregateId === '') {
+                $aggregateId = $action;
+            }
+
+            $metadata = [
+                'source' => 'api_controller',
+                'controller' => static::class,
+            ];
+            if ($context !== []) {
+                $metadata['context_keys'] = array_values(array_map('strval', array_keys($context)));
+            }
+
+            $this->data->logEvent(
+                $action,
+                'api_action',
+                $aggregateId,
+                ['context' => $context],
+                [
+                    'actor_name' => $user,
+                    'ip_address' => $this->clientIp(),
+                    'session_id' => session_status() === PHP_SESSION_ACTIVE ? session_id() : null,
+                    'metadata' => $metadata,
+                ]
+            );
+        } catch (Throwable $e) {
+            @error_log('[BaseController] audit write failed: ' . $e->getMessage());
+        }
     }
 
     // ── Utility ─────────────────────────────────────────────────────────────

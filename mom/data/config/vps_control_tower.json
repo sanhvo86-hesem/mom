@@ -143,6 +143,26 @@
       "body": "Di chuyển zone khỏi nơi chỉ có web portal sang provider có API hoặc self-host authoritative DNS để dashboard sửa record, diff zone và rollout ingress được thật."
     }
   ],
+  "operational_findings": [
+    {
+      "title": "Netdata PostgreSQL collector phải khai báo tường minh",
+      "status": "warning",
+      "url": "https://learn.netdata.cloud/docs/collecting-metrics/collectors/databases/postgresql",
+      "body": "Host hiện tại đã từng log lỗi collector PostgreSQL do thiếu role/DSN phù hợp. Cách đúng là để collector này tắt mặc định và chỉ bật khi đã cấp DSN hoặc account read-only rõ ràng."
+    },
+    {
+      "title": "Grafana nên được provision từ Git",
+      "status": "next",
+      "url": "https://grafana.com/docs/grafana/latest/administration/provisioning/",
+      "body": "Datasource và dashboard nên nằm trong provisioning files để tránh drift sau khi sửa tay trên UI, nhất là khi control plane sẽ mở rộng sang nhiều host."
+    },
+    {
+      "title": "ttyd phải ở sau trusted auth proxy",
+      "status": "ok",
+      "url": "https://github.com/tsl0922/ttyd/wiki/Auth-Proxy",
+      "body": "Portal đang bảo vệ ttyd qua Nginx auth_request. Tiếp tục giữ terminal gateway ở loopback hoặc socket nội bộ thay vì để nó tin header từ client bên ngoài."
+    }
+  ],
   "quick_commands": [
     {
       "label": "SSH primary VPS",
@@ -154,7 +174,7 @@
     },
     {
       "label": "Health check after deploy",
-      "command": "ssh root@103.110.87.55 \"nginx -t && systemctl is-active php8.3-fpm postgresql redis-server\""
+      "command": "ssh root@103.110.87.55 \"php_fpm=$(systemctl list-units --type=service --all 'php*-fpm.service' --no-legend 2>/dev/null | awk '{print $1}' | head -n 1); nginx -t && if [ -n \\\"$php_fpm\\\" ]; then systemctl is-active \\\"$php_fpm\\\"; fi && systemctl is-active postgresql\""
     },
     {
       "label": "Install terminal gateway",
@@ -215,8 +235,6 @@
         "reverse-proxy",
         "portal",
         "postgres",
-        "redis",
-        "otel",
         "terminal-gateway",
         "observability"
       ],
@@ -224,42 +242,44 @@
         {
           "name": "nginx",
           "label": "Nginx",
-          "kind": "systemd"
+          "kind": "systemd",
+          "unit_candidates": ["nginx"]
         },
         {
-          "name": "php8.3-fpm",
+          "name": "php-fpm",
           "label": "PHP-FPM",
-          "kind": "systemd"
+          "kind": "systemd",
+          "unit_candidates": ["php8.2-fpm", "php8.3-fpm", "php8.4-fpm", "php-fpm"]
         },
         {
           "name": "postgresql",
           "label": "PostgreSQL",
-          "kind": "systemd"
-        },
-        {
-          "name": "redis-server",
-          "label": "Redis",
-          "kind": "systemd"
+          "kind": "systemd",
+          "unit_candidates": ["postgresql"]
         },
         {
           "name": "hesem-ttyd-primary",
           "label": "Terminal gateway (primary)",
-          "kind": "systemd"
+          "kind": "systemd",
+          "unit_candidates": ["hesem-ttyd-primary"]
         },
         {
           "name": "hesem-ttyd-readonly",
           "label": "Terminal gateway (readonly)",
-          "kind": "systemd"
+          "kind": "systemd",
+          "unit_candidates": ["hesem-ttyd-readonly"]
         },
         {
           "name": "netdata",
           "label": "Netdata Agent",
-          "kind": "systemd"
+          "kind": "systemd",
+          "unit_candidates": ["netdata"]
         },
         {
           "name": "grafana-server",
           "label": "Grafana",
-          "kind": "systemd"
+          "kind": "systemd",
+          "unit_candidates": ["grafana-server"]
         }
       ],
       "safe_actions": [
@@ -280,17 +300,17 @@
         {
           "host": "eqms.hesemeng.com",
           "url": "https://eqms.hesemeng.com",
-          "role": "Legacy portal entry"
+          "role": "Portal alias"
         },
         {
           "host": "files.hesemeng.com",
           "url": "https://files.hesemeng.com",
-          "role": "File services"
+          "role": "Portal alias"
         },
         {
           "host": "portainer.hesemeng.com",
           "url": "https://portainer.hesemeng.com",
-          "role": "Container console"
+          "role": "Portal alias"
         }
       ],
       "dns_records": [
@@ -327,7 +347,10 @@
           "url": "/ops/terminal/primary/",
           "note": "Interactive ttyd shell protected by portal session through nginx auth_request.",
           "embed": true,
-          "access": "write"
+          "access": "write",
+          "service_name": "hesem-ttyd-primary",
+          "internal_url": "http://127.0.0.1:7681/",
+          "expected_http_codes": [200, 401, 403, 407]
         },
         {
           "id": "readonly",
@@ -335,7 +358,10 @@
           "url": "/ops/terminal/readonly/",
           "note": "Readonly ttyd diagnostics view for quick triage without write access.",
           "embed": true,
-          "access": "read"
+          "access": "read",
+          "service_name": "hesem-ttyd-readonly",
+          "internal_url": "http://127.0.0.1:7682/",
+          "expected_http_codes": [200, 401, 403, 407]
         }
       ],
       "observability": [
@@ -346,7 +372,10 @@
           "note": "Realtime CPU, RAM, disk, network and process telemetry through Netdata behind Nginx.",
           "embed": true,
           "kind": "metrics",
-          "access": "read"
+          "access": "read",
+          "service_name": "netdata",
+          "internal_url": "http://127.0.0.1:19999/api/v1/info",
+          "expected_http_codes": [200]
         },
         {
           "id": "grafana",
@@ -355,7 +384,10 @@
           "note": "Embedded Grafana workspace protected by auth proxy for team dashboards and alerts.",
           "embed": true,
           "kind": "dashboard",
-          "access": "read"
+          "access": "read",
+          "service_name": "grafana-server",
+          "internal_url": "http://127.0.0.1:3000/api/health",
+          "expected_http_codes": [200]
         }
       ]
     }

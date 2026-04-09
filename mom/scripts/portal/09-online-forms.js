@@ -35,10 +35,10 @@ var state = {
   filter: 'all',
   search: '',
   searchTimer: null,
-  workspaceMode: 'form',
+  workspaceMode: 'mine',
   workspaceLoading: false,
   ready: false,
-  activeTab: 'form',
+  activeTab: 'mine',
   pendingFillSelection: null,
   pendingUploadSelection: null,
   pendingContext: null,
@@ -88,6 +88,15 @@ var state = {
     search: '',
     mineOnly: true,
     promise: null
+  },
+  evidence: {
+    mode: 'browse',
+    items: [], loading: false, loaded: false, error: '',
+    filters: { type: '', dateFrom: '', dateTo: '', linkedTo: '' },
+    detail: null, detailLoading: false, detailError: '',
+    searchQuery: '', searchResults: [], searchLoading: false,
+    integrityRunning: false, integrityResult: null, integrityProgress: 0,
+    uploadProgress: 0, uploadResult: null
   }
 };
 
@@ -544,18 +553,18 @@ function stopWorkQueuePolling(){
 }
 
 function ensureWorkQueuePolling(){
-  if(state.workspaceMode !== 'work'){
+  if(state.workspaceMode !== 'mine'){
     stopWorkQueuePolling();
     return;
   }
   if(state.workQueue.pollTimer) return;
   state.workQueue.pollTimer = setInterval(function(){
-    if(state.workspaceMode !== 'work'){
+    if(state.workspaceMode !== 'mine'){
       stopWorkQueuePolling();
       return;
     }
     loadWorkQueue(true).then(function(){
-      if(state.workspaceMode === 'work') requestRender();
+      if(state.workspaceMode === 'mine') requestRender();
     });
   }, 60000);
 }
@@ -574,7 +583,11 @@ function currentDept(){
 function canSeeAllWorkQueue(){
   var roles = roleList();
   if(!roles.length) return true;
-  var elevated = ['admin','it_admin','ceo','production_director','qa_manager','quality_manager','production_manager','engineering_manager','qms_engineer'];
+  /* Elevated roles: loaded from HmRegistry → 'elevated_management_roles' (single source of truth) */
+  var elevated = (window.HmRegistry && typeof HmRegistry.selectOptions === 'function')
+    ? (HmRegistry.selectOptions('elevated_management_roles') || []).map(function(o){ return o.value; })
+    : [];
+  if(!elevated.length) elevated = ['admin','it_admin','ceo','production_director','qa_manager','quality_manager','production_manager','engineering_manager','qms_engineer'];
   return roles.some(function(role){ return elevated.indexOf(role) >= 0; });
 }
 
@@ -815,7 +828,7 @@ function openFormWorkspace(formCode, allocationId, bypassGuard){
   if(formCode) state.selectedFormCode = formCode;
   if(allocationId !== undefined && allocationId !== null) state.selectedAllocationId = allocationId || '';
   resetRuntimeGuard();
-  state.workspaceMode = 'form';
+  state.workspaceMode = 'forms';
   state.workspaceLoading = true;
   requestRender();
   loadAllocations().then(function(){
@@ -836,7 +849,7 @@ function openUploadWorkspace(allocationId, formCode, bypassGuard){
   if(allocationId) state.selectedAllocationId = allocationId;
   state.pendingUploadSelection = allocationId ? { allocationId: allocationId, formCode: formCode || state.selectedFormCode || '' } : null;
   resetRuntimeGuard();
-  state.workspaceMode = 'upload';
+  state.workspaceMode = 'evidence';
   requestRender();
 }
 
@@ -935,13 +948,74 @@ function findLocalDraftForForm(formCode){
 }
 
 function resolveRecordTypeForForm(form){
-  if(!form) return '';
+  if(!form) return 'GENR';
+  // 1. Explicit record_type on the form/schema
   var direct = String(form.record_type || '').trim().toUpperCase();
   if(direct) return direct;
+  // 2. Registry/catalog map built at load time
   var code = String(form.form_code || '').trim().toUpperCase();
   if(state.formToRecordType[code]) return state.formToRecordType[code];
   var base = code.replace(/-[A-Z0-9]+$/, '');
-  return String(state.formToRecordType[base] || '').trim().toUpperCase();
+  var fromMap = String(state.formToRecordType[base] || '').trim().toUpperCase();
+  if(fromMap) return fromMap;
+  // 3. Auto-derive from FRM-xxx numeric series (Standard 15 universal coverage)
+  return _deriveRecordTypeFromSeries(code);
+}
+
+/**
+ * Derive a series-level record type from a form code.
+ * Maps FRM-Nxx → the catch-all type defined in document_type_registry.json.
+ * Guarantees every form gets a traceable code even without an explicit registry entry.
+ */
+function _deriveRecordTypeFromSeries(code){
+  /* Maps FRM-Nxx to the nearest supported allocation record type.
+     Supported: NCR, CAPA, FAI, TRN, AUD, ECR, CAL, SCAR, IMP, MR, RISK, DOWNTIME, PO-EXCEPTION */
+  var m = String(code || '').match(/^(?:FRM-)?(\d+)/i);
+  if(!m) return 'MR';
+  var n = parseInt(m[1], 10);
+  if(n < 200) return 'RISK';      // 100s: Foundation / risk / change control
+  if(n < 300) return 'MR';        // 200s: Sales / customer / management
+  if(n < 400) return 'FAI';       // 300s: Engineering / first article / setup
+  if(n < 500) return 'SCAR';      // 400s: Supply chain / supplier corrective action
+  if(n < 600) return 'DOWNTIME';  // 500s: Production / operations / maintenance
+  if(n < 700) return 'NCR';       // 600s: Quality / calibration / inspection
+  if(n < 800) return 'MR';        // 700s: Warehouse / logistics
+  if(n < 900) return 'TRN';       // 800s: Training / HR / competency
+  if(n < 1000) return 'AUD';      // 900s: Audit / management review / improvement
+  return 'MR';
+}
+
+/**
+ * Derive a valid 2-5 uppercase department code for a form.
+ * Used when sending allocation requests to the backend.
+ * Falls back through: dept_code field → owner first token → category → 'QA'.
+ */
+function _resolveDeptCodeForForm(form){
+  // Explicit dept field
+  var direct = String(form.dept_code || form.department || '').trim().toUpperCase();
+  if(direct && /^[A-Z]{2,5}$/.test(direct)) return direct;
+
+  // Extract first 2-5 letter token from owner field (e.g. "QA / QMS Engineer" → "QA")
+  var owner = String(form.owner || '').trim();
+  if(owner){
+    var parts = owner.split(/\s*[\/,]\s*/);
+    for(var i = 0; i < parts.length; i++){
+      var p = parts[i].trim().toUpperCase();
+      if(/^[A-Z]{2,5}$/.test(p)) return p;
+    }
+  }
+
+  // Derive from category
+  var cat = String(form.category || '').toLowerCase();
+  if(cat === 'production') return 'PRO';
+  if(cat === 'quality') return 'QA';
+  if(cat === 'hr') return 'HR';
+  if(cat === 'logistics') return 'WH';
+  if(cat === 'engineering') return 'ENG';
+  if(cat === 'scm' || cat === 'supply_chain') return 'SCM';
+  if(cat === 'management' || cat === 'management_review') return 'EXE';
+
+  return 'QA';
 }
 
 function openEqmsRuntime(formCode, options, bypassGuard){
@@ -950,7 +1024,7 @@ function openEqmsRuntime(formCode, options, bypassGuard){
     return;
   }
   formCode = canonicalEqmsFormCode(formCode);
-  state.workspaceMode = 'eqms';
+  state.workspaceMode = 'forms';
   state._eqmsOpenCode = formCode || '';
   state._eqmsOpenOptions = Object.assign({}, options || {});
   state._eqmsBuilderFormCode = '';
@@ -963,7 +1037,7 @@ function openEqmsHub(bypassGuard){
     runWithRuntimeGuard(function(){ openEqmsHub(true); });
     return;
   }
-  state.workspaceMode = 'eqms';
+  state.workspaceMode = 'forms';
   state._eqmsOpenCode = '';
   state._eqmsOpenOptions = null;
   state._eqmsBuilderFormCode = '';
@@ -971,7 +1045,7 @@ function openEqmsHub(bypassGuard){
   resetRuntimeGuard();
   requestRender();
   loadRegistry(false).then(function(){
-    if(state.workspaceMode === 'eqms' && !state._eqmsOpenCode) requestRender();
+    if(state.workspaceMode === 'forms' && !state._eqmsOpenCode) requestRender();
   });
 }
 
@@ -1123,12 +1197,8 @@ function startNewEqmsOnline(formCode){
     showToast(t('Biểu mẫu online chưa sẵn sàng.', 'Online form is not ready.'), 'warn');
     return;
   }
-  var recordType = resolveRecordTypeForForm(form);
-  if(!recordType){
-    showToast(t('Chưa cấu hình record type cho form này.', 'Record type is not configured for this form.'), 'error');
-    return;
-  }
-  var dept = String((form.owner || 'QA').split('/')[0] || 'QA').trim().toUpperCase();
+  var recordType = resolveRecordTypeForForm(form); // always returns a value now
+  var dept = _resolveDeptCodeForForm(form);
   showToast(t('Đang cấp mã cho biểu mẫu online...', 'Issuing a code for the online form...'), 'info');
   window.AllocationTracker.allocate(recordType, dept, {
     year: new Date().getFullYear(),
@@ -1161,12 +1231,12 @@ function startNewEqmsOffline(formCode){
     return;
   }
   var targetFormCode = String(form.offline_form_code || form.linked_excel_form || form.form_code || '');
-  var recordType = resolveRecordTypeForForm(form);
-  if(!recordType || !targetFormCode){
+  if(!targetFormCode){
     showToast(t('Chưa cấu hình luồng offline cho form này.', 'Offline flow is not configured for this form.'), 'error');
     return;
   }
-  var dept = String((form.owner || 'QA').split('/')[0] || 'QA').trim().toUpperCase();
+  var recordType = resolveRecordTypeForForm(form); // always returns a value now
+  var dept = _resolveDeptCodeForForm(form);
   showToast(t('Đang cấp mã và chuẩn bị file Excel kiểm soát...', 'Issuing the code and preparing the controlled Excel workbook...'), 'info');
   window.AllocationTracker.allocate(recordType, dept, {
     year: new Date().getFullYear(),
@@ -1557,15 +1627,20 @@ function renderWorkQueue(container){
       '<section class="ec-board-hero">' +
         '<div class="ec-board-copy">' +
           '<div class="ec-board-kicker">' + esc(t('Việc của tôi', 'My Work')) + '</div>' +
-          '<h2>' + esc(t('Hàng chờ xử lý cho hồ sơ và tải lên', 'Action queue for evidence and uploads')) + '</h2>' +
-          '<p>' + esc(t('Mở thẳng hồ sơ để xem xét và xử lý tệp cách ly ngay trong cùng phân hệ.', 'Open records for review and resolve quarantined uploads directly inside the same module.')) + '</p>' +
+          '<h2>' + esc(t('Hàng chờ xử lý: hồ sơ, tải lên & chứng cứ', 'Action queue: records, uploads & evidence')) + '</h2>' +
+          '<p>' + esc(t('Xem xét hồ sơ chờ duyệt, xử lý tệp cách ly, bắt đầu form mới hoặc tải lên chứng cứ ngay tại đây.', 'Review pending records, resolve quarantined uploads, start new forms, or upload evidence — all in one place.')) + '</p>' +
           (work.error ? '<div class="ec-inline-alert">' + esc(work.error) + '</div>' : '') +
         '</div>' +
+        '<div class="ec-toolbar-actions" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button type="button" class="ec-btn primary" id="ec-mw-new-form">' + esc(t('Bắt đầu form mới', '+ New form')) + '</button>' +
+          '<button type="button" class="ec-btn secondary" id="ec-mw-goto-codes">' + esc(t('Cấp mã mới', 'Issue code')) + '</button>' +
+          '<button type="button" class="ec-btn ghost" id="ec-mw-goto-evidence">' + esc(t('Kho chứng cứ', 'Evidence vault')) + '</button>' +
+        '</div>' +
         '<div class="ec-kpi-grid">' +
-          '<div class="ec-kpi-card primary"><small>' + esc(t('Tổng việc đang mở', 'Open actions')) + '</small><strong>' + esc(totalOpen) + '</strong><span>' + esc(t('Tổng số mục cần xử lý trong phạm vi đang lọc.', 'Total items that need attention in the current scope.')) + '</span></div>' +
-          '<div class="ec-kpi-card warning"><small>' + esc(t('Chờ duyệt', 'Pending review')) + '</small><strong>' + esc((work.pending || []).length) + '</strong><span>' + esc(t('Hồ sơ đang ở trạng thái đang xem xét.', 'Evidence records currently in review.')) + '</span></div>' +
-          '<div class="ec-kpi-card danger"><small>' + esc(t('Ngoại lệ tải lên', 'Upload exceptions')) + '</small><strong>' + esc(exceptions.length) + '</strong><span>' + esc(t('Tệp bị chặn hoặc xác minh thất bại.', 'Files that were blocked or failed verification.')) + '</span></div>' +
-          '<div class="ec-kpi-card neutral"><small>' + esc(t('Lần làm mới gần nhất', 'Last refresh')) + '</small><strong>' + esc(work.lastLoaded ? fmtDateTime(work.lastLoaded) : t('Chưa tải', 'Not loaded')) + '</strong><span>' + esc(t('Bạn có thể làm mới bất cứ lúc nào.', 'You can refresh manually at any time.')) + '</span></div>' +
+          '<div class="ec-kpi-card primary"><small>' + esc(t('Tổng việc đang mở', 'Open actions')) + '</small><strong>' + esc(totalOpen) + '</strong><span>' + esc(t('Tổng số mục cần xử lý trong phạm vi đang lọc.', 'Total items needing attention.')) + '</span></div>' +
+          '<div class="ec-kpi-card warning"><small>' + esc(t('Chờ duyệt', 'Pending review')) + '</small><strong>' + esc((work.pending || []).length) + '</strong><span>' + esc(t('Hồ sơ đang ở trạng thái xem xét.', 'Records currently in review.')) + '</span></div>' +
+          '<div class="ec-kpi-card danger"><small>' + esc(t('Ngoại lệ tải lên', 'Upload exceptions')) + '</small><strong>' + esc(exceptions.length) + '</strong><span>' + esc(t('Tệp bị chặn hoặc xác minh thất bại.', 'Blocked or failed verification files.')) + '</span></div>' +
+          '<div class="ec-kpi-card neutral"><small>' + esc(t('Bản nháp cục bộ', 'Local drafts')) + '</small><strong>' + esc(typeof window.listUserDrafts === 'function' ? (window.listUserDrafts() || []).length : 0) + '</strong><span>' + esc(t('Bản nháp form lưu trong trình duyệt này.', 'Form drafts saved in this browser.')) + '</span></div>' +
         '</div>' +
       '</section>' +
       '<section class="ec-board-toolbar">' +
@@ -1601,12 +1676,12 @@ function verifyQuarantine(quarantineId){
       metadata:(resp && resp.metadata) || null
     });
     showToast(resp && resp.ok ? t('Tệp cách ly đã được xác minh an toàn.', 'Quarantine verified successfully.') : t('Tệp cách ly không đạt.', 'Quarantine verification failed.'), resp && resp.ok ? 'success' : 'warn');
-    if(state.workspaceMode === 'work') requestRender();
+    if(state.workspaceMode === 'mine') requestRender();
     return resp;
   }).catch(function(){
     updateQuarantineState(quarantineId, { busy:false, status:'failed' });
     showToast(t('Không thể xác minh tệp cách ly.', 'Could not verify quarantine.'), 'error');
-    if(state.workspaceMode === 'work') requestRender();
+    if(state.workspaceMode === 'mine') requestRender();
     return null;
   });
 }
@@ -1618,11 +1693,11 @@ function acceptQuarantine(quarantineId, targetDir){
   return api('upload_accept', { quarantine_id: quarantineId, target_dir: targetDir || '' }, 'POST').then(function(resp){
     updateQuarantineState(quarantineId, { busy:false, accepted:!!(resp && resp.ok) });
     showToast(resp && resp.ok ? t('Đã chấp nhận tệp cách ly.', 'Quarantine file accepted.') : t('Không thể chấp nhận tệp.', 'Could not accept the file.'), resp && resp.ok ? 'success' : 'error');
-    return loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); return resp; });
+    return loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); return resp; });
   }).catch(function(){
     updateQuarantineState(quarantineId, { busy:false });
     showToast(t('Không thể chấp nhận tệp.', 'Could not accept the file.'), 'error');
-    if(state.workspaceMode === 'work') requestRender();
+    if(state.workspaceMode === 'mine') requestRender();
     return null;
   });
 }
@@ -1643,11 +1718,11 @@ function rejectQuarantine(quarantineId){
     return api('upload_reject', { quarantine_id: quarantineId, reason: reason }, 'POST').then(function(resp){
       updateQuarantineState(quarantineId, { busy:false, rejected:!!(resp && resp.ok) });
       showToast(resp && resp.ok ? t('Đã từ chối tệp cách ly.', 'Quarantine file rejected.') : t('Không thể từ chối tệp.', 'Could not reject the file.'), resp && resp.ok ? 'success' : 'error');
-      return loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); return resp; });
+      return loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); return resp; });
     }).catch(function(){
       updateQuarantineState(quarantineId, { busy:false });
       showToast(t('Không thể từ chối tệp.', 'Could not reject the file.'), 'error');
-      if(state.workspaceMode === 'work') requestRender();
+      if(state.workspaceMode === 'mine') requestRender();
       return null;
     });
   });
@@ -1657,42 +1732,42 @@ function bindWorkQueue(container){
   var deptEl = document.getElementById('ec-wq-dept');
   if(deptEl) deptEl.onchange = function(){
     state.workQueue.department = deptEl.value || '';
-    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   };
 
   var formEl = document.getElementById('ec-wq-form');
   if(formEl) formEl.onchange = function(){
     state.workQueue.formCode = formEl.value || '';
-    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   };
 
   var typeEl = document.getElementById('ec-wq-type');
   if(typeEl) typeEl.onchange = function(){
     state.workQueue.exceptionType = typeEl.value || '';
-    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   };
 
   var fromEl = document.getElementById('ec-wq-from');
   if(fromEl) fromEl.onchange = function(){
     state.workQueue.dateFrom = fromEl.value || '';
-    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   };
 
   var toEl = document.getElementById('ec-wq-to');
   if(toEl) toEl.onchange = function(){
     state.workQueue.dateTo = toEl.value || '';
-    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   };
 
   var daysEl = document.getElementById('ec-wq-days');
   if(daysEl) daysEl.onchange = function(){
     state.workQueue.days = Number(daysEl.value || 30) || 30;
-    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   };
 
   var refreshBtn = document.getElementById('ec-wq-refresh');
   if(refreshBtn) refreshBtn.onclick = function(){
-    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   };
 
   Array.prototype.forEach.call(container.querySelectorAll('[data-open-allocation]'), function(btn){
@@ -1748,19 +1823,35 @@ function bindWorkQueue(container){
       window.open('api.php?action=form_fill_download_received&allocation_id=' + encodeURIComponent(allocationId), '_blank');
     };
   });
+
+  /* My Work quick-action buttons */
+  var newFormBtn = document.getElementById('ec-mw-new-form');
+  if(newFormBtn) newFormBtn.onclick = function(){ state.workspaceMode = 'forms'; requestRender(); };
+  var gotoCodesBtn = document.getElementById('ec-mw-goto-codes');
+  if(gotoCodesBtn) gotoCodesBtn.onclick = function(){ state.workspaceMode = 'codes'; requestRender(); loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
+  var gotoEvidenceBtn = document.getElementById('ec-mw-goto-evidence');
+  if(gotoEvidenceBtn) gotoEvidenceBtn.onclick = function(){ state.workspaceMode = 'evidence'; requestRender(); };
 }
 
 function render(container){
   var workCount = state.workQueue.loaded ? ((state.workQueue.pending || []).length + (state.workQueue.exceptions || []).length) : 0;
+  var m = state.workspaceMode;
 
   container.innerHTML =
     '<div class="ec-tabs" id="ec-tabs">' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'eqms' ? ' active' : '') + '" data-tab="eqms">' + esc(t('Online Form', 'Online Form')) + '</button>' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'registry' ? ' active' : '') + '" data-tab="registry">' + esc(t('Quản lý mã', 'Code Registry')) + '</button>' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
+      '<button type="button" class="ec-tab' + (m === 'mine' ? ' active' : '') + '" data-tab="mine">' +
+        esc(t('Việc của tôi', 'My Work')) +
+        (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') +
+      '</button>' +
+      '<button type="button" class="ec-tab' + (m === 'forms' ? ' active' : '') + '" data-tab="forms">' +
+        esc(t('Biểu mẫu', 'Forms')) +
+      '</button>' +
+      '<button type="button" class="ec-tab' + (m === 'codes' ? ' active' : '') + '" data-tab="codes">' +
+        esc(t('Tạo & Quản lý mã', 'Codes')) +
+      '</button>' +
+      '<button type="button" class="ec-tab' + (m === 'evidence' ? ' active' : '') + '" data-tab="evidence">' +
+        esc(t('Chứng cứ', 'Evidence')) +
+      '</button>' +
     '</div>' +
     '<div class="ec-shell"><div class="ec-workspace ec-workspace-full" id="ec-workspace"></div></div>';
   bindSidebar(container);
@@ -1770,8 +1861,14 @@ function render(container){
 function renderSidebar(){
   var forms = filterForms();
   var categories = {};
-  var cats = ['all','quality','production','maintenance','hr','logistics','safety','other'];
-  var catLabels = { all:t('Tất cả','All'), quality:t('Chất lượng','Quality'), production:t('Sản xuất','Production'), maintenance:t('Bảo trì','Maintenance'), hr:t('Nhân sự','HR'), logistics:t('Kho vận','Logistics'), safety:t('An toàn','Safety'), other:t('Khác','Other') };
+  /* Form categories: loaded from HmRegistry → 'form_category' (single source of truth) */
+  var cats = ['all'];
+  var catLabels = { all:t('Tất cả','All') };
+  if(window.HmRegistry && typeof HmRegistry.selectOptions === 'function'){
+    var regCats = HmRegistry.selectOptions('form_category') || [];
+    regCats.forEach(function(o){ cats.push(o.value); catLabels[o.value] = o.label || o.value; });
+  }
+  if(cats.length <= 1){ cats = ['all','quality','production','maintenance','hr','logistics','safety','other']; catLabels = { all:t('Tất cả','All'), quality:t('Chất lượng','Quality'), production:t('Sản xuất','Production'), maintenance:t('Bảo trì','Maintenance'), hr:t('Nhân sự','HR'), logistics:t('Kho vận','Logistics'), safety:t('An toàn','Safety'), other:t('Khác','Other') }; }
   var workCount = state.workQueue.loaded ? ((state.workQueue.pending || []).length + (state.workQueue.exceptions || []).length) : 0;
 
   forms.forEach(function(form){
@@ -1897,9 +1994,9 @@ function renderEqmsHub(container){
     btn.onclick = function(){
       state.registry.formCode = btn.getAttribute('data-eqms-open-registry') || '';
       state.registry.page = 1;
-      state.workspaceMode = 'registry';
+      state.workspaceMode = 'codes';
       requestRender();
-      loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); });
+      loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); });
     };
   });
   Array.prototype.forEach.call(container.querySelectorAll('[data-eqms-edit-template]'), function(btn){
@@ -2178,7 +2275,7 @@ function renderEqmsRegistry(container){
       '<section class="ec-board-toolbar">' +
         '<div class="ec-filter-field"><label>' + esc(t('Form', 'Form')) + '</label><select id="ec-reg-form" class="ec-select">' + formOptions + '</select></div>' +
         '<div class="ec-filter-field"><label>' + esc(t('Luồng', 'Mode')) + '</label><select id="ec-reg-mode" class="ec-select"><option value="">' + esc(t('Tất cả', 'All')) + '</option><option value="online"' + (reg.deliveryMode === 'online' ? ' selected' : '') + '>online</option><option value="offline"' + (reg.deliveryMode === 'offline' ? ' selected' : '') + '>offline</option></select></div>' +
-        '<div class="ec-filter-field"><label>' + esc(t('Trạng thái', 'State')) + '</label><select id="ec-reg-state" class="ec-select"><option value="">' + esc(t('Tất cả trạng thái', 'All states')) + '</option>' + ['draft','allocated','submitted','approved','closed','received','rejected','void'].map(function(value){ return '<option value="' + value + '"' + (reg.state === value ? ' selected' : '') + '>' + esc(value) + '</option>'; }).join('') + '</select></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Trạng thái', 'State')) + '</label><select id="ec-reg-state" class="ec-select"><option value="">' + esc(t('Tất cả trạng thái', 'All states')) + '</option>' + ((window.HmRegistry && typeof HmRegistry.selectOptions === 'function' ? (HmRegistry.selectOptions('allocation_status') || []).map(function(o){ return o.value; }) : []).length ? (HmRegistry.selectOptions('allocation_status') || []).map(function(o){ return o.value; }) : ['draft','allocated','submitted','approved','closed','received','rejected','void']).map(function(value){ return '<option value="' + value + '"' + (reg.state === value ? ' selected' : '') + '>' + esc(value) + '</option>'; }).join('') + '</select></div>' +
         '<div class="ec-filter-field"><label>' + esc(t('Tìm kiếm', 'Search')) + '</label><input id="ec-reg-search" class="ec-input" type="search" value="' + esc(reg.search || '') + '" placeholder="' + esc(t('Mã, form, file...', 'Record, form, file...')) + '"></div>' +
         '<div class="ec-filter-field"><label>' + esc(t('Phạm vi', 'Scope')) + '</label><select id="ec-reg-scope" class="ec-select"><option value="mine"' + (reg.mineOnly ? ' selected' : '') + '>' + esc(t('Của tôi', 'Mine')) + '</option>' + (canSeeAllWorkQueue() ? '<option value="all"' + (!reg.mineOnly ? ' selected' : '') + '>' + esc(t('Tất cả', 'All')) + '</option>' : '') + '</select></div>' +
         '<div class="ec-toolbar-actions"><button type="button" class="ec-btn secondary" id="ec-reg-refresh">' + esc(reg.loading ? t('Đang tải...', 'Refreshing...') : t('Làm mới', 'Refresh')) + '</button></div>' +
@@ -2190,17 +2287,17 @@ function renderEqmsRegistry(container){
 
 function bindEqmsRegistry(container){
   var formEl = document.getElementById('ec-reg-form');
-  if(formEl) formEl.onchange = function(){ state.registry.formCode = formEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  if(formEl) formEl.onchange = function(){ state.registry.formCode = formEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
   var modeEl = document.getElementById('ec-reg-mode');
-  if(modeEl) modeEl.onchange = function(){ state.registry.deliveryMode = modeEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  if(modeEl) modeEl.onchange = function(){ state.registry.deliveryMode = modeEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
   var stateEl = document.getElementById('ec-reg-state');
-  if(stateEl) stateEl.onchange = function(){ state.registry.state = stateEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  if(stateEl) stateEl.onchange = function(){ state.registry.state = stateEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
   var searchEl = document.getElementById('ec-reg-search');
-  if(searchEl) searchEl.onchange = searchEl.onsearch = function(){ state.registry.search = searchEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  if(searchEl) searchEl.onchange = searchEl.onsearch = function(){ state.registry.search = searchEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
   var scopeEl = document.getElementById('ec-reg-scope');
-  if(scopeEl) scopeEl.onchange = function(){ state.registry.mineOnly = scopeEl.value !== 'all'; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  if(scopeEl) scopeEl.onchange = function(){ state.registry.mineOnly = scopeEl.value !== 'all'; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
   var refreshBtn = document.getElementById('ec-reg-refresh');
-  if(refreshBtn) refreshBtn.onclick = function(){ loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  if(refreshBtn) refreshBtn.onclick = function(){ loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
 
   Array.prototype.forEach.call(container.querySelectorAll('[data-reg-open]'), function(btn){
     btn.onclick = function(){
@@ -2238,69 +2335,369 @@ function bindEqmsRegistry(container){
   });
 }
 
+/* ── Forms Library (Tab 2: "Biểu mẫu") ────────────────────────── */
+function renderFormsLibrary(container){
+  /* If a form runtime is open inside this tab, delegate to it */
+  if(state._eqmsOpenCode){
+    if(typeof window.openEqmsForm === 'function'){
+      window.openEqmsForm(state._eqmsOpenCode, container, Object.assign({ editMode: true }, state._eqmsOpenOptions || {}));
+    }
+    return;
+  }
+
+  var forms = state.forms || [];
+  /* Category counts */
+  var catCounts = {};
+  forms.forEach(function(f){ var c = f.category || 'other'; catCounts[c] = (catCounts[c] || 0) + 1; });
+
+  /* Category labels */
+  var cats = ['all'];
+  var catLabels = { all: t('Tất cả', 'All') };
+  if(window.HmRegistry && typeof HmRegistry.selectOptions === 'function'){
+    (HmRegistry.selectOptions('form_category') || []).forEach(function(o){ cats.push(o.value); catLabels[o.value] = o.label || o.value; });
+  }
+  if(cats.length <= 1){ cats = ['all','quality','production','maintenance','hr','logistics','safety','other']; catLabels = { all: t('Tất cả','All'), quality: t('Chất lượng','Quality'), production: t('Sản xuất','Production'), maintenance: t('Bảo trì','Maintenance'), hr: t('Nhân sự','HR'), logistics: t('Kho vận','Logistics'), safety: t('An toàn','Safety'), other: t('Khác','Other') }; }
+
+  /* Filter forms */
+  var sq = String(state.search || '').trim().toLowerCase();
+  var filtered = forms.filter(function(f){
+    if(state.filter !== 'all' && (f.category || 'other') !== state.filter) return false;
+    if(sq){ return (f.form_code || '').toLowerCase().indexOf(sq) >= 0 || (f.title || '').toLowerCase().indexOf(sq) >= 0 || (f.title_vi || '').toLowerCase().indexOf(sq) >= 0; }
+    return true;
+  });
+
+  /* Build form cards */
+  var cardsHtml = '';
+  if(!filtered.length){
+    cardsHtml = '<div class="ec-empty ec-fl-empty"><h3>' + esc(t('Không tìm thấy biểu mẫu', 'No forms found')) + '</h3><p>' + esc(t('Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.', 'Try changing the filter or search keyword.')) + '</p></div>';
+  } else {
+    filtered.forEach(function(form){
+      var draft = findLocalDraftForForm(form.form_code);
+      var hasOnline = form.online !== false;
+      var hasOffline = !!(form.offline_fallback_available || form.blank_path || form.linked_excel_form || form.offline_form_code);
+      var meta = FORM_COLORS[form.category || 'other'] || FORM_COLORS.other;
+      cardsHtml +=
+        '<article class="ec-form-card">' +
+          '<div class="ec-form-card-head" style="background:' + meta.bg + '">' +
+            '<span class="ec-form-card-icon">' + esc(meta.icon) + '</span>' +
+            '<div class="ec-form-card-badges">' +
+              (hasOnline ? '<span class="ec-badge success">' + esc(t('Online','Online')) + '</span>' : '') +
+              (hasOffline ? '<span class="ec-badge warn">' + esc(t('Offline','Offline')) + '</span>' : '') +
+              (form.version ? '<span class="ec-badge info">' + esc(form.version) + '</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="ec-form-card-body">' +
+            '<div class="ec-form-card-code">' + esc(form.form_code || '') + '</div>' +
+            '<div class="ec-form-card-title">' + esc(form.title_vi || form.title || form.form_code || '') + '</div>' +
+            (form.description_vi || form.description ? '<div class="ec-form-card-desc">' + esc(String(form.description_vi || form.description || '').slice(0, 100)) + '</div>' : '') +
+            (form.sop_ref ? '<div class="ec-form-card-sop">' + esc(form.sop_ref) + '</div>' : '') +
+          '</div>' +
+          '<div class="ec-form-card-actions">' +
+            (hasOnline ? '<button type="button" class="ec-btn primary sm" data-eqms-new-online="' + esc(form.form_code || '') + '">' + esc(t('Online mới','New online')) + '</button>' : '') +
+            (hasOffline ? '<button type="button" class="ec-btn secondary sm" data-eqms-new-offline="' + esc(form.form_code || '') + '">' + esc(t('Offline mới','New offline')) + '</button>' : '') +
+            (draft ? '<button type="button" class="ec-btn ghost sm" data-eqms-resume="' + esc(form.form_code || '') + '" data-eqms-resume-alloc="' + esc(draft.allocationId || '') + '" data-eqms-resume-record="' + esc(draft.recordId || '') + '" data-eqms-resume-entry="' + esc(draft.entryId || '') + '">' + esc(t('Tiếp tục bản nháp','Resume draft')) + '</button>' : '') +
+            '<button type="button" class="ec-btn ghost sm" data-eqms-open-registry="' + esc(form.form_code || '') + '">' + esc(t('Xem mã','View codes')) + '</button>' +
+          '</div>' +
+        '</article>';
+    });
+  }
+
+  container.innerHTML =
+    '<div class="ec-forms-library">' +
+      '<div class="ec-forms-toolbar">' +
+        '<input class="ec-input ec-fl-search" type="search" id="ec-fl-search" value="' + esc(state.search || '') + '" placeholder="' + esc(t('Tìm biểu mẫu...','Search forms...')) + '">' +
+        '<div class="ec-chip-bar" id="ec-fl-chips">' +
+          cats.map(function(cat){
+            var cnt = cat === 'all' ? forms.length : (catCounts[cat] || 0);
+            return '<button type="button" class="ec-chip' + (state.filter === cat ? ' active' : '') + '" data-filter="' + cat + '">' + esc(catLabels[cat] || cat) + (cnt ? ' <span class="ec-chip-count">' + cnt + '</span>' : '') + '</button>';
+          }).join('') +
+        '</div>' +
+        '<div class="ec-toolbar-actions">' +
+          '<button type="button" class="ec-btn secondary" id="ec-fl-create-btn">' + esc(t('Tạo form mới','+ New form schema')) + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ec-forms-grid" id="ec-forms-grid">' + cardsHtml + '</div>' +
+    '</div>';
+
+  /* Bind search */
+  var searchEl = document.getElementById('ec-fl-search');
+  if(searchEl) searchEl.oninput = function(){
+    state.search = searchEl.value;
+    if(state.searchTimer) clearTimeout(state.searchTimer);
+    state.searchTimer = setTimeout(function(){ state.searchTimer = null; renderFormsLibrary(container); }, 250);
+  };
+
+  /* Bind clicks */
+  container.onclick = function(e){
+    var filterBtn = e.target.closest('[data-filter]');
+    if(filterBtn){ state.filter = filterBtn.getAttribute('data-filter') || 'all'; renderFormsLibrary(container); return; }
+
+    var newOnline = e.target.closest('[data-eqms-new-online]');
+    if(newOnline){ startNewEqmsOnline(newOnline.getAttribute('data-eqms-new-online') || ''); return; }
+
+    var newOffline = e.target.closest('[data-eqms-new-offline]');
+    if(newOffline){ startNewEqmsOffline(newOffline.getAttribute('data-eqms-new-offline') || ''); return; }
+
+    var resumeBtn = e.target.closest('[data-eqms-resume]');
+    if(resumeBtn){
+      openEqmsRuntime(resumeBtn.getAttribute('data-eqms-resume') || '', {
+        allocationId: resumeBtn.getAttribute('data-eqms-resume-alloc') || '',
+        recordId: resumeBtn.getAttribute('data-eqms-resume-record') || '',
+        entryId: resumeBtn.getAttribute('data-eqms-resume-entry') || '',
+        editMode: true, editOrigin: 'draft_resume'
+      });
+      return;
+    }
+
+    var openReg = e.target.closest('[data-eqms-open-registry]');
+    if(openReg){
+      state.registry.formCode = openReg.getAttribute('data-eqms-open-registry') || '';
+      state.registry.page = 1;
+      state.workspaceMode = 'codes';
+      requestRender();
+      loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); });
+      return;
+    }
+
+    var createBtn = document.getElementById('ec-fl-create-btn');
+    if(e.target === createBtn || (createBtn && createBtn.contains(e.target))){ openEqmsFormCreator(); return; }
+  };
+}
+
+/* ── Code Management (Tab 3: "Tạo & Quản lý mã") ──────────────── */
+function renderCodeManagement(container){
+  var reg = state.registry;
+  var forms = state.forms || [];
+
+  /* Allocation panel form options */
+  var allocFormOpts = '<option value="">' + esc(t('-- Chọn form --','-- Select form --')) + '</option>' +
+    forms.map(function(f){
+      return '<option value="' + esc(f.form_code || '') + '">' + esc((f.form_code || '') + ' · ' + (f.title_vi || f.title || f.form_code || '')) + '</option>';
+    }).join('');
+
+  /* Registry table options */
+  var regFormOpts = '<option value="">' + esc(t('Tất cả form','All forms')) + '</option>' +
+    forms.map(function(f){
+      return '<option value="' + esc(f.form_code || '') + '"' + (String(f.form_code || '') === String(reg.formCode || '') ? ' selected' : '') + '>' + esc((f.form_code || '') + ' · ' + (f.title || f.form_code || '')) + '</option>';
+    }).join('');
+
+  /* Registry rows */
+  var rowsHtml = (reg.loading && !reg.loaded)
+    ? '<tr><td colspan="8">' + esc(t('Đang tải...','Loading...')) + '</td></tr>'
+    : (!reg.rows.length
+      ? '<tr><td colspan="8">' + esc(t('Không có hồ sơ nào trong phạm vi lọc.','No records match current filters.')) + '</td></tr>'
+      : reg.rows.map(function(row){
+          return '<tr>' +
+            '<td class="mono">' + esc(row.record_id || '') + '</td>' +
+            '<td><strong>' + esc(row.form_code || '') + '</strong></td>' +
+            '<td>' + esc(row.delivery_mode || '-') + '</td>' +
+            '<td>' + renderStatusPill(row.workflow_state || row.status || 'allocated') + '</td>' +
+            '<td>' + esc(fmtDateTime(row.last_action_at || row.created_at || '')) + '</td>' +
+            '<td><strong>' + esc(String(row.submission_count || 0)) + '</strong></td>' +
+            '<td>' + esc(row.latest_filename || '—') + '</td>' +
+            '<td class="ec-registry-actions">' +
+              (row.delivery_mode === 'online'
+                ? '<button type="button" class="ec-btn ghost" data-reg-open="' + esc(row.form_code||'') + '" data-reg-alloc="' + esc(row.allocation_id||'') + '" data-reg-record="' + esc(row.record_id||'') + '" data-reg-entry="' + esc(row.entry_id||'') + '">' + esc(t('Mở','Open')) + '</button>' +
+                  '<button type="button" class="ec-btn secondary" data-reg-edit="' + esc(row.form_code||'') + '" data-reg-edit-alloc="' + esc(row.allocation_id||'') + '" data-reg-edit-record="' + esc(row.record_id||'') + '" data-reg-edit-entry="' + esc(row.entry_id||'') + '" data-reg-edit-source-entry="' + esc(row.entry_id||'') + '" data-reg-edit-revision="' + esc(String(row.submission_count||0)) + '">' + esc(t('Sửa','Edit')) + '</button>'
+                : '<button type="button" class="ec-btn ghost" data-reg-download-received="' + esc(row.allocation_id||'') + '">' + esc(t('Tải','Download')) + '</button>' +
+                  '<button type="button" class="ec-btn secondary" data-reg-open-upload="' + esc(row.allocation_id||'') + '" data-reg-open-upload-form="' + esc(row.form_code||'') + '">' + esc(t('Tải lên','Upload')) + '</button>') +
+            '</td>' +
+          '</tr>';
+        }).join(''));
+
+  var stateOpts = ['draft','allocated','submitted','approved','closed','received','rejected','void'].map(function(v){
+    return '<option value="' + v + '"' + (reg.state === v ? ' selected' : '') + '>' + esc(v) + '</option>';
+  }).join('');
+
+  container.innerHTML =
+    '<div class="ec-code-mgmt">' +
+
+      /* ── Quick Allocation Panel ── */
+      '<section class="ec-panel ec-alloc-panel">' +
+        '<div class="ec-panel-head">' +
+          '<div>' +
+            '<h3>' + esc(t('Cấp mã hồ sơ mới','Issue new record code')) + '</h3>' +
+            '<p>' + esc(t('Mọi đối tượng quản lý đều phải có mã kiểm soát. Bất kỳ ai cũng có thể cấp mã.','Every controlled object must have a tracking code. Anyone can issue codes.')) + '</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ec-alloc-form">' +
+          '<div class="ec-field-group">' +
+            '<label class="ec-field-label">' + esc(t('Form / Loại tài liệu','Form / Document type')) + '</label>' +
+            '<select id="ec-alloc-form-code" class="ec-select">' + allocFormOpts + '</select>' +
+          '</div>' +
+          '<div class="ec-field-group">' +
+            '<label class="ec-field-label">' + esc(t('Mã phòng ban','Dept code')) + ' <span class="ec-req">*</span></label>' +
+            '<input id="ec-alloc-dept" class="ec-input" type="text" maxlength="5" placeholder="QA, PRO, ENG..." value="' + esc(currentDept() || '') + '">' +
+          '</div>' +
+          '<div class="ec-field-group">' +
+            '<label class="ec-field-label">' + esc(t('Ưu tiên','Priority')) + '</label>' +
+            '<select id="ec-alloc-priority" class="ec-select"><option value="normal">' + esc(t('Bình thường','Normal')) + '</option><option value="urgent">' + esc(t('Khẩn','Urgent')) + '</option></select>' +
+          '</div>' +
+          '<div class="ec-field-group ec-field-group-wide">' +
+            '<label class="ec-field-label">' + esc(t('Ghi chú','Notes')) + '</label>' +
+            '<input id="ec-alloc-notes" class="ec-input" type="text" placeholder="' + esc(t('Mục đích cấp mã...','Purpose...')) + '">' +
+          '</div>' +
+          '<div class="ec-alloc-submit-row">' +
+            '<button type="button" class="ec-btn primary" id="ec-alloc-submit-btn">' + esc(t('Cấp mã ngay','Issue code now')) + '</button>' +
+            '<div class="ec-alloc-result" id="ec-alloc-result" style="display:none"></div>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      /* ── Registry ── */
+      '<div class="ec-board">' +
+        '<section class="ec-board-hero" style="padding-bottom:0">' +
+          '<div class="ec-board-copy">' +
+            '<div class="ec-board-kicker">' + esc(t('Sổ quản lý mã','Code registry')) + '</div>' +
+            '<h2>' + esc(t('Danh sách mã hồ sơ đã cấp','Issued record code registry')) + '</h2>' +
+            (reg.error ? '<div class="ec-inline-alert">' + esc(reg.error) + '</div>' : '') +
+          '</div>' +
+          '<div class="ec-kpi-grid">' +
+            '<div class="ec-kpi-card primary"><small>' + esc(t('Đã cấp','Issued')) + '</small><strong>' + esc(reg.summary.issued_count || 0) + '</strong></div>' +
+            '<div class="ec-kpi-card warning"><small>' + esc(t('Đã nộp','Submitted')) + '</small><strong>' + esc(reg.summary.submitted_count || 0) + '</strong></div>' +
+            '<div class="ec-kpi-card danger"><small>' + esc(t('Nộp lại','Resubmitted')) + '</small><strong>' + esc(reg.summary.resubmitted_count || 0) + '</strong></div>' +
+            '<div class="ec-kpi-card neutral"><small>' + esc(t('Hoàn thành','Completed')) + '</small><strong>' + esc(reg.summary.completed_count || 0) + '</strong></div>' +
+          '</div>' +
+        '</section>' +
+        '<section class="ec-board-toolbar">' +
+          '<div class="ec-filter-field"><label>' + esc(t('Form','Form')) + '</label><select id="ec-reg-form" class="ec-select">' + regFormOpts + '</select></div>' +
+          '<div class="ec-filter-field"><label>' + esc(t('Luồng','Mode')) + '</label><select id="ec-reg-mode" class="ec-select"><option value="">' + esc(t('Tất cả','All')) + '</option><option value="online"' + (reg.deliveryMode === 'online' ? ' selected' : '') + '>online</option><option value="offline"' + (reg.deliveryMode === 'offline' ? ' selected' : '') + '>offline</option></select></div>' +
+          '<div class="ec-filter-field"><label>' + esc(t('Trạng thái','State')) + '</label><select id="ec-reg-state" class="ec-select"><option value="">' + esc(t('Tất cả','All')) + '</option>' + stateOpts + '</select></div>' +
+          '<div class="ec-filter-field"><label>' + esc(t('Tìm kiếm','Search')) + '</label><input id="ec-reg-search" class="ec-input" type="search" value="' + esc(reg.search || '') + '" placeholder="' + esc(t('Mã, form, file...','Record, form, file...')) + '"></div>' +
+          '<div class="ec-filter-field"><label>' + esc(t('Phạm vi','Scope')) + '</label><select id="ec-reg-scope" class="ec-select"><option value="mine"' + (reg.mineOnly ? ' selected' : '') + '>' + esc(t('Của tôi','Mine')) + '</option>' + (canSeeAllWorkQueue() ? '<option value="all"' + (!reg.mineOnly ? ' selected' : '') + '>' + esc(t('Tất cả','All')) + '</option>' : '') + '</select></div>' +
+          '<div class="ec-toolbar-actions"><button type="button" class="ec-btn secondary" id="ec-reg-refresh">' + esc(reg.loading ? t('Đang tải...','Loading...') : t('Làm mới','Refresh')) + '</button></div>' +
+        '</section>' +
+        '<section class="ec-panel"><div class="ec-table-scroll"><table class="ec-table ec-registry-table">' +
+          '<thead><tr>' +
+            '<th>' + esc(t('Mã hồ sơ','Record ID')) + '</th>' +
+            '<th>' + esc(t('Form','Form')) + '</th>' +
+            '<th>' + esc(t('Luồng','Mode')) + '</th>' +
+            '<th>' + esc(t('Trạng thái','State')) + '</th>' +
+            '<th>' + esc(t('Thời gian','Last activity')) + '</th>' +
+            '<th>' + esc(t('Nộp','Submissions')) + '</th>' +
+            '<th>' + esc(t('File mới nhất','Latest file')) + '</th>' +
+            '<th>' + esc(t('Thao tác','Actions')) + '</th>' +
+          '</tr></thead>' +
+          '<tbody>' + rowsHtml + '</tbody>' +
+        '</table></div></section>' +
+      '</div>' +
+    '</div>';
+
+  /* ── Bind allocation form ── */
+  var submitBtn = document.getElementById('ec-alloc-submit-btn');
+  if(submitBtn) submitBtn.onclick = function(){
+    var formCode = String((document.getElementById('ec-alloc-form-code') || {}).value || '').trim();
+    var dept = String((document.getElementById('ec-alloc-dept') || {}).value || '').trim().toUpperCase();
+    var priority = String((document.getElementById('ec-alloc-priority') || {}).value || 'normal').trim();
+    var notes = String((document.getElementById('ec-alloc-notes') || {}).value || '').trim();
+    var resultEl = document.getElementById('ec-alloc-result');
+    if(!dept || !/^[A-Z]{2,5}$/.test(dept)){
+      showToast(t('Mã phòng ban không hợp lệ (2–5 chữ cái in hoa).','Invalid dept code (2–5 uppercase letters).'), 'warn');
+      return;
+    }
+    if(!window.AllocationTracker){
+      showToast(t('AllocationTracker chưa sẵn sàng.','AllocationTracker not ready.'), 'error');
+      return;
+    }
+    var form = formCode ? (state.formMap[formCode] || { form_code: formCode }) : null;
+    var recordType = form ? resolveRecordTypeForForm(form) : 'GENR';
+    submitBtn.disabled = true;
+    submitBtn.textContent = t('Đang cấp...','Issuing...');
+    window.AllocationTracker.allocate(recordType, dept, {
+      year: new Date().getFullYear(),
+      form_code: formCode || '',
+      priority: priority,
+      notes: notes || 'manual_allocation'
+    }).then(function(resp){
+      submitBtn.disabled = false;
+      submitBtn.textContent = t('Cấp mã ngay','Issue code now');
+      if(resp && resp.ok){
+        var recordId = resp.record_id || '?';
+        if(resultEl){ resultEl.style.display = 'block'; resultEl.innerHTML = '<span class="ec-badge success">' + esc(t('Đã cấp','Issued') + ': ') + '<strong>' + esc(recordId) + '</strong></span>'; }
+        showToast(t('Đã cấp mã: ','Issued code: ') + recordId, 'success');
+        loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); });
+      } else {
+        showToast(t('Không thể cấp mã mới.','Could not issue a new code.'), 'error');
+      }
+    }).catch(function(err){
+      submitBtn.disabled = false;
+      submitBtn.textContent = t('Cấp mã ngay','Issue code now');
+      showToast((window.AllocationTracker && window.AllocationTracker.describeError)
+        ? window.AllocationTracker.describeError(err && err.body ? err.body : {}, 'allocation').message
+        : t('Không thể cấp mã mới.','Could not issue a new code.'), 'error');
+    });
+  };
+
+  /* ── Bind registry filters ── */
+  var formEl = document.getElementById('ec-reg-form');
+  if(formEl) formEl.onchange = function(){ state.registry.formCode = formEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
+  var modeEl = document.getElementById('ec-reg-mode');
+  if(modeEl) modeEl.onchange = function(){ state.registry.deliveryMode = modeEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
+  var stateEl = document.getElementById('ec-reg-state');
+  if(stateEl) stateEl.onchange = function(){ state.registry.state = stateEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
+  var searchEl = document.getElementById('ec-reg-search');
+  if(searchEl) searchEl.onchange = searchEl.onsearch = function(){ state.registry.search = searchEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
+  var scopeEl = document.getElementById('ec-reg-scope');
+  if(scopeEl) scopeEl.onchange = function(){ state.registry.mineOnly = scopeEl.value !== 'all'; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
+  var refreshBtn = document.getElementById('ec-reg-refresh');
+  if(refreshBtn) refreshBtn.onclick = function(){ loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); }); };
+
+  /* ── Bind row actions ── */
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-open]'), function(btn){
+    btn.onclick = function(){ openEqmsRuntime(btn.getAttribute('data-reg-open') || '', { allocationId: btn.getAttribute('data-reg-alloc') || '', recordId: btn.getAttribute('data-reg-record') || '', entryId: btn.getAttribute('data-reg-entry') || '', editMode: false, editOrigin: 'view_existing' }); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-edit]'), function(btn){
+    btn.onclick = function(){ openEqmsRuntime(btn.getAttribute('data-reg-edit') || '', { allocationId: btn.getAttribute('data-reg-edit-alloc') || '', recordId: btn.getAttribute('data-reg-edit-record') || '', entryId: btn.getAttribute('data-reg-edit-entry') || '', editMode: true, editOrigin: 'controlled_edit', sourceEntryId: btn.getAttribute('data-reg-edit-source-entry') || '', sourceSubmissionRevision: Number(btn.getAttribute('data-reg-edit-revision') || 0) || 0 }); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-download-received]'), function(btn){
+    btn.onclick = function(){ var id = btn.getAttribute('data-reg-download-received') || ''; if(!id) return; window.open('api.php?action=form_fill_download_received&allocation_id=' + encodeURIComponent(id), '_blank'); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-open-upload]'), function(btn){
+    btn.onclick = function(){ openUploadWorkspace(btn.getAttribute('data-reg-open-upload') || '', btn.getAttribute('data-reg-open-upload-form') || ''); };
+  });
+}
+
 function renderWorkspacePane(){
   var wsEl = document.getElementById('ec-workspace');
   if(!wsEl) return;
-  if(state.workspaceMode === 'eqms-builder') state.workspaceMode = 'eqms';
-  if(state.workspaceMode !== 'work') stopWorkQueuePolling();
-  /* Clear main header toolbar when not viewing a specific form */
-  if(state.workspaceMode !== 'form' && typeof setDocHeaderToolbar === 'function') setDocHeaderToolbar('');
+  /* Normalize legacy mode names to the 4-tab model */
+  if(state.workspaceMode === 'work') state.workspaceMode = 'mine';
+  else if(state.workspaceMode === 'eqms' || state.workspaceMode === 'eqms-builder' || state.workspaceMode === 'form') state.workspaceMode = 'forms';
+  else if(state.workspaceMode === 'registry' || state.workspaceMode === 'record-id') state.workspaceMode = 'codes';
+  else if(state.workspaceMode === 'upload') state.workspaceMode = 'evidence';
+  if(state.workspaceMode !== 'mine') stopWorkQueuePolling();
+  if(typeof setDocHeaderToolbar === 'function') setDocHeaderToolbar('');
   if(state.workspaceLoading){
     wsEl.innerHTML = renderWorkspaceSkeleton();
     return;
   }
-  if(state.workspaceMode === 'work'){
+
+  /* Tab 1 — My Work */
+  if(state.workspaceMode === 'mine'){
     ensureWorkQueuePolling();
     renderWorkQueue(wsEl);
-    if(!state.workQueue.loaded && !state.workQueue.loading) loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
-    if(!state.registry.loaded && !state.registry.loading) loadRegistry(false).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
-    return;
-  }
-  if(state.workspaceMode === 'record-id'){
-    if(typeof window._renderRecordIdGenerator === 'function') window._renderRecordIdGenerator(state.forms, {}, wsEl);
-    else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Phân hệ Trợ lý tạo mã chưa sẵn sàng', 'Record ID Assistant not ready')) + '</h3></div>';
-    return;
-  }
-  if(state.workspaceMode === 'registry'){
-    renderEqmsRegistry(wsEl);
-    if(!state.registry.loaded && !state.registry.loading) loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); });
-    return;
-  }
-  if(state.workspaceMode === 'upload'){
-    if(typeof window._renderUploadVerify === 'function') window._renderUploadVerify(state.forms, {}, wsEl);
-    else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Phân hệ Tải lên & Kiểm tra chưa sẵn sàng', 'Upload & Verify not ready')) + '</h3></div>';
+    if(!state.workQueue.loaded && !state.workQueue.loading) loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
+    if(!state.registry.loaded && !state.registry.loading) loadRegistry(false).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
     return;
   }
 
-  /* eQMS Online Form tab */
-  if(state.workspaceMode === 'eqms'){
-    if(state._eqmsOpenCode){
-      /* A specific form was selected — open it */
-      if(typeof window.openEqmsForm === 'function'){
-        window.openEqmsForm(state._eqmsOpenCode, wsEl, Object.assign({ editMode: true }, state._eqmsOpenOptions || {}));
-      }
-    } else {
-      /* Show form list */
-      renderEqmsHub(wsEl);
-      if(!state.registry.loaded && !state.registry.loading) loadRegistry(false);
-    }
+  /* Tab 2 — Forms Library */
+  if(state.workspaceMode === 'forms'){
+    renderFormsLibrary(wsEl);
+    if(!state.registry.loaded && !state.registry.loading) loadRegistry(false);
     return;
   }
 
-  /* Form tab: embed the document file explorer for FRM category */
-  if(state.workspaceMode === 'form'){
-    /* Set document browser state to show FRM category */
-    if(typeof currentFilter !== 'undefined') currentFilter = 'FRM';
-    if(typeof currentFolderPath !== 'undefined' && !state._formFolderInited){
-      currentFolderPath = [];
-      state._formFolderInited = true;
-    }
-    /* Render document explorer into our workspace container */
-    if(typeof renderDocuments === 'function'){
-      renderDocuments('ec-workspace');
-    } else {
-      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Trình duyệt tài liệu chưa sẵn sàng', 'Document browser not ready')) + '</h3></div>';
-    }
+  /* Tab 3 — Code Management */
+  if(state.workspaceMode === 'codes'){
+    renderCodeManagement(wsEl);
+    if(!state.registry.loaded && !state.registry.loading) loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); });
+    return;
+  }
+
+  /* Tab 4 — Evidence (merged Evidence Vault + offline form upload) */
+  if(state.workspaceMode === 'evidence'){
+    renderEvidenceTab(wsEl);
     return;
   }
 
@@ -2324,21 +2721,12 @@ function bindSidebar(container){
 
     var formItem = event.target.closest('[data-form]');
     if(formItem){
+      /* Legacy sidebar item — navigate to forms tab with this form selected */
       var code = formItem.getAttribute('data-form') || '';
-      if(code === state.selectedFormCode && state.workspaceMode === 'form') return;
       state.selectedFormCode = code;
-      state.selectedAllocationId = '';
-      state.allocations = [];
-      state.workspaceMode = 'form';
-      state.workspaceLoading = true;
+      state.workspaceMode = 'forms';
+      state._eqmsOpenCode = '';
       render(container);
-      loadAllocations().then(function(){
-        state.workspaceLoading = false;
-        render(container);
-      }).catch(function(){
-        state.workspaceLoading = false;
-        render(container);
-      });
       return;
     }
 
@@ -2347,25 +2735,29 @@ function bindSidebar(container){
 
     var toolBtn = event.target.closest('[data-tool]');
     if(toolBtn){
-      var mode = toolBtn.getAttribute('data-tool') || 'form';
-      var nextMode = (state.workspaceMode === mode) ? 'form' : mode;
+      /* Legacy tool buttons — map to new modes */
+      var rawMode = toolBtn.getAttribute('data-tool') || 'mine';
+      var nextMode = _normalizeTabMode(rawMode);
+      if(nextMode === state.workspaceMode) nextMode = 'mine';
       if(nextMode !== state.workspaceMode && hasRuntimeDirtySession()){
         runWithRuntimeGuard(function(){
           state.workspaceMode = nextMode;
           render(container);
-          if(state.workspaceMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
+          if(state.workspaceMode === 'mine') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') render(container); });
         });
         return;
       }
       state.workspaceMode = nextMode;
       render(container);
-      if(state.workspaceMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
+      if(state.workspaceMode === 'mine') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') render(container); });
       return;
     }
 
     var tabBtn = event.target.closest('[data-tab]');
+    /* Ignore [data-tab] clicks from inside the Evidence pane — handled by capture listener */
+    if(tabBtn && tabBtn.closest('#ec-ev-container')) return;
     if(tabBtn){
-      var tabMode = tabBtn.getAttribute('data-tab') || 'form';
+      var tabMode = _normalizeTabMode(tabBtn.getAttribute('data-tab') || 'mine');
       var applyTabSwitch = function(){
         if(tabMode !== state.workspaceMode){
           state._formFolderInited = false;
@@ -2377,8 +2769,8 @@ function bindSidebar(container){
         }
         state.workspaceMode = tabMode;
         render(container);
-        if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
-        if(tabMode === 'registry') loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') render(container); });
+        if(tabMode === 'mine') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') render(container); });
+        if(tabMode === 'codes') loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') render(container); });
       };
       if(tabMode !== state.workspaceMode && hasRuntimeDirtySession()){
         runWithRuntimeGuard(applyTabSwitch);
@@ -2422,13 +2814,455 @@ function refreshFormList(container){
   if(filtersEl) Array.prototype.forEach.call(filtersEl.querySelectorAll('.ec-chip'), function(btn){ btn.classList.toggle('active', btn.getAttribute('data-filter') === state.filter); });
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   EVIDENCE TAB — Tab 4: "Chứng cứ"
+   Self-contained. Uses data-ev-mode / data-ev-action (NOT data-tab) to avoid
+   collision with bindSidebar's [data-tab] listener.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+var _EV_MODES = [
+  { id:'browse',    vi:'Duyệt',    en:'Browse' },
+  { id:'upload',    vi:'Tải lên',  en:'Upload' },
+  { id:'detail',    vi:'Chi tiết', en:'Detail' },
+  { id:'search',    vi:'Tìm kiếm', en:'Search' },
+  { id:'integrity', vi:'Toàn vẹn', en:'Integrity' }
+];
+var _EV_TYPE_OPTS = [
+  { value:'',            vi:'Tất cả loại',  en:'All types' },
+  { value:'photo',       vi:'Ảnh',          en:'Photo' },
+  { value:'video',       vi:'Video',         en:'Video' },
+  { value:'document',    vi:'Tài liệu',      en:'Document' },
+  { value:'measurement', vi:'Đo lường',      en:'Measurement' },
+  { value:'machine_log', vi:'Nhật ký máy',   en:'Machine log' },
+  { value:'cert',        vi:'Chứng nhận',    en:'Certificate' }
+];
+
+function _evS(){ return state.evidence; }
+
+function _evRepaint(){
+  if(state.workspaceMode !== 'evidence') return;
+  var ws = document.getElementById('ec-workspace');
+  if(ws) renderEvidencePane(ws);
+}
+
+function _evLoadItems(){
+  var ev = _evS(); if(ev.loading) return;
+  ev.loading = true; ev.error = '';
+  var p = { offset:0, limit:50 };
+  if(ev.filters.type)     p.type     = ev.filters.type;
+  if(ev.filters.dateFrom) p.dateFrom = ev.filters.dateFrom;
+  if(ev.filters.dateTo)   p.dateTo   = ev.filters.dateTo;
+  if(ev.filters.linkedTo) p.linkedTo = ev.filters.linkedTo;
+  api('evidence_list', p, 'GET').then(function(r){
+    ev.items = (r && r.items) ? r.items : (Array.isArray(r) ? r : []);
+    ev.loaded = true; ev.loading = false; _evRepaint();
+  }).catch(function(err){
+    ev.loading = false; ev.loaded = true;
+    ev.error = (err && err.message) || t('Lỗi tải dữ liệu', 'Load error'); _evRepaint();
+  });
+}
+
+function _evLoadDetail(id){
+  var ev = _evS();
+  ev.mode = 'detail'; ev.detail = null; ev.detailLoading = true; ev.detailError = '';
+  _evRepaint();
+  api('evidence_detail', {id:id}, 'GET').then(function(r){
+    ev.detailLoading = false;
+    ev.detail = (r && r.item) ? r.item : r;
+    _evRepaint();
+  }).catch(function(err){
+    ev.detailLoading = false;
+    ev.detailError = (err && err.message) || t('Lỗi tải chi tiết', 'Detail load error');
+    _evRepaint();
+  });
+}
+
+function _evSearch(){
+  var ev = _evS(); if(!ev.searchQuery.trim()) return;
+  ev.searchLoading = true; _evRepaint();
+  api('evidence_search', {query:ev.searchQuery}, 'GET').then(function(r){
+    ev.searchResults = (r && r.results) ? r.results : (Array.isArray(r) ? r : []);
+    ev.searchLoading = false; _evRepaint();
+  }).catch(function(){
+    ev.searchLoading = false; _evRepaint();
+  });
+}
+
+function _evVerifyChain(){
+  var ev = _evS(); if(ev.integrityRunning) return;
+  ev.integrityRunning = true; ev.integrityResult = null; ev.integrityProgress = 10;
+  _evRepaint();
+  var ticker = setInterval(function(){
+    ev.integrityProgress = Math.min(88, ev.integrityProgress + 14);
+    _evRepaint();
+  }, 400);
+  api('evidence_verify_chain', {}, 'GET').then(function(r){
+    clearInterval(ticker);
+    ev.integrityProgress = 100; ev.integrityRunning = false; ev.integrityResult = r;
+    _evRepaint();
+  }).catch(function(err){
+    clearInterval(ticker);
+    ev.integrityRunning = false;
+    ev.integrityResult = { valid:false, error:(err && err.message)||'Error' };
+    _evRepaint();
+  });
+}
+
+function _evDoUpload(evCont){
+  var fileInput = evCont.querySelector('#ec-ev-file-input');
+  if(!fileInput || !fileInput.files.length){
+    showToast(t('Chưa chọn tệp', 'No files selected'), 'warn'); return;
+  }
+  var fd = new FormData();
+  Array.from(fileInput.files).forEach(function(f){ fd.append('files[]', f); });
+  var g = function(id){ return (evCont.querySelector('#' + id) || {}).value || ''; };
+  if(g('ec-ev-title'))  fd.append('title',       g('ec-ev-title'));
+  if(g('ec-ev-type'))   fd.append('type',         g('ec-ev-type'));
+  if(g('ec-ev-tags'))   fd.append('tags',         g('ec-ev-tags'));
+  if(g('ec-ev-linked')) fd.append('linked',       g('ec-ev-linked'));
+  if(g('ec-ev-desc'))   fd.append('description',  g('ec-ev-desc'));
+  var ev = _evS();
+  ev.uploadProgress = 20; ev.uploadResult = null;
+  var ws = document.getElementById('ec-workspace');
+  if(ws) renderEvidencePane(ws);
+  var hdrs = {};
+  if(typeof csrfToken !== 'undefined' && csrfToken) hdrs['X-CSRF-Token'] = csrfToken;
+  fetch('api.php?action=evidence_upload', {method:'POST', credentials:'include', headers:hdrs, body:fd})
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      ev.uploadProgress = 100;
+      ev.uploadResult = { ok:!!(r && r.success), message:(r && r.message)||t('Tải lên thành công!','Upload successful!') };
+      if(r && r.success){ ev.loaded = false; showToast(ev.uploadResult.message, 'success'); }
+      else showToast(ev.uploadResult.message, 'error');
+      if(ws) renderEvidencePane(ws);
+    })
+    .catch(function(err){
+      ev.uploadProgress = 0;
+      ev.uploadResult = { ok:false, message:t('Lỗi: ','Error: ') + (err.message||'Unknown') };
+      if(ws) renderEvidencePane(ws);
+    });
+}
+
+/* ── Render helpers ── */
+function _evRenderBrowse(ev){
+  var typeOpts = _EV_TYPE_OPTS.map(function(o){
+    return '<option value="' + esc(o.value) + '"' + (ev.filters.type === o.value ? ' selected' : '') + '>' + esc(t(o.vi,o.en)) + '</option>';
+  }).join('');
+  var filters =
+    '<div class="ec-ev-filters">' +
+      '<select class="ec-input ec-ev-fsel" data-ev-filter="type">' + typeOpts + '</select>' +
+      '<input type="date" class="ec-input ec-ev-finp" data-ev-filter="dateFrom" value="' + esc(ev.filters.dateFrom) + '" title="' + t('Từ ngày','From') + '">' +
+      '<input type="date" class="ec-input ec-ev-finp" data-ev-filter="dateTo" value="' + esc(ev.filters.dateTo) + '" title="' + t('Đến ngày','To') + '">' +
+      '<input type="text" class="ec-input ec-ev-finp" data-ev-filter="linkedTo" value="' + esc(ev.filters.linkedTo) + '" placeholder="' + t('Liên kết (NCR...)','Linked (NCR...)') + '">' +
+      '<button type="button" class="ec-btn primary sm" data-ev-action="browse-refresh">' + t('Làm mới','Refresh') + '</button>' +
+    '</div>';
+  if(ev.loading) return filters + '<div class="ec-ev-state">' + t('Đang tải...','Loading...') + '</div>';
+  if(ev.error)   return filters + '<div class="ec-ev-state error">' + esc(ev.error) + '</div>';
+  if(!ev.items || !ev.items.length) return filters +
+    '<div class="ec-ev-state empty">' +
+      '<div style="font-size:2.5rem;margin-bottom:12px">📂</div>' +
+      '<p>' + t('Chưa có bằng chứng. Dùng tab Tải lên để thêm.','No evidence yet. Use Upload to add.') + '</p>' +
+      '<button type="button" class="ec-btn primary" data-ev-mode="upload">' + t('Tải lên ngay','Upload now') + '</button>' +
+    '</div>';
+  var cards = ev.items.map(function(item){
+    var ICONS = {photo:'🖼️',video:'🎥',measurement:'📐',machine_log:'🖥️',cert:'🏅',document:'📄'};
+    var icon = ICONS[item.type] || '📄';
+    var media = item.thumbnail_url
+      ? '<img src="' + esc(item.thumbnail_url) + '" class="ec-ev-card-thumb" alt="">'
+      : '<div class="ec-ev-card-icon">' + icon + '</div>';
+    var size = item.file_size ? (item.file_size/1024).toFixed(0) + ' KB' : '';
+    return '<div class="ec-ev-card" data-ev-action="view-detail" data-ev-id="' + esc(item.id) + '">' +
+      '<div class="ec-ev-card-media">' + media + '</div>' +
+      '<div class="ec-ev-card-body">' +
+        '<div class="ec-ev-card-title">' + esc(item.title || item.filename || item.id) + '</div>' +
+        '<div class="ec-ev-card-meta">' +
+          '<span class="ec-badge info">' + esc(item.type||'doc') + '</span>' +
+          (size ? '<span class="ec-ev-meta-dim">' + size + '</span>' : '') +
+          (item.created_at ? '<span class="ec-ev-meta-dim">' + esc(item.created_at.slice(0,10)) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return filters + '<div class="ec-ev-grid">' + cards + '</div>';
+}
+
+function _evRenderUpload(ev){
+  var typeOpts = _EV_TYPE_OPTS.filter(function(o){ return o.value; }).map(function(o){
+    return '<option value="' + esc(o.value) + '">' + esc(t(o.vi,o.en)) + '</option>';
+  }).join('');
+  var progressHtml = (ev.uploadProgress > 0 && ev.uploadProgress < 100)
+    ? '<div class="ec-ev-progress"><div class="ec-ev-progress-bar" style="width:' + ev.uploadProgress + '%"></div></div>' : '';
+  var resultHtml = ev.uploadResult
+    ? '<div class="ec-ev-upload-result ' + (ev.uploadResult.ok ? 'ok' : 'err') + '">' + esc(ev.uploadResult.message) + '</div>' : '';
+  return '<div class="ec-ev-upload-wrap">' +
+    '<div class="ec-ev-dropzone" id="ec-ev-dropzone">' +
+      '<div style="font-size:2rem">📤</div>' +
+      '<div class="ec-ev-dz-text">' + t('Kéo thả tệp vào đây hoặc','Drag files here or') + '</div>' +
+      '<label class="ec-btn primary sm" style="cursor:pointer">' +
+        t('Chọn tệp','Choose files') +
+        '<input type="file" id="ec-ev-file-input" multiple accept="image/*,application/pdf,video/mp4,.csv,.xlsx,.txt,.json" style="display:none">' +
+      '</label>' +
+      '<div id="ec-ev-selected-files" class="ec-ev-selected-files"></div>' +
+    '</div>' +
+    '<div class="ec-ev-upload-form">' +
+      '<div class="ec-field-group"><label class="ec-label">' + t('Tiêu đề','Title') + '</label><input type="text" class="ec-input" id="ec-ev-title" placeholder="' + t('Tên mô tả...','Descriptive name...') + '"></div>' +
+      '<div class="ec-field-group"><label class="ec-label">' + t('Loại bằng chứng','Type') + '</label><select class="ec-input" id="ec-ev-type">' + typeOpts + '</select></div>' +
+      '<div class="ec-field-group"><label class="ec-label">' + t('Nhãn (phân cách bởi dấu phẩy)','Tags (comma-separated)') + '</label><input type="text" class="ec-input" id="ec-ev-tags" placeholder="qc, sop-302..."></div>' +
+      '<div class="ec-field-group"><label class="ec-label">' + t('Liên kết hồ sơ','Linked record') + '</label><input type="text" class="ec-input" id="ec-ev-linked" placeholder="NCR-001, SO-456..."></div>' +
+      '<div class="ec-field-group"><label class="ec-label">' + t('Mô tả','Description') + '</label><textarea class="ec-input" id="ec-ev-desc" rows="3"></textarea></div>' +
+      progressHtml + resultHtml +
+      '<div class="ec-alloc-submit-row"><button type="button" class="ec-btn primary" data-ev-action="do-upload">' + t('Tải lên','Upload') + '</button></div>' +
+    '</div>' +
+  '</div>';
+}
+
+function _evRenderDetail(ev){
+  if(ev.detailLoading) return '<div class="ec-ev-state">' + t('Đang tải...','Loading...') + '</div>';
+  if(ev.detailError)   return '<div class="ec-ev-state error">' + esc(ev.detailError) + '</div>';
+  if(!ev.detail) return '<div class="ec-ev-state empty">' + t('Chọn một mục từ tab Duyệt.','Select an item from Browse.') + '</div>';
+  var item = ev.detail;
+  var ICONS = {photo:'🖼️',video:'🎥',measurement:'📐',machine_log:'🖥️',cert:'🏅',document:'📄'};
+  var media = item.thumbnail_url
+    ? '<img src="' + esc(item.thumbnail_url) + '" class="ec-ev-detail-img">'
+    : '<div class="ec-ev-detail-icon-lg">' + (ICONS[item.type]||'📄') + '</div>';
+  var rows = [
+    [t('Loại','Type'),     item.type],
+    [t('Kích thước','Size'), item.file_size ? (item.file_size/1024).toFixed(0)+' KB' : '—'],
+    [t('Ngày tải','Date'),  item.created_at ? item.created_at.slice(0,16).replace('T',' ') : '—'],
+    [t('Người tải','By'),   item.created_by],
+    ['SHA-256',             item.hash ? item.hash.slice(0,20)+'…' : '—']
+  ].map(function(r){
+    return '<div class="ec-ev-drow"><span class="ec-ev-dlabel">' + esc(r[0]) + '</span><span class="ec-ev-dval">' + esc(r[1]||'—') + '</span></div>';
+  }).join('');
+  var CUST_COLORS = {uploaded:'#3b82f6',viewed:'#8b5cf6',linked:'#f59e0b',verified:'#10b981',modified:'#ef4444',downloaded:'#06b6d4'};
+  var custodyHtml = '';
+  if(item.chain_of_custody && item.chain_of_custody.length){
+    custodyHtml = '<div class="ec-ev-custody"><div class="ec-ev-sec-title">' + t('Chuỗi giám sát','Chain of custody') + '</div>' +
+      item.chain_of_custody.map(function(c){
+        var col = CUST_COLORS[c.action]||'#64748b';
+        return '<div class="ec-ev-cust-row" style="border-left-color:' + col + '">' +
+          '<span class="ec-ev-cust-act" style="color:' + col + '">' + esc(c.action) + '</span>' +
+          '<span class="ec-ev-cust-who">' + esc(c.user||'') + '</span>' +
+          '<span class="ec-ev-cust-when">' + esc((c.timestamp||'').slice(0,16).replace('T',' ')) + '</span>' +
+          (c.note ? '<span class="ec-ev-cust-note">' + esc(c.note) + '</span>' : '') +
+        '</div>';
+      }).join('') + '</div>';
+  }
+  var tagsHtml = (item.tags && item.tags.length)
+    ? '<div class="ec-ev-tags">' + item.tags.map(function(tg){ return '<span class="ec-badge info">' + esc(tg) + '</span>'; }).join('') + '</div>' : '';
+  return '<div class="ec-ev-detail">' +
+    '<button type="button" class="ec-btn sm" data-ev-action="back-to-browse">← ' + t('Quay lại','Back') + '</button>' +
+    '<div class="ec-ev-detail-hdr">' + media + '<div class="ec-ev-detail-ttl">' + esc(item.title||item.filename||item.id) + '</div></div>' +
+    '<div class="ec-ev-dgrid">' + rows + '</div>' +
+    (item.description ? '<div class="ec-ev-detail-desc">' + esc(item.description) + '</div>' : '') +
+    tagsHtml + custodyHtml +
+    '<div class="ec-ev-link-sec"><div class="ec-ev-sec-title">' + t('Liên kết hồ sơ','Link record') + '</div>' +
+      '<div class="ec-ev-link-row"><input type="text" class="ec-input" id="ec-ev-link-inp" placeholder="NCR-001...">' +
+      '<button type="button" class="ec-btn primary sm" data-ev-action="link-entity" data-ev-id="' + esc(item.id) + '">' + t('Liên kết','Link') + '</button></div>' +
+    '</div>' +
+  '</div>';
+}
+
+function _evRenderSearch(ev){
+  var resultsHtml = '';
+  if(ev.searchLoading){
+    resultsHtml = '<div class="ec-ev-state">' + t('Đang tìm...','Searching...') + '</div>';
+  } else if(ev.searchResults && ev.searchResults.length){
+    var ICONS = {photo:'🖼️',video:'🎥',measurement:'📐',machine_log:'🖥️',cert:'🏅',document:'📄'};
+    resultsHtml = '<div class="ec-ev-search-list">' +
+      ev.searchResults.map(function(item){
+        return '<div class="ec-ev-srow" data-ev-action="view-detail" data-ev-id="' + esc(item.id) + '">' +
+          '<span class="ec-ev-sicon">' + (ICONS[item.type]||'📄') + '</span>' +
+          '<div class="ec-ev-sinfo">' +
+            '<div class="ec-ev-stitle">' + esc(item.title||item.filename) + '</div>' +
+            '<div class="ec-ev-smeta">' +
+              '<span class="ec-badge info">' + esc(item.type||'doc') + '</span>' +
+              (item.created_at ? '<span class="ec-ev-meta-dim">' + esc(item.created_at.slice(0,10)) + '</span>' : '') +
+            '</div>' +
+            (item.snippet ? '<div class="ec-ev-snippet">' + item.snippet + '</div>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+  } else if(ev.searchQuery){
+    resultsHtml = '<div class="ec-ev-state empty">' + t('Không tìm thấy kết quả.','No results found.') + '</div>';
+  }
+  return '<div class="ec-ev-search-wrap">' +
+    '<div class="ec-ev-sbar">' +
+      '<input type="text" class="ec-input" id="ec-ev-search-inp" value="' + esc(ev.searchQuery) + '" placeholder="' + t('Tìm kiếm bằng chứng...','Search evidence...') + '">' +
+      '<button type="button" class="ec-btn primary" data-ev-action="do-search">' + t('Tìm','Search') + '</button>' +
+    '</div>' + resultsHtml +
+  '</div>';
+}
+
+function _evRenderIntegrity(ev){
+  var body = '';
+  if(ev.integrityRunning){
+    body = '<div class="ec-ev-progress ec-ev-igprog"><div class="ec-ev-progress-bar" style="width:' + ev.integrityProgress + '%"></div></div>' +
+      '<p style="color:var(--ec-text-secondary);margin-top:8px">' + t('Đang xác minh chuỗi băm...','Verifying hash chain...') + '</p>';
+  } else if(ev.integrityResult){
+    var r = ev.integrityResult;
+    var isApiErr = !!r.error;
+    var ok = !isApiErr && r.valid === true;
+    body = '<div class="ec-ev-ig-verdict ' + (ok ? 'ok' : 'fail') + '">' +
+      (ok
+        ? '✅ ' + t('Dữ liệu toàn vẹn — Chuỗi băm hợp lệ','Integrity verified — Hash chain valid')
+        : isApiErr
+          ? '⚠️ ' + t('Không thể xác minh — Máy chủ không phản hồi','Cannot verify — Server did not respond')
+          : '❌ ' + t('CẢNH BÁO — Phát hiện can thiệp dữ liệu','WARNING — Data tampering detected')) +
+    '</div>';
+    if(isApiErr && r.error){
+      body += '<p style="color:var(--ec-text-muted);font-size:12px;margin-top:6px">' + esc(r.error) + '</p>';
+    }
+    if(r.chain && r.chain.length){
+      body += '<div class="ec-ev-ig-list">' +
+        r.chain.map(function(ci){
+          return '<div class="ec-ev-ig-row">' +
+            '<span class="ec-ev-ig-st ' + (ci.valid ? 'ok' : 'fail') + '">' + (ci.valid ? '✓' : '✗') + '</span>' +
+            '<span class="ec-ev-ig-ttl">' + esc(ci.title||ci.id) + '</span>' +
+            '<code class="ec-ev-ig-hash">' + (ci.hash||'').slice(0,12) + '…</code>' +
+          '</div>';
+        }).join('') + '</div>';
+    }
+  }
+  return '<div class="ec-ev-ig-wrap">' +
+    '<div class="ec-ev-sec-title">' + t('Xác minh tính toàn vẹn','Integrity Verification') + '</div>' +
+    '<p class="ec-ev-ig-desc">' + t('Kiểm tra chuỗi băm SHA-256 để phát hiện bất kỳ sự can thiệp nào.','Verify SHA-256 hash chain to detect tampering.') + '</p>' +
+    '<button type="button" class="ec-btn primary" data-ev-action="do-integrity"' + (ev.integrityRunning ? ' disabled' : '') + '>' +
+      (ev.integrityRunning ? t('Đang xác minh...','Verifying...') : t('Bắt đầu xác minh','Start Verification')) +
+    '</button>' +
+    body +
+  '</div>';
+}
+
+/* ── Main entry points ── */
+function renderEvidenceTab(container){
+  /* Offline pending upload — hand off to upload validator */
+  if(state.pendingUploadSelection && state.pendingUploadSelection.allocationId && typeof window._renderUploadVerify === 'function'){
+    window._renderUploadVerify(state.forms, state.pendingUploadSelection, container);
+    state.pendingUploadSelection = null;
+    return;
+  }
+  renderEvidencePane(container);
+  if(!state.evidence.loaded && !state.evidence.loading) _evLoadItems();
+}
+
+function renderEvidencePane(container){
+  var ev = _evS(); var m = ev.mode;
+  var modeBar = _EV_MODES.map(function(mode){
+    return '<button type="button" class="ec-ev-mode-btn' + (m === mode.id ? ' active' : '') + '" data-ev-mode="' + mode.id + '">' + t(mode.vi, mode.en) + '</button>';
+  }).join('');
+  var pane = '';
+  if(m === 'browse')    pane = _evRenderBrowse(ev);
+  else if(m === 'upload')    pane = _evRenderUpload(ev);
+  else if(m === 'detail')    pane = _evRenderDetail(ev);
+  else if(m === 'search')    pane = _evRenderSearch(ev);
+  else if(m === 'integrity') pane = _evRenderIntegrity(ev);
+  container.innerHTML =
+    '<div class="ec-ev-container" id="ec-ev-container">' +
+      '<div class="ec-ev-modebar">' + modeBar + '</div>' +
+      '<div class="ec-ev-pane" id="ec-ev-pane">' + pane + '</div>' +
+    '</div>';
+  _evBindEvents(container);
+}
+
+function _evBindEvents(container){
+  var root = container.querySelector('#ec-ev-container');
+  if(!root) return;
+
+  /* Use capture phase so ev-actions fire before any bubbling to bindSidebar */
+  root.addEventListener('click', function(e){
+    var modeBtn = e.target.closest('[data-ev-mode]');
+    if(modeBtn){
+      e.stopPropagation();
+      var nm = modeBtn.getAttribute('data-ev-mode');
+      state.evidence.mode = nm;
+      if(nm === 'browse' && !state.evidence.loaded) _evLoadItems();
+      renderEvidencePane(container);
+      return;
+    }
+    var actBtn = e.target.closest('[data-ev-action]');
+    if(actBtn){
+      e.stopPropagation();
+      var action = actBtn.getAttribute('data-ev-action');
+      var itemId = actBtn.getAttribute('data-ev-id') || '';
+      if(action === 'browse-refresh'){
+        var ev2 = _evS();
+        var q = function(sel){ return root.querySelector(sel); };
+        var ts = q('[data-ev-filter="type"]'); if(ts) ev2.filters.type = ts.value;
+        var df = q('[data-ev-filter="dateFrom"]'); if(df) ev2.filters.dateFrom = df.value;
+        var dt = q('[data-ev-filter="dateTo"]'); if(dt) ev2.filters.dateTo = dt.value;
+        var ln = q('[data-ev-filter="linkedTo"]'); if(ln) ev2.filters.linkedTo = ln.value;
+        ev2.loaded = false; _evLoadItems();
+      } else if(action === 'view-detail'){
+        _evLoadDetail(itemId);
+      } else if(action === 'back-to-browse'){
+        state.evidence.mode = 'browse'; renderEvidencePane(container);
+      } else if(action === 'do-search'){
+        var si = root.querySelector('#ec-ev-search-inp');
+        if(si) state.evidence.searchQuery = si.value.trim();
+        _evSearch();
+      } else if(action === 'do-integrity'){
+        _evVerifyChain();
+      } else if(action === 'do-upload'){
+        _evDoUpload(root);
+      } else if(action === 'link-entity'){
+        var li = root.querySelector('#ec-ev-link-inp');
+        var entityVal = li ? li.value.trim() : '';
+        if(!entityVal || !itemId){ showToast(t('Nhập ID hồ sơ để liên kết','Enter record ID to link'), 'warn'); return; }
+        api('evidence_link', {id:itemId, entity:entityVal}, 'POST').then(function(){
+          showToast(t('Đã liên kết','Linked'), 'success'); _evLoadDetail(itemId);
+        }).catch(function(){ showToast(t('Lỗi liên kết','Link failed'), 'error'); });
+      }
+    }
+  }, true);
+
+  /* Search on Enter */
+  var si2 = root.querySelector('#ec-ev-search-inp');
+  if(si2) si2.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ state.evidence.searchQuery = this.value.trim(); _evSearch(); }
+  });
+
+  /* File input change → show selected filenames */
+  var fi = root.querySelector('#ec-ev-file-input');
+  if(fi) fi.addEventListener('change', function(){
+    var sel = root.querySelector('#ec-ev-selected-files'); if(!sel) return;
+    sel.innerHTML = Array.from(this.files).map(function(f){
+      return '<div class="ec-ev-fitem">📎 ' + esc(f.name) + ' (' + (f.size/1024).toFixed(0) + ' KB)</div>';
+    }).join('');
+  });
+
+  /* Dropzone drag-and-drop */
+  var dz = root.querySelector('#ec-ev-dropzone');
+  if(dz){
+    dz.addEventListener('dragover', function(e){ e.preventDefault(); this.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', function(){ this.classList.remove('drag-over'); });
+    dz.addEventListener('drop', function(e){
+      e.preventDefault(); this.classList.remove('drag-over');
+      var fi2 = root.querySelector('#ec-ev-file-input');
+      if(fi2 && e.dataTransfer.files.length){
+        try{ var dt = new DataTransfer(); Array.from(e.dataTransfer.files).forEach(function(f){ dt.items.add(f); }); fi2.files = dt.files; fi2.dispatchEvent(new Event('change')); }catch(ex){}
+      }
+    });
+  }
+}
+
+/* Map legacy tab/mode names to the current 4-tab model */
+function _normalizeTabMode(mode){
+  var m = String(mode || '').trim();
+  if(m === 'work' || m === 'my-work' || m === 'mine') return 'mine';
+  if(m === 'form' || m === 'eqms' || m === 'eqms-builder' || m === 'forms' || m === 'fill' || m === 'fill-download') return 'forms';
+  if(m === 'registry' || m === 'record-id' || m === 'codes') return 'codes';
+  if(m === 'upload' || m === 'upload-verify' || m === 'evidence') return 'evidence';
+  return 'mine';
+}
+
 window._renderOnlineFormsLegacy = function(formCode){
   var page = pageEl();
   if(!page) return;
   if(!formCode && state.pendingFillSelection && state.pendingFillSelection.formCode){
     formCode = state.pendingFillSelection.formCode;
     if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
-    state.workspaceMode = 'form';
+    state.workspaceMode = 'forms';
   }
   if(formCode) state.selectedFormCode = formCode;
   page.innerHTML = renderWorkspaceSkeleton();
@@ -2438,9 +3272,6 @@ window._renderOnlineFormsLegacy = function(formCode){
       if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
       state.pendingFillSelection = null;
     }
-    if(!state.selectedFormCode && state.forms.length) state.selectedFormCode = state.forms[0].form_code;
-    return loadAllocations();
-  }).then(function(){
     state.ready = true;
     render(page);
   }).catch(function(){
@@ -2453,11 +3284,9 @@ window._fhSwitchTab = function(target){
     runWithRuntimeGuard(function(){ window._fhSwitchTab(target); });
     return;
   }
-  state.activeTab = target || '';
-  if(target === 'record-id'){ state.workspaceMode = 'record-id'; requestRender(); return; }
-  if(target === 'upload' || target === 'upload-verify'){ state.workspaceMode = 'upload'; requestRender(); return; }
-  if(target === 'registry'){ state.workspaceMode = 'registry'; requestRender(); loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); return; }
-  if(target === 'work' || target === 'my-work'){ state.workspaceMode = 'work'; requestRender(); loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); }); return; }
+  var mode = _normalizeTabMode(target);
+  state.activeTab = mode;
+  state.workspaceMode = mode;
   if(target === 'fill' || target === 'fill-download'){
     var pending = state.pendingFillSelection || {};
     if(pending.formCode || state.selectedFormCode){
@@ -2466,32 +3295,29 @@ window._fhSwitchTab = function(target){
       return;
     }
   }
-  state.workspaceMode = 'form';
   requestRender();
+  if(mode === 'mine') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
+  if(mode === 'codes') loadRegistry(true).then(function(){ if(state.workspaceMode === 'codes') requestRender(); });
 };
 
 window.renderOnlineForms = function(formCode){
   var page = pageEl();
   if(!page) return;
 
-  /* If a specific form is requested, navigate to document browser to open it */
+  /* If a specific form is requested, navigate to forms tab and open it */
   if(formCode){
-    if(typeof navigateTo === 'function'){
-      navigateTo('documents', 'FRM');
-      /* After navigating, try to open the specific document */
-      setTimeout(function(){
-        if(typeof openDoc === 'function') openDoc(formCode);
-      }, 500);
-    }
-    return;
+    state.selectedFormCode = formCode;
+    state.workspaceMode = 'forms';
+    state._eqmsOpenCode = '';
+  } else {
+    /* Default: "My Work" tab */
+    if(!state.workspaceMode || state.workspaceMode === 'form' || state.workspaceMode === 'work') state.workspaceMode = 'mine';
   }
-
-  /* Default: show work queue (Việc của tôi) */
-  if(!state.workspaceMode || state.workspaceMode === 'form') state.workspaceMode = 'work';
   page.innerHTML = renderWorkspaceSkeleton();
   loadAll().then(function(){
     state.ready = true;
     render(page);
+    if(state.workspaceMode === 'mine') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'mine') requestRender(); });
   }).catch(function(err){
     page.innerHTML = renderLoadFailure(err);
     var retry = page.querySelector('#ec-retry-load');

@@ -4,12 +4,21 @@ Canonical Publication Orchestrator
 ===================================
 Single entry-point that runs the full publication pipeline in sequence:
 
-  1. generate-module-builder-registry.mjs   (canonical generator)
-  2. add_slice_field_definitions.py          (slice field definitions)
-  3. onboard_registry_keys.py               (slice entity onboarder)
-  4. regenerate_slice_publication.py         (slice publication regenerator)
-  5. Generate publication proof artifact     (_reports/publication-proof-latest.json)
-  6. Generate wave/gap ledger               (wave-gap-ledger.json)
+  1. generate-table-architecture.mjs         (table architecture + registry regeneration)
+  2. generate-data-fields-registry.mjs       (data-field regeneration)
+  3. generate-workflow-governance.mjs        (status/workflow regeneration)
+  4. generate-module-builder-registry.mjs    (canonical generator)
+  5. add_slice_field_definitions.py          (slice field definitions)
+  6. onboard_registry_keys.py                (slice entity onboarder)
+  7. regenerate_slice_publication.py         (slice publication regenerator)
+  8. generate_wave0_governance.py            (wave-0 governance report + manifest patch)
+  9. generate_operational_blind_spot_report.py (real-world blind-spot assessment)
+  10. generate_wave1_lifecycle_governance.py  (wave-1 lifecycle normalization report)
+  11. generate_wave2_canonical_governance.py  (wave-2 canonical exposure/archive report)
+  12. generate_operational_stress_report.py   (stress/exception reality assessment)
+  13. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
+  14. Generate publication proof artifact     (_reports/publication-proof-latest.json)
+  15. Generate wave/gap ledger                (wave-gap-ledger.json)
 
 The proof artifact contains checksums, counts, and invariant checks so that
 downstream consumers can verify the publication run is consistent.
@@ -36,8 +45,21 @@ from pathlib import Path
 PORTAL_ROOT = Path(__file__).resolve().parent.parent.parent
 TOOLS_REGISTRY_DIR = PORTAL_ROOT / "tools" / "registry"
 TOOLS_DIR = PORTAL_ROOT / "tools"
-REGISTRY_DIR = PORTAL_ROOT / "qms-data" / "registry"
 REPORTS_DIR = PORTAL_ROOT / "_reports"
+
+
+def resolve_registry_dir() -> Path:
+    candidates = [
+        PORTAL_ROOT / "data" / "registry",
+        PORTAL_ROOT / "qms-data" / "registry",
+    ]
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate
+    return candidates[0]
+
+
+REGISTRY_DIR = resolve_registry_dir()
 
 # Registry artifact paths
 ENDPOINT_CATALOG = REGISTRY_DIR / "endpoint-catalog.json"
@@ -318,7 +340,11 @@ def generate_wave_gap_ledger(run_id: str) -> dict:
             ledger_entities[entity_key] = {
                 "verdict": "blocked",
                 "score": rdns.get("score", 0),
+                "profile": ent.get("profile"),
                 "blockers": rdns.get("blockers", []),
+                "warnings": rdns.get("warnings", []),
+                "publishable": bool(rdns.get("publishable")),
+                "reasons": rdns.get("blockers", []),
                 "reason_bucket": "blocked",
                 "closure_mode": "manual_domain_decision",
                 "wave_assignment": "P0",
@@ -338,7 +364,11 @@ def generate_wave_gap_ledger(run_id: str) -> dict:
             ledger_entities[entity_key] = {
                 "verdict": verdict,
                 "score": rdns.get("score", 0),
+                "profile": ent.get("profile"),
                 "blockers": [],
+                "warnings": rdns.get("warnings", []),
+                "publishable": bool(rdns.get("publishable")),
+                "reasons": ["Partial with no specific blockers listed"],
                 "reason_bucket": "metadata_only_gap",
                 "closure_mode": "generator_automatable",
                 "wave_assignment": "P1",
@@ -361,7 +391,11 @@ def generate_wave_gap_ledger(run_id: str) -> dict:
         ledger_entities[entity_key] = {
             "verdict": verdict,
             "score": rdns.get("score", 0),
+            "profile": ent.get("profile"),
             "blockers": blockers,
+            "warnings": rdns.get("warnings", []),
+            "publishable": bool(rdns.get("publishable")),
+            "reasons": summaries,
             "reason_bucket": entity_reason,
             "closure_mode": entity_mode,
             "wave_assignment": entity_wave,
@@ -606,11 +640,32 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
 
     step_results: dict[str, bool] = {}
 
-    # Step 1: Canonical generator (Node.js)
+    # Step 1-4: Registry generators (Node.js)
     if skip_generator:
         print("\n[SKIP] Canonical generator (--skip-generator flag)")
+        step_results["table_architecture_generator"] = True
+        step_results["data_fields_generator"] = True
+        step_results["workflow_governance_generator"] = True
         step_results["canonical_generator"] = True
     else:
+        step_results["table_architecture_generator"] = run_step(
+            "Table Architecture Generator (generate-table-architecture.mjs)",
+            ["node", "generate-table-architecture.mjs"],
+            cwd=TOOLS_REGISTRY_DIR,
+            dry_run=dry_run,
+        )
+        step_results["data_fields_generator"] = run_step(
+            "Data Fields Generator (generate-data-fields-registry.mjs)",
+            ["node", "generate-data-fields-registry.mjs"],
+            cwd=TOOLS_REGISTRY_DIR,
+            dry_run=dry_run,
+        )
+        step_results["workflow_governance_generator"] = run_step(
+            "Workflow Governance Generator (generate-workflow-governance.mjs)",
+            ["node", "generate-workflow-governance.mjs"],
+            cwd=TOOLS_REGISTRY_DIR,
+            dry_run=dry_run,
+        )
         step_results["canonical_generator"] = run_step(
             "Canonical Generator (generate-module-builder-registry.mjs)",
             ["node", "generate-module-builder-registry.mjs"],
@@ -618,7 +673,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
             dry_run=dry_run,
         )
 
-    # Step 2: Slice field definitions adder
+    # Step 4: Slice field definitions adder
     step_results["slice_field_definitions"] = run_step(
         "Slice Field Definitions (add_slice_field_definitions.py)",
         [sys.executable, "add_slice_field_definitions.py"],
@@ -626,7 +681,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 3: Slice entity onboarder
+    # Step 5: Slice entity onboarder
     step_results["onboard_registry_keys"] = run_step(
         "Slice Entity Onboarder (onboard_registry_keys.py)",
         [sys.executable, "onboard_registry_keys.py"],
@@ -634,7 +689,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 4: Slice publication regenerator
+    # Step 6: Slice publication regenerator
     step_results["regenerate_slice_publication"] = run_step(
         "Slice Publication Regenerator (regenerate_slice_publication.py)",
         [sys.executable, "regenerate_slice_publication.py"],
@@ -642,7 +697,55 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 5: Generate wave/gap ledger
+    # Step 7: Wave 0 governance report
+    step_results["wave0_governance"] = run_step(
+        "Wave 0 Governance (generate_wave0_governance.py)",
+        [sys.executable, "generate_wave0_governance.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 8: Operational blind-spot assessment
+    step_results["operational_blind_spots"] = run_step(
+        "Operational Blind Spots (generate_operational_blind_spot_report.py)",
+        [sys.executable, "generate_operational_blind_spot_report.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 9: Wave 1 lifecycle normalization assessment
+    step_results["wave1_lifecycle_governance"] = run_step(
+        "Wave 1 Lifecycle Governance (generate_wave1_lifecycle_governance.py)",
+        [sys.executable, "generate_wave1_lifecycle_governance.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 10: Wave 2 canonical governance assessment
+    step_results["wave2_canonical_governance"] = run_step(
+        "Wave 2 Canonical Governance (generate_wave2_canonical_governance.py)",
+        [sys.executable, "generate_wave2_canonical_governance.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 11: Operational stress assessment
+    step_results["operational_stress_governance"] = run_step(
+        "Operational Stress Governance (generate_operational_stress_report.py)",
+        [sys.executable, "generate_operational_stress_report.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 12: Compact truth/accounting summaries
+    step_results["publication_truth_summaries"] = run_step(
+        "Publication Truth Summaries (generate_publication_truth_summaries.py)",
+        [sys.executable, "generate_publication_truth_summaries.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 13-14: Proof + wave/gap ledger
     print(f"\n{'=' * 72}")
     print("STEP: Wave/Gap Ledger Generation")
     print(f"{'=' * 72}")

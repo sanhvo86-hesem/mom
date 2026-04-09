@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-09T20:20:00+07:00",
+    "description": "Explicit Wave 2 normalization decisions for canonical resource mapping, service-backed slices, and archive isolation."
+  },
+  "catalog_alignment_targets": {
+    "commercial_customer.quotations": {
+      "expected_table": "quotes",
+      "expected_primary_key": "quote_id",
+      "expected_status_column": "status"
+    },
+    "commercial_customer.quote-effectiveness-reviews": {
+      "expected_table": "qual_effectiveness_reviews",
+      "expected_primary_key": "qual_effectiveness_review_id",
+      "expected_status_column": "review_result"
+    },
+    "planning_production.production-plans": {
+      "expected_table": "production_schedule",
+      "expected_primary_key": "schedule_id",
+      "expected_status_column": "schedule_status"
+    },
+    "planning_production.dispatch-lists": {
+      "expected_table": "mes_dispatch_queue",
+      "expected_primary_key": "queue_id",
+      "expected_status_column": "queue_status"
+    },
+    "quality_improvement.nonconformances": {
+      "expected_table": "ncr_records",
+      "expected_primary_key": "ncr_id",
+      "expected_status_column": "ncr_status"
+    },
+    "quality_improvement.corrective-actions": {
+      "expected_table": "capa_records",
+      "expected_primary_key": "capa_id",
+      "expected_status_column": "capa_status"
+    },
+    "quality_improvement.msa-studies": {
+      "expected_table": "calibration_grr_studies",
+      "expected_primary_key": "grr_id",
+      "expected_status_column": "grr_result"
+    },
+    "quality_improvement.audit-programs": {
+      "expected_table": "qual_audit_programs",
+      "expected_primary_key": "qual_audit_program_id",
+      "expected_status_column": "status"
+    },
+    "quality_improvement.improvement-actions": {
+      "expected_table": "improvement_projects",
+      "expected_primary_key": "improvement_id",
+      "expected_status_column": "improvement_status"
+    },
+    "maintenance_ehs.maintenance-plans": {
+      "expected_table": "pm_maintenance_plans",
+      "expected_primary_key": "maintenance_plan_id",
+      "expected_status_column": "status"
+    },
+    "maintenance_ehs.maintenance-work-orders": {
+      "expected_table": "pm_work_orders",
+      "expected_primary_key": "pm_work_order_id",
+      "expected_status_column": "status"
+    },
+    "maintenance_ehs.five-s-audits": {
+      "expected_table": "lean_5s_audits",
+      "expected_primary_key": "audit_5s_id",
+      "expected_status_column": "status"
+    }
+  },
+  "service_backed_resources": {
+    "quality_improvement.override-controls": {
+      "entity_key": "governance.override_controls",
+      "required_endpoints": [
+        "governance.override_controls.list",
+        "governance.override_controls.detail",
+        "governance.override_controls.create"
+      ]
+    },
+    "finance.period-closes": {
+      "entity_key": "finance.period_close_controls",
+      "required_endpoints": [
+        "finance.period_close_controls.list",
+        "finance.period_close_controls.detail",
+        "finance.period_close_controls.create"
+      ]
+    },
+    "finance.backdate-exceptions": {
+      "entity_key": "finance.backdate_exceptions",
+      "required_endpoints": [
+        "finance.backdate_exceptions.list",
+        "finance.backdate_exceptions.detail",
+        "finance.backdate_exceptions.create"
+      ]
+    },
+    "finance.credit-memos": {
+      "entity_key": "finance.credit_memos",
+      "required_endpoints": [
+        "finance.credit_memos.list",
+        "finance.credit_memos.detail",
+        "finance.credit_memos.create"
+      ]
+    },
+    "finance.debit-memos": {
+      "entity_key": "finance.debit_memos",
+      "required_endpoints": [
+        "finance.debit_memos.list",
+        "finance.debit_memos.detail",
+        "finance.debit_memos.create"
+      ]
+    }
+  },
+  "archive_isolation_targets": {
+    "quality_management.deviation": {
+      "canonical_resource": "quality_improvement.deviations",
+      "successor_table": "deviations",
+      "reason": "Legacy singular alias retained only for traceability; active composition must use the canonical deviations object."
+    }
+  }
+}

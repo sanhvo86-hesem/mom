@@ -1,4 +1,52 @@
 {
+  "alarm_event": [
+    "alarm_code",
+    "alarm_event_id",
+    "alarm_state",
+    "cleared_at",
+    "occurred_at",
+    "severity_code",
+    "work_unit_id"
+  ],
+  "allocation": [
+    "allocated_at",
+    "allocated_qty",
+    "allocation_id",
+    "demand_entity_id",
+    "demand_entity_name",
+    "item_revision_id",
+    "supply_entity_id",
+    "supply_entity_name"
+  ],
+  "allocation_events": [
+    "actor",
+    "allocation_id",
+    "created_at",
+    "detail",
+    "event_id",
+    "event_type",
+    "metadata"
+  ],
+  "allocations": [
+    "allocation_id",
+    "created_at",
+    "created_by",
+    "delivery_mode",
+    "dept_code",
+    "fiscal_year",
+    "form_code",
+    "form_revision",
+    "linked_order_id",
+    "master_context",
+    "notes",
+    "priority",
+    "record_id",
+    "record_type",
+    "seq",
+    "status",
+    "updated_at",
+    "updated_by"
+  ],
   "ap_ar_invoices": [
     "aging_bucket",
     "currency_code",
@@ -32,6 +80,66 @@
     "three_way_match_status",
     "total_amount",
     "vendor_or_customer_id"
+  ],
+  "ap_invoice_lines": [
+    "ap_invoice_id",
+    "ap_invoice_line_id",
+    "created_at",
+    "item_id",
+    "line_amount",
+    "line_number",
+    "metadata",
+    "purchase_receipt_line_id",
+    "qty_invoiced",
+    "row_version",
+    "three_way_match_status",
+    "unit_price",
+    "updated_at"
+  ],
+  "ap_invoices": [
+    "ap_invoice_id",
+    "created_at",
+    "currency_code",
+    "dispute_status",
+    "due_date",
+    "hold_reason",
+    "invoice_amount",
+    "invoice_date",
+    "invoice_number",
+    "invoice_status",
+    "matched_amount",
+    "metadata",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "period_close_code",
+    "po_id",
+    "posting_date",
+    "purchase_receipt_id",
+    "row_version",
+    "source_record_id",
+    "source_system",
+    "updated_at",
+    "vendor_id"
+  ],
+  "approval": [
+    "approval_group_id",
+    "approval_id",
+    "approval_step_code",
+    "approver_party_id",
+    "comment_text",
+    "created_at",
+    "decided_at",
+    "decision_code",
+    "decision_reason_code",
+    "electronic_signature_id",
+    "entity_id",
+    "entity_name",
+    "row_version",
+    "status_code",
+    "updated_at"
   ],
   "approved_supplier_list": [
     "approved_by",
@@ -363,6 +471,33 @@
     "validated_date",
     "work_center_id"
   ],
+  "attachment": [
+    "attachment_id",
+    "attachment_type",
+    "checksum_sha256",
+    "content_type",
+    "created_at",
+    "entity_id",
+    "entity_name",
+    "evidence_chain_hash",
+    "file_name",
+    "file_size_bytes",
+    "row_version",
+    "storage_uri",
+    "updated_at",
+    "uploaded_by_party_id"
+  ],
+  "audit": [
+    "audit_id",
+    "audit_no",
+    "audit_program_id",
+    "audit_type",
+    "auditee_party_id",
+    "created_at",
+    "scheduled_end_at",
+    "scheduled_start_at",
+    "status_code"
+  ],
   "audit_actions": [
     "action_description",
     "action_id",
@@ -415,6 +550,26 @@
     "source_record_id",
     "source_system"
   ],
+  "audit_program": [
+    "audit_program_code",
+    "audit_program_id",
+    "created_at",
+    "frequency_code",
+    "owner_party_id",
+    "program_name",
+    "scope_text"
+  ],
+  "audit_trail": [
+    "acted_at",
+    "acted_by_party_id",
+    "action_code",
+    "audit_trail_id",
+    "electronic_signature_id",
+    "entity_id",
+    "entity_name",
+    "new_payload",
+    "old_payload"
+  ],
   "audits": [
     "audit_code",
     "audit_conclusion",
@@ -462,6 +617,15 @@
     "valid_from",
     "valid_to"
   ],
+  "bom": [
+    "alternate_code",
+    "bom_code",
+    "bom_id",
+    "bom_type",
+    "created_at",
+    "parent_item_revision_id",
+    "status_code"
+  ],
   "bom_components": [
     "bom_id",
     "bom_level",
@@ -491,6 +655,42 @@
     "source_system",
     "substitute_component_id",
     "yield_factor_pct"
+  ],
+  "bom_line": [
+    "bom_line_id",
+    "bom_version_id",
+    "component_item_revision_id",
+    "issue_method",
+    "qty_per",
+    "scrap_factor_pct",
+    "sequence_no"
+  ],
+  "bom_substitute": [
+    "bom_line_id",
+    "bom_substitute_id",
+    "effective_from",
+    "effective_to",
+    "priority_no",
+    "quantity_factor",
+    "substitute_item_revision_id"
+  ],
+  "bom_version": [
+    "approval_state",
+    "bom_id",
+    "bom_version_id",
+    "effective_from",
+    "effective_to",
+    "version_code"
+  ],
+  "calendar": [
+    "calendar_code",
+    "calendar_id",
+    "calendar_name",
+    "created_at",
+    "row_version",
+    "status_code",
+    "timezone",
+    "updated_at"
   ],
   "calibration_grr_studies": [
     "approved_by",
@@ -583,6 +783,17 @@
     "uncertainty",
     "valid_from",
     "valid_to"
+  ],
+  "capa": [
+    "capa_id",
+    "capa_no",
+    "created_at",
+    "effectiveness_due_date",
+    "owner_party_id",
+    "root_cause_method",
+    "source_case_id",
+    "source_case_name",
+    "status_code"
   ],
   "capa_8d_steps": [
     "capa_id",
@@ -715,6 +926,16 @@
     "row_version",
     "source_record_id",
     "source_system"
+  ],
+  "change_control": [
+    "approval_state",
+    "change_control_id",
+    "change_control_no",
+    "change_type",
+    "created_at",
+    "impact_summary",
+    "risk_summary",
+    "source_document_revision_id"
   ],
   "cnc_program_approvals": [
     "approval_id",
@@ -1014,6 +1235,25 @@
     "source_system",
     "updated_at"
   ],
+  "competency": [
+    "competency_code",
+    "competency_id",
+    "competency_name",
+    "competency_type",
+    "created_at"
+  ],
+  "complaint": [
+    "complaint_id",
+    "complaint_no",
+    "complaint_text",
+    "created_at",
+    "customer_party_id",
+    "reported_item_revision_id",
+    "reported_lot_id",
+    "reported_serial_id",
+    "severity_code",
+    "status_code"
+  ],
   "compliance_records": [
     "buy_american_compliant",
     "compliance_id",
@@ -1076,6 +1316,14 @@
     "status",
     "title",
     "updated_at"
+  ],
+  "container": [
+    "container_code",
+    "container_id",
+    "container_type",
+    "current_warehouse_id",
+    "parent_container_id",
+    "status_code"
   ],
   "contamination_checks": [
     "check_id",
@@ -1245,6 +1493,17 @@
     "variance_type",
     "yield_adjustment"
   ],
+  "cost_ledger": [
+    "cost_amount",
+    "cost_element_code",
+    "cost_ledger_id",
+    "cost_object_id",
+    "cost_object_type",
+    "currency_code",
+    "posting_at",
+    "reference_entity_id",
+    "reference_entity_name"
+  ],
   "crm_accounts": [
     "account_name",
     "account_number",
@@ -1335,6 +1594,7 @@
     "updated_at"
   ],
   "crm_customer_touchpoints": [
+    "closed_at",
     "created_at",
     "crm_account_id",
     "crm_customer_touchpoint_id",
@@ -1351,7 +1611,8 @@
     "source_record_id",
     "source_system",
     "touchpoint_channel",
-    "touchpoint_date"
+    "touchpoint_date",
+    "touchpoint_status"
   ],
   "crm_forecasts": [
     "best_case_value",
@@ -1586,6 +1847,16 @@
     "storage_tier",
     "table_name"
   ],
+  "demand": [
+    "demand_id",
+    "demand_qty",
+    "demand_source",
+    "item_site_id",
+    "priority_code",
+    "required_date",
+    "source_document_no",
+    "status_code"
+  ],
   "demand_classifications": [
     "classification_code",
     "created_at",
@@ -1643,6 +1914,16 @@
     "source_system",
     "updated_at"
   ],
+  "deviation": [
+    "created_at",
+    "deviation_id",
+    "deviation_no",
+    "disposition_code",
+    "reason_code",
+    "source_id",
+    "source_type",
+    "status_code"
+  ],
   "deviations": [
     "actual_qty_used",
     "affected_items",
@@ -1674,6 +1955,24 @@
     "updated_at",
     "valid_from",
     "valid_to"
+  ],
+  "dispatch_queue": [
+    "dispatch_queue_id",
+    "dispatch_rule",
+    "dispatch_sequence",
+    "frozen_flag",
+    "job_id",
+    "queue_date",
+    "work_center_id"
+  ],
+  "document": [
+    "created_at",
+    "document_id",
+    "document_no",
+    "document_type",
+    "lifecycle_state",
+    "owner_party_id",
+    "title_text"
   ],
   "document_distribution": [
     "acknowledged_at",
@@ -1707,6 +2006,16 @@
     "source_record_id",
     "source_system",
     "version_id"
+  ],
+  "document_revision": [
+    "approval_state",
+    "checksum_sha256",
+    "document_id",
+    "document_revision_id",
+    "effective_from",
+    "effective_to",
+    "electronic_signature_id",
+    "revision_code"
   ],
   "document_versions": [
     "approver",
@@ -1749,6 +2058,15 @@
     "title",
     "title_vi",
     "updated_at"
+  ],
+  "downtime_event": [
+    "downtime_event_id",
+    "duration_minutes",
+    "ended_at",
+    "production_order_id",
+    "reason_code",
+    "started_at",
+    "work_unit_id"
   ],
   "dw_customer_dim": [
     "country_code",
@@ -2036,6 +2354,7 @@
     "storage_requirement"
   ],
   "ehs_incidents": [
+    "closed_at",
     "corrective_action",
     "created_at",
     "incident_code",
@@ -2043,6 +2362,7 @@
     "incident_description",
     "incident_id",
     "incident_location",
+    "incident_status",
     "incident_type",
     "metadata",
     "org_company_code",
@@ -2050,8 +2370,10 @@
     "org_plant_id",
     "org_site_id",
     "payload_schema_version",
+    "qual_compliance_obligation_id",
     "record_id",
     "reported_by",
+    "reported_by_employee_id",
     "row_version",
     "source_record_id",
     "source_system"
@@ -2198,6 +2520,32 @@
     "waste_code",
     "waste_name"
   ],
+  "electronic_signature": [
+    "electronic_signature_id",
+    "hash_value",
+    "metadata",
+    "provider_name",
+    "signature_meaning",
+    "signature_status",
+    "signed_at",
+    "signed_by_party_id"
+  ],
+  "electronic_signatures": [
+    "action",
+    "entity_id",
+    "entity_type",
+    "ip_address",
+    "meaning",
+    "metadata",
+    "signature_hash",
+    "signature_id",
+    "signature_mode",
+    "signed_at",
+    "signer_id",
+    "signer_name",
+    "signer_role",
+    "user_agent"
+  ],
   "employee_certifications": [
     "cert_id",
     "certificate_number",
@@ -2222,6 +2570,7 @@
     "dept_code",
     "employee_id",
     "employee_name",
+    "employment_status",
     "hire_date",
     "is_active",
     "metadata",
@@ -2493,6 +2842,7 @@
     "equipment_location",
     "equipment_name",
     "equipment_serial",
+    "equipment_status",
     "equipment_type",
     "feed_override_percent",
     "heartbeat_sla_seconds",
@@ -3190,6 +3540,16 @@
     "threshold_amount",
     "vendor_type"
   ],
+  "finding": [
+    "audit_id",
+    "created_at",
+    "finding_id",
+    "finding_no",
+    "finding_text",
+    "finding_type",
+    "severity_code",
+    "status_code"
+  ],
   "fixture_maintenance_logs": [
     "created_at",
     "fixture_id",
@@ -3321,6 +3681,16 @@
     "revision_number",
     "snapshot"
   ],
+  "forecast": [
+    "confidence_pct",
+    "customer_party_id",
+    "forecast_id",
+    "forecast_qty",
+    "item_site_id",
+    "period_end",
+    "period_start",
+    "status_code"
+  ],
   "form_attachments": [
     "attachment_id",
     "entry_id",
@@ -3339,6 +3709,17 @@
     "source_system",
     "uploaded_at",
     "uploaded_by"
+  ],
+  "form_drafts": [
+    "allocation_id",
+    "attachments",
+    "draft_id",
+    "field_values",
+    "form_code",
+    "saved_at",
+    "signatures",
+    "user_id",
+    "version"
   ],
   "form_entries": [
     "approved_by",
@@ -3387,6 +3768,16 @@
     "valid_from",
     "valid_to",
     "version"
+  ],
+  "genealogy_link": [
+    "child_lot_no",
+    "child_serial_no",
+    "genealogy_link_id",
+    "link_type",
+    "linked_at",
+    "parent_lot_no",
+    "parent_serial_no",
+    "production_order_id"
   ],
   "gl_transactions": [
     "actual_amount",
@@ -3790,6 +4181,40 @@
     "updated_at",
     "vendor_id"
   ],
+  "inspection_characteristic": [
+    "characteristic_code",
+    "characteristic_name",
+    "inspection_characteristic_id",
+    "inspection_plan_id",
+    "is_critical",
+    "lower_spec_limit",
+    "sequence_no",
+    "target_value_text",
+    "uom_code",
+    "upper_spec_limit"
+  ],
+  "inspection_lot": [
+    "created_at",
+    "inspection_lot_id",
+    "inspection_lot_no",
+    "inspection_status",
+    "item_revision_id",
+    "lot_id",
+    "serial_id",
+    "severity_code",
+    "source_id",
+    "source_type"
+  ],
+  "inspection_plan": [
+    "effective_from",
+    "effective_to",
+    "inspection_plan_id",
+    "item_revision_id",
+    "plan_code",
+    "plan_type",
+    "revision_code",
+    "status_code"
+  ],
   "inspection_plans": [
     "accept_number",
     "aql_level",
@@ -3814,6 +4239,16 @@
     "test_method",
     "valid_from",
     "valid_to"
+  ],
+  "inspection_result": [
+    "characteristic_code",
+    "disposition_code",
+    "inspection_characteristic_id",
+    "inspection_lot_id",
+    "inspection_result_id",
+    "recorded_at",
+    "result_value_num",
+    "result_value_text"
   ],
   "inspection_results": [
     "actual_value",
@@ -3860,6 +4295,17 @@
     "target_system",
     "updated_at"
   ],
+  "inventory_balance_snapshot": [
+    "allocated_qty",
+    "available_qty",
+    "inventory_balance_snapshot_id",
+    "item_site_id",
+    "lot_id",
+    "on_hand_qty",
+    "serial_id",
+    "snapshot_at",
+    "warehouse_id"
+  ],
   "inventory_buffer_profiles": [
     "buffer_code",
     "created_at",
@@ -3878,6 +4324,18 @@
     "source_record_id",
     "source_system",
     "yellow_zone_qty"
+  ],
+  "inventory_ledger": [
+    "inventory_ledger_id",
+    "item_site_id",
+    "lot_id",
+    "movement_at",
+    "movement_type",
+    "qty_delta",
+    "reference_entity_id",
+    "reference_entity_name",
+    "serial_id",
+    "warehouse_id"
   ],
   "inventory_locations": [
     "bin_location",
@@ -3909,6 +4367,8 @@
     "org_site_id",
     "payload_schema_version",
     "performed_by",
+    "posting_date",
+    "posting_status",
     "qty_allocated",
     "qty_available",
     "qty_change",
@@ -3921,6 +4381,8 @@
     "recorded_at",
     "reference_id",
     "reference_type",
+    "reversal_of_txn_id",
+    "reversal_reason_code",
     "row_version",
     "serial_number",
     "source_record_id",
@@ -3935,6 +4397,93 @@
     "unit_cost_std",
     "warehouse_id"
   ],
+  "ipqc_inspection_results": [
+    "actual_value",
+    "characteristic",
+    "created_at",
+    "defect_code",
+    "ipqc_inspection_id",
+    "ipqc_inspection_result_id",
+    "line_number",
+    "lower_spec_limit",
+    "metadata",
+    "nominal_value",
+    "notes",
+    "pass_fail",
+    "row_version",
+    "updated_at",
+    "upper_spec_limit"
+  ],
+  "ipqc_inspections": [
+    "completed_at",
+    "created_at",
+    "disposition_code",
+    "inspection_plan_id",
+    "inspection_status",
+    "inspector_id",
+    "ipqc_inspection_id",
+    "ipqc_number",
+    "job_op_id",
+    "lot_number",
+    "metadata",
+    "ncr_reference",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "quarantine_required",
+    "queued_at",
+    "row_version",
+    "source_record_id",
+    "source_system",
+    "started_at",
+    "updated_at",
+    "work_order_id"
+  ],
+  "item": [
+    "base_uom_code",
+    "created_at",
+    "item_code",
+    "item_id",
+    "item_name",
+    "item_type",
+    "lot_policy_id",
+    "product_family_code",
+    "serial_policy_id",
+    "shelf_life_policy_id",
+    "status_code",
+    "updated_at"
+  ],
+  "item_attr": [
+    "attr_name",
+    "attr_type",
+    "attr_value_bool",
+    "attr_value_json",
+    "attr_value_num",
+    "attr_value_text",
+    "created_at",
+    "item_attr_id",
+    "item_id"
+  ],
+  "item_class": [
+    "class_code",
+    "class_name",
+    "created_at",
+    "item_class_id",
+    "lifecycle_type",
+    "parent_class_id"
+  ],
+  "item_revision": [
+    "approval_state",
+    "drawing_reference",
+    "effective_from",
+    "effective_to",
+    "item_id",
+    "item_revision_id",
+    "lifecycle_state",
+    "revision_code"
+  ],
   "item_revisions": [
     "change_type",
     "description",
@@ -3946,6 +4495,35 @@
     "rev",
     "valid_from",
     "valid_to"
+  ],
+  "item_site": [
+    "default_warehouse_id",
+    "item_id",
+    "item_site_id",
+    "planner_code",
+    "procurement_type",
+    "site_id",
+    "status_code"
+  ],
+  "item_spec": [
+    "item_revision_id",
+    "item_spec_id",
+    "lower_limit_num",
+    "spec_code",
+    "spec_name",
+    "spec_type",
+    "status_code",
+    "target_value_text",
+    "upper_limit_num"
+  ],
+  "item_variant": [
+    "created_at",
+    "is_default",
+    "item_revision_id",
+    "item_variant_id",
+    "option_payload",
+    "variant_code",
+    "variant_name"
   ],
   "items": [
     "abc_class",
@@ -4019,6 +4597,16 @@
     "weight_net",
     "weight_uom"
   ],
+  "job": [
+    "current_state",
+    "job_id",
+    "job_no",
+    "planned_end_at",
+    "planned_start_at",
+    "status_code",
+    "work_order_id",
+    "work_unit_id"
+  ],
   "job_costing": [
     "job_cost_id",
     "job_number",
@@ -4039,6 +4627,15 @@
     "source_system",
     "subcontract_cost",
     "total_cost"
+  ],
+  "job_event": [
+    "event_at",
+    "event_type",
+    "event_value_json",
+    "job_event_id",
+    "job_id",
+    "operator_party_id",
+    "source_system"
   ],
   "job_operations": [
     "actual_end",
@@ -4215,6 +4812,14 @@
     "supplier_quality_index",
     "target_value",
     "training_completion_rate"
+  ],
+  "labor_capture": [
+    "captured_at",
+    "job_id",
+    "labor_capture_id",
+    "labor_minutes",
+    "labor_type",
+    "party_id"
   ],
   "labor_transactions": [
     "approval_status",
@@ -4535,6 +5140,27 @@
     "started_on_time",
     "tier_level"
   ],
+  "location_balance": [
+    "container_id",
+    "item_site_id",
+    "location_balance_id",
+    "lot_id",
+    "on_hand_qty",
+    "reserved_qty",
+    "serial_id",
+    "updated_at",
+    "warehouse_id"
+  ],
+  "lot": [
+    "expiry_date",
+    "genealogy_state",
+    "item_revision_id",
+    "lot_id",
+    "lot_no",
+    "lot_status",
+    "manufacture_date",
+    "supplier_party_id"
+  ],
   "lot_master": [
     "batch_number",
     "coc_number",
@@ -4560,6 +5186,23 @@
     "source_system",
     "vendor_id",
     "vendor_lot_number"
+  ],
+  "lot_policy": [
+    "genealogy_required",
+    "lot_numbering_rule",
+    "lot_policy_id",
+    "policy_code",
+    "shelf_life_days",
+    "status_code"
+  ],
+  "machine_event": [
+    "event_at",
+    "event_type",
+    "machine_event_id",
+    "payload_json",
+    "reason_code",
+    "severity_code",
+    "work_unit_id"
   ],
   "machine_rate_cards": [
     "created_at",
@@ -4647,6 +5290,26 @@
     "row_version",
     "source_record_id",
     "source_system"
+  ],
+  "master_data_store": [
+    "created_at",
+    "created_by",
+    "data",
+    "entity_id",
+    "entity_type",
+    "id",
+    "status",
+    "updated_at"
+  ],
+  "material_consumption": [
+    "consumed_at",
+    "consumed_qty",
+    "item_revision_id",
+    "job_id",
+    "lot_no",
+    "material_consumption_id",
+    "serial_no",
+    "uom_code"
   ],
   "material_cost_templates": [
     "cost_unit",
@@ -4777,6 +5440,16 @@
     "source_record_id",
     "source_system"
   ],
+  "mdm_form_series": [
+    "created_at",
+    "dept_owner",
+    "description",
+    "is_active",
+    "label",
+    "label_vi",
+    "series_code",
+    "sort_order"
+  ],
   "mdm_governance_issues": [
     "created_at",
     "entity_reference",
@@ -4794,6 +5467,16 @@
     "source_record_id",
     "source_system",
     "status"
+  ],
+  "mdm_incoterms": [
+    "created_at",
+    "description",
+    "incoterm_code",
+    "is_active",
+    "label",
+    "label_vi",
+    "updated_at",
+    "year_version"
   ],
   "mdm_item_classes": [
     "class_code",
@@ -4827,6 +5510,29 @@
     "source_record_id",
     "source_system"
   ],
+  "mdm_payment_terms": [
+    "created_at",
+    "discount_days",
+    "discount_pct",
+    "is_active",
+    "label",
+    "label_vi",
+    "net_days",
+    "term_code",
+    "updated_at"
+  ],
+  "mdm_promise_policies": [
+    "buffer_days",
+    "created_at",
+    "is_active",
+    "label",
+    "label_vi",
+    "metadata",
+    "otd_target_pct",
+    "policy_code",
+    "review_freq",
+    "updated_at"
+  ],
   "mdm_reference_code_values": [
     "code_value",
     "created_at",
@@ -4858,6 +5564,15 @@
     "row_version",
     "source_record_id",
     "source_system"
+  ],
+  "mdm_shipping_methods": [
+    "carrier_type",
+    "created_at",
+    "is_active",
+    "label",
+    "label_vi",
+    "method_code",
+    "updated_at"
   ],
   "mdm_site_parameters": [
     "created_at",
@@ -6318,6 +7033,17 @@
     "supply_source",
     "time_bucket"
   ],
+  "mrp_signal": [
+    "due_at",
+    "item_site_id",
+    "mrp_signal_id",
+    "priority_code",
+    "shortage_qty",
+    "signal_type",
+    "source_entity_id",
+    "source_entity_name",
+    "status_code"
+  ],
   "naming_patterns": [
     "applicable_to",
     "description",
@@ -6419,6 +7145,17 @@
     "source_system",
     "updated_at"
   ],
+  "nonconformance": [
+    "containment_action",
+    "created_at",
+    "disposition_code",
+    "nonconformance_id",
+    "nonconformance_no",
+    "quality_order_id",
+    "source_id",
+    "source_type",
+    "status_code"
+  ],
   "notifications": [
     "body",
     "category",
@@ -6469,6 +7206,41 @@
     "source_record_id",
     "source_system",
     "updated_at"
+  ],
+  "operation": [
+    "operation_code",
+    "operation_id",
+    "operation_name",
+    "sequence_no",
+    "standard_run_minutes",
+    "standard_setup_minutes",
+    "status_code",
+    "work_definition_version_id"
+  ],
+  "operation_material": [
+    "issue_method",
+    "item_revision_id",
+    "operation_id",
+    "operation_material_id",
+    "quantity_per",
+    "scrap_factor_pct"
+  ],
+  "operation_output": [
+    "item_revision_id",
+    "operation_id",
+    "operation_output_id",
+    "output_type",
+    "yield_factor_pct"
+  ],
+  "operation_resource": [
+    "crew_size",
+    "operation_id",
+    "operation_resource_id",
+    "resource_type",
+    "run_minutes_per_unit",
+    "setup_minutes",
+    "work_center_id",
+    "work_unit_id"
   ],
   "oqc_inspections": [
     "approved_at",
@@ -6645,6 +7417,29 @@
     "metadata",
     "updated_at"
   ],
+  "org_company": [
+    "company_code",
+    "company_id",
+    "created_at",
+    "enterprise_id",
+    "functional_currency_code",
+    "legal_name",
+    "registration_country_code",
+    "row_version",
+    "status_code",
+    "updated_at"
+  ],
+  "org_enterprise": [
+    "base_timezone",
+    "created_at",
+    "enterprise_code",
+    "enterprise_id",
+    "enterprise_name",
+    "home_currency_code",
+    "row_version",
+    "status_code",
+    "updated_at"
+  ],
   "org_legal_entities": [
     "company_code",
     "country_code",
@@ -6655,6 +7450,17 @@
     "legal_entity_name_vi",
     "legal_entity_status",
     "metadata",
+    "updated_at"
+  ],
+  "org_plant": [
+    "created_at",
+    "plant_code",
+    "plant_id",
+    "plant_name",
+    "plant_type",
+    "row_version",
+    "site_id",
+    "status_code",
     "updated_at"
   ],
   "org_plants": [
@@ -6668,6 +7474,52 @@
     "site_id",
     "timezone",
     "updated_at"
+  ],
+  "org_site": [
+    "company_id",
+    "created_at",
+    "row_version",
+    "site_code",
+    "site_id",
+    "site_name",
+    "site_type",
+    "status_code",
+    "timezone",
+    "updated_at"
+  ],
+  "org_warehouse": [
+    "created_at",
+    "plant_id",
+    "row_version",
+    "status_code",
+    "updated_at",
+    "warehouse_code",
+    "warehouse_id",
+    "warehouse_name",
+    "warehouse_type"
+  ],
+  "org_work_center": [
+    "capacity_uom_code",
+    "created_at",
+    "plant_id",
+    "row_version",
+    "status_code",
+    "updated_at",
+    "work_center_code",
+    "work_center_id",
+    "work_center_name"
+  ],
+  "org_work_unit": [
+    "created_at",
+    "equipment_class",
+    "row_version",
+    "serial_number",
+    "status_code",
+    "updated_at",
+    "work_center_id",
+    "work_unit_code",
+    "work_unit_id",
+    "work_unit_name"
   ],
   "osc_dispatch_batch_lines": [
     "created_at",
@@ -6937,6 +7789,62 @@
     "verified_at",
     "verified_by"
   ],
+  "party": [
+    "country_code",
+    "created_at",
+    "display_name",
+    "party_code",
+    "party_id",
+    "party_type",
+    "row_version",
+    "status_code",
+    "tax_registration_no",
+    "updated_at"
+  ],
+  "party_contact": [
+    "contact_name",
+    "contact_role_code",
+    "created_at",
+    "email_address",
+    "is_primary",
+    "party_contact_id",
+    "party_id",
+    "party_site_id",
+    "phone_number",
+    "row_version",
+    "status_code",
+    "updated_at"
+  ],
+  "party_role": [
+    "created_at",
+    "effective_from",
+    "effective_to",
+    "party_id",
+    "party_role_id",
+    "role_code",
+    "row_version",
+    "scope_entity_id",
+    "scope_entity_name",
+    "status_code",
+    "updated_at"
+  ],
+  "party_site": [
+    "address_line_1",
+    "address_line_2",
+    "city_name",
+    "country_code",
+    "created_at",
+    "is_default",
+    "party_id",
+    "party_site_id",
+    "postal_code",
+    "row_version",
+    "site_name",
+    "site_role_code",
+    "state_name",
+    "status_code",
+    "updated_at"
+  ],
   "passport_access_log": [
     "access_id",
     "access_type",
@@ -6964,6 +7872,34 @@
     "passport_id",
     "photos",
     "work_center_id"
+  ],
+  "pause_resume": [
+    "acted_at",
+    "acted_by_party_id",
+    "action_code",
+    "job_id",
+    "pause_resume_id",
+    "reason_code"
+  ],
+  "pegging": [
+    "child_entity_id",
+    "child_entity_name",
+    "created_at",
+    "item_revision_id",
+    "parent_entity_id",
+    "parent_entity_name",
+    "pegged_qty",
+    "pegging_id"
+  ],
+  "planned_supply": [
+    "item_site_id",
+    "mrp_signal_id",
+    "planned_end_at",
+    "planned_qty",
+    "planned_start_at",
+    "planned_supply_id",
+    "status_code",
+    "supply_type"
   ],
   "plm_change_order_lines": [
     "affected_reference",
@@ -7921,6 +8857,16 @@
     "wbs_name",
     "wbs_type"
   ],
+  "process_param_capture": [
+    "captured_at",
+    "job_id",
+    "operation_id",
+    "param_code",
+    "param_value_num",
+    "param_value_text",
+    "process_param_capture_id",
+    "uom_code"
+  ],
   "product_passports": [
     "carbon_footprint_kg",
     "coa_reference",
@@ -7963,6 +8909,41 @@
     "total_inspection_time_minutes",
     "total_machining_time_minutes",
     "updated_at"
+  ],
+  "production_completion": [
+    "good_qty",
+    "job_id",
+    "output_lot_no",
+    "output_serial_no",
+    "production_completion_id",
+    "reject_qty",
+    "reported_at",
+    "status_code"
+  ],
+  "production_order": [
+    "item_revision_id",
+    "planned_end_at",
+    "planned_qty",
+    "planned_start_at",
+    "plant_id",
+    "production_order_id",
+    "production_order_no",
+    "release_state",
+    "status_code"
+  ],
+  "production_order_bom_snapshot": [
+    "bom_version_id",
+    "frozen_at",
+    "production_order_bom_snapshot_id",
+    "production_order_id",
+    "snapshot_json"
+  ],
+  "production_order_route_snapshot": [
+    "frozen_at",
+    "production_order_id",
+    "production_order_route_snapshot_id",
+    "snapshot_json",
+    "work_definition_version_id"
   ],
   "production_schedule": [
     "actual_run_end",
@@ -8104,6 +9085,25 @@
     "updated_at",
     "wbs_code"
   ],
+  "purchase_order": [
+    "currency_code",
+    "order_date",
+    "purchase_order_id",
+    "purchase_order_no",
+    "requested_receipt_date",
+    "status_code",
+    "supplier_party_id"
+  ],
+  "purchase_order_line": [
+    "item_revision_id",
+    "line_no",
+    "ordered_qty",
+    "purchase_order_id",
+    "purchase_order_line_id",
+    "requested_receipt_date",
+    "status_code",
+    "unit_price"
+  ],
   "purchase_order_lines": [
     "coc_required",
     "duty_pct",
@@ -8161,6 +9161,137 @@
     "vendor_id",
     "vendor_quote_ref"
   ],
+  "purchase_receipt_correction_lines": [
+    "created_at",
+    "disposition_status",
+    "inventory_action",
+    "item_id",
+    "line_number",
+    "metadata",
+    "purchase_receipt_correction_id",
+    "purchase_receipt_correction_line_id",
+    "purchase_receipt_line_id",
+    "qty_delta",
+    "row_version",
+    "unit_cost_delta",
+    "updated_at"
+  ],
+  "purchase_receipt_corrections": [
+    "ap_invoice_id",
+    "approved_by",
+    "correction_number",
+    "correction_reason",
+    "correction_status",
+    "correction_type",
+    "created_at",
+    "financial_hold_required",
+    "metadata",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "posted_by",
+    "purchase_receipt_correction_id",
+    "purchase_receipt_id",
+    "reconciled_at",
+    "requested_by",
+    "row_version",
+    "source_record_id",
+    "source_system",
+    "supplier_notification_status",
+    "updated_at"
+  ],
+  "purchase_receipt_lines": [
+    "created_at",
+    "hold_status",
+    "item_id",
+    "line_number",
+    "location_id",
+    "lot_number",
+    "metadata",
+    "po_line_id",
+    "purchase_receipt_id",
+    "purchase_receipt_line_id",
+    "qty_accepted",
+    "qty_putaway",
+    "qty_received",
+    "qty_rejected",
+    "row_version",
+    "serial_numbers",
+    "updated_at"
+  ],
+  "purchase_receipts": [
+    "created_at",
+    "iqc_hold_reason",
+    "iqc_required",
+    "metadata",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "po_id",
+    "purchase_receipt_id",
+    "receipt_date",
+    "receipt_number",
+    "receipt_status",
+    "received_by",
+    "related_invoice_ref",
+    "reversal_reason_code",
+    "reversed_at",
+    "reversed_by",
+    "row_version",
+    "source_record_id",
+    "source_system",
+    "supplier_asn_id",
+    "updated_at",
+    "vendor_id",
+    "warehouse_id"
+  ],
+  "purchase_requisition_lines": [
+    "approved_qty",
+    "created_at",
+    "item_id",
+    "line_notes",
+    "line_number",
+    "metadata",
+    "preferred_supplier_id",
+    "purchase_requisition_id",
+    "purchase_requisition_line_id",
+    "requested_qty",
+    "required_on",
+    "required_operation_seq",
+    "row_version",
+    "uom",
+    "updated_at"
+  ],
+  "purchase_requisitions": [
+    "approved_by",
+    "created_at",
+    "job_order_id",
+    "metadata",
+    "need_by_date",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "purchase_requisition_id",
+    "reason_code",
+    "request_date",
+    "request_type",
+    "requested_by",
+    "requester_notes",
+    "requisition_number",
+    "requisition_status",
+    "row_version",
+    "source_record_id",
+    "source_system",
+    "sourcing_owner_id",
+    "updated_at",
+    "vendor_id"
+  ],
   "qual_audit_programs": [
     "created_at",
     "frequency_months",
@@ -8213,6 +9344,7 @@
     "metadata",
     "obligation_code",
     "obligation_source",
+    "obligation_status",
     "obligation_title",
     "org_company_code",
     "org_legal_entity_code",
@@ -8406,6 +9538,25 @@
     "source_system",
     "standard_reference"
   ],
+  "quality_case_link": [
+    "created_at",
+    "linked_entity_id",
+    "linked_entity_name",
+    "quality_case_link_id",
+    "quality_order_id",
+    "relationship_code"
+  ],
+  "quality_order": [
+    "case_type",
+    "created_at",
+    "owner_party_id",
+    "quality_order_id",
+    "quality_order_no",
+    "severity_code",
+    "source_id",
+    "source_type",
+    "status_code"
+  ],
   "quality_predictions": [
     "acknowledged_at",
     "acknowledged_by",
@@ -8526,6 +9677,17 @@
     "version",
     "win_loss_reason"
   ],
+  "reason_code": [
+    "created_at",
+    "is_active",
+    "reason_code",
+    "reason_code_id",
+    "reason_domain",
+    "reason_name",
+    "row_version",
+    "severity_code",
+    "updated_at"
+  ],
   "record_counters": [
     "counter_digits",
     "fiscal_year",
@@ -8597,12 +9759,25 @@
     "table_name",
     "updated_at"
   ],
+  "rework": [
+    "created_at",
+    "job_id",
+    "production_order_id",
+    "reason_code",
+    "rework_id",
+    "rework_status",
+    "source_entity_id",
+    "source_entity_name"
+  ],
   "risk_register": [
     "created_at",
+    "detection_code",
     "impact",
     "likelihood",
     "metadata",
     "mitigation_action",
+    "mitigation_text",
+    "occurrence_code",
     "org_company_code",
     "org_legal_entity_code",
     "org_plant_id",
@@ -8615,12 +9790,18 @@
     "risk_category",
     "risk_code",
     "risk_description",
+    "risk_domain",
     "risk_id",
     "risk_level",
     "risk_owner",
+    "risk_register_id",
     "row_version",
+    "severity_code",
+    "source_entity_id",
+    "source_entity_name",
     "source_record_id",
     "source_system",
+    "status_code",
     "updated_at",
     "valid_from",
     "valid_to"
@@ -8736,6 +9917,27 @@
     "status",
     "valid_from",
     "valid_to"
+  ],
+  "sales_order": [
+    "currency_code",
+    "customer_party_id",
+    "order_date",
+    "promise_date",
+    "requested_ship_date",
+    "sales_order_id",
+    "sales_order_no",
+    "status_code"
+  ],
+  "sales_order_line": [
+    "item_revision_id",
+    "line_no",
+    "ordered_qty",
+    "promised_ship_date",
+    "requested_ship_date",
+    "sales_order_id",
+    "sales_order_line_id",
+    "status_code",
+    "unit_price"
   ],
   "sales_order_lines": [
     "bom_id",
@@ -8893,6 +10095,25 @@
     "source_record_id",
     "source_system"
   ],
+  "scrap": [
+    "item_revision_id",
+    "job_id",
+    "lot_no",
+    "production_order_id",
+    "reason_code",
+    "scrap_id",
+    "scrap_qty",
+    "scrapped_at",
+    "serial_no"
+  ],
+  "serial": [
+    "genealogy_state",
+    "item_revision_id",
+    "parent_lot_id",
+    "serial_id",
+    "serial_no",
+    "serial_status"
+  ],
   "serial_master": [
     "created_at",
     "item_id",
@@ -8909,6 +10130,14 @@
     "source_record_id",
     "source_system",
     "status"
+  ],
+  "serial_policy": [
+    "policy_code",
+    "serial_numbering_rule",
+    "serial_policy_id",
+    "serialization_point",
+    "status_code",
+    "uniqueness_scope"
   ],
   "sessions": [
     "csrf_token",
@@ -8971,6 +10200,27 @@
     "title",
     "updated_at",
     "version"
+  ],
+  "shelf_life_policy": [
+    "policy_code",
+    "quarantine_on_expiry",
+    "retest_interval_days",
+    "shelf_life_policy_id",
+    "status_code",
+    "total_shelf_life_days"
+  ],
+  "shift": [
+    "calendar_id",
+    "created_at",
+    "crosses_midnight",
+    "end_time",
+    "row_version",
+    "shift_code",
+    "shift_id",
+    "shift_name",
+    "start_time",
+    "status_code",
+    "updated_at"
   ],
   "shift_assignments": [
     "assigned_by",
@@ -9683,6 +10933,46 @@
     "vendor_id",
     "warehouse_id"
   ],
+  "status_code": [
+    "created_at",
+    "is_active",
+    "is_terminal",
+    "row_version",
+    "sequence_no",
+    "status_code",
+    "status_code_id",
+    "status_domain",
+    "status_name",
+    "updated_at"
+  ],
+  "stock_balances": [
+    "created_at",
+    "inventory_item_id",
+    "location_id",
+    "lot_number",
+    "metadata",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "qty_allocated",
+    "qty_available",
+    "qty_in_inspection",
+    "qty_on_hand",
+    "qty_on_order",
+    "qty_quarantined",
+    "row_version",
+    "serial_number",
+    "snapshot_reason",
+    "source_record_id",
+    "source_system",
+    "source_txn_recorded_at",
+    "stock_balance_id",
+    "stock_snapshot_at",
+    "updated_at",
+    "warehouse_id"
+  ],
   "subcontract_orders": [
     "actual_return_date",
     "coc_received",
@@ -9738,6 +11028,48 @@
     "source_system",
     "subcontract_id"
   ],
+  "supplier_asn_lines": [
+    "created_at",
+    "discrepant_qty",
+    "disposition_notes",
+    "expected_qty",
+    "item_id",
+    "line_number",
+    "metadata",
+    "po_line_id",
+    "received_qty",
+    "row_version",
+    "serial_numbers",
+    "supplier_asn_id",
+    "supplier_asn_line_id",
+    "updated_at",
+    "vendor_lot_number"
+  ],
+  "supplier_asns": [
+    "asn_number",
+    "asn_status",
+    "bill_of_lading_number",
+    "carrier_name",
+    "created_at",
+    "discrepancy_summary",
+    "expected_arrival_date",
+    "metadata",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "po_id",
+    "received_date",
+    "row_version",
+    "ship_date",
+    "source_record_id",
+    "source_system",
+    "supplier_asn_id",
+    "tracking_number",
+    "updated_at",
+    "vendor_id"
+  ],
   "supplier_audit_schedule": [
     "actual_date",
     "audit_id",
@@ -9766,6 +11098,16 @@
     "status",
     "updated_at",
     "vendor_id"
+  ],
+  "supplier_quality_case": [
+    "created_at",
+    "issue_code",
+    "severity_code",
+    "source_id",
+    "source_type",
+    "status_code",
+    "supplier_party_id",
+    "supplier_quality_case_id"
   ],
   "supplier_scorecards": [
     "compliance_score",
@@ -10245,6 +11587,15 @@
     "txn_id",
     "txn_type"
   ],
+  "tool_usage": [
+    "captured_at",
+    "job_id",
+    "tool_code",
+    "tool_usage_id",
+    "usage_cycles",
+    "usage_minutes",
+    "work_unit_id"
+  ],
   "tooling_assemblies": [
     "assembly_code",
     "assembly_status",
@@ -10497,6 +11848,7 @@
     "tool_preset_verified_at",
     "tool_reorder_point",
     "tool_reorder_qty",
+    "tool_status",
     "tool_type",
     "tool_usage_minutes_total",
     "tool_usage_parts_total",
@@ -10660,6 +12012,21 @@
     "metadata",
     "serial_number",
     "trace_serial_event_id"
+  ],
+  "track_in": [
+    "job_id",
+    "track_in_id",
+    "tracked_at",
+    "tracked_by_party_id",
+    "work_unit_id"
+  ],
+  "track_out": [
+    "good_qty",
+    "job_id",
+    "reject_qty",
+    "track_out_id",
+    "tracked_at",
+    "tracked_by_party_id"
   ],
   "trade_broker_profiles": [
     "broker_code",
@@ -10851,6 +12218,25 @@
     "source_system",
     "trade_screening_hit_id"
   ],
+  "training_matrix": [
+    "competency_id",
+    "created_at",
+    "document_id",
+    "refresh_cycle_days",
+    "required_flag",
+    "role_code",
+    "training_matrix_id"
+  ],
+  "training_record": [
+    "completed_at",
+    "created_at",
+    "expiry_at",
+    "party_id",
+    "score_value",
+    "status_code",
+    "training_matrix_id",
+    "training_record_id"
+  ],
   "training_records": [
     "assessment_result",
     "assessment_score",
@@ -10878,6 +12264,14 @@
     "training_type",
     "valid_from",
     "valid_to"
+  ],
+  "uom": [
+    "base_uom_code",
+    "conversion_factor",
+    "status_code",
+    "uom_category",
+    "uom_code",
+    "uom_name"
   ],
   "user_roles": [
     "assigned_at",
@@ -11034,7 +12428,17 @@
     "source_system",
     "warehouse_id",
     "warehouse_name",
-    "warehouse_name_vi"
+    "warehouse_name_vi",
+    "warehouse_status"
+  ],
+  "wip_ledger": [
+    "amount_delta",
+    "item_revision_id",
+    "posting_at",
+    "production_order_id",
+    "quantity_delta",
+    "stage_code",
+    "wip_ledger_id"
   ],
   "wms_bin_contents": [
     "content_status",
@@ -11338,6 +12742,73 @@
     "work_center_name",
     "work_center_name_vi",
     "work_center_type"
+  ],
+  "work_definition": [
+    "created_at",
+    "definition_type",
+    "item_revision_id",
+    "plant_id",
+    "status_code",
+    "work_definition_code",
+    "work_definition_id"
+  ],
+  "work_definition_version": [
+    "approval_state",
+    "effective_from",
+    "effective_to",
+    "version_code",
+    "work_definition_id",
+    "work_definition_version_id"
+  ],
+  "work_instruction": [
+    "document_revision_id",
+    "instruction_code",
+    "instruction_title",
+    "is_mandatory",
+    "operation_id",
+    "sequence_no",
+    "work_instruction_id"
+  ],
+  "work_order": [
+    "operation_id",
+    "planned_qty",
+    "production_order_id",
+    "release_state",
+    "status_code",
+    "work_order_id",
+    "work_order_no"
+  ],
+  "work_orders": [
+    "actual_end_at",
+    "actual_start_at",
+    "completed_qty",
+    "created_at",
+    "equipment_id",
+    "item_id",
+    "job_op_id",
+    "job_order_id",
+    "metadata",
+    "operation_seq",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "planned_end_at",
+    "planned_qty",
+    "planned_start_at",
+    "release_gate_status",
+    "rework_qty",
+    "row_version",
+    "scrap_qty",
+    "source_record_id",
+    "source_system",
+    "traveler_number",
+    "updated_at",
+    "warehouse_id",
+    "work_order_id",
+    "work_order_number",
+    "work_order_status"
   ],
   "workflow_definitions": [
     "created_at",

@@ -5,7 +5,14 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const portalRoot = path.resolve(__dirname, '..', '..');
-const registryDir = path.join(portalRoot, 'qms-data', 'registry');
+function resolveRegistryDir() {
+  const candidates = [
+    path.join(portalRoot, 'data', 'registry'),
+    path.join(portalRoot, 'qms-data', 'registry'),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0];
+}
+const registryDir = resolveRegistryDir();
 const generatedAt = new Date().toISOString();
 
 const STANDARD_BY_DOMAIN = {
@@ -71,6 +78,7 @@ const ROLE_GUARDS_BY_DOMAIN = {
   finance: ['accountant', 'finance_manager', 'system_admin'],
   finance_extended: ['finance_manager', 'controller', 'system_admin'],
   finance_treasury: ['treasury_manager', 'controller', 'system_admin'],
+  transportation: ['logistics_manager', 'shipping_manager', 'trade_compliance_officer', 'system_admin'],
   shipping_compliance: ['shipping_manager', 'trade_compliance_officer', 'system_admin'],
   trade_compliance: ['trade_compliance_officer', 'export_control_manager', 'system_admin'],
   document_control: ['document_controller', 'quality_manager', 'system_admin'],
@@ -124,6 +132,19 @@ const STATUS_LABELS = {
   overdue: ['Quá hạn', 'Overdue'],
   open: ['Đang mở', 'Open'],
   paid: ['Đã thanh toán', 'Paid'],
+  prospective: ['Tiềm năng', 'Prospective'],
+  inactive: ['Ngưng hoạt động', 'Inactive'],
+  preboarding: ['Tiền nhận việc', 'Preboarding'],
+  suspended: ['Tạm đình chỉ', 'Suspended'],
+  terminated: ['Chấm dứt', 'Terminated'],
+  blocked: ['Bị chặn', 'Blocked'],
+  spend_authorized: ['Được phép mua', 'Spend Authorized'],
+  dispatched: ['Đã điều xe', 'Dispatched'],
+  disputed: ['Tranh chấp', 'Disputed'],
+  retired: ['Ngừng sử dụng', 'Retired'],
+  disposed: ['Đã thanh lý', 'Disposed'],
+  accepted: ['Đạt', 'Accepted'],
+  waived: ['Miễn kiểm', 'Waived'],
 };
 
 function readJson(filePath) {
@@ -164,6 +185,31 @@ function standardForDomain(domain) {
 
 function rolesForDomain(domain) {
   return ROLE_GUARDS_BY_DOMAIN[domain] || ['module_admin', 'system_admin'];
+}
+
+function loadWave1LifecycleNormalization() {
+  const filePath = path.join(registryDir, 'wave1-lifecycle-normalization.json');
+  return fs.existsSync(filePath) ? readJson(filePath) : {};
+}
+
+const WAVE1_LIFECYCLE_NORMALIZATION = loadWave1LifecycleNormalization();
+
+function wave1EntityOverride(tableName) {
+  return WAVE1_LIFECYCLE_NORMALIZATION?.normalized_entities?.[tableName] || null;
+}
+
+function effectiveStatusColumn(tableName, table) {
+  const override = wave1EntityOverride(tableName);
+  const overrideField = String(override?.status_field_override || '').trim();
+  if (overrideField && table?.columns?.[overrideField]) return overrideField;
+  return String(table?.statusColumn || '').trim();
+}
+
+function effectiveStatusSet(tableName, table) {
+  const override = wave1EntityOverride(tableName);
+  const overrideKey = String(override?.status_set_key || '').trim();
+  if (overrideKey) return overrideKey;
+  return String(table?.statusSet || '').trim();
 }
 
 function normalizeStatusSets(raw) {
@@ -238,22 +284,22 @@ function isNumericType(type, uiType) {
 
 function statusColor(value) {
   const key = String(value || '').toLowerCase();
-  if (/(approved|released|published|paid|delivered|verified|validated|implemented|completed|closed|won|passed|active|renewed|received)/.test(key)) return '#10b981';
-  if (/(draft|new|planned|assigned|submitted|open|pending|review|under_review|in_progress|picking|packed|shipped|in_transit|partial|frozen)/.test(key)) return '#3b82f6';
-  if (/(hold|on_hold|overdue|expired)/.test(key)) return '#f59e0b';
-  if (/(rejected|cancelled|failed|lost|broken)/.test(key)) return '#ef4444';
+  if (/(approved|released|published|paid|delivered|verified|validated|implemented|completed|closed|won|passed|active|renewed|received|qualified|spend_authorized|accepted)/.test(key)) return '#10b981';
+  if (/(draft|new|planned|assigned|submitted|open|pending|review|under_review|in_progress|picking|packed|shipped|in_transit|partial|frozen|prospective|preboarding|ready|dispatched)/.test(key)) return '#3b82f6';
+  if (/(hold|on_hold|overdue|expired|suspended|inactive|waived)/.test(key)) return '#f59e0b';
+  if (/(rejected|cancelled|failed|lost|broken|blocked|disputed|retired|disposed|terminated)/.test(key)) return '#ef4444';
   return '#6b7280';
 }
 
 function statusIcon(value) {
   const key = String(value || '').toLowerCase();
-  if (/(approved|released|published|completed|closed|verified|implemented|passed|paid|delivered|won)/.test(key)) return 'CheckCircle2';
-  if (/(submitted|shipped|in_transit)/.test(key)) return 'Send';
-  if (/(draft|new)/.test(key)) return 'FileEdit';
+  if (/(approved|released|published|completed|closed|verified|implemented|passed|paid|delivered|won|qualified|spend_authorized|accepted)/.test(key)) return 'CheckCircle2';
+  if (/(submitted|shipped|in_transit|dispatched)/.test(key)) return 'Send';
+  if (/(draft|new|prospective|preboarding)/.test(key)) return 'FileEdit';
   if (/(review|under_review|validated)/.test(key)) return 'Search';
-  if (/(in_progress|active|picking|packed)/.test(key)) return 'Play';
-  if (/(hold|on_hold|frozen|pending|planned|assigned|partial)/.test(key)) return 'Clock';
-  if (/(rejected|cancelled|failed|lost|broken|expired)/.test(key)) return 'Ban';
+  if (/(in_progress|active|picking|packed|ready)/.test(key)) return 'Play';
+  if (/(hold|on_hold|frozen|pending|planned|assigned|partial|inactive|suspended|waived)/.test(key)) return 'Clock';
+  if (/(rejected|cancelled|failed|lost|broken|expired|blocked|disputed|retired|disposed|terminated)/.test(key)) return 'Ban';
   return 'CircleDot';
 }
 
@@ -270,10 +316,33 @@ function terminalStatuses(values) {
   return new Set(values.filter((value) => /(closed|completed|archived|cancelled|rejected|lost|failed|expired|paid|delivered|won|passed|broken)/.test(value)));
 }
 
+function normalizedWave1StatusOptions(tableName, table) {
+  const override = wave1EntityOverride(tableName);
+  const options = Array.isArray(override?.status_options) ? override.status_options : [];
+  if (!options.length) return null;
+  return options.map((option) => {
+    const value = String(option?.value || '').trim();
+    const labels = stateLabels(value);
+    return {
+      value,
+      label: option?.label || labels.label,
+      labelEn: option?.labelEn || labels.labelEn,
+      color: option?.color || statusColor(value),
+      icon: option?.icon || statusIcon(value),
+      allowedTransitionsFrom: Array.isArray(option?.allowedTransitionsFrom)
+        ? option.allowedTransitionsFrom.map((entry) => String(entry || '').trim()).filter(Boolean)
+        : [],
+    };
+  }).filter((option) => option.value);
+}
+
 function inferStatusValues(tableName, table, currentSet) {
+  const normalized = normalizedWave1StatusOptions(tableName, table);
+  if (normalized?.length) return normalized;
   if (currentSet?.options?.length) return clone(currentSet.options);
 
-  const text = `${tableName} ${table.domain} ${table.statusColumn} ${table.labelEn || ''}`.toLowerCase();
+  const statusColumn = effectiveStatusColumn(tableName, table);
+  const text = `${tableName} ${table.domain} ${statusColumn} ${table.labelEn || ''}`.toLowerCase();
   let values;
 
   if (/payment|invoice|receivable|payable/.test(text)) {
@@ -329,8 +398,10 @@ function buildStatusOptions(tableRegistry, existingRaw) {
   const usage = {};
 
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
-    if (!table.statusColumn) continue;
-    const key = table.statusSet || `${tableName}_${table.statusColumn}`;
+    const statusColumn = effectiveStatusColumn(tableName, table);
+    const statusSet = effectiveStatusSet(tableName, table);
+    if (!statusColumn) continue;
+    const key = statusSet || `${tableName}_${statusColumn}`;
     usage[key] = usage[key] || [];
     usage[key].push(tableName);
   }
@@ -340,26 +411,27 @@ function buildStatusOptions(tableRegistry, existingRaw) {
   }
 
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
-    if (!table.statusColumn) continue;
-    const baseKey = table.statusSet || `${tableName}_${table.statusColumn}`;
+    const statusColumn = effectiveStatusColumn(tableName, table);
+    const baseKey = effectiveStatusSet(tableName, table) || `${tableName}_${statusColumn}`;
+    if (!statusColumn) continue;
     const existingSet = result[baseKey] || existing[baseKey] || null;
     const options = inferStatusValues(tableName, table, existingSet);
-    const baseLabel = `${table.label} - ${titleCase(String(table.statusColumn).replace(/_/g, ' '))}`;
-    const baseLabelEn = `${table.labelEn || titleCase(tableName)} ${titleCase(String(table.statusColumn).replace(/_/g, ' '))}`;
+    const baseLabel = `${table.label} - ${titleCase(String(statusColumn).replace(/_/g, ' '))}`;
+    const baseLabelEn = `${table.labelEn || titleCase(tableName)} ${titleCase(String(statusColumn).replace(/_/g, ' '))}`;
     result[baseKey] = {
       label: existingSet?.label || baseLabel,
       labelEn: existingSet?.labelEn || baseLabelEn,
-      source: existingSet?.source || 'table-registry',
+      source: existingSet?.source || (wave1EntityOverride(tableName) ? 'wave1-lifecycle-normalization' : 'table-registry'),
       standard: existingSet?.standard || standardForDomain(table.domain),
       sourceTable: tableName,
-      statusColumn: table.statusColumn,
+      statusColumn,
       options,
     };
 
     const aliasCandidates = new Set([
-      `${tableName}_${table.statusColumn}`,
-      table.statusColumn === 'status' ? `${tableName}_status` : '',
-      usage[baseKey] && usage[baseKey].length > 1 ? `${tableName}__${table.statusColumn}_set` : '',
+      `${tableName}_${statusColumn}`,
+      statusColumn === 'status' ? `${tableName}_status` : '',
+      usage[baseKey] && usage[baseKey].length > 1 ? `${tableName}__${statusColumn}_set` : '',
     ]);
 
     for (const alias of aliasCandidates) {
@@ -368,10 +440,10 @@ function buildStatusOptions(tableRegistry, existingRaw) {
       result[aliasKey] = {
         label: baseLabel,
         labelEn: baseLabelEn,
-        source: 'table-registry-alias',
+        source: wave1EntityOverride(tableName) ? 'wave1-lifecycle-normalization-alias' : 'table-registry-alias',
         standard: standardForDomain(table.domain),
         sourceTable: tableName,
-        statusColumn: table.statusColumn,
+        statusColumn,
         aliasOf: baseKey,
         options: clone(options),
       };
@@ -394,6 +466,7 @@ function triggerForStatus(to) {
   if (/submitted/.test(key)) return 'submit';
   if (/approved/.test(key)) return 'approve';
   if (/released/.test(key)) return 'release';
+  if (/spend_authorized/.test(key)) return 'authorize_spend';
   if (/published/.test(key)) return 'publish';
   if (/in_progress/.test(key)) return 'start';
   if (/completed/.test(key)) return 'complete';
@@ -402,6 +475,13 @@ function triggerForStatus(to) {
   if (/posted/.test(key)) return 'post';
   if (/received/.test(key)) return 'receive';
   if (/shipped/.test(key)) return 'ship';
+  if (/accepted/.test(key)) return 'accept';
+  if (/waived/.test(key)) return 'waive';
+  if (/blocked/.test(key)) return 'block';
+  if (/suspended/.test(key)) return 'suspend';
+  if (/terminated/.test(key)) return 'terminate';
+  if (/retired/.test(key)) return 'retire';
+  if (/disposed/.test(key)) return 'dispose';
   if (/delivered/.test(key)) return 'deliver';
   if (/closed/.test(key)) return 'close';
   if (/archived/.test(key)) return 'archive';
@@ -426,7 +506,7 @@ function actionsForTransition(to, domain) {
     to: rolesForDomain(domain)[0],
     template: `${slug(domain)}_${slug(to)}`,
   }];
-  if (/(submitted|approved|released|published|completed|closed|verified|validated|implemented|posted|shipped|delivered|received|won|lost|cancelled|rejected)/.test(String(to))) {
+  if (/(submitted|approved|released|published|completed|closed|verified|validated|implemented|posted|shipped|delivered|received|won|lost|cancelled|rejected|accepted|waived|spend_authorized|blocked|retired|disposed|terminated|archived)/.test(String(to))) {
     actions.push({
       type: 'setField',
       field: `${slug(to)}_at`,
@@ -438,7 +518,7 @@ function actionsForTransition(to, domain) {
 
 function guardsForTransition(to, domain) {
   const roles = rolesForDomain(domain);
-  if (/(approved|released|published|posted|closed|cancelled|rejected|verified|validated|implemented|won|lost)/.test(String(to))) {
+  if (/(approved|released|published|posted|closed|cancelled|rejected|verified|validated|implemented|won|lost|spend_authorized|blocked|accepted|waived|retired|disposed|terminated|archived)/.test(String(to))) {
     return [{ type: 'role', roles }];
   }
   return [];
@@ -475,8 +555,10 @@ function buildTransitionsFromStates(states, domain) {
 }
 
 function defaultStatesForTable(primaryTable, statusSets) {
-  if (primaryTable.statusColumn && statusSets[primaryTable.statusSet]) {
-    return statusSets[primaryTable.statusSet].options.map((option) => ({
+  const statusColumn = effectiveStatusColumn(primaryTable.tableName, primaryTable);
+  const statusSet = effectiveStatusSet(primaryTable.tableName, primaryTable);
+  if (statusColumn && statusSet && statusSets[statusSet]) {
+    return statusSets[statusSet].options.map((option) => ({
       id: option.value,
       label: option.label,
       labelEn: option.labelEn,
@@ -507,7 +589,9 @@ function workflowNameEn(table) {
 }
 
 function persistedStatesForTable(primaryTable, statusSets) {
-  return primaryTable.statusColumn && statusSets[primaryTable.statusSet]
+  const statusColumn = effectiveStatusColumn(primaryTable.tableName, primaryTable);
+  const statusSet = effectiveStatusSet(primaryTable.tableName, primaryTable);
+  return statusColumn && statusSet && statusSets[statusSet]
     ? defaultStatesForTable(primaryTable, statusSets)
     : [];
 }
@@ -517,10 +601,17 @@ function stableWorkflowName(table) {
 }
 
 function lifecycleModeForTable(primaryTable, statusSets) {
-  if (!(primaryTable.statusColumn && primaryTable.statusSet && statusSets[primaryTable.statusSet])) {
+  const override = wave1EntityOverride(primaryTable.tableName);
+  const overrideMode = String(override?.lifecycle_mode || '').trim();
+  if (overrideMode) {
+    return overrideMode;
+  }
+  const statusColumn = effectiveStatusColumn(primaryTable.tableName, primaryTable);
+  const statusSet = effectiveStatusSet(primaryTable.tableName, primaryTable);
+  if (!(statusColumn && statusSet && statusSets[statusSet])) {
     return 'stateless';
   }
-  if (primaryTable.statusSet === 'digital_thread_status') {
+  if (statusSet === 'digital_thread_status') {
     return 'generic_status_only';
   }
   return 'persisted';
@@ -542,24 +633,31 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
   const workflows = {};
   for (const [workflowId, tables] of groups.entries()) {
     const existingWorkflow = existing[workflowId] || null;
-    const primaryTable = tables.find((table) => table.statusColumn) || tables[0];
+    const primaryTable = tables.find((table) => effectiveStatusColumn(table.tableName, table)) || tables[0];
+    const override = wave1EntityOverride(primaryTable.tableName);
+    const statusColumn = effectiveStatusColumn(primaryTable.tableName, primaryTable);
+    const statusSet = effectiveStatusSet(primaryTable.tableName, primaryTable);
     const lifecycleMode = lifecycleModeForTable(primaryTable, statusSets);
-    const hasPersistedLifecycle = lifecycleMode === 'persisted';
-    const states = hasPersistedLifecycle
-      ? (existingWorkflow?.states?.length ? clone(existingWorkflow.states) : persistedStatesForTable(primaryTable, statusSets))
+    const hasExplicitTransitionLifecycle = ['persisted', 'guarded_transition_runtime'].includes(lifecycleMode);
+    const states = hasExplicitTransitionLifecycle
+      ? (override?.status_options?.length
+        ? defaultStatesForTable(primaryTable, statusSets)
+        : (existingWorkflow?.states?.length ? clone(existingWorkflow.states) : persistedStatesForTable(primaryTable, statusSets)))
       : [];
-    const transitions = hasPersistedLifecycle
-      ? (existingWorkflow?.transitions?.length ? clone(existingWorkflow.transitions) : buildTransitionsFromStates(states, primaryTable.domain))
+    const transitions = hasExplicitTransitionLifecycle
+      ? (override?.status_options?.length
+        ? buildTransitionsFromStates(states, primaryTable.domain)
+        : (existingWorkflow?.transitions?.length ? clone(existingWorkflow.transitions) : buildTransitionsFromStates(states, primaryTable.domain)))
       : [];
     const relatedTables = Array.from(new Set([
       ...tables.map((table) => table.tableName),
-      ...primaryTable.foreignKeys.map((fk) => String(fk.references || '').split('.')[0]).filter(Boolean),
+      ...((primaryTable.foreignKeys || []).map((fk) => String(fk.references || '').split('.')[0]).filter(Boolean)),
       ...(primaryTable.digitalThread?.upstream || []),
       ...(primaryTable.digitalThread?.downstream || []),
     ]));
 
-    const sla = hasPersistedLifecycle
-      ? (existingWorkflow?.sla || Object.fromEntries(
+    const sla = hasExplicitTransitionLifecycle
+      ? ((override?.status_options?.length ? null : existingWorkflow?.sla) || Object.fromEntries(
         transitions.map((transition) => [`${transition.from}_to_${transition.to}`, { hours: /(approved|closed|completed|posted|delivered)/.test(transition.to) ? 72 : 24, escalateTo: rolesForDomain(primaryTable.domain)[0] }]),
       ))
       : {};
@@ -573,8 +671,8 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
       standard: existingWorkflow?.standard || standardForDomain(primaryTable.domain),
       primaryTable: primaryTable.tableName,
       relatedTables,
-      stateField: primaryTable.statusColumn || '',
-      statusSet: primaryTable.statusSet || '',
+      stateField: statusColumn || '',
+      statusSet: statusSet || '',
       lifecycleMode,
       states,
       transitions,
@@ -650,8 +748,10 @@ function patternForColumn(columnName, hint) {
 }
 
 function enumValuesForColumn(table, columnName, column, statusSets) {
-  if (table.statusColumn === columnName && table.statusSet && statusSets[table.statusSet]) {
-    return statusSets[table.statusSet].options.map((option) => option.value);
+  const statusColumn = effectiveStatusColumn(table.tableName, table);
+  const statusSet = effectiveStatusSet(table.tableName, table);
+  if (statusColumn === columnName && statusSet && statusSets[statusSet]) {
+    return statusSets[statusSet].options.map((option) => option.value);
   }
   const rawType = slug(String(column.type || '').replace(/_enum$/i, ''));
   if (rawType && statusSets[rawType]) {
@@ -702,6 +802,7 @@ function buildValidationRules(tableRegistry, dataFields, statusOptionsRaw, exist
   }
 
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
+    table.tableName = tableName;
     for (const [columnName, column] of Object.entries(table.columns || {})) {
       if (column.generated) continue;
       const hint = hints.get(`${tableName}.${columnName}`) || null;
@@ -831,7 +932,8 @@ function buildComputedFormulas(tableRegistry, dataFields, existingRaw) {
     formulaReference(recordCount, { type: 'endpoint', id: `${table.domain}.${tableName}.list` });
     formulas[recordCountId] = recordCount;
 
-    if (table.statusColumn) {
+    const statusColumn = effectiveStatusColumn(tableName, table);
+    if (statusColumn) {
       const closedCountId = `f_${slug(tableName)}_closed_count`;
       const closedCount = formulas[closedCountId] || {
         formulaId: closedCountId,
@@ -841,7 +943,7 @@ function buildComputedFormulas(tableRegistry, dataFields, existingRaw) {
         domain: table.domain,
         unit: 'records',
         outputType: 'number',
-        expression: `COUNT(*) FILTER (WHERE ${table.statusColumn} IN ('closed','completed','archived','paid','delivered')) FROM ${tableName}`,
+        expression: `COUNT(*) FILTER (WHERE ${statusColumn} IN ('closed','completed','archived','paid','delivered')) FROM ${tableName}`,
         source: 'registry-auto',
         referencedBy: [],
       };

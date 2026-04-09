@@ -84,14 +84,19 @@ try {
 
     $overview = $service->getOverview();
     smoke_assert(($overview['metrics']['host_count'] ?? null) === 1, 'VPS overview should report one host.');
+    smoke_assert(($overview['metrics']['sites_count'] ?? null) === 0, 'VPS overview should expose the declared site count.');
+    smoke_assert(($overview['metrics']['terminals_count'] ?? null) === 2, 'VPS overview should expose the declared terminal count.');
+    smoke_assert(($overview['metrics']['observability_panels'] ?? null) === 2, 'VPS overview should expose the declared observability panel count.');
     smoke_assert(($overview['metrics']['terminal_ready_hosts'] ?? null) === 1, 'VPS overview should count one terminal-ready host.');
     smoke_assert(($overview['metrics']['observability_ready_hosts'] ?? null) === 1, 'VPS overview should count one observability-ready host.');
     smoke_assert(count((array)($overview['control_assets'] ?? [])) >= 6, 'VPS overview should expose the whitelisted control assets.');
 
     $snapshot = $service->getHostSnapshot('local-vps');
     smoke_assert(($snapshot['id'] ?? null) === 'local-vps', 'Host snapshot should resolve the configured host.');
+    smoke_assert(($snapshot['mode'] ?? null) === 'local', 'Host snapshot should preserve the declared execution mode.');
     smoke_assert(count((array)($snapshot['terminals'] ?? [])) === 2, 'Host snapshot should expose both terminal entries.');
     smoke_assert(count((array)($snapshot['observability'] ?? [])) === 2, 'Host snapshot should expose both observability panels.');
+    smoke_assert(is_array($snapshot['capabilities'] ?? null), 'Host snapshot should expose probe capabilities.');
     smoke_assert($service->terminalRequiresWrite('local-vps', 'primary') === true, 'Primary terminal should require write access.');
     smoke_assert($service->terminalRequiresWrite('local-vps', 'readonly') === false, 'Readonly terminal should not require write access.');
     smoke_assert($service->observabilityRequiresWrite('local-vps', 'netdata') === false, 'Netdata panel should stay read-only.');
@@ -114,6 +119,7 @@ try {
 
     if (shell_exec_available()) {
         smoke_assert(($snapshot['connection']['status'] ?? null) === 'ok', 'Local-mode host probe should succeed when exec is available.');
+        smoke_assert(array_key_exists('docker', (array)($snapshot['capabilities'] ?? [])), 'Probe capabilities should surface docker availability.');
         $run = $service->runAction('local-vps', 'health');
         smoke_assert(($run['ok'] ?? false) === true, 'Health action should succeed in local mode.');
         smoke_assert(trim((string)($run['output'] ?? '')) !== '', 'Health action should return output.');

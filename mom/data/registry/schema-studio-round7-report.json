@@ -1,768 +1,783 @@
 {
-  "_meta": {
-    "generatedAt": "2026-04-07T14:16:00Z",
-    "source": "schema_studio_round7_report",
-    "designId": "canonical_erp_mes_eqms_7layer_core",
-    "designName": "Canonical ERP+MES+eQMS 7-Layer Core"
-  },
-  "summary": {
-    "atlasMeshScore": 97,
-    "physicalCoverageScore": 98,
-    "reviewOpsScore": 98,
-    "exportSurfaceScore": 98,
-    "interoperabilityScore": 97,
-    "roleModeScore": 97,
-    "traceabilityAtlasScore": 96,
-    "beautySystemScore": 97,
-    "objectSurfaceCount": 12,
-    "roleModeCount": 6,
-    "reviewBoardCount": 5,
-    "exportBundleCount": 8
-  },
-  "hero": {
-    "headline": "Round 7 atlas mesh",
-    "subheadline": "Physical PostgreSQL object coverage, governance boards, export surfaces, role-aware views and traceability atlas now sit on the same world-class control plane.",
-    "atlasMeshScore": 97,
-    "physicalCoverageScore": 98,
-    "reviewOpsScore": 98,
-    "exportSurfaceScore": 98,
-    "interoperabilityScore": 97
-  },
-  "atlas": {
-    "score": 98,
-    "objectSurfaces": [
-      {
-        "key": "tables",
-        "label": "Tables",
-        "count": 101,
-        "target": 96,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Canonical operational objects and runtime-facing entities.",
-        "tone": "good",
-        "examples": [
-          "org_enterprise",
-          "org_company",
-          "org_site",
-          "org_plant",
-          "org_warehouse",
-          "org_work_center"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "relations",
-        "label": "Relations",
-        "count": 161,
-        "target": 150,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Cross-domain dependencies and digital thread edges.",
-        "tone": "good",
-        "examples": [
-          "fk_org_company_enterprise_id",
-          "fk_org_site_company_id",
-          "fk_org_plant_site_id",
-          "fk_org_warehouse_plant_id",
-          "fk_org_work_center_plant_id",
-          "fk_org_work_unit_work_center_id"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "indexes",
-        "label": "Indexes",
-        "count": 223,
-        "target": 120,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Lookup, queue, and join posture for scale-heavy operational flows.",
-        "tone": "good",
-        "examples": [
-          "ux_org_enterprise_enterprise_code",
-          "ix_org_enterprise_status_operate",
-          "ux_org_company_company_code",
-          "ix_org_company_enterprise_id",
-          "ix_org_company_status_operate",
-          "ux_org_site_site_code"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "checks",
-        "label": "Check constraints",
-        "count": 45,
-        "target": 60,
-        "coverageScore": 75,
-        "readinessScore": 75,
-        "detail": "Guardrails for status, quantity, and data-quality invariants.",
-        "tone": "warning",
-        "examples": [
-          "ck_org_enterprise_status_not_blank",
-          "ck_org_company_status_not_blank",
-          "ck_org_site_status_not_blank",
-          "ck_org_plant_status_not_blank",
-          "ck_org_warehouse_status_not_blank",
-          "ck_org_work_unit_status_not_blank"
-        ],
-        "gaps": [
-          "Add 15 more modeled objects to reach target posture"
-        ]
-      },
-      {
-        "key": "triggers",
-        "label": "Triggers",
-        "count": 202,
-        "target": 90,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Audit/event hooks for review evidence and release pulse.",
-        "tone": "good",
-        "examples": [
-          "trg_org_enterprise_audit_row_change",
-          "trg_org_enterprise_emit_domain_event",
-          "trg_org_company_audit_row_change",
-          "trg_org_company_emit_domain_event",
-          "trg_org_site_audit_row_change",
-          "trg_org_site_emit_domain_event"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "views",
-        "label": "Views",
-        "count": 8,
-        "target": 8,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Curated operational and review-oriented read models.",
-        "tone": "good",
-        "examples": [
-          "vw_release_readiness_cross_domain",
-          "vw_work_order_execution_status",
-          "vw_lot_serial_genealogy",
-          "vw_incoming_quality_containment",
-          "vw_nc_capa_chain",
-          "vw_document_training_competency"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "materialized_views",
-        "label": "Materialized views",
-        "count": 4,
-        "target": 4,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Fast atlas and backlog surfaces for large graphs.",
-        "tone": "good",
-        "examples": [
-          "mv_release_radar",
-          "mv_wip_traceability_backbone",
-          "mv_quality_backlog",
-          "mv_training_compliance"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "functions",
-        "label": "Functions",
-        "count": 8,
-        "target": 8,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Reusable server-side behaviors for audit, masking, and pulse.",
-        "tone": "good",
-        "examples": [
-          "fn_audit_row_change",
-          "fn_emit_domain_event",
-          "fn_compute_lot_genealogy_path",
-          "fn_release_firewall_guard",
-          "fn_registry_contract_fingerprint",
-          "fn_mask_sensitive_value"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "procedures",
-        "label": "Procedures",
-        "count": 4,
-        "target": 4,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Promotion/backfill/control-plane orchestration.",
-        "tone": "good",
-        "examples": [
-          "pr_promote_schema_release",
-          "pr_backfill_traceability_projection",
-          "pr_sync_registry_compiler_contracts",
-          "pr_close_quality_chain"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "event_triggers",
-        "label": "Event triggers",
-        "count": 3,
-        "target": 3,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "DDL/posture review signals for destructive changes.",
-        "tone": "good",
-        "examples": [
-          "evt_schema_release_publish",
-          "evt_registry_contract_drift",
-          "evt_policy_posture_change"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "policies",
-        "label": "Policies",
-        "count": 63,
-        "target": 60,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "RLS and policy-backed runtime exposure discipline.",
-        "tone": "good",
-        "examples": [
-          "policy_runtime_release_gate"
-        ],
-        "gaps": []
-      },
-      {
-        "key": "schemas_roles",
-        "label": "Schemas & roles",
-        "count": 15,
-        "target": 15,
-        "coverageScore": 100,
-        "readinessScore": 100,
-        "detail": "Ownership and access-intent modeling surfaces.",
-        "tone": "good",
-        "examples": [
-          "public",
-          "erp",
-          "mes",
-          "trace",
-          "eqms",
-          "eng"
-        ],
-        "gaps": []
-      }
-    ],
-    "capabilityBands": [
-      {
-        "label": "Domains",
-        "count": 7,
-        "score": 100,
-        "detail": "Cross-domain semantic coverage."
-      },
-      {
-        "label": "Layers",
-        "count": 7,
-        "score": 96,
-        "detail": "Canonical 7-layer orchestration posture."
-      },
-      {
-        "label": "Policies",
-        "count": 63,
-        "score": 100,
-        "detail": "RLS / policy / masking intent visibility."
-      },
-      {
-        "label": "Compiler contracts",
-        "count": 101,
+    "_meta": {
+        "generatedAt": "2026-04-09T13:01:21+00:00",
+        "source": "schema_studio_round7_report",
+        "designId": "workspace",
+        "designName": "Workspace Canonical ERP+MES+eQMS 7-Layer"
+    },
+    "summary": {
+        "atlasMeshScore": 84,
+        "physicalCoverageScore": 98,
+        "reviewOpsScore": 77,
+        "exportSurfaceScore": 86,
+        "interoperabilityScore": 97,
+        "roleModeScore": 57,
+        "traceabilityAtlasScore": 96,
+        "beautySystemScore": 47,
+        "objectSurfaceCount": 12,
+        "roleModeCount": 6,
+        "reviewBoardCount": 5,
+        "exportBundleCount": 8
+    },
+    "hero": {
+        "headline": "Round 7 atlas mesh",
+        "subheadline": "Physical PostgreSQL object coverage, governance boards, export surfaces, role-aware views and traceability atlas now sit on the same world-class control plane.",
+        "atlasMeshScore": 84,
+        "physicalCoverageScore": 98,
+        "reviewOpsScore": 77,
+        "exportSurfaceScore": 86,
+        "interoperabilityScore": 97
+    },
+    "atlas": {
         "score": 98,
-        "detail": "Registry/API/module-builder propagation."
-      }
-    ]
-  },
-  "reviewBoards": [
-    {
-      "key": "architecture_board",
-      "label": "Architecture board",
-      "owner": "enterprise_architecture_office",
-      "approver": "chief_architect",
-      "score": 99,
-      "tone": "good",
-      "evidence": [
-        "typed_diff",
-        "dependency_matrix",
-        "release_radar"
-      ],
-      "detail": "typed_diff → dependency_matrix → release_radar"
+        "objectSurfaces": [
+            {
+                "key": "tables",
+                "label": "Tables",
+                "count": 101,
+                "target": 96,
+                "detail": "Canonical operational and runtime-facing table coverage.",
+                "examples": [
+                    "org_enterprise",
+                    "org_company",
+                    "org_site",
+                    "org_plant",
+                    "org_warehouse",
+                    "org_work_center"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "relations",
+                "label": "Relations",
+                "count": 161,
+                "target": 150,
+                "detail": "Cross-domain dependencies and digital thread edges.",
+                "examples": [
+                    "fk_org_company_enterprise_id",
+                    "fk_org_site_company_id",
+                    "fk_org_plant_site_id",
+                    "fk_org_warehouse_plant_id",
+                    "fk_org_work_center_plant_id",
+                    "fk_org_work_unit_work_center_id"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "indexes",
+                "label": "Indexes",
+                "count": 223,
+                "target": 120,
+                "detail": "Lookup, queue, and join posture for scale-heavy flows.",
+                "examples": [
+                    "ux_org_enterprise_enterprise_code",
+                    "ix_org_enterprise_status_operate",
+                    "ux_org_company_company_code",
+                    "ix_org_company_enterprise_id",
+                    "ix_org_company_status_operate",
+                    "ux_org_site_site_code"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "checks",
+                "label": "Check constraints",
+                "count": 45,
+                "target": 60,
+                "detail": "Guardrails for status and quantity invariants.",
+                "examples": [
+                    "ck_org_enterprise_status_not_blank",
+                    "ck_org_company_status_not_blank",
+                    "ck_org_site_status_not_blank",
+                    "ck_org_plant_status_not_blank",
+                    "ck_org_warehouse_status_not_blank",
+                    "ck_org_work_unit_status_not_blank"
+                ],
+                "coverageScore": 75,
+                "readinessScore": 75,
+                "tone": "warning",
+                "gaps": [
+                    "Add 15 more modeled objects to reach target posture"
+                ]
+            },
+            {
+                "key": "triggers",
+                "label": "Triggers",
+                "count": 202,
+                "target": 90,
+                "detail": "Audit and live-pulse hooks for release evidence.",
+                "examples": [
+                    "trg_org_enterprise_audit_row_change",
+                    "trg_org_enterprise_emit_domain_event",
+                    "trg_org_company_audit_row_change",
+                    "trg_org_company_emit_domain_event",
+                    "trg_org_site_audit_row_change",
+                    "trg_org_site_emit_domain_event"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "views",
+                "label": "Views",
+                "count": 8,
+                "target": 8,
+                "detail": "Curated read models for operations and review.",
+                "examples": [
+                    "vw_release_readiness_cross_domain",
+                    "vw_work_order_execution_status",
+                    "vw_lot_serial_genealogy",
+                    "vw_incoming_quality_containment",
+                    "vw_nc_capa_chain",
+                    "vw_document_training_competency"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "materialized_views",
+                "label": "Materialized views",
+                "count": 4,
+                "target": 4,
+                "detail": "Accelerated atlas and backlog surfaces.",
+                "examples": [
+                    "mv_release_radar",
+                    "mv_wip_traceability_backbone",
+                    "mv_quality_backlog",
+                    "mv_training_compliance"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "functions",
+                "label": "Functions",
+                "count": 8,
+                "target": 8,
+                "detail": "Reusable database logic for audit, masking, and pulse.",
+                "examples": [
+                    "fn_audit_row_change",
+                    "fn_emit_domain_event",
+                    "fn_compute_lot_genealogy_path",
+                    "fn_release_firewall_guard",
+                    "fn_registry_contract_fingerprint",
+                    "fn_mask_sensitive_value"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "procedures",
+                "label": "Procedures",
+                "count": 4,
+                "target": 4,
+                "detail": "Promotion, backfill, and control-plane orchestration.",
+                "examples": [
+                    "pr_promote_schema_release",
+                    "pr_backfill_traceability_projection",
+                    "pr_sync_registry_compiler_contracts",
+                    "pr_close_quality_chain"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "event_triggers",
+                "label": "Event triggers",
+                "count": 3,
+                "target": 3,
+                "detail": "Destructive-change firewall and release telemetry hooks.",
+                "examples": [
+                    "evt_schema_release_publish",
+                    "evt_registry_contract_drift",
+                    "evt_policy_posture_change"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "policies",
+                "label": "Policies",
+                "count": 63,
+                "target": 60,
+                "detail": "RLS and policy-backed runtime exposure discipline.",
+                "examples": [
+                    "policy_runtime_release_gate"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            },
+            {
+                "key": "schemas_roles",
+                "label": "Schemas & roles",
+                "count": 15,
+                "target": 15,
+                "detail": "Ownership and access-intent modeling surfaces.",
+                "examples": [
+                    "public",
+                    "erp",
+                    "mes",
+                    "trace",
+                    "eqms",
+                    "eng"
+                ],
+                "coverageScore": 100,
+                "readinessScore": 100,
+                "tone": "good",
+                "gaps": []
+            }
+        ],
+        "capabilityBands": [
+            {
+                "label": "Domains",
+                "count": 7,
+                "score": 100,
+                "detail": "Cross-domain semantic coverage."
+            },
+            {
+                "label": "Layers",
+                "count": 7,
+                "score": 96,
+                "detail": "Canonical 7-layer orchestration posture."
+            },
+            {
+                "label": "Policies",
+                "count": 63,
+                "score": 100,
+                "detail": "RLS / policy / masking intent visibility."
+            },
+            {
+                "label": "Compiler contracts",
+                "count": 101,
+                "score": 98,
+                "detail": "Registry/API/module-builder propagation."
+            }
+        ]
     },
-    {
-      "key": "data_governance_board",
-      "label": "Data governance board",
-      "owner": "master_data_council",
-      "approver": "data_governance_lead",
-      "score": 98,
-      "tone": "good",
-      "evidence": [
-        "policy_matrix",
-        "naming_review",
-        "contract_fingerprint"
-      ],
-      "detail": "policy_matrix → naming_review → contract_fingerprint"
-    },
-    {
-      "key": "manufacturing_release_lane",
-      "label": "Manufacturing release lane",
-      "owner": "manufacturing_engineering",
-      "approver": "site_operations_lead",
-      "score": 98,
-      "tone": "good",
-      "evidence": [
-        "journey_simulation",
-        "traceability_atlas",
-        "dispatch_validation"
-      ],
-      "detail": "journey_simulation → traceability_atlas → dispatch_validation"
-    },
-    {
-      "key": "quality_compliance_lane",
-      "label": "Quality & compliance lane",
-      "owner": "quality_systems",
-      "approver": "compliance_lead",
-      "score": 100,
-      "tone": "good",
-      "evidence": [
-        "e_signature_hook",
-        "approval_comments",
-        "evidence_retention"
-      ],
-      "detail": "e_signature_hook → approval_comments → evidence_retention"
-    },
-    {
-      "key": "runtime_builder_lane",
-      "label": "Runtime & builder lane",
-      "owner": "platform_integration",
-      "approver": "product_platform_owner",
-      "score": 97,
-      "tone": "good",
-      "evidence": [
-        "registry_sync",
-        "module_builder_projection",
-        "workflow_bindings"
-      ],
-      "detail": "registry_sync → module_builder_projection → workflow_bindings"
-    }
-  ],
-  "exports": [
-    {
-      "key": "json_design",
-      "label": "Design JSON",
-      "status": "ready",
-      "format": "json",
-      "purpose": "Canonical schema source of truth.",
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "typed_diff",
-      "label": "Typed diff package",
-      "status": "ready",
-      "format": "json",
-      "purpose": "Reviewable structured diff with approval class.",
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "sql_migration",
-      "label": "SQL migration plan",
-      "status": "ready",
-      "format": "sql",
-      "purpose": "Operational migration package with firewall flags.",
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "registry_manifest",
-      "label": "Registry manifest",
-      "status": "ready",
-      "format": "json",
-      "purpose": "Runtime compiler and control-plane synchronization.",
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "dbml",
-      "label": "DBML export",
-      "status": "ready",
-      "format": "dbml",
-      "purpose": "Interoperability with external modeling ecosystems.",
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "mermaid",
-      "label": "Mermaid architecture pack",
-      "status": "ready",
-      "format": "mermaid",
-      "purpose": "Lightweight diagram distribution for docs.",
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "plantuml",
-      "label": "PlantUML operations atlas",
-      "status": "ready",
-      "format": "plantuml",
-      "purpose": "Formal review diagrams for architecture boards.",
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "release_notes",
-      "label": "Release notes brief",
-      "status": "ready",
-      "format": "markdown",
-      "purpose": "Human-readable summary for CAB and stakeholders.",
-      "score": 100,
-      "tone": "good"
-    }
-  ],
-  "roleModes": [
-    {
-      "key": "architect_mode",
-      "label": "Architect mode",
-      "persona": "enterprise_architect",
-      "score": 99,
-      "tone": "good",
-      "focus": [
-        "layers",
-        "domains",
-        "dependencyMatrix",
-        "reviewBoards"
-      ],
-      "subtitle": "layers · domains · dependencyMatrix · reviewBoards"
-    },
-    {
-      "key": "data_engineer_mode",
-      "label": "Data engineer mode",
-      "persona": "data_platform_engineer",
-      "score": 98,
-      "tone": "good",
-      "focus": [
-        "physicalCoverage",
-        "typedDiff",
-        "firewall",
-        "exports"
-      ],
-      "subtitle": "physicalCoverage · typedDiff · firewall · exports"
-    },
-    {
-      "key": "manufacturing_mode",
-      "label": "Manufacturing mode",
-      "persona": "manufacturing_process_engineer",
-      "score": 98,
-      "tone": "good",
-      "focus": [
-        "dispatch",
-        "execution",
-        "genealogy",
-        "equipment"
-      ],
-      "subtitle": "dispatch · execution · genealogy · equipment"
-    },
-    {
-      "key": "quality_mode",
-      "label": "Quality mode",
-      "persona": "quality_manager",
-      "score": 99,
-      "tone": "good",
-      "focus": [
-        "inspection",
-        "nc_capa",
-        "deviation",
-        "approvals"
-      ],
-      "subtitle": "inspection · nc_capa · deviation · approvals"
-    },
-    {
-      "key": "compliance_mode",
-      "label": "Compliance mode",
-      "persona": "compliance_lead",
-      "score": 99,
-      "tone": "good",
-      "focus": [
-        "evidence",
-        "signatures",
-        "retention",
-        "reviewOps"
-      ],
-      "subtitle": "evidence · signatures · retention · reviewOps"
-    },
-    {
-      "key": "builder_mode",
-      "label": "Builder mode",
-      "persona": "app_builder",
-      "score": 98,
-      "tone": "good",
-      "focus": [
-        "registry",
-        "forms",
-        "workflows",
-        "moduleBuilder"
-      ],
-      "subtitle": "registry · forms · workflows · moduleBuilder"
-    }
-  ],
-  "interoperability": [
-    {
-      "key": "schema_to_registry",
-      "label": "Schema → registry compiler",
-      "status": "ready",
-      "detail": "Tables, fields, policies and contracts compile into runtime registry.",
-      "score": 98,
-      "tone": "good"
-    },
-    {
-      "key": "registry_to_module_builder",
-      "label": "Registry → module builder",
-      "status": "ready",
-      "detail": "Builder suggestions, digital thread hints and pack scaffolding stay in sync.",
-      "score": 98,
-      "tone": "good"
-    },
-    {
-      "key": "schema_to_workflow",
-      "label": "Schema → workflow bindings",
-      "status": "ready",
-      "detail": "Workflow candidate tables carry contract and stage metadata.",
-      "score": 98,
-      "tone": "good"
-    },
-    {
-      "key": "schema_to_api",
-      "label": "Schema → API exposure hints",
-      "status": "ready",
-      "detail": "Field/contract metadata supports API generation and governance.",
-      "score": 98,
-      "tone": "good"
-    },
-    {
-      "key": "schema_to_docs",
-      "label": "Schema → docs/export surface",
-      "status": "ready",
-      "detail": "DBML/Mermaid/PlantUML/Markdown packages expose the same source of truth.",
-      "score": 98,
-      "tone": "good"
-    },
-    {
-      "key": "schema_to_traceability",
-      "label": "Schema → traceability atlas",
-      "status": "ready",
-      "detail": "Genealogy, quality, and production chains map onto canonical primitives.",
-      "score": 98,
-      "tone": "good"
-    }
-  ],
-  "traceabilityAtlas": [
-    {
-      "key": "lot_serial_genealogy",
-      "label": "Lot / serial genealogy",
-      "domains": [
-        "inventory_traceability",
-        "mes_execution",
-        "engineering"
-      ],
-      "focusTables": [
-        "lot",
-        "serial",
-        "genealogy_link",
-        "material_consumption",
-        "production_completion"
-      ],
-      "score": 99,
-      "tone": "good"
-    },
-    {
-      "key": "incoming_quality_chain",
-      "label": "Incoming quality chain",
-      "domains": [
-        "planning_erp",
-        "eqms_compliance"
-      ],
-      "focusTables": [
-        "purchase_order",
-        "inspection_lot",
-        "inspection_result",
-        "supplier_quality_case"
-      ],
-      "score": 98,
-      "tone": "good"
-    },
-    {
-      "key": "nc_capa_closure",
-      "label": "NC / CAPA closure",
-      "domains": [
-        "eqms_compliance",
-        "foundation"
-      ],
-      "focusTables": [
-        "nonconformance",
-        "deviation",
-        "capa",
-        "approval",
-        "electronic_signature"
-      ],
-      "score": 100,
-      "tone": "good"
-    },
-    {
-      "key": "document_training_readiness",
-      "label": "Document → training readiness",
-      "domains": [
-        "eqms_compliance",
-        "foundation"
-      ],
-      "focusTables": [
-        "document",
-        "document_revision",
-        "training_matrix",
-        "training_record",
-        "competency"
-      ],
-      "score": 98,
-      "tone": "good"
-    },
-    {
-      "key": "equipment_calibration_loop",
-      "label": "Equipment calibration loop",
-      "domains": [
-        "eqms_compliance",
-        "mes_execution"
-      ],
-      "focusTables": [
-        "equipment",
-        "calibration_schedule",
-        "maintenance_order",
-        "maintenance_log"
-      ],
-      "score": 97,
-      "tone": "good"
-    },
-    {
-      "key": "production_dispatch_to_completion",
-      "label": "Production dispatch → completion",
-      "domains": [
-        "planning_erp",
-        "mes_execution"
-      ],
-      "focusTables": [
-        "production_order",
-        "work_order",
-        "dispatch_queue",
-        "track_in",
-        "track_out",
-        "production_completion"
-      ],
-      "score": 99,
-      "tone": "good"
-    }
-  ],
-  "beautySystem": {
-    "score": 97,
-    "ambiences": [
-      {
-        "key": "midnight",
-        "label": "Midnight control room",
-        "score": 98
-      },
-      {
-        "key": "aurora",
-        "label": "Aurora operations pulse",
-        "score": 97
-      },
-      {
-        "key": "clean",
-        "label": "Clean compliance canvas",
-        "score": 96
-      },
-      {
-        "key": "graphite",
-        "label": "Graphite engineering review",
-        "score": 96
-      },
-      {
-        "key": "celestial",
-        "label": "Celestial presentation glass",
-        "score": 97
-      }
+    "reviewBoards": [
+        {
+            "key": "architecture_board",
+            "label": "Architecture board",
+            "owner": "enterprise_architecture_office",
+            "approver": "chief_architect",
+            "score": 99,
+            "tone": "good",
+            "evidence": [
+                "typed_diff",
+                "dependency_matrix",
+                "release_radar"
+            ],
+            "detail": "typed_diff → dependency_matrix → release_radar"
+        },
+        {
+            "key": "data_governance_board",
+            "label": "Data governance board",
+            "owner": "master_data_council",
+            "approver": "data_governance_lead",
+            "score": 98,
+            "tone": "good",
+            "evidence": [
+                "policy_matrix",
+                "naming_review",
+                "contract_fingerprint"
+            ],
+            "detail": "policy_matrix → naming_review → contract_fingerprint"
+        },
+        {
+            "key": "manufacturing_release_lane",
+            "label": "Manufacturing release lane",
+            "owner": "manufacturing_engineering",
+            "approver": "site_operations_lead",
+            "score": 98,
+            "tone": "good",
+            "evidence": [
+                "journey_simulation",
+                "traceability_atlas",
+                "dispatch_validation"
+            ],
+            "detail": "journey_simulation → traceability_atlas → dispatch_validation"
+        },
+        {
+            "key": "quality_compliance_lane",
+            "label": "Quality & compliance lane",
+            "owner": "quality_systems",
+            "approver": "compliance_lead",
+            "score": 100,
+            "tone": "good",
+            "evidence": [
+                "e_signature_hook",
+                "approval_comments",
+                "evidence_retention"
+            ],
+            "detail": "e_signature_hook → approval_comments → evidence_retention"
+        },
+        {
+            "key": "runtime_builder_lane",
+            "label": "Runtime & builder lane",
+            "owner": "platform_integration",
+            "approver": "product_platform_owner",
+            "score": 97,
+            "tone": "good",
+            "evidence": [
+                "registry_sync",
+                "module_builder_projection",
+                "workflow_bindings"
+            ],
+            "detail": "registry_sync → module_builder_projection → workflow_bindings"
+        }
     ],
-    "densities": [
-      {
-        "key": "compact",
-        "label": "Compact review density",
-        "score": 97
-      },
-      {
-        "key": "comfortable",
-        "label": "Comfortable mission density",
-        "score": 98
-      },
-      {
-        "key": "presentation",
-        "label": "Presentation showcase density",
-        "score": 96
-      }
+    "exports": [
+        {
+            "key": "json_design",
+            "label": "Design JSON",
+            "status": "ready",
+            "format": "json",
+            "purpose": "Canonical schema source of truth.",
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "typed_diff",
+            "label": "Typed diff package",
+            "status": "ready",
+            "format": "json",
+            "purpose": "Reviewable structured diff with approval class.",
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "sql_migration",
+            "label": "SQL migration plan",
+            "status": "ready",
+            "format": "sql",
+            "purpose": "Operational migration package with firewall flags.",
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "registry_manifest",
+            "label": "Registry manifest",
+            "status": "ready",
+            "format": "json",
+            "purpose": "Runtime compiler and control-plane synchronization.",
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "dbml",
+            "label": "DBML export",
+            "status": "ready",
+            "format": "dbml",
+            "purpose": "Interoperability with external modeling ecosystems.",
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "mermaid",
+            "label": "Mermaid architecture pack",
+            "status": "ready",
+            "format": "mermaid",
+            "purpose": "Lightweight diagram distribution for docs.",
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "plantuml",
+            "label": "PlantUML operations atlas",
+            "status": "ready",
+            "format": "plantuml",
+            "purpose": "Formal review diagrams for architecture boards.",
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "release_notes",
+            "label": "Release notes brief",
+            "status": "ready",
+            "format": "markdown",
+            "purpose": "Human-readable summary for CAB and stakeholders.",
+            "score": 100,
+            "tone": "good"
+        }
     ],
-    "sceneFamilies": [
-      {
-        "key": "executive",
-        "label": "Executive radar stories",
-        "count": 3
-      },
-      {
-        "key": "journey",
-        "label": "Journey trace stories",
-        "count": 3
-      },
-      {
-        "key": "governance",
-        "label": "Governance review walls",
-        "count": 2
-      },
-      {
-        "key": "ops",
-        "label": "Operations cockpit stories",
-        "count": 2
-      },
-      {
-        "key": "atlas",
-        "label": "Atlas mesh storyboards",
-        "count": 3
-      }
-    ]
-  },
-  "reportSummary": {
-    "tableCount": 101,
-    "relationCount": 161,
-    "columnCount": 577,
-    "domainCount": 7,
-    "layerCount": 7,
-    "policyCount": 63,
-    "rlsTableCount": 36,
-    "generatedColumnCount": 0,
-    "foreignKeyColumnCount": 161,
-    "partitionedTableCount": 25,
-    "savedViewCount": 10,
-    "canonicalCoveragePercent": 90,
-    "releaseReadinessScore": 100
-  },
-  "diffSummary": {
-    "total": 0,
-    "breakingCount": 0,
-    "destructiveCount": 0,
-    "criticalCount": 0,
-    "highCount": 0,
-    "mediumCount": 0,
-    "lowCount": 0,
-    "compatibilityScore": 100,
-    "riskScore": 0,
-    "approvalClass": "standard",
-    "destructiveBlocked": false
-  }
+    "roleModes": [
+        {
+            "key": "architect_mode",
+            "label": "Architect mode",
+            "persona": "enterprise_architect",
+            "score": 99,
+            "tone": "good",
+            "focus": [
+                "layers",
+                "domains",
+                "dependencyMatrix",
+                "reviewBoards"
+            ],
+            "subtitle": "layers · domains · dependencyMatrix · reviewBoards"
+        },
+        {
+            "key": "data_engineer_mode",
+            "label": "Data engineer mode",
+            "persona": "data_platform_engineer",
+            "score": 98,
+            "tone": "good",
+            "focus": [
+                "physicalCoverage",
+                "typedDiff",
+                "firewall",
+                "exports"
+            ],
+            "subtitle": "physicalCoverage · typedDiff · firewall · exports"
+        },
+        {
+            "key": "manufacturing_mode",
+            "label": "Manufacturing mode",
+            "persona": "manufacturing_process_engineer",
+            "score": 98,
+            "tone": "good",
+            "focus": [
+                "dispatch",
+                "execution",
+                "genealogy",
+                "equipment"
+            ],
+            "subtitle": "dispatch · execution · genealogy · equipment"
+        },
+        {
+            "key": "quality_mode",
+            "label": "Quality mode",
+            "persona": "quality_manager",
+            "score": 99,
+            "tone": "good",
+            "focus": [
+                "inspection",
+                "nc_capa",
+                "deviation",
+                "approvals"
+            ],
+            "subtitle": "inspection · nc_capa · deviation · approvals"
+        },
+        {
+            "key": "compliance_mode",
+            "label": "Compliance mode",
+            "persona": "compliance_lead",
+            "score": 99,
+            "tone": "good",
+            "focus": [
+                "evidence",
+                "signatures",
+                "retention",
+                "reviewOps"
+            ],
+            "subtitle": "evidence · signatures · retention · reviewOps"
+        },
+        {
+            "key": "builder_mode",
+            "label": "Builder mode",
+            "persona": "app_builder",
+            "score": 98,
+            "tone": "good",
+            "focus": [
+                "registry",
+                "forms",
+                "workflows",
+                "moduleBuilder"
+            ],
+            "subtitle": "registry · forms · workflows · moduleBuilder"
+        }
+    ],
+    "interoperability": [
+        {
+            "key": "schema_to_registry",
+            "label": "Schema → registry compiler",
+            "status": "ready",
+            "detail": "Tables, fields, policies and contracts compile into runtime registry.",
+            "score": 98,
+            "tone": "good"
+        },
+        {
+            "key": "registry_to_module_builder",
+            "label": "Registry → module builder",
+            "status": "ready",
+            "detail": "Builder suggestions, digital thread hints and pack scaffolding stay in sync.",
+            "score": 98,
+            "tone": "good"
+        },
+        {
+            "key": "schema_to_workflow",
+            "label": "Schema → workflow bindings",
+            "status": "ready",
+            "detail": "Workflow candidate tables carry contract and stage metadata.",
+            "score": 98,
+            "tone": "good"
+        },
+        {
+            "key": "schema_to_api",
+            "label": "Schema → API exposure hints",
+            "status": "ready",
+            "detail": "Field/contract metadata supports API generation and governance.",
+            "score": 98,
+            "tone": "good"
+        },
+        {
+            "key": "schema_to_docs",
+            "label": "Schema → docs/export surface",
+            "status": "ready",
+            "detail": "DBML/Mermaid/PlantUML/Markdown packages expose the same source of truth.",
+            "score": 98,
+            "tone": "good"
+        },
+        {
+            "key": "schema_to_traceability",
+            "label": "Schema → traceability atlas",
+            "status": "ready",
+            "detail": "Genealogy, quality, and production chains map onto canonical primitives.",
+            "score": 98,
+            "tone": "good"
+        }
+    ],
+    "traceabilityAtlas": [
+        {
+            "key": "lot_serial_genealogy",
+            "label": "Lot / serial genealogy",
+            "domains": [
+                "inventory_traceability",
+                "mes_execution",
+                "engineering"
+            ],
+            "focusTables": [
+                "lot",
+                "serial",
+                "genealogy_link",
+                "material_consumption",
+                "production_completion"
+            ],
+            "score": 99,
+            "tone": "good"
+        },
+        {
+            "key": "incoming_quality_chain",
+            "label": "Incoming quality chain",
+            "domains": [
+                "planning_erp",
+                "eqms_compliance"
+            ],
+            "focusTables": [
+                "purchase_order",
+                "inspection_lot",
+                "inspection_result",
+                "supplier_quality_case"
+            ],
+            "score": 98,
+            "tone": "good"
+        },
+        {
+            "key": "nc_capa_closure",
+            "label": "NC / CAPA closure",
+            "domains": [
+                "eqms_compliance",
+                "foundation"
+            ],
+            "focusTables": [
+                "nonconformance",
+                "deviation",
+                "capa",
+                "approval",
+                "electronic_signature"
+            ],
+            "score": 100,
+            "tone": "good"
+        },
+        {
+            "key": "document_training_readiness",
+            "label": "Document → training readiness",
+            "domains": [
+                "eqms_compliance",
+                "foundation"
+            ],
+            "focusTables": [
+                "document",
+                "document_revision",
+                "training_matrix",
+                "training_record",
+                "competency"
+            ],
+            "score": 98,
+            "tone": "good"
+        },
+        {
+            "key": "equipment_calibration_loop",
+            "label": "Equipment calibration loop",
+            "domains": [
+                "eqms_compliance",
+                "mes_execution"
+            ],
+            "focusTables": [
+                "equipment",
+                "calibration_schedule",
+                "maintenance_order",
+                "maintenance_log"
+            ],
+            "score": 97,
+            "tone": "good"
+        },
+        {
+            "key": "production_dispatch_to_completion",
+            "label": "Production dispatch → completion",
+            "domains": [
+                "planning_erp",
+                "mes_execution"
+            ],
+            "focusTables": [
+                "production_order",
+                "work_order",
+                "dispatch_queue",
+                "track_in",
+                "track_out",
+                "production_completion"
+            ],
+            "score": 99,
+            "tone": "good"
+        }
+    ],
+    "beautySystem": {
+        "score": 47,
+        "ambiences": [
+            {
+                "key": "midnight",
+                "label": "Midnight control room",
+                "score": 98
+            },
+            {
+                "key": "aurora",
+                "label": "Aurora operations pulse",
+                "score": 97
+            },
+            {
+                "key": "clean",
+                "label": "Clean compliance canvas",
+                "score": 96
+            },
+            {
+                "key": "graphite",
+                "label": "Graphite engineering review",
+                "score": 96
+            },
+            {
+                "key": "celestial",
+                "label": "Celestial presentation glass",
+                "score": 97
+            }
+        ],
+        "densities": [
+            {
+                "key": "compact",
+                "label": "Compact review density",
+                "score": 97
+            },
+            {
+                "key": "comfortable",
+                "label": "Comfortable mission density",
+                "score": 98
+            },
+            {
+                "key": "presentation",
+                "label": "Presentation showcase density",
+                "score": 96
+            }
+        ],
+        "sceneFamilies": [
+            {
+                "key": "executive",
+                "label": "Executive radar stories",
+                "count": 3
+            },
+            {
+                "key": "journey",
+                "label": "Journey trace stories",
+                "count": 3
+            },
+            {
+                "key": "governance",
+                "label": "Governance review walls",
+                "count": 2
+            },
+            {
+                "key": "ops",
+                "label": "Operations cockpit stories",
+                "count": 2
+            },
+            {
+                "key": "atlas",
+                "label": "Atlas mesh storyboards",
+                "count": 3
+            }
+        ]
+    },
+    "reportSummary": {
+        "tableCount": 101,
+        "relationCount": 161,
+        "columnCount": 577,
+        "domainCount": 7,
+        "layerCount": 7,
+        "policyCount": 63,
+        "rlsTableCount": 36,
+        "generatedColumnCount": 0,
+        "foreignKeyColumnCount": 161,
+        "partitionedTableCount": 25,
+        "indexCount": 223,
+        "checkConstraintCount": 45,
+        "triggerCount": 202,
+        "viewCatalogCount": 8,
+        "materializedViewCount": 4,
+        "functionCount": 8,
+        "procedureCount": 4,
+        "eventTriggerCount": 3,
+        "schemaCatalogCount": 7,
+        "roleCatalogCount": 8,
+        "exportBundleCount": 8,
+        "reviewBoardCount": 5,
+        "roleModeCount": 6,
+        "interoperabilityTrackCount": 6,
+        "traceabilityScenarioCount": 6,
+        "savedViewCount": 10,
+        "canonicalCoveragePercent": 90,
+        "releaseReadinessScore": 100
+    },
+    "diffSummary": {
+        "total": 0,
+        "breakingCount": 0,
+        "destructiveCount": 0,
+        "criticalCount": 0,
+        "highCount": 0,
+        "mediumCount": 0,
+        "lowCount": 0,
+        "compatibilityScore": 100,
+        "riskScore": 0,
+        "approvalClass": "standard",
+        "destructiveBlocked": false
+    }
 }

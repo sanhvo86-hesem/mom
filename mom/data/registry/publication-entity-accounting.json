@@ -1,45 +1,45 @@
 {
   "entity_accounting": {
-    "generated_at": "2026-04-08T00:00:00Z",
-    "publication_run_id": "0b987d57-e143-47f7-96c8-815033baec67",
-    "purpose": "Explains the relationship between table counts, entity counts, and field coverage counts across canonical artifacts.",
+    "generated_at": "2026-04-09T13:45:04.985Z",
+    "publication_run_id": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90",
+    "purpose": "Explains the current relationship between registered tables, frontend entities, readiness state, and field coverage after canonical publication.",
     "schema_tables": {
-      "count": 628,
-      "source": "database/migrations (001-079)",
-      "description": "Physical tables in PostgreSQL schema"
+      "count": 652,
+      "source": "table-registry.json",
+      "description": "Physical tables currently governed by the canonical table registry."
     },
     "frontend_entities": {
-      "count": 633,
+      "count": 652,
       "source": "frontend-foundation-catalog.json",
-      "description": "Frontend entity registrations. 628 table-backed + 5 virtual/composite entities.",
+      "description": "Frontend entity registrations, including non-table views and additional aliases over the same physical table where business presentation differs.",
       "breakdown": {
-        "table_backed": 628,
-        "virtual_composite": 5,
-        "total": 633
-      }
+        "table_backed": 652,
+        "virtual_composite": 0,
+        "duplicate_table_views": 0,
+        "total": 652
+      },
+      "non_table_entities": []
     },
     "readiness": {
-      "ready": 533,
-      "partial": 3,
-      "blocked": 97,
-      "total": 633,
-      "description": "97 blocked = canonical ISA-95 tables from migrations 072-078 not yet configured for frontend. 3 partial = tables with incomplete field definitions."
+      "ready": 646,
+      "partial": 6,
+      "blocked": 0,
+      "total": 652,
+      "description": "Current readiness counts are taken directly from frontend-foundation-catalog.json and reflect the live publication state, not historical onboarding assumptions."
     },
     "field_coverage": {
-      "tables_with_fields": 528,
-      "tables_without_fields": 100,
-      "derivation": "628 schema tables - 97 blocked - 3 partial = 528 tables with complete field definitions",
+      "tables_with_fields": 652,
+      "tables_without_fields": 0,
+      "derivation": "652 registry tables -> 652 tables referenced by data-fields artifacts -> 0 tables without field definitions.",
       "affected_artifacts": [
-        "data-fields-index.json (2872 entries for 528 tables)",
-        "endpoint-catalog.json (2865 entries for 528 tables)",
-        "domain-field-packs.json (3768 packs for 628 tables)"
+        "data-fields.json + split parts",
+        "endpoint-catalog.json",
+        "domain-field-packs.json"
       ]
     },
     "why_counts_differ": {
-      "633_vs_628": "5 virtual/composite entities have no physical table but appear in frontend catalog",
-      "528_vs_628": "100 tables (97 blocked + 3 partial) lack field definitions and endpoint catalog entries",
-      "533_vs_628": "533 ready entities = 528 ready table-backed + 5 virtual entities",
-      "conclusion": "These are NOT bugs. They reflect the progressive onboarding of canonical ISA-95 tables into the frontend entity system."
+      "652_vs_652": "Field coverage is now full across the canonical table registry.",
+      "conclusion": "Count differences are governed and explainable. Any remaining delta must map either to a non-table entity or a deliberate alias over an existing physical table."
     }
   }
 }

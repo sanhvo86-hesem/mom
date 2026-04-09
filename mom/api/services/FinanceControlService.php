@@ -1,0 +1,388 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MOM\Services;
+
+use DateTimeImmutable;
+use RuntimeException;
+
+/**
+ * First-class finance control objects for period close and memo corrections.
+ *
+ * These objects do not replace full ERP posting, but they make close/correction
+ * governance explicit and auditable instead of leaving them implicit inside a
+ * unified invoice record.
+ */
+final class FinanceControlService
+{
+    private string $dataDir;
+
+    public function __construct(string $dataDir)
+    {
+        $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listPeriodCloses(): array
+    {
+        return $this->readCollection('period_closes');
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getPeriodClose(string $periodCloseId): ?array
+    {
+        return $this->findById('period_closes', 'period_close_id', $periodCloseId);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public function createPeriodClose(array $payload, string $userId): array
+    {
+        $periodCode = trim((string)($payload['period_code'] ?? ''));
+        $ledgerScope = strtoupper(trim((string)($payload['ledger_scope'] ?? '')));
+        $reasonText = trim((string)($payload['reason'] ?? ''));
+        if (preg_match('/^\d{4}\-(0[1-9]|1[0-2])$/', $periodCode) !== 1) {
+            throw new RuntimeException('Invalid period_code. Expected YYYY-MM.');
+        }
+        if (!in_array($ledgerScope, ['AP', 'AR', 'PLANT'], true)) {
+            throw new RuntimeException('Invalid ledger_scope.');
+        }
+        if ($reasonText === '') {
+            throw new RuntimeException('Period close requires a reason.');
+        }
+
+        $rows = $this->readCollection('period_closes');
+        foreach ($rows as $row) {
+            if (($row['period_code'] ?? '') === $periodCode && ($row['ledger_scope'] ?? '') === $ledgerScope && ($row['close_status'] ?? '') === 'closed') {
+                throw new RuntimeException('Period is already closed for this ledger scope.');
+            }
+        }
+
+        $now = $this->nowIso();
+        $row = [
+            'period_close_id' => $this->uuid('PC'),
+            'period_code' => $periodCode,
+            'ledger_scope' => $ledgerScope,
+            'close_status' => 'closed',
+            'closed_by' => $userId,
+            'closed_at' => $now,
+            'reason' => $reasonText,
+            'e_signature' => [
+                'type' => 'electronic_signature',
+                'signature_meaning' => function_exists('evidence_signature_meaning_normalize_strict')
+                    ? \evidence_signature_meaning_normalize_strict('approval')
+                    : 'approval',
+                'signature_status' => 'applied',
+                'signed_by' => $userId,
+                'signed_at' => $now,
+            ],
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+
+        $rows[] = $row;
+        $this->writeCollection('period_closes', $rows);
+        return $row;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listBackdateExceptions(): array
+    {
+        return $this->readCollection('backdate_exceptions');
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getBackdateException(string $backdateExceptionId): ?array
+    {
+        return $this->findById('backdate_exceptions', 'backdate_exception_id', $backdateExceptionId);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public function createBackdateException(array $payload, string $userId): array
+    {
+        $ledgerScope = strtoupper(trim((string)($payload['ledger_scope'] ?? '')));
+        $subjectType = trim((string)($payload['subject_type'] ?? ''));
+        $subjectRef = trim((string)($payload['subject_ref'] ?? ''));
+        $reasonCode = trim((string)($payload['reason_code'] ?? 'closed_period_adjustment'));
+        $reasonText = trim((string)($payload['reason'] ?? ''));
+        $approvalReference = trim((string)($payload['approval_reference'] ?? ''));
+        $requestedPostingDate = $this->normalizeDate((string)($payload['requested_posting_date'] ?? ''), 'requested_posting_date');
+        $originalEventAt = $this->normalizeIsoTimestamp((string)($payload['original_event_at'] ?? ''), 'original_event_at');
+        $expiresAt = $this->normalizeIsoTimestamp((string)($payload['expires_at'] ?? ''), 'expires_at');
+
+        if (!in_array($ledgerScope, ['AP', 'AR', 'PLANT', 'EXECUTION'], true)) {
+            throw new RuntimeException('Invalid ledger_scope.');
+        }
+        if ($subjectType === '' || $subjectRef === '') {
+            throw new RuntimeException('Backdate exception requires subject_type and subject_ref.');
+        }
+        if ($reasonText === '' || $approvalReference === '') {
+            throw new RuntimeException('Backdate exception requires a reason and approval_reference.');
+        }
+
+        $now = new DateTimeImmutable('now', new \DateTimeZone('+07:00'));
+        $expiry = new DateTimeImmutable($expiresAt);
+        if ($expiry <= $now) {
+            throw new RuntimeException('Backdate exception expiry must be in the future.');
+        }
+
+        $rows = $this->readCollection('backdate_exceptions');
+        foreach ($rows as $row) {
+            if (
+                ($row['ledger_scope'] ?? '') === $ledgerScope
+                && ($row['subject_type'] ?? '') === $subjectType
+                && ($row['subject_ref'] ?? '') === $subjectRef
+                && ($row['requested_posting_date'] ?? '') === $requestedPostingDate
+                && ($row['exception_status'] ?? '') === 'approved'
+                && strtotime((string)($row['expires_at'] ?? '')) > time()
+            ) {
+                throw new RuntimeException('An active backdate exception already exists for this subject and posting date.');
+            }
+        }
+
+        $nowIso = $this->nowIso();
+        $row = [
+            'backdate_exception_id' => $this->uuid('BDX'),
+            'exception_status' => 'approved',
+            'ledger_scope' => $ledgerScope,
+            'subject_type' => $subjectType,
+            'subject_ref' => $subjectRef,
+            'reason_code' => $reasonCode,
+            'reason' => $reasonText,
+            'approval_reference' => $approvalReference,
+            'original_event_at' => $originalEventAt,
+            'requested_posting_date' => $requestedPostingDate,
+            'approved_period_code' => substr($requestedPostingDate, 0, 7),
+            'approved_by' => $userId,
+            'approved_at' => $nowIso,
+            'expires_at' => $expiresAt,
+            'e_signature' => [
+                'type' => 'electronic_signature',
+                'signature_meaning' => function_exists('evidence_signature_meaning_normalize_strict')
+                    ? \evidence_signature_meaning_normalize_strict('approval')
+                    : 'approval',
+                'signature_status' => 'applied',
+                'signed_by' => $userId,
+                'signed_at' => $nowIso,
+            ],
+            'created_at' => $nowIso,
+            'updated_at' => $nowIso,
+        ];
+
+        $rows[] = $row;
+        $this->writeCollection('backdate_exceptions', $rows);
+        return $row;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listCreditMemos(): array
+    {
+        return $this->readCollection('credit_memos');
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getCreditMemo(string $creditMemoId): ?array
+    {
+        return $this->findById('credit_memos', 'credit_memo_id', $creditMemoId);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public function createCreditMemo(array $payload, string $userId): array
+    {
+        return $this->createMemo('credit', $payload, $userId);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listDebitMemos(): array
+    {
+        return $this->readCollection('debit_memos');
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getDebitMemo(string $debitMemoId): ?array
+    {
+        return $this->findById('debit_memos', 'debit_memo_id', $debitMemoId);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public function createDebitMemo(array $payload, string $userId): array
+    {
+        return $this->createMemo('debit', $payload, $userId);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function createMemo(string $kind, array $payload, string $userId): array
+    {
+        $invoiceScope = strtoupper(trim((string)($payload['invoice_scope'] ?? '')));
+        $originalInvoiceRef = trim((string)($payload['original_invoice_ref'] ?? ''));
+        $reasonCode = trim((string)($payload['reason_code'] ?? 'manual_adjustment'));
+        $reasonText = trim((string)($payload['reason'] ?? ''));
+        $currencyCode = strtoupper(trim((string)($payload['currency_code'] ?? 'VND')));
+        $amount = (float)($payload['amount'] ?? 0);
+
+        if (!in_array($invoiceScope, ['AP', 'AR'], true)) {
+            throw new RuntimeException('Invalid invoice_scope.');
+        }
+        if ($originalInvoiceRef === '' || $reasonText === '' || $amount <= 0) {
+            throw new RuntimeException('Memo requires original invoice reference, reason, and positive amount.');
+        }
+
+        $collection = $kind === 'credit' ? 'credit_memos' : 'debit_memos';
+        $idField = $kind === 'credit' ? 'credit_memo_id' : 'debit_memo_id';
+        $now = $this->nowIso();
+        $row = [
+            $idField => $this->uuid(strtoupper(substr($kind, 0, 1)) . 'M'),
+            'memo_type' => $kind,
+            'memo_status' => 'approved',
+            'invoice_scope' => $invoiceScope,
+            'original_invoice_ref' => $originalInvoiceRef,
+            'reason_code' => $reasonCode,
+            'reason' => $reasonText,
+            'amount' => round($amount, 2),
+            'currency_code' => $currencyCode,
+            'approved_by' => $userId,
+            'approved_at' => $now,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+
+        $rows = $this->readCollection($collection);
+        $rows[] = $row;
+        $this->writeCollection($collection, $rows);
+        return $row;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function readCollection(string $name): array
+    {
+        $path = $this->collectionPath($name);
+        if (!is_file($path)) {
+            return [];
+        }
+        $raw = @file_get_contents($path);
+        if ($raw === false || trim($raw) === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? array_values(array_filter($decoded, 'is_array')) : [];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     */
+    private function writeCollection(string $name, array $rows): void
+    {
+        $path = $this->collectionPath($name);
+        $dir = dirname($path);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to initialize finance control storage.');
+        }
+        $tmp = $path . '.tmp.' . getmypid();
+        $json = json_encode(array_values($rows), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($json === false) {
+            throw new RuntimeException('Unable to encode finance control storage.');
+        }
+        if (@file_put_contents($tmp, $json . PHP_EOL, LOCK_EX) === false) {
+            @unlink($tmp);
+            throw new RuntimeException('Unable to persist finance control storage.');
+        }
+        if (!@rename($tmp, $path)) {
+            @unlink($tmp);
+            throw new RuntimeException('Unable to finalize finance control storage.');
+        }
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function findById(string $collection, string $idField, string $recordId): ?array
+    {
+        $needle = trim($recordId);
+        if ($needle === '') {
+            return null;
+        }
+
+        foreach ($this->readCollection($collection) as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            if ((string)($row[$idField] ?? '') === $needle) {
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
+    private function collectionPath(string $name): string
+    {
+        return $this->dataDir . '/finance/' . $name . '.json';
+    }
+
+    private function normalizeDate(string $value, string $field): string
+    {
+        $trimmed = trim($value);
+        if (preg_match('/^\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|[12]\d|3[01])$/', $trimmed) !== 1) {
+            throw new RuntimeException("Invalid {$field}. Expected YYYY-MM-DD.");
+        }
+
+        return $trimmed;
+    }
+
+    private function normalizeIsoTimestamp(string $value, string $field): string
+    {
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            throw new RuntimeException("Missing {$field}.");
+        }
+
+        try {
+            return (new DateTimeImmutable($trimmed))->format('c');
+        } catch (\Throwable $e) {
+            throw new RuntimeException("Invalid {$field}. Expected ISO-8601 timestamp.");
+        }
+    }
+
+    private function nowIso(): string
+    {
+        return (new DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
+    }
+
+    private function uuid(string $prefix): string
+    {
+        return $prefix . '-' . substr(bin2hex(random_bytes(6)), 0, 12);
+    }
+}

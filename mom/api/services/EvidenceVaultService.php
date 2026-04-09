@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Database\DataLayer;
 use RuntimeException;
 
 /**
@@ -13,6 +14,12 @@ use RuntimeException;
  * custody logging, and entity linking. Ensures full traceability
  * of quality records, machine logs, and measurement data.
  *
+ * Supports DataLayer migration ladder:
+ *   JSON_ONLY        → Read/write JSON only
+ *   SHADOW_WRITE     → Read JSON, write BOTH JSON + PostgreSQL
+ *   POSTGRES_PRIMARY → Read PostgreSQL (fallback JSON), write both
+ *   POSTGRES_ONLY    → Read/write PostgreSQL only
+ *
  * @package MOM\Services
  * @since   4.0.0
  */
@@ -20,42 +27,39 @@ final class EvidenceVaultService
 {
     private readonly string $dataDir;
     private readonly string $evidenceDir;
-    private ?object $db = null;
+    private ?DataLayer $dataLayer = null;
     private readonly string $vaultFile;
     private readonly string $custodyFile;
     private readonly string $linksFile;
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir, ?object $db = null)
+    public function __construct(string $dataDir, ?DataLayer $dataLayer = null)
     {
         $this->dataDir     = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->evidenceDir = $this->dataDir . '/evidence';
         $this->vaultFile   = $this->evidenceDir . '/vault.json';
         $this->custodyFile = $this->evidenceDir . '/custody.json';
         $this->linksFile   = $this->evidenceDir . '/links.json';
-        $this->db          = $db;
+        $this->dataLayer   = $dataLayer;
 
         if (!is_dir($this->evidenceDir)) {
             @mkdir($this->evidenceDir, 0775, true);
         }
     }
 
-    // ── Shadow Write ────────────────────────────────────────────────────────
+    // ── DataLayer Mode Helpers ──────────────────────────────────────────────
 
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    private function pgWriteEnabled(): bool
     {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[EvidenceVaultService] Shadow write to {$table} failed: " . $e->getMessage());
-        }
+        if ($this->dataLayer === null) return false;
+        return $this->dataLayer->getMode() !== DataLayer::MODE_JSON_ONLY;
+    }
+
+    private function jsonWriteEnabled(): bool
+    {
+        if ($this->dataLayer === null) return true;
+        return $this->dataLayer->getMode() !== DataLayer::MODE_POSTGRES_ONLY;
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -141,10 +145,15 @@ final class EvidenceVaultService
         unset($record['content']);
 
         $vault[] = $record;
-        $this->saveVault($vault);
+        if ($this->jsonWriteEnabled()) {
+            $this->saveVault($vault);
+        }
+
+        // PostgreSQL dual-write
+        $this->pgInsertEvidence($record);
 
         // Record initial custody event
-        $this->recordCustody($record['evidence_id'], 'stored', $userId, 'Initial storage in vault');
+        $this->recordCustody($record['evidence_id'], 'stored', $actorId, 'Initial storage in vault');
 
         return $record;
     }
@@ -294,7 +303,12 @@ final class EvidenceVaultService
         ];
 
         $links[] = $linkRecord;
-        $this->saveLinks($links);
+        if ($this->jsonWriteEnabled()) {
+            $this->saveLinks($links);
+        }
+
+        // PostgreSQL dual-write
+        $this->pgInsertLink($linkRecord);
 
         return $linkRecord;
     }
@@ -304,22 +318,37 @@ final class EvidenceVaultService
      */
     public function unlink(string $evidenceId, string $entityType, string $entityId, string $userId): void
     {
-        $links   = $this->loadLinks();
-        $updated = [];
+        if ($this->jsonWriteEnabled()) {
+            $links   = $this->loadLinks();
+            $updated = [];
 
-        foreach ($links as $link) {
-            if (!is_array($link)) {
-                continue;
+            foreach ($links as $link) {
+                if (!is_array($link)) {
+                    continue;
+                }
+                if (($link['evidence_id'] ?? '') === $evidenceId
+                    && ($link['entity_type'] ?? '') === $entityType
+                    && ($link['entity_id'] ?? '') === $entityId) {
+                    continue; // Skip this link (remove it)
+                }
+                $updated[] = $link;
             }
-            if (($link['evidence_id'] ?? '') === $evidenceId
-                && ($link['entity_type'] ?? '') === $entityType
-                && ($link['entity_id'] ?? '') === $entityId) {
-                continue; // Skip this link (remove it)
-            }
-            $updated[] = $link;
+
+            $this->saveLinks($updated);
         }
 
-        $this->saveLinks($updated);
+        // PostgreSQL: delete the link
+        if ($this->pgWriteEnabled()) {
+            try {
+                $db = $this->dataLayer->getConnection();
+                $db->execute(
+                    'DELETE FROM evidence_links WHERE evidence_id = :eid::uuid AND entity_type = :etype AND entity_id = :entityid',
+                    [':eid' => $evidenceId, ':etype' => $entityType, ':entityid' => $entityId]
+                );
+            } catch (\Throwable $e) {
+                error_log('[EvidenceVaultService] PG unlink failed: ' . $e->getMessage());
+            }
+        }
 
         // Record custody event for unlink
         $this->recordCustody($evidenceId, 'unlinked', $userId,
@@ -374,9 +403,7 @@ final class EvidenceVaultService
      */
     public function recordCustody(string $evidenceId, string $action, string $userId, ?string $reason = null): void
     {
-        $custody = $this->loadCustody();
-
-        $custody[] = [
+        $event = [
             'event_id'    => $this->generateUuidV4(),
             'evidence_id' => $evidenceId,
             'action'      => $action,
@@ -385,7 +412,14 @@ final class EvidenceVaultService
             'timestamp'   => $this->nowIso(),
         ];
 
-        $this->saveCustody($custody);
+        if ($this->jsonWriteEnabled()) {
+            $custody = $this->loadCustody();
+            $custody[] = $event;
+            $this->saveCustody($custody);
+        }
+
+        // PostgreSQL dual-write
+        $this->pgInsertCustody($event);
     }
 
     /**
@@ -719,5 +753,126 @@ final class EvidenceVaultService
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    // ── PostgreSQL Integration ─────────────────────────────────────────────
+
+    /**
+     * Insert evidence record into evidence_vault table.
+     */
+    private function pgInsertEvidence(array $record): void
+    {
+        if (!$this->pgWriteEnabled()) return;
+        try {
+            $db = $this->dataLayer->getConnection();
+            $meta = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            $db->execute(
+                'INSERT INTO evidence_vault
+                    (evidence_id, evidence_type, title, description, file_name, file_path,
+                     file_hash, mime_type, file_size, chain_hash, chain_sequence,
+                     stored_by, metadata)
+                 VALUES
+                    (:eid::uuid, :etype::evidence_type_enum, :title, :desc, :fname, :fpath,
+                     :fhash, :mime, :fsize, :chash, :cseq,
+                     :user, :meta::jsonb)
+                 ON CONFLICT (evidence_id) DO NOTHING',
+                [
+                    ':eid'   => $record['evidence_id'],
+                    ':etype' => $this->mapEvidenceType($record['type'] ?? 'document'),
+                    ':title' => $record['title'] ?? '',
+                    ':desc'  => $record['description'] ?? '',
+                    ':fname' => $record['filename'] ?? $record['original_name'] ?? '',
+                    ':fpath' => $record['stored_path'] ?? '',
+                    ':fhash' => $record['file_hash'] ?? '',
+                    ':mime'  => $record['mime_type'] ?? 'application/octet-stream',
+                    ':fsize' => (int)($record['file_size'] ?? 0),
+                    ':chash' => $record['chain_hash'] ?? '',
+                    ':cseq'  => (int)($record['chain_sequence'] ?? 0),
+                    ':user'  => $record['stored_by'] ?? 'unknown',
+                    ':meta'  => $meta,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[EvidenceVaultService] PG insert evidence failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Insert custody event into evidence_chain_custody table.
+     */
+    private function pgInsertCustody(array $event): void
+    {
+        if (!$this->pgWriteEnabled()) return;
+        try {
+            $db = $this->dataLayer->getConnection();
+            $custodyAction = $this->mapCustodyAction($event['action'] ?? 'accessed');
+
+            $db->execute(
+                'INSERT INTO evidence_chain_custody
+                    (custody_id, evidence_id, action, actor, reason)
+                 VALUES
+                    (:cid::uuid, :eid::uuid, :action::custody_action_enum, :actor, :reason)
+                 ON CONFLICT DO NOTHING',
+                [
+                    ':cid'    => $event['event_id'],
+                    ':eid'    => $event['evidence_id'],
+                    ':action' => $custodyAction,
+                    ':actor'  => $event['user'] ?? 'unknown',
+                    ':reason' => $event['reason'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[EvidenceVaultService] PG insert custody failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Insert link into evidence_links table.
+     */
+    private function pgInsertLink(array $linkRecord): void
+    {
+        if (!$this->pgWriteEnabled()) return;
+        try {
+            $db = $this->dataLayer->getConnection();
+
+            $db->execute(
+                'INSERT INTO evidence_links
+                    (link_id, evidence_id, entity_type, entity_id, linked_by, note)
+                 VALUES
+                    (:lid::uuid, :eid::uuid, :etype, :entityid, :user, :note)
+                 ON CONFLICT DO NOTHING',
+                [
+                    ':lid'      => $linkRecord['link_id'],
+                    ':eid'      => $linkRecord['evidence_id'],
+                    ':etype'    => $linkRecord['entity_type'] ?? '',
+                    ':entityid' => $linkRecord['entity_id'] ?? '',
+                    ':user'     => $linkRecord['linked_by'] ?? '',
+                    ':note'     => $linkRecord['note'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[EvidenceVaultService] PG insert link failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Map evidence type to DB enum value.
+     */
+    private function mapEvidenceType(string $type): string
+    {
+        $valid = ['photo', 'document', 'certificate', 'measurement', 'video', 'audio', 'log', 'report', 'other'];
+        $type = strtolower(trim($type));
+        return in_array($type, $valid, true) ? $type : 'document';
+    }
+
+    /**
+     * Map custody action to DB enum value.
+     */
+    private function mapCustodyAction(string $action): string
+    {
+        $valid = ['stored', 'accessed', 'exported', 'transferred', 'sealed', 'released', 'archived'];
+        $action = strtolower(trim($action));
+        return in_array($action, $valid, true) ? $action : 'accessed';
     }
 }

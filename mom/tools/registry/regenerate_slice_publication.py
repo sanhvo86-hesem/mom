@@ -23,7 +23,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 PORTAL_ROOT = Path(__file__).resolve().parent.parent.parent
-REGISTRY_DIR = PORTAL_ROOT / "qms-data" / "registry"
+
+
+def resolve_registry_dir() -> Path:
+    candidates = [
+        PORTAL_ROOT / "data" / "registry",
+        PORTAL_ROOT / "qms-data" / "registry",
+    ]
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate
+    return candidates[0]
+
+
+REGISTRY_DIR = resolve_registry_dir()
 ENDPOINT_CATALOG = REGISTRY_DIR / "endpoint-catalog.json"
 FRONTEND_CATALOG = REGISTRY_DIR / "frontend-foundation-catalog.json"
 REGISTRY_MANIFEST = REGISTRY_DIR / "registry-manifest.json"

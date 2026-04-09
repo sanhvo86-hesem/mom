@@ -72,6 +72,53 @@ class GenericCrudService
     }
 
     /**
+     * @param array<string, mixed> $table
+     */
+    private function managedStatusField(array $table): string
+    {
+        $statusColumn = trim((string)($table['statusColumn'] ?? ''));
+        if ($statusColumn !== '') {
+            return $statusColumn;
+        }
+
+        $workflowId = trim((string)($table['workflowId'] ?? ''));
+        if ($workflowId === '') {
+            return '';
+        }
+
+        $workflow = $this->registry->workflowById($workflowId);
+        if (!is_array($workflow)) {
+            return '';
+        }
+
+        $workflowField = trim((string)($workflow['stateField'] ?? ''));
+        if ($workflowField === '') {
+            return '';
+        }
+
+        return array_key_exists($workflowField, (array)($table['columns'] ?? [])) ? $workflowField : '';
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     */
+    private function managedStatusSet(array $table): string
+    {
+        $workflowId = trim((string)($table['workflowId'] ?? ''));
+        if ($workflowId !== '') {
+            $workflow = $this->registry->workflowById($workflowId);
+            if (is_array($workflow)) {
+                $workflowStatusSet = trim((string)($workflow['statusSet'] ?? ''));
+                if ($workflowStatusSet !== '') {
+                    return $workflowStatusSet;
+                }
+            }
+        }
+
+        return trim((string)($table['statusSet'] ?? ''));
+    }
+
+    /**
      * @return array<int, array{
      *   key:string,
      *   sourceField:string,
@@ -262,7 +309,7 @@ class GenericCrudService
             }
         }
 
-        $statusColumn = (string)($table['statusColumn'] ?? '');
+        $statusColumn = $this->managedStatusField($table);
         $status = trim((string)($query['status'] ?? ''));
         if ($status !== '' && $statusColumn !== '' && in_array($statusColumn, $columns, true)) {
             $where[] = $this->q($statusColumn) . ' = :status';
@@ -614,7 +661,7 @@ class GenericCrudService
     {
         $table = $this->resolveTable($domain, $tableName);
         $runtime = $this->assertTransitionRuntimeSupported($domain, $tableName, $table);
-        $statusColumn = trim((string)($table['statusColumn'] ?? ''));
+        $statusColumn = $this->managedStatusField($table);
         if ($statusColumn === '') {
             throw new RuntimeException("Table {$tableName} does not define a status column");
         }
@@ -682,7 +729,7 @@ class GenericCrudService
     {
         $columns = (array)($table['columns'] ?? []);
         $primaryKeys = array_flip($this->primaryKeyMeta($table)['fields']);
-        $statusColumn = (string)($table['statusColumn'] ?? '');
+        $statusColumn = $this->managedStatusField($table);
         $result = [];
 
         foreach ($payload as $key => $value) {
@@ -854,7 +901,7 @@ class GenericCrudService
             $add((string)$field);
         }
         $add($sort);
-        $add((string)($table['statusColumn'] ?? ''));
+        $add($this->managedStatusField($table));
         $add('row_version');
         foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
             $add($field);
@@ -1158,7 +1205,7 @@ class GenericCrudService
      */
     private function assertValidStatus(array $table, string $toStatus): void
     {
-        $statusSet = trim((string)($table['statusSet'] ?? ''));
+        $statusSet = $this->managedStatusSet($table);
         if ($statusSet === '') {
             return;
         }

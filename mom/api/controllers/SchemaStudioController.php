@@ -5,12 +5,15 @@ namespace MOM\Api\Controllers;
 
 use MOM\Database\Connection;
 use MOM\Database\DataLayer;
+use MOM\Services\DataSchemaService;
 use PDO;
 use RuntimeException;
 use Throwable;
 
 class SchemaStudioController extends BaseController
 {
+    private const DESIGN_SAVE_MAX_BYTES = 6291456;
+
     private string $studioDir;
     private string $designDir;
     private string $snapshotDir;
@@ -54,7 +57,10 @@ class SchemaStudioController extends BaseController
 
     private function requireDatabaseAccess(array $user): void
     {
-        $this->requireAnyRole($user, ['it_admin', 'ceo', 'qa_manager', 'developer']);
+        // Live DB surfaces must stay narrower than the general schema control plane.
+        // Do not reuse admin_roles() here because legacy aliases such as qms_supervisor
+        // normalize into qms_engineer and would silently widen database access.
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'ceo', 'qa_manager', 'developer']);
     }
 
     private function requireMigrationAccess(array $user): void
@@ -119,6 +125,159 @@ class SchemaStudioController extends BaseController
         $label = str_replace(['_', '-'], ' ', trim($value));
         $label = preg_replace('/\s+/', ' ', $label) ?? $label;
         return ucwords($label);
+    }
+
+    private function dataSchemaOperationalState(): array
+    {
+        $service = new DataSchemaService($this->data, $this->dataDir, $this->rootDir);
+        $workspace = $service->getWorkspace();
+        return is_array($workspace['operational'] ?? null) ? $workspace['operational'] : [];
+    }
+
+    private function enforceReleaseGate(): void
+    {
+        $operational = $this->dataSchemaOperationalState();
+        $releaseGate = is_array($operational['releaseGate'] ?? null) ? $operational['releaseGate'] : [];
+        if (!empty($releaseGate['blocking'])) {
+            $this->error('release_gate_blocked', 409, 'Resolve blocking operational risks before creating a release bundle.', [
+                'release_gate' => $releaseGate,
+                'operational' => $operational,
+            ]);
+        }
+    }
+
+    private function savePolicy(): array
+    {
+        return [
+            'requiresRevision' => true,
+            'maxPayloadBytes' => self::DESIGN_SAVE_MAX_BYTES,
+            'conflictMode' => 'reject_stale_write',
+            'auditTrail' => true,
+        ];
+    }
+
+    private function ensureSavePayloadLimit(): void
+    {
+        $length = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+        if ($length > self::DESIGN_SAVE_MAX_BYTES) {
+            $this->error('payload_too_large', 413, null, [
+                'maxBytes' => self::DESIGN_SAVE_MAX_BYTES,
+                'save_policy' => $this->savePolicy(),
+            ]);
+        }
+    }
+
+    private function relativeWorkspacePath(string $path): string
+    {
+        $normalized = str_replace('\\', '/', $path);
+        $prefix = rtrim(str_replace('\\', '/', $this->rootDir), '/') . '/';
+        if (str_starts_with($normalized, $prefix)) {
+            return substr($normalized, strlen($prefix));
+        }
+        return ltrim($normalized, '/');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function fileRevision(string $path): array
+    {
+        clearstatcache(true, $path);
+        $exists = is_file($path);
+        $size = $exists ? (int)(filesize($path) ?: 0) : 0;
+        $mtime = $exists ? (int)(filemtime($path) ?: 0) : 0;
+
+        return [
+            'path' => $this->relativeWorkspacePath($path),
+            'exists' => $exists,
+            'mtime' => $mtime > 0 ? gmdate('c', $mtime) : '',
+            'size' => $size,
+            'sha1' => $exists ? substr((string)sha1_file($path), 0, 12) : '',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function currentDesignRevisions(string $designId): array
+    {
+        return [
+            'designId' => $designId,
+            'capturedAt' => $this->nowIso(),
+            'files' => [
+                'design' => $this->fileRevision($this->designPath($designId)),
+                'baseline' => $this->fileRevision($this->baselinePath($designId)),
+            ],
+        ];
+    }
+
+    /**
+     * @param list<string> $scopes
+     */
+    private function requiresRevisionToken(array $current, array $scopes): bool
+    {
+        $files = is_array($current['files'] ?? null) ? $current['files'] : [];
+        foreach ($scopes as $scope) {
+            $file = is_array($files[$scope] ?? null) ? $files[$scope] : [];
+            if (!empty($file['exists'])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param list<string> $scopes
+     */
+    private function revisionsMatch(array $expected, array $current, array $scopes): bool
+    {
+        if ((string)($expected['designId'] ?? '') !== (string)($current['designId'] ?? '')) {
+            return false;
+        }
+
+        $expectedFiles = is_array($expected['files'] ?? null) ? $expected['files'] : [];
+        $currentFiles = is_array($current['files'] ?? null) ? $current['files'] : [];
+
+        foreach ($scopes as $scope) {
+            $expectedFile = is_array($expectedFiles[$scope] ?? null) ? $expectedFiles[$scope] : null;
+            $currentFile = is_array($currentFiles[$scope] ?? null) ? $currentFiles[$scope] : null;
+            if ($expectedFile === null || $currentFile === null) {
+                return false;
+            }
+            foreach (['path', 'exists', 'mtime', 'size', 'sha1'] as $field) {
+                if (($expectedFile[$field] ?? null) !== ($currentFile[$field] ?? null)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param list<string> $scopes
+     * @return array<string, mixed>
+     */
+    private function assertRevisionToken(string $designId, mixed $revision, array $scopes): array
+    {
+        $current = $this->currentDesignRevisions($designId);
+        if (!$this->requiresRevisionToken($current, $scopes)) {
+            return $current;
+        }
+        if (!is_array($revision)) {
+            $this->error('missing_design_revision_token', 409, 'Reload the design workspace before writing artifacts.', [
+                'current_revisions' => $current,
+                'save_policy' => $this->savePolicy(),
+            ]);
+        }
+        if (!$this->revisionsMatch($revision, $current, $scopes)) {
+            $this->error('stale_design_workspace_revision', 409, 'This design workspace changed on the server. Reload the latest design/baseline before continuing.', [
+                'current_revisions' => $current,
+                'save_policy' => $this->savePolicy(),
+            ]);
+        }
+
+        return $current;
     }
 
     private function inferLayerForTable(array $schema, array $table): string
@@ -4209,6 +4368,27 @@ class SchemaStudioController extends BaseController
             'contracts' => $compilerBundle['contracts'] ?? [],
         ];
 
+        $experienceReport = $this->buildExperienceArtifact(
+            (string)($compilerBundle['_meta']['designId'] ?? ''),
+            (string)($compilerBundle['_meta']['designName'] ?? ''),
+            (array)($compilerBundle['health'] ?? []),
+            (array)($compilerBundle['report'] ?? []),
+            ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
+        );
+        $operationsReport = $this->buildOperationsArtifact(
+            (string)($compilerBundle['_meta']['designId'] ?? ''),
+            (string)($compilerBundle['_meta']['designName'] ?? ''),
+            (array)($compilerBundle['health'] ?? []),
+            (array)($compilerBundle['report'] ?? []),
+            ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
+        );
+        $commandCenterReport = $this->buildCommandCenterArtifact(
+            (string)($compilerBundle['_meta']['designId'] ?? ''),
+            (string)($compilerBundle['_meta']['designName'] ?? ''),
+            (array)($compilerBundle['health'] ?? []),
+            (array)($compilerBundle['report'] ?? []),
+            ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
+        );
         $diagnostics = [
             '_meta' => [
                 'generatedAt' => $this->nowIso(),
@@ -4244,28 +4424,6 @@ class SchemaStudioController extends BaseController
             'reportSummary' => (array)($compilerBundle['report']['summary'] ?? []),
             'diffSummary' => (array)($compilerBundle['health']['diffSummary'] ?? []),
         ];
-
-        $experienceReport = $this->buildExperienceArtifact(
-            (string)($compilerBundle['_meta']['designId'] ?? ''),
-            (string)($compilerBundle['_meta']['designName'] ?? ''),
-            (array)($compilerBundle['health'] ?? []),
-            (array)($compilerBundle['report'] ?? []),
-            ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
-        );
-        $operationsReport = $this->buildOperationsArtifact(
-            (string)($compilerBundle['_meta']['designId'] ?? ''),
-            (string)($compilerBundle['_meta']['designName'] ?? ''),
-            (array)($compilerBundle['health'] ?? []),
-            (array)($compilerBundle['report'] ?? []),
-            ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
-        );
-        $commandCenterReport = $this->buildCommandCenterArtifact(
-            (string)($compilerBundle['_meta']['designId'] ?? ''),
-            (string)($compilerBundle['_meta']['designName'] ?? ''),
-            (array)($compilerBundle['health'] ?? []),
-            (array)($compilerBundle['report'] ?? []),
-            ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
-        );
         $round7Report = $this->buildRound7Artifact(
             (string)($compilerBundle['_meta']['designId'] ?? ''),
             (string)($compilerBundle['_meta']['designName'] ?? ''),
@@ -4780,7 +4938,12 @@ class SchemaStudioController extends BaseController
         if (is_array($baseline)) {
             $baseline = $this->normalizeEnterpriseSchema($baseline, (string)($user['username'] ?? 'system'));
         }
-        $this->success(['schema' => $schema, 'baseline' => $baseline]);
+        $this->success([
+            'schema' => $schema,
+            'baseline' => $baseline,
+            'revisions' => $this->currentDesignRevisions($id),
+            'save_policy' => $this->savePolicy(),
+        ]);
     }
 
     public function saveDesign(): never
@@ -4788,6 +4951,7 @@ class SchemaStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireWriteAccess($user);
         $this->requireCsrf();
+        $this->ensureSavePayloadLimit();
         $body = $this->jsonBody();
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $body;
         if (!is_array($schema) || !isset($schema['_meta'])) {
@@ -4795,6 +4959,7 @@ class SchemaStudioController extends BaseController
         }
         $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
         $schema['_meta']['id'] = $this->safeId((string)($schema['_meta']['id'] ?? ''));
+        $this->assertRevisionToken((string)$schema['_meta']['id'], $body['revisions'] ?? null, ['design']);
         $schema['_meta']['updatedAt'] = $this->nowIso();
         $schema['_meta']['author'] = (string)($user['username'] ?? 'system');
         $schema['_meta']['enterprise']['last_saved_at'] = $schema['_meta']['updatedAt'];
@@ -4811,6 +4976,8 @@ class SchemaStudioController extends BaseController
                 'projectionCount' => (int)($manifest['summary']['projectionCount'] ?? 0),
                 'releaseCount' => (int)($manifest['summary']['releaseCount'] ?? 0),
             ],
+            'revisions' => $this->currentDesignRevisions((string)$schema['_meta']['id']),
+            'save_policy' => $this->savePolicy(),
         ]);
     }
 
@@ -4840,6 +5007,7 @@ class SchemaStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireWriteAccess($user);
         $this->requireCsrf();
+        $this->ensureSavePayloadLimit();
         $body = $this->jsonBody();
         $designId = $this->safeId((string)($body['design_id'] ?? ''));
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : null;
@@ -4847,9 +5015,14 @@ class SchemaStudioController extends BaseController
             $this->error('missing_payload', 400);
         }
         $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
+        $this->assertRevisionToken($designId, $body['revisions'] ?? null, ['baseline']);
         $this->writeJsonFile($this->baselinePath($designId), $schema);
         $this->auditLog('schema_studio_set_baseline', ['design_id' => $designId], (string)($user['username'] ?? ''));
-        $this->success(['baselineAt' => $this->nowIso()]);
+        $this->success([
+            'baselineAt' => $this->nowIso(),
+            'revisions' => $this->currentDesignRevisions($designId),
+            'save_policy' => $this->savePolicy(),
+        ]);
     }
 
     public function loadFromRegistry(): never
@@ -5056,7 +5229,11 @@ class SchemaStudioController extends BaseController
         }
         unset($table, $column);
 
-        $this->success(['schema' => $schema]);
+        $this->success([
+            'schema' => $schema,
+            'revisions' => $this->currentDesignRevisions((string)($schema['_meta']['id'] ?? 'workspace')),
+            'save_policy' => $this->savePolicy(),
+        ]);
     }
 
     public function reverseEngineer(): never
@@ -5223,7 +5400,11 @@ class SchemaStudioController extends BaseController
             unset($table, $column);
 
             $this->auditLog('schema_studio_reverse_engineer', ['table_count' => count($schema['tables'])], (string)($user['username'] ?? ''));
-            $this->success(['schema' => $schema]);
+            $this->success([
+                'schema' => $schema,
+                'revisions' => $this->currentDesignRevisions((string)($schema['_meta']['id'] ?? 'workspace')),
+                'save_policy' => $this->savePolicy(),
+            ]);
         } catch (Throwable $e) {
             error_log('[SchemaStudio] reverseEngineer failed: ' . $e->getMessage());
             $this->error('reverse_engineer_failed', 500, 'Database introspection failed');
@@ -5593,9 +5774,11 @@ class SchemaStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireWriteAccess($user);
         $this->requireCsrf();
+        $this->ensureSavePayloadLimit();
 
         $body = $this->jsonBody();
         $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $this->assertRevisionToken($designId, $body['revisions'] ?? null, ['design']);
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
@@ -5641,6 +5824,8 @@ class SchemaStudioController extends BaseController
             'experienceSummary' => (array)($manifest['experienceSummary'] ?? []),
             'operationsSummary' => (array)($manifest['operationsSummary'] ?? []),
             'commandCenterSummary' => (array)($manifest['commandCenterSummary'] ?? []),
+            'revisions' => $this->currentDesignRevisions($designId),
+            'save_policy' => $this->savePolicy(),
         ]);
     }
 
@@ -5649,9 +5834,12 @@ class SchemaStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireWriteAccess($user);
         $this->requireCsrf();
+        $this->ensureSavePayloadLimit();
+        $this->enforceReleaseGate();
 
         $body = $this->jsonBody();
         $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $this->assertRevisionToken($designId, $body['revisions'] ?? null, ['design', 'baseline']);
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
@@ -5743,6 +5931,8 @@ class SchemaStudioController extends BaseController
             'health' => $health,
             'manifest' => $manifest,
             'experienceSummary' => (array)($manifest['experienceSummary'] ?? []),
+            'revisions' => $this->currentDesignRevisions($designId),
+            'save_policy' => $this->savePolicy(),
         ]);
     }
 
@@ -5751,9 +5941,11 @@ class SchemaStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireReadAccess($user);
         $this->requireCsrf();
+        $this->ensureSavePayloadLimit();
 
         $body = $this->jsonBody();
         $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $this->assertRevisionToken($designId, $body['revisions'] ?? null, ['design', 'baseline']);
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
@@ -5866,6 +6058,8 @@ class SchemaStudioController extends BaseController
             'operationsReport' => $operationsReport,
             'commandCenterReport' => $commandCenterReport,
             'round7Report' => $round7Report,
+            'revisions' => $this->currentDesignRevisions($designId),
+            'save_policy' => $this->savePolicy(),
         ]);
     }
 

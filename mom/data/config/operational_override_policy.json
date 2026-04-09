@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Governed operational override policy. Every override must be typed, timeboxed, signed, and reviewable."
+  },
+  "reason_codes": {
+    "customer_approved_deviation": {
+      "label": "Customer approved deviation",
+      "risk_class": "major"
+    },
+    "temporary_document_gap": {
+      "label": "Temporary document gap with containment",
+      "risk_class": "major"
+    },
+    "risk_accepted_by_quality": {
+      "label": "Quality-approved risk acceptance",
+      "risk_class": "major"
+    },
+    "logistics_cutoff_exception": {
+      "label": "Logistics cutoff exception",
+      "risk_class": "major"
+    },
+    "source_inspection_waiver": {
+      "label": "Source inspection waiver",
+      "risk_class": "critical"
+    }
+  },
+  "override_types": {
+    "shipment_gate_override": {
+      "subject_type": "sales_order",
+      "control_family": "shipment_gate",
+      "allowed_approver_roles": [
+        "qa_manager",
+        "production_director",
+        "ceo",
+        "it_admin"
+      ],
+      "allowed_reason_codes": [
+        "customer_approved_deviation",
+        "temporary_document_gap",
+        "risk_accepted_by_quality",
+        "logistics_cutoff_exception",
+        "source_inspection_waiver"
+      ],
+      "default_expiry_hours": 72,
+      "max_expiry_hours": 168,
+      "follow_up_required": true,
+      "approval_reference_required": false,
+      "signature_meaning": "approval",
+      "signature_attestation": "I approve this timeboxed shipment-gate override and accept the recorded risk."
+    }
+  }
+}

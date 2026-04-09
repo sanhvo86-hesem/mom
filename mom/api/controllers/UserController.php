@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\AuthUserShadowSyncService;
 use Throwable;
 
 /**
@@ -59,6 +60,7 @@ class UserController extends BaseController
 
         $usersFile = $this->confDir . '/users.json';
         $existing  = find_user_by_username($this->store, $username);
+        $shadowSync = new AuthUserShadowSyncService($this->rootDir);
 
         if ($existing) {
             // Update existing user
@@ -71,6 +73,8 @@ class UserController extends BaseController
                 'personal_email',
                 'cccd',
                 'active',
+                'hcm_org_unit_id',
+                'hcm_position_id',
                 'org_company_code',
                 'org_legal_entity_code',
                 'org_plant_id',
@@ -85,10 +89,26 @@ class UserController extends BaseController
 
             // Handle password change
             $newPw = (string)($data['password'] ?? '');
-            if ($newPw !== '') {
+                if ($newPw !== '') {
                 [$pwOk, $pwErr] = password_policy($newPw);
                 if (!$pwOk) $this->error($pwErr, 400);
                 $existing['password_hash'] = password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]);
+            }
+
+            if (trim((string)($existing['employee_id'] ?? '')) === '') {
+                $existing['employee_id'] = AuthUserShadowSyncService::canonicalEmployeeIdForUser($existing);
+            }
+
+            if (method_exists($shadowSync, 'normalizeUserLinkage')) {
+                $linkage = $shadowSync->normalizeUserLinkage($existing);
+                $existing['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $existing['hcm_org_unit_id'] ?? '');
+                $existing['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $existing['hcm_position_id'] ?? '');
+                if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
+                    $existing['dept'] = (string)$linkage['dept_code'];
+                }
+                if (trim((string)($linkage['position_title'] ?? '')) !== '') {
+                    $existing['title'] = (string)$linkage['position_title'];
+                }
             }
 
             update_user($this->store, $existing);
@@ -111,15 +131,30 @@ class UserController extends BaseController
                 'personal_email' => (string)($data['personal_email'] ?? ''),
                 'cccd'          => (string)($data['cccd'] ?? ''),
                 'active'        => (bool)($data['active'] ?? true),
+                'hcm_org_unit_id' => (string)($data['hcm_org_unit_id'] ?? ''),
+                'hcm_position_id' => (string)($data['hcm_position_id'] ?? ''),
                 'org_company_code' => (string)($data['org_company_code'] ?? ''),
                 'org_legal_entity_code' => (string)($data['org_legal_entity_code'] ?? ''),
                 'org_plant_id'  => (string)($data['org_plant_id'] ?? ''),
                 'org_site_id'   => (string)($data['org_site_id'] ?? ''),
+                'employee_id'   => AuthUserShadowSyncService::canonicalEmployeeIdForUser(['username' => $username]),
                 'password_hash' => password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]),
                 'mfa'           => ['enabled' => false],
                 'created_at'    => $this->nowIso(),
                 'updated_at'    => $this->nowIso(),
             ];
+
+            if (method_exists($shadowSync, 'normalizeUserLinkage')) {
+                $linkage = $shadowSync->normalizeUserLinkage($newUser);
+                $newUser['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $newUser['hcm_org_unit_id'] ?? '');
+                $newUser['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $newUser['hcm_position_id'] ?? '');
+                if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
+                    $newUser['dept'] = (string)$linkage['dept_code'];
+                }
+                if (trim((string)($linkage['position_title'] ?? '')) !== '') {
+                    $newUser['title'] = (string)$linkage['position_title'];
+                }
+            }
 
             if (!isset($this->store['users'])) {
                 $this->store['users'] = [];
@@ -133,6 +168,12 @@ class UserController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
+        }
+
+        try {
+            $shadowSync->syncUser($existing);
+        } catch (Throwable $e) {
+            @error_log('[UserController] shadow sync failed: ' . $e->getMessage());
         }
 
         $this->auditLog('admin_user_upsert', ['username' => $username]);
@@ -163,6 +204,7 @@ class UserController extends BaseController
         }
 
         $users = $this->store['users'] ?? [];
+        $deletedUser = find_user_by_username($this->store, $username);
         $this->store['users'] = array_values(array_filter($users, function ($u) use ($username) {
             return !is_array($u) || strtolower((string)($u['username'] ?? '')) !== $username;
         }));
@@ -173,6 +215,13 @@ class UserController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
+        }
+
+        try {
+            $shadowSync = new AuthUserShadowSyncService($this->rootDir);
+            $shadowSync->deactivateUser($username, is_array($deletedUser) ? (string)($deletedUser['employee_id'] ?? '') : null);
+        } catch (Throwable $e) {
+            @error_log('[UserController] shadow deactivate failed: ' . $e->getMessage());
         }
 
         $this->auditLog('admin_user_delete', ['username' => $username]);
@@ -209,6 +258,9 @@ class UserController extends BaseController
 
         $user['password_hash'] = password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]);
         $user['updated_at']    = $this->nowIso();
+        if (trim((string)($user['employee_id'] ?? '')) === '') {
+            $user['employee_id'] = AuthUserShadowSyncService::canonicalEmployeeIdForUser($user);
+        }
         update_user($this->store, $user);
 
         $usersFile = $this->confDir . '/users.json';
@@ -217,6 +269,13 @@ class UserController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
+        }
+
+        try {
+            $shadowSync = new AuthUserShadowSyncService($this->rootDir);
+            $shadowSync->syncUser($user);
+        } catch (Throwable $e) {
+            @error_log('[UserController] shadow password sync failed: ' . $e->getMessage());
         }
 
         $this->auditLog('admin_user_reset_password', ['username' => $username]);
@@ -240,8 +299,10 @@ class UserController extends BaseController
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         $perms = load_role_permissions($rolePermsFile);
+        $roleDocsFile = $this->confDir . '/portal_role_docs.json';
+        $roleDocs = portal_load_role_docs($this->rootDir . '/mom/scripts/portal/01-data-config.js', $roleDocsFile);
 
-        $this->success(['perms' => $perms]);
+        $this->success(['perms' => $perms, 'role_docs' => $roleDocs]);
     }
 
     /**
@@ -260,6 +321,10 @@ class UserController extends BaseController
         $data = $this->jsonBody();
         $in   = $data['perms'] ?? null;
         if (!is_array($in)) $this->error('invalid_perms', 400);
+        $roleDocsInput = $data['role_docs'] ?? null;
+        if ($roleDocsInput !== null && !is_array($roleDocsInput)) {
+            $this->error('invalid_role_docs', 400);
+        }
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         $clean = load_role_permissions($rolePermsFile);
@@ -280,8 +345,12 @@ class UserController extends BaseController
         }
 
         save_role_permissions($rolePermsFile, $clean);
+        $roleDocsFile = $this->confDir . '/portal_role_docs.json';
+        $roleDocs = $roleDocsInput === null
+            ? portal_load_role_docs($this->rootDir . '/mom/scripts/portal/01-data-config.js', $roleDocsFile)
+            : portal_save_role_docs($roleDocsFile, $roleDocsInput, $this->rootDir . '/mom/scripts/portal/01-data-config.js');
 
         $this->auditLog('admin_role_perms_save');
-        $this->success(['perms' => $clean]);
+        $this->success(['perms' => $clean, 'role_docs' => $roleDocs]);
     }
 }

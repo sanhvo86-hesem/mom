@@ -87,19 +87,29 @@ async function loadUsersFromServerIfAdmin(){
         shipping_packing:'logistics_coordinator',trainee:'cnc_operator'
       };
       USERS = res.users.map(u=>({
-        // Normalize id to string so onclick handlers work reliably (server may return numeric ids)
-        id: String(u.id),
+        // Prefer the system identity key over UI-local numeric ids.
+        id: String(u.employee_id || u.id || u.username || ''),
+        employee_id: String(u.employee_id || ''),
         name: u.name || u.username || '',
         username: u.username || '',
         role: _ROLE_MIGRATE[u.role] || u.role || 'cnc_operator',
         dept: (u.dept==='BOD'?'EXE':(u.dept==='WH'?'WHS':(u.dept||''))),
         title: (u.title||''),
+        hcm_org_unit_id: String(u.hcm_org_unit_id || ''),
+        hcm_position_id: String(u.hcm_position_id || ''),
+        cccd: (u.cccd || ''),
+        phone: (u.phone || ''),
+        personal_email: (u.personal_email || ''),
+        org_company_code: String(u.org_company_code || ''),
+        org_legal_entity_code: String(u.org_legal_entity_code || ''),
+        org_plant_id: String(u.org_plant_id || ''),
+        org_site_id: String(u.org_site_id || ''),
         avatar: u.avatar || '👤',
         active: (u.active !== false),
         // Keep pin empty: passwords are server-side only
         pin: ''
       }));
-      try{ saveUsersToStorage(); }catch(e){}
+      if(typeof syncUsersWithAuthoritativeOrg === 'function') syncUsersWithAuthoritativeOrg();
       if(currentPage==='admin'){ renderAdmin(); }
     }
   }catch(e){
@@ -263,7 +273,7 @@ let TITLES = [...DEFAULT_TITLES];
 
 // V9 migration: clear stale session cache BEFORE loading
 (function(){
-  const QMS_VER = 'v10.2';
+  const QMS_VER = 'v10.4';
   try {
     if(sessionStorage.getItem('hesem_qms_version') !== QMS_VER){
       sessionStorage.removeItem('hesem_departments');
@@ -271,8 +281,10 @@ let TITLES = [...DEFAULT_TITLES];
       sessionStorage.removeItem('hesem_titles');
       sessionStorage.removeItem('hesem_users_db');
       sessionStorage.removeItem('hesem_activity_log');
+      sessionStorage.removeItem('hesem_perm_overrides');
+      sessionStorage.removeItem('hesem_role_docs');
       sessionStorage.setItem('hesem_qms_version', QMS_VER);
-      console.log('[QMS] V9.1 migration: cleared all stale session cache');
+      console.log('[QMS] v10.3 migration: cleared stale governance cache');
     }
   } catch(e){}
 })();
@@ -941,12 +953,22 @@ function isAdmin(){ return currentUser && ADMIN_ROLES.includes(currentUser.role)
 
 // Permission overrides stored per user (from admin panel)
 let PERM_OVERRIDES = {};
-function loadPermOverrides(){try{const s=sessionStorage.getItem('hesem_perm_overrides');if(s)PERM_OVERRIDES=JSON.parse(s);}catch(e){}}
-function savePermOverrides(){try{sessionStorage.setItem('hesem_perm_overrides',JSON.stringify(PERM_OVERRIDES));}catch(e){}}
-function loadUsersFromStorage(){try{const s=sessionStorage.getItem('hesem_users_db');if(s){const loaded=JSON.parse(s);if(Array.isArray(loaded)&&loaded.length>0&&loaded[0].id)USERS=loaded;}}catch(e){sessionStorage.removeItem('hesem_users_db');}}
-function saveUsersToStorage(){try{sessionStorage.setItem('hesem_users_db',JSON.stringify(USERS));}catch(e){}}
-function saveRoleDocsToStorage(){try{sessionStorage.setItem('hesem_role_docs',JSON.stringify(ROLE_DOCS));}catch(e){}}
-function loadRoleDocsFromStorage(){try{const s=sessionStorage.getItem('hesem_role_docs');if(s){const loaded=JSON.parse(s);if(loaded&&typeof loaded==='object')Object.assign(ROLE_DOCS,loaded);}}catch(e){}}
+function loadPermOverrides(){
+  PERM_OVERRIDES = {};
+  try{ sessionStorage.removeItem('hesem_perm_overrides'); }catch(e){}
+}
+function savePermOverrides(){ return true; }
+function loadUsersFromStorage(){
+  try{ sessionStorage.removeItem('hesem_users_db'); }catch(e){}
+}
+function saveUsersToStorage(){ return true; }
+function saveRoleDocsToStorage(){
+  try{ sessionStorage.removeItem('hesem_role_docs'); }catch(e){}
+  return true;
+}
+function loadRoleDocsFromStorage(){
+  try{ sessionStorage.removeItem('hesem_role_docs'); }catch(e){}
+}
 loadPermOverrides();
 loadUsersFromStorage();
 loadRoleDocsFromStorage();

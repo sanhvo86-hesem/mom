@@ -7,9 +7,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const portalRoot = path.resolve(__dirname, '..', '..');
 const migrationsDir = path.join(portalRoot, 'database', 'migrations');
-const registryDir = path.join(portalRoot, 'qms-data', 'registry');
 const docsDir = path.join(portalRoot, 'docs');
 const generatedAt = new Date().toISOString();
+
+function resolveRegistryDir() {
+  const candidates = [
+    path.join(portalRoot, 'data', 'registry'),
+    path.join(portalRoot, 'qms-data', 'registry'),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0];
+}
+
+const registryDir = resolveRegistryDir();
 
 const researchReferences = [
   {
@@ -125,6 +134,16 @@ const domainDefinitions = {
     description: 'Người dùng, vai trò, phiên, tổ chức và nhật ký hệ thống lõi.',
     businessProcess: 'Identity, authorization, tenancy, security, and audit foundation.',
     workflowPlan: ['wf_core_access_governance'],
+    supportDomain: false,
+  },
+  foundation_governance: {
+    label: 'Nền tảng và governance',
+    labelEn: 'Foundation Governance',
+    icon: 'fa-sitemap',
+    color: '#0f766e',
+    description: 'Cấu trúc tổ chức, party, UOM, lịch, mã chuẩn, approval, e-signature và attachment nền tảng.',
+    businessProcess: 'Enterprise structure, identity-bearing party master, governed codes, approvals, and compliant signatures.',
+    workflowPlan: ['wf_foundation_governance', 'wf_approval_group'],
     supportDomain: false,
   },
   document_control: {
@@ -661,9 +680,128 @@ const migrationDomainDefaults = new Map([
   ['068_trade_compliance_advanced.sql', 'trade_compliance'],
   ['069_lean_manufacturing_world_class.sql', 'lean_manufacturing'],
   ['070_enterprise_governance_uplift.sql', 'master_data_governance'],
+  ['072_canonical_foundation_governance.sql', 'foundation_governance'],
+  ['073_canonical_master_data_core.sql', 'master_data'],
+  ['074_canonical_engineering_definition.sql', 'mfg_engineering'],
+  ['075_canonical_planning_erp_orchestration.sql', 'demand_supply_planning'],
+  ['076_canonical_mes_execution_spine.sql', 'mes_execution'],
+  ['077_canonical_inventory_cost_traceability.sql', 'inventory'],
+  ['078_canonical_eqms_compliance_backbone.sql', 'quality_management'],
+  ['082_allocation_lifecycle.sql', 'record_system'],
+  ['083_procurement_recovery_chain.sql', 'purchasing'],
+  ['084_execution_quality_projection.sql', 'production'],
+  ['085_operational_lifecycle_hardening.sql', 'master_data_governance'],
 ]);
 
 const tableDomainOverrides = {
+  // Canonical 7-layer blueprint tables rely on explicit governance mapping
+  // because many intentionally avoid module-specific prefixes.
+  org_enterprise: 'foundation_governance',
+  org_company: 'foundation_governance',
+  org_site: 'foundation_governance',
+  org_plant: 'foundation_governance',
+  org_warehouse: 'foundation_governance',
+  org_work_center: 'foundation_governance',
+  org_work_unit: 'foundation_governance',
+  party: 'foundation_governance',
+  party_role: 'foundation_governance',
+  party_site: 'foundation_governance',
+  party_contact: 'foundation_governance',
+  uom: 'foundation_governance',
+  calendar: 'foundation_governance',
+  shift: 'foundation_governance',
+  reason_code: 'foundation_governance',
+  status_code: 'foundation_governance',
+  electronic_signature: 'foundation_governance',
+  attachment: 'foundation_governance',
+  approval: 'foundation_governance',
+  lot_policy: 'master_data',
+  serial_policy: 'master_data',
+  shelf_life_policy: 'master_data',
+  item: 'master_data',
+  item_class: 'master_data',
+  item_revision: 'master_data',
+  item_variant: 'master_data',
+  item_site: 'master_data',
+  item_attr: 'master_data',
+  item_spec: 'master_data',
+  bom: 'mfg_engineering',
+  bom_version: 'mfg_engineering',
+  bom_line: 'mfg_engineering',
+  bom_substitute: 'mfg_engineering',
+  work_definition: 'mfg_engineering',
+  work_definition_version: 'mfg_engineering',
+  operation: 'mfg_engineering',
+  operation_resource: 'mfg_engineering',
+  operation_material: 'mfg_engineering',
+  operation_output: 'mfg_engineering',
+  work_instruction: 'mfg_engineering',
+  demand: 'demand_supply_planning',
+  forecast: 'demand_supply_planning',
+  sales_order: 'sales',
+  sales_order_line: 'sales',
+  purchase_order: 'purchasing',
+  purchase_order_line: 'purchasing',
+  production_order: 'production',
+  mrp_signal: 'demand_supply_planning',
+  planned_supply: 'demand_supply_planning',
+  allocation: 'demand_supply_planning',
+  pegging: 'demand_supply_planning',
+  production_order_bom_snapshot: 'production',
+  production_order_route_snapshot: 'production',
+  work_order: 'mes_execution',
+  job: 'mes_execution',
+  track_in: 'mes_execution',
+  track_out: 'mes_execution',
+  pause_resume: 'mes_execution',
+  dispatch_queue: 'mes_execution',
+  job_event: 'mes_execution',
+  machine_event: 'mes_execution',
+  downtime_event: 'mes_execution',
+  alarm_event: 'mes_execution',
+  process_param_capture: 'mes_execution',
+  labor_capture: 'mes_execution',
+  tool_usage: 'mes_execution',
+  material_consumption: 'mes_execution',
+  production_completion: 'mes_execution',
+  scrap: 'mes_execution',
+  rework: 'mes_execution',
+  genealogy_link: 'traceability_serialization',
+  lot: 'traceability_serialization',
+  serial: 'traceability_serialization',
+  container: 'inventory',
+  inventory_ledger: 'inventory',
+  inventory_balance_snapshot: 'inventory',
+  location_balance: 'inventory',
+  cost_ledger: 'finance',
+  wip_ledger: 'finance',
+  inspection_plan: 'quality_management',
+  inspection_characteristic: 'quality_management',
+  inspection_lot: 'quality_management',
+  inspection_result: 'quality_management',
+  quality_order: 'quality_management',
+  quality_case_link: 'quality_management',
+  nonconformance: 'quality_management',
+  deviation: 'quality_management',
+  capa: 'quality_management',
+  complaint: 'quality_management',
+  document: 'document_control',
+  document_revision: 'document_control',
+  change_control: 'plm_change_control',
+  audit_program: 'audit_risk',
+  audit: 'audit_risk',
+  finding: 'audit_risk',
+  competency: 'training_hr',
+  training_matrix: 'training_hr',
+  training_record: 'training_hr',
+  supplier_quality_case: 'supplier_relationship',
+  risk_register: 'audit_risk',
+  audit_trail: 'audit_risk',
+  allocations: 'record_system',
+  allocation_events: 'record_system',
+  form_drafts: 'forms_system',
+  electronic_signatures: 'record_system',
+  master_data_store: 'master_data_governance',
   npi_projects: 'project_management',
   ehs_incidents: 'ehs_sustainability',
   engineering_change_requests: 'plm_change_control',
@@ -704,6 +842,11 @@ const tableDomainOverrides = {
   supplier_scorecards: 'supplier_relationship',
   incoming_inspections: 'quality_management',
   incoming_inspection_results: 'quality_management',
+  ap_invoices: 'finance',
+  ap_invoice_lines: 'finance',
+  ipqc_inspections: 'quality_management',
+  ipqc_inspection_results: 'quality_management',
+  stock_balances: 'inventory',
   skip_lot_tracking: 'supplier_relationship',
   approved_supplier_list: 'supplier_relationship',
   scar_records: 'supplier_relationship',
@@ -870,6 +1013,7 @@ const supportTableNamePatterns = [
 ];
 
 const nonSupportTableNameOverrides = new Set([
+  'job_operations',
   'lean_andon_events',
   'lean_kaizen_events',
   'lean_qrqc_events',
@@ -2131,7 +2275,7 @@ function inferDomain(tableName, migration) {
   if (/^trade_/.test(tableName)) return 'trade_compliance';
   if (/^calibration_/.test(tableName)) return 'calibration_equipment';
   if (/^lean_/.test(tableName)) return 'lean_manufacturing';
-  if (/^org_/.test(tableName)) return 'master_data_governance';
+  if (/^org_/.test(tableName)) return 'foundation_governance';
   if (/^retention_/.test(tableName) || /^source_system_/.test(tableName) || /^data_archival_/.test(tableName)) return 'master_data_governance';
   if (/^integration_/.test(tableName)) return 'system_infrastructure';
   return migrationDomainDefaults.get(migration) ?? null;
@@ -2163,9 +2307,11 @@ function inferWorkflowId(tableName, supportTable) {
     sales_orders: 'wf_sales_order',
     sales_order_lines: 'wf_sales_order',
     job_orders: 'wf_job_order',
-    job_operations: 'wf_job_order',
+    job_operations: 'wf_production_operation',
     purchase_orders: 'wf_purchase_order',
     purchase_order_lines: 'wf_purchase_order',
+    warehouses: 'wf_warehouse',
+    work_orders: 'wf_work_order_execution',
     incoming_inspections: 'wf_receiving_inspection',
     incoming_inspection_results: 'wf_receiving_inspection',
     ncr_records: 'wf_ncr',

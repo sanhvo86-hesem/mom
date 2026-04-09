@@ -2,130 +2,127 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-07T14:51:51.303Z",
+    "generatedAt": "2026-04-09T13:44:54.953Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "0b987d57-e143-47f7-96c8-815033baec67"
+    "publication_run_id": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90"
   },
   "summary": {
-    "endpoint_count": 2865,
-    "pack_count": 3768,
-    "relation_edge_count": 2440,
-    "workflow_count": 425,
-    "status_set_count": 536,
-    "validation_rule_count": 27794,
-    "formula_count": 960,
-    "formula_reference_count": 960,
-    "field_context_count": 39672,
-    "row_version_tables": 628,
-    "org_scoped_tables": 628,
-    "composite_pk_tables": 19,
+    "endpoint_count": 3508,
+    "pack_count": 3912,
+    "relation_edge_count": 2685,
+    "workflow_count": 532,
+    "status_set_count": 659,
+    "validation_rule_count": 41710,
+    "formula_count": 1134,
+    "formula_reference_count": 1134,
+    "field_context_count": 44768,
+    "row_version_tables": 439,
+    "org_scoped_tables": 416,
+    "composite_pk_tables": 20,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
     "optimistic_concurrency_issues": 0,
+    "idempotency_contract_issues": 0,
     "org_scope_contract_issues": 0,
-    "contract_issues": 24,
+    "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 115,
-    "workflow_engine_bridge_ready": 116,
+    "transition_runtime_warnings": 123,
+    "workflow_engine_bridge_ready": 124,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 474,
+    "archive_only_tables": 540,
     "soft_delete_tables": 0,
-    "hard_delete_tables": 154,
+    "hard_delete_tables": 112,
     "workflow_lifecycle_modes": {
-      "stateless": 367,
-      "generic_status_only": 146,
-      "persisted": 115,
+      "stateless": 380,
+      "generic_status_only": 121,
+      "guarded_transition_runtime": 28,
+      "persisted": 123,
       "unknown": 0
     },
-    "frontend_foundation_entities": 633,
-    "frontend_ready_entities": 533,
-    "frontend_partial_entities": 3,
-    "frontend_blocked_entities": 97,
-    "attachment_contract_entities": 628,
-    "comment_contract_entities": 628,
-    "activity_contract_entities": 628,
-    "publishability_ready": false,
-    "publishability_review_required_entities": 100
+    "frontend_foundation_entities": 652,
+    "frontend_ready_entities": 646,
+    "frontend_partial_entities": 6,
+    "frontend_blocked_entities": 0,
+    "frontend_publishable_entities": 652,
+    "frontend_unpublishable_entities": 0,
+    "attachment_contract_entities": 645,
+    "comment_contract_entities": 645,
+    "activity_contract_entities": 420,
+    "publishability_ready": true,
+    "publishability_review_required_entities": 0
   },
   "publishability": {
-    "ready": false,
-    "status": "review_required",
-    "review_required": true,
-    "failed_checks": [
-      {
-        "id": "frontend_entities_publishable",
-        "passed": false,
-        "actual": 100,
-        "target": 0
-      },
-      {
-        "id": "record_endpoint_contracts_clean",
-        "passed": false,
-        "actual": 24,
-        "target": 0
-      }
-    ],
+    "ready": true,
+    "status": "ready",
+    "review_required": false,
+    "failed_checks": [],
     "blocking_counts": {
-      "frontend_partial_entities": 3,
-      "frontend_blocked_entities": 97,
+      "frontend_partial_entities": 6,
+      "frontend_blocked_entities": 0,
+      "frontend_unpublishable_entities": 0,
       "workflow_engine_bridge_blocked": 0,
       "unsupported_record_endpoints": 0,
-      "contract_issues": 24
+      "contract_issues": 0
     },
     "recommended_next_actions": [
-      "Promote partial frontend foundation entities into publishable contracts.",
-      "Bridge persisted workflows into the workflow engine before exposing transition UX.",
-      "Resolve remaining record endpoint/runtime contract gaps before publishing modules."
+      "Raise partial console experiences into production-grade operator/planning workflows.",
+      "Close metadata-only and field-pack gaps so partial entities can move into the ready tier."
     ]
   },
   "checks": [
     {
       "id": "tables_have_fields",
-      "passed": false,
-      "actual": 528,
-      "target": 628
+      "passed": true,
+      "actual": 652,
+      "target": 652
     },
     {
       "id": "tables_have_endpoint_catalog",
-      "passed": false,
-      "actual": 528,
-      "target": 628
+      "passed": true,
+      "actual": 652,
+      "target": 652
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 628,
-      "target": 628
+      "actual": 652,
+      "target": 652
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 2440,
-      "target": 2440
+      "actual": 2685,
+      "target": 2685
     },
     {
       "id": "workflow_coverage",
-      "passed": false,
-      "actual": 528,
-      "target": 628
+      "passed": true,
+      "actual": 652,
+      "target": 652
     },
     {
       "id": "status_coverage",
-      "passed": false,
-      "actual": 222,
-      "target": 246
+      "passed": true,
+      "actual": 248,
+      "target": 248
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 609,
-      "target": 596
+      "actual": 632,
+      "target": 620
     },
     {
       "id": "optimistic_concurrency_contracts",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "idempotency_contracts",
       "passed": true,
       "actual": 0,
       "target": 0
@@ -145,8 +142,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 628,
-      "target": 628
+      "actual": 652,
+      "target": 652
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -156,8 +153,8 @@
     },
     {
       "id": "endpoint_contract_readiness",
-      "passed": false,
-      "actual": 24,
+      "passed": true,
+      "actual": 0,
       "target": 0
     },
     {
@@ -169,44 +166,56 @@
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 425,
+      "actual": 532,
       "target": 60
     },
     {
       "id": "domain_workflow_target",
       "passed": true,
-      "actual": 48,
-      "target": 48
+      "actual": 49,
+      "target": 49
     },
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 536,
+      "actual": 659,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 27794,
+      "actual": 41710,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 960,
+      "actual": 1134,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 960,
-      "target": 960
+      "actual": 1134,
+      "target": 1134
     }
   ],
   "warnings": {
     "row_version_tables": [
       {
         "table": "ap_ar_invoices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ap_invoice_lines",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ap_invoices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "approval",
         "concurrency_field": "row_version"
       },
       {
@@ -230,23 +239,11 @@
         "concurrency_field": "row_version"
       },
       {
-        "table": "aps_demand_forecast_lines",
-        "concurrency_field": "row_version"
-      },
-      {
         "table": "aps_demand_forecasts",
         "concurrency_field": "row_version"
       },
       {
-        "table": "aps_kpi_snapshots",
-        "concurrency_field": "row_version"
-      },
-      {
         "table": "aps_material_availability",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "aps_pegging_links",
         "concurrency_field": "row_version"
       },
       {
@@ -270,11 +267,11 @@
         "concurrency_field": "row_version"
       },
       {
-        "table": "audit_actions",
+        "table": "attachment",
         "concurrency_field": "row_version"
       },
       {
-        "table": "audit_events",
+        "table": "audit_actions",
         "concurrency_field": "row_version"
       },
       {
@@ -294,6 +291,10 @@
         "concurrency_field": "row_version"
       },
       {
+        "table": "calendar",
+        "concurrency_field": "row_version"
+      },
+      {
         "table": "calibration_grr_studies",
         "concurrency_field": "row_version"
       },
@@ -306,19 +307,11 @@
         "concurrency_field": "row_version"
       },
       {
-        "table": "capa_8d_steps",
-        "concurrency_field": "row_version"
-      },
-      {
         "table": "capa_effectiveness_checks",
         "concurrency_field": "row_version"
       },
       {
         "table": "capa_records",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "capacity_snapshots",
         "concurrency_field": "row_version"
       },
       {
@@ -330,19 +323,11 @@
         "concurrency_field": "row_version"
       },
       {
-        "table": "cnc_program_versions",
-        "concurrency_field": "row_version"
-      },
-      {
         "table": "cnc_programs",
         "concurrency_field": "row_version"
       },
       {
         "table": "com_contract_amendments",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "com_contract_lines",
         "concurrency_field": "row_version"
       },
       {
@@ -367,10 +352,6 @@
       },
       {
         "table": "com_payment_terms_profiles",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "com_price_list_lines",
         "concurrency_field": "row_version"
       },
       {
@@ -403,10 +384,6 @@
       },
       {
         "table": "contamination_checks",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "contract_review_items",
         "concurrency_field": "row_version"
       },
       {
@@ -443,6 +420,26 @@
       },
       {
         "table": "crm_customer_touchpoints",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_forecasts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_leads",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_opportunities",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "crm_quotes_pipeline",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "customer_complaints",
         "concurrency_field": "row_version"
       }
     ],
@@ -457,6 +454,15 @@
         ]
       },
       {
+        "table": "ap_invoices",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
         "table": "approved_supplier_list",
         "scope_fields": [
           "org_company_code",
@@ -502,15 +508,6 @@
         ]
       },
       {
-        "table": "aps_demand_forecast_lines",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
         "table": "aps_demand_forecasts",
         "scope_fields": [
           "org_company_code",
@@ -520,25 +517,7 @@
         ]
       },
       {
-        "table": "aps_kpi_snapshots",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
         "table": "aps_material_availability",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "aps_pegging_links",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -593,15 +572,6 @@
       },
       {
         "table": "audit_actions",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "audit_events",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -673,15 +643,6 @@
         ]
       },
       {
-        "table": "capa_8d_steps",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
         "table": "capa_effectiveness_checks",
         "scope_fields": [
           "org_company_code",
@@ -692,15 +653,6 @@
       },
       {
         "table": "capa_records",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "capacity_snapshots",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -727,15 +679,6 @@
         ]
       },
       {
-        "table": "cnc_program_versions",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
         "table": "cnc_programs",
         "scope_fields": [
           "org_company_code",
@@ -746,15 +689,6 @@
       },
       {
         "table": "com_contract_amendments",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "com_contract_lines",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -809,15 +743,6 @@
       },
       {
         "table": "com_payment_terms_profiles",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "com_price_list_lines",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -890,15 +815,6 @@
       },
       {
         "table": "contamination_checks",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "contract_review_items",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -980,6 +896,87 @@
       },
       {
         "table": "crm_customer_touchpoints",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_forecasts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_leads",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_opportunities",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "crm_quotes_pipeline",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "customer_complaints",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "customer_sites",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "customers",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "demand_classifications",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "demand_history_buckets",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -1128,6 +1125,14 @@
         ]
       },
       {
+        "table": "risk_register",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "risk_id",
+          "risk_register_id"
+        ]
+      },
+      {
         "table": "routings",
         "primary_key_mode": "composite",
         "primary_key_fields": [
@@ -1147,35 +1152,25 @@
     "missing_primary_key_tables": [],
     "unsupported_record_endpoints": [],
     "optimistic_concurrency_issues": [],
+    "idempotency_contract_issues": [],
     "org_scope_contract_issues": [],
-    "contract_issues": [
-      "foundation_governance.org_enterprise.transition:missing_targets",
-      "foundation_governance.org_company.transition:missing_targets",
-      "foundation_governance.org_site.transition:missing_targets",
-      "foundation_governance.org_plant.transition:missing_targets",
-      "foundation_governance.org_warehouse.transition:missing_targets",
-      "foundation_governance.org_work_center.transition:missing_targets",
-      "foundation_governance.org_work_unit.transition:missing_targets",
-      "foundation_governance.party.transition:missing_targets",
-      "foundation_governance.party_role.transition:missing_targets",
-      "foundation_governance.party_site.transition:missing_targets",
-      "foundation_governance.party_contact.transition:missing_targets",
-      "foundation_governance.uom.transition:missing_targets",
-      "foundation_governance.calendar.transition:missing_targets",
-      "foundation_governance.shift.transition:missing_targets",
-      "foundation_governance.status_code.transition:missing_targets",
-      "foundation_governance.approval.transition:missing_targets",
-      "master_data.item_revision.transition:missing_targets",
-      "mfg_engineering.bom.transition:missing_targets",
-      "sales.sales_order.transition:missing_targets",
-      "purchasing.purchase_order.transition:missing_targets",
-      "document_control.document.transition:missing_targets",
-      "audit_risk.audit.transition:missing_targets",
-      "training_hr.training_record.transition:missing_targets",
-      "supplier_relationship.supplier_quality_case.transition:missing_targets"
-    ],
+    "contract_issues": [],
     "workflow_alignment_issues": [],
     "transition_runtime_warnings": [
+      {
+        "table": "allocation",
+        "workflowId": "wf_allocation",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "allocations",
+        "workflowId": "wf_allocation",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
       {
         "table": "apqp_gate_reviews",
         "workflowId": "wf_apqp_project",
@@ -1214,6 +1209,13 @@
       {
         "table": "calibration_oot_investigations",
         "workflowId": "wf_calibration_control",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "capa",
+        "workflowId": "wf_capa",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1289,6 +1291,13 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "deviation",
+        "workflowId": "wf_deviation",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "deviations",
         "workflowId": "wf_deviation",
         "lifecycle_mode": "persisted",
@@ -1324,13 +1333,6 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
-        "table": "ehs_incidents",
-        "workflowId": "wf_ehs_incident",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
         "table": "ehs_permit_register",
         "workflowId": "wf_ehs_permit_register",
         "lifecycle_mode": "persisted",
@@ -1340,13 +1342,6 @@
       {
         "table": "ehs_regulatory_submissions",
         "workflowId": "wf_ehs_regulatory_submission",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "ehs_sustainability_projects",
-        "workflowId": "wf_ehs_incident",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1441,27 +1436,43 @@
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "hcm_org_units",
-        "workflowId": "wf_hcm_org_unit",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "hcm_payroll_periods",
-        "workflowId": "wf_hcm_payroll_period",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       }
     ],
     "workflow_engine_bridge": [],
     "delete_governance": [
       {
+        "table": "alarm_event",
+        "domain": "mes_execution",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "allocation",
+        "domain": "demand_supply_planning",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "allocations",
+        "domain": "record_system",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
         "table": "ap_ar_invoices",
         "domain": "finance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "ap_invoices",
+        "domain": "finance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "approval",
+        "domain": "foundation_governance",
         "mode": "archive_only",
         "governance_level": "governed"
       },
@@ -1538,6 +1549,18 @@
         "governance_level": "governed"
       },
       {
+        "table": "attachment",
+        "domain": "foundation_governance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "audit",
+        "domain": "audit_risk",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
         "table": "audit_actions",
         "domain": "audit_risk",
         "mode": "archive_only",
@@ -1545,6 +1568,18 @@
       },
       {
         "table": "audit_findings",
+        "domain": "audit_risk",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "audit_program",
+        "domain": "audit_risk",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "audit_trail",
         "domain": "audit_risk",
         "mode": "archive_only",
         "governance_level": "governed"
@@ -1562,8 +1597,32 @@
         "governance_level": "governed"
       },
       {
+        "table": "bom",
+        "domain": "mfg_engineering",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
         "table": "bom_components",
         "domain": "master_data",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "bom_substitute",
+        "domain": "mfg_engineering",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "bom_version",
+        "domain": "mfg_engineering",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "calendar",
+        "domain": "foundation_governance",
         "mode": "archive_only",
         "governance_level": "governed"
       },
@@ -1586,6 +1645,12 @@
         "governance_level": "governed"
       },
       {
+        "table": "capa",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
         "table": "capa_effectiveness_checks",
         "domain": "quality_management",
         "mode": "archive_only",
@@ -1600,6 +1665,12 @@
       {
         "table": "certificates",
         "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "change_control",
+        "domain": "plm_change_control",
         "mode": "archive_only",
         "governance_level": "governed"
       },
@@ -1688,6 +1759,18 @@
         "governance_level": "governed"
       },
       {
+        "table": "competency",
+        "domain": "training_hr",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "complaint",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
         "table": "compliance_records",
         "domain": "shipping_compliance",
         "mode": "archive_only",
@@ -1696,6 +1779,12 @@
       {
         "table": "concessions",
         "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "container",
+        "domain": "inventory",
         "mode": "archive_only",
         "governance_level": "governed"
       },
@@ -1710,919 +1799,9 @@
         "domain": "fmea_apqp",
         "mode": "archive_only",
         "governance_level": "governed"
-      },
-      {
-        "table": "control_plans",
-        "domain": "fmea_apqp",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "copq_ledger",
-        "domain": "quality_management",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "cost_elements",
-        "domain": "finance",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_accounts",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_activities",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_campaigns",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_contacts",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_customer_touchpoints",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_forecasts",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_leads",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_opportunities",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "crm_quotes_pipeline",
-        "domain": "crm",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "customer_complaints",
-        "domain": "quality_management",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "customer_sites",
-        "domain": "sales",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "customers",
-        "domain": "sales",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "data_archival_runs",
-        "domain": "master_data_governance",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "demand_classifications",
-        "domain": "demand_supply_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "demand_history_buckets",
-        "domain": "demand_supply_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
       }
     ],
-    "frontend_foundation": [
-      {
-        "entity_key": "foundation_governance.org_enterprise",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.org_company",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.org_site",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.org_plant",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.org_warehouse",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.org_work_center",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.org_work_unit",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.party",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.party_role",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.party_site",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.party_contact",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.uom",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.calendar",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.shift",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.reason_code",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "foundation_governance.status_code",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.electronic_signature",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "foundation_governance.approval",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "foundation_governance.attachment",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.lot_policy",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.serial_policy",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.shelf_life_policy",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.item",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.item_class",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.item_revision",
-        "profile": "document_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 52
-      },
-      {
-        "entity_key": "master_data.item_variant",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.item_site",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.item_attr",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "master_data.item_spec",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.bom",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "mfg_engineering.bom_version",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.bom_line",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.bom_substitute",
-        "profile": "master_data",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.work_definition",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.work_definition_version",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.operation",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.operation_resource",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.operation_material",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.operation_output",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mfg_engineering.work_instruction",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "demand_supply_planning.demand",
-        "profile": "planning_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_planning_time_axis",
-          "missing_planning_status_dimension"
-        ],
-        "score": 43
-      },
-      {
-        "entity_key": "demand_supply_planning.forecast",
-        "profile": "planning_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_planning_status_dimension"
-        ],
-        "score": 43
-      },
-      {
-        "entity_key": "sales.sales_order",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 49
-      },
-      {
-        "entity_key": "sales.sales_order_line",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "purchasing.purchase_order_line",
-        "profile": "transactional_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 50
-      },
-      {
-        "entity_key": "demand_supply_planning.mrp_signal",
-        "profile": "planning_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_planning_status_dimension"
-        ],
-        "score": 43
-      },
-      {
-        "entity_key": "demand_supply_planning.planned_supply",
-        "profile": "planning_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_planning_time_axis",
-          "missing_planning_status_dimension"
-        ],
-        "score": 43
-      },
-      {
-        "entity_key": "demand_supply_planning.allocation",
-        "profile": "planning_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_planning_time_axis",
-          "missing_planning_status_dimension"
-        ],
-        "score": 43
-      },
-      {
-        "entity_key": "demand_supply_planning.pegging",
-        "profile": "planning_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_planning_time_axis",
-          "missing_planning_status_dimension"
-        ],
-        "score": 43
-      },
-      {
-        "entity_key": "production.production_order",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "production.production_order_bom_snapshot",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "production.production_order_route_snapshot",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      },
-      {
-        "entity_key": "mes_execution.work_order",
-        "profile": "operator_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 52
-      },
-      {
-        "entity_key": "mes_execution.job",
-        "profile": "operator_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_operation_context"
-        ],
-        "score": 46
-      },
-      {
-        "entity_key": "mes_execution.track_in",
-        "profile": "operator_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_operation_context",
-          "missing_execution_status"
-        ],
-        "score": 46
-      },
-      {
-        "entity_key": "mes_execution.track_out",
-        "profile": "operator_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_operation_context",
-          "missing_execution_status"
-        ],
-        "score": 46
-      },
-      {
-        "entity_key": "mes_execution.pause_resume",
-        "profile": "operator_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_operation_context",
-          "missing_execution_status"
-        ],
-        "score": 46
-      },
-      {
-        "entity_key": "mes_execution.dispatch_queue",
-        "profile": "operator_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_operation_context",
-          "missing_execution_status"
-        ],
-        "score": 46
-      },
-      {
-        "entity_key": "mes_execution.job_event",
-        "profile": "operator_console",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields",
-          "missing_operation_context",
-          "missing_execution_status"
-        ],
-        "score": 46
-      },
-      {
-        "entity_key": "mes_execution.machine_event",
-        "profile": "business_record",
-        "blockers": [
-          "missing_list_endpoint",
-          "insufficient_list_fields",
-          "missing_detail_endpoint",
-          "missing_detail_sections",
-          "missing_form_mutation_endpoints",
-          "missing_editable_fields"
-        ],
-        "score": 44
-      }
-    ]
+    "frontend_foundation": []
   },
-  "all_passed": false
+  "all_passed": true
 }

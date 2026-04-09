@@ -380,6 +380,200 @@ class AdminController extends BaseController
         $this->success(['config' => portal_display_config_public_payload($saved)]);
     }
 
+    /**
+     * GET getModuleAccessConfig — Get portal module access configuration.
+     *
+     * Action: `module_access_get`
+     *
+     * @return never
+     */
+    public function getModuleAccessConfig(): never
+    {
+        $this->requireAuth();
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $config = module_access_load_config($configFile);
+
+        $this->success(['config' => module_access_public_payload($config)]);
+    }
+
+    /**
+     * POST saveModuleAccessConfig — Save portal module access configuration.
+     *
+     * Action: `admin_module_access_save`
+     *
+     * @return never
+     */
+    public function saveModuleAccessConfig(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $data = $this->jsonBody();
+        $configIn = $data['config'] ?? null;
+        if (!is_array($configIn)) {
+            $this->error('invalid_config', 400);
+        }
+
+        $configFile = $this->confDir . '/module_access_config.json';
+        $saved = module_access_save_config($configFile, $configIn);
+
+        $this->auditLog('admin_module_access_save');
+        $this->success(['config' => module_access_public_payload($saved)]);
+    }
+
+    /**
+     * GET getAuditTrail — Read authoritative administrative audit trail.
+     *
+     * Action: `admin_audit_trail_list`
+     *
+     * @return never
+     */
+    public function getAuditTrail(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
+        $limit = max(1, min(500, (int)($this->query('limit', '200') ?? '200')));
+        $filters = ['limit' => $limit];
+        foreach (['event_type', 'aggregate_type', 'aggregate_id', 'from', 'to'] as $key) {
+            $value = trim((string)($this->query($key, '') ?? ''));
+            if ($value !== '') {
+                $filters[$key] = $value;
+            }
+        }
+
+        try {
+            $events = $this->data->getAuditLog($filters);
+            $sanitized = array_values(array_map(static function ($row): array {
+                $entry = is_array($row) ? $row : [];
+                return [
+                    'event_type' => (string)($entry['event_type'] ?? $entry['action'] ?? ''),
+                    'aggregate_type' => (string)($entry['aggregate_type'] ?? 'api_action'),
+                    'aggregate_id' => (string)($entry['aggregate_id'] ?? ''),
+                    'actor_name' => (string)($entry['actor_name'] ?? $entry['user'] ?? ''),
+                    'payload' => is_array($entry['payload'] ?? null) ? (array)$entry['payload'] : [],
+                    'metadata' => is_array($entry['metadata'] ?? null) ? (array)$entry['metadata'] : [],
+                    'ip_address' => (string)($entry['ip_address'] ?? $entry['ip'] ?? ''),
+                    'recorded_at' => (string)($entry['recorded_at'] ?? $entry['timestamp'] ?? ''),
+                ];
+            }, is_array($events) ? $events : []));
+
+            $this->success(['events' => $sanitized, 'limit' => $limit]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('audit_trail_read_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET getUserDocumentOverrides — Read per-user document access overrides.
+     *
+     * Action: `user_doc_overrides_get`
+     *
+     * Admin users receive the full map. Non-admin users only receive their own
+     * override slice so document access can be enforced consistently in the UI.
+     *
+     * @return never
+     */
+    public function getUserDocumentOverrides(): never
+    {
+        $user = $this->requireAuth();
+
+        try {
+            $config = $this->data->getConfig('user_doc_overrides');
+            $rawOverrides = is_array($config['overrides'] ?? null)
+                ? (array)$config['overrides']
+                : (is_array($config) ? $config : []);
+            $clean = $this->normalizeUserDocumentOverrides($rawOverrides);
+
+            if (!$this->userHasAnyRole($user, admin_roles())) {
+                $username = strtolower(trim((string)($user['username'] ?? '')));
+                $clean = ($username !== '' && isset($clean[$username]))
+                    ? [$username => $clean[$username]]
+                    : [];
+            }
+
+            $this->success(['overrides' => $clean]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('user_doc_overrides_read_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST saveUserDocumentOverrides — Persist per-user document access overrides.
+     *
+     * Action: `admin_user_doc_overrides_save`
+     *
+     * @return never
+     */
+    public function saveUserDocumentOverrides(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($user);
+
+        $data = $this->jsonBody();
+        $input = $data['overrides'] ?? null;
+        if (!is_array($input)) {
+            $this->error('invalid_overrides', 400);
+        }
+
+        $clean = $this->normalizeUserDocumentOverrides($input);
+        $payload = [
+            'overrides' => $clean,
+            'updated_by' => (string)($user['username'] ?? ''),
+            'updated_at' => $this->nowIso(),
+        ];
+
+        try {
+            $this->data->saveConfig('user_doc_overrides', $payload);
+            $this->auditLog('admin_user_doc_overrides_save', ['count' => count($clean)]);
+            $this->success(['overrides' => $clean]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('user_doc_overrides_save_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, array{grant: array<int, string>, deny: array<int, string>}>
+     */
+    private function normalizeUserDocumentOverrides(array $input): array
+    {
+        $clean = [];
+        foreach ($input as $username => $override) {
+            $key = strtolower(trim((string)$username));
+            if ($key === '' || !is_array($override)) {
+                continue;
+            }
+
+            $grant = array_values(array_unique(array_filter(array_map(
+                static fn($value): string => strtoupper(trim((string)$value)),
+                is_array($override['grant'] ?? null) ? (array)$override['grant'] : []
+            ))));
+            $deny = array_values(array_unique(array_filter(array_map(
+                static fn($value): string => strtoupper(trim((string)$value)),
+                is_array($override['deny'] ?? null) ? (array)$override['deny'] : []
+            ))));
+
+            if ($grant === [] && $deny === []) {
+                continue;
+            }
+
+            $clean[$key] = [
+                'grant' => $grant,
+                'deny' => $deny,
+            ];
+        }
+
+        ksort($clean);
+        return $clean;
+    }
+
     // â”€â”€ MFA Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**

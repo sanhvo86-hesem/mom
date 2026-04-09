@@ -38,7 +38,7 @@ function _statusClass(status){
   var key = String(status || '').toLowerCase();
   if(key === 'ok' || key === 'active' || key === 'online' || key === 'green') return 'good';
   if(key === 'warning' || key === 'warn' || key === 'degraded' || key === 'amber') return 'warn';
-  if(key === 'error' || key === 'critical' || key === 'offline' || key === 'inactive' || key === 'red') return 'bad';
+  if(key === 'error' || key === 'critical' || key === 'offline' || key === 'inactive' || key === 'red' || key === 'unavailable') return 'bad';
   return 'neutral';
 }
 function _fmtTime(value){
@@ -48,6 +48,44 @@ function _fmtTime(value){
   }catch(_err){
     return String(value);
   }
+}
+function _fmtInt(value){
+  var num = Number(value || 0);
+  if(!isFinite(num)) return '0';
+  return num.toLocaleString(lang === 'en' ? 'en-US' : 'vi-VN');
+}
+function _fmtMs(value){
+  if(value == null || value === '') return '—';
+  var num = Number(value);
+  if(!isFinite(num)) return '—';
+  return Math.round(num) + ' ms';
+}
+function _fmtSizeFromKb(value){
+  var num = Number(value || 0);
+  if(!isFinite(num) || num <= 0) return '—';
+  var bytes = num * 1024;
+  var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  var unit = 0;
+  while(bytes >= 1024 && unit < units.length - 1){
+    bytes /= 1024;
+    unit += 1;
+  }
+  return (bytes >= 10 || unit === 0 ? Math.round(bytes) : bytes.toFixed(1)) + ' ' + units[unit];
+}
+function _fmtSizeFromMb(value){
+  var num = Number(value || 0);
+  if(!isFinite(num) || num <= 0) return '—';
+  if(num >= 1024){
+    var gb = num / 1024;
+    return (gb >= 10 ? Math.round(gb) : gb.toFixed(1)) + ' GB';
+  }
+  return Math.round(num) + ' MB';
+}
+function _progressWidth(text){
+  var raw = parseFloat(String(text || '').replace('%', '').trim());
+  if(!isFinite(raw) || raw < 0) return '0%';
+  if(raw > 100) raw = 100;
+  return raw + '%';
 }
 function _webHref(value){
   var url = String(value || '').trim();
@@ -63,6 +101,17 @@ function _assetHref(value, download){
   var path = String(value || '').trim();
   if(!path) return '';
   return 'api.php?action=vps_control_asset&path=' + encodeURIComponent(path) + (download ? '&download=1' : '');
+}
+function _countStatus(items, target){
+  return (Array.isArray(items) ? items : []).filter(function(item){
+    return String(item && item.status || '') === target;
+  }).length;
+}
+function _hostModeLabel(mode){
+  var key = String(mode || '').toLowerCase();
+  if(key === 'local' || key === 'localhost') return _t('local runner', 'local runner');
+  if(key === 'ssh') return 'SSH';
+  return key || _t('inventory', 'inventory');
 }
 
 var state = {
@@ -92,22 +141,6 @@ function _syncTerminalSelection(host){
   }
 }
 
-function _setTerminal(terminalId){
-  if(!terminalId || terminalId === state.selectedTerminalId) return;
-  state.selectedTerminalId = terminalId;
-  _paint();
-}
-
-function _selectedTerminal(host){
-  var terminals = Array.isArray(host && host.terminals) ? host.terminals : [];
-  for(var i=0;i<terminals.length;i+=1){
-    if(String(terminals[i] && terminals[i].id || '') === String(state.selectedTerminalId || '')){
-      return terminals[i];
-    }
-  }
-  return terminals[0] || null;
-}
-
 function _syncObservabilitySelection(host){
   var panels = Array.isArray(host && host.observability) ? host.observability : [];
   if(!panels.length){
@@ -122,20 +155,24 @@ function _syncObservabilitySelection(host){
   }
 }
 
-function _setObservability(panelId){
-  if(!panelId || panelId === state.selectedObservabilityId) return;
-  state.selectedObservabilityId = panelId;
-  _paint();
+function _selectedTerminal(host){
+  var items = Array.isArray(host && host.terminals) ? host.terminals : [];
+  for(var i = 0; i < items.length; i += 1){
+    if(String(items[i] && items[i].id || '') === String(state.selectedTerminalId || '')){
+      return items[i];
+    }
+  }
+  return items[0] || null;
 }
 
 function _selectedObservability(host){
-  var panels = Array.isArray(host && host.observability) ? host.observability : [];
-  for(var i=0;i<panels.length;i+=1){
-    if(String(panels[i] && panels[i].id || '') === String(state.selectedObservabilityId || '')){
-      return panels[i];
+  var items = Array.isArray(host && host.observability) ? host.observability : [];
+  for(var i = 0; i < items.length; i += 1){
+    if(String(items[i] && items[i].id || '') === String(state.selectedObservabilityId || '')){
+      return items[i];
     }
   }
-  return panels[0] || null;
+  return items[0] || null;
 }
 
 function _render(container){
@@ -155,14 +192,18 @@ async function _loadOverview(){
     if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'overview_failed');
     state.overview = res.overview || {};
     var hosts = Array.isArray(state.overview.hosts) ? state.overview.hosts : [];
-    if(!state.selectedHostId && hosts.length) state.selectedHostId = String(hosts[0].id || '');
+    if(!hosts.some(function(host){ return String(host && host.id || '') === String(state.selectedHostId || ''); })){
+      state.selectedHostId = hosts.length ? String(hosts[0].id || '') : '';
+    }
     if(state.selectedHostId){
       await _loadHost(false);
       return;
     }
+    state.host = null;
   }catch(err){
     state.overview = {error: (err && err.message) || 'overview_failed'};
-    _toast(_t('Không thể tải VPS Control Tower.', 'Could not load the VPS Control Tower.'), 'error');
+    state.host = null;
+    _toast(_t('Không thể tải trạng thái VPS live.', 'Could not load the live VPS state.'), 'error');
   }finally{
     state.loading = false;
     _paint();
@@ -196,6 +237,13 @@ async function _loadHost(showSpinner){
   }
 }
 
+async function _refresh(){
+  if(state.loading) return;
+  state.actionResult = null;
+  await _loadOverview();
+  _toast(_t('Đã làm mới trạng thái live.', 'Live state refreshed.'), 'success');
+}
+
 async function _runAction(actionId){
   if(!state.selectedHostId || !actionId || state.actionBusy) return;
   state.actionBusy = actionId;
@@ -207,6 +255,8 @@ async function _runAction(actionId){
     state.actionResult = res.result || null;
     if(state.actionResult && state.actionResult.host_after){
       state.host = state.actionResult.host_after;
+      _syncTerminalSelection(state.host);
+      _syncObservabilitySelection(state.host);
     }else{
       await _loadHost(false);
       return;
@@ -242,78 +292,105 @@ function _setHost(hostId){
   _loadHost(true);
 }
 
+function _setTerminal(terminalId){
+  if(!terminalId || terminalId === state.selectedTerminalId) return;
+  state.selectedTerminalId = terminalId;
+  _paint();
+}
+
+function _setObservability(panelId){
+  if(!panelId || panelId === state.selectedObservabilityId) return;
+  state.selectedObservabilityId = panelId;
+  _paint();
+}
+
 function _summaryCards(metrics){
   metrics = metrics || {};
   var items = [
     {
-      title: _t('Host reachability', 'Host reachability'),
-      value: (metrics.reachable_hosts || 0) + '/' + (metrics.host_count || 0),
-      detail: _t('Host probe đang mở được qua local runner hoặc SSH.', 'Hosts that currently answer the local runner or SSH probe.')
+      title: _t('Host online', 'Hosts online'),
+      value: _fmtInt(metrics.reachable_hosts || 0) + '/' + _fmtInt(metrics.host_count || 0),
+      tone: (metrics.reachable_hosts || 0) === (metrics.host_count || 0) ? 'good' : 'warn',
+      detail: _t('Probe host thật sự đang trả dữ liệu.', 'Hosts whose probe currently returns live data.')
     },
     {
-      title: _t('Critical services', 'Critical services'),
-      value: (metrics.active_services || 0) + '/' + (metrics.declared_services || 0),
-      detail: _t('Nginx, PHP-FPM, PostgreSQL, Redis, Docker, OTel.', 'Nginx, PHP-FPM, PostgreSQL, Redis, Docker, OTel.')
+      title: _t('Service khỏe', 'Healthy services'),
+      value: _fmtInt(metrics.active_services || 0) + '/' + _fmtInt(metrics.declared_services || 0),
+      tone: (metrics.active_services || 0) === (metrics.declared_services || 0) ? 'good' : 'warn',
+      detail: _t('Systemd service khai báo và đang active.', 'Declared systemd services that are currently active.')
     },
     {
-      title: _t('Running containers', 'Running containers'),
-      value: String(metrics.running_containers || 0),
-      detail: _t('Container đang chạy trên inventory đã khai báo.', 'Containers running across the declared inventory.')
+      title: _t('Site sống', 'Healthy sites'),
+      value: _fmtInt(metrics.healthy_sites || 0) + '/' + _fmtInt(metrics.sites_count || 0),
+      tone: (metrics.healthy_sites || 0) === (metrics.sites_count || 0) ? 'good' : 'warn',
+      detail: _t('HTTP probe của domain/site trong inventory.', 'HTTP probe status for sites in the inventory.')
     },
     {
-      title: _t('DNS records in scope', 'DNS records in scope'),
-      value: String(metrics.dns_records || 0),
-      detail: _t('Record mà dashboard này phải điều phối và theo dõi.', 'Records this dashboard needs to govern and track.')
+      title: 'DNS',
+      value: _fmtInt(metrics.healthy_dns_records || 0) + '/' + _fmtInt(metrics.dns_records || 0),
+      tone: (metrics.healthy_dns_records || 0) === (metrics.dns_records || 0) ? 'good' : 'warn',
+      detail: _t('Record phân giải đúng với inventory hiện tại.', 'Records whose resolution currently matches the inventory.')
     },
     {
-      title: _t('Terminal ready hosts', 'Terminal ready hosts'),
-      value: String(metrics.terminal_ready_hosts || 0),
-      detail: _t('Host đã gắn URL terminal riêng thay vì chỉ chạy action whitelisted.', 'Hosts that already expose a dedicated terminal URL instead of read-only actions only.')
+      title: _t('Terminal', 'Terminal'),
+      value: _fmtInt(metrics.healthy_terminals || 0) + '/' + _fmtInt(metrics.terminals_count || 0),
+      tone: (metrics.healthy_terminals || 0) === (metrics.terminals_count || 0) ? 'good' : 'warn',
+      detail: _t('Gateway terminal nội bộ đang reachable đúng mã phản hồi mong đợi.', 'Terminal gateways responding with the expected internal status codes.')
     },
     {
-      title: _t('Observability ready hosts', 'Observability ready hosts'),
-      value: String(metrics.observability_ready_hosts || 0),
-      detail: _t('Host đã gắn Netdata hoặc Grafana trực tiếp vào control plane.', 'Hosts that already expose Netdata or Grafana directly inside the control plane.')
+      title: _t('Observability', 'Observability'),
+      value: _fmtInt(metrics.healthy_observability_panels || 0) + '/' + _fmtInt(metrics.observability_panels || 0),
+      tone: (metrics.healthy_observability_panels || 0) === (metrics.observability_panels || 0) ? 'good' : 'warn',
+      detail: _t('Netdata/Grafana panel đang probe được thật.', 'Netdata and Grafana panels whose probes currently succeed.')
+    },
+    {
+      title: _t('Cảnh báo', 'Alerts'),
+      value: _fmtInt(metrics.alert_count || 0),
+      tone: (metrics.alert_count || 0) > 0 ? 'bad' : 'good',
+      detail: _t('Điểm lệch giữa inventory và trạng thái live.', 'Current mismatches between inventory and live state.')
     }
   ];
   return '<div class="vps-summary-grid">' + items.map(function(item){
-    return '<div class="vps-summary-card"><small>' + _esc(item.title) + '</small><strong>' + _esc(item.value) + '</strong><span>' + _esc(item.detail) + '</span></div>';
+    return '<article class="vps-summary-card tone-' + _esc(item.tone) + '">' +
+      '<small>' + _esc(item.title) + '</small>' +
+      '<strong>' + _esc(item.value) + '</strong>' +
+      '<span>' + _esc(item.detail) + '</span>' +
+    '</article>';
   }).join('') + '</div>';
 }
 
-function _hero(overview){
+function _header(overview, host){
   overview = overview || {};
-  var dns = overview.dns_strategy || {};
-  var command = overview.quick_command || 'ssh root@103.110.87.55';
-  var architectureHref = _assetHref(overview.architecture_doc);
-  var setupHref = _assetHref(overview.setup_script);
+  host = host || {};
+  var terminal = _selectedTerminal(host);
+  var observability = _selectedObservability(host);
+  var hostStatus = host && host.connection ? host.connection.status : 'neutral';
   return '' +
-    '<section class="vps-hero">' +
-      '<div class="vps-hero-grid">' +
-        '<div class="vps-hero-copy">' +
-          '<span class="vps-kicker">HESEM OPS • VPS CONTROL PLANE</span>' +
-          '<h1 class="vps-title">' + _esc(_t('VPS Control Tower', 'VPS Control Tower')) + '</h1>' +
-          '<p>' + _esc(_t(
-            'Một điểm điều khiển duy nhất cho host, service, Docker, ingress, DNS strategy và terminal. Mục tiêu là bỏ kiểu vận hành phải mở AZDIGI rồi lại quay sang SSH thủ công.',
-            'A single control surface for hosts, services, Docker, ingress, DNS strategy, and terminal access. The goal is to eliminate the AZDIGI web tab plus manual SSH hop workflow.'
-          )) + '</p>' +
-          ((architectureHref || setupHref) ? '<div class="vps-hero-actions">' +
-            (architectureHref ? '<a class="primary" href="' + _esc(architectureHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở spec kiến trúc', 'Open architecture spec')) + '</a>' : '') +
-            (setupHref ? '<a href="' + _esc(setupHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Xem bootstrap VPS', 'Open VPS bootstrap')) + '</a>' : '') +
-          '</div>' : '') +
-        '</div>' +
-        '<div class="vps-hero-side">' +
-          '<div class="vps-hero-side-card">' +
-            '<small>' + _esc(_t('DNS reality check', 'DNS reality check')) + '</small>' +
-            '<strong>' + _esc(dns.current_mode || _t('AZDIGI portal', 'AZDIGI portal')) + '</strong>' +
-            '<div>' + _esc(dns.recommended_next || _t('Chuyển sang DNS có API.', 'Move to an API-first DNS provider.')) + '</div>' +
+    '<section class="vps-ops-header">' +
+      '<div class="vps-ops-header-main">' +
+        '<div class="vps-ops-title-row">' +
+          '<div>' +
+            '<small class="vps-section-kicker">' + _esc(overview.product || 'HESEM VPS CONTROL TOWER') + '</small>' +
+            '<h2>' + _esc(_t('Hạ tầng VPS', 'VPS Infrastructure')) + '</h2>' +
           '</div>' +
-          '<div class="vps-command-card">' +
-            '<small>' + _esc(_t('Quick jump', 'Quick jump')) + '</small>' +
-            '<div>' + _esc(_t('Nếu terminal bastion chưa bật, đây là lệnh nhanh để vào host theo inventory hiện tại.', 'If the bastion terminal is not live yet, this is the fastest way to enter the host described in the current inventory.')) + '</div>' +
-            '<code>' + _esc(command) + '</code>' +
-          '</div>' +
+          '<span class="vps-status ' + _statusClass(hostStatus) + '">' + _esc(host && host.connection && host.connection.message ? host.connection.message : _t('Chưa có host', 'No host selected')) + '</span>' +
         '</div>' +
+        '<p class="vps-ops-subtitle">' + _esc(_t(
+          'Mọi khối trong module này đều phải bám probe thật từ backend: host, service, site, DNS, terminal, observability và output action. Không còn tab chiến lược hay nhãn placeholder ở bề mặt điều hành.',
+          'Every surface in this module is tied to a real backend probe: host, service, site, DNS, terminal, observability, and safe-action output. Decorative strategy tabs and placeholder labels have been removed from the operational surface.'
+        )) + '</p>' +
+        '<div class="vps-chip-list">' +
+          (host.label ? '<span class="vps-chip">' + _esc(host.label) + '</span>' : '') +
+          (host.public_ip ? '<span class="vps-chip">' + _esc(host.public_ip) + '</span>' : '') +
+          ((host.execution_mode || host.mode) ? '<span class="vps-chip">' + _esc(_hostModeLabel(host.execution_mode || host.mode)) + '</span>' : '') +
+          (host.system && host.system.last_probe_at ? '<span class="vps-chip">' + _esc(_t('Probe lúc', 'Probed at')) + ': ' + _esc(_fmtTime(host.system.last_probe_at)) + '</span>' : '') +
+          '<span class="vps-chip">' + _esc(_t('Admin only', 'Admin only')) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="vps-ops-header-actions">' +
+        '<button class="vps-action-btn primary" data-refresh-live="1"' + (state.loading ? ' disabled' : '') + '>' + _esc(state.loading ? _t('Đang tải...', 'Loading...') : _t('Làm mới live', 'Refresh live')) + '</button>' +
+        (terminal && terminal.url ? '<a class="vps-link-btn" href="' + _esc(terminal.url) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở terminal', 'Open terminal')) + '</a>' : '') +
+        (observability && observability.url ? '<a class="vps-link-btn" href="' + _esc(observability.url) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở observability', 'Open observability')) + '</a>' : '') +
       '</div>' +
     '</section>';
 }
@@ -322,343 +399,444 @@ function _hostPicker(hosts){
   if(!hosts || !hosts.length) return '';
   return '<div class="vps-host-strip">' + hosts.map(function(host){
     var active = String(host.id || '') === String(state.selectedHostId || '');
+    var status = host.connection && host.connection.status ? host.connection.status : 'neutral';
     return '<button class="vps-host-pill' + (active ? ' active' : '') + '" data-host-id="' + _esc(host.id) + '">' +
-      '<span>' + _esc(host.label || host.id) + '</span>' +
-      '<span class="vps-status ' + _statusClass(host.connection && host.connection.status) + '">' + _esc(host.connection && host.connection.label ? host.connection.label : host.connection && host.connection.status ? host.connection.status : 'inventory') + '</span>' +
+      '<span>' + _esc(host.label || host.id || '') + '</span>' +
+      '<span class="vps-status ' + _statusClass(status) + '">' + _esc(host.connection && host.connection.label ? host.connection.label : status) + '</span>' +
     '</button>';
   }).join('') + '</div>';
 }
 
-function _architectureCards(overview){
-  var cards = Array.isArray(overview && overview.architecture_layers) ? overview.architecture_layers : [];
-  if(!cards.length) return '<div class="vps-empty">' + _esc(_t('Chưa có layer kiến trúc.', 'No architecture layers declared yet.')) + '</div>';
-  return '<div class="vps-card-grid">' + cards.map(function(card){
-    return '<article class="vps-card dark"><strong>' + _esc(card.title || '') + '</strong><p>' + _esc(card.body || '') + '</p><ul>' +
-      (Array.isArray(card.points) ? card.points.map(function(point){ return '<li>' + _esc(point) + '</li>'; }).join('') : '') +
-    '</ul></article>';
+function _tabs(){
+  var tabs = [
+    {id:'overview', label:_t('Tổng quan live', 'Live overview')},
+    {id:'services', label:_t('Service', 'Services')},
+    {id:'network', label:_t('Site & DNS', 'Sites & DNS')},
+    {id:'terminal', label:'Terminal'},
+    {id:'observability', label:'Observability'},
+    {id:'actions', label:_t('Actions', 'Actions')}
+  ];
+  return '<div class="vps-tabs">' + tabs.map(function(tab){
+    return '<button class="vps-tab' + (state.tab === tab.id ? ' active' : '') + '" data-vps-tab="' + _esc(tab.id) + '">' + _esc(tab.label) + '</button>';
   }).join('') + '</div>';
 }
 
-function _referenceCards(overview){
-  var refs = Array.isArray(overview && overview.references) ? overview.references : [];
-  if(!refs.length) return '';
-  return '<div class="vps-reference-list">' + refs.map(function(ref){
-    return '<article class="vps-ref-card"><a href="' + _esc(ref.url || '#') + '" target="_blank" rel="noopener noreferrer">' + _esc(ref.title || ref.url || '') + '</a><p>' + _esc(ref.note || '') + '</p></article>';
-  }).join('') + '</div>';
+function _empty(message){
+  return '<div class="vps-panel"><div class="vps-panel-body"><div class="vps-empty">' + _esc(message) + '</div></div></div>';
 }
 
-function _nextFeatureCards(overview){
-  var items = Array.isArray(overview && overview.next_features) ? overview.next_features : [];
-  if(!items.length) return '';
-  return '<div class="vps-card-grid">' + items.map(function(item){
-    var href = _webHref(item.url);
-    var status = String(item.status || 'next');
-    return '<article class="vps-card">' +
-      '<strong>' + (href ? '<a href="' + _esc(href) + '" target="_blank" rel="noopener noreferrer">' + _esc(item.title || '') + '</a>' : _esc(item.title || '')) + '</strong>' +
-      '<p>' + _esc(item.body || '') + '</p>' +
-      '<span class="vps-status ' + _statusClass(status === 'next' ? 'ok' : 'warning') + '">' + _esc(status) + '</span>' +
+function _healthCards(host){
+  var services = Array.isArray(host && host.services) ? host.services : [];
+  var sites = Array.isArray(host && host.sites) ? host.sites : [];
+  var dns = Array.isArray(host && host.dns_records) ? host.dns_records : [];
+  var terminals = Array.isArray(host && host.terminals) ? host.terminals : [];
+  var panels = Array.isArray(host && host.observability) ? host.observability : [];
+  var items = [
+    {label:_t('Service active', 'Active services'), good:_countStatus(services, 'active'), total:services.length},
+    {label:_t('Site HTTP OK', 'Healthy sites'), good:_countStatus(sites, 'ok'), total:sites.length},
+    {label:'DNS', good:_countStatus(dns, 'ok'), total:dns.length},
+    {label:'Terminal', good:_countStatus(terminals, 'ok'), total:terminals.length},
+    {label:'Observability', good:_countStatus(panels, 'ok'), total:panels.length}
+  ];
+  return '<div class="vps-health-grid">' + items.map(function(item){
+    var tone = item.total > 0 && item.good === item.total ? 'good' : (item.good > 0 ? 'warn' : 'bad');
+    return '<article class="vps-health-card tone-' + _esc(tone) + '">' +
+      '<small>' + _esc(item.label) + '</small>' +
+      '<strong>' + _esc(_fmtInt(item.good) + '/' + _fmtInt(item.total)) + '</strong>' +
     '</article>';
   }).join('') + '</div>';
 }
 
-function _assetCards(overview){
-  var items = Array.isArray(overview && overview.control_assets) ? overview.control_assets : [];
-  if(!items.length) return '';
-  return '<div class="vps-card-grid">' + items.map(function(item){
-    var openHref = _assetHref(item.path);
-    var downloadHref = _assetHref(item.path, true);
-    return '<article class="vps-card">' +
-      '<strong>' + _esc(item.label || item.id || '') + '</strong>' +
-      '<p>' + _esc(item.relative_path || item.path || '') + '</p>' +
-      '<span class="vps-status ' + _statusClass(item.exists ? 'ok' : 'warning') + '">' + _esc(item.kind || 'asset') + (item.exists ? '' : ' • missing') + '</span>' +
-      '<div class="vps-inline-actions">' +
-        (openHref ? '<a class="vps-link-btn primary" href="' + _esc(openHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở trong portal', 'Open in portal')) + '</a>' : '') +
-        (downloadHref ? '<a class="vps-link-btn" href="' + _esc(downloadHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Tải raw file', 'Download raw file')) + '</a>' : '') +
-      '</div>' +
-    '</article>';
-  }).join('') + '</div>';
-}
-
-function _overviewTab(overview){
-  overview = overview || {};
-  return '' +
-    '<div class="vps-shell-grid">' +
-      '<section class="vps-panel dark">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(_t('4 lớp control plane', 'Four control-plane layers')) + '</h2><p>' + _esc(_t('Không nhồi tất cả vào một PHP terminal. Tách rõ UI, terminal, telemetry và DNS/API mới đi được đường dài.', 'Do not cram everything into a single PHP terminal. Separate UI, terminal, telemetry, and DNS/API if you want a durable system.')) + '</p></div></div>' +
-        '<div class="vps-panel-body">' + _architectureCards(overview) + '</div>' +
-      '</section>' +
-      '<section class="vps-panel">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(_t('Quyết định nền tảng', 'Platform decisions')) + '</h2><p>' + _esc(_t('Phần này chốt những thứ phải đổi nếu muốn bỏ hoàn toàn quy trình “AZDIGI tab + SSH tab”.', 'These are the non-negotiable changes required if you want to fully eliminate the “AZDIGI tab + SSH tab” workflow.')) + '</p></div></div>' +
-        '<div class="vps-panel-body">' +
-          '<div class="vps-card-grid">' +
-            '<article class="vps-card"><strong>' + _esc(_t('DNS', 'DNS')) + '</strong><p>' + _esc((overview.dns_strategy && overview.dns_strategy.limitation) || _t('Nếu zone vẫn giữ ở portal nhà cung cấp không có API ổn định, dashboard chỉ dừng ở mức nhắc việc hoặc scrape tạm.', 'If the zone stays inside a provider portal without a stable API, the dashboard cannot become a real control plane.')) + '</p></article>' +
-            '<article class="vps-card"><strong>' + _esc(_t('Terminal', 'Terminal')) + '</strong><p>' + _esc(_t('Giao diện terminal nên dùng xterm.js phía browser và một terminal gateway kiểu ttyd ở bastion hoặc trên từng host.', 'The terminal UX should use xterm.js in the browser and a ttyd-style terminal gateway on a bastion or each host.')) + '</p></article>' +
-            '<article class="vps-card"><strong>' + _esc(_t('Container control', 'Container control')) + '</strong><p>' + _esc(_t('Nếu host chạy Docker nhiều, Portainer Edge hợp lý cho lớp điều phối container; đừng bắt portal PHP làm hết phần này.', 'If the host runs a real Docker estate, Portainer Edge is the right layer for container control; do not force the PHP portal to own everything.')) + '</p></article>' +
-            '<article class="vps-card"><strong>' + _esc(_t('Observability', 'Observability')) + '</strong><p>' + _esc(_t('Repo này đã có OTel collector local. Hướng nâng cấp đúng là gắn host metrics/alerts chuẩn, không phải chỉ đọc log thủ công.', 'This repo already includes a local OTel collector. The correct next step is proper host metrics and alerts, not manual log reading forever.')) + '</p></article>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-    '</div>' +
-    '<section class="vps-panel" style="margin-top:16px">' +
-      '<div class="vps-panel-head"><div><h2>' + _esc(_t('Nguồn tham chiếu chính thức', 'Official reference stack')) + '</h2><p>' + _esc(_t('Những nguồn này là xương sống cho terminal, observability, container control và DNS/API.', 'These are the backbone sources for terminal, observability, container control, and DNS/API decisions.')) + '</p></div></div>' +
-      '<div class="vps-panel-body">' + _referenceCards(overview) + '</div>' +
-    '</section>' +
-    '<section class="vps-panel" style="margin-top:16px">' +
-      '<div class="vps-panel-head"><div><h2>' + _esc(_t('Tính năng nên làm tiếp', 'Next capabilities')) + '</h2><p>' + _esc(_t('Các tính năng này là bước nâng cấp hợp lý tiếp theo nếu muốn control plane này quản được nhiều host hơn và ít thao tác tay hơn.', 'These are the next sensible upgrades if you want this control plane to govern more hosts with less manual work.')) + '</p></div></div>' +
-      '<div class="vps-panel-body">' + _nextFeatureCards(overview) + '</div>' +
-    '</section>';
-}
-
-function _keyval(system, resources){
-  return '<div class="vps-keyval">' +
-    '<div class="vps-kv"><small>' + _esc(_t('Hostname', 'Hostname')) + '</small><strong>' + _esc(system.hostname || '—') + '</strong></div>' +
-    '<div class="vps-kv"><small>' + _esc(_t('OS / arch', 'OS / arch')) + '</small><strong>' + _esc([system.os, system.arch].filter(Boolean).join(' / ') || '—') + '</strong></div>' +
-    '<div class="vps-kv"><small>' + _esc(_t('Load', 'Load')) + '</small><strong>' + _esc(system.load || '—') + '</strong></div>' +
-    '<div class="vps-kv"><small>' + _esc(_t('Disk root', 'Disk root')) + '</small><strong>' + _esc(resources.disk_used_pct || '—') + '</strong></div>' +
-    '<div class="vps-kv"><small>' + _esc(_t('Memory', 'Memory')) + '</small><strong>' + _esc(resources.memory_used_pct || '—') + '</strong></div>' +
-    '<div class="vps-kv"><small>' + _esc(_t('Last probe', 'Last probe')) + '</small><strong>' + _esc(_fmtTime(system.last_probe_at)) + '</strong></div>' +
+function _resourceMeters(resources){
+  resources = resources || {};
+  var diskLine = _fmtSizeFromKb(resources.disk_used_kb || 0) + ' / ' + _fmtSizeFromKb(resources.disk_total_kb || 0);
+  var memLine = _fmtSizeFromMb(resources.memory_used_mb || 0) + ' / ' + _fmtSizeFromMb(resources.memory_total_mb || 0);
+  return '<div class="vps-meter-grid">' +
+    '<article class="vps-meter-card">' +
+      '<small>' + _esc(_t('Dung lượng root', 'Root filesystem')) + '</small>' +
+      '<strong>' + _esc(resources.disk_used_pct || '—') + '</strong>' +
+      '<div class="vps-meter"><span style="width:' + _esc(_progressWidth(resources.disk_used_pct)) + '"></span></div>' +
+      '<span>' + _esc(diskLine) + '</span>' +
+    '</article>' +
+    '<article class="vps-meter-card">' +
+      '<small>' + _esc(_t('Bộ nhớ', 'Memory')) + '</small>' +
+      '<strong>' + _esc(resources.memory_used_pct || '—') + '</strong>' +
+      '<div class="vps-meter"><span style="width:' + _esc(_progressWidth(resources.memory_used_pct)) + '"></span></div>' +
+      '<span>' + _esc(memLine) + '</span>' +
+    '</article>' +
   '</div>';
+}
+
+function _facts(host){
+  host = host || {};
+  var system = host.system || {};
+  var capabilities = host.capabilities || {};
+  var roles = Array.isArray(host.roles) ? host.roles : [];
+  return '<div class="vps-fact-grid">' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('Hostname', 'Hostname')) + '</small><strong>' + _esc(system.hostname || '—') + '</strong></article>' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('OS / arch', 'OS / arch')) + '</small><strong>' + _esc([system.os, system.arch].filter(Boolean).join(' / ') || '—') + '</strong></article>' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('Load', 'Load')) + '</small><strong>' + _esc(system.load || '—') + '</strong></article>' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('Uptime', 'Uptime')) + '</small><strong>' + _esc(system.uptime || '—') + '</strong></article>' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('Docker', 'Docker')) + '</small><strong>' + _esc(capabilities.docker ? _t('Có', 'Available') : _t('Không có', 'Not installed')) + '</strong></article>' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('Vai trò', 'Roles')) + '</small><strong>' + _esc(roles.join(', ') || '—') + '</strong></article>' +
+  '</div>';
+}
+
+function _alerts(host){
+  var alerts = Array.isArray(host && host.alerts) ? host.alerts : [];
+  if(!alerts.length){
+    return '<div class="vps-note">' + _esc(_t('Không có cảnh báo active từ probe hiện tại.', 'No active alerts in the current probe.')) + '</div>';
+  }
+  return '<div class="vps-alert-list">' + alerts.map(function(item){
+    return '<article class="vps-alert-item">' +
+      '<span class="vps-status ' + _statusClass('error') + '">' + _esc(item.scope || 'alert') + '</span>' +
+      '<strong>' + _esc(item.label || '') + '</strong>' +
+      '<p>' + _esc(item.detail || '') + '</p>' +
+    '</article>';
+  }).join('') + '</div>';
 }
 
 function _servicesTable(host){
   var services = Array.isArray(host && host.services) ? host.services : [];
-  if(!services.length) return '<div class="vps-empty">' + _esc(_t('Chưa khai báo service.', 'No services declared.')) + '</div>';
-  return '<table class="vps-service-table"><thead><tr><th>' + _esc(_t('Service', 'Service')) + '</th><th>' + _esc(_t('Status', 'Status')) + '</th><th>' + _esc(_t('Type', 'Type')) + '</th></tr></thead><tbody>' +
-    services.map(function(item){
-      return '<tr><td><strong>' + _esc(item.label || item.name || '') + '</strong><br><span>' + _esc(item.name || '') + '</span></td>' +
-        '<td><span class="vps-status ' + _statusClass(item.status) + '">' + _esc(item.status || 'unknown') + '</span></td>' +
-        '<td>' + _esc(item.kind || 'systemd') + '</td></tr>';
-    }).join('') +
-  '</tbody></table>';
+  if(!services.length){
+    return '<div class="vps-empty">' + _esc(_t('Chưa khai báo service.', 'No services declared.')) + '</div>';
+  }
+  return '<div class="vps-table-wrap"><table class="vps-service-table"><thead><tr>' +
+    '<th>' + _esc(_t('Service', 'Service')) + '</th>' +
+    '<th>' + _esc(_t('Unit', 'Unit')) + '</th>' +
+    '<th>' + _esc(_t('Status', 'Status')) + '</th>' +
+    '<th>' + _esc(_t('Chi tiết', 'Detail')) + '</th>' +
+  '</tr></thead><tbody>' + services.map(function(item){
+    return '<tr>' +
+      '<td><strong>' + _esc(item.label || item.name || '') + '</strong><br><span>' + _esc(item.name || '') + '</span></td>' +
+      '<td>' + _esc(item.resolved_unit || '—') + '</td>' +
+      '<td><span class="vps-status ' + _statusClass(item.status) + '">' + _esc(item.status || 'unknown') + '</span></td>' +
+      '<td>' + _esc(item.detail || '—') + '</td>' +
+    '</tr>';
+  }).join('') + '</tbody></table></div>';
 }
 
-function _dnsAndSites(host){
+function _containersPanel(host){
+  var capabilities = host && host.capabilities ? host.capabilities : {};
+  var containers = Array.isArray(host && host.containers) ? host.containers : [];
+  if(!capabilities.docker){
+    return '<div class="vps-note warn">' + _esc(_t('Docker chưa được cài trên host này.', 'Docker is not installed on this host.')) + '</div>';
+  }
+  if(!containers.length){
+    return '<div class="vps-note">' + _esc(_t('Docker có mặt nhưng hiện không có container đang chạy.', 'Docker is available but no containers are running right now.')) + '</div>';
+  }
+  return '<div class="vps-table-wrap"><table class="vps-list-table"><thead><tr>' +
+    '<th>' + _esc(_t('Container', 'Container')) + '</th>' +
+    '<th>' + _esc(_t('Image', 'Image')) + '</th>' +
+    '<th>' + _esc(_t('Status', 'Status')) + '</th>' +
+    '<th>' + _esc(_t('Ports', 'Ports')) + '</th>' +
+  '</tr></thead><tbody>' + containers.map(function(item){
+    return '<tr>' +
+      '<td>' + _esc(item.name || '—') + '</td>' +
+      '<td>' + _esc(item.image || '—') + '</td>' +
+      '<td>' + _esc(item.status || '—') + '</td>' +
+      '<td>' + _esc(item.ports || '—') + '</td>' +
+    '</tr>';
+  }).join('') + '</tbody></table></div>';
+}
+
+function _portsPanel(host){
+  var ports = Array.isArray(host && host.ports) ? host.ports : [];
+  if(!ports.length){
+    return '<div class="vps-note">' + _esc(_t('Chưa lấy được listen ports từ probe hiện tại.', 'No listening ports were returned by the current probe.')) + '</div>';
+  }
+  return '<div class="vps-chip-list">' + ports.map(function(port){
+    return '<span class="vps-chip code">' + _esc(port) + '</span>';
+  }).join('') + '</div>';
+}
+
+function _sitesTable(host){
   var sites = Array.isArray(host && host.sites) ? host.sites : [];
-  var dnsRecords = Array.isArray(host && host.dns_records) ? host.dns_records : [];
+  if(!sites.length){
+    return '<div class="vps-empty">' + _esc(_t('Chưa khai báo site.', 'No sites declared.')) + '</div>';
+  }
+  return '<div class="vps-table-wrap"><table class="vps-list-table"><thead><tr>' +
+    '<th>' + _esc(_t('Domain', 'Domain')) + '</th>' +
+    '<th>' + _esc(_t('Status', 'Status')) + '</th>' +
+    '<th>HTTP</th>' +
+    '<th>' + _esc(_t('Role', 'Role')) + '</th>' +
+    '<th>' + _esc(_t('Final URL', 'Final URL')) + '</th>' +
+    '<th>' + _esc(_t('Latency', 'Latency')) + '</th>' +
+    '<th>IP</th>' +
+  '</tr></thead><tbody>' + sites.map(function(site){
+    var href = site.url || site.final_url || '';
+    return '<tr>' +
+      '<td>' + (href ? '<a href="' + _esc(href) + '" target="_blank" rel="noopener noreferrer">' + _esc(site.host || href) + '</a>' : _esc(site.host || '—')) + '<br><span>' + _esc(site.detail || '') + '</span></td>' +
+      '<td><span class="vps-status ' + _statusClass(site.status) + '">' + _esc(site.status || 'unknown') + '</span></td>' +
+      '<td>' + _esc(site.http_status || '—') + '</td>' +
+      '<td>' + _esc(site.role || '—') + '</td>' +
+      '<td>' + (site.final_url ? '<a href="' + _esc(site.final_url) + '" target="_blank" rel="noopener noreferrer">' + _esc(site.final_url) + '</a>' : '—') + '</td>' +
+      '<td>' + _esc(_fmtMs(site.response_ms)) + '</td>' +
+      '<td>' + _esc(site.remote_ip || '—') + '</td>' +
+    '</tr>';
+  }).join('') + '</tbody></table></div>';
+}
+
+function _dnsTable(host){
+  var records = Array.isArray(host && host.dns_records) ? host.dns_records : [];
+  if(!records.length){
+    return '<div class="vps-empty">' + _esc(_t('Chưa khai báo DNS.', 'No DNS records declared.')) + '</div>';
+  }
+  return '<div class="vps-table-wrap"><table class="vps-list-table"><thead><tr>' +
+    '<th>' + _esc(_t('Name', 'Name')) + '</th>' +
+    '<th>' + _esc(_t('Status', 'Status')) + '</th>' +
+    '<th>' + _esc(_t('Type', 'Type')) + '</th>' +
+    '<th>' + _esc(_t('Inventory', 'Inventory')) + '</th>' +
+    '<th>' + _esc(_t('Resolved', 'Resolved')) + '</th>' +
+    '<th>' + _esc(_t('Chi tiết', 'Detail')) + '</th>' +
+  '</tr></thead><tbody>' + records.map(function(item){
+    var resolved = Array.isArray(item.resolved_values) && item.resolved_values.length ? item.resolved_values.join(', ') : '—';
+    return '<tr>' +
+      '<td>' + _esc(item.name || '—') + '</td>' +
+      '<td><span class="vps-status ' + _statusClass(item.status) + '">' + _esc(item.status || 'unknown') + '</span></td>' +
+      '<td>' + _esc(item.type || '—') + '</td>' +
+      '<td>' + _esc(item.value || '—') + '</td>' +
+      '<td>' + _esc(resolved) + '</td>' +
+      '<td>' + _esc(item.detail || '—') + '</td>' +
+    '</tr>';
+  }).join('') + '</tbody></table></div>';
+}
+
+function _endpointTiles(items, kind){
+  items = Array.isArray(items) ? items : [];
+  if(!items.length){
+    return '<div class="vps-note warn">' + _esc(kind === 'terminal' ? _t('Host này chưa có terminal được cấu hình.', 'No terminal is configured for this host.') : _t('Host này chưa có panel observability được cấu hình.', 'No observability panel is configured for this host.')) + '</div>';
+  }
+  return '<div class="vps-endpoint-grid">' + items.map(function(item){
+    var selected = kind === 'terminal'
+      ? String(item.id || '') === String(state.selectedTerminalId || '')
+      : String(item.id || '') === String(state.selectedObservabilityId || '');
+    var href = item.url || '';
+    var meta = [];
+    if(item.access) meta.push(item.access);
+    if(item.kind) meta.push(item.kind);
+    if(item.http_status) meta.push('HTTP ' + item.http_status);
+    return '<button class="vps-endpoint-card' + (selected ? ' active' : '') + '" ' +
+      (kind === 'terminal' ? 'data-terminal-id="' + _esc(item.id || '') + '"' : 'data-observability-id="' + _esc(item.id || '') + '"') + '>' +
+      '<div class="vps-endpoint-head">' +
+        '<strong>' + _esc(item.label || item.id || '') + '</strong>' +
+        '<span class="vps-status ' + _statusClass(item.status) + '">' + _esc(item.status || 'unknown') + '</span>' +
+      '</div>' +
+      '<p>' + _esc(item.detail || item.note || '') + '</p>' +
+      '<div class="vps-endpoint-meta">' + meta.map(function(token){ return '<span>' + _esc(token) + '</span>'; }).join('') + '</div>' +
+      (href ? '<div class="vps-endpoint-link">' + _esc(href) + '</div>' : '') +
+    '</button>';
+  }).join('') + '</div>';
+}
+
+function _selectedEndpointDetail(item, modeLabel){
+  if(!item) return '';
+  return '<div class="vps-fact-grid compact">' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('Truy cập', 'Access')) + '</small><strong>' + _esc(item.access || '—') + '</strong></article>' +
+    '<article class="vps-fact-card"><small>' + _esc(_t('Service', 'Service')) + '</small><strong>' + _esc(item.service_name || '—') + '</strong></article>' +
+    '<article class="vps-fact-card"><small>HTTP</small><strong>' + _esc(item.http_status || '—') + '</strong></article>' +
+    '<article class="vps-fact-card"><small>' + _esc(modeLabel) + '</small><strong>' + _esc(item.reachable ? _t('Reachable', 'Reachable') : _t('Chưa probe được', 'Not reachable')) + '</strong></article>' +
+  '</div>' +
+  '<div class="vps-note' + ((item.status || '') === 'ok' ? '' : ' warn') + '">' + _esc(item.detail || item.note || '') + '</div>' +
+  (item.summary ? '<div class="vps-console compact"><div class="vps-console-head"><span>' + _esc(_t('Probe summary', 'Probe summary')) + '</span></div><pre>' + _esc(item.summary) + '</pre></div>' : '');
+}
+
+function _quickLinks(overview){
+  var assets = Array.isArray(overview && overview.control_assets) ? overview.control_assets : [];
+  var commands = Array.isArray(overview && overview.quick_commands) ? overview.quick_commands : [];
+  var gateway = overview && overview.terminal_gateway ? overview.terminal_gateway : {};
+  var stack = overview && overview.observability_stack ? overview.observability_stack : {};
+  var links = [];
+  if(gateway.setup_doc) links.push({label:_t('Setup terminal', 'Terminal setup'), href:_assetHref(gateway.setup_doc)});
+  if(gateway.install_script) links.push({label:_t('Installer terminal', 'Terminal installer'), href:_assetHref(gateway.install_script)});
+  if(stack.setup_doc) links.push({label:_t('Setup observability', 'Observability setup'), href:_assetHref(stack.setup_doc)});
+  if(stack.install_script) links.push({label:_t('Installer observability', 'Observability installer'), href:_assetHref(stack.install_script)});
+  assets.slice(0, 4).forEach(function(item){
+    links.push({label:item.label || item.relative_path || item.path || item.id || 'asset', href:_assetHref(item.path)});
+  });
   return '' +
-    '<div class="vps-site-grid">' +
-      '<article class="vps-site-card"><a href="#">' + _esc(_t('Ingress & domains', 'Ingress & domains')) + '</a><p>' + _esc(_t('Những domain/site đang buộc control plane phải theo dõi.', 'The domains and sites this control plane needs to keep alive.')) + '</p>' +
-        '<table class="vps-list-table"><thead><tr><th>' + _esc(_t('Site', 'Site')) + '</th><th>' + _esc(_t('Role', 'Role')) + '</th></tr></thead><tbody>' +
-        (sites.length ? sites.map(function(site){
-          var href = site.url || '#';
-          return '<tr><td><a href="' + _esc(href) + '" target="_blank" rel="noopener noreferrer">' + _esc(site.host || site.label || href) + '</a></td><td>' + _esc(site.role || '') + '</td></tr>';
-        }).join('') : '<tr><td colspan="2">' + _esc(_t('Chưa có site.', 'No sites declared.')) + '</td></tr>') +
-        '</tbody></table></article>' +
-      '<article class="vps-site-card"><a href="#">DNS</a><p>' + _esc(_t('Đây là inventory DNS cần chuyển sang API-first nếu muốn điều khiển thật từ dashboard.', 'This is the DNS inventory that needs to move to an API-first model if you want true dashboard control.')) + '</p>' +
-        '<table class="vps-list-table"><thead><tr><th>' + _esc(_t('Name', 'Name')) + '</th><th>' + _esc(_t('Type', 'Type')) + '</th><th>' + _esc(_t('Target', 'Target')) + '</th></tr></thead><tbody>' +
-        (dnsRecords.length ? dnsRecords.map(function(row){
-          return '<tr><td>' + _esc(row.name || '') + '</td><td>' + _esc(row.type || '') + '</td><td>' + _esc(row.value || '') + '</td></tr>';
-        }).join('') : '<tr><td colspan="3">' + _esc(_t('Chưa có record.', 'No records declared.')) + '</td></tr>') +
-        '</tbody></table></article>' +
-    '</div>';
+    '<section class="vps-panel">' +
+      '<div class="vps-panel-head"><div><h3>' + _esc(_t('Hỗ trợ vận hành', 'Operational support')) + '</h3><p>' + _esc(_t('Link kỹ thuật và lệnh thật, không phải tab roadmap.', 'Technical links and real commands, not roadmap tabs.')) + '</p></div></div>' +
+      '<div class="vps-panel-body">' +
+        (links.length ? '<div class="vps-support-links">' + links.map(function(item){
+          return '<a class="vps-link-btn" href="' + _esc(item.href || '#') + '" target="_blank" rel="noopener noreferrer">' + _esc(item.label || 'link') + '</a>';
+        }).join('') + '</div>' : '') +
+        (commands.length ? '<div class="vps-command-stack">' + commands.map(function(cmd){
+          return '<div class="vps-command-card compact"><small>' + _esc(cmd.label || '') + '</small><code>' + _esc(cmd.command || '') + '</code></div>';
+        }).join('') + '</div>' : '<div class="vps-empty">' + _esc(_t('Chưa có quick command.', 'No quick commands declared.')) + '</div>') +
+      '</div>' +
+    '</section>';
 }
 
 function _console(result){
   if(!result){
-    return '<div class="vps-console"><div class="vps-console-head"><span>' + _esc(_t('Action output', 'Action output')) + '</span><span>' + _esc(_t('Chọn một action an toàn để xem output.', 'Select a safe action to see command output.')) + '</span></div><pre>' + _esc(_t('Chưa có output nào. Gợi ý: chạy Health snapshot hoặc Nginx config test.', 'No output yet. Suggested first actions: Health snapshot or Nginx config test.')) + '</pre></div>';
+    return '<div class="vps-console"><div class="vps-console-head"><span>' + _esc(_t('Action output', 'Action output')) + '</span><span>' + _esc(_t('Chọn action an toàn để lấy dữ liệu thật từ host.', 'Run a safe action to fetch live output from the host.')) + '</span></div><pre>' + _esc(_t('Chưa có output nào.', 'No output yet.')) + '</pre></div>';
   }
   return '<div class="vps-console"><div class="vps-console-head"><span>' + _esc(result.label || result.action || 'command') + '</span><span>' + _esc(_fmtTime(result.executed_at)) + ' • exit ' + _esc(result.exit_code) + '</span></div><pre>' + _esc(result.output || _t('Không có output.', 'No output.')) + '</pre></div>';
 }
 
-function _hostTab(host){
+function _overviewTab(host){
   if(!host){
-    return '<div class="vps-panel"><div class="vps-panel-body"><div class="vps-empty">' + _esc(_t('Chưa chọn host hoặc host chưa phản hồi.', 'No host selected or the host has not answered yet.')) + '</div></div></div>';
+    return _empty(_t('Chưa có host live để hiển thị.', 'No live host is available to display.'));
   }
-  var actions = Array.isArray(host.allowed_actions) ? host.allowed_actions : [];
-  var system = host.system || {};
-  var resources = host.resources || {};
   return '' +
     '<div class="vps-shell-grid">' +
       '<section class="vps-panel">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(host.label || host.id || '') + '</h2><p>' + _esc((host.provider || '') + (host.public_ip ? ' • ' + host.public_ip : '')) + '</p></div>' +
-          '<span class="vps-status ' + _statusClass(host.connection && host.connection.status) + '">' + _esc(host.connection && host.connection.message ? host.connection.message : (host.connection && host.connection.status ? host.connection.status : _t('inventory only', 'inventory only'))) + '</span>' +
-        '</div>' +
+        '<div class="vps-panel-head"><div><h3>' + _esc(_t('Snapshot hiện tại', 'Current snapshot')) + '</h3><p>' + _esc(_t('Thông số này lấy từ probe live gần nhất.', 'These values come from the most recent live probe.')) + '</p></div></div>' +
         '<div class="vps-panel-body">' +
-          _keyval(system, resources) +
-          '<div style="margin-top:16px"></div>' +
-          _dnsAndSites(host) +
+          _facts(host) +
+          '<div style="height:14px"></div>' +
+          _resourceMeters(host.resources || {}) +
+          '<div style="height:14px"></div>' +
+          _healthCards(host) +
         '</div>' +
       '</section>' +
       '<section class="vps-panel">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(_t('Safe action runner', 'Safe action runner')) + '</h2><p>' + _esc(_t('Chỉ cho chạy action whitelisted. Không mở arbitrary shell trực tiếp trong PHP layer.', 'Only whitelisted actions are allowed. No arbitrary shell is exposed directly from the PHP layer.')) + '</p></div></div>' +
+        '<div class="vps-panel-head"><div><h3>' + _esc(_t('Cảnh báo đang mở', 'Open alerts')) + '</h3><p>' + _esc(_t('Bất kỳ mục nào ở đây đều là lệch thật giữa inventory và trạng thái live.', 'Everything listed here is a real mismatch between the inventory and the live state.')) + '</p></div></div>' +
+        '<div class="vps-panel-body">' + _alerts(host) + '</div>' +
+      '</section>' +
+    '</div>';
+}
+
+function _servicesTab(host){
+  if(!host){
+    return _empty(_t('Chưa có host live để hiển thị service.', 'No live host is available to display services.'));
+  }
+  return '' +
+    '<div class="vps-shell-grid">' +
+      '<section class="vps-panel">' +
+        '<div class="vps-panel-head"><div><h3>' + _esc(_t('Service health', 'Service health')) + '</h3><p>' + _esc(_t('Status lấy từ systemctl thật trên host.', 'Statuses are derived from the actual systemctl state on the host.')) + '</p></div></div>' +
+        '<div class="vps-panel-body">' + _servicesTable(host) + '</div>' +
+      '</section>' +
+      '<div class="vps-stack-column">' +
+        '<section class="vps-panel">' +
+          '<div class="vps-panel-head"><div><h3>' + _esc(_t('Containers', 'Containers')) + '</h3><p>' + _esc(_t('Nếu Docker không có, module phải nói thẳng.', 'If Docker is absent, the module should say so explicitly.')) + '</p></div></div>' +
+          '<div class="vps-panel-body">' + _containersPanel(host) + '</div>' +
+        '</section>' +
+        '<section class="vps-panel">' +
+          '<div class="vps-panel-head"><div><h3>' + _esc(_t('Listen ports', 'Listen ports')) + '</h3><p>' + _esc(_t('Danh sách lấy trực tiếp từ ss/netstat.', 'This list is read directly from ss or netstat.')) + '</p></div></div>' +
+          '<div class="vps-panel-body">' + _portsPanel(host) + '</div>' +
+        '</section>' +
+      '</div>' +
+    '</div>';
+}
+
+function _networkTab(host){
+  if(!host){
+    return _empty(_t('Chưa có host live để hiển thị site và DNS.', 'No live host is available to display sites and DNS.'));
+  }
+  return '' +
+    '<div class="vps-stack-column">' +
+      '<section class="vps-panel">' +
+        '<div class="vps-panel-head"><div><h3>' + _esc(_t('Site probes', 'Site probes')) + '</h3><p>' + _esc(_t('Bảng này cho thấy domain nào đang sống thật, đang redirect đi đâu, và đang gán role gì trong inventory.', 'This table shows which domains are really alive, where they redirect, and which role they are currently assigned in the inventory.')) + '</p></div></div>' +
+        '<div class="vps-panel-body">' + _sitesTable(host) + '</div>' +
+      '</section>' +
+      '<section class="vps-panel">' +
+        '<div class="vps-panel-head"><div><h3>' + _esc(_t('DNS probes', 'DNS probes')) + '</h3><p>' + _esc(_t('Record nào không khớp inventory sẽ hiện rõ ở đây.', 'Any DNS record that does not match the inventory is surfaced here.')) + '</p></div></div>' +
+        '<div class="vps-panel-body">' + _dnsTable(host) + '</div>' +
+      '</section>' +
+    '</div>';
+}
+
+function _terminalTab(host, overview){
+  if(!host){
+    return _empty(_t('Chưa có host live để hiển thị terminal.', 'No live host is available to display terminals.'));
+  }
+  var selected = _selectedTerminal(host);
+  var canEmbed = !!(selected && selected.url && selected.embed !== false);
+  return '' +
+    '<div class="vps-shell-grid">' +
+      '<section class="vps-panel">' +
+        '<div class="vps-panel-head"><div><h3>Terminal</h3><p>' + _esc(_t('Mỗi terminal phải có cả service state và HTTP probe thật.', 'Each terminal must have both a service state and a real HTTP probe.')) + '</p></div></div>' +
+        '<div class="vps-panel-body">' +
+          _endpointTiles(host.terminals || [], 'terminal') +
+          (selected ? '<div style="height:16px"></div>' + _selectedEndpointDetail(selected, _t('Gateway', 'Gateway')) : '') +
+          (selected && selected.url ? '<div class="vps-inline-actions">' +
+            '<a class="vps-link-btn primary" href="' + _esc(selected.url) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở terminal', 'Open terminal')) + '</a>' +
+          '</div>' : '') +
+          '<div style="height:16px"></div>' +
+          (canEmbed
+            ? '<iframe class="vps-terminal-frame" src="' + _esc(selected.url) + '" title="' + _esc(selected.label || selected.id || 'terminal') + '" loading="lazy" referrerpolicy="same-origin"></iframe>'
+            : '<div class="vps-note warn">' + _esc(_t('Terminal này chưa có URL nhúng hợp lệ.', 'This terminal does not have a valid embeddable URL yet.')) + '</div>') +
+        '</div>' +
+      '</section>' +
+      _quickLinks(overview) +
+    '</div>';
+}
+
+function _observabilityTab(host, overview){
+  if(!host){
+    return _empty(_t('Chưa có host live để hiển thị observability.', 'No live host is available to display observability.'));
+  }
+  var selected = _selectedObservability(host);
+  var canEmbed = !!(selected && selected.url && selected.embed !== false);
+  return '' +
+    '<div class="vps-shell-grid">' +
+      '<section class="vps-panel">' +
+        '<div class="vps-panel-head"><div><h3>Observability</h3><p>' + _esc(_t('Panel nào dùng được phải trả probe OK và nhúng được trong portal.', 'A usable panel must return a successful probe and be embeddable inside the portal.')) + '</p></div></div>' +
+        '<div class="vps-panel-body">' +
+          _endpointTiles(host.observability || [], 'observability') +
+          (selected ? '<div style="height:16px"></div>' + _selectedEndpointDetail(selected, _t('Panel', 'Panel')) : '') +
+          (selected && selected.url ? '<div class="vps-inline-actions">' +
+            '<a class="vps-link-btn primary" href="' + _esc(selected.url) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở panel', 'Open panel')) + '</a>' +
+          '</div>' : '') +
+          '<div style="height:16px"></div>' +
+          (canEmbed
+            ? '<iframe class="vps-terminal-frame" src="' + _esc(selected.url) + '" title="' + _esc(selected.label || selected.id || 'observability') + '" loading="lazy" referrerpolicy="same-origin"></iframe>'
+            : '<div class="vps-note warn">' + _esc(_t('Panel này chưa có URL nhúng hợp lệ.', 'This panel does not have a valid embeddable URL yet.')) + '</div>') +
+        '</div>' +
+      '</section>' +
+      _quickLinks(overview) +
+    '</div>';
+}
+
+function _actionsTab(host, overview){
+  if(!host){
+    return _empty(_t('Chưa có host live để chạy action.', 'No live host is available for actions.'));
+  }
+  var actions = Array.isArray(host.allowed_actions) ? host.allowed_actions : [];
+  return '' +
+    '<div class="vps-shell-grid">' +
+      '<section class="vps-panel">' +
+        '<div class="vps-panel-head"><div><h3>' + _esc(_t('Safe action runner', 'Safe action runner')) + '</h3><p>' + _esc(_t('Chỉ cho phép action whitelist. Không có shell tùy ý trong PHP.', 'Only whitelisted actions are allowed. No arbitrary shell is exposed in PHP.')) + '</p></div></div>' +
         '<div class="vps-panel-body">' +
           '<div class="vps-actions">' +
             (actions.length ? actions.map(function(action){
               var active = state.actionBusy && state.actionBusy === action.id;
               return '<button class="vps-action-btn' + (action.emphasis ? ' primary' : '') + '" data-action="' + _esc(action.id) + '"' + (active ? ' disabled' : '') + '>' + _esc(active ? _t('Đang chạy...', 'Running...') : action.label || action.id) + '</button>';
-            }).join('') : '<div class="vps-note warn">' + _esc(_t('Host này chưa khai báo safe action.', 'No safe action is declared for this host yet.')) + '</div>') +
+            }).join('') : '<div class="vps-note warn">' + _esc(_t('Host này chưa khai báo safe action.', 'No safe actions are declared for this host.')) + '</div>') +
           '</div>' +
-          '<div style="margin-top:16px">' + _console(state.actionResult) + '</div>' +
+          '<div style="height:16px"></div>' +
+          _console(state.actionResult) +
         '</div>' +
       '</section>' +
-    '</div>' +
-    '<section class="vps-panel" style="margin-top:16px">' +
-      '<div class="vps-panel-head"><div><h2>' + _esc(_t('Service health', 'Service health')) + '</h2><p>' + _esc(_t('Status đọc từ probe local/SSH. Nếu connection fail, bảng này vẫn giữ inventory để bạn biết host cần gì.', 'Status is derived from the local/SSH probe. If the connection fails, the table still shows the declared inventory so you know what the host is supposed to run.')) + '</p></div></div>' +
-      '<div class="vps-panel-body">' + _servicesTable(host) + '</div>' +
-    '</section>';
-}
-
-function _terminalTab(host, overview){
-  var terminals = Array.isArray(host && host.terminals) ? host.terminals : [];
-  var quickCommands = Array.isArray(overview && overview.quick_commands) ? overview.quick_commands : [];
-  var gateway = overview && overview.terminal_gateway ? overview.terminal_gateway : {};
-  var selected = _selectedTerminal(host);
-  var selectedUrl = selected && selected.url ? String(selected.url) : '';
-  var canEmbed = !!(selected && selected.embed !== false && selectedUrl);
-  var setupDocHref = _assetHref(gateway.setup_doc);
-  var installScriptHref = _assetHref(gateway.install_script);
-  var installScriptDownloadHref = _assetHref(gateway.install_script, true);
-  return '' +
-    '<div class="vps-shell-grid">' +
-      '<section class="vps-panel">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(_t('Terminal plane', 'Terminal plane')) + '</h2><p>' + _esc(_t('Dashboard này không nên tự làm PTY server trong PHP. Nó chỉ nên nhúng hoặc mở terminal gateway đã hardened.', 'This dashboard should not become a PTY server inside PHP. It should embed or open a hardened terminal gateway.')) + '</p></div></div>' +
-        '<div class="vps-panel-body">' +
-          (terminals.length ? (
-            '<div class="vps-terminal-picker">' + terminals.map(function(item){
-              var active = String(item.id || '') === String(state.selectedTerminalId || '');
-              return '<button class="vps-terminal-tile' + (active ? ' active' : '') + '" data-terminal-id="' + _esc(item.id || '') + '">' +
-                '<strong>' + _esc(item.label || item.id || '') + '</strong>' +
-                '<span class="vps-status ' + _statusClass((item.access || '') === 'write' ? 'warn' : 'ok') + '">' + _esc((item.access || '') === 'write' ? _t('write', 'write') : _t('read-only', 'read-only')) + '</span>' +
-                '<p>' + _esc(item.note || '') + '</p>' +
-              '</button>';
-            }).join('') + '</div>' +
-            (selected ? (
-              '<div class="vps-terminal-workspace">' +
-                '<div class="vps-terminal-toolbar">' +
-                  '<div><strong>' + _esc(selected.label || selected.id || '') + '</strong><span>' + _esc(gateway.auth_model || _t('Portal session bảo vệ terminal qua gateway.', 'Portal session protects the terminal via the gateway.')) + '</span></div>' +
-                  '<div class="vps-terminal-actions">' +
-                    (selectedUrl ? '<a class="vps-link-btn primary" href="' + _esc(selectedUrl) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở terminal', 'Open terminal')) + '</a>' : '') +
-                    (setupDocHref ? '<a class="vps-link-btn" href="' + _esc(setupDocHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Xem setup', 'Open setup doc')) + '</a>' : '') +
-                    (installScriptHref ? '<a class="vps-link-btn" href="' + _esc(installScriptHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở script', 'Open install script')) + '</a>' : '') +
-                  '</div>' +
-                '</div>' +
-                (canEmbed
-                  ? '<iframe class="vps-terminal-frame" src="' + _esc(selectedUrl) + '" title="' + _esc(selected.label || selected.id || 'terminal') + '" loading="lazy" referrerpolicy="same-origin"></iframe>'
-                  : '<div class="vps-note warn">' + _esc(_t('Terminal này chưa có URL để nhúng. Hãy chạy script cài terminal gateway và cấu hình lại inventory.', 'This terminal does not have an embeddable URL yet. Run the terminal gateway installer and update the inventory.')) + '</div>'
-                ) +
-              '</div>'
-            ) : '') 
-          ) : '<div class="vps-note warn">' + _esc(_t('Chưa có terminal URL nào được cấu hình. Hãy dựng ttyd ở bastion hoặc trên từng host rồi gắn URL vào inventory.', 'No terminal URL is configured yet. Deploy ttyd on the bastion or each host, then attach the URL to the inventory.')) + '</div>') +
-        '</div>' +
-      '</section>' +
-      '<section class="vps-panel dark">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(_t('Quick commands', 'Quick commands')) + '</h2><p>' + _esc(_t('Dùng cho giai đoạn chuyển tiếp trước khi terminal gateway hoàn thiện.', 'Use these during the transition phase before the terminal gateway is fully deployed.')) + '</p></div></div>' +
-        '<div class="vps-panel-body">' +
-          '<div class="vps-note">' + _esc((gateway.stack || _t('ttyd sau Nginx reverse proxy.', 'ttyd behind an Nginx reverse proxy.')) + ' • ' + (gateway.auth_model || _t('Portal session auth.', 'Portal session auth.'))) + '</div>' +
-          (gateway.install_script ? '<div class="vps-command-card" style="margin:12px 0"><small>' + _esc(_t('Install gateway', 'Install gateway')) + '</small><code>' + _esc(gateway.install_script) + '</code></div>' : '') +
-          ((setupDocHref || installScriptDownloadHref) ? '<div class="vps-inline-actions" style="margin:12px 0 16px">' +
-            (setupDocHref ? '<a class="vps-link-btn primary" href="' + _esc(setupDocHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Đọc setup', 'Read setup doc')) + '</a>' : '') +
-            (installScriptDownloadHref ? '<a class="vps-link-btn" href="' + _esc(installScriptDownloadHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Tải script', 'Download script')) + '</a>' : '') +
-          '</div>' : '') +
-          (quickCommands.length ? quickCommands.map(function(cmd){
-            return '<div class="vps-command-card" style="margin-bottom:12px"><small>' + _esc(cmd.label || '') + '</small><code>' + _esc(cmd.command || '') + '</code></div>';
-          }).join('') : '<div class="vps-empty">' + _esc(_t('Chưa có quick command.', 'No quick command declared.')) + '</div>') +
-        '</div>' +
-      '</section>' +
+      _quickLinks(overview) +
     '</div>';
-}
-
-function _observabilityTab(host, overview){
-  var panels = Array.isArray(host && host.observability) ? host.observability : [];
-  var stack = overview && overview.observability_stack ? overview.observability_stack : {};
-  var selected = _selectedObservability(host);
-  var selectedUrl = selected && selected.url ? String(selected.url) : '';
-  var canEmbed = !!(selected && selected.embed !== false && selectedUrl);
-  var setupDocHref = _assetHref(stack.setup_doc);
-  var installScriptHref = _assetHref(stack.install_script);
-  var installScriptDownloadHref = _assetHref(stack.install_script, true);
-  var quickCommands = Array.isArray(overview && overview.quick_commands) ? overview.quick_commands.filter(function(cmd){
-    return /observability|grafana|netdata/i.test(String(cmd && cmd.label || '') + ' ' + String(cmd && cmd.command || ''));
-  }) : [];
-  return '' +
-    '<div class="vps-shell-grid">' +
-      '<section class="vps-panel">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(_t('Observability plane', 'Observability plane')) + '</h2><p>' + _esc(_t('Live metrics và dashboard phải được xem ngay trong control plane, không chỉ là link tham khảo.', 'Live metrics and dashboards should be visible inside the control plane, not merely linked as references.')) + '</p></div></div>' +
-        '<div class="vps-panel-body">' +
-          (panels.length ? (
-            '<div class="vps-terminal-picker">' + panels.map(function(item){
-              var active = String(item.id || '') === String(state.selectedObservabilityId || '');
-              return '<button class="vps-terminal-tile' + (active ? ' active' : '') + '" data-observability-id="' + _esc(item.id || '') + '">' +
-                '<strong>' + _esc(item.label || item.id || '') + '</strong>' +
-                '<span class="vps-status ' + _statusClass((item.kind || '') === 'metrics' ? 'ok' : 'warn') + '">' + _esc(item.kind || 'dashboard') + '</span>' +
-                '<p>' + _esc(item.note || '') + '</p>' +
-              '</button>';
-            }).join('') + '</div>' +
-            (selected ? (
-              '<div class="vps-terminal-workspace">' +
-                '<div class="vps-terminal-toolbar">' +
-                  '<div><strong>' + _esc(selected.label || selected.id || '') + '</strong><span>' + _esc(stack.auth_model || _t('Portal session bảo vệ observability stack qua Nginx.', 'Portal session protects the observability stack through Nginx.')) + '</span></div>' +
-                  '<div class="vps-terminal-actions">' +
-                    (selectedUrl ? '<a class="vps-link-btn primary" href="' + _esc(selectedUrl) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở panel', 'Open panel')) + '</a>' : '') +
-                    (setupDocHref ? '<a class="vps-link-btn" href="' + _esc(setupDocHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Xem setup', 'Open setup doc')) + '</a>' : '') +
-                    (installScriptHref ? '<a class="vps-link-btn" href="' + _esc(installScriptHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Mở script', 'Open install script')) + '</a>' : '') +
-                  '</div>' +
-                '</div>' +
-                (canEmbed
-                  ? '<iframe class="vps-terminal-frame" src="' + _esc(selectedUrl) + '" title="' + _esc(selected.label || selected.id || 'observability') + '" loading="lazy" referrerpolicy="same-origin"></iframe>'
-                  : '<div class="vps-note warn">' + _esc(_t('Panel này chưa có URL để nhúng. Hãy chạy script cài observability stack và cấu hình lại inventory.', 'This panel does not have an embeddable URL yet. Run the observability installer and update the inventory.')) + '</div>'
-                ) +
-              '</div>'
-            ) : '')
-          ) : '<div class="vps-note warn">' + _esc(_t('Chưa có observability panel nào được cấu hình cho host này.', 'No observability panel is configured for this host yet.')) + '</div>') +
-        '</div>' +
-      '</section>' +
-      '<section class="vps-panel dark">' +
-        '<div class="vps-panel-head"><div><h2>' + _esc(_t('Monitoring stack', 'Monitoring stack')) + '</h2><p>' + _esc(_t('Netdata cho host telemetry tức thời, Grafana cho dashboard và alerting cùng domain.', 'Netdata provides instant host telemetry, while Grafana handles dashboards and alerting under the same domain.')) + '</p></div></div>' +
-        '<div class="vps-panel-body">' +
-          '<div class="vps-note">' + _esc((stack.stack || _t('Netdata và Grafana sau Nginx reverse proxy.', 'Netdata and Grafana behind an Nginx reverse proxy.')) + ' • ' + (stack.auth_model || _t('Portal session auth.', 'Portal session auth.'))) + '</div>' +
-          (stack.install_script ? '<div class="vps-command-card" style="margin:12px 0"><small>' + _esc(_t('Install stack', 'Install stack')) + '</small><code>' + _esc(stack.install_script) + '</code></div>' : '') +
-          ((setupDocHref || installScriptDownloadHref) ? '<div class="vps-inline-actions" style="margin:12px 0 16px">' +
-            (setupDocHref ? '<a class="vps-link-btn primary" href="' + _esc(setupDocHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Đọc setup', 'Read setup doc')) + '</a>' : '') +
-            (installScriptDownloadHref ? '<a class="vps-link-btn" href="' + _esc(installScriptDownloadHref) + '" target="_blank" rel="noopener noreferrer">' + _esc(_t('Tải script', 'Download script')) + '</a>' : '') +
-          '</div>' : '') +
-          (quickCommands.length ? quickCommands.map(function(cmd){
-            return '<div class="vps-command-card" style="margin-bottom:12px"><small>' + _esc(cmd.label || '') + '</small><code>' + _esc(cmd.command || '') + '</code></div>';
-          }).join('') : '<div class="vps-empty">' + _esc(_t('Chưa có quick command observability.', 'No observability quick command declared.')) + '</div>') +
-        '</div>' +
-      '</section>' +
-    '</div>';
-}
-
-function _runbookTab(overview){
-  var steps = Array.isArray(overview && overview.runbook_steps) ? overview.runbook_steps : [];
-  return '<section class="vps-panel"><div class="vps-panel-head"><div><h2>' + _esc(_t('Phased rollout', 'Phased rollout')) + '</h2><p>' + _esc(_t('Đây là thứ tự nên làm để từ một portal nội bộ đi tới control plane thật cho VPS.', 'This is the correct sequence to move from an internal portal to a real VPS control plane.')) + '</p></div></div><div class="vps-panel-body"><div class="vps-runbook-list">' +
-    (steps.length ? steps.map(function(step){
-      return '<article class="vps-runbook-step"><strong>' + _esc(step.phase || '') + '</strong><div><h3>' + _esc(step.title || '') + '</h3><p>' + _esc(step.body || '') + '</p></div></article>';
-    }).join('') : '<div class="vps-empty">' + _esc(_t('Chưa có rollout step.', 'No rollout steps declared.')) + '</div>') +
-  '</div>' +
-  '<div style="margin-top:18px"><h3 style="margin:0 0 12px">' + _esc(_t('Ops assets', 'Ops assets')) + '</h3>' + _assetCards(overview) + '</div>' +
-  '</div></section>';
 }
 
 function _body(){
   var overview = state.overview || {};
   if(overview.error){
-    return '<div class="vps-panel"><div class="vps-panel-body"><div class="vps-empty">' + _esc(overview.error) + '</div></div></div>';
+    return _empty(overview.error);
   }
   var hosts = Array.isArray(overview.hosts) ? overview.hosts : [];
-  var body = _hero(overview) + _summaryCards(overview.metrics || {});
-  body += '<div class="vps-tabs">' +
-    '<button class="vps-tab' + (state.tab === 'overview' ? ' active' : '') + '" data-vps-tab="overview">' + _esc(_t('Kiến trúc', 'Architecture')) + '</button>' +
-    '<button class="vps-tab' + (state.tab === 'hosts' ? ' active' : '') + '" data-vps-tab="hosts">' + _esc(_t('Host & service', 'Hosts & services')) + '</button>' +
-    '<button class="vps-tab' + (state.tab === 'observability' ? ' active' : '') + '" data-vps-tab="observability">' + _esc(_t('Observability', 'Observability')) + '</button>' +
-    '<button class="vps-tab' + (state.tab === 'terminal' ? ' active' : '') + '" data-vps-tab="terminal">' + _esc(_t('Terminal', 'Terminal')) + '</button>' +
-    '<button class="vps-tab' + (state.tab === 'runbook' ? ' active' : '') + '" data-vps-tab="runbook">' + _esc(_t('Roadmap', 'Roadmap')) + '</button>' +
-  '</div>';
+  var body = _header(overview, state.host || {}) + _summaryCards(overview.metrics || {});
+  body += _tabs();
   body += _hostPicker(hosts);
-  body += '<div style="margin-top:16px"></div>';
-  if(state.tab === 'overview') body += _overviewTab(overview);
-  if(state.tab === 'hosts') body += _hostTab(state.host);
-  if(state.tab === 'observability') body += _observabilityTab(state.host || {}, overview);
-  if(state.tab === 'terminal') body += _terminalTab(state.host || {}, overview);
-  if(state.tab === 'runbook') body += _runbookTab(overview);
+  body += '<div style="height:16px"></div>';
+  if(state.tab === 'overview') body += _overviewTab(state.host);
+  if(state.tab === 'services') body += _servicesTab(state.host);
+  if(state.tab === 'network') body += _networkTab(state.host);
+  if(state.tab === 'terminal') body += _terminalTab(state.host, overview);
+  if(state.tab === 'observability') body += _observabilityTab(state.host, overview);
+  if(state.tab === 'actions') body += _actionsTab(state.host, overview);
   return body;
 }
 
 function _paint(){
   if(!state.container) return;
   if(state.loading && !state.overview){
-    state.container.innerHTML = '<div class="vps-ct"><div class="vps-panel"><div class="vps-panel-body"><div class="vps-empty">' + _esc(_t('Đang tải control plane VPS...', 'Loading VPS control plane...')) + '</div></div></div></div>';
+    state.container.innerHTML = '<div class="vps-ct"><div class="vps-panel"><div class="vps-panel-body"><div class="vps-empty">' + _esc(_t('Đang tải trạng thái VPS live...', 'Loading the live VPS state...')) + '</div></div></div></div>';
     return;
   }
   state.container.innerHTML = '<div class="vps-ct">' + _body() + '</div>';
@@ -681,6 +859,9 @@ function _bind(){
   });
   state.container.querySelectorAll('[data-observability-id]').forEach(function(btn){
     btn.onclick = function(){ _setObservability(btn.getAttribute('data-observability-id')); };
+  });
+  state.container.querySelectorAll('[data-refresh-live]').forEach(function(btn){
+    btn.onclick = function(){ _refresh(); };
   });
 }
 

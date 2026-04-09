@@ -34,9 +34,17 @@ final class VpsService
         $activeServices = 0;
         $runningContainers = 0;
         $dnsRecords = 0;
+        $siteCount = 0;
+        $terminalCount = 0;
+        $observabilityCount = 0;
         $reachableHosts = 0;
         $terminalReadyHosts = 0;
         $observabilityReadyHosts = 0;
+        $healthySites = 0;
+        $healthyDnsRecords = 0;
+        $healthyTerminals = 0;
+        $healthyObservabilityPanels = 0;
+        $alertCount = 0;
 
         foreach ((array)($config['hosts'] ?? []) as $host) {
             if (!is_array($host)) {
@@ -50,6 +58,14 @@ final class VpsService
             $activeServices += count(array_filter((array)($snapshot['services'] ?? []), static fn(array $service): bool => ($service['status'] ?? '') === 'active'));
             $runningContainers += count((array)($snapshot['containers'] ?? []));
             $dnsRecords += count((array)($snapshot['dns_records'] ?? []));
+            $siteCount += count((array)($snapshot['sites'] ?? []));
+            $terminalCount += count((array)($snapshot['terminals'] ?? []));
+            $observabilityCount += count((array)($snapshot['observability'] ?? []));
+            $healthySites += count(array_filter((array)($snapshot['sites'] ?? []), static fn(array $site): bool => ($site['status'] ?? '') === 'ok'));
+            $healthyDnsRecords += count(array_filter((array)($snapshot['dns_records'] ?? []), static fn(array $row): bool => ($row['status'] ?? '') === 'ok'));
+            $healthyTerminals += count(array_filter((array)($snapshot['terminals'] ?? []), static fn(array $terminal): bool => ($terminal['status'] ?? '') === 'ok'));
+            $healthyObservabilityPanels += count(array_filter((array)($snapshot['observability'] ?? []), static fn(array $panel): bool => ($panel['status'] ?? '') === 'ok'));
+            $alertCount += count((array)($snapshot['alerts'] ?? []));
             $reachableHosts += (($snapshot['connection']['status'] ?? '') === 'ok') ? 1 : 0;
             $terminalReadyHosts += count(array_filter((array)($snapshot['terminals'] ?? []), static fn(array $terminal): bool => trim((string)($terminal['url'] ?? '')) !== '')) > 0 ? 1 : 0;
             $observabilityReadyHosts += count(array_filter((array)($snapshot['observability'] ?? []), static fn(array $panel): bool => trim((string)($panel['url'] ?? '')) !== '')) > 0 ? 1 : 0;
@@ -62,9 +78,17 @@ final class VpsService
             'declared_services' => $declaredServices,
             'active_services' => $activeServices,
             'running_containers' => $runningContainers,
+            'sites_count' => $siteCount,
             'dns_records' => $dnsRecords,
+            'terminals_count' => $terminalCount,
+            'observability_panels' => $observabilityCount,
             'terminal_ready_hosts' => $terminalReadyHosts,
             'observability_ready_hosts' => $observabilityReadyHosts,
+            'healthy_sites' => $healthySites,
+            'healthy_dns_records' => $healthyDnsRecords,
+            'healthy_terminals' => $healthyTerminals,
+            'healthy_observability_panels' => $healthyObservabilityPanels,
+            'alert_count' => $alertCount,
         ];
         $config['quick_command'] = (string)($config['quick_command'] ?? (($hosts[0]['ssh_target'] ?? '') ? 'ssh ' . $hosts[0]['ssh_target'] : 'ssh root@103.110.87.55'));
         $config['setup_script'] = './ops/vps/setup-vps.sh';
@@ -84,7 +108,11 @@ final class VpsService
         $config['next_features'] = is_array($config['next_features'] ?? null) && $config['next_features'] !== []
             ? array_values(array_filter($config['next_features'], 'is_array'))
             : $this->defaultNextFeatures();
+        $config['operational_findings'] = is_array($config['operational_findings'] ?? null) && $config['operational_findings'] !== []
+            ? array_values(array_filter($config['operational_findings'], 'is_array'))
+            : $this->defaultOperationalFindings();
         $config['control_assets'] = $this->listControlAssets();
+        $config['metrics']['hardening_findings'] = count((array)($config['operational_findings'] ?? []));
 
         return $config;
     }
@@ -361,23 +389,22 @@ final class VpsService
                     'mode' => 'ssh',
                     'ssh_target' => 'root@103.110.87.55',
                     'public_ip' => '103.110.87.55',
-                    'roles' => ['reverse-proxy', 'portal', 'postgres', 'redis', 'otel', 'terminal-gateway', 'observability'],
+                    'roles' => ['reverse-proxy', 'portal', 'postgres', 'terminal-gateway', 'observability'],
                     'services' => [
-                        ['name' => 'nginx', 'label' => 'Nginx', 'kind' => 'systemd'],
-                        ['name' => 'php8.3-fpm', 'label' => 'PHP-FPM', 'kind' => 'systemd'],
-                        ['name' => 'postgresql', 'label' => 'PostgreSQL', 'kind' => 'systemd'],
-                        ['name' => 'redis-server', 'label' => 'Redis', 'kind' => 'systemd'],
-                        ['name' => 'hesem-ttyd-primary', 'label' => 'Terminal gateway (primary)', 'kind' => 'systemd'],
-                        ['name' => 'hesem-ttyd-readonly', 'label' => 'Terminal gateway (readonly)', 'kind' => 'systemd'],
-                        ['name' => 'netdata', 'label' => 'Netdata Agent', 'kind' => 'systemd'],
-                        ['name' => 'grafana-server', 'label' => 'Grafana', 'kind' => 'systemd'],
+                        ['name' => 'nginx', 'label' => 'Nginx', 'kind' => 'systemd', 'unit_candidates' => ['nginx']],
+                        ['name' => 'php-fpm', 'label' => 'PHP-FPM', 'kind' => 'systemd', 'unit_candidates' => ['php8.2-fpm', 'php8.3-fpm', 'php8.4-fpm', 'php-fpm']],
+                        ['name' => 'postgresql', 'label' => 'PostgreSQL', 'kind' => 'systemd', 'unit_candidates' => ['postgresql']],
+                        ['name' => 'hesem-ttyd-primary', 'label' => 'Terminal gateway (primary)', 'kind' => 'systemd', 'unit_candidates' => ['hesem-ttyd-primary']],
+                        ['name' => 'hesem-ttyd-readonly', 'label' => 'Terminal gateway (readonly)', 'kind' => 'systemd', 'unit_candidates' => ['hesem-ttyd-readonly']],
+                        ['name' => 'netdata', 'label' => 'Netdata Agent', 'kind' => 'systemd', 'unit_candidates' => ['netdata']],
+                        ['name' => 'grafana-server', 'label' => 'Grafana', 'kind' => 'systemd', 'unit_candidates' => ['grafana-server']],
                     ],
                     'safe_actions' => ['health', 'docker_ps', 'nginx_test', 'ports', 'recent_logs', 'terminal_gateway_logs', 'observability_logs'],
                     'sites' => [
                         ['host' => 'qms.hesem.com.vn', 'url' => 'https://qms.hesem.com.vn', 'role' => 'Main portal'],
-                        ['host' => 'eqms.hesemeng.com', 'url' => 'https://eqms.hesemeng.com', 'role' => 'Legacy portal entry'],
-                        ['host' => 'files.hesemeng.com', 'url' => 'https://files.hesemeng.com', 'role' => 'File services'],
-                        ['host' => 'portainer.hesemeng.com', 'url' => 'https://portainer.hesemeng.com', 'role' => 'Container console'],
+                        ['host' => 'eqms.hesemeng.com', 'url' => 'https://eqms.hesemeng.com', 'role' => 'Portal alias'],
+                        ['host' => 'files.hesemeng.com', 'url' => 'https://files.hesemeng.com', 'role' => 'Portal alias'],
+                        ['host' => 'portainer.hesemeng.com', 'url' => 'https://portainer.hesemeng.com', 'role' => 'Portal alias'],
                     ],
                     'dns_records' => [
                         ['name' => 'hesemeng.com', 'type' => 'A', 'value' => '103.110.87.55'],
@@ -394,6 +421,9 @@ final class VpsService
                             'note' => 'Interactive ttyd shell protected by portal session through nginx auth_request.',
                             'embed' => true,
                             'access' => 'write',
+                            'service_name' => 'hesem-ttyd-primary',
+                            'internal_url' => 'http://127.0.0.1:7681/',
+                            'expected_http_codes' => [200, 401, 403, 407],
                         ],
                         [
                             'id' => 'readonly',
@@ -402,6 +432,9 @@ final class VpsService
                             'note' => 'Readonly ttyd diagnostics view for fast triage without write access.',
                             'embed' => true,
                             'access' => 'read',
+                            'service_name' => 'hesem-ttyd-readonly',
+                            'internal_url' => 'http://127.0.0.1:7682/',
+                            'expected_http_codes' => [200, 401, 403, 407],
                         ],
                     ],
                     'observability' => [
@@ -413,6 +446,9 @@ final class VpsService
                             'embed' => true,
                             'kind' => 'metrics',
                             'access' => 'read',
+                            'service_name' => 'netdata',
+                            'internal_url' => 'http://127.0.0.1:19999/api/v1/info',
+                            'expected_http_codes' => [200],
                         ],
                         [
                             'id' => 'grafana',
@@ -422,6 +458,9 @@ final class VpsService
                             'embed' => true,
                             'kind' => 'dashboard',
                             'access' => 'read',
+                            'service_name' => 'grafana-server',
+                            'internal_url' => 'http://127.0.0.1:3000/api/health',
+                            'expected_http_codes' => [200],
                         ],
                     ],
                 ],
@@ -458,6 +497,33 @@ final class VpsService
                 'status' => 'later',
                 'url' => 'https://developers.cloudflare.com/fundamentals/api/get-started/create-token/',
                 'body' => 'Chuyển DNS write sang API token giới hạn theo zone và quyền, để dashboard sửa record mà không cần quay lại portal thủ công.',
+            ],
+        ];
+    }
+
+    /**
+     * @return list<array<string, string>>
+     */
+    private function defaultOperationalFindings(): array
+    {
+        return [
+            [
+                'title' => 'Netdata PostgreSQL collector must be explicit',
+                'status' => 'warning',
+                'url' => 'https://learn.netdata.cloud/docs/collecting-metrics/collectors/databases/postgresql',
+                'body' => 'Do not let Netdata guess PostgreSQL credentials. Keep the collector disabled by default and enable it only when a valid DSN or dedicated read-only role is provisioned.',
+            ],
+            [
+                'title' => 'Grafana should stay provisioned, not hand-tuned',
+                'status' => 'next',
+                'url' => 'https://grafana.com/docs/grafana/latest/administration/provisioning/',
+                'body' => 'Provision dashboards and datasources from Git so the control plane does not drift after manual edits in Grafana.',
+            ],
+            [
+                'title' => 'ttyd auth proxy stays behind a trusted gateway',
+                'status' => 'ok',
+                'url' => 'https://github.com/tsl0922/ttyd/wiki/Auth-Proxy',
+                'body' => 'Keep ttyd bound to loopback or an internal socket and let Nginx inject the auth header. The terminal gateway should not trust arbitrary client-supplied headers.',
             ],
         ];
     }
@@ -531,15 +597,19 @@ final class VpsService
             'label' => (string)($host['label'] ?? ($host['id'] ?? 'Host')),
             'provider' => (string)($host['provider'] ?? ''),
             'mode' => (string)($host['mode'] ?? 'inventory'),
+            'execution_mode' => $this->resolveExecutionMode($host),
             'ssh_target' => (string)($host['ssh_target'] ?? ''),
             'public_ip' => (string)($host['public_ip'] ?? ''),
             'roles' => array_values(array_map('strval', (array)($host['roles'] ?? []))),
             'services' => array_values(array_map(function (array $service): array {
                 return [
+                    'id' => (string)($service['id'] ?? ($service['name'] ?? '')),
                     'name' => (string)($service['name'] ?? ''),
                     'label' => (string)($service['label'] ?? ($service['name'] ?? '')),
                     'kind' => (string)($service['kind'] ?? 'systemd'),
                     'status' => 'unknown',
+                    'resolved_unit' => '',
+                    'detail' => 'No live probe yet',
                 ];
             }, array_values(array_filter((array)($host['services'] ?? []), 'is_array')))),
             'containers' => [],
@@ -548,11 +618,21 @@ final class VpsService
                 'host' => (string)($site['host'] ?? ''),
                 'url' => (string)($site['url'] ?? ''),
                 'role' => (string)($site['role'] ?? ''),
+                'status' => 'unknown',
+                'http_status' => 0,
+                'final_url' => '',
+                'response_ms' => null,
+                'content_type' => '',
+                'remote_ip' => '',
+                'detail' => 'No live probe yet',
             ], array_values(array_filter((array)($host['sites'] ?? []), 'is_array')))),
             'dns_records' => array_values(array_map(fn(array $row): array => [
                 'name' => (string)($row['name'] ?? ''),
                 'type' => (string)($row['type'] ?? ''),
                 'value' => (string)($row['value'] ?? ''),
+                'status' => 'unknown',
+                'resolved_values' => [],
+                'detail' => 'No live probe yet',
             ], array_values(array_filter((array)($host['dns_records'] ?? []), 'is_array')))),
             'terminals' => array_values(array_map(fn(array $terminal): array => [
                 'id' => (string)($terminal['id'] ?? ''),
@@ -561,6 +641,12 @@ final class VpsService
                 'note' => (string)($terminal['note'] ?? ''),
                 'embed' => (bool)($terminal['embed'] ?? true),
                 'access' => strtolower(trim((string)($terminal['access'] ?? 'read'))),
+                'service_name' => (string)($terminal['service_name'] ?? ''),
+                'internal_url' => (string)($terminal['internal_url'] ?? ''),
+                'status' => 'unknown',
+                'http_status' => 0,
+                'detail' => 'No live probe yet',
+                'reachable' => false,
             ], array_values(array_filter((array)($host['terminals'] ?? []), 'is_array')))),
             'observability' => array_values(array_map(fn(array $panel): array => [
                 'id' => (string)($panel['id'] ?? ''),
@@ -570,6 +656,13 @@ final class VpsService
                 'embed' => (bool)($panel['embed'] ?? true),
                 'kind' => strtolower(trim((string)($panel['kind'] ?? 'dashboard'))),
                 'access' => strtolower(trim((string)($panel['access'] ?? 'read'))),
+                'service_name' => (string)($panel['service_name'] ?? ''),
+                'internal_url' => (string)($panel['internal_url'] ?? ''),
+                'status' => 'unknown',
+                'http_status' => 0,
+                'detail' => 'No live probe yet',
+                'summary' => '',
+                'reachable' => false,
             ], array_values(array_filter((array)($host['observability'] ?? []), 'is_array')))),
             'system' => [
                 'hostname' => '',
@@ -579,9 +672,19 @@ final class VpsService
                 'load' => '',
                 'last_probe_at' => gmdate('c'),
             ],
+            'capabilities' => [
+                'systemctl' => false,
+                'docker' => false,
+            ],
             'resources' => [
                 'disk_used_pct' => '',
                 'memory_used_pct' => '',
+                'disk_total_kb' => 0,
+                'disk_used_kb' => 0,
+                'disk_available_kb' => 0,
+                'memory_total_mb' => 0,
+                'memory_used_mb' => 0,
+                'memory_free_mb' => 0,
             ],
             'connection' => [
                 'status' => 'neutral',
@@ -589,6 +692,7 @@ final class VpsService
                 'message' => 'Inventory only',
             ],
             'allowed_actions' => $this->listAllowedActions($host),
+            'alerts' => [],
         ];
 
         $probe = $this->probeHost($host);
@@ -604,23 +708,64 @@ final class VpsService
         $snapshot['connection'] = [
             'status' => 'ok',
             'label' => 'online',
-            'message' => (string)($probe['message'] ?? 'Probe OK'),
+            'message' => (string)($probe['message'] ?? 'Probe OK') . ' via ' . $this->resolveExecutionMode($host),
         ];
         $snapshot['system'] = array_merge($snapshot['system'], (array)($probe['system'] ?? []));
+        $snapshot['capabilities'] = array_merge($snapshot['capabilities'], (array)($probe['capabilities'] ?? []));
         $snapshot['resources'] = array_merge($snapshot['resources'], (array)($probe['resources'] ?? []));
         $snapshot['ports'] = array_values(array_map('strval', (array)($probe['ports'] ?? [])));
         $snapshot['containers'] = array_values(array_filter((array)($probe['containers'] ?? []), 'is_array'));
 
-        $serviceStatuses = (array)($probe['service_statuses'] ?? []);
-        foreach ($snapshot['services'] as &$service) {
-            $serviceName = (string)($service['name'] ?? '');
-            if ($serviceName !== '' && isset($serviceStatuses[$serviceName])) {
-                $service['status'] = (string)$serviceStatuses[$serviceName];
+        $serviceStatuses = array_values(array_filter((array)($probe['service_statuses'] ?? []), 'is_array'));
+        foreach ($snapshot['services'] as $index => $service) {
+            $serviceProbe = $serviceStatuses[$index] ?? null;
+            if (is_array($serviceProbe)) {
+                $snapshot['services'][$index]['status'] = (string)($serviceProbe['status'] ?? 'unknown');
+                $snapshot['services'][$index]['resolved_unit'] = (string)($serviceProbe['resolved_unit'] ?? '');
+                $snapshot['services'][$index]['detail'] = (string)($serviceProbe['detail'] ?? '');
             } elseif (($probe['capabilities']['systemctl'] ?? false) !== true) {
-                $service['status'] = 'unavailable';
+                $snapshot['services'][$index]['status'] = 'unavailable';
+                $snapshot['services'][$index]['detail'] = 'systemctl unavailable';
             }
         }
-        unset($service);
+
+        $siteProbes = $this->probeSites($host);
+        foreach ($snapshot['sites'] as $index => $site) {
+            $siteProbe = $siteProbes[$index] ?? null;
+            if (!is_array($siteProbe)) {
+                continue;
+            }
+            $snapshot['sites'][$index] = array_merge($snapshot['sites'][$index], $siteProbe);
+        }
+
+        $dnsProbes = $this->probeDnsRecords($host);
+        foreach ($snapshot['dns_records'] as $index => $row) {
+            $dnsProbe = $dnsProbes[$index] ?? null;
+            if (!is_array($dnsProbe)) {
+                continue;
+            }
+            $snapshot['dns_records'][$index] = array_merge($snapshot['dns_records'][$index], $dnsProbe);
+        }
+
+        $terminalProbes = $this->probeTerminals($host, $snapshot['services']);
+        foreach ($snapshot['terminals'] as $index => $terminal) {
+            $terminalProbe = $terminalProbes[$index] ?? null;
+            if (!is_array($terminalProbe)) {
+                continue;
+            }
+            $snapshot['terminals'][$index] = array_merge($snapshot['terminals'][$index], $terminalProbe);
+        }
+
+        $observabilityProbes = $this->probeObservabilityPanels($host, $snapshot['services']);
+        foreach ($snapshot['observability'] as $index => $panel) {
+            $panelProbe = $observabilityProbes[$index] ?? null;
+            if (!is_array($panelProbe)) {
+                continue;
+            }
+            $snapshot['observability'][$index] = array_merge($snapshot['observability'][$index], $panelProbe);
+        }
+
+        $snapshot['alerts'] = $this->buildAlerts($snapshot);
 
         return $snapshot;
     }
@@ -654,10 +799,10 @@ final class VpsService
                 'load' => (string)($systemData['load'] ?? ''),
                 'last_probe_at' => gmdate('c'),
             ],
-            'resources' => [
-                'disk_used_pct' => $this->formatDisk($systemData['disk'] ?? ''),
-                'memory_used_pct' => $this->formatMemory($systemData['memory'] ?? ''),
-            ],
+            'resources' => array_merge(
+                $this->formatDisk($systemData['disk'] ?? ''),
+                $this->formatMemory($systemData['memory'] ?? '')
+            ),
             'service_statuses' => $serviceStatuses['statuses'],
             'containers' => $containers['containers'],
             'ports' => $ports['ports'],
@@ -683,22 +828,31 @@ BASH;
     }
 
     /**
-     * @return array{statuses: array<string, string>, systemctl: bool}
+     * @return array{statuses: array<int, array<string, string>>, systemctl: bool}
      */
     private function probeServices(array $host): array
     {
-        $services = array_values(array_filter(array_map(
-            static fn(array $service): string => trim((string)($service['name'] ?? '')),
-            array_values(array_filter((array)($host['services'] ?? []), 'is_array'))
-        ), static fn(string $value): bool => $value !== ''));
-
+        $services = array_values(array_filter((array)($host['services'] ?? []), 'is_array'));
         if ($services === []) {
             return ['statuses' => [], 'systemctl' => false];
         }
 
         $parts = [];
-        foreach ($services as $service) {
-            $parts[] = "printf '%s=' " . escapeshellarg($service) . "; if command -v systemctl >/dev/null 2>&1; then systemctl is-active " . escapeshellarg($service) . " 2>/dev/null || echo inactive; else echo unavailable; fi";
+        foreach ($services as $index => $service) {
+            $units = array_values(array_filter(array_map(
+                static fn($value): string => trim((string)$value),
+                (array)($service['unit_candidates'] ?? [$service['name'] ?? ''])
+            ), static fn(string $value): bool => $value !== ''));
+            if ($units === []) {
+                continue;
+            }
+
+            $loop = implode(' ', array_map('escapeshellarg', $units));
+            $parts[] = "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in {$loop}; do current_state=\"\$(systemctl is-active \"\$unit\" 2>/dev/null || true)\"; if [ -n \"\$current_state\" ] && [ \"\$current_state\" != 'unknown' ]; then resolved=\"\$unit\"; state=\"\$current_state\"; break; fi; done; [ -n \"\$state\" ] || state='unknown'; printf '__SERVICE__|{$index}|%s|%s\n' \"\$resolved\" \"\$state\"; else printf '__SERVICE__|{$index}||unavailable\n'; fi";
+        }
+
+        if ($parts === []) {
+            return ['statuses' => [], 'systemctl' => false];
         }
 
         $run = $this->executeOnHost($host, implode('; ', $parts));
@@ -708,16 +862,23 @@ BASH;
 
         $statuses = [];
         foreach (preg_split("/\r\n|\n|\r/", trim((string)($run['output'] ?? ''))) ?: [] as $line) {
-            if (!is_string($line) || trim($line) === '' || !str_contains($line, '=')) {
+            if (!is_string($line) || trim($line) === '' || !str_starts_with($line, '__SERVICE__|')) {
                 continue;
             }
-            [$name, $value] = array_pad(explode('=', $line, 2), 2, '');
-            $statuses[trim($name)] = trim($value) !== '' ? trim($value) : 'unknown';
+            $parts = array_pad(explode('|', $line, 4), 4, '');
+            $index = (int)($parts[1] ?? -1);
+            $resolvedUnit = trim((string)($parts[2] ?? ''));
+            $status = trim((string)($parts[3] ?? '')) ?: 'unknown';
+            $statuses[$index] = [
+                'resolved_unit' => $resolvedUnit,
+                'status' => $status,
+                'detail' => $resolvedUnit !== '' ? ($status . ' via ' . $resolvedUnit) : $status,
+            ];
         }
 
         return [
             'statuses' => $statuses,
-            'systemctl' => count($statuses) > 0 && !in_array('unavailable', array_values($statuses), true),
+            'systemctl' => count($statuses) > 0 && !in_array('unavailable', array_map(static fn(array $row): string => (string)($row['status'] ?? ''), $statuses), true),
         ];
     }
 
@@ -759,6 +920,362 @@ BASH;
         ), static fn(string $line): bool => $line !== ''));
 
         return ['ports' => $ports];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function probeSites(array $host): array
+    {
+        $sites = array_values(array_filter((array)($host['sites'] ?? []), 'is_array'));
+        if ($sites === []) {
+            return [];
+        }
+
+        $probes = [];
+        $parts = [];
+        foreach ($sites as $index => $site) {
+            $url = trim((string)($site['url'] ?? ''));
+            if ($url === '') {
+                $probes[$index] = [
+                    'status' => 'error',
+                    'http_status' => 0,
+                    'final_url' => '',
+                    'content_type' => '',
+                    'remote_ip' => '',
+                    'response_ms' => null,
+                    'detail' => 'Missing site URL',
+                ];
+                continue;
+            }
+
+            $probes[$index] = [
+                'status' => 'error',
+                'http_status' => 0,
+                'final_url' => '',
+                'content_type' => '',
+                'remote_ip' => '',
+                'response_ms' => null,
+                'detail' => 'Site probe failed',
+            ];
+            $parts[] = "if command -v curl >/dev/null 2>&1; then out=\"\$(curl -k -L --max-time 8 -o /dev/null -s -w " . escapeshellarg('%{http_code}|%{url_effective}|%{content_type}|%{remote_ip}|%{time_total}') . ' ' . escapeshellarg($url) . " 2>/dev/null || true)\"; [ -n \"\$out\" ] || out='000||||'; printf '__SITE__|{$index}|%s\n' \"\$out\"; else printf '__SITE__|{$index}|000||||\n'; fi";
+        }
+
+        if ($parts === []) {
+            return $probes;
+        }
+
+        $run = $this->executeOnHost($host, implode('; ', $parts));
+        foreach (preg_split("/\r\n|\n|\r/", trim((string)($run['output'] ?? ''))) ?: [] as $line) {
+            if (!is_string($line) || !str_starts_with($line, '__SITE__|')) {
+                continue;
+            }
+            $parts = array_pad(explode('|', $line, 7), 7, '');
+            $index = (int)($parts[1] ?? -1);
+            $httpCode = (int)($parts[2] ?? 0);
+            $status = $httpCode >= 200 && $httpCode < 400 ? 'ok' : (($httpCode === 401 || $httpCode === 403) ? 'warning' : 'error');
+            $probes[$index] = [
+                'status' => $status,
+                'http_status' => $httpCode,
+                'final_url' => (string)($parts[3] ?? ''),
+                'content_type' => (string)($parts[4] ?? ''),
+                'remote_ip' => (string)($parts[5] ?? ''),
+                'response_ms' => is_numeric($parts[6] ?? null) ? (float)$parts[6] * 1000 : null,
+                'detail' => $httpCode > 0 ? ('HTTP ' . $httpCode) : 'Site probe failed',
+            ];
+        }
+
+        return $probes;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function probeDnsRecords(array $host): array
+    {
+        $records = array_values(array_filter((array)($host['dns_records'] ?? []), 'is_array'));
+        $probes = [];
+        foreach ($records as $record) {
+            $name = trim((string)($record['name'] ?? ''));
+            $type = strtoupper(trim((string)($record['type'] ?? 'A')));
+            $value = trim((string)($record['value'] ?? ''));
+            if ($name === '') {
+                $probes[] = ['status' => 'error', 'resolved_values' => [], 'detail' => 'Missing record name'];
+                continue;
+            }
+
+            if ($type === 'CNAME') {
+                $resolvedTargets = [];
+                foreach ((array)(@\dns_get_record($name, DNS_CNAME) ?: []) as $row) {
+                    if (!is_array($row) || trim((string)($row['target'] ?? '')) === '') {
+                        continue;
+                    }
+                    $resolvedTargets[] = strtolower(rtrim((string)$row['target'], '.'));
+                }
+                $resolvedTargets = array_values(array_unique($resolvedTargets));
+                $expectedTarget = strtolower(rtrim($value, '.'));
+                $matches = $expectedTarget !== '' && in_array($expectedTarget, $resolvedTargets, true);
+                if (!$matches && $expectedTarget !== '') {
+                    $matches = count(array_intersect($this->resolveHostIps($name), $this->resolveHostIps($expectedTarget))) > 0;
+                }
+                $probes[] = [
+                    'status' => $matches ? 'ok' : ($resolvedTargets === [] ? 'error' : 'warning'),
+                    'resolved_values' => $resolvedTargets,
+                    'detail' => $matches ? 'DNS matches inventory' : ($resolvedTargets === [] ? 'CNAME unresolved' : ('Resolved to ' . implode(', ', $resolvedTargets))),
+                ];
+                continue;
+            }
+
+            $resolvedIps = $this->resolveHostIps($name);
+            $matches = $value !== '' && in_array($value, $resolvedIps, true);
+            $probes[] = [
+                'status' => $matches ? 'ok' : ($resolvedIps === [] ? 'error' : 'warning'),
+                'resolved_values' => $resolvedIps,
+                'detail' => $matches ? 'DNS matches inventory' : ($resolvedIps === [] ? 'Record unresolved' : ('Resolved to ' . implode(', ', $resolvedIps))),
+            ];
+        }
+
+        return $probes;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $services
+     * @return array<int, array<string, mixed>>
+     */
+    private function probeTerminals(array $host, array $services): array
+    {
+        return $this->probeControlEndpoints(
+            $host,
+            array_values(array_filter((array)($host['terminals'] ?? []), 'is_array')),
+            $services
+        );
+    }
+
+    /**
+     * @param list<array<string, mixed>> $services
+     * @return array<int, array<string, mixed>>
+     */
+    private function probeObservabilityPanels(array $host, array $services): array
+    {
+        return $this->probeControlEndpoints(
+            $host,
+            array_values(array_filter((array)($host['observability'] ?? []), 'is_array')),
+            $services,
+            true
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $host
+     * @param list<array<string, mixed>> $items
+     * @param list<array<string, mixed>> $services
+     * @return array<int, array<string, mixed>>
+     */
+    private function probeControlEndpoints(array $host, array $items, array $services, bool $captureBody = false): array
+    {
+        if ($items === []) {
+            return [];
+        }
+
+        $statusMap = [];
+        foreach ($services as $service) {
+            $statusMap[(string)($service['name'] ?? '')] = (string)($service['status'] ?? 'unknown');
+        }
+
+        $probes = [];
+        $parts = [];
+        foreach ($items as $index => $item) {
+            $internalUrl = trim((string)($item['internal_url'] ?? ''));
+            $serviceStatus = $statusMap[(string)($item['service_name'] ?? '')] ?? 'unknown';
+            if ($internalUrl === '') {
+                $probes[$index] = [
+                    'status' => $serviceStatus === 'active' ? 'warning' : 'error',
+                    'http_status' => 0,
+                    'content_type' => '',
+                    'detail' => $serviceStatus === 'active' ? 'Missing internal probe URL' : ('Service ' . $serviceStatus),
+                    'summary' => '',
+                    'reachable' => false,
+                ];
+                continue;
+            }
+
+            $probes[$index] = [
+                'status' => $serviceStatus === 'active' ? 'warning' : 'error',
+                'http_status' => 0,
+                'content_type' => '',
+                'detail' => $serviceStatus !== '' ? ('service=' . $serviceStatus . ' • endpoint probe failed') : 'endpoint probe failed',
+                'summary' => '',
+                'reachable' => false,
+            ];
+            if ($captureBody) {
+                $parts[] = "if command -v curl >/dev/null 2>&1; then tmp_file=\"\$(mktemp)\"; meta=\"\$(curl -sS --max-time 6 -o \"\$tmp_file\" -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; body=\"\$(head -c 180 \"\$tmp_file\" 2>/dev/null | tr '\n' ' ' | tr '\r' ' ' | tr '|' ' ')\"; rm -f \"\$tmp_file\"; printf '__CTRL__|{$index}|%s|%s\n' \"\$meta\" \"\$body\"; else printf '__CTRL__|{$index}|000||curl_missing\n'; fi";
+            } else {
+                $parts[] = "if command -v curl >/dev/null 2>&1; then meta=\"\$(curl -sSI --max-time 5 -o /dev/null -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; printf '__CTRL__|{$index}|%s|\n' \"\$meta\"; else printf '__CTRL__|{$index}|000||curl_missing\n'; fi";
+            }
+        }
+
+        if ($parts === []) {
+            return $probes;
+        }
+
+        $run = $this->executeOnHost($host, implode('; ', $parts));
+        foreach (preg_split("/\r\n|\n|\r/", trim((string)($run['output'] ?? ''))) ?: [] as $line) {
+            if (!is_string($line) || !str_starts_with($line, '__CTRL__|')) {
+                continue;
+            }
+            $parts = array_pad(explode('|', $line, 5), 5, '');
+            $index = (int)($parts[1] ?? -1);
+            $httpCode = (int)($parts[2] ?? 0);
+            $contentType = trim((string)($parts[3] ?? ''));
+            $summary = trim((string)($parts[4] ?? ''));
+            $item = $items[$index] ?? [];
+            $expected = array_map('intval', (array)($item['expected_http_codes'] ?? [200]));
+            $serviceStatus = $statusMap[(string)($item['service_name'] ?? '')] ?? 'unknown';
+            $reachable = in_array($httpCode, $expected, true);
+            $status = ($serviceStatus === 'active' && $reachable) ? 'ok' : (($serviceStatus === 'active' || $reachable) ? 'warning' : 'error');
+            $detail = ($serviceStatus !== '' ? ('service=' . $serviceStatus . ' • ') : '') . ($httpCode > 0 ? ('HTTP ' . $httpCode) : 'endpoint probe failed');
+            $probes[$index] = [
+                'status' => $status,
+                'http_status' => $httpCode,
+                'content_type' => $contentType,
+                'detail' => $detail,
+                'summary' => $summary,
+                'reachable' => $reachable,
+            ];
+        }
+
+        return $probes;
+    }
+
+    /**
+     * @return list<array<string, string>>
+     */
+    private function buildAlerts(array $snapshot): array
+    {
+        $alerts = [];
+        foreach ((array)($snapshot['services'] ?? []) as $service) {
+            if (!is_array($service) || ($service['status'] ?? '') === 'active') {
+                continue;
+            }
+            $alerts[] = [
+                'scope' => 'service',
+                'label' => (string)($service['label'] ?? $service['name'] ?? 'service'),
+                'detail' => (string)($service['detail'] ?? $service['status'] ?? 'unknown'),
+            ];
+        }
+        foreach ((array)($snapshot['dns_records'] ?? []) as $row) {
+            if (!is_array($row) || ($row['status'] ?? '') === 'ok') {
+                continue;
+            }
+            $alerts[] = [
+                'scope' => 'dns',
+                'label' => (string)($row['name'] ?? 'record'),
+                'detail' => (string)($row['detail'] ?? 'DNS mismatch'),
+            ];
+        }
+        foreach ((array)($snapshot['sites'] ?? []) as $row) {
+            if (!is_array($row) || ($row['status'] ?? '') === 'ok') {
+                continue;
+            }
+            $alerts[] = [
+                'scope' => 'site',
+                'label' => (string)($row['host'] ?? $row['url'] ?? 'site'),
+                'detail' => (string)($row['detail'] ?? 'Site probe failed'),
+            ];
+        }
+        foreach ((array)($snapshot['terminals'] ?? []) as $row) {
+            if (!is_array($row) || ($row['status'] ?? '') === 'ok') {
+                continue;
+            }
+            $alerts[] = [
+                'scope' => 'terminal',
+                'label' => (string)($row['label'] ?? $row['id'] ?? 'terminal'),
+                'detail' => (string)($row['detail'] ?? 'Terminal probe failed'),
+            ];
+        }
+        foreach ((array)($snapshot['observability'] ?? []) as $row) {
+            if (!is_array($row) || ($row['status'] ?? '') === 'ok') {
+                continue;
+            }
+            $alerts[] = [
+                'scope' => 'observability',
+                'label' => (string)($row['label'] ?? $row['id'] ?? 'panel'),
+                'detail' => (string)($row['detail'] ?? 'Observability probe failed'),
+            ];
+        }
+        return $alerts;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function resolveHostIps(string $host): array
+    {
+        $host = trim($host);
+        if ($host === '') {
+            return [];
+        }
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            return [$host];
+        }
+        $ips = @gethostbynamel($host);
+        if (!is_array($ips)) {
+            return [];
+        }
+        return array_values(array_unique(array_filter(array_map('strval', $ips), static fn(string $value): bool => $value !== '')));
+    }
+
+    private function hostLooksLocal(array $host): bool
+    {
+        $candidates = [];
+        $publicIp = trim((string)($host['public_ip'] ?? ''));
+        if ($publicIp !== '') {
+            $candidates[] = $publicIp;
+        }
+
+        $target = trim((string)($host['ssh_target'] ?? ''));
+        if ($target !== '') {
+            $targetHost = preg_replace('/^[^@]+@/', '', $target);
+            if (is_string($targetHost) && trim($targetHost) !== '') {
+                $candidates[] = trim($targetHost);
+            }
+        }
+
+        $locals = ['127.0.0.1', 'localhost', gethostname() ?: '', php_uname('n') ?: ''];
+        $locals = array_merge($locals, $this->resolveHostIps(gethostname() ?: ''));
+        $serverAddr = trim((string)($_SERVER['SERVER_ADDR'] ?? ''));
+        if ($serverAddr !== '') {
+            $locals[] = $serverAddr;
+        }
+
+        if ($this->shellAvailable()) {
+            $exitCode = 1;
+            try {
+                $raw = (string)\shell_run("bash -lc 'hostname -I 2>/dev/null || true'", $exitCode);
+                if ($exitCode === 0 && trim($raw) !== '') {
+                    $locals = array_merge($locals, preg_split('/\s+/', trim($raw)) ?: []);
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        $locals = array_values(array_unique(array_filter(array_map(static fn($value): string => strtolower(trim((string)$value)), $locals), static fn(string $value): bool => $value !== '')));
+        foreach ($candidates as $candidate) {
+            $candidate = strtolower(trim((string)$candidate));
+            if ($candidate === '') {
+                continue;
+            }
+            if (in_array($candidate, $locals, true)) {
+                return true;
+            }
+            foreach ($this->resolveHostIps($candidate) as $ip) {
+                if (in_array(strtolower(trim($ip)), $locals, true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -807,8 +1324,8 @@ BASH;
 
     private function buildCommand(array $host, string $command): ?string
     {
-        $mode = strtolower(trim((string)($host['mode'] ?? 'local')));
-        if ($mode === 'local' || $mode === 'localhost' || $mode === '') {
+        $mode = $this->resolveExecutionMode($host);
+        if ($mode === 'local') {
             return 'bash -lc ' . escapeshellarg($command);
         }
 
@@ -832,6 +1349,18 @@ BASH;
         return null;
     }
 
+    private function resolveExecutionMode(array $host): string
+    {
+        $mode = strtolower(trim((string)($host['mode'] ?? 'local')));
+        if ($mode === 'local' || $mode === 'localhost' || $mode === '' || $this->hostLooksLocal($host)) {
+            return 'local';
+        }
+        if ($mode === 'ssh') {
+            return 'ssh';
+        }
+        return $mode !== '' ? $mode : 'local';
+    }
+
     private function shellAvailable(): bool
     {
         return \function_exists('shell_exec_available') ? (bool)\shell_exec_available() : false;
@@ -853,26 +1382,45 @@ BASH;
         return $pairs;
     }
 
-    private function formatDisk(string $raw): string
+    /**
+     * @return array<string, int|string>
+     */
+    private function formatDisk(string $raw): array
     {
         $parts = array_pad(explode(':', (string)$raw), 3, '');
-        $percent = trim($parts[2]);
-        if ($percent === '') {
-            return '—';
-        }
-        return $percent;
+        $total = (int)trim($parts[0]);
+        $used = (int)trim($parts[1]);
+        return [
+            'disk_total_kb' => $total,
+            'disk_used_kb' => $used,
+            'disk_available_kb' => max(0, $total - $used),
+            'disk_used_pct' => trim($parts[2]) !== '' ? trim($parts[2]) : '—',
+        ];
     }
 
-    private function formatMemory(string $raw): string
+    /**
+     * @return array<string, int|string>
+     */
+    private function formatMemory(string $raw): array
     {
         $parts = array_pad(explode(':', (string)$raw), 3, '');
         $total = (float)($parts[0] ?? 0);
         $used = (float)($parts[1] ?? 0);
         if ($total <= 0) {
-            return '—';
+            return [
+                'memory_total_mb' => 0,
+                'memory_used_mb' => 0,
+                'memory_free_mb' => 0,
+                'memory_used_pct' => '—',
+            ];
         }
         $pct = round(($used / $total) * 100, 1);
-        return $pct . '%';
+        return [
+            'memory_total_mb' => (int)$total,
+            'memory_used_mb' => (int)$used,
+            'memory_free_mb' => (int)($parts[2] ?? 0),
+            'memory_used_pct' => $pct . '%',
+        ];
     }
 
     /**

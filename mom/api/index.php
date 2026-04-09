@@ -51,6 +51,7 @@ spl_autoload_register(function (string $class): void {
         'MOM\\Api\\Controllers\\'  => __DIR__ . '/controllers/',
         'MOM\\Api\\Middleware\\'    => __DIR__ . '/middleware/',
         'MOM\\Api\\Validators\\'    => __DIR__ . '/validators/',
+        'MOM\\Api\\Services\\'      => __DIR__ . '/services/',
         'MOM\\Services\\'           => __DIR__ . '/services/',
         'MOM\\Api\\'               => __DIR__ . '/',
         'MOM\\Database\\'           => dirname(__DIR__) . '/database/',
@@ -129,12 +130,15 @@ use MOM\Api\Controllers\ComplianceReportController;
 use MOM\Api\Controllers\KnowledgeController;
 use MOM\Api\Controllers\CiController;
 use MOM\Api\Controllers\EnergyController;
+use MOM\Api\Controllers\FinanceController;
 use MOM\Api\Controllers\VpsController;
 use MOM\Api\Controllers\GenericCrudController;
 use MOM\Api\Controllers\ModuleSchemaController;
 use MOM\Api\Controllers\SchemaStudioController;
 use MOM\Api\Controllers\RegistryController;
 use MOM\Api\Controllers\ApprovalGroupController;
+use MOM\Api\Controllers\AllocationController;
+use MOM\Api\Controllers\OperationalOverrideController;
 use MOM\Database\DataLayer;
 
 // â”€â”€ Bootstrap DataLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -209,6 +213,9 @@ $router->actions([
     'record_id_peek'      => [FormController::class, 'peekNextId'],
     'form_version_stream' => [FormController::class, 'streamVersion'],
     'form_upload_draft'   => [FormController::class, 'uploadDraft'],
+    'form_draft_save'     => [FormController::class, 'saveDraft'],
+    'form_draft_get'      => [FormController::class, 'getDraft'],
+    'form_draft_list'     => [FormController::class, 'listDrafts'],
 ]);
 
 // Files & Folders
@@ -244,6 +251,11 @@ $router->actions([
     'save_data_settings'               => [AdminController::class, 'saveSettings'],
     'admin_portal_display_config_get'  => [AdminController::class, 'getPortalConfig'],
     'admin_portal_display_config_save' => [AdminController::class, 'savePortalConfig'],
+    'module_access_get'                => [AdminController::class, 'getModuleAccessConfig'],
+    'admin_module_access_save'         => [AdminController::class, 'saveModuleAccessConfig'],
+    'admin_audit_trail_list'           => [AdminController::class, 'getAuditTrail'],
+    'user_doc_overrides_get'           => [AdminController::class, 'getUserDocumentOverrides'],
+    'admin_user_doc_overrides_save'    => [AdminController::class, 'saveUserDocumentOverrides'],
     'admin_mfa_settings_get'           => [AdminController::class, 'getMfaSettings'],
     'admin_mfa_settings_save'          => [AdminController::class, 'saveMfaSettings'],
     'admin_metadata_studio_summary'    => [AdminMetadataStudioController::class, 'getSummary'],
@@ -285,6 +297,22 @@ $router->actions([
     'vps_observability_auth' => [VpsController::class, 'observabilityAuth'],
 ]);
 
+// Allocation & Record ID Management
+$router->actions([
+    'allocation_allocate'       => [AllocationController::class, 'allocate'],
+    'allocation_history'        => [AllocationController::class, 'getHistory'],
+    'allocation_void'           => [AllocationController::class, 'void'],
+    'record_id_check_duplicate' => [AllocationController::class, 'checkDuplicate'],
+    'upload_allocation_status'  => [AllocationController::class, 'getStatus'],
+    'record_id_download_txt'    => [AllocationController::class, 'downloadTxt'],
+    'record_id_types_expanded'  => [AllocationController::class, 'getExpandedTypes'],
+    'record_id_preview'         => [AllocationController::class, 'preview'],
+    // Legacy aliases (fallback from 09h-allocation-tracker.js)
+    'record_id_generate'        => [AllocationController::class, 'allocate'],
+    'record_id_history'         => [AllocationController::class, 'getHistory'],
+    'record_id_void'            => [AllocationController::class, 'void'],
+]);
+
 // Orders (SO/JO/WO)
 $router->actions([
     'order_so_list'           => [OrderController::class, 'listSalesOrders'],
@@ -309,6 +337,8 @@ $router->actions([
     'order_search'            => [OrderController::class, 'search'],
     'order_link_form'         => [OrderController::class, 'linkForm'],
     'order_shipment_gate'     => [OrderController::class, 'checkShipmentReadiness'],
+    'order_shipment_gate_override' => [OrderController::class, 'overrideShipmentGate'],
+    'order_shipment_gate_overrides' => [OrderController::class, 'listShipmentGateOverrides'],
     'order_schedule_get'      => [OrderController::class, 'getSchedule'],
     'order_schedule_slot'     => [OrderController::class, 'createScheduleSlot'],
     'order_schedule_update'   => [OrderController::class, 'updateScheduleSlot'],
@@ -333,6 +363,18 @@ $router->actions([
     'exception_copq_summary'    => [ExceptionController::class, 'copqSummary'],
     'exception_trends'          => [ExceptionController::class, 'trends'],
     'exception_escalate'        => [ExceptionController::class, 'escalate'],
+]);
+
+// Finance control objects
+$router->actions([
+    'finance_period_close_list' => [FinanceController::class, 'listPeriodCloses'],
+    'finance_period_close_create' => [FinanceController::class, 'createPeriodClose'],
+    'finance_backdate_exception_list' => [FinanceController::class, 'listBackdateExceptions'],
+    'finance_backdate_exception_create' => [FinanceController::class, 'createBackdateException'],
+    'finance_credit_memo_list' => [FinanceController::class, 'listCreditMemos'],
+    'finance_credit_memo_create' => [FinanceController::class, 'createCreditMemo'],
+    'finance_debit_memo_list' => [FinanceController::class, 'listDebitMemos'],
+    'finance_debit_memo_create' => [FinanceController::class, 'createDebitMemo'],
 ]);
 
 // Supplier Quality Management
@@ -857,6 +899,25 @@ $router->get('/api/v1/governance/approval-groups/{approvalGroupId}/attachments',
 $router->get('/api/v1/governance/attachments/{attachmentId}', EvidenceController::class, 'getGovernanceAttachment');
 $router->post('/api/v1/governance/attachments', EvidenceController::class, 'createGovernanceAttachment');
 
+// Governance override controls
+$router->get('/api/v1/governance/override-controls', OperationalOverrideController::class, 'listOverrides');
+$router->get('/api/v1/governance/override-controls/{overrideId}', OperationalOverrideController::class, 'getOverride');
+$router->post('/api/v1/governance/override-controls', OperationalOverrideController::class, 'createOverride');
+
+// Finance control objects
+$router->get('/api/v1/finance/period-closes', FinanceController::class, 'listPeriodCloses');
+$router->get('/api/v1/finance/period-closes/{periodCloseId}', FinanceController::class, 'getPeriodClose');
+$router->post('/api/v1/finance/period-closes', FinanceController::class, 'createPeriodClose');
+$router->get('/api/v1/finance/backdate-exceptions', FinanceController::class, 'listBackdateExceptions');
+$router->get('/api/v1/finance/backdate-exceptions/{backdateExceptionId}', FinanceController::class, 'getBackdateException');
+$router->post('/api/v1/finance/backdate-exceptions', FinanceController::class, 'createBackdateException');
+$router->get('/api/v1/finance/credit-memos', FinanceController::class, 'listCreditMemos');
+$router->get('/api/v1/finance/credit-memos/{creditMemoId}', FinanceController::class, 'getCreditMemo');
+$router->post('/api/v1/finance/credit-memos', FinanceController::class, 'createCreditMemo');
+$router->get('/api/v1/finance/debit-memos', FinanceController::class, 'listDebitMemos');
+$router->get('/api/v1/finance/debit-memos/{debitMemoId}', FinanceController::class, 'getDebitMemo');
+$router->post('/api/v1/finance/debit-memos', FinanceController::class, 'createDebitMemo');
+
 // Folders
 $router->get('/api/folders', FileController::class, 'scanFolders');
 $router->post('/api/folders', FileController::class, 'createFolder');
@@ -871,6 +932,9 @@ $router->post('/api/documents/snapshot', DocumentController::class, 'docsSnapsho
 
 // Forms â€” draft upload
 $router->post('/api/forms/upload-draft', FormController::class, 'uploadDraft');
+$router->post('/api/forms/drafts', FormController::class, 'saveDraft');
+$router->get('/api/forms/drafts', FormController::class, 'listDrafts');
+$router->get('/api/forms/{code}/draft', FormController::class, 'getDraft');
 
 // Dashboards
 $router->get('/api/dashboard/executive', DashboardController::class, 'executive');

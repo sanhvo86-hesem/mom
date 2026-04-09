@@ -17,6 +17,8 @@ PHP_SOCK="${PHP_SOCK:-}"
 NGINX_SITE="${NGINX_SITE:-}"
 GRAFANA_PORT="${GRAFANA_PORT:-3000}"
 NETDATA_PORT="${NETDATA_PORT:-19999}"
+NETDATA_ENABLE_POSTGRES_COLLECTOR="${NETDATA_ENABLE_POSTGRES_COLLECTOR:-0}"
+NETDATA_POSTGRES_DSN="${NETDATA_POSTGRES_DSN:-}"
 NGINX_SNIPPET="/etc/nginx/snippets/hesem-observability-stack.conf"
 
 require_root() {
@@ -94,6 +96,47 @@ write_netdata_local_config() {
     access = off
 # HESEM MANAGED LOCAL END
 CONF
+}
+
+write_netdata_collector_config() {
+  local conf="/etc/netdata/go.d.conf"
+  local tmp
+  local postgres_enabled="no"
+
+  mkdir -p /etc/netdata/go.d
+  touch "$conf"
+  backup_file "$conf"
+
+  if [ "$NETDATA_ENABLE_POSTGRES_COLLECTOR" = "1" ] && [ -n "$NETDATA_POSTGRES_DSN" ]; then
+    postgres_enabled="yes"
+    cat > /etc/netdata/go.d/postgres.conf <<EOF
+jobs:
+  - name: local
+    dsn: ${NETDATA_POSTGRES_DSN}
+EOF
+  else
+    rm -f /etc/netdata/go.d/postgres.conf
+  fi
+
+  tmp="$(mktemp)"
+  awk '
+    BEGIN { skip = 0 }
+    /^# HESEM MANAGED GO START$/ { skip = 1; next }
+    /^# HESEM MANAGED GO END$/ { skip = 0; next }
+    skip == 0 { print }
+  ' "$conf" > "$tmp"
+  mv "$tmp" "$conf"
+
+  cat >> "$conf" <<EOF
+# HESEM MANAGED GO START
+modules:
+  postgres: ${postgres_enabled}
+# HESEM MANAGED GO END
+EOF
+
+  if [ "$NETDATA_ENABLE_POSTGRES_COLLECTOR" = "1" ] && [ -z "$NETDATA_POSTGRES_DSN" ]; then
+    echo "NETDATA_ENABLE_POSTGRES_COLLECTOR=1 was requested without NETDATA_POSTGRES_DSN; PostgreSQL collector remains disabled." >&2
+  fi
 }
 
 install_grafana() {
@@ -246,6 +289,10 @@ print_summary() {
 The stack is protected by:
   nginx auth_request -> api.php?action=vps_observability_auth
 
+ Netdata PostgreSQL collector:
+   enabled=${NETDATA_ENABLE_POSTGRES_COLLECTOR}
+   dsn_supplied=$([ -n "${NETDATA_POSTGRES_DSN}" ] && echo yes || echo no)
+
 SUMMARY
 }
 
@@ -255,6 +302,7 @@ validate_runtime
 install_prereqs
 install_netdata
 write_netdata_local_config
+write_netdata_collector_config
 install_grafana
 configure_grafana_proxy_auth
 write_nginx_snippet

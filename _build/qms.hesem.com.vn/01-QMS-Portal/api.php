@@ -12354,10 +12354,19 @@ function users_save(string $usersFile, array $store): void {
   // Prefer atomic write (tmp + rename). Some hosts may block rename() across
   // file systems; fall back to direct write in that case.
   $tmp = $usersFile . '.tmp';
-  $wroteTmp = @file_put_contents($tmp, $json, LOCK_EX);
+  $wroteTmp = false;
+  try {
+    $wroteTmp = @file_put_contents($tmp, $json, LOCK_EX);
+  } catch (Throwable $e) {
+    $wroteTmp = false;
+  }
 
   if ($wroteTmp === false) {
-    $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    try {
+      $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    } catch (Throwable $e) {
+      $wrote = false;
+    }
     if ($wrote === false) {
       throw new RuntimeException('Cannot write users file. Please ensure the web server can write to: ' . $usersFile);
     }
@@ -12365,11 +12374,28 @@ function users_save(string $usersFile, array $store): void {
     return;
   }
 
-  if (!@rename($tmp, $usersFile)) {
+  $renamed = false;
+  try {
+    $renamed = @rename($tmp, $usersFile);
+  } catch (Throwable $e) {
+    $renamed = false;
+  }
+
+  if (!$renamed) {
     // Fallback: direct write / copy
-    $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    try {
+      $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    } catch (Throwable $e) {
+      $wrote = false;
+    }
     if ($wrote === false) {
-      if (!@copy($tmp, $usersFile)) {
+      $copied = false;
+      try {
+        $copied = @copy($tmp, $usersFile);
+      } catch (Throwable $e) {
+        $copied = false;
+      }
+      if (!$copied) {
         @unlink($tmp);
         throw new RuntimeException('Cannot replace users file. Please ensure write permissions for: ' . $usersFile);
       }

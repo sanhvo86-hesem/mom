@@ -1,8 +1,8 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-07T08:18:40Z",
+        "generatedAt": "2026-04-09T13:01:21+00:00",
         "source": "schema_studio_compiler",
-        "designId": "canonical_erp_mes_eqms_7layer_core"
+        "designId": "workspace"
     },
     "contracts": [
         {

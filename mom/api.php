@@ -88,6 +88,7 @@ $ROLE_PERMS_FILE   = $CONF_DIR . '/role_permissions.json';
 $CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.local.json';
 $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
 $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
+$MODULE_ACCESS_CONFIG_FILE = $CONF_DIR . '/module_access_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $EVIDENCE_RETENTION_POLICY_FILE = $CONF_DIR . '/evidence_retention_policy.json';
 $EVIDENCE_REVIEW_SLA_POLICY_FILE = $CONF_DIR . '/evidence_review_sla_policy.json';
@@ -100,6 +101,7 @@ $RELEASE_FOLLOWUP_STORE_FILE = $DATA_DIR . '/training/release-followup.json';
 $EPICOR_POLICY_FILE = $CONF_DIR . '/epicor_integration_policy.json';
 $RUNTIME_DATA_LAYER_OVERRIDE_FILE = $CONF_DIR . '/runtime_data_layer_overrides.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
+$PORTAL_ROLE_DOCS_FILE = $CONF_DIR . '/portal_role_docs.json';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
 $MAX_FORM_UPLOAD_BYTES = 25 * 1024 * 1024;
@@ -648,8 +650,14 @@ function write_json_file(string $path, array $data): void {
   $tmp = $path . '.tmp';
   $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
   if ($json === false) throw new RuntimeException('Failed to encode json');
-  if (@file_put_contents($tmp, $json, LOCK_EX) === false) throw new RuntimeException('Cannot write json');
-  @rename($tmp, $path);
+  $tmpWriteOk = @file_put_contents($tmp, $json, LOCK_EX);
+  if ($tmpWriteOk !== false) {
+    if (@rename($tmp, $path)) {
+      return;
+    }
+    @unlink($tmp);
+  }
+  if (@file_put_contents($path, $json, LOCK_EX) === false) throw new RuntimeException('Cannot write json');
 }
 
 function ts_compact(): string {
@@ -1064,9 +1072,198 @@ function merge_role_permission_row(array $base, array $override): array {
   return sanitize_role_permission_row($merged);
 }
 
+function portal_system_db_connection() {
+  static $initialized = false;
+  static $connection = null;
+
+  if ($initialized) {
+    return $connection;
+  }
+  $initialized = true;
+
+  $configFile = __DIR__ . '/database/config.php';
+  $connectionFile = __DIR__ . '/database/Connection.php';
+  if (!is_file($configFile) || !is_file($connectionFile)) {
+    return null;
+  }
+
+  $config = (array)(require $configFile);
+  if (empty($config['use_postgres'])) {
+    return null;
+  }
+
+  require_once $connectionFile;
+  if (!class_exists('\MOM\Database\Connection')) {
+    return null;
+  }
+
+  try {
+    $connection = \MOM\Database\Connection::getInstance($config);
+  } catch (Throwable $e) {
+    @error_log('[API] system DB connection unavailable: ' . $e->getMessage());
+    $connection = null;
+  }
+
+  return $connection;
+}
+
+function portal_system_config_shadow_read(string $key): ?array {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return null;
+  }
+
+  try {
+    $row = $connection->queryOne(
+      "SELECT enum_values
+         FROM variable_registry
+        WHERE category = 'config' AND key = :key
+        LIMIT 1",
+      [':key' => $key]
+    );
+    if (!is_array($row) || !array_key_exists('enum_values', $row)) {
+      return null;
+    }
+    $value = $row['enum_values'];
+    if (is_array($value)) {
+      return $value;
+    }
+    if (is_string($value)) {
+      $decoded = json_decode($value, true);
+      return is_array($decoded) ? $decoded : null;
+    }
+  } catch (Throwable $e) {
+    @error_log('[API] config shadow read failed for ' . $key . ': ' . $e->getMessage());
+  }
+
+  return null;
+}
+
+function portal_system_config_shadow_write(string $key, array $value): void {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return;
+  }
+
+  try {
+    $connection->execute(
+      "INSERT INTO variable_registry (category, key, label, data_type, enum_values)
+       VALUES ('config', :key, :label, 'json', :value::jsonb)
+       ON CONFLICT (category, key) DO UPDATE SET
+         label = EXCLUDED.label,
+         data_type = EXCLUDED.data_type,
+         enum_values = EXCLUDED.enum_values",
+      [
+        ':key' => $key,
+        ':label' => $key,
+        ':value' => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+      ]
+    );
+  } catch (Throwable $e) {
+    @error_log('[API] config shadow write failed for ' . $key . ': ' . $e->getMessage());
+  }
+}
+
+function portal_auth_shadow_sync_service(string $rootDir) {
+  static $loaded = false;
+  static $serviceClassReady = false;
+
+  if (!$loaded) {
+    $loaded = true;
+    $connectionFile = __DIR__ . '/database/Connection.php';
+    $serviceFile = __DIR__ . '/api/services/AuthUserShadowSyncService.php';
+    if (is_file($connectionFile)) require_once $connectionFile;
+    if (is_file($serviceFile)) require_once $serviceFile;
+    $serviceClassReady = class_exists('\MOM\Api\Services\AuthUserShadowSyncService');
+  }
+
+  if (!$serviceClassReady) {
+    return null;
+  }
+
+  try {
+    return new \MOM\Api\Services\AuthUserShadowSyncService($rootDir);
+  } catch (Throwable $e) {
+    @error_log('[API] auth shadow sync service unavailable: ' . $e->getMessage());
+    return null;
+  }
+}
+
+function portal_auth_employee_id_for_user(array $user): string {
+  $existing = strtoupper(trim((string)($user['employee_id'] ?? '')));
+  if ($existing !== '') {
+    $sanitized = preg_replace('/[^A-Z0-9_-]/', '', $existing);
+    return substr((string)$sanitized, 0, 20);
+  }
+
+  $service = portal_auth_shadow_sync_service(__DIR__);
+  if ($service && method_exists($service, 'canonicalEmployeeIdForUser')) {
+    try {
+      return \MOM\Api\Services\AuthUserShadowSyncService::canonicalEmployeeIdForUser($user);
+    } catch (Throwable $e) {
+      @error_log('[API] employee ID generation via shadow service failed: ' . $e->getMessage());
+    }
+  }
+
+  $seed = strtolower(trim((string)($user['username'] ?? '')));
+  if ($seed === '') $seed = strtolower(trim((string)($user['personal_email'] ?? $user['email'] ?? '')));
+  if ($seed === '') $seed = strtolower(trim((string)($user['cccd'] ?? '')));
+  if ($seed === '') $seed = json_encode($user, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: uniqid('emp', true);
+  return 'EMP' . strtoupper(substr(sha1($seed), 0, 12));
+}
+
+function portal_auth_normalize_user_linkage(array $user, string $rootDir): array {
+  $fallback = [
+    'dept_code' => trim((string)($user['dept'] ?? '')) !== '' ? trim((string)$user['dept']) : null,
+    'hcm_org_unit_id' => trim((string)($user['hcm_org_unit_id'] ?? '')) !== '' ? trim((string)$user['hcm_org_unit_id']) : null,
+    'hcm_position_id' => trim((string)($user['hcm_position_id'] ?? '')) !== '' ? trim((string)$user['hcm_position_id']) : null,
+    'position_title' => trim((string)($user['title'] ?? '')),
+  ];
+
+  $service = portal_auth_shadow_sync_service($rootDir);
+  if (!$service || !method_exists($service, 'normalizeUserLinkage')) {
+    return $fallback;
+  }
+
+  try {
+    $normalized = $service->normalizeUserLinkage($user);
+    return is_array($normalized) ? array_merge($fallback, $normalized) : $fallback;
+  } catch (Throwable $e) {
+    @error_log('[API] auth user linkage normalize failed: ' . $e->getMessage());
+    return $fallback;
+  }
+}
+
+function portal_auth_shadow_sync_user(array $user, string $rootDir): void {
+  $service = portal_auth_shadow_sync_service($rootDir);
+  if (!$service || !method_exists($service, 'syncUser')) {
+    return;
+  }
+  try {
+    $service->syncUser($user);
+  } catch (Throwable $e) {
+    @error_log('[API] auth user shadow sync failed: ' . $e->getMessage());
+  }
+}
+
+function portal_auth_shadow_deactivate_user(string $username, ?string $employeeId, string $rootDir): void {
+  $service = portal_auth_shadow_sync_service($rootDir);
+  if (!$service || !method_exists($service, 'deactivateUser')) {
+    return;
+  }
+  try {
+    $service->deactivateUser($username, $employeeId);
+  } catch (Throwable $e) {
+    @error_log('[API] auth user shadow deactivate failed: ' . $e->getMessage());
+  }
+}
+
 function load_role_permissions(string $file): array {
   $defaults = default_role_permissions();
-  $j = read_json_file($file);
+  $j = portal_system_config_shadow_read('role_permissions');
+  if (!is_array($j)) {
+    $j = read_json_file($file);
+  }
   if (!is_array($j)) return $defaults;
 
   $merged = $defaults;
@@ -1083,6 +1280,7 @@ function load_role_permissions(string $file): array {
 
 function save_role_permissions(string $file, array $perms): void {
   write_json_file($file, $perms);
+  portal_system_config_shadow_write('role_permissions', $perms);
 }
 
 function role_can_create_docs(array $user, string $file): bool {
@@ -1368,7 +1566,10 @@ function patch_custom_doc_entries(string $file, string $code, array $patch): boo
 
 // ---------- Document visibility (Effective docs) ----------
 function load_doc_visibility(string $file): array {
-  $j = read_json_file($file);
+  $j = portal_system_config_shadow_read('docs_visibility');
+  if (!is_array($j)) {
+    $j = read_json_file($file);
+  }
   if (is_array($j)) {
     $hidden = $j['hidden'] ?? null;
     if (is_array($hidden)) return array_values($hidden);
@@ -1379,7 +1580,9 @@ function load_doc_visibility(string $file): array {
 function save_doc_visibility(string $file, array $hidden): void {
   // Store as object for extensibility
   $hidden = array_values(array_unique(array_map('strval', $hidden)));
-  write_json_file($file, ['hidden' => $hidden, 'updated_at' => now_iso()]);
+  $payload = ['hidden' => $hidden, 'updated_at' => now_iso()];
+  write_json_file($file, $payload);
+  portal_system_config_shadow_write('docs_visibility', $payload);
 }
 
 function portal_default_doc_extensions(): array {
@@ -1555,6 +1758,192 @@ function portal_display_config_public_payload(array $config): array {
   ];
 }
 
+function module_access_portal_catalog(): array {
+  return [
+    ['id' => 'dashboard', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'documents', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'search', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'dictionary', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'access', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'deploy', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'exceptions', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'orders', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'dispatch', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'mes', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'mobile-shopfloor', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'quoting', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'purchasing', 'default_access' => 'roles', 'default_roles' => [
+      'admin',
+      'it_admin',
+      'ceo',
+      'qa_manager',
+      'quality_manager',
+      'qms_engineer',
+      'quality_engineer',
+      'qc_inspector',
+      'supply_chain_manager',
+      'buyer',
+      'warehouse_clerk',
+      'tool_storekeeper',
+      'logistics_coordinator',
+      'production_planner',
+    ]],
+    ['id' => 'quality-exceptions', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'supplier-quality', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'fmea', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'apqp-ppap', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'ai-scheduling', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'forms', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'evidence', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'compliance-reports', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'continuous-improvement', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'knowledge-base', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'cnc-programs', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'product-passport', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'schema-studio', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'energy-dashboard', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'customer-portal', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'admin', 'default_access' => 'admin', 'default_roles' => [], 'locked' => true],
+    ['id' => 'template-demo', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'module-builder', 'default_access' => 'admin', 'default_roles' => []],
+  ];
+}
+
+function module_access_admin_tab_catalog(): array {
+  return [
+    ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'dept_title', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'roles', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'orgchart', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'perms', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'module_access', 'default_access' => 'admin', 'default_roles' => [], 'locked' => true],
+    ['id' => 'activity', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'docs', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'portal_display', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'retention', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'data_sources', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'metadata_studio', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'infrastructure', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'manual_runtime', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'version_control', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'mfa', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'appearance', 'default_access' => 'admin', 'default_roles' => []],
+  ];
+}
+
+function module_access_policy_defaults(array $meta): array {
+  return [
+    'enabled' => true,
+    'access' => in_array((string)($meta['default_access'] ?? 'all'), ['all', 'admin', 'roles'], true)
+      ? (string)$meta['default_access']
+      : 'all',
+    'roles' => array_values(array_map('migrate_role', portal_normalize_lower_id_list((array)($meta['default_roles'] ?? [])))),
+  ];
+}
+
+function module_access_normalize_mode($value, string $default = 'all'): string {
+  $mode = strtolower(trim((string)$value));
+  return in_array($mode, ['all', 'admin', 'roles'], true) ? $mode : $default;
+}
+
+function module_access_normalize_policy(array $raw, array $meta): array {
+  $default = module_access_policy_defaults($meta);
+  if (!empty($meta['locked'])) {
+    return $default;
+  }
+
+  $roles = [];
+  $seenRoles = [];
+  foreach ((array)($raw['roles'] ?? $default['roles']) as $role) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    $normalizedRole = preg_replace('/[^a-z0-9_-]+/', '', $normalizedRole);
+    if ($normalizedRole === '' || isset($seenRoles[$normalizedRole])) continue;
+    $seenRoles[$normalizedRole] = true;
+    $roles[] = $normalizedRole;
+  }
+
+  return [
+    'enabled' => array_key_exists('enabled', $raw) ? (bool)$raw['enabled'] : $default['enabled'],
+    'access' => module_access_normalize_mode($raw['access'] ?? $default['access'], $default['access']),
+    'roles' => $roles,
+  ];
+}
+
+function module_access_config_defaults(): array {
+  $portal = [];
+  foreach (module_access_portal_catalog() as $meta) {
+    $portal[(string)$meta['id']] = module_access_policy_defaults($meta);
+  }
+
+  $adminTabs = [];
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $adminTabs[(string)$meta['id']] = module_access_policy_defaults($meta);
+  }
+
+  return [
+    'portal_modules' => $portal,
+    'admin_tabs' => $adminTabs,
+  ];
+}
+
+function module_access_load_config(string $file): array {
+  $raw = portal_system_config_shadow_read('module_access_config');
+  if (!is_array($raw)) {
+    $raw = read_json_file($file);
+  }
+  if (!is_array($raw)) {
+    $raw = [];
+  }
+
+  $config = module_access_config_defaults();
+  foreach (module_access_portal_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $config['portal_modules'][$id] = module_access_normalize_policy((array)($raw['portal_modules'][$id] ?? []), $meta);
+  }
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $config['admin_tabs'][$id] = module_access_normalize_policy((array)($raw['admin_tabs'][$id] ?? []), $meta);
+  }
+
+  return $config;
+}
+
+function module_access_save_config(string $file, array $config): array {
+  $normalized = module_access_config_defaults();
+  foreach (module_access_portal_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['portal_modules'][$id] = module_access_normalize_policy((array)($config['portal_modules'][$id] ?? []), $meta);
+  }
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
+  }
+
+  $payload = [
+    'portal_modules' => $normalized['portal_modules'],
+    'admin_tabs' => $normalized['admin_tabs'],
+    'updated_at' => now_iso(),
+  ];
+
+  write_json_file($file, $payload);
+  portal_system_config_shadow_write('module_access_config', $payload);
+
+  return $normalized;
+}
+
+function module_access_public_payload(array $config): array {
+  $normalized = module_access_config_defaults();
+  foreach (module_access_portal_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['portal_modules'][$id] = module_access_normalize_policy((array)($config['portal_modules'][$id] ?? []), $meta);
+  }
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
+  }
+  return $normalized;
+}
+
 function portal_doc_extension_is_enabled(string $ext, array $displayConfig): bool {
   $ext = strtolower(trim($ext));
   if ($ext === '') return false;
@@ -1590,12 +1979,10 @@ function portal_parse_js_string_array(string $src, string $constName): array {
   return array_values(array_map('stripcslashes', $matches[1] ?? []));
 }
 
-function portal_load_role_docs(string $jsFile): array {
-  static $cache = [];
-  if (isset($cache[$jsFile])) return $cache[$jsFile];
-  if (!is_file($jsFile)) return $cache[$jsFile] = [];
+function portal_parse_role_docs_from_js(string $jsFile): array {
+  if (!is_file($jsFile)) return [];
   $src = (string)@file_get_contents($jsFile);
-  if ($src === '') return $cache[$jsFile] = [];
+  if ($src === '') return [];
 
   $shared = [
     '_UNI' => portal_parse_js_string_array($src, '_UNI'),
@@ -1603,7 +1990,7 @@ function portal_load_role_docs(string $jsFile): array {
   ];
 
   if (!preg_match('/const\s+ROLE_DOCS\s*=\s*\{(.*?)\n\};/s', $src, $m)) {
-    return $cache[$jsFile] = [];
+    return [];
   }
 
   $body = (string)$m[1];
@@ -1645,7 +2032,104 @@ function portal_load_role_docs(string $jsFile): array {
     }
   }
 
-  return $cache[$jsFile] = $roleDocs;
+  return $roleDocs;
+}
+
+/**
+ * @param mixed $entry
+ * @return string|array<int, string>|null
+ */
+function portal_normalize_role_docs_entry($entry) {
+  if (is_string($entry) && strtoupper(trim($entry)) === 'ALL') {
+    return 'ALL';
+  }
+  if (!is_array($entry)) {
+    return null;
+  }
+  $patterns = [];
+  foreach ($entry as $value) {
+    foreach (portal_normalize_doc_pattern((string)$value) as $normalized) {
+      $normalized = strtoupper(trim((string)$normalized));
+      if ($normalized === '') continue;
+      $patterns[$normalized] = true;
+    }
+  }
+  return array_keys($patterns);
+}
+
+/**
+ * @param array<string, mixed> $raw
+ * @param array<string, mixed> $defaults
+ * @return array<string, string|array<int, string>>
+ */
+function portal_normalize_role_docs_map(array $raw, array $defaults = []): array {
+  $normalized = [];
+  foreach ($defaults as $role => $entry) {
+    $roleKey = migrate_role(strtolower(trim((string)$role)));
+    if ($roleKey === '') continue;
+    $normalizedEntry = portal_normalize_role_docs_entry($entry);
+    if ($normalizedEntry === null) continue;
+    $normalized[$roleKey] = $normalizedEntry;
+  }
+  foreach ($raw as $role => $entry) {
+    $roleKey = migrate_role(strtolower(trim((string)$role)));
+    if ($roleKey === '') continue;
+    $normalizedEntry = portal_normalize_role_docs_entry($entry);
+    if ($normalizedEntry === null) continue;
+    $normalized[$roleKey] = $normalizedEntry;
+  }
+  return $normalized;
+}
+
+/**
+ * @return array<string, array<string, string|array<int, string>>>
+ */
+function &portal_role_docs_cache_store(): array {
+  static $cache = [];
+  return $cache;
+}
+
+function portal_load_role_docs(string $jsFile, ?string $jsonFile = null): array {
+  $cache = &portal_role_docs_cache_store();
+  global $CONF_DIR;
+  $jsonFile = $jsonFile ?: ($CONF_DIR . '/portal_role_docs.json');
+  $cacheKey = $jsFile . '|' . $jsonFile;
+  if (isset($cache[$cacheKey])) return $cache[$cacheKey];
+
+  $defaults = portal_parse_role_docs_from_js($jsFile);
+  $stored = portal_system_config_shadow_read('portal_role_docs');
+  if (!is_array($stored) && is_file($jsonFile)) {
+    $stored = read_json_file($jsonFile);
+  }
+  if (is_array($stored) && isset($stored['role_docs']) && is_array($stored['role_docs'])) {
+    $stored = $stored['role_docs'];
+  }
+  if (!is_array($stored)) {
+    $stored = [];
+  }
+
+  return $cache[$cacheKey] = portal_normalize_role_docs_map($stored, $defaults);
+}
+
+/**
+ * @param array<string, mixed> $roleDocs
+ * @return array<string, string|array<int, string>>
+ */
+function portal_save_role_docs(string $file, array $roleDocs, string $jsFile): array {
+  $cache = &portal_role_docs_cache_store();
+  $normalized = portal_normalize_role_docs_map($roleDocs, portal_parse_role_docs_from_js($jsFile));
+  $payload = [
+    'role_docs' => $normalized,
+    'updated_at' => now_iso(),
+  ];
+  write_json_file($file, $payload);
+  portal_system_config_shadow_write('portal_role_docs', $payload);
+  foreach (array_keys($cache) as $cacheKey) {
+    if (str_starts_with($cacheKey, $jsFile . '|')) {
+      unset($cache[$cacheKey]);
+    }
+  }
+  return $normalized;
 }
 
 function portal_normalize_doc_pattern(string $pattern): array {
@@ -12211,11 +12695,18 @@ function normalize_session_dir(string $path): string {
 function session_dir_candidates(): array {
   global $DATA_DIR;
 
+  // Ensure primary session dir exists early (VPS deployments)
+  $primary = $DATA_DIR . '/sessions';
+  if ($primary !== '' && !is_dir($primary)) {
+    @mkdir($primary, 0775, true);
+  }
+
   $candidates = [
-    $DATA_DIR . '/sessions',
+    $primary,
     normalize_session_dir((string)session_save_path()),
     '/var/lib/php/sessions',
     sys_get_temp_dir() . '/hesem-sessions',
+    sys_get_temp_dir(),
   ];
 
   $unique = [];
@@ -13221,10 +13712,19 @@ function users_save(string $usersFile, array $store): void {
   // Prefer atomic write (tmp + rename). Some hosts may block rename() across
   // file systems; fall back to direct write in that case.
   $tmp = $usersFile . '.tmp';
-  $wroteTmp = @file_put_contents($tmp, $json, LOCK_EX);
+  $wroteTmp = false;
+  try {
+    $wroteTmp = @file_put_contents($tmp, $json, LOCK_EX);
+  } catch (Throwable $e) {
+    $wroteTmp = false;
+  }
 
   if ($wroteTmp === false) {
-    $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    try {
+      $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    } catch (Throwable $e) {
+      $wrote = false;
+    }
     if ($wrote === false) {
       throw new RuntimeException('Cannot write users file. Please ensure the web server can write to: ' . $usersFile);
     }
@@ -13232,11 +13732,28 @@ function users_save(string $usersFile, array $store): void {
     return;
   }
 
-  if (!@rename($tmp, $usersFile)) {
+  $renamed = false;
+  try {
+    $renamed = @rename($tmp, $usersFile);
+  } catch (Throwable $e) {
+    $renamed = false;
+  }
+
+  if (!$renamed) {
     // Fallback: direct write / copy
-    $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    try {
+      $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
+    } catch (Throwable $e) {
+      $wrote = false;
+    }
     if ($wrote === false) {
-      if (!@copy($tmp, $usersFile)) {
+      $copied = false;
+      try {
+        $copied = @copy($tmp, $usersFile);
+      } catch (Throwable $e) {
+        $copied = false;
+      }
+      if (!$copied) {
         @unlink($tmp);
         throw new RuntimeException('Cannot replace users file. Please ensure write permissions for: ' . $usersFile);
       }
@@ -13360,12 +13877,15 @@ function otpauth_url(string $issuer, string $account, string $secretB32): string
 
 function sanitize_user_for_client(array $user): array {
   return [
+    'employee_id' => (string)($user['employee_id'] ?? ''),
     'username' => (string)($user['username'] ?? ''),
     'active'   => (bool)($user['active'] ?? true),
     'role'     => (string)($user['role'] ?? 'user'),
     'name'     => (string)($user['name'] ?? ''),
     'dept'     => (string)($user['dept'] ?? ''),
     'title'    => (string)($user['title'] ?? ''),
+    'hcm_org_unit_id' => (string)($user['hcm_org_unit_id'] ?? ''),
+    'hcm_position_id' => (string)($user['hcm_position_id'] ?? ''),
     'cccd'     => (string)($user['cccd'] ?? ''),
     'phone'    => (string)($user['phone'] ?? ''),
     'personal_email' => (string)($user['personal_email'] ?? ''),
@@ -13545,7 +14065,8 @@ switch ($action) {
     $me = require_logged_in($store);
     if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
     $perms = load_role_permissions($ROLE_PERMS_FILE);
-    api_json(['ok' => true, 'perms' => $perms, 'server_time' => now_iso()]);
+    $roleDocs = portal_load_role_docs($PORTAL_CONFIG_JS_FILE, $PORTAL_ROLE_DOCS_FILE);
+    api_json(['ok' => true, 'perms' => $perms, 'role_docs' => $roleDocs, 'server_time' => now_iso()]);
   }
 
   case 'admin_role_perms_save': {
@@ -13560,6 +14081,10 @@ switch ($action) {
     $data = read_json_body();
     $in = $data['perms'] ?? null;
     if (!is_array($in)) api_json(['ok' => false, 'error' => 'invalid_perms'], 400);
+    $roleDocsInput = $data['role_docs'] ?? null;
+    if ($roleDocsInput !== null && !is_array($roleDocsInput)) {
+      api_json(['ok' => false, 'error' => 'invalid_role_docs'], 400);
+    }
 
     $clean = load_role_permissions($ROLE_PERMS_FILE);
     if (!is_array($clean)) {
@@ -13578,7 +14103,10 @@ switch ($action) {
     }
 
     save_role_permissions($ROLE_PERMS_FILE, $clean);
-    api_json(['ok' => true, 'perms' => $clean, 'server_time' => now_iso()]);
+    $roleDocs = $roleDocsInput === null
+      ? portal_load_role_docs($PORTAL_CONFIG_JS_FILE, $PORTAL_ROLE_DOCS_FILE)
+      : portal_save_role_docs($PORTAL_ROLE_DOCS_FILE, $roleDocsInput, $PORTAL_CONFIG_JS_FILE);
+    api_json(['ok' => true, 'perms' => $clean, 'role_docs' => $roleDocs, 'server_time' => now_iso()]);
   }
 
   case 'admin_git_sync': {
@@ -13877,6 +14405,27 @@ switch ($action) {
     $saved = portal_save_display_config($PORTAL_DISPLAY_CONFIG_FILE, $configIn);
     invalidate_scan_cache($DATA_DIR);
     api_json(['ok' => true, 'config' => portal_display_config_public_payload($saved), 'server_time' => now_iso()]);
+  }
+
+  case 'module_access_get': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    require_logged_in($store);
+    $config = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
+    api_json(['ok' => true, 'config' => module_access_public_payload($config), 'server_time' => now_iso()]);
+  }
+
+  case 'admin_module_access_save': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    $data = read_json_body();
+    $configIn = $data['config'] ?? null;
+    if (!is_array($configIn)) api_json(['ok' => false, 'error' => 'invalid_config'], 400);
+
+    $saved = module_access_save_config($MODULE_ACCESS_CONFIG_FILE, $configIn);
+    api_json(['ok' => true, 'config' => module_access_public_payload($saved), 'server_time' => now_iso()]);
   }
 
 
@@ -15718,22 +16267,16 @@ case 'doc_save_draft': {
     if (!$isAdmin) api_json(['ok' => false, 'error' => 'forbidden'], 403);
 
     $out = [];
-    $i = 1;
     foreach (($store['users'] ?? []) as $u) {
       if (!is_array($u)) continue;
-      $out[] = [
-        'id' => $i++,
-        'name' => (string)($u['name'] ?? ''),
-        'username' => (string)($u['username'] ?? ''),
-        'role' => (string)($u['role'] ?? 'user'),
-        'dept' => (string)($u['dept'] ?? ''),
-        'title' => (string)($u['title'] ?? ''),
-        'active' => (bool)($u['active'] ?? true),
-        'mfa' => ['enabled' => (bool)(($u['mfa']['enabled'] ?? false))],
-        'updated_at' => (string)($u['updated_at'] ?? ''),
-        'created_at' => (string)($u['created_at'] ?? ''),
-      ];
+      $row = sanitize_user_for_client($u);
+      $row['id'] = $row['employee_id'] !== '' ? $row['employee_id'] : ($row['username'] !== '' ? $row['username'] : uniqid('user_', true));
+      $out[] = $row;
     }
+
+    usort($out, static function(array $a, array $b): int {
+      return strcasecmp((string)($a['name'] ?? ''), (string)($b['name'] ?? ''));
+    });
 
     api_json(['ok' => true, 'users' => $out, 'server_time' => now_iso()]);
   }
@@ -15760,6 +16303,8 @@ case 'doc_save_draft': {
     $cccd = trim((string)($data['cccd'] ?? ''));
     $phone = trim((string)($data['phone'] ?? ''));
     $personal_email = trim((string)($data['personal_email'] ?? ''));
+    $hcmOrgUnitId = trim((string)($data['hcm_org_unit_id'] ?? ''));
+    $hcmPositionId = trim((string)($data['hcm_position_id'] ?? ''));
     $orgCompanyCode = trim((string)($data['org_company_code'] ?? ''));
     $orgLegalEntityCode = trim((string)($data['org_legal_entity_code'] ?? ''));
     $orgPlantId = trim((string)($data['org_plant_id'] ?? ''));
@@ -15779,6 +16324,9 @@ case 'doc_save_draft': {
     foreach ($users as $i => $u) {
       if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
         $found = true;
+        $users[$i]['employee_id'] = trim((string)($users[$i]['employee_id'] ?? '')) !== ''
+          ? (string)$users[$i]['employee_id']
+          : portal_auth_employee_id_for_user($users[$i]);
         $users[$i]['name'] = $name !== '' ? $name : ($users[$i]['name'] ?? $username);
         $users[$i]['dept'] = $dept;
         $users[$i]['title'] = $title;
@@ -15787,6 +16335,8 @@ case 'doc_save_draft': {
         $users[$i]['cccd'] = $cccd;
         $users[$i]['phone'] = $phone;
         $users[$i]['personal_email'] = $personal_email;
+        $users[$i]['hcm_org_unit_id'] = $hcmOrgUnitId;
+        $users[$i]['hcm_position_id'] = $hcmPositionId;
         $users[$i]['org_company_code'] = $orgCompanyCode;
         $users[$i]['org_legal_entity_code'] = $orgLegalEntityCode;
         $users[$i]['org_plant_id'] = $orgPlantId;
@@ -15800,6 +16350,16 @@ case 'doc_save_draft': {
           // Clear any legacy keys
           unset($users[$i]['mfa_enabled'], $users[$i]['mfa_secret'], $users[$i]['pin']);
         }
+
+        $linkage = portal_auth_normalize_user_linkage($users[$i], $ROOT_DIR);
+        $users[$i]['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $users[$i]['hcm_org_unit_id'] ?? '');
+        $users[$i]['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $users[$i]['hcm_position_id'] ?? '');
+        if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
+          $users[$i]['dept'] = (string)$linkage['dept_code'];
+        }
+        if (trim((string)($linkage['position_title'] ?? '')) !== '') {
+          $users[$i]['title'] = (string)$linkage['position_title'];
+        }
         break;
       }
     }
@@ -15810,6 +16370,11 @@ case 'doc_save_draft': {
       }
 
       $users[] = [
+        'employee_id' => portal_auth_employee_id_for_user([
+          'username' => $username,
+          'personal_email' => $personal_email,
+          'cccd' => $cccd,
+        ]),
         'username' => $username,
         'password_hash' => password_hash((string)$plainPassword, PASSWORD_DEFAULT),
         'name' => $name !== '' ? $name : $username,
@@ -15820,6 +16385,8 @@ case 'doc_save_draft': {
         'cccd' => $cccd,
         'phone' => $phone,
         'personal_email' => $personal_email,
+        'hcm_org_unit_id' => $hcmOrgUnitId,
+        'hcm_position_id' => $hcmPositionId,
         'org_company_code' => $orgCompanyCode,
         'org_legal_entity_code' => $orgLegalEntityCode,
         'org_plant_id' => $orgPlantId,
@@ -15828,6 +16395,18 @@ case 'doc_save_draft': {
         'created_at' => now_iso(),
         'updated_at' => now_iso(),
       ];
+      $lastIndex = count($users) - 1;
+      if ($lastIndex >= 0) {
+        $linkage = portal_auth_normalize_user_linkage($users[$lastIndex], $ROOT_DIR);
+        $users[$lastIndex]['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $users[$lastIndex]['hcm_org_unit_id'] ?? '');
+        $users[$lastIndex]['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $users[$lastIndex]['hcm_position_id'] ?? '');
+        if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
+          $users[$lastIndex]['dept'] = (string)$linkage['dept_code'];
+        }
+        if (trim((string)($linkage['position_title'] ?? '')) !== '') {
+          $users[$lastIndex]['title'] = (string)$linkage['position_title'];
+        }
+      }
     }
 
     $store['users'] = $users;
@@ -15838,6 +16417,9 @@ case 'doc_save_draft': {
     }
 
     $updated = find_user_by_username($store, $username);
+    if (is_array($updated)) {
+      portal_auth_shadow_sync_user($updated, $ROOT_DIR);
+    }
     api_json([
       'ok' => true,
       'user' => $updated ? sanitize_user_for_client($updated) : null,
@@ -15867,9 +16449,11 @@ case 'doc_save_draft': {
     $users = $store['users'] ?? [];
     $found = false;
     $newUsers = [];
+    $deletedUser = null;
     foreach ($users as $u) {
       if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
         $found = true;
+        $deletedUser = is_array($u) ? $u : null;
         continue; // skip = remove
       }
       $newUsers[] = $u;
@@ -15879,6 +16463,11 @@ case 'doc_save_draft': {
 
     $store['users'] = $newUsers;
     users_save($USERS_FILE, $store);
+    portal_auth_shadow_deactivate_user(
+      $username,
+      is_array($deletedUser) ? (string)($deletedUser['employee_id'] ?? '') : null,
+      $ROOT_DIR
+    );
     api_json(['ok' => true, 'deleted' => $username]);
   }
 
@@ -15900,6 +16489,9 @@ case 'doc_save_draft': {
     foreach ($users as $i => $u) {
       if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
         $found = true;
+        $users[$i]['employee_id'] = trim((string)($users[$i]['employee_id'] ?? '')) !== ''
+          ? (string)$users[$i]['employee_id']
+          : portal_auth_employee_id_for_user($users[$i]);
         $users[$i]['password_hash'] = password_hash($newPw, PASSWORD_DEFAULT);
         $users[$i]['updated_at'] = now_iso();
         // Reset MFA enrollment (force re-enroll)
@@ -15916,6 +16508,11 @@ case 'doc_save_draft': {
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
       api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+    }
+
+    $updated = find_user_by_username($store, $username);
+    if (is_array($updated)) {
+      portal_auth_shadow_sync_user($updated, $ROOT_DIR);
     }
 
     api_json(['ok' => true, 'username' => $username, 'temp_password' => $newPw]);
@@ -17746,6 +18343,11 @@ if ($username === '') {
     api_json(['ok' => true, 'record_types' => load_record_type_registry()]);
   }
 
+  // MVC-named alias — delegates to the complete legacy allocation logic below.
+  // When the MVC AllocationController is reached via the default case, it uses a
+  // different data store (allocation_log.json). Routing allocation_allocate here
+  // ensures all allocations land in allocations.json, which eqms_record_registry reads.
+  case 'allocation_allocate':
   case 'record_id_generate': {
     $me = require_logged_in($store);
     require_csrf();
@@ -17861,6 +18463,7 @@ if ($username === '') {
     ]);
   }
 
+  case 'allocation_history':   // MVC alias → legacy handler
   case 'record_id_history': {
     require_logged_in($store);
     $body = read_json_body();
@@ -17887,6 +18490,7 @@ if ($username === '') {
     api_json(['ok' => true, 'exists' => (bool)$allocation, 'allocation' => $allocation]);
   }
 
+  case 'allocation_void':   // MVC alias → legacy handler
   case 'record_id_void': {
     $me = require_logged_in($store);
     require_csrf();
@@ -18461,6 +19065,22 @@ if ($username === '') {
         $schema = json_decode((string)@file_get_contents($f), true);
         if (!is_array($schema) || empty($schema['form_code'])) continue;
         $code = (string)$schema['form_code'];
+        $codeNum = (int)preg_replace('/\D+/', '', $code);
+        $schemaRecordType = (string)($schema['record_type'] ?? '');
+        if($schemaRecordType === '') {
+          $schemaRecordType = match(true) {
+            $codeNum >= 100 && $codeNum < 200 => 'MGMT',
+            $codeNum >= 200 && $codeNum < 300 => 'SALE',
+            $codeNum >= 300 && $codeNum < 400 => 'ENGR',
+            $codeNum >= 400 && $codeNum < 500 => 'SCMR',
+            $codeNum >= 500 && $codeNum < 600 => 'PROD',
+            $codeNum >= 600 && $codeNum < 700 => 'QUAL',
+            $codeNum >= 700 && $codeNum < 800 => 'LOGR',
+            $codeNum >= 800 && $codeNum < 900 => 'HREC',
+            $codeNum >= 900 && $codeNum < 1000 => 'MGTR',
+            default => 'GENR',
+          };
+        }
         $onlineMap[$code] = [
           'form_code' => $code,
           'title' => (string)($schema['title'] ?? $code),
@@ -18472,7 +19092,7 @@ if ($username === '') {
           'online' => ($schema['online'] ?? true) !== false,
           'version' => (string)($schema['version'] ?? 'V1'),
           'standalone_html' => (string)($schema['standalone_html'] ?? ''),
-          'record_type' => (string)($schema['record_type'] ?? ''),
+          'record_type' => $schemaRecordType,
           'roles_allowed' => is_array($schema['roles_allowed'] ?? null) ? $schema['roles_allowed'] : [],
           'schema' => $schema,
         ];
@@ -18507,11 +19127,29 @@ if ($username === '') {
           $num = (int)preg_replace('/\D+/', '', (string)$code);
           $series = (int)floor($num / 100) * 100;
           $category = match (true) {
+            $series >= 100 && $series < 200 => 'management',
+            $series >= 200 && $series < 300 => 'sales',
+            $series >= 300 && $series < 400 => 'engineering',
+            $series >= 400 && $series < 500 => 'scm',
             $series >= 500 && $series < 600 => 'production',
             $series >= 600 && $series < 700 => 'quality',
-            $series >= 800 && $series < 900 => 'hr',
             $series >= 700 && $series < 800 => 'logistics',
+            $series >= 800 && $series < 900 => 'hr',
+            $series >= 900 && $series < 1000 => 'management_review',
             default => 'other',
+          };
+          // Auto-derive record type from series so every form gets a traceable code
+          $autoRecordType = match (true) {
+            $num >= 100 && $num < 200 => 'MGMT',
+            $num >= 200 && $num < 300 => 'SALE',
+            $num >= 300 && $num < 400 => 'ENGR',
+            $num >= 400 && $num < 500 => 'SCMR',
+            $num >= 500 && $num < 600 => 'PROD',
+            $num >= 600 && $num < 700 => 'QUAL',
+            $num >= 700 && $num < 800 => 'LOGR',
+            $num >= 800 && $num < 900 => 'HREC',
+            $num >= 900 && $num < 1000 => 'MGTR',
+            default => 'GENR',
           };
           $catalogMap[$code] = [
             'form_code' => (string)$code,
@@ -18526,6 +19164,7 @@ if ($username === '') {
             'blank_filename' => (string)($entry['filename'] ?? ''),
             'template_checksum' => (string)($entry['sha256'] ?? ''),
             'delivery_mode' => (string)($entry['delivery_mode'] ?? 'download'),
+            'record_type' => (string)($entry['record_type'] ?? $autoRecordType),
           ];
         }
       }

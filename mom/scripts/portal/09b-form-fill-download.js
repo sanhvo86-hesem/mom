@@ -36,28 +36,44 @@ function user(){
   return { username:String(u.username||'').trim(), name:String(u.display_name||u.name||u.username||'').trim(), title:String(u.title||u.role||'').trim(), dept:String(u.dept||'').trim(), signerId:String(u.username||'').trim().toUpperCase() };
 }
 
-var DEPARTMENTS = [
-  {v:'QA',l:'Đảm bảo chất lượng',e:'Quality Assurance'},
-  {v:'PRO',l:'Sản xuất',e:'Production'},
-  {v:'ENG',l:'Kỹ thuật',e:'Engineering'},
-  {v:'SCM',l:'Chuỗi cung ứng',e:'Supply Chain'},
-  {v:'HR',l:'Nhân sự & Đào tạo',e:'HR & Training'},
-  {v:'EXE',l:'Ban giám đốc',e:'Executive'},
-  {v:'SAL',l:'Kinh doanh',e:'Sales'},
-  {v:'WH',l:'Kho vận',e:'Warehouse'},
-  {v:'IT',l:'Công nghệ thông tin',e:'IT'},
-  {v:'EHS',l:'An toàn & Môi trường',e:'EHS'}
-];
+/* DEPARTMENTS — loaded from HmRegistry → 'department' (single source of truth) */
+var DEPARTMENTS = (function(){
+  var fallback = [
+    {v:'QA',l:'Đảm bảo chất lượng',e:'Quality Assurance'},
+    {v:'PRO',l:'Sản xuất',e:'Production'},
+    {v:'ENG',l:'Kỹ thuật',e:'Engineering'},
+    {v:'SCM',l:'Chuỗi cung ứng',e:'Supply Chain'},
+    {v:'HR',l:'Nhân sự & Đào tạo',e:'HR & Training'},
+    {v:'EXE',l:'Ban giám đốc',e:'Executive'},
+    {v:'SAL',l:'Kinh doanh',e:'Sales'},
+    {v:'WH',l:'Kho vận',e:'Warehouse'},
+    {v:'IT',l:'Công nghệ thông tin',e:'IT'},
+    {v:'EHS',l:'An toàn & Môi trường',e:'EHS'}
+  ];
+  if(window.HmRegistry){
+    var opts = HmRegistry.selectOptions('department_code');
+    if(opts && opts.length) return opts.map(function(o){ return {v:o.value,l:o.label||o.value,e:o.labelEn||o.label||o.value}; });
+  }
+  return fallback;
+})();
 
-var RELATED_RELATIONS = [
-  { value:'related', labelVi:'Liên quan', labelEn:'Related' },
-  { value:'corrective_for', labelVi:'Khắc phục cho', labelEn:'Corrective for' },
-  { value:'caused_by', labelVi:'Phát sinh từ', labelEn:'Caused by' },
-  { value:'verifies', labelVi:'Xác minh cho', labelEn:'Verifies' },
-  { value:'references', labelVi:'Tham chiếu', labelEn:'References' },
-  { value:'supersedes', labelVi:'Thay thế', labelEn:'Supersedes' },
-  { value:'training_for', labelVi:'Đào tạo cho', labelEn:'Training for' }
-];
+/* RELATED_RELATIONS — loaded from HmRegistry → 'record_relation_type' */
+var RELATED_RELATIONS = (function(){
+  var fallback = [
+    { value:'related', labelVi:'Liên quan', labelEn:'Related' },
+    { value:'corrective_for', labelVi:'Khắc phục cho', labelEn:'Corrective for' },
+    { value:'caused_by', labelVi:'Phát sinh từ', labelEn:'Caused by' },
+    { value:'verifies', labelVi:'Xác minh cho', labelEn:'Verifies' },
+    { value:'references', labelVi:'Tham chiếu', labelEn:'References' },
+    { value:'supersedes', labelVi:'Thay thế', labelEn:'Supersedes' },
+    { value:'training_for', labelVi:'Đào tạo cho', labelEn:'Training for' }
+  ];
+  if(window.HmRegistry){
+    var opts = HmRegistry.selectOptions('record_relation_type');
+    if(opts && opts.length) return opts.map(function(o){ return {value:o.value,labelVi:o.label||o.value,labelEn:o.labelEn||o.label||o.value}; });
+  }
+  return fallback;
+})();
 
 /* ── Workspace state ── */
 var ws = {
@@ -3438,10 +3454,11 @@ function linkOrderIfPossible(allocation){
 /* ── server draft persistence ── */
 function saveDraftToServer(form, allocation){
   if(!form || !allocation || !allocation.allocation_id) return;
-  api('form_fill_save_draft', {
+  api('form_draft_save', {
     allocation_id: allocation.allocation_id,
-    form_code: form.form_code,
-    data: { fieldValues: ws.fieldValues, signatures: ws.signatures }
+    code: form.form_code,
+    field_values: ws.fieldValues,
+    signatures: ws.signatures
   }, 'POST').catch(function(){
     toast(t('Không lưu được nháp lên máy chủ. Bản cục bộ vẫn còn.','Draft was not saved to the server. The local copy is still available.'),'warn');
   });
@@ -3452,9 +3469,13 @@ function userHasApproveRole(schema){
   var u = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
   var roles = Array.isArray(u.roles) ? u.roles : [String(u.role || '')];
   var cfg = reviewConfig(schema || {});
+  /* Approval roles: prefer schema config, then HmRegistry, then built-in fallback */
   var approveRoles = Array.isArray(cfg.rolesAllowed) && cfg.rolesAllowed.length
     ? cfg.rolesAllowed
-    : ['admin','qa_manager','quality_manager','production_manager','engineering_manager','production_director','engineering_lead','quality_engineer','qms_engineer'];
+    : (window.HmRegistry && typeof HmRegistry.selectOptions === 'function'
+      ? (HmRegistry.selectOptions('approval_roles') || []).map(function(o){ return o.value; })
+      : []);
+  if(!approveRoles.length) approveRoles = ['admin','qa_manager','quality_manager','production_manager','engineering_manager','production_director','engineering_lead','quality_engineer','qms_engineer'];
   for(var i = 0; i < roles.length; i++){
     if(approveRoles.indexOf(String(roles[i]).toLowerCase()) >= 0) return true;
   }

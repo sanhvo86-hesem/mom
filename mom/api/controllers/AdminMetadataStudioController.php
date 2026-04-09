@@ -4,15 +4,25 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
-/**
- * Admin metadata studio controller.
- *
- * Provides a focused admin API for governing API catalog metadata,
- * table registry definitions, schema blueprints, canonical data fields,
- * and variable libraries from one unified admin workspace.
- */
-class AdminMetadataStudioController extends BaseController
+use MOM\Services\DataSchemaService;
+
+final class AdminMetadataStudioController extends BaseController
 {
+    private DataSchemaService $service;
+
+    public function __construct(\MOM\Database\DataLayer $data, string $rootDir, string $dataDir)
+    {
+        parent::__construct($data, $rootDir, $dataDir);
+        $this->service = new DataSchemaService($data, $dataDir, $rootDir);
+    }
+
+    private function requireWorkspaceAccess(): array
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        return $user;
+    }
+
     private function registryDir(): string
     {
         $dir = $this->dataDir . '/registry';
@@ -40,325 +50,13 @@ class AdminMetadataStudioController extends BaseController
         return trim($value, $separator);
     }
 
-    protected function nowIso(): string
-    {
-        return gmdate('c');
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function benchmarkReferences(): array
-    {
-        return [
-            [
-                'key' => 'postman_api_catalog',
-                'platform' => 'Postman API Catalog',
-                'url' => 'https://learning.postman.com/docs/api-catalog/overview/',
-                'focus' => [
-                    'central API catalog',
-                    'governance groups',
-                    'ownership and health visibility',
-                ],
-            ],
-            [
-                'key' => 'supabase_tables',
-                'platform' => 'Supabase Tables and Data',
-                'url' => 'https://supabase.com/docs/guides/database/tables',
-                'focus' => [
-                    'schema > table > column navigation',
-                    'spreadsheet-like table editor',
-                    'physical schema + easy data operations',
-                ],
-            ],
-            [
-                'key' => 'supabase_auto_docs',
-                'platform' => 'Supabase Auto-generated Docs',
-                'url' => 'https://supabase.com/docs/guides/api/rest/auto-generated-docs',
-                'focus' => [
-                    'API docs generated from schema',
-                    'table/view-aware documentation',
-                ],
-            ],
-            [
-                'key' => 'directus_data_model',
-                'platform' => 'Directus Data Model',
-                'url' => 'https://docs.directus.io/app/data-model',
-                'focus' => [
-                    'SQL-backed visual data model',
-                    'collections, fields, relations',
-                    'human labels over physical structures',
-                ],
-            ],
-            [
-                'key' => 'hasura_metadata',
-                'platform' => 'Hasura Metadata-driven API Layer',
-                'url' => 'https://hasura.io/ddn',
-                'focus' => [
-                    'metadata-powered API platform',
-                    'governance through declarative metadata',
-                    'cross-domain aggregation',
-                ],
-            ],
-            [
-                'key' => 'dataverse_metadata',
-                'platform' => 'Microsoft Dataverse Metadata',
-                'url' => 'https://learn.microsoft.com/en-us/power-apps/developer/data-platform/webapi/create-update-entity-definitions-using-web-api',
-                'focus' => [
-                    'logical names vs display names',
-                    'localized labels',
-                    'table definition through API',
-                ],
-            ],
-            [
-                'key' => 'dataverse_virtual_tables',
-                'platform' => 'Microsoft Dataverse Virtual Tables',
-                'url' => 'https://learn.microsoft.com/en-us/power-apps/maker/data-platform/create-edit-virtual-entities',
-                'focus' => [
-                    'external data surfaced as tables',
-                    'virtual schema governance',
-                ],
-            ],
-            [
-                'key' => 'ifs_projections',
-                'platform' => 'IFS Cloud Projections',
-                'url' => 'https://docs.ifs.com/techdocs/25r2/030_administration/010_security/020_permission_sets/004_permission_set_overview/010_projections/',
-                'focus' => [
-                    'bounded API surface',
-                    'permission set based access levels',
-                ],
-            ],
-            [
-                'key' => 'oracle_workflow_status',
-                'platform' => 'Oracle Quality Workflow Status',
-                'url' => 'https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/24b/fauqm/workflow-status.html',
-                'focus' => [
-                    'predefined quality workflow states',
-                    'read-only states and status governance',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @return array<int, array<string, string>>
-     */
-    private function benchmarkPrinciples(): array
-    {
-        return [
-            [
-                'title' => 'Metadata First',
-                'description' => 'Giữ API, table, field và schema ở dạng metadata có thể kiểm soát, thay vì hardcode rải rác trong UI.',
-            ],
-            [
-                'title' => 'Physical + Logical Together',
-                'description' => 'Hiển thị tên kỹ thuật cùng label nghiệp vụ/song ngữ để người vận hành và kỹ sư cùng làm việc được trên một màn.',
-            ],
-            [
-                'title' => 'Reusable Fields',
-                'description' => 'Field không nên sống đơn lẻ; chúng cần được liên kết với endpoint, db column, status set và validation rule rõ ràng.',
-            ],
-            [
-                'title' => 'Bounded Governance',
-                'description' => 'API nên có owner/module/domain/phạm vi rõ ràng; schema nên gom theo business capability thay vì file kỹ thuật rời rạc.',
-            ],
-            [
-                'title' => 'Variables as Assets',
-                'description' => 'Variable library cần được quản trị như tài sản hệ thống để template, form, document và automation dùng chung.',
-            ],
-        ];
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function apiSummaries(array $endpointCatalog): array
-    {
-        $rows = [];
-        $endpoints = is_array($endpointCatalog['endpoints'] ?? null) ? $endpointCatalog['endpoints'] : [];
-        foreach ($endpoints as $action => $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $rows[] = [
-                'key' => (string)$action,
-                'action' => (string)($item['action'] ?? $action),
-                'label' => (string)($item['label'] ?? $action),
-                'labelEn' => (string)($item['labelEn'] ?? $item['label'] ?? $action),
-                'module' => (string)($item['module'] ?? ''),
-                'moduleEn' => (string)($item['moduleEn'] ?? $item['module'] ?? ''),
-                'method' => strtoupper((string)($item['method'] ?? 'GET')),
-                'kind' => (string)($item['kind'] ?? ''),
-                'domain' => (string)($item['domain'] ?? ''),
-                'entity' => (string)($item['entity'] ?? ''),
-                'field_count' => (int)($item['field_count'] ?? 0),
-                'source' => (string)($item['source'] ?? ''),
-            ];
-        }
-
-        usort($rows, static function (array $a, array $b): int {
-            return [$a['module'], $a['action']] <=> [$b['module'], $b['action']];
-        });
-
-        return $rows;
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function tableSummaries(array $tableRegistry): array
-    {
-        $rows = [];
-        $tables = is_array($tableRegistry['tables'] ?? null) ? $tableRegistry['tables'] : [];
-        foreach ($tables as $tableKey => $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $rows[] = [
-                'key' => (string)$tableKey,
-                'label' => (string)($item['label'] ?? $tableKey),
-                'labelEn' => (string)($item['labelEn'] ?? $item['label'] ?? $tableKey),
-                'domain' => (string)($item['domain'] ?? ''),
-                'migration' => (string)($item['migration'] ?? ''),
-                'workflowId' => (string)($item['workflowId'] ?? ''),
-                'statusColumn' => (string)($item['statusColumn'] ?? ''),
-                'columnCount' => (int)($item['columnCount'] ?? count((array)($item['columns'] ?? []))),
-                'supportTable' => (bool)($item['supportTable'] ?? false),
-            ];
-        }
-
-        usort($rows, static fn(array $a, array $b): int => [$a['domain'], $a['key']] <=> [$b['domain'], $b['key']]);
-        return $rows;
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function schemaSummaries(array $schemaLibrary): array
-    {
-        $rows = [];
-        $entities = is_array($schemaLibrary['entities'] ?? null) ? $schemaLibrary['entities'] : [];
-        foreach ($entities as $schemaKey => $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $rows[] = [
-                'key' => (string)$schemaKey,
-                'description' => (string)($item['description'] ?? ''),
-                'tableCount' => count((array)($item['tables'] ?? [])),
-                'migrationCount' => count((array)($item['migrations'] ?? [])),
-            ];
-        }
-
-        usort($rows, static fn(array $a, array $b): int => $a['key'] <=> $b['key']);
-        return $rows;
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function variableSummaries(array $variableLibrary): array
-    {
-        $rows = [];
-        $categories = is_array($variableLibrary['categories'] ?? null) ? $variableLibrary['categories'] : [];
-        foreach ($categories as $categoryKey => $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $rows[] = [
-                'key' => (string)$categoryKey,
-                'label' => (string)($item['label'] ?? $categoryKey),
-                'label_vi' => (string)($item['label_vi'] ?? $item['label'] ?? $categoryKey),
-                'description' => (string)($item['description'] ?? ''),
-                'variableCount' => count((array)($item['variables'] ?? [])),
-            ];
-        }
-
-        usort($rows, static fn(array $a, array $b): int => $a['key'] <=> $b['key']);
-        return $rows;
-    }
-
-    private function countVariables(array $variableLibrary): int
-    {
-        $count = 0;
-        $categories = is_array($variableLibrary['categories'] ?? null) ? $variableLibrary['categories'] : [];
-        foreach ($categories as $item) {
-            if (is_array($item)) {
-                $count += count((array)($item['variables'] ?? []));
-            }
-        }
-        return $count;
-    }
-
     private function dataFieldsIndex(): array
     {
         return $this->readJsonFile($this->registryPath('data-fields')) ?? [];
     }
 
-    private function schemaStudioManifest(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-enterprise-manifest')) ?? [];
-    }
-
-    private function schemaStudioRuntimeProjection(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-runtime-projections')) ?? [];
-    }
-
-    private function schemaStudioReleaseLog(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-release-log')) ?? [];
-    }
-
-    private function schemaStudioDiagnostics(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-diagnostics')) ?? [];
-    }
-
-    private function schemaStudioExperienceReport(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-experience-report')) ?? [];
-    }
-
-    private function schemaStudioOperationsReport(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-operations-report')) ?? [];
-    }
-
-    private function schemaStudioCommandCenterReport(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-command-center-report')) ?? [];
-    }
-
-    private function schemaStudioRound7Report(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-round7-report')) ?? [];
-    }
-
-    private function schemaStudioRound9Report(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-round9-report')) ?? [];
-    }
-
-    private function schemaStudioRound10Report(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-round10-report')) ?? [];
-    }
-
-    private function schemaStudioRound11Report(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-round11-report')) ?? [];
-    }
-
-
-    private function schemaStudioRound12Report(): array
-    {
-        return $this->readJsonFile($this->registryPath('schema-studio-round12-report')) ?? [];
-    }
-
-
     /**
-     * @return array<int, array<string, mixed>>
+     * @return list<array<string, mixed>>
      */
     private function dataFieldsParts(array $index): array
     {
@@ -366,6 +64,9 @@ class AdminMetadataStudioController extends BaseController
         return is_array($parts) ? array_values(array_filter($parts, 'is_array')) : [];
     }
 
+    /**
+     * @return list<array<string, mixed>>|null
+     */
     private function loadDataFieldsEntry(string $endpointKey): ?array
     {
         $index = $this->dataFieldsIndex();
@@ -388,7 +89,7 @@ class AdminMetadataStudioController extends BaseController
     }
 
     /**
-     * @param array<int, array<string, mixed>> $fields
+     * @param list<array<string, mixed>> $fields
      */
     private function saveDataFieldsEntry(string $endpointKey, array $fields): void
     {
@@ -418,21 +119,20 @@ class AdminMetadataStudioController extends BaseController
             break;
         }
 
+        if (!$updated && $parts !== []) {
+            $last = $parts[count($parts) - 1];
+            $file = trim((string)($last['file'] ?? ''));
+            if ($file !== '') {
+                $path = $this->registryDir() . '/' . $file;
+                $payload = $this->readJsonFile($path) ?? [];
+                $payload[$endpointKey] = $fields;
+                $this->writeJsonFile($path, $payload);
+                $updated = true;
+            }
+        }
+
         if (!$updated) {
-            if ($parts !== []) {
-                $last = $parts[count($parts) - 1];
-                $file = trim((string)($last['file'] ?? ''));
-                if ($file !== '') {
-                    $path = $this->registryDir() . '/' . $file;
-                    $payload = $this->readJsonFile($path) ?? [];
-                    $payload[$endpointKey] = $fields;
-                    $this->writeJsonFile($path, $payload);
-                    $updated = true;
-                }
-            }
-            if (!$updated) {
-                $index[$endpointKey] = $fields;
-            }
+            $index[$endpointKey] = $fields;
         }
 
         $this->writeJsonFile($indexPath, $index);
@@ -458,8 +158,7 @@ class AdminMetadataStudioController extends BaseController
             return;
         }
 
-        $label = str_replace('_', ' ', $domain);
-        $label = ucwords($label);
+        $label = ucwords(str_replace('_', ' ', $domain));
         $tableRegistry['domains'][$domain] = [
             'label' => $label,
             'labelEn' => $label,
@@ -482,217 +181,230 @@ class AdminMetadataStudioController extends BaseController
             if (!is_array($domainMeta)) {
                 continue;
             }
-            $tables = array_values(array_filter((array)($domainMeta['tables'] ?? []), static function ($item) use ($tableKey): bool {
-                return (string)$item !== $tableKey;
-            }));
+            $tables = array_values(array_filter((array)($domainMeta['tables'] ?? []), static fn(mixed $item): bool => (string)$item !== $tableKey));
             $tableRegistry['domains'][$domainKey]['tables'] = $tables;
         }
 
         $this->ensureDomainEntry($tableRegistry, $domain);
-        $tables = array_values(array_unique(array_merge(
-            (array)($tableRegistry['domains'][$domain]['tables'] ?? []),
-            [$tableKey],
-        )));
+        $tables = array_values(array_unique(array_merge((array)($tableRegistry['domains'][$domain]['tables'] ?? []), [$tableKey])));
         sort($tables);
         $tableRegistry['domains'][$domain]['tables'] = $tables;
     }
 
-    /**
-     * GET admin_metadata_studio_summary
-     */
-    public function getSummary(): never
+    private function relationEntity(string $tableKey): ?array
     {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
+        $relationMap = $this->readJsonFile($this->registryPath('relation-map')) ?? [];
+        $entities = is_array($relationMap['entities'] ?? null) ? $relationMap['entities'] : [];
+        return is_array($entities[$tableKey] ?? null) ? $entities[$tableKey] : null;
+    }
 
-        $endpointCatalog = $this->readJsonFile($this->registryPath('endpoint-catalog')) ?? [];
-        $tableRegistry = $this->readJsonFile($this->registryPath('table-registry')) ?? [];
-        $schemaLibrary = $this->readJsonFile($this->registryPath('schema-library')) ?? [];
-        $dataFieldsIndex = $this->dataFieldsIndex();
-        $variableLibrary = $this->readJsonFile($this->configPath('variable_library.json')) ?? [];
-        $schemaStudioManifest = $this->schemaStudioManifest();
-        $schemaStudioRuntimeProjection = $this->schemaStudioRuntimeProjection();
-        $schemaStudioReleaseLog = $this->schemaStudioReleaseLog();
-        $schemaStudioDiagnostics = $this->schemaStudioDiagnostics();
-        $schemaStudioExperienceReport = $this->schemaStudioExperienceReport();
-        $schemaStudioOperationsReport = $this->schemaStudioOperationsReport();
-        $schemaStudioCommandCenterReport = $this->schemaStudioCommandCenterReport();
-        $schemaStudioRound7Report = $this->schemaStudioRound7Report();
-        $schemaStudioRound9Report = $this->schemaStudioRound9Report();
-        $schemaStudioRound10Report = $this->schemaStudioRound10Report();
-        $schemaStudioRound11Report = $this->schemaStudioRound11Report();
-        $schemaStudioRound12Report = $this->schemaStudioRound12Report();
+    private function synthesizeTableFromRelationEntity(string $tableKey, array $entity): array
+    {
+        $columns = [];
+        foreach ((array)($entity['fields'] ?? []) as $field) {
+            if (!is_scalar($field)) {
+                continue;
+            }
+            $name = trim((string)$field);
+            if ($name === '') {
+                continue;
+            }
+            $columns[$name] = [
+                'type' => 'text',
+                'nullable' => true,
+            ];
+        }
 
-        $apiSummaries = $this->apiSummaries($endpointCatalog);
-        $tableSummaries = $this->tableSummaries($tableRegistry);
-        $schemaSummaries = $this->schemaSummaries($schemaLibrary);
-        $variableSummaries = $this->variableSummaries($variableLibrary);
+        return [
+            'key' => $tableKey,
+            'label' => (string)($entity['label'] ?? $this->slugifyKey($tableKey)),
+            'labelEn' => (string)($entity['labelEn'] ?? $entity['label'] ?? $tableKey),
+            'domain' => (string)($entity['domain'] ?? ''),
+            'primaryKey' => (string)($entity['primaryKey'] ?? ''),
+            'statusColumn' => (string)($entity['statusField'] ?? ''),
+            'workflowId' => (string)($entity['workflowId'] ?? ''),
+            'columnCount' => count($columns),
+            'supportTable' => (bool)($entity['supportTable'] ?? false),
+            'canonical' => false,
+            'source' => 'relation-map',
+            'columns' => $columns,
+        ];
+    }
 
-        $this->success([
-            'overview' => [
-                'endpointCount' => count($apiSummaries),
-                'tableCount' => count($tableSummaries),
-                'schemaCount' => count($schemaSummaries),
-                'variableCategoryCount' => count($variableSummaries),
-                'variableCount' => $this->countVariables($variableLibrary),
-                'dataFieldEndpointCount' => (int)(
-                    $dataFieldsIndex['_meta']['generatedEndpointCount']
-                    ?? $dataFieldsIndex['_meta']['sourceEndpointCount']
-                    ?? count($this->dataFieldsParts($dataFieldsIndex))
-                ),
-                'schemaStudioProjectionCount' => (int)($schemaStudioManifest['summary']['projectionCount'] ?? count((array)($schemaStudioRuntimeProjection['tables'] ?? []))),
-                'schemaStudioReleaseCount' => (int)($schemaStudioManifest['summary']['releaseCount'] ?? count((array)($schemaStudioReleaseLog['items'] ?? []))),
-                'schemaStudioPolicyCount' => (int)($schemaStudioManifest['summary']['policyCount'] ?? 0),
-                'schemaStudioCanonicalCoverage' => (int)($schemaStudioManifest['summary']['canonicalCoveragePercent'] ?? 0),
-                'schemaStudioCriticalGaps' => (int)($schemaStudioManifest['summary']['criticalCanonicalGaps'] ?? 0),
-                'schemaStudioVisualReadiness' => (int)($schemaStudioManifest['summary']['visualReadinessScore'] ?? $schemaStudioDiagnostics['summary']['visualReadinessScore'] ?? 0),
-                'schemaStudioMetadataCompleteness' => (int)($schemaStudioManifest['summary']['metadataCompletenessPercent'] ?? $schemaStudioDiagnostics['summary']['metadataCompletenessPercent'] ?? 0),
-                'schemaStudioGraphDensity' => (int)($schemaStudioManifest['summary']['graphDensityScore'] ?? $schemaStudioDiagnostics['summary']['graphDensityScore'] ?? 0),
-                'schemaStudioWorkflowCoverage' => (int)($schemaStudioManifest['summary']['workflowBindingCoveragePercent'] ?? $schemaStudioDiagnostics['summary']['workflowBindingCoveragePercent'] ?? 0),
-                'schemaStudioOrphanRisk' => (int)($schemaStudioManifest['summary']['orphanRelationRiskCount'] ?? $schemaStudioDiagnostics['summary']['orphanRelationRiskCount'] ?? 0),
-                'schemaStudioHotspots' => (int)($schemaStudioManifest['summary']['hotspotCount'] ?? count((array)($schemaStudioDiagnostics['hotspots'] ?? []))),
-                'schemaStudioGovernanceCoverage' => (int)($schemaStudioManifest['summary']['governanceCoveragePercent'] ?? $schemaStudioDiagnostics['summary']['governanceCoveragePercent'] ?? 0),
-                'schemaStudioJourneyReadiness' => (int)($schemaStudioManifest['summary']['journeyReadinessScore'] ?? $schemaStudioDiagnostics['summary']['journeyReadinessScore'] ?? 0),
-                'schemaStudioDomainReadiness' => (int)($schemaStudioManifest['summary']['domainReadinessScore'] ?? $schemaStudioDiagnostics['summary']['domainReadinessScore'] ?? 0),
-                'schemaStudioReleaseRadar' => (int)($schemaStudioManifest['summary']['releaseRadarScore'] ?? $schemaStudioDiagnostics['summary']['releaseRadarScore'] ?? 0),
-                'schemaStudioBlockers' => (int)($schemaStudioManifest['summary']['blockerCount'] ?? count((array)($schemaStudioDiagnostics['blockers'] ?? []))),
-                'schemaStudioDomainCount' => (int)($schemaStudioManifest['summary']['domainCount'] ?? count((array)($schemaStudioDiagnostics['domains'] ?? []))),
-                'schemaStudioLayerCount' => (int)($schemaStudioManifest['summary']['layerCount'] ?? count((array)($schemaStudioDiagnostics['layers'] ?? []))),
-                'schemaStudioStoryboardCount' => (int)($schemaStudioManifest['summary']['storyboardCount'] ?? count((array)($schemaStudioDiagnostics['storyboards'] ?? []))),
-                'schemaStudioPolicyCoverage' => (int)($schemaStudioManifest['summary']['policyCoveragePercent'] ?? $schemaStudioDiagnostics['summary']['policyCoveragePercent'] ?? 0),
-                'schemaStudioPerformancePosture' => (int)($schemaStudioManifest['summary']['performancePostureScore'] ?? $schemaStudioDiagnostics['summary']['performancePostureScore'] ?? $schemaStudioExperienceReport['summary']['performancePostureScore'] ?? 0),
-                'schemaStudioRegistrySync' => (int)($schemaStudioManifest['summary']['registrySyncScore'] ?? $schemaStudioDiagnostics['summary']['registrySyncScore'] ?? $schemaStudioExperienceReport['summary']['registrySyncScore'] ?? 0),
-                'schemaStudioComplianceReadiness' => (int)($schemaStudioManifest['summary']['complianceReadinessScore'] ?? $schemaStudioDiagnostics['summary']['complianceReadinessScore'] ?? $schemaStudioExperienceReport['summary']['complianceReadinessScore'] ?? 0),
-                'schemaStudioAICopilotReadiness' => (int)($schemaStudioManifest['summary']['aiCopilotReadinessScore'] ?? $schemaStudioDiagnostics['summary']['aiCopilotReadinessScore'] ?? $schemaStudioExperienceReport['summary']['aiCopilotReadinessScore'] ?? 0),
-                'schemaStudioExperienceScore' => (int)($schemaStudioManifest['summary']['experienceScore'] ?? $schemaStudioDiagnostics['summary']['experienceScore'] ?? $schemaStudioExperienceReport['summary']['experienceScore'] ?? 0),
-                'schemaStudioOperationsScore' => (int)($schemaStudioManifest['summary']['operationsScore'] ?? $schemaStudioDiagnostics['summary']['operationsScore'] ?? $schemaStudioExperienceReport['summary']['operationsScore'] ?? $schemaStudioOperationsReport['summary']['operationsScore'] ?? 0),
-                'schemaStudioPromotionReadiness' => (int)($schemaStudioManifest['summary']['promotionReadinessScore'] ?? $schemaStudioDiagnostics['summary']['promotionReadinessScore'] ?? $schemaStudioExperienceReport['summary']['promotionReadinessScore'] ?? $schemaStudioOperationsReport['summary']['promotionReadinessScore'] ?? 0),
-                'schemaStudioFirewallScore' => (int)($schemaStudioManifest['summary']['firewallScore'] ?? $schemaStudioDiagnostics['summary']['firewallScore'] ?? $schemaStudioExperienceReport['summary']['firewallScore'] ?? $schemaStudioOperationsReport['summary']['firewallScore'] ?? 0),
-                'schemaStudioObservabilityScore' => (int)($schemaStudioManifest['summary']['observabilityScore'] ?? $schemaStudioDiagnostics['summary']['observabilityScore'] ?? $schemaStudioExperienceReport['summary']['observabilityScore'] ?? $schemaStudioOperationsReport['summary']['observabilityScore'] ?? 0),
-                'schemaStudioCommandCenterScore' => (int)($schemaStudioManifest['summary']['commandCenterScore'] ?? $schemaStudioDiagnostics['summary']['commandCenterScore'] ?? $schemaStudioExperienceReport['summary']['commandCenterScore'] ?? $schemaStudioOperationsReport['summary']['commandCenterScore'] ?? 0),
-                'schemaStudioPersonaCount' => (int)($schemaStudioManifest['summary']['personaCount'] ?? count((array)($schemaStudioDiagnostics['personas'] ?? [])) ?: count((array)($schemaStudioExperienceReport['personas'] ?? []))),
-                'schemaStudioPlaybookCount' => (int)($schemaStudioManifest['summary']['playbookCount'] ?? count((array)($schemaStudioDiagnostics['playbooks'] ?? [])) ?: count((array)($schemaStudioExperienceReport['playbooks'] ?? []))),
-                'schemaStudioReleaseLaneCount' => (int)($schemaStudioManifest['summary']['releaseLaneCount'] ?? count((array)($schemaStudioDiagnostics['releaseLanes'] ?? [])) ?: count((array)($schemaStudioExperienceReport['releaseLanes'] ?? []))),
-                'schemaStudioCopilotSuggestionCount' => (int)($schemaStudioManifest['summary']['copilotSuggestionCount'] ?? count((array)($schemaStudioDiagnostics['aiCopilot'] ?? [])) ?: count((array)($schemaStudioExperienceReport['aiCopilot'] ?? []))),
-                'schemaStudioFocusDeckCount' => (int)($schemaStudioManifest['summary']['focusDeckCount'] ?? $schemaStudioDiagnostics['summary']['focusDeckCount'] ?? $schemaStudioExperienceReport['summary']['focusDeckCount'] ?? $schemaStudioOperationsReport['summary']['focusDeckCount'] ?? count((array)($schemaStudioDiagnostics['focusDeck'] ?? []))),
-                'schemaStudioBranchCount' => (int)($schemaStudioManifest['summary']['branchCount'] ?? $schemaStudioDiagnostics['summary']['branchCount'] ?? $schemaStudioExperienceReport['summary']['branchCount'] ?? $schemaStudioOperationsReport['summary']['branchCount'] ?? count((array)($schemaStudioDiagnostics['branchTopology'] ?? []))),
-                'schemaStudioEnvironmentCount' => (int)($schemaStudioManifest['summary']['environmentCount'] ?? $schemaStudioDiagnostics['summary']['environmentCount'] ?? $schemaStudioOperationsReport['summary']['environmentCount'] ?? count((array)($schemaStudioDiagnostics['environments'] ?? []))),
-                'schemaStudioStageCount' => (int)($schemaStudioManifest['summary']['stageCount'] ?? $schemaStudioDiagnostics['summary']['stageCount'] ?? $schemaStudioOperationsReport['summary']['stageCount'] ?? count((array)($schemaStudioDiagnostics['promotionBoard'] ?? []))),
-                'schemaStudioEventRailCount' => (int)($schemaStudioManifest['summary']['eventRailCount'] ?? $schemaStudioDiagnostics['summary']['eventRailCount'] ?? $schemaStudioOperationsReport['summary']['eventRailCount'] ?? count((array)($schemaStudioDiagnostics['eventRail'] ?? []))),
-                'schemaStudioOrchestrationScore' => (int)($schemaStudioManifest['summary']['orchestrationScore'] ?? $schemaStudioCommandCenterReport['summary']['orchestrationScore'] ?? 0),
-                'schemaStudioNarrativeCoverage' => (int)($schemaStudioManifest['summary']['narrativeCoverageScore'] ?? $schemaStudioCommandCenterReport['summary']['narrativeCoverageScore'] ?? 0),
-                'schemaStudioReviewWallScore' => (int)($schemaStudioManifest['summary']['reviewWallScore'] ?? $schemaStudioCommandCenterReport['summary']['reviewWallScore'] ?? 0),
-                'schemaStudioAtlasReadiness' => (int)($schemaStudioManifest['summary']['atlasReadinessScore'] ?? $schemaStudioCommandCenterReport['summary']['atlasReadinessScore'] ?? 0),
-                'schemaStudioLivePulseScore' => (int)($schemaStudioManifest['summary']['livePulseScore'] ?? $schemaStudioCommandCenterReport['summary']['livePulseScore'] ?? 0),
-                'schemaStudioCollaborationReadiness' => (int)($schemaStudioManifest['summary']['collaborationReadinessScore'] ?? $schemaStudioCommandCenterReport['summary']['collaborationReadinessScore'] ?? 0),
-                'schemaStudioVisualPolish' => (int)($schemaStudioManifest['summary']['visualPolishScore'] ?? $schemaStudioCommandCenterReport['summary']['visualPolishScore'] ?? 0),
-                'schemaStudioSceneCount' => (int)($schemaStudioManifest['summary']['sceneCount'] ?? $schemaStudioCommandCenterReport['summary']['sceneCount'] ?? count((array)($schemaStudioCommandCenterReport['scenes'] ?? []))),
-                'schemaStudioSpotlightCount' => (int)($schemaStudioManifest['summary']['spotlightCount'] ?? $schemaStudioCommandCenterReport['summary']['spotlightCount'] ?? count((array)($schemaStudioCommandCenterReport['spotlight'] ?? []))),
-                'schemaStudioReviewLaneCount' => (int)($schemaStudioManifest['summary']['reviewLaneCount'] ?? $schemaStudioCommandCenterReport['summary']['reviewLaneCount'] ?? count((array)($schemaStudioCommandCenterReport['reviewWall']['lanes'] ?? []))),
-                'schemaStudioAtlasCount' => (int)($schemaStudioManifest['summary']['atlasCount'] ?? $schemaStudioCommandCenterReport['summary']['atlasCount'] ?? count((array)($schemaStudioCommandCenterReport['atlas'] ?? []))),
-                'schemaStudioAtlasMeshScore' => (int)($schemaStudioManifest['summary']['atlasMeshScore'] ?? $schemaStudioDiagnostics['summary']['atlasMeshScore'] ?? $schemaStudioRound7Report['summary']['atlasMeshScore'] ?? 0),
-                'schemaStudioPhysicalCoverage' => (int)($schemaStudioManifest['summary']['physicalCoverageScore'] ?? $schemaStudioDiagnostics['summary']['physicalCoverageScore'] ?? $schemaStudioRound7Report['summary']['physicalCoverageScore'] ?? 0),
-                'schemaStudioReviewOpsScore' => (int)($schemaStudioManifest['summary']['reviewOpsScore'] ?? $schemaStudioDiagnostics['summary']['reviewOpsScore'] ?? $schemaStudioRound7Report['summary']['reviewOpsScore'] ?? 0),
-                'schemaStudioExportSurfaceScore' => (int)($schemaStudioManifest['summary']['exportSurfaceScore'] ?? $schemaStudioDiagnostics['summary']['exportSurfaceScore'] ?? $schemaStudioRound7Report['summary']['exportSurfaceScore'] ?? 0),
-                'schemaStudioInteroperabilityScore' => (int)($schemaStudioManifest['summary']['interoperabilityScore'] ?? $schemaStudioDiagnostics['summary']['interoperabilityScore'] ?? $schemaStudioRound7Report['summary']['interoperabilityScore'] ?? 0),
-                'schemaStudioRoleModeScore' => (int)($schemaStudioManifest['summary']['roleModeScore'] ?? $schemaStudioDiagnostics['summary']['roleModeScore'] ?? $schemaStudioRound7Report['summary']['roleModeScore'] ?? 0),
-                'schemaStudioTraceabilityAtlasScore' => (int)($schemaStudioManifest['summary']['traceabilityAtlasScore'] ?? $schemaStudioDiagnostics['summary']['traceabilityAtlasScore'] ?? $schemaStudioRound7Report['summary']['traceabilityAtlasScore'] ?? 0),
-                'schemaStudioBeautySystemScore' => (int)($schemaStudioManifest['summary']['beautySystemScore'] ?? $schemaStudioDiagnostics['summary']['beautySystemScore'] ?? $schemaStudioRound7Report['summary']['beautySystemScore'] ?? 0),
-                'schemaStudioObjectSurfaceCount' => (int)($schemaStudioManifest['summary']['objectSurfaceCount'] ?? $schemaStudioRound7Report['summary']['objectSurfaceCount'] ?? count((array)($schemaStudioRound7Report['atlas']['objectSurfaces'] ?? []))),
-                'schemaStudioRoleModeCount' => (int)($schemaStudioManifest['summary']['roleModeCount'] ?? $schemaStudioRound7Report['summary']['roleModeCount'] ?? count((array)($schemaStudioRound7Report['roleModes'] ?? []))),
-                'schemaStudioReviewBoardCount' => (int)($schemaStudioManifest['summary']['reviewBoardCount'] ?? $schemaStudioRound7Report['summary']['reviewBoardCount'] ?? count((array)($schemaStudioRound7Report['reviewBoards'] ?? []))),
-                'schemaStudioExportBundleCount' => (int)($schemaStudioManifest['summary']['exportBundleCount'] ?? $schemaStudioRound7Report['summary']['exportBundleCount'] ?? count((array)($schemaStudioRound7Report['exports'] ?? []))),
-                'schemaStudioVisualLanguageScore' => (int)($schemaStudioManifest['summary']['visualLanguageScore'] ?? $schemaStudioRound9Report['summary']['visualLanguageScore'] ?? 0),
-                'schemaStudioCardHierarchy' => (int)($schemaStudioManifest['summary']['cardHierarchyScore'] ?? $schemaStudioRound9Report['summary']['cardHierarchyScore'] ?? 0),
-                'schemaStudioEdgeLegibility' => (int)($schemaStudioManifest['summary']['edgeLegibilityScore'] ?? $schemaStudioRound9Report['summary']['edgeLegibilityScore'] ?? 0),
-                'schemaStudioLaneReadability' => (int)($schemaStudioManifest['summary']['laneReadabilityScore'] ?? $schemaStudioRound9Report['summary']['laneReadabilityScore'] ?? 0),
-                'schemaStudioAccessibilityScore' => (int)($schemaStudioManifest['summary']['accessibilityScore'] ?? $schemaStudioRound9Report['summary']['accessibilityScore'] ?? 0),
-                'schemaStudioDensityDiscipline' => (int)($schemaStudioManifest['summary']['densityDisciplineScore'] ?? $schemaStudioRound9Report['summary']['densityDisciplineScore'] ?? 0),
-                'schemaStudioCardModeCoverage' => (int)($schemaStudioManifest['summary']['cardModeCoverageScore'] ?? $schemaStudioRound9Report['summary']['cardModeCoverageScore'] ?? 0),
-                'schemaStudioVisualDirectorScore' => (int)($schemaStudioManifest['summary']['visualDirectorScore'] ?? $schemaStudioRound9Report['summary']['visualDirectorScore'] ?? 0),
-                'schemaStudioVisualLaneCount' => (int)($schemaStudioManifest['summary']['laneCount'] ?? $schemaStudioRound9Report['summary']['laneCount'] ?? count((array)($schemaStudioRound9Report['laneGuides'] ?? []))),
-                'schemaStudioVisualModeCount' => (int)($schemaStudioManifest['summary']['cardModeCount'] ?? $schemaStudioRound9Report['summary']['cardModeCount'] ?? count((array)($schemaStudioRound9Report['cardModes'] ?? []))),
-                'schemaStudioEdgeLensCount' => (int)($schemaStudioManifest['summary']['edgeLensCount'] ?? $schemaStudioRound9Report['summary']['edgeLensCount'] ?? count((array)($schemaStudioRound9Report['edgeLenses'] ?? []))),
-                'schemaStudioVisualQuickActionCount' => (int)($schemaStudioManifest['summary']['quickActionCount'] ?? $schemaStudioRound9Report['summary']['quickActionCount'] ?? count((array)($schemaStudioRound9Report['quickActions'] ?? []))),
-                'schemaStudioReviewTheatreScore' => (int)($schemaStudioManifest['summary']['reviewTheatreScore'] ?? $schemaStudioRound10Report['summary']['reviewTheatreScore'] ?? 0),
-                'schemaStudioThemeSystemScore' => (int)($schemaStudioManifest['summary']['themeSystemScore'] ?? $schemaStudioRound10Report['summary']['themeSystemScore'] ?? 0),
-                'schemaStudioScenePresetScore' => (int)($schemaStudioManifest['summary']['scenePresetScore'] ?? $schemaStudioRound10Report['summary']['scenePresetScore'] ?? 0),
-                'schemaStudioSelectionRailScore' => (int)($schemaStudioManifest['summary']['selectionRailScore'] ?? $schemaStudioRound10Report['summary']['selectionRailScore'] ?? 0),
-                'schemaStudioLaneTelemetryScore' => (int)($schemaStudioManifest['summary']['laneTelemetryScore'] ?? $schemaStudioRound10Report['summary']['laneTelemetryScore'] ?? 0),
-                'schemaStudioSemanticLegendScore' => (int)($schemaStudioManifest['summary']['semanticLegendScore'] ?? $schemaStudioRound10Report['summary']['semanticLegendScore'] ?? 0),
-                'schemaStudioFocusNarrativeScore' => (int)($schemaStudioManifest['summary']['focusNarrativeScore'] ?? $schemaStudioRound10Report['summary']['focusNarrativeScore'] ?? 0),
-                'schemaStudioKeyboardFlowScore' => (int)($schemaStudioManifest['summary']['keyboardFlowScore'] ?? $schemaStudioRound10Report['summary']['keyboardFlowScore'] ?? 0),
-                'schemaStudioThemeCount' => (int)($schemaStudioManifest['summary']['themeCount'] ?? $schemaStudioRound10Report['summary']['themeCount'] ?? count((array)($schemaStudioRound10Report['themes'] ?? []))),
-                'schemaStudioScenePresetCount' => (int)($schemaStudioManifest['summary']['scenePresetCount'] ?? $schemaStudioRound10Report['summary']['scenePresetCount'] ?? count((array)($schemaStudioRound10Report['scenes'] ?? []))),
-                'schemaStudioReviewRailActionCount' => (int)($schemaStudioManifest['summary']['reviewRailActionCount'] ?? $schemaStudioRound10Report['summary']['reviewRailActionCount'] ?? count((array)($schemaStudioRound10Report['reviewRailActions'] ?? []))),
-                'schemaStudioLegendGroupCount' => (int)($schemaStudioManifest['summary']['legendGroupCount'] ?? $schemaStudioRound10Report['summary']['legendGroupCount'] ?? count((array)($schemaStudioRound10Report['legendGroups'] ?? []))),
-                'schemaStudioLaneTelemetryCount' => (int)($schemaStudioManifest['summary']['laneTelemetryCount'] ?? $schemaStudioRound10Report['summary']['laneTelemetryCount'] ?? count((array)($schemaStudioRound10Report['laneTelemetry'] ?? []))),
-                'schemaStudioShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound10Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound10Report['shortcuts'] ?? []))),
-                'schemaStudioPresentationStudioScore' => (int)($schemaStudioManifest['summary']['presentationStudioScore'] ?? $schemaStudioDiagnostics['summary']['presentationStudioScore'] ?? $schemaStudioRound11Report['summary']['presentationStudioScore'] ?? 0),
-                'schemaStudioEvidenceDockScore' => (int)($schemaStudioManifest['summary']['evidenceDockScore'] ?? $schemaStudioDiagnostics['summary']['evidenceDockScore'] ?? $schemaStudioRound11Report['summary']['evidenceDockScore'] ?? 0),
-                'schemaStudioSpotlightPackScore' => (int)($schemaStudioManifest['summary']['spotlightPackScore'] ?? $schemaStudioDiagnostics['summary']['spotlightPackScore'] ?? $schemaStudioRound11Report['summary']['spotlightPackScore'] ?? 0),
-                'schemaStudioQuietCanvasScore' => (int)($schemaStudioManifest['summary']['quietCanvasScore'] ?? $schemaStudioDiagnostics['summary']['quietCanvasScore'] ?? $schemaStudioRound11Report['summary']['quietCanvasScore'] ?? 0),
-                'schemaStudioAccessibilityOpsScore' => (int)($schemaStudioManifest['summary']['accessibilityOpsScore'] ?? $schemaStudioDiagnostics['summary']['accessibilityOpsScore'] ?? $schemaStudioRound11Report['summary']['accessibilityOpsScore'] ?? 0),
-                'schemaStudioTopologyReadingScore' => (int)($schemaStudioManifest['summary']['topologyReadingScore'] ?? $schemaStudioDiagnostics['summary']['topologyReadingScore'] ?? $schemaStudioRound11Report['summary']['topologyReadingScore'] ?? 0),
-                'schemaStudioExecutiveReadoutScore' => (int)($schemaStudioManifest['summary']['executiveReadoutScore'] ?? $schemaStudioDiagnostics['summary']['executiveReadoutScore'] ?? $schemaStudioRound11Report['summary']['executiveReadoutScore'] ?? 0),
-                'schemaStudioLegendDisciplineScore' => (int)($schemaStudioManifest['summary']['legendDisciplineScore'] ?? $schemaStudioDiagnostics['summary']['legendDisciplineScore'] ?? $schemaStudioRound11Report['summary']['legendDisciplineScore'] ?? 0),
-                'schemaStudioSpotlightPackCount' => (int)($schemaStudioManifest['summary']['spotlightPackCount'] ?? $schemaStudioRound11Report['summary']['spotlightPackCount'] ?? count((array)($schemaStudioRound11Report['spotlightPacks'] ?? []))),
-                'schemaStudioEvidenceModeCount' => (int)($schemaStudioManifest['summary']['evidenceModeCount'] ?? $schemaStudioRound11Report['summary']['evidenceModeCount'] ?? count((array)($schemaStudioRound11Report['evidenceModes'] ?? []))),
-                'schemaStudioLegendModeCount' => (int)($schemaStudioManifest['summary']['legendModeCount'] ?? $schemaStudioRound11Report['summary']['legendModeCount'] ?? count((array)($schemaStudioRound11Report['legendModes'] ?? []))),
-                'schemaStudioTypeScaleCount' => (int)($schemaStudioManifest['summary']['typeScaleCount'] ?? $schemaStudioRound11Report['summary']['typeScaleCount'] ?? 0),
-                'schemaStudioDockActionCount' => (int)($schemaStudioManifest['summary']['dockActionCount'] ?? $schemaStudioRound11Report['summary']['dockActionCount'] ?? count((array)($schemaStudioRound11Report['dockActions'] ?? []))),
-                'schemaStudioRound11ShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound11Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound11Report['shortcuts'] ?? []))),
-                'schemaStudioScenarioComposerScore' => (int)($schemaStudioManifest['summary']['scenarioComposerScore'] ?? $schemaStudioDiagnostics['summary']['scenarioComposerScore'] ?? $schemaStudioRound12Report['summary']['scenarioComposerScore'] ?? 0),
-                'schemaStudioAdaptiveDensityScore' => (int)($schemaStudioManifest['summary']['adaptiveDensityScore'] ?? $schemaStudioDiagnostics['summary']['adaptiveDensityScore'] ?? $schemaStudioRound12Report['summary']['adaptiveDensityScore'] ?? 0),
-                'schemaStudioFocusRadiusScore' => (int)($schemaStudioManifest['summary']['focusRadiusScore'] ?? $schemaStudioDiagnostics['summary']['focusRadiusScore'] ?? $schemaStudioRound12Report['summary']['focusRadiusScore'] ?? 0),
-                'schemaStudioDockFlexScore' => (int)($schemaStudioManifest['summary']['dockFlexScore'] ?? $schemaStudioDiagnostics['summary']['dockFlexScore'] ?? $schemaStudioRound12Report['summary']['dockFlexScore'] ?? 0),
-                'schemaStudioLabelCadenceScore' => (int)($schemaStudioManifest['summary']['labelCadenceScore'] ?? $schemaStudioDiagnostics['summary']['labelCadenceScore'] ?? $schemaStudioRound12Report['summary']['labelCadenceScore'] ?? 0),
-                'schemaStudioLaneMatrixScore' => (int)($schemaStudioManifest['summary']['laneMatrixScore'] ?? $schemaStudioDiagnostics['summary']['laneMatrixScore'] ?? $schemaStudioRound12Report['summary']['laneMatrixScore'] ?? 0),
-                'schemaStudioPrecisionReadingScore' => (int)($schemaStudioManifest['summary']['precisionReadingScore'] ?? $schemaStudioDiagnostics['summary']['precisionReadingScore'] ?? $schemaStudioRound12Report['summary']['precisionReadingScore'] ?? 0),
-                'schemaStudioReviewMobilityScore' => (int)($schemaStudioManifest['summary']['reviewMobilityScore'] ?? $schemaStudioDiagnostics['summary']['reviewMobilityScore'] ?? $schemaStudioRound12Report['summary']['reviewMobilityScore'] ?? 0),
-                'schemaStudioPresetCount' => (int)($schemaStudioManifest['summary']['presetCount'] ?? $schemaStudioRound12Report['summary']['presetCount'] ?? count((array)($schemaStudioRound12Report['presets'] ?? []))),
-                'schemaStudioDensityModeCount' => (int)($schemaStudioManifest['summary']['densityModeCount'] ?? $schemaStudioRound12Report['summary']['densityModeCount'] ?? count((array)($schemaStudioRound12Report['densityModes'] ?? []))),
-                'schemaStudioRadiusModeCount' => (int)($schemaStudioManifest['summary']['radiusModeCount'] ?? $schemaStudioRound12Report['summary']['radiusModeCount'] ?? count((array)($schemaStudioRound12Report['radiusModes'] ?? []))),
-                'schemaStudioDockModeCount' => (int)($schemaStudioManifest['summary']['dockModeCount'] ?? $schemaStudioRound12Report['summary']['dockModeCount'] ?? count((array)($schemaStudioRound12Report['dockModes'] ?? []))),
-                'schemaStudioLabelModeCount' => (int)($schemaStudioManifest['summary']['labelModeCount'] ?? $schemaStudioRound12Report['summary']['labelModeCount'] ?? count((array)($schemaStudioRound12Report['labelModes'] ?? []))),
-                'schemaStudioRound12ShortcutCount' => (int)($schemaStudioManifest['summary']['shortcutCount'] ?? $schemaStudioRound12Report['summary']['shortcutCount'] ?? count((array)($schemaStudioRound12Report['shortcuts'] ?? []))),
-                'schemaStudioLaneOverviewCount' => (int)($schemaStudioManifest['summary']['laneOverviewCount'] ?? $schemaStudioRound12Report['summary']['laneOverviewCount'] ?? count((array)($schemaStudioRound12Report['laneOverview'] ?? []))),
-            ],
-            'benchmarks' => $this->benchmarkReferences(),
-            'principles' => $this->benchmarkPrinciples(),
-            'schemaStudio' => [
-                'manifest' => $schemaStudioManifest,
-                'runtimeProjection' => [
-                    'tableCount' => count((array)($schemaStudioRuntimeProjection['tables'] ?? [])),
-                    'relationCount' => count((array)($schemaStudioRuntimeProjection['relations'] ?? [])),
-                ],
-                'diagnostics' => $schemaStudioDiagnostics,
-                'experienceReport' => $schemaStudioExperienceReport,
-                'operationsReport' => $schemaStudioOperationsReport,
-                'commandCenterReport' => $schemaStudioCommandCenterReport,
-                'round7Report' => $schemaStudioRound7Report,
-                'round9Report' => $schemaStudioRound9Report,
-                'round10Report' => $schemaStudioRound10Report,
-                'round11Report' => $schemaStudioRound11Report,
-                'round12Report' => $schemaStudioRound12Report,
-                'releaseLog' => array_slice((array)($schemaStudioReleaseLog['items'] ?? []), 0, 10),
-            ],
-            'lists' => [
-                'apis' => $apiSummaries,
-                'tables' => $tableSummaries,
-                'schemas' => $schemaSummaries,
-                'variables' => $variableSummaries,
-            ],
-        ]);
+    private function savePolicy(): array
+    {
+        return [
+            'requiresRevision' => true,
+            'maxPayloadBytes' => DataSchemaService::DETAIL_SAVE_MAX_BYTES,
+            'conflictMode' => 'reject_stale_write',
+            'auditTrail' => true,
+        ];
+    }
+
+    private function ensureSavePayloadLimit(): void
+    {
+        $length = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+        if ($length > DataSchemaService::DETAIL_SAVE_MAX_BYTES) {
+            $this->error('payload_too_large', 413, null, [
+                'maxBytes' => DataSchemaService::DETAIL_SAVE_MAX_BYTES,
+                'save_policy' => $this->savePolicy(),
+            ]);
+        }
+    }
+
+    private function relativeWorkspacePath(string $path): string
+    {
+        $normalized = str_replace('\\', '/', $path);
+        $prefix = rtrim(str_replace('\\', '/', $this->rootDir), '/') . '/';
+        if (str_starts_with($normalized, $prefix)) {
+            return substr($normalized, strlen($prefix));
+        }
+        return ltrim($normalized, '/');
     }
 
     /**
-     * GET admin_metadata_studio_detail?type=api|table|schema|variable&key=...
+     * @return array<string, mixed>
      */
+    private function fileRevision(string $path): array
+    {
+        clearstatcache(true, $path);
+        $exists = is_file($path);
+        $size = $exists ? (int)(filesize($path) ?: 0) : 0;
+        $mtime = $exists ? (int)(filemtime($path) ?: 0) : 0;
+
+        return [
+            'path' => $this->relativeWorkspacePath($path),
+            'exists' => $exists,
+            'mtime' => $mtime > 0 ? gmdate('c', $mtime) : '',
+            'size' => $size,
+            'sha1' => $exists ? substr((string)sha1_file($path), 0, 12) : '',
+        ];
+    }
+
+    private function dataFieldsEntrySourcePath(string $endpointKey): ?string
+    {
+        $index = $this->dataFieldsIndex();
+        if (isset($index[$endpointKey]) && is_array($index[$endpointKey])) {
+            return $this->registryPath('data-fields');
+        }
+
+        foreach ($this->dataFieldsParts($index) as $part) {
+            $file = trim((string)($part['file'] ?? ''));
+            if ($file === '') {
+                continue;
+            }
+            $path = $this->registryDir() . '/' . $file;
+            $payload = $this->readJsonFile($path) ?? [];
+            if (isset($payload[$endpointKey]) && is_array($payload[$endpointKey])) {
+                return $path;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function currentRevision(string $type, string $key): array
+    {
+        $files = [];
+        switch ($type) {
+            case 'api':
+                $files = [
+                    'endpoint_catalog' => $this->fileRevision($this->registryPath('endpoint-catalog')),
+                    'api_params' => $this->fileRevision($this->registryPath('api-params')),
+                    'data_fields_index' => $this->fileRevision($this->registryPath('data-fields')),
+                ];
+                $sourcePath = $this->dataFieldsEntrySourcePath($key);
+                if (is_string($sourcePath) && $sourcePath !== '') {
+                    $files['data_fields_source'] = $this->fileRevision($sourcePath);
+                }
+                break;
+            case 'table':
+                $files = [
+                    'table_registry' => $this->fileRevision($this->registryPath('table-registry')),
+                ];
+                break;
+            case 'schema':
+                $files = [
+                    'schema_library' => $this->fileRevision($this->registryPath('schema-library')),
+                ];
+                break;
+            case 'variable':
+                $files = [
+                    'variable_library' => $this->fileRevision($this->configPath('variable_library.json')),
+                ];
+                break;
+        }
+
+        return [
+            'type' => $type,
+            'key' => $key,
+            'capturedAt' => $this->nowIso(),
+            'files' => $files,
+        ];
+    }
+
+    private function revisionsMatch(array $expected, array $current): bool
+    {
+        if ((string)($expected['type'] ?? '') !== (string)($current['type'] ?? '')) {
+            return false;
+        }
+        if ((string)($expected['key'] ?? '') !== (string)($current['key'] ?? '')) {
+            return false;
+        }
+
+        $expectedFiles = is_array($expected['files'] ?? null) ? $expected['files'] : [];
+        $currentFiles = is_array($current['files'] ?? null) ? $current['files'] : [];
+        if (array_keys($expectedFiles) !== array_keys($currentFiles)) {
+            return false;
+        }
+
+        foreach ($currentFiles as $name => $currentFile) {
+            $expectedFile = is_array($expectedFiles[$name] ?? null) ? $expectedFiles[$name] : null;
+            if ($expectedFile === null) {
+                return false;
+            }
+            foreach (['path', 'exists', 'mtime', 'size', 'sha1'] as $field) {
+                if (($expectedFile[$field] ?? null) !== ($currentFile[$field] ?? null)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private function assertRevisionToken(string $type, string $key, mixed $revision): void
+    {
+        $current = $this->currentRevision($type, $key);
+        if (!is_array($revision)) {
+            $this->error('missing_revision_token', 409, 'Reload the detail view before saving.', [
+                'current_revision' => $current,
+                'save_policy' => $this->savePolicy(),
+            ]);
+        }
+
+        if (!$this->revisionsMatch($revision, $current)) {
+            $this->error('stale_workspace_revision', 409, 'This document changed on the server. Reload detail and re-apply your edit.', [
+                'current_revision' => $current,
+                'save_policy' => $this->savePolicy(),
+            ]);
+        }
+    }
+
+    public function getSummary(): never
+    {
+        $this->requireWorkspaceAccess();
+        $this->success([
+            'workspace' => $this->service->getWorkspace(),
+        ]);
+    }
+
     public function getDetail(): never
     {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
+        $this->requireWorkspaceAccess();
 
         $type = trim((string)$this->query('type', ''));
         $key = trim((string)$this->query('key', ''));
@@ -713,21 +425,34 @@ class AdminMetadataStudioController extends BaseController
                     'type' => 'api',
                     'key' => $key,
                     'item' => $endpoint,
-                    'api_params' => is_array($apiParams[$key] ?? null) ? $apiParams[$key] : ['params' => [], 'response' => ['type' => 'object', 'fields' => [], 'pagination' => false]],
+                    'api_params' => is_array($apiParams[$key] ?? null)
+                        ? $apiParams[$key]
+                        : ['params' => [], 'response' => ['type' => 'object', 'fields' => [], 'pagination' => false]],
                     'fields' => $fields,
+                    'revision' => $this->currentRevision('api', $key),
+                    'save_policy' => $this->savePolicy(),
                 ]);
             }
             case 'table': {
                 $tableRegistry = $this->readJsonFile($this->registryPath('table-registry')) ?? [];
                 $table = is_array($tableRegistry['tables'][$key] ?? null) ? $tableRegistry['tables'][$key] : null;
-                if ($table === null) {
+                $relationEntity = $this->relationEntity($key);
+                if ($table === null && $relationEntity === null) {
                     $this->error('table_not_found', 404);
                 }
+                if ($table === null && $relationEntity !== null) {
+                    $table = $this->synthesizeTableFromRelationEntity($key, $relationEntity);
+                }
+                $domainKey = (string)($table['domain'] ?? '');
+                $domain = is_array($tableRegistry['domains'][$domainKey] ?? null) ? $tableRegistry['domains'][$domainKey] : null;
                 $this->success([
                     'type' => 'table',
                     'key' => $key,
                     'item' => $table,
-                    'domain' => is_array($tableRegistry['domains'][$table['domain'] ?? ''] ?? null) ? $tableRegistry['domains'][$table['domain']] : null,
+                    'domain' => $domain,
+                    'relation_entity' => $relationEntity,
+                    'revision' => $this->currentRevision('table', $key),
+                    'save_policy' => $this->savePolicy(),
                 ]);
             }
             case 'schema': {
@@ -740,6 +465,8 @@ class AdminMetadataStudioController extends BaseController
                     'type' => 'schema',
                     'key' => $key,
                     'item' => $schema,
+                    'revision' => $this->currentRevision('schema', $key),
+                    'save_policy' => $this->savePolicy(),
                 ]);
             }
             case 'variable': {
@@ -752,6 +479,8 @@ class AdminMetadataStudioController extends BaseController
                     'type' => 'variable',
                     'key' => $key,
                     'item' => $category,
+                    'revision' => $this->currentRevision('variable', $key),
+                    'save_policy' => $this->savePolicy(),
                 ]);
             }
             default:
@@ -759,25 +488,22 @@ class AdminMetadataStudioController extends BaseController
         }
     }
 
-    /**
-     * POST admin_metadata_studio_save
-     */
     public function saveDetail(): never
     {
-        $user = $this->requireAuth();
-        $this->requireAdmin($user);
+        $user = $this->requireWorkspaceAccess();
         $this->requireCsrf();
+        $this->ensureSavePayloadLimit();
 
         $body = $this->jsonBody();
         $type = trim((string)($body['type'] ?? ''));
         $key = trim((string)($body['key'] ?? ''));
+        $revision = $body['revision'] ?? null;
 
         switch ($type) {
             case 'api': {
                 $item = $body['item'] ?? null;
                 $apiParams = $body['api_params'] ?? null;
                 $fields = $body['fields'] ?? [];
-
                 if (!is_array($item) || !is_array($apiParams) || !is_array($fields)) {
                     $this->error('invalid_payload', 400);
                 }
@@ -787,6 +513,15 @@ class AdminMetadataStudioController extends BaseController
                 }
                 if ($key === '') {
                     $this->error('missing_api_key', 400);
+                }
+                $this->assertRevisionToken('api', $key, $revision);
+                foreach (['security', 'request', 'response', 'workflow', 'capabilities'] as $field) {
+                    if (array_key_exists($field, $item) && !is_array($item[$field])) {
+                        $this->error('invalid_api_' . $field, 400);
+                    }
+                }
+                if (count($fields) > 5000) {
+                    $this->error('too_many_fields', 400);
                 }
 
                 $catalogPath = $this->registryPath('endpoint-catalog');
@@ -828,7 +563,13 @@ class AdminMetadataStudioController extends BaseController
                 $this->saveDataFieldsEntry($key, array_values(array_filter($fields, 'is_array')));
 
                 $this->auditLog('admin_metadata_studio_save_api', ['key' => $key], (string)($user['username'] ?? ''));
-                $this->success(['saved' => true, 'type' => 'api', 'key' => $key]);
+                $this->success([
+                    'saved' => true,
+                    'type' => 'api',
+                    'key' => $key,
+                    'revision' => $this->currentRevision('api', $key),
+                    'save_policy' => $this->savePolicy(),
+                ]);
             }
             case 'table': {
                 $item = $body['item'] ?? null;
@@ -846,6 +587,16 @@ class AdminMetadataStudioController extends BaseController
                 $domain = $this->slugifyKey((string)($item['domain'] ?? ''));
                 if ($domain === '') {
                     $this->error('missing_domain', 400);
+                }
+                $this->assertRevisionToken('table', $key, $revision);
+                if (array_key_exists('columns', $item) && !is_array($item['columns'])) {
+                    $this->error('invalid_table_columns', 400);
+                }
+                if (array_key_exists('primaryKeys', $item) && !is_array($item['primaryKeys'])) {
+                    $this->error('invalid_table_primary_keys', 400);
+                }
+                if (array_key_exists('primaryKey', $item) && !is_scalar($item['primaryKey']) && !is_array($item['primaryKey'])) {
+                    $this->error('invalid_table_primary_key', 400);
                 }
 
                 $item['domain'] = $domain;
@@ -866,7 +617,13 @@ class AdminMetadataStudioController extends BaseController
                 $this->writeJsonFile($tablePath, $tableRegistry);
 
                 $this->auditLog('admin_metadata_studio_save_table', ['key' => $key], (string)($user['username'] ?? ''));
-                $this->success(['saved' => true, 'type' => 'table', 'key' => $key]);
+                $this->success([
+                    'saved' => true,
+                    'type' => 'table',
+                    'key' => $key,
+                    'revision' => $this->currentRevision('table', $key),
+                    'save_policy' => $this->savePolicy(),
+                ]);
             }
             case 'schema': {
                 $item = $body['item'] ?? null;
@@ -879,6 +636,12 @@ class AdminMetadataStudioController extends BaseController
                 }
                 if ($key === '') {
                     $this->error('missing_schema_key', 400);
+                }
+                $this->assertRevisionToken('schema', $key, $revision);
+                foreach (['tables', 'migrations'] as $field) {
+                    if (array_key_exists($field, $item) && !is_array($item[$field])) {
+                        $this->error('invalid_schema_' . $field, 400);
+                    }
                 }
 
                 $schemaPath = $this->registryPath('schema-library');
@@ -894,7 +657,13 @@ class AdminMetadataStudioController extends BaseController
                 $this->writeJsonFile($schemaPath, $schemaLibrary);
 
                 $this->auditLog('admin_metadata_studio_save_schema', ['key' => $key], (string)($user['username'] ?? ''));
-                $this->success(['saved' => true, 'type' => 'schema', 'key' => $key]);
+                $this->success([
+                    'saved' => true,
+                    'type' => 'schema',
+                    'key' => $key,
+                    'revision' => $this->currentRevision('schema', $key),
+                    'save_policy' => $this->savePolicy(),
+                ]);
             }
             case 'variable': {
                 $item = $body['item'] ?? null;
@@ -907,6 +676,10 @@ class AdminMetadataStudioController extends BaseController
                 }
                 if ($key === '') {
                     $this->error('missing_variable_category_key', 400);
+                }
+                $this->assertRevisionToken('variable', $key, $revision);
+                if (array_key_exists('variables', $item) && !is_array($item['variables'])) {
+                    $this->error('invalid_variable_library', 400);
                 }
 
                 $variablePath = $this->configPath('variable_library.json');
@@ -922,7 +695,13 @@ class AdminMetadataStudioController extends BaseController
                 $this->writeJsonFile($variablePath, $variableLibrary);
 
                 $this->auditLog('admin_metadata_studio_save_variable', ['key' => $key], (string)($user['username'] ?? ''));
-                $this->success(['saved' => true, 'type' => 'variable', 'key' => $key]);
+                $this->success([
+                    'saved' => true,
+                    'type' => 'variable',
+                    'key' => $key,
+                    'revision' => $this->currentRevision('variable', $key),
+                    'save_policy' => $this->savePolicy(),
+                ]);
             }
             default:
                 $this->error('invalid_type', 400, 'Allowed: api, table, schema, variable');

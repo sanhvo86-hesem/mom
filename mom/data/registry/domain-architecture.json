@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-05T13:32:34.897Z",
-    "domainCount": 48,
-    "tableCount": 528,
+    "generatedAt": "2026-04-09T13:44:47.092Z",
+    "domainCount": 49,
+    "tableCount": 652,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-05T13:32:47.256Z"
+    "workflowCoverageGeneratedAt": "2026-04-09T13:44:52.016Z"
   },
   "domains": {
     "core_system": {
@@ -276,7 +276,7 @@
         "wf_user"
       ],
       "upstreamDomains": [
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution"
       ],
       "downstreamDomains": [
@@ -331,6 +331,135 @@
         "wf_user_role"
       ]
     },
+    "foundation_governance": {
+      "label": "Nền tảng và governance",
+      "labelEn": "Foundation Governance",
+      "icon": "fa-sitemap",
+      "color": "#0f766e",
+      "description": "Cấu trúc tổ chức, party, UOM, lịch, mã chuẩn, approval, e-signature và attachment nền tảng.",
+      "businessProcess": "Enterprise structure, identity-bearing party master, governed codes, approvals, and compliant signatures.",
+      "tables": [
+        "approval",
+        "attachment",
+        "calendar",
+        "electronic_signature",
+        "org_companies",
+        "org_company",
+        "org_enterprise",
+        "org_legal_entities",
+        "org_plant",
+        "org_plants",
+        "org_site",
+        "org_warehouse",
+        "org_work_center",
+        "org_work_unit",
+        "party",
+        "party_contact",
+        "party_role",
+        "party_site",
+        "reason_code",
+        "shift",
+        "status_code",
+        "uom"
+      ],
+      "primaryWorkflows": [
+        "wf_approval",
+        "wf_attachment",
+        "wf_calendar",
+        "wf_electronic_signature",
+        "wf_org_company",
+        "wf_org_enterprise",
+        "wf_org_legal_entity",
+        "wf_org_plant",
+        "wf_org_site",
+        "wf_org_warehouse",
+        "wf_org_work_center",
+        "wf_org_work_unit",
+        "wf_party",
+        "wf_party_contact",
+        "wf_party_role",
+        "wf_party_site",
+        "wf_reason_code",
+        "wf_shift",
+        "wf_status_code",
+        "wf_uom"
+      ],
+      "upstreamDomains": [
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "advanced_planning",
+        "ai_predictive",
+        "audit_risk",
+        "calibration_equipment",
+        "cnc_programs",
+        "commercial_contracts",
+        "core_system",
+        "crm",
+        "customer_portal",
+        "demand_supply_planning",
+        "digital_product_passport",
+        "document_control",
+        "ehs_sustainability",
+        "evidence_vault",
+        "finance",
+        "finance_extended",
+        "finance_treasury",
+        "fmea_apqp",
+        "forms_system",
+        "hcm_workforce",
+        "inventory",
+        "lean_manufacturing",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "mfg_engineering",
+        "mobile_operations",
+        "outsource_execution",
+        "plant_maintenance",
+        "plm_change_control",
+        "production",
+        "project_management",
+        "purchasing",
+        "quality_lab",
+        "quality_management",
+        "record_system",
+        "sales",
+        "service_warranty",
+        "shipping_compliance",
+        "supplier_relationship",
+        "system_infrastructure",
+        "tooling_lifecycle",
+        "traceability_serialization",
+        "trade_compliance",
+        "training_hr",
+        "transportation",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_approval",
+        "wf_attachment",
+        "wf_calendar",
+        "wf_electronic_signature",
+        "wf_org_company",
+        "wf_org_enterprise",
+        "wf_org_legal_entity",
+        "wf_org_plant",
+        "wf_org_site",
+        "wf_org_warehouse",
+        "wf_org_work_center",
+        "wf_org_work_unit",
+        "wf_party",
+        "wf_party_contact",
+        "wf_party_role",
+        "wf_party_site",
+        "wf_reason_code",
+        "wf_shift",
+        "wf_status_code",
+        "wf_uom"
+      ]
+    },
     "document_control": {
       "label": "Kiểm soát tài liệu",
       "labelEn": "Document Control",
@@ -339,32 +468,39 @@
       "description": "Tài liệu có kiểm soát, phiên bản, phân phối và xác nhận đọc.",
       "businessProcess": "Controlled documents, revisions, release, acknowledgment, and retrieval.",
       "tables": [
+        "document",
         "document_distribution",
         "document_embeddings",
+        "document_revision",
         "document_versions",
         "documents"
       ],
       "primaryWorkflows": [
+        "wf_document",
         "wf_document_distribution",
         "wf_document_embedding",
+        "wf_document_revision",
         "wf_document_change_control"
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution"
       ],
       "downstreamDomains": [
         "hcm_workforce",
         "mfg_engineering",
         "plm_change_control",
-        "quality_lab"
+        "quality_lab",
+        "training_hr"
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_document",
         "wf_document_change_control",
         "wf_document_distribution",
-        "wf_document_embedding"
+        "wf_document_embedding",
+        "wf_document_revision"
       ]
     },
     "master_data": {
@@ -377,22 +513,41 @@
       "tables": [
         "bill_of_materials",
         "bom_components",
+        "item",
+        "item_attr",
+        "item_class",
+        "item_revision",
         "item_revisions",
+        "item_site",
+        "item_spec",
+        "item_variant",
         "items",
+        "lot_policy",
         "routing_operations",
         "routings",
+        "serial_policy",
+        "shelf_life_policy",
         "work_centers"
       ],
       "primaryWorkflows": [
         "wf_bill_of_material",
         "wf_bom_component",
         "wf_item",
+        "wf_item_attr",
+        "wf_item_class",
+        "wf_item_revision",
+        "wf_item_site",
+        "wf_item_spec",
+        "wf_item_variant",
+        "wf_lot_policy",
         "wf_routing",
+        "wf_serial_policy",
+        "wf_shelf_life_policy",
         "wf_work_center"
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution"
       ],
       "downstreamDomains": [
@@ -433,7 +588,16 @@
         "wf_bill_of_material",
         "wf_bom_component",
         "wf_item",
+        "wf_item_attr",
+        "wf_item_class",
+        "wf_item_revision",
+        "wf_item_site",
+        "wf_item_spec",
+        "wf_item_variant",
+        "wf_lot_policy",
         "wf_routing",
+        "wf_serial_policy",
+        "wf_shelf_life_policy",
         "wf_work_center"
       ]
     },
@@ -458,6 +622,8 @@
         "quote_history",
         "quote_lines",
         "quotes",
+        "sales_order",
+        "sales_order_line",
         "sales_order_lines",
         "sales_orders"
       ],
@@ -473,8 +639,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution"
       ],
       "downstreamDomains": [
@@ -509,7 +675,8 @@
         "wf_order_milestone",
         "wf_order_note",
         "wf_quote_lifecycle",
-        "wf_sales_order"
+        "wf_sales_order",
+        "wf_sales_order_line"
       ]
     },
     "purchasing": {
@@ -520,26 +687,44 @@
       "description": "Nhà cung cấp, PO, line, đánh giá và nguồn cung.",
       "businessProcess": "Source-to-order, supplier evaluation, approval, and procurement control.",
       "tables": [
+        "purchase_order",
+        "purchase_order_line",
         "purchase_order_lines",
         "purchase_orders",
+        "purchase_receipt_correction_lines",
+        "purchase_receipt_corrections",
+        "purchase_receipt_lines",
+        "purchase_receipts",
+        "purchase_requisition_lines",
+        "purchase_requisitions",
+        "supplier_asn_lines",
+        "supplier_asns",
         "vendor_ratings",
         "vendors"
       ],
       "primaryWorkflows": [
         "wf_purchase_order",
+        "wf_purchase_receipt_correction",
+        "wf_purchase_receipt",
+        "wf_purchase_requisition",
+        "wf_supplier_asn",
         "wf_vendor_rating",
         "wf_vendor"
       ],
       "upstreamDomains": [
         "core_system",
+        "finance",
+        "foundation_governance",
+        "inventory",
         "master_data",
-        "master_data_governance",
-        "mes_execution"
+        "mes_execution",
+        "production"
       ],
       "downstreamDomains": [
         "bi_datawarehouse",
         "calibration_equipment",
         "demand_supply_planning",
+        "finance",
         "finance_extended",
         "inventory",
         "outsource_execution",
@@ -552,6 +737,11 @@
       "supportDomain": false,
       "workflows": [
         "wf_purchase_order",
+        "wf_purchase_order_line",
+        "wf_purchase_receipt",
+        "wf_purchase_receipt_correction",
+        "wf_purchase_requisition",
+        "wf_supplier_asn",
         "wf_vendor",
         "wf_vendor_rating"
       ]
@@ -564,25 +754,36 @@
       "description": "Kho, vị trí, lô, serial và giao dịch tồn kho nền tảng.",
       "businessProcess": "Inventory receiving, stocking, lot/serial traceability, and stock movement.",
       "tables": [
+        "container",
+        "inventory_balance_snapshot",
+        "inventory_ledger",
         "inventory_locations",
         "inventory_transactions",
+        "location_balance",
         "lot_master",
         "serial_master",
+        "stock_balances",
         "warehouses"
       ],
       "primaryWorkflows": [
+        "wf_container",
+        "wf_inventory_balance_snapshot",
+        "wf_inventory_ledger",
         "wf_inventory_location",
         "wf_inventory_transaction",
+        "wf_location_balance",
         "wf_lot_master",
         "wf_serial_master",
-        "wf_warehous"
+        "wf_stock_balance",
+        "wf_warehouse"
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
-        "purchasing"
+        "purchasing",
+        "traceability_serialization"
       ],
       "downstreamDomains": [
         "demand_supply_planning",
@@ -590,7 +791,10 @@
         "outsource_execution",
         "plant_maintenance",
         "plm_change_control",
+        "production",
+        "purchasing",
         "quality_lab",
+        "quality_management",
         "service_warranty",
         "shipping_compliance",
         "supplier_relationship",
@@ -599,11 +803,17 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_container",
+        "wf_inventory_balance_snapshot",
+        "wf_inventory_ledger",
         "wf_inventory_location",
         "wf_inventory_transaction",
+        "wf_location_balance",
         "wf_lot_master",
         "wf_serial_master",
-        "wf_warehous"
+        "wf_stock_balance",
+        "wf_warehous",
+        "wf_warehouse"
       ]
     },
     "production": {
@@ -618,33 +828,49 @@
         "job_orders",
         "job_release_gates",
         "labor_transactions",
+        "production_order",
+        "production_order_bom_snapshot",
+        "production_order_route_snapshot",
         "production_schedule",
         "shift_assignments",
         "shift_calendar_holidays",
         "shift_definitions",
         "shift_production_log",
-        "shift_targets"
+        "shift_targets",
+        "work_orders"
       ],
       "primaryWorkflows": [
+        "wf_production_operation",
         "wf_job_order",
         "wf_job_release_gate",
         "wf_labor_transaction",
+        "wf_production_order",
+        "wf_production_order_bom_snapshot",
+        "wf_production_order_route_snapshot",
         "wf_production_schedule",
         "wf_shift_calendar_holiday",
         "wf_shift_definition",
-        "wf_shift_target"
+        "wf_shift_target",
+        "wf_work_order_execution"
       ],
       "upstreamDomains": [
+        "calibration_equipment",
         "core_system",
+        "foundation_governance",
+        "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
+        "mfg_engineering",
         "sales",
         "training_hr"
       ],
       "downstreamDomains": [
         "advanced_planning",
+        "finance",
+        "mes_execution",
         "outsource_execution",
+        "purchasing",
+        "quality_management",
         "traceability_serialization",
         "warehouse_management"
       ],
@@ -653,11 +879,16 @@
         "wf_job_order",
         "wf_job_release_gate",
         "wf_labor_transaction",
+        "wf_production_operation",
+        "wf_production_order",
+        "wf_production_order_bom_snapshot",
+        "wf_production_order_route_snapshot",
         "wf_production_schedule",
         "wf_shift_calendar_holiday",
         "wf_shift_definition",
         "wf_shift_production_log",
-        "wf_shift_target"
+        "wf_shift_target",
+        "wf_work_order_execution"
       ]
     },
     "quality_management": {
@@ -668,32 +899,45 @@
       "description": "Kiểm tra, NCR, CAPA, FAI, SPC, OQC và chất lượng vận hành.",
       "businessProcess": "Inspection, nonconformance, CAPA, first article, SPC, and containment.",
       "tables": [
+        "capa",
         "capa_8d_steps",
         "capa_effectiveness_checks",
         "capa_records",
         "certificates",
+        "complaint",
         "concessions",
         "contamination_checks",
         "copq_ledger",
         "customer_complaints",
+        "deviation",
         "deviations",
         "fai_characteristics",
         "fai_records",
         "fai_trigger_log",
         "incoming_inspection_results",
         "incoming_inspections",
+        "inspection_characteristic",
+        "inspection_lot",
+        "inspection_plan",
         "inspection_plans",
+        "inspection_result",
         "inspection_results",
+        "ipqc_inspection_results",
+        "ipqc_inspections",
         "material_review_board",
         "ncr_human_factors",
         "ncr_mrb_decisions",
         "ncr_records",
+        "nonconformance",
         "oqc_inspections",
+        "quality_case_link",
+        "quality_order",
         "spc_data"
       ],
       "primaryWorkflows": [
         "wf_capa",
         "wf_certificate",
+        "wf_complaint",
         "wf_concession",
         "wf_contamination_check",
         "wf_copq_ledger",
@@ -702,21 +946,29 @@
         "wf_fai_characteristic",
         "wf_fai",
         "wf_receiving_inspection",
+        "wf_inspection_characteristic",
+        "wf_inspection_lot",
         "wf_inspection_plan",
+        "wf_ipqc_inspection",
         "wf_material_review_board",
         "wf_ncr",
+        "wf_nonconformance",
         "wf_oqc_inspection",
+        "wf_quality_order",
         "wf_spc_data"
       ],
       "upstreamDomains": [
         "core_system",
         "fmea_apqp",
+        "foundation_governance",
+        "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
+        "production",
         "purchasing",
         "record_system",
-        "sales"
+        "sales",
+        "traceability_serialization"
       ],
       "downstreamDomains": [
         "calibration_equipment",
@@ -729,6 +981,7 @@
       "workflows": [
         "wf_capa",
         "wf_certificate",
+        "wf_complaint",
         "wf_concession",
         "wf_contamination_check",
         "wf_copq_ledger",
@@ -736,10 +989,17 @@
         "wf_deviation",
         "wf_fai",
         "wf_fai_characteristic",
+        "wf_inspection_characteristic",
+        "wf_inspection_lot",
         "wf_inspection_plan",
+        "wf_inspection_result",
+        "wf_ipqc_inspection",
         "wf_material_review_board",
         "wf_ncr",
+        "wf_nonconformance",
         "wf_oqc_inspection",
+        "wf_quality_case_link",
+        "wf_quality_order",
         "wf_receiving_inspection",
         "wf_spc_data"
       ]
@@ -770,7 +1030,7 @@
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "purchasing",
         "quality_management"
@@ -780,6 +1040,7 @@
         "mes_execution",
         "mfg_engineering",
         "plant_maintenance",
+        "production",
         "quality_lab",
         "tooling_lifecycle"
       ],
@@ -789,6 +1050,7 @@
         "wf_calibration_record",
         "wf_equipment",
         "wf_maintenance_work_order",
+        "wf_tool_life",
         "wf_tool_transaction"
       ]
     },
@@ -800,24 +1062,31 @@
       "description": "Đánh giá, phát hiện, hành động, rủi ro và cải tiến.",
       "businessProcess": "Audit planning, findings, action closure, management review, and risk tracking.",
       "tables": [
+        "audit",
         "audit_actions",
         "audit_findings",
+        "audit_program",
+        "audit_trail",
         "audits",
+        "finding",
         "improvement_projects",
         "management_reviews",
         "risk_register"
       ],
       "primaryWorkflows": [
+        "wf_audit",
         "wf_audit_action",
         "wf_audit_finding",
-        "wf_audit",
+        "wf_audit_program",
+        "wf_audit_trail",
+        "wf_finding",
         "wf_improvement_project",
         "wf_management_review",
         "wf_risk_register"
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "record_system"
       ],
@@ -827,6 +1096,9 @@
         "wf_audit",
         "wf_audit_action",
         "wf_audit_finding",
+        "wf_audit_program",
+        "wf_audit_trail",
+        "wf_finding",
         "wf_improvement_project",
         "wf_management_review",
         "wf_risk_register"
@@ -840,20 +1112,27 @@
       "description": "Hồ sơ nhân viên, đào tạo, kỹ năng và chứng chỉ nền tảng.",
       "businessProcess": "Competency, certification, and personnel qualification baseline.",
       "tables": [
+        "competency",
         "employee_certifications",
         "employees",
         "skills_matrix",
+        "training_matrix",
+        "training_record",
         "training_records"
       ],
       "primaryWorkflows": [
+        "wf_competency",
         "wf_employee_certification",
         "wf_employee",
         "wf_skills_matrix",
+        "wf_training_matrix",
+        "wf_training_record",
         "wf_training_qualification"
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "document_control",
+        "foundation_governance",
         "mes_execution",
         "record_system"
       ],
@@ -867,10 +1146,13 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_competency",
         "wf_employee",
         "wf_employee_certification",
         "wf_skills_matrix",
-        "wf_training_qualification"
+        "wf_training_matrix",
+        "wf_training_qualification",
+        "wf_training_record"
       ]
     },
     "finance": {
@@ -882,29 +1164,43 @@
       "businessProcess": "Costing, accounting, invoicing, and financial transaction control.",
       "tables": [
         "ap_ar_invoices",
+        "ap_invoice_lines",
+        "ap_invoices",
         "cost_elements",
+        "cost_ledger",
         "gl_transactions",
-        "job_costing"
+        "job_costing",
+        "wip_ledger"
       ],
       "primaryWorkflows": [
         "wf_ap_ar_invoice",
+        "wf_ap_invoice",
         "wf_cost_element",
+        "wf_cost_ledger",
         "wf_gl_transaction",
-        "wf_job_costing"
+        "wf_job_costing",
+        "wf_wip_ledger"
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
-        "mes_execution"
+        "mes_execution",
+        "production",
+        "purchasing"
       ],
-      "downstreamDomains": [],
+      "downstreamDomains": [
+        "purchasing"
+      ],
       "supportDomain": false,
       "workflows": [
         "wf_ap_ar_invoice",
+        "wf_ap_invoice",
         "wf_cost_element",
+        "wf_cost_ledger",
         "wf_gl_transaction",
-        "wf_job_costing"
+        "wf_job_costing",
+        "wf_wip_ledger"
       ]
     },
     "shipping_compliance": {
@@ -932,9 +1228,9 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales"
       ],
@@ -959,6 +1255,14 @@
       "description": "MES shopfloor gồm core, execution, telemetry, inline quality, material, integration và analytics.",
       "businessProcess": "Machine connectivity, execution tracking, telemetry, inline quality, genealogy, and OEE.",
       "tables": [
+        "alarm_event",
+        "dispatch_queue",
+        "downtime_event",
+        "job",
+        "job_event",
+        "labor_capture",
+        "machine_event",
+        "material_consumption",
         "mes_alarm_catalog",
         "mes_alarm_playbooks",
         "mes_areas",
@@ -1007,9 +1311,26 @@
         "mes_tool_life_events",
         "mes_tool_preset_offsets",
         "mes_wip_location",
-        "mes_wip_movements"
+        "mes_wip_movements",
+        "pause_resume",
+        "process_param_capture",
+        "production_completion",
+        "rework",
+        "scrap",
+        "tool_usage",
+        "track_in",
+        "track_out",
+        "work_order"
       ],
       "primaryWorkflows": [
+        "wf_alarm_event",
+        "wf_dispatch_queue",
+        "wf_downtime_event",
+        "wf_job",
+        "wf_job_event",
+        "wf_labor_capture",
+        "wf_machine_event",
+        "wf_material_consumption",
         "wf_mes_alarm_catalog",
         "wf_mes_alarm_playbook",
         "wf_mes_area",
@@ -1047,12 +1368,23 @@
         "wf_mes_tool_assembly",
         "wf_mes_tool_preset_offset",
         "wf_mes_wip_location",
-        "wf_mes_wip_movement"
+        "wf_mes_wip_movement",
+        "wf_pause_resume",
+        "wf_process_param_capture",
+        "wf_production_completion",
+        "wf_rework",
+        "wf_scrap",
+        "wf_tool_usage",
+        "wf_track_in",
+        "wf_track_out",
+        "wf_work_order"
       ],
       "upstreamDomains": [
         "calibration_equipment",
+        "foundation_governance",
         "master_data",
-        "master_data_governance"
+        "mfg_engineering",
+        "production"
       ],
       "downstreamDomains": [
         "advanced_planning",
@@ -1074,6 +1406,7 @@
         "finance_treasury",
         "fmea_apqp",
         "forms_system",
+        "foundation_governance",
         "hcm_workforce",
         "inventory",
         "lean_manufacturing",
@@ -1197,6 +1530,14 @@
         }
       },
       "workflows": [
+        "wf_alarm_event",
+        "wf_dispatch_queue",
+        "wf_downtime_event",
+        "wf_job",
+        "wf_job_event",
+        "wf_labor_capture",
+        "wf_machine_event",
+        "wf_material_consumption",
         "wf_mes_alarm_catalog",
         "wf_mes_alarm_playbook",
         "wf_mes_area",
@@ -1234,7 +1575,16 @@
         "wf_mes_tool_assembly",
         "wf_mes_tool_preset_offset",
         "wf_mes_wip_location",
-        "wf_mes_wip_movement"
+        "wf_mes_wip_movement",
+        "wf_pause_resume",
+        "wf_process_param_capture",
+        "wf_production_completion",
+        "wf_rework",
+        "wf_scrap",
+        "wf_tool_usage",
+        "wf_track_in",
+        "wf_track_out",
+        "wf_work_order"
       ]
     },
     "plant_maintenance": {
@@ -1277,9 +1627,9 @@
       "upstreamDomains": [
         "calibration_equipment",
         "core_system",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "purchasing"
       ],
@@ -1340,8 +1690,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "production",
         "sales"
@@ -1371,6 +1721,7 @@
       "description": "ECR/ECO, review board, yêu cầu, test plan và deviation permit.",
       "businessProcess": "Engineering change, configuration control, design validation, and product traceability.",
       "tables": [
+        "change_control",
         "engineering_change_requests",
         "plm_change_order_lines",
         "plm_change_orders",
@@ -1386,6 +1737,7 @@
         "plm_test_results"
       ],
       "primaryWorkflows": [
+        "wf_change_control",
         "wf_engineering_change_request",
         "wf_plm_change_order",
         "wf_plm_change_request",
@@ -1400,9 +1752,9 @@
       "upstreamDomains": [
         "core_system",
         "document_control",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "record_system",
         "sales"
@@ -1410,6 +1762,7 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
+        "wf_change_control",
         "wf_engineering_change_request",
         "wf_plm_change_order",
         "wf_plm_change_request",
@@ -1462,7 +1815,7 @@
       "upstreamDomains": [
         "core_system",
         "document_control",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "record_system",
         "training_hr"
@@ -1520,9 +1873,9 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "production",
         "sales"
@@ -1577,7 +1930,7 @@
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "purchasing",
         "sales"
@@ -1639,8 +1992,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales",
         "training_hr"
@@ -1694,8 +2047,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales"
       ],
@@ -1744,8 +2097,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales",
         "shipping_compliance",
@@ -1854,6 +2207,7 @@
         "srm_supplier_risk_events",
         "srm_vendor_managed_inventory",
         "supplier_audit_schedule",
+        "supplier_quality_case",
         "supplier_scorecards"
       ],
       "primaryWorkflows": [
@@ -1872,13 +2226,14 @@
         "wf_srm_supplier_ppap_package",
         "wf_srm_vendor_managed_inventory",
         "wf_supplier_audit_schedule",
+        "wf_supplier_quality_case",
         "wf_supplier_scorecard"
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "purchasing",
         "record_system"
@@ -1901,6 +2256,7 @@
         "wf_srm_vendor_managed_inventory",
         "wf_supplier_action_request",
         "wf_supplier_audit_schedule",
+        "wf_supplier_quality_case",
         "wf_supplier_scorecard"
       ]
     },
@@ -1944,8 +2300,8 @@
         "calibration_equipment",
         "cnc_programs",
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "purchasing"
       ],
@@ -1955,7 +2311,6 @@
       "supportDomain": false,
       "workflows": [
         "wf_fixture_master",
-        "wf_tool_life",
         "wf_tooling_assembly",
         "wf_tooling_component",
         "wf_tooling_crib_transaction",
@@ -1975,9 +2330,15 @@
       "description": "S&OP, demand consensus, supply consensus, buffer và replenishment policies.",
       "businessProcess": "Demand consensus, supply consensus, replenishment, and inventory policy management.",
       "tables": [
+        "allocation",
+        "demand",
         "demand_classifications",
         "demand_history_buckets",
+        "forecast",
         "inventory_buffer_profiles",
+        "mrp_signal",
+        "pegging",
+        "planned_supply",
         "sop_action_items",
         "sop_demand_consensus",
         "sop_inventory_policies",
@@ -1989,9 +2350,15 @@
         "supply_replenishment_policies"
       ],
       "primaryWorkflows": [
+        "wf_allocation",
+        "wf_demand",
         "wf_demand_classification",
         "wf_demand_history_bucket",
+        "wf_forecast",
         "wf_inventory_buffer_profile",
+        "wf_mrp_signal",
+        "wf_pegging",
+        "wf_planned_supply",
         "wf_sop_demand_consensu",
         "wf_sop_inventory_policy",
         "wf_sop_cycle",
@@ -2002,9 +2369,9 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "purchasing",
         "sales"
@@ -2012,9 +2379,14 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
+        "wf_demand",
         "wf_demand_classification",
         "wf_demand_history_bucket",
+        "wf_forecast",
         "wf_inventory_buffer_profile",
+        "wf_mrp_signal",
+        "wf_pegging",
+        "wf_planned_supply",
         "wf_sop_cycle",
         "wf_sop_demand_consensu",
         "wf_sop_inventory_policy",
@@ -2059,9 +2431,9 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales"
       ],
@@ -2113,8 +2485,8 @@
       ],
       "upstreamDomains": [
         "finance_extended",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales"
       ],
@@ -2174,15 +2546,17 @@
         "calibration_equipment",
         "core_system",
         "document_control",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "quality_management",
         "record_system",
         "sales"
       ],
-      "downstreamDomains": [],
+      "downstreamDomains": [
+        "ehs_sustainability"
+      ],
       "supportDomain": false,
       "workflows": [
         "wf_qual_audit_program",
@@ -2242,9 +2616,10 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
+        "quality_lab",
         "record_system",
         "training_hr"
       ],
@@ -2275,6 +2650,10 @@
       "description": "Process family, standard operations, time standards, instructions và calendars.",
       "businessProcess": "Industrialization, standard work, time standards, and engineering readiness.",
       "tables": [
+        "bom",
+        "bom_line",
+        "bom_substitute",
+        "bom_version",
         "eng_capacity_models",
         "eng_changeover_standards",
         "eng_factory_calendar_days",
@@ -2288,9 +2667,19 @@
         "eng_time_standards",
         "eng_tooling_requirements",
         "eng_work_instruction_steps",
-        "eng_work_instructions"
+        "eng_work_instructions",
+        "operation",
+        "operation_material",
+        "operation_output",
+        "operation_resource",
+        "work_definition",
+        "work_definition_version",
+        "work_instruction"
       ],
       "primaryWorkflows": [
+        "wf_bom",
+        "wf_bom_substitute",
+        "wf_bom_version",
         "wf_eng_capacity_model",
         "wf_eng_changeover_standard",
         "wf_eng_factory_calendar_day",
@@ -2300,19 +2689,33 @@
         "wf_eng_process_validation",
         "wf_eng_resource_group",
         "wf_eng_time_standard",
-        "wf_work_instruction_release"
+        "wf_work_instruction_release",
+        "wf_operation",
+        "wf_operation_material",
+        "wf_operation_output",
+        "wf_operation_resource",
+        "wf_work_definition",
+        "wf_work_definition_version",
+        "wf_work_instruction"
       ],
       "upstreamDomains": [
         "calibration_equipment",
         "document_control",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "tooling_lifecycle"
       ],
-      "downstreamDomains": [],
+      "downstreamDomains": [
+        "mes_execution",
+        "production"
+      ],
       "supportDomain": false,
       "workflows": [
+        "wf_bom",
+        "wf_bom_line",
+        "wf_bom_substitute",
+        "wf_bom_version",
         "wf_eng_capacity_model",
         "wf_eng_changeover_standard",
         "wf_eng_factory_calendar",
@@ -2322,6 +2725,13 @@
         "wf_eng_process_validation",
         "wf_eng_resource_group",
         "wf_eng_time_standard",
+        "wf_operation",
+        "wf_operation_material",
+        "wf_operation_output",
+        "wf_operation_resource",
+        "wf_work_definition",
+        "wf_work_definition_version",
+        "wf_work_instruction",
         "wf_work_instruction_release"
       ]
     },
@@ -2334,114 +2744,79 @@
       "businessProcess": "Stewardship, number series, duplicate control, and MDM issue resolution.",
       "tables": [
         "data_archival_runs",
+        "master_data_store",
         "mdm_approval_policies",
         "mdm_attribute_sets",
         "mdm_attribute_values",
         "mdm_data_stewards",
         "mdm_duplicate_candidates",
+        "mdm_form_series",
         "mdm_governance_issues",
+        "mdm_incoterms",
         "mdm_item_classes",
         "mdm_number_series",
+        "mdm_payment_terms",
+        "mdm_promise_policies",
         "mdm_reference_code_values",
         "mdm_reference_codes",
+        "mdm_shipping_methods",
         "mdm_site_parameters",
         "mdm_uom_conversions",
-        "org_companies",
-        "org_legal_entities",
-        "org_plants",
         "retention_policies",
         "source_system_registry"
       ],
       "primaryWorkflows": [
         "wf_data_archival_run",
+        "wf_master_data_store",
         "wf_mdm_approval_policy",
         "wf_mdm_attribute_set",
         "wf_mdm_attribute_value",
         "wf_mdm_data_steward",
         "wf_mdm_duplicate_candidate",
+        "wf_mdm_form_sery",
         "wf_mdm_governance",
+        "wf_mdm_incoterm",
         "wf_mdm_item_class",
         "wf_mdm_number_sery",
+        "wf_mdm_payment_term",
+        "wf_mdm_promise_policy",
         "wf_mdm_reference_code_value",
         "wf_mdm_reference_code",
+        "wf_mdm_shipping_method",
         "wf_mdm_site_parameter",
         "wf_mdm_uom_conversion",
-        "wf_org_company",
-        "wf_org_legal_entity",
-        "wf_org_plant",
         "wf_retention_policy",
         "wf_source_system_registry"
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "mes_execution"
       ],
       "downstreamDomains": [
-        "advanced_planning",
-        "ai_predictive",
-        "audit_risk",
-        "calibration_equipment",
-        "cnc_programs",
-        "commercial_contracts",
-        "core_system",
-        "crm",
-        "customer_portal",
-        "demand_supply_planning",
-        "digital_product_passport",
-        "document_control",
-        "ehs_sustainability",
-        "evidence_vault",
-        "finance",
-        "finance_extended",
-        "finance_treasury",
-        "fmea_apqp",
-        "forms_system",
-        "hcm_workforce",
-        "inventory",
-        "lean_manufacturing",
-        "master_data",
-        "mes_execution",
-        "mfg_engineering",
-        "mobile_operations",
-        "outsource_execution",
-        "plant_maintenance",
-        "plm_change_control",
-        "production",
-        "project_management",
-        "purchasing",
-        "quality_lab",
-        "quality_management",
-        "record_system",
-        "sales",
-        "service_warranty",
-        "shipping_compliance",
-        "supplier_relationship",
-        "system_infrastructure",
-        "tooling_lifecycle",
-        "traceability_serialization",
-        "trade_compliance",
-        "training_hr",
-        "transportation",
-        "warehouse_management"
+        "system_infrastructure"
       ],
       "supportDomain": false,
       "workflows": [
         "wf_data_archival_run",
+        "wf_master_data_store",
         "wf_mdm_approval_policy",
         "wf_mdm_attribute_set",
         "wf_mdm_attribute_value",
         "wf_mdm_data_steward",
         "wf_mdm_duplicate_candidate",
+        "wf_mdm_form_sery",
         "wf_mdm_governance",
+        "wf_mdm_incoterm",
         "wf_mdm_item_class",
         "wf_mdm_number_sery",
+        "wf_mdm_payment_term",
+        "wf_mdm_promise_policy",
         "wf_mdm_reference_code",
         "wf_mdm_reference_code_value",
+        "wf_mdm_shipping_method",
         "wf_mdm_site_parameter",
         "wf_mdm_uom_conversion",
-        "wf_org_company",
-        "wf_org_legal_entity",
-        "wf_org_plant",
         "wf_retention_policy",
         "wf_source_system_registry"
       ]
@@ -2486,8 +2861,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales"
       ],
@@ -2516,6 +2891,9 @@
       "description": "Genealogy, serial events, lot attributes, travelers, labels và recall.",
       "businessProcess": "Lot/serial genealogy, traveler control, labeling, and recall execution.",
       "tables": [
+        "genealogy_link",
+        "lot",
+        "serial",
         "trace_dispatch_events",
         "trace_genealogy_batches",
         "trace_genealogy_links",
@@ -2530,6 +2908,8 @@
         "trace_serial_events"
       ],
       "primaryWorkflows": [
+        "wf_lot",
+        "wf_serial",
         "wf_trace_genealogy_batche",
         "wf_trace_heat_lot_register",
         "wf_traceability_traveler",
@@ -2539,16 +2919,22 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "production",
         "purchasing"
       ],
-      "downstreamDomains": [],
+      "downstreamDomains": [
+        "inventory",
+        "quality_management"
+      ],
       "supportDomain": false,
       "workflows": [
+        "wf_genealogy_link",
+        "wf_lot",
+        "wf_serial",
         "wf_trace_genealogy_batche",
         "wf_trace_heat_lot_register",
         "wf_trace_label_print_job",
@@ -2597,9 +2983,9 @@
         "wf_subcontract_receipt"
       ],
       "upstreamDomains": [
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "production",
         "purchasing",
@@ -2658,7 +3044,7 @@
         "wf_trade_screening"
       ],
       "upstreamDomains": [
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "sales",
         "shipping_compliance"
@@ -2688,23 +3074,29 @@
       "businessProcess": "Schema-driven form publishing, submission, approval, and attachment capture.",
       "tables": [
         "form_attachments",
+        "form_drafts",
         "form_entries",
         "form_schemas"
       ],
       "primaryWorkflows": [
         "wf_form_attachment",
+        "wf_form_draft",
         "wf_form_submission",
         "wf_form_schema"
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
-        "mes_execution"
+        "foundation_governance",
+        "mes_execution",
+        "record_system"
       ],
-      "downstreamDomains": [],
+      "downstreamDomains": [
+        "record_system"
+      ],
       "supportDomain": false,
       "workflows": [
         "wf_form_attachment",
+        "wf_form_draft",
         "wf_form_schema",
         "wf_form_submission"
       ]
@@ -2717,22 +3109,29 @@
       "description": "Counter, hồ sơ và liên kết hồ sơ dùng chung toàn portal.",
       "businessProcess": "Record numbering, lifecycle governance, and cross-record linkage.",
       "tables": [
+        "allocation_events",
+        "allocations",
+        "electronic_signatures",
         "record_counters",
         "record_links",
         "records"
       ],
       "primaryWorkflows": [
+        "wf_allocation",
+        "wf_electronic_signature",
         "wf_record_counter",
         "wf_record_lifecycle"
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "forms_system",
+        "foundation_governance",
         "mes_execution"
       ],
       "downstreamDomains": [
         "audit_risk",
         "ehs_sustainability",
+        "forms_system",
         "hcm_workforce",
         "lean_manufacturing",
         "plm_change_control",
@@ -2743,6 +3142,7 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_allocation",
         "wf_record_counter",
         "wf_record_lifecycle"
       ]
@@ -2782,6 +3182,7 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data_governance",
         "mes_execution"
       ],
@@ -2828,7 +3229,7 @@
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "sales"
       ],
@@ -2863,7 +3264,7 @@
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution"
       ],
       "downstreamDomains": [],
@@ -2894,8 +3295,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution"
       ],
       "downstreamDomains": [
@@ -2923,9 +3324,9 @@
         "wf_product_passport"
       ],
       "upstreamDomains": [
+        "foundation_governance",
         "inventory",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "sales"
       ],
@@ -2954,8 +3355,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution"
       ],
       "downstreamDomains": [],
@@ -2991,8 +3392,8 @@
       ],
       "upstreamDomains": [
         "core_system",
+        "foundation_governance",
         "master_data",
-        "master_data_governance",
         "mes_execution",
         "quality_management",
         "sales"
@@ -3025,7 +3426,7 @@
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "quality_management",
         "training_hr"
@@ -3064,7 +3465,7 @@
       ],
       "upstreamDomains": [
         "core_system",
-        "master_data_governance",
+        "foundation_governance",
         "mes_execution",
         "quality_management",
         "record_system"

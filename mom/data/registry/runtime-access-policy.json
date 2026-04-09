@@ -1,10 +1,10 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-07T14:51:43.593Z",
+    "generatedAt": "2026-04-09T13:44:52.703Z",
     "description": "Runtime access policy generated from domain architecture and table-registry defaults.",
     "domainPolicyCount": 49,
-    "tableOverrideCount": 105
+    "tableOverrideCount": 124
   },
   "defaults": {
     "list": [
@@ -1122,31 +1122,34 @@
     },
     "foundation_governance": {
       "list": [
-        "authenticated"
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
       ],
       "detail": [
-        "authenticated"
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
       ],
       "create": [
         "it_admin",
         "ceo",
         "qa_manager",
-        "quality_manager",
-        "qms_engineer"
+        "quality_manager"
       ],
       "update": [
         "it_admin",
         "ceo",
         "qa_manager",
-        "quality_manager",
-        "qms_engineer"
+        "quality_manager"
       ],
       "transition": [
         "it_admin",
         "ceo",
         "qa_manager",
-        "quality_manager",
-        "qms_engineer"
+        "quality_manager"
       ],
       "delete": [
         "it_admin",
@@ -1962,7 +1965,6 @@
         "qa_manager",
         "quality_manager",
         "supply_chain_manager",
-        "buyer",
         "qms_engineer"
       ],
       "update": [
@@ -1971,7 +1973,6 @@
         "qa_manager",
         "quality_manager",
         "supply_chain_manager",
-        "buyer",
         "qms_engineer"
       ],
       "transition": [
@@ -1980,9 +1981,6 @@
         "qa_manager",
         "quality_manager",
         "supply_chain_manager",
-        "buyer",
-        "warehouse_clerk",
-        "logistics_coordinator",
         "qms_engineer"
       ],
       "delete": [
@@ -2710,6 +2708,66 @@
     }
   },
   "tables": {
+    "allocation_events": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "ap_invoice_lines": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
     "aps_demand_forecast_lines": {
       "list": [
         "authenticated"
@@ -2818,6 +2876,36 @@
       "create": [],
       "update": [],
       "transition": [],
+      "delete": []
+    },
+    "bom_line": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
       "delete": []
     },
     "capa_8d_steps": {
@@ -3480,6 +3568,36 @@
       ],
       "delete": []
     },
+    "genealogy_link": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
     "hcm_payroll_lines": {
       "list": [
         "authenticated"
@@ -3570,6 +3688,36 @@
       ],
       "delete": []
     },
+    "inspection_result": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
     "inspection_results": {
       "list": [
         "authenticated"
@@ -3600,7 +3748,7 @@
       ],
       "delete": []
     },
-    "item_revisions": {
+    "ipqc_inspection_results": {
       "list": [
         "authenticated"
       ],
@@ -3630,7 +3778,7 @@
       ],
       "delete": []
     },
-    "job_operations": {
+    "item_revisions": {
       "list": [
         "authenticated"
       ],
@@ -4140,6 +4288,237 @@
       ],
       "delete": []
     },
+    "org_companies": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "delete": []
+    },
+    "org_company": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "delete": []
+    },
+    "org_plant": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "delete": []
+    },
+    "org_plants": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "delete": []
+    },
+    "org_site": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "delete": []
+    },
+    "org_warehouse": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "delete": []
+    },
+    "org_work_center": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager"
+      ],
+      "delete": []
+    },
     "osc_dispatch_batch_lines": {
       "list": [
         "authenticated"
@@ -4560,38 +4939,18 @@
       ],
       "delete": []
     },
-    "purchase_order_lines": {
+    "purchase_order_line": {
       "list": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "supply_chain_manager",
-        "buyer",
-        "warehouse_clerk",
-        "tool_storekeeper",
-        "logistics_coordinator",
-        "qms_engineer"
+        "authenticated"
       ],
       "detail": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "supply_chain_manager",
-        "buyer",
-        "warehouse_clerk",
-        "tool_storekeeper",
-        "logistics_coordinator",
-        "qms_engineer"
+        "authenticated"
       ],
       "create": [
         "it_admin",
         "ceo",
         "qa_manager",
         "quality_manager",
-        "supply_chain_manager",
-        "buyer",
         "qms_engineer"
       ],
       "update": [
@@ -4599,8 +4958,6 @@
         "ceo",
         "qa_manager",
         "quality_manager",
-        "supply_chain_manager",
-        "buyer",
         "qms_engineer"
       ],
       "transition": [
@@ -4608,69 +4965,127 @@
         "ceo",
         "qa_manager",
         "quality_manager",
-        "supply_chain_manager",
-        "buyer",
         "qms_engineer"
       ],
       "delete": []
     },
-    "incoming_inspections": {
+    "purchase_order_lines": {
       "list": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer",
-        "quality_engineer",
-        "qc_inspector",
-        "warehouse_clerk",
-        "logistics_coordinator",
-        "supply_chain_manager"
+        "authenticated"
       ],
       "detail": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer",
-        "quality_engineer",
-        "qc_inspector",
-        "warehouse_clerk",
-        "logistics_coordinator",
-        "supply_chain_manager"
+        "authenticated"
       ],
       "create": [
         "it_admin",
         "ceo",
         "qa_manager",
         "quality_manager",
-        "qms_engineer",
-        "quality_engineer",
-        "qc_inspector",
-        "warehouse_clerk",
-        "supply_chain_manager"
+        "qms_engineer"
       ],
       "update": [
         "it_admin",
         "ceo",
         "qa_manager",
         "quality_manager",
-        "qms_engineer",
-        "quality_engineer",
-        "qc_inspector",
-        "warehouse_clerk",
-        "supply_chain_manager"
+        "qms_engineer"
       ],
       "transition": [
         "it_admin",
         "ceo",
         "qa_manager",
         "quality_manager",
-        "qms_engineer",
-        "quality_engineer",
-        "qc_inspector",
-        "warehouse_clerk",
-        "supply_chain_manager"
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "purchase_receipt_correction_lines": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "purchase_receipt_lines": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "purchase_requisition_lines": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
       ],
       "delete": []
     },
@@ -4795,6 +5210,36 @@
       "delete": []
     },
     "qual_escape_events": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "quality_case_link": {
       "list": [
         "authenticated"
       ],
@@ -4953,6 +5398,36 @@
       ]
     },
     "routing_operations": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "sales_order_line": {
       "list": [
         "authenticated"
       ],
@@ -5223,6 +5698,36 @@
       "delete": []
     },
     "srm_supplier_risk_events": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "supplier_asn_lines": {
       "list": [
         "authenticated"
       ],

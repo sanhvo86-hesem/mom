@@ -1,0 +1,166 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-09T19:12:00+07:00",
+    "description": "Operational stress and exception scenario catalog for backend-first ERP/MES/eQMS hardening."
+  },
+  "source_authority": {
+    "http_and_retry_safety": [
+      "https://www.rfc-editor.org/in-notes/rfc9110.pdf",
+      "https://google.aip.dev/155"
+    ],
+    "recovery_patterns": [
+      "https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction"
+    ],
+    "receiving_corrections_and_returns": [
+      "https://docs.oracle.com/cd/G44591_01/trans/G41058-01/using-receiving.pdf"
+    ],
+    "duplicate_invoice_and_payment_control": [
+      "https://docs.oracle.com/cd/E26401_01/doc.122/e48760/T295436T485719.htm"
+    ],
+    "quality_hold_and_quarantine": [
+      "https://learn.microsoft.com/en-us/dynamics365/supply-chain/inventory/quarantine-orders",
+      "https://learn.microsoft.com/en-us/dynamics365/supply-chain/inventory/quality-orders"
+    ],
+    "lean_and_continuous_improvement": [
+      "https://www.nist.gov/mep/lean-and-process-improvement"
+    ],
+    "electronic_records_and_signatures": [
+      "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application"
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario_id": "STR-001",
+      "title": "Retry, timeout, and duplicate submit create repeated business side effects",
+      "priority": "critical",
+      "required_controls": [
+        "idempotency_key_or_equivalent_duplicate_suppression",
+        "duplicate_document_detection",
+        "safe_retry_contract_for_side_effect_actions",
+        "alerting_on_duplicate_attempt_patterns"
+      ]
+    },
+    {
+      "scenario_id": "STR-002",
+      "title": "Multi-step flow succeeds partially and leaves the plant in a half-committed state",
+      "priority": "critical",
+      "required_controls": [
+        "compensating_transaction_or_reconciliation_queue",
+        "correction_reversal_and_return_model",
+        "stateful_partial_completion_visibility",
+        "operator_recovery_workbench"
+      ]
+    },
+    {
+      "scenario_id": "STR-003",
+      "title": "Backdated posting crosses period, expiry, or shift boundary and falsifies KPI",
+      "priority": "critical",
+      "required_controls": [
+        "period_close_guard",
+        "posting_date_vs_execution_date_control",
+        "backdate_exception_workflow",
+        "financial_correction_model"
+      ]
+    },
+    {
+      "scenario_id": "STR-004",
+      "title": "Master data changes after release and execution no longer reflects approved truth",
+      "priority": "high",
+      "required_controls": [
+        "effective_dating",
+        "release_snapshot_of_critical_master_attributes",
+        "requalification_or_reapproval_gate",
+        "change_impact_detection"
+      ]
+    },
+    {
+      "scenario_id": "STR-005",
+      "title": "Hold, quarantine, or blocked disposition leaks into downstream execution",
+      "priority": "critical",
+      "required_controls": [
+        "downstream_reservation_pick_ship_consume_block",
+        "authorized_release_only",
+        "cross_domain_hold_visibility",
+        "gate_status_propagation"
+      ]
+    },
+    {
+      "scenario_id": "STR-006",
+      "title": "Manual override or waiver exists but is not governed tightly enough",
+      "priority": "critical",
+      "required_controls": [
+        "typed_override_reason",
+        "authorized_approver_boundary",
+        "timeboxed_override_expiry",
+        "audit_and_signature_evidence"
+      ]
+    },
+    {
+      "scenario_id": "STR-007",
+      "title": "Offline sync, async job drift, or dependency outage leaves stale truth behind",
+      "priority": "high",
+      "required_controls": [
+        "job_heartbeat_and_staleness_detection",
+        "reconciliation_queue",
+        "offline_conflict_resolution_model",
+        "dependency_failure_visibility"
+      ]
+    },
+    {
+      "scenario_id": "STR-008",
+      "title": "Correction, archive, supersede, or merge breaks audit continuity",
+      "priority": "high",
+      "required_controls": [
+        "traceable_supersede_chain",
+        "archive_without_active_lookup_leakage",
+        "correction_linkage_to_original_event",
+        "evidence_preservation_after_state_change"
+      ]
+    },
+    {
+      "scenario_id": "STR-009",
+      "title": "Inventory discrepancy, cycle count, or negative availability is hidden instead of governed",
+      "priority": "high",
+      "required_controls": [
+        "cycle_count_and_discrepancy_case",
+        "negative_inventory_policy",
+        "inventory_movement_exception_transition",
+        "availability_recalculation_and_hold"
+      ]
+    },
+    {
+      "scenario_id": "STR-010",
+      "title": "Scheduling releases work without validated operation context, material, tool, or safety state",
+      "priority": "high",
+      "required_controls": [
+        "operation_context_state",
+        "execution_status_state",
+        "material_tool_worker_safety_gate",
+        "dispatch_conflict_visibility"
+      ]
+    },
+    {
+      "scenario_id": "STR-011",
+      "title": "Customer return and complaint loop does not close physical, quality, and financial truth together",
+      "priority": "high",
+      "required_controls": [
+        "rma_return_receipt_inspection_disposition_chain",
+        "linked_customer_care_ncr_and_financial_action",
+        "replacement_vs_credit_decision_gate",
+        "return_reason_and_recall_linkage"
+      ]
+    },
+    {
+      "scenario_id": "STR-012",
+      "title": "Finance still lacks dedicated correction and close objects for AP and AR reality",
+      "priority": "critical",
+      "required_controls": [
+        "separate_ap_and_ar_operational_contracts",
+        "credit_memo_and_debit_memo_models",
+        "period_close_control_object",
+        "duplicate_and_hold_release_audit"
+      ]
+    }
+  ]
+}

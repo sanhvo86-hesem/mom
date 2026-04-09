@@ -1,0 +1,257 @@
+{
+  "portal_modules": {
+    "dashboard": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "documents": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "search": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "dictionary": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "access": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "deploy": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "exceptions": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "orders": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "dispatch": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "mes": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "mobile-shopfloor": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "quoting": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "purchasing": {
+      "enabled": true,
+      "access": "roles",
+      "roles": [
+        "admin",
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer",
+        "quality_engineer",
+        "qc_inspector",
+        "supply_chain_manager",
+        "buyer",
+        "warehouse_clerk",
+        "tool_storekeeper",
+        "logistics_coordinator",
+        "production_planner"
+      ]
+    },
+    "quality-exceptions": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "supplier-quality": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "fmea": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "apqp-ppap": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "ai-scheduling": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "forms": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "compliance-reports": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "continuous-improvement": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "knowledge-base": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "cnc-programs": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "product-passport": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "schema-studio": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "energy-dashboard": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "customer-portal": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
+    "admin": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "template-demo": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "module-builder": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    }
+  },
+  "admin_tabs": {
+    "users": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "dept_title": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "roles": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "orgchart": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "perms": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "module_access": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "activity": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "docs": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "portal_display": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "retention": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "data_sources": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "metadata_studio": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "infrastructure": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "manual_runtime": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "version_control": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "mfa": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    },
+    "appearance": {
+      "enabled": true,
+      "access": "admin",
+      "roles": []
+    }
+  },
+  "updated_at": "2026-04-09T15:30:00+07:00"
+}

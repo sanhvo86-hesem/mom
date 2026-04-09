@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 require __DIR__ . '/bootstrap.php';
+restore_exception_handler();
+restore_error_handler();
 
 ini_set('memory_limit', '1024M');
 
@@ -35,8 +37,12 @@ use MOM\Api\Middleware\CorsMiddleware;
 use MOM\Api\Middleware\RateLimitMiddleware;
 use MOM\Api\Router;
 use MOM\Api\Services\GenericCrudService;
+use MOM\Api\Services\IdempotencyService;
+use MOM\Api\Services\RecordConflictException;
 use MOM\Api\Services\WorkflowBridgeRequiredException;
 use MOM\Database\DataLayer;
+use MOM\Services\FinanceControlService;
+use MOM\Services\ShipmentGateService;
 
 function smoke_reset_request_state(): void
 {
@@ -490,6 +496,28 @@ try {
     smoke_assert(is_array($e->getPayload()['designs'] ?? null), 'Schema Studio read payload missing designs array.');
 }
 
+smoke_reset_request_state();
+session_init();
+$_SESSION['user'] = 'builder-user';
+$_SESSION['mfa_ok'] = true;
+$_SESSION['csrf'] = 'schema-smoke-token';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SERVER['HTTP_X_CSRF_TOKEN'] = 'schema-smoke-token';
+$releaseGateSchemaStudioController = (new SchemaStudioController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($builderStore);
+try {
+    $releaseGateSchemaStudioController->createReleaseBundle();
+    throw new RuntimeException('Schema Studio release bundle accepted a write without revision tokens.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 409, 'Schema Studio release gate returned wrong status.');
+    $releaseError = (string)($e->getPayload()['error'] ?? '');
+    smoke_assert(in_array($releaseError, ['missing_design_revision_token', 'release_gate_blocked'], true), 'Schema Studio release action should reject writes before bundle creation, either on operational release gate or missing revision tokens.');
+    if ($releaseError === 'missing_design_revision_token') {
+        smoke_assert(is_array($e->getPayload()['current_revisions'] ?? null), 'Schema Studio release action should expose current revision fingerprints when the workspace token is missing.');
+    } else {
+        smoke_assert(is_array($e->getPayload()['release_gate'] ?? null), 'Schema Studio release gate must expose blocking operational details when release bundling is blocked earlier.');
+    }
+}
+
 // Schema Studio DB-backed surfaces must now be limited to DB-admin roles, not generic schema editors.
 $schemaStudioGuardController = (new SchemaStudioController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($builderStore);
 $schemaStudioDbGuard = smoke_reflection_method($schemaStudioGuardController, 'requireDatabaseAccess');
@@ -613,7 +641,7 @@ smoke_assert(user_permission_matrix_configured(['role' => 'internal_auditor'], $
 smoke_assert(!user_has_any_permission(['role' => 'internal_auditor'], 'audit_risk.audit_programs.read', $rolePermFile), 'Internal auditor should not inherit generic CRUD access by fallback.');
 smoke_assert(user_permission_matrix_configured(['role' => 'deburr_team_lead'], $rolePermFile), 'Deburr team lead should be marked as managed even without generic CRUD grants.');
 smoke_assert(!user_has_any_permission(['role' => 'deburr_team_lead'], 'production.work_orders.read', $rolePermFile), 'Deburr team lead should not inherit generic production CRUD access by fallback.');
-smoke_assert(!user_has_any_permission(['role' => 'qms_engineer'], 'master_data_governance.org_companies.read', $rolePermFile), 'QMS engineer must not inherit generic governance-table access.');
+smoke_assert(!user_has_any_permission(['role' => 'qms_engineer'], 'foundation_governance.org_companies.read', $rolePermFile), 'QMS engineer must not inherit generic governance-table access.');
 smoke_assert(!user_has_any_permission(['role' => 'qms_engineer'], 'forms_system.form_definitions.read', $rolePermFile), 'QMS engineer must not inherit generic forms-system access.');
 smoke_assert(!user_has_any_permission(['role' => 'finance_manager'], 'finance.ap_ar_invoices.delete', $rolePermFile), 'Finance manager must not inherit generic delete permission.');
 smoke_assert(!user_has_any_permission(['role' => 'production_planner'], 'advanced_planning.aps_planning_scenarios.delete', $rolePermFile), 'Production planner must not inherit generic delete permission.');
@@ -699,6 +727,303 @@ $filteredPersistedUpdate = $filterWritableColumns->invoke($genericCrudService, [
 ], true);
 smoke_assert(!array_key_exists('capa_status', (array)$filteredPersistedUpdate), 'Generic update payload filtering must strip managed status fields.');
 smoke_assert(($filteredPersistedUpdate['title'] ?? null) === 'Retain me', 'Generic update payload filtering must preserve non-status writable fields.');
+$idempotencyTempDir = sys_get_temp_dir() . '/qms-backend-smoke-idempotency';
+if (is_dir($idempotencyTempDir)) {
+    $idempotencyIterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($idempotencyTempDir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($idempotencyIterator as $idempotencyEntry) {
+        if ($idempotencyEntry->isDir()) {
+            rmdir($idempotencyEntry->getPathname());
+            continue;
+        }
+        unlink($idempotencyEntry->getPathname());
+    }
+    rmdir($idempotencyTempDir);
+}
+mkdir($idempotencyTempDir . '/data', 0775, true);
+$idempotencyService = new IdempotencyService($idempotencyTempDir . '/data');
+$callbackExecutions = 0;
+$idempotencyDescriptor = [
+    'scope_key' => 'generic_crud|update|quality_management|capa_records|smoke',
+    'key' => 'smoke-retry-001',
+    'key_source' => 'header:Idempotency-Key',
+    'mode' => 'client_token',
+    'kind' => 'update',
+    'domain' => 'quality_management',
+    'table' => 'capa_records',
+    'user_id' => 'smoke-user',
+    'fingerprint' => [
+        'id' => 'CAPA-001',
+        'expected_row_version' => 5,
+        'payload' => [
+            'title' => 'Containment',
+        ],
+    ],
+];
+$firstIdempotentResult = $idempotencyService->execute($idempotencyDescriptor, static function () use (&$callbackExecutions): array {
+    $callbackExecutions++;
+    return [
+        'status_code' => 200,
+        'payload' => [
+            'record' => [
+                'capa_id' => 'CAPA-001',
+                'row_version' => 6,
+                'title' => 'Containment',
+            ],
+        ],
+    ];
+});
+smoke_assert($callbackExecutions === 1, 'Idempotency runtime must execute the first mutation exactly once.');
+smoke_assert(($firstIdempotentResult['replayed'] ?? true) === false, 'Idempotency runtime must mark the first execution as non-replayed.');
+$secondIdempotentResult = $idempotencyService->execute($idempotencyDescriptor, static function (): array {
+    throw new RuntimeException('Idempotency replay should not re-execute the callback.');
+});
+smoke_assert($callbackExecutions === 1, 'Idempotency replay must not re-execute the callback.');
+smoke_assert(($secondIdempotentResult['replayed'] ?? false) === true, 'Idempotency runtime must replay a matching duplicate request.');
+smoke_assert((($secondIdempotentResult['payload'] ?? [])['record']['title'] ?? null) === 'Containment', 'Idempotency replay must preserve the original response payload.');
+$payloadWindowCrudController = new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR);
+$payloadWindowResolver = smoke_reflection_method($payloadWindowCrudController, 'resolveMutationIdempotency');
+$payloadWindowSpec = $payloadWindowResolver->invoke(
+    $payloadWindowCrudController,
+    'create',
+    [
+        'domain' => 'crm',
+        'table' => 'crm_activities',
+        'scope' => ['org_site_id' => 'SITE-A'],
+        'tableMeta' => [
+            'primaryKey' => 'crm_activity_id',
+            'columns' => [
+                'crm_activity_id' => ['generated' => true],
+                'activity_type' => ['required' => true],
+                'subject' => ['required' => true],
+                'org_site_id' => ['required' => false],
+            ],
+        ],
+    ],
+    [],
+    ['username' => 'smoke-user'],
+    [
+        'activity_type' => 'follow_up_call',
+        'subject' => 'Customer follow-up',
+        'org_site_id' => 'SITE-A',
+    ]
+);
+smoke_assert(($payloadWindowSpec['applied'] ?? false) === true, 'Create idempotency must apply by default even when no strong business key exists.');
+smoke_assert(($payloadWindowSpec['mode'] ?? null) === 'derived_payload_window', 'Create idempotency must fall back to a short retry window when only payload replay protection is available.');
+smoke_assert(($payloadWindowSpec['safe_retry_requires_client_key'] ?? true) === false, 'Create retry safety must no longer depend entirely on client-supplied idempotency keys.');
+smoke_assert((int)(($payloadWindowSpec['descriptor'] ?? [])['ttl_seconds'] ?? 0) >= 15, 'Create payload-window replay protection must persist for a bounded retry window.');
+$payloadWindowExecutions = 0;
+$payloadWindowFirst = $idempotencyService->execute((array)($payloadWindowSpec['descriptor'] ?? []), static function () use (&$payloadWindowExecutions): array {
+    $payloadWindowExecutions++;
+    return [
+        'status_code' => 201,
+        'payload' => [
+            'record' => [
+                'crm_activity_id' => 'ACT-001',
+                'activity_type' => 'follow_up_call',
+            ],
+        ],
+    ];
+});
+$payloadWindowReplay = $idempotencyService->execute((array)($payloadWindowSpec['descriptor'] ?? []), static function (): array {
+    throw new RuntimeException('Payload-window create replay should not re-execute the callback.');
+});
+smoke_assert($payloadWindowExecutions === 1, 'Payload-window create replay must not execute the callback more than once inside the retry window.');
+smoke_assert(($payloadWindowFirst['replayed'] ?? true) === false, 'Payload-window create replay must treat the first execution as a real mutation.');
+smoke_assert(($payloadWindowReplay['replayed'] ?? false) === true, 'Payload-window create replay must return the stored success response on duplicate submit.');
+$updateWindowSpec = $payloadWindowResolver->invoke(
+    $payloadWindowCrudController,
+    'update',
+    [
+        'domain' => 'crm',
+        'table' => 'crm_activities',
+        'identity' => ['crm_activity_id' => 'ACT-001'],
+        'scope' => ['org_site_id' => 'SITE-A'],
+        'expected_row_version' => null,
+        'tableMeta' => [
+            'primaryKey' => 'crm_activity_id',
+            'columns' => [
+                'crm_activity_id' => ['generated' => true],
+                'activity_type' => ['required' => true],
+                'subject' => ['required' => true],
+                'org_site_id' => ['required' => false],
+            ],
+        ],
+    ],
+    [],
+    ['username' => 'smoke-user'],
+    [
+        'crm_activity_id' => 'ACT-001',
+        'subject' => 'Customer follow-up updated',
+        'org_site_id' => 'SITE-A',
+    ]
+);
+smoke_assert(($updateWindowSpec['applied'] ?? false) === true, 'Update idempotency must apply by default even when the table does not support optimistic concurrency.');
+smoke_assert(($updateWindowSpec['mode'] ?? null) === 'derived_identity_window', 'Update idempotency must fall back to an identity-scoped retry window when row_version is unavailable.');
+smoke_assert(($updateWindowSpec['safe_retry_requires_client_key'] ?? true) === false, 'Update retry safety must not depend on explicit client idempotency keys.');
+try {
+    $idempotencyService->execute([
+        'scope_key' => 'generic_crud|update|quality_management|capa_records|smoke',
+        'key' => 'smoke-retry-001',
+        'key_source' => 'header:Idempotency-Key',
+        'mode' => 'client_token',
+        'kind' => 'update',
+        'domain' => 'quality_management',
+        'table' => 'capa_records',
+        'user_id' => 'smoke-user',
+        'fingerprint' => [
+            'id' => 'CAPA-001',
+            'expected_row_version' => 5,
+            'payload' => [
+                'title' => 'Escaped duplicate',
+            ],
+        ],
+    ], static function (): array {
+        throw new RuntimeException('Conflicting duplicate should be rejected before callback execution.');
+    });
+    throw new RuntimeException('Idempotency runtime accepted a conflicting duplicate mutation.');
+} catch (RecordConflictException $e) {
+    smoke_assert(stripos($e->getMessage(), 'idempotency key') !== false, 'Conflicting duplicate mutation should identify idempotency key misuse.');
+}
+$shipmentOverrideTempDir = sys_get_temp_dir() . '/qms-backend-smoke-shipment-override';
+if (is_dir($shipmentOverrideTempDir)) {
+    $shipmentOverrideIterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($shipmentOverrideTempDir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($shipmentOverrideIterator as $shipmentOverrideEntry) {
+        if ($shipmentOverrideEntry->isDir()) {
+            rmdir($shipmentOverrideEntry->getPathname());
+            continue;
+        }
+        unlink($shipmentOverrideEntry->getPathname());
+    }
+    rmdir($shipmentOverrideTempDir);
+}
+mkdir($shipmentOverrideTempDir . '/data/orders', 0775, true);
+mkdir($shipmentOverrideTempDir . '/data/config', 0775, true);
+copy(QMS_TEST_DATA_DIR . '/config/operational_override_policy.json', $shipmentOverrideTempDir . '/data/config/operational_override_policy.json');
+file_put_contents(
+    $shipmentOverrideTempDir . '/data/orders/orders.json',
+    json_encode([
+        'sales_orders' => [
+            ['so_number' => 'SO-TEST'],
+        ],
+        'job_orders' => [],
+        'work_orders' => [],
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+);
+$shipmentGateService = new ShipmentGateService($shipmentOverrideTempDir . '/data', $shipmentOverrideTempDir . '/data/config');
+$shipmentOverride = $shipmentGateService->overrideGate(
+    'SO-TEST',
+    'SG-01',
+    'Temporary release accepted with documented risk.',
+    'qa-user',
+    'qa_manager',
+    'risk_accepted_by_quality',
+    (new DateTimeImmutable('now', new DateTimeZone('+07:00')))->modify('+24 hours')->format('c'),
+    'QA-SIGN-001'
+);
+smoke_assert(($shipmentOverride['current_status'] ?? null) === 'active', 'Operational override must stay active until expiry or revocation.');
+smoke_assert((($shipmentOverride['e_signature'] ?? [])['signature_status'] ?? null) === 'applied', 'Operational override must carry applied electronic-signature evidence.');
+$operationalOverrideService = new \MOM\Services\OperationalOverrideService($shipmentOverrideTempDir . '/data', $shipmentOverrideTempDir . '/data/config');
+$loadedShipmentOverride = $operationalOverrideService->getOverride((string)($shipmentOverride['override_id'] ?? ''));
+smoke_assert(is_array($loadedShipmentOverride), 'Operational override detail lookup must resolve the created control object.');
+smoke_assert(($loadedShipmentOverride['override_id'] ?? null) === ($shipmentOverride['override_id'] ?? null), 'Operational override detail lookup must preserve the canonical override identity.');
+$shipmentOverrides = $shipmentGateService->listOverrides('SO-TEST');
+smoke_assert(count($shipmentOverrides) === 1, 'Shipment gate override listing must expose governed override records.');
+smoke_assert(($shipmentOverrides[0]['control_code'] ?? null) === 'SG-01', 'Shipment gate override listing must preserve the controlled gate code.');
+$shipmentReadiness = $shipmentGateService->checkReadiness('SO-TEST', 'qa-user', 'qa_manager');
+$shipmentGateRow = null;
+foreach ((array)($shipmentReadiness['items'] ?? []) as $item) {
+    if (($item['code'] ?? null) === 'SG-01') {
+        $shipmentGateRow = $item;
+        break;
+    }
+}
+smoke_assert(is_array($shipmentGateRow), 'Shipment gate readiness must still emit the governed gate row.');
+smoke_assert(($shipmentGateRow['status'] ?? null) === 'waived', 'Shipment gate readiness must apply active governed overrides as waived status.');
+smoke_assert((($shipmentReadiness['overrides']['SG-01'] ?? [])['e_signature']['signature_status'] ?? null) === 'applied', 'Shipment gate readiness must surface signature-backed override evidence.');
+try {
+    $shipmentGateService->overrideGate(
+        'SO-TEST',
+        'SG-04',
+        'Unauthorized release attempt.',
+        'sales-user',
+        'sales_manager',
+        'logistics_cutoff_exception',
+        (new DateTimeImmutable('now', new DateTimeZone('+07:00')))->modify('+24 hours')->format('c'),
+        'SALES-SIGN-001'
+    );
+    throw new RuntimeException('Shipment gate override allowed a role outside the governed approver boundary.');
+} catch (RuntimeException $e) {
+    smoke_assert(stripos($e->getMessage(), 'cannot override shipment gates') !== false, 'Shipment gate override must report approver-boundary violations clearly.');
+}
+$financeControlTempDir = sys_get_temp_dir() . '/qms-backend-smoke-finance-controls';
+if (is_dir($financeControlTempDir)) {
+    $financeControlIterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($financeControlTempDir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($financeControlIterator as $financeControlEntry) {
+        if ($financeControlEntry->isDir()) {
+            rmdir($financeControlEntry->getPathname());
+            continue;
+        }
+        unlink($financeControlEntry->getPathname());
+    }
+    rmdir($financeControlTempDir);
+}
+mkdir($financeControlTempDir . '/data', 0775, true);
+$financeControlService = new FinanceControlService($financeControlTempDir . '/data');
+$periodClose = $financeControlService->createPeriodClose([
+    'period_code' => '2026-04',
+    'ledger_scope' => 'AP',
+    'reason' => 'April AP close completed after match review.',
+], 'finance-user');
+smoke_assert(($periodClose['close_status'] ?? null) === 'closed', 'Finance period close control must create a closed control record.');
+smoke_assert((($periodClose['e_signature'] ?? [])['signature_status'] ?? null) === 'applied', 'Finance period close control must carry signature evidence.');
+$backdateException = $financeControlService->createBackdateException([
+    'ledger_scope' => 'AR',
+    'subject_type' => 'shipment',
+    'subject_ref' => 'SHP-001',
+    'reason_code' => 'closed_period_adjustment',
+    'reason' => 'Approved late logistics billing adjustment crossing the monthly close boundary.',
+    'approval_reference' => 'APR-AR-001',
+    'original_event_at' => '2026-04-01T08:15:00+07:00',
+    'requested_posting_date' => '2026-04-02',
+    'expires_at' => '2026-04-10T23:59:00+07:00',
+], 'finance-user');
+smoke_assert(($backdateException['exception_status'] ?? null) === 'approved', 'Finance backdate exception must create an approved governed exception record.');
+smoke_assert((($backdateException['e_signature'] ?? [])['signature_status'] ?? null) === 'applied', 'Finance backdate exception must carry signature evidence.');
+$creditMemo = $financeControlService->createCreditMemo([
+    'invoice_scope' => 'AR',
+    'original_invoice_ref' => 'INV-AR-001',
+    'reason_code' => 'price_adjustment',
+    'reason' => 'Post-shipment commercial adjustment.',
+    'amount' => 1250000,
+    'currency_code' => 'VND',
+], 'finance-user');
+smoke_assert(($creditMemo['memo_status'] ?? null) === 'approved', 'Finance credit memo control must create an approved memo record.');
+$debitMemo = $financeControlService->createDebitMemo([
+    'invoice_scope' => 'AP',
+    'original_invoice_ref' => 'INV-AP-001',
+    'reason_code' => 'supplier_chargeback',
+    'reason' => 'Supplier under-billed freight adjustment.',
+    'amount' => 350000,
+    'currency_code' => 'VND',
+], 'finance-user');
+smoke_assert(($debitMemo['memo_status'] ?? null) === 'approved', 'Finance debit memo control must create an approved memo record.');
+smoke_assert(count($financeControlService->listPeriodCloses()) === 1, 'Finance period close listing must expose created close controls.');
+smoke_assert(count($financeControlService->listBackdateExceptions()) === 1, 'Finance backdate exception listing must expose created temporal controls.');
+smoke_assert(count($financeControlService->listCreditMemos()) === 1, 'Finance credit memo listing must expose created correction controls.');
+smoke_assert(count($financeControlService->listDebitMemos()) === 1, 'Finance debit memo listing must expose created correction controls.');
+smoke_assert(($financeControlService->getPeriodClose((string)($periodClose['period_close_id'] ?? ''))['period_close_id'] ?? null) === ($periodClose['period_close_id'] ?? null), 'Finance period close detail lookup must resolve the created close control.');
+smoke_assert(($financeControlService->getBackdateException((string)($backdateException['backdate_exception_id'] ?? ''))['backdate_exception_id'] ?? null) === ($backdateException['backdate_exception_id'] ?? null), 'Finance backdate exception detail lookup must resolve the created temporal control.');
+smoke_assert(($financeControlService->getCreditMemo((string)($creditMemo['credit_memo_id'] ?? ''))['credit_memo_id'] ?? null) === ($creditMemo['credit_memo_id'] ?? null), 'Finance credit memo detail lookup must resolve the created correction control.');
+smoke_assert(($financeControlService->getDebitMemo((string)($debitMemo['debit_memo_id'] ?? ''))['debit_memo_id'] ?? null) === ($debitMemo['debit_memo_id'] ?? null), 'Finance debit memo detail lookup must resolve the created correction control.');
 
 // Generic runtime write access must be denied when the permission matrix covers the action but the role does not.
 smoke_reset_request_state();
@@ -715,11 +1040,11 @@ try {
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Generic CRUD create guard returned wrong error.');
 }
 
-// Restricted governance tables must remain blocked for non-admin roles even on generic reads.
+// Restricted foundation-governance tables must remain blocked for non-admin roles even on generic reads.
 smoke_reset_request_state();
 $_SESSION['user'] = 'finance-user';
 $_SESSION['mfa_ok'] = true;
-$_GET['domain'] = 'master_data_governance';
+$_GET['domain'] = 'foundation_governance';
 $_GET['table'] = 'org_companies';
 $governanceCrudController = (new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
 try {
@@ -733,7 +1058,7 @@ try {
 smoke_reset_request_state();
 $_SESSION['user'] = 'qms-runtime-user';
 $_SESSION['mfa_ok'] = true;
-$_GET['domain'] = 'master_data_governance';
+$_GET['domain'] = 'foundation_governance';
 $_GET['table'] = 'org_companies';
 $qmsGovernanceCrudController = (new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($genericPermissionStore);
 try {
@@ -906,15 +1231,42 @@ smoke_assert($persistedTransitionCount > 0, 'Endpoint catalog must retain persis
 smoke_assert($genericTransitionCount > 0, 'Endpoint catalog must retain generic-status transition endpoints for invariant checks.');
 smoke_assert(is_array($runtimeAccessPolicy), 'Runtime access policy registry asset missing.');
 smoke_assert(in_array('production_planner', (array)($runtimeAccessPolicy['domains']['advanced_planning']['update'] ?? []), true), 'Advanced planning runtime policy must allow production planners to mutate APS records.');
-smoke_assert(in_array('qa_manager', (array)($runtimeAccessPolicy['domains']['master_data_governance']['list'] ?? []), true), 'Restricted runtime policy must retain admin-grade governance access.');
-smoke_assert(!in_array('qms_engineer', (array)($runtimeAccessPolicy['domains']['master_data_governance']['list'] ?? []), true), 'Restricted runtime policy must not expose governance tables to QMS engineers.');
+smoke_assert(in_array('qa_manager', (array)($runtimeAccessPolicy['tables']['org_companies']['list'] ?? []), true), 'Restricted runtime policy must retain admin-grade access for org companies.');
+smoke_assert(!in_array('qms_engineer', (array)($runtimeAccessPolicy['tables']['org_companies']['list'] ?? []), true), 'Restricted runtime policy must not expose org companies to QMS engineers.');
 smoke_assert((array)($runtimeAccessPolicy['tables']['audit_events']['delete'] ?? ['unexpected']) === [], 'Audit events runtime policy must block generic delete.');
 smoke_assert(in_array('quality_engineer', (array)($runtimeAccessPolicy['domains']['quality_management']['create'] ?? []), true), 'Quality runtime policy must allow controlled quality operations roles.');
 
 $qualityReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/registry-quality-report.json'), true);
-smoke_assert(($qualityReport['all_passed'] ?? null) === false, 'Registry quality report must remain non-green while publishability blockers still exist.');
+$registryManifest = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/registry-manifest.json'), true);
+$wave0Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave0-governance-policy.json'), true);
+$wave0Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave0-governance-report.json'), true);
+$operationalBlindSpotCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-blind-spot-catalog.json'), true);
+$operationalBlindSpotReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-blind-spot-report.json'), true);
+$wave1Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave1-lifecycle-governance-policy.json'), true);
+$wave1Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave1-lifecycle-normalization.json'), true);
+$wave1Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave1-lifecycle-report.json'), true);
+$wave2Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave2-canonical-governance-policy.json'), true);
+$wave2Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave2-canonical-normalization.json'), true);
+$wave2Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave2-canonical-report.json'), true);
+$operationalStressPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-governance-policy.json'), true);
+$operationalStressCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-catalog.json'), true);
+$operationalStressReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-report.json'), true);
+$operationalBlindSpotById = [];
+foreach ((array)($operationalBlindSpotReport['assessments'] ?? []) as $row) {
+    if (is_array($row) && isset($row['scenario_id'])) {
+        $operationalBlindSpotById[(string)$row['scenario_id']] = $row;
+    }
+}
+$operationalStressById = [];
+foreach ((array)($operationalStressReport['assessments'] ?? []) as $row) {
+    if (is_array($row) && isset($row['scenario_id'])) {
+        $operationalStressById[(string)$row['scenario_id']] = $row;
+    }
+}
+smoke_assert(($qualityReport['all_passed'] ?? null) === true, 'Registry quality report must go green once publishability blockers and critical operational findings are cleared.');
 smoke_assert((int)($qualityReport['summary']['missing_primary_key_tables'] ?? -1) === 0, 'Registry quality report still reports missing primary-key tables.');
 smoke_assert((int)($qualityReport['summary']['optimistic_concurrency_issues'] ?? -1) === 0, 'Registry quality report still reports optimistic concurrency contract gaps.');
+smoke_assert((int)($qualityReport['summary']['idempotency_contract_issues'] ?? -1) === 0, 'Registry quality report still reports idempotency contract gaps.');
 smoke_assert((int)($qualityReport['summary']['org_scope_contract_issues'] ?? -1) === 0, 'Registry quality report still reports org-scope contract gaps.');
 smoke_assert((int)($qualityReport['summary']['transition_runtime_warnings'] ?? 0) > 0, 'Registry quality report must surface persisted workflow runtime warnings.');
 smoke_assert((int)($qualityReport['summary']['workflow_engine_bridge_ready'] ?? 0) > 0, 'Registry quality report must surface ready workflow-engine bridges.');
@@ -927,9 +1279,80 @@ smoke_assert((int)($qualityReport['summary']['attachment_contract_entities'] ?? 
 smoke_assert((int)($qualityReport['summary']['comment_contract_entities'] ?? 0) > 0, 'Registry quality report must surface generated comment contracts.');
 smoke_assert((int)($qualityReport['summary']['activity_contract_entities'] ?? 0) > 0, 'Registry quality report must surface generated activity contracts.');
 smoke_assert(is_array($qualityReport['publishability'] ?? null), 'Registry quality report must include publishability metadata.');
-smoke_assert(($qualityReport['publishability']['ready'] ?? true) === false, 'Registry publishability must remain review-required while partial entities and blocked workflow bridges still exist.');
-smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'review_required', 'Registry publishability status must surface review-required state.');
-smoke_assert((int)($qualityReport['summary']['publishability_review_required_entities'] ?? 0) > 0, 'Registry quality report must count publishability review-required entities.');
+smoke_assert(($qualityReport['publishability']['ready'] ?? false) === true, 'Registry publishability must flip to ready once only partial-but-publishable entities remain.');
+smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'ready', 'Registry publishability status must surface ready when no unpublishable entities remain.');
+smoke_assert((int)($qualityReport['summary']['publishability_review_required_entities'] ?? -1) === 0, 'Registry quality report must clear review-required entity counts once publishability blockers are gone.');
+smoke_assert(is_array($wave0Policy), 'Wave 0 governance policy asset missing.');
+smoke_assert(count((array)($wave0Policy['build_questions'] ?? [])) >= 10, 'Wave 0 governance policy must enforce the full build-question set including exception and recovery logic.');
+smoke_assert(in_array('split_registry_path_or_split_write_model', (array)($wave0Policy['rejection_criteria'] ?? []), true), 'Wave 0 governance policy must explicitly reject split registry paths and split write models.');
+smoke_assert(is_array($wave0Report), 'Wave 0 governance report asset missing.');
+smoke_assert((int)($wave0Report['summary']['core_value_stream_entities'] ?? 0) > 0, 'Wave 0 governance report must classify core value-stream entities.');
+smoke_assert((int)($wave0Report['summary']['critical_split_path_risks'] ?? -1) === 0, 'Wave 0 governance report must clear critical split-path risks from the publication path.');
+smoke_assert(array_key_exists('wave0-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave0-governance-policy.json.');
+smoke_assert(array_key_exists('wave0-governance-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave0-governance-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['wave0_governance'] ?? null), 'Registry manifest must surface Wave 0 governance coverage.');
+smoke_assert(is_array($operationalBlindSpotCatalog), 'Operational blind-spot catalog asset missing.');
+smoke_assert(count((array)($operationalBlindSpotCatalog['scenarios'] ?? [])) >= 10, 'Operational blind-spot catalog must enumerate real-world backend failure scenarios.');
+smoke_assert(is_array($operationalBlindSpotReport), 'Operational blind-spot report asset missing.');
+smoke_assert((int)($operationalBlindSpotReport['summary']['scenario_count'] ?? 0) >= 10, 'Operational blind-spot report must assess the real-world scenario set.');
+smoke_assert((float)($operationalBlindSpotReport['summary']['idempotency_contract_coverage_ratio'] ?? 0.0) >= 0.90, 'Operational blind-spot report must surface broad idempotency contract coverage.');
+smoke_assert((float)($operationalBlindSpotReport['summary']['default_retry_safe_ratio'] ?? 0.0) >= 0.55, 'Operational blind-spot report must show retry-safe defaults above the critical threshold.');
+smoke_assert((float)($operationalBlindSpotReport['summary']['idempotency_contract_coverage_ratio'] ?? 0.0) >= 1.0, 'Operational blind-spot report must now show full mutating-surface idempotency contract coverage.');
+smoke_assert((float)($operationalBlindSpotReport['summary']['default_retry_safe_ratio'] ?? 0.0) >= 1.0, 'Operational blind-spot report must now show full default retry-safe coverage across the mutating surface.');
+smoke_assert((int)($operationalBlindSpotReport['summary']['create_endpoints_requiring_client_key'] ?? -1) === 0, 'Operational blind-spot report must clear create endpoints that still depend on explicit client idempotency keys.');
+smoke_assert((string)($operationalBlindSpotById['OPS-001']['current_severity'] ?? '') === 'watch', 'Operational blind-spot report must close duplicate/retry risk once every mutating endpoint has server-backed retry protection.');
+smoke_assert((string)($operationalBlindSpotById['OPS-013']['current_severity'] ?? '') === 'watch', 'Operational blind-spot report must demote manual override once it becomes a first-class governed control.');
+smoke_assert((string)($operationalBlindSpotById['OPS-011']['current_severity'] ?? '') === 'watch', 'Operational blind-spot report must demote finance posting-period risk once period-close and credit-memo controls exist as first-class objects.');
+smoke_assert((string)($operationalBlindSpotById['OPS-015']['current_severity'] ?? '') === 'watch', 'Operational blind-spot report must close legacy-alias ambiguity once the alias moves from unused into formal archive isolation.');
+smoke_assert(array_key_exists('operational-blind-spot-catalog.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-blind-spot-catalog.json.');
+smoke_assert(array_key_exists('operational-blind-spot-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-blind-spot-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['operational_blind_spots'] ?? null), 'Registry manifest must surface operational blind-spot coverage.');
+smoke_assert(is_array($wave1Policy), 'Wave 1 lifecycle governance policy asset missing.');
+smoke_assert(array_key_exists('guarded_transition_runtime', (array)($wave1Policy['lifecycle_modes'] ?? [])), 'Wave 1 lifecycle governance policy must declare guarded_transition_runtime.');
+smoke_assert(is_array($wave1Normalization), 'Wave 1 lifecycle normalization asset missing.');
+smoke_assert(count((array)($wave1Normalization['normalized_entities'] ?? [])) >= 6, 'Wave 1 lifecycle normalization must target the core lifecycle entities.');
+smoke_assert(is_array($wave1Report), 'Wave 1 lifecycle governance report asset missing.');
+smoke_assert((int)($wave1Report['summary']['normalized_target_entities_failed'] ?? -1) === 0, 'Wave 1 lifecycle report must pass all normalized target entities.');
+smoke_assert((int)($wave1Report['summary']['remaining_generic_status_only_core_entities'] ?? -1) === 0, 'Wave 1 lifecycle report must eliminate generic_status_only from core entities.');
+smoke_assert(array_key_exists('wave1-lifecycle-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave1-lifecycle-governance-policy.json.');
+smoke_assert(array_key_exists('wave1-lifecycle-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave1-lifecycle-normalization.json.');
+smoke_assert(array_key_exists('wave1-lifecycle-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave1-lifecycle-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['wave1_lifecycle_governance'] ?? null), 'Registry manifest must surface Wave 1 lifecycle governance coverage.');
+smoke_assert(is_array($wave2Policy), 'Wave 2 canonical governance policy asset missing.');
+smoke_assert(count((array)($wave2Policy['build_questions'] ?? [])) >= 6, 'Wave 2 canonical governance policy must force canonical-owner, archive, and service-backed exposure questions.');
+smoke_assert(in_array('service_backed_governed_control_missing_canonical_list_or_detail_endpoint', (array)($wave2Policy['rejection_criteria'] ?? []), true), 'Wave 2 canonical governance policy must explicitly reject service-backed controls that are not exposed canonically.');
+smoke_assert(is_array($wave2Normalization), 'Wave 2 canonical normalization asset missing.');
+smoke_assert(count((array)($wave2Normalization['catalog_alignment_targets'] ?? [])) >= 8, 'Wave 2 canonical normalization must register the reviewed catalog alignment targets.');
+smoke_assert(is_array($wave2Report), 'Wave 2 canonical governance report asset missing.');
+smoke_assert((int)($wave2Report['summary']['canonical_catalog_meta_mismatch'] ?? -1) === 0, 'Wave 2 report must eliminate canonical catalog meta/count drift.');
+smoke_assert((int)($wave2Report['summary']['service_backed_resource_gaps'] ?? -1) === 0, 'Wave 2 report must expose all reviewed service-backed controls through canonical slices.');
+smoke_assert((int)($wave2Report['summary']['archive_isolation_targets_failed'] ?? -1) === 0, 'Wave 2 report must move declared legacy aliases into archive isolation.');
+smoke_assert((int)($wave2Report['summary']['remaining_unused_candidate_entities'] ?? -1) === 0, 'Wave 2 report must clear unused candidates once archive isolation is formalized.');
+smoke_assert(array_key_exists('wave2-canonical-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-governance-policy.json.');
+smoke_assert(array_key_exists('wave2-canonical-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-normalization.json.');
+smoke_assert(array_key_exists('wave2-canonical-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['wave2_canonical_governance'] ?? null), 'Registry manifest must surface Wave 2 canonical governance coverage.');
+smoke_assert(is_array($operationalStressPolicy), 'Operational stress governance policy asset missing.');
+smoke_assert(count((array)($operationalStressPolicy['build_questions'] ?? [])) >= 10, 'Operational stress governance policy must force retry, compensation, override, archive, and backdate design questions.');
+smoke_assert(in_array('create_or_side_effect_action_without_duplicate_or_retry_control', (array)($operationalStressPolicy['rejection_criteria'] ?? []), true), 'Operational stress governance policy must explicitly reject duplicate-unsafe side-effect actions.');
+smoke_assert(is_array($operationalStressCatalog), 'Operational stress catalog asset missing.');
+smoke_assert(count((array)($operationalStressCatalog['scenarios'] ?? [])) >= 10, 'Operational stress catalog must enumerate stress and exception scenarios beyond blind-spot coverage.');
+smoke_assert(is_array($operationalStressReport), 'Operational stress report asset missing.');
+smoke_assert((int)($operationalStressReport['summary']['scenario_count'] ?? 0) >= 10, 'Operational stress report must assess the stress scenario set.');
+smoke_assert((float)($operationalStressReport['summary']['idempotency_contract_coverage_ratio'] ?? 0.0) >= 0.90, 'Operational stress report must surface broad idempotency contract coverage.');
+smoke_assert((float)($operationalStressReport['summary']['default_retry_safe_ratio'] ?? 0.0) >= 0.55, 'Operational stress report must keep default retry safety above the critical floor.');
+smoke_assert((float)($operationalStressReport['summary']['idempotency_contract_coverage_ratio'] ?? 0.0) >= 1.0, 'Operational stress report must now show full mutating-surface idempotency contract coverage.');
+smoke_assert((float)($operationalStressReport['summary']['default_retry_safe_ratio'] ?? 0.0) >= 1.0, 'Operational stress report must now show full default retry-safe coverage across the mutating surface.');
+smoke_assert((int)($operationalStressReport['summary']['create_endpoints_requiring_client_key'] ?? -1) === 0, 'Operational stress report must clear create endpoints that still require client-supplied idempotency keys for safe retry.');
+smoke_assert((int)($operationalStressReport['summary']['override_resources'] ?? 0) >= 1, 'Operational stress report must detect at least one first-class override resource.');
+smoke_assert((string)($operationalStressById['STR-001']['current_severity'] ?? '') === 'watch', 'Operational stress report must close retry and duplicate side-effect risk once every mutating endpoint has server-backed retry protection.');
+smoke_assert((string)($operationalStressById['STR-002']['current_severity'] ?? '') === 'medium', 'Operational stress report must demote partial-completion recovery once compensation and correction semantics are first-class enough for governed follow-up.');
+smoke_assert((string)($operationalStressById['STR-006']['current_severity'] ?? '') === 'medium', 'Operational stress report must demote override risk once typed, signed, timeboxed override controls exist.');
+smoke_assert((string)($operationalStressById['STR-012']['current_severity'] ?? '') === 'medium', 'Operational stress report must demote AP/AR correction and period-close risk once first-class control objects exist, even before full invoice-model separation.');
+smoke_assert(array_key_exists('operational-stress-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-stress-governance-policy.json.');
+smoke_assert(array_key_exists('operational-stress-catalog.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-stress-catalog.json.');
+smoke_assert(array_key_exists('operational-stress-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-stress-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['operational_stress_governance'] ?? null), 'Registry manifest must surface operational stress governance coverage.');
 
 $moduleBuilderSource = (string)file_get_contents(QMS_TEST_BASE_DIR . '/scripts/portal/31-module-builder.js');
 $blockEngineSource = (string)file_get_contents(QMS_TEST_BASE_DIR . '/scripts/portal/00-block-engine.js');

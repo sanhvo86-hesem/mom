@@ -1,0 +1,1670 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-09T15:45:00+07:00",
+    "description": "Machine-readable authority catalog for international-standard backend normalization across ERP, MES, QMS, EAM, EHS, CRM, SCM, and finance flows.",
+    "resourceCount": 62,
+    "authorityDocs": [
+      "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/backend-readiness-gap-analysis-2026-04-09.md",
+      "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/global-backend-standardization-blueprint-2026-04-09.md",
+      "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/canonical-endpoint-schema-catalog-2026-04-09.md"
+    ],
+    "referenceStandards": [
+      "OpenAPI 3.1.1",
+      "JSON Schema 2020-12",
+      "RFC 9110",
+      "RFC 9457",
+      "ISA-95",
+      "ERP/MES/QMS/EAM operating patterns from SAP, Oracle, Dynamics, and IFS"
+    ]
+  },
+  "standards": {
+    "api": {
+      "root": "/api/v1",
+      "contract": "OpenAPI 3.1.1",
+      "errors": "application/problem+json",
+      "error_spec": "RFC 9457",
+      "schema_spec": "JSON Schema 2020-12",
+      "pagination": "cursor_with_limit",
+      "concurrency": "row_version_and_if_match",
+      "idempotency": "idempotency_key_for_create_and_side_effect_actions",
+      "timestamps": "RFC3339_UTC"
+    },
+    "naming": {
+      "database_tables": "snake_case_plural",
+      "database_columns": "snake_case",
+      "json_fields": "snake_case",
+      "path_resources": "kebab-case_plural",
+      "path_identifiers": "snake_case_in_braces",
+      "enum_values": "snake_case"
+    },
+    "workflow": {
+      "owner_rule": "every_lifecycle_owner_requires_primary_status_column_and_explicit_transition_contract",
+      "timeline_rule": "every_governed_case_requires_timeline_and_audit_history",
+      "attachment_rule": "every_lifecycle_owner_requires_attachment_binding",
+      "state_machine_rule": "transitions_are_guarded_server_side_not_frontend_only",
+      "write_model_rule": "one_canonical_write_model_per_business_object"
+    }
+  },
+  "endpoint_patterns": {
+    "reference_master": {
+      "required_endpoints": [
+        "GET /api/v1/{resource}",
+        "POST /api/v1/{resource}",
+        "GET /api/v1/{resource}/{id}",
+        "PATCH /api/v1/{resource}/{id}"
+      ],
+      "recommended_endpoints": [
+        "GET /api/v1/{resource}/{id}/timeline",
+        "GET /api/v1/{resource}/{id}/attachments",
+        "POST /api/v1/{resource}/{id}/attachments"
+      ],
+      "minimum_columns": [
+        "id",
+        "code",
+        "name",
+        "status",
+        "org_company_id",
+        "org_site_id",
+        "effective_from",
+        "effective_to",
+        "row_version",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "lifecycle_owner": {
+      "required_endpoints": [
+        "GET /api/v1/{resource}",
+        "POST /api/v1/{resource}",
+        "GET /api/v1/{resource}/{id}",
+        "PATCH /api/v1/{resource}/{id}",
+        "POST /api/v1/{resource}/{id}:transition",
+        "GET /api/v1/{resource}/{id}/timeline",
+        "GET /api/v1/{resource}/{id}/attachments",
+        "POST /api/v1/{resource}/{id}/attachments"
+      ],
+      "recommended_endpoints": [
+        "GET /api/v1/{resource}/{id}/comments",
+        "POST /api/v1/{resource}/{id}/comments",
+        "GET /api/v1/{resource}/{id}/activities"
+      ],
+      "minimum_columns": [
+        "id",
+        "number",
+        "status",
+        "source_record_id",
+        "org_company_id",
+        "org_site_id",
+        "owner_id",
+        "effective_date",
+        "closed_at",
+        "row_version",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "contained_child": {
+      "required_endpoints": [
+        "GET /api/v1/{parent_resource}/{parent_id}/{resource}",
+        "POST /api/v1/{parent_resource}/{parent_id}/{resource}",
+        "GET /api/v1/{parent_resource}/{parent_id}/{resource}/{id}",
+        "PATCH /api/v1/{parent_resource}/{parent_id}/{resource}/{id}",
+        "DELETE /api/v1/{parent_resource}/{parent_id}/{resource}/{id}"
+      ],
+      "minimum_columns": [
+        "id",
+        "parent_id",
+        "line_number",
+        "status",
+        "row_version",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "ledger_document": {
+      "required_endpoints": [
+        "GET /api/v1/{resource}",
+        "POST /api/v1/{resource}",
+        "GET /api/v1/{resource}/{id}",
+        "PATCH /api/v1/{resource}/{id}",
+        "POST /api/v1/{resource}/{id}:post",
+        "POST /api/v1/{resource}/{id}:void",
+        "GET /api/v1/{resource}/{id}/timeline"
+      ],
+      "recommended_endpoints": [
+        "POST /api/v1/{resource}/{id}:match",
+        "POST /api/v1/{resource}/{id}:settle"
+      ],
+      "minimum_columns": [
+        "id",
+        "number",
+        "document_status",
+        "posting_status",
+        "currency_code",
+        "company_id",
+        "document_date",
+        "accounting_date",
+        "row_version",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "projection": {
+      "required_endpoints": [
+        "GET /api/v1/{resource}",
+        "GET /api/v1/{resource}/{id}"
+      ],
+      "minimum_columns": [
+        "projection_id",
+        "snapshot_at",
+        "dimension_key",
+        "measure_value"
+      ]
+    }
+  },
+  "domains": {
+    "master_data": {
+      "resources": {
+        "customers": {
+          "pattern": "reference_master",
+          "table": "customers",
+          "primary_key": "customer_id",
+          "status_column": "customer_status",
+          "legacy_tables": [
+            "customers"
+          ],
+          "child_tables": [
+            "customer_contacts",
+            "customer_addresses"
+          ],
+          "recommended_actions": [
+            "activate",
+            "suspend",
+            "archive"
+          ],
+          "key_relationships": [
+            "customer_id -> quotations.customer_id",
+            "customer_id -> customer_purchase_orders.customer_id",
+            "customer_id -> sales_orders.customer_id"
+          ]
+        },
+        "suppliers": {
+          "pattern": "reference_master",
+          "table": "suppliers",
+          "primary_key": "supplier_id",
+          "status_column": "supplier_status",
+          "legacy_tables": [
+            "vendors",
+            "suppliers"
+          ],
+          "child_tables": [
+            "supplier_contacts",
+            "supplier_addresses",
+            "supplier_qualifications"
+          ],
+          "recommended_actions": [
+            "approve",
+            "suspend",
+            "block_for_procurement"
+          ],
+          "key_relationships": [
+            "supplier_id -> supplier_purchase_orders.supplier_id",
+            "supplier_id -> incoming_inspections.supplier_id",
+            "supplier_id -> nonconformances.supplier_id"
+          ]
+        },
+        "employees": {
+          "pattern": "reference_master",
+          "table": "employees",
+          "primary_key": "employee_id",
+          "status_column": "employment_status",
+          "legacy_tables": [
+            "hcm_employees"
+          ],
+          "child_tables": [
+            "employee_qualifications",
+            "employee_assignments"
+          ],
+          "recommended_actions": [
+            "hire",
+            "transfer",
+            "terminate"
+          ],
+          "key_relationships": [
+            "employee_id -> quotations.owner_id",
+            "employee_id -> sales_orders.owner_id",
+            "employee_id -> incidents.reported_by_employee_id"
+          ]
+        },
+        "assets": {
+          "pattern": "reference_master",
+          "table": "assets",
+          "primary_key": "asset_id",
+          "status_column": "asset_status",
+          "legacy_tables": [
+            "fin_fixed_assets",
+            "svc_customer_assets",
+            "pm_equipment_master"
+          ],
+          "child_tables": [
+            "asset_locations",
+            "asset_books"
+          ],
+          "recommended_actions": [
+            "capitalize",
+            "transfer",
+            "retire"
+          ],
+          "key_relationships": [
+            "asset_id -> maintenance_work_orders.asset_id",
+            "asset_id -> fixed_asset_capitalizations.asset_id"
+          ]
+        },
+        "equipment": {
+          "pattern": "reference_master",
+          "table": "equipment",
+          "primary_key": "equipment_id",
+          "status_column": "equipment_status",
+          "legacy_tables": [
+            "equipment",
+            "pm_equipment_master"
+          ],
+          "child_tables": [
+            "equipment_components"
+          ],
+          "recommended_actions": [
+            "commission",
+            "decommission",
+            "lockout"
+          ],
+          "key_relationships": [
+            "equipment_id -> maintenance_plans.equipment_id",
+            "equipment_id -> work_orders.equipment_id"
+          ]
+        },
+        "tools": {
+          "pattern": "reference_master",
+          "table": "tools",
+          "primary_key": "tool_id",
+          "status_column": "tool_status",
+          "legacy_tables": [
+            "tools"
+          ],
+          "child_tables": [
+            "tool_issue_history"
+          ],
+          "recommended_actions": [
+            "issue",
+            "return",
+            "retire"
+          ],
+          "key_relationships": [
+            "tool_id -> work_orders.tool_id",
+            "tool_id -> calibration_events.tool_id"
+          ]
+        },
+        "measuring-devices": {
+          "pattern": "reference_master",
+          "table": "measuring_devices",
+          "primary_key": "measuring_device_id",
+          "status_column": "calibration_status",
+          "legacy_tables": [
+            "gauges",
+            "tools"
+          ],
+          "child_tables": [
+            "calibration_events",
+            "measurement_certificates"
+          ],
+          "recommended_actions": [
+            "calibrate",
+            "quarantine",
+            "release"
+          ],
+          "key_relationships": [
+            "measuring_device_id -> msa_studies.measuring_device_id",
+            "measuring_device_id -> iqc_inspections.measuring_device_id"
+          ]
+        },
+        "compliance-obligations": {
+          "pattern": "lifecycle_owner",
+          "table": "compliance_obligations",
+          "primary_key": "compliance_obligation_id",
+          "status_column": "obligation_status",
+          "legacy_tables": [
+            "qual_compliance_obligations",
+            "ehs_permit_register"
+          ],
+          "child_tables": [
+            "obligation_tasks",
+            "obligation_evidence"
+          ],
+          "recommended_actions": [
+            "activate",
+            "acknowledge",
+            "close"
+          ],
+          "key_relationships": [
+            "compliance_obligation_id -> permits.compliance_obligation_id",
+            "compliance_obligation_id -> incidents.compliance_obligation_id"
+          ]
+        }
+      }
+    },
+    "commercial_customer": {
+      "resources": {
+        "quotations": {
+          "pattern": "lifecycle_owner",
+          "table": "quotes",
+          "primary_key": "quote_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "quotations"
+          ],
+          "child_tables": [
+            "quotation_lines"
+          ],
+          "recommended_actions": [
+            "submit",
+            "approve",
+            "send",
+            "convert_to_customer_po",
+            "close_lost"
+          ],
+          "key_relationships": [
+            "quote_id -> qual_effectiveness_reviews.related_record_id",
+            "quote_id -> customer_purchase_orders.quote_id",
+            "quote_id -> sales_orders.quote_id"
+          ]
+        },
+        "quote-effectiveness-reviews": {
+          "pattern": "lifecycle_owner",
+          "table": "qual_effectiveness_reviews",
+          "primary_key": "qual_effectiveness_review_id",
+          "status_column": "review_result",
+          "legacy_tables": [
+            "quote_effectiveness_reviews"
+          ],
+          "child_tables": [
+            "quote_effectiveness_metrics"
+          ],
+          "recommended_actions": [
+            "start_review",
+            "complete_review",
+            "approve_improvement"
+          ],
+          "key_relationships": [
+            "related_record_id -> quotes.quote_id"
+          ]
+        },
+        "customer-care-cases": {
+          "pattern": "lifecycle_owner",
+          "table": "customer_care_cases",
+          "primary_key": "customer_care_case_id",
+          "status_column": "case_status",
+          "legacy_tables": [
+            "customer_complaints",
+            "crm_customer_touchpoints"
+          ],
+          "child_tables": [
+            "customer_care_case_events",
+            "customer_care_case_actions"
+          ],
+          "recommended_actions": [
+            "acknowledge",
+            "escalate",
+            "resolve",
+            "close"
+          ],
+          "key_relationships": [
+            "customer_id -> customers.customer_id",
+            "sales_order_id -> sales_orders.sales_order_id"
+          ]
+        },
+        "customer-purchase-orders": {
+          "pattern": "lifecycle_owner",
+          "table": "customer_purchase_orders",
+          "primary_key": "customer_po_id",
+          "status_column": "po_status",
+          "legacy_tables": [
+            "sales_orders"
+          ],
+          "child_tables": [
+            "customer_purchase_order_lines"
+          ],
+          "recommended_actions": [
+            "submit",
+            "confirm",
+            "cancel",
+            "close"
+          ],
+          "key_relationships": [
+            "customer_id -> customers.customer_id",
+            "quote_id -> quotations.quote_id",
+            "sales_order_id -> sales_orders.sales_order_id"
+          ]
+        },
+        "sales-orders": {
+          "pattern": "lifecycle_owner",
+          "table": "sales_orders",
+          "primary_key": "sales_order_id",
+          "status_column": "so_status",
+          "legacy_tables": [
+            "sales_orders"
+          ],
+          "child_tables": [
+            "sales_order_lines"
+          ],
+          "recommended_actions": [
+            "confirm",
+            "release",
+            "ship",
+            "close",
+            "cancel"
+          ],
+          "key_relationships": [
+            "customer_po_id -> customer_purchase_orders.customer_po_id",
+            "sales_order_id -> job_orders.sales_order_id",
+            "sales_order_id -> shipments.sales_order_id"
+          ]
+        }
+      }
+    },
+    "procurement_supplier_quality": {
+      "resources": {
+        "purchase-requisitions": {
+          "pattern": "lifecycle_owner",
+          "table": "purchase_requisitions",
+          "primary_key": "purchase_requisition_id",
+          "status_column": "requisition_status",
+          "legacy_tables": [
+            "purchase_requisitions"
+          ],
+          "child_tables": [
+            "purchase_requisition_lines"
+          ],
+          "recommended_actions": [
+            "submit",
+            "approve",
+            "source",
+            "cancel"
+          ],
+          "key_relationships": [
+            "purchase_requisition_id -> supplier_purchase_orders.purchase_requisition_id",
+            "job_order_id -> job_orders.job_order_id"
+          ]
+        },
+        "supplier-purchase-orders": {
+          "pattern": "lifecycle_owner",
+          "table": "supplier_purchase_orders",
+          "primary_key": "supplier_purchase_order_id",
+          "status_column": "po_status",
+          "legacy_tables": [
+            "purchase_orders"
+          ],
+          "child_tables": [
+            "supplier_purchase_order_lines"
+          ],
+          "recommended_actions": [
+            "approve",
+            "dispatch",
+            "close",
+            "cancel"
+          ],
+          "key_relationships": [
+            "supplier_id -> suppliers.supplier_id",
+            "purchase_requisition_id -> purchase_requisitions.purchase_requisition_id",
+            "supplier_purchase_order_id -> purchase_receipts.supplier_purchase_order_id"
+          ]
+        },
+        "supplier-asns": {
+          "pattern": "lifecycle_owner",
+          "table": "supplier_asns",
+          "primary_key": "supplier_asn_id",
+          "status_column": "asn_status",
+          "legacy_tables": [
+            "supplier_asns"
+          ],
+          "child_tables": [
+            "supplier_asn_lines"
+          ],
+          "recommended_actions": [
+            "confirm",
+            "receive",
+            "close"
+          ],
+          "key_relationships": [
+            "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id"
+          ]
+        },
+        "purchase-receipts": {
+          "pattern": "lifecycle_owner",
+          "table": "purchase_receipts",
+          "primary_key": "purchase_receipt_id",
+          "status_column": "receipt_status",
+          "legacy_tables": [
+            "goods_receipts",
+            "incoming_inspections"
+          ],
+          "child_tables": [
+            "purchase_receipt_lines"
+          ],
+          "recommended_actions": [
+            "receive",
+            "putaway",
+            "close",
+            "reverse"
+          ],
+          "key_relationships": [
+            "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id",
+            "purchase_receipt_id -> iqc_inspections.purchase_receipt_id"
+          ]
+        },
+        "purchase-receipt-corrections": {
+          "pattern": "lifecycle_owner",
+          "table": "purchase_receipt_corrections",
+          "primary_key": "purchase_receipt_correction_id",
+          "status_column": "correction_status",
+          "legacy_tables": [
+            "purchase_receipt_corrections"
+          ],
+          "child_tables": [
+            "purchase_receipt_correction_lines"
+          ],
+          "recommended_actions": [
+            "submit",
+            "approve",
+            "post",
+            "void"
+          ],
+          "key_relationships": [
+            "purchase_receipt_id -> purchase_receipts.purchase_receipt_id",
+            "ap_invoice_id -> ap_invoices.ap_invoice_id"
+          ]
+        },
+        "iqc-inspections": {
+          "pattern": "lifecycle_owner",
+          "table": "iqc_inspections",
+          "primary_key": "iqc_inspection_id",
+          "status_column": "inspection_status",
+          "legacy_tables": [
+            "incoming_inspections"
+          ],
+          "child_tables": [
+            "iqc_inspection_results"
+          ],
+          "recommended_actions": [
+            "queue",
+            "start",
+            "accept",
+            "reject",
+            "waive"
+          ],
+          "key_relationships": [
+            "purchase_receipt_id -> purchase_receipts.purchase_receipt_id",
+            "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id"
+          ]
+        }
+      }
+    },
+    "planning_production": {
+      "resources": {
+        "production-plans": {
+          "pattern": "lifecycle_owner",
+          "table": "production_schedule",
+          "primary_key": "schedule_id",
+          "status_column": "schedule_status",
+          "legacy_tables": [
+            "production_plans"
+          ],
+          "child_tables": [
+            "production_plan_lines"
+          ],
+          "recommended_actions": [
+            "publish",
+            "freeze",
+            "replan",
+            "close"
+          ],
+          "key_relationships": [
+            "sales_order_id -> sales_orders.sales_order_id",
+            "schedule_id -> mes_dispatch_queue.source_schedule_id"
+          ]
+        },
+        "job-orders": {
+          "pattern": "lifecycle_owner",
+          "table": "job_orders",
+          "primary_key": "job_order_id",
+          "status_column": "job_status",
+          "legacy_tables": [
+            "job_orders"
+          ],
+          "child_tables": [
+            "job_order_operations",
+            "job_order_materials"
+          ],
+          "recommended_actions": [
+            "release",
+            "hold",
+            "complete",
+            "close",
+            "cancel"
+          ],
+          "key_relationships": [
+            "sales_order_id -> sales_orders.sales_order_id",
+            "job_order_id -> work_orders.job_order_id",
+            "job_order_id -> purchase_requisitions.job_order_id"
+          ]
+        },
+        "work-orders": {
+          "pattern": "lifecycle_owner",
+          "table": "work_orders",
+          "primary_key": "work_order_id",
+          "status_column": "work_order_status",
+          "legacy_tables": [
+            "work_orders"
+          ],
+          "child_tables": [
+            "work_order_operations",
+            "work_order_material_issues"
+          ],
+          "recommended_actions": [
+            "dispatch",
+            "start",
+            "pause",
+            "complete",
+            "close"
+          ],
+          "key_relationships": [
+            "job_order_id -> job_orders.job_order_id",
+            "work_order_id -> ipqc_inspections.work_order_id",
+            "work_order_id -> oqc_inspections.work_order_id"
+          ]
+        },
+        "production-operations": {
+          "pattern": "contained_child",
+          "table": "production_operations",
+          "primary_key": "production_operation_id",
+          "status_column": "operation_status",
+          "legacy_tables": [
+            "routing_steps",
+            "job_operations",
+            "job_order_operations",
+            "work_order_operations"
+          ],
+          "child_tables": [],
+          "recommended_actions": [
+            "dispatch",
+            "start",
+            "complete",
+            "scrap"
+          ],
+          "key_relationships": [
+            "work_order_id -> work_orders.work_order_id",
+            "job_order_id -> job_orders.job_order_id"
+          ]
+        },
+        "dispatch-lists": {
+          "pattern": "lifecycle_owner",
+          "table": "mes_dispatch_queue",
+          "primary_key": "queue_id",
+          "status_column": "queue_status",
+          "legacy_tables": [
+            "dispatch_lists",
+            "dispatch_queue"
+          ],
+          "child_tables": [
+            "dispatch_list_entries"
+          ],
+          "recommended_actions": [
+            "publish",
+            "acknowledge",
+            "close"
+          ],
+          "key_relationships": [
+            "source_schedule_id -> production_schedule.schedule_id"
+          ]
+        },
+        "ipqc-inspections": {
+          "pattern": "lifecycle_owner",
+          "table": "ipqc_inspections",
+          "primary_key": "ipqc_inspection_id",
+          "status_column": "inspection_status",
+          "legacy_tables": [],
+          "child_tables": [
+            "ipqc_inspection_results"
+          ],
+          "recommended_actions": [
+            "queue",
+            "start",
+            "accept",
+            "reject",
+            "reinspect"
+          ],
+          "key_relationships": [
+            "work_order_id -> work_orders.work_order_id",
+            "production_operation_id -> production_operations.production_operation_id"
+          ]
+        }
+      }
+    },
+    "inventory_logistics": {
+      "resources": {
+        "inventory-items": {
+          "pattern": "reference_master",
+          "table": "inventory_items",
+          "primary_key": "inventory_item_id",
+          "status_column": "item_status",
+          "legacy_tables": [
+            "items",
+            "inventory_items"
+          ],
+          "child_tables": [
+            "inventory_item_uoms",
+            "inventory_item_revisions"
+          ],
+          "recommended_actions": [
+            "release",
+            "obsolesce",
+            "block"
+          ],
+          "key_relationships": [
+            "inventory_item_id -> stock_balances.inventory_item_id",
+            "inventory_item_id -> sales_order_lines.inventory_item_id",
+            "inventory_item_id -> supplier_purchase_order_lines.inventory_item_id"
+          ]
+        },
+        "stock-balances": {
+          "pattern": "projection",
+          "table": "stock_balances",
+          "primary_key": "stock_balance_id",
+          "status_column": null,
+          "legacy_tables": [
+            "inventory_balances",
+            "wms_stock"
+          ],
+          "child_tables": [],
+          "recommended_actions": [],
+          "key_relationships": [
+            "inventory_item_id -> inventory_items.inventory_item_id",
+            "warehouse_id -> warehouses.warehouse_id"
+          ]
+        },
+        "cycle-count-plans": {
+          "pattern": "lifecycle_owner",
+          "table": "wms_cycle_count_plans",
+          "primary_key": "wms_cycle_count_plan_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "wms_cycle_count_plans"
+          ],
+          "child_tables": [
+            "wms_cycle_count_results"
+          ],
+          "recommended_actions": [
+            "publish",
+            "start",
+            "complete",
+            "close"
+          ],
+          "key_relationships": [
+            "warehouse_id -> warehouses.warehouse_id",
+            "wms_zone_id -> wms_zones.wms_zone_id"
+          ]
+        },
+        "inventory-movements": {
+          "pattern": "lifecycle_owner",
+          "table": "inventory_movements",
+          "primary_key": "inventory_movement_id",
+          "status_column": "movement_status",
+          "legacy_tables": [
+            "inventory_transactions",
+            "wms_transfer_orders"
+          ],
+          "child_tables": [
+            "inventory_movement_lines"
+          ],
+          "recommended_actions": [
+            "reserve",
+            "issue",
+            "receive",
+            "transfer",
+            "reverse"
+          ],
+          "key_relationships": [
+            "warehouse_id -> warehouses.warehouse_id",
+            "work_order_id -> work_orders.work_order_id",
+            "purchase_receipt_id -> purchase_receipts.purchase_receipt_id"
+          ]
+        },
+        "warehouses": {
+          "pattern": "reference_master",
+          "table": "warehouses",
+          "primary_key": "warehouse_id",
+          "status_column": "warehouse_status",
+          "legacy_tables": [
+            "warehouses"
+          ],
+          "child_tables": [
+            "warehouse_bins"
+          ],
+          "recommended_actions": [
+            "activate",
+            "freeze",
+            "archive"
+          ],
+          "key_relationships": [
+            "warehouse_id -> stock_balances.warehouse_id",
+            "warehouse_id -> shipments.origin_warehouse_id"
+          ]
+        },
+        "shipments": {
+          "pattern": "lifecycle_owner",
+          "table": "shipments",
+          "primary_key": "shipment_id",
+          "status_column": "shipment_status",
+          "legacy_tables": [
+            "tms_shipments",
+            "shipping_records"
+          ],
+          "child_tables": [
+            "shipment_lines",
+            "shipment_packages"
+          ],
+          "recommended_actions": [
+            "plan",
+            "pick",
+            "pack",
+            "dispatch",
+            "deliver"
+          ],
+          "key_relationships": [
+            "sales_order_id -> sales_orders.sales_order_id",
+            "shipment_id -> customer_returns.original_shipment_id"
+          ]
+        },
+        "freight-orders": {
+          "pattern": "lifecycle_owner",
+          "table": "freight_orders",
+          "primary_key": "freight_order_id",
+          "status_column": "freight_status",
+          "legacy_tables": [
+            "freight_orders"
+          ],
+          "child_tables": [
+            "freight_order_stops"
+          ],
+          "recommended_actions": [
+            "tender",
+            "book",
+            "close"
+          ],
+          "key_relationships": [
+            "shipment_id -> shipments.shipment_id"
+          ]
+        },
+        "customer-returns": {
+          "pattern": "lifecycle_owner",
+          "table": "customer_returns",
+          "primary_key": "customer_return_id",
+          "status_column": "return_status",
+          "legacy_tables": [
+            "customer_returns",
+            "rma_orders",
+            "returned_goods"
+          ],
+          "child_tables": [
+            "customer_return_lines"
+          ],
+          "recommended_actions": [
+            "authorize",
+            "receive",
+            "disposition",
+            "close"
+          ],
+          "key_relationships": [
+            "sales_order_id -> sales_orders.sales_order_id",
+            "original_shipment_id -> shipments.shipment_id",
+            "customer_return_id -> nonconformances.customer_return_id"
+          ]
+        }
+      }
+    },
+    "quality_improvement": {
+      "resources": {
+        "nonconformances": {
+          "pattern": "lifecycle_owner",
+          "table": "ncr_records",
+          "primary_key": "ncr_id",
+          "status_column": "ncr_status",
+          "legacy_tables": [
+            "ncr_cases",
+            "nonconformance",
+            "nonconformances"
+          ],
+          "child_tables": [
+            "nonconformance_dispositions",
+            "nonconformance_evidence"
+          ],
+          "recommended_actions": [
+            "contain",
+            "disposition",
+            "close"
+          ],
+          "key_relationships": [
+            "iqc_inspection_id -> iqc_inspections.iqc_inspection_id",
+            "ipqc_inspection_id -> ipqc_inspections.ipqc_inspection_id",
+            "oqc_inspection_id -> oqc_inspections.oqc_inspection_id",
+            "customer_return_id -> customer_returns.customer_return_id"
+          ]
+        },
+        "corrective-actions": {
+          "pattern": "lifecycle_owner",
+          "table": "capa_records",
+          "primary_key": "capa_id",
+          "status_column": "capa_status",
+          "legacy_tables": [
+            "capa",
+            "capa_actions",
+            "corrective_actions"
+          ],
+          "child_tables": [
+            "corrective_action_tasks",
+            "corrective_action_verifications"
+          ],
+          "recommended_actions": [
+            "open",
+            "assign",
+            "verify",
+            "close"
+          ],
+          "key_relationships": [
+            "source_ncr_id -> ncr_records.ncr_id",
+            "incident_id -> incidents.incident_id"
+          ]
+        },
+        "msa-studies": {
+          "pattern": "lifecycle_owner",
+          "table": "calibration_grr_studies",
+          "primary_key": "grr_id",
+          "status_column": "grr_result",
+          "legacy_tables": [
+            "msa_studies"
+          ],
+          "child_tables": [
+            "msa_trials"
+          ],
+          "recommended_actions": [
+            "approve_protocol",
+            "complete_study",
+            "approve_result"
+          ],
+          "key_relationships": [
+            "measuring_device_id -> measuring_devices.measuring_device_id"
+          ]
+        },
+        "oqc-inspections": {
+          "pattern": "lifecycle_owner",
+          "table": "oqc_inspections",
+          "primary_key": "oqc_inspection_id",
+          "status_column": "inspection_status",
+          "legacy_tables": [
+            "oqc_inspections"
+          ],
+          "child_tables": [
+            "oqc_inspection_results"
+          ],
+          "recommended_actions": [
+            "queue",
+            "start",
+            "accept",
+            "reject",
+            "release_to_shipping"
+          ],
+          "key_relationships": [
+            "work_order_id -> work_orders.work_order_id",
+            "shipment_id -> shipments.shipment_id"
+          ]
+        },
+        "fqc-inspections": {
+          "pattern": "lifecycle_owner",
+          "table": "fqc_inspections",
+          "primary_key": "fqc_inspection_id",
+          "status_column": "inspection_status",
+          "legacy_tables": [
+            "oqc_inspections"
+          ],
+          "child_tables": [
+            "fqc_inspection_results"
+          ],
+          "recommended_actions": [
+            "queue",
+            "start",
+            "accept",
+            "reject",
+            "close"
+          ],
+          "key_relationships": [
+            "sales_order_id -> sales_orders.sales_order_id",
+            "shipment_id -> shipments.shipment_id"
+          ]
+        },
+        "deviations": {
+          "pattern": "lifecycle_owner",
+          "table": "deviations",
+          "primary_key": "deviation_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "deviation",
+            "deviations",
+            "plm_deviation_permits"
+          ],
+          "legacy_tables_to_isolate": [
+            "deviation"
+          ],
+          "child_tables": [
+            "electronic_signature"
+          ],
+          "recommended_actions": [
+            "submit",
+            "approve",
+            "expire",
+            "close"
+          ],
+          "key_relationships": [
+            "linked_so_number -> sales_orders.sales_order_number",
+            "linked_jo_number -> job_orders.job_order_number"
+          ],
+          "e_signature_required": true,
+          "signature_meaning_field": "signature_meaning",
+          "reason_code_field": "deviation_type",
+          "timeboxed_expiry_required": true
+        },
+        "concessions": {
+          "pattern": "lifecycle_owner",
+          "table": "concessions",
+          "primary_key": "concession_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "concessions"
+          ],
+          "child_tables": [
+            "electronic_signature"
+          ],
+          "recommended_actions": [
+            "submit",
+            "approve",
+            "expire",
+            "close"
+          ],
+          "key_relationships": [
+            "customer_id -> customers.customer_id",
+            "affected_so_number -> sales_orders.sales_order_number"
+          ],
+          "e_signature_required": true,
+          "signature_meaning_field": "signature_meaning",
+          "reason_code_field": "concession_type",
+          "timeboxed_expiry_required": true
+        },
+        "audit-programs": {
+          "pattern": "lifecycle_owner",
+          "table": "qual_audit_programs",
+          "primary_key": "qual_audit_program_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "audit_program",
+            "audit_programs",
+            "internal_audits"
+          ],
+          "child_tables": [
+            "audit_findings",
+            "audit_checklists"
+          ],
+          "recommended_actions": [
+            "schedule",
+            "start",
+            "issue_findings",
+            "close"
+          ],
+          "key_relationships": [
+            "qual_audit_program_id -> improvement_projects.source_record_id"
+          ]
+        },
+        "improvement-actions": {
+          "pattern": "lifecycle_owner",
+          "table": "improvement_projects",
+          "primary_key": "improvement_id",
+          "status_column": "improvement_status",
+          "legacy_tables": [
+            "improvement_actions",
+            "continuous_improvements",
+            "kaizen_actions"
+          ],
+          "child_tables": [
+            "improvement_action_tasks"
+          ],
+          "recommended_actions": [
+            "approve",
+            "implement",
+            "verify",
+            "close"
+          ],
+          "key_relationships": [
+            "source_record_id -> qual_audit_programs.qual_audit_program_id",
+            "source_ncr_id -> ncr_records.ncr_id"
+          ]
+        },
+        "override-controls": {
+          "pattern": "lifecycle_owner",
+          "table": "operational_override_controls",
+          "primary_key": "override_id",
+          "status_column": "override_status",
+          "legacy_tables": [
+            "shipment_gate_overrides"
+          ],
+          "child_tables": [
+            "override_follow_ups",
+            "electronic_signature"
+          ],
+          "recommended_actions": [
+            "approve",
+            "expire",
+            "revoke",
+            "close_follow_up"
+          ],
+          "key_relationships": [
+            "subject_id -> sales_orders.sales_order_id",
+            "control_code -> shipment_releases.shipment_id"
+          ],
+          "e_signature_required": true,
+          "signature_meaning_field": "signature_meaning",
+          "timeboxed_expiry_required": true,
+          "reason_code_field": "reason_code",
+          "approval_reference_required": true
+        }
+      }
+    },
+    "maintenance_ehs": {
+      "resources": {
+        "maintenance-plans": {
+          "pattern": "lifecycle_owner",
+          "table": "pm_maintenance_plans",
+          "primary_key": "maintenance_plan_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "maintenance_plans",
+            "pm_plans"
+          ],
+          "child_tables": [
+            "maintenance_plan_tasks"
+          ],
+          "recommended_actions": [
+            "activate",
+            "schedule",
+            "suspend",
+            "retire"
+          ],
+          "key_relationships": [
+            "equipment_id -> equipment.equipment_id",
+            "asset_id -> assets.asset_id"
+          ]
+        },
+        "maintenance-work-orders": {
+          "pattern": "lifecycle_owner",
+          "table": "pm_work_orders",
+          "primary_key": "pm_work_order_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "maintenance_work_orders"
+          ],
+          "child_tables": [
+            "maintenance_work_order_tasks",
+            "maintenance_work_order_materials"
+          ],
+          "recommended_actions": [
+            "release",
+            "start",
+            "complete",
+            "close"
+          ],
+          "key_relationships": [
+            "maintenance_plan_id -> pm_maintenance_plans.maintenance_plan_id",
+            "asset_id -> assets.asset_id",
+            "equipment_id -> equipment.equipment_id"
+          ]
+        },
+        "incidents": {
+          "pattern": "lifecycle_owner",
+          "table": "incidents",
+          "primary_key": "incident_id",
+          "status_column": "incident_status",
+          "legacy_tables": [
+            "ehs_incidents"
+          ],
+          "child_tables": [
+            "incident_investigations",
+            "incident_actions"
+          ],
+          "recommended_actions": [
+            "report",
+            "investigate",
+            "contain",
+            "close"
+          ],
+          "key_relationships": [
+            "reported_by_employee_id -> employees.employee_id",
+            "corrective_action_id -> corrective_actions.corrective_action_id"
+          ]
+        },
+        "safety-observations": {
+          "pattern": "lifecycle_owner",
+          "table": "safety_observations",
+          "primary_key": "safety_observation_id",
+          "status_column": "observation_status",
+          "legacy_tables": [
+            "safety_observations"
+          ],
+          "child_tables": [
+            "safety_observation_actions"
+          ],
+          "recommended_actions": [
+            "log",
+            "assign",
+            "close"
+          ],
+          "key_relationships": [
+            "employee_id -> employees.employee_id",
+            "incident_id -> incidents.incident_id"
+          ]
+        },
+        "permits": {
+          "pattern": "lifecycle_owner",
+          "table": "permits",
+          "primary_key": "permit_id",
+          "status_column": "permit_status",
+          "legacy_tables": [
+            "ehs_permit_register"
+          ],
+          "child_tables": [
+            "permit_conditions"
+          ],
+          "recommended_actions": [
+            "apply",
+            "renew",
+            "suspend",
+            "close"
+          ],
+          "key_relationships": [
+            "compliance_obligation_id -> compliance_obligations.compliance_obligation_id"
+          ]
+        },
+        "five-s-audits": {
+          "pattern": "lifecycle_owner",
+          "table": "lean_5s_audits",
+          "primary_key": "audit_5s_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "five_s_audits",
+            "workplace_audits"
+          ],
+          "child_tables": [
+            "five_s_audit_findings"
+          ],
+          "recommended_actions": [
+            "schedule",
+            "complete",
+            "close"
+          ],
+          "key_relationships": [
+            "improvement_action_id -> improvement_projects.improvement_id"
+          ]
+        }
+      }
+    },
+    "integration_resilience": {
+      "resources": {
+        "reconciliation-exceptions": {
+          "pattern": "lifecycle_owner",
+          "table": "mes_erp_reconciliation_exceptions",
+          "primary_key": "reconciliation_id",
+          "status_column": "exception_status",
+          "legacy_tables": [
+            "mes_erp_reconciliation_exceptions"
+          ],
+          "child_tables": [],
+          "recommended_actions": [
+            "acknowledge",
+            "retry",
+            "compensate",
+            "close"
+          ],
+          "key_relationships": [
+            "org_site_id -> org_sites.org_site_id"
+          ],
+          "recovery_mode": "reconciliation_queue_with_compensating_action"
+        }
+      }
+    },
+    "finance": {
+      "resources": {
+        "ap-invoices": {
+          "pattern": "ledger_document",
+          "table": "ap_invoices",
+          "primary_key": "ap_invoice_id",
+          "status_column": "invoice_status",
+          "legacy_tables": [
+            "ap_ar_invoices"
+          ],
+          "child_tables": [
+            "ap_invoice_lines"
+          ],
+          "recommended_actions": [
+            "match",
+            "post",
+            "settle",
+            "void"
+          ],
+          "key_relationships": [
+            "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id",
+            "purchase_receipt_id -> purchase_receipts.purchase_receipt_id"
+          ]
+        },
+        "ar-invoices": {
+          "pattern": "ledger_document",
+          "table": "ar_invoices",
+          "primary_key": "ar_invoice_id",
+          "status_column": "invoice_status",
+          "legacy_tables": [
+            "ap_ar_invoices"
+          ],
+          "child_tables": [
+            "ar_invoice_lines"
+          ],
+          "recommended_actions": [
+            "post",
+            "settle",
+            "void"
+          ],
+          "key_relationships": [
+            "sales_order_id -> sales_orders.sales_order_id",
+            "shipment_id -> shipments.shipment_id"
+          ]
+        },
+        "period-closes": {
+          "pattern": "lifecycle_owner",
+          "table": "period_close_controls",
+          "primary_key": "period_close_id",
+          "status_column": "close_status",
+          "legacy_tables": [
+            "gl_period_close"
+          ],
+          "child_tables": [
+            "period_close_steps",
+            "electronic_signature"
+          ],
+          "recommended_actions": [
+            "prepare",
+            "close",
+            "reopen"
+          ],
+          "key_relationships": [
+            "period_code -> ap_invoices.accounting_period",
+            "period_code -> ar_invoices.accounting_period"
+          ]
+        },
+        "backdate-exceptions": {
+          "pattern": "lifecycle_owner",
+          "table": "backdate_exceptions",
+          "primary_key": "backdate_exception_id",
+          "status_column": "exception_status",
+          "legacy_tables": [
+            "period_close_controls"
+          ],
+          "child_tables": [
+            "electronic_signature"
+          ],
+          "recommended_actions": [
+            "submit",
+            "approve",
+            "expire",
+            "close"
+          ],
+          "key_relationships": [
+            "approved_period_code -> period_close_controls.period_code",
+            "subject_ref -> ap_invoices.ap_invoice_id"
+          ],
+          "e_signature_required": true,
+          "signature_meaning_field": "signature_meaning",
+          "reason_code_field": "reason_code",
+          "timeboxed_expiry_required": true
+        },
+        "credit-memos": {
+          "pattern": "ledger_document",
+          "table": "credit_memos",
+          "primary_key": "credit_memo_id",
+          "status_column": "memo_status",
+          "legacy_tables": [
+            "ap_ar_invoices"
+          ],
+          "child_tables": [
+            "credit_memo_lines"
+          ],
+          "recommended_actions": [
+            "approve",
+            "post",
+            "settle",
+            "void"
+          ],
+          "key_relationships": [
+            "ap_invoice_id -> ap_invoices.ap_invoice_id",
+            "ar_invoice_id -> ar_invoices.ar_invoice_id"
+          ]
+        },
+        "debit-memos": {
+          "pattern": "ledger_document",
+          "table": "debit_memos",
+          "primary_key": "debit_memo_id",
+          "status_column": "memo_status",
+          "legacy_tables": [
+            "ap_ar_invoices"
+          ],
+          "child_tables": [
+            "debit_memo_lines"
+          ],
+          "recommended_actions": [
+            "approve",
+            "post",
+            "settle",
+            "void"
+          ],
+          "key_relationships": [
+            "ap_invoice_id -> ap_invoices.ap_invoice_id",
+            "ar_invoice_id -> ar_invoices.ar_invoice_id"
+          ]
+        },
+        "inventory-valuations": {
+          "pattern": "projection",
+          "table": "inventory_valuations",
+          "primary_key": "inventory_valuation_id",
+          "status_column": null,
+          "legacy_tables": [
+            "inventory_valuations"
+          ],
+          "child_tables": [],
+          "recommended_actions": [],
+          "key_relationships": [
+            "inventory_item_id -> inventory_items.inventory_item_id"
+          ]
+        },
+        "fixed-asset-capitalizations": {
+          "pattern": "ledger_document",
+          "table": "fixed_asset_capitalizations",
+          "primary_key": "fixed_asset_capitalization_id",
+          "status_column": "capitalization_status",
+          "legacy_tables": [
+            "fin_fixed_assets"
+          ],
+          "child_tables": [
+            "fixed_asset_capitalization_lines"
+          ],
+          "recommended_actions": [
+            "capitalize",
+            "post",
+            "retire",
+            "void"
+          ],
+          "key_relationships": [
+            "asset_id -> assets.asset_id",
+            "ap_invoice_id -> ap_invoices.ap_invoice_id"
+          ]
+        }
+      }
+    },
+    "analytics": {
+      "resources": {
+        "inventory-balance-snapshots": {
+          "pattern": "projection",
+          "table": "inventory_balance_snapshot",
+          "primary_key": "inventory_balance_snapshot_id",
+          "status_column": null,
+          "legacy_tables": [
+            "inventory_balance_snapshot"
+          ],
+          "child_tables": [],
+          "recommended_actions": [],
+          "key_relationships": [
+            "warehouse_id -> org_warehouses.warehouse_id",
+            "lot_id -> lot.lot_id"
+          ],
+          "release_snapshot_of": "inventory_balance"
+        },
+        "production-bom-snapshots": {
+          "pattern": "projection",
+          "table": "production_order_bom_snapshot",
+          "primary_key": "production_order_bom_snapshot_id",
+          "status_column": null,
+          "legacy_tables": [
+            "production_order_bom_snapshot"
+          ],
+          "child_tables": [],
+          "recommended_actions": [],
+          "key_relationships": [
+            "production_order_id -> production_orders.production_order_id"
+          ],
+          "release_snapshot_of": "production_order_bom"
+        },
+        "production-route-snapshots": {
+          "pattern": "projection",
+          "table": "production_order_route_snapshot",
+          "primary_key": "production_order_route_snapshot_id",
+          "status_column": null,
+          "legacy_tables": [
+            "production_order_route_snapshot"
+          ],
+          "child_tables": [],
+          "recommended_actions": [],
+          "key_relationships": [
+            "production_order_id -> production_orders.production_order_id"
+          ],
+          "release_snapshot_of": "production_order_route"
+        },
+        "mes-oee-snapshots": {
+          "pattern": "projection",
+          "table": "mes_oee_snapshots",
+          "primary_key": "snapshot_id",
+          "status_column": null,
+          "legacy_tables": [
+            "mes_oee_snapshots"
+          ],
+          "child_tables": [],
+          "recommended_actions": [],
+          "key_relationships": [
+            "equipment_id -> equipment.equipment_id"
+          ],
+          "release_snapshot_of": "mes_execution_oee"
+        },
+        "plant-performance-snapshots": {
+          "pattern": "projection",
+          "table": "plant_performance_snapshots",
+          "primary_key": "plant_performance_snapshot_id",
+          "status_column": null,
+          "legacy_tables": [
+            "plant_performance",
+            "factory_kpis"
+          ],
+          "child_tables": [],
+          "recommended_actions": [],
+          "key_relationships": [
+            "org_site_id -> org_sites.org_site_id"
+          ]
+        }
+      }
+    }
+  },
+  "roadmap_waves": [
+    {
+      "wave": 0,
+      "title": "Contract Freeze And Naming Baseline",
+      "objectives": [
+        "freeze_canonical_naming_and_path_rules",
+        "publish_openapi_error_and_versioning_rules",
+        "ban_new_generic_status_only_objects"
+      ]
+    },
+    {
+      "wave": 1,
+      "title": "Lifecycle Contract Repair",
+      "objectives": [
+        "add_missing_status_columns_and_guarded_transition_endpoints",
+        "backfill_timeline_and_attachment_contracts_for_all_lifecycle_owners",
+        "remove_split_brain_write_paths"
+      ]
+    },
+    {
+      "wave": 2,
+      "title": "Identity Unification",
+      "objectives": [
+        "unify_customer_supplier_employee_asset_equipment_tool_identity",
+        "publish_crosswalk_tables_and_migration_views",
+        "deprecate_duplicate_master_records"
+      ]
+    },
+    {
+      "wave": 3,
+      "title": "Commercial And Procure To Pay Completion",
+      "objectives": [
+        "introduce_customer_purchase_orders_purchase_requisitions_supplier_asns_purchase_receipts",
+        "split_ap_ar_invoices_into_ap_and_ar",
+        "complete_three_way_match_contract"
+      ]
+    },
+    {
+      "wave": 4,
+      "title": "Production And Quality Closure",
+      "objectives": [
+        "introduce_ipqc_and_fqc_as_first_class_objects",
+        "normalize_oqc_and_ncr_capa_linkages",
+        "close_shop_floor_inventory_and_traceability_loops"
+      ]
+    },
+    {
+      "wave": 5,
+      "title": "Maintenance EHS And Compliance Closure",
+      "objectives": [
+        "unify_asset_equipment_maintenance_models",
+        "normalize_incident_permit_and_obligation_closure",
+        "connect_five_s_and_safety_observations_to_improvement_actions"
+      ]
+    },
+    {
+      "wave": 6,
+      "title": "Finance And Performance Projection Hardening",
+      "objectives": [
+        "stabilize_posting_and_settlement_contracts",
+        "publish_inventory_and_asset_valuation_projections",
+        "deliver_governed_plant_performance_snapshots"
+      ]
+    }
+  ]
+}

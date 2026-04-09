@@ -1,1473 +1,1332 @@
-/**
- * 32-admin-metadata-studio.js — World-Class API & DB Studio v3.0
- * Redesigned April 2026 — Most powerful API + DB management tool
- *
- * Tabs: Command Center | API Explorer | DB Studio | Field Forge | Schema Architect | Variables | Registry Ops
- * Features: Live API tester · ERD canvas · DB data preview · Schema diff · Permission matrix ·
- *           Field reuse analysis · OpenAPI export · Registry compile & release · Health scoring
- */
-(function () {
+(function(){
 'use strict';
 
-/* ═══════════════════════════ CONSTANTS ═══════════════════════════ */
+function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
+function _esc(v){
+  var node = document.createElement('div');
+  node.appendChild(document.createTextNode(String(v == null ? '' : v)));
+  return node.innerHTML;
+}
+function _js(v){
+  return JSON.stringify(String(v == null ? '' : v));
+}
+function _api(action, payload, method, timeoutMs){
+  if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', timeoutMs || 30000);
+  var url = 'api.php?action=' + encodeURIComponent(action);
+  if((method || 'GET') === 'GET' && payload){
+    var params = new URLSearchParams();
+    Object.keys(payload || {}).forEach(function(key){
+      if(payload[key] == null || payload[key] === '') return;
+      params.append(key, String(payload[key]));
+    });
+    var query = params.toString();
+    if(query) url += '&' + query;
+  }
+  return fetch(url, {
+    method: method || 'GET',
+    credentials: 'include',
+    headers: Object.assign(
+      {},
+      (method || 'GET') === 'GET' ? {} : {'Content-Type':'application/json'},
+      (typeof csrfToken !== 'undefined' && csrfToken ? {'X-CSRF-Token': csrfToken} : {})
+    ),
+    body: (method || 'GET') === 'GET' ? undefined : JSON.stringify(payload || {})
+  }).then(function(r){ return r.json(); });
+}
+function _toast(message, type){
+  if(typeof showToast === 'function') return showToast(message, type);
+  console[type === 'error' ? 'error' : 'log'](message);
+}
+function _fmtInt(value){
+  var num = Number(value || 0);
+  if(!isFinite(num)) return '0';
+  return num.toLocaleString(lang === 'en' ? 'en-US' : 'vi-VN');
+}
+function _fmtPct(value){
+  var num = Number(value || 0);
+  if(!isFinite(num)) return '0%';
+  return Math.round(num) + '%';
+}
+function _fmtTime(value){
+  if(!value) return '—';
+  try{
+    return new Date(value).toLocaleString(lang === 'en' ? 'en-US' : 'vi-VN');
+  }catch(_err){
+    return String(value);
+  }
+}
+function _tone(status){
+  var key = String(status || '').toLowerCase();
+  if(key === 'ok' || key === 'good' || key === 'pass' || key === 'ready' || key === 'reachable') return 'good';
+  if(key === 'warn' || key === 'warning' || key === 'review_required' || key === 'partial' || key === 'medium') return 'warn';
+  if(key === 'bad' || key === 'error' || key === 'failed' || key === 'unreachable' || key === 'blocked' || key === 'critical' || key === 'high') return 'bad';
+  return 'neutral';
+}
+function _boolTone(flag){
+  return flag ? 'good' : 'bad';
+}
+function _jsonPretty(value){
+  return JSON.stringify(value == null ? {} : value, null, 2);
+}
+function _parseJson(text, fallbackLabel){
+  try{
+    return { ok:true, value: JSON.parse(String(text || '{}')) };
+  }catch(err){
+    return { ok:false, error: (fallbackLabel || 'invalid_json') + ': ' + err.message };
+  }
+}
+function _actionError(res, fallback){
+  var code = res && res.error ? String(res.error) : '';
+  if(code === 'stale_design_workspace_revision' || code === 'missing_design_revision_token'){
+    return new Error(_t('Design hoặc baseline đã đổi trên server. Tải lại design mới nhất rồi chạy lại thao tác.', 'The design or baseline changed on the server. Reload the latest design before retrying.'));
+  }
+  if(code === 'release_gate_blocked'){
+    var reasons = res && res.release_gate && Array.isArray(res.release_gate.reasons) ? res.release_gate.reasons.join(' · ') : '';
+    return new Error(reasons || _t('Release gate đang bị chặn bởi rủi ro vận hành.', 'The release gate is blocked by operational risks.'));
+  }
+  return new Error((res && (res.detail || res.error)) || fallback || 'action_failed');
+}
+function _copyText(text){
+  if(navigator && navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(String(text || ''));
+  }
+  return Promise.reject(new Error('clipboard_unavailable'));
+}
+function _badge(label, tone){
+  return '<span class="ds-badge tone-' + _esc(tone || 'neutral') + '">' + _esc(label) + '</span>';
+}
+function _methodBadge(method){
+  return '<span class="ds-method method-' + _esc(String(method || 'GET').toLowerCase()) + '">' + _esc(method || 'GET') + '</span>';
+}
+function _emptyState(title, text){
+  return '<div class="ds-empty"><div class="ds-empty-icon">∅</div><div class="ds-empty-title">' + _esc(title) + '</div><p>' + _esc(text) + '</p></div>';
+}
+function _humanizeKey(key){
+  return String(key || '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function _fmtBytes(value){
+  var bytes = Number(value || 0);
+  if(!isFinite(bytes) || bytes <= 0) return '0 B';
+  if(bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + ' GB';
+  if(bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+  if(bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return Math.round(bytes) + ' B';
+}
+function _dbProbeApplicable(scope){
+  return !!(scope && scope.db_probe_applicable);
+}
+function _dbStatusLabel(applicable, present){
+  if(!applicable) return _t('DB N/A', 'DB N/A');
+  return present ? _t('DB', 'DB') : _t('Missing', 'Missing');
+}
+function _dbStatusTone(applicable, present){
+  if(!applicable) return 'neutral';
+  return present ? 'good' : 'bad';
+}
 
-var STYLE_ID = 'ams3-styles';
+var state = {
+  container: null,
+  loading: false,
+  workspace: null,
+  tab: 'overview',
+  apiSearch: '',
+  apiDomain: 'ALL',
+  apiMethod: 'ALL',
+  apiKind: 'ALL',
+  tableSearch: '',
+  tableDomain: 'ALL',
+  libraryTab: 'schemas',
+  selectedApiKey: '',
+  apiDetail: null,
+  apiEditor: '',
+  selectedTableKey: '',
+  tableDetail: null,
+  tableEditor: '',
+  tablePreview: null,
+  tablePreviewOffset: 0,
+  tablePreviewBusy: false,
+  rowEditorOpen: false,
+  rowEditorMode: 'insert',
+  rowEditorJson: '{}',
+  rowEditorOriginal: null,
+  selectedSchemaKey: '',
+  schemaDetail: null,
+  schemaEditor: '',
+  selectedVariableKey: '',
+  variableDetail: null,
+  variableEditor: '',
+  selectedDesignId: '',
+  designSchema: null,
+  designBaseline: null,
+  designRevisions: null,
+  designSavePolicy: null,
+  designEditor: '',
+  designBusy: false,
+  designResult: null,
+  releases: [],
+  busyKey: '',
+  error: ''
+};
 
 var TABS = [
-  { id:'command',  icon:'⚡', label:'Command Center' },
-  { id:'apis',     icon:'🔌', label:'API Explorer'   },
-  { id:'db',       icon:'🗄️', label:'DB Studio'      },
-  { id:'fields',   icon:'🧩', label:'Field Forge'    },
-  { id:'schema',   icon:'🏗️', label:'Schema'         },
-  { id:'vars',     icon:'📦', label:'Variables'      },
-  { id:'ops',      icon:'⚙️', label:'Registry Ops'  }
+  { id:'overview', labelEn:'Overview', labelVi:'Tổng quan' },
+  { id:'apis', labelEn:'API Catalog', labelVi:'Catalog API' },
+  { id:'tables', labelEn:'Tables & Data', labelVi:'Bảng & dữ liệu' },
+  { id:'designs', labelEn:'Designs & Releases', labelVi:'Design & release' },
+  { id:'libraries', labelEn:'Libraries', labelVi:'Thư viện' }
 ];
 
-var METHOD_CFG = {
-  GET:    { bg:'var(--green-100,#dcfce7)',   text:'var(--green-700,#15803d)',   dot:'var(--green-500,#22c55e)'  },
-  POST:   { bg:'var(--brand-9,#dbeafe)',     text:'var(--blue-700,#1d4ed8)',    dot:'var(--brand-2,#2563eb)'    },
-  PUT:    { bg:'var(--amber-100,#fef3c7)',   text:'var(--amber-700,#b45309)',   dot:'var(--amber-500,#f59e0b)'  },
-  PATCH:  { bg:'var(--purple-100,#ede9fe)',  text:'var(--purple-700,#6d28d9)',  dot:'var(--purple-500,#8b5cf6)' },
-  DELETE: { bg:'var(--red-100,#fee2e2)',     text:'var(--red-700,#b91c1c)',     dot:'var(--red-500,#ef4444)'    }
-};
-
-var DOMAIN_ICON = {
-  finance:'💰', production:'🏭', quality:'✅', logistics:'🚚', procurement:'📦',
-  hr:'👥', sales:'💼', maintenance:'🔧', compliance:'📋', engineering:'⚙️',
-  admin:'🛡️', core:'🔷', supplier:'🤝', inventory:'📊', planning:'📅', analytics:'📈'
-};
-
-var UITYPE_ICON = {
-  string:'Aa', number:'#', currency:'$', date:'📅', boolean:'☑',
-  select:'▾', reference:'🔗', json:'{}', uuid:'🔑', textarea:'¶', file:'📎'
-};
-
-/* ═══════════════════════════ STATE ═══════════════════════════ */
-
-var S = {
-  container: null,
-  tab: 'command',
-  loading: false, loaded: false, error: '',
-  detailLoading: false, saveLoading: false,
-  testLoading: false, previewLoading: false,
-  summary: null,
-  /* filters */
-  apiSearch:'', apiMethod:'ALL', apiDomain:'ALL', apiKind:'ALL',
-  tableSearch:'', tableDomain:'ALL',
-  fieldSearch:'', schemaSearch:'', varSearch:'',
-  /* selections */
-  selApi:'', selTable:'', selSchema:'', selVar:'',
-  apiDetailTab:'overview',
-  dbDetailTab:'columns',
-  /* editors */
-  apiEditor:null, tableEditor:null, schemaEditor:null, varEditor:null,
-  /* tester */
-  testerOpen:false, testerMethod:'GET', testerUrl:'', testerBody:'{}',
-  testerResult:null, testerStatus:0, testerLatency:0,
-  /* db preview */
-  previewData:null, previewPage:1, previewTotal:0,
-  /* erd */
-  erdNodes:[], erdScale:1, erdOffX:0, erdOffY:0,
-  /* ops log */
-  opsLog:[]
-};
-
-/* ═══════════════════════════ UTILS ═══════════════════════════ */
-
-function esc(v) {
-  var d = document.createElement('div');
-  d.appendChild(document.createTextNode(v == null ? '' : String(v)));
-  return d.innerHTML;
+function _workspace(){
+  return state.workspace || { metrics:{}, lists:{}, highlights:{}, domains:[], artifacts:{}, audits:{}, connection:{} };
 }
 
-function T(vi, en) {
-  return (typeof lang !== 'undefined' && lang === 'en') ? en : vi;
+function _list(name){
+  var ws = _workspace();
+  return Array.isArray(ws.lists && ws.lists[name]) ? ws.lists[name] : [];
 }
 
-function fmt(n, d) {
-  if (n == null || isNaN(n)) return '—';
-  return Number(n).toLocaleString(undefined, { maximumFractionDigits: d || 0 });
+function _selectedApiSummary(){
+  var rows = _list('apis');
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i] && rows[i].key || '') === String(state.selectedApiKey || '')){
+      return rows[i];
+    }
+  }
+  return null;
 }
 
-function pct(n) {
-  if (n == null || isNaN(n)) return '0%';
-  return Math.round(Number(n)) + '%';
+function _selectedTableSummary(){
+  var rows = _list('tables');
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i] && rows[i].key || '') === String(state.selectedTableKey || '')){
+      return rows[i];
+    }
+  }
+  return null;
 }
 
-function scoreClass(n) {
-  n = Number(n) || 0;
-  if (n >= 90) return 'excellent';
-  if (n >= 70) return 'good';
-  if (n >= 40) return 'warn';
-  return 'poor';
+function _currentDetailRevision(type){
+  var detail = null;
+  if(type === 'api') detail = state.apiDetail;
+  if(type === 'table') detail = state.tableDetail;
+  if(type === 'schema') detail = state.schemaDetail;
+  if(type === 'variable') detail = state.variableDetail;
+  return detail && detail.revision ? detail.revision : null;
 }
 
-function methodBadge(m) {
-  var c = METHOD_CFG[m] || METHOD_CFG.GET;
-  return '<span class="ams3-method" style="background:' + c.bg + ';color:' + c.text + '">' + esc(m) + '</span>';
+function _currentSavePolicy(type){
+  var detail = null;
+  if(type === 'api') detail = state.apiDetail;
+  if(type === 'table') detail = state.tableDetail;
+  if(type === 'schema') detail = state.schemaDetail;
+  if(type === 'variable') detail = state.variableDetail;
+  return detail && detail.save_policy ? detail.save_policy : ((_workspace().save_policy) || {});
 }
 
-function domainIcon(d) {
-  return DOMAIN_ICON[String(d).toLowerCase()] || '📂';
+function _currentDesignRevisions(){
+  return state.designRevisions || null;
 }
 
-function arr(v) { return Array.isArray(v) ? v : []; }
-function obj(v) { return (v && typeof v === 'object' && !Array.isArray(v)) ? v : {}; }
-
-function keys(o) { return Object.keys(obj(o)); }
-
-function debounce(fn, ms) {
-  var t;
-  return function() { var a = arguments; clearTimeout(t); t = setTimeout(function(){ fn.apply(null, a); }, ms); };
+function _currentDesignSavePolicy(){
+  return state.designSavePolicy || ((_workspace().save_policy) || {});
 }
 
-function hlJson(v) {
-  var s = typeof v === 'string' ? v : JSON.stringify(v, null, 2);
-  return s.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|true|false|null|-?\d+(?:\.\d+)?)/g, function(m) {
-    if (/^"/.test(m)) return m.endsWith(':') ? '<span class="jk">' + esc(m) + '</span>' : '<span class="js">' + esc(m) + '</span>';
-    if (/true|false/.test(m)) return '<span class="jb">' + m + '</span>';
-    if (/null/.test(m)) return '<span class="jn">' + m + '</span>';
-    return '<span class="jnum">' + m + '</span>';
-  });
+function _renderSaveGuard(detail, type){
+  var policy = detail && detail.save_policy ? detail.save_policy : _currentSavePolicy(type);
+  var revision = detail && detail.revision ? detail.revision : _currentDetailRevision(type);
+  if(!policy || !policy.requiresRevision) return '';
+  return '<div class="ds-helper-text">' + _esc(_t('Save được khóa bằng revision token; nếu file đổi trên server, hệ thống sẽ trả 409 thay vì ghi đè im lặng.', 'Saves are guarded by revision tokens; if the file changed on the server, the save returns 409 instead of silently overwriting it.')) + ' ' + _esc(_t('Loaded at', 'Loaded at')) + ': ' + _fmtTime(revision && revision.capturedAt) + ' · ' + _esc(_t('Payload limit', 'Payload limit')) + ': ' + _esc(_fmtBytes(policy.maxPayloadBytes || 0)) + '</div>';
 }
 
-function apiSummaries() { return arr((obj(S.summary).lists || {}).apis); }
-function tableSummaries() { return arr((obj(S.summary).lists || {}).tables); }
-function schemaSummaries() { return arr((obj(S.summary).lists || {}).schemas); }
-function varSummaries() { return arr((obj(S.summary).lists || {}).variables); }
-
-/* ═══════════════════════════ API ═══════════════════════════ */
-
-function _api(action, payload, method) {
-  method = method || 'GET';
-  var url = 'api/index.php?action=' + encodeURIComponent(action);
-  var opts = { method: method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } };
-  if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
-  else if (method === 'GET' && payload) url += '&' + Object.keys(payload).map(function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]); }).join('&');
-  return fetch(url, opts).then(function(r){ return r.json(); });
+function _renderDesignSaveGuard(){
+  var policy = _currentDesignSavePolicy();
+  var revisions = _currentDesignRevisions();
+  if(!policy || !policy.requiresRevision) return '';
+  return '<div class="ds-helper-text">' + _esc(_t('Các thao tác save / baseline / diagnose / compile / release đều khóa theo revision của design và baseline; nếu file đổi trên server, hệ thống sẽ chặn để tránh build từ editor cũ.', 'Save / baseline / diagnose / compile / release are locked to the current design and baseline revisions; if the files changed on the server, the system blocks the action to avoid building from a stale editor.')) + ' ' + _esc(_t('Loaded at', 'Loaded at')) + ': ' + _fmtTime(revisions && revisions.capturedAt) + ' · ' + _esc(_t('Payload limit', 'Payload limit')) + ': ' + _esc(_fmtBytes(policy.maxPayloadBytes || 0)) + '</div>';
 }
 
-/* ═══════════════════════════ STYLES ═══════════════════════════ */
+function _syncSelections(){
+  var apis = _list('apis');
+  var tables = _list('tables');
+  var schemas = _list('schemas');
+  var variables = _list('variables');
+  var designs = _list('designs');
 
-function ensureStyles() {
-  if (document.getElementById(STYLE_ID)) return;
-  var el = document.createElement('style');
-  el.id = STYLE_ID;
-  el.textContent = CSS_RULES.join('');
-  document.head.appendChild(el);
+  if(!apis.some(function(item){ return String(item.key) === String(state.selectedApiKey); })){
+    state.selectedApiKey = apis.length ? String(apis[0].key) : '';
+  }
+  if(!tables.some(function(item){ return String(item.key) === String(state.selectedTableKey); })){
+    state.selectedTableKey = tables.length ? String(tables[0].key) : '';
+  }
+  if(!schemas.some(function(item){ return String(item.key) === String(state.selectedSchemaKey); })){
+    state.selectedSchemaKey = schemas.length ? String(schemas[0].key) : '';
+  }
+  if(!variables.some(function(item){ return String(item.key) === String(state.selectedVariableKey); })){
+    state.selectedVariableKey = variables.length ? String(variables[0].key) : '';
+  }
+  if(!designs.some(function(item){ return String(item.id) === String(state.selectedDesignId); })){
+    state.selectedDesignId = designs.length ? String(designs[0].id) : '';
+  }
+  state.releases = _list('releases');
 }
 
-var CSS_RULES = [
-/* ── Root ── */
-'.ams3{display:flex;flex-direction:column;height:100%;min-height:600px;font-family:var(--font-sans,"Inter",system-ui,sans-serif);background:var(--bg-surface,#fff);color:var(--text-primary,#0f172a);box-sizing:border-box;}',
-'.ams3 *{box-sizing:border-box;}',
-'@keyframes ams3-spin{to{transform:rotate(360deg)}}',
-'@keyframes ams3-pulse{0%,100%{opacity:.6}50%{opacity:1}}',
+async function _loadWorkspace(silent){
+  if(!silent){
+    state.loading = true;
+  }
+  state.error = '';
+  _paint();
+  try{
+    var res = await _api('admin_metadata_studio_summary', null, 'GET', 45000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'summary_failed');
+    state.workspace = res.workspace || {};
+    _syncSelections();
+    if(state.tab === 'apis' && state.selectedApiKey) await _loadApiDetail(state.selectedApiKey, true);
+    if(state.tab === 'tables' && state.selectedTableKey) await _loadTableDetail(state.selectedTableKey, true);
+    if(state.tab === 'libraries'){
+      if(state.libraryTab === 'schemas' && state.selectedSchemaKey) await _loadSchemaDetail(state.selectedSchemaKey, true);
+      if(state.libraryTab === 'variables' && state.selectedVariableKey) await _loadVariableDetail(state.selectedVariableKey, true);
+    }
+    if(state.tab === 'designs' && state.selectedDesignId && !state.designSchema){
+      await _loadDesign(state.selectedDesignId, true);
+    }
+  }catch(err){
+    state.workspace = null;
+    state.error = (err && err.message) || 'summary_failed';
+    if(!silent) _toast(_t('Không thể tải Data Schema workspace.', 'Could not load the Data Schema workspace.'), 'error');
+  }finally{
+    state.loading = false;
+    _paint();
+  }
+}
 
-/* ── Header ── */
-'.ams3-hd{padding:16px 24px 0;border-bottom:1px solid var(--border,#e2e8f0);flex-shrink:0;}',
-'.ams3-hd-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}',
-'.ams3-hd-title{font-size:18px;font-weight:900;letter-spacing:-.025em;margin:0;flex:1;}',
-'.ams3-hd-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:var(--brand-9,#dbeafe);color:var(--brand-2,#2563eb);}',
-'.ams3-hd-actions{display:flex;gap:6px;align-items:center;}',
-'.ams3-tabs{display:flex;gap:2px;overflow-x:auto;padding-bottom:0;scrollbar-width:none;}',
-'.ams3-tabs::-webkit-scrollbar{display:none;}',
-'.ams3-tab{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s;color:var(--text-muted,#64748b);border:1px solid transparent;border-bottom:none;position:relative;}',
-'.ams3-tab:hover{color:var(--text-secondary,#475569);background:var(--bg-surface-alt,#f8fafc);}',
-'.ams3-tab.active{color:var(--brand-2,#2563eb);background:var(--bg-surface,#fff);border-color:var(--border,#e2e8f0);top:1px;}',
-'.ams3-tab-n{font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:var(--bg-surface-alt,#f8fafc);color:var(--text-muted,#64748b);}',
-'.ams3-tab.active .ams3-tab-n{background:var(--brand-9,#dbeafe);color:var(--brand-2,#2563eb);}',
+async function _refresh(){
+  state.apiDetail = null;
+  state.tableDetail = null;
+  state.schemaDetail = null;
+  state.variableDetail = null;
+  state.tablePreview = null;
+  state.rowEditorOpen = false;
+  await _loadWorkspace(false);
+  _toast(_t('Đã làm mới Data Schema workspace.', 'Data Schema workspace refreshed.'), 'success');
+}
 
-/* ── Body ── */
-'.ams3-body{flex:1;overflow:auto;padding:20px 24px;}',
-'.ams3-loading{display:flex;align-items:center;justify-content:center;height:240px;gap:12px;color:var(--text-muted,#64748b);font-size:14px;}',
-'.ams3-spinner{width:22px;height:22px;border:3px solid var(--border,#e2e8f0);border-top-color:var(--brand-2,#2563eb);border-radius:50%;animation:ams3-spin .7s linear infinite;flex-shrink:0;}',
-'.ams3-err{background:var(--red-50,#fef2f2);border:1px solid var(--red-200,#fecaca);border-radius:12px;padding:12px 16px;color:var(--red-700,#b91c1c);font-size:13px;margin-bottom:16px;}',
-'.ams3-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:60px 24px;color:var(--text-muted,#64748b);}',
-'.ams3-empty-icon{font-size:44px;opacity:.35;}',
-'.ams3-empty-t{font-size:14px;font-weight:700;color:var(--text-secondary,#475569);}',
-'.ams3-empty-s{font-size:12px;text-align:center;max-width:260px;line-height:1.4;}',
+async function _loadApiDetail(key, silent){
+  if(!key) return;
+  state.busyKey = silent ? state.busyKey : 'api:' + key;
+  if(!silent) _paint();
+  try{
+    var res = await _api('admin_metadata_studio_detail', {type:'api', key:key}, 'GET', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'api_detail_failed');
+    state.selectedApiKey = key;
+    state.apiDetail = res;
+    state.apiEditor = _jsonPretty({
+      item: res.item || {},
+      api_params: res.api_params || {},
+      fields: res.fields || []
+    });
+  }catch(err){
+    if(!silent) _toast(_t('Không thể tải chi tiết API.', 'Could not load API detail.'), 'error');
+  }finally{
+    state.busyKey = '';
+    _paint();
+  }
+}
 
-/* ── Section ── */
-'.ams3-sec{margin-bottom:22px;}',
-'.ams3-sec-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted,#64748b);margin:0 0 10px;display:flex;align-items:center;gap:10px;}',
-'.ams3-sec-title::after{content:"";flex:1;height:1px;background:var(--border,#e2e8f0);}',
+async function _loadTableDetail(key, silent){
+  if(!key) return;
+  state.busyKey = silent ? state.busyKey : 'table:' + key;
+  if(!silent) _paint();
+  try{
+    var res = await _api('admin_metadata_studio_detail', {type:'table', key:key}, 'GET', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'table_detail_failed');
+    state.selectedTableKey = key;
+    state.tableDetail = res;
+    state.tableEditor = _jsonPretty({ item: res.item || {} });
+    state.tablePreview = null;
+    state.tablePreviewOffset = 0;
+    state.rowEditorOpen = false;
+  }catch(err){
+    if(!silent) _toast(_t('Không thể tải chi tiết bảng.', 'Could not load table detail.'), 'error');
+  }finally{
+    state.busyKey = '';
+    _paint();
+  }
+}
 
-/* ── Buttons ── */
-'.ams3-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;border:none;outline:none;white-space:nowrap;}',
-'.ams3-btn.primary{background:var(--brand-2,#2563eb);color:var(--white,#fff);}',
-'.ams3-btn.primary:hover{background:var(--blue-700,#1d4ed8);}',
-'.ams3-btn.ghost{background:transparent;border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#475569);}',
-'.ams3-btn.ghost:hover{border-color:var(--text-secondary,#475569);}',
-'.ams3-btn.success{background:var(--green-600,#16a34a);color:var(--white,#fff);}',
-'.ams3-btn.success:hover{background:var(--green-700,#15803d);}',
-'.ams3-btn.danger{background:var(--red-500,#ef4444);color:var(--white,#fff);}',
-'.ams3-btn.sm{padding:5px 10px;font-size:11px;border-radius:7px;}',
-'.ams3-btn:disabled{opacity:.45;cursor:default;}',
+async function _loadSchemaDetail(key, silent){
+  if(!key) return;
+  state.busyKey = silent ? state.busyKey : 'schema:' + key;
+  if(!silent) _paint();
+  try{
+    var res = await _api('admin_metadata_studio_detail', {type:'schema', key:key}, 'GET', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'schema_detail_failed');
+    state.selectedSchemaKey = key;
+    state.schemaDetail = res;
+    state.schemaEditor = _jsonPretty({ item: res.item || {} });
+  }catch(err){
+    if(!silent) _toast(_t('Không thể tải blueprint schema.', 'Could not load schema blueprint.'), 'error');
+  }finally{
+    state.busyKey = '';
+    _paint();
+  }
+}
 
-/* ── Chips / badges ── */
-'.ams3-method{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:5px;font-size:9px;font-weight:900;letter-spacing:.04em;flex-shrink:0;}',
-'.ams3-chip{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:999px;font-size:10px;font-weight:700;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f8fafc);color:var(--text-secondary,#475569);}',
-'.ams3-chip.auth{background:var(--amber-100,#fef3c7);border-color:var(--amber-200,#fde68a);color:var(--amber-700,#b45309);}',
-'.ams3-chip.admin{background:var(--red-100,#fee2e2);border-color:var(--red-200,#fecaca);color:var(--red-700,#b91c1c);}',
-'.ams3-chip.csrf{background:var(--purple-100,#ede9fe);border-color:var(--purple-200,#ddd6fe);color:var(--purple-700,#6d28d9);}',
-'.ams3-chip.ok{background:var(--green-100,#dcfce7);border-color:var(--green-200,#bbf7d0);color:var(--green-700,#15803d);}',
-'.ams3-chip.info{background:var(--brand-9,#dbeafe);border-color:var(--brand-7,#93c5fd);color:var(--blue-700,#1d4ed8);}',
+async function _loadVariableDetail(key, silent){
+  if(!key) return;
+  state.busyKey = silent ? state.busyKey : 'variable:' + key;
+  if(!silent) _paint();
+  try{
+    var res = await _api('admin_metadata_studio_detail', {type:'variable', key:key}, 'GET', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'variable_detail_failed');
+    state.selectedVariableKey = key;
+    state.variableDetail = res;
+    state.variableEditor = _jsonPretty({ item: res.item || {} });
+  }catch(err){
+    if(!silent) _toast(_t('Không thể tải variable library.', 'Could not load variable library.'), 'error');
+  }finally{
+    state.busyKey = '';
+    _paint();
+  }
+}
 
-/* ── KPI cards ── */
-'.ams3-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px;}',
-'.ams3-kpi{background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border,#e2e8f0);border-radius:14px;padding:14px 16px;display:grid;gap:4px;transition:.15s;}',
-'.ams3-kpi:hover{border-color:var(--brand-2,#2563eb);box-shadow:0 0 0 3px var(--brand-9,#dbeafe);}',
-'.ams3-kpi-val{font-size:26px;font-weight:900;letter-spacing:-.03em;line-height:1;}',
-'.ams3-kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted,#64748b);}',
-'.ams3-kpi.blue .ams3-kpi-val{color:var(--brand-2,#2563eb);}',
-'.ams3-kpi.green .ams3-kpi-val{color:var(--green-600,#16a34a);}',
-'.ams3-kpi.purple .ams3-kpi-val{color:var(--purple-500,#8b5cf6);}',
-'.ams3-kpi.amber .ams3-kpi-val{color:var(--amber-500,#f59e0b);}',
-'.ams3-kpi.cyan .ams3-kpi-val{color:var(--cyan-500,#06b6d4);}',
+async function _loadDesign(id, silent){
+  if(!id) return;
+  state.designBusy = true;
+  if(!silent) _paint();
+  try{
+    var res = await _api('schema_studio_get', {id:id}, 'POST', 45000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'design_load_failed');
+    state.selectedDesignId = id;
+    state.designSchema = res.schema || null;
+    state.designBaseline = res.baseline || null;
+    state.designRevisions = res.revisions || null;
+    state.designSavePolicy = res.save_policy || null;
+    state.designEditor = _jsonPretty(state.designSchema || {});
+    state.designResult = null;
+  }catch(err){
+    if(!silent) _toast(_t('Không thể tải design schema.', 'Could not load the schema design.'), 'error');
+  }finally{
+    state.designBusy = false;
+    _paint();
+  }
+}
 
-/* ── Hero ── */
-'.ams3-hero{background:linear-gradient(135deg,var(--text-primary,#0f172a) 0%,rgba(37,99,235,.85) 100%);border-radius:18px;padding:24px 28px;color:var(--white,#fff);margin-bottom:20px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;}',
-'.ams3-hero-t{font-size:24px;font-weight:900;letter-spacing:-.03em;margin:0 0 5px;}',
-'.ams3-hero-s{font-size:12px;opacity:.7;margin:0;}',
-'.ams3-hero-stats{display:flex;flex-direction:column;gap:6px;text-align:right;}',
-'.ams3-hero-stat{font-size:12px;opacity:.8;}',
-'.ams3-hero-stat strong{font-size:18px;font-weight:900;display:block;line-height:1;}',
+async function _loadReleases(){
+  var designId = _currentDesignId();
+  state.designBusy = true;
+  _paint();
+  try{
+    var res = await _api('schema_studio_list_releases', {design_id: designId || ''}, 'POST', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'release_list_failed');
+    state.releases = Array.isArray(res.releases) ? res.releases : [];
+    state.designResult = { type:'release_list', payload: res };
+  }catch(err){
+    _toast(_t('Không thể tải release bundle.', 'Could not load release bundles.'), 'error');
+  }finally{
+    state.designBusy = false;
+    _paint();
+  }
+}
 
-/* ── Health grid ── */
-'.ams3-health{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px;}',
-'.ams3-hcard{background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:7px;}',
-'.ams3-hcard-name{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted,#64748b);}',
-'.ams3-hcard-score{font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1;}',
-'.ams3-hcard-bar{height:5px;background:var(--bg-surface-alt,#f8fafc);border-radius:999px;overflow:hidden;}',
-'.ams3-hcard-fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.4,0,.2,1);}',
-'.sc-excellent .ams3-hcard-score{color:var(--green-600,#16a34a);}.sc-excellent .ams3-hcard-fill{background:var(--green-500,#22c55e);}',
-'.sc-good .ams3-hcard-score{color:var(--brand-2,#2563eb);}.sc-good .ams3-hcard-fill{background:var(--brand-2,#2563eb);}',
-'.sc-warn .ams3-hcard-score{color:var(--amber-500,#f59e0b);}.sc-warn .ams3-hcard-fill{background:var(--amber-500,#f59e0b);}',
-'.sc-poor .ams3-hcard-score{color:var(--red-500,#ef4444);}.sc-poor .ams3-hcard-fill{background:var(--red-500,#ef4444);}',
+function _currentDesignId(){
+  if(state.designSchema && state.designSchema._meta && state.designSchema._meta.id){
+    return String(state.designSchema._meta.id);
+  }
+  return String(state.selectedDesignId || '');
+}
 
-/* ── Explorer (API + DB) split layout ── */
-'.ams3-split{display:grid;grid-template-columns:340px 1fr;gap:0;border:1px solid var(--border,#e2e8f0);border-radius:16px;overflow:hidden;height:calc(100vh - 200px);min-height:520px;}',
-'.ams3-split-list{border-right:1px solid var(--border,#e2e8f0);display:flex;flex-direction:column;overflow:hidden;background:var(--bg-surface-alt,#f8fafc);}',
-'.ams3-split-detail{display:flex;flex-direction:column;overflow:hidden;background:var(--bg-surface,#fff);}',
-'.ams3-toolbar{padding:10px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--border,#e2e8f0);}',
-'.ams3-searchbox{display:flex;align-items:center;gap:7px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:9px;padding:7px 10px;}',
-'.ams3-searchbox input{flex:1;border:none;background:transparent;font-size:12px;outline:none;color:var(--text-primary,#0f172a);min-width:0;}',
-'.ams3-searchbox input::placeholder{color:var(--text-muted,#64748b);}',
-'.ams3-filters{display:flex;gap:5px;}',
-'.ams3-sel{flex:1;border:1px solid var(--border,#e2e8f0);border-radius:7px;padding:5px 7px;font-size:11px;font-weight:600;background:var(--bg-surface,#fff);color:var(--text-primary,#0f172a);cursor:pointer;outline:none;min-width:0;}',
-'.ams3-list-items{flex:1;overflow-y:auto;}',
-'.ams3-list-items::-webkit-scrollbar{width:4px;}.ams3-list-items::-webkit-scrollbar-thumb{background:var(--border,#e2e8f0);border-radius:999px;}',
-'.ams3-list-foot{padding:7px 10px;font-size:10px;color:var(--text-muted,#64748b);border-top:1px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f8fafc);}',
+async function _saveEditor(type){
+  var editorMap = {
+    api: state.apiEditor,
+    table: state.tableEditor,
+    schema: state.schemaEditor,
+    variable: state.variableEditor
+  };
+  var keyMap = {
+    api: state.selectedApiKey,
+    table: state.selectedTableKey,
+    schema: state.selectedSchemaKey,
+    variable: state.selectedVariableKey
+  };
+  var parsed = _parseJson(editorMap[type], type);
+  if(!parsed.ok){
+    _toast(parsed.error, 'error');
+    return;
+  }
+  state.busyKey = 'save:' + type;
+  _paint();
+  try{
+    var payload = Object.assign({ type:type, key:keyMap[type], revision:_currentDetailRevision(type) }, parsed.value || {});
+    var res = await _api('admin_metadata_studio_save', payload, 'POST', 45000);
+    if(!res || !res.ok){
+      if(res && res.error === 'stale_workspace_revision'){
+        throw new Error(_t('Metadata đã đổi trên server. Tải lại detail mới rồi áp lại thay đổi.', 'The metadata changed on the server. Reload the latest detail and reapply the change.'));
+      }
+      if(res && res.error === 'missing_revision_token'){
+        throw new Error(_t('Editor này không còn revision token hợp lệ. Hãy tải lại detail trước khi lưu.', 'This editor no longer has a valid revision token. Reload the detail before saving.'));
+      }
+      throw new Error((res && (res.detail || res.error)) || 'save_failed');
+    }
+    await _loadWorkspace(true);
+    if(type === 'api') await _loadApiDetail(res.key || keyMap[type], true);
+    if(type === 'table') await _loadTableDetail(res.key || keyMap[type], true);
+    if(type === 'schema') await _loadSchemaDetail(res.key || keyMap[type], true);
+    if(type === 'variable') await _loadVariableDetail(res.key || keyMap[type], true);
+    _toast(_t('Đã lưu metadata.', 'Metadata saved.'), 'success');
+  }catch(err){
+    _toast((err && err.message) || 'save_failed', 'error');
+  }finally{
+    state.busyKey = '';
+    _paint();
+  }
+}
 
-/* ── API list items ── */
-'.ams3-api-row{padding:9px 10px;cursor:pointer;border-bottom:1px solid var(--border,#e2e8f0);display:grid;gap:3px;transition:.1s;}',
-'.ams3-api-row:hover{background:var(--bg-surface,#fff);}',
-'.ams3-api-row.sel{background:var(--brand-9,#dbeafe);border-left:3px solid var(--brand-2,#2563eb);}',
-'.ams3-api-r1{display:flex;align-items:center;gap:7px;}',
-'.ams3-api-action{font-size:11px;font-weight:700;color:var(--text-primary,#0f172a);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace;}',
-'.ams3-api-label{font-size:10px;color:var(--text-muted,#64748b);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
-'.ams3-api-meta{display:flex;gap:5px;align-items:center;}',
+async function _loadTablePreview(offset){
+  if(!state.selectedTableKey) return;
+  state.tablePreviewBusy = true;
+  if(typeof offset === 'number') state.tablePreviewOffset = Math.max(0, offset);
+  _paint();
+  try{
+    var res = await _api('schema_studio_table_preview', {
+      schema: 'public',
+      table: state.selectedTableKey,
+      limit: 25,
+      offset: state.tablePreviewOffset
+    }, 'POST', 45000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'table_preview_failed');
+    state.tablePreview = res;
+    state.rowEditorOpen = false;
+  }catch(err){
+    _toast(_t('Không thể tải preview dữ liệu.', 'Could not load table preview.'), 'error');
+  }finally{
+    state.tablePreviewBusy = false;
+    _paint();
+  }
+}
 
-/* ── Detail panel ── */
-'.ams3-detail-hd{padding:14px 18px;border-bottom:1px solid var(--border,#e2e8f0);display:flex;align-items:flex-start;gap:12px;flex-shrink:0;}',
-'.ams3-detail-hd-info{flex:1;min-width:0;}',
-'.ams3-detail-name{font-size:15px;font-weight:800;margin:0 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
-'.ams3-detail-path{font-size:11px;font-family:monospace;color:var(--text-muted,#64748b);}',
-'.ams3-detail-tabs{display:flex;gap:1px;padding:0 18px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border,#e2e8f0);flex-shrink:0;overflow-x:auto;}',
-'.ams3-dtab{padding:8px 11px;font-size:11px;font-weight:700;cursor:pointer;color:var(--text-muted,#64748b);border-bottom:2px solid transparent;white-space:nowrap;transition:.12s;}',
-'.ams3-dtab.active{color:var(--brand-2,#2563eb);border-bottom-color:var(--brand-2,#2563eb);}',
-'.ams3-detail-body{flex:1;overflow-y:auto;padding:16px 18px;}',
-'.ams3-detail-body::-webkit-scrollbar{width:4px;}.ams3-detail-body::-webkit-scrollbar-thumb{background:var(--border,#e2e8f0);border-radius:999px;}',
+function _openRowInsert(){
+  state.rowEditorMode = 'insert';
+  state.rowEditorOriginal = null;
+  state.rowEditorJson = '{}';
+  state.rowEditorOpen = true;
+  _paint();
+}
 
-/* ── Property rows ── */
-'.ams3-props{display:grid;gap:0;margin-bottom:16px;border:1px solid var(--border,#e2e8f0);border-radius:12px;overflow:hidden;}',
-'.ams3-prop{display:grid;grid-template-columns:140px 1fr;padding:9px 12px;border-bottom:1px solid var(--border,#e2e8f0);font-size:12px;align-items:start;}',
-'.ams3-prop:last-child{border-bottom:none;}',
-'.ams3-prop-k{color:var(--text-muted,#64748b);font-weight:700;padding-right:10px;}',
-'.ams3-prop-v{color:var(--text-primary,#0f172a);}',
-'.ams3-prop-v code{font-family:monospace;font-size:11px;background:var(--bg-surface-alt,#f8fafc);padding:1px 5px;border-radius:4px;color:var(--text-secondary,#475569);}',
+function _openRowUpdate(index){
+  var preview = state.tablePreview || {};
+  var rows = Array.isArray(preview.rows) ? preview.rows : [];
+  var row = rows[index];
+  if(!row) return;
+  state.rowEditorMode = 'update';
+  state.rowEditorOriginal = row;
+  state.rowEditorJson = _jsonPretty(row);
+  state.rowEditorOpen = true;
+  _paint();
+}
 
-/* ── Tester ── */
-'.ams3-tester{background:var(--text-primary,#0f172a);border-radius:14px;overflow:hidden;margin-bottom:16px;}',
-'.ams3-tester-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;}',
-'.ams3-tester-meth{background:var(--brand-2,#2563eb);color:var(--white,#fff);border:none;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;min-width:60px;}',
-'.ams3-tester-url{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 10px;font-size:11px;font-family:monospace;color:var(--white,#fff);outline:none;}',
-'.ams3-tester-send{background:var(--green-600,#16a34a);color:var(--white,#fff);border:none;border-radius:7px;padding:7px 14px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;}',
-'.ams3-tester-send:hover{background:var(--green-500,#22c55e);}',
-'.ams3-tester-send:disabled{opacity:.5;cursor:default;}',
-'.ams3-tester-body{padding:0 14px 10px;}',
-'.ams3-tester-body textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px;font-size:10px;font-family:monospace;color:var(--white,#fff);resize:vertical;min-height:70px;outline:none;}',
-'.ams3-tester-res{margin:0 14px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:9px;overflow:hidden;}',
-'.ams3-tester-res-hd{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.08);font-size:10px;}',
-'.ams3-st-pill{font-size:9px;font-weight:800;padding:2px 7px;border-radius:999px;}',
-'.ams3-st-2xx{background:rgba(34,197,94,.2);color:var(--green-300,#86efac);}',
-'.ams3-st-4xx{background:rgba(251,191,36,.2);color:var(--amber-300,#fcd34d);}',
-'.ams3-st-5xx{background:rgba(239,68,68,.2);color:var(--red-300,#fca5a5);}',
-'.ams3-tester-json{padding:10px;font-size:10px;font-family:monospace;white-space:pre-wrap;color:rgba(255,255,255,.8);max-height:280px;overflow-y:auto;line-height:1.5;}',
-'.ams3-tester-json .jk{color:var(--cyan-300,#7dd3fc);}',
-'.ams3-tester-json .js{color:var(--green-300,#86efac);}',
-'.ams3-tester-json .jnum{color:var(--amber-300,#fcd34d);}',
-'.ams3-tester-json .jb{color:var(--purple-400,#a78bfa);}',
-'.ams3-tester-json .jn{color:var(--red-400,#f87171);}',
+function _closeRowEditor(){
+  state.rowEditorOpen = false;
+  _paint();
+}
 
-/* ── Column table ── */
-'.ams3-tbl{width:100%;border-collapse:collapse;font-size:11px;}',
-'.ams3-tbl th{text-align:left;padding:7px 9px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted,#64748b);border-bottom:2px solid var(--border,#e2e8f0);white-space:nowrap;background:var(--bg-surface-alt,#f8fafc);}',
-'.ams3-tbl td{padding:7px 9px;border-bottom:1px solid var(--border,#e2e8f0);vertical-align:middle;}',
-'.ams3-tbl tr:last-child td{border-bottom:none;}',
-'.ams3-tbl tr:hover td{background:var(--bg-surface-alt,#f8fafc);}',
-'.ams3-type-pill{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:monospace;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#475569);}',
-'.ams3-pk{font-size:9px;font-weight:800;padding:1px 5px;border-radius:3px;background:var(--amber-100,#fef3c7);color:var(--amber-700,#b45309);border:1px solid var(--amber-200,#fde68a);}',
-'.ams3-fk{font-size:9px;font-weight:800;padding:1px 5px;border-radius:3px;background:var(--purple-100,#ede9fe);color:var(--purple-700,#6d28d9);border:1px solid var(--purple-200,#ddd6fe);}',
-'.ams3-req-dot{width:6px;height:6px;border-radius:50%;display:inline-block;background:var(--red-500,#ef4444);}',
-'.ams3-opt-dot{width:6px;height:6px;border-radius:50%;display:inline-block;background:var(--border,#e2e8f0);}',
+async function _saveRowEditor(){
+  if(!state.selectedTableKey) return;
+  var parsed = _parseJson(state.rowEditorJson, 'row_editor');
+  if(!parsed.ok){
+    _toast(parsed.error, 'error');
+    return;
+  }
+  state.busyKey = 'row_save';
+  _paint();
+  try{
+    var res = await _api('schema_studio_table_row_save', {
+      schema: 'public',
+      table: state.selectedTableKey,
+      mode: state.rowEditorMode,
+      row: parsed.value || {},
+      original: state.rowEditorOriginal || {}
+    }, 'POST', 45000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'row_save_failed');
+    _toast(_t('Đã lưu dữ liệu bảng.', 'Table data saved.'), 'success');
+    state.rowEditorOpen = false;
+    await _loadTablePreview(state.tablePreviewOffset || 0);
+  }catch(err){
+    _toast((err && err.message) || 'row_save_failed', 'error');
+  }finally{
+    state.busyKey = '';
+    _paint();
+  }
+}
 
-/* ── ERD ── */
-'.ams3-erd-wrap{position:relative;background:var(--bg-surface-alt,#f8fafc);border-radius:12px;overflow:hidden;margin-bottom:16px;}',
-'.ams3-erd-canvas{display:block;cursor:grab;}',
-'.ams3-erd-canvas.grabbing{cursor:grabbing;}',
-'.ams3-erd-ctl{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:4px;}',
-'.ams3-erd-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:.12s;}',
-'.ams3-erd-btn:hover{border-color:var(--brand-2,#2563eb);background:var(--brand-9,#dbeafe);}',
-'.ams3-erd-legend{position:absolute;bottom:10px;left:10px;background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:8px;padding:8px 10px;font-size:10px;display:flex;flex-direction:column;gap:4px;}',
-'.ams3-erd-leg-row{display:flex;align-items:center;gap:6px;color:var(--text-muted,#64748b);}',
-'.ams3-erd-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}',
-
-/* ── Data preview ── */
-'.ams3-preview-wrap{overflow:auto;margin-bottom:10px;border:1px solid var(--border,#e2e8f0);border-radius:10px;}',
-'.ams3-prev-tbl{width:100%;border-collapse:collapse;font-size:10px;white-space:nowrap;}',
-'.ams3-prev-tbl th{padding:6px 9px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted,#64748b);border-bottom:2px solid var(--border,#e2e8f0);background:var(--bg-surface-alt,#f8fafc);position:sticky;top:0;}',
-'.ams3-prev-tbl td{padding:5px 9px;border-bottom:1px solid var(--border,#e2e8f0);font-family:monospace;max-width:180px;overflow:hidden;text-overflow:ellipsis;}',
-'.ams3-prev-tbl tr:last-child td{border-bottom:none;}',
-'.ams3-prev-tbl tr:hover td{background:var(--bg-surface-alt,#f8fafc);}',
-'.pv-null{color:var(--text-muted,#64748b);font-style:italic;}',
-'.pv-t{color:var(--green-600,#16a34a);font-weight:700;}',
-'.pv-f{color:var(--red-500,#ef4444);}',
-'.ams3-pager{display:flex;align-items:center;gap:7px;justify-content:center;padding:8px 0;font-size:11px;color:var(--text-muted,#64748b);}',
-'.ams3-pg-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border,#e2e8f0);background:var(--bg-surface,#fff);cursor:pointer;font-size:11px;font-weight:600;}',
-'.ams3-pg-btn:hover{border-color:var(--brand-2,#2563eb);}',
-'.ams3-pg-btn:disabled{opacity:.4;cursor:default;}',
-
-/* ── Schema diff ── */
-'.ams3-diff-row{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:9px;margin-bottom:4px;font-size:11px;}',
-'.ams3-diff-ok{background:var(--green-100,#dcfce7);}',
-'.ams3-diff-warn{background:var(--amber-100,#fef3c7);}',
-'.ams3-diff-err{background:var(--red-100,#fee2e2);}',
-'.ams3-diff-icon{font-size:14px;flex-shrink:0;margin-top:1px;}',
-'.ams3-diff-info{flex:1;}',
-'.ams3-diff-title{font-weight:700;color:var(--text-primary,#0f172a);}',
-'.ams3-diff-detail{color:var(--text-muted,#64748b);margin-top:2px;font-size:10px;}',
-
-/* ── Field Forge grid ── */
-'.ams3-field-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}',
-'.ams3-fcard{background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:12px;padding:12px 14px;display:grid;gap:6px;transition:.15s;}',
-'.ams3-fcard:hover{border-color:var(--brand-2,#2563eb);box-shadow:0 0 0 3px var(--brand-9,#dbeafe);}',
-'.ams3-fcard-name{font-size:12px;font-weight:700;font-family:monospace;color:var(--text-primary,#0f172a);}',
-'.ams3-fcard-meta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}',
-'.ams3-fcard-desc{font-size:10px;color:var(--text-muted,#64748b);line-height:1.4;}',
-'.ams3-fcard-usage{font-size:10px;font-weight:700;color:var(--brand-2,#2563eb);}',
-
-/* ── Schema grid ── */
-'.ams3-schema-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}',
-'.ams3-scard{background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:14px;padding:14px 16px;display:grid;gap:8px;cursor:pointer;transition:.15s;}',
-'.ams3-scard:hover{border-color:var(--brand-2,#2563eb);box-shadow:0 4px 18px rgba(37,99,235,.07);}',
-'.ams3-scard.sel{border-color:var(--brand-2,#2563eb);box-shadow:0 0 0 3px var(--brand-9,#dbeafe);}',
-'.ams3-scard-name{font-size:13px;font-weight:800;color:var(--text-primary,#0f172a);}',
-'.ams3-scard-desc{font-size:11px;color:var(--text-muted,#64748b);line-height:1.4;}',
-'.ams3-scard-tables{display:flex;flex-wrap:wrap;gap:4px;}',
-'.ams3-stag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#475569);font-family:monospace;}',
-
-/* ── Variables ── */
-'.ams3-var-cats{display:grid;gap:14px;}',
-'.ams3-vcat{background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:14px;overflow:hidden;}',
-'.ams3-vcat-hd{padding:11px 16px;border-bottom:1px solid var(--border,#e2e8f0);display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--bg-surface-alt,#f8fafc);}',
-'.ams3-vcat-name{font-size:12px;font-weight:800;color:var(--text-primary,#0f172a);flex:1;}',
-'.ams3-vcat-n{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--border,#e2e8f0);color:var(--text-muted,#64748b);}',
-'.ams3-var-tbl{width:100%;border-collapse:collapse;font-size:11px;}',
-'.ams3-var-tbl th{padding:6px 14px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted,#64748b);border-bottom:1px solid var(--border,#e2e8f0);}',
-'.ams3-var-tbl td{padding:7px 14px;border-bottom:1px solid var(--border,#e2e8f0);}',
-'.ams3-var-tbl tr:last-child td{border-bottom:none;}',
-'.ams3-var-key{font-family:monospace;font-weight:700;font-size:10px;color:var(--text-primary,#0f172a);}',
-'.ams3-var-type{font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;background:var(--purple-100,#ede9fe);color:var(--purple-700,#6d28d9);}',
-'.ams3-var-ex{font-family:monospace;font-size:10px;color:var(--text-muted,#64748b);}',
-
-/* ── Ops ── */
-'.ams3-ops-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:20px;}',
-'.ams3-ocard{background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:14px;padding:16px;display:grid;gap:8px;}',
-'.ams3-ocard-icon{font-size:26px;}',
-'.ams3-ocard-title{font-size:13px;font-weight:800;color:var(--text-primary,#0f172a);}',
-'.ams3-ocard-desc{font-size:11px;color:var(--text-muted,#64748b);line-height:1.4;}',
-'.ams3-ocard-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:9px;font-size:11px;font-weight:800;cursor:pointer;border:none;width:100%;transition:.15s;}',
-'.ams3-ocard-btn.primary{background:var(--brand-2,#2563eb);color:var(--white,#fff);}',
-'.ams3-ocard-btn.primary:hover{background:var(--blue-700,#1d4ed8);}',
-'.ams3-ocard-btn.success{background:var(--green-600,#16a34a);color:var(--white,#fff);}',
-'.ams3-ocard-btn.ghost{background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border,#e2e8f0);color:var(--text-secondary,#475569);}',
-'.ams3-ops-log{background:var(--text-primary,#0f172a);border-radius:12px;padding:14px;font-size:10px;font-family:monospace;color:rgba(255,255,255,.8);max-height:220px;overflow-y:auto;line-height:1.8;}',
-'.ams3-log-ok{color:var(--green-300,#86efac);}',
-'.ams3-log-err{color:var(--red-400,#f87171);}',
-'.ams3-log-info{color:var(--cyan-300,#7dd3fc);}',
-'.ams3-log-warn{color:var(--amber-300,#fcd34d);}',
-
-/* ── JSON viewer ── */
-'.ams3-json{background:var(--text-primary,#0f172a);border-radius:10px;padding:12px;font-size:10px;font-family:monospace;color:rgba(255,255,255,.85);overflow:auto;max-height:360px;line-height:1.5;white-space:pre-wrap;}',
-'.ams3-json .jk{color:var(--cyan-300,#7dd3fc);}',
-'.ams3-json .js{color:var(--green-300,#86efac);}',
-'.ams3-json .jnum{color:var(--amber-300,#fcd34d);}',
-'.ams3-json .jb{color:var(--purple-400,#a78bfa);}',
-'.ams3-json .jn{color:var(--red-400,#f87171);}',
-
-/* ── Responsive ── */
-'@media(max-width:900px){.ams3-split{grid-template-columns:1fr;height:auto;}.ams3-split-list{height:280px;}.ams3-hero{grid-template-columns:1fr;}.ams3-kpis{grid-template-columns:repeat(2,1fr);}.ams3-health{grid-template-columns:repeat(2,1fr);}}'
-];
-
-/* ═══════════════════════════ RENDER ENTRY ═══════════════════════════ */
-
-function render() {
-  var c = S.container;
-  if (!c) return;
-  ensureStyles();
-
-  if (S.loading) {
-    c.innerHTML = '<div class="ams3"><div class="ams3-loading"><div class="ams3-spinner"></div>Loading studio data…</div></div>';
+async function _runDesignAction(actionId){
+  var designId = _currentDesignId();
+  var schema = state.designSchema;
+  if(!actionId) return;
+  if(['save_design','validate','set_baseline','diagnose','compile','release'].indexOf(actionId) !== -1 && !schema){
+    _toast(_t('Chưa có working design để chạy thao tác này.', 'No working design is loaded for this action.'), 'error');
     return;
   }
 
-  var tabCounts = buildTabCounts();
-  var tabs = TABS.map(function(t) {
-    var n = tabCounts[t.id];
-    return '<div class="ams3-tab' + (S.tab === t.id ? ' active' : '') + '" data-tab="' + t.id + '">' +
-      t.icon + ' ' + t.label +
-      (n != null ? ' <span class="ams3-tab-n">' + fmt(n) + '</span>' : '') +
-    '</div>';
-  }).join('');
-
-  var overview = obj(obj(S.summary).overview);
-  var endpointCount = overview.endpointCount || 0;
-  var tableCount = overview.tableCount || 0;
-
-  var body = '';
-  if (S.error) body = '<div class="ams3-err">⚠️ ' + esc(S.error) + ' <button class="ams3-btn ghost sm" data-action="reload">Retry</button></div>';
-
-  if (S.loaded) {
-    switch (S.tab) {
-      case 'command': body += renderCommandCenter(); break;
-      case 'apis':    body += renderApiExplorer();   break;
-      case 'db':      body += renderDbStudio();      break;
-      case 'fields':  body += renderFieldForge();    break;
-      case 'schema':  body += renderSchemaArchitect(); break;
-      case 'vars':    body += renderVariables();     break;
-      case 'ops':     body += renderRegistryOps();   break;
+  state.designBusy = true;
+  _paint();
+  try{
+    var res;
+    if(actionId === 'load_registry'){
+      res = await _api('schema_studio_load_registry', {}, 'POST', 45000);
+      if(!res || !res.ok) throw _actionError(res, 'load_registry_failed');
+      state.designSchema = res.schema || null;
+      state.designBaseline = null;
+      state.designRevisions = null;
+      state.designSavePolicy = res.save_policy || _currentDesignSavePolicy();
+      state.designEditor = _jsonPretty(state.designSchema || {});
+      state.selectedDesignId = _currentDesignId();
+      state.designResult = { type: actionId, payload: res };
+    } else if(actionId === 'reverse_engineer'){
+      res = await _api('schema_studio_reverse_engineer', {}, 'POST', 45000);
+      if(!res || !res.ok) throw _actionError(res, 'reverse_engineer_failed');
+      state.designSchema = res.schema || null;
+      state.designBaseline = null;
+      state.designRevisions = null;
+      state.designSavePolicy = res.save_policy || _currentDesignSavePolicy();
+      state.designEditor = _jsonPretty(state.designSchema || {});
+      state.selectedDesignId = _currentDesignId();
+      state.designResult = { type: actionId, payload: res };
+    } else if(actionId === 'save_design'){
+      var parsedDesign = _parseJson(state.designEditor, 'design_editor');
+      if(!parsedDesign.ok) throw new Error(parsedDesign.error);
+      state.designSchema = parsedDesign.value || {};
+      res = await _api('schema_studio_save', { schema: state.designSchema, revisions: _currentDesignRevisions() }, 'POST', 45000);
+      if(!res || !res.ok) throw _actionError(res, 'design_save_failed');
+      state.selectedDesignId = res.id || _currentDesignId();
+      state.designRevisions = res.revisions || null;
+      state.designSavePolicy = res.save_policy || _currentDesignSavePolicy();
+      state.designResult = { type: actionId, payload: res };
+      await _loadWorkspace(true);
+      if(state.selectedDesignId) await _loadDesign(state.selectedDesignId, true);
+    } else if(actionId === 'validate'){
+      var parsedValidate = _parseJson(state.designEditor, 'design_editor');
+      if(!parsedValidate.ok) throw new Error(parsedValidate.error);
+      state.designSchema = parsedValidate.value || {};
+      res = await _api('schema_studio_validate', { schema: state.designSchema }, 'POST', 45000);
+      if(!res || !res.ok) throw _actionError(res, 'design_validate_failed');
+      state.designResult = { type: actionId, payload: res };
+    } else if(actionId === 'set_baseline'){
+      var parsedBaseline = _parseJson(state.designEditor, 'design_editor');
+      if(!parsedBaseline.ok) throw new Error(parsedBaseline.error);
+      state.designSchema = parsedBaseline.value || {};
+      res = await _api('schema_studio_set_baseline', { design_id: designId || 'workspace', schema: state.designSchema, revisions: _currentDesignRevisions() }, 'POST', 45000);
+      if(!res || !res.ok) throw _actionError(res, 'set_baseline_failed');
+      state.designBaseline = JSON.parse(JSON.stringify(state.designSchema));
+      state.designRevisions = res.revisions || null;
+      state.designSavePolicy = res.save_policy || _currentDesignSavePolicy();
+      state.designResult = { type: actionId, payload: res };
+      await _loadWorkspace(true);
+    } else if(actionId === 'diagnose'){
+      var parsedDiagnose = _parseJson(state.designEditor, 'design_editor');
+      if(!parsedDiagnose.ok) throw new Error(parsedDiagnose.error);
+      state.designSchema = parsedDiagnose.value || {};
+      res = await _api('schema_studio_diagnose', {
+        design_id: designId || 'workspace',
+        schema: state.designSchema,
+        baseline: state.designBaseline || undefined,
+        revisions: _currentDesignRevisions()
+      }, 'POST', 60000);
+      if(!res || !res.ok) throw _actionError(res, 'diagnose_failed');
+      state.designRevisions = res.revisions || null;
+      state.designSavePolicy = res.save_policy || _currentDesignSavePolicy();
+      state.designResult = { type: actionId, payload: res };
+      await _loadWorkspace(true);
+    } else if(actionId === 'compile'){
+      var parsedCompile = _parseJson(state.designEditor, 'design_editor');
+      if(!parsedCompile.ok) throw new Error(parsedCompile.error);
+      state.designSchema = parsedCompile.value || {};
+      res = await _api('schema_studio_compile_registry', {
+        design_id: designId || 'workspace',
+        schema: state.designSchema,
+        revisions: _currentDesignRevisions()
+      }, 'POST', 60000);
+      if(!res || !res.ok) throw _actionError(res, 'compile_failed');
+      state.designRevisions = res.revisions || null;
+      state.designSavePolicy = res.save_policy || _currentDesignSavePolicy();
+      state.designResult = { type: actionId, payload: res };
+      await _loadWorkspace(true);
+    } else if(actionId === 'release'){
+      var parsedRelease = _parseJson(state.designEditor, 'design_editor');
+      if(!parsedRelease.ok) throw new Error(parsedRelease.error);
+      state.designSchema = parsedRelease.value || {};
+      res = await _api('schema_studio_release_bundle', {
+        design_id: designId || 'workspace',
+        schema: state.designSchema,
+        baseline: state.designBaseline || undefined,
+        revisions: _currentDesignRevisions()
+      }, 'POST', 60000);
+      if(!res || !res.ok) throw _actionError(res, 'release_failed');
+      state.designRevisions = res.revisions || null;
+      state.designSavePolicy = res.save_policy || _currentDesignSavePolicy();
+      state.designResult = { type: actionId, payload: res };
+      await _loadWorkspace(true);
+      await _loadReleases();
+    } else if(actionId === 'refresh_releases'){
+      await _loadReleases();
     }
-  } else if (!S.error) {
-    body = '<div class="ams3-loading"><div class="ams3-spinner"></div>Initializing…</div>';
+    _toast(_t('Đã chạy thao tác schema.', 'Schema action completed.'), 'success');
+  }catch(err){
+    _toast((err && err.message) || 'design_action_failed', 'error');
+  }finally{
+    state.designBusy = false;
+    _paint();
   }
-
-  c.innerHTML =
-    '<div class="ams3">' +
-      '<div class="ams3-hd">' +
-        '<div class="ams3-hd-top">' +
-          '<h2 class="ams3-hd-title">⚡ API &amp; DB Studio</h2>' +
-          '<span class="ams3-hd-badge">v3.0 — ' + fmt(endpointCount) + ' endpoints · ' + fmt(tableCount) + ' tables</span>' +
-          '<div class="ams3-hd-actions">' +
-            '<button class="ams3-btn ghost sm" data-action="reload">↻ Refresh</button>' +
-            '<button class="ams3-btn ghost sm" data-action="export-openapi">↓ OpenAPI</button>' +
-            '<button class="ams3-btn primary sm" data-action="compile">⚡ Compile</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="ams3-tabs">' + tabs + '</div>' +
-      '</div>' +
-      '<div class="ams3-body">' + body + '</div>' +
-    '</div>';
-
-  attachEvents(c);
 }
 
-function buildTabCounts() {
-  if (!S.summary) return {};
-  var ov = obj(S.summary.overview);
-  return {
-    apis:   ov.endpointCount,
-    db:     ov.tableCount,
-    fields: ov.dataFieldEndpointCount,
-    schema: ov.schemaCount,
-    vars:   ov.variableCount
-  };
-}
-
-/* ═══════════════════════════ COMMAND CENTER ═══════════════════════════ */
-
-function renderCommandCenter() {
-  if (!S.summary) return '<div class="ams3-empty"><div class="ams3-empty-icon">📊</div><div class="ams3-empty-t">No data yet</div></div>';
-  var ov = obj(S.summary.overview);
-  var ss = obj(S.summary.schemaStudio);
-  var manifest = obj(ss.manifest);
-  var diag = obj(ss.diagnostics);
-  var exp  = obj(ss.experienceReport);
-  var ops  = obj(ss.operationsReport);
-  var cmd  = obj(ss.commandCenterReport);
-
-  /* Health scores */
-  var scores = [
-    { name:'Experience',        val: pctVal(exp.summary, 'overallExperienceScore') || pctVal(cmd, 'experienceScore') },
-    { name:'Operations',        val: pctVal(ops.summary, 'overallOperationsScore') || pctVal(cmd, 'operationsScore') },
-    { name:'Promotion Ready',   val: pctVal(cmd, 'promotionReadinessScore') },
-    { name:'Firewall',          val: pctVal(cmd, 'firewallScore') },
-    { name:'Observability',     val: pctVal(cmd, 'observabilityScore') },
-    { name:'Compliance',        val: pctVal(cmd, 'complianceReadinessScore') },
-    { name:'Performance',       val: pctVal(cmd, 'performancePostureScore') },
-    { name:'Registry Sync',     val: pctVal(cmd, 'registrySyncScore') },
-    { name:'AI Copilot',        val: pctVal(cmd, 'aiCopilotScore') },
-    { name:'Coverage',          val: pctVal(ov, 'canonicalCoverage') }
-  ];
-
-  var healthCards = scores.map(function(s) {
-    var sc = scoreClass(s.val);
-    return '<div class="ams3-hcard sc-' + sc + '">' +
-      '<div class="ams3-hcard-name">' + esc(s.name) + '</div>' +
-      '<div class="ams3-hcard-score">' + Math.round(s.val) + '%</div>' +
-      '<div class="ams3-hcard-bar"><div class="ams3-hcard-fill" style="width:' + Math.min(100, Math.round(s.val)) + '%"></div></div>' +
-    '</div>';
-  }).join('');
-
-  /* KPIs */
-  var kpis = [
-    { val: ov.endpointCount,    lbl:'Endpoints',  tone:'blue'   },
-    { val: ov.tableCount,       lbl:'DB Tables',  tone:'green'  },
-    { val: ov.schemaCount,      lbl:'Schemas',    tone:'purple' },
-    { val: ov.variableCount,    lbl:'Variables',  tone:'amber'  },
-    { val: ov.dataFieldEndpointCount, lbl:'Field Defs', tone:'cyan' },
-    { val: ov.domainCount,      lbl:'Domains',    tone:'blue'   },
-    { val: ov.workflowCount,    lbl:'Workflows',  tone:'green'  },
-    { val: ov.migrationCount,   lbl:'Migrations', tone:'purple' }
-  ].map(function(k) {
-    return '<div class="ams3-kpi ' + k.tone + '">' +
-      '<div class="ams3-kpi-val">' + fmt(k.val || 0) + '</div>' +
-      '<div class="ams3-kpi-lbl">' + esc(k.lbl) + '</div>' +
-    '</div>';
-  }).join('');
-
-  /* Blockers / hotspots */
-  var hotspots = pctVal(cmd, 'hotspots') || 0;
-  var blockers  = pctVal(cmd, 'blockers') || 0;
-
-  /* Principles */
-  var principles = arr(S.summary.principles);
-  var prinHtml = principles.length ? principles.map(function(p) {
-    return '<div class="ams3-diff-row ams3-diff-ok">' +
-      '<div class="ams3-diff-icon">✅</div>' +
-      '<div class="ams3-diff-info">' +
-        '<div class="ams3-diff-title">' + esc(p.title || p.name || '') + '</div>' +
-        (p.description ? '<div class="ams3-diff-detail">' + esc(p.description) + '</div>' : '') +
-      '</div></div>';
-  }).join('') : '';
-
-  return [
-    '<div class="ams3-hero">',
-      '<div>',
-        '<div class="ams3-hero-t">⚡ API &amp; DB Command Center</div>',
-        '<div class="ams3-hero-s">Unified metadata governance · Registry-driven · Zero hardcoding</div>',
-      '</div>',
-      '<div class="ams3-hero-stats">',
-        '<div class="ams3-hero-stat"><strong>' + fmt(hotspots) + '</strong>Hotspots</div>',
-        '<div class="ams3-hero-stat"><strong>' + fmt(blockers) + '</strong>Blockers</div>',
-      '</div>',
-    '</div>',
-
-    '<div class="ams3-sec"><div class="ams3-sec-title">System KPIs</div>',
-      '<div class="ams3-kpis">' + kpis + '</div>',
-    '</div>',
-
-    '<div class="ams3-sec"><div class="ams3-sec-title">Health Scores</div>',
-      '<div class="ams3-health">' + healthCards + '</div>',
-    '</div>',
-
-    principles.length ? '<div class="ams3-sec"><div class="ams3-sec-title">Governance Principles</div>' + prinHtml + '</div>' : '',
-
-    manifest && manifest.headline ? [
-      '<div class="ams3-sec"><div class="ams3-sec-title">Schema Studio Manifest</div>',
-        '<div class="ams3-props">',
-          prop('Version', manifest.schemaStudioVersion || manifest.version),
-          prop('Headline', manifest.headline),
-          prop('Architecture', manifest.architectureMode),
-          prop('Generated', manifest.generatedAt ? new Date(manifest.generatedAt).toLocaleString() : null),
-        '</div>',
-      '</div>'
-    ].join('') : ''
-
-  ].join('');
-}
-
-function pctVal(o, k) { return Number(obj(o)[k]) || 0; }
-
-/* ═══════════════════════════ API EXPLORER ═══════════════════════════ */
-
-function renderApiExplorer() {
-  var all = apiSummaries();
-
-  /* filter */
-  var methods = ['ALL'].concat(Object.keys(METHOD_CFG));
-  var domains = ['ALL'].concat(uniqueVals(all, 'domain').sort());
-  var kinds   = ['ALL'].concat(uniqueVals(all, 'kind').sort());
-
-  var filtered = all.filter(function(a) {
-    var q = S.apiSearch.toLowerCase();
-    var mOk = S.apiMethod === 'ALL' || a.method === S.apiMethod;
-    var dOk = S.apiDomain === 'ALL' || a.domain === S.apiDomain;
-    var kOk = S.apiKind   === 'ALL' || a.kind   === S.apiKind;
-    var sOk = !q || (a.action||'').toLowerCase().includes(q) || (a.label||'').toLowerCase().includes(q) || (a.labelEn||'').toLowerCase().includes(q) || (a.entity||'').toLowerCase().includes(q);
-    return mOk && dOk && kOk && sOk;
+function _filteredApis(){
+  var rows = _list('apis');
+  return rows.filter(function(item){
+    var search = String(state.apiSearch || '').trim().toLowerCase();
+    if(search){
+      var hay = [
+        item.key, item.label, item.labelEn, item.domain, item.entity, item.path, item.module
+      ].join(' ').toLowerCase();
+      if(hay.indexOf(search) === -1) return false;
+    }
+    if(state.apiDomain !== 'ALL' && String(item.domain || '') !== state.apiDomain) return false;
+    if(state.apiMethod !== 'ALL' && String(item.method || '') !== state.apiMethod) return false;
+    if(state.apiKind !== 'ALL' && String(item.kind || '') !== state.apiKind) return false;
+    return true;
   });
-
-  var listHtml = filtered.length ? filtered.map(function(a) {
-    var sel = S.selApi === a.key;
-    var mc = METHOD_CFG[a.method] || METHOD_CFG.GET;
-    return '<div class="ams3-api-row' + (sel ? ' sel' : '') + '" data-api-key="' + esc(a.key || a.action) + '">' +
-      '<div class="ams3-api-r1">' +
-        '<span class="ams3-method" style="background:' + mc.bg + ';color:' + mc.text + '">' + esc(a.method) + '</span>' +
-        '<span class="ams3-api-action">' + esc(a.action || a.key) + '</span>' +
-      '</div>' +
-      '<div class="ams3-api-label">' + esc(a.label || a.labelEn || '') + '</div>' +
-      '<div class="ams3-api-meta">' +
-        (a.domain ? '<span class="ams3-chip">' + domainIcon(a.domain) + ' ' + esc(a.domain) + '</span>' : '') +
-        (a.kind   ? '<span class="ams3-chip">' + esc(a.kind) + '</span>' : '') +
-        (a.field_count ? '<span style="font-size:10px;color:var(--text-muted,#64748b);">' + a.field_count + ' fields</span>' : '') +
-      '</div>' +
-    '</div>';
-  }).join('') : '<div class="ams3-empty" style="padding:30px;"><div class="ams3-empty-icon">🔍</div><div class="ams3-empty-t">No endpoints match</div></div>';
-
-  var detail = S.selApi && S.apiEditor ? renderApiDetail() : renderApiEmpty();
-
-  return '<div class="ams3-split">' +
-    '<div class="ams3-split-list">' +
-      '<div class="ams3-toolbar">' +
-        '<div class="ams3-searchbox"><span>🔍</span><input type="text" placeholder="Search action, label, entity…" value="' + esc(S.apiSearch) + '" data-filter="apiSearch"></div>' +
-        '<div class="ams3-filters">' +
-          selFilter('apiMethod', methods, S.apiMethod, 'Method') +
-          selFilter('apiDomain', domains, S.apiDomain, 'Domain') +
-          selFilter('apiKind',   kinds,   S.apiKind,   'Kind') +
-        '</div>' +
-      '</div>' +
-      '<div class="ams3-list-items">' + listHtml + '</div>' +
-      '<div class="ams3-list-foot">' + filtered.length + ' / ' + all.length + ' endpoints</div>' +
-    '</div>' +
-    '<div class="ams3-split-detail">' + detail + '</div>' +
-  '</div>';
 }
 
-function renderApiDetail() {
-  var ed = S.apiEditor;
-  if (!ed) return renderApiEmpty();
-  var it = obj(ed.item);
-  var sec = obj(it.security);
-  var req = obj(it.request);
-  var res = obj(it.response);
-  var mc = METHOD_CFG[it.method] || METHOD_CFG.GET;
-
-  var dtabs = ['overview','contract','fields','tester'].map(function(t) {
-    return '<div class="ams3-dtab' + (S.apiDetailTab === t ? ' active' : '') + '" data-api-dtab="' + t + '">' +
-      { overview:'📋 Overview', contract:'📐 Contract', fields:'🧩 Fields', tester:'🚀 Tester' }[t] +
-    '</div>';
-  }).join('');
-
-  var body = '';
-  if (S.detailLoading) {
-    body = '<div class="ams3-loading"><div class="ams3-spinner"></div>Loading…</div>';
-  } else {
-    switch (S.apiDetailTab) {
-      case 'overview':  body = renderApiOverview(ed); break;
-      case 'contract':  body = renderApiContract(ed); break;
-      case 'fields':    body = renderApiFields(ed);   break;
-      case 'tester':    body = renderTester(ed);      break;
+function _filteredTables(){
+  var rows = _list('tables');
+  return rows.filter(function(item){
+    var search = String(state.tableSearch || '').trim().toLowerCase();
+    if(search){
+      var hay = [
+        item.key, item.label, item.labelEn, item.domain, item.primaryKey, item.workflowId
+      ].join(' ').toLowerCase();
+      if(hay.indexOf(search) === -1) return false;
     }
-  }
+    if(state.tableDomain !== 'ALL' && String(item.domain || '') !== state.tableDomain) return false;
+    return true;
+  });
+}
+
+function _apiDomains(){
+  var seen = {};
+  var rows = [];
+  _list('apis').forEach(function(item){
+    var key = String(item.domain || '');
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    rows.push(key);
+  });
+  rows.sort();
+  return rows;
+}
+
+function _tableDomains(){
+  var seen = {};
+  var rows = [];
+  _list('tables').forEach(function(item){
+    var key = String(item.domain || '');
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    rows.push(key);
+  });
+  rows.sort();
+  return rows;
+}
+
+function _apiKinds(){
+  var seen = {};
+  var rows = [];
+  _list('apis').forEach(function(item){
+    var key = String(item.kind || '');
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    rows.push(key);
+  });
+  rows.sort();
+  return rows;
+}
+
+function _renderMetricCards(){
+  var ws = _workspace();
+  var m = ws.metrics || {};
+  var connection = ws.connection || {};
+  var dbProbeApplicable = _dbProbeApplicable(m) || _dbProbeApplicable(connection);
+  var cards = [
+    { label:_t('Endpoint catalog', 'Endpoint catalog'), value:m.endpoint_count, note:_t('Tổng endpoint có contract.', 'Total endpoints under contract.') },
+    { label:_t('Tables covered', 'Tables covered'), value:m.table_count, note:_t('Union từ registry + relation map.', 'Union from registry + relation map.') },
+    { label:_t('Present in DB', 'Present in DB'), value:dbProbeApplicable ? m.db_present_table_count : _t('N/A', 'N/A'), note:dbProbeApplicable ? _t('Bảng thật tìm thấy trong PostgreSQL.', 'Tables found in live PostgreSQL.') : _t('Runtime hiện không bật PostgreSQL path, nên metric này không áp dụng.', 'The runtime does not currently use the PostgreSQL path, so this metric is not applicable.') },
+    { label:_t('Structural drift', 'Structural drift'), value:dbProbeApplicable ? m.db_structural_drift_table_count : _t('N/A', 'N/A'), note:dbProbeApplicable ? _t('Bảng live lệch cột/PK so với authority.', 'Live tables drifting in columns or PK from authority.') : _t('Chỉ tính khi PostgreSQL là runtime truth đang hoạt động.', 'Only applies when PostgreSQL is the active runtime truth.') },
+    { label:_t('Operational risks', 'Operational risks'), value:m.operational_risk_count, note:_t('Rủi ro vận hành và logic chưa an toàn.', 'Operational and logic risks that still need treatment.') },
+    { label:_t('Blocking risks', 'Blocking risks'), value:m.blocking_operational_risk_count, note:_t('Điểm đang chặn release gate.', 'Risks currently blocking the release gate.') },
+    { label:_t('Stale artifacts', 'Stale artifacts'), value:m.stale_artifact_count, note:_t('Artifact quá tuổi hoặc lệch chu kỳ sinh.', 'Artifacts that are stale or generated out of cycle.') },
+    { label:_t('Dependency drift', 'Dependency drift'), value:m.dependency_outdated_artifact_count, note:_t('Artifact dẫn xuất bị source vượt mặt.', 'Derived artifacts that lag behind their source documents.') },
+    { label:_t('Blind spots critical', 'Blind spots critical'), value:m.operational_blind_spot_critical_count, note:_t('Khe hở nghiệp vụ/governance còn ở mức critical.', 'Critical business/governance blind spots still open.') },
+    { label:_t('Stress paths critical', 'Stress paths critical'), value:m.operational_stress_critical_count, note:_t('Tình huống thực chiến còn fail truth.', 'Critical real-world stress paths still fail truth.') },
+    { label:_t('Publishability blockers', 'Publishability blockers'), value:m.publishability_blockers, note:_t('Frontend/contract blockers từ quality report.', 'Frontend/contract blockers from the quality report.') },
+    { label:_t('Designs / releases', 'Designs / releases'), value:_fmtInt(m.design_count) + ' / ' + _fmtInt(m.release_count), note:_t('Working design và bundle phát hành.', 'Working designs and release bundles.') }
+  ];
+  return '<div class="ds-metric-grid">' + cards.map(function(card){
+    return '<article class="ds-metric-card"><small>' + _esc(card.label) + '</small><strong>' + _esc(String(card.value == null ? '0' : card.value)) + '</strong><p>' + _esc(card.note) + '</p></article>';
+  }).join('') + '</div>';
+}
+
+function _renderOverview(){
+  var ws = _workspace();
+  var metrics = ws.metrics || {};
+  var connection = ws.connection || {};
+  var dataLayer = connection.data_layer || {};
+  var dbProbeApplicable = _dbProbeApplicable(connection) || _dbProbeApplicable(metrics);
+  var highlights = ws.highlights || {};
+  var audits = ws.audits || {};
+  var artifacts = ws.artifacts || {};
+  var operational = ws.operational || {};
+  var domains = Array.isArray(ws.domains) ? ws.domains.slice(0, 12) : [];
+
+  var blockers = Array.isArray(highlights.blockers) ? highlights.blockers : [];
+  var governanceGaps = Array.isArray(highlights.governance_gaps) ? highlights.governance_gaps : [];
+  var registryGaps = Array.isArray(highlights.registry_gaps) ? highlights.registry_gaps : [];
+  var dbMissing = Array.isArray(highlights.db_missing_tables) ? highlights.db_missing_tables : [];
+  var dbUnexpected = Array.isArray(highlights.db_unexpected_tables) ? highlights.db_unexpected_tables : [];
+  var structuralDrift = Array.isArray(highlights.structural_drift) ? highlights.structural_drift : [];
+  var blindSpots = Array.isArray(highlights.blind_spots) ? highlights.blind_spots : [];
+  var stressScenarios = Array.isArray(highlights.stress_scenarios) ? highlights.stress_scenarios : [];
+  var migrationHotspots = Array.isArray(highlights.migration_hotspots) ? highlights.migration_hotspots : [];
+  var operationalRisks = Array.isArray(operational.risks) ? operational.risks : [];
+  var coverageGaps = Array.isArray(operational.coverageGaps) ? operational.coverageGaps : [];
+  var freshness = operational.freshness || {};
+  var freshnessArtifacts = Array.isArray(freshness.artifacts) ? freshness.artifacts : [];
+  var releaseGate = operational.releaseGate || {};
+  var saveGuard = operational.saveGuard || ws.save_policy || {};
+  var blindSpotSummary = audits.blind_spots && audits.blind_spots.summary ? audits.blind_spots.summary : {};
+  var stressSummary = audits.stress && audits.stress.summary ? audits.stress.summary : {};
 
   return [
-    '<div class="ams3-detail-hd">',
-      '<div style="margin-top:2px">' + '<span class="ams3-method" style="background:' + mc.bg + ';color:' + mc.text + ';font-size:11px;padding:3px 8px">' + esc(it.method) + '</span>' + '</div>',
-      '<div class="ams3-detail-hd-info">',
-        '<div class="ams3-detail-name">' + esc(it.action || ed.key) + '</div>',
-        '<div class="ams3-detail-path">' +
-          (it.path ? '<code>' + esc(it.path) + '</code>' : '') +
-          (it.entity ? ' · <span class="ams3-chip">' + esc(it.entity) + '</span>' : '') +
+    '<section class="ds-hero">',
+      '<div class="ds-hero-copy">',
+        '<span class="ds-kicker">' + _esc(_t('Admin data platform', 'Admin data platform')) + '</span>',
+        '<h2>' + _esc(_t('Data Schema control plane rebuilt around registry truth, PostgreSQL truth and release truth', 'Data Schema control plane rebuilt around registry truth, PostgreSQL truth and release truth')) + '</h2>',
+        '<p>' + _esc(_t(
+          'Module này bây giờ phải trả lời được 4 câu hỏi vận hành thật: dữ liệu có đồng bộ chu kỳ không, release có đang bị chặn không, runtime có đang nhìn cùng một nguồn sự thật không, và save có còn nguy cơ ghi đè im lặng hay không.',
+          'This module now has to answer four real operating questions: are artifacts generated in sync, is release currently blocked, is runtime looking at the same source of truth, and can saves still overwrite silently.'
+        )) + '</p>',
+      '</div>',
+      '<div class="ds-hero-side">',
+        '<div class="ds-hero-card">',
+          '<small>' + _esc(_t('Live DB probe', 'Live DB probe')) + '</small>',
+          '<strong class="tone-' + _esc(dbProbeApplicable ? _boolTone(connection.reachable) : 'neutral') + '">' + _esc(dbProbeApplicable ? (connection.reachable ? _t('Connected', 'Connected') : _t('Unavailable', 'Unavailable')) : _t('Not enabled', 'Not enabled')) + '</strong>',
+          '<p>' + _esc(dbProbeApplicable ? ((connection.database || '—') + ' / ' + (connection.schema || '—')) : _t('Runtime đang dùng JSON_ONLY thay vì PostgreSQL.', 'The runtime is using JSON_ONLY instead of PostgreSQL.')) + '</p>',
+        '</div>',
+        '<div class="ds-hero-card">',
+          '<small>' + _esc(_t('Release gate', 'Release gate')) + '</small>',
+          '<strong class="tone-' + _esc(_tone(releaseGate.blocking ? 'blocked' : (releaseGate.status || 'neutral'))) + '">' + _esc(releaseGate.status || '—') + '</strong>',
+          '<p>' + _esc(_t('Blocking reasons', 'Blocking reasons') + ': ' + _fmtInt(releaseGate.reasonCount || 0)) + '</p>',
+        '</div>',
+        '<div class="ds-hero-card">',
+          '<small>' + _esc(_t('Save guard', 'Save guard')) + '</small>',
+          '<strong class="tone-' + _esc(saveGuard.requiresRevision ? 'good' : 'warn') + '">' + _esc(saveGuard.requiresRevision ? _t('Revision locked', 'Revision locked') : _t('Unsafe', 'Unsafe')) + '</strong>',
+          '<p>' + _esc(_t('Payload limit', 'Payload limit') + ': ' + _fmtBytes(saveGuard.maxPayloadBytes || 0)) + '</p>',
         '</div>',
       '</div>',
-    '</div>',
-    '<div class="ams3-detail-tabs">' + dtabs + '</div>',
-    '<div class="ams3-detail-body">' + body + '</div>'
-  ].join('');
-}
-
-function renderApiOverview(ed) {
-  var it = obj(ed.item);
-  var sec = obj(it.security);
-  var ap = obj(ed.apiParams);
-  return [
-    '<div class="ams3-props">',
-      prop('Action',    it.action),
-      prop('Label',     it.label || it.labelEn),
-      prop('Module',    it.module || it.moduleEn),
-      prop('Domain',    (it.domain ? domainIcon(it.domain) + ' ' : '') + (it.domain || '—')),
-      prop('Entity',    it.entity),
-      prop('Kind',      it.kind),
-      prop('Path',      it.path),
-    '</div>',
-    '<div class="ams3-sec-title" style="margin-top:12px">Security</div>',
-    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">',
-      sec.auth_required  ? '<span class="ams3-chip auth">🔒 Auth Required</span>' : '<span class="ams3-chip">Public</span>',
-      sec.csrf_required  ? '<span class="ams3-chip csrf">🛡️ CSRF</span>' : '',
-      sec.admin_only     ? '<span class="ams3-chip admin">👑 Admin Only</span>' : '',
-      sec.dynamic_permission ? '<span class="ams3-chip info">⚙️ Dynamic Perm</span>' : '',
-      arr(sec.permission_keys).map(function(k){ return '<span class="ams3-chip">' + esc(k) + '</span>'; }).join(''),
-    '</div>',
-    ap && ap.description ? '<div style="font-size:12px;color:var(--text-muted,#64748b);line-height:1.5;margin-bottom:12px;">' + esc(ap.description) + '</div>' : ''
-  ].join('');
-}
-
-function renderApiContract(ed) {
-  var it = obj(ed.item);
-  var req = obj(it.request);
-  var res = obj(it.response);
-  var cap = obj(it.capabilities);
-  return [
-    '<div class="ams3-sec-title">Request</div>',
-    '<div class="ams3-props">',
-      prop('Query Params',    arr(req.query_params).join(', ') || '—'),
-      prop('Body Fields',     arr(req.body_fields).join(', ')  || '—'),
-      prop('Required Fields', arr(req.required_body_fields).join(', ') || '—'),
-      prop('Body Mode',       req.body_mode),
-      prop('Org Scope',       req.org_scope ? '✅' : '—'),
-    '</div>',
-    '<div class="ams3-sec-title" style="margin-top:12px">Response</div>',
-    '<div class="ams3-props">',
-      prop('Collection Key',  res.collection_key),
-      prop('Response Fields', arr(res.response_fields).join(', ') || '—'),
-      prop('Paginated',       res.paginated ? '✅ Yes' : 'No'),
-    '</div>',
-    cap && arr(cap.searchable_fields).length ? [
-      '<div class="ams3-sec-title" style="margin-top:12px">Capabilities</div>',
-      '<div class="ams3-props">',
-        prop('Searchable',  arr(cap.searchable_fields).join(', ')  || '—'),
-        prop('Sortable',    arr(cap.sortable_fields).join(', ')    || '—'),
-        prop('Filterable',  arr(cap.filterable_fields).join(', ')  || '—'),
-        prop('Transitions', arr(cap.transition_targets).join(', ') || '—'),
-      '</div>'
-    ].join('') : ''
-  ].join('');
-}
-
-function renderApiFields(ed) {
-  var fields = arr(ed.fields);
-  if (!fields.length) return '<div class="ams3-empty" style="padding:30px;"><div class="ams3-empty-icon">🧩</div><div class="ams3-empty-t">No fields defined</div></div>';
-  return '<table class="ams3-tbl"><thead><tr>' +
-    '<th>Key</th><th>Label</th><th>Type</th><th>DB Table</th><th>DB Column</th><th>Req</th>' +
-    '</tr></thead><tbody>' +
-    fields.map(function(f) {
-      return '<tr>' +
-        '<td><code style="font-family:monospace;font-size:10px">' + esc(f.key) + '</code></td>' +
-        '<td>' + esc(f.label || f.labelEn || '') + '</td>' +
-        '<td><span class="ams3-type-pill">' + esc(f.type || '') + '</span></td>' +
-        '<td style="font-family:monospace;font-size:10px">' + esc(f.dbTable || '') + '</td>' +
-        '<td style="font-family:monospace;font-size:10px">' + esc(f.dbColumn || '') + '</td>' +
-        '<td>' + (f.required ? '<span class="ams3-req-dot"></span>' : '<span class="ams3-opt-dot"></span>') + '</td>' +
-      '</tr>';
-    }).join('') +
-    '</tbody></table>';
-}
-
-function renderTester(ed) {
-  var it = obj(ed ? ed.item : {});
-  var url = 'api/index.php?action=' + encodeURIComponent(it.action || '');
-  var method = it.method || 'GET';
-  var showBody = method !== 'GET';
-  var hasResult = S.testerResult != null;
-
-  var statusPillClass = 'ams3-st-' + (S.testerStatus >= 500 ? '5xx' : S.testerStatus >= 400 ? '4xx' : '2xx');
-
-  return [
-    '<div class="ams3-tester">',
-      '<div class="ams3-tester-bar">',
-        '<button class="ams3-tester-meth" data-action="tester-toggle-method">' + esc(S.testerMethod || method) + '</button>',
-        '<input class="ams3-tester-url" type="text" value="' + esc(S.testerUrl || url) + '" data-tester="url" placeholder="Request URL">',
-        '<button class="ams3-tester-send" data-action="tester-send"' + (S.testLoading ? ' disabled' : '') + '>' +
-          (S.testLoading ? '⏳ Sending…' : '▶ Send') +
-        '</button>',
-      '</div>',
-      showBody || S.testerMethod !== 'GET' ? [
-        '<div class="ams3-tester-body">',
-          '<textarea data-tester="body" placeholder=\'{"key": "value"}\'>' + esc(S.testerBody || '{}') + '</textarea>',
-        '</div>'
-      ].join('') : '',
-      hasResult ? [
-        '<div class="ams3-tester-res">',
-          '<div class="ams3-tester-res-hd">',
-            '<span class="ams3-st-pill ' + statusPillClass + '">' + (S.testerStatus || '—') + '</span>',
-            '<span style="color:rgba(255,255,255,.6)">' + (S.testerLatency ? S.testerLatency + 'ms' : '') + '</span>',
-            '<span style="flex:1"></span>',
-            '<button class="ams3-btn ghost sm" style="font-size:10px;padding:3px 8px" data-action="tester-copy">Copy</button>',
+    '</section>',
+    _renderMetricCards(),
+    '<div class="ds-grid ds-grid-2">',
+      '<section class="ds-panel">',
+        '<div class="ds-panel-head"><div><small>' + _esc(_t('Connection reality', 'Connection reality')) + '</small><h3>' + _esc(_t('Registry vs PostgreSQL', 'Registry vs PostgreSQL')) + '</h3></div></div>',
+        '<div class="ds-panel-body">',
+          '<div class="ds-facts">',
+            '<div><span>' + _esc(_t('Reachable', 'Reachable')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? _boolTone(connection.reachable) : 'neutral') + '">' + _esc(dbProbeApplicable ? (connection.reachable ? _t('Yes', 'Yes') : _t('No', 'No')) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Present tables', 'Present tables')) + '</span><strong>' + _esc(dbProbeApplicable ? _fmtInt(connection.present_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Missing tables', 'Missing tables')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? (connection.missing_table_count ? 'warn' : 'good') : 'neutral') + '">' + _esc(dbProbeApplicable ? _fmtInt(connection.missing_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Structural drift tables', 'Structural drift tables')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? (connection.structural_drift_table_count ? 'warn' : 'good') : 'neutral') + '">' + _esc(dbProbeApplicable ? _fmtInt(connection.structural_drift_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Authoritative count', 'Authoritative count')) + '</span><strong>' + _esc(_fmtInt(metrics.authoritative_table_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Registry count', 'Registry count')) + '</span><strong>' + _esc(_fmtInt(metrics.registry_table_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Registry gaps', 'Registry gaps')) + '</span><strong class="tone-' + _esc(metrics.registry_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(metrics.registry_gap_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Data layer mode', 'Data layer mode')) + '</span><strong>' + _esc(dataLayer.mode || '—') + '</strong></div>',
+            '<div><span>' + _esc(_t('Postgres path', 'Postgres path')) + '</span><strong class="tone-' + _esc(dataLayer.postgres_path_active ? 'good' : 'neutral') + '">' + _esc(dataLayer.postgres_path_active ? _t('Active', 'Active') : _t('Inactive', 'Inactive')) + '</strong></div>',
+            '<div><span>' + _esc(_t('JSON fallback', 'JSON fallback')) + '</span><strong class="tone-' + _esc(dataLayer.json_fallback ? 'warn' : 'good') + '">' + _esc(dataLayer.json_fallback ? _t('Enabled', 'Enabled') : _t('Off', 'Off')) + '</strong></div>',
           '</div>',
-          '<div class="ams3-tester-json">' + hlJson(S.testerResult) + '</div>',
-        '</div>'
-      ].join('') : '',
+          (!dbProbeApplicable ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Live PostgreSQL probe đang được tắt đúng thiết kế vì runtime hiện không chạy PostgreSQL path. Các chỉ số DB được đánh dấu N/A thay vì báo lỗi giả.', 'The live PostgreSQL probe is intentionally disabled because the runtime is not using the PostgreSQL path. DB metrics are marked N/A instead of being reported as false failures.')) + '</div>' : ''),
+          (connection.error ? '<div class="ds-inline-alert tone-bad"><strong>' + _esc(_t('DB probe error', 'DB probe error')) + ':</strong> ' + _esc(connection.error) + '</div>' : ''),
+        '</div>',
+      '</section>',
+      '<section class="ds-panel">',
+        '<div class="ds-panel-head"><div><small>' + _esc(_t('Registry quality', 'Registry quality')) + '</small><h3>' + _esc(_t('Publishability and authority', 'Publishability and authority')) + '</h3></div></div>',
+        '<div class="ds-panel-body">',
+          '<div class="ds-facts">',
+            '<div><span>' + _esc(_t('Frontend blocked', 'Frontend blocked')) + '</span><strong class="tone-' + _esc((artifacts.registry_quality && artifacts.registry_quality.summary && artifacts.registry_quality.summary.frontendBlockedEntities) ? 'warn' : 'good') + '">' + _esc(_fmtInt(artifacts.registry_quality && artifacts.registry_quality.summary && artifacts.registry_quality.summary.frontendBlockedEntities)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Contract issues', 'Contract issues')) + '</span><strong class="tone-' + _esc((artifacts.registry_quality && artifacts.registry_quality.summary && artifacts.registry_quality.summary.contractIssues) ? 'warn' : 'good') + '">' + _esc(_fmtInt(artifacts.registry_quality && artifacts.registry_quality.summary && artifacts.registry_quality.summary.contractIssues)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Publishability', 'Publishability')) + '</span><strong class="tone-' + _esc(_tone(artifacts.registry_quality && artifacts.registry_quality.publishability && artifacts.registry_quality.publishability.status)) + '">' + _esc((artifacts.registry_quality && artifacts.registry_quality.publishability && artifacts.registry_quality.publishability.status) || '—') + '</strong></div>',
+            '<div><span>' + _esc(_t('Schema authority', 'Schema authority')) + '</span><strong>' + _esc(_fmtInt(metrics.authoritative_table_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Artifact drift', 'Artifact drift')) + '</span><strong class="tone-' + _esc(_tone(freshness.driftStatus || 'neutral')) + '">' + _esc(freshness.driftLabel || '—') + '</strong></div>',
+            '<div><span>' + _esc(_t('Dependency drift', 'Dependency drift')) + '</span><strong class="tone-' + _esc((metrics.dependency_outdated_artifact_count ? 'warn' : 'good')) + '">' + _esc(_fmtInt(metrics.dependency_outdated_artifact_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Blind spots critical', 'Blind spots critical')) + '</span><strong class="tone-' + _esc((blindSpotSummary.critical ? 'bad' : 'good')) + '">' + _esc(_fmtInt(blindSpotSummary.critical)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Stress paths critical', 'Stress paths critical')) + '</span><strong class="tone-' + _esc((stressSummary.critical ? 'bad' : 'good')) + '">' + _esc(_fmtInt(stressSummary.critical)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Release gate', 'Release gate')) + '</span><strong class="tone-' + _esc(_tone(releaseGate.blocking ? 'blocked' : (releaseGate.status || 'neutral'))) + '">' + _esc(releaseGate.status || '—') + '</strong></div>',
+          '</div>',
+          '<div class="ds-helper-text">' + _esc(_t('Authority vẫn là migrations -> schema.sql. Registry chỉ là metadata vận hành, nên khoảng lệch phải hiện ra rõ ràng tại đây.', 'Authority remains migrations -> schema.sql. The registry is an operational metadata layer, so drift must be shown clearly here.')) + '</div>',
+        '</div>',
+      '</section>',
     '</div>',
-    '<div style="font-size:10px;color:var(--text-muted,#64748b);margin-top:-8px">Execute real API requests directly from the studio. Responses are live from the server.</div>'
-  ].join('');
-}
-
-function renderApiEmpty() {
-  return '<div class="ams3-empty"><div class="ams3-empty-icon">🔌</div><div class="ams3-empty-t">Select an API endpoint</div><div class="ams3-empty-s">Search and click any endpoint from the list to view full contract, fields, and run live tests.</div></div>';
-}
-
-/* ═══════════════════════════ DB STUDIO ═══════════════════════════ */
-
-function renderDbStudio() {
-  var all = tableSummaries();
-  var domains = ['ALL'].concat(uniqueVals(all, 'domain').sort());
-  var filtered = all.filter(function(t) {
-    var q = S.tableSearch.toLowerCase();
-    var dOk = S.tableDomain === 'ALL' || t.domain === S.tableDomain;
-    var sOk = !q || (t.key||'').toLowerCase().includes(q) || (t.label||'').toLowerCase().includes(q) || (t.labelEn||'').toLowerCase().includes(q);
-    return dOk && sOk;
-  });
-
-  var listHtml = filtered.map(function(t) {
-    var sel = S.selTable === t.key;
-    return '<div class="ams3-api-row' + (sel ? ' sel' : '') + '" data-table-key="' + esc(t.key) + '">' +
-      '<div class="ams3-api-r1">' +
-        '<span style="font-size:16px">' + domainIcon(t.domain) + '</span>' +
-        '<span class="ams3-api-action">' + esc(t.key) + '</span>' +
-      '</div>' +
-      '<div class="ams3-api-label">' + esc(t.label || t.labelEn || '') + '</div>' +
-      '<div class="ams3-api-meta">' +
-        '<span class="ams3-chip">' + esc(t.domain || '') + '</span>' +
-        '<span style="font-size:10px;color:var(--text-muted,#64748b);">' + (t.columnCount || 0) + ' cols</span>' +
-        (t.workflowId ? '<span class="ams3-chip ok">⚡ workflow</span>' : '') +
-        (t.supportTable ? '<span class="ams3-chip info">ref</span>' : '') +
-      '</div>' +
-    '</div>';
-  }).join('');
-
-  var detail = S.selTable && S.tableEditor ? renderTableDetail() : renderTableEmpty();
-
-  return '<div class="ams3-split">' +
-    '<div class="ams3-split-list">' +
-      '<div class="ams3-toolbar">' +
-        '<div class="ams3-searchbox"><span>🔍</span><input type="text" placeholder="Search table…" value="' + esc(S.tableSearch) + '" data-filter="tableSearch"></div>' +
-        '<div class="ams3-filters">' + selFilter('tableDomain', domains, S.tableDomain, 'Domain') + '</div>' +
-      '</div>' +
-      '<div class="ams3-list-items">' + listHtml + '</div>' +
-      '<div class="ams3-list-foot">' + filtered.length + ' / ' + all.length + ' tables</div>' +
-    '</div>' +
-    '<div class="ams3-split-detail">' + detail + '</div>' +
-  '</div>';
-}
-
-function renderTableDetail() {
-  var ed = S.tableEditor;
-  if (!ed) return renderTableEmpty();
-  var it = obj(ed.item);
-
-  var dtabs = ['columns','relations','preview','diff'].map(function(t) {
-    return '<div class="ams3-dtab' + (S.dbDetailTab === t ? ' active' : '') + '" data-db-dtab="' + t + '">' +
-      { columns:'📋 Columns', relations:'🔗 Relations', preview:'👁 Preview', diff:'⚡ Schema Diff' }[t] +
-    '</div>';
-  }).join('');
-
-  var body = S.detailLoading
-    ? '<div class="ams3-loading"><div class="ams3-spinner"></div>Loading…</div>'
-    : ({
-        columns:   renderTableColumns(ed),
-        relations: renderTableRelations(ed),
-        preview:   renderDataPreview(ed),
-        diff:      renderSchemaDiff(ed)
-      })[S.dbDetailTab] || '';
-
-  return [
-    '<div class="ams3-detail-hd">',
-      '<div style="font-size:28px">' + domainIcon(it.domain) + '</div>',
-      '<div class="ams3-detail-hd-info">',
-        '<div class="ams3-detail-name">' + esc(ed.key) + '</div>',
-        '<div class="ams3-detail-path">' +
-          esc(it.label || it.labelEn || '') +
-          (it.domain ? ' · <span class="ams3-chip">' + esc(it.domain) + '</span>' : '') +
-          (it.workflowId ? ' · <span class="ams3-chip ok">⚡ ' + esc(it.workflowId) + '</span>' : '') +
-          (it.statusColumn ? ' · <span class="ams3-chip info">status: ' + esc(it.statusColumn) + '</span>' : '') +
+    '<div class="ds-grid ds-grid-3">',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Operational risks', 'Operational risks')) + '</small><h3>' + _esc(_t('Rủi ro vận hành thật', 'Real operational risks')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(operationalRisks, 'operational') + '</div></section>',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Blockers', 'Blockers')) + '</small><h3>' + _esc(_t('Điểm nghẽn thật', 'Real blockers')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(blockers, 'blocker') + '</div></section>',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Governance gaps', 'Governance gaps')) + '</small><h3>' + _esc(_t('Thiếu metadata governance', 'Missing governance metadata')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(governanceGaps, 'governance') + '</div></section>',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Migration hotspots', 'Migration hotspots')) + '</small><h3>' + _esc(_t('Khoảng trống schema authority', 'Schema authority gaps')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(migrationHotspots, 'migration') + '</div></section>',
+    '</div>',
+    '<div class="ds-grid ds-grid-2">',
+      '<section class="ds-panel">',
+        '<div class="ds-panel-head"><div><small>' + _esc(_t('Missing coverage', 'Missing coverage')) + '</small><h3>' + _esc(_t('Registry / DB drift surfaces', 'Registry / DB drift surfaces')) + '</h3></div></div>',
+        '<div class="ds-panel-body">',
+          '<div class="ds-chip-row">' + (registryGaps.length ? registryGaps.map(function(item){ return _badge(item.table, 'warn'); }).join('') : _badge(_t('No registry gaps', 'No registry gaps'), 'good')) + '</div>',
+          '<div class="ds-chip-row">' + (dbMissing.length ? dbMissing.map(function(item){ return _badge(item, 'bad'); }).join('') : _badge(_t('No DB gaps', 'No DB gaps'), 'good')) + '</div>',
+          '<div class="ds-chip-row">' + (dbUnexpected.length ? dbUnexpected.map(function(item){ return _badge(item, 'warn'); }).join('') : _badge(_t('No unmanaged tables', 'No unmanaged tables'), 'good')) + '</div>',
+        '</div>',
+      '</section>',
+      '<section class="ds-panel">',
+        '<div class="ds-panel-head"><div><small>' + _esc(_t('Coverage gaps', 'Coverage gaps')) + '</small><h3>' + _esc(_t('Các điểm hệ thống chưa bao phủ đủ', 'Areas the system still does not cover well')) + '</h3></div></div>',
+        '<div class="ds-panel-body">' + _renderIssueList(coverageGaps, 'coverage') + '</div>',
+      '</section>',
+    '</div>',
+    '<div class="ds-grid ds-grid-3">',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Structural drift', 'Structural drift')) + '</small><h3>' + _esc(_t('Lệch cấu trúc DB thật', 'Live DB structural drift')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(structuralDrift, 'drift') + '</div></section>',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Blind spots', 'Blind spots')) + '</small><h3>' + _esc(_t('Khe hở vận hành critical', 'Critical operational blind spots')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(blindSpots, 'audit') + '</div></section>',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Stress paths', 'Stress paths')) + '</small><h3>' + _esc(_t('Stress scenario critical', 'Critical stress scenarios')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(stressScenarios, 'audit') + '</div></section>',
+    '</div>',
+    '<section class="ds-panel">',
+      '<div class="ds-panel-head"><div><small>' + _esc(_t('Artifact freshness', 'Artifact freshness')) + '</small><h3>' + _esc(_t('Chu kỳ sinh registry / authority', 'Registry / authority generation cycles')) + '</h3></div></div>',
+      '<div class="ds-panel-body">' + _renderArtifactFreshnessTable(freshnessArtifacts) + '</div>',
+    '</section>',
+    '<section class="ds-panel">',
+      '<div class="ds-panel-head"><div><small>' + _esc(_t('Action rail', 'Action rail')) + '</small><h3>' + _esc(_t('Luồng xử lý chuẩn', 'Standard remediation flow')) + '</h3></div></div>',
+      '<div class="ds-panel-body">',
+        '<div class="ds-action-rail">',
+          '<button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.setTab("designs")\'>' + _esc(_t('Mở workspace design', 'Open design workspace')) + '</button>',
+          '<button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.setTab("tables")\'>' + _esc(_t('Rà soát bảng thật', 'Audit live tables')) + '</button>',
+          '<button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.setTab("apis")\'>' + _esc(_t('Rà soát API contract', 'Audit API contracts')) + '</button>',
+          '<button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.setTab("libraries")\'>' + _esc(_t('Sửa blueprint / variable', 'Fix blueprint / variables')) + '</button>',
         '</div>',
       '</div>',
-      '<button class="ams3-btn ghost sm" data-action="table-preview" data-table="' + esc(ed.key) + '">👁 Live Preview</button>',
-    '</div>',
-    '<div class="ams3-detail-tabs">' + dtabs + '</div>',
-    '<div class="ams3-detail-body">' + body + '</div>'
+    '</section>',
+    '<section class="ds-panel">',
+      '<div class="ds-panel-head"><div><small>' + _esc(_t('Domain coverage', 'Domain coverage')) + '</small><h3>' + _esc(_t('Bức tranh theo domain', 'Domain posture by domain')) + '</h3></div></div>',
+      '<div class="ds-panel-body">' + _renderDomainTable(domains) + '</div>',
+    '</section>'
   ].join('');
 }
 
-function renderTableColumns(ed) {
-  var it = obj(ed.item);
-  var cols = ed.columnsList || [];
-  if (!cols.length) return '<div class="ams3-empty" style="padding:30px;"><div class="ams3-empty-icon">📋</div><div class="ams3-empty-t">No columns defined</div></div>';
-
-  return [
-    '<div class="ams3-props" style="margin-bottom:12px">',
-      prop('Table',      ed.key),
-      prop('Primary Key', Array.isArray(it.primaryKey) ? it.primaryKey.join(', ') : (it.primaryKey || '—')),
-      prop('Migration',  it.migration),
-      prop('Description', it.description),
-    '</div>',
-    '<table class="ams3-tbl"><thead><tr>',
-      '<th>Column</th><th>SQL Type</th><th>UI Type</th><th>Label</th><th>Req</th><th>Flags</th><th>References</th>',
-    '</tr></thead><tbody>',
-    cols.map(function(col) {
-      var flags = [];
-      if (col.pk)        flags.push('<span class="ams3-pk">PK</span>');
-      if (col.unique)    flags.push('<span class="ams3-chip" style="font-size:9px">UQ</span>');
-      if (col.generated) flags.push('<span class="ams3-chip" style="font-size:9px">GEN</span>');
-      if (col.fk || col.references) flags.push('<span class="ams3-fk">FK</span>');
-      var uiIcon = UITYPE_ICON[col.uiType] || '—';
-      return '<tr>' +
-        '<td style="font-family:monospace;font-weight:700;font-size:11px">' + esc(col.key) + '</td>' +
-        '<td><span class="ams3-type-pill">' + esc(col.type || '') + '</span></td>' +
-        '<td title="' + esc(col.uiType || '') + '" style="font-size:12px">' + esc(uiIcon) + '</td>' +
-        '<td style="font-size:11px">' + esc(col.label || col.labelEn || '') + '</td>' +
-        '<td>' + (col.required ? '<span class="ams3-req-dot"></span>' : '<span class="ams3-opt-dot"></span>') + '</td>' +
-        '<td style="display:flex;gap:3px;flex-wrap:wrap">' + (flags.join('') || '—') + '</td>' +
-        '<td style="font-family:monospace;font-size:10px;color:var(--text-muted,#64748b)">' + esc(col.references || '') + '</td>' +
-      '</tr>';
-    }).join('') +
-    '</tbody></table>'
-  ].join('');
-}
-
-function renderTableRelations(ed) {
-  var it = obj(ed.item);
-  var fks = arr(it.foreignKeys);
-  var dt  = obj(it.digitalThread);
-  var upstream   = arr(dt.upstream);
-  var downstream = arr(dt.downstream);
-
-  return [
-    fks.length ? [
-      '<div class="ams3-sec-title">Foreign Keys (' + fks.length + ')</div>',
-      '<table class="ams3-tbl"><thead><tr><th>Column</th><th>References</th><th>Label</th></tr></thead><tbody>',
-      fks.map(function(fk) {
-        return '<tr><td style="font-family:monospace;font-weight:700">' + esc(fk.column) + '</td><td style="font-family:monospace;color:var(--brand-2,#2563eb)">' + esc(fk.references) + '</td><td>' + esc(fk.label || '') + '</td></tr>';
-      }).join(''),
-      '</tbody></table>'
-    ].join('') : '<div style="color:var(--text-muted,#64748b);font-size:12px;margin-bottom:12px">No foreign keys</div>',
-
-    upstream.length || downstream.length ? [
-      '<div class="ams3-sec-title" style="margin-top:16px">Digital Thread</div>',
-      upstream.length ? '<div style="margin-bottom:8px"><span style="font-size:11px;font-weight:700;color:var(--text-muted,#64748b)">⬆ Upstream:</span> ' + upstream.map(function(t){ return '<span class="ams3-stag">' + esc(t) + '</span>'; }).join(' ') + '</div>' : '',
-      downstream.length ? '<div><span style="font-size:11px;font-weight:700;color:var(--text-muted,#64748b)">⬇ Downstream:</span> ' + downstream.map(function(t){ return '<span class="ams3-stag">' + esc(t) + '</span>'; }).join(' ') + '</div>' : ''
-    ].join('') : ''
-  ].join('');
-}
-
-function renderDataPreview(ed) {
-  if (S.previewLoading) return '<div class="ams3-loading"><div class="ams3-spinner"></div>Loading live data…</div>';
-  if (!S.previewData) {
-    return '<div class="ams3-empty" style="padding:30px;">' +
-      '<div class="ams3-empty-icon">👁</div>' +
-      '<div class="ams3-empty-t">Live Data Preview</div>' +
-      '<div class="ams3-empty-s">Fetch real rows directly from the database.</div>' +
-      '<button class="ams3-btn primary" style="margin-top:12px" data-action="table-preview" data-table="' + esc(ed.key) + '">Load Data</button>' +
-    '</div>';
+function _renderIssueList(items, mode){
+  if(!Array.isArray(items) || !items.length){
+    return _emptyState(_t('Không có mục nào', 'No items'), _t('Không có vấn đề nào ở nhóm này.', 'There are no issues in this group.'));
   }
+  return '<div class="ds-issue-stack">' + items.map(function(item){
+    if(mode === 'blocker'){
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.severity || 'info', _tone(item.severity || 'warn')) + '<strong>' + _esc(item.title || item.source || 'blocker') + '</strong></div><p>' + _esc(item.detail || '') + '</p>' + (item.nextAction ? '<div class="ds-helper-text">' + _esc(item.nextAction) + '</div>' : '') + '</article>';
+    }
+    if(mode === 'governance'){
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.domain || 'domain', 'warn') + '<strong>' + _esc(item.table || item.label || 'table') + '</strong></div><p>' + _esc((item.missing || []).join(', ')) + '</p></article>';
+    }
+    if(mode === 'migration'){
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.priority || 'medium', _tone(item.priority || 'warn')) + '<strong>' + _esc(item.table || 'table') + '</strong></div><p>' + _esc(item.reason || '') + '</p>' + (item.suggestedMigration ? '<div class="ds-helper-text">' + _esc(item.suggestedMigration) + '</div>' : '') + '</article>';
+    }
+    if(mode === 'operational'){
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.severity || 'warn', _tone(item.severity || 'warn')) + (item.blocking ? _badge(_t('blocking', 'blocking'), 'bad') : '') + '<strong>' + _esc(item.title || item.id || 'risk') + '</strong></div><p>' + _esc(item.detail || '') + '</p>' + (item.nextAction ? '<div class="ds-helper-text">' + _esc(item.nextAction) + '</div>' : '') + '</article>';
+    }
+    if(mode === 'drift'){
+      var driftBits = [];
+      if(Array.isArray(item.missing) && item.missing.length) driftBits.push(_t('Missing', 'Missing') + ': ' + item.missing.join(', '));
+      if(Array.isArray(item.unexpected) && item.unexpected.length) driftBits.push(_t('Unexpected', 'Unexpected') + ': ' + item.unexpected.join(', '));
+      if(item.pk_drift) driftBits.push(_t('Primary key mismatch', 'Primary key mismatch'));
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.domain || 'domain', 'warn') + '<strong>' + _esc(item.table || item.label || 'table') + '</strong></div><p>' + _esc(driftBits.join(' · ')) + '</p></article>';
+    }
+    if(mode === 'audit'){
+      var rationale = Array.isArray(item.rationale) ? item.rationale.join(' ') : '';
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.severity || item.priority || 'warn', _tone(item.severity || item.priority || 'warn')) + '<strong>' + _esc((item.id || 'audit') + ' · ' + (item.title || '')) + '</strong></div><p>' + _esc(rationale || _t('Chưa có rationale chi tiết.', 'No detailed rationale is attached.')) + '</p></article>';
+    }
+    if(mode === 'coverage'){
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(_t('gap', 'gap'), 'warn') + '<strong>' + _esc(item.title || 'gap') + '</strong></div><p>' + _esc(item.detail || '') + '</p></article>';
+    }
+    return '<article class="ds-issue-card"><strong>' + _esc(item.title || item.table || item.label || 'item') + '</strong></article>';
+  }).join('') + '</div>';
+}
 
-  var rows = arr(S.previewData.rows);
-  var cols = arr(S.previewData.columns);
-  if (!rows.length) return '<div style="color:var(--text-muted,#64748b);font-size:13px;padding:20px">Table is empty</div>';
+function _renderArtifactFreshnessTable(rows){
+  if(!Array.isArray(rows) || !rows.length){
+    return _emptyState(_t('Chưa có artifact', 'No artifacts'), _t('Không có dữ liệu freshness cho artifacts.', 'No freshness data is available for artifacts.'));
+  }
+  return '<div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>' + _esc(_t('Artifact', 'Artifact')) + '</th><th>' + _esc(_t('Category', 'Category')) + '</th><th>' + _esc(_t('Status', 'Status')) + '</th><th>' + _esc(_t('Age', 'Age')) + '</th><th>' + _esc(_t('Source drift', 'Source drift')) + '</th><th>' + _esc(_t('Size', 'Size')) + '</th><th>' + _esc(_t('Source', 'Source')) + '</th></tr></thead><tbody>' + rows.map(function(row){
+    var sourceDrift = row.dependencyStatus === 'n/a'
+      ? _badge(_t('n/a', 'n/a'), 'neutral')
+      : _badge(row.dependencyStatus || 'aligned', _tone(row.dependencyStatus || 'neutral'));
+    var releaseBadge = row.requiredForRelease ? _badge(_t('release', 'release'), 'warn') : '';
+    return '<tr><td><strong>' + _esc(row.label || row.id) + '</strong><div class="ds-table-note">' + _esc(row.id || '') + '</div><div class="ds-chip-row">' + releaseBadge + '</div></td><td>' + _badge(row.category || 'artifact', 'neutral') + '</td><td>' + _badge(row.status || 'unknown', _tone(row.status || 'neutral')) + '</td><td>' + _esc(row.ageLabel || '—') + '<div class="ds-table-note">' + _esc(_fmtTime(row.generatedAt || row.fileMtime)) + '</div></td><td>' + sourceDrift + '<div class="ds-table-note">' + _esc(row.sourceDriftLabel || '0s') + (row.latestDependencyAt ? ' · ' + _esc(_fmtTime(row.latestDependencyAt)) : '') + '</div>' + (row.latestDependencyPath ? '<div class="ds-table-note"><code>' + _esc(row.latestDependencyPath) + '</code></div>' : '') + '</td><td>' + _esc(row.sizeLabel || _fmtBytes(row.sizeBytes || 0)) + '</td><td><code>' + _esc(row.path || '') + '</code></td></tr>';
+  }).join('') + '</tbody></table></div>';
+}
 
-  var theads = cols.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('');
-  var tbody = rows.map(function(row) {
-    var tds = cols.map(function(c) {
-      var v = row[c];
-      if (v === null || v === undefined) return '<td class="pv-null">null</td>';
-      if (v === true)  return '<td class="pv-t">true</td>';
-      if (v === false) return '<td class="pv-f">false</td>';
-      return '<td>' + esc(String(v).substring(0, 80)) + '</td>';
-    }).join('');
-    return '<tr>' + tds + '</tr>';
-  }).join('');
+function _renderDomainTable(rows){
+  if(!rows.length){
+    return _emptyState(_t('Chưa có domain', 'No domains'), _t('Không có dữ liệu domain để hiển thị.', 'No domain data is available.'));
+  }
+  return '<div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>' + _esc(_t('Domain', 'Domain')) + '</th><th>' + _esc(_t('API', 'API')) + '</th><th>' + _esc(_t('Tables', 'Tables')) + '</th><th>' + _esc(_t('Present', 'Present')) + '</th><th>' + _esc(_t('Workflow', 'Workflow')) + '</th><th>' + _esc(_t('Gov gaps', 'Gov gaps')) + '</th><th>' + _esc(_t('Registry gaps', 'Registry gaps')) + '</th><th>' + _esc(_t('Structural drift', 'Structural drift')) + '</th></tr></thead><tbody>' + rows.map(function(row){
+    return '<tr><td><strong>' + _esc(row.label || row.id) + '</strong><div class="ds-table-note">' + _esc(row.id || '') + '</div></td><td>' + _esc(_fmtInt(row.api_count)) + '</td><td>' + _esc(_fmtInt(row.table_count)) + '</td><td>' + _esc(_fmtInt(row.present_table_count)) + '</td><td>' + _esc(_fmtInt(row.workflow_table_count)) + '</td><td class="tone-' + _esc(row.governance_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.governance_gap_count)) + '</td><td class="tone-' + _esc(row.registry_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.registry_gap_count)) + '</td><td class="tone-' + _esc(row.structural_drift_table_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.structural_drift_table_count)) + '</td></tr>';
+  }).join('') + '</tbody></table></div>';
+}
+
+function _renderApiTab(){
+  var rows = _filteredApis();
+  var detail = state.apiDetail;
+  var summary = _selectedApiSummary();
+  var current = detail && detail.item ? Object.assign({}, summary || {}, detail.item || {}) : (summary || null);
+  var toolbar = [
+    '<div class="ds-toolbar">',
+      '<div class="ds-search"><input value="' + _esc(state.apiSearch) + '" placeholder="' + _esc(_t('Tìm action, path, entity...', 'Search action, path, entity...')) + '" oninput=\'DataSchemaAdmin.setApiSearch(this.value)\'></div>',
+      '<div class="ds-select-row">',
+        '<select onchange=\'DataSchemaAdmin.setApiDomain(this.value)\'><option value="ALL">All domains</option>' + _apiDomains().map(function(key){ return '<option value="' + _esc(key) + '"' + (state.apiDomain===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select>',
+        '<select onchange=\'DataSchemaAdmin.setApiMethod(this.value)\'><option value="ALL">All methods</option>' + ['GET','POST','PUT','PATCH','DELETE'].map(function(key){ return '<option value="' + _esc(key) + '"' + (state.apiMethod===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select>',
+        '<select onchange=\'DataSchemaAdmin.setApiKind(this.value)\'><option value="ALL">All kinds</option>' + _apiKinds().map(function(key){ return '<option value="' + _esc(key) + '"' + (state.apiKind===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select>',
+      '</div>',
+    '</div>'
+  ].join('');
+
+  var listHtml = rows.length ? rows.map(function(item){
+    var active = String(item.key) === String(state.selectedApiKey);
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectApi(' + _js(item.key) + ')\'><div class="ds-list-head">' + _methodBadge(item.method) + '<strong>' + _esc(item.label || item.key) + '</strong></div><div class="ds-list-meta">' + _esc(item.key) + '</div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge(item.kind || 'kind', 'neutral') + ((item.csrf_required) ? _badge('CSRF', 'warn') : '') + ((item.admin_only) ? _badge('ADMIN', 'bad') : '') + '</div></button>';
+  }).join('') : _emptyState(_t('Không có API', 'No APIs'), _t('Không còn API phù hợp bộ lọc hiện tại.', 'No APIs match the current filters.'));
+
+  var detailHtml = current ? [
+    '<div class="ds-detail-scroll">',
+      '<div class="ds-detail-head">',
+        '<div><small>' + _esc(_t('Endpoint detail', 'Endpoint detail')) + '</small><h3>' + _esc(current.label || state.selectedApiKey) + '</h3><p>' + _esc(current.action || state.selectedApiKey) + '</p></div>',
+        '<div class="ds-chip-row">' + _methodBadge(current.method || 'GET') + _badge(current.domain || 'domain', 'neutral') + _badge(current.kind || 'kind', 'neutral') + '</div>',
+      '</div>',
+      '<div class="ds-facts">',
+        '<div><span>Path</span><strong>' + _esc(current.path || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Controller', 'Controller')) + '</span><strong>' + _esc((current.controller || '—') + '::' + (current.handler || '—')) + '</strong></div>',
+        '<div><span>' + _esc(_t('Field count', 'Field count')) + '</span><strong>' + _esc(_fmtInt(current.field_count)) + '</strong></div>',
+        '<div><span>' + _esc(_t('Workflow mode', 'Workflow mode')) + '</span><strong>' + _esc(current.workflow_mode || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Security', 'Security')) + '</span><strong>' + _esc((current.security && current.security.auth_required ? 'auth' : 'public')) + '</strong></div>',
+      '</div>',
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Security and contract', 'Security and contract')) + '</h4><div class="ds-chip-row">' +
+        _badge((current.security && current.security.auth_required) ? 'AUTH' : 'PUBLIC', _boolTone(current.security && current.security.auth_required)) +
+        _badge((current.security && current.security.csrf_required) ? 'CSRF' : 'NO CSRF', (current.security && current.security.csrf_required) ? 'warn' : 'neutral') +
+        _badge((current.security && current.security.admin_only) ? 'ADMIN ONLY' : 'SHARED', (current.security && current.security.admin_only) ? 'bad' : 'good') +
+        '</div><div class="ds-helper-text">' + _esc(_t('Dùng editor JSON bên dưới để chỉnh metadata endpoint, request/response và field packs.', 'Use the JSON editor below to update endpoint metadata, request/response and field packs.')) + '</div>' + _renderSaveGuard(detail, 'api') + '</section>',
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Request / response summary', 'Request / response summary')) + '</h4>' +
+        '<div class="ds-inline-grid"><article class="ds-mini-card"><small>Request</small><strong>' + _esc(_fmtInt((detail.api_params && detail.api_params.params && detail.api_params.params.length) || (current.request && current.request.body_fields && current.request.body_fields.length) || 0)) + '</strong><p>' + _esc(_t('tham số / field được khai báo', 'declared params / fields')) + '</p></article>' +
+        '<article class="ds-mini-card"><small>Fields</small><strong>' + _esc(_fmtInt((detail.fields || []).length)) + '</strong><p>' + _esc(_t('field definitions gắn với endpoint', 'field definitions bound to the endpoint')) + '</p></article>' +
+        '<article class="ds-mini-card"><small>Deletion</small><strong>' + _esc((current.capabilities && current.capabilities.deletion && current.capabilities.deletion.mode) || '—') + '</strong><p>' + _esc(_t('chính sách xóa hiện tại', 'current deletion posture')) + '</p></article></div></section>',
+      '<section class="ds-detail-section"><h4>JSON</h4><textarea class="ds-editor" oninput=\'DataSchemaAdmin.setApiEditor(this.value)\'>' + _esc(state.apiEditor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveApi()\'>' + _esc(_t('Lưu API metadata', 'Save API metadata')) + '</button><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.copyApiPath()\'>' + _esc(_t('Copy path', 'Copy path')) + '</button></div></section>',
+    '</div>'
+  ].join('') : _emptyState(_t('Chọn một API', 'Select an API'), _t('Chọn một endpoint bên trái để xem contract và chỉnh metadata.', 'Select an endpoint on the left to inspect its contract and edit metadata.'));
+
+  return '<div class="ds-shell"><aside class="ds-shell-list">' + toolbar + '<div class="ds-list-scroll">' + listHtml + '</div></aside><section class="ds-shell-detail">' + detailHtml + '</section></div>';
+}
+
+function _tableColumnRows(item, preview){
+  var rows = [];
+  var previewColumns = Array.isArray(preview && preview.columns) ? preview.columns : [];
+  if(previewColumns.length){
+    previewColumns.forEach(function(column){
+      rows.push({
+        name: column.column_name || '',
+        type: column.data_type || column.udt_name || 'text',
+        nullable: !!column.is_nullable || String(column.is_nullable||'').toUpperCase() === 'YES',
+        source: 'db'
+      });
+    });
+    return rows;
+  }
+  var columns = item && item.columns && typeof item.columns === 'object' ? item.columns : {};
+  Object.keys(columns).forEach(function(name){
+    var column = columns[name] || {};
+    rows.push({
+      name: name,
+      type: column.type || 'text',
+      nullable: !!column.nullable,
+      source: 'registry'
+    });
+  });
+  return rows;
+}
+
+function _renderPreviewTable(preview){
+  if(!preview){
+    return _emptyState(_t('Chưa tải preview', 'Preview not loaded'), _t('Bấm "Load preview" để lấy dữ liệu thật từ PostgreSQL.', 'Click "Load preview" to fetch live data from PostgreSQL.'));
+  }
+  if(preview.available === false){
+    return '<div class="ds-inline-alert tone-warn">' + _esc(preview.message || _t('Preview không khả dụng.', 'Preview is unavailable.')) + '</div>';
+  }
+  var columns = Array.isArray(preview.columns) ? preview.columns : [];
+  var rows = Array.isArray(preview.rows) ? preview.rows : [];
+  if(!columns.length){
+    return _emptyState(_t('Không có cột', 'No columns'), _t('Không lấy được metadata cột cho bảng này.', 'No column metadata could be loaded for this table.'));
+  }
+  return [
+    '<div class="ds-preview-toolbar">',
+      '<div class="ds-chip-row">',
+        _badge(_t('Rows', 'Rows') + ': ' + _fmtInt(preview.totalRows || rows.length), 'neutral'),
+        _badge(_t('Offset', 'Offset') + ': ' + _fmtInt(preview.offset || 0), 'neutral'),
+        (preview.syntheticSample ? _badge(_t('Sample only', 'Sample only'), 'warn') : ''),
+      '</div>',
+      '<div class="ds-editor-actions">',
+        '<button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.prevPreviewPage()\' ' + ((preview.offset || 0) <= 0 ? 'disabled' : '') + '>' + _esc(_t('Trang trước', 'Previous')) + '</button>',
+        '<button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.nextPreviewPage()\' ' + (!preview.hasMore ? 'disabled' : '') + '>' + _esc(_t('Trang sau', 'Next')) + '</button>',
+      '</div>',
+    '</div>',
+    '<div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>#</th>' + columns.map(function(column){ return '<th>' + _esc(column.column_name || '') + '</th>'; }).join('') + '<th>' + _esc(_t('Action', 'Action')) + '</th></tr></thead><tbody>' + (rows.length ? rows.map(function(row, index){
+      return '<tr><td>' + _esc(String(index + 1 + (preview.offset || 0))) + '</td>' + columns.map(function(column){
+        var value = row[column.column_name];
+        if(value && typeof value === 'object') return '<td><code>' + _esc(JSON.stringify(value)) + '</code></td>';
+        return '<td>' + _esc(value == null ? '' : String(value)) + '</td>';
+      }).join('') + '<td><button class="ds-btn sm" type="button" onclick=\'DataSchemaAdmin.openRowUpdate(' + String(index) + ')\'>' + _esc(_t('Sửa', 'Edit')) + '</button></td></tr>';
+    }).join('') : '<tr><td colspan="' + String(columns.length + 2) + '">' + _esc(_t('Không có dòng dữ liệu.', 'No rows available.')) + '</td></tr>') + '</tbody></table></div>'
+  ].join('');
+}
+
+function _renderTableTab(){
+  var rows = _filteredTables();
+  var detail = state.tableDetail;
+  var summary = _selectedTableSummary();
+  var item = detail && detail.item ? Object.assign({}, summary || {}, detail.item || {}) : (summary || null);
+  var preview = state.tablePreview;
+  var columns = _tableColumnRows(item, preview);
+
+  var listHtml = rows.length ? rows.map(function(row){
+    var active = String(row.key) === String(state.selectedTableKey);
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectTable(' + _js(row.key) + ')\'><div class="ds-list-head"><strong>' + _esc(row.label || row.key) + '</strong>' + _badge(_dbStatusLabel(!!row.db_probe_applicable, row.db_present === true), _dbStatusTone(!!row.db_probe_applicable, row.db_present === true)) + '</div><div class="ds-list-meta">' + _esc(row.key) + '</div><div class="ds-chip-row">' + _badge(row.domain || 'domain', 'neutral') + (row.workflowId ? _badge('WF', 'good') : '') + (row.governance_gap_count ? _badge('GAP ' + row.governance_gap_count, 'warn') : '') + (row.column_drift_count ? _badge('DRIFT ' + row.column_drift_count, 'warn') : '') + (row.pk_drift ? _badge('PK', 'bad') : '') + ((!row.registry_present) ? _badge('NOT IN REGISTRY', 'bad') : '') + '</div></button>';
+  }).join('') : _emptyState(_t('Không có bảng', 'No tables'), _t('Không còn bảng phù hợp bộ lọc hiện tại.', 'No tables match the current filters.'));
+
+  var detailHtml = item ? [
+    '<div class="ds-detail-scroll">',
+      '<div class="ds-detail-head"><div><small>' + _esc(_t('Table detail', 'Table detail')) + '</small><h3>' + _esc(item.label || state.selectedTableKey) + '</h3><p>' + _esc(state.selectedTableKey) + '</p></div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge((item.primaryKey || 'no_pk'), item.primaryKey ? 'good' : 'warn') + _badge(item.db_probe_applicable ? (item.db_present ? 'DB OK' : 'DB MISSING') : _t('DB N/A', 'DB N/A'), item.db_probe_applicable ? (item.db_present ? 'good' : 'bad') : 'neutral') + _badge(item.registry_present === false ? 'RELATION ONLY' : 'REGISTRY', item.registry_present === false ? 'warn' : 'good') + '</div></div>',
+      '<div class="ds-facts">',
+        '<div><span>' + _esc(_t('Columns', 'Columns')) + '</span><strong>' + _esc(_fmtInt(item.columnCount || columns.length)) + '</strong></div>',
+        '<div><span>' + _esc(_t('DB columns', 'DB columns')) + '</span><strong class="tone-' + _esc(item.db_probe_applicable ? (item.db_present ? 'good' : 'neutral') : 'neutral') + '">' + _esc(item.db_probe_applicable ? _fmtInt(item.db_column_count || 0) : _t('N/A', 'N/A')) + '</strong></div>',
+        '<div><span>' + _esc(_t('Primary key', 'Primary key')) + '</span><strong>' + _esc(item.primaryKey || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Status column', 'Status column')) + '</span><strong>' + _esc(item.statusColumn || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Workflow', 'Workflow')) + '</span><strong>' + _esc(item.workflowId || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Support table', 'Support table')) + '</span><strong>' + _esc(item.supportTable ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
+        '<div><span>' + _esc(_t('Registry source', 'Registry source')) + '</span><strong>' + _esc(item.source || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Governance gaps', 'Governance gaps')) + '</span><strong class="tone-' + _esc(item.governance_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.governance_gap_count)) + '</strong></div>',
+        '<div><span>' + _esc(_t('Missing columns', 'Missing columns')) + '</span><strong class="tone-' + _esc(item.missing_column_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.missing_column_count || 0)) + '</strong></div>',
+        '<div><span>' + _esc(_t('Unexpected columns', 'Unexpected columns')) + '</span><strong class="tone-' + _esc(item.unexpected_column_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.unexpected_column_count || 0)) + '</strong></div>',
+        '<div><span>' + _esc(_t('Primary key drift', 'Primary key drift')) + '</span><strong class="tone-' + _esc(item.pk_drift ? 'bad' : 'good') + '">' + _esc(item.pk_drift ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
+        '<div><span>' + _esc(_t('Digital thread', 'Digital thread')) + '</span><strong>' + _esc(item.digital_thread ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
+      '</div>',
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Structural drift', 'Structural drift')) + '</h4>' + (
+        (!item.db_probe_applicable)
+          ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Runtime hiện không dùng PostgreSQL path, nên so sánh drift cột/PK với DB thật chưa được áp dụng ở bảng này.', 'The runtime is not currently using the PostgreSQL path, so live DB column/PK drift is not applicable for this table yet.')) + '</div>'
+          : (!item.db_present)
+          ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('Bảng này chưa hiện diện trong PostgreSQL đang probe, nên chưa thể so drift cột/PK.', 'This table is not present in the probed PostgreSQL database yet, so column/PK drift cannot be compared.')) + '</div>'
+          : (
+            (!item.missing_column_count && !item.unexpected_column_count && !item.pk_drift)
+              ? '<div class="ds-inline-alert tone-good">' + _esc(_t('Không phát hiện drift cột/PK giữa registry authority và DB thật.', 'No column/PK drift detected between registry authority and the live DB.')) + '</div>'
+              : '<div class="ds-issue-stack">' +
+                (item.missing_column_count ? '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(_t('missing', 'missing'), 'warn') + '<strong>' + _esc(_t('Registry expects columns not present in DB', 'Registry expects columns not present in DB')) + '</strong></div><p>' + _esc((item.missing_columns || []).join(', ')) + '</p></article>' : '') +
+                (item.unexpected_column_count ? '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(_t('unexpected', 'unexpected'), 'warn') + '<strong>' + _esc(_t('DB contains unmanaged columns', 'DB contains unmanaged columns')) + '</strong></div><p>' + _esc((item.unexpected_columns || []).join(', ')) + '</p></article>' : '') +
+                (item.pk_drift ? '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge('pk', 'bad') + '<strong>' + _esc(_t('Primary key posture differs', 'Primary key posture differs')) + '</strong></div><p>' + _esc(_t('Expected', 'Expected') + ': ' + (item.expected_primary_key_fields || []).join(', ') + ' · ' + _t('DB', 'DB') + ': ' + (item.db_primary_key_fields || []).join(', ')) + '</p></article>' : '') +
+                '</div>'
+          )
+      ) + '</section>',
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Columns', 'Columns')) + '</h4>' + (columns.length ? '<div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>' + _esc(_t('Name', 'Name')) + '</th><th>' + _esc(_t('Type', 'Type')) + '</th><th>' + _esc(_t('Nullable', 'Nullable')) + '</th><th>' + _esc(_t('Source', 'Source')) + '</th></tr></thead><tbody>' + columns.map(function(column){
+        return '<tr><td>' + _esc(column.name) + '</td><td>' + _esc(column.type) + '</td><td>' + _esc(column.nullable ? 'YES' : 'NO') + '</td><td>' + _esc(column.source || '') + '</td></tr>';
+      }).join('') + '</tbody></table></div>' : _emptyState(_t('Không có cột', 'No columns'), _t('Không lấy được cấu trúc cột.', 'Could not resolve the column structure.'))) + '</section>',
+      '<section class="ds-detail-section"><div class="ds-section-head"><h4>' + _esc(_t('Live preview', 'Live preview')) + '</h4><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.loadPreview()\'>' + _esc(_t('Load preview', 'Load preview')) + '</button><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.openRowInsert()\'>' + _esc(_t('Thêm dòng', 'Insert row')) + '</button></div></div>' + _renderPreviewTable(preview) + '</section>',
+      (state.rowEditorOpen ? '<section class="ds-detail-section"><h4>' + _esc(state.rowEditorMode === 'insert' ? _t('Insert row JSON', 'Insert row JSON') : _t('Update row JSON', 'Update row JSON')) + '</h4><textarea class="ds-editor" oninput=\'DataSchemaAdmin.setRowEditorJson(this.value)\'>' + _esc(state.rowEditorJson) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveRow()\'>' + _esc(_t('Lưu dòng', 'Save row')) + '</button><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.closeRowEditor()\'>' + _esc(_t('Đóng', 'Close')) + '</button></div></section>' : ''),
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Registry JSON editor', 'Registry JSON editor')) + '</h4>' + _renderSaveGuard(detail, 'table') + '<textarea class="ds-editor" oninput=\'DataSchemaAdmin.setTableEditor(this.value)\'>' + _esc(state.tableEditor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveTable()\'>' + _esc(_t('Lưu table metadata', 'Save table metadata')) + '</button></div></section>',
+    '</div>'
+  ].join('') : _emptyState(_t('Chọn một bảng', 'Select a table'), _t('Chọn một bảng bên trái để xem runtime posture, preview dữ liệu và chỉnh metadata.', 'Select a table on the left to inspect runtime posture, preview data and edit metadata.'));
+
+  return '<div class="ds-shell"><aside class="ds-shell-list"><div class="ds-toolbar"><div class="ds-search"><input value="' + _esc(state.tableSearch) + '" placeholder="' + _esc(_t('Tìm bảng, khóa chính, workflow...', 'Search table, primary key, workflow...')) + '" oninput=\'DataSchemaAdmin.setTableSearch(this.value)\'></div><div class="ds-select-row"><select onchange=\'DataSchemaAdmin.setTableDomain(this.value)\'><option value="ALL">All domains</option>' + _tableDomains().map(function(key){ return '<option value="' + _esc(key) + '"' + (state.tableDomain===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select></div></div><div class="ds-list-scroll">' + listHtml + '</div></aside><section class="ds-shell-detail">' + detailHtml + '</section></div>';
+}
+
+function _renderDesignResult(){
+  if(!state.designResult) return _emptyState(_t('Chưa có kết quả action', 'No action result yet'), _t('Chạy validate, diagnose, compile hoặc release để xem kết quả ở đây.', 'Run validate, diagnose, compile or release to inspect the result here.'));
+  return '<div class="ds-result-card"><div class="ds-result-head"><strong>' + _esc(state.designResult.type || 'result') + '</strong></div><pre class="ds-code">' + _esc(_jsonPretty(state.designResult.payload || {})) + '</pre></div>';
+}
+
+function _renderDesignTab(){
+  var designs = _list('designs');
+  var actions = (_workspace().actions || []).filter(function(item){ return item && item.id; });
+  var designSummary = state.designSchema && state.designSchema._meta ? state.designSchema._meta : null;
+  var releases = Array.isArray(state.releases) ? state.releases : [];
+  var operational = _workspace().operational || {};
+  var releaseGate = operational.releaseGate || {};
+
+  var listHtml = designs.length ? designs.map(function(item){
+    var active = String(item.id) === String(state.selectedDesignId);
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectDesign(' + _js(item.id) + ')\'><div class="ds-list-head"><strong>' + _esc(item.name || item.id) + '</strong>' + _badge(item.baselineAvailable ? 'BASELINE' : 'NO BASELINE', item.baselineAvailable ? 'good' : 'warn') + '</div><div class="ds-list-meta">' + _esc(item.id) + '</div><div class="ds-chip-row">' + _badge(item.profile || 'profile', 'neutral') + _badge(_fmtInt(item.tableCount) + ' tbl', 'neutral') + (item.lastReleaseId ? _badge('RELEASED', 'good') : '') + '</div></button>';
+  }).join('') : _emptyState(_t('Chưa có design', 'No designs'), _t('Hãy load từ registry hoặc reverse engineer để tạo working design đầu tiên.', 'Load from the registry or reverse engineer the database to create the first working design.'));
 
   return [
-    '<div class="ams3-preview-wrap"><table class="ams3-prev-tbl"><thead><tr>' + theads + '</tr></thead><tbody>' + tbody + '</tbody></table></div>',
-    '<div class="ams3-pager">',
-      '<button class="ams3-pg-btn" data-action="preview-prev"' + (S.previewPage <= 1 ? ' disabled' : '') + '>← Prev</button>',
-      '<span>Page ' + S.previewPage + (S.previewTotal ? ' of ' + Math.ceil(S.previewTotal / 25) : '') + '</span>',
-      '<button class="ams3-pg-btn" data-action="preview-next">Next →</button>',
-      '<span style="margin-left:8px;font-size:10px">' + (S.previewTotal ? fmt(S.previewTotal) + ' rows total' : '') + '</span>',
+    '<div class="ds-shell">',
+      '<aside class="ds-shell-list">',
+        '<div class="ds-toolbar"><div class="ds-section-title">' + _esc(_t('Design documents', 'Design documents')) + '</div></div>',
+        '<div class="ds-list-scroll">' + listHtml + '</div>',
+      '</aside>',
+      '<section class="ds-shell-detail">',
+        '<div class="ds-detail-scroll">',
+          '<div class="ds-detail-head"><div><small>' + _esc(_t('Working design', 'Working design')) + '</small><h3>' + _esc((designSummary && (designSummary.name || designSummary.id)) || _t('Chưa có working design', 'No working design loaded')) + '</h3><p>' + _esc(_currentDesignId() || '—') + '</p></div><div class="ds-chip-row">' + (state.designBaseline ? _badge('BASELINE', 'good') : _badge('NO BASELINE', 'warn')) + (designSummary && designSummary.enterprise && designSummary.enterprise.profile ? _badge(designSummary.enterprise.profile, 'neutral') : '') + '</div></div>',
+          (releaseGate.blocking ? '<div class="ds-inline-alert tone-warn"><strong>' + _esc(_t('Release gate is blocked.', 'Release gate is blocked.')) + '</strong> ' + _esc((releaseGate.reasons || []).join(' · ')) + '</div>' : ''),
+          '<div class="ds-facts">',
+            '<div><span>' + _esc(_t('Tables', 'Tables')) + '</span><strong>' + _esc(_fmtInt(state.designSchema && state.designSchema.tables && state.designSchema.tables.length)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Relations', 'Relations')) + '</span><strong>' + _esc(_fmtInt(state.designSchema && state.designSchema.relations && state.designSchema.relations.length)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Groups', 'Groups')) + '</span><strong>' + _esc(_fmtInt(state.designSchema && state.designSchema.groups && state.designSchema.groups.length)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Updated', 'Updated')) + '</span><strong>' + _esc(_fmtTime(designSummary && (designSummary.updatedAt || designSummary.generated_at))) + '</strong></div>',
+          '</div>',
+          '<section class="ds-detail-section"><h4>' + _esc(_t('Action runner', 'Action runner')) + '</h4><div class="ds-action-grid">' + actions.map(function(action){
+            var requiresDesign = ['validate','set_baseline','diagnose','compile','release'].indexOf(action.id) !== -1;
+            var disabled = (requiresDesign && !state.designSchema) || (action.id === 'release' && releaseGate.blocking);
+            return '<button class="ds-action-card' + (disabled ? ' disabled' : '') + '" type="button" onclick=\'DataSchemaAdmin.runDesignAction(' + _js(action.id) + ')\' ' + (disabled ? 'disabled' : '') + '><strong>' + _esc(action.label_vi || action.label) + '</strong><span>' + _esc(action.description || '') + '</span></button>';
+          }).join('') + '<button class="ds-action-card" type="button" onclick=\'DataSchemaAdmin.runDesignAction("save_design")\' ' + (!state.designSchema ? 'disabled' : '') + '><strong>' + _esc(_t('Lưu working design', 'Save working design')) + '</strong><span>' + _esc(_t('Ghi working schema hiện tại xuống thư mục design.', 'Persist the current working schema into the design store.')) + '</span></button><button class="ds-action-card" type="button" onclick=\'DataSchemaAdmin.runDesignAction("refresh_releases")\'><strong>' + _esc(_t('Tải release bundle', 'Refresh release bundles')) + '</strong><span>' + _esc(_t('Lấy danh sách release bundle mới nhất.', 'Fetch the latest release bundle list.')) + '</span></button></div></section>',
+          '<section class="ds-detail-section"><h4>' + _esc(_t('Working schema JSON', 'Working schema JSON')) + '</h4>' + _renderDesignSaveGuard() + '<textarea class="ds-editor ds-editor-xl" oninput=\'DataSchemaAdmin.setDesignEditor(this.value)\'>' + _esc(state.designEditor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.prettifyDesignEditor()\'>' + _esc(_t('Format JSON', 'Format JSON')) + '</button></div></section>',
+          '<section class="ds-detail-section"><h4>' + _esc(_t('Action result', 'Action result')) + '</h4>' + _renderDesignResult() + '</section>',
+          '<section class="ds-detail-section"><h4>' + _esc(_t('Recent releases', 'Recent releases')) + '</h4>' + (releases.length ? '<div class="ds-release-list">' + releases.slice(0, 12).map(function(item){
+            return '<article class="ds-release-card"><div><strong>' + _esc(item.name || item.id) + '</strong><p>' + _esc(item.designId || '') + '</p></div><div class="ds-chip-row">' + _badge(item.approvalClass || 'standard', 'neutral') + _badge('risk ' + _fmtInt(item.riskScore), item.riskScore ? 'warn' : 'good') + '</div></article>';
+          }).join('') + '</div>' : _emptyState(_t('Chưa có release', 'No releases'), _t('Chưa có release bundle nào trong workspace này.', 'No release bundles exist for this workspace yet.'))) + '</section>',
+        '</div>',
+      '</section>',
     '</div>'
   ].join('');
 }
 
-function renderSchemaDiff(ed) {
-  var it = obj(ed.item);
-  var cols = ed.columnsList || [];
-  /* Simulate diff based on registry data — actual diff happens via reverse_engineer */
-  var items = [
-    { type:'ok',   title:'Table exists in registry & DB', detail: ed.key + ' · ' + (it.migration || 'no migration ref') },
-    { type:'ok',   title:cols.length + ' columns defined in registry', detail: 'Use "Reverse Engineer" in Registry Ops to sync from actual DB schema.' },
-    it.workflowId ? { type:'ok', title:'Workflow binding: ' + it.workflowId, detail:'Status column: ' + (it.statusColumn || '—') } : null,
-    it.statusColumn && !it.statusSet ? { type:'warn', title:'Status set not configured', detail:'statusSet is empty — add registry:' + ed.key + '_status reference.' } : null,
-    !it.migration  ? { type:'warn', title:'No migration file referenced', detail:'Add migration field to table registry entry.' } : null,
-    !it.description ? { type:'warn', title:'Missing table description', detail:'Add a description to improve discoverability.' } : null
-  ].filter(Boolean);
+function _renderLibraryTab(){
+  var leftRows = state.libraryTab === 'schemas' ? _list('schemas') : _list('variables');
+  var current = state.libraryTab === 'schemas' ? state.schemaDetail : state.variableDetail;
+  var editor = state.libraryTab === 'schemas' ? state.schemaEditor : state.variableEditor;
 
-  return [
-    '<div style="margin-bottom:10px;font-size:12px;color:var(--text-muted,#64748b)">Registry vs. DB schema analysis. Run <strong>Reverse Engineer</strong> in Registry Ops for a full live diff.</div>',
-    items.map(function(item) {
-      return '<div class="ams3-diff-row ams3-diff-' + esc(item.type) + '">' +
-        '<div class="ams3-diff-icon">' + { ok:'✅', warn:'⚠️', err:'❌' }[item.type] + '</div>' +
-        '<div class="ams3-diff-info">' +
-          '<div class="ams3-diff-title">' + esc(item.title) + '</div>' +
-          '<div class="ams3-diff-detail">' + esc(item.detail) + '</div>' +
-        '</div>' +
-      '</div>';
-    }).join('')
-  ].join('');
-}
+  var listHtml = leftRows.length ? leftRows.map(function(item){
+    var key = String(item.key || '');
+    var active = state.libraryTab === 'schemas'
+      ? key === String(state.selectedSchemaKey)
+      : key === String(state.selectedVariableKey);
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectLibraryItem(' + _js(state.libraryTab) + ',' + _js(key) + ')\'><div class="ds-list-head"><strong>' + _esc(item.label || item.label_vi || key) + '</strong></div><div class="ds-list-meta">' + _esc(key) + '</div><div class="ds-chip-row">' + (state.libraryTab === 'schemas' ? _badge(_fmtInt(item.tableCount) + ' tbl', 'neutral') + _badge(_fmtInt(item.migrationCount) + ' mig', 'neutral') : _badge(_fmtInt(item.variableCount) + ' vars', 'neutral')) + '</div></button>';
+  }).join('') : _emptyState(_t('Không có thư viện', 'No libraries'), _t('Không có dữ liệu cho nhóm thư viện hiện tại.', 'There is no data for the current library group.'));
 
-function renderTableEmpty() {
-  return '<div class="ams3-empty"><div class="ams3-empty-icon">🗄️</div><div class="ams3-empty-t">Select a table</div><div class="ams3-empty-s">Browse 528 tables, inspect columns, FK relationships, live data, and schema diff.</div></div>';
-}
-
-/* ═══════════════════════════ FIELD FORGE ═══════════════════════════ */
-
-function renderFieldForge() {
-  var all = apiSummaries();
-  /* build field list from loaded apiEditor if available */
-  var fields = S.apiEditor ? arr(S.apiEditor.fields) : [];
-  var q = S.fieldSearch.toLowerCase();
-  if (q) fields = fields.filter(function(f){ return (f.key||'').toLowerCase().includes(q) || (f.label||'').toLowerCase().includes(q) || (f.type||'').toLowerCase().includes(q); });
-
-  var sideList = all.slice(0, 50).map(function(a) {
-    var sel = S.selApi === a.key;
-    var mc = METHOD_CFG[a.method] || METHOD_CFG.GET;
-    return '<div class="ams3-api-row' + (sel ? ' sel' : '') + '" data-field-api="' + esc(a.key || a.action) + '">' +
-      '<div class="ams3-api-r1">' +
-        '<span class="ams3-method" style="background:' + mc.bg + ';color:' + mc.text + '">' + esc(a.method) + '</span>' +
-        '<span class="ams3-api-action">' + esc(a.action || a.key) + '</span>' +
-      '</div>' +
-      '<div class="ams3-api-label">' + (a.field_count || 0) + ' fields · ' + esc(a.entity || '') + '</div>' +
-    '</div>';
-  }).join('');
-
-  var fieldHtml = fields.length ? [
-    '<div class="ams3-searchbox" style="margin-bottom:12px"><span>🔍</span><input type="text" placeholder="Filter fields…" value="' + esc(S.fieldSearch) + '" data-filter="fieldSearch"></div>',
-    '<div class="ams3-field-grid">',
-    fields.map(function(f) {
-      var uiIcon = UITYPE_ICON[f.type] || '?';
-      return '<div class="ams3-fcard">' +
-        '<div class="ams3-fcard-name">' + esc(f.key) + '</div>' +
-        '<div class="ams3-fcard-meta">' +
-          '<span class="ams3-type-pill">' + esc(uiIcon + ' ' + (f.type || 'string')) + '</span>' +
-          (f.required ? '<span class="ams3-chip admin" style="font-size:9px">required</span>' : '') +
-          (f.dbTable ? '<span class="ams3-chip info" style="font-size:9px">' + esc(f.dbTable + '.' + (f.dbColumn || f.key)) + '</span>' : '') +
-        '</div>' +
-        (f.label || f.labelEn ? '<div class="ams3-fcard-desc">' + esc(f.label || f.labelEn) + '</div>' : '') +
-      '</div>';
-    }).join(''),
+  var detailHtml = current && current.item ? [
+    '<div class="ds-detail-scroll">',
+      '<div class="ds-detail-head"><div><small>' + _esc(state.libraryTab === 'schemas' ? _t('Schema blueprint', 'Schema blueprint') : _t('Variable category', 'Variable category')) + '</small><h3>' + _esc((current.item.label || current.item.label_vi || (current.item.key || (state.libraryTab === 'schemas' ? state.selectedSchemaKey : state.selectedVariableKey)))) + '</h3><p>' + _esc(state.libraryTab === 'schemas' ? state.selectedSchemaKey : state.selectedVariableKey) + '</p></div></div>',
+      '<section class="ds-detail-section">' + _renderSaveGuard(current, state.libraryTab === 'schemas' ? 'schema' : 'variable') + '<textarea class="ds-editor ds-editor-xl" oninput=\'DataSchemaAdmin.setLibraryEditor(this.value)\'>' + _esc(editor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveLibrary()\'>' + _esc(_t('Lưu thư viện', 'Save library')) + '</button></div></section>',
     '</div>'
-  ].join('') : '<div class="ams3-empty" style="padding:40px;"><div class="ams3-empty-icon">🧩</div><div class="ams3-empty-t">Select an API to inspect its fields</div></div>';
+  ].join('') : _emptyState(_t('Chọn một mục', 'Select an item'), _t('Chọn một blueprint hoặc variable category để chỉnh metadata.', 'Select a blueprint or variable category to edit metadata.'));
 
-  return '<div class="ams3-split">' +
-    '<div class="ams3-split-list">' +
-      '<div class="ams3-toolbar"><div class="ams3-searchbox"><span>🔍</span><input type="text" placeholder="Find API…" value="" data-filter="apiSearch"></div></div>' +
-      '<div class="ams3-list-items">' + sideList + '</div>' +
-      '<div class="ams3-list-foot">Select API → inspect fields</div>' +
-    '</div>' +
-    '<div class="ams3-split-detail"><div class="ams3-detail-body">' + fieldHtml + '</div></div>' +
-  '</div>';
+  return '<div class="ds-shell"><aside class="ds-shell-list"><div class="ds-toolbar"><div class="ds-toggle-row"><button class="ds-btn ' + (state.libraryTab === 'schemas' ? 'primary' : '') + '" type="button" onclick=\'DataSchemaAdmin.setLibraryTab("schemas")\'>' + _esc(_t('Blueprints', 'Blueprints')) + '</button><button class="ds-btn ' + (state.libraryTab === 'variables' ? 'primary' : '') + '" type="button" onclick=\'DataSchemaAdmin.setLibraryTab("variables")\'>' + _esc(_t('Variables', 'Variables')) + '</button></div></div><div class="ds-list-scroll">' + listHtml + '</div></aside><section class="ds-shell-detail">' + detailHtml + '</section></div>';
 }
 
-/* ═══════════════════════════ SCHEMA ARCHITECT ═══════════════════════════ */
-
-function renderSchemaArchitect() {
-  var all = schemaSummaries();
-  var q = S.schemaSearch.toLowerCase();
-  var filtered = q ? all.filter(function(s){ return (s.key||'').toLowerCase().includes(q) || (s.description||'').toLowerCase().includes(q); }) : all;
-
-  var selected = S.selSchema ? all.find(function(s){ return s.key === S.selSchema; }) : null;
-
-  var cards = filtered.map(function(s) {
-    var sel = S.selSchema === s.key;
-    var tables = arr(s.tables || (S.summary && S.summary.schemaLibrary && S.summary.schemaLibrary[s.key] ? S.summary.schemaLibrary[s.key].tables : []));
-    return '<div class="ams3-scard' + (sel ? ' sel' : '') + '" data-schema-key="' + esc(s.key) + '">' +
-      '<div class="ams3-scard-name">🏗️ ' + esc(s.key) + '</div>' +
-      '<div class="ams3-scard-desc">' + esc(s.description || '') + '</div>' +
-      '<div class="ams3-scard-tables">' +
-        '<span class="ams3-chip">' + (s.tableCount || tables.length || 0) + ' tables</span>' +
-        (s.migrationCount ? '<span class="ams3-chip info">' + s.migrationCount + ' migrations</span>' : '') +
-      '</div>' +
-    '</div>';
-  }).join('');
-
-  return [
-    '<div class="ams3-searchbox" style="margin-bottom:14px"><span>🔍</span><input type="text" placeholder="Search schemas…" value="' + esc(S.schemaSearch) + '" data-filter="schemaSearch"></div>',
-    '<div style="font-size:11px;color:var(--text-muted,#64748b);margin-bottom:12px">' + filtered.length + ' schema groups</div>',
-    '<div class="ams3-schema-grid">' + (cards || '<div class="ams3-empty" style="padding:40px"><div class="ams3-empty-icon">🏗️</div><div class="ams3-empty-t">No schemas found</div></div>') + '</div>'
-  ].join('');
-}
-
-/* ═══════════════════════════ VARIABLES ═══════════════════════════ */
-
-function renderVariables() {
-  var all = varSummaries();
-  var q = S.varSearch.toLowerCase();
-  var filtered = q ? all.filter(function(v){ return (v.key||'').toLowerCase().includes(q) || (v.label||'').toLowerCase().includes(q); }) : all;
-
-  /* Expand one category with variable rows if apiEditor has variablesList */
-  var cats = filtered.map(function(cat) {
-    var vcount = cat.variableCount || 0;
-    return '<div class="ams3-vcat">' +
-      '<div class="ams3-vcat-hd" data-var-cat="' + esc(cat.key) + '">' +
-        '<span style="font-size:18px">📦</span>' +
-        '<div>' +
-          '<div class="ams3-vcat-name">' + esc(cat.label || cat.key) + '</div>' +
-          '<div style="font-size:10px;color:var(--text-muted,#64748b)">' + esc(cat.label_vi || cat.description || '') + '</div>' +
-        '</div>' +
-        '<span class="ams3-vcat-n">' + vcount + '</span>' +
-      '</div>' +
-      (S.selVar === cat.key && S.varEditor ? renderVarRows(S.varEditor) : '') +
-    '</div>';
-  }).join('');
-
-  return [
-    '<div class="ams3-searchbox" style="margin-bottom:14px"><span>🔍</span><input type="text" placeholder="Search variable categories…" value="' + esc(S.varSearch) + '" data-filter="varSearch"></div>',
-    '<div class="ams3-var-cats">' + (cats || '<div class="ams3-empty"><div class="ams3-empty-icon">📦</div><div class="ams3-empty-t">No variable categories</div></div>') + '</div>'
-  ].join('');
-}
-
-function renderVarRows(ed) {
-  var rows = arr(ed.variablesList);
-  if (!rows.length) return '<div style="padding:12px 16px;font-size:11px;color:var(--text-muted,#64748b)">No variables in this category.</div>';
-  return '<table class="ams3-var-tbl"><thead><tr>' +
-    '<th>Key</th><th>Label</th><th>Type</th><th>Required</th><th>Example</th><th>Description</th>' +
-    '</tr></thead><tbody>' +
-    rows.map(function(v) {
-      return '<tr>' +
-        '<td><span class="ams3-var-key">' + esc(v.key) + '</span></td>' +
-        '<td>' + esc(v.label || v.label_vi || '') + '</td>' +
-        '<td><span class="ams3-var-type">' + esc(v.type || '') + '</span></td>' +
-        '<td>' + (v.required ? '<span class="ams3-req-dot"></span>' : '<span class="ams3-opt-dot"></span>') + '</td>' +
-        '<td><span class="ams3-var-ex">' + esc(v.example || '') + '</span></td>' +
-        '<td style="font-size:10px;color:var(--text-muted,#64748b)">' + esc(v.description || '') + '</td>' +
-      '</tr>';
-    }).join('') +
-    '</tbody></table>';
-}
-
-/* ═══════════════════════════ REGISTRY OPS ═══════════════════════════ */
-
-function renderRegistryOps() {
-  var ov = obj(obj(S.summary).overview);
-  var ss = obj(obj(S.summary).schemaStudio);
-  var manifest = obj(ss.manifest);
-
-  var ops = [
-    { icon:'⚡', title:'Compile Registry', desc:'Rebuild endpoint-catalog.json, table-registry.json, data-fields.json from source schemas. Runs all Schema Studio rounds.', action:'ops-compile', cls:'primary' },
-    { icon:'🔄', title:'Reverse Engineer', desc:'Introspect the live database and sync schema changes back into the table registry.', action:'ops-reverse', cls:'success' },
-    { icon:'📤', title:'Export OpenAPI 3.0', desc:'Generate a full OpenAPI 3.0 specification from the endpoint catalog.', action:'ops-export-openapi', cls:'ghost' },
-    { icon:'📬', title:'Export Postman Collection', desc:'Generate a Postman v2.1 collection with all 2,800+ endpoints pre-configured.', action:'ops-export-postman', cls:'ghost' },
-    { icon:'🚀', title:'Release Bundle', desc:'Package and publish the compiled registry as a versioned release bundle.', action:'ops-release', cls:'success' },
-    { icon:'📊', title:'Quality Report', desc:'Run the full registry quality analysis: coverage gaps, orphan detection, enum drift, FK integrity.', action:'ops-quality', cls:'ghost' },
-    { icon:'🧹', title:'Orphan Resolution', desc:'Detect and resolve orphaned fields, unmapped tables, and dangling schema references.', action:'ops-orphans', cls:'ghost' },
-    { icon:'🔍', title:'Parity Check', desc:'Compare schema registry against actual DB enums, tables and columns. Shows drift report.', action:'ops-parity', cls:'ghost' }
-  ];
-
-  var cards = ops.map(function(op) {
-    return '<div class="ams3-ocard">' +
-      '<div class="ams3-ocard-icon">' + op.icon + '</div>' +
-      '<div class="ams3-ocard-title">' + esc(op.title) + '</div>' +
-      '<div class="ams3-ocard-desc">' + esc(op.desc) + '</div>' +
-      '<button class="ams3-ocard-btn ' + op.cls + '" data-action="' + op.action + '">' + op.icon + ' ' + esc(op.title) + '</button>' +
-    '</div>';
-  }).join('');
-
-  var logHtml = S.opsLog.length
-    ? S.opsLog.map(function(l) {
-        return '<div class="ams3-log-' + esc(l.type) + '">' + esc('[' + l.time + '] ' + l.msg) + '</div>';
-      }).join('')
-    : '<span style="opacity:.5">No operations logged yet. Run an operation above.</span>';
-
-  return [
-    manifest.headline ? [
-      '<div class="ams3-props" style="margin-bottom:16px">',
-        prop('Version',      manifest.schemaStudioVersion || manifest.version),
-        prop('Generated',    manifest.generatedAt ? new Date(manifest.generatedAt).toLocaleString() : '—'),
-        prop('Architecture', manifest.architectureMode),
-        prop('Endpoints',    fmt(ov.endpointCount)),
-        prop('Tables',       fmt(ov.tableCount)),
-      '</div>'
-    ].join('') : '',
-
-    '<div class="ams3-ops-grid">' + cards + '</div>',
-    '<div class="ams3-sec-title">Operations Log</div>',
-    '<div class="ams3-ops-log">' + logHtml + '</div>'
-  ].join('');
-}
-
-/* ═══════════════════════════ HELPERS ═══════════════════════════ */
-
-function prop(k, v) {
-  if (v == null || v === '') return '';
-  return '<div class="ams3-prop"><div class="ams3-prop-k">' + esc(k) + '</div><div class="ams3-prop-v">' + esc(String(v)) + '</div></div>';
-}
-
-function selFilter(id, options, current, placeholder) {
-  return '<select class="ams3-sel" data-filter="' + id + '">' +
-    options.map(function(o) {
-      return '<option value="' + esc(o) + '"' + (o === current ? ' selected' : '') + '>' + (o === 'ALL' ? placeholder + ': All' : esc(o)) + '</option>';
-    }).join('') +
-  '</select>';
-}
-
-function uniqueVals(arr, key) {
-  var seen = {}, out = [];
-  arr.forEach(function(item) { var v = item[key]; if (v && !seen[v]) { seen[v] = 1; out.push(v); } });
-  return out;
-}
-
-function opsLog(type, msg) {
-  var now = new Date().toLocaleTimeString();
-  S.opsLog.unshift({ type: type, time: now, msg: msg });
-  if (S.opsLog.length > 50) S.opsLog.length = 50;
-}
-
-/* ═══════════════════════════ DATA LOADING ═══════════════════════════ */
-
-function loadSummary() {
-  if (S.loading) return;
-  S.loading = true; S.error = '';
-  render();
-  _api('admin_metadata_studio_summary', null, 'GET').then(function(d) {
-    S.loading = false;
-    if (!d || d.ok === false) { S.error = (d && d.error) || 'Server error'; render(); return; }
-    S.summary = d;
-    S.loaded = true;
-    render();
-  }).catch(function(err) {
-    S.loading = false;
-    S.error = String(err);
-    render();
-  });
-}
-
-function loadApiDetail(key) {
-  S.detailLoading = true;
-  _api('admin_metadata_studio_detail', { type: 'api', key: key }, 'GET').then(function(d) {
-    S.detailLoading = false;
-    if (d && d.ok !== false) {
-      S.apiEditor = d;
-      S.testerMethod = (d.item && d.item.method) || 'GET';
-      S.testerUrl = 'api/index.php?action=' + encodeURIComponent(d.item && d.item.action ? d.item.action : key);
-      S.testerResult = null;
-    }
-    render();
-  }).catch(function() { S.detailLoading = false; render(); });
-}
-
-function loadTableDetail(key) {
-  S.detailLoading = true;
-  _api('admin_metadata_studio_detail', { type: 'table', key: key }, 'GET').then(function(d) {
-    S.detailLoading = false;
-    if (d && d.ok !== false) S.tableEditor = d;
-    S.previewData = null;
-    render();
-  }).catch(function() { S.detailLoading = false; render(); });
-}
-
-function loadVarDetail(key) {
-  S.detailLoading = true;
-  _api('admin_metadata_studio_detail', { type: 'variable', key: key }, 'GET').then(function(d) {
-    S.detailLoading = false;
-    if (d && d.ok !== false) S.varEditor = d;
-    render();
-  }).catch(function() { S.detailLoading = false; render(); });
-}
-
-function loadTablePreview(key, page) {
-  S.previewLoading = true;
-  render();
-  _api('schema_studio_table_preview', { table_key: key, page: page || 1, per_page: 25 }, 'POST').then(function(d) {
-    S.previewLoading = false;
-    if (d && d.ok !== false) {
-      S.previewData = d;
-      S.previewTotal = d.total || 0;
-      S.previewPage = page || 1;
-    }
-    render();
-  }).catch(function() { S.previewLoading = false; render(); });
-}
-
-function runApiTest() {
-  if (S.testLoading) return;
-  S.testLoading = true; S.testerResult = null;
-  render();
-  var start = Date.now();
-  var method = S.testerMethod || 'GET';
-  var url = S.testerUrl;
-  var opts = { method: method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } };
-  if (method !== 'GET') { try { opts.body = S.testerBody || '{}'; } catch(e){} }
-  fetch(url, opts).then(function(r) {
-    S.testerStatus = r.status;
-    S.testerLatency = Date.now() - start;
-    return r.json().catch(function(){ return { error: 'Non-JSON response', status: r.status }; });
-  }).then(function(data) {
-    S.testLoading = false;
-    S.testerResult = data;
-    render();
-  }).catch(function(err) {
-    S.testLoading = false;
-    S.testerResult = { error: String(err) };
-    S.testerStatus = 0;
-    render();
-  });
-}
-
-function runOpsAction(action) {
-  var actionMap = {
-    'ops-compile':        ['schema_studio_compile_registry',  { design_id: 'workspace' }],
-    'ops-reverse':        ['schema_studio_reverse_engineer',  { design_id: 'workspace' }],
-    'ops-release':        ['schema_studio_release_bundle',    { design_id: 'workspace' }],
-    'ops-quality':        ['schema_studio_quality_report',    { design_id: 'workspace' }],
-    'ops-orphans':        ['schema_studio_orphan_resolution', { design_id: 'workspace' }],
-    'ops-parity':         ['schema_studio_parity_check',      { design_id: 'workspace' }],
-    'ops-export-openapi': ['schema_studio_export_openapi',    { design_id: 'workspace' }],
-    'ops-export-postman': ['schema_studio_export_postman',    { design_id: 'workspace' }]
-  };
-  var cfg = actionMap[action];
-  if (!cfg) return;
-  opsLog('info', 'Starting: ' + action + '…');
-  render();
-  _api(cfg[0], cfg[1], 'POST').then(function(d) {
-    if (d && d.ok !== false) {
-      opsLog('ok', 'Completed: ' + action + (d.message ? ' — ' + d.message : ''));
-      if (action === 'ops-compile' || action === 'ops-reverse') loadSummary();
-    } else {
-      opsLog('err', 'Failed: ' + action + (d && d.error ? ' — ' + d.error : ''));
-    }
-    render();
-  }).catch(function(err) {
-    opsLog('err', 'Error: ' + String(err));
-    render();
-  });
-}
-
-/* ═══════════════════════════ EVENTS ═══════════════════════════ */
-
-var _debouncedSearch = debounce(function() { render(); }, 200);
-
-function attachEvents(container) {
-  /* Remove old listener via clone trick */
-  var root = container.querySelector('.ams3');
-  if (!root) return;
-
-  root.addEventListener('click', function(e) {
-    var el = e.target;
-
-    /* Tab switching */
-    var tabEl = el.closest('[data-tab]');
-    if (tabEl) { S.tab = tabEl.dataset.tab; S.selApi = ''; S.selTable = ''; S.apiEditor = null; S.tableEditor = null; render(); return; }
-
-    /* API list select */
-    var apiRow = el.closest('[data-api-key]');
-    if (apiRow) { S.selApi = apiRow.dataset.apiKey; S.apiDetailTab = 'overview'; S.testerResult = null; loadApiDetail(S.selApi); return; }
-
-    /* DB table select */
-    var tableRow = el.closest('[data-table-key]');
-    if (tableRow) { S.selTable = tableRow.dataset.tableKey; S.dbDetailTab = 'columns'; S.previewData = null; loadTableDetail(S.selTable); return; }
-
-    /* API detail sub-tab */
-    var apiDtab = el.closest('[data-api-dtab]');
-    if (apiDtab) { S.apiDetailTab = apiDtab.dataset.apiDtab; render(); return; }
-
-    /* DB detail sub-tab */
-    var dbDtab = el.closest('[data-db-dtab]');
-    if (dbDtab) { S.dbDetailTab = dbDtab.dataset.dbDtab; render(); return; }
-
-    /* Field Forge API select */
-    var fieldApi = el.closest('[data-field-api]');
-    if (fieldApi) { S.selApi = fieldApi.dataset.fieldApi; loadApiDetail(S.selApi); return; }
-
-    /* Schema select */
-    var schemaEl = el.closest('[data-schema-key]');
-    if (schemaEl) { S.selSchema = schemaEl.dataset.schemaKey; render(); return; }
-
-    /* Variable category expand */
-    var varCat = el.closest('[data-var-cat]');
-    if (varCat) {
-      var key = varCat.dataset.varCat;
-      if (S.selVar === key) { S.selVar = ''; S.varEditor = null; render(); }
-      else { S.selVar = key; loadVarDetail(key); }
-      return;
-    }
-
-    /* Actions */
-    var btn = el.closest('[data-action]');
-    if (btn) {
-      var act = btn.dataset.action;
-      if (act === 'reload')       { loadSummary(); return; }
-      if (act === 'compile')      { S.tab = 'ops'; render(); setTimeout(function(){ runOpsAction('ops-compile'); }, 100); return; }
-      if (act === 'tester-send')  { runApiTest(); return; }
-      if (act === 'tester-copy')  { navigator.clipboard && S.testerResult && navigator.clipboard.writeText(JSON.stringify(S.testerResult, null, 2)); return; }
-      if (act === 'tester-toggle-method') {
-        var methods = Object.keys(METHOD_CFG);
-        var idx = methods.indexOf(S.testerMethod);
-        S.testerMethod = methods[(idx + 1) % methods.length];
-        render(); return;
-      }
-      if (act === 'table-preview') { S.dbDetailTab = 'preview'; loadTablePreview(btn.dataset.table || S.selTable, 1); return; }
-      if (act === 'preview-prev')  { loadTablePreview(S.selTable, Math.max(1, S.previewPage - 1)); return; }
-      if (act === 'preview-next')  { loadTablePreview(S.selTable, S.previewPage + 1); return; }
-      if (act === 'export-openapi') { runOpsAction('ops-export-openapi'); return; }
-      if (act.startsWith('ops-')) { runOpsAction(act); return; }
-    }
-  });
-
-  /* Filter inputs */
-  root.addEventListener('input', function(e) {
-    var el = e.target;
-    var filterKey = el.dataset.filter;
-    var testerKey = el.dataset.tester;
-    if (filterKey && filterKey in S) {
-      S[filterKey] = el.value;
-      _debouncedSearch();
-    }
-    if (testerKey === 'url')  { S.testerUrl  = el.value; }
-    if (testerKey === 'body') { S.testerBody = el.value; }
-  });
-
-  root.addEventListener('change', function(e) {
-    var el = e.target;
-    var filterKey = el.dataset.filter;
-    if (filterKey && filterKey in S) { S[filterKey] = el.value; render(); }
-  });
-
-  /* Keyboard shortcut: Escape resets selection */
-  root.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      S.selApi = ''; S.selTable = ''; S.apiEditor = null; S.tableEditor = null;
-      render();
-    }
-  });
-}
-
-/* ═══════════════════════════ MODULE ENTRY ═══════════════════════════ */
-
-window._renderAdminMetadataStudio = function(container) {
-  if (!container) return;
-  /* Reset on new container */
-  if (S.container !== container) {
-    S.container = container;
-    S.loaded = false;
-    S.summary = null;
-    S.selApi = ''; S.selTable = '';
-    S.apiEditor = null; S.tableEditor = null;
-    S.opsLog = [];
+function _paint(){
+  if(!state.container) return;
+  if(state.loading && !state.workspace){
+    state.container.innerHTML = '<div class="ds-root"><div class="ds-loading"><div class="ds-spinner"></div><span>' + _esc(_t('Đang tải Data Schema workspace...', 'Loading Data Schema workspace...')) + '</span></div></div>';
+    return;
   }
-  if (!S.loaded && !S.loading) loadSummary();
-  else render();
+  var body = '';
+  if(state.error){
+    body += '<div class="ds-inline-alert tone-bad">' + _esc(state.error) + '</div>';
+  }
+  if(!state.workspace){
+    body += _emptyState(_t('Không có dữ liệu', 'No data'), _t('Workspace chưa tải được dữ liệu backend.', 'The workspace could not load backend data.'));
+  } else {
+    if(state.tab === 'overview') body += _renderOverview();
+    if(state.tab === 'apis') body += _renderApiTab();
+    if(state.tab === 'tables') body += _renderTableTab();
+    if(state.tab === 'designs') body += _renderDesignTab();
+    if(state.tab === 'libraries') body += _renderLibraryTab();
+  }
+  state.container.innerHTML = [
+    '<div class="ds-root">',
+      '<header class="ds-topbar">',
+        '<div>',
+          '<div class="ds-topbar-kicker">' + _esc(_t('Admin / Data platform', 'Admin / Data platform')) + '</div>',
+          '<h2>' + _esc(_t('Data Schema', 'Data Schema')) + '</h2>',
+          '<p>' + _esc(_t('Catalog API, runtime table coverage, design workspace, diagnostics, compile/release và metadata libraries.', 'API catalog, runtime table coverage, design workspace, diagnostics, compile/release and metadata libraries.')) + '</p>',
+        '</div>',
+        '<div class="ds-topbar-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.refresh()\'>' + _esc(_t('Làm mới', 'Refresh')) + '</button></div>',
+      '</header>',
+      '<nav class="ds-tabs">' + TABS.map(function(tab){
+        return '<button class="ds-tab' + (state.tab===tab.id?' active':'') + '" type="button" onclick=\'DataSchemaAdmin.setTab(' + _js(tab.id) + ')\'>' + _esc((typeof lang !== 'undefined' && lang === 'en') ? tab.labelEn : tab.labelVi) + '</button>';
+      }).join('') + '</nav>',
+      '<div class="ds-content">' + body + '</div>',
+    '</div>'
+  ].join('');
+}
+
+var DataSchemaAdmin = {
+  render: function(container){
+    state.container = container;
+    if(!state.workspace) _loadWorkspace(false);
+    else _paint();
+  },
+  refresh: function(){ _refresh(); },
+  setTab: function(tab){
+    state.tab = String(tab || 'overview');
+    if(state.tab === 'apis' && state.selectedApiKey && !state.apiDetail) _loadApiDetail(state.selectedApiKey, false);
+    if(state.tab === 'tables' && state.selectedTableKey && !state.tableDetail) _loadTableDetail(state.selectedTableKey, false);
+    if(state.tab === 'libraries'){
+      if(state.libraryTab === 'schemas' && state.selectedSchemaKey && !state.schemaDetail) _loadSchemaDetail(state.selectedSchemaKey, false);
+      if(state.libraryTab === 'variables' && state.selectedVariableKey && !state.variableDetail) _loadVariableDetail(state.selectedVariableKey, false);
+    }
+    if(state.tab === 'designs' && state.selectedDesignId && !state.designSchema) _loadDesign(state.selectedDesignId, false);
+    _paint();
+  },
+  setApiSearch: function(value){ state.apiSearch = String(value || ''); _paint(); },
+  setApiDomain: function(value){ state.apiDomain = String(value || 'ALL'); _paint(); },
+  setApiMethod: function(value){ state.apiMethod = String(value || 'ALL'); _paint(); },
+  setApiKind: function(value){ state.apiKind = String(value || 'ALL'); _paint(); },
+  selectApi: function(key){ _loadApiDetail(String(key || ''), false); },
+  setApiEditor: function(value){ state.apiEditor = String(value || ''); },
+  saveApi: function(){ _saveEditor('api'); },
+  copyApiPath: function(){
+    var current = state.apiDetail && state.apiDetail.item ? state.apiDetail.item : null;
+    if(!current || !current.path) return;
+    _copyText(current.path).then(function(){ _toast(_t('Đã copy path API.', 'API path copied.'), 'success'); }).catch(function(){ _toast('clipboard_unavailable', 'error'); });
+  },
+  setTableSearch: function(value){ state.tableSearch = String(value || ''); _paint(); },
+  setTableDomain: function(value){ state.tableDomain = String(value || 'ALL'); _paint(); },
+  selectTable: function(key){ _loadTableDetail(String(key || ''), false); },
+  setTableEditor: function(value){ state.tableEditor = String(value || ''); },
+  saveTable: function(){ _saveEditor('table'); },
+  loadPreview: function(){ _loadTablePreview(0); },
+  prevPreviewPage: function(){ var current = state.tablePreview || {}; _loadTablePreview(Math.max(0, Number(current.offset || 0) - 25)); },
+  nextPreviewPage: function(){ var current = state.tablePreview || {}; _loadTablePreview(Number(current.offset || 0) + 25); },
+  openRowInsert: function(){ _openRowInsert(); },
+  openRowUpdate: function(index){ _openRowUpdate(Number(index || 0)); },
+  closeRowEditor: function(){ _closeRowEditor(); },
+  setRowEditorJson: function(value){ state.rowEditorJson = String(value || ''); },
+  saveRow: function(){ _saveRowEditor(); },
+  selectDesign: function(id){ _loadDesign(String(id || ''), false); },
+  setDesignEditor: function(value){ state.designEditor = String(value || ''); },
+  prettifyDesignEditor: function(){
+    var parsed = _parseJson(state.designEditor, 'design_editor');
+    if(!parsed.ok){ _toast(parsed.error, 'error'); return; }
+    state.designEditor = _jsonPretty(parsed.value || {});
+    _paint();
+  },
+  runDesignAction: function(actionId){ _runDesignAction(String(actionId || '')); },
+  setLibraryTab: function(tab){
+    state.libraryTab = String(tab || 'schemas');
+    if(state.libraryTab === 'schemas' && state.selectedSchemaKey && !state.schemaDetail) _loadSchemaDetail(state.selectedSchemaKey, false);
+    if(state.libraryTab === 'variables' && state.selectedVariableKey && !state.variableDetail) _loadVariableDetail(state.selectedVariableKey, false);
+    _paint();
+  },
+  selectLibraryItem: function(type, key){
+    if(String(type) === 'schemas') _loadSchemaDetail(String(key || ''), false);
+    else _loadVariableDetail(String(key || ''), false);
+  },
+  setLibraryEditor: function(value){
+    if(state.libraryTab === 'schemas') state.schemaEditor = String(value || '');
+    else state.variableEditor = String(value || '');
+  },
+  saveLibrary: function(){
+    if(state.libraryTab === 'schemas') _saveEditor('schema');
+    else _saveEditor('variable');
+  }
 };
 
+window.DataSchemaAdmin = DataSchemaAdmin;
+window._renderAdminMetadataStudio = function(container){
+  DataSchemaAdmin.render(container);
+};
 })();

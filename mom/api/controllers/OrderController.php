@@ -68,6 +68,18 @@ class OrderController extends BaseController
     }
 
     /**
+     * Get primary user role string.
+     */
+    private function userRole(array $user): string
+    {
+        if (is_array($user['roles'] ?? null) && !empty($user['roles'])) {
+            return (string)$user['roles'][0];
+        }
+
+        return (string)($user['role'] ?? '');
+    }
+
+    /**
      * Load the SO/JO/WO access control configuration.
      *
      * @return array<string, mixed>
@@ -1217,12 +1229,70 @@ class OrderController extends BaseController
 
         try {
             $gateService = new ShipmentGateService($this->dataDir, $this->confDir);
-            $result = $gateService->checkReadiness(trim($soNumber));
+            $result = $gateService->checkReadiness(trim($soNumber), $this->userId($user), $this->userRole($user));
 
             $this->success(['shipment_gate' => $result]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('shipment_gate_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST overrideShipmentGate — Approve a timeboxed shipment gate override.
+     * Action: `order_shipment_gate_override`
+     * @return never
+     */
+    public function overrideShipmentGate(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'so_write');
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['so_number', 'gate_code', 'reason_code', 'reason', 'expires_at']);
+
+        try {
+            $gateService = new ShipmentGateService($this->dataDir, $this->confDir);
+            $override = $gateService->overrideGate(
+                trim((string)$body['so_number']),
+                trim((string)$body['gate_code']),
+                trim((string)$body['reason']),
+                $this->userId($user),
+                $this->userRole($user),
+                trim((string)$body['reason_code']),
+                trim((string)$body['expires_at']),
+                isset($body['approval_reference']) ? trim((string)$body['approval_reference']) : null,
+            );
+
+            $this->success(['override' => $override], 201);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('shipment_gate_override_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET listShipmentGateOverrides — List governed shipment gate overrides for one SO.
+     * Action: `order_shipment_gate_overrides`
+     * @return never
+     */
+    public function listShipmentGateOverrides(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'so_read');
+
+        $soNumber = $this->query('so_number');
+        if ($soNumber === null || trim($soNumber) === '') {
+            $this->error('missing_so_number', 400);
+        }
+
+        try {
+            $gateService = new ShipmentGateService($this->dataDir, $this->confDir);
+            $this->success(['overrides' => $gateService->listOverrides(trim($soNumber))]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('shipment_gate_override_list_failed', 500, $e->getMessage());
         }
     }
 }

@@ -47,6 +47,7 @@ bash mom/ops/vps/install-observability-stack.sh
 3. ghi cấu hình Netdata để:
    - chỉ bind `127.0.0.1 ::1`
    - tắt access log của Netdata để tránh double logging sau Nginx
+   - tắt collector PostgreSQL mặc định nếu chưa cấp `NETDATA_POSTGRES_DSN`
 4. cài Grafana từ APT repo chính thức
 5. tạo systemd drop-in cho Grafana để:
    - chạy sau `127.0.0.1:3000`
@@ -79,6 +80,15 @@ NGINX_SITE=/etc/nginx/sites-available/hesem-mom \
 PHP_SOCK=/run/php/php8.3-fpm-hesem.sock \
 GRAFANA_PORT=3000 \
 NETDATA_PORT=19999 \
+NETDATA_ENABLE_POSTGRES_COLLECTOR=0 \
+bash mom/ops/vps/install-observability-stack.sh
+```
+
+Nếu thật sự muốn Netdata đọc PostgreSQL, bật rõ ràng thay vì để agent tự đoán credential:
+
+```bash
+NETDATA_ENABLE_POSTGRES_COLLECTOR=1 \
+NETDATA_POSTGRES_DSN='postgres://netdata:strong-password@127.0.0.1:5432/postgres?sslmode=disable' \
 bash mom/ops/vps/install-observability-stack.sh
 ```
 
@@ -91,15 +101,14 @@ Tab `Observability` trong dashboard sẽ nhúng hai URL này trực tiếp nếu
 
 ## Phân quyền
 
-Hiện observability panels dùng quyền read của `VpsController`.
+Hiện observability panels dùng quyền read của `VpsController` và đã đi cùng chính guard của module `Hạ tầng VPS` trong `Admin`.
 
-Role read hiện là:
+Role read hiện theo `admin_roles()` của portal:
 
 - `admin`
 - `it_admin`
 - `ceo`
-- `engineering_manager`
-- `engineering_lead`
+- `qa_manager`
 
 Nếu sau này thêm panel có quyền write, route `vps_observability_auth` đã có nhánh kiểm tra write role.
 
@@ -127,6 +136,7 @@ curl -H 'X-WEBAUTH-USER: admin' http://127.0.0.1:3000/api/user
 - script sẽ fail sớm nếu không dò được `api.php`, Nginx site hoặc PHP-FPM socket hợp lệ
 - Grafana đang auto gán user mới vào role `Viewer`; nếu cần editor/admin phải phân quyền riêng
 - Netdata chỉ bind loopback, nên mọi truy cập ngoài phải đi qua Nginx
+- PostgreSQL collector của Netdata chỉ nên bật khi đã có DSN hoặc account read-only rõ ràng; nếu không, cứ để disabled để tránh spam lỗi auth trong log
 
 ## Nguồn chính thức
 

@@ -2,61 +2,63 @@
   "slice_publication": {
     "scope": "foundation_governance_contract_slice",
     "truth_model": "slice_within_global_canonical",
-    "publication_run_family": "0b987d57-e143-47f7-96c8-815033baec67",
-    "generated_at": "2026-04-08T00:00:00Z",
+    "publication_run_family": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90",
+    "generated_at": "2026-04-09T13:45:04.985Z",
     "slice_verdict": "PASS",
     "blockers": "none",
-    "entity_count": 19,
-    "route_count": 10,
-    "internal_command_count": 12,
+    "entity_count": 0,
+    "route_count": 0,
+    "internal_command_count": 0,
     "entities": {
       "foundation_tables": [
-        "org_enterprise", "org_company", "org_site", "org_plant",
-        "org_warehouse", "org_work_center", "org_work_unit",
-        "party", "party_role", "party_site", "party_contact",
-        "uom", "calendar", "shift", "reason_code", "status_code"
+        "approval",
+        "attachment",
+        "calendar",
+        "electronic_signature",
+        "org_companies",
+        "org_company",
+        "org_enterprise",
+        "org_legal_entities",
+        "org_plant",
+        "org_plants",
+        "org_site",
+        "org_warehouse",
+        "org_work_center",
+        "org_work_unit",
+        "party",
+        "party_contact",
+        "party_role",
+        "party_site",
+        "reason_code",
+        "shift",
+        "status_code",
+        "uom"
       ],
       "governance_tables": [
-        "approval_group", "approval_step", "electronic_signature"
+        "attachment",
+        "electronic_signature"
       ]
     },
-    "public_routes": [
-      "GET /api/v1/foundation/organizations",
-      "GET /api/v1/foundation/parties",
-      "GET /api/v1/foundation/calendars",
-      "GET /api/v1/governance/approval-groups",
-      "POST /api/v1/governance/approval-groups",
-      "GET /api/v1/governance/approval-groups/{id}",
-      "POST /api/v1/governance/approval-groups/{id}:decide",
-      "GET /api/v1/governance/approval-groups/{id}/timeline",
-      "POST /api/v1/governance/approval-groups/{id}/attachments",
-      "GET /api/v1/governance/attachments/{id}"
-    ],
-    "internal_commands": [
-      "registerOrganizationNode", "amendOrganizationNode",
-      "reparentOrganizationNode", "deactivateOrganizationNode",
-      "registerParty", "amendPartyIdentity", "assignPartyRole",
-      "registerPartySite", "registerPartyContact",
-      "registerCalendar", "registerShift", "requestApproval"
-    ],
+    "public_routes": [],
+    "internal_commands": [],
     "workflow_bridge": {
-      "ready": true,
+      "ready": false,
       "engine": "WorkflowEngine",
       "adapter": "ApprovalWorkflowAdapter",
-      "state_machine": "APPROVAL_STEP: pending → approved | rejected | changes_requested"
+      "state_machine": "approval_group: pending -> approved|rejected|changes_requested"
     },
-    "concurrency_model": "ETag + If-Match optimistic locking with row_version triggers (412/428)",
-    "self_approval_prohibition": "enforced in service layer — requestedByPartyId === actorPartyId → 403",
-    "audit_trail": "FDA 21 CFR Part 11 electronic signatures + ALCOA+ audit events",
+    "concurrency_model": "ETag + If-Match optimistic locking with row_version on governed records where published.",
+    "self_approval_prohibition": "Governed at service-layer approval actions; no summary claim beyond current runtime enforcement.",
+    "audit_trail": "Electronic signature and audit artifacts remain governed through canonical backend records.",
     "observability": {
       "mode": "file_export_only",
-      "honesty": "OTel-compatible structured logs to file. No live collector proven."
+      "honesty": "No live collector proof is claimed in this slice summary."
     },
     "benchmark": {
       "mode": "stability_probe",
-      "honesty": "Stability/smoke probe, not production load test."
+      "honesty": "Smoke/stability only."
     },
     "openapi_version": "3.1.2",
-    "anti_false_green": "This summary covers the Foundation Governance slice only. Platform-global readiness is reported in publication-truth-summary.json. Observability is file_export_only. Benchmark is stability_probe."
+    "anti_false_green": "This summary covers the Foundation/Governance publication slice only. Platform-global readiness is reported separately in publication-truth-summary.json."
   }
 }

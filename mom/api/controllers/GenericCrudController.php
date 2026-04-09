@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\GenericCrudService;
+use MOM\Api\Services\IdempotencyService;
 use MOM\Api\Services\MissingScopeContextException;
 use MOM\Api\Services\PreconditionRequiredException;
 use MOM\Api\Services\RecordConflictException;
@@ -18,6 +19,7 @@ use Throwable;
 class GenericCrudController extends BaseController
 {
     private ?GenericCrudService $service = null;
+    private ?IdempotencyService $idempotencyService = null;
     private ?array $endpointCatalog = null;
     private ?array $runtimeAccessPolicy = null;
 
@@ -28,6 +30,15 @@ class GenericCrudController extends BaseController
         }
 
         return $this->service;
+    }
+
+    private function idempotency(): IdempotencyService
+    {
+        if ($this->idempotencyService === null) {
+            $this->idempotencyService = new IdempotencyService($this->dataDir);
+        }
+
+        return $this->idempotencyService;
     }
 
     /**
@@ -326,6 +337,424 @@ class GenericCrudController extends BaseController
         return max(0, (int)$matches[1]);
     }
 
+    private function parseIdempotencyKeyToken(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_scalar($value)) {
+            throw new RuntimeException('Invalid idempotency key token');
+        }
+
+        $text = trim((string)$value);
+        if ($text === '') {
+            return null;
+        }
+        if (strlen($text) > 200 || preg_match('/^[A-Za-z0-9._:\-]+$/', $text) !== 1) {
+            throw new RuntimeException('Invalid idempotency key token');
+        }
+
+        return $text;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @return array{key:string, key_source:string, mode:string}|null
+     */
+    private function explicitIdempotencyKey(array $body): ?array
+    {
+        $dataBody = is_array($body['data'] ?? null) ? (array)$body['data'] : [];
+        $candidates = [
+            ['source' => 'header:Idempotency-Key', 'value' => $this->requestHeader('Idempotency-Key')],
+            ['source' => 'query:idempotency_key', 'value' => $this->query('idempotency_key')],
+            ['source' => 'query:idempotencyKey', 'value' => $this->query('idempotencyKey')],
+            ['source' => 'query:request_id', 'value' => $this->query('request_id')],
+            ['source' => 'query:requestId', 'value' => $this->query('requestId')],
+            ['source' => 'body:idempotency_key', 'value' => $body['idempotency_key'] ?? null],
+            ['source' => 'body:idempotencyKey', 'value' => $body['idempotencyKey'] ?? null],
+            ['source' => 'body:request_id', 'value' => $body['request_id'] ?? null],
+            ['source' => 'body:requestId', 'value' => $body['requestId'] ?? null],
+            ['source' => 'body.data:idempotency_key', 'value' => $dataBody['idempotency_key'] ?? null],
+            ['source' => 'body.data:idempotencyKey', 'value' => $dataBody['idempotencyKey'] ?? null],
+            ['source' => 'body.data:request_id', 'value' => $dataBody['request_id'] ?? null],
+            ['source' => 'body.data:requestId', 'value' => $dataBody['requestId'] ?? null],
+        ];
+
+        foreach ($candidates as $candidate) {
+            $key = $this->parseIdempotencyKeyToken($candidate['value']);
+            if ($key === null) {
+                continue;
+            }
+
+            return [
+                'key' => $key,
+                'key_source' => (string)$candidate['source'],
+                'mode' => 'client_token',
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $tableMeta
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>|null
+     */
+    private function createPrimaryKeyIdentityPayload(array $tableMeta, array $payload): ?array
+    {
+        $pk = $this->primaryKeyMeta($tableMeta);
+        if ($pk['fields'] === []) {
+            return null;
+        }
+
+        $identity = [];
+        foreach ($pk['fields'] as $field) {
+            if (!array_key_exists($field, $payload) || !is_scalar($payload[$field])) {
+                return null;
+            }
+            $value = trim((string)$payload[$field]);
+            if ($value === '') {
+                return null;
+            }
+            $identity[$field] = $value;
+        }
+
+        return $identity;
+    }
+
+    /**
+     * @param array<string, mixed> $tableMeta
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>|null
+     */
+    private function createRequiredUniqueIdentityPayload(array $tableMeta, array $payload): ?array
+    {
+        $columns = (array)($tableMeta['columns'] ?? []);
+        if ($columns === []) {
+            return null;
+        }
+
+        $identity = [];
+        foreach ($columns as $field => $meta) {
+            if (!is_array($meta) || ($meta['unique'] ?? false) !== true || ($meta['required'] ?? false) !== true) {
+                continue;
+            }
+            if (!array_key_exists($field, $payload) || !is_scalar($payload[$field])) {
+                continue;
+            }
+            $value = trim((string)$payload[$field]);
+            if ($value === '') {
+                continue;
+            }
+            $identity[$field] = $value;
+        }
+
+        return $identity === [] ? null : $identity;
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $user
+     * @return array<string, mixed>
+     */
+    private function createPayloadRetryWindowDescriptor(array $ctx, array $payload, array $user): array
+    {
+        $scopeIdentity = is_array($ctx['scope'] ?? null) ? (array)$ctx['scope'] : [];
+        $retryWindowSeconds = $this->idempotency()->retryWindowSeconds();
+        $derivation = [
+            'kind' => 'create',
+            'domain' => $ctx['domain'],
+            'table' => $ctx['table'],
+            'scope' => $scopeIdentity,
+            'payload' => $payload,
+        ];
+
+        return [
+            'scope_key' => implode('|', ['generic_crud', 'create', (string)$ctx['domain'], (string)$ctx['table'], (string)($user['username'] ?? 'system')]),
+            'key' => 'drv-create-window-' . hash('sha256', json_encode($derivation, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+            'key_source' => 'derived:payload_retry_window',
+            'mode' => 'derived_payload_window',
+            'kind' => 'create',
+            'domain' => $ctx['domain'],
+            'table' => $ctx['table'],
+            'user_id' => (string)($user['username'] ?? 'system'),
+            'ttl_seconds' => $retryWindowSeconds,
+            'fingerprint' => $derivation,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $user
+     * @return array<string, mixed>|null
+     */
+    private function mutationIdentityRetryWindowDescriptor(string $kind, array $ctx, array $payload, array $user, ?string $toStatus = null): ?array
+    {
+        $identity = is_array($ctx['identity'] ?? null) ? (array)$ctx['identity'] : [];
+        if ($identity === []) {
+            return null;
+        }
+
+        $scopeIdentity = is_array($ctx['scope'] ?? null) ? (array)$ctx['scope'] : [];
+        $retryWindowSeconds = $this->idempotency()->retryWindowSeconds();
+        $derivation = [
+            'kind' => $kind,
+            'domain' => $ctx['domain'],
+            'table' => $ctx['table'],
+            'identity' => $identity,
+            'scope' => $scopeIdentity,
+            'payload' => $payload,
+            'to_status' => $toStatus,
+        ];
+
+        return [
+            'scope_key' => implode('|', ['generic_crud', $kind, (string)$ctx['domain'], (string)$ctx['table'], (string)($user['username'] ?? 'system')]),
+            'key' => 'drv-' . $kind . '-window-' . hash('sha256', json_encode($derivation, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+            'key_source' => 'derived:identity_payload_retry_window',
+            'mode' => 'derived_identity_window',
+            'kind' => $kind,
+            'domain' => $ctx['domain'],
+            'table' => $ctx['table'],
+            'user_id' => (string)($user['username'] ?? 'system'),
+            'ttl_seconds' => $retryWindowSeconds,
+            'fingerprint' => $derivation,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $user
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function resolveMutationIdempotency(string $kind, array $ctx, array $body, array $user, array $payload = [], ?string $toStatus = null): array
+    {
+        $base = [
+            'supported' => in_array($kind, ['create', 'update', 'delete', 'transition'], true),
+            'applied' => false,
+            'mode' => null,
+            'key_source' => null,
+            'safe_retry_requires_client_key' => $kind === 'create',
+            'accepted_headers' => ['Idempotency-Key'],
+            'accepted_query_params' => ['request_id', 'requestId', 'idempotency_key', 'idempotencyKey'],
+            'accepted_body_fields' => ['request_id', 'requestId', 'idempotency_key', 'idempotencyKey'],
+            'descriptor' => null,
+        ];
+
+        if ($base['supported'] !== true || !$this->idempotency()->isEnabled()) {
+            return $base;
+        }
+
+        $explicit = $this->explicitIdempotencyKey($body);
+        if ($explicit !== null) {
+            return array_merge($base, [
+                'applied' => true,
+                'mode' => $explicit['mode'],
+                'key_source' => $explicit['key_source'],
+                'safe_retry_requires_client_key' => false,
+                'descriptor' => [
+                    'scope_key' => implode('|', ['generic_crud', $kind, (string)$ctx['domain'], (string)$ctx['table'], (string)($user['username'] ?? 'system')]),
+                    'key' => $explicit['key'],
+                    'key_source' => $explicit['key_source'],
+                    'mode' => $explicit['mode'],
+                    'kind' => $kind,
+                    'domain' => $ctx['domain'],
+                    'table' => $ctx['table'],
+                    'user_id' => (string)($user['username'] ?? 'system'),
+                    'fingerprint' => [
+                        'kind' => $kind,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'identity' => $ctx['identity'] ?? [],
+                        'scope' => $ctx['scope'] ?? [],
+                        'payload' => $payload,
+                        'to_status' => $toStatus,
+                        'expected_row_version' => $ctx['expected_row_version'] ?? null,
+                    ],
+                ],
+            ]);
+        }
+
+        if ($kind === 'create') {
+            $scopeIdentity = $ctx['scope'] ?? [];
+            $identity = $this->createPrimaryKeyIdentityPayload((array)$ctx['tableMeta'], $payload);
+            if ($identity !== null) {
+                return array_merge($base, [
+                    'applied' => true,
+                    'mode' => 'derived_identity',
+                    'key_source' => 'derived:primary_key_payload',
+                    'safe_retry_requires_client_key' => false,
+                    'descriptor' => [
+                        'scope_key' => implode('|', ['generic_crud', $kind, (string)$ctx['domain'], (string)$ctx['table'], (string)($user['username'] ?? 'system')]),
+                        'key' => 'drv-create-' . hash('sha256', json_encode([
+                            'domain' => $ctx['domain'],
+                            'table' => $ctx['table'],
+                            'scope' => $scopeIdentity,
+                            'identity' => $identity,
+                        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+                        'key_source' => 'derived:primary_key_payload',
+                        'mode' => 'derived_identity',
+                        'kind' => $kind,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'user_id' => (string)($user['username'] ?? 'system'),
+                        'fingerprint' => [
+                            'kind' => $kind,
+                            'domain' => $ctx['domain'],
+                            'table' => $ctx['table'],
+                            'identity' => $identity,
+                            'scope' => $scopeIdentity,
+                            'payload' => $payload,
+                        ],
+                    ],
+                ]);
+            }
+
+            $uniqueIdentity = $this->createRequiredUniqueIdentityPayload((array)$ctx['tableMeta'], $payload);
+            if ($uniqueIdentity !== null) {
+                return array_merge($base, [
+                    'applied' => true,
+                    'mode' => 'derived_unique_fields',
+                    'key_source' => 'derived:required_unique_fields',
+                    'safe_retry_requires_client_key' => false,
+                    'descriptor' => [
+                        'scope_key' => implode('|', ['generic_crud', $kind, (string)$ctx['domain'], (string)$ctx['table'], (string)($user['username'] ?? 'system')]),
+                        'key' => 'drv-create-' . hash('sha256', json_encode([
+                            'domain' => $ctx['domain'],
+                            'table' => $ctx['table'],
+                            'scope' => $scopeIdentity,
+                            'identity' => $uniqueIdentity,
+                        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+                        'key_source' => 'derived:required_unique_fields',
+                        'mode' => 'derived_unique_fields',
+                        'kind' => $kind,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'user_id' => (string)($user['username'] ?? 'system'),
+                        'fingerprint' => [
+                            'kind' => $kind,
+                            'domain' => $ctx['domain'],
+                            'table' => $ctx['table'],
+                            'identity' => $uniqueIdentity,
+                            'scope' => $scopeIdentity,
+                            'payload' => $payload,
+                        ],
+                    ],
+                ]);
+            }
+
+            return array_merge($base, [
+                'applied' => true,
+                'mode' => 'derived_payload_window',
+                'key_source' => 'derived:payload_retry_window',
+                'safe_retry_requires_client_key' => false,
+                'retry_window_seconds' => $this->idempotency()->retryWindowSeconds(),
+                'descriptor' => $this->createPayloadRetryWindowDescriptor($ctx, $payload, $user),
+            ]);
+        }
+
+        $expectedVersion = $ctx['expected_row_version'] ?? null;
+        if ($kind === 'transition' && $toStatus === null) {
+            return $base;
+        }
+        if ($expectedVersion !== null) {
+            return array_merge($base, [
+                'applied' => true,
+                'mode' => 'derived_concurrency',
+                'key_source' => 'derived:identity_row_version_payload',
+                'safe_retry_requires_client_key' => false,
+                'descriptor' => [
+                    'scope_key' => implode('|', ['generic_crud', $kind, (string)$ctx['domain'], (string)$ctx['table'], (string)($user['username'] ?? 'system')]),
+                    'key' => 'drv-' . $kind . '-' . hash('sha256', json_encode([
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'identity' => $ctx['identity'] ?? [],
+                        'scope' => $ctx['scope'] ?? [],
+                        'payload' => $payload,
+                        'to_status' => $toStatus,
+                        'expected_row_version' => $expectedVersion,
+                    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+                    'key_source' => 'derived:identity_row_version_payload',
+                    'mode' => 'derived_concurrency',
+                    'kind' => $kind,
+                    'domain' => $ctx['domain'],
+                    'table' => $ctx['table'],
+                    'user_id' => (string)($user['username'] ?? 'system'),
+                    'fingerprint' => [
+                        'kind' => $kind,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'identity' => $ctx['identity'] ?? [],
+                        'scope' => $ctx['scope'] ?? [],
+                        'payload' => $payload,
+                        'to_status' => $toStatus,
+                        'expected_row_version' => $expectedVersion,
+                    ],
+                ],
+            ]);
+        }
+
+        $retryWindowDescriptor = $this->mutationIdentityRetryWindowDescriptor($kind, $ctx, $payload, $user, $toStatus);
+        if ($retryWindowDescriptor === null) {
+            return $base;
+        }
+
+        return array_merge($base, [
+            'applied' => true,
+            'mode' => 'derived_identity_window',
+            'key_source' => 'derived:identity_payload_retry_window',
+            'safe_retry_requires_client_key' => false,
+            'retry_window_seconds' => $this->idempotency()->retryWindowSeconds(),
+            'descriptor' => $retryWindowDescriptor,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $spec
+     * @return array{status_code:int, payload:array<string, mixed>, replayed:bool, stored_at:string}
+     */
+    private function runMutationWithIdempotency(array $spec, callable $operation): array
+    {
+        if (($spec['applied'] ?? false) !== true || !is_array($spec['descriptor'] ?? null)) {
+            $result = $operation();
+            return [
+                'status_code' => max(200, (int)($result['status_code'] ?? 200)),
+                'payload' => is_array($result['payload'] ?? null) ? (array)$result['payload'] : [],
+                'replayed' => false,
+                'stored_at' => '',
+            ];
+        }
+
+        return $this->idempotency()->execute((array)$spec['descriptor'], $operation);
+    }
+
+    /**
+     * @param array<string, mixed> $spec
+     * @param array{status_code:int, payload:array<string, mixed>, replayed:bool, stored_at:string} $execution
+     * @return array<string, mixed>
+     */
+    private function idempotencyResponseMeta(array $spec, array $execution): array
+    {
+        return [
+            'supported' => (bool)($spec['supported'] ?? false),
+            'applied' => (bool)($spec['applied'] ?? false),
+            'replayed' => (bool)($execution['replayed'] ?? false),
+            'mode' => $spec['mode'] ?? null,
+            'key_source' => $spec['key_source'] ?? null,
+            'safe_retry_requires_client_key' => (bool)($spec['safe_retry_requires_client_key'] ?? false),
+            'storage' => (bool)($spec['applied'] ?? false) ? 'server_persisted_success_response' : null,
+            'stored_at' => $execution['stored_at'] ?? '',
+            'retry_window_seconds' => $spec['retry_window_seconds'] ?? (($spec['descriptor']['ttl_seconds'] ?? null) ?: null),
+            'accepted_headers' => (array)($spec['accepted_headers'] ?? []),
+            'accepted_query_params' => (array)($spec['accepted_query_params'] ?? []),
+            'accepted_body_fields' => (array)($spec['accepted_body_fields'] ?? []),
+        ];
+    }
+
     /**
      * @param array<string, mixed> $tableMeta
      * @param array<string, mixed> $payload
@@ -462,17 +891,9 @@ class GenericCrudController extends BaseController
      */
     private function runtimePermissionKeys(array $ctx): array
     {
-        $action = strtolower($ctx['domain'] . '.' . $ctx['table'] . '.' . $ctx['kind']);
-        $endpoint = $this->endpointCatalog()[$action] ?? null;
-        $keys = array_values(array_filter(array_map(
-            static fn($value): string => strtolower(trim((string)$value)),
-            is_array($endpoint['security']['permission_keys'] ?? null) ? $endpoint['security']['permission_keys'] : []
-        ), static fn(string $value): bool => $value !== ''));
-
-        if ($keys !== []) {
-            return array_values(array_unique($keys));
-        }
-
+        // Generic CRUD endpoints follow the canonical dynamic permission pattern.
+        // Avoid loading the full endpoint catalog here because the generated asset
+        // is large and can create avoidable memory pressure on routine reads.
         return [
             in_array($ctx['kind'], ['list', 'detail'], true)
                 ? strtolower($ctx['domain'] . '.' . $ctx['table'] . '.read')
@@ -644,26 +1065,36 @@ class GenericCrudController extends BaseController
             $payload = is_array($body['data'] ?? null) ? (array)$body['data'] : $body;
             unset($payload['domain'], $payload['table'], $payload['action']);
             $payload = $this->applyScopeToPayload($ctx['tableMeta'], $payload, $ctx['scope'], $user);
-            $record = $this->service()->create(
-                $ctx['domain'],
-                $ctx['table'],
-                $payload,
-                (string)($user['username'] ?? 'system'),
-                $ctx['scope']
-            );
-            $this->auditLog('generic_crud_create', ['domain' => $ctx['domain'], 'table' => $ctx['table']], (string)($user['username'] ?? ''));
+            $idempotency = $this->resolveMutationIdempotency('create', $ctx, $body, $user, $payload);
+            $execution = $this->runMutationWithIdempotency($idempotency, function () use ($ctx, $payload, $user): array {
+                $record = $this->service()->create(
+                    $ctx['domain'],
+                    $ctx['table'],
+                    $payload,
+                    (string)($user['username'] ?? 'system'),
+                    $ctx['scope']
+                );
+                $this->auditLog('generic_crud_create', ['domain' => $ctx['domain'], 'table' => $ctx['table']], (string)($user['username'] ?? ''));
+                return [
+                    'status_code' => 201,
+                    'payload' => [
+                        'record' => $record,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'scope' => $ctx['scope'],
+                        'concurrency' => [
+                            'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
+                            'value' => $record['row_version'] ?? null,
+                            'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
+                        ],
+                    ],
+                ];
+            });
+            $response = $execution['payload'];
+            $response['idempotency'] = $this->idempotencyResponseMeta($idempotency, $execution);
+            $record = is_array($response['record'] ?? null) ? (array)$response['record'] : [];
             $this->emitConcurrencyHeaders($ctx['tableMeta'], $record);
-            $this->success([
-                'record' => $record,
-                'domain' => $ctx['domain'],
-                'table' => $ctx['table'],
-                'scope' => $ctx['scope'],
-                'concurrency' => [
-                    'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
-                    'value' => $record['row_version'] ?? null,
-                    'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
-                ],
-            ], 201);
+            $this->success($response, (int)$execution['status_code']);
         } catch (Throwable $e) {
             $this->handleCrudFailure($e, 'generic_create_failed');
         }
@@ -684,31 +1115,41 @@ class GenericCrudController extends BaseController
                 unset($payload[$identityField]);
             }
             $payload = $this->applyScopeToPayload($ctx['tableMeta'], $payload, $ctx['scope'], $user);
-            $record = $this->service()->update(
-                $ctx['domain'],
-                $ctx['table'],
-                $ctx['identity'],
-                $payload,
-                (string)($user['username'] ?? 'system'),
-                $ctx['scope'],
-                $ctx['expected_row_version']
-            );
-            $this->auditLog('generic_crud_update', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
+            $idempotency = $this->resolveMutationIdempotency('update', $ctx, $body, $user, $payload);
+            $execution = $this->runMutationWithIdempotency($idempotency, function () use ($ctx, $payload, $user): array {
+                $record = $this->service()->update(
+                    $ctx['domain'],
+                    $ctx['table'],
+                    $ctx['identity'],
+                    $payload,
+                    (string)($user['username'] ?? 'system'),
+                    $ctx['scope'],
+                    $ctx['expected_row_version']
+                );
+                $this->auditLog('generic_crud_update', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
+                return [
+                    'status_code' => 200,
+                    'payload' => [
+                        'record' => $record,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'id' => $ctx['id'],
+                        'identity' => $ctx['identity'],
+                        'scope' => $ctx['scope'],
+                        'concurrency' => [
+                            'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
+                            'value' => $record['row_version'] ?? null,
+                            'expected' => $ctx['expected_row_version'],
+                            'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
+                        ],
+                    ],
+                ];
+            });
+            $response = $execution['payload'];
+            $response['idempotency'] = $this->idempotencyResponseMeta($idempotency, $execution);
+            $record = is_array($response['record'] ?? null) ? (array)$response['record'] : [];
             $this->emitConcurrencyHeaders($ctx['tableMeta'], $record);
-            $this->success([
-                'record' => $record,
-                'domain' => $ctx['domain'],
-                'table' => $ctx['table'],
-                'id' => $ctx['id'],
-                'identity' => $ctx['identity'],
-                'scope' => $ctx['scope'],
-                'concurrency' => [
-                    'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
-                    'value' => $record['row_version'] ?? null,
-                    'expected' => $ctx['expected_row_version'],
-                    'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
-                ],
-            ]);
+            $this->success($response, (int)$execution['status_code']);
         } catch (Throwable $e) {
             $this->handleCrudFailure($e, 'generic_update_failed');
         }
@@ -722,28 +1163,38 @@ class GenericCrudController extends BaseController
             $ctx = $this->resolveContext('delete', true, $user);
             $this->enforceRuntimePermission($user, $ctx);
             $this->requireCsrf();
-            $record = $this->service()->delete(
-                $ctx['domain'],
-                $ctx['table'],
-                $ctx['identity'],
-                $ctx['scope'],
-                $ctx['expected_row_version'],
-                (string)($user['username'] ?? 'system')
-            );
-            $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
-            $this->success([
-                'record' => $record,
-                'domain' => $ctx['domain'],
-                'table' => $ctx['table'],
-                'id' => $ctx['id'],
-                'identity' => $ctx['identity'],
-                'scope' => $ctx['scope'],
-                'concurrency' => [
-                    'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
-                    'expected' => $ctx['expected_row_version'],
-                    'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
-                ],
-            ]);
+            $body = $this->jsonBody();
+            $idempotency = $this->resolveMutationIdempotency('delete', $ctx, $body, $user, $body);
+            $execution = $this->runMutationWithIdempotency($idempotency, function () use ($ctx, $user): array {
+                $record = $this->service()->delete(
+                    $ctx['domain'],
+                    $ctx['table'],
+                    $ctx['identity'],
+                    $ctx['scope'],
+                    $ctx['expected_row_version'],
+                    (string)($user['username'] ?? 'system')
+                );
+                $this->auditLog('generic_crud_delete', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity']], (string)($user['username'] ?? ''));
+                return [
+                    'status_code' => 200,
+                    'payload' => [
+                        'record' => $record,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'id' => $ctx['id'],
+                        'identity' => $ctx['identity'],
+                        'scope' => $ctx['scope'],
+                        'concurrency' => [
+                            'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
+                            'expected' => $ctx['expected_row_version'],
+                            'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
+                        ],
+                    ],
+                ];
+            });
+            $response = $execution['payload'];
+            $response['idempotency'] = $this->idempotencyResponseMeta($idempotency, $execution);
+            $this->success($response, (int)$execution['status_code']);
         } catch (Throwable $e) {
             $this->handleCrudFailure($e, 'generic_delete_failed');
         }
@@ -762,32 +1213,42 @@ class GenericCrudController extends BaseController
             if ($toStatus === '') {
                 $this->error('missing_status', 400);
             }
-            $record = $this->service()->transition(
-                $ctx['domain'],
-                $ctx['table'],
-                $ctx['identity'],
-                $toStatus,
-                (string)($user['username'] ?? 'system'),
-                $this->currentRoles($user),
-                $ctx['scope'],
-                $ctx['expected_row_version']
-            );
-            $this->auditLog('generic_crud_transition', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity'], 'to' => $toStatus], (string)($user['username'] ?? ''));
+            $idempotency = $this->resolveMutationIdempotency('transition', $ctx, $body, $user, $body, $toStatus);
+            $execution = $this->runMutationWithIdempotency($idempotency, function () use ($ctx, $toStatus, $user): array {
+                $record = $this->service()->transition(
+                    $ctx['domain'],
+                    $ctx['table'],
+                    $ctx['identity'],
+                    $toStatus,
+                    (string)($user['username'] ?? 'system'),
+                    $this->currentRoles($user),
+                    $ctx['scope'],
+                    $ctx['expected_row_version']
+                );
+                $this->auditLog('generic_crud_transition', ['domain' => $ctx['domain'], 'table' => $ctx['table'], 'id' => $ctx['id'], 'identity' => $ctx['identity'], 'to' => $toStatus], (string)($user['username'] ?? ''));
+                return [
+                    'status_code' => 200,
+                    'payload' => [
+                        'record' => $record,
+                        'domain' => $ctx['domain'],
+                        'table' => $ctx['table'],
+                        'id' => $ctx['id'],
+                        'identity' => $ctx['identity'],
+                        'scope' => $ctx['scope'],
+                        'concurrency' => [
+                            'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
+                            'value' => $record['row_version'] ?? null,
+                            'expected' => $ctx['expected_row_version'],
+                            'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
+                        ],
+                    ],
+                ];
+            });
+            $response = $execution['payload'];
+            $response['idempotency'] = $this->idempotencyResponseMeta($idempotency, $execution);
+            $record = is_array($response['record'] ?? null) ? (array)$response['record'] : [];
             $this->emitConcurrencyHeaders($ctx['tableMeta'], $record);
-            $this->success([
-                'record' => $record,
-                'domain' => $ctx['domain'],
-                'table' => $ctx['table'],
-                'id' => $ctx['id'],
-                'identity' => $ctx['identity'],
-                'scope' => $ctx['scope'],
-                'concurrency' => [
-                    'field' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])) ? 'row_version' : null,
-                    'value' => $record['row_version'] ?? null,
-                    'expected' => $ctx['expected_row_version'],
-                    'optimistic' => array_key_exists('row_version', (array)($ctx['tableMeta']['columns'] ?? [])),
-                ],
-            ]);
+            $this->success($response, (int)$execution['status_code']);
         } catch (Throwable $e) {
             $this->handleCrudFailure($e, 'generic_transition_failed');
         }

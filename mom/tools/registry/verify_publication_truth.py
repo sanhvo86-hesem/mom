@@ -11,14 +11,40 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 PORTAL = Path(__file__).resolve().parent.parent.parent
-REG = PORTAL / "qms-data" / "registry"
 REPORTS = PORTAL.parent / "_reports"
+
+
+def resolve_registry_dir() -> Path:
+    candidates = [
+        PORTAL / "data" / "registry",
+        PORTAL / "qms-data" / "registry",
+    ]
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate
+    return candidates[0]
+
+
+REG = resolve_registry_dir()
 
 REQUIRED_ARTIFACTS = [
     REG / "endpoint-catalog.json",
     REG / "frontend-foundation-catalog.json",
     REG / "registry-manifest.json",
     REG / "registry-quality-report.json",
+    REG / "wave0-governance-policy.json",
+    REG / "wave0-governance-report.json",
+    REG / "operational-blind-spot-catalog.json",
+    REG / "operational-blind-spot-report.json",
+    REG / "wave1-lifecycle-governance-policy.json",
+    REG / "wave1-lifecycle-normalization.json",
+    REG / "wave1-lifecycle-report.json",
+    REG / "wave2-canonical-governance-policy.json",
+    REG / "wave2-canonical-normalization.json",
+    REG / "wave2-canonical-report.json",
+    REG / "operational-stress-governance-policy.json",
+    REG / "operational-stress-catalog.json",
+    REG / "operational-stress-report.json",
     REG / "wave-gap-ledger.json",
     REG / "publication-truth-summary.json",
     REG / "publication-entity-accounting.json",
@@ -179,7 +205,10 @@ def main() -> int:
         ea_data = ea.get("entity_accounting", {})
         schema_tables = ea_data.get("schema_tables", {}).get("count", 0)
         fe_entities = ea_data.get("frontend_entities", {}).get("count", 0)
-        check("accounting_tables_628", schema_tables == 628, f"schema_tables={schema_tables}")
+        table_registry = load(REG / "table-registry.json")
+        actual_schema_tables = len((table_registry.get("tables") or {}))
+        check("accounting_schema_tables_match_registry", schema_tables == actual_schema_tables,
+              f"accounting={schema_tables} registry={actual_schema_tables}")
         check("accounting_entities_match_fc", fe_entities == fcs.get("entity_count"),
               f"accounting={fe_entities} fc={fcs.get('entity_count')}")
 
@@ -202,6 +231,169 @@ def main() -> int:
               f"scope={sp.get('scope')}")
         check("slice_verdict_pass", sp.get("slice_verdict") == "PASS",
               f"verdict={sp.get('slice_verdict')}")
+
+    # Gate O: Wave 0 governance
+    print("\nGate O: Wave 0 governance")
+    wave0_policy_path = REG / "wave0-governance-policy.json"
+    wave0_report_path = REG / "wave0-governance-report.json"
+    if wave0_policy_path.is_file():
+        wave0_policy = load(wave0_policy_path)
+        questions = wave0_policy.get("build_questions", [])
+        check("wave0_has_build_questions", len(questions) >= 10,
+              f"question_count={len(questions)}")
+        rejection_criteria = wave0_policy.get("rejection_criteria", [])
+        check("wave0_rejects_split_paths", "split_registry_path_or_split_write_model" in rejection_criteria,
+              "missing split path rejection criteria")
+    if wave0_report_path.is_file():
+        wave0_report = load(wave0_report_path)
+        summary = wave0_report.get("summary", {})
+        check("wave0_critical_split_path_zero", summary.get("critical_split_path_risks") == 0,
+              f"critical_split_path_risks={summary.get('critical_split_path_risks')}")
+        check("wave0_usage_classification_present",
+              sum(len(v) for v in (wave0_report.get("usage_zones") or {}).values()) > 0,
+              "usage_zones empty")
+        check("wave0_manifest_asset_registered",
+              "wave0-governance-report.json" in (rm.get("assets") or {}),
+              "wave0-governance-report.json missing from registry-manifest assets")
+
+    # Gate P: Operational blind spots
+    print("\nGate P: Operational blind spots")
+    obs_catalog_path = REG / "operational-blind-spot-catalog.json"
+    obs_report_path = REG / "operational-blind-spot-report.json"
+    if obs_catalog_path.is_file():
+        obs_catalog = load(obs_catalog_path)
+        check("ops_blind_spot_catalog_populated",
+              len(obs_catalog.get("scenarios", [])) >= 10,
+              f"scenario_count={len(obs_catalog.get('scenarios', []))}")
+    if obs_report_path.is_file():
+        obs_report = load(obs_report_path)
+        obs_summary = obs_report.get("summary", {})
+        obs_assessments = {
+            row.get("scenario_id"): row
+            for row in obs_report.get("assessments", [])
+            if isinstance(row, dict) and row.get("scenario_id")
+        }
+        check("ops_blind_spot_report_present",
+              obs_summary.get("scenario_count", 0) >= 10,
+              f"scenario_count={obs_summary.get('scenario_count')}")
+        check("ops_blind_spot_idempotency_contract_coverage",
+              (obs_summary.get("idempotency_contract_coverage_ratio", 0) >= 0.90),
+              f"coverage_ratio={obs_summary.get('idempotency_contract_coverage_ratio')}")
+        check("ops_blind_spot_detects_idempotency_gap",
+              (obs_assessments.get("OPS-001", {}).get("current_severity") in {"critical", "high", "medium", "watch"}),
+              f"OPS-001 severity={obs_assessments.get('OPS-001', {}).get('current_severity')}")
+        check("ops_blind_spot_manifest_asset_registered",
+              "operational-blind-spot-report.json" in (rm.get("assets") or {}),
+              "operational-blind-spot-report.json missing from registry-manifest assets")
+
+    # Gate Q: Wave 1 lifecycle governance
+    print("\nGate Q: Wave 1 lifecycle governance")
+    wave1_policy_path = REG / "wave1-lifecycle-governance-policy.json"
+    wave1_normalization_path = REG / "wave1-lifecycle-normalization.json"
+    wave1_report_path = REG / "wave1-lifecycle-report.json"
+    if wave1_policy_path.is_file():
+        wave1_policy = load(wave1_policy_path)
+        lifecycle_modes = wave1_policy.get("lifecycle_modes", {})
+        check("wave1_declares_guarded_runtime",
+              "guarded_transition_runtime" in lifecycle_modes,
+              "guarded_transition_runtime missing from wave1 policy")
+    if wave1_normalization_path.is_file():
+        wave1_normalization = load(wave1_normalization_path)
+        normalized_entities = wave1_normalization.get("normalized_entities", {})
+        check("wave1_normalization_targets_present",
+              len(normalized_entities) >= 6,
+              f"normalized_entities={len(normalized_entities)}")
+    if wave1_report_path.is_file():
+        wave1_report = load(wave1_report_path)
+        wave1_summary = wave1_report.get("summary", {})
+        check("wave1_normalized_targets_pass",
+              wave1_summary.get("normalized_target_entities_failed", 1) == 0,
+              f"failed={wave1_summary.get('normalized_target_entities_failed')}")
+        check("wave1_generic_core_reduced",
+              wave1_summary.get("remaining_generic_status_only_core_entities", 999) == 0,
+              f"remaining={wave1_summary.get('remaining_generic_status_only_core_entities')}")
+        check("wave1_manifest_asset_registered",
+              "wave1-lifecycle-report.json" in (rm.get("assets") or {}),
+              "wave1-lifecycle-report.json missing from registry-manifest assets")
+
+    # Gate R: Wave 2 canonical governance
+    print("\nGate R: Wave 2 canonical governance")
+    wave2_policy_path = REG / "wave2-canonical-governance-policy.json"
+    wave2_normalization_path = REG / "wave2-canonical-normalization.json"
+    wave2_report_path = REG / "wave2-canonical-report.json"
+    if wave2_policy_path.is_file():
+        wave2_policy = load(wave2_policy_path)
+        check("wave2_build_questions_present",
+              len(wave2_policy.get("build_questions", [])) >= 6,
+              f"build_questions={len(wave2_policy.get('build_questions', []))}")
+        check("wave2_rejects_service_backed_gap",
+              "service_backed_governed_control_missing_canonical_list_or_detail_endpoint" in (wave2_policy.get("rejection_criteria") or []),
+              "service-backed rejection missing")
+    if wave2_normalization_path.is_file():
+        wave2_normalization = load(wave2_normalization_path)
+        check("wave2_alignment_targets_present",
+              len(wave2_normalization.get("catalog_alignment_targets", {})) >= 8,
+              f"catalog_alignment_targets={len(wave2_normalization.get('catalog_alignment_targets', {}))}")
+    if wave2_report_path.is_file():
+        wave2_report = load(wave2_report_path)
+        wave2_summary = wave2_report.get("summary", {})
+        check("wave2_catalog_meta_consistent",
+              wave2_summary.get("canonical_catalog_meta_mismatch", 1) == 0,
+              f"mismatch={wave2_summary.get('canonical_catalog_meta_mismatch')}")
+        check("wave2_service_backed_resources_exposed",
+              wave2_summary.get("service_backed_resource_gaps", 999) == 0,
+              f"gaps={wave2_summary.get('service_backed_resource_gaps')}")
+        check("wave2_archive_isolation_closed",
+              wave2_summary.get("archive_isolation_targets_failed", 999) == 0,
+              f"failed={wave2_summary.get('archive_isolation_targets_failed')}")
+        check("wave2_unused_candidates_cleared",
+              wave2_summary.get("remaining_unused_candidate_entities", 999) == 0,
+              f"remaining={wave2_summary.get('remaining_unused_candidate_entities')}")
+        check("wave2_manifest_asset_registered",
+              "wave2-canonical-report.json" in (rm.get("assets") or {}),
+              "wave2-canonical-report.json missing from registry-manifest assets")
+
+    # Gate S: Operational stress governance
+    print("\nGate S: Operational stress governance")
+    stress_policy_path = REG / "operational-stress-governance-policy.json"
+    stress_catalog_path = REG / "operational-stress-catalog.json"
+    stress_report_path = REG / "operational-stress-report.json"
+    if stress_policy_path.is_file():
+        stress_policy = load(stress_policy_path)
+        check("stress_policy_build_questions",
+              len(stress_policy.get("build_questions", [])) >= 10,
+              f"build_questions={len(stress_policy.get('build_questions', []))}")
+        check("stress_policy_rejects_duplicate_unsafe_flows",
+              "create_or_side_effect_action_without_duplicate_or_retry_control" in (stress_policy.get("rejection_criteria") or []),
+              "duplicate/retry rejection missing")
+    if stress_catalog_path.is_file():
+        stress_catalog = load(stress_catalog_path)
+        check("stress_catalog_populated",
+              len(stress_catalog.get("scenarios", [])) >= 10,
+              f"scenario_count={len(stress_catalog.get('scenarios', []))}")
+    if stress_report_path.is_file():
+        stress_report = load(stress_report_path)
+        stress_summary = stress_report.get("summary", {})
+        stress_assessments = {
+            row.get("scenario_id"): row
+            for row in stress_report.get("assessments", [])
+            if isinstance(row, dict) and row.get("scenario_id")
+        }
+        check("stress_report_present",
+              stress_summary.get("scenario_count", 0) >= 10,
+              f"scenario_count={stress_summary.get('scenario_count')}")
+        check("stress_idempotency_contract_coverage",
+              (stress_summary.get("idempotency_contract_coverage_ratio", 0) >= 0.90),
+              f"coverage_ratio={stress_summary.get('idempotency_contract_coverage_ratio')}")
+        check("stress_report_detects_retry_risk",
+              (stress_assessments.get("STR-001", {}).get("current_severity") in {"critical", "high", "medium", "watch"}),
+              f"STR-001 severity={stress_assessments.get('STR-001', {}).get('current_severity')}")
+        check("stress_report_detects_compensation_gap",
+              (stress_assessments.get("STR-002", {}).get("current_severity") in {"critical", "high", "medium"}),
+              f"STR-002 severity={stress_assessments.get('STR-002', {}).get('current_severity')}")
+        check("stress_manifest_asset_registered",
+              "operational-stress-report.json" in (rm.get("assets") or {}),
+              "operational-stress-report.json missing from registry-manifest assets")
 
     # Summary
     total = checks_passed + checks_failed

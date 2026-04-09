@@ -1,15 +1,15 @@
 {
   "_meta": {
     "version": "4.0",
-    "generatedAt": "2026-04-05T14:44:32.532Z",
+    "generatedAt": "2026-04-09T13:44:50.371Z",
     "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
     "sourceEndpointCount": 3,
-    "generatedEndpointCount": 2866,
-    "uniqueFieldKeys": 4014,
-    "uniqueDbColumnNamesCovered": 3701,
-    "totalDbTableColumnsCovered": 10339,
-    "baselineUniqueColumnCoverage": 3701,
-    "migrationCount": 71,
+    "generatedEndpointCount": 3512,
+    "uniqueFieldKeys": 4517,
+    "uniqueDbColumnNamesCovered": 4125,
+    "totalDbTableColumnsCovered": 11562,
+    "baselineUniqueColumnCoverage": 4125,
+    "migrationCount": 85,
     "researchReferences": [
       {
         "key": "sap_inspection_lot",
@@ -183,13 +183,14 @@
     ]
   },
   "split": true,
-  "lineCount": 606975,
+  "lineCount": 685257,
   "parts": [
     {
       "file": "data-fields-part1.json",
-      "endpointCount": 1643,
+      "endpointCount": 2040,
       "domains": [
         "core_system",
+        "foundation_governance",
         "document_control",
         "master_data",
         "sales",
@@ -212,14 +213,14 @@
         "project_management",
         "crm",
         "transportation",
-        "bi_datawarehouse",
-        "supplier_relationship"
+        "bi_datawarehouse"
       ]
     },
     {
       "file": "data-fields-part2.json",
-      "endpointCount": 1223,
+      "endpointCount": 1472,
       "domains": [
+        "supplier_relationship",
         "tooling_lifecycle",
         "demand_supply_planning",
         "service_warranty",

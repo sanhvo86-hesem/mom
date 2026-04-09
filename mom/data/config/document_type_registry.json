@@ -262,6 +262,127 @@
       "sharepoint_path": "HESEM-Records/Supply-Chain-Records/PO-Exception/{YYYY}",
       "online": false,
       "decision_score": null
+    },
+
+    "MGMT": {
+      "label": "Management Document",
+      "label_vi": "Hồ sơ quản lý",
+      "description": "Management-level documentation: policies, procedures, controlled document registers (FRM-1xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["EXE", "QA", "IT"],
+      "naming_pattern": "MGMT-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Management-Records/Docs/{YYYY}",
+      "online": false,
+      "series": 100
+    },
+    "SALE": {
+      "label": "Sales Record",
+      "label_vi": "Hồ sơ kinh doanh",
+      "description": "Sales, contract review, quotation, and customer communication records (FRM-2xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["SAL", "EXE"],
+      "naming_pattern": "SALE-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Sales-Records/{YYYY}",
+      "online": false,
+      "series": 200
+    },
+    "ENGR": {
+      "label": "Engineering Record",
+      "label_vi": "Hồ sơ kỹ thuật",
+      "description": "Engineering records not covered by FAI or ECR — process sheets, setup sheets, work instructions (FRM-3xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["ENG", "QA"],
+      "naming_pattern": "ENGR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Engineering-Records/General/{YYYY}",
+      "online": false,
+      "series": 300
+    },
+    "SCMR": {
+      "label": "Supply Chain Record",
+      "label_vi": "Hồ sơ chuỗi cung ứng",
+      "description": "Supply chain records not covered by SCAR or PO-EXCEPTION (FRM-4xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["SCM"],
+      "naming_pattern": "SCMR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Supply-Chain-Records/General/{YYYY}",
+      "online": false,
+      "series": 400
+    },
+    "PROD": {
+      "label": "Production Record",
+      "label_vi": "Hồ sơ sản xuất",
+      "description": "General production records: job travelers, shift handovers, tier boards, dispatch lists, productivity (FRM-5xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["PRO", "ENG"],
+      "naming_pattern": "PROD-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Production-Records/General/{YYYY}",
+      "online": true,
+      "series": 500
+    },
+    "QUAL": {
+      "label": "Quality Record",
+      "label_vi": "Hồ sơ chất lượng",
+      "description": "General quality records not covered by NCR, CAPA, FAI, SCAR, AUD, or CAL (FRM-6xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["QA"],
+      "naming_pattern": "QUAL-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Quality-Records/General/{YYYY}",
+      "online": true,
+      "series": 600
+    },
+    "LOGR": {
+      "label": "Logistics Record",
+      "label_vi": "Hồ sơ kho vận",
+      "description": "Warehouse, shipping, receiving, inventory, and logistics records (FRM-7xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["WH", "SCM"],
+      "naming_pattern": "LOGR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Logistics-Records/{YYYY}",
+      "online": false,
+      "series": 700
+    },
+    "HREC": {
+      "label": "HR Record",
+      "label_vi": "Hồ sơ nhân sự",
+      "description": "Human resources records not covered by TRN — personnel, attendance, leave, performance (FRM-8xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["HR"],
+      "naming_pattern": "HREC-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/HR-Records/General/{YYYY}",
+      "online": false,
+      "series": 800
+    },
+    "MGTR": {
+      "label": "Management Review Record",
+      "label_vi": "Hồ sơ xem xét lãnh đạo",
+      "description": "Management review, audit reporting, and strategic planning records (FRM-9xx series)",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["EXE", "QA"],
+      "naming_pattern": "MGTR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Management-Records/Reviews/{YYYY}",
+      "online": false,
+      "series": 900
+    },
+    "GENR": {
+      "label": "General Record",
+      "label_vi": "Hồ sơ tổng quát",
+      "description": "Generic fallback for forms not covered by any specific record type",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": [],
+      "naming_pattern": "GENR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/General/{YYYY}",
+      "online": false,
+      "series": null
     }
   },
 

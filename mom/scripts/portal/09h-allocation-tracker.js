@@ -23,17 +23,33 @@ function _uid(){
   return 'alloc-' + Math.random().toString(36).slice(2, 10);
 }
 
-/* ── status palette ──────────────────────────────────────────────── */
+/* ── status palette — enriched from HmRegistry → 'allocation_status' ── */
 
-var STATUS_CONFIG = {
-  allocated:  { color:'var(--brand-2,#1565c0)', bg:'#e3f2fd', label:'Đã cấp mã',      labelEn:'Allocated',   icon:'\u{1F4CB}', terminal:false },
-  downloaded: { color:'var(--amber-light,#d97706)', bg:'#fef3c7', label:'Đã tải form',     labelEn:'Downloaded',  icon:'\u2B07',    terminal:false },
-  submitted:  { color:'var(--purple-light,#7c3aed)', bg:'#f3e8ff', label:'Đã nộp',          labelEn:'Submitted',   icon:'\u{1F4DD}', terminal:false },
-  received:   { color:'var(--green-dark,#059669)', bg:'#d1fae5', label:'Đã tiếp nhận',    labelEn:'Received',    icon:'\u{1F4E5}', terminal:true  },
-  void:       { color:'var(--text-secondary,#64748b)', bg:'var(--bg-surface-alt,#f1f5f9)', label:'Đã hủy',          labelEn:'Void',        icon:'\u26D4',    terminal:true  },
-  rejected:   { color:'var(--red-light,#dc2626)', bg:'#fef2f2', label:'Bị từ chối',      labelEn:'Rejected',    icon:'\u2717',    terminal:false },
-  error:      { color:'var(--red-light,#dc2626)', bg:'#fef2f2', label:'Lỗi',             labelEn:'Error',       icon:'\u2715',    terminal:false }
-};
+var STATUS_CONFIG = (function(){
+  var defaults = {
+    allocated:  { color:'var(--brand-2,#1565c0)', bg:'#e3f2fd', label:'Đã cấp mã',      labelEn:'Allocated',   icon:'\u{1F4CB}', terminal:false },
+    downloaded: { color:'var(--amber-light,#d97706)', bg:'#fef3c7', label:'Đã tải form',     labelEn:'Downloaded',  icon:'\u2B07',    terminal:false },
+    submitted:  { color:'var(--purple-light,#7c3aed)', bg:'#f3e8ff', label:'Đã nộp',          labelEn:'Submitted',   icon:'\u{1F4DD}', terminal:false },
+    received:   { color:'var(--green-dark,#059669)', bg:'#d1fae5', label:'Đã tiếp nhận',    labelEn:'Received',    icon:'\u{1F4E5}', terminal:true  },
+    void:       { color:'var(--text-secondary,#64748b)', bg:'var(--bg-surface-alt,#f1f5f9)', label:'Đã hủy',          labelEn:'Void',        icon:'\u26D4',    terminal:true  },
+    rejected:   { color:'var(--red-light,#dc2626)', bg:'#fef2f2', label:'Bị từ chối',      labelEn:'Rejected',    icon:'\u2717',    terminal:false },
+    error:      { color:'var(--red-light,#dc2626)', bg:'#fef2f2', label:'Lỗi',             labelEn:'Error',       icon:'\u2715',    terminal:false }
+  };
+  /* Enrich from registry if available */
+  if(window.HmRegistry && typeof HmRegistry.statusSet === 'function'){
+    var opts = HmRegistry.statusSet('allocation_status');
+    if(opts && opts.length){ opts.forEach(function(o){
+      var key = String(o.value||'').toLowerCase();
+      if(defaults[key]){
+        if(o.label) defaults[key].label = o.label;
+        if(o.labelEn) defaults[key].labelEn = o.labelEn;
+        if(o.color) defaults[key].color = o.color;
+        if(o.icon) defaults[key].icon = o.icon;
+      }
+    }); }
+  }
+  return defaults;
+})();
 
 /* ── inject stylesheet once ──────────────────────────────────────── */
 

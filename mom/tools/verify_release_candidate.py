@@ -10,6 +10,17 @@ from datetime import datetime, timezone
 PORTAL = Path(__file__).resolve().parent.parent
 REPORTS = PORTAL.parent / "_reports"
 
+
+def resolve_registry_dir() -> Path:
+    candidates = [
+        PORTAL / "data" / "registry",
+        PORTAL / "qms-data" / "registry",
+    ]
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate
+    return candidates[0]
+
 passed = 0
 failed = 0
 
@@ -52,7 +63,7 @@ if http_path.is_file():
 
 # 4. Publication truth
 print("\nPublication Truth:")
-pub_path = PORTAL / "qms-data/registry/publication-truth-summary.json"
+pub_path = resolve_registry_dir() / "publication-truth-summary.json"
 check("publication-truth-summary.json exists", pub_path.is_file())
 if pub_path.is_file():
     pub = json.loads(pub_path.read_text(encoding="utf-8"))

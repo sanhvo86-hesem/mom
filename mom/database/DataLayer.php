@@ -1299,13 +1299,9 @@ class DataLayer
      * @param string $aggregateId   Entity identifier.
      * @param array  $payload       Event payload/details.
      */
-    public function logEvent(string $eventType, string $aggregateType, string $aggregateId, array $payload): void
+    public function logEvent(string $eventType, string $aggregateType, string $aggregateId, array $payload, array $options = []): void
     {
-        // Always write to JSON audit log
-        $logDir = $this->dataDir . '/audit';
-        if (!is_dir($logDir)) {
-            @mkdir($logDir, 0775, true);
-        }
+        $metadata = is_array($options['metadata'] ?? null) ? (array)$options['metadata'] : [];
         $entry = [
             'event_type'     => $eventType,
             'aggregate_type' => $aggregateType,
@@ -1313,6 +1309,27 @@ class DataLayer
             'payload'        => $payload,
             'recorded_at'    => $this->nowIso(),
         ];
+        if (isset($options['actor_id']) && is_scalar($options['actor_id'])) {
+            $entry['actor_id'] = (string)$options['actor_id'];
+        }
+        if (isset($options['actor_name']) && is_scalar($options['actor_name'])) {
+            $entry['actor_name'] = (string)$options['actor_name'];
+        }
+        if (isset($options['ip_address']) && is_scalar($options['ip_address'])) {
+            $entry['ip_address'] = (string)$options['ip_address'];
+        }
+        if (isset($options['session_id']) && is_scalar($options['session_id'])) {
+            $entry['session_id'] = (string)$options['session_id'];
+        }
+        if ($metadata !== []) {
+            $entry['metadata'] = $metadata;
+        }
+
+        // Always write to JSON audit log
+        $logDir = $this->dataDir . '/audit';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0775, true);
+        }
         $logFile = $logDir . '/audit_' . date('Y-m') . '.jsonl';
         @file_put_contents(
             $logFile,
@@ -1324,14 +1341,38 @@ class DataLayer
         if ($this->usesPostgres()) {
             try {
                 $this->db->execute(
-                    'INSERT INTO audit_events (event_type, aggregate_type, aggregate_id, payload, metadata)
-                     VALUES (:type, :agg_type, :agg_id, :payload::jsonb, :meta::jsonb)',
+                    'INSERT INTO audit_events (
+                        event_type,
+                        aggregate_type,
+                        aggregate_id,
+                        actor_id,
+                        actor_name,
+                        payload,
+                        metadata,
+                        ip_address,
+                        session_id
+                     )
+                     VALUES (
+                        :type,
+                        :agg_type,
+                        :agg_id,
+                        :actor_id,
+                        :actor_name,
+                        :payload::jsonb,
+                        :meta::jsonb,
+                        :ip_address::inet,
+                        :session_id::uuid
+                     )',
                     [
                         ':type'     => $eventType,
                         ':agg_type' => $aggregateType,
                         ':agg_id'   => $aggregateId,
+                        ':actor_id' => isset($entry['actor_id']) && trim((string)$entry['actor_id']) !== '' ? (string)$entry['actor_id'] : null,
+                        ':actor_name' => isset($entry['actor_name']) && trim((string)$entry['actor_name']) !== '' ? (string)$entry['actor_name'] : null,
                         ':payload'  => json_encode($payload, JSON_UNESCAPED_UNICODE),
-                        ':meta'     => json_encode(['source' => 'api'], JSON_UNESCAPED_UNICODE),
+                        ':meta'     => json_encode($metadata !== [] ? $metadata : ['source' => 'api'], JSON_UNESCAPED_UNICODE),
+                        ':ip_address' => isset($entry['ip_address']) && trim((string)$entry['ip_address']) !== '' ? (string)$entry['ip_address'] : null,
+                        ':session_id' => isset($entry['session_id']) && trim((string)$entry['session_id']) !== '' ? (string)$entry['session_id'] : null,
                     ],
                 );
             } catch (\Throwable $e) {

@@ -6,77 +6,12 @@
             "*"
         ]
     },
-    "production_director": {
+    "it_admin": {
         "canCreateDocs": true,
+        "allowAllPermissions": true,
         "permissions": [
-            "*.read",
-            "advanced_planning.*",
-            "demand_supply_planning.*",
-            "mes_execution.*",
-            "mobile_operations.*",
-            "plant_maintenance.*",
-            "production.*",
-            "tooling_lifecycle.*"
-        ],
-        "denies": [
-            "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
+            "*"
         ]
-    },
-    "cnc_workshop_manager": {
-        "canCreateDocs": false
-    },
-    "shift_leader": {
-        "canCreateDocs": false
-    },
-    "setup_technician": {
-        "canCreateDocs": false
-    },
-    "cnc_operator": {
-        "canCreateDocs": false
-    },
-    "deburr_team_lead": {
-        "canCreateDocs": false
-    },
-    "deburr_technician": {
-        "canCreateDocs": false
-    },
-    "production_planner": {
-        "canCreateDocs": false,
-        "permissions": [
-            "*.read",
-            "advanced_planning.*",
-            "demand_supply_planning.*",
-            "production.*.read",
-            "production.*.update",
-            "production.*.transition"
-        ],
-        "denies": [
-            "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
-        ]
-    },
-    "cleaning_packaging_supervisor": {
-        "canCreateDocs": false
-    },
-    "cleaning_packaging_technician": {
-        "canCreateDocs": false
-    },
-    "maintenance_technician": {
-        "canCreateDocs": false
-    },
-    "engineering_lead": {
-        "canCreateDocs": false
-    },
-    "process_engineer": {
-        "canCreateDocs": false
-    },
-    "cam_nc_programmer": {
-        "canCreateDocs": false
     },
     "qa_manager": {
         "canCreateDocs": true,
@@ -94,21 +29,35 @@
             "document_control.*",
             "evidence_vault.*",
             "fmea_apqp.*",
-            "forms_system.*",
-            "master_data_governance.*",
             "module_schema.read",
             "module_schema.write",
             "quality_lab.*",
             "quality_management.*",
-            "record_system.*",
             "registry.read",
             "registry.write",
-            "schema_studio.*"
+            "supplier_relationship.*",
+            "schema_studio.*",
+            "forms_system.*",
+            "record_system.*"
+        ],
+        "denies": [
+            "*.delete",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
         ]
     },
     "quality_engineer": {
         "canCreateDocs": false,
         "permissions": [
+            "audit_risk.*",
+            "calibration_equipment.*",
+            "quality_lab.*",
+            "quality_management.*",
+            "supplier_relationship.*",
             "*.read",
             "quality_management.incoming_inspections.read",
             "quality_management.incoming_inspections.create",
@@ -116,15 +65,27 @@
             "quality_management.incoming_inspections.transition"
         ],
         "denies": [
-            "master_data_governance.*",
+            "*.delete",
             "module_schema.*",
             "registry.*",
-            "schema_studio.*"
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
         ]
     },
     "qc_inspector": {
         "canCreateDocs": false,
         "permissions": [
+            "audit_risk.*",
+            "calibration_equipment.*",
+            "quality_lab.*",
+            "quality_management.*",
+            "supplier_relationship.*",
             "*.read",
             "quality_management.incoming_inspections.read",
             "quality_management.incoming_inspections.create",
@@ -132,10 +93,32 @@
             "quality_management.incoming_inspections.transition"
         ],
         "denies": [
-            "master_data_governance.*",
+            "*.delete",
             "module_schema.*",
             "registry.*",
-            "schema_studio.*"
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "internal_auditor": {
+        "canCreateDocs": false,
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
         ]
     },
     "qms_engineer": {
@@ -147,156 +130,167 @@
             "document_control.*",
             "evidence_vault.*",
             "fmea_apqp.*",
-            "forms_system.*",
-            "master_data_governance.*",
             "module_schema.read",
             "module_schema.write",
             "quality_lab.*",
             "quality_management.*",
-            "record_system.*",
             "registry.read",
             "registry.write",
-            "schema_studio.*"
-        ]
-    },
-    "internal_auditor": {
-        "canCreateDocs": false
-    },
-    "supply_chain_manager": {
-        "canCreateDocs": false,
-        "permissions": [
-            "*.read",
-            "inventory.*",
-            "outsource_execution.*",
-            "purchasing.*",
-            "shipping_compliance.*",
             "supplier_relationship.*",
-            "traceability_serialization.*",
-            "transportation.*",
-            "warehouse_management.*"
+            "schema_studio.*",
+            "forms_system.*",
+            "record_system.*"
         ],
         "denies": [
+            "*.delete",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
             "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
-        ]
-    },
-    "buyer": {
-        "canCreateDocs": false,
-        "permissions": [
-            "*.read",
-            "inventory.*.read",
-            "purchasing.*",
-            "supplier_relationship.*",
-            "warehouse_management.*.read"
-        ],
-        "denies": [
-            "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
-        ]
-    },
-    "warehouse_clerk": {
-        "canCreateDocs": false,
-        "permissions": [
-            "*.read",
-            "inventory.*",
-            "purchasing.purchase_orders.read",
-            "purchasing.purchase_orders.detail",
-            "purchasing.purchase_orders.transition",
-            "purchasing.purchase_order_lines.read",
-            "purchasing.purchase_order_lines.detail",
-            "quality_management.incoming_inspections.read",
-            "quality_management.incoming_inspections.create",
-            "quality_management.incoming_inspections.update",
-            "quality_management.incoming_inspections.transition",
-            "warehouse_management.*"
-        ],
-        "denies": [
-            "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
-        ]
-    },
-    "tool_storekeeper": {
-        "canCreateDocs": false
-    },
-    "logistics_coordinator": {
-        "canCreateDocs": false,
-        "permissions": [
-            "*.read",
-            "purchasing.purchase_orders.read",
-            "purchasing.purchase_orders.detail",
-            "purchasing.purchase_orders.transition",
-            "shipping_compliance.*",
-            "transportation.*"
-        ],
-        "denies": [
-            "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
-        ]
-    },
-    "estimator": {
-        "canCreateDocs": false
-    },
-    "customer_service": {
-        "canCreateDocs": false
-    },
-    "finance_manager": {
-        "canCreateDocs": false,
-        "permissions": [
-            "*.read",
-            "commercial_contracts.*",
-            "finance.*",
-            "finance_extended.*",
-            "finance_treasury.*"
-        ],
-        "denies": [
-            "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
-        ]
-    },
-    "gl_payroll_accountant": {
-        "canCreateDocs": false
-    },
-    "ap_ar_accountant": {
-        "canCreateDocs": false
-    },
-    "hr_manager": {
-        "canCreateDocs": true,
-        "permissions": [
-            "*.read",
-            "hcm_workforce.*",
-            "training_hr.*"
-        ],
-        "denies": [
-            "master_data_governance.*",
-            "module_schema.*",
-            "registry.*",
-            "schema_studio.*"
-        ]
-    },
-    "ehs_specialist": {
-        "canCreateDocs": false
-    },
-    "it_admin": {
-        "canCreateDocs": true,
-        "allowAllPermissions": true,
-        "permissions": [
-            "*"
+            "customer_portal.*",
+            "foundation_governance.*"
         ]
     },
     "developer": {
         "canCreateDocs": false,
         "permissions": [
             "schema_studio.*"
+        ],
+        "denies": [
+            "*.delete",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "shift_leader": {
+        "canCreateDocs": false,
+        "permissions": [
+            "advanced_planning.*.read",
+            "demand_supply_planning.*.read",
+            "mes_execution.*.read",
+            "mobile_operations.*.read",
+            "plant_maintenance.*.read",
+            "production.*.read",
+            "tooling_lifecycle.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "setup_technician": {
+        "canCreateDocs": false,
+        "permissions": [
+            "advanced_planning.*.read",
+            "demand_supply_planning.*.read",
+            "mes_execution.*.read",
+            "mobile_operations.*.read",
+            "plant_maintenance.*.read",
+            "production.*.read",
+            "tooling_lifecycle.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "cnc_operator": {
+        "canCreateDocs": false,
+        "permissions": [
+            "advanced_planning.*.read",
+            "demand_supply_planning.*.read",
+            "mes_execution.*.read",
+            "mobile_operations.*.read",
+            "plant_maintenance.*.read",
+            "production.*.read",
+            "tooling_lifecycle.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "deburr_team_lead": {
+        "canCreateDocs": false,
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "deburr_technician": {
+        "canCreateDocs": false,
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "maintenance_technician": {
+        "canCreateDocs": false,
+        "permissions": [
+            "advanced_planning.*.read",
+            "demand_supply_planning.*.read",
+            "mes_execution.*.read",
+            "mobile_operations.*.read",
+            "plant_maintenance.*.read",
+            "production.*.read",
+            "tooling_lifecycle.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
         ]
     },
     "production_manager": {
@@ -312,10 +306,96 @@
             "tooling_lifecycle.*"
         ],
         "denies": [
-            "master_data_governance.*",
+            "*.delete",
             "module_schema.*",
             "registry.*",
-            "schema_studio.*"
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "cnc_workshop_manager": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "advanced_planning.*",
+            "demand_supply_planning.*",
+            "mes_execution.*",
+            "mobile_operations.*",
+            "plant_maintenance.*",
+            "production.*",
+            "tooling_lifecycle.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "production_planner": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "advanced_planning.*",
+            "demand_supply_planning.*",
+            "production.*.read",
+            "production.*.update",
+            "production.*.transition"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "cleaning_packaging_supervisor": {
+        "canCreateDocs": false,
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "cleaning_packaging_technician": {
+        "canCreateDocs": false,
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
         ]
     },
     "engineering_manager": {
@@ -324,18 +404,447 @@
             "*.read",
             "cnc_programs.*",
             "fmea_apqp.*",
-            "master_data_governance.*",
             "mfg_engineering.*",
             "plm_change_control.*",
             "tooling_lifecycle.*"
         ],
         "denies": [
+            "*.delete",
             "module_schema.*",
             "registry.*",
-            "schema_studio.*"
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "engineering_lead": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "cnc_programs.*",
+            "fmea_apqp.*",
+            "mfg_engineering.*",
+            "plm_change_control.*",
+            "tooling_lifecycle.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "process_engineer": {
+        "canCreateDocs": false,
+        "permissions": [
+            "advanced_planning.*.read",
+            "demand_supply_planning.*.read",
+            "mes_execution.*.read",
+            "mobile_operations.*.read",
+            "plant_maintenance.*.read",
+            "production.*.read",
+            "tooling_lifecycle.*.read",
+            "cnc_programs.*.read",
+            "fmea_apqp.*.read",
+            "mfg_engineering.*.read",
+            "plm_change_control.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "cam_nc_programmer": {
+        "canCreateDocs": false,
+        "permissions": [
+            "advanced_planning.*.read",
+            "demand_supply_planning.*.read",
+            "mes_execution.*.read",
+            "mobile_operations.*.read",
+            "plant_maintenance.*.read",
+            "production.*.read",
+            "tooling_lifecycle.*.read",
+            "cnc_programs.*.read",
+            "fmea_apqp.*.read",
+            "mfg_engineering.*.read",
+            "plm_change_control.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "supply_chain_manager": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "inventory.*",
+            "outsource_execution.*",
+            "purchasing.*",
+            "shipping_compliance.*",
+            "supplier_relationship.*",
+            "traceability_serialization.*",
+            "transportation.*",
+            "warehouse_management.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "buyer": {
+        "canCreateDocs": false,
+        "permissions": [
+            "inventory.*.read",
+            "outsource_execution.*.read",
+            "purchasing.*.read",
+            "shipping_compliance.*.read",
+            "supplier_relationship.*.read",
+            "traceability_serialization.*.read",
+            "transportation.*.read",
+            "warehouse_management.*.read",
+            "*.read",
+            "purchasing.*",
+            "supplier_relationship.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "warehouse_clerk": {
+        "canCreateDocs": false,
+        "permissions": [
+            "inventory.*.read",
+            "outsource_execution.*.read",
+            "purchasing.*.read",
+            "shipping_compliance.*.read",
+            "supplier_relationship.*.read",
+            "traceability_serialization.*.read",
+            "transportation.*.read",
+            "warehouse_management.*.read",
+            "*.read",
+            "inventory.*",
+            "purchasing.purchase_orders.read",
+            "purchasing.purchase_orders.detail",
+            "purchasing.purchase_orders.transition",
+            "purchasing.purchase_order_lines.read",
+            "purchasing.purchase_order_lines.detail",
+            "quality_management.incoming_inspections.read",
+            "quality_management.incoming_inspections.create",
+            "quality_management.incoming_inspections.update",
+            "quality_management.incoming_inspections.transition",
+            "warehouse_management.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "tool_storekeeper": {
+        "canCreateDocs": false,
+        "permissions": [
+            "inventory.*.read",
+            "outsource_execution.*.read",
+            "purchasing.*.read",
+            "shipping_compliance.*.read",
+            "supplier_relationship.*.read",
+            "traceability_serialization.*.read",
+            "transportation.*.read",
+            "warehouse_management.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "logistics_coordinator": {
+        "canCreateDocs": false,
+        "permissions": [
+            "inventory.*.read",
+            "outsource_execution.*.read",
+            "purchasing.*.read",
+            "shipping_compliance.*.read",
+            "supplier_relationship.*.read",
+            "traceability_serialization.*.read",
+            "transportation.*.read",
+            "warehouse_management.*.read",
+            "*.read",
+            "purchasing.purchase_orders.read",
+            "purchasing.purchase_orders.detail",
+            "purchasing.purchase_orders.transition",
+            "shipping_compliance.*",
+            "transportation.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "finance_manager": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "commercial_contracts.*",
+            "finance.*",
+            "finance_extended.*",
+            "finance_treasury.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "gl_payroll_accountant": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "finance.*",
+            "finance_extended.*.read",
+            "finance_treasury.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "ap_ar_accountant": {
+        "canCreateDocs": false,
+        "permissions": [
+            "*.read",
+            "finance.*",
+            "finance_extended.*.read"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "hr_manager": {
+        "canCreateDocs": true,
+        "permissions": [
+            "*.read",
+            "hcm_workforce.*",
+            "training_hr.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
+    },
+    "ehs_specialist": {
+        "canCreateDocs": false,
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "estimator": {
+        "canCreateDocs": false,
+        "permissions": [
+            "commercial_contracts.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "customer_service": {
+        "canCreateDocs": false,
+        "permissions": [
+            "commercial_contracts.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "sales_manager": {
+        "canCreateDocs": false,
+        "permissions": [
+            "commercial_contracts.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
         ]
     },
     "epicor_admin": {
-        "canCreateDocs": false
+        "canCreateDocs": false,
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*"
+        ]
+    },
+    "production_director": {
+        "canCreateDocs": true,
+        "permissions": [
+            "*.read",
+            "advanced_planning.*",
+            "demand_supply_planning.*",
+            "mes_execution.*",
+            "mobile_operations.*",
+            "plant_maintenance.*",
+            "production.*",
+            "tooling_lifecycle.*"
+        ],
+        "denies": [
+            "*.delete",
+            "module_schema.*",
+            "registry.*",
+            "schema_studio.*",
+            "core_system.*",
+            "system_infrastructure.*",
+            "forms_system.*",
+            "record_system.*",
+            "master_data_governance.*",
+            "customer_portal.*",
+            "foundation_governance.*"
+        ]
     }
 }

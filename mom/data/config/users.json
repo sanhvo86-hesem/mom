@@ -5,338 +5,2140 @@
     },
     "users": [
         {
+            "username": "an.nguyen",
+            "name": "Nguyễn Quốc An",
+            "password_hash": "$2y$12$duWLTzYhXKIEhyJp2G6to.Ef.lI9YanhQnbiYzUX6wcoBcZSfv2kK",
+            "role": "warehouse_clerk",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Warehouse Clerk",
+            "dept": "SCM",
+            "cccd": "074201006106",
+            "phone": "0786135494",
+            "personal_email": "an.nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-WAR",
+            "jd_title": "Warehouse Clerk",
+            "role_source": {
+                "excel_dept": "WH",
+                "excel_title": "warehouse_staff",
+                "excel_role": "Warehouse Staff",
+                "excel_role_key": "warehouse_staff",
+                "mapping_reason": "Warehouse Staff mapped to the warehouse clerk JD."
+            },
+            "employee_id": "EMP7DDECAAFC29C"
+        },
+        {
+            "username": "anh.nguyen",
+            "name": "Nguyển Phi Anh",
+            "password_hash": "$2y$12$zIcVIpwD2W6nsMHnejUWKuSSXDqVRTzUZlZaE9Xt15ZBmp3DPhgGa",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "038204003293",
+            "phone": "0969152705",
+            "personal_email": "PhiAnh.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP9DF6380945ED"
+        },
+        {
+            "username": "bich.bui",
+            "name": "Bùi Thị Bích",
+            "password_hash": "$2y$12$rwoQ4YBEVmPEUSHL3TVDP.kFhVwPlFGRhOe5CqG8LbDbD4A/7biiW",
+            "role": "hr_manager",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "HR Manager",
+            "dept": "HR",
+            "cccd": "034187009653",
+            "phone": "0974 864 113",
+            "personal_email": "Bich.Bui@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-HR",
+            "jd_title": "HR Manager",
+            "role_source": {
+                "excel_dept": "HR",
+                "excel_title": "HR Manager",
+                "excel_role": "HR Manager",
+                "excel_role_key": "hr_manager",
+                "mapping_reason": "Exact HR JD match."
+            },
+            "employee_id": "EMP75A406C3CA98"
+        },
+        {
+            "username": "binh.trinh",
+            "name": "Trịnh Thanh Bình",
+            "password_hash": "$2y$12$M6kxmt0iM4e/I.SBCxtuPeWyOvlwqt8LeaCK4q5PoudDQ2OSTmgL6",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "066203002800",
+            "phone": "0363880804",
+            "personal_email": "Binh.Trinh@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPCCF3B01F8AEE"
+        },
+        {
+            "username": "canh.nguyen",
+            "name": "Nguyễn Văn Cảnh",
+            "password_hash": "$2y$12$qbhroTpooSMTO8SkbNb3DOjps.YNzY98/3dDODcYpD8Taz7u4y3Au",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "052099012884",
+            "phone": "0377 076 682",
+            "personal_email": "Canh.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP6960CE5F104B"
+        },
+        {
+            "username": "chung.nguyen",
+            "name": "Nguyễn Chung",
+            "password_hash": "$2y$12$SpgUgcl1MH90vmrCL6wSquNx9G3KaOhkrajsCa6rk86yeIYOj62ou",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "070203005650",
+            "phone": "0889211823",
+            "personal_email": "Chung.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP2DE0CA4AB43F"
+        },
+        {
+            "username": "cuong.ho",
+            "name": "Hồ Lâm Quốc Cường",
+            "password_hash": "$2y$12$VVCPIHd6toj2VmCcVkF6fudHA.nWFEehoRn3IR/wOc1.9u8HYRohu",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "062201006396",
+            "phone": "0774743967",
+            "personal_email": "Cuong.Ho@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP9EA12DE876C7"
+        },
+        {
+            "username": "cuong.nguyen",
+            "name": "Nguyễn Quốc Cường",
+            "password_hash": "$2y$12$65e8vMnm1OZB/g7OiVtrQuSiRId.FPd4D1Cx.gN3X3qqr/77EeCtm",
+            "role": "qc_inspector",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "QC Inspector / CMM Programmer-Operator",
+            "dept": "QA",
+            "cccd": "089202010119",
+            "phone": "0373519642",
+            "personal_email": "Nguyen.Cuong@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-QC",
+            "jd_title": "QC Inspector / CMM Programmer-Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "QC",
+                "excel_role": "QC",
+                "excel_role_key": "qc",
+                "mapping_reason": "QC staff mapped to the QC inspector JD."
+            },
+            "employee_id": "EMP825D6536668C"
+        },
+        {
+            "username": "cuong.pham",
+            "name": "Phạm Tuấn Cường",
+            "password_hash": "$2y$12$KHrXGPFK7orU/ThnUA.yCOgOaeAAAYroxxA3IPnY/uDKpnI9oyiP2",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "087096009255",
+            "phone": "0333 799 377",
+            "personal_email": "Phamtuancuong96@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services_engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP496E5FC959A0"
+        },
+        {
+            "username": "dat.nguyen",
+            "name": "Nguyễn Bá Thành Đạt",
+            "password_hash": "$2y$12$yr67IhFHmZm0BXBH4eRDgOxqdRI7Vj7mpzqa6Dzl3WNfhG1poSgLW",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "075099017846",
+            "phone": "0363874690",
+            "personal_email": "Thanhdat.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP4142C9B85492"
+        },
+        {
+            "username": "dat.vo",
+            "name": "Võ Quốc Đạt",
+            "password_hash": "$2y$12$4VGS86p4/T8FZvq8Fke7N.VhwVLcXrNfxZFfov7VPzL9DQ7MzGjyS",
+            "role": "qc_inspector",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "QC Inspector Lead",
+            "dept": "QA",
+            "cccd": "075098004912",
+            "phone": "035 570 5777",
+            "personal_email": "Dat.vo@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-QCL",
+            "jd_title": "QC Inspector Lead",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "QC",
+                "excel_role": "QC manager",
+                "excel_role_key": "qc_manager",
+                "mapping_reason": "QC Manager mapped to QC Inspector Lead; the portal reuses the qc_inspector permission profile."
+            },
+            "employee_id": "EMP5DCCE79F5004"
+        },
+        {
+            "username": "diem.huynh",
+            "name": "Huỳnh Thị Thúy Diễm",
+            "password_hash": "$2y$12$vdas9zkzPDAisI7t6dgu7OQrFP5ZPFPugXS9L53VdrNtBzNyJM5DG",
+            "role": "buyer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Buyer / Purchasing",
+            "dept": "SCM",
+            "cccd": "052302003481",
+            "phone": "0388701127",
+            "personal_email": "Diem.Huynh@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-BUY",
+            "jd_title": "Buyer / Purchasing",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Buyer",
+                "excel_role": "Buyer",
+                "excel_role_key": "buyer",
+                "mapping_reason": "Exact supply chain JD match."
+            },
+            "employee_id": "EMPE3C50D407830"
+        },
+        {
+            "username": "dien.pham",
+            "name": "Phạm Minh Diễn",
+            "password_hash": "$2y$12$h53ddRIBJV28DrN5ne9RTe48asNSgnhiIOE50lxkPBfteHYdGBMPq",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "083203008340",
+            "phone": "0346038401",
+            "personal_email": "Dien.Pham@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP444D8C87C481"
+        },
+        {
+            "username": "dung.le",
+            "name": "Lê Hoàng Dũng",
+            "password_hash": "$2y$12$2DHpjfNaDUnfgiJESpayIuzWyxwe8fkKdJJRp0xrAO4QyI3HoC6.6",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "077097004336",
+            "phone": "0386069985",
+            "personal_email": "dunghoangle91@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services_engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP79CE29EA2141"
+        },
+        {
+            "username": "duong.nguyen",
+            "name": "Nguyễn Hướng Dương",
+            "password_hash": "$2y$12$/iiSOqLVBByf.1nViskSkunt2RloHC3r/pLfzGSWtz6MKWqt2BNii",
+            "role": "engineering_lead",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Engineering Lead / Manager",
+            "dept": "ENG",
+            "cccd": "051094009293",
+            "phone": "0336 573 651",
+            "personal_email": "Duong.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-ENGM",
+            "jd_title": "Engineering Lead / Manager",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer lead",
+                "excel_role": "Service engineering team leader",
+                "excel_role_key": "service_engineering team leader",
+                "mapping_reason": "Service engineering lead mapped to the engineering manager JD."
+            },
+            "employee_id": "EMP4D228B9AA0B8"
+        },
+        {
+            "username": "duy.le",
+            "name": "Lê Nhựt Duy",
+            "password_hash": "$2y$12$hSe8EB.EJpciodJSd./RBOGAA.SBJ9lvePqlLkEZcR0Mow5g6EqVW",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "089097009872",
+            "phone": "0981734994",
+            "personal_email": "duyln016@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services_engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP43333C76D356"
+        },
+        {
+            "username": "duy.nguyen",
+            "name": "Nguyễn Thành Duy",
+            "password_hash": "$2y$12$2JJzXaVIceJC5RkTKC6TGuVpJ5UwJyP0d8.GzRNq8Trw5cEphP41a",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "034202014292",
+            "phone": "0973953532",
+            "personal_email": "Duy.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services_engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP5F6037BFA093"
+        },
+        {
+            "username": "duyen.doan",
+            "name": "Đoàn Thị Mỹ Duyên",
+            "password_hash": "$2y$12$clUm4.OQP0o/HcctXexJh.m6m0BbOR3qwpdS6H3S5ApLldZWa8R5e",
+            "role": "buyer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Buyer / Purchasing",
+            "dept": "SCM",
+            "cccd": "052303006810",
+            "phone": "0938108551",
+            "personal_email": "Duyen.Doan@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-BUY",
+            "jd_title": "Buyer / Purchasing",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Buyer",
+                "excel_role": "Buyer",
+                "excel_role_key": "buyer",
+                "mapping_reason": "Exact supply chain JD match."
+            },
+            "employee_id": "EMP2995B20672DD"
+        },
+        {
+            "username": "giau.nguyen",
+            "name": "Nguyễn Thị Giàu",
+            "password_hash": "$2y$12$24XBIyeTAAmF9aWpoINWMeGLVaFFLOJm14tU0uKAZCw2K5TVqr0Cy",
+            "role": "cleaning_packaging_supervisor",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Cleaning and Packaging Supervisor",
+            "dept": "PRO",
+            "cccd": "074193007084",
+            "phone": "0971 724114",
+            "personal_email": "nguyenthigiau2k24@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-CPS",
+            "jd_title": "Cleaning and Packaging Supervisor",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Packaging",
+                "excel_role": "Packaging manager",
+                "excel_role_key": "packaging_manager",
+                "mapping_reason": "Packaging manager mapped to the published packaging supervisor JD."
+            },
+            "employee_id": "EMP91FE9805B1A5"
+        },
+        {
+            "username": "ha.le",
+            "name": "Lê Đình Quang Hạ",
+            "password_hash": "$2y$12$FSSZlnqKK68zvXDPQOqgMu5Ig.L.mha2a1d/jVc/fdAsPSJJ5VHlG",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "079095005073",
+            "phone": "0797 339 790",
+            "personal_email": "Ha.Le@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP3069BA8A8AEF"
+        },
+        {
+            "username": "hanh.nguyen",
+            "name": "Nguyễn Thị Mỹ Hạnh",
+            "password_hash": "$2y$12$.7l7Jl2yuC4/zalTKxQOeuCymfzo2gVS4j50VHQ.51nACM40D.m3u",
+            "role": "qc_inspector",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "QC Inspector / CMM Programmer-Operator",
+            "dept": "QA",
+            "cccd": "052303010725",
+            "phone": "0702741435",
+            "personal_email": "Hanh.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-QC",
+            "jd_title": "QC Inspector / CMM Programmer-Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "QC",
+                "excel_role": "QC",
+                "excel_role_key": "qc",
+                "mapping_reason": "QC staff mapped to the QC inspector JD."
+            },
+            "employee_id": "EMPCF176D341A19"
+        },
+        {
+            "username": "hau.huong",
+            "name": "Hường Thanh Hậu",
+            "password_hash": "$2y$12$HioPemHeS8xg8XSXlJFju.abenIyruaLoQnKUi6/REoNYwC2heqBS",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "066203008252",
+            "phone": "0966206407",
+            "personal_email": "Hau.Huong@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPF55F15F6AEC1"
+        },
+        {
+            "username": "hieu.le.1950",
+            "name": "Lê Ngọc Hiếu",
+            "password_hash": "$2y$12$vXGkipYdKSylOBAp57WgpeXdDx43ZNwdHk6U0OLRRHDolRUc8Fe12",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "066202011950",
+            "phone": "0988782386",
+            "personal_email": "HieuNgoc.Le@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPFF2CEB5637FA"
+        },
+        {
+            "username": "hieu.le.3805",
+            "name": "Lê Văn Hiếu",
+            "password_hash": "$2y$12$7ybb4kG9404QTsgbnacmT.QudC33cXuJWagS5mNPq2l1z0ztDQmwa",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "054087003805",
+            "phone": "0782566771",
+            "personal_email": "hl8512301@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPD22B600A0747"
+        },
+        {
+            "username": "hoa.vo",
+            "name": "Võ Huỳnh Tấn Hòa",
+            "password_hash": "$2y$12$GyopngkOKoVmzRg9mRim4e5//DYHnL3ppRubF7sXVFTWBs5lukwYO",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "066203002186",
+            "phone": "0786581526",
+            "personal_email": "Hoa.Vo@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP99A90B9FC928"
+        },
+        {
+            "username": "hong.truong",
+            "name": "Trương Thị Kim Hồng",
+            "password_hash": "$2y$12$2ps9DFyp5O5EwR5F5FcM5./29CsY1VNgIDHjTJK/ZoR3g0NNkePcK",
+            "role": "gl_payroll_accountant",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "General Ledger and Payroll Accountant",
+            "dept": "FIN",
+            "cccd": "075302019998",
+            "phone": "0397246743",
+            "personal_email": "kimhong071102@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-GLP",
+            "jd_title": "General Ledger and Payroll Accountant",
+            "role_source": {
+                "excel_dept": "FIN",
+                "excel_title": "accounting_staff",
+                "excel_role": "Accounting Staff",
+                "excel_role_key": "accounting_staff",
+                "mapping_reason": "Accounting Staff mapped to the closest finance JD used by the portal."
+            },
+            "employee_id": "EMPD37B7C1A2930"
+        },
+        {
+            "username": "hue.bui",
+            "name": "Bùi Thị Huệ",
+            "password_hash": "$2y$12$jVcChcokVPBFKQW1dm9AQeXofricexclJ5/JHo.wzECyFlZ3AEWHO",
+            "role": "supply_chain_manager",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Supply Chain Manager",
+            "dept": "SCM",
+            "cccd": "038188010624",
+            "phone": "0346021882",
+            "personal_email": "Hue.Bui@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-SCM",
+            "jd_title": "Supply Chain Manager",
+            "role_source": {
+                "excel_dept": "WH",
+                "excel_title": "warehouse_manager",
+                "excel_role": "Warehouse Manager",
+                "excel_role_key": "warehouse_manager",
+                "mapping_reason": "Warehouse Manager mapped to the warehouse leadership JD available in the portal role model."
+            },
+            "employee_id": "EMPE1C115215937"
+        },
+        {
+            "username": "hung.nguyen.5661",
+            "name": "Nguyễn Thanh Hùng",
+            "password_hash": "$2y$12$PGENO/dB3ZUQVtw1n0cSvOxGBuepi.Rr5JOXq5z7WzjjeLmVPFSs2",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "052201015661",
+            "phone": "0382687381",
+            "personal_email": "Thanhhung.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP7EE334384692"
+        },
+        {
+            "username": "hung.nguyen.5748",
+            "name": "Nguyễn Văn Thế Hùng",
+            "password_hash": "$2y$12$yGsGPheHw1q7EpU5rO2wTeennlndJRcIPyOAT8ZIrI2d8cXHRdDdy",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "075200015748",
+            "phone": "0347139317",
+            "personal_email": "Thehung.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPBA68A31163B7"
+        },
+        {
+            "username": "huy.nguyen",
+            "name": "Nguyễn Quốc Huy",
+            "password_hash": "$2y$12$CGCjlmjV3EwiqlwsFyLmNedkhz/jBOxJxrQwZ7EaiBvsRIVZNQjIa",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "052204008188",
+            "phone": "0977897950",
+            "personal_email": "Huy.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP50ED401ABC6A"
+        },
+        {
+            "username": "kien.bui",
+            "name": "Bùi Trung Kiên",
+            "password_hash": "$2y$12$ylPfHiAYc08lUoEK.eujKeYAYX7QVgBX0cuP12atu9xEZsOav/Sn2",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "089202006818",
+            "phone": "0328371401",
+            "personal_email": "kienbui141002@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "service_ engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMPD9E1D6EDE6C0"
+        },
+        {
+            "username": "kiet.huynh",
+            "name": "Huỳnh Lê Quốc Kiệt",
+            "password_hash": "$2y$12$7ZcikdfzidFBDrlyu0Qyd.bbLnbSfyPG2ZhueCLeWWETVCLj7uY26",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "083204009491",
+            "phone": "0394913039",
+            "personal_email": "Kiet.Huynh@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPA59FF93F6B9A"
+        },
+        {
+            "username": "kiet.ngo",
+            "name": "Ngô Nguyễn Anh Kiệt",
+            "password_hash": "$2y$12$5MwyQWMtRkd98AlnqVsXHu.oV2VMpJqyOPf0/i/px/OfjhhF3hv72",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "051202006933",
+            "phone": "0376783952",
+            "personal_email": "Kiet.Ngo@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPE94B214DD18D"
+        },
+        {
+            "username": "lien.vu",
+            "name": "Vũ Thị Liên",
+            "password_hash": "$2y$12$kCU9q9MqtG2JUknaOyxRbOBS6EX5f74Dbayi2ZgjAGJBZQ3Kp9RV6",
+            "role": "deburr_technician",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Deburr Technician",
+            "dept": "PRO",
+            "cccd": "08181004931",
+            "phone": "0355046227",
+            "personal_email": "an2255thh@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DBT",
+            "jd_title": "Deburr Technician",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Packaging",
+                "excel_role": "Finish/Deburr/Assembly",
+                "excel_role_key": "finish_deburr_assembly",
+                "mapping_reason": "Finish/deburr/assembly mapped to the deburr technician JD."
+            },
+            "employee_id": "EMPF154E8299024"
+        },
+        {
+            "username": "linh.nguyen",
+            "name": "Nguyễn Đình Nhật Linh",
+            "password_hash": "$2y$12$amIJsESN8FbNQDX4f7xVYuW8A1Zc5HEsiH2mdJ0Dq2K57gItrgfqe",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "038204030370",
+            "phone": "0347486977",
+            "personal_email": "Linh.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP2A532124F45D"
+        },
+        {
+            "username": "loc.nguyen",
+            "name": "Nguyễn Văn Lộc",
+            "password_hash": "$2y$12$wYPCkYqCYtJajlql/diwee/jYiknMOUqRSTY3rP19R4/.kr6x/o92",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Production Engineer / Industrial Engineer",
+            "dept": "PRO",
+            "cccd": "054202003424",
+            "phone": "0389704568",
+            "personal_email": "Loc.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-PIE",
+            "jd_title": "Production Engineer / Industrial Engineer",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Engineer",
+                "excel_role": "Mfg Engineering",
+                "excel_role_key": "mfg engineering",
+                "mapping_reason": "Manufacturing engineering inside production mapped to the production engineer JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMPD22D9C131090"
+        },
+        {
+            "username": "ly.bien",
+            "name": "Biện Thị Cẩm Ly",
+            "password_hash": "$2y$12$6pk.T22RKrYLVYUuADEWnuxA8yjyfj4UR6Iu2YYa7de/MfUlZOAiC",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Production Engineer / Industrial Engineer",
+            "dept": "PRO",
+            "cccd": "052205004480",
+            "phone": "0333064820",
+            "personal_email": "Ly.Bien@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-PIE",
+            "jd_title": "Production Engineer / Industrial Engineer",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Engineering Assistant",
+                "excel_role": "Mfg Engineering",
+                "excel_role_key": "mfg engineering",
+                "mapping_reason": "Manufacturing engineering inside production mapped to the production engineer JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMPD0F5DC955ED2"
+        },
+        {
+            "username": "mai.nguyen",
+            "name": "Nguyễn Ngọc Mai",
+            "password_hash": "$2y$12$ovcG9apCG5EHkz9SdqiWyO5B2o6igq4audbXqmh5cgJ6dL43K56qG",
+            "role": "deburr_technician",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Deburr Technician",
+            "dept": "PRO",
+            "cccd": "094174003622",
+            "phone": "0365589751",
+            "personal_email": "Vobaonhan2008@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DBT",
+            "jd_title": "Deburr Technician",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Packaging",
+                "excel_role": "Finish/Deburr/Assembly",
+                "excel_role_key": "finish_deburr_assembly",
+                "mapping_reason": "Finish/deburr/assembly mapped to the deburr technician JD."
+            },
+            "employee_id": "EMPED2CFF65CF30"
+        },
+        {
+            "username": "nam.le",
+            "name": "Lê Hoàng Nam",
+            "password_hash": "$2y$12$X6mUKfjwilQEGqV2rPWfrunlfDaKk7zqE/ymHSL5FwJN5TEIMSa/.",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "094200003328",
+            "phone": "0822355919",
+            "personal_email": "Nam.Le@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPDB09846A83A4"
+        },
+        {
+            "username": "nam.nguyen",
+            "name": "Nguyễn Văn Nam",
+            "password_hash": "$2y$12$1s9SsMtYEaNDPe74DY8RcOPe9RcwRwX1Whb/mKHWk9R5O7HGqYLtW",
+            "role": "cnc_workshop_manager",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Workshop Manager",
+            "dept": "PRO",
+            "cccd": "042096010650",
+            "phone": "0972754204",
+            "personal_email": "Nam.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-WKM",
+            "jd_title": "CNC Workshop Manager",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Production Manager",
+                "excel_role": "Production Manager",
+                "excel_role_key": "prod_manager",
+                "mapping_reason": "Production Manager mapped to the workshop management JD."
+            },
+            "employee_id": "EMP1C9C2B1CAC47"
+        },
+        {
+            "username": "nghia.le",
+            "name": "Lê Hữu Nghĩa",
+            "password_hash": "$2y$12$3pyU0Dcay/RuQMUJJrnumOX.K4PhGcRyk6cZ7lFIMH7dGd/f0qHZG",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "089205001394",
+            "phone": "0812339574",
+            "personal_email": "Nghia.Le@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP9351927A1951"
+        },
+        {
+            "username": "nghia.nguyen",
+            "name": "Nguyễn Trọng Nghĩa",
+            "password_hash": "$2y$12$GHDJOWjZfF5K90cXTvJBbOK4Pa5vk2jH6miS6M2p5AGMhMJJcQOaO",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "072090016028",
+            "phone": "0378 167 897",
+            "personal_email": "nguyentrongnghia130390@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services_engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP16B4DE08C703"
+        },
+        {
+            "username": "nguyen.nguyen",
+            "name": "Nguyễn Trọng Nguyên",
+            "password_hash": "$2y$12$xqR42ZA8PWMVDq0gabAlq.aUQYZXrIvZHxanDZidMJMWCaFNdeTH.",
+            "role": "qc_inspector",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "QC Inspector / CMM Programmer-Operator",
+            "dept": "QA",
+            "cccd": "051201006105",
+            "phone": "0379790516",
+            "personal_email": "Nguyen.Trong@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-QC",
+            "jd_title": "QC Inspector / CMM Programmer-Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "QC",
+                "excel_role": "QC",
+                "excel_role_key": "qc",
+                "mapping_reason": "QC staff mapped to the QC inspector JD."
+            },
+            "employee_id": "EMP0EA5926D32DC"
+        },
+        {
+            "username": "nhat.pham",
+            "name": "Phạm Xuân Nhật",
+            "password_hash": "$2y$12$Y03BxmSKDo../Hz3gu0t4.D1C2f6MIbzIn8vmrMgP8gWT1FnZxdg.",
+            "role": "qc_inspector",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "QC Inspector / CMM Programmer-Operator",
+            "dept": "QA",
+            "cccd": "052203017329",
+            "phone": "0356630462",
+            "personal_email": "Pham.Nhat@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-QC",
+            "jd_title": "QC Inspector / CMM Programmer-Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "QC",
+                "excel_role": "QC",
+                "excel_role_key": "qc",
+                "mapping_reason": "QC staff mapped to the QC inspector JD."
+            },
+            "employee_id": "EMPA58A631470A1"
+        },
+        {
+            "username": "phu.bui",
+            "name": "Bùi Gia Phú",
+            "password_hash": "$2y$12$GLhPhp0d64c2PTZpuXsiY.NnRPEV5CGmj7E8zNQrTCvB2noSAWGpu",
+            "role": "engineering_lead",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Engineering Lead / Manager",
+            "dept": "ENG",
+            "cccd": "034094010361",
+            "phone": "0974 371 021",
+            "personal_email": "Phu.Bui@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-ENGM",
+            "jd_title": "Engineering Lead / Manager",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer lead",
+                "excel_role": "Service engineering team leader",
+                "excel_role_key": "service_engineering team leader",
+                "mapping_reason": "Service engineering lead mapped to the engineering manager JD."
+            },
+            "employee_id": "EMPB2D3E7298DEE"
+        },
+        {
+            "username": "phu.tran",
+            "name": "Trần Anh Phú",
+            "password_hash": "$2y$12$QUCTmFDKWjrwEvluxNgUAeQ7XqwDmOj3UWir.JaMaIUQZicG/vqua",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "052304016519",
+            "phone": "0352824897",
+            "personal_email": "Phu.Tran@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP0014876BFDE7"
+        },
+        {
+            "username": "phuc.nguyen",
+            "name": "Nguyễn Đình Phúc",
+            "password_hash": "$2y$12$.c7YHOXNk7o9bL4H4Z4tZu2l9r.Jz7rXyf3LmGQf3XF5qqemJrA42",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "056202006085",
+            "phone": "0899383044",
+            "personal_email": "Phuc.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP71E9D220E08A"
+        },
+        {
+            "username": "phuong.nguyen",
+            "name": "Nguyễn Kim Phượng",
+            "password_hash": "$2y$12$lrLy2PtgUG2h/qxwMq33BObD7WJhQ88JBblRoRI0lVnn7qomTU6t6",
+            "role": "deburr_technician",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Deburr Technician",
+            "dept": "PRO",
+            "cccd": "074192002191",
+            "phone": "0349264636",
+            "personal_email": "rfrfg5694@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DBT",
+            "jd_title": "Deburr Technician",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Packaging",
+                "excel_role": "Finish/Deburr/Assembly",
+                "excel_role_key": "finish_deburr_assembly",
+                "mapping_reason": "Finish/deburr/assembly mapped to the deburr technician JD."
+            },
+            "employee_id": "EMP1A45BDCE264D"
+        },
+        {
+            "username": "quan.huynh",
+            "name": "Huỳnh Minh Quan",
+            "password_hash": "$2y$12$WUrZsEOMB5s0FzJv.a9oaOrl2bTck.1Thi3YtsWmTtPrWDuF6Z4HW",
+            "role": "shift_leader",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Shift Leader",
+            "dept": "PRO",
+            "cccd": "051095007510",
+            "phone": "033 9747467",
+            "personal_email": "Quan.Huynh@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-SL",
+            "jd_title": "Shift Leader",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Production lead",
+                "excel_role": "Production team leader",
+                "excel_role_key": "production team_leader",
+                "mapping_reason": "Production team lead mapped to the shift leader JD."
+            },
+            "employee_id": "EMPABF0F7BAA13D"
+        },
+        {
+            "username": "quan.nguyen",
+            "name": "Nguyễn Hữu Quân",
+            "password_hash": "$2y$12$zE7y315GYTfJ62pQ6Q9phem1NOZSgCD9Xl8GYW1WBxL3fnabYbtsi",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "052204011548",
+            "phone": "0975803127",
+            "personal_email": "Quan.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP9D987C6086D5"
+        },
+        {
+            "username": "quan.tran",
+            "name": "Trần Minh Quân",
+            "password_hash": "$2y$12$rfIA0GN9vJPrFxBo.TgKZ.TPvH7X.v9X8koolyHQPXWBpFvzL2W7G",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "082097012058",
+            "phone": "0974427310",
+            "personal_email": "tmquandcvc@gmail.com.",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services_engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP2508D4215A28"
+        },
+        {
+            "username": "quyen.vo",
+            "name": "Võ Thị Quyên",
+            "password_hash": "$2y$12$vuakvHXUSrTGv/J0QWeCWeCBJ8qMTz9uNFAIb0.3nRhRPhwKoodeC",
+            "role": "production_planner",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Production Planner",
+            "dept": "PRO",
+            "cccd": "051302011569",
+            "phone": "0368036887",
+            "personal_email": "Quyen.Vo@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-PPL",
+            "jd_title": "Production Planner",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Order processing",
+                "excel_role": "Planning",
+                "excel_role_key": "planning",
+                "mapping_reason": "Planning/order processing mapped to the production planner JD."
+            },
+            "employee_id": "EMP6B20E452489D"
+        },
+        {
+            "username": "rich.chau",
+            "name": "Châu Rích",
+            "password_hash": "$2y$12$jWfk4CgikX5uIDQXxYN6de0nA1/24Ih5BKNpq6EXPyJwkP6TGKo3K",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "089202006724",
+            "phone": "0379925742",
+            "personal_email": "Rich.Chau@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPEAC625AB442C"
+        },
+        {
             "username": "sanh.vo",
+            "name": "Võ Ngọc Sanh",
             "password_hash": "$2y$10$ddK/9AJVjEctrUd0eao8guMybAtvSgBrc//QONGkxZhCoxJoi/Xuq",
             "role": "ceo",
             "active": true,
             "created_at": "2026-02-13T04:20:22.318249Z",
-            "updated_at": "2026-04-07T09:14:28+00:00",
-            "name": "Võ Ngọc Sanh",
-            "dept": "EXE",
+            "updated_at": "2026-04-09T09:58:43+00:00",
             "title": "Chief Executive Officer (CEO)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": "",
-            "last_login": "2026-04-07T09:14:28+00:00",
+            "dept": "EXE",
+            "cccd": "075086003569",
+            "phone": "0933 090 593",
+            "personal_email": "SanhVo@hesem.com.vn",
             "mfa": {
                 "enabled": true,
                 "secret_b32": "OQ6HFXXRRPJNZYYS2HXS5LU2ZBDBXVW6",
                 "enabled_at": "2026-03-07T05:34:19+00:00"
-            }
-        },
-        {
-            "username": "mai.tran",
-            "password_hash": "$2y$10$qKHGnQlmFrEuiMZHlMz6h.WGKLLDeA0eYLViIbC13Tt/jRQXQChf6",
-            "role": "qa_manager",
-            "active": true,
-            "created_at": "2026-02-13T04:20:22.618767Z",
-            "updated_at": "2026-03-05T15:08:12+00:00",
-            "name": "Trần Thị Mai",
-            "dept": "QA",
-            "title": "QA Manager",
-            "cccd": "",
-            "phone": "",
-            "personal_email": "",
-            "mfa": {
-                "enabled": true,
-                "secret_b32": "SLCT4MU32YDQOUVKE7B4C26ATWPLIR57",
-                "enabled_at": "2026-03-04T09:01:05+00:00"
             },
-            "last_login": "2026-03-05T15:08:12+00:00"
+            "jd_code": "JD-CEO",
+            "jd_title": "Chief Executive Officer (CEO)",
+            "role_source": {
+                "excel_dept": "BOD",
+                "excel_title": "Tổng Giám Đốc",
+                "excel_role": "Tổng Giám Đốc",
+                "excel_role_key": "general_director",
+                "mapping_reason": "Exact executive JD match."
+            },
+            "last_login": "2026-04-02T01:58:29+00:00",
+            "employee_id": "EMP4D81E098F9CF"
         },
         {
-            "username": "van.nguyen",
-            "password_hash": "$2b$12$iLvBzy37RwdUIF5NGU3omelsLh6LfmDj97HIh5X0C3j9SbkzoKxTm",
-            "role": "production_director",
+            "username": "son.nguyen",
+            "name": "Nguyễn Ngọc Sơn",
+            "password_hash": "$2y$12$lWRuUMJZc00dIc5c/YYS8eBCzHb8CEieywt1wERYiW8ApVAgwPt5S",
+            "role": "engineering_lead",
             "active": true,
-            "created_at": "2026-02-13T04:20:22.954824Z",
-            "updated_at": "2026-03-04T08:49:41+00:00",
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Engineering Lead / Manager",
+            "dept": "ENG",
+            "cccd": "054098000350",
+            "phone": "0984 307 865",
+            "personal_email": "Son.Nguyen@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Nguyễn Sỹ Văn",
-            "dept": "EXE",
-            "title": "Production Director",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "bich.bui",
-            "password_hash": "$2y$10$Zlu3MaF1rAXw5tlalK57o.bmWESEnoHaUHO5tm9QU1/lLlsbaeqna",
-            "role": "hr_manager",
-            "active": true,
-            "created_at": "2026-02-13T04:20:23.232400Z",
-            "updated_at": "2026-03-04T08:58:07+00:00",
-            "name": "Bùi Thị Bích",
-            "dept": "HR",
-            "title": "HR Manager",
-            "cccd": "",
-            "phone": "",
-            "personal_email": "",
-            "mfa": {
-                "enabled": true,
-                "secret_b32": "HSBJLZWWV7EYQBQLZDPSBDJK4LAEYQR6",
-                "enabled_at": "2026-03-04T08:55:08+00:00"
+            "jd_code": "JD-ENGM",
+            "jd_title": "Engineering Lead / Manager",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Engineer",
+                "excel_role": "Mfg Engineering manager",
+                "excel_role_key": "mfg engineering_manager",
+                "mapping_reason": "Manufacturing engineering manager mapped to the engineering manager JD."
             },
-            "last_login": "2026-03-04T08:58:07+00:00"
-        },
-        {
-            "username": "yen.tran",
-            "password_hash": "$2b$12$mWsb79h2aSFf0hvRq0DI2uHF0RRY3T8QXDDaLbszCbwVBAjf.nbC6",
-            "role": "finance_manager",
-            "active": true,
-            "created_at": "2026-02-13T04:20:23.511218Z",
-            "updated_at": "2026-02-13T04:20:23.511236Z",
-            "mfa": {
-                "enabled": false
-            },
-            "name": "Trần Ngọc Yến",
-            "dept": "FIN",
-            "title": "Finance Manager (FIN-01)"
+            "employee_id": "EMP20C69B968796"
         },
         {
             "username": "son.phan",
-            "password_hash": "$2b$12$lKLadIhNm0lXmP9dPpmgk.qowk108ICKI1xyT1XmBj5cU9uD8mt2i",
-            "role": "sales_officer",
-            "active": true,
-            "created_at": "2026-02-13T04:20:23.776875Z",
-            "updated_at": "2026-02-13T04:20:23.776893Z",
-            "mfa": {
-                "enabled": false
-            },
             "name": "Phan Hồng Sơn",
-            "dept": "SAL",
-            "title": "Estimator (SAL-03)"
-        },
-        {
-            "username": "ha.nguyen",
-            "password_hash": "$2b$12$3tQmDDC.CHl2KnopxRo2kO8Wjz/FaLm5/aSs.jQDyt6MMfVOycyqe",
-            "role": "supply_chain_manager",
-            "active": false,
-            "created_at": "2026-02-13T04:20:24.045719Z",
-            "updated_at": "2026-03-05T09:19:26+00:00",
-            "mfa": {
-                "enabled": false
-            },
-            "name": "Nguyễn Thị Hà",
-            "dept": "PUR",
-            "title": "Purchasing Manager (PUR-02)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "khoa.tran",
-            "password_hash": "$2b$12$aVxL/rFISCQ1fkVazvA3v.M/v2PSNynsjyQge0D/ZiszyKKVSMaUK",
-            "role": "qc_inspector",
-            "active": false,
-            "created_at": "2026-02-13T04:20:24.317309Z",
-            "updated_at": "2026-03-05T09:19:21+00:00",
-            "mfa": {
-                "enabled": false
-            },
-            "name": "Trần Đăng Khoa",
-            "dept": "QA",
-            "title": "QC Inspector (QA-02)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "ngoc.pham",
-            "password_hash": "$2b$12$vOZuFpuHlN0kxCZfrosAXuNFclHI6uF1vp512lxclpWnyYR9Sd4Gq",
+            "password_hash": "$2y$12$0v3wsEOYXQoy5A1kiO7jpu6nJocrUmGlPY4i8pFq.p4jvmHt8zrS6",
             "role": "estimator",
-            "active": false,
-            "created_at": "2026-02-13T04:20:24.588906Z",
-            "updated_at": "2026-03-05T09:19:17+00:00",
-            "mfa": {
-                "enabled": false
-            },
-            "name": "Phạm Thị Ngọc",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Estimator",
             "dept": "SAL",
-            "title": "Estimator (SAL-03)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "hue.bui",
-            "password_hash": "$2b$12$0qfNEBzCL5/373ql77Xmy.cF3A3idwnZnm2C4HKsvabIQ08CM4h8K",
-            "role": "warehouse_lead",
-            "active": true,
-            "created_at": "2026-02-13T04:20:24.859453Z",
-            "updated_at": "2026-02-13T04:20:24.859472Z",
+            "cccd": "077096003564",
+            "phone": "0335 327 727",
+            "personal_email": "Son.Phan@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Bùi Thị Huệ",
-            "dept": "WHS",
-            "title": "Warehouse Manager (WHS-01)"
+            "jd_code": "JD-EST",
+            "jd_title": "Estimator",
+            "role_source": {
+                "excel_dept": "SAL",
+                "excel_title": "sales_manager",
+                "excel_role": "Sales Manager",
+                "excel_role_key": "sales_manager",
+                "mapping_reason": "Sales Manager mapped to the closest commercial JD available in the current portal roles."
+            },
+            "employee_id": "EMP2B462C96D0E0"
         },
         {
-            "username": "hong.truong",
-            "password_hash": "$2b$12$dRtvzbnPtth87OX0A5Cm9u9p65M1ZG7KBY6abkGOl203abceGG/v6",
-            "role": "finance_officer",
+            "username": "tai.pham",
+            "name": "Phạm Út Tài",
+            "password_hash": "$2y$12$LyngiayhxEAS6YXpGPSBluTMyvKYlDTt2/lvGgTkiqjaprPvjLkiW",
+            "role": "process_engineer",
             "active": true,
-            "created_at": "2026-02-13T04:20:25.128654Z",
-            "updated_at": "2026-02-13T04:20:25.128673Z",
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Production Engineer / Industrial Engineer",
+            "dept": "PRO",
+            "cccd": "070098007865",
+            "phone": "0399 783 535",
+            "personal_email": "Tai.Pham@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Trương thị Kim Hồng",
-            "dept": "FIN",
-            "title": "Accounting Staff (FIN-02)"
+            "jd_code": "JD-PIE",
+            "jd_title": "Production Engineer / Industrial Engineer",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Engineer",
+                "excel_role": "Mfg Engineering",
+                "excel_role_key": "mfg engineering",
+                "mapping_reason": "Manufacturing engineering inside production mapped to the production engineer JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMPF42AD92083F9"
         },
         {
-            "username": "minh.tran",
-            "password_hash": "$2b$12$1Lkn8cnj64Q6bL1iChl/SO2JPhtfmn65gF0cJfr/eBl3NnBurQZu.",
+            "username": "tai.tran",
+            "name": "Trần Hữu Tài",
+            "password_hash": "$2y$12$EIb7BT85FAe3CgqI1jSIm.9/Xfo7WmvRzVDfJPMlUqiSnM0vKpfGe",
             "role": "cnc_operator",
-            "active": false,
-            "created_at": "2026-02-13T04:20:25.406066Z",
-            "updated_at": "2026-03-05T02:12:10+00:00",
-            "mfa": {
-                "enabled": false
-            },
-            "name": "Trần Văn Minh",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
             "dept": "PRO",
-            "title": "CNC Operator (PRO-04)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "dung.vo",
-            "password_hash": "$2b$12$KcgIboMBFTA8UKL94Kr.Ke39WSFZHnbLl5AtzfDy7f310fHGL37Aq",
-            "role": "hr_manager",
-            "active": false,
-            "created_at": "2026-02-13T04:20:26.211171Z",
-            "updated_at": "2026-03-05T09:19:12+00:00",
+            "cccd": "082095005207",
+            "phone": "0334692105",
+            "personal_email": "Tai.Tran@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Võ Thị Dung",
-            "dept": "HR",
-            "title": "HR Manager (HR-01)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP7BF588DD69CE"
         },
         {
-            "username": "hung.le",
-            "password_hash": "$2b$12$fq1owbWf3jrCtglFOE27zuXdMIAjGt/d/NFH3GjarWe37iiNUJl0e",
-            "role": "qms_engineer",
-            "active": false,
-            "created_at": "2026-02-13T04:20:26.487783Z",
-            "updated_at": "2026-03-05T09:18:59+00:00",
+            "username": "tan.bui",
+            "name": "Bùi Nhật Tân",
+            "password_hash": "$2y$12$j4XjA5K9aBswPWFZRDcD/enRBtPrB0rlc36x2F3TI2ilnmIxApA2K",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "082201000596",
+            "phone": "0354956599",
+            "personal_email": "Tan.Bui@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Lê Văn Hùng",
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPA6439DB65D96"
+        },
+        {
+            "username": "thanh.le",
+            "name": "Lê Tấn Thành",
+            "password_hash": "$2y$12$b8hzwwpxp66ytIfq9YtYjOJnERe4of3bT6YpIpQ0aKT1wBTLIah02",
+            "role": "deburr_technician",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Deburr Technician",
+            "dept": "PRO",
+            "cccd": "079201033817",
+            "phone": "0374587335",
+            "personal_email": "lletanthanh30082001@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DBT",
+            "jd_title": "Deburr Technician",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Packaging",
+                "excel_role": "Finish/Deburr/Assembly",
+                "excel_role_key": "finish_deburr_assembly",
+                "mapping_reason": "Finish/deburr/assembly mapped to the deburr technician JD."
+            },
+            "employee_id": "EMP7F4A9B91398A"
+        },
+        {
+            "username": "thi.le",
+            "name": "Lê Huỳnh Ngọc Thi",
+            "password_hash": "$2y$12$1Uc9LvtlfSdaFDfbBA7cu.94gw8Ul8eEO6Q3/ZsPPCvSbsQZROR7K",
+            "role": "qc_inspector",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "QC Inspector / CMM Programmer-Operator",
             "dept": "QA",
-            "title": "Document Controller (QA-05)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "nam.nguyen",
-            "password_hash": "$2b$12$2wIdyx9VAFT3YqbTznAVKe14bcIGxF0wgt4VtMqb39Q2MH.qMRNiW",
-            "role": "prod_manager",
-            "active": true,
-            "created_at": "2026-02-13T04:20:26.752535Z",
-            "updated_at": "2026-02-13T04:20:26.752553Z",
+            "cccd": "080301002297",
+            "phone": "0355106275",
+            "personal_email": "Le.Thi@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Nguyễn Văn Nam",
+            "jd_code": "JD-QC",
+            "jd_title": "QC Inspector / CMM Programmer-Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "QC",
+                "excel_role": "QC",
+                "excel_role_key": "qc",
+                "mapping_reason": "QC staff mapped to the QC inspector JD."
+            },
+            "employee_id": "EMP9055A26442CA"
+        },
+        {
+            "username": "thinh.ho",
+            "name": "Hồ Văn Thịnh",
+            "password_hash": "$2y$12$R00Pt2Kfk.WdutkFgbHy8eht1w3b0mcfikQQZ8ZFU2AJPIZmOaDoe",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
             "dept": "PRO",
-            "title": "Production Manager (PRO-01)"
-        },
-        {
-            "username": "trang.luu",
-            "password_hash": "$2b$12$Q89Jriv1k/hd3c1Y6QLaqOxu4.eMOfjv5kk/jmcrzAgrXMUWcaaOa",
-            "role": "it_admin",
-            "active": false,
-            "created_at": "2026-02-13T04:20:27.019969Z",
-            "updated_at": "2026-03-05T09:19:02+00:00",
+            "cccd": "086202003958",
+            "phone": "0776510017",
+            "personal_email": "Thinh.Ho@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Lưu Thị Trang",
-            "dept": "IT",
-            "title": "System Administrator (IT-02)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPB6C03B80484D"
         },
         {
-            "username": "khanh.nguyen",
-            "password_hash": "$2b$12$89vJKHP.oeUHfr76xv9lresMAtZNi0VY5FfxhwUKwqd2flqFYVeiO",
-            "role": "engineering_lead",
+            "username": "tho.nguyen",
+            "name": "Nguyễn Đức Thọ",
+            "password_hash": "$2y$12$vmZtYj8GXQ3LTXjM5j5SUuYMr0THrpqFicg1AaALyo58rlpcIrcQW",
+            "role": "cnc_operator",
             "active": true,
-            "created_at": "2026-02-13T04:20:27.295877Z",
-            "updated_at": "2026-02-13T04:20:27.295894Z",
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "051201003730",
+            "phone": "0384529853",
+            "personal_email": "Tho.Nguyen@hesem.com.vn",
             "mfa": {
                 "enabled": false
             },
-            "name": "Nguyễn Minh Khánh",
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMPA522E2A413C2"
+        },
+        {
+            "username": "thuan.le",
+            "name": "Lê Minh Thuận",
+            "password_hash": "$2y$12$V3XJW1m90G8.3ujP.hkMqOXt/HpbzK65X58ZULXbArColP0AZfMl2",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
             "dept": "ENG",
-            "title": "Engineering Manager (ENG-01)"
+            "cccd": "082202015207",
+            "phone": "0363178432",
+            "personal_email": "leminhthuan.250802@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP71EA18D27A7B"
         },
         {
-            "username": "my.le",
-            "password_hash": "$2b$12$Jw5lyPpjc4MFkkdegHbet.Zc/cnKy95dnZlfnXUeLCNtKY26uxyLi",
+            "username": "tien.phan",
+            "name": "Phan Văn Tiến",
+            "password_hash": "$2y$12$jJoOXPNFtnSjbae8OeO/eOxzHmCBDS/BnTzBWxQlVfUjbqY2DDLjO",
             "role": "cnc_operator",
-            "active": false,
-            "created_at": "2026-02-13T04:20:27.567852Z",
-            "updated_at": "2026-03-05T09:19:06+00:00",
-            "mfa": {
-                "enabled": false
-            },
-            "name": "Lê Thị Mỹ",
-            "dept": "GEN",
-            "title": "Trainee / Intern",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "nam.pham",
-            "password_hash": "$2b$12$UQ36B5WwWg06T3N7bCmkTuTtX6ZxfG4J7i5w1dcGAAA.T7NUki/Q2",
-            "role": "qa_manager",
-            "active": false,
-            "created_at": "2026-02-13T04:20:27.839683Z",
-            "updated_at": "2026-03-05T09:18:48+00:00",
-            "mfa": {
-                "enabled": false
-            },
-            "name": "Phạm Văn Nam",
-            "dept": "QA",
-            "title": "QA Manager (QA-01)",
-            "cccd": "",
-            "phone": "",
-            "personal_email": ""
-        },
-        {
-            "username": "hien.hoang",
-            "password_hash": "$2y$10$qHfGOM2HzMKf8iorSUs43OxtP/M8/YpOjY.mwpJcilY0WJjqspW2C",
-            "name": "Hoàng Trung Hiền",
-            "role": "production_director",
-            "dept": "QA",
-            "title": "",
             "active": true,
-            "cccd": "",
-            "phone": "",
-            "personal_email": "",
-            "created_at": "2026-03-05T02:24:55+00:00",
-            "updated_at": "2026-03-07T06:40:41+00:00",
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "052200005898",
+            "phone": "0982869342",
+            "personal_email": "Tien.Phan@hesem.com.vn",
             "mfa": {
-                "enabled": true,
-                "secret_b32": "TKLX2MIA7HO2V56DYVNCIUYZRNWY6XP3",
-                "enabled_at": "2026-03-07T06:30:30+00:00"
+                "enabled": false
             },
-            "last_login": "2026-03-07T06:40:41+00:00"
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP522D66EC0C24"
+        },
+        {
+            "username": "tien.tran",
+            "name": "Trần Quốc Tiến",
+            "password_hash": "$2y$12$gbHbFY8bIpLPEJz4AJBY7uOUwM5C1Vo9G9E3G0ChwPoFeljXeLrgm",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "083090012576",
+            "phone": "0362359295",
+            "personal_email": "Tien.Tran@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP6378846BEFCD"
+        },
+        {
+            "username": "tri.nguyen",
+            "name": "Nguyễn Thanh Trí",
+            "password_hash": "$2y$12$qjwtmBd5EHmnQZgKr4kAeuKhMDVJpYRVnjA0u/Cl1gRF247MRvZZW",
+            "role": "deburr_technician",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Deburr Technician",
+            "dept": "PRO",
+            "cccd": "093207004844",
+            "phone": "0359366297",
+            "personal_email": "thanhtringuyen151@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DBT",
+            "jd_title": "Deburr Technician",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Packaging",
+                "excel_role": "Finish/Deburr/Assembly",
+                "excel_role_key": "finish_deburr_assembly",
+                "mapping_reason": "Finish/deburr/assembly mapped to the deburr technician JD."
+            },
+            "employee_id": "EMP50502E65AB7E"
+        },
+        {
+            "username": "tri.pham",
+            "name": "Phạm Thanh Trí",
+            "password_hash": "$2y$12$jeIVjGQQC8ga851fe75h/eSa97QOnNgNAAI50Hv8.kC.Md/ngQVn.",
+            "role": "qc_inspector",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "QC Inspector / CMM Programmer-Operator",
+            "dept": "QA",
+            "cccd": "079201007894",
+            "phone": "0938307524",
+            "personal_email": "Pham.Tri@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-QC",
+            "jd_title": "QC Inspector / CMM Programmer-Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "QC",
+                "excel_role": "QC",
+                "excel_role_key": "qc",
+                "mapping_reason": "QC staff mapped to the QC inspector JD."
+            },
+            "employee_id": "EMPFC636F3676E0"
+        },
+        {
+            "username": "tu.do",
+            "name": "Đỗ Tấn Tú",
+            "password_hash": "$2y$12$gCCCP2wiAqHXTdedWYJciuncRPUNZkO0sxouwdWkgb/Wf3LCchLpi",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "052204000996",
+            "phone": "0862611453",
+            "personal_email": "Tu.Do@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP058761C54C4D"
+        },
+        {
+            "username": "tu.vu",
+            "name": "Vũ Thanh Tú",
+            "password_hash": "$2y$12$Ok1Osz27dm5q9qmqAjohFuPb4FiicBUlvt6sxK1.JZe3MxMoDbKVC",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "DFM Engineer",
+            "dept": "ENG",
+            "cccd": "079097002673",
+            "phone": "0902 936 680",
+            "personal_email": "vuthanhtu247@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DFM",
+            "jd_title": "DFM Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Services engineering",
+                "excel_role_key": "services_engineering",
+                "mapping_reason": "Service engineering mapped to the DFM JD; the portal reuses process_engineer permissions."
+            },
+            "employee_id": "EMP8D4536FD67A3"
+        },
+        {
+            "username": "tuan.le",
+            "name": "Lê Đức Tuấn",
+            "password_hash": "$2y$12$xK5DQMXWtAfofLZQssW4wejonEzkPMJAGUQgTC8nsRyUtV3OmgPqu",
+            "role": "process_engineer",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Process Engineer",
+            "dept": "ENG",
+            "cccd": "068098003849",
+            "phone": "0975 892 514",
+            "personal_email": "Tuan.Le@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-PE",
+            "jd_title": "Process Engineer",
+            "role_source": {
+                "excel_dept": "ENG",
+                "excel_title": "Engineer",
+                "excel_role": "Mfg Engineering",
+                "excel_role_key": "mfg_engineering",
+                "mapping_reason": "Manufacturing engineering inside engineering mapped to the process engineer JD."
+            },
+            "employee_id": "EMP1D307850A5E4"
+        },
+        {
+            "username": "tuan.nguyen",
+            "name": "Nguyễn Quốc Tuấn",
+            "password_hash": "$2y$12$g/UhkRLVfDUqfyTJqDKgVOD/FxOtmKz/eetGNU7u/zRMf8T2Z8tFW",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "083200014118",
+            "phone": "0866023253",
+            "personal_email": "Tuan.Nguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP8E566D1F1F54"
+        },
+        {
+            "username": "tuan.pham",
+            "name": "Phạm Tiến Tuân",
+            "password_hash": "$2y$12$Ywm7Aoj9PuHtwjQ1pki8fOJedIdBz3OXmmd7t3xdnkNvbXS0QQCxW",
+            "role": "deburr_technician",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Deburr Technician",
+            "dept": "PRO",
+            "cccd": "034082012379",
+            "phone": "0909964070",
+            "personal_email": "phamtientuan07@gmail.com",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-DBT",
+            "jd_title": "Deburr Technician",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Packaging",
+                "excel_role": "Finish/Deburr/Assembly",
+                "excel_role_key": "finish_deburr_assembly",
+                "mapping_reason": "Finish/deburr/assembly mapped to the deburr technician JD."
+            },
+            "employee_id": "EMPB1DC7ED4E144"
+        },
+        {
+            "username": "tuong.le",
+            "name": "Lê Minh Tường",
+            "password_hash": "$2y$12$DVHLZzbo81FkbJhoK/4NxuU6rtrdJdliyvaAm9m7vwDc/XQi2TAQm",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "051203003416",
+            "phone": "0358413465",
+            "personal_email": "Tuong.Le@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP1E8D78432445"
+        },
+        {
+            "username": "tuong.luong",
+            "name": "Lương Trọng Tường",
+            "password_hash": "$2y$12$i0yXs9LQ./JJqag0OCgE0.9hjYO2RzWfJsZ778KJ43.6RXciqiy5i",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "087203004401",
+            "phone": "0797023848",
+            "personal_email": "Tuong.Luong@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (Lathe)",
+                "excel_role": "Production (Lathe)",
+                "excel_role_key": "production _lathe",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP67783BFE4413"
+        },
+        {
+            "username": "van.nguyen",
+            "name": "Nguyễn Sỹ Văn",
+            "password_hash": "$2y$12$zjb.PsL4VDjdCuyHtwz6TuFtea0PxqHZGtZnl4HbmbmmlVCCmoiWi",
+            "role": "production_director",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Production Director",
+            "dept": "EXE",
+            "cccd": "075084000638",
+            "phone": "0985 994 010",
+            "personal_email": "vannguyen@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-PD",
+            "jd_title": "Production Director",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "operations_manager",
+                "excel_role": "Operations Manager",
+                "excel_role_key": "operations_manager",
+                "mapping_reason": "Operations Manager mapped to the plant-level production leadership JD."
+            },
+            "employee_id": "EMPA3E0EDBD7745"
+        },
+        {
+            "username": "vinh.do",
+            "name": "Đỗ Văn Vĩnh",
+            "password_hash": "$2y$12$0wNAirKStUIxz.zGlLfOWugNQnZHdNMcEquHlGWp7G.Odw.U0VZ26",
+            "role": "cnc_operator",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "CNC Operator",
+            "dept": "PRO",
+            "cccd": "034098005890",
+            "phone": "0396309798",
+            "personal_email": "Vinh.Do@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-OPR",
+            "jd_title": "CNC Operator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Worker (mill)",
+                "excel_role": "Production (Mil)",
+                "excel_role_key": "production _mil",
+                "mapping_reason": "Production operators mapped to the CNC operator JD."
+            },
+            "employee_id": "EMP8D8863808121"
+        },
+        {
+            "username": "y.le",
+            "name": "Lê Ngọc Như Ý",
+            "password_hash": "$2y$12$vBKgtRkkgoCexQpNq.F3Huas6tna8VqoaK/JpNzOIdQneAU.85sO2",
+            "role": "epicor_admin",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Epicor System Administrator",
+            "dept": "IT",
+            "cccd": "075197012072",
+            "phone": "0793702577",
+            "personal_email": "Y.Le@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-ESA",
+            "jd_title": "Epicor System Administrator",
+            "role_source": {
+                "excel_dept": "PRO",
+                "excel_title": "Epicor",
+                "excel_role": "Epicor",
+                "excel_role_key": "epicor",
+                "mapping_reason": "Exact IT JD match."
+            },
+            "employee_id": "EMP4790FDE3209C"
+        },
+        {
+            "username": "yen.tran",
+            "name": "Trần Ngọc Yến",
+            "password_hash": "$2y$12$uFk8BuQ8Rl/yh72.wQkuKO3JhIlnY.X5CvnGtBV3eHMlN/iKCZjji",
+            "role": "finance_manager",
+            "active": true,
+            "created_at": "2026-04-09T09:58:43+00:00",
+            "updated_at": "2026-04-09T09:58:43+00:00",
+            "title": "Finance Manager",
+            "dept": "FIN",
+            "cccd": "068191002879",
+            "phone": "0983868670",
+            "personal_email": "yen.tran@hesem.com.vn",
+            "mfa": {
+                "enabled": false
+            },
+            "jd_code": "JD-FIN",
+            "jd_title": "Finance Manager",
+            "role_source": {
+                "excel_dept": "FIN",
+                "excel_title": "finance_manager",
+                "excel_role": "Finance Manager",
+                "excel_role_key": "finance_manager",
+                "mapping_reason": "Exact finance manager JD match."
+            },
+            "employee_id": "EMP5F545D8090BB"
         }
     ],
     "data_collection": {

@@ -26,7 +26,8 @@
       "Bash(find mom/ -name '*.js' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' -e s/HESEM-QMS/HESEM-MOM/g '{}' +)",
       "Bash(find mom/ -name '*.css' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' '{}' +)",
       "Bash(find mom/ -name '*.html' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' '{}' +)",
-      "Bash(ls -1d mom/docs/*/)"
+      "Bash(ls -1d mom/docs/*/)",
+      "Bash(grep -l \"docs_custom\\\\|loadDocument\\\\|getDocs\\\\|getCategories\" \"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/scripts/portal\"/*.js)"
     ]
   }
 }

@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-09T19:10:00+07:00",
+    "description": "Operational stress governance policy for backend-first manufacturing execution hardening."
+  },
+  "purpose": {
+    "statement": "The backend must remain truthful and recoverable when reality deviates from the happy path: retries, delays, partial completion, backdating, overrides, quarantine, stale master data, archive, and dependency failure must all stay governed.",
+    "operating_mode": "stress_first_operational_governance",
+    "decision_rule": "If the system cannot explain what happens after retry, delay, partial completion, correction, reversal, override, or archive, then the design is not production-safe."
+  },
+  "stress_dimensions": [
+    "flow_integrity",
+    "temporal_integrity",
+    "authority_integrity",
+    "quantity_integrity",
+    "traceability_integrity",
+    "evidence_integrity",
+    "archive_truth_integrity",
+    "recovery_integrity"
+  ],
+  "critical_mes_execution_entities": [
+    "mes_execution.dispatch_queue",
+    "mes_execution.job",
+    "mes_execution.job_event",
+    "mes_execution.labor_capture",
+    "mes_execution.material_consumption",
+    "mes_execution.mes_material_consumption",
+    "mes_execution.pause_resume",
+    "mes_execution.process_param_capture",
+    "mes_execution.production_completion",
+    "mes_execution.rework",
+    "mes_execution.scrap",
+    "mes_execution.tool_usage",
+    "mes_execution.track_in",
+    "mes_execution.track_out"
+  ],
+  "build_questions": [
+    "If this action is retried after a timeout, what prevents duplicate side effects?",
+    "If one step succeeds and the next step fails, what compensates or reconciles the partial completion?",
+    "If a posting is backdated across a closed period, shift boundary, or expiry boundary, what blocks or reroutes it?",
+    "If customer, supplier, employee, equipment, or calibration status changes after release, what snapshot protects execution truth?",
+    "If a quarantine, hold, or blocked disposition exists, what downstream reservations, picks, shipments, or consumption are prevented automatically?",
+    "If manual override or waiver is required, who can do it, with what reason, what evidence, what expiry, and what audit trail?",
+    "If mobile or async execution syncs late, what resolves conflicts, stale decisions, and replay collisions?",
+    "If a correction, return, reversal, or credit is needed, where is the first-class governed object and how does it close the physical and financial loops?",
+    "If the record is archived, merged, superseded, or corrected, how does the system preserve authoritative traceability without keeping it active in normal flow?",
+    "If an external dependency, scheduled job, or worker heartbeat fails, how does the system detect drift and surface reconciliation queues?",
+    "If inventory, genealogy, or quantity truth differs from the claimed document state, which signal wins and where is the exception held?",
+    "If this element has no KPI, gate, exception model, or audit output, why does it still exist in the active system?"
+  ],
+  "acceptance_criteria": {
+    "required_for_operational_release": [
+      "idempotent_or_duplicate_safe_mutation_contract",
+      "concurrency_and_conflict_response_contract",
+      "partial_completion_recovery_or_reconciliation_model",
+      "correction_reversal_or_return_path_for_physical_financial_effects",
+      "gated_release_against_hold_quarantine_expiry_and_authority",
+      "machine_readable_audit_and_problem_details",
+      "archive_without_active_flow_leakage"
+    ],
+    "required_for_override_path": [
+      "typed_override_or_waiver_reason",
+      "approver_or_authorized_role_boundary",
+      "timebox_or_expiry",
+      "evidence_and_audit_capture"
+    ],
+    "required_for_temporal_integrity": [
+      "posting_date_and_execution_date_governance",
+      "effective_dating_or_release_snapshot",
+      "period_or_close_boundary_control"
+    ]
+  },
+  "rejection_criteria": [
+    "create_or_side_effect_action_without_duplicate_or_retry_control",
+    "multi_step_flow_without_compensation_or_reconciliation_contract",
+    "hold_or_quarantine_state_that_can_still_flow_downstream",
+    "override_or_waiver_without_reason_authority_expiry_and_audit",
+    "archive_or_supersede_operation_that_breaks_traceability_truth",
+    "closed_period_or_expired_qualification_that_can_be_bypassed_by_backdating",
+    "async_or_offline_flow_without_heartbeat_or_reconciliation_visibility",
+    "element_kept_active_without_kpi_gate_exception_or_business_owner"
+  ]
+}
