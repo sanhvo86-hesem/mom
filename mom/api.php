@@ -23,17 +23,62 @@ $BASE_DIR   = __DIR__;
 $ROOT_DIR = realpath($BASE_DIR . '/..') ?: dirname($BASE_DIR);
 $ROOT_PARENT_DIR = realpath($ROOT_DIR . '/..') ?: dirname($ROOT_DIR);
 
-$LEGACY_DATA_DIR = $BASE_DIR . '/data';
-$DATA_DIR_ENV = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
-
-if ($DATA_DIR_ENV !== '') {
-  $DATA_DIR = rtrim(str_replace('\\', '/', $DATA_DIR_ENV), '/\\');
-} else {
-  // NOTE: Always use in-repo data dir. Do NOT create data-private outside
-  // the repo — it breaks git deploy (files outside repo are not synced by git pull).
-  // All config/data lives in mom/data/ which is protected by .htaccess.
-  $DATA_DIR = $LEGACY_DATA_DIR;
+function normalize_runtime_dir(string $dir): string {
+  return rtrim(str_replace('\\', '/', trim($dir)), '/\\');
 }
+
+function runtime_dir_has_bootstrap_files(string $dir): bool {
+  $dir = normalize_runtime_dir($dir);
+  if ($dir === '') return false;
+  $configDir = $dir . '/config';
+  $markers = [
+    'users.json',
+    'role_permissions.json',
+    'docs_custom.json',
+    'form_control_registry.json',
+  ];
+  foreach ($markers as $marker) {
+    if (is_file($configDir . '/' . $marker)) return true;
+  }
+  return false;
+}
+
+function runtime_dir_looks_like_legacy_qms(string $dir): bool {
+  $dir = normalize_runtime_dir($dir);
+  if ($dir === '') return false;
+  return strtolower((string)pathinfo($dir, PATHINFO_BASENAME)) === 'qms-data';
+}
+
+function resolve_runtime_data_dir(string $envDir, string $inRepoDir, string $legacyCompatDir): string {
+  $envDir = normalize_runtime_dir($envDir);
+  $inRepoDir = normalize_runtime_dir($inRepoDir);
+  $legacyCompatDir = normalize_runtime_dir($legacyCompatDir);
+
+  if ($envDir !== '') {
+    if ($envDir === $inRepoDir) return $inRepoDir;
+
+    // The MOM/VPS migration changed the canonical runtime path from `qms-data`
+    // to `mom/data`. If the environment still points to a legacy `qms-data`
+    // directory, prefer the in-repo runtime tree when it is already initialized
+    // so stale migrated config cannot shadow the current portal.
+    if (runtime_dir_looks_like_legacy_qms($envDir) && runtime_dir_has_bootstrap_files($inRepoDir)) {
+      @error_log('[API] QMS_DATA_DIR points to legacy qms-data; preferring in-repo mom/data: ' . $envDir);
+      return $inRepoDir;
+    }
+
+    if (runtime_dir_has_bootstrap_files($envDir)) return $envDir;
+  }
+
+  if (runtime_dir_has_bootstrap_files($inRepoDir)) return $inRepoDir;
+  if (runtime_dir_has_bootstrap_files($legacyCompatDir)) return $legacyCompatDir;
+  if ($envDir !== '') return $envDir;
+  return $inRepoDir;
+}
+
+$LEGACY_DATA_DIR = $BASE_DIR . '/data';
+$LEGACY_COMPAT_DATA_DIR = $ROOT_DIR . '/qms-data';
+$DATA_DIR_ENV = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
+$DATA_DIR = resolve_runtime_data_dir($DATA_DIR_ENV, $LEGACY_DATA_DIR, $LEGACY_COMPAT_DATA_DIR);
 
 if (!is_dir($DATA_DIR)) @mkdir($DATA_DIR, 0775, true);
 
@@ -259,15 +304,15 @@ function first_existing_rel_dir(array $candidates, string $rootDir): string {
 
 function default_folder_for_cat(string $cat, string $rootDir): string {
   $candidates = match ($cat) {
-    'MAN' => ['mom/docs/system/quality-manual'],
-    'POL' => ['mom/docs/system/policies'],
-    'ORG', 'JD', 'DEP' => ['mom/docs/system/organization'],
-    'SOP', 'PROC' => ['mom/docs/operations/sops'],
-    'WI' => ['mom/docs/operations/work-instructions'],
-    'ANNEX' => ['mom/docs/operations/references'],
-    'FRM' => ['mom/docs/forms'],
-    'TRN' => ['mom/docs/training'],
-    default => ['mom/docs/operations/sops'],
+    'MAN' => ['mom/docs/system/quality-manual', '02-Tai-Lieu-He-Thong/01-Quality-Manual'],
+    'POL' => ['mom/docs/system/policies', '02-Tai-Lieu-He-Thong/02-Policies-Objectives'],
+    'ORG', 'JD', 'DEP' => ['mom/docs/system/organization', '02-Tai-Lieu-He-Thong/03-Organization'],
+    'SOP', 'PROC' => ['mom/docs/operations/sops', '03-Tai-Lieu-Van-Hanh/01-SOPs'],
+    'WI' => ['mom/docs/operations/work-instructions', '03-Tai-Lieu-Van-Hanh/02-Work-Instructions'],
+    'ANNEX' => ['mom/docs/operations/references', '03-Tai-Lieu-Van-Hanh/03-Reference'],
+    'FRM' => ['mom/docs/forms', '04-Bieu-Mau'],
+    'TRN' => ['mom/docs/training', '10-Training-Academy'],
+    default => ['mom/docs/operations/sops', '03-Tai-Lieu-Van-Hanh/01-SOPs'],
   };
   return first_existing_rel_dir($candidates, $rootDir);
 }
@@ -310,20 +355,21 @@ function scan_cat_from_filename(string $fn): ?string {
 
 function scan_cat_from_subfolder(string $subName): ?string {
   $map = [
-    'Quality-Manual' => 'MAN', 'quality-manual' => 'MAN',
-    'Policies-Objectives' => 'POL', 'policies' => 'POL',
+    'Quality-Manual' => 'MAN', 'quality-manual' => 'MAN', 'Quality Manual' => 'MAN', 'quality manual' => 'MAN',
+    'Policies-Objectives' => 'POL', 'policies' => 'POL', 'Policies Objectives' => 'POL', 'policies objectives' => 'POL',
     'SOPs' => 'SOP', 'sops' => 'SOP',
-    'Work-Instructions' => 'WI', 'work-instructions' => 'WI',
+    'Work-Instructions' => 'WI', 'work-instructions' => 'WI', 'Work Instructions' => 'WI', 'work instructions' => 'WI',
     'Reference' => 'ANNEX', 'references' => 'ANNEX',
     'ANNEX-System' => 'ANNEX', 'ANNEX-Standards' => 'ANNEX', 'ANNEX-Digital' => 'ANNEX',
     'Organization' => 'ORG', 'organization' => 'ORG', 'Org-Chart' => 'ORG',
-    'Department-Handbooks' => 'ORG', 'Job-Descriptions' => 'ORG',
-    'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
+    'Department-Handbooks' => 'ORG', 'Department Handbooks' => 'ORG',
+    'Job-Descriptions' => 'ORG', 'Job Descriptions' => 'ORG',
+    'RACI-Authority' => 'ORG', 'RACI Authority' => 'ORG', 'Labor-Relations' => 'ORG', 'Labor Relations' => 'ORG',
     'Bieu-Mau' => 'FRM',
-    'Competency-System' => 'TRN', 'competency' => 'TRN',
+    'Competency-System' => 'TRN', 'Competency System' => 'TRN', 'competency' => 'TRN',
     'Training-Content' => 'TRN', 'content' => 'TRN',
-    'System-Operations' => 'TRN', 'system-ops' => 'TRN',
-    'templates' => 'TRN',
+    'System-Operations' => 'TRN', 'System Operations' => 'TRN', 'system-ops' => 'TRN', 'System Ops' => 'TRN',
+    'templates' => 'TRN', 'Templates' => 'TRN',
   ];
   foreach ($map as $k => $v) {
     if (stripos($subName, $k) !== false) return $v;
@@ -13170,6 +13216,9 @@ if (defined('API_HELPERS_ONLY')) {
 // ---------- Boot ----------
 ensure_dir($DATA_DIR);
 migrate_legacy_data_dir($LEGACY_DATA_DIR, $DATA_DIR);
+if ($DATA_DIR === normalize_runtime_dir($LEGACY_DATA_DIR) && is_dir($LEGACY_COMPAT_DATA_DIR)) {
+  migrate_legacy_data_dir($LEGACY_COMPAT_DATA_DIR, $DATA_DIR);
+}
 ensure_dir($CONF_DIR);
 ensure_dir($RL_DIR);
 session_init();
@@ -16680,6 +16729,7 @@ if ($username === '') {
       sort($subDirs);
 
       $hasNumberedSubs = false;
+      $vSubAutoNum = 1; // counter for unnumbered subdirs in virtual mom/docs entries
       foreach ($subDirs as $subName) {
         if ($subName[0] === '.' || $subName === '_Archive' || $subName === 'index.html') continue;
         $subAbs = $topAbs . '/' . $subName;
@@ -16688,7 +16738,6 @@ if ($username === '') {
         [$subNum, $subLabel] = parse_folder_num($subName);
         // For virtual mom/docs entries, also accept unnumbered subdirs (quality-manual, sops, etc.)
         if ($subNum === null && $isVirtual) {
-          static $vSubAutoNum = 1;
           $subNum = $vSubAutoNum++;
           $subLabel = ucwords(str_replace('-', ' ', $subName));
         }
