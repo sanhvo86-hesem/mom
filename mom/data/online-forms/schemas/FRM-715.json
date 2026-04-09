@@ -7,13 +7,50 @@
   "frequency": "per_event",
   "sop_ref": "SOP-605",
   "description": "Chứng nhận lô hàng đáp ứng yêu cầu kỹ thuật và chất lượng theo bản vẽ, PO và tiêu chuẩn áp dụng.",
-  "roles_allowed": ["admin", "qa_manager", "quality_engineer", "qc_inspector"],
+  "roles_allowed": [
+    "admin",
+    "qa_manager",
+    "quality_engineer",
+    "qc_inspector"
+  ],
   "fields": [
-    {"id": "coc_date", "type": "date", "label": "Ngày phát hành", "label_en": "Issue Date", "required": true, "default": "today"},
-    {"id": "coc_number", "type": "text", "label": "Số CoC", "label_en": "CoC Number", "required": true, "placeholder": "VD: COC-2026-001"},
-    {"id": "customer", "type": "text", "label": "Khách hàng", "label_en": "Customer", "required": true},
-    {"id": "customer_po", "type": "text", "label": "Số PO khách hàng", "label_en": "Customer PO", "required": true},
-    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true},
+    {
+      "id": "coc_date",
+      "type": "date",
+      "label": "Ngày phát hành",
+      "label_en": "Issue Date",
+      "required": true,
+      "default": "today"
+    },
+    {
+      "id": "coc_number",
+      "type": "text",
+      "label": "Số CoC",
+      "label_en": "CoC Number",
+      "required": true,
+      "placeholder": "VD: COC-2026-001"
+    },
+    {
+      "id": "customer",
+      "type": "text",
+      "label": "Khách hàng",
+      "label_en": "Customer",
+      "required": true
+    },
+    {
+      "id": "customer_po",
+      "type": "text",
+      "label": "Số PO khách hàng",
+      "label_en": "Customer PO",
+      "required": true
+    },
+    {
+      "id": "job_number",
+      "type": "text",
+      "label": "Số Job",
+      "label_en": "Job Number",
+      "required": true
+    },
     {
       "id": "line_items",
       "type": "table",
@@ -22,13 +59,51 @@
       "min_rows": 1,
       "max_rows": 20,
       "columns": [
-        {"id": "part_number", "type": "text", "label": "Mã chi tiết", "width": "18%", "required": true},
-        {"id": "part_rev", "type": "text", "label": "Rev", "width": "8%", "required": true},
-        {"id": "part_name", "type": "text", "label": "Tên chi tiết", "width": "22%"},
-        {"id": "material", "type": "text", "label": "Vật liệu", "width": "16%"},
-        {"id": "qty_shipped", "type": "text", "label": "SL giao", "width": "10%", "required": true},
-        {"id": "lot_number", "type": "text", "label": "Số lô", "width": "14%"},
-        {"id": "heat_lot", "type": "text", "label": "Heat / Lot", "width": "12%"}
+        {
+          "id": "part_number",
+          "type": "text",
+          "label": "Mã chi tiết",
+          "width": "18%",
+          "required": true
+        },
+        {
+          "id": "part_rev",
+          "type": "text",
+          "label": "Rev",
+          "width": "8%",
+          "required": true
+        },
+        {
+          "id": "part_name",
+          "type": "text",
+          "label": "Tên chi tiết",
+          "width": "22%"
+        },
+        {
+          "id": "material",
+          "type": "text",
+          "label": "Vật liệu",
+          "width": "16%"
+        },
+        {
+          "id": "qty_shipped",
+          "type": "text",
+          "label": "SL giao",
+          "width": "10%",
+          "required": true
+        },
+        {
+          "id": "lot_number",
+          "type": "text",
+          "label": "Số lô",
+          "width": "14%"
+        },
+        {
+          "id": "heat_lot",
+          "type": "text",
+          "label": "Heat / Lot",
+          "width": "12%"
+        }
       ]
     },
     {
@@ -72,10 +147,22 @@
       "required": true,
       "options_source": "registry:inspection_method",
       "options": [
-        {"value": "100_pct", "label": "Kiểm tra 100%"},
-        {"value": "sampling", "label": "Lấy mẫu theo AQL"},
-        {"value": "fai", "label": "FAI (First Article)"},
-        {"value": "combination", "label": "Kết hợp (Combination)"}
+        {
+          "value": "100_pct",
+          "label": "Kiểm tra 100%"
+        },
+        {
+          "value": "sampling",
+          "label": "Lấy mẫu theo AQL"
+        },
+        {
+          "value": "fai",
+          "label": "FAI (First Article)"
+        },
+        {
+          "value": "combination",
+          "label": "Kết hợp (Combination)"
+        }
       ]
     },
     {
@@ -86,9 +173,21 @@
       "required": true,
       "options_source": "registry:yes_no_na",
       "options": [
-        {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
-        {"value": "no", "label": "Không (No)", "color": "#e03131"},
-        {"value": "na", "label": "N/A", "color": "#868e96"}
+        {
+          "value": "yes",
+          "label": "Có (Yes)",
+          "color": "#2f9e44"
+        },
+        {
+          "value": "no",
+          "label": "Không (No)",
+          "color": "#e03131"
+        },
+        {
+          "value": "na",
+          "label": "N/A",
+          "color": "#868e96"
+        }
       ]
     },
     {
@@ -98,9 +197,21 @@
       "label_en": "Special Process Certs Attached",
       "options_source": "registry:yes_no_na",
       "options": [
-        {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
-        {"value": "no", "label": "Không (No)", "color": "#e03131"},
-        {"value": "na", "label": "N/A", "color": "#868e96"}
+        {
+          "value": "yes",
+          "label": "Có (Yes)",
+          "color": "#2f9e44"
+        },
+        {
+          "value": "no",
+          "label": "Không (No)",
+          "color": "#e03131"
+        },
+        {
+          "value": "na",
+          "label": "N/A",
+          "color": "#868e96"
+        }
       ]
     },
     {
@@ -117,18 +228,61 @@
       "label_en": "RoHS Compliant",
       "options_source": "registry:yes_no_na",
       "options": [
-        {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
-        {"value": "no", "label": "Không (No)", "color": "#e03131"},
-        {"value": "na", "label": "N/A", "color": "#868e96"}
+        {
+          "value": "yes",
+          "label": "Có (Yes)",
+          "color": "#2f9e44"
+        },
+        {
+          "value": "no",
+          "label": "Không (No)",
+          "color": "#e03131"
+        },
+        {
+          "value": "na",
+          "label": "N/A",
+          "color": "#868e96"
+        }
       ]
     },
-    {"id": "issued_by", "type": "text", "label": "Người phát hành", "label_en": "Issued By", "required": true},
-    {"id": "title_position", "type": "text", "label": "Chức danh", "label_en": "Title / Position", "required": true},
-    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By", "required": true},
-    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3}
+    {
+      "id": "issued_by",
+      "type": "text",
+      "label": "Người phát hành",
+      "label_en": "Issued By",
+      "required": true
+    },
+    {
+      "id": "title_position",
+      "type": "text",
+      "label": "Chức danh",
+      "label_en": "Title / Position",
+      "required": true
+    },
+    {
+      "id": "approved_by",
+      "type": "text",
+      "label": "Người phê duyệt",
+      "label_en": "Approved By",
+      "required": true
+    },
+    {
+      "id": "notes",
+      "type": "textarea",
+      "label": "Ghi chú",
+      "label_en": "Notes",
+      "rows": 3
+    }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
   "notifications": {
-    "on_submit": ["qa_manager"]
-  }
+    "on_submit": [
+      "qa_manager"
+    ]
+  },
+  "record_type": "FAI"
 }

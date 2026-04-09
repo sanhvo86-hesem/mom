@@ -28,6 +28,48 @@ var _initCallbacks = [];
 var FALLBACK_COLOR = '#6b7280';
 var FALLBACK_BADGE_STYLE = 'display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:';
 
+function _uniquePaths(list){
+  var out = [];
+  (list || []).forEach(function(item){
+    var value = String(item || '').replace(/^\s+|\s+$/g, '');
+    if(!value || out.indexOf(value) >= 0) return;
+    out.push(value);
+  });
+  return out;
+}
+
+function _portalBasePath(){
+  var pathname = String((window.location && window.location.pathname) || '/');
+  if(pathname === '/mom') return '/mom/';
+  var idx = pathname.indexOf('/mom/');
+  if(idx >= 0) return pathname.slice(0, idx + 5);
+  return '/';
+}
+
+function _portalAssetPath(rel){
+  var path = String(rel || '').replace(/^\.?\//, '');
+  return _portalBasePath() + path;
+}
+
+window.HmRuntimePaths = window.HmRuntimePaths || {
+  portalBase: _portalBasePath,
+  portalAsset: _portalAssetPath,
+  apiAction: function(action){
+    return _portalAssetPath('api.php?action=' + encodeURIComponent(String(action || '')));
+  },
+  registryJson: function(name){
+    return _portalAssetPath('data/registry/' + String(name || '') + '.json');
+  },
+  registryCandidates: function(name){
+    var rel = 'data/registry/' + String(name || '') + '.json';
+    return _uniquePaths([
+      _portalAssetPath(rel),
+      './' + rel,
+      rel
+    ]);
+  }
+};
+
 function _isObject(value){
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
@@ -157,14 +199,14 @@ function _optionObjects(list){
 
 /** Build array of fallback paths for a registry file */
 function _paths(name){
+  if(window.HmRuntimePaths && typeof window.HmRuntimePaths.registryCandidates === 'function'){
+    return window.HmRuntimePaths.registryCandidates(name);
+  }
   var base = 'data/registry/' + name + '.json';
-  return [
+  return _uniquePaths([
     base,
-    './' + base,
-    '/' + base,
-    'mom/' + base,
-    './mom/' + base
-  ];
+    './' + base
+  ]);
 }
 
 /** Fetch JSON with path fallback */
@@ -196,7 +238,9 @@ function _fetchJson(paths, idx, onSuccess, onError){
 function _fetchRegistry(name, onSuccess, onError){
   // Try API first: api.php?action=registry_{name_with_underscores}
   var apiAction = 'registry_' + name.replace(/-/g, '_');
-  var apiUrl = 'api.php?action=' + encodeURIComponent(apiAction);
+  var apiUrl = (window.HmRuntimePaths && typeof window.HmRuntimePaths.apiAction === 'function')
+    ? window.HmRuntimePaths.apiAction(apiAction)
+    : ('api.php?action=' + encodeURIComponent(apiAction));
 
   var xhr = new XMLHttpRequest();
   xhr.open('GET', apiUrl, true);

@@ -252,10 +252,14 @@ def main() -> int:
             evidence = {
                 "compensation_markers": signals["compensation_markers"],
                 "correction_markers": signals["correction_markers"],
+                "reconciliation_resources": reconciliation_resources,
             }
             if evidence["compensation_markers"] + evidence["correction_markers"] == 0:
                 severity = "critical"
                 rationale.append("The platform still lacks explicit compensation, correction, and reversal semantics for partial completion recovery.")
+            elif evidence["compensation_markers"] > 0 and evidence["correction_markers"] > 0 and reconciliation_resources:
+                severity = "watch"
+                rationale.append("Compensation markers, correction semantics, and reconciliation resources now exist together, so partial-completion recovery has moved out of the active remediation tier.")
             else:
                 severity = "medium"
                 rationale.append("Correction and reversal semantics now exist, but compensation coverage is still narrower than the broader retry-safe contract posture.")

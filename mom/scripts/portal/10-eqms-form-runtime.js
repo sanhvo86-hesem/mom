@@ -327,7 +327,10 @@ function ensureRegistryOptions(){
     return registryOptions;
   }).catch(function(){
     /* Fallback: try direct fetch */
-    return fetch('data/registry/status-options.json', { credentials:'include' })
+    var fallbackUrl = (window.HmRuntimePaths && typeof window.HmRuntimePaths.registryJson === 'function')
+      ? window.HmRuntimePaths.registryJson('status-options')
+      : 'data/registry/status-options.json';
+    return fetch(fallbackUrl, { credentials:'include' })
       .then(function(r){ return r.json(); })
       .then(function(data){
         registryOptions = data || {};

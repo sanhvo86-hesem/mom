@@ -1,22 +1,22 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T13:45:00.783Z",
+    "generatedAt": "2026-04-09T14:35:26.130Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 652,
+    "total_frontend_entities": 663,
     "canonical_resources": 63,
     "implemented_canonical_resources": 56,
     "planned_canonical_resources": 7,
-    "core_value_stream_entities": 62,
-    "governed_support_entities": 587,
+    "core_value_stream_entities": 65,
+    "governed_support_entities": 595,
     "conditional_extension_entities": 2,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 1,
-    "generic_status_only_core_entities": 3,
+    "generic_status_only_core_entities": 0,
     "missing_transition_contracts_for_core_entities": 6,
     "missing_canonical_resources": 0,
     "split_path_risks_total": 0,
@@ -145,6 +145,19 @@
         ]
       },
       {
+        "entity_key": "commercial_customer.customer_purchase_orders",
+        "entity": "customer_purchase_orders",
+        "profile": "governed_case",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": [
+          "commercial_customer.customer-purchase-orders"
+        ]
+      },
+      {
         "entity_key": "crm.crm_customer_touchpoints",
         "entity": "crm_customer_touchpoints",
         "profile": "governed_case",
@@ -211,6 +224,32 @@
         "readiness": "ready",
         "canonical_resources": [
           "finance.ap-invoices"
+        ]
+      },
+      {
+        "entity_key": "finance.credit_memos",
+        "entity": "credit_memos",
+        "profile": "transactional_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": [
+          "finance.credit-memos"
+        ]
+      },
+      {
+        "entity_key": "finance.debit_memos",
+        "entity": "debit_memos",
+        "profile": "transactional",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": [
+          "finance.debit-memos"
         ]
       },
       {
@@ -378,7 +417,7 @@
         "archive_candidate": false,
         "relation_count": 6,
         "workflow_state": "ready",
-        "readiness": "partial",
+        "readiness": "ready",
         "canonical_resources": [
           "master_data.assets",
           "master_data.equipment"
@@ -392,7 +431,7 @@
         "archive_candidate": false,
         "relation_count": 8,
         "workflow_state": "ready",
-        "readiness": "partial",
+        "readiness": "ready",
         "canonical_resources": [
           "maintenance_ehs.maintenance-plans"
         ]
@@ -2314,6 +2353,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "finance.backdate_exceptions",
+        "entity": "backdate_exceptions",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "finance.cost_elements",
         "entity": "cost_elements",
         "profile": "governed_case",
@@ -2354,6 +2404,17 @@
         "archive_candidate": false,
         "relation_count": 4,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "finance.period_close_controls",
+        "entity": "period_close_controls",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": null,
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -2754,6 +2815,39 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "foundation.calendar",
+        "entity": "calendar",
+        "profile": "master_data",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "foundation.organization",
+        "entity": "organization",
+        "profile": "master_data",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "foundation.party",
+        "entity": "party",
+        "profile": "master_data",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 24,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "foundation_governance.approval",
         "entity": "approval",
         "profile": "governed_case",
@@ -2992,6 +3086,39 @@
         "archive_candidate": false,
         "relation_count": 4,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "governance.approval_group",
+        "entity": "approval_group",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "governance.attachment",
+        "entity": "attachment",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": null,
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "governance.override_controls",
+        "entity": "operational_override_controls",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": null,
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3806,7 +3933,7 @@
         "archive_candidate": false,
         "relation_count": 6,
         "workflow_state": "ready",
-        "readiness": "partial",
+        "readiness": "ready",
         "canonical_resources": []
       },
       {
@@ -3817,7 +3944,7 @@
         "archive_candidate": false,
         "relation_count": 2,
         "workflow_state": "ready",
-        "readiness": "partial",
+        "readiness": "ready",
         "canonical_resources": []
       },
       {
@@ -5159,7 +5286,7 @@
         "archive_candidate": false,
         "relation_count": 1,
         "workflow_state": "ready",
-        "readiness": "partial",
+        "readiness": "ready",
         "canonical_resources": []
       },
       {
@@ -5533,7 +5660,7 @@
         "archive_candidate": false,
         "relation_count": 6,
         "workflow_state": "ready",
-        "readiness": "partial",
+        "readiness": "ready",
         "canonical_resources": []
       },
       {
@@ -7383,35 +7510,7 @@
     ]
   },
   "violations": {
-    "generic_status_only_core_entities": [
-      {
-        "entity_key": "audit_risk.improvement_projects",
-        "entity": "improvement_projects",
-        "transition_action": "audit_risk.improvement_projects.transition",
-        "workflow_mode": "generic_status_only",
-        "canonical_resources": [
-          "quality_improvement.improvement-actions"
-        ]
-      },
-      {
-        "entity_key": "mes_execution.mes_dispatch_queue",
-        "entity": "mes_dispatch_queue",
-        "transition_action": "mes_execution.mes_dispatch_queue.transition",
-        "workflow_mode": "generic_status_only",
-        "canonical_resources": [
-          "planning_production.dispatch-lists"
-        ]
-      },
-      {
-        "entity_key": "production.production_schedule",
-        "entity": "production_schedule",
-        "transition_action": "production.production_schedule.transition",
-        "workflow_mode": "generic_status_only",
-        "canonical_resources": [
-          "planning_production.production-plans"
-        ]
-      }
-    ],
+    "generic_status_only_core_entities": [],
     "missing_transition_contracts_for_core_entities": [
       {
         "entity_key": "audit_risk.audit_program",

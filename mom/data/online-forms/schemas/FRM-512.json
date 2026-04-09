@@ -20,8 +20,14 @@
     "maintenance_manager"
   ],
   "record_context": {
-    "required": ["machine_id"],
-    "autofill_priority": ["wo_number", "machine_id", "work_center_id"]
+    "required": [
+      "machine_id"
+    ],
+    "autofill_priority": [
+      "wo_number",
+      "machine_id",
+      "work_center_id"
+    ]
   },
   "offline_package": {
     "enabled": false,
@@ -34,7 +40,15 @@
       "title_vi": "Ngữ cảnh runtime",
       "description": "Select the governed machine, work center, work order, and the affected tooling before recording the downtime event.",
       "description_vi": "Chọn máy, work center, work order và tooling liên quan đã được quản lý trước khi ghi nhận sự kiện dừng máy.",
-      "field_ids": ["event_date", "shift", "work_center_id", "machine_id", "wo_number", "operator_id", "affected_tool_id"]
+      "field_ids": [
+        "event_date",
+        "shift",
+        "work_center_id",
+        "machine_id",
+        "wo_number",
+        "operator_id",
+        "affected_tool_id"
+      ]
     },
     {
       "id": "event",
@@ -42,7 +56,14 @@
       "title_vi": "Sự kiện dừng máy",
       "description": "Capture when the downtime started, how severe it is, and which 6M categories are involved.",
       "description_vi": "Ghi nhận thời điểm dừng máy, mức độ ảnh hưởng và các nhóm nguyên nhân 6M liên quan.",
-      "field_ids": ["start_time", "end_time", "downtime_category", "severity", "root_cause_categories", "reason"]
+      "field_ids": [
+        "start_time",
+        "end_time",
+        "downtime_category",
+        "severity",
+        "root_cause_categories",
+        "reason"
+      ]
     },
     {
       "id": "recovery",
@@ -50,7 +71,12 @@
       "title_vi": "Ngăn chặn và khôi phục",
       "description": "Record the immediate action, scrap impact, and recovery evidence before closing the event.",
       "description_vi": "Ghi nhận hành động tức thời, lượng scrap ảnh hưởng và bằng chứng khôi phục trước khi đóng sự kiện.",
-      "field_ids": ["corrective_action", "parts_scrapped", "reported_by_operator", "recovery_note"]
+      "field_ids": [
+        "corrective_action",
+        "parts_scrapped",
+        "reported_by_operator",
+        "recovery_note"
+      ]
     }
   ],
   "fields": [
@@ -72,10 +98,26 @@
       "width": "third",
       "options_source": "registry:shift_code",
       "options": [
-        { "value": "1", "label": "Shift 1", "label_vi": "Ca 1" },
-        { "value": "2", "label": "Shift 2", "label_vi": "Ca 2" },
-        { "value": "3", "label": "Shift 3", "label_vi": "Ca 3" },
-        { "value": "day", "label": "Day", "label_vi": "Hành chính" }
+        {
+          "value": "1",
+          "label": "Shift 1",
+          "label_vi": "Ca 1"
+        },
+        {
+          "value": "2",
+          "label": "Shift 2",
+          "label_vi": "Ca 2"
+        },
+        {
+          "value": "3",
+          "label": "Shift 3",
+          "label_vi": "Ca 3"
+        },
+        {
+          "value": "day",
+          "label": "Day",
+          "label_vi": "Hành chính"
+        }
       ]
     },
     {
@@ -87,7 +129,10 @@
       "width": "third",
       "lookup_source": "work_centers",
       "strict_select": true,
-      "display_fields": ["work_center_id", "work_center_name"],
+      "display_fields": [
+        "work_center_id",
+        "work_center_name"
+      ],
       "placeholder": "Search work center",
       "placeholder_vi": "Tìm work center"
     },
@@ -100,8 +145,14 @@
       "width": "third",
       "lookup_source": "machines",
       "strict_select": true,
-      "depends_on": ["work_center_id"],
-      "display_fields": ["machine_id", "machine_name", "machine_type"],
+      "depends_on": [
+        "work_center_id"
+      ],
+      "display_fields": [
+        "machine_id",
+        "machine_name",
+        "machine_type"
+      ],
       "autofill_map": {
         "work_center_id": "work_center_id"
       },
@@ -117,8 +168,15 @@
       "width": "third",
       "lookup_source": "work_orders",
       "strict_select": true,
-      "depends_on": ["machine_id"],
-      "display_fields": ["wo_number", "operation_desc", "part_number", "part_revision"],
+      "depends_on": [
+        "machine_id"
+      ],
+      "display_fields": [
+        "wo_number",
+        "operation_desc",
+        "part_number",
+        "part_revision"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "so_number": "so_number",
@@ -142,8 +200,14 @@
       "width": "third",
       "lookup_source": "operators",
       "strict_select": true,
-      "depends_on": ["work_center_id"],
-      "display_fields": ["operator_id", "operator_name", "role"],
+      "depends_on": [
+        "work_center_id"
+      ],
+      "display_fields": [
+        "operator_id",
+        "operator_name",
+        "role"
+      ],
       "placeholder": "Search operator",
       "placeholder_vi": "Tìm người vận hành"
     },
@@ -156,8 +220,15 @@
       "width": "third",
       "lookup_source": "tooling_assets",
       "strict_select": true,
-      "depends_on": ["machine_id", "work_center_id"],
-      "display_fields": ["tool_id", "tool_name", "tool_type"],
+      "depends_on": [
+        "machine_id",
+        "work_center_id"
+      ],
+      "display_fields": [
+        "tool_id",
+        "tool_name",
+        "tool_type"
+      ],
       "placeholder": "Search affected tooling",
       "placeholder_vi": "Tìm tooling liên quan"
     },
@@ -186,14 +257,46 @@
       "width": "third",
       "options_source": "registry:downtime_category",
       "options": [
-        { "value": "breakdown", "label": "Breakdown", "label_vi": "Hỏng máy" },
-        { "value": "planned_pm", "label": "Planned PM", "label_vi": "Bảo trì định kỳ" },
-        { "value": "setup", "label": "Setup / Changeover", "label_vi": "Setup / Changeover" },
-        { "value": "material_wait", "label": "Material Wait", "label_vi": "Chờ vật tư" },
-        { "value": "quality_hold", "label": "Quality Hold", "label_vi": "Hold chất lượng" },
-        { "value": "tool_change", "label": "Tool Change", "label_vi": "Thay dao / tool" },
-        { "value": "utility", "label": "Utility / Power", "label_vi": "Điện / tiện ích" },
-        { "value": "other", "label": "Other", "label_vi": "Khác" }
+        {
+          "value": "breakdown",
+          "label": "Breakdown",
+          "label_vi": "Hỏng máy"
+        },
+        {
+          "value": "planned_pm",
+          "label": "Planned PM",
+          "label_vi": "Bảo trì định kỳ"
+        },
+        {
+          "value": "setup",
+          "label": "Setup / Changeover",
+          "label_vi": "Setup / Changeover"
+        },
+        {
+          "value": "material_wait",
+          "label": "Material Wait",
+          "label_vi": "Chờ vật tư"
+        },
+        {
+          "value": "quality_hold",
+          "label": "Quality Hold",
+          "label_vi": "Hold chất lượng"
+        },
+        {
+          "value": "tool_change",
+          "label": "Tool Change",
+          "label_vi": "Thay dao / tool"
+        },
+        {
+          "value": "utility",
+          "label": "Utility / Power",
+          "label_vi": "Điện / tiện ích"
+        },
+        {
+          "value": "other",
+          "label": "Other",
+          "label_vi": "Khác"
+        }
       ]
     },
     {
@@ -205,9 +308,21 @@
       "width": "third",
       "options_source": "registry:severity",
       "options": [
-        { "value": "minor", "label": "Minor", "label_vi": "Nhẹ" },
-        { "value": "major", "label": "Major", "label_vi": "Lớn" },
-        { "value": "critical", "label": "Critical", "label_vi": "Nghiêm trọng" }
+        {
+          "value": "minor",
+          "label": "Minor",
+          "label_vi": "Nhẹ"
+        },
+        {
+          "value": "major",
+          "label": "Major",
+          "label_vi": "Lớn"
+        },
+        {
+          "value": "critical",
+          "label": "Critical",
+          "label_vi": "Nghiêm trọng"
+        }
       ]
     },
     {
@@ -218,12 +333,36 @@
       "required": true,
       "options_source": "registry:root_cause_6m",
       "options": [
-        { "value": "man", "label": "Man", "label_vi": "Con người" },
-        { "value": "machine", "label": "Machine", "label_vi": "Máy móc" },
-        { "value": "method", "label": "Method", "label_vi": "Phương pháp" },
-        { "value": "material", "label": "Material", "label_vi": "Vật liệu" },
-        { "value": "measurement", "label": "Measurement", "label_vi": "Đo lường" },
-        { "value": "environment", "label": "Environment", "label_vi": "Môi trường" }
+        {
+          "value": "man",
+          "label": "Man",
+          "label_vi": "Con người"
+        },
+        {
+          "value": "machine",
+          "label": "Machine",
+          "label_vi": "Máy móc"
+        },
+        {
+          "value": "method",
+          "label": "Method",
+          "label_vi": "Phương pháp"
+        },
+        {
+          "value": "material",
+          "label": "Material",
+          "label_vi": "Vật liệu"
+        },
+        {
+          "value": "measurement",
+          "label": "Measurement",
+          "label_vi": "Đo lường"
+        },
+        {
+          "value": "environment",
+          "label": "Environment",
+          "label_vi": "Môi trường"
+        }
       ]
     },
     {
@@ -267,7 +406,11 @@
       "width": "third",
       "lookup_source": "operators",
       "strict_select": true,
-      "display_fields": ["operator_id", "operator_name", "role"],
+      "display_fields": [
+        "operator_id",
+        "operator_name",
+        "role"
+      ],
       "placeholder": "Search reporter",
       "placeholder_vi": "Tìm người báo cáo"
     },
@@ -325,5 +468,10 @@
       "labelEn": "Recovery reviewer"
     }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"]
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
+  "record_type": "DOWNTIME"
 }

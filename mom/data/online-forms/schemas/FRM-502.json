@@ -7,9 +7,22 @@
   "frequency": "daily",
   "sop_ref": "SOP-501",
   "description": "Danh sách điều phối công việc hàng ngày cho từng ca, theo dõi phân bổ máy, nhân viên và tiến độ thực hiện.",
-  "roles_allowed": ["admin", "production_manager", "planner", "shift_leader", "dispatcher"],
+  "roles_allowed": [
+    "admin",
+    "production_manager",
+    "planner",
+    "shift_leader",
+    "dispatcher"
+  ],
   "fields": [
-    {"id": "dispatch_date", "type": "date", "label": "Ngày điều phối", "label_en": "Dispatch Date", "required": true, "default": "today"},
+    {
+      "id": "dispatch_date",
+      "type": "date",
+      "label": "Ngày điều phối",
+      "label_en": "Dispatch Date",
+      "required": true,
+      "default": "today"
+    },
     {
       "id": "shift",
       "type": "select",
@@ -18,12 +31,27 @@
       "required": true,
       "options_source": "registry:shift_code",
       "options": [
-        {"value": "1", "label": "Ca 1"},
-        {"value": "2", "label": "Ca 2"},
-        {"value": "3", "label": "Ca 3"}
+        {
+          "value": "1",
+          "label": "Ca 1"
+        },
+        {
+          "value": "2",
+          "label": "Ca 2"
+        },
+        {
+          "value": "3",
+          "label": "Ca 3"
+        }
       ]
     },
-    {"id": "dispatcher", "type": "text", "label": "Người điều phối", "label_en": "Dispatcher", "required": true},
+    {
+      "id": "dispatcher",
+      "type": "text",
+      "label": "Người điều phối",
+      "label_en": "Dispatcher",
+      "required": true
+    },
     {
       "id": "dispatch_items",
       "type": "table",
@@ -32,12 +60,48 @@
       "min_rows": 1,
       "max_rows": 60,
       "columns": [
-        {"id": "job_number", "type": "text", "label": "Số Job", "width": "10%", "required": true},
-        {"id": "operation", "type": "text", "label": "Nguyên công", "width": "10%", "required": true},
-        {"id": "machine", "type": "text", "label": "Máy", "width": "10%", "required": true},
-        {"id": "operator", "type": "text", "label": "Người vận hành", "width": "12%", "required": true},
-        {"id": "scheduled_start", "type": "time", "label": "Giờ bắt đầu", "width": "10%", "required": true},
-        {"id": "scheduled_end", "type": "time", "label": "Giờ kết thúc", "width": "10%", "required": true},
+        {
+          "id": "job_number",
+          "type": "text",
+          "label": "Số Job",
+          "width": "10%",
+          "required": true
+        },
+        {
+          "id": "operation",
+          "type": "text",
+          "label": "Nguyên công",
+          "width": "10%",
+          "required": true
+        },
+        {
+          "id": "machine",
+          "type": "text",
+          "label": "Máy",
+          "width": "10%",
+          "required": true
+        },
+        {
+          "id": "operator",
+          "type": "text",
+          "label": "Người vận hành",
+          "width": "12%",
+          "required": true
+        },
+        {
+          "id": "scheduled_start",
+          "type": "time",
+          "label": "Giờ bắt đầu",
+          "width": "10%",
+          "required": true
+        },
+        {
+          "id": "scheduled_end",
+          "type": "time",
+          "label": "Giờ kết thúc",
+          "width": "10%",
+          "required": true
+        },
         {
           "id": "status",
           "type": "select",
@@ -46,21 +110,69 @@
           "required": true,
           "options_source": "registry:frm502_status",
           "options": [
-            {"value": "pending", "label": "Chờ", "color": "#868e96"},
-            {"value": "in_progress", "label": "Đang chạy", "color": "#1971c2"},
-            {"value": "completed", "label": "Hoàn thành", "color": "#2f9e44"},
-            {"value": "delayed", "label": "Trễ", "color": "#e67700"},
-            {"value": "cancelled", "label": "Hủy", "color": "#e03131"}
+            {
+              "value": "pending",
+              "label": "Chờ",
+              "color": "#868e96"
+            },
+            {
+              "value": "in_progress",
+              "label": "Đang chạy",
+              "color": "#1971c2"
+            },
+            {
+              "value": "completed",
+              "label": "Hoàn thành",
+              "color": "#2f9e44"
+            },
+            {
+              "value": "delayed",
+              "label": "Trễ",
+              "color": "#e67700"
+            },
+            {
+              "value": "cancelled",
+              "label": "Hủy",
+              "color": "#e03131"
+            }
           ]
         },
-        {"id": "notes", "type": "text", "label": "Ghi chú", "width": "24%"}
+        {
+          "id": "notes",
+          "type": "text",
+          "label": "Ghi chú",
+          "width": "24%"
+        }
       ]
     },
-    {"id": "total_jobs", "type": "number", "label": "Tổng số công việc", "label_en": "Total Jobs", "required": true, "min": 0},
-    {"id": "capacity_utilization_pct", "type": "number", "label": "Tỷ lệ sử dụng năng lực (%)", "label_en": "Capacity Utilization (%)", "required": true, "min": 0, "max": 100, "suffix": "%"}
+    {
+      "id": "total_jobs",
+      "type": "number",
+      "label": "Tổng số công việc",
+      "label_en": "Total Jobs",
+      "required": true,
+      "min": 0
+    },
+    {
+      "id": "capacity_utilization_pct",
+      "type": "number",
+      "label": "Tỷ lệ sử dụng năng lực (%)",
+      "label_en": "Capacity Utilization (%)",
+      "required": true,
+      "min": 0,
+      "max": 100,
+      "suffix": "%"
+    }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
   "notifications": {
-    "on_submit": ["production_manager"]
-  }
+    "on_submit": [
+      "production_manager"
+    ]
+  },
+  "record_type": "DOWNTIME"
 }

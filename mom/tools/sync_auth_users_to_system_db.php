@@ -56,6 +56,35 @@ foreach ($users as $index => $user) {
     }
 
     try {
+        if (method_exists($shadowSync, 'normalizeUserLinkage')) {
+            $linkage = $shadowSync->normalizeUserLinkage($user);
+            $nextOrgUnitId = trim((string)($linkage['hcm_org_unit_id'] ?? ''));
+            $nextPositionId = trim((string)($linkage['hcm_position_id'] ?? ''));
+            $nextDeptCode = trim((string)($linkage['dept_code'] ?? ''));
+            $nextTitle = trim((string)($linkage['position_title'] ?? ''));
+
+            if ($nextOrgUnitId !== '' && trim((string)($user['hcm_org_unit_id'] ?? '')) !== $nextOrgUnitId) {
+                $users[$index]['hcm_org_unit_id'] = $nextOrgUnitId;
+                $user['hcm_org_unit_id'] = $nextOrgUnitId;
+                $updatedIdentity++;
+            }
+            if ($nextPositionId !== '' && trim((string)($user['hcm_position_id'] ?? '')) !== $nextPositionId) {
+                $users[$index]['hcm_position_id'] = $nextPositionId;
+                $user['hcm_position_id'] = $nextPositionId;
+                $updatedIdentity++;
+            }
+            if ($nextDeptCode !== '' && trim((string)($user['dept'] ?? '')) !== $nextDeptCode) {
+                $users[$index]['dept'] = $nextDeptCode;
+                $user['dept'] = $nextDeptCode;
+                $updatedIdentity++;
+            }
+            if ($nextTitle !== '' && trim((string)($user['title'] ?? '')) !== $nextTitle) {
+                $users[$index]['title'] = $nextTitle;
+                $user['title'] = $nextTitle;
+                $updatedIdentity++;
+            }
+        }
+
         $shadowSync->syncUser($user);
         $synced++;
     } catch (Throwable $e) {

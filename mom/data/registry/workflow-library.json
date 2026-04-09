@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-09T13:44:52.016Z",
+    "generatedAt": "2026-04-09T14:35:20.092Z",
     "workflowCount": 532
   },
   "workflows": {
@@ -12045,11 +12045,544 @@
         "mes_sites"
       ],
       "stateField": "improvement_status",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
-      "sla": {},
+      "statusSet": "improvement_projects_improvement_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "id": "under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "id": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "id": "implemented",
+          "label": "Đã triển khai",
+          "labelEn": "Implemented",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "submitted",
+            "under_review",
+            "approved",
+            "implemented"
+          ]
+        },
+        {
+          "id": "verified",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "implemented"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "verified"
+          ]
+        },
+        {
+          "id": "rejected",
+          "label": "Từ chối",
+          "labelEn": "Rejected",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "submitted",
+            "under_review"
+          ]
+        },
+        {
+          "id": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "closed",
+            "rejected"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "submitted",
+          "trigger": "submit",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_submitted"
+            },
+            {
+              "type": "setField",
+              "field": "submitted_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "submitted",
+          "to": "under_review",
+          "trigger": "move_to_under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_under_review"
+            }
+          ]
+        },
+        {
+          "from": "under_review",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_approved"
+            },
+            {
+              "type": "setField",
+              "field": "approved_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "implemented",
+          "trigger": "implement",
+          "label": "Đã triển khai",
+          "labelEn": "Implemented",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_implemented"
+            },
+            {
+              "type": "setField",
+              "field": "implemented_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "implemented",
+          "trigger": "implement",
+          "label": "Đã triển khai",
+          "labelEn": "Implemented",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_implemented"
+            },
+            {
+              "type": "setField",
+              "field": "implemented_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "submitted",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "under_review",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "implemented",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "implemented",
+          "to": "verified",
+          "trigger": "verify",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_verified"
+            },
+            {
+              "type": "setField",
+              "field": "verified_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "verified",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "submitted",
+          "to": "rejected",
+          "trigger": "reject",
+          "label": "Từ chối",
+          "labelEn": "Rejected",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_rejected"
+            },
+            {
+              "type": "setField",
+              "field": "rejected_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "under_review",
+          "to": "rejected",
+          "trigger": "reject",
+          "label": "Từ chối",
+          "labelEn": "Rejected",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_rejected"
+            },
+            {
+              "type": "setField",
+              "field": "rejected_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "closed",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "rejected",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "compliance_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "audit_risk_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "draft_to_submitted": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "submitted_to_under_review": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "under_review_to_approved": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        },
+        "approved_to_implemented": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "on_hold_to_implemented": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "submitted_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "under_review_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "approved_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "implemented_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "implemented_to_verified": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "verified_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        },
+        "submitted_to_rejected": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "under_review_to_rejected": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "closed_to_archived": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "rejected_to_archived": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        }
+      },
       "digitalThread": {
         "upstreamTriggers": [
           "records"
@@ -17241,11 +17774,470 @@
         "mes_sites"
       ],
       "stateField": "queue_status",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
-      "sla": {},
+      "statusSet": "mes_dispatch_queue_queue_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "states": [
+        {
+          "id": "planned",
+          "label": "Đã lên kế hoạch",
+          "labelEn": "Planned",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "planned",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "in_progress",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "planned",
+            "released",
+            "in_progress"
+          ]
+        },
+        {
+          "id": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "completed"
+          ]
+        },
+        {
+          "id": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "planned",
+            "released",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "closed",
+            "cancelled"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "planned",
+          "to": "released",
+          "trigger": "release",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_released"
+            },
+            {
+              "type": "setField",
+              "field": "released_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "released",
+          "trigger": "release",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_released"
+            },
+            {
+              "type": "setField",
+              "field": "released_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "in_progress",
+          "trigger": "start",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_in_progress"
+            }
+          ]
+        },
+        {
+          "from": "planned",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "in_progress",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "in_progress",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "completed",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "planned",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "closed",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "cancelled",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "planned_to_released": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "on_hold_to_released": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "released_to_in_progress": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "planned_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "released_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "in_progress_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "in_progress_to_completed": {
+          "hours": 72,
+          "escalateTo": "production_supervisor"
+        },
+        "completed_to_closed": {
+          "hours": 72,
+          "escalateTo": "production_supervisor"
+        },
+        "planned_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "released_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "on_hold_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "closed_to_archived": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "cancelled_to_archived": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        }
+      },
       "digitalThread": {
         "upstreamTriggers": [],
         "downstreamEffects": []
@@ -26135,11 +27127,551 @@
         "mes_sites"
       ],
       "stateField": "schedule_status",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
-      "sla": {},
+      "statusSet": "production_schedule_schedule_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "id": "published",
+          "label": "Đã công bố",
+          "labelEn": "Published",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "id": "frozen",
+          "label": "Đã đóng băng",
+          "labelEn": "Frozen",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "published"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft",
+            "under_review",
+            "approved",
+            "published",
+            "frozen"
+          ]
+        },
+        {
+          "id": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "published",
+            "frozen"
+          ]
+        },
+        {
+          "id": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft",
+            "under_review",
+            "approved"
+          ]
+        },
+        {
+          "id": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "completed",
+            "cancelled"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "under_review",
+          "trigger": "move_to_under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_under_review"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "under_review",
+          "trigger": "move_to_under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_under_review"
+            }
+          ]
+        },
+        {
+          "from": "under_review",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_approved"
+            },
+            {
+              "type": "setField",
+              "field": "approved_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "published",
+          "trigger": "publish",
+          "label": "Đã công bố",
+          "labelEn": "Published",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_published"
+            },
+            {
+              "type": "setField",
+              "field": "published_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "published",
+          "to": "frozen",
+          "trigger": "move_to_frozen",
+          "label": "Đã đóng băng",
+          "labelEn": "Frozen",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_frozen"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "under_review",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "published",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "frozen",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "published",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "frozen",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "under_review",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "completed",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "cancelled",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "production_supervisor",
+                "operations_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "draft_to_under_review": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "on_hold_to_under_review": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "under_review_to_approved": {
+          "hours": 72,
+          "escalateTo": "production_supervisor"
+        },
+        "approved_to_published": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "published_to_frozen": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "draft_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "under_review_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "approved_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "published_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "frozen_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "published_to_completed": {
+          "hours": 72,
+          "escalateTo": "production_supervisor"
+        },
+        "frozen_to_completed": {
+          "hours": 72,
+          "escalateTo": "production_supervisor"
+        },
+        "draft_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "under_review_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "approved_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "completed_to_archived": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "cancelled_to_archived": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        }
+      },
       "digitalThread": {
         "upstreamTriggers": [
           "work_centers"

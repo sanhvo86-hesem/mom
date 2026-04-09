@@ -3,7 +3,7 @@
     "version": "1.0",
     "generatedAt": "2026-04-09T15:45:00+07:00",
     "description": "Machine-readable authority catalog for international-standard backend normalization across ERP, MES, QMS, EAM, EHS, CRM, SCM, and finance flows.",
-    "resourceCount": 62,
+    "resourceCount": 63,
     "authorityDocs": [
       "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/backend-readiness-gap-analysis-2026-04-09.md",
       "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/global-backend-standardization-blueprint-2026-04-09.md",

@@ -86,7 +86,7 @@ Contained children should include:
 | Resource | Target tables | Minimum key columns | Required extra endpoints/actions |
 |---|---|---|---|
 | `customers` | `customer_master`, `customer_sites`, `customer_contacts` | `customer_id`, `customer_code`, `customer_status`, `party_id` | `POST /customers/{customer_id}:approve`, `:suspend`; child sites and contacts |
-| `customer-purchase-orders` | `customer_purchase_orders`, `customer_purchase_order_lines`, `customer_po_revisions` | `customer_purchase_order_id`, `customer_po_number`, `customer_po_status`, `customer_id` | `POST /customer-purchase-orders/{id}:acknowledge`, `:revise`, `:close`; child lines |
+| `customer-purchase-orders` | `customer_purchase_orders`, `customer_purchase_order_lines`, `customer_po_revisions` | `customer_purchase_order_id`, `customer_po_number`, `customer_po_status`, `customer_id` | `POST /customer-purchase-orders`, `GET /customer-purchase-orders/{id}`, `POST /customer-purchase-orders/{id}:transition` with `acknowledge/confirm/cancel/close`; child lines |
 | `customer-touchpoints` | `customer_touchpoints` | `customer_touchpoint_id`, `touchpoint_type`, `touchpoint_status`, `customer_id` | `POST /customer-touchpoints/{id}:complete`, `:escalate` |
 | `quotes` | `quotes`, `quote_lines`, `quote_revisions` | `quote_id`, `quote_number`, `quote_status`, `customer_id` | `POST /quotes/{quote_id}:submit`, `:approve`, `:reject`, `:convert-to-sales-order`; child lines |
 | `quote-effectiveness-reviews` | `quote_effectiveness_reviews` | `quote_effectiveness_review_id`, `quote_id`, `conversion_outcome`, `review_status` | `POST /quote-effectiveness-reviews/{id}:publish` |
@@ -148,7 +148,7 @@ Contained children should include:
 | `inspection-results` | `inspection_results` | `inspection_result_id`, `inspection_lot_id`, `characteristic_code`, `result_status` | child resource under inspection lots |
 | `incoming-inspections` | `incoming_inspections` | `incoming_inspection_id`, `incoming_inspection_number`, `incoming_inspection_status`, `purchase_receipt_id` | `POST /incoming-inspections/{id}:start`, `:accept`, `:reject`, `:waive` |
 | `ipqc-inspections` | `ipqc_inspections` | `ipqc_inspection_id`, `ipqc_inspection_number`, `ipqc_inspection_status`, `job_operation_id`, `work_order_id` | `POST /ipqc-inspections/{id}:start`, `:accept`, `:reject`, `:hold-process` |
-| `fqc-inspections` | `fqc_inspections` | `fqc_inspection_id`, `fqc_inspection_number`, `fqc_inspection_status`, `job_order_id`, `work_order_id` | `POST /fqc-inspections/{id}:start`, `:accept`, `:reject`, `:release-to-oqc` |
+| `fqc-inspections` | `fqc_inspections` | `fqc_inspection_id`, `fqc_inspection_number`, `fqc_inspection_status`, `job_order_id`, `work_order_id` | Conditional alias only until a distinct finished-goods release gate exists; otherwise remain on canonical `oqc-inspections` |
 | `oqc-inspections` | `oqc_inspections` | `oqc_inspection_id`, `oqc_inspection_number`, `oqc_inspection_status`, `shipment_id` | `POST /oqc-inspections/{id}:start`, `:accept`, `:reject`, `:release-shipment` |
 | `nonconformances` | `nonconformances`, `nonconformance_links` | `nonconformance_id`, `nonconformance_number`, `nonconformance_status`, `source_type`, `source_id` | `POST /nonconformances/{id}:contain`, `:disposition`, `:launch-capa`, `:close` |
 | `mrb-cases` | `mrb_cases`, `mrb_decisions` | `mrb_case_id`, `mrb_case_number`, `mrb_case_status`, `nonconformance_id` | `POST /mrb-cases/{id}:decide`, `:approve`, `:close` |

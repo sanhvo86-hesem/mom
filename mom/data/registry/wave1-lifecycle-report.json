@@ -1,17 +1,17 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T13:45:02.378Z",
+    "generatedAt": "2026-04-09T14:35:27.187Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.0",
     "description": "Wave 1 lifecycle normalization verification report."
   },
   "summary": {
-    "normalized_target_entities": 25,
-    "normalized_target_entities_passed": 25,
+    "normalized_target_entities": 28,
+    "normalized_target_entities_passed": 28,
     "normalized_target_entities_failed": 0,
-    "guarded_transition_runtime_entities": 25,
-    "remaining_generic_status_only_core_entities": 3,
+    "guarded_transition_runtime_entities": 28,
+    "remaining_generic_status_only_core_entities": 0,
     "schema_blockers": 0,
     "unused_candidate_entities": 0
   },
@@ -205,6 +205,51 @@
       "passed": true,
       "canonical_resource": "procurement_supplier_quality.supplier-asns",
       "purpose": "Controls inbound supplier notice, discrepancy handling, and receiving readiness before physical receipt hits stock truth."
+    },
+    {
+      "table": "improvement_projects",
+      "entity_key": "audit_risk.improvement_projects",
+      "transition_action": "audit_risk.improvement_projects.transition",
+      "expected_mode": "guarded_transition_runtime",
+      "actual_mode": "guarded_transition_runtime",
+      "expected_status_field": "improvement_status",
+      "actual_status_field": "improvement_status",
+      "expected_status_set": "improvement_projects_improvement_status_set",
+      "actual_status_set": "improvement_projects_improvement_status_set",
+      "transition_count": 15,
+      "passed": true,
+      "canonical_resource": "quality_improvement.improvement-actions",
+      "purpose": "Controls lean improvement intake, approval, implementation, verification, and closure so kaizen/corrective initiatives can be measured against realized benefit instead of staying as unmanaged ideas."
+    },
+    {
+      "table": "mes_dispatch_queue",
+      "entity_key": "mes_execution.mes_dispatch_queue",
+      "transition_action": "mes_execution.mes_dispatch_queue.transition",
+      "expected_mode": "guarded_transition_runtime",
+      "actual_mode": "guarded_transition_runtime",
+      "expected_status_field": "queue_status",
+      "actual_status_field": "queue_status",
+      "expected_status_set": "mes_dispatch_queue_queue_status_set",
+      "actual_status_set": "mes_dispatch_queue_queue_status_set",
+      "transition_count": 13,
+      "passed": true,
+      "canonical_resource": "planning_production.dispatch-lists",
+      "purpose": "Controls shopfloor dispatch release, hold, and execution closure so operations cannot start or disappear from queue outside the governed MES release horizon."
+    },
+    {
+      "table": "production_schedule",
+      "entity_key": "production.production_schedule",
+      "transition_action": "production.production_schedule.transition",
+      "expected_mode": "guarded_transition_runtime",
+      "actual_mode": "guarded_transition_runtime",
+      "expected_status_field": "schedule_status",
+      "actual_status_field": "schedule_status",
+      "expected_status_set": "production_schedule_schedule_status_set",
+      "actual_status_set": "production_schedule_schedule_status_set",
+      "transition_count": 17,
+      "passed": true,
+      "canonical_resource": "planning_production.production-plans",
+      "purpose": "Controls finite schedule review, publication, freeze, and closure so the released factory plan remains a governed source for capacity, dispatch, and OTIF commitments."
     },
     {
       "table": "purchase_receipts",

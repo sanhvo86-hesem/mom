@@ -197,6 +197,72 @@
         { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "confirmed"] }
       ]
     },
+    "improvement_projects": {
+      "canonical_resource": "quality_improvement.improvement-actions",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls lean improvement intake, approval, implementation, verification, and closure so kaizen/corrective initiatives can be measured against realized benefit instead of staying as unmanaged ideas.",
+      "kpi_family": "continuous_improvement",
+      "gate_type": "improvement_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "pdca",
+      "status_set_key": "improvement_projects_improvement_status_set",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+        { "value": "under_review", "label": "Đang xem xét", "labelEn": "Under Review", "allowedTransitionsFrom": ["submitted"] },
+        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
+        { "value": "implemented", "label": "Đã triển khai", "labelEn": "Implemented", "allowedTransitionsFrom": ["approved", "on_hold"] },
+        { "value": "on_hold", "label": "Tạm dừng", "labelEn": "On Hold", "allowedTransitionsFrom": ["submitted", "under_review", "approved", "implemented"] },
+        { "value": "verified", "label": "Đã xác nhận", "labelEn": "Verified", "allowedTransitionsFrom": ["implemented"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["verified"] },
+        { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "allowedTransitionsFrom": ["submitted", "under_review"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed", "rejected"] }
+      ]
+    },
+    "mes_dispatch_queue": {
+      "canonical_resource": "planning_production.dispatch-lists",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls shopfloor dispatch release, hold, and execution closure so operations cannot start or disappear from queue outside the governed MES release horizon.",
+      "kpi_family": "throughput",
+      "gate_type": "release_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "tier_review",
+      "status_set_key": "mes_dispatch_queue_queue_status_set",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "planned", "label": "Đã lên kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+        { "value": "released", "label": "Đã phát hành", "labelEn": "Released", "allowedTransitionsFrom": ["planned", "on_hold"] },
+        { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "allowedTransitionsFrom": ["released"] },
+        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["planned", "released", "in_progress"] },
+        { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "allowedTransitionsFrom": ["in_progress"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["completed"] },
+        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "released", "on_hold"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed", "cancelled"] }
+      ]
+    },
+    "production_schedule": {
+      "canonical_resource": "planning_production.production-plans",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls finite schedule review, publication, freeze, and closure so the released factory plan remains a governed source for capacity, dispatch, and OTIF commitments.",
+      "kpi_family": "schedule_adherence",
+      "gate_type": "planning_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "s_and_op_review",
+      "status_set_key": "production_schedule_schedule_status_set",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+        { "value": "under_review", "label": "Đang xem xét", "labelEn": "Under Review", "allowedTransitionsFrom": ["draft", "on_hold"] },
+        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
+        { "value": "published", "label": "Đã công bố", "labelEn": "Published", "allowedTransitionsFrom": ["approved"] },
+        { "value": "frozen", "label": "Đã đóng băng", "labelEn": "Frozen", "allowedTransitionsFrom": ["published"] },
+        { "value": "on_hold", "label": "Tạm dừng", "labelEn": "On Hold", "allowedTransitionsFrom": ["draft", "under_review", "approved", "published", "frozen"] },
+        { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "allowedTransitionsFrom": ["published", "frozen"] },
+        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "under_review", "approved"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["completed", "cancelled"] }
+      ]
+    },
     "purchase_receipts": {
       "canonical_resource": "procurement_supplier_quality.purchase-receipts",
       "usage_zone": "core_value_stream",

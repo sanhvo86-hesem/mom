@@ -107,6 +107,14 @@ tags:
     description: |
       Approval workflows, decision tracking, attachments, and timeline.
       Quy trinh phe duyet, theo doi quyet dinh, dinh kem, va dong thoi gian.
+  - name: Finance
+    description: |
+      Financial control objects -- period close, backdate exception, credit memo, debit memo.
+      Doi tuong kiem soat tai chinh -- khoa ky, ngoai le lui ngay, credit memo, debit memo.
+  - name: Commercial
+    description: |
+      Commercial demand objects -- customer purchase orders and quote-to-order commitment controls.
+      Doi tuong cau thuong mai -- PO khach hang va kiem soat cam ket quote-to-order.
 
 paths:
   # ═══════════════════════════════════════════════════════════════════════════
@@ -2762,6 +2770,557 @@ paths:
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
 
+  /api/v1/governance/override-controls:
+    get:
+      operationId: listOverrideControls
+      tags: [Governance]
+      summary: List operational override controls
+      description: |
+        Returns the governed override records used to authorize temporary gate bypasses with typed reasons,
+        electronic signature evidence, and expiry windows.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Override control list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OverrideControlConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createOverrideControl
+      tags: [Governance]
+      summary: Create an operational override control
+      description: |
+        Creates a typed, signed, and timeboxed override control. Safe retries are supported through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Optional idempotency key for safe client retries.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOverrideControlRequest'
+      responses:
+        '201':
+          description: Override control created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OverrideControlEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/governance/override-controls/{overrideId}:
+    get:
+      operationId: getOverrideControl
+      tags: [Governance]
+      summary: Get a single operational override control
+      description: |
+        Returns the full override record including approval identity, reason code, electronic signature, and expiry.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: overrideId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier of the override control.
+      responses:
+        '200':
+          description: Override control detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OverrideControlEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/finance/period-closes:
+    get:
+      operationId: listPeriodCloses
+      tags: [Finance]
+      summary: List period close controls
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Period close control list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeriodCloseConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createPeriodClose
+      tags: [Finance]
+      summary: Close an accounting period
+      description: |
+        Closes a period for a ledger scope with approval reason and electronic signature evidence.
+        Safe retries are supported through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePeriodCloseRequest'
+      responses:
+        '201':
+          description: Period close created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeriodCloseEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/finance/period-closes/{periodCloseId}:
+    get:
+      operationId: getPeriodClose
+      tags: [Finance]
+      summary: Get a single period close control
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: periodCloseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Period close detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeriodCloseEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/finance/backdate-exceptions:
+    get:
+      operationId: listBackdateExceptions
+      tags: [Finance]
+      summary: List approved backdate exceptions
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Backdate exception list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackdateExceptionConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createBackdateException
+      tags: [Finance]
+      summary: Create a backdate exception
+      description: |
+        Creates a signed exception for posting back into a controlled accounting period. Safe retries are supported through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBackdateExceptionRequest'
+      responses:
+        '201':
+          description: Backdate exception created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackdateExceptionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/finance/backdate-exceptions/{backdateExceptionId}:
+    get:
+      operationId: getBackdateException
+      tags: [Finance]
+      summary: Get a single backdate exception
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: backdateExceptionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Backdate exception detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackdateExceptionEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/finance/credit-memos:
+    get:
+      operationId: listCreditMemos
+      tags: [Finance]
+      summary: List approved credit memos
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Credit memo list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createCreditMemo
+      tags: [Finance]
+      summary: Create a credit memo
+      description: |
+        Creates an approved credit memo record with safe retry support through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMemoRequest'
+      responses:
+        '201':
+          description: Credit memo created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/finance/credit-memos/{creditMemoId}:
+    get:
+      operationId: getCreditMemo
+      tags: [Finance]
+      summary: Get a single credit memo
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: creditMemoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Credit memo detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/finance/debit-memos:
+    get:
+      operationId: listDebitMemos
+      tags: [Finance]
+      summary: List approved debit memos
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Debit memo list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebitMemoConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createDebitMemo
+      tags: [Finance]
+      summary: Create a debit memo
+      description: |
+        Creates an approved debit memo record with safe retry support through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMemoRequest'
+      responses:
+        '201':
+          description: Debit memo created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebitMemoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/finance/debit-memos/{debitMemoId}:
+    get:
+      operationId: getDebitMemo
+      tags: [Finance]
+      summary: Get a single debit memo
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: debitMemoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Debit memo detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebitMemoEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/commercial/customer-purchase-orders:
+    get:
+      operationId: listCustomerPurchaseOrders
+      tags: [Commercial]
+      summary: List customer purchase orders
+      description: |
+        Returns the canonical commercial-demand objects extracted from customer PO commitments and linked Sales Orders.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Customer purchase order list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createCustomerPurchaseOrder
+      tags: [Commercial]
+      summary: Create a customer purchase order
+      description: |
+        Captures a customer commercial commitment as a first-class lifecycle owner.
+        Safe retries are supported through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerPurchaseOrderRequest'
+      responses:
+        '201':
+          description: Customer purchase order created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/commercial/customer-purchase-orders/{customerPoId}:
+    get:
+      operationId: getCustomerPurchaseOrder
+      tags: [Commercial]
+      summary: Get a single customer purchase order
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: customerPoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer purchase order detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/commercial/customer-purchase-orders/{customerPoId}:transition:
+    post:
+      operationId: transitionCustomerPurchaseOrder
+      tags: [Commercial]
+      summary: Transition a customer purchase order
+      description: |
+        Executes a governed customer-PO lifecycle transition such as acknowledge, confirm, cancel, or close.
+        Safe retries are supported through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: customerPoId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionCustomerPurchaseOrderRequest'
+      responses:
+        '200':
+          description: Customer purchase order transitioned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPONENTS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -3669,6 +4228,530 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/AttachmentDetail'
+
+    OverrideControlItem:
+      type: object
+      required: [override_id, override_type, override_status, subject_type, subject_id, control_code, reason_code, approved_by, approved_at, effective_from, expires_at]
+      properties:
+        override_id:
+          type: string
+        override_type:
+          type: string
+        override_status:
+          type: string
+        subject_type:
+          type: string
+        subject_id:
+          type: string
+        control_family:
+          type: string
+        control_code:
+          type: string
+        reason_code:
+          type: string
+        reason_label:
+          type: string
+        reason_text:
+          type: string
+        approved_by:
+          type: string
+        approved_role:
+          type: string
+        approved_at:
+          type: string
+          format: date-time
+        effective_from:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        approval_reference:
+          type: [string, "null"]
+        follow_up_status:
+          type: string
+        e_signature:
+          type: object
+          additionalProperties: true
+
+    OverrideControlConnection:
+      type: object
+      required: [override_controls]
+      properties:
+        override_controls:
+          type: array
+          items:
+            $ref: '#/components/schemas/OverrideControlItem'
+
+    OverrideControlEnvelope:
+      type: object
+      required: [override_control]
+      properties:
+        override_control:
+          $ref: '#/components/schemas/OverrideControlItem'
+
+    CreateOverrideControlRequest:
+      type: object
+      required: [override_type, subject_type, subject_id, control_family, control_code, reason_code, reason_text, approved_by, approved_role]
+      properties:
+        override_type:
+          type: string
+        subject_type:
+          type: string
+        subject_id:
+          type: string
+        control_family:
+          type: string
+        control_code:
+          type: string
+        reason_code:
+          type: string
+        reason_text:
+          type: string
+        approved_by:
+          type: string
+        approved_role:
+          type: string
+        requested_by:
+          type: string
+        requested_role:
+          type: string
+        approval_reference:
+          type: string
+        effective_from:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        source_context:
+          type: object
+          additionalProperties: true
+
+    PeriodCloseItem:
+      type: object
+      required: [period_close_id, period_code, ledger_scope, close_status, closed_by, closed_at, reason]
+      properties:
+        period_close_id:
+          type: string
+        period_code:
+          type: string
+          pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+        ledger_scope:
+          type: string
+          enum: [AP, AR, PLANT]
+        close_status:
+          type: string
+        closed_by:
+          type: string
+        closed_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+        e_signature:
+          type: object
+          additionalProperties: true
+
+    PeriodCloseConnection:
+      type: object
+      required: [period_closes]
+      properties:
+        period_closes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeriodCloseItem'
+
+    PeriodCloseEnvelope:
+      type: object
+      required: [period_close]
+      properties:
+        period_close:
+          $ref: '#/components/schemas/PeriodCloseItem'
+
+    CreatePeriodCloseRequest:
+      type: object
+      required: [period_code, ledger_scope, reason]
+      properties:
+        period_code:
+          type: string
+          pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+        ledger_scope:
+          type: string
+          enum: [AP, AR, PLANT]
+        reason:
+          type: string
+
+    BackdateExceptionItem:
+      type: object
+      required: [backdate_exception_id, exception_status, ledger_scope, subject_type, subject_ref, requested_posting_date, approved_by, approved_at, expires_at]
+      properties:
+        backdate_exception_id:
+          type: string
+        exception_status:
+          type: string
+        ledger_scope:
+          type: string
+          enum: [AP, AR, PLANT, EXECUTION]
+        subject_type:
+          type: string
+        subject_ref:
+          type: string
+        reason_code:
+          type: string
+        reason:
+          type: string
+        approval_reference:
+          type: string
+        original_event_at:
+          type: string
+          format: date-time
+        requested_posting_date:
+          type: string
+          format: date
+        approved_period_code:
+          type: string
+        approved_by:
+          type: string
+        approved_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        e_signature:
+          type: object
+          additionalProperties: true
+
+    BackdateExceptionConnection:
+      type: object
+      required: [backdate_exceptions]
+      properties:
+        backdate_exceptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BackdateExceptionItem'
+
+    BackdateExceptionEnvelope:
+      type: object
+      required: [backdate_exception]
+      properties:
+        backdate_exception:
+          $ref: '#/components/schemas/BackdateExceptionItem'
+
+    CreateBackdateExceptionRequest:
+      type: object
+      required: [ledger_scope, subject_type, subject_ref, reason, approval_reference, requested_posting_date, original_event_at, expires_at]
+      properties:
+        ledger_scope:
+          type: string
+          enum: [AP, AR, PLANT, EXECUTION]
+        subject_type:
+          type: string
+        subject_ref:
+          type: string
+        reason_code:
+          type: string
+        reason:
+          type: string
+        approval_reference:
+          type: string
+        requested_posting_date:
+          type: string
+          format: date
+        original_event_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+
+    MemoItem:
+      type: object
+      required: [memo_type, memo_status, invoice_scope, original_invoice_ref, amount, currency_code, approved_by, approved_at]
+      properties:
+        memo_type:
+          type: string
+          enum: [credit, debit]
+        memo_status:
+          type: string
+        invoice_scope:
+          type: string
+          enum: [AP, AR]
+        original_invoice_ref:
+          type: string
+        reason_code:
+          type: string
+        reason:
+          type: string
+        amount:
+          type: number
+        currency_code:
+          type: string
+        approved_by:
+          type: string
+        approved_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreditMemoItem:
+      allOf:
+        - $ref: '#/components/schemas/MemoItem'
+        - type: object
+          required: [credit_memo_id]
+          properties:
+            credit_memo_id:
+              type: string
+
+    DebitMemoItem:
+      allOf:
+        - $ref: '#/components/schemas/MemoItem'
+        - type: object
+          required: [debit_memo_id]
+          properties:
+            debit_memo_id:
+              type: string
+
+    CreditMemoConnection:
+      type: object
+      required: [credit_memos]
+      properties:
+        credit_memos:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditMemoItem'
+
+    DebitMemoConnection:
+      type: object
+      required: [debit_memos]
+      properties:
+        debit_memos:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebitMemoItem'
+
+    CreditMemoEnvelope:
+      type: object
+      required: [credit_memo]
+      properties:
+        credit_memo:
+          $ref: '#/components/schemas/CreditMemoItem'
+
+    DebitMemoEnvelope:
+      type: object
+      required: [debit_memo]
+      properties:
+        debit_memo:
+          $ref: '#/components/schemas/DebitMemoItem'
+
+    CreateMemoRequest:
+      type: object
+      required: [invoice_scope, original_invoice_ref, reason, amount]
+      properties:
+        invoice_scope:
+          type: string
+          enum: [AP, AR]
+        original_invoice_ref:
+          type: string
+        reason_code:
+          type: string
+        reason:
+          type: string
+        amount:
+          type: number
+          exclusiveMinimum: 0
+        currency_code:
+          type: string
+          default: VND
+
+    CustomerPurchaseOrderLine:
+      type: object
+      properties:
+        customer_po_line_id:
+          type: string
+        line_number:
+          type: integer
+        customer_item_ref:
+          type: string
+        item_id:
+          type: string
+        part_number:
+          type: string
+        description:
+          type: string
+        qty:
+          type: number
+        uom:
+          type: string
+        unit_price:
+          type: number
+        line_total:
+          type: number
+        requested_date:
+          type: string
+          format: date
+        promise_date:
+          type: string
+          format: date
+
+    CustomerPurchaseOrderItem:
+      type: object
+      required: [customer_po_id, customer_po_number, po_status, customer_id, received_at]
+      properties:
+        customer_po_id:
+          type: string
+        customer_po_number:
+          type: string
+        po_status:
+          type: string
+          enum: [received, acknowledged, confirmed, closed, cancelled]
+        customer_id:
+          type: string
+        customer_name:
+          type: string
+        customer_site_id:
+          type: string
+        ship_to_site_id:
+          type: string
+        quote_id:
+          type: string
+        received_at:
+          type: string
+          format: date-time
+        requested_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+        incoterm_code:
+          type: string
+        payment_term_code:
+          type: string
+        customer_reference:
+          type: string
+        source:
+          type: string
+        source_system:
+          type: string
+        source_record_id:
+          type: string
+        notes:
+          type: string
+        line_count:
+          type: integer
+        total_qty:
+          type: number
+        total_value:
+          type: number
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerPurchaseOrderLine'
+        sales_order_refs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        status_history:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        updated_by:
+          type: string
+
+    CustomerPurchaseOrderConnection:
+      type: object
+      required: [customer_purchase_orders]
+      properties:
+        customer_purchase_orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerPurchaseOrderItem'
+
+    CustomerPurchaseOrderEnvelope:
+      type: object
+      required: [customer_purchase_order]
+      properties:
+        customer_purchase_order:
+          $ref: '#/components/schemas/CustomerPurchaseOrderItem'
+
+    CreateCustomerPurchaseOrderRequest:
+      type: object
+      required: [customer_id, customer_po_number]
+      properties:
+        customer_id:
+          type: string
+        customer_name:
+          type: string
+        customer_site_id:
+          type: string
+        ship_to_site_id:
+          type: string
+        customer_po_number:
+          type: string
+        received_at:
+          type: string
+          format: date-time
+        requested_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        quote_id:
+          type: string
+        currency_code:
+          type: string
+        incoterm_code:
+          type: string
+        payment_term_code:
+          type: string
+        customer_reference:
+          type: string
+        source:
+          type: string
+        source_system:
+          type: string
+        source_record_id:
+          type: string
+        notes:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerPurchaseOrderLine'
+
+    TransitionCustomerPurchaseOrderRequest:
+      type: object
+      required: [transition]
+      properties:
+        transition:
+          type: string
+          enum: [acknowledge, confirm, cancel, close]
+        reason:
+          type: string
+        so_number:
+          type: string
+        sales_order_status:
+          type: string
 
     # ── Governance Requests ──
 

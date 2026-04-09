@@ -1,25 +1,26 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T13:45:03.069Z",
+    "generatedAt": "2026-04-09T14:35:27.458Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.0",
     "description": "Wave 2 canonical governance verification report."
   },
   "summary": {
     "canonical_resources": 63,
-    "canonical_catalog_meta_resource_count": 62,
-    "canonical_catalog_meta_mismatch": 1,
+    "canonical_catalog_meta_resource_count": 63,
+    "canonical_catalog_meta_mismatch": 0,
     "catalog_alignment_targets": 12,
     "catalog_alignment_failures": 0,
     "service_backed_resources": 5,
-    "service_backed_resource_gaps": 5,
+    "service_backed_resource_gaps": 0,
+    "planned_canonical_resources_not_yet_in_registry": 4,
     "archive_isolation_targets": 1,
     "archive_isolation_targets_failed": 0,
-    "direct_table_matches": 37,
-    "legacy_table_matches": 17,
-    "service_backed_slice_matches": 0,
-    "true_schema_gaps": 9,
+    "direct_table_matches": 38,
+    "legacy_table_matches": 16,
+    "service_backed_slice_matches": 5,
+    "true_schema_gaps": 0,
     "remaining_unused_candidate_entities": 0,
     "archive_isolation_entities": 1
   },
@@ -221,97 +222,67 @@
     {
       "resource_key": "quality_improvement.override-controls",
       "entity_key": "governance.override_controls",
-      "entity_exists": false,
+      "entity_exists": true,
       "required_endpoints": [
         "governance.override_controls.list",
         "governance.override_controls.detail",
         "governance.override_controls.create"
       ],
-      "missing_endpoints": [
-        "governance.override_controls.list",
-        "governance.override_controls.detail",
-        "governance.override_controls.create"
-      ],
-      "idempotency_failures": [
-        "governance.override_controls.create"
-      ],
-      "passed": false
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
     },
     {
       "resource_key": "finance.period-closes",
       "entity_key": "finance.period_close_controls",
-      "entity_exists": false,
+      "entity_exists": true,
       "required_endpoints": [
         "finance.period_close_controls.list",
         "finance.period_close_controls.detail",
         "finance.period_close_controls.create"
       ],
-      "missing_endpoints": [
-        "finance.period_close_controls.list",
-        "finance.period_close_controls.detail",
-        "finance.period_close_controls.create"
-      ],
-      "idempotency_failures": [
-        "finance.period_close_controls.create"
-      ],
-      "passed": false
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
     },
     {
       "resource_key": "finance.backdate-exceptions",
       "entity_key": "finance.backdate_exceptions",
-      "entity_exists": false,
+      "entity_exists": true,
       "required_endpoints": [
         "finance.backdate_exceptions.list",
         "finance.backdate_exceptions.detail",
         "finance.backdate_exceptions.create"
       ],
-      "missing_endpoints": [
-        "finance.backdate_exceptions.list",
-        "finance.backdate_exceptions.detail",
-        "finance.backdate_exceptions.create"
-      ],
-      "idempotency_failures": [
-        "finance.backdate_exceptions.create"
-      ],
-      "passed": false
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
     },
     {
       "resource_key": "finance.credit-memos",
       "entity_key": "finance.credit_memos",
-      "entity_exists": false,
+      "entity_exists": true,
       "required_endpoints": [
         "finance.credit_memos.list",
         "finance.credit_memos.detail",
         "finance.credit_memos.create"
       ],
-      "missing_endpoints": [
-        "finance.credit_memos.list",
-        "finance.credit_memos.detail",
-        "finance.credit_memos.create"
-      ],
-      "idempotency_failures": [
-        "finance.credit_memos.create"
-      ],
-      "passed": false
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
     },
     {
       "resource_key": "finance.debit-memos",
       "entity_key": "finance.debit_memos",
-      "entity_exists": false,
+      "entity_exists": true,
       "required_endpoints": [
         "finance.debit_memos.list",
         "finance.debit_memos.detail",
         "finance.debit_memos.create"
       ],
-      "missing_endpoints": [
-        "finance.debit_memos.list",
-        "finance.debit_memos.detail",
-        "finance.debit_memos.create"
-      ],
-      "idempotency_failures": [
-        "finance.debit_memos.create"
-      ],
-      "passed": false
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
     }
   ],
   "archive_isolation": [
@@ -482,8 +453,10 @@
       "legacy_tables": [
         "sales_orders"
       ],
-      "resolution_mode": "legacy_table_match",
-      "matched_entities": [],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "commercial_customer.customer_purchase_orders"
+      ],
       "matched_legacy_tables": [
         "sales_orders"
       ]
@@ -752,7 +725,7 @@
       "legacy_tables": [
         "freight_orders"
       ],
-      "resolution_mode": "true_schema_gap",
+      "resolution_mode": "planned_canonical_resource",
       "matched_entities": [],
       "matched_legacy_tables": []
     },
@@ -908,8 +881,10 @@
       "legacy_tables": [
         "shipment_gate_overrides"
       ],
-      "resolution_mode": "service_backed_gap",
-      "matched_entities": [],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "governance.override_controls"
+      ],
       "matched_legacy_tables": []
     },
     {
@@ -957,7 +932,7 @@
       "legacy_tables": [
         "safety_observations"
       ],
-      "resolution_mode": "true_schema_gap",
+      "resolution_mode": "planned_canonical_resource",
       "matched_entities": [],
       "matched_legacy_tables": []
     },
@@ -1032,8 +1007,10 @@
       "legacy_tables": [
         "gl_period_close"
       ],
-      "resolution_mode": "service_backed_gap",
-      "matched_entities": [],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.period_close_controls"
+      ],
       "matched_legacy_tables": []
     },
     {
@@ -1042,9 +1019,13 @@
       "legacy_tables": [
         "period_close_controls"
       ],
-      "resolution_mode": "service_backed_gap",
-      "matched_entities": [],
-      "matched_legacy_tables": []
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.backdate_exceptions"
+      ],
+      "matched_legacy_tables": [
+        "period_close_controls"
+      ]
     },
     {
       "resource_key": "finance.credit-memos",
@@ -1052,8 +1033,10 @@
       "legacy_tables": [
         "ap_ar_invoices"
       ],
-      "resolution_mode": "service_backed_gap",
-      "matched_entities": [],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.credit_memos"
+      ],
       "matched_legacy_tables": [
         "ap_ar_invoices"
       ]
@@ -1064,8 +1047,10 @@
       "legacy_tables": [
         "ap_ar_invoices"
       ],
-      "resolution_mode": "service_backed_gap",
-      "matched_entities": [],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.debit_memos"
+      ],
       "matched_legacy_tables": [
         "ap_ar_invoices"
       ]
@@ -1076,7 +1061,7 @@
       "legacy_tables": [
         "inventory_valuations"
       ],
-      "resolution_mode": "true_schema_gap",
+      "resolution_mode": "planned_canonical_resource",
       "matched_entities": [],
       "matched_legacy_tables": []
     },
@@ -1155,7 +1140,7 @@
         "plant_performance",
         "factory_kpis"
       ],
-      "resolution_mode": "true_schema_gap",
+      "resolution_mode": "planned_canonical_resource",
       "matched_entities": [],
       "matched_legacy_tables": []
     }

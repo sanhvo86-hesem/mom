@@ -2480,13 +2480,12 @@ function _loadRegistryText(file){
 }
 
 function _registryPaths(file){
+  if(window.HmRuntimePaths && typeof window.HmRuntimePaths.registryCandidates === 'function'){
+    return window.HmRuntimePaths.registryCandidates(file);
+  }
   return [
     'data/registry/' + file + '.json',
-    './data/registry/' + file + '.json',
-    '/data/registry/' + file + '.json',
-    'mom/data/registry/' + file + '.json',
-    './mom/data/registry/' + file + '.json',
-    '/mom/data/registry/' + file + '.json'
+    './data/registry/' + file + '.json'
   ];
 }
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Onboard canonical entity keys and public endpoint keys into registry JSON assets.
-- Adds 25 endpoint entries to endpoint-catalog.json
-- Adds 10 entity entries to frontend-foundation-catalog.json
+- Adds 29 endpoint entries to endpoint-catalog.json
+- Adds 11 entity entries to frontend-foundation-catalog.json
 """
 
 import json
@@ -28,7 +28,7 @@ REGISTRY_DIR = resolve_registry_dir()
 ENDPOINT_CATALOG = os.path.join(REGISTRY_DIR, "endpoint-catalog.json")
 FRONTEND_CATALOG = os.path.join(REGISTRY_DIR, "frontend-foundation-catalog.json")
 
-# ── 10 canonical endpoint definitions ──────────────────────────────────────
+# ── 29 canonical endpoint definitions ──────────────────────────────────────
 NEW_ENDPOINTS = [
     {
         "action": "foundation.organization.list",
@@ -765,9 +765,147 @@ NEW_ENDPOINTS = [
             }
         }
     },
+    {
+        "action": "commercial_customer.customer_purchase_orders.list",
+        "label": "Danh sach PO khach hang",
+        "labelEn": "Customer Purchase Order List",
+        "module": "Commercial",
+        "moduleEn": "Commercial",
+        "method": "GET",
+        "path": "/api/v1/commercial/customer-purchase-orders",
+        "controller": "CustomerPurchaseOrderController",
+        "handler": "listPurchaseOrders",
+        "source": "canonical-onboard",
+        "kind": "list",
+        "domain": "commercial_customer",
+        "entity": "customer_purchase_orders",
+        "status": "active",
+        "security": {
+            "auth_required": True,
+            "csrf_required": False,
+            "admin_only": False,
+            "permission_keys": ["commercial_customer.customer_purchase_orders.read"],
+            "dynamic_permission": True
+        }
+    },
+    {
+        "action": "commercial_customer.customer_purchase_orders.detail",
+        "label": "Chi tiet PO khach hang",
+        "labelEn": "Customer Purchase Order Detail",
+        "module": "Commercial",
+        "moduleEn": "Commercial",
+        "method": "GET",
+        "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}",
+        "controller": "CustomerPurchaseOrderController",
+        "handler": "getPurchaseOrder",
+        "source": "canonical-onboard",
+        "kind": "detail",
+        "domain": "commercial_customer",
+        "entity": "customer_purchase_orders",
+        "status": "active",
+        "security": {
+            "auth_required": True,
+            "csrf_required": False,
+            "admin_only": False,
+            "permission_keys": ["commercial_customer.customer_purchase_orders.read"],
+            "dynamic_permission": True
+        }
+    },
+    {
+        "action": "commercial_customer.customer_purchase_orders.create",
+        "label": "Tao PO khach hang",
+        "labelEn": "Create Customer Purchase Order",
+        "module": "Commercial",
+        "moduleEn": "Commercial",
+        "method": "POST",
+        "path": "/api/v1/commercial/customer-purchase-orders",
+        "controller": "CustomerPurchaseOrderController",
+        "handler": "createPurchaseOrder",
+        "source": "canonical-onboard",
+        "kind": "create",
+        "domain": "commercial_customer",
+        "entity": "customer_purchase_orders",
+        "status": "active",
+        "security": {
+            "auth_required": True,
+            "csrf_required": True,
+            "admin_only": False,
+            "permission_keys": ["commercial_customer.customer_purchase_orders.create"],
+            "dynamic_permission": True
+        },
+        "request": {
+            "idempotency": {
+                "enabled": True,
+                "required": False,
+                "strongly_recommended": True,
+                "safe_retry_requires_client_key": False,
+                "applied_by_default": True,
+                "accepted_headers": ["Idempotency-Key"],
+                "accepted_query_params": ["idempotency_key", "request_id"],
+                "accepted_body_fields": ["idempotency_key", "request_id"],
+                "replay_strategy": "return_stored_success_response",
+                "conflict_policy": "reject_same_key_different_fingerprint",
+                "retry_window_profile": "short_retry_window",
+                "server_derivation": "customer_id+customer_po_number+payload_retry_window"
+            }
+        },
+        "response": {
+            "idempotency": {
+                "enabled": True,
+                "replay_strategy": "return_stored_success_response",
+                "response_status_reused": True
+            }
+        }
+    },
+    {
+        "action": "commercial_customer.customer_purchase_orders.transition",
+        "label": "Chuyen trang thai PO khach hang",
+        "labelEn": "Transition Customer Purchase Order",
+        "module": "Commercial",
+        "moduleEn": "Commercial",
+        "method": "POST",
+        "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
+        "controller": "CustomerPurchaseOrderController",
+        "handler": "transitionPurchaseOrder",
+        "source": "canonical-onboard",
+        "kind": "transition",
+        "domain": "commercial_customer",
+        "entity": "customer_purchase_orders",
+        "status": "active",
+        "security": {
+            "auth_required": True,
+            "csrf_required": True,
+            "admin_only": False,
+            "permission_keys": ["commercial_customer.customer_purchase_orders.update"],
+            "dynamic_permission": True
+        },
+        "request": {
+            "idempotency": {
+                "enabled": True,
+                "required": False,
+                "strongly_recommended": True,
+                "safe_retry_requires_client_key": False,
+                "applied_by_default": True,
+                "accepted_headers": ["Idempotency-Key"],
+                "accepted_query_params": ["idempotency_key", "request_id"],
+                "accepted_body_fields": ["idempotency_key", "request_id"],
+                "replay_strategy": "return_stored_success_response",
+                "conflict_policy": "reject_same_key_different_fingerprint",
+                "retry_window_profile": "short_retry_window",
+                "server_derivation": "identity+payload_retry_window"
+            }
+        },
+        "response": {
+            "idempotency": {
+                "enabled": True,
+                "replay_strategy": "return_stored_success_response",
+                "response_status_reused": True
+            }
+        }
+    },
 ]
 
-# ── 5 canonical entity definitions ─────────────────────────────────────────
+# ── 11 canonical entity definitions ────────────────────────────────────────
 NEW_ENTITIES = [
     {
         "entity_key": "foundation.organization",
@@ -908,7 +1046,7 @@ NEW_ENTITIES = [
         "entity_key": "governance.attachment",
         "domain": "governance",
         "entity": "attachment",
-        "profile": "transactional",
+        "profile": "transactional_record",
         "recommended_patterns": ["object_page"],
         "actions": {
             "detail": "governance.attachment.detail",
@@ -955,11 +1093,11 @@ NEW_ENTITIES = [
             "owner_field": "approved_by",
             "updated_at_field": "updated_at",
             "created_at_field": "created_at",
-            "due_date_field": null,
+            "due_date_field": None,
             "start_date_field": "effective_from",
             "end_date_field": "expires_at",
-            "resource_field": null,
-            "operation_field": null,
+            "resource_field": None,
+            "operation_field": None,
             "traceability_field": "override_id"
         },
         "detail_layout": {"sections": []},
@@ -989,11 +1127,11 @@ NEW_ENTITIES = [
             "owner_field": "closed_by",
             "updated_at_field": "updated_at",
             "created_at_field": "created_at",
-            "due_date_field": null,
-            "start_date_field": null,
+            "due_date_field": None,
+            "start_date_field": None,
             "end_date_field": "closed_at",
-            "resource_field": null,
-            "operation_field": null,
+            "resource_field": None,
+            "operation_field": None,
             "traceability_field": "period_close_id"
         },
         "detail_layout": {"sections": []},
@@ -1026,8 +1164,8 @@ NEW_ENTITIES = [
             "due_date_field": "expires_at",
             "start_date_field": "original_event_at",
             "end_date_field": "expires_at",
-            "resource_field": null,
-            "operation_field": null,
+            "resource_field": None,
+            "operation_field": None,
             "traceability_field": "backdate_exception_id"
         },
         "detail_layout": {"sections": []},
@@ -1043,7 +1181,7 @@ NEW_ENTITIES = [
         "entity_key": "finance.credit_memos",
         "domain": "finance",
         "entity": "credit_memos",
-        "profile": "transactional",
+        "profile": "transactional_record",
         "recommended_patterns": ["object_page", "related_lists"],
         "actions": {
             "list": "finance.credit_memos.list",
@@ -1057,11 +1195,11 @@ NEW_ENTITIES = [
             "owner_field": "approved_by",
             "updated_at_field": "updated_at",
             "created_at_field": "created_at",
-            "due_date_field": null,
-            "start_date_field": null,
+            "due_date_field": None,
+            "start_date_field": None,
             "end_date_field": "approved_at",
-            "resource_field": null,
-            "operation_field": null,
+            "resource_field": None,
+            "operation_field": None,
             "traceability_field": "credit_memo_id"
         },
         "detail_layout": {"sections": []},
@@ -1091,11 +1229,11 @@ NEW_ENTITIES = [
             "owner_field": "approved_by",
             "updated_at_field": "updated_at",
             "created_at_field": "created_at",
-            "due_date_field": null,
-            "start_date_field": null,
+            "due_date_field": None,
+            "start_date_field": None,
             "end_date_field": "approved_at",
-            "resource_field": null,
-            "operation_field": null,
+            "resource_field": None,
+            "operation_field": None,
             "traceability_field": "debit_memo_id"
         },
         "detail_layout": {"sections": []},
@@ -1105,6 +1243,41 @@ NEW_ENTITIES = [
             "detail_ready": True,
             "create_ready": True,
             "workflow_ready": False
+        }
+    },
+    {
+        "entity_key": "commercial_customer.customer_purchase_orders",
+        "domain": "commercial_customer",
+        "entity": "customer_purchase_orders",
+        "profile": "governed_case",
+        "recommended_patterns": ["object_page", "related_lists", "workflow_panel", "timeline", "attachments"],
+        "actions": {
+            "list": "commercial_customer.customer_purchase_orders.list",
+            "detail": "commercial_customer.customer_purchase_orders.detail",
+            "create": "commercial_customer.customer_purchase_orders.create",
+            "transition": "commercial_customer.customer_purchase_orders.transition"
+        },
+        "semantic_slots": {
+            "title_field": "customer_po_number",
+            "subtitle_field": "customer_name",
+            "status_field": "po_status",
+            "owner_field": "created_by",
+            "updated_at_field": "updated_at",
+            "created_at_field": "created_at",
+            "due_date_field": "due_date",
+            "start_date_field": "received_at",
+            "end_date_field": None,
+            "resource_field": None,
+            "operation_field": None,
+            "traceability_field": "customer_po_id"
+        },
+        "detail_layout": {"sections": []},
+        "readiness": {
+            "overall": "ready",
+            "list_ready": True,
+            "detail_ready": True,
+            "create_ready": True,
+            "workflow_ready": True
         }
     },
 ]
@@ -1117,24 +1290,32 @@ def onboard_endpoints():
 
     endpoints = catalog["endpoints"]
     added = []
+    updated = []
     skipped = []
 
     for ep in NEW_ENDPOINTS:
         key = ep["action"]
-        if key in endpoints:
-            skipped.append(key)
-        else:
+        current = endpoints.get(key)
+        if current is None:
             endpoints[key] = ep
             added.append(key)
+        elif current != ep:
+            endpoints[key] = ep
+            updated.append(key)
+        else:
+            skipped.append(key)
 
-    if added:
+    if added or updated:
         catalog["_meta"]["endpointCount"] = len(endpoints)
         print(f"Writing {ENDPOINT_CATALOG} ...")
         with open(ENDPOINT_CATALOG, "w", encoding="utf-8") as f:
             json.dump(catalog, f, indent=2, ensure_ascii=False)
-        print(f"  Added {len(added)} endpoints: {', '.join(added)}")
+        if added:
+            print(f"  Added {len(added)} endpoints: {', '.join(added)}")
+        if updated:
+            print(f"  Updated {len(updated)} endpoints: {', '.join(updated)}")
     else:
-        print("  No new endpoints to add.")
+        print("  No endpoint changes required.")
 
     if skipped:
         print(f"  Skipped (already exist): {', '.join(skipped)}")
@@ -1147,24 +1328,32 @@ def onboard_entities():
 
     entities = catalog["entities"]
     added = []
+    updated = []
     skipped = []
 
     for ent in NEW_ENTITIES:
         key = ent["entity_key"]
-        if key in entities:
-            skipped.append(key)
-        else:
+        current = entities.get(key)
+        if current is None:
             entities[key] = ent
             added.append(key)
+        elif current != ent:
+            entities[key] = ent
+            updated.append(key)
+        else:
+            skipped.append(key)
 
-    if added:
+    if added or updated:
         catalog["summary"]["entity_count"] = len(entities)
         print(f"Writing {FRONTEND_CATALOG} ...")
         with open(FRONTEND_CATALOG, "w", encoding="utf-8") as f:
             json.dump(catalog, f, indent=2, ensure_ascii=False)
-        print(f"  Added {len(added)} entities: {', '.join(added)}")
+        if added:
+            print(f"  Added {len(added)} entities: {', '.join(added)}")
+        if updated:
+            print(f"  Updated {len(updated)} entities: {', '.join(updated)}")
     else:
-        print("  No new entities to add.")
+        print("  No entity changes required.")
 
     if skipped:
         print(f"  Skipped (already exist): {', '.join(skipped)}")

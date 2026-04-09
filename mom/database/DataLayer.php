@@ -1224,6 +1224,12 @@ class DataLayer
     {
         return $this->read(
             jsonReader: function () use ($key): mixed {
+                if (\function_exists('portal_system_config_shadow_read')) {
+                    $shadow = \portal_system_config_shadow_read($key);
+                    if (\is_array($shadow)) {
+                        return $shadow;
+                    }
+                }
                 $fileMap = [
                     'portal_display_config' => $this->confDir() . '/portal_display_config.json',
                     'role_permissions'       => $this->confDir() . '/role_permissions.json',
@@ -1269,6 +1275,9 @@ class DataLayer
                 $data = is_array($value) ? $value : ['value' => $value];
                 $data['updated_at'] = $this->nowIso();
                 $this->writeJson($file, $data);
+                if (\function_exists('portal_system_config_shadow_write')) {
+                    \portal_system_config_shadow_write($key, $data);
+                }
                 return true;
             },
             pgWriter: function () use ($key, $value): bool {
@@ -1337,6 +1346,10 @@ class DataLayer
             FILE_APPEND | LOCK_EX,
         );
 
+        if (!$this->usesPostgres() && \function_exists('portal_system_audit_shadow_write')) {
+            \portal_system_audit_shadow_write($entry);
+        }
+
         // Also write to Postgres when enabled
         if ($this->usesPostgres()) {
             try {
@@ -1392,6 +1405,12 @@ class DataLayer
     {
         return $this->read(
             jsonReader: function () use ($filters): array {
+                if (\function_exists('portal_system_audit_shadow_read')) {
+                    $shadow = \portal_system_audit_shadow_read($filters);
+                    if (\is_array($shadow)) {
+                        return $shadow;
+                    }
+                }
                 $dir = $this->dataDir . '/audit';
                 if (!is_dir($dir)) {
                     return [];
@@ -1408,6 +1427,39 @@ class DataLayer
                             $entries[] = $entry;
                         }
                     }
+                }
+                if (!empty($filters['event_type'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['event_type'] ?? $row['action'] ?? '') === (string)$filters['event_type']));
+                }
+                if (!empty($filters['aggregate_type'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['aggregate_type'] ?? 'api_action') === (string)$filters['aggregate_type']));
+                }
+                if (!empty($filters['aggregate_id'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['aggregate_id'] ?? '') === (string)$filters['aggregate_id']));
+                }
+                if (!empty($filters['actor_name'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['actor_name'] ?? $row['user'] ?? '') === (string)$filters['actor_name']));
+                }
+                if (!empty($filters['from'])) {
+                    $from = (string)$filters['from'];
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['recorded_at'] ?? $row['timestamp'] ?? '') >= $from));
+                }
+                if (!empty($filters['to'])) {
+                    $to = (string)$filters['to'];
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['recorded_at'] ?? $row['timestamp'] ?? '') <= $to));
+                }
+                if (!empty($filters['search'])) {
+                    $needle = mb_strtolower((string)$filters['search']);
+                    $entries = array_values(array_filter($entries, static function (array $row) use ($needle): bool {
+                        $haystack = mb_strtolower(json_encode([
+                            'actor_name' => $row['actor_name'] ?? $row['user'] ?? '',
+                            'event_type' => $row['event_type'] ?? $row['action'] ?? '',
+                            'aggregate_type' => $row['aggregate_type'] ?? '',
+                            'aggregate_id' => $row['aggregate_id'] ?? '',
+                            'payload' => $row['payload'] ?? [],
+                        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '');
+                        return $needle === '' || str_contains($haystack, $needle);
+                    }));
                 }
                 // Newest first
                 usort($entries, fn($a, $b) => strcmp(
@@ -1430,11 +1482,24 @@ class DataLayer
                 if (!empty($filters['aggregate_id'])) {
                     $qb->where('aggregate_id', $filters['aggregate_id']);
                 }
+                if (!empty($filters['actor_name'])) {
+                    $qb->where('actor_name', $filters['actor_name']);
+                }
                 if (!empty($filters['from'])) {
                     $qb->where('recorded_at', '>=', $filters['from']);
                 }
                 if (!empty($filters['to'])) {
                     $qb->where('recorded_at', '<=', $filters['to']);
+                }
+                if (!empty($filters['search'])) {
+                    $needle = '%' . (string)$filters['search'] . '%';
+                    $qb->whereRaw('(coalesce(actor_name, \'\') ILIKE ? OR coalesce(event_type, \'\') ILIKE ? OR coalesce(aggregate_type, \'\') ILIKE ? OR coalesce(aggregate_id, \'\') ILIKE ? OR CAST(payload AS text) ILIKE ?)', [
+                        $needle,
+                        $needle,
+                        $needle,
+                        $needle,
+                        $needle,
+                    ]);
                 }
                 $qb->limit((int)($filters['limit'] ?? 100));
                 return $qb->get();

@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.0",
     "description": "Compact endpoint index for admin/runtime workspace lists and metrics.",
-    "generatedAt": "2026-04-09T13:44:52.703Z",
+    "generatedAt": "2026-04-09T14:35:20.670Z",
     "endpointCount": 3508,
     "activeEndpoints": 0,
     "blockedEndpoints": 0,
@@ -3155,7 +3155,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -3178,7 +3178,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -3201,7 +3201,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -3224,7 +3224,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -3247,7 +3247,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -3270,7 +3270,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -35815,7 +35815,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -35838,7 +35838,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -35861,7 +35861,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -35884,7 +35884,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -35907,7 +35907,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -35930,7 +35930,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -51800,7 +51800,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -51823,7 +51823,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -51846,7 +51846,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -51869,7 +51869,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -51892,7 +51892,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -51915,7 +51915,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "generic_status_only",
+      "workflow_mode": "guarded_transition_runtime",
       "runtime_safe": true,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"

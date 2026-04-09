@@ -109,7 +109,42 @@ function invoke_private(object $target, string $method, array $args = []): mixed
     return $reflection->invokeArgs($target, $args);
 }
 
-run_refresh_command(['node', $portalRoot . '/tools/registry/generate-registry-v3.mjs'], $projectRoot, false);
+function refresh_portal_only_migration_gap_report(string $portalRoot, string $dataDir, string $projectRoot): void
+{
+    $registryDir = $dataDir . '/registry';
+    $reportPath = $registryDir . '/migration-gap-report.json';
+    $tableRegistry = read_json_file($registryDir . '/table-registry.json');
+    $relationMap = read_json_file($registryDir . '/relation-map.json');
+    $portalTableCount = count(array_filter((array)($tableRegistry['tables'] ?? []), 'is_array'));
+    if ($portalTableCount === 0) {
+        $portalTableCount = count(array_filter((array)($relationMap['entities'] ?? []), 'is_array'));
+    }
+
+    write_json_file($reportPath, [
+        '_meta' => [
+            'generatedAt' => gmdate('c'),
+            'sourceMode' => 'portal_only',
+            'sourceAvailable' => false,
+            'sourceRoot' => $projectRoot . '/../my-project',
+            'portalTables' => $portalTableCount,
+            'myProjectTables' => 0,
+            'gaps' => 0,
+            'note' => 'External my-project source is unavailable in this workspace; migration-gap comparison is intentionally skipped.',
+        ],
+        'missingTables' => [],
+        'missingColumns' => [],
+        'missingConstraints' => [],
+    ]);
+}
+
+$myProjectRoot = $projectRoot . '/../my-project';
+if (is_dir($myProjectRoot)) {
+    run_refresh_command(['node', $portalRoot . '/tools/registry/generate-registry-v3.mjs'], $projectRoot, false);
+} else {
+    fwrite(STDOUT, "[refresh_data_schema_authority] skipped generate-registry-v3.mjs because my-project source is unavailable." . PHP_EOL);
+    refresh_portal_only_migration_gap_report($portalRoot, $dataDir, $projectRoot);
+}
+
 run_refresh_command(['python3', $portalRoot . '/tools/registry/canonical_publication_orchestrator.py'], $projectRoot);
 
 $dataLayer = new DataLayer($dataDir, $projectRoot);
@@ -127,6 +162,9 @@ run_refresh_command(['php', $portalRoot . '/tools/schema/refresh_schema_authorit
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_blind_spot_report.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_stress_report.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_publication_truth_summaries.py'], $projectRoot);
+if (!is_dir($myProjectRoot)) {
+    refresh_portal_only_migration_gap_report($portalRoot, $dataDir, $projectRoot);
+}
 
 fwrite(STDOUT, json_encode([
     'designId' => $designId,

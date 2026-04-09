@@ -128,6 +128,16 @@ detect_remote_data_owner_group() {
     run_ssh "bash -s" <<'REMOTE'
 set -euo pipefail
 
+for conf in /etc/php/*/fpm/pool.d/mom.conf /etc/php/*/fpm/pool.d/*.conf; do
+  [ -f "$conf" ] || continue
+  user="$(sed -n 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*//p' "$conf" | head -n 1 || true)"
+  group="$(sed -n 's/^[[:space:]]*group[[:space:]]*=[[:space:]]*//p' "$conf" | head -n 1 || true)"
+  if [ -n "$user" ] && [ -n "$group" ]; then
+    printf '%s:%s\n' "$user" "$group"
+    exit 0
+  fi
+done
+
 for sock in /run/php/php*-hesem.sock /run/php/php*-fpm.sock /var/run/php/php*-fpm.sock; do
   if [ -S "$sock" ]; then
     stat -c '%U:%G' "$sock" 2>/dev/null || true
@@ -200,7 +210,7 @@ sync_repo() {
 
 fix_permissions() {
   echo "==> Fix remote permissions"
-  run_remote_cmd "mkdir -p '${APP_DIR}/mom/data' '${APP_DIR}/mom/data/sessions' && chown -R '${APP_DATA_OWNER_GROUP}' '${APP_DIR}/mom/data' && find '${APP_DIR}/mom/data' -type d -exec chmod 775 {} + && find '${APP_DIR}/mom/data' -type f -exec chmod 664 {} +"
+  run_remote_cmd "owner_group='${APP_DATA_OWNER_GROUP}'; owner=\${owner_group%%:*}; group=\${owner_group##*:}; mkdir -p '${APP_DIR}/mom/data' '${APP_DIR}/mom/data/sessions' '${APP_DIR}/mom/data/ratelimit'; touch '${APP_DIR}/mom/data/php_error.log'; chown -R \"\${owner}:\${group}\" '${APP_DIR}/mom/data'; find '${APP_DIR}/mom/data' -type d -exec chmod 775 {} +; find '${APP_DIR}/mom/data' -type f -exec chmod 664 {} +; chown -R \"\${owner}:\${group}\" '${APP_DIR}/mom/data/sessions' '${APP_DIR}/mom/data/ratelimit' '${APP_DIR}/mom/data/php_error.log'; find '${APP_DIR}/mom/data/sessions' -type f -exec chmod 660 {} +; chmod 2770 '${APP_DIR}/mom/data/sessions'; chmod 2775 '${APP_DIR}/mom/data/ratelimit'; chmod 664 '${APP_DIR}/mom/data/php_error.log'"
 }
 
 run_installers() {
@@ -220,13 +230,18 @@ run_installers() {
   fi
 }
 
+reload_runtime() {
+  echo "==> Reload runtime"
+  run_remote_cmd "set -e; nginx -t >/dev/null; systemctl reload nginx; php_fpm_service=\$(systemctl list-units --type=service --all 'php*-fpm.service' --no-legend 2>/dev/null | awk '{print \$1}' | head -n 1 || true); if [ -n \"\$php_fpm_service\" ]; then systemctl reload \"\$php_fpm_service\"; fi"
+}
+
 remote_smoke() {
   if [ "$RUN_REMOTE_SMOKE" != "1" ]; then
     return
   fi
 
   echo "==> Remote smoke checks"
-  run_remote_cmd "set -e; nginx -t >/dev/null; systemctl is-active nginx >/dev/null; php_fpm_service=\$(systemctl list-units --type=service --all 'php*-fpm.service' --no-legend 2>/dev/null | awk '{print \$1}' | head -n 1 || true); if [ -n \"\$php_fpm_service\" ]; then systemctl is-active \"\$php_fpm_service\" >/dev/null; fi; for unit in postgresql redis-server; do if systemctl list-unit-files \"\$unit.service\" >/dev/null 2>&1; then systemctl is-active \"\$unit\" >/dev/null; fi; done; systemctl is-active hesem-ttyd-primary hesem-ttyd-readonly >/dev/null || true; systemctl is-active netdata grafana-server >/dev/null || true; curl -fsSI 'http://127.0.0.1:7681' >/dev/null || true; curl -fsSI 'http://127.0.0.1:7682' >/dev/null || true; curl -fsSI 'http://127.0.0.1:19999' >/dev/null || true; curl -fsSI 'http://127.0.0.1:3000' >/dev/null || true; echo 'remote_smoke_ok'"
+  run_remote_cmd "set -e; nginx -t >/dev/null; systemctl is-active nginx >/dev/null; php_fpm_service=\$(systemctl list-units --type=service --all 'php*-fpm.service' --no-legend 2>/dev/null | awk '{print \$1}' | head -n 1 || true); if [ -n \"\$php_fpm_service\" ]; then systemctl is-active \"\$php_fpm_service\" >/dev/null; fi; for unit in postgresql redis-server; do if systemctl list-unit-files \"\$unit.service\" >/dev/null 2>&1; then systemctl is-active \"\$unit\" >/dev/null; fi; done; systemctl is-active hesem-ttyd-primary hesem-ttyd-readonly >/dev/null || true; systemctl is-active netdata grafana-server >/dev/null || true; code7681=\$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:7681' || true); code7682=\$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:7682' || true); [ \"\$code7681\" = '200' ] || [ \"\$code7681\" = '401' ] || [ \"\$code7681\" = '407' ] || true; [ \"\$code7682\" = '200' ] || [ \"\$code7682\" = '401' ] || [ \"\$code7682\" = '407' ] || true; curl -fsS 'http://127.0.0.1:19999/api/v1/info' >/dev/null || true; curl -fsS 'http://127.0.0.1:3000/api/health' >/dev/null || true; cookie_jar=\$(mktemp); auth_json=\$(curl -kfsS --resolve '${DOMAIN}:443:127.0.0.1' -c \"\$cookie_jar\" -b \"\$cookie_jar\" 'https://${DOMAIN}/mom/api.php?action=auth_status'); csrf=\$(printf '%s' \"\$auth_json\" | php -r '\$d=json_decode(stream_get_contents(STDIN), true); echo (string)(\$d[\"csrf_token\"] ?? \"\");'); [ -n \"\$csrf\" ]; login_body=\$(mktemp); login_code=\$(curl -ksS -o \"\$login_body\" -w '%{http_code}' --resolve '${DOMAIN}:443:127.0.0.1' -c \"\$cookie_jar\" -b \"\$cookie_jar\" -X POST 'https://${DOMAIN}/mom/api.php?action=auth_login' -H 'Origin: https://${DOMAIN}' -H \"X-CSRF-Token: \$csrf\" -H 'Content-Type: application/x-www-form-urlencoded' --data 'username=invalid&password=invalid'); [ \"\$login_code\" = '401' ]; grep -q 'invalid_credentials' \"\$login_body\"; rm -f \"\$cookie_jar\" \"\$login_body\"; echo 'remote_smoke_ok'"
 }
 
 print_summary() {
@@ -263,5 +278,7 @@ detect_remote_domain
 sync_repo
 fix_permissions
 run_installers
+fix_permissions
+reload_runtime
 remote_smoke
 print_summary

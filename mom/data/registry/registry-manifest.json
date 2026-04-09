@@ -2,10 +2,10 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-09T13:44:54.953Z",
+    "generatedAt": "2026-04-09T14:35:24.626Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90"
+    "publication_run_id": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5"
   },
   "coverage": {
     "router_actions": 3508,
@@ -15,14 +15,14 @@
     "status_sets": 659,
     "workflow_count": 532,
     "relation_edges": 2685,
-    "validation_rules": 41710,
+    "validation_rules": 41713,
     "formula_count": 1134,
     "domain_pack_count": 3912,
     "scalar_record_endpoints": 3403,
     "workflow_runtime_modes": {
       "stateless": 380,
-      "generic_status_only": 121,
-      "guarded_transition_runtime": 28,
+      "generic_status_only": 118,
+      "guarded_transition_runtime": 31,
       "persisted": 123,
       "unknown": 0
     },
@@ -37,63 +37,102 @@
       "unneeded": 529
     },
     "frontend_foundation": {
-      "entity_count": 652,
-      "ready_entities": 646,
-      "partial_entities": 6,
+      "entity_count": 663,
+      "ready_entities": 663,
+      "partial_entities": 0,
       "blocked_entities": 0,
-      "workflow_ready_entities": 248,
+      "workflow_ready_entities": 249,
       "related_ready_entities": 626,
       "analytics_ready_entities": 603,
       "planning_console_entities": 34,
       "operator_console_entities": 63
     },
+    "wave0_governance": {
+      "total_frontend_entities": 663,
+      "canonical_resources": 63,
+      "implemented_canonical_resources": 56,
+      "planned_canonical_resources": 7,
+      "core_value_stream_entities": 65,
+      "governed_support_entities": 595,
+      "conditional_extension_entities": 2,
+      "unused_candidate_entities": 0,
+      "archive_isolation_entities": 1,
+      "generic_status_only_core_entities": 0,
+      "missing_transition_contracts_for_core_entities": 6,
+      "missing_canonical_resources": 0,
+      "split_path_risks_total": 0,
+      "critical_split_path_risks": 0,
+      "openapi_version": "3.1.2"
+    },
     "operational_blind_spots": {
       "scenario_count": 15,
       "critical": 0,
       "high": 0,
-      "medium": 1,
-      "watch": 14,
-      "idempotency_mentions": 18036,
+      "medium": 0,
+      "watch": 15,
+      "idempotency_mentions": 18081,
       "idempotency_contract_coverage_ratio": 1.0,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "generic_status_only_core_entities": 3,
+      "generic_status_only_core_entities": 0,
       "missing_transition_contracts_for_core_entities": 6,
       "missing_canonical_resources": 0,
       "unused_candidate_entities": 0
     },
+    "wave1_lifecycle_governance": {
+      "normalized_target_entities": 28,
+      "normalized_target_entities_passed": 28,
+      "normalized_target_entities_failed": 0,
+      "guarded_transition_runtime_entities": 28,
+      "remaining_generic_status_only_core_entities": 0,
+      "schema_blockers": 0,
+      "unused_candidate_entities": 0
+    },
     "wave2_canonical_governance": {
       "canonical_resources": 63,
-      "canonical_catalog_meta_resource_count": 62,
-      "canonical_catalog_meta_mismatch": 1,
+      "canonical_catalog_meta_resource_count": 63,
+      "canonical_catalog_meta_mismatch": 0,
       "catalog_alignment_targets": 12,
       "catalog_alignment_failures": 0,
       "service_backed_resources": 5,
-      "service_backed_resource_gaps": 5,
+      "service_backed_resource_gaps": 0,
+      "planned_canonical_resources_not_yet_in_registry": 4,
       "archive_isolation_targets": 1,
       "archive_isolation_targets_failed": 0,
-      "direct_table_matches": 37,
-      "legacy_table_matches": 17,
-      "service_backed_slice_matches": 0,
-      "true_schema_gaps": 9,
+      "direct_table_matches": 38,
+      "legacy_table_matches": 16,
+      "service_backed_slice_matches": 5,
+      "true_schema_gaps": 0,
       "remaining_unused_candidate_entities": 0,
       "archive_isolation_entities": 1
+    },
+    "wave3_process_governance": {
+      "must_introduce_first_class_targets": 1,
+      "must_introduce_first_class_failed": 0,
+      "already_first_class_targets": 4,
+      "already_first_class_failed": 0,
+      "conditional_alias_targets": 1,
+      "conditional_alias_failed": 0,
+      "duplicate_guard_targets": 5,
+      "duplicate_guard_failed": 0,
+      "remaining_wave3_gaps": 0,
+      "remaining_unused_candidate_entities": 0
     },
     "operational_stress_governance": {
       "scenario_count": 12,
       "critical": 0,
       "high": 0,
-      "medium": 1,
-      "watch": 11,
-      "idempotency_mentions": 18038,
+      "medium": 0,
+      "watch": 12,
+      "idempotency_mentions": 18098,
       "idempotency_contract_coverage_ratio": 1.0,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
       "compensation_markers": 2,
       "correction_markers": 327,
-      "period_close_mentions": 18,
-      "credit_memo_mentions": 3,
-      "debit_memo_mentions": 3,
+      "period_close_mentions": 33,
+      "credit_memo_mentions": 18,
+      "debit_memo_mentions": 18,
       "override_resources": 3,
       "snapshot_resources": 5,
       "mes_execution_blockers": 0
@@ -126,7 +165,7 @@
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
-      "records": 652
+      "records": 663
     },
     "workflow-library.json": {
       "kind": "workflow-library",
@@ -142,7 +181,7 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 41710
+      "records": 41713
     },
     "computed-formulas.json": {
       "kind": "formula-library",
@@ -156,6 +195,14 @@
       "kind": "quality-report",
       "records": 1
     },
+    "wave0-governance-policy.json": {
+      "kind": "wave0-governance-policy",
+      "records": 1
+    },
+    "wave0-governance-report.json": {
+      "kind": "wave0-governance-report",
+      "records": 663
+    },
     "operational-blind-spot-catalog.json": {
       "kind": "operational-blind-spot-catalog",
       "records": 15
@@ -163,6 +210,18 @@
     "operational-blind-spot-report.json": {
       "kind": "operational-blind-spot-report",
       "records": 15
+    },
+    "wave1-lifecycle-governance-policy.json": {
+      "kind": "wave1-lifecycle-governance-policy",
+      "records": 1
+    },
+    "wave1-lifecycle-normalization.json": {
+      "kind": "wave1-lifecycle-normalization",
+      "records": 28
+    },
+    "wave1-lifecycle-report.json": {
+      "kind": "wave1-lifecycle-report",
+      "records": 28
     },
     "wave2-canonical-governance-policy.json": {
       "kind": "wave2-canonical-governance-policy",
@@ -175,6 +234,18 @@
     "wave2-canonical-report.json": {
       "kind": "wave2-canonical-report",
       "records": 63
+    },
+    "wave3-process-governance-policy.json": {
+      "kind": "wave3-process-governance-policy",
+      "records": 1
+    },
+    "wave3-process-normalization.json": {
+      "kind": "wave3-process-normalization",
+      "records": 11
+    },
+    "wave3-process-report.json": {
+      "kind": "wave3-process-report",
+      "records": 11
     },
     "operational-stress-governance-policy.json": {
       "kind": "operational-stress-governance-policy",

@@ -138,6 +138,7 @@ use MOM\Api\Controllers\SchemaStudioController;
 use MOM\Api\Controllers\RegistryController;
 use MOM\Api\Controllers\ApprovalGroupController;
 use MOM\Api\Controllers\AllocationController;
+use MOM\Api\Controllers\CustomerPurchaseOrderController;
 use MOM\Api\Controllers\OperationalOverrideController;
 use MOM\Database\DataLayer;
 
@@ -375,6 +376,14 @@ $router->actions([
     'finance_credit_memo_create' => [FinanceController::class, 'createCreditMemo'],
     'finance_debit_memo_list' => [FinanceController::class, 'listDebitMemos'],
     'finance_debit_memo_create' => [FinanceController::class, 'createDebitMemo'],
+]);
+
+// Commercial customer purchase-order controls
+$router->actions([
+    'customer_purchase_order_list' => [CustomerPurchaseOrderController::class, 'listPurchaseOrders'],
+    'customer_purchase_order_detail' => [CustomerPurchaseOrderController::class, 'getPurchaseOrder'],
+    'customer_purchase_order_create' => [CustomerPurchaseOrderController::class, 'createPurchaseOrder'],
+    'customer_purchase_order_transition' => [CustomerPurchaseOrderController::class, 'transitionPurchaseOrder'],
 ]);
 
 // Supplier Quality Management
@@ -917,6 +926,12 @@ $router->post('/api/v1/finance/credit-memos', FinanceController::class, 'createC
 $router->get('/api/v1/finance/debit-memos', FinanceController::class, 'listDebitMemos');
 $router->get('/api/v1/finance/debit-memos/{debitMemoId}', FinanceController::class, 'getDebitMemo');
 $router->post('/api/v1/finance/debit-memos', FinanceController::class, 'createDebitMemo');
+
+// Commercial customer purchase-order objects
+$router->get('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'listPurchaseOrders');
+$router->get('/api/v1/commercial/customer-purchase-orders/{customerPoId}', CustomerPurchaseOrderController::class, 'getPurchaseOrder');
+$router->post('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'createPurchaseOrder');
+$router->post('/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition', CustomerPurchaseOrderController::class, 'transitionPurchaseOrder');
 
 // Folders
 $router->get('/api/folders', FileController::class, 'scanFolders');

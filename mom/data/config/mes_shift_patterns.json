@@ -4,7 +4,7 @@
     "updated_at": "2026-03-30T18:30:00+07:00",
     "description": "Governed MES shift definitions for cockpit, handover, and exception logic."
   },
-  "timezone": "Asia/Saigon",
+  "timezone": "Asia/Ho_Chi_Minh",
   "shift_handover_grace_minutes": 45,
   "stale_progress_minutes": 90,
   "shifts": [

@@ -165,7 +165,7 @@ final class EpicorIntegrationService
             }
         }
 
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('Asia/Saigon'));
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('Asia/Ho_Chi_Minh'));
         $domainRows = [];
         $degraded = 0;
         $reconciliationOpen = 0;

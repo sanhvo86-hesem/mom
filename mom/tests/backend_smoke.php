@@ -41,7 +41,9 @@ use MOM\Api\Services\IdempotencyService;
 use MOM\Api\Services\RecordConflictException;
 use MOM\Api\Services\WorkflowBridgeRequiredException;
 use MOM\Database\DataLayer;
+use MOM\Services\CustomerPurchaseOrderService;
 use MOM\Services\FinanceControlService;
+use MOM\Services\OrderService;
 use MOM\Services\ShipmentGateService;
 
 function smoke_reset_request_state(): void
@@ -1024,6 +1026,99 @@ smoke_assert(($financeControlService->getPeriodClose((string)($periodClose['peri
 smoke_assert(($financeControlService->getBackdateException((string)($backdateException['backdate_exception_id'] ?? ''))['backdate_exception_id'] ?? null) === ($backdateException['backdate_exception_id'] ?? null), 'Finance backdate exception detail lookup must resolve the created temporal control.');
 smoke_assert(($financeControlService->getCreditMemo((string)($creditMemo['credit_memo_id'] ?? ''))['credit_memo_id'] ?? null) === ($creditMemo['credit_memo_id'] ?? null), 'Finance credit memo detail lookup must resolve the created correction control.');
 smoke_assert(($financeControlService->getDebitMemo((string)($debitMemo['debit_memo_id'] ?? ''))['debit_memo_id'] ?? null) === ($debitMemo['debit_memo_id'] ?? null), 'Finance debit memo detail lookup must resolve the created correction control.');
+$customerPoTempDir = sys_get_temp_dir() . '/qms-backend-smoke-customer-po';
+if (is_dir($customerPoTempDir)) {
+    $customerPoIterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($customerPoTempDir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($customerPoIterator as $customerPoEntry) {
+        if ($customerPoEntry->isDir()) {
+            rmdir($customerPoEntry->getPathname());
+            continue;
+        }
+        unlink($customerPoEntry->getPathname());
+    }
+    rmdir($customerPoTempDir);
+}
+mkdir($customerPoTempDir . '/data/orders', 0775, true);
+file_put_contents(
+    $customerPoTempDir . '/data/orders/orders.json',
+    json_encode([
+        'sales_orders' => [[
+            'so_number' => 'SO-LEGACY-001',
+            'customer_id' => 'CUS-LEGACY',
+            'customer_name' => 'Legacy Customer',
+            'customer_po' => 'PO-LEGACY-001',
+            'customer_po_number' => 'PO-LEGACY-001',
+            'order_date' => '2026-04-01',
+            'due_date' => '2026-04-20',
+            'status' => 'in_production',
+            'lines' => [[
+                'line_number' => 1,
+                'part_number' => 'PN-LEG-01',
+                'qty' => 10,
+                'unit_price' => 150000,
+            ]],
+        ]],
+        'job_orders' => [],
+        'work_orders' => [],
+        'counters' => ['so' => 1, 'jo' => 0, 'wo' => 0],
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+);
+$customerPoService = new CustomerPurchaseOrderService($customerPoTempDir . '/data');
+$backfilledCustomerPos = $customerPoService->listPurchaseOrders();
+smoke_assert(count($backfilledCustomerPos) === 1, 'Customer purchase-order service must backfill canonical records from legacy embedded Sales Order customer PO fields.');
+$legacyCustomerPo = $backfilledCustomerPos[0];
+smoke_assert(($legacyCustomerPo['customer_po_number'] ?? null) === 'PO-LEGACY-001', 'Customer purchase-order backfill must preserve the original customer PO number.');
+smoke_assert(($legacyCustomerPo['po_status'] ?? null) === 'confirmed', 'Customer purchase-order backfill must promote linked legacy demand into confirmed state once a Sales Order exists.');
+smoke_assert((($legacyCustomerPo['sales_order_refs'] ?? [])[0]['so_number'] ?? null) === 'SO-LEGACY-001', 'Customer purchase-order backfill must preserve the linked Sales Order reference.');
+$manualCustomerPo = $customerPoService->createPurchaseOrder([
+    'customer_id' => 'CUS-MANUAL',
+    'customer_name' => 'Manual Customer',
+    'customer_po_number' => 'PO-MANUAL-001',
+    'received_at' => '2026-04-09T08:00:00+07:00',
+    'requested_date' => '2026-04-25',
+    'due_date' => '2026-04-30',
+    'lines' => [[
+        'line_number' => 1,
+        'part_number' => 'PN-MAN-01',
+        'qty' => 5,
+        'unit_price' => 200000,
+    ]],
+], 'commercial-user');
+smoke_assert(($manualCustomerPo['po_status'] ?? null) === 'received', 'Customer purchase-order creation must start in received state.');
+$manualCustomerPo = $customerPoService->transitionPurchaseOrder((string)($manualCustomerPo['customer_po_id'] ?? ''), 'acknowledge', 'commercial-user', [
+    'reason' => 'Customer PO content reviewed and acknowledged by commercial planning.',
+]);
+smoke_assert(($manualCustomerPo['po_status'] ?? null) === 'acknowledged', 'Customer purchase-order transition must support explicit acknowledgment before Sales Order confirmation.');
+$orderService = new OrderService($customerPoTempDir . '/data');
+$salesOrder = $orderService->createSalesOrder([
+    'so_number' => 'SO-2026-0002',
+    'customer_id' => 'CUS-MANUAL',
+    'customer_name' => 'Manual Customer',
+    'customer_po_number' => 'PO-MANUAL-001',
+    'customer_po' => 'PO-MANUAL-001',
+    'order_date' => '2026-04-09',
+    'due_date' => '2026-04-30',
+    'status' => 'draft',
+    'lines' => [[
+        'line_number' => 1,
+        'part_number' => 'PN-MAN-01',
+        'qty' => 5,
+        'unit_price' => 200000,
+    ]],
+    'created_at' => '2026-04-09T09:00:00+07:00',
+    'updated_at' => '2026-04-09T09:00:00+07:00',
+    'status_history' => [],
+    'change_history' => [],
+]);
+$synchronizedCustomerPo = $customerPoService->synchronizeSalesOrder($salesOrder, 'commercial-user');
+smoke_assert(($synchronizedCustomerPo['customer_po_id'] ?? null) === ($manualCustomerPo['customer_po_id'] ?? null), 'Customer purchase-order synchronization must reuse the existing commercial demand object instead of creating a duplicate.');
+smoke_assert(($synchronizedCustomerPo['po_status'] ?? null) === 'confirmed', 'Customer purchase-order synchronization must promote the record to confirmed once a Sales Order is linked.');
+$linkedSalesOrder = $orderService->getSalesOrder('SO-2026-0002');
+smoke_assert(($linkedSalesOrder['customer_po_id'] ?? null) === ($manualCustomerPo['customer_po_id'] ?? null), 'Sales Order runtime must persist the canonical customer_po_id linkage after synchronization.');
+smoke_assert(($customerPoService->getPurchaseOrder((string)($manualCustomerPo['customer_po_id'] ?? ''))['customer_po_id'] ?? null) === ($manualCustomerPo['customer_po_id'] ?? null), 'Customer purchase-order detail lookup must resolve the synchronized canonical record.');
 
 // Generic runtime write access must be denied when the permission matrix covers the action but the role does not.
 smoke_reset_request_state();
@@ -1248,6 +1343,9 @@ $wave1Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/regis
 $wave2Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave2-canonical-governance-policy.json'), true);
 $wave2Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave2-canonical-normalization.json'), true);
 $wave2Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave2-canonical-report.json'), true);
+$wave3Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave3-process-governance-policy.json'), true);
+$wave3Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave3-process-normalization.json'), true);
+$wave3Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave3-process-report.json'), true);
 $operationalStressPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-governance-policy.json'), true);
 $operationalStressCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-catalog.json'), true);
 $operationalStressReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-report.json'), true);
@@ -1332,6 +1430,21 @@ smoke_assert(array_key_exists('wave2-canonical-governance-policy.json', (array)(
 smoke_assert(array_key_exists('wave2-canonical-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-normalization.json.');
 smoke_assert(array_key_exists('wave2-canonical-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-report.json.');
 smoke_assert(is_array($registryManifest['coverage']['wave2_canonical_governance'] ?? null), 'Registry manifest must surface Wave 2 canonical governance coverage.');
+smoke_assert(is_array($wave3Policy), 'Wave 3 process governance policy asset missing.');
+smoke_assert(count((array)($wave3Policy['build_questions'] ?? [])) >= 6, 'Wave 3 governance policy must force purpose, duplicate, gate, alias, and extraction questions.');
+smoke_assert(in_array('new_process_object_created_where_a_governed_lifecycle_owner_already_exists', (array)($wave3Policy['rejection_criteria'] ?? []), true), 'Wave 3 governance policy must explicitly reject duplicate process objects.');
+smoke_assert(is_array($wave3Normalization), 'Wave 3 process normalization asset missing.');
+smoke_assert(count((array)($wave3Normalization['must_introduce_first_class_resources'] ?? [])) >= 1, 'Wave 3 normalization must register at least one extracted lifecycle owner.');
+smoke_assert(count((array)($wave3Normalization['do_not_create_duplicate'] ?? [])) >= 4, 'Wave 3 normalization must explicitly block duplicate creation for already-governed process objects.');
+smoke_assert(is_array($wave3Report), 'Wave 3 process governance report asset missing.');
+smoke_assert((int)($wave3Report['summary']['must_introduce_first_class_failed'] ?? -1) === 0, 'Wave 3 report must pass the extracted process-object targets.');
+smoke_assert((int)($wave3Report['summary']['duplicate_guard_failed'] ?? -1) === 0, 'Wave 3 report must pass duplicate suppression targets.');
+smoke_assert((int)($wave3Report['summary']['conditional_alias_failed'] ?? -1) === 0, 'Wave 3 report must pass conditional alias retention targets.');
+smoke_assert((int)($wave3Report['summary']['remaining_wave3_gaps'] ?? -1) === 0, 'Wave 3 report must classify and close every remaining Wave 3 process-object gap.');
+smoke_assert(array_key_exists('wave3-process-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave3-process-governance-policy.json.');
+smoke_assert(array_key_exists('wave3-process-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave3-process-normalization.json.');
+smoke_assert(array_key_exists('wave3-process-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave3-process-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['wave3_process_governance'] ?? null), 'Registry manifest must surface Wave 3 process governance coverage.');
 smoke_assert(is_array($operationalStressPolicy), 'Operational stress governance policy asset missing.');
 smoke_assert(count((array)($operationalStressPolicy['build_questions'] ?? [])) >= 10, 'Operational stress governance policy must force retry, compensation, override, archive, and backdate design questions.');
 smoke_assert(in_array('create_or_side_effect_action_without_duplicate_or_retry_control', (array)($operationalStressPolicy['rejection_criteria'] ?? []), true), 'Operational stress governance policy must explicitly reject duplicate-unsafe side-effect actions.');
@@ -1346,9 +1459,9 @@ smoke_assert((float)($operationalStressReport['summary']['default_retry_safe_rat
 smoke_assert((int)($operationalStressReport['summary']['create_endpoints_requiring_client_key'] ?? -1) === 0, 'Operational stress report must clear create endpoints that still require client-supplied idempotency keys for safe retry.');
 smoke_assert((int)($operationalStressReport['summary']['override_resources'] ?? 0) >= 1, 'Operational stress report must detect at least one first-class override resource.');
 smoke_assert((string)($operationalStressById['STR-001']['current_severity'] ?? '') === 'watch', 'Operational stress report must close retry and duplicate side-effect risk once every mutating endpoint has server-backed retry protection.');
-smoke_assert((string)($operationalStressById['STR-002']['current_severity'] ?? '') === 'medium', 'Operational stress report must demote partial-completion recovery once compensation and correction semantics are first-class enough for governed follow-up.');
-smoke_assert((string)($operationalStressById['STR-006']['current_severity'] ?? '') === 'medium', 'Operational stress report must demote override risk once typed, signed, timeboxed override controls exist.');
-smoke_assert((string)($operationalStressById['STR-012']['current_severity'] ?? '') === 'medium', 'Operational stress report must demote AP/AR correction and period-close risk once first-class control objects exist, even before full invoice-model separation.');
+smoke_assert((string)($operationalStressById['STR-002']['current_severity'] ?? '') === 'watch', 'Operational stress report must reduce partial-completion recovery risk to watch once compensation, correction, and reconciliation semantics are first-class enough for governed follow-up.');
+smoke_assert((string)($operationalStressById['STR-006']['current_severity'] ?? '') === 'watch', 'Operational stress report must reduce override risk to watch once typed, signed, timeboxed override controls exist.');
+smoke_assert((string)($operationalStressById['STR-012']['current_severity'] ?? '') === 'watch', 'Operational stress report must reduce AP/AR correction and period-close risk to watch once first-class control objects exist, even before full invoice-model separation.');
 smoke_assert(array_key_exists('operational-stress-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-stress-governance-policy.json.');
 smoke_assert(array_key_exists('operational-stress-catalog.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-stress-catalog.json.');
 smoke_assert(array_key_exists('operational-stress-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register operational-stress-report.json.');

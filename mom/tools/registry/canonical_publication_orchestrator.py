@@ -15,10 +15,11 @@ Single entry-point that runs the full publication pipeline in sequence:
   9. generate_operational_blind_spot_report.py (real-world blind-spot assessment)
   10. generate_wave1_lifecycle_governance.py  (wave-1 lifecycle normalization report)
   11. generate_wave2_canonical_governance.py  (wave-2 canonical exposure/archive report)
-  12. generate_operational_stress_report.py   (stress/exception reality assessment)
-  13. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
-  14. Generate publication proof artifact     (_reports/publication-proof-latest.json)
-  15. Generate wave/gap ledger                (wave-gap-ledger.json)
+  12. generate_wave3_process_governance.py    (wave-3 process-object extraction report)
+  13. generate_operational_stress_report.py   (stress/exception reality assessment)
+  14. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
+  15. Generate publication proof artifact     (_reports/publication-proof-latest.json)
+  16. Generate wave/gap ledger                (wave-gap-ledger.json)
 
 The proof artifact contains checksums, counts, and invariant checks so that
 downstream consumers can verify the publication run is consistent.
@@ -729,7 +730,15 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 11: Operational stress assessment
+    # Step 11: Wave 3 process-object extraction assessment
+    step_results["wave3_process_governance"] = run_step(
+        "Wave 3 Process Governance (generate_wave3_process_governance.py)",
+        [sys.executable, "generate_wave3_process_governance.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 12: Operational stress assessment
     step_results["operational_stress_governance"] = run_step(
         "Operational Stress Governance (generate_operational_stress_report.py)",
         [sys.executable, "generate_operational_stress_report.py"],
@@ -737,7 +746,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 12: Compact truth/accounting summaries
+    # Step 13: Compact truth/accounting summaries
     step_results["publication_truth_summaries"] = run_step(
         "Publication Truth Summaries (generate_publication_truth_summaries.py)",
         [sys.executable, "generate_publication_truth_summaries.py"],
@@ -745,7 +754,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 13-14: Proof + wave/gap ledger
+    # Step 14-15: Proof + wave/gap ledger
     print(f"\n{'=' * 72}")
     print("STEP: Wave/Gap Ledger Generation")
     print(f"{'=' * 72}")

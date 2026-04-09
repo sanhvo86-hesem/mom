@@ -2,38 +2,38 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90",
-    "generated_at": "2026-04-09T13:45:04.985Z",
+    "publication_run_id": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5",
+    "generated_at": "2026-04-09T14:35:28.784Z",
     "schema_authority": "table-registry.json backed by database/migrations and publication generators",
     "table_count": 652,
     "entity_counts": {
-      "total": 652,
-      "ready": 646,
-      "partial": 6,
+      "total": 663,
+      "ready": 663,
+      "partial": 0,
       "blocked": 0,
-      "explanation": "652 frontend entities are published from 652 registered tables, with 0 non-table entities and 0 additional view aliases."
+      "explanation": "663 frontend entities are published from 652 registered tables, with 8 non-table entities and 3 additional view aliases."
     },
     "field_coverage": {
-      "tables_with_fields": 652,
+      "tables_with_fields": 657,
       "tables_without_fields": 0,
       "explanation": "All registered tables currently have field coverage."
     },
     "workflow_engine_bridge": {
       "ready": 124,
       "blocked": 0,
-      "unneeded": 528,
+      "unneeded": 539,
       "counting_model": "Entities with persisted or guarded runtime workflows need an explicit bridge; stateless or generic status flows do not."
     },
     "openapi": {
       "version": "3.1.2",
-      "path_count": 57,
-      "foundation_governance_paths": 0
+      "path_count": 70,
+      "foundation_governance_paths": 10
     },
     "publishability": {
       "ready": true,
       "verdict": "PASS",
       "review_required_entities": 0,
-      "enhancement_backlog_entities": 6,
+      "enhancement_backlog_entities": 0,
       "blockers": [],
       "anti_false_green": "Publishability follows the quality gate's unpublishable-entity and contract checks. Partial-but-publishable entities remain visible as enhancement backlog, not as a false release blocker."
     },

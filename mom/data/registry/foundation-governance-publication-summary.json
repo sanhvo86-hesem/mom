@@ -2,12 +2,12 @@
   "slice_publication": {
     "scope": "foundation_governance_contract_slice",
     "truth_model": "slice_within_global_canonical",
-    "publication_run_family": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90",
-    "generated_at": "2026-04-09T13:45:04.985Z",
+    "publication_run_family": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5",
+    "generated_at": "2026-04-09T14:35:28.784Z",
     "slice_verdict": "PASS",
     "blockers": "none",
-    "entity_count": 0,
-    "route_count": 0,
+    "entity_count": 6,
+    "route_count": 10,
     "internal_command_count": 0,
     "entities": {
       "foundation_tables": [
@@ -39,10 +39,21 @@
         "electronic_signature"
       ]
     },
-    "public_routes": [],
+    "public_routes": [
+      "GET /api/v1/foundation/organizations",
+      "GET /api/v1/foundation/parties",
+      "GET /api/v1/foundation/calendars",
+      "GET /api/v1/governance/approval-groups",
+      "GET /api/v1/governance/approval-groups/{approvalGroupId}",
+      "POST /api/v1/governance/approval-groups/{approvalGroupId}:decide",
+      "GET /api/v1/governance/approval-groups/{approvalGroupId}/timeline",
+      "GET /api/v1/governance/approval-groups/{approvalGroupId}/attachments",
+      "GET /api/v1/governance/attachments/{attachmentId}",
+      "POST /api/v1/governance/attachments"
+    ],
     "internal_commands": [],
     "workflow_bridge": {
-      "ready": false,
+      "ready": true,
       "engine": "WorkflowEngine",
       "adapter": "ApprovalWorkflowAdapter",
       "state_machine": "approval_group: pending -> approved|rejected|changes_requested"

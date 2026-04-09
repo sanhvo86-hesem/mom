@@ -643,21 +643,8 @@ function renderSidebar(){
 }
 
 function renderSupplierHints(){
-  if(!els.supplierHints) return;
-  els.supplierHints.innerHTML = '';
-  supplierSuggestions().forEach(function(item){
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'scar-supplier-card';
-    button.setAttribute('data-supplier-id', item.supplier_id || '');
-    var title = document.createElement('strong');
-    title.textContent = [item.supplier_id || '', item.supplier_name || ''].filter(Boolean).join(' · ');
-    var detail = document.createElement('span');
-    detail.textContent = item.note;
-    button.appendChild(title);
-    button.appendChild(detail);
-    els.supplierHints.appendChild(button);
-  });
+  /* Supplier quick-picks removed â supplier is chosen via the lookup dropdown only. */
+  if(els.supplierHints) els.supplierHints.innerHTML = '';
 }
 
 function renderWorkflowPanel(){
@@ -1928,16 +1915,8 @@ function supplierSuggestions(){
 }
 
 function autoFillSupplierFromPart(data, rerender){
-  if(!data || hasMeaningfulValue(data.supplier_id) || hasMeaningfulValue(data.supplier_name)) return;
-  var supplier = preferredSupplierForPart(data.part_number);
-  if(!supplier) return;
-  data.supplier_id = String(supplier.supplier_id || '');
-  data.supplier_name = String(supplier.supplier_name || '');
-  data.supplier_contact = buildSupplierContact(supplier);
-  if(rerender){
-    populateForm();
-    renderAll();
-  }
+  /* Auto-fill from preferred_supplier_id removed â user must select supplier from dropdown. */
+  void data; void rerender;
 }
 
 function autoFillSupplierIdentity(data, rerender){

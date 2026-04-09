@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
+use MOM\Services\CustomerPurchaseOrderService;
 use MOM\Services\OrderService;
 use MOM\Services\OrderWorkflowService;
 use MOM\Services\ShipmentGateService;
@@ -29,6 +30,9 @@ class OrderController extends BaseController
 
     /** @var OrderWorkflowService|null Lazy-loaded workflow service. */
     private ?OrderWorkflowService $workflowService = null;
+
+    /** @var CustomerPurchaseOrderService|null Lazy-loaded canonical customer PO service. */
+    private ?CustomerPurchaseOrderService $customerPurchaseOrderService = null;
 
     /** @var array|null Cached SO/JO/WO config. */
     private ?array $orderConfig = null;
@@ -57,6 +61,15 @@ class OrderController extends BaseController
             $this->workflowService = new OrderWorkflowService($this->dataDir);
         }
         return $this->workflowService;
+    }
+
+    private function customerPurchaseOrders(): CustomerPurchaseOrderService
+    {
+        if ($this->customerPurchaseOrderService === null) {
+            $this->customerPurchaseOrderService = new CustomerPurchaseOrderService($this->dataDir);
+        }
+
+        return $this->customerPurchaseOrderService;
     }
 
     /**
@@ -512,6 +525,7 @@ class OrderController extends BaseController
             'customer_name'  => trim((string)($body['customer_name'] ?? '')),
             'customer_site_id' => trim((string)($body['customer_site_id'] ?? '')),
             'ship_to_site_id' => trim((string)($body['ship_to_site_id'] ?? '')),
+            'customer_po_id' => trim((string)($body['customer_po_id'] ?? '')),
             'customer_po'    => trim((string)($body['customer_po'] ?? $body['customer_po_number'] ?? '')),
             'customer_po_number' => trim((string)($body['customer_po_number'] ?? $body['customer_po'] ?? '')),
             'order_date'     => (string)($body['order_date'] ?? ''),
@@ -538,6 +552,14 @@ class OrderController extends BaseController
 
         try {
             $saved = $this->orderService()->createSalesOrder($so);
+            $linkedCustomerPo = $this->customerPurchaseOrders()->synchronizeSalesOrder($saved, $uid);
+            if (is_array($linkedCustomerPo)) {
+                $saved = $this->orderService()->linkCustomerPurchaseOrderToSalesOrder(
+                    (string)$saved['so_number'],
+                    (string)$linkedCustomerPo['customer_po_id'],
+                    (string)$linkedCustomerPo['customer_po_number']
+                );
+            }
             $this->auditLog('order_so_create', ['so_number' => $saved['so_number']], $uid);
             $this->success(['sales_order' => $saved], 201);
         } catch (Throwable $e) {
@@ -573,6 +595,9 @@ class OrderController extends BaseController
             $result = $this->workflowService()->executeFieldEdit('so', $soNumber, $changes, $uid, $reason);
             if (!$result->ok) {
                 $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+            }
+            if (is_array($result->data ?? null)) {
+                $this->customerPurchaseOrders()->synchronizeSalesOrder((array)$result->data, $uid);
             }
             $this->auditLog('order_so_update', ['so_number' => $soNumber, 'fields' => array_keys($changes)], $uid);
             $this->success(['sales_order' => $result->data]);
@@ -808,6 +833,9 @@ class OrderController extends BaseController
             $result = $this->workflowService()->executeTransition($orderType, $orderId, $target, $uid, $reason ?: null);
             if (!$result->ok) {
                 $this->error($result->errorCode ?? 'transition_failed', 400, $result->message);
+            }
+            if ($orderType === 'so' && is_array($result->data ?? null)) {
+                $this->customerPurchaseOrders()->synchronizeSalesOrder((array)$result->data, $uid);
             }
             $this->auditLog('order_transition', [
                 'order_type' => $orderType,

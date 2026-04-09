@@ -1813,6 +1813,10 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
     /^task_/,
   ]);
   const traceabilityField = findFieldKey(allFields, table, [
+    'assignment_id',
+    'downtime_id',
+    'event_id',
+    'adapter_event_id',
     'lot_id',
     'lot_no',
     'serial_id',
@@ -1974,6 +1978,8 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
     /^.*status.*$/,
     /^.*state.*$/,
   ]);
+  const operatorOperationExpected = rawOperatorOperationSignal || /(?:operation|work_order|job|dispatch|downtime|inspection_lot|consumption|completion|scrap|rework)/.test(String(tableName || ''));
+  const operatorTraceabilityExpected = rawOperatorTraceabilitySignal || /(?:event|assignment|operation|work_order|job|dispatch|consumption|completion|scrap|rework|inspection_lot)/.test(String(tableName || ''));
   const operatorInstructionExpected = transitionExpected || /(?:work_order|operation_execution|pm_execution)/.test(String(tableName || ''));
 
   if (createdAtField) {
@@ -2046,9 +2052,9 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
     if (!statusField && (transitionExpected || rawPlanningStatusSignal)) planningBlockers.push('missing_planning_status_dimension');
   }
   if (profile === 'operator_console') {
-    if (!operationField && (transitionExpected || rawOperatorOperationSignal)) operatorBlockers.push('missing_operation_context');
+    if (!operationField && operatorOperationExpected) operatorBlockers.push('missing_operation_context');
     if (!resourceField) operatorBlockers.push('missing_station_or_resource_context');
-    if (!traceabilityField && (transitionExpected || rawOperatorTraceabilitySignal)) operatorBlockers.push('missing_traceability_identity');
+    if (!traceabilityField && operatorTraceabilityExpected) operatorBlockers.push('missing_traceability_identity');
     if (!instructionSignal && !attachmentSignal && operatorInstructionExpected) operatorBlockers.push('missing_work_instruction_signal');
     if (!statusField && (transitionExpected || rawOperatorStatusSignal) && !executionEventSignal) operatorBlockers.push('missing_execution_status');
   }

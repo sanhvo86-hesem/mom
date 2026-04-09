@@ -1,38 +1,38 @@
 {
-  "publication_run_id": "688be860-cad3-4d2b-8b5c-d162be49dc8a",
-  "generatedAt": "2026-04-09T13:45:05.410Z",
-  "source_commit": "1554338c",
+  "publication_run_id": "f87da195-9aa3-4c37-964b-0b2a4908f64d",
+  "generatedAt": "2026-04-09T14:35:29.028Z",
+  "source_commit": "7240d118",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "901cd7b3b011034f7d3f6d10475c7f0cf63ee707b86f761b16f39384b8c8cfaf",
-    "frontend-foundation-catalog.json": "511c63851b197ea1e184e967f5649c369c4d0046dec971923e68eb4db5e4e390",
-    "registry-manifest.json": "44936da7410916b6205809edaa1ddca14198d6f3a6495af1839e1b9353fc7dfb",
-    "registry-quality-report.json": "8ddeec55a9a54bdd21eb478fe7c23bd1f4e7ec9284b57cfce02a8b73b8de3aa8",
-    "domain-field-packs.json": "3ed12a845a4341f3ec40992b99b252dd2358da1992e0fb4595788bf8bb12395b",
-    "data-fields-part2.json": "455d842769058d74de955b7640af69d82aa73b314a795099f211251d4f5f5f6e",
-    "wave-gap-ledger.json": "088c960793f1996ed28f47291d54d4f28e9e7e2da5b0cdc5e0043a8575cb0767"
+    "endpoint-catalog.json": "39e74b90f5ef64fb1a50cf78734282e3538ddb7703c2be641954e1a52fcc8a2d",
+    "frontend-foundation-catalog.json": "720b0fbe0129eca4141117f56f5e0327e876407684bb37b0f0e6f76e77b9c700",
+    "registry-manifest.json": "ab831ff9ac38da09ad2c10446f565e3fda90bbe588ed1fd28554079a3887d579",
+    "registry-quality-report.json": "1fb69c983a3ba707206c4c44c16581dee31f3d7db3f0831864e9540f5e21127c",
+    "domain-field-packs.json": "9d29d0b7551a5ee03a92d6b977f2e898d3d5dbf48e66ea4e9900dc89aef7ce41",
+    "data-fields-part2.json": "04512711a322d1ce15bdc11cb5ebb243e57ce723e61d1c20ee02ffdeb1b170a7",
+    "wave-gap-ledger.json": "eae79f0ba18b37e22ff89fa2583208a3603123920bf37087288f1a2bff51a2f0"
   },
   "summary_counts": {
-    "ready": 646,
-    "partial": 6,
+    "ready": 663,
+    "partial": 0,
     "blocked": 0,
-    "wf_ready": 248,
+    "wf_ready": 249,
     "bridge_ready": 124,
     "bridge_blocked": 0,
-    "endpoints": 3508
+    "endpoints": 3537
   },
   "invariant_checks": [
     {
       "name": "endpoint_count_matches_manifest",
       "status": "PASS",
-      "detail": "catalog_meta=3508, actual_keys=3508, manifest=3508"
+      "detail": "catalog_meta=3537, actual_keys=3537, manifest=3537"
     },
     {
       "name": "frontend_entity_counts_consistent",
       "status": "PASS",
-      "detail": "summary.entity_count=652 vs actual=652; ready=646/646; partial=6/6; blocked=0/0"
+      "detail": "summary.entity_count=663 vs actual=663; ready=663/663; partial=0/0; blocked=0/0"
     },
     {
       "name": "bridge_counts_consistent",
@@ -42,12 +42,12 @@
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90']"
+      "detail": "distinct_run_ids=['7a87705f-fd29-4c8c-9473-7a78c5c4cde5']"
     },
     {
       "name": "approval_group_not_split_truth",
-      "status": "FAIL",
-      "detail": "entity_verdict=unknown, decide_endpoint_status=missing"
+      "status": "PASS",
+      "detail": "entity_verdict=ready, decide_endpoint_status=active"
     }
   ],
   "step_results": {
@@ -55,16 +55,17 @@
     "data_fields_generator": "OK",
     "workflow_governance_generator": "OK",
     "canonical_generator": "OK",
-    "slice_field_definitions": "FAIL",
-    "onboard_registry_keys": "FAIL",
+    "slice_field_definitions": "OK",
+    "onboard_registry_keys": "OK",
     "regenerate_slice_publication": "OK",
     "wave0_governance": "OK",
     "operational_blind_spots": "OK",
     "wave1_lifecycle_governance": "OK",
     "wave2_canonical_governance": "OK",
+    "wave3_process_governance": "OK",
     "operational_stress_governance": "OK",
     "publication_truth_summaries": "OK",
     "wave_gap_ledger": "OK"
   },
-  "overall_status": "FAIL"
+  "overall_status": "PASS"
 }

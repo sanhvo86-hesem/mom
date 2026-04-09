@@ -291,6 +291,16 @@ class AdminController extends BaseController
         ];
 
         $settings = $this->store['data_collection'] ?? $defaults;
+        try {
+            $shadow = $this->data->getConfig('data_collection_settings');
+            if (is_array($shadow)) {
+                $settings = is_array($shadow['settings'] ?? null)
+                    ? (array)$shadow['settings']
+                    : $shadow;
+            }
+        } catch (Throwable) {
+            // Keep users.json-backed fallback when shadow storage is unavailable.
+        }
         foreach ($defaults as $k => $v) {
             if (!isset($settings[$k])) $settings[$k] = $v;
         }
@@ -328,6 +338,11 @@ class AdminController extends BaseController
         $usersFile = $this->confDir . '/users.json';
         try {
             users_save($usersFile, $this->store);
+            $this->data->saveConfig('data_collection_settings', [
+                'settings' => $current,
+                'updated_by' => (string)($me['username'] ?? ''),
+                'updated_at' => $this->nowIso(),
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
@@ -437,7 +452,7 @@ class AdminController extends BaseController
 
         $limit = max(1, min(500, (int)($this->query('limit', '200') ?? '200')));
         $filters = ['limit' => $limit];
-        foreach (['event_type', 'aggregate_type', 'aggregate_id', 'from', 'to'] as $key) {
+        foreach (['event_type', 'aggregate_type', 'aggregate_id', 'actor_name', 'search', 'from', 'to'] as $key) {
             $value = trim((string)($this->query($key, '') ?? ''));
             if ($value !== '') {
                 $filters[$key] = $value;

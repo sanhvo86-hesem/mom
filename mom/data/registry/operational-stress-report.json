@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T13:45:04.453Z",
+    "generatedAt": "2026-04-09T14:35:28.513Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -9,17 +9,17 @@
     "scenario_count": 12,
     "critical": 0,
     "high": 0,
-    "medium": 1,
-    "watch": 11,
-    "idempotency_mentions": 18038,
+    "medium": 0,
+    "watch": 12,
+    "idempotency_mentions": 18098,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
     "compensation_markers": 2,
     "correction_markers": 327,
-    "period_close_mentions": 18,
-    "credit_memo_mentions": 3,
-    "debit_memo_mentions": 3,
+    "period_close_mentions": 33,
+    "credit_memo_mentions": 18,
+    "debit_memo_mentions": 18,
     "override_resources": 3,
     "snapshot_resources": 5,
     "mes_execution_blockers": 0
@@ -84,35 +84,35 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 18038,
+      "idempotency_mentions": 18098,
       "optimistic_concurrency_mentions": 7016,
-      "if_match_mentions": 2411,
+      "if_match_mentions": 2412,
       "row_version_mentions": 19106,
       "compensation_markers": 2,
       "correction_markers": 327,
-      "effective_dating_markers": 682,
-      "override_mentions": 36,
+      "effective_dating_markers": 685,
+      "override_mentions": 103,
       "waiver_mentions": 24,
       "heartbeat_mentions": 33,
       "quarantine_mentions": 302,
       "disposition_mentions": 341,
-      "period_close_mentions": 18,
-      "credit_memo_mentions": 3,
-      "debit_memo_mentions": 3,
-      "backdate_exception_mentions": 3,
-      "archive_mentions": 19594,
+      "period_close_mentions": 33,
+      "credit_memo_mentions": 18,
+      "debit_memo_mentions": 18,
+      "backdate_exception_mentions": 23,
+      "archive_mentions": 19600,
       "snapshot_mentions": 1315,
-      "esign_mentions": 158,
+      "esign_mentions": 161,
       "cycle_count_mentions": 339
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2204,
-      "idempotent_endpoint_count": 2204,
+      "mutating_endpoint_count": 2213,
+      "idempotent_endpoint_count": 2213,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2204,
+      "default_retry_safe_endpoint_count": 2213,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2204
+      "response_replay_documented_count": 2213
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -153,16 +153,16 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 18038,
-        "if_match_mentions": 2411,
+        "idempotency_mentions": 18098,
+        "if_match_mentions": 2412,
         "row_version_mentions": 19106,
-        "mutating_endpoint_count": 2204,
-        "idempotent_endpoint_count": 2204,
+        "mutating_endpoint_count": 2213,
+        "idempotent_endpoint_count": 2213,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2204,
+        "default_retry_safe_endpoint_count": 2213,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2204
+        "response_replay_documented_count": 2213
       },
       "required_controls": [
         "idempotency_key_or_equivalent_duplicate_suppression",
@@ -175,13 +175,16 @@
       "scenario_id": "STR-002",
       "title": "Multi-step flow succeeds partially and leaves the plant in a half-committed state",
       "priority": "critical",
-      "current_severity": "medium",
+      "current_severity": "watch",
       "rationale": [
-        "Correction and reversal semantics now exist, but compensation coverage is still narrower than the broader retry-safe contract posture."
+        "Compensation markers, correction semantics, and reconciliation resources now exist together, so partial-completion recovery has moved out of the active remediation tier."
       ],
       "evidence": {
         "compensation_markers": 2,
-        "correction_markers": 327
+        "correction_markers": 327,
+        "reconciliation_resources": [
+          "integration_resilience.reconciliation-exceptions"
+        ]
       },
       "required_controls": [
         "compensating_transaction_or_reconciliation_queue",
@@ -199,10 +202,10 @@
         "Backdate exceptions, period-close controls, and credit/debit memo semantics are now explicit, so remaining risk is residual operating discipline rather than a modeling gap."
       ],
       "evidence": {
-        "period_close_mentions": 18,
-        "credit_memo_mentions": 3,
-        "debit_memo_mentions": 3,
-        "backdate_exception_mentions": 3,
+        "period_close_mentions": 33,
+        "credit_memo_mentions": 18,
+        "debit_memo_mentions": 18,
+        "backdate_exception_mentions": 23,
         "backdate_exception_resources": [
           "finance.backdate-exceptions"
         ]
@@ -223,7 +226,7 @@
         "Effective dating and release-snapshot resources are both present at meaningful breadth, so the remaining risk is no longer an active design blocker."
       ],
       "evidence": {
-        "effective_dating_markers": 682,
+        "effective_dating_markers": 685,
         "snapshot_mentions": 1315,
         "snapshot_resources": [
           "analytics.inventory-balance-snapshots",
@@ -269,9 +272,9 @@
         "Typed, signed, timeboxed override resources are now explicit, so the remaining risk is governance execution quality rather than missing platform structure."
       ],
       "evidence": {
-        "override_mentions": 36,
+        "override_mentions": 103,
         "waiver_mentions": 24,
-        "esign_mentions": 158,
+        "esign_mentions": 161,
         "override_resources": [
           "quality_improvement.concessions",
           "quality_improvement.deviations",
@@ -300,7 +303,7 @@
       ],
       "evidence": {
         "heartbeat_mentions": 33,
-        "idempotency_mentions": 18038,
+        "idempotency_mentions": 18098,
         "compensation_markers": 2,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -322,9 +325,9 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 19594,
+        "archive_mentions": 19600,
         "correction_markers": 327,
-        "esign_mentions": 158
+        "esign_mentions": 161
       },
       "required_controls": [
         "traceable_supersede_chain",
@@ -405,9 +408,9 @@
       ],
       "evidence": {
         "unified_ap_ar_present": true,
-        "period_close_mentions": 18,
-        "credit_memo_mentions": 3,
-        "debit_memo_mentions": 3,
+        "period_close_mentions": 33,
+        "credit_memo_mentions": 18,
+        "debit_memo_mentions": 18,
         "finance_correction_resources": [
           "finance.credit-memos",
           "finance.period-closes"

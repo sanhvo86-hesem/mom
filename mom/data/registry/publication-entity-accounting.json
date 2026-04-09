@@ -1,7 +1,7 @@
 {
   "entity_accounting": {
-    "generated_at": "2026-04-09T13:45:04.985Z",
-    "publication_run_id": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90",
+    "generated_at": "2026-04-09T14:35:28.784Z",
+    "publication_run_id": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5",
     "purpose": "Explains the current relationship between registered tables, frontend entities, readiness state, and field coverage after canonical publication.",
     "schema_tables": {
       "count": 652,
@@ -9,28 +9,61 @@
       "description": "Physical tables currently governed by the canonical table registry."
     },
     "frontend_entities": {
-      "count": 652,
+      "count": 663,
       "source": "frontend-foundation-catalog.json",
       "description": "Frontend entity registrations, including non-table views and additional aliases over the same physical table where business presentation differs.",
       "breakdown": {
-        "table_backed": 652,
-        "virtual_composite": 0,
-        "duplicate_table_views": 0,
-        "total": 652
+        "table_backed": 655,
+        "virtual_composite": 8,
+        "duplicate_table_views": 3,
+        "total": 663
       },
-      "non_table_entities": []
+      "non_table_entities": [
+        {
+          "entity_key": "foundation.organization",
+          "entity": "organization"
+        },
+        {
+          "entity_key": "governance.approval_group",
+          "entity": "approval_group"
+        },
+        {
+          "entity_key": "governance.override_controls",
+          "entity": "operational_override_controls"
+        },
+        {
+          "entity_key": "finance.period_close_controls",
+          "entity": "period_close_controls"
+        },
+        {
+          "entity_key": "finance.backdate_exceptions",
+          "entity": "backdate_exceptions"
+        },
+        {
+          "entity_key": "finance.credit_memos",
+          "entity": "credit_memos"
+        },
+        {
+          "entity_key": "finance.debit_memos",
+          "entity": "debit_memos"
+        },
+        {
+          "entity_key": "commercial_customer.customer_purchase_orders",
+          "entity": "customer_purchase_orders"
+        }
+      ]
     },
     "readiness": {
-      "ready": 646,
-      "partial": 6,
+      "ready": 663,
+      "partial": 0,
       "blocked": 0,
-      "total": 652,
+      "total": 663,
       "description": "Current readiness counts are taken directly from frontend-foundation-catalog.json and reflect the live publication state, not historical onboarding assumptions."
     },
     "field_coverage": {
-      "tables_with_fields": 652,
+      "tables_with_fields": 657,
       "tables_without_fields": 0,
-      "derivation": "652 registry tables -> 652 tables referenced by data-fields artifacts -> 0 tables without field definitions.",
+      "derivation": "652 registry tables -> 657 tables referenced by data-fields artifacts -> 0 tables without field definitions.",
       "affected_artifacts": [
         "data-fields.json + split parts",
         "endpoint-catalog.json",
@@ -38,7 +71,8 @@
       ]
     },
     "why_counts_differ": {
-      "652_vs_652": "Field coverage is now full across the canonical table registry.",
+      "663_vs_652": "8 non-table entities and 3 additional table-view aliases explain why frontend entity registrations exceed physical tables.",
+      "657_vs_652": "Field coverage is now full across the canonical table registry.",
       "conclusion": "Count differences are governed and explainable. Any remaining delta must map either to a non-table entity or a deliberate alias over an existing physical table."
     }
   }

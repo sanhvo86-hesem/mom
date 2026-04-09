@@ -1,0 +1,133 @@
+{
+  "roles": {
+    "ceo": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "process_engineer": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "qc_inspector": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "engineering_lead": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "production_director": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "epicor_admin": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "cnc_workshop_manager": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_search"
+    ],
+    "supply_chain_manager": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_search"
+    ],
+    "shift_leader": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_search"
+    ],
+    "hr_manager": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_search"
+    ],
+    "production_planner": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_search"
+    ],
+    "cleaning_packaging_supervisor": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_search"
+    ],
+    "cnc_operator": [
+      "ev_read",
+      "ev_write",
+      "ev_link"
+    ],
+    "deburr_technician": [
+      "ev_read",
+      "ev_write",
+      "ev_link"
+    ],
+    "buyer": [
+      "ev_read",
+      "ev_search"
+    ],
+    "estimator": [
+      "ev_read",
+      "ev_search"
+    ],
+    "finance_manager": [
+      "ev_read",
+      "ev_search"
+    ],
+    "gl_payroll_accountant": [
+      "ev_read"
+    ],
+    "warehouse_clerk": [
+      "ev_read"
+    ],
+    "admin": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "doc_controller": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_verify",
+      "ev_search"
+    ],
+    "quality": [
+      "ev_read",
+      "ev_write",
+      "ev_link",
+      "ev_search"
+    ],
+    "viewer": [
+      "ev_read"
+    ]
+  }
+}

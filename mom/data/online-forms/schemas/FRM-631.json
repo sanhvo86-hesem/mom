@@ -695,5 +695,6 @@
     "on_submit": [
       "qa_manager"
     ]
-  }
+  },
+  "record_type": "NCR"
 }

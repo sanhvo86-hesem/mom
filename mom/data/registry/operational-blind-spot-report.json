@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T13:45:01.841Z",
+    "generatedAt": "2026-04-09T14:35:26.907Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
@@ -9,47 +9,19 @@
     "scenario_count": 15,
     "critical": 0,
     "high": 0,
-    "medium": 1,
-    "watch": 14,
-    "idempotency_mentions": 18036,
+    "medium": 0,
+    "watch": 15,
+    "idempotency_mentions": 18081,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
-    "generic_status_only_core_entities": 3,
+    "generic_status_only_core_entities": 0,
     "missing_transition_contracts_for_core_entities": 6,
     "missing_canonical_resources": 0,
     "unused_candidate_entities": 0
   },
   "current_local_signals": {
-    "generic_status_only_core_entities": [
-      {
-        "entity_key": "audit_risk.improvement_projects",
-        "entity": "improvement_projects",
-        "transition_action": "audit_risk.improvement_projects.transition",
-        "workflow_mode": "generic_status_only",
-        "canonical_resources": [
-          "quality_improvement.improvement-actions"
-        ]
-      },
-      {
-        "entity_key": "mes_execution.mes_dispatch_queue",
-        "entity": "mes_dispatch_queue",
-        "transition_action": "mes_execution.mes_dispatch_queue.transition",
-        "workflow_mode": "generic_status_only",
-        "canonical_resources": [
-          "planning_production.dispatch-lists"
-        ]
-      },
-      {
-        "entity_key": "production.production_schedule",
-        "entity": "production_schedule",
-        "transition_action": "production.production_schedule.transition",
-        "workflow_mode": "generic_status_only",
-        "canonical_resources": [
-          "planning_production.production-plans"
-        ]
-      }
-    ],
+    "generic_status_only_core_entities": [],
     "missing_transition_contracts_for_core_entities": [
       {
         "entity_key": "audit_risk.audit_program",
@@ -247,10 +219,10 @@
     ],
     "unused_candidate_entities": [],
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2204,
-      "idempotent_endpoint_count": 2204,
+      "mutating_endpoint_count": 2213,
+      "idempotent_endpoint_count": 2213,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2204,
+      "default_retry_safe_endpoint_count": 2213,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0
     }
@@ -263,12 +235,12 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 18036,
+        "idempotency_mentions": 18081,
         "optimistic_concurrency_mentions": 7016,
-        "mutating_endpoint_count": 2204,
-        "idempotent_endpoint_count": 2204,
+        "mutating_endpoint_count": 2213,
+        "idempotent_endpoint_count": 2213,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2204,
+        "default_retry_safe_endpoint_count": 2213,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0
       },
@@ -283,12 +255,14 @@
       "scenario_id": "OPS-002",
       "title": "Concurrent edits overwrite a governed state change",
       "priority": "critical",
-      "current_severity": "medium",
+      "current_severity": "watch",
       "rationale": [
-        "Optimistic concurrency exists, but recovery still depends on per-action error handling discipline."
+        "Optimistic concurrency, If-Match preconditions, and row-version evidence are all present broadly enough that this is no longer an active structural blind spot."
       ],
       "evidence": {
-        "optimistic_concurrency_mentions": 7016
+        "optimistic_concurrency_mentions": 7016,
+        "if_match_mentions": 2408,
+        "row_version_mentions": 19101
       },
       "required_controls": [
         "row_version_and_if_match",
@@ -454,7 +428,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 18036
+        "idempotency_mentions": 18081
       },
       "required_controls": [
         "offline_conflict_model",

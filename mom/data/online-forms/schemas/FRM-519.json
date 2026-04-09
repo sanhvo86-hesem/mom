@@ -19,8 +19,16 @@
     "qc_inspector"
   ],
   "record_context": {
-    "required": ["wo_number", "machine_id", "work_center_id"],
-    "autofill_priority": ["wo_number", "machine_id", "operator_id"]
+    "required": [
+      "wo_number",
+      "machine_id",
+      "work_center_id"
+    ],
+    "autofill_priority": [
+      "wo_number",
+      "machine_id",
+      "operator_id"
+    ]
   },
   "offline_package": {
     "enabled": false,
@@ -89,10 +97,26 @@
       "width": "third",
       "options_source": "registry:shift_code",
       "options": [
-        { "value": "1", "label": "Shift 1", "label_vi": "Ca 1" },
-        { "value": "2", "label": "Shift 2", "label_vi": "Ca 2" },
-        { "value": "3", "label": "Shift 3", "label_vi": "Ca 3" },
-        { "value": "day", "label": "Day", "label_vi": "Hành chính" }
+        {
+          "value": "1",
+          "label": "Shift 1",
+          "label_vi": "Ca 1"
+        },
+        {
+          "value": "2",
+          "label": "Shift 2",
+          "label_vi": "Ca 2"
+        },
+        {
+          "value": "3",
+          "label": "Shift 3",
+          "label_vi": "Ca 3"
+        },
+        {
+          "value": "day",
+          "label": "Day",
+          "label_vi": "Hành chính"
+        }
       ]
     },
     {
@@ -104,7 +128,10 @@
       "width": "third",
       "lookup_source": "work_centers",
       "strict_select": true,
-      "display_fields": ["work_center_id", "work_center_name"],
+      "display_fields": [
+        "work_center_id",
+        "work_center_name"
+      ],
       "placeholder": "Search work center",
       "placeholder_vi": "Tìm work center"
     },
@@ -117,8 +144,14 @@
       "width": "third",
       "lookup_source": "machines",
       "strict_select": true,
-      "depends_on": ["work_center_id"],
-      "display_fields": ["machine_id", "machine_name", "machine_type"],
+      "depends_on": [
+        "work_center_id"
+      ],
+      "display_fields": [
+        "machine_id",
+        "machine_name",
+        "machine_type"
+      ],
       "autofill_map": {
         "work_center_id": "work_center_id"
       },
@@ -134,8 +167,15 @@
       "width": "third",
       "lookup_source": "work_orders",
       "strict_select": true,
-      "depends_on": ["machine_id"],
-      "display_fields": ["wo_number", "operation_desc", "part_number", "part_revision"],
+      "depends_on": [
+        "machine_id"
+      ],
+      "display_fields": [
+        "wo_number",
+        "operation_desc",
+        "part_number",
+        "part_revision"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "so_number": "so_number",
@@ -160,8 +200,14 @@
       "width": "third",
       "lookup_source": "operators",
       "strict_select": true,
-      "depends_on": ["work_center_id"],
-      "display_fields": ["operator_id", "operator_name", "role"],
+      "depends_on": [
+        "work_center_id"
+      ],
+      "display_fields": [
+        "operator_id",
+        "operator_name",
+        "role"
+      ],
       "placeholder": "Search operator",
       "placeholder_vi": "Tìm người vận hành"
     },
@@ -174,8 +220,15 @@
       "width": "third",
       "lookup_source": "tooling_assets",
       "strict_select": true,
-      "depends_on": ["machine_id", "work_center_id"],
-      "display_fields": ["tool_id", "tool_name", "tool_type"],
+      "depends_on": [
+        "machine_id",
+        "work_center_id"
+      ],
+      "display_fields": [
+        "tool_id",
+        "tool_name",
+        "tool_type"
+      ],
       "placeholder": "Search tooling",
       "placeholder_vi": "Tìm tooling / dao"
     },
@@ -188,8 +241,13 @@
       "width": "third",
       "lookup_source": "parts",
       "strict_select": true,
-      "depends_on": ["customer_id"],
-      "display_fields": ["part_number", "part_description"],
+      "depends_on": [
+        "customer_id"
+      ],
+      "display_fields": [
+        "part_number",
+        "part_description"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "part_number": "part_number"
@@ -206,8 +264,13 @@
       "width": "third",
       "lookup_source": "revisions",
       "strict_select": true,
-      "depends_on": ["part_number"],
-      "display_fields": ["revision", "status"],
+      "depends_on": [
+        "part_number"
+      ],
+      "display_fields": [
+        "revision",
+        "status"
+      ],
       "autofill_map": {
         "part_number": "part_number",
         "part_revision": "part_revision"
@@ -234,8 +297,19 @@
       "width": "third",
       "lookup_source": "nc_program_releases",
       "strict_select": true,
-      "depends_on": ["wo_number", "part_number", "part_revision", "machine_id", "work_center_id"],
-      "display_fields": ["program_id", "part_number", "part_revision", "status"],
+      "depends_on": [
+        "wo_number",
+        "part_number",
+        "part_revision",
+        "machine_id",
+        "work_center_id"
+      ],
+      "display_fields": [
+        "program_id",
+        "part_number",
+        "part_revision",
+        "status"
+      ],
       "placeholder": "Search released NC program",
       "placeholder_vi": "Tìm chương trình NC đã release"
     },
@@ -337,12 +411,36 @@
       "required": false,
       "options_source": "registry:pre_run_risk_flags",
       "options": [
-        { "value": "new_revision", "label": "New revision", "label_vi": "Revision mới" },
-        { "value": "customer_hold_point", "label": "Customer hold point", "label_vi": "Điểm hold khách hàng" },
-        { "value": "special_process", "label": "Special process downstream", "label_vi": "Có special process phía sau" },
-        { "value": "tight_tolerance", "label": "Tight tolerance", "label_vi": "Dung sai chặt" },
-        { "value": "first_run_on_machine", "label": "First run on this machine", "label_vi": "Lần đầu chạy trên máy này" },
-        { "value": "program_reloaded", "label": "Program reloaded", "label_vi": "Vừa nạp lại chương trình" }
+        {
+          "value": "new_revision",
+          "label": "New revision",
+          "label_vi": "Revision mới"
+        },
+        {
+          "value": "customer_hold_point",
+          "label": "Customer hold point",
+          "label_vi": "Điểm hold khách hàng"
+        },
+        {
+          "value": "special_process",
+          "label": "Special process downstream",
+          "label_vi": "Có special process phía sau"
+        },
+        {
+          "value": "tight_tolerance",
+          "label": "Tight tolerance",
+          "label_vi": "Dung sai chặt"
+        },
+        {
+          "value": "first_run_on_machine",
+          "label": "First run on this machine",
+          "label_vi": "Lần đầu chạy trên máy này"
+        },
+        {
+          "value": "program_reloaded",
+          "label": "Program reloaded",
+          "label_vi": "Vừa nạp lại chương trình"
+        }
       ]
     },
     {
@@ -421,5 +519,10 @@
       "labelEn": "Shift leader / QC"
     }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"]
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
+  "record_type": "DOWNTIME"
 }

@@ -1140,7 +1140,7 @@ function apiRequest(path, options={}){
 }
 
 function runtimeApiPath(domain, table, recordId=''){
-  const base = `api/runtime/${encodeURIComponent(domain)}/${encodeURIComponent(table)}`;
+  const base = `/api/runtime/${encodeURIComponent(domain)}/${encodeURIComponent(table)}`;
   return recordId ? `${base}/${encodeURIComponent(recordId)}` : base;
 }
 
@@ -1430,7 +1430,7 @@ async function loadAuthoritativeAuditTrail(options={}){
   ADMIN_AUTH_STATE.audit.loading = true;
   ADMIN_AUTH_STATE.audit.error = '';
   try{
-    const res = await apiCall('admin_audit_trail_list', {limit:200}, 'GET', 9000);
+    const res = await apiCall('admin_audit_trail_list', {limit:500}, 'GET', 9000);
     if(!(res && res.ok && Array.isArray(res.events))) throw new Error(runtimeErrorMessage(res, 'audit_trail_load_failed'));
     ADMIN_AUTH_STATE.audit.events = res.events;
     ADMIN_AUTH_STATE.audit.loaded = true;
@@ -5088,6 +5088,42 @@ let adminDataSourceState = {
   snapshot:null,
   dirty:false
 };
+const ADMIN_TAB_FILTER_DEFAULTS = {
+  dept_title:{search:'',status:'all'},
+  orgchart:{search:'',status:'all'},
+  roles:{search:'',dept:'',status:'all'},
+  activity:{search:'',actor:'',eventType:'',aggregateType:''}
+};
+let ADMIN_TAB_FILTERS = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS));
+
+function adminFilterState(tab){
+  if(!ADMIN_TAB_FILTERS[tab]){
+    ADMIN_TAB_FILTERS[tab] = {};
+  }
+  return ADMIN_TAB_FILTERS[tab];
+}
+
+function setAdminFilter(tab, key, value){
+  const state = adminFilterState(tab);
+  state[key] = value == null ? '' : String(value);
+  if(currentPage === 'admin'){
+    renderAdmin();
+  }
+}
+
+function resetAdminFilters(tab){
+  if(!ADMIN_TAB_FILTER_DEFAULTS[tab]) return;
+  ADMIN_TAB_FILTERS[tab] = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS[tab]));
+  if(currentPage === 'admin'){
+    renderAdmin();
+  }
+}
+
+function adminContainsNeedle(needle, values){
+  const token = String(needle || '').trim().toLowerCase();
+  if(!token) return true;
+  return (values || []).some(value => String(value || '').toLowerCase().includes(token));
+}
 
 function showToast(msg, type, duration){
   duration = duration || 3000;
@@ -8847,7 +8883,9 @@ function renderAdminActivityFallback(){
 // ADMIN TAB: DEPARTMENTS & TITLES
 // ═══════════════════════════════════════════════════
 function renderAdminDeptTitle(){
-  adminPanel.innerHTML='';
+  const panel = document.getElementById('admin-content');
+  if(!panel) return;
+  panel.innerHTML='';
   if(!ADMIN_AUTH_STATE.org.loaded){
     if(!ADMIN_AUTH_STATE.org.loading && !ADMIN_AUTH_STATE.org.error){
       loadAuthoritativeOrgCatalog({silent:true});
@@ -8856,10 +8894,11 @@ function renderAdminDeptTitle(){
       renderAdminDeptTitleFallback();
       return;
     }
-    adminPanel.innerHTML = authoritativeLoadSummaryHtml('org');
+    panel.innerHTML = authoritativeLoadSummaryHtml('org');
     return;
   }
 
+  const filters = adminFilterState('dept_title');
   const orgUnits = (ADMIN_AUTH_STATE.org.orgUnits || []).slice().sort((a,b)=>{
     const typeCmp = orgUnitTypeWeight(String(a.org_unit_type||'')) - orgUnitTypeWeight(String(b.org_unit_type||''));
     if(typeCmp !== 0) return typeCmp;
@@ -8886,86 +8925,88 @@ function renderAdminDeptTitle(){
   const totalPositions = positions.length;
   const activeUnits = orgUnits.filter(unit => String(unit.status || 'active') !== 'inactive').length;
   const activePositions = positions.filter(position => String(position.status || 'active') !== 'inactive').length;
+  const filteredUnits = orgUnits.filter(unit=>{
+    const active = String(unit.status || 'active') !== 'inactive';
+    if(filters.status === 'active' && !active) return false;
+    if(filters.status === 'inactive' && active) return false;
+    const unitPositions = positionsByUnit[String(unit.hcm_org_unit_id || '')] || [];
+    return adminContainsNeedle(filters.search, [
+      unit.org_unit_code,
+      unit.org_unit_name,
+      unit.org_unit_type,
+      ...unitPositions.map(position=>position.position_title),
+      ...unitPositions.map(position=>position.position_code)
+    ]);
+  });
 
-  const card=el('div',{class:'card'},[]);
-  const header=el('div',{style:'display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;'},[
-    el('div',{},[
-      el('div',{style:'font-weight:800;font-size:16px;line-height:1.2;'},'Cơ cấu tổ chức & vị trí công việc'),
-      el('div',{class:'muted',style:'margin-top:4px;'},'Nguồn authoritative của tab này là HCM runtime: `hcm_org_units` và `hcm_positions`. Mọi thay đổi được ghi trực tiếp vào hệ thống thay vì session browser.')
-    ]),
-    el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;align-items:center;'},[
-      el('div',{class:'muted',style:'font-size:12px;'},`${activeUnits}/${orgUnits.length} đơn vị hoạt động • ${activePositions}/${totalPositions} vị trí hoạt động`),
-      el('button',{class:'btn',onclick:()=>loadAuthoritativeOrgCatalog({force:true})},lang==='en'?'Refresh':'Làm mới'),
-      el('button',{class:'btn',onclick:()=>promptCreateAuthoritativeOrgUnit()},'Thêm đơn vị'),
-      el('button',{class:'btn',onclick:()=>{
-        const code = (prompt('Nhập mã đơn vị cha để thêm vị trí (ví dụ QA, PRO, ENG):','') || '').trim().toUpperCase();
-        if(!code) return;
-        const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(x=>String(x.org_unit_code||'').toUpperCase() === code);
-        if(!unit){ showToast('⚠ Không tìm thấy đơn vị', 'error'); return; }
-        promptCreateAuthoritativePosition(unit.hcm_org_unit_id);
-      }},'Thêm vị trí')
-    ])
-  ]);
-
-  const body=el('div',{style:'margin-top:12px;border:1px solid var(--border,var(--ln));border-radius:14px;background:var(--bg-surface,#fff);overflow:hidden;'},[]);
-  const tree=el('div',{style:'padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg-surface-alt,#f8fafc);'},[]);
-
-  orgUnits.forEach(unit=>{
+  const cards = filteredUnits.map(unit=>{
     const deptColor = defaultDepartmentColor(unit.org_unit_code);
     const unitPositions = positionsByUnit[String(unit.hcm_org_unit_id || '')] || [];
     const assignedUsers = USERS.filter(u=>String(u.dept||'') === String(unit.org_unit_code||'')).length;
     const active = String(unit.status || 'active') !== 'inactive';
-    const folder=el('details',{open:active,class:'fm-folder',style:`border:1px solid color-mix(in srgb, ${deptColor} 24%, var(--border));background:var(--bg-surface,#fff);border-radius:12px;overflow:hidden;${active?'':'opacity:.72;'}`},[]);
-    const summary=el('summary',{style:'list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc));'},[
-      el('div',{style:'display:flex;align-items:center;gap:10px;'},[
-        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${deptColor}18;border:1px solid color-mix(in srgb, ${deptColor} 28%, var(--border));display:flex;align-items:center;justify-content:center;font-size:18px;color:${deptColor};`},active?'🏢':'📁'),
-        el('div',{},[
-          el('div',{style:'font-weight:800;'},`${unit.org_unit_code} — ${unit.org_unit_name}`),
-          el('div',{class:'muted',style:'margin-top:2px;font-size:11px;'},`${unit.org_unit_type || 'department'} • ${unitPositions.length} vị trí • ${assignedUsers} user portal`)
-        ])
-      ]),
-      el('div',{style:'display:flex;gap:6px;flex-wrap:wrap;align-items:center;'},[
-        el('span',{style:`font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb, ${deptColor} 28%, var(--border));background:${active?'color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff))':'color-mix(in srgb, var(--amber) 14%, var(--bg-surface,#fff))'};color:${active?'var(--green-dark,#15803d)':'var(--amber-dark,#b45309)'}`},active?'active':'inactive'),
-        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();promptCreateAuthoritativePosition(unit.hcm_org_unit_id);}},'Thêm vị trí'),
-        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();promptEditAuthoritativeOrgUnit(unit.hcm_org_unit_id);}},'Sửa'),
-        el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();setAuthoritativeOrgUnitActive(unit.hcm_org_unit_id, !active);}},active?'Ngừng dùng':'Kích hoạt')
-      ])
-    ]);
-    folder.appendChild(summary);
+    return `<article class="admin-authority-card" style="border-color:color-mix(in srgb, ${deptColor} 24%, var(--border))">
+      <div class="admin-authority-card-head">
+        <div>
+          <div style="font-weight:800;color:${escapeHtml(deptColor)}">${escapeHtml(String(unit.org_unit_code || ''))}</div>
+          <div style="font-size:16px;font-weight:800;margin-top:4px">${escapeHtml(String(unit.org_unit_name || unit.org_unit_code || ''))}</div>
+          <div class="muted" style="margin-top:4px;font-size:11px">${escapeHtml(String(unit.org_unit_type || 'department'))} • ${unitPositions.length} vị trí • ${assignedUsers} user portal</div>
+        </div>
+        <div class="admin-authority-chip-row">
+          <span class="admin-inline-badge ${active ? 'is-active' : 'is-inactive'}">${active ? 'active' : 'inactive'}</span>
+          <button class="btn-admin secondary sm" onclick="promptCreateAuthoritativePosition('${escapeHtml(String(unit.hcm_org_unit_id || ''))}')">Thêm vị trí</button>
+          <button class="btn-admin secondary sm" onclick="promptEditAuthoritativeOrgUnit('${escapeHtml(String(unit.hcm_org_unit_id || ''))}')">Sửa</button>
+          <button class="btn-admin secondary sm" onclick="setAuthoritativeOrgUnitActive('${escapeHtml(String(unit.hcm_org_unit_id || ''))}', ${active ? 'false' : 'true'})">${active ? 'Ngừng dùng' : 'Kích hoạt'}</button>
+        </div>
+      </div>
+      <div class="admin-pill-cloud" style="margin-top:12px">
+        ${unitPositions.length ? unitPositions.map(position=>{
+          const activePosition = String(position.status || 'active') !== 'inactive';
+          const count = usersByDeptTitle[`${unit.org_unit_code}__${position.position_title}`] || 0;
+          return `<div class="admin-position-chip ${activePosition ? '' : 'is-inactive'}">
+            <div>
+              <div style="font-weight:700">${escapeHtml(String(position.position_title || ''))}</div>
+              <div class="muted" style="font-size:10px;margin-top:2px">${escapeHtml(String(position.position_code || 'NO-CODE'))} • HC ${escapeHtml(String(position.required_headcount || 1))} • ${escapeHtml(String(position.employment_type || 'full_time'))}</div>
+            </div>
+            <div class="admin-authority-chip-row">
+              <span class="admin-inline-badge">${count} user</span>
+              <button class="btn-admin secondary sm" onclick="promptEditAuthoritativePosition('${escapeHtml(String(position.hcm_position_id || ''))}')">Sửa</button>
+              <button class="btn-admin secondary sm" onclick="setAuthoritativePositionActive('${escapeHtml(String(position.hcm_position_id || ''))}', ${activePosition ? 'false' : 'true'})">${activePosition ? 'Ngừng dùng' : 'Kích hoạt'}</button>
+            </div>
+          </div>`;
+        }).join('') : `<div class="hm-empty" style="margin:0">Chưa có vị trí trong đơn vị này.</div>`}
+      </div>
+    </article>`;
+  }).join('');
 
-    const list=el('div',{style:'padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;background:var(--bg-surface,#fff);'},[]);
-    if(!unitPositions.length){
-      list.appendChild(el('div',{class:'muted',style:'padding:8px 10px;'},'Chưa có vị trí trong đơn vị này.'));
-    }else{
-      unitPositions.forEach(position=>{
-        const activePosition = String(position.status || 'active') !== 'inactive';
-        const count = usersByDeptTitle[`${unit.org_unit_code}__${position.position_title}`] || 0;
-        const row=el('div',{class:'fm-file-row',style:'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border,var(--ln));border-radius:10px;background:var(--bg-surface-alt,#f8fafc);'},[
-          el('div',{style:'display:flex;align-items:center;gap:10px;min-width:0;'},[
-            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));border-radius:8px;font-size:15px;'},activePosition?'📄':'📁'),
-            el('div',{style:'min-width:0;'},[
-              el('div',{style:'font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'},String(position.position_title || '')),
-              el('div',{class:'muted',style:'font-size:11px;margin-top:1px;'},`${position.position_code || 'NO-CODE'} • HC ${position.required_headcount || 1} • ${position.employment_type || 'full_time'}`)
-            ])
-          ]),
-          el('div',{style:'display:flex;align-items:center;gap:6px;flex-wrap:wrap;'},[
-            el('span',{style:'font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2);border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));'},`${count} user`+(count===1?'':'s')),
-            el('span',{style:`font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:${activePosition?'var(--bg-surface,#fff)':'color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff))'};color:${activePosition?'var(--text-2,#475569)':'var(--amber-dark,#b45309)'}`},activePosition?'active':'inactive'),
-            el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();promptEditAuthoritativePosition(position.hcm_position_id);}},'Sửa'),
-            el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();setAuthoritativePositionActive(position.hcm_position_id, !activePosition);}},activePosition?'Ngừng dùng':'Kích hoạt')
-          ])
-        ]);
-        list.appendChild(row);
-      });
-    }
-    folder.appendChild(list);
-    tree.appendChild(folder);
-  });
-
-  body.appendChild(tree);
-  card.appendChild(header);
-  card.appendChild(body);
-  adminPanel.appendChild(card);
+  panel.innerHTML = `
+    <section class="admin-authority-section">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <h3 style="font-size:16px;font-weight:800;margin:0">Cơ cấu tổ chức & vị trí công việc</h3>
+          <div class="muted" style="margin-top:4px">Nguồn authoritative của tab này là HCM runtime: <code>hcm_org_units</code> và <code>hcm_positions</code>. Mọi thay đổi được ghi trực tiếp vào hệ thống.</div>
+        </div>
+        <div class="muted" style="font-size:12px">${activeUnits}/${orgUnits.length} đơn vị hoạt động • ${activePositions}/${totalPositions} vị trí hoạt động</div>
+      </div>
+      <div class="admin-toolbar" style="margin-top:14px">
+        <input type="search" placeholder="Tìm đơn vị, mã vị trí, chức danh..." value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('dept_title','search',this.value)">
+        <select onchange="setAdminFilter('dept_title','status',this.value)">
+          <option value="all"${filters.status === 'all' ? ' selected' : ''}>Tất cả trạng thái</option>
+          <option value="active"${filters.status === 'active' ? ' selected' : ''}>Đang hoạt động</option>
+          <option value="inactive"${filters.status === 'inactive' ? ' selected' : ''}>Ngừng dùng</option>
+        </select>
+        <button class="btn-admin secondary" onclick="resetAdminFilters('dept_title')">↺ Reset filter</button>
+        <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 Làm mới</button>
+        <button class="btn-admin primary" onclick="promptCreateAuthoritativeOrgUnit()">＋ Thêm đơn vị</button>
+        <button class="btn-admin secondary" onclick="(function(){const code=(prompt('Nhập mã đơn vị để thêm vị trí:','')||'').trim().toUpperCase();if(!code)return;const unit=(ADMIN_AUTH_STATE.org.orgUnits||[]).find(x=>String(x.org_unit_code||'').toUpperCase()===code);if(!unit){showToast('⚠ Không tìm thấy đơn vị','error');return;}promptCreateAuthoritativePosition(unit.hcm_org_unit_id);})();">＋ Thêm vị trí</button>
+      </div>
+      <div class="admin-authority-meta-strip">
+        <span>${filteredUnits.length} / ${orgUnits.length} đơn vị hiển thị</span>
+        <span>${positions.length} vị trí trong catalog</span>
+      </div>
+      <div class="admin-authority-grid">
+        ${cards || `<div class="hm-empty">Không có đơn vị nào khớp bộ lọc hiện tại.</div>`}
+      </div>
+    </section>`;
 }
 
 async function promptCreateAuthoritativeOrgUnit(){
@@ -9210,15 +9251,18 @@ function renderAdminOrgChart(){
   });
   const positions = (ADMIN_AUTH_STATE.org.positions || []).slice();
   const hcmEmployees = (ADMIN_AUTH_STATE.org.employees || []).slice();
+  const filters = adminFilterState('orgchart');
   const childrenByParent = {};
   const positionsByUnit = {};
   const employeesByPosition = {};
   const portalUsersByDeptTitle = {};
+  const unitById = {};
 
   orgUnits.forEach(unit=>{
     const parentId = String(unit.parent_org_unit_id || '');
     if(!childrenByParent[parentId]) childrenByParent[parentId] = [];
     childrenByParent[parentId].push(unit);
+    unitById[String(unit.hcm_org_unit_id || '')] = unit;
   });
   positions.forEach(position=>{
     const unitId = String(position.hcm_org_unit_id || '');
@@ -9236,11 +9280,47 @@ function renderAdminOrgChart(){
     portalUsersByDeptTitle[key].push(user);
   });
 
+  const unitMatchesFilter = {};
+  function matchesUnitSearch(unit){
+    const unitPositions = positionsByUnit[String(unit.hcm_org_unit_id || '')] || [];
+    const deptUsers = USERS.filter(u=>String(u.dept||'') === String(unit.org_unit_code||''));
+    return adminContainsNeedle(filters.search, [
+      unit.org_unit_code,
+      unit.org_unit_name,
+      unit.org_unit_type,
+      ...unitPositions.map(position=>position.position_title),
+      ...unitPositions.map(position=>position.position_code),
+      ...deptUsers.map(user=>user.name),
+      ...deptUsers.map(user=>user.username)
+    ]);
+  }
+  function isUnitVisible(unitId){
+    if(Object.prototype.hasOwnProperty.call(unitMatchesFilter, unitId)){
+      return unitMatchesFilter[unitId];
+    }
+    const unit = unitById[unitId];
+    if(!unit){
+      unitMatchesFilter[unitId] = false;
+      return false;
+    }
+    const active = String(unit.status || 'active') !== 'inactive';
+    const statusMatch = filters.status === 'all'
+      ? true
+      : (filters.status === 'active' ? active : !active);
+    const childVisible = (childrenByParent[unitId] || []).some(child => isUnitVisible(String(child.hcm_org_unit_id || '')));
+    const selfVisible = statusMatch && matchesUnitSearch(unit);
+    unitMatchesFilter[unitId] = selfVisible || childVisible;
+    return unitMatchesFilter[unitId];
+  }
+
   function renderOrgUnitNode(unit, depth){
     const color = defaultDepartmentColor(unit.org_unit_code);
     const unitId = String(unit.hcm_org_unit_id || '');
     const unitPositions = (positionsByUnit[unitId] || []).slice().sort((a,b)=>String(a.position_title||'').localeCompare(String(b.position_title||'')));
-    const childUnits = (childrenByParent[unitId] || []).slice().sort((a,b)=>String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||'')));
+    const childUnits = (childrenByParent[unitId] || [])
+      .filter(child => isUnitVisible(String(child.hcm_org_unit_id || '')))
+      .slice()
+      .sort((a,b)=>String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||'')));
     const active = String(unit.status || 'active') !== 'inactive';
     const unitUsers = USERS.filter(u=>String(u.dept||'') === String(unit.org_unit_code||'') && u.active !== false);
     const marginLeft = depth * 18;
@@ -9292,23 +9372,39 @@ function renderAdminOrgChart(){
   }
 
   const roots = (childrenByParent[''] || []).length ? (childrenByParent[''] || []) : orgUnits.filter(unit => !unit.parent_org_unit_id);
-  const html = roots.map(root => renderOrgUnitNode(root, 0)).join('');
+  const visibleRoots = roots.filter(root => isUnitVisible(String(root.hcm_org_unit_id || '')));
+  const html = visibleRoots.map(root => renderOrgUnitNode(root, 0)).join('');
 
   el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
-      <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization chart':'Sơ đồ tổ chức authoritative'}</h3>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <div>
+        <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization chart':'Sơ đồ tổ chức authoritative'}</h3>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">
+          ${lang==='en'
+            ?'Generated from HCM org units and positions, then cross-checked against portal users. This replaces the old synthetic role-level diagram.'
+            :'Dựng từ HCM org units và positions, sau đó đối chiếu với user portal. Đây là projection authoritative thay cho sơ đồ suy diễn theo level vai trò.'}
+        </div>
+      </div>
       <div style="display:flex;gap:8px">
         <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
         <button class="btn-admin secondary" onclick="window.print()">🖨 ${lang==='en'?'Print':'In'}</button>
       </div>
     </div>
-    <div style="font-size:11px;color:var(--text-3);margin-bottom:16px">
-      ${lang==='en'
-        ?'Generated from HCM org units and positions, then cross-checked against portal users. This replaces the old synthetic role-level diagram.'
-        :'Dựng từ HCM org units và positions, sau đó đối chiếu với user portal. Đây là projection authoritative thay cho sơ đồ suy diễn theo level vai trò.'}
+    <div class="admin-toolbar">
+      <input type="search" placeholder="Tìm đơn vị, vị trí, nhân sự portal..." value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('orgchart','search',this.value)">
+      <select onchange="setAdminFilter('orgchart','status',this.value)">
+        <option value="all"${filters.status === 'all' ? ' selected' : ''}>Tất cả trạng thái</option>
+        <option value="active"${filters.status === 'active' ? ' selected' : ''}>Đang hoạt động</option>
+        <option value="inactive"${filters.status === 'inactive' ? ' selected' : ''}>Ngừng dùng</option>
+      </select>
+      <button class="btn-admin secondary" onclick="resetAdminFilters('orgchart')">↺ Reset filter</button>
+    </div>
+    <div class="admin-authority-meta-strip" style="margin-bottom:16px">
+      <span>${visibleRoots.length} / ${roots.length} cây gốc hiển thị</span>
+      <span>${orgUnits.length} org unit • ${positions.length} position • ${hcmEmployees.length} HCM employee</span>
     </div>
     <div style="border:1px solid var(--border);border-radius:12px;overflow:auto;background:var(--bg-surface-alt,#fafbfc);max-height:680px;padding:12px;display:flex;flex-direction:column;gap:10px">
-      ${html || '<div class="hm-empty">Chưa có dữ liệu org unit authoritative.</div>'}
+      ${html || '<div class="hm-empty">Không có org unit nào khớp bộ lọc hiện tại.</div>'}
     </div>`;
 }
 
@@ -9335,21 +9431,51 @@ function renderAdminActivity(){
   }
 
   const auditEvents = (ADMIN_AUTH_STATE.audit.events || []).slice().sort((a,b)=>String(b.recorded_at||'').localeCompare(String(a.recorded_at||'')));
-  const uniqueUsers = [...new Set(auditEvents.map(item => item.actor_name).filter(Boolean))];
+  const filters = adminFilterState('activity');
+  const uniqueUsers = [...new Set(auditEvents.map(item => item.actor_name).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+  const uniqueEventTypes = [...new Set(auditEvents.map(item => item.event_type).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+  const uniqueAggregates = [...new Set(auditEvents.map(item => item.aggregate_type).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+  const filteredEvents = auditEvents.filter(event=>{
+    if(filters.actor && String(event.actor_name || '') !== String(filters.actor)) return false;
+    if(filters.eventType && String(event.event_type || '') !== String(filters.eventType)) return false;
+    if(filters.aggregateType && String(event.aggregate_type || '') !== String(filters.aggregateType)) return false;
+    return adminContainsNeedle(filters.search, [
+      event.actor_name,
+      event.event_type,
+      event.aggregate_type,
+      event.aggregate_id,
+      event.ip_address,
+      JSON.stringify(event.payload || {})
+    ]);
+  });
 
   el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'Administrative audit trail':'Kiểm soát hành vi & audit trail'}</h3>
-      <div style="display:flex;gap:8px;align-items:center">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div>
+        <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'Administrative audit trail':'Kiểm soát hành vi & audit trail'}</h3>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${filteredEvents.length} / ${auditEvents.length} event hiển thị</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <button class="btn-admin secondary" onclick="document.getElementById('ds-panel').style.display=document.getElementById('ds-panel').style.display==='none'?'':'none'">⚙️ ${lang==='en'?'Settings':'Cài đặt'}</button>
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">
-          <option value="">${lang==='en'?'All actors':'Tất cả actor'}</option>
-          ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('')}
-        </select>
         <button class="btn-admin secondary" onclick="loadAuthoritativeAuditTrail({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
+        <button class="btn-admin secondary" onclick="resetAdminFilters('activity')">↺ Reset filter</button>
         <button class="btn-admin secondary" onclick="exportActivityCSV()">📥 CSV</button>
       </div>
+    </div>
+    <div class="admin-toolbar">
+      <input type="search" placeholder="Tìm actor, event, aggregate, payload..." value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('activity','search',this.value)">
+      <select onchange="setAdminFilter('activity','actor',this.value)">
+        <option value="">${lang==='en'?'All actors':'Tất cả actor'}</option>
+        ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}"${filters.actor === u ? ' selected' : ''}>${escapeHtml(u)}</option>`).join('')}
+      </select>
+      <select onchange="setAdminFilter('activity','eventType',this.value)">
+        <option value="">Tất cả event</option>
+        ${uniqueEventTypes.map(eventType=>`<option value="${escapeHtml(eventType)}"${filters.eventType === eventType ? ' selected' : ''}>${escapeHtml(eventType)}</option>`).join('')}
+      </select>
+      <select onchange="setAdminFilter('activity','aggregateType',this.value)">
+        <option value="">Tất cả aggregate</option>
+        ${uniqueAggregates.map(aggregateType=>`<option value="${escapeHtml(aggregateType)}"${filters.aggregateType === aggregateType ? ' selected' : ''}>${escapeHtml(aggregateType)}</option>`).join('')}
+      </select>
     </div>
     <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
       <div style="padding:12px 16px;font-weight:700;font-size:13px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border)">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
@@ -9389,55 +9515,70 @@ function renderAdminActivity(){
         ?'Server-side administrative actions are sourced from the system audit layer. This tab no longer relies on browser-local telemetry for governance decisions.'
         :'Các hành động quản trị phía server được lấy từ lớp audit hệ thống. Tab này không còn dựa vào telemetry cục bộ của trình duyệt cho quyết định quản trị.'}
     </div>
-    <div id="activity-sessions-list" style="max-height:550px;overflow-y:auto">
-      ${auditEvents.length === 0
+    <div class="activity-log-scroller">
+      ${filteredEvents.length === 0
         ? '<div style="text-align:center;padding:40px;color:var(--text-3)">'+( lang==='en'?'No authoritative audit event recorded yet':'Chưa có audit event authoritative nào')+'</div>'
-        : auditEvents.map((event,idx)=>{
+        : `<table class="activity-log-table">
+            <thead>
+              <tr>
+                <th style="min-width:140px">Thời điểm</th>
+                <th style="min-width:140px">Actor</th>
+                <th style="min-width:150px">Event</th>
+                <th style="min-width:150px">Aggregate</th>
+                <th style="min-width:120px">ID</th>
+                <th style="min-width:130px">IP</th>
+                <th>Ngữ cảnh</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredEvents.map((event,idx)=>{
           const recorded = event.recorded_at ? new Date(event.recorded_at) : null;
           const dateStr = recorded && !Number.isNaN(recorded.getTime())
             ? recorded.toLocaleDateString('vi-VN') + ' ' + recorded.toLocaleTimeString('vi-VN')
             : '—';
           const context = (event.payload && typeof event.payload === 'object') ? (event.payload.context || event.payload) : {};
           const contextText = escapeHtml(JSON.stringify(context || {}, null, 2));
-          return `<div class="al-session" data-user="${escapeHtml(event.actor_name || '')}" data-idx="${idx}">
-            <div class="al-header">
-              <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap">
-                <span style="font-weight:700;font-size:12px;color:var(--text)">${escapeHtml(event.actor_name || 'system')}</span>
-                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2)">${escapeHtml(event.event_type || 'event')}</span>
-                <span style="font-size:10px;color:var(--text-2)">🕐 ${dateStr}</span>
-              </div>
-              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('▾')?'▴ Thu gọn':'▾ Chi tiết'">
-                ▾ ${lang==='en'?'Detail':'Chi tiết'}
-              </button>
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:var(--bg-surface-alt,#f8fafc);border-radius:6px">
-              <span>🧩 <b>Aggregate:</b> ${escapeHtml(event.aggregate_type || 'api_action')}</span>
-              <span>🔑 <b>ID:</b> ${escapeHtml(event.aggregate_id || '—')}</span>
-              <span>🌐 <b>IP:</b> ${escapeHtml(event.ip_address || '—')}</span>
-            </div>
-            <div class="al-detail" style="display:none">
-              <div style="font-size:10px;font-weight:700;margin:8px 0 6px;color:var(--text-2);border-bottom:1px solid var(--border);padding-bottom:4px">
-                ${lang==='en'?'Payload context':'Ngữ cảnh payload'}
-              </div>
-              <pre style="margin:0;padding:10px;border-radius:8px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);font-size:10px;line-height:1.45;white-space:pre-wrap;word-break:break-word">${contextText}</pre>
-            </div>
-          </div>`;
-        }).join('')
+          return `<tr data-user="${escapeHtml(event.actor_name || '')}" data-idx="${idx}">
+                <td>${escapeHtml(dateStr)}</td>
+                <td><b>${escapeHtml(event.actor_name || 'system')}</b></td>
+                <td><span class="admin-inline-badge">${escapeHtml(event.event_type || 'event')}</span></td>
+                <td>${escapeHtml(event.aggregate_type || 'api_action')}</td>
+                <td style="font-family:var(--mono);font-size:10px">${escapeHtml(event.aggregate_id || '—')}</td>
+                <td>${escapeHtml(event.ip_address || '—')}</td>
+                <td>
+                  <details class="activity-detail-panel">
+                    <summary>Xem payload</summary>
+                    <pre>${contextText}</pre>
+                  </details>
+                </td>
+              </tr>`;
+        }).join('')}
+            </tbody>
+          </table>`
       }
     </div>`;
 
 }
 
 function filterActivityLog(){
-  const userFilter = (document.getElementById('activity-user-filter')||{}).value||'';
-  document.querySelectorAll('#activity-sessions-list .al-session').forEach(el=>{
-    const u = el.dataset.user||'';
-    el.style.display = (!userFilter || u === userFilter) ? '' : 'none';
-  });
+  renderAdminActivity();
 }
 
 function exportActivityCSV(){
-  const events = ADMIN_AUTH_STATE.audit.loaded ? (ADMIN_AUTH_STATE.audit.events || []) : legacyAuditEventsForAdmin();
+  const filters = adminFilterState('activity');
+  const events = (ADMIN_AUTH_STATE.audit.loaded ? (ADMIN_AUTH_STATE.audit.events || []) : legacyAuditEventsForAdmin()).filter(event=>{
+    if(filters.actor && String(event.actor_name || '') !== String(filters.actor)) return false;
+    if(filters.eventType && String(event.event_type || '') !== String(filters.eventType)) return false;
+    if(filters.aggregateType && String(event.aggregate_type || '') !== String(filters.aggregateType)) return false;
+    return adminContainsNeedle(filters.search, [
+      event.actor_name,
+      event.event_type,
+      event.aggregate_type,
+      event.aggregate_id,
+      event.ip_address,
+      JSON.stringify(event.payload || {})
+    ]);
+  });
   let csv = 'Recorded At,Actor,Event Type,Aggregate Type,Aggregate ID,IP,Payload\n';
   events.forEach(event=>{
     const payload = JSON.stringify(event.payload || {}).replace(/"/g, '\'');
@@ -9469,7 +9610,26 @@ function renderAdminRoles(){
     el.innerHTML = authoritativeLoadSummaryHtml('roles');
     return;
   }
+  const filters = adminFilterState('roles');
   const rows = rolesForAdminGrid();
+  const deptOptions = [...new Set(rows.map(row => String(row.dept_code || roleRecordUi(String(row.role_code || ''), row).dept || '')).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+  const filteredRows = rows.filter(row=>{
+    const code = String(row.role_code || '');
+    const ui = roleRecordUi(code, row);
+    const members = USERS.filter(user => String(user.role||'') === code && user.active !== false);
+    const active = row.is_active !== false;
+    if(filters.dept && String(row.dept_code || ui.dept || '') !== String(filters.dept)) return false;
+    if(filters.status === 'active' && !active) return false;
+    if(filters.status === 'inactive' && active) return false;
+    return adminContainsNeedle(filters.search, [
+      code,
+      ui.label,
+      ui.labelEn,
+      row.dept_code,
+      ...members.map(user=>user.name),
+      ...members.map(user=>user.username)
+    ]);
+  });
   el.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
       <div>
@@ -9480,8 +9640,25 @@ function renderAdminRoles(){
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-admin secondary" onclick="loadAuthoritativeRoleCatalog({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
+        <button class="btn-admin secondary" onclick="resetAdminFilters('roles')">↺ Reset filter</button>
         <button class="btn-admin primary" onclick="promptCreateSystemRole()">＋ ${lang==='en'?'Create role':'Tạo vai trò'}</button>
       </div>
+    </div>
+    <div class="admin-toolbar">
+      <input type="search" placeholder="Tìm vai trò, code, thành viên..." value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('roles','search',this.value)">
+      <select onchange="setAdminFilter('roles','dept',this.value)">
+        <option value="">Tất cả phòng ban</option>
+        ${deptOptions.map(dept=>`<option value="${escapeHtml(dept)}"${filters.dept === dept ? ' selected' : ''}>${escapeHtml(dept)}</option>`).join('')}
+      </select>
+      <select onchange="setAdminFilter('roles','status',this.value)">
+        <option value="all"${filters.status === 'all' ? ' selected' : ''}>Tất cả trạng thái</option>
+        <option value="active"${filters.status === 'active' ? ' selected' : ''}>Đang hoạt động</option>
+        <option value="inactive"${filters.status === 'inactive' ? ' selected' : ''}>Ngừng dùng</option>
+      </select>
+    </div>
+    <div class="admin-authority-meta-strip" style="margin-bottom:12px">
+      <span>${filteredRows.length} / ${rows.length} vai trò hiển thị</span>
+      <span>${deptOptions.length} phòng ban có role authoritative</span>
     </div>
     <div style="overflow-x:auto">
       <table class="admin-table">
@@ -9502,7 +9679,7 @@ function renderAdminRoles(){
           <th>${lang==='en'?'Actions':'Thao tác'}</th>
         </tr></thead>
         <tbody>
-          ${rows.map(row=>{
+          ${filteredRows.map(row=>{
             const code = String(row.role_code || '');
             const codeJs = JSON.stringify(code);
             const ui = roleRecordUi(code, row);

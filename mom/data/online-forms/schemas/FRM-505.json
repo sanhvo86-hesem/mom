@@ -7,9 +7,22 @@
   "frequency": "per_shift",
   "sop_ref": "SOP-502",
   "description": "Nhật ký ghi nhận hiệu suất sử dụng máy theo ca, bao gồm thời gian chạy, dừng, OEE và sản lượng.",
-  "roles_allowed": ["admin", "production_manager", "shift_leader", "cnc_operator", "maintenance_manager"],
+  "roles_allowed": [
+    "admin",
+    "production_manager",
+    "shift_leader",
+    "cnc_operator",
+    "maintenance_manager"
+  ],
   "fields": [
-    {"id": "log_date", "type": "date", "label": "Ngày", "label_en": "Log Date", "required": true, "default": "today"},
+    {
+      "id": "log_date",
+      "type": "date",
+      "label": "Ngày",
+      "label_en": "Log Date",
+      "required": true,
+      "default": "today"
+    },
     {
       "id": "shift",
       "type": "select",
@@ -18,29 +31,135 @@
       "required": true,
       "options_source": "registry:shift_code",
       "options": [
-        {"value": "1", "label": "Ca 1"},
-        {"value": "2", "label": "Ca 2"},
-        {"value": "3", "label": "Ca 3"}
+        {
+          "value": "1",
+          "label": "Ca 1"
+        },
+        {
+          "value": "2",
+          "label": "Ca 2"
+        },
+        {
+          "value": "3",
+          "label": "Ca 3"
+        }
       ]
     },
-    {"id": "machine_id", "type": "text", "label": "Mã máy", "label_en": "Machine ID", "required": true, "placeholder": "VD: CNC-01"},
-    {"id": "operator_id", "type": "text", "label": "Người vận hành", "label_en": "Operator", "required": true},
-    {"id": "planned_hours", "type": "number", "label": "Giờ kế hoạch", "label_en": "Planned Hours", "required": true, "min": 0, "max": 24, "step": 0.25},
-    {"id": "run_hours", "type": "number", "label": "Giờ chạy máy", "label_en": "Run Hours", "required": true, "min": 0, "max": 24, "step": 0.25},
-    {"id": "idle_hours", "type": "number", "label": "Giờ chờ/dừng chờ", "label_en": "Idle Hours", "required": true, "min": 0, "max": 24, "step": 0.25},
-    {"id": "setup_hours", "type": "number", "label": "Giờ cài đặt", "label_en": "Setup Hours", "required": true, "min": 0, "max": 24, "step": 0.25},
-    {"id": "downtime_hours", "type": "number", "label": "Giờ dừng máy (hỏng)", "label_en": "Downtime Hours", "required": true, "min": 0, "max": 24, "step": 0.25},
-    {"id": "parts_produced", "type": "number", "label": "Số chi tiết sản xuất", "label_en": "Parts Produced", "required": true, "min": 0},
-    {"id": "parts_scrapped", "type": "number", "label": "Số chi tiết phế phẩm", "label_en": "Parts Scrapped", "required": true, "min": 0},
-    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3, "placeholder": "Nguyên nhân dừng máy, sự cố, ghi chú khác..."}
+    {
+      "id": "machine_id",
+      "type": "text",
+      "label": "Mã máy",
+      "label_en": "Machine ID",
+      "required": true,
+      "placeholder": "VD: CNC-01"
+    },
+    {
+      "id": "operator_id",
+      "type": "text",
+      "label": "Người vận hành",
+      "label_en": "Operator",
+      "required": true
+    },
+    {
+      "id": "planned_hours",
+      "type": "number",
+      "label": "Giờ kế hoạch",
+      "label_en": "Planned Hours",
+      "required": true,
+      "min": 0,
+      "max": 24,
+      "step": 0.25
+    },
+    {
+      "id": "run_hours",
+      "type": "number",
+      "label": "Giờ chạy máy",
+      "label_en": "Run Hours",
+      "required": true,
+      "min": 0,
+      "max": 24,
+      "step": 0.25
+    },
+    {
+      "id": "idle_hours",
+      "type": "number",
+      "label": "Giờ chờ/dừng chờ",
+      "label_en": "Idle Hours",
+      "required": true,
+      "min": 0,
+      "max": 24,
+      "step": 0.25
+    },
+    {
+      "id": "setup_hours",
+      "type": "number",
+      "label": "Giờ cài đặt",
+      "label_en": "Setup Hours",
+      "required": true,
+      "min": 0,
+      "max": 24,
+      "step": 0.25
+    },
+    {
+      "id": "downtime_hours",
+      "type": "number",
+      "label": "Giờ dừng máy (hỏng)",
+      "label_en": "Downtime Hours",
+      "required": true,
+      "min": 0,
+      "max": 24,
+      "step": 0.25
+    },
+    {
+      "id": "parts_produced",
+      "type": "number",
+      "label": "Số chi tiết sản xuất",
+      "label_en": "Parts Produced",
+      "required": true,
+      "min": 0
+    },
+    {
+      "id": "parts_scrapped",
+      "type": "number",
+      "label": "Số chi tiết phế phẩm",
+      "label_en": "Parts Scrapped",
+      "required": true,
+      "min": 0
+    },
+    {
+      "id": "notes",
+      "type": "textarea",
+      "label": "Ghi chú",
+      "label_en": "Notes",
+      "rows": 3,
+      "placeholder": "Nguyên nhân dừng máy, sự cố, ghi chú khác..."
+    }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
   "computed_fields": [
-    {"id": "utilization_pct", "formula": "round((run_hours / planned_hours) * 100, 1)", "label": "Tỷ lệ sử dụng máy (%)"},
-    {"id": "oee_pct", "formula": "round((run_hours / planned_hours) * ((parts_produced - parts_scrapped) / parts_produced) * 100, 1)", "label": "OEE (%)"}
+    {
+      "id": "utilization_pct",
+      "formula": "round((run_hours / planned_hours) * 100, 1)",
+      "label": "Tỷ lệ sử dụng máy (%)"
+    },
+    {
+      "id": "oee_pct",
+      "formula": "round((run_hours / planned_hours) * ((parts_produced - parts_scrapped) / parts_produced) * 100, 1)",
+      "label": "OEE (%)"
+    }
   ],
   "notifications": {
-    "on_submit": ["production_manager"],
-    "on_low_utilization": ["production_manager", "maintenance_manager"]
-  }
+    "on_submit": [
+      "production_manager"
+    ],
+    "on_low_utilization": [
+      "production_manager",
+      "maintenance_manager"
+    ]
+  },
+  "record_type": "DOWNTIME"
 }

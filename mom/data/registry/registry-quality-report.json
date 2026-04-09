@@ -2,12 +2,12 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-09T13:44:54.953Z",
+    "generatedAt": "2026-04-09T14:35:24.626Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90"
+    "publication_run_id": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5"
   },
   "summary": {
     "endpoint_count": 3508,
@@ -15,7 +15,7 @@
     "relation_edge_count": 2685,
     "workflow_count": 532,
     "status_set_count": 659,
-    "validation_rule_count": 41710,
+    "validation_rule_count": 41713,
     "formula_count": 1134,
     "formula_reference_count": 1134,
     "field_context_count": 44768,
@@ -37,14 +37,14 @@
     "hard_delete_tables": 112,
     "workflow_lifecycle_modes": {
       "stateless": 380,
-      "generic_status_only": 121,
-      "guarded_transition_runtime": 28,
+      "generic_status_only": 118,
+      "guarded_transition_runtime": 31,
       "persisted": 123,
       "unknown": 0
     },
-    "frontend_foundation_entities": 652,
-    "frontend_ready_entities": 646,
-    "frontend_partial_entities": 6,
+    "frontend_foundation_entities": 663,
+    "frontend_ready_entities": 663,
+    "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_publishable_entities": 652,
     "frontend_unpublishable_entities": 0,
@@ -60,17 +60,14 @@
     "review_required": false,
     "failed_checks": [],
     "blocking_counts": {
-      "frontend_partial_entities": 6,
+      "frontend_partial_entities": 0,
       "frontend_blocked_entities": 0,
       "frontend_unpublishable_entities": 0,
       "workflow_engine_bridge_blocked": 0,
       "unsupported_record_endpoints": 0,
       "contract_issues": 0
     },
-    "recommended_next_actions": [
-      "Raise partial console experiences into production-grade operator/planning workflows.",
-      "Close metadata-only and field-pack gaps so partial entities can move into the ready tier."
-    ]
+    "recommended_next_actions": []
   },
   "checks": [
     {
@@ -184,7 +181,7 @@
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 41710,
+      "actual": 41713,
       "target": 5000
     },
     {

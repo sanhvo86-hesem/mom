@@ -504,6 +504,7 @@ class AuthUserShadowSyncService
     private function resolveUserLinkage(array $user): array
     {
         $deptCode = $this->validDeptCode((string)($user['dept'] ?? ''));
+        $roleCode = trim((string)($user['role'] ?? ''));
         $requestedOrgUnitId = $this->validOrgUnitId((string)($user['hcm_org_unit_id'] ?? ''));
         $requestedPosition = $this->positionRecordForId((string)($user['hcm_position_id'] ?? ''));
         $orgUnitId = $requestedOrgUnitId;
@@ -528,6 +529,14 @@ class AuthUserShadowSyncService
             $positionId = $this->positionIdForAssignment($orgUnitId, $positionTitle);
             if ($positionId !== null) {
                 $requestedPosition = $this->positionRecordForId($positionId);
+            }
+        }
+
+        if ($positionId === null && $roleCode !== '') {
+            $requestedPosition = $this->positionRecordForRoleCode($orgUnitId, $roleCode);
+            if (is_array($requestedPosition)) {
+                $positionId = (string)($requestedPosition['hcm_position_id'] ?? '') ?: null;
+                $positionTitle = trim((string)($requestedPosition['position_title'] ?? $positionTitle));
             }
         }
 
@@ -645,6 +654,16 @@ class AuthUserShadowSyncService
             return (string)$row['hcm_position_id'];
         }
 
+        $normalizedTitle = $this->normalizeComparableTitle($title);
+        if ($normalizedTitle !== '') {
+            $records = $this->positionCandidatesForMatching($orgUnitId);
+            foreach ($records as $record) {
+                if ($this->normalizeComparableTitle((string)($record['position_title'] ?? '')) === $normalizedTitle) {
+                    return (string)($record['hcm_position_id'] ?? '') ?: null;
+                }
+            }
+        }
+
         if ($orgUnitId !== null && $orgUnitId !== '') {
             $row = $this->db->queryOne(
                 'SELECT hcm_position_id
@@ -658,6 +677,69 @@ class AuthUserShadowSyncService
         }
 
         return null;
+    }
+
+    private function positionRecordForRoleCode(?string $orgUnitId, string $roleCode): ?array
+    {
+        $roleCode = trim($roleCode);
+        if ($roleCode === '') {
+            return null;
+        }
+
+        $role = $this->db->queryOne(
+            'SELECT role_label, role_label_vi
+               FROM roles
+              WHERE role_code = :role_code
+              LIMIT 1',
+            [':role_code' => $roleCode]
+        );
+        if (!is_array($role)) {
+            return null;
+        }
+
+        $candidates = array_values(array_unique(array_filter([
+            trim((string)($role['role_label'] ?? '')),
+            trim((string)($role['role_label_vi'] ?? '')),
+        ])));
+        foreach ($candidates as $candidate) {
+            $positionId = $this->positionIdForAssignment($orgUnitId, $candidate);
+            if ($positionId !== null) {
+                return $this->positionRecordForId($positionId);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function positionCandidatesForMatching(?string $orgUnitId): array
+    {
+        $params = [];
+        $sql = 'SELECT hcm_position_id, position_title
+                  FROM hcm_positions';
+        if ($orgUnitId !== null && $orgUnitId !== '') {
+            $sql .= ' WHERE hcm_org_unit_id = :org_unit_id';
+            $params[':org_unit_id'] = $orgUnitId;
+        }
+        $sql .= ' ORDER BY CASE WHEN status = \'active\' THEN 0 ELSE 1 END, updated_at DESC';
+
+        $rows = $this->db->query($sql, $params);
+        return is_array($rows) ? $rows : [];
+    }
+
+    private function normalizeComparableTitle(string $title): string
+    {
+        $title = mb_strtolower(trim($title), 'UTF-8');
+        if ($title === '') {
+            return '';
+        }
+
+        $title = str_replace(['&', '/', '_', '-'], [' and ', ' ', ' ', ' '], $title);
+        $title = preg_replace('/[^[:alnum:]\s]+/u', ' ', $title) ?: $title;
+        $title = preg_replace('/\s+/u', ' ', $title) ?: $title;
+        return trim($title);
     }
 
     private function employeeIdForUsername(string $username): ?string

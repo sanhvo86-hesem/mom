@@ -109,6 +109,11 @@ def main() -> int:
     resources = canonical_resources(canonical_catalog)
     actual_resource_count = len(resources)
     meta_resource_count = int(((canonical_catalog.get("_meta") or {}).get("resourceCount")) or 0)
+    planned_resource_keys = {
+        str(row.get("resource_key") or "")
+        for row in (wave0_report.get("violations") or {}).get("planned_canonical_resources_not_yet_in_registry", [])
+        if isinstance(row, dict) and row.get("resource_key")
+    }
 
     catalog_alignment_rows: list[dict] = []
     for resource_key, expected in (normalization.get("catalog_alignment_targets") or {}).items():
@@ -191,7 +196,9 @@ def main() -> int:
         matched_entities = entity_name_to_keys.get(table_name, [])
         matched_legacy = [table for table in legacy_tables if entity_name_to_keys.get(table)]
 
-        if resource_key in service_backed_resource_keys:
+        if resource_key in planned_resource_keys and resource_key not in service_backed_resource_keys:
+            mode = "planned_canonical_resource"
+        elif resource_key in service_backed_resource_keys:
             mode = "service_backed_slice" if service_pass_by_key.get(resource_key) else "service_backed_gap"
         elif matched_entities:
             mode = "direct_table_match"
@@ -226,6 +233,7 @@ def main() -> int:
         "catalog_alignment_failures": sum(1 for row in catalog_alignment_rows if not row["passed"]),
         "service_backed_resources": len(service_rows),
         "service_backed_resource_gaps": sum(1 for row in service_rows if not row["passed"]),
+        "planned_canonical_resources_not_yet_in_registry": sum(1 for row in resolution_rows if row["resolution_mode"] == "planned_canonical_resource"),
         "archive_isolation_targets": len(archive_rows),
         "archive_isolation_targets_failed": sum(1 for row in archive_rows if not row["in_archive_isolation"]),
         "direct_table_matches": direct_matches,

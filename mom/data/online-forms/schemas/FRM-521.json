@@ -19,8 +19,15 @@
     "shift_leader"
   ],
   "record_context": {
-    "required": ["machine_id", "work_center_id"],
-    "autofill_priority": ["machine_id", "work_center_id", "wo_number"]
+    "required": [
+      "machine_id",
+      "work_center_id"
+    ],
+    "autofill_priority": [
+      "machine_id",
+      "work_center_id",
+      "wo_number"
+    ]
   },
   "offline_package": {
     "enabled": false,
@@ -33,7 +40,15 @@
       "title_vi": "Ngữ cảnh thiết bị",
       "description": "Select the governed machine, work center, maintenance type, and related work order if any.",
       "description_vi": "Chọn máy, work center, loại bảo trì và work order liên quan nếu có.",
-      "field_ids": ["pm_date", "maintenance_type", "work_center_id", "machine_id", "wo_number", "related_tool_id", "assigned_to"]
+      "field_ids": [
+        "pm_date",
+        "maintenance_type",
+        "work_center_id",
+        "machine_id",
+        "wo_number",
+        "related_tool_id",
+        "assigned_to"
+      ]
     },
     {
       "id": "execution",
@@ -41,7 +56,13 @@
       "title_vi": "Phạm vi thực hiện",
       "description": "Capture the main tasks completed, the operating hours, and any replaced parts or findings.",
       "description_vi": "Ghi nhận các hạng mục chính đã thực hiện, giờ vận hành, linh kiện thay và các phát hiện chính.",
-      "field_ids": ["operating_hours", "maintenance_scope", "parts_replaced", "findings", "corrective_action"]
+      "field_ids": [
+        "operating_hours",
+        "maintenance_scope",
+        "parts_replaced",
+        "findings",
+        "corrective_action"
+      ]
     },
     {
       "id": "result",
@@ -49,7 +70,12 @@
       "title_vi": "Kết quả và bước tiếp theo",
       "description": "Assess the machine condition, follow-up need, and the next PM date.",
       "description_vi": "Đánh giá tình trạng máy, nhu cầu follow-up và ngày PM tiếp theo.",
-      "field_ids": ["overall_condition", "requires_follow_up", "next_pm_date", "notes"]
+      "field_ids": [
+        "overall_condition",
+        "requires_follow_up",
+        "next_pm_date",
+        "notes"
+      ]
     }
   ],
   "fields": [
@@ -71,9 +97,21 @@
       "width": "third",
       "options_source": "registry:maintenance_type",
       "options": [
-        { "value": "preventive", "label": "Preventive", "label_vi": "Phòng ngừa" },
-        { "value": "corrective", "label": "Corrective", "label_vi": "Khắc phục" },
-        { "value": "inspection", "label": "Inspection", "label_vi": "Kiểm tra" }
+        {
+          "value": "preventive",
+          "label": "Preventive",
+          "label_vi": "Phòng ngừa"
+        },
+        {
+          "value": "corrective",
+          "label": "Corrective",
+          "label_vi": "Khắc phục"
+        },
+        {
+          "value": "inspection",
+          "label": "Inspection",
+          "label_vi": "Kiểm tra"
+        }
       ]
     },
     {
@@ -85,7 +123,10 @@
       "width": "third",
       "lookup_source": "work_centers",
       "strict_select": true,
-      "display_fields": ["work_center_id", "work_center_name"],
+      "display_fields": [
+        "work_center_id",
+        "work_center_name"
+      ],
       "placeholder": "Search work center",
       "placeholder_vi": "Tìm work center"
     },
@@ -98,8 +139,14 @@
       "width": "third",
       "lookup_source": "machines",
       "strict_select": true,
-      "depends_on": ["work_center_id"],
-      "display_fields": ["machine_id", "machine_name", "machine_type"],
+      "depends_on": [
+        "work_center_id"
+      ],
+      "display_fields": [
+        "machine_id",
+        "machine_name",
+        "machine_type"
+      ],
       "autofill_map": {
         "work_center_id": "work_center_id"
       },
@@ -115,8 +162,15 @@
       "width": "third",
       "lookup_source": "work_orders",
       "strict_select": true,
-      "depends_on": ["machine_id"],
-      "display_fields": ["wo_number", "operation_desc", "part_number", "part_revision"],
+      "depends_on": [
+        "machine_id"
+      ],
+      "display_fields": [
+        "wo_number",
+        "operation_desc",
+        "part_number",
+        "part_revision"
+      ],
       "autofill_map": {
         "customer_id": "customer_id",
         "so_number": "so_number",
@@ -139,8 +193,15 @@
       "width": "third",
       "lookup_source": "tooling_assets",
       "strict_select": true,
-      "depends_on": ["machine_id", "work_center_id"],
-      "display_fields": ["tool_id", "tool_name", "tool_type"],
+      "depends_on": [
+        "machine_id",
+        "work_center_id"
+      ],
+      "display_fields": [
+        "tool_id",
+        "tool_name",
+        "tool_type"
+      ],
       "placeholder": "Search related tooling",
       "placeholder_vi": "Tìm tooling liên quan"
     },
@@ -153,7 +214,11 @@
       "width": "third",
       "lookup_source": "operators",
       "strict_select": true,
-      "display_fields": ["operator_id", "operator_name", "role"],
+      "display_fields": [
+        "operator_id",
+        "operator_name",
+        "role"
+      ],
       "placeholder": "Search technician",
       "placeholder_vi": "Tìm kỹ thuật viên"
     },
@@ -174,14 +239,46 @@
       "required": true,
       "options_source": "registry:maintenance_scope",
       "options": [
-        { "value": "lubrication", "label": "Lubrication", "label_vi": "Bôi trơn" },
-        { "value": "coolant_system", "label": "Coolant system", "label_vi": "Hệ thống coolant" },
-        { "value": "air_system", "label": "Air / pneumatic", "label_vi": "Khí nén / pneumatic" },
-        { "value": "chip_removal", "label": "Chip removal & guards", "label_vi": "Thoát phoi & che chắn" },
-        { "value": "tool_changer", "label": "Tool changer", "label_vi": "Ổ dao / tool changer" },
-        { "value": "spindle_check", "label": "Spindle check", "label_vi": "Kiểm tra spindle" },
-        { "value": "probe_fixture", "label": "Probe / fixture", "label_vi": "Probe / fixture" },
-        { "value": "electrical_panel", "label": "Electrical cabinet", "label_vi": "Tủ điện" }
+        {
+          "value": "lubrication",
+          "label": "Lubrication",
+          "label_vi": "Bôi trơn"
+        },
+        {
+          "value": "coolant_system",
+          "label": "Coolant system",
+          "label_vi": "Hệ thống coolant"
+        },
+        {
+          "value": "air_system",
+          "label": "Air / pneumatic",
+          "label_vi": "Khí nén / pneumatic"
+        },
+        {
+          "value": "chip_removal",
+          "label": "Chip removal & guards",
+          "label_vi": "Thoát phoi & che chắn"
+        },
+        {
+          "value": "tool_changer",
+          "label": "Tool changer",
+          "label_vi": "Ổ dao / tool changer"
+        },
+        {
+          "value": "spindle_check",
+          "label": "Spindle check",
+          "label_vi": "Kiểm tra spindle"
+        },
+        {
+          "value": "probe_fixture",
+          "label": "Probe / fixture",
+          "label_vi": "Probe / fixture"
+        },
+        {
+          "value": "electrical_panel",
+          "label": "Electrical cabinet",
+          "label_vi": "Tủ điện"
+        }
       ]
     },
     {
@@ -226,10 +323,26 @@
       "width": "third",
       "options_source": "registry:overall_condition",
       "options": [
-        { "value": "good", "label": "Good", "label_vi": "Tốt" },
-        { "value": "acceptable", "label": "Acceptable", "label_vi": "Chấp nhận được" },
-        { "value": "needs_repair", "label": "Needs Repair", "label_vi": "Cần sửa chữa" },
-        { "value": "critical", "label": "Critical", "label_vi": "Nghiêm trọng" }
+        {
+          "value": "good",
+          "label": "Good",
+          "label_vi": "Tốt"
+        },
+        {
+          "value": "acceptable",
+          "label": "Acceptable",
+          "label_vi": "Chấp nhận được"
+        },
+        {
+          "value": "needs_repair",
+          "label": "Needs Repair",
+          "label_vi": "Cần sửa chữa"
+        },
+        {
+          "value": "critical",
+          "label": "Critical",
+          "label_vi": "Nghiêm trọng"
+        }
       ]
     },
     {
@@ -304,5 +417,10 @@
       "labelEn": "Maintenance supervisor"
     }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"]
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
+  "record_type": "DOWNTIME"
 }

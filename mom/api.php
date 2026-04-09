@@ -159,6 +159,9 @@ set_exception_handler(function (Throwable $e) {
 });
 
 set_error_handler(function (int $severity, string $message, string $file, int $line) {
+  if (!(error_reporting() & $severity)) {
+    return false;
+  }
   throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
@@ -201,6 +204,11 @@ function ensure_dir(string $dir): void {
   }
   // Try to ensure directory is writable (shared hosting / CGI setups)
   if (is_dir($dir) && !is_writable($dir)) {
+    $ownerId = @fileowner($dir);
+    $effectiveUserId = function_exists('posix_geteuid') ? @posix_geteuid() : false;
+    if ($ownerId !== false && $effectiveUserId !== false && (int)$ownerId !== (int)$effectiveUserId) {
+      return;
+    }
     try { @chmod($dir, 0775); } catch (\Throwable $e) {}
   }
 }
@@ -1088,7 +1096,10 @@ function portal_system_db_connection() {
   }
 
   $config = (array)(require $configFile);
-  if (empty($config['use_postgres'])) {
+  $host = trim((string)($config['host'] ?? ''));
+  $database = trim((string)($config['database'] ?? ''));
+  $username = trim((string)($config['username'] ?? ''));
+  if ($host === '' || $database === '' || $username === '') {
     return null;
   }
 
@@ -1161,6 +1172,176 @@ function portal_system_config_shadow_write(string $key, array $value): void {
     );
   } catch (Throwable $e) {
     @error_log('[API] config shadow write failed for ' . $key . ': ' . $e->getMessage());
+  }
+}
+
+function portal_system_normalize_uuid(?string $value): ?string {
+  $candidate = trim((string)$value);
+  if ($candidate === '') {
+    return null;
+  }
+  return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $candidate)
+    ? strtolower($candidate)
+    : null;
+}
+
+function portal_system_normalize_ip(?string $value): ?string {
+  $candidate = trim((string)$value);
+  if ($candidate === '') {
+    return null;
+  }
+  return filter_var($candidate, FILTER_VALIDATE_IP) ? $candidate : null;
+}
+
+function portal_system_audit_shadow_write(array $entry): void {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return;
+  }
+
+  $eventType = trim((string)($entry['event_type'] ?? ''));
+  if ($eventType === '') {
+    return;
+  }
+
+  $aggregateType = trim((string)($entry['aggregate_type'] ?? 'api_action'));
+  $aggregateId = trim((string)($entry['aggregate_id'] ?? ''));
+  $actorName = trim((string)($entry['actor_name'] ?? ''));
+  $actorId = trim((string)($entry['actor_id'] ?? ''));
+  $payload = is_array($entry['payload'] ?? null) ? (array)$entry['payload'] : [];
+  $metadata = is_array($entry['metadata'] ?? null) ? (array)$entry['metadata'] : [];
+  $recordedAt = trim((string)($entry['recorded_at'] ?? ''));
+  $recordedAt = $recordedAt !== '' ? $recordedAt : gmdate('c');
+  $ipAddress = portal_system_normalize_ip((string)($entry['ip_address'] ?? ''));
+  $sessionId = portal_system_normalize_uuid((string)($entry['session_id'] ?? ''));
+  $eventHash = sha1(json_encode([
+    'event_type' => $eventType,
+    'aggregate_type' => $aggregateType,
+    'aggregate_id' => $aggregateId,
+    'actor_id' => $actorId,
+    'actor_name' => $actorName,
+    'recorded_at' => $recordedAt,
+    'payload' => $payload,
+    'metadata' => $metadata,
+    'ip_address' => $ipAddress,
+  ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+  try {
+    $connection->execute(
+      'INSERT INTO audit_events (
+          event_type,
+          aggregate_type,
+          aggregate_id,
+          actor_id,
+          actor_name,
+          payload,
+          metadata,
+          ip_address,
+          session_id,
+          recorded_at,
+          source_event_hash
+       ) VALUES (
+          :event_type,
+          :aggregate_type,
+          :aggregate_id,
+          :actor_id,
+          :actor_name,
+          :payload::jsonb,
+          :metadata::jsonb,
+          :ip_address::inet,
+          :session_id::uuid,
+          :recorded_at::timestamptz,
+          :event_hash
+       )
+       ON CONFLICT (source_event_hash) DO NOTHING',
+      [
+        ':event_type' => $eventType,
+        ':aggregate_type' => $aggregateType,
+        ':aggregate_id' => $aggregateId !== '' ? $aggregateId : null,
+        ':actor_id' => $actorId !== '' ? $actorId : null,
+        ':actor_name' => $actorName !== '' ? $actorName : null,
+        ':payload' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        ':metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        ':ip_address' => $ipAddress,
+        ':session_id' => $sessionId,
+        ':recorded_at' => $recordedAt,
+        ':event_hash' => $eventHash,
+      ]
+    );
+  } catch (Throwable $e) {
+    @error_log('[API] audit shadow write failed: ' . $e->getMessage());
+  }
+}
+
+function portal_system_audit_shadow_read(array $filters = []): ?array {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return null;
+  }
+
+  $limit = max(1, min(1000, (int)($filters['limit'] ?? 200)));
+  $where = [];
+  $params = [':limit' => $limit];
+
+  $scalarFilters = [
+    'event_type' => 'event_type',
+    'aggregate_type' => 'aggregate_type',
+    'aggregate_id' => 'aggregate_id',
+    'actor_name' => 'actor_name',
+  ];
+  foreach ($scalarFilters as $key => $column) {
+    $value = trim((string)($filters[$key] ?? ''));
+    if ($value === '') {
+      continue;
+    }
+    $param = ':' . $key;
+    $where[] = $column . ' = ' . $param;
+    $params[$param] = $value;
+  }
+
+  $from = trim((string)($filters['from'] ?? ''));
+  if ($from !== '') {
+    $where[] = 'recorded_at >= :from::timestamptz';
+    $params[':from'] = $from;
+  }
+  $to = trim((string)($filters['to'] ?? ''));
+  if ($to !== '') {
+    $where[] = 'recorded_at <= :to::timestamptz';
+    $params[':to'] = $to;
+  }
+
+  $search = trim((string)($filters['search'] ?? ''));
+  if ($search !== '') {
+    $where[] = "(coalesce(actor_name,'') ILIKE :search OR coalesce(event_type,'') ILIKE :search OR coalesce(aggregate_type,'') ILIKE :search OR coalesce(aggregate_id,'') ILIKE :search OR CAST(payload AS text) ILIKE :search)";
+    $params[':search'] = '%' . $search . '%';
+  }
+
+  $sql = 'SELECT event_type, aggregate_type, aggregate_id, actor_id, actor_name, payload, metadata, ip_address::text AS ip_address, session_id::text AS session_id, recorded_at
+            FROM audit_events';
+  if ($where !== []) {
+    $sql .= ' WHERE ' . implode(' AND ', $where);
+  }
+  $sql .= ' ORDER BY recorded_at DESC LIMIT :limit';
+
+  try {
+    $rows = $connection->query($sql, $params);
+    return array_values(array_map(static function ($row): array {
+      return [
+        'event_type' => (string)($row['event_type'] ?? ''),
+        'aggregate_type' => (string)($row['aggregate_type'] ?? ''),
+        'aggregate_id' => (string)($row['aggregate_id'] ?? ''),
+        'actor_id' => (string)($row['actor_id'] ?? ''),
+        'actor_name' => (string)($row['actor_name'] ?? ''),
+        'payload' => is_array($row['payload'] ?? null) ? (array)$row['payload'] : (json_decode((string)($row['payload'] ?? '{}'), true) ?: []),
+        'metadata' => is_array($row['metadata'] ?? null) ? (array)$row['metadata'] : (json_decode((string)($row['metadata'] ?? '{}'), true) ?: []),
+        'ip_address' => (string)($row['ip_address'] ?? ''),
+        'session_id' => (string)($row['session_id'] ?? ''),
+        'recorded_at' => (string)($row['recorded_at'] ?? ''),
+      ];
+    }, is_array($rows) ? $rows : []));
+  } catch (Throwable $e) {
+    @error_log('[API] audit shadow read failed: ' . $e->getMessage());
+    return null;
   }
 }
 
@@ -5593,7 +5774,7 @@ function upsert_epicor_runtime_item(array &$rows, string $idKey, array $item): a
 }
 
 function mes_runtime_id(string $prefix): string {
-  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   return strtoupper($prefix) . '-' . $dt->format('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
 }
 
@@ -5840,7 +6021,7 @@ function order_late_days(string $plannedDate = '', string $actualDate = '', stri
   try {
     $compare = trim($actualDate) !== ''
       ? new DateTimeImmutable($actualDate)
-      : new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+      : new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   } catch (Throwable) {
     return 0;
   }
@@ -6729,7 +6910,7 @@ function mes_minutes_between(string $startAt = '', string $endAt = '', ?DateTime
   if ($startAt === '') return 0.0;
   try {
     $start = new DateTimeImmutable($startAt);
-    $end = $endAt !== '' ? new DateTimeImmutable($endAt) : ($now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon')));
+    $end = $endAt !== '' ? new DateTimeImmutable($endAt) : ($now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh')));
     $seconds = max(0, $end->getTimestamp() - $start->getTimestamp());
     return round($seconds / 60, 1);
   } catch (Throwable) {
@@ -6745,7 +6926,7 @@ function mes_timestamp_age_seconds(string $timestamp = '', ?DateTimeImmutable $n
   } catch (Throwable) {
     return null;
   }
-  $now = $now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $now = $now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   return max(0, $now->getTimestamp() - $dt->getTimestamp());
 }
 
@@ -6854,13 +7035,13 @@ function load_mes_shift_patterns(): array {
   $data = read_json_file($file);
   if (!is_array($data)) {
     return [
-      'timezone' => 'Asia/Saigon',
+      'timezone' => 'Asia/Ho_Chi_Minh',
       'shift_handover_grace_minutes' => 45,
       'stale_progress_minutes' => 90,
       'shifts' => [],
     ];
   }
-  $data['timezone'] = trim((string)($data['timezone'] ?? 'Asia/Saigon')) ?: 'Asia/Saigon';
+  $data['timezone'] = trim((string)($data['timezone'] ?? 'Asia/Ho_Chi_Minh')) ?: 'Asia/Ho_Chi_Minh';
   $data['shift_handover_grace_minutes'] = max(0, (int)($data['shift_handover_grace_minutes'] ?? 45));
   $data['stale_progress_minutes'] = max(15, (int)($data['stale_progress_minutes'] ?? 90));
   $data['shifts'] = array_values(array_filter((array)($data['shifts'] ?? []), fn($row) => is_array($row)));
@@ -6876,7 +7057,7 @@ function mes_shift_time_to_minutes(string $value): ?int {
 }
 
 function mes_resolve_current_shift(array $patterns, DateTimeImmutable $now): array {
-  $timezone = new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Saigon'));
+  $timezone = new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Ho_Chi_Minh'));
   $localNow = $now->setTimezone($timezone);
   $currentMinutes = ((int)$localNow->format('H')) * 60 + (int)$localNow->format('i');
 
@@ -9830,7 +10011,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $formLinksByOrder = mes_form_link_index($orders);
   $gateRules = load_mes_gate_rules();
   $shiftPatterns = load_mes_shift_patterns();
-  $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   $currentShift = mes_resolve_current_shift($shiftPatterns, $now);
   $connectorFeeds = mes_latest_rows_by_machine((array)($mes['connector_feeds'] ?? []), 'updated_at');
   $machineSignals = mes_latest_rows_by_machine((array)($mes['machine_signals'] ?? []), 'signal_at');
@@ -12241,7 +12422,7 @@ function normalize_master_context(array $context): array {
 }
 
 function build_issued_filename(string $formCode, string $formRevision, string $recordId, string $username, string $ext = 'xlsx'): string {
-  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   $stampDate = $dt->format('Ymd');
   $stampTime = $dt->format('Hi');
   $initials = build_user_initials($username);
@@ -12252,7 +12433,7 @@ function build_received_filename(array $allocation, int $receiptVersion, string 
   $formCode = (string)($allocation['form_code'] ?? 'FORM');
   $formRevision = (string)($allocation['form_revision'] ?? 'V0');
   $recordId = (string)($allocation['record_id'] ?? 'RECORD');
-  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   return sprintf('%s_%s_%s_%s_R%02d.%s', $formCode, $formRevision, $recordId, $dt->format('Ymd'), $receiptVersion, $ext);
 }
 
@@ -12624,7 +12805,7 @@ function extract_user_scope(array $user): array {
 
 function set_preauth_session(string $username): void {
   if (session_status() !== PHP_SESSION_ACTIVE) session_init();
-  session_regenerate_id(true);
+  session_regenerate_id_safe(true);
   clear_auth_session_state();
   $_SESSION['preauth_user'] = strtolower(trim($username));
   $_SESSION['preauth_started'] = time();
@@ -12633,7 +12814,7 @@ function set_preauth_session(string $username): void {
 
 function set_authenticated_session(string $username, array $user = []): void {
   if (session_status() !== PHP_SESSION_ACTIVE) session_init();
-  session_regenerate_id(true);
+  session_regenerate_id_safe(true);
   clear_auth_session_state();
   $_SESSION['user'] = strtolower(trim($username));
   $_SESSION['mfa_ok'] = true;
@@ -12648,7 +12829,7 @@ function set_authenticated_session(string $username, array $user = []): void {
 function destroy_auth_session(): void {
   if (session_status() !== PHP_SESSION_ACTIVE) session_init();
   clear_auth_session_state();
-  if (ini_get('session.use_cookies')) {
+  if (ini_get('session.use_cookies') && !headers_sent()) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 3600, $params['path'] ?: '/', $params['domain'] ?? '', (bool)($params['secure'] ?? false), (bool)($params['httponly'] ?? true));
   }
@@ -12703,9 +12884,9 @@ function session_dir_candidates(): array {
 
   $candidates = [
     $primary,
+    sys_get_temp_dir() . '/hesem-sessions',
     normalize_session_dir((string)session_save_path()),
     '/var/lib/php/sessions',
-    sys_get_temp_dir() . '/hesem-sessions',
     sys_get_temp_dir(),
   ];
 
@@ -12726,27 +12907,33 @@ function session_init(): void {
   $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https')
     || ((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on');
+  $headersMutable = !headers_sent();
 
-  @ini_set('session.use_only_cookies', '1');
-  @ini_set('session.use_strict_mode', '1');
-  @ini_set('session.cookie_httponly', '1');
-  @ini_set('session.cookie_samesite', 'Lax');
-  if ($https) {
-    @ini_set('session.cookie_secure', '1');
+  if ($headersMutable) {
+    @ini_set('session.use_only_cookies', '1');
+    @ini_set('session.use_strict_mode', '1');
+    @ini_set('session.cookie_httponly', '1');
+    @ini_set('session.cookie_samesite', 'Lax');
+    if ($https) {
+      @ini_set('session.cookie_secure', '1');
+    }
   }
 
   // Host-only cookie (do not set Domain attribute) to maximize compatibility on subdomains
   $domain = '';
+  $sessionName = $https ? '__Host-HESEMSESSID' : 'HESEMSESSID';
 
-  session_name($https ? '__Host-HESEMSESSID' : 'HESEMSESSID');
-  session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => $domain,
-    'secure' => $https,
-    'httponly' => true,
-    'samesite' => 'Lax',
-  ]);
+  if ($headersMutable) {
+    session_name($sessionName);
+    session_set_cookie_params([
+      'lifetime' => 0,
+      'path' => '/',
+      'domain' => $domain,
+      'secure' => $https,
+      'httponly' => true,
+      'samesite' => 'Lax',
+    ]);
+  }
 
   $lastError = null;
   foreach (session_dir_candidates() as $sessDir) {
@@ -12755,7 +12942,9 @@ function session_init(): void {
       continue;
     }
 
-    @session_save_path($sessDir);
+    if ($headersMutable) {
+      @session_save_path($sessDir);
+    }
 
     try {
       session_start();
@@ -12765,6 +12954,11 @@ function session_init(): void {
       if (session_status() === PHP_SESSION_ACTIVE) {
         @session_write_close();
       }
+      if (session_exception_allows_fresh_start($e)) {
+        if (session_start_with_fresh_id()) {
+          return;
+        }
+      }
     }
   }
 
@@ -12773,6 +12967,68 @@ function session_init(): void {
   }
 
   session_start();
+}
+
+function session_exception_allows_fresh_start(\Throwable $e): bool {
+  $message = strtolower(trim($e->getMessage()));
+  if ($message === '') return false;
+
+  return str_contains($message, 'session_start(): open(')
+    || str_contains($message, 'failed to read session data')
+    || str_contains($message, 'permission denied')
+    || str_contains($message, 'no such file or directory');
+}
+
+function session_start_with_fresh_id(): bool {
+  $cookieName = session_name();
+  if ($cookieName !== '' && isset($_COOKIE[$cookieName])) {
+    unset($_COOKIE[$cookieName]);
+  }
+
+  if (session_status() === PHP_SESSION_ACTIVE) {
+    @session_write_close();
+  }
+
+  @session_id(bin2hex(random_bytes(16)));
+
+  try {
+    session_start();
+    return true;
+  } catch (\Throwable $retryError) {
+    @error_log('[API] Session recovery failed: ' . $retryError->getMessage() . ' in ' . $retryError->getFile() . ':' . $retryError->getLine());
+    if (session_status() === PHP_SESSION_ACTIVE) {
+      @session_write_close();
+    }
+  }
+
+  return false;
+}
+
+function session_regenerate_id_safe(bool $deleteOldSession = true): void {
+  if (session_status() !== PHP_SESSION_ACTIVE) {
+    return;
+  }
+
+  try {
+    if (@session_regenerate_id($deleteOldSession)) {
+      return;
+    }
+  } catch (Throwable $e) {
+    @error_log('[API] session_regenerate_id failed: ' . $e->getMessage());
+  }
+
+  if ($deleteOldSession) {
+    try {
+      if (@session_regenerate_id(false)) {
+        @error_log('[API] session_regenerate_id fallback kept old session file');
+        return;
+      }
+    } catch (Throwable $e) {
+      @error_log('[API] session_regenerate_id fallback failed: ' . $e->getMessage());
+    }
+  }
+
+  @error_log('[API] session_regenerate_id skipped; continuing with current session id');
 }
 
 function csrf_token(): string {
@@ -19069,16 +19325,16 @@ if ($username === '') {
         $schemaRecordType = (string)($schema['record_type'] ?? '');
         if($schemaRecordType === '') {
           $schemaRecordType = match(true) {
-            $codeNum >= 100 && $codeNum < 200 => 'MGMT',
-            $codeNum >= 200 && $codeNum < 300 => 'SALE',
-            $codeNum >= 300 && $codeNum < 400 => 'ENGR',
-            $codeNum >= 400 && $codeNum < 500 => 'SCMR',
-            $codeNum >= 500 && $codeNum < 600 => 'PROD',
-            $codeNum >= 600 && $codeNum < 700 => 'QUAL',
-            $codeNum >= 700 && $codeNum < 800 => 'LOGR',
-            $codeNum >= 800 && $codeNum < 900 => 'HREC',
-            $codeNum >= 900 && $codeNum < 1000 => 'MGTR',
-            default => 'GENR',
+            $codeNum >= 100 && $codeNum < 200 => 'RISK',
+            $codeNum >= 200 && $codeNum < 300 => 'MR',
+            $codeNum >= 300 && $codeNum < 400 => 'FAI',
+            $codeNum >= 400 && $codeNum < 500 => 'SCAR',
+            $codeNum >= 500 && $codeNum < 600 => 'DOWNTIME',
+            $codeNum >= 600 && $codeNum < 700 => 'NCR',
+            $codeNum >= 700 && $codeNum < 800 => 'MR',
+            $codeNum >= 800 && $codeNum < 900 => 'TRN',
+            $codeNum >= 900 && $codeNum < 1000 => 'AUD',
+            default => 'MR',
           };
         }
         $onlineMap[$code] = [
@@ -19140,16 +19396,16 @@ if ($username === '') {
           };
           // Auto-derive record type from series so every form gets a traceable code
           $autoRecordType = match (true) {
-            $num >= 100 && $num < 200 => 'MGMT',
-            $num >= 200 && $num < 300 => 'SALE',
-            $num >= 300 && $num < 400 => 'ENGR',
-            $num >= 400 && $num < 500 => 'SCMR',
-            $num >= 500 && $num < 600 => 'PROD',
-            $num >= 600 && $num < 700 => 'QUAL',
-            $num >= 700 && $num < 800 => 'LOGR',
-            $num >= 800 && $num < 900 => 'HREC',
-            $num >= 900 && $num < 1000 => 'MGTR',
-            default => 'GENR',
+            $num >= 100 && $num < 200 => 'RISK',
+            $num >= 200 && $num < 300 => 'MR',
+            $num >= 300 && $num < 400 => 'FAI',
+            $num >= 400 && $num < 500 => 'SCAR',
+            $num >= 500 && $num < 600 => 'DOWNTIME',
+            $num >= 600 && $num < 700 => 'NCR',
+            $num >= 700 && $num < 800 => 'MR',
+            $num >= 800 && $num < 900 => 'TRN',
+            $num >= 900 && $num < 1000 => 'AUD',
+            default => 'MR',
           };
           $catalogMap[$code] = [
             'form_code' => (string)$code,
@@ -21084,7 +21340,7 @@ if ($username === '') {
     $master = load_master_data_store();
     $mes = load_mes_runtime_store();
     $patterns = load_mes_shift_patterns();
-    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Saigon')));
+    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Ho_Chi_Minh')));
     api_json([
       'ok' => true,
       'current_shift' => mes_resolve_current_shift($patterns, $now),
@@ -21106,7 +21362,7 @@ if ($username === '') {
     $master = load_master_data_store();
     $mes = load_mes_runtime_store();
     $patterns = load_mes_shift_patterns();
-    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Saigon')));
+    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Ho_Chi_Minh')));
     $currentShift = mes_resolve_current_shift($patterns, $now);
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $woNumber = trim((string)($body['wo_number'] ?? ''));

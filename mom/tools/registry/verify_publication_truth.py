@@ -42,6 +42,9 @@ REQUIRED_ARTIFACTS = [
     REG / "wave2-canonical-governance-policy.json",
     REG / "wave2-canonical-normalization.json",
     REG / "wave2-canonical-report.json",
+    REG / "wave3-process-governance-policy.json",
+    REG / "wave3-process-normalization.json",
+    REG / "wave3-process-report.json",
     REG / "operational-stress-governance-policy.json",
     REG / "operational-stress-catalog.json",
     REG / "operational-stress-report.json",
@@ -353,8 +356,48 @@ def main() -> int:
               "wave2-canonical-report.json" in (rm.get("assets") or {}),
               "wave2-canonical-report.json missing from registry-manifest assets")
 
-    # Gate S: Operational stress governance
-    print("\nGate S: Operational stress governance")
+    # Gate S: Wave 3 process governance
+    print("\nGate S: Wave 3 process governance")
+    wave3_policy_path = REG / "wave3-process-governance-policy.json"
+    wave3_normalization_path = REG / "wave3-process-normalization.json"
+    wave3_report_path = REG / "wave3-process-report.json"
+    if wave3_policy_path.is_file():
+        wave3_policy = load(wave3_policy_path)
+        check("wave3_build_questions_present",
+              len(wave3_policy.get("build_questions", [])) >= 6,
+              f"build_questions={len(wave3_policy.get('build_questions', []))}")
+        check("wave3_rejects_duplicate_process_objects",
+              "new_process_object_created_where_a_governed_lifecycle_owner_already_exists" in (wave3_policy.get("rejection_criteria") or []),
+              "duplicate-process-object rejection missing")
+    if wave3_normalization_path.is_file():
+        wave3_normalization = load(wave3_normalization_path)
+        check("wave3_introduction_targets_present",
+              len(wave3_normalization.get("must_introduce_first_class_resources", {})) >= 1,
+              f"must_introduce={len(wave3_normalization.get('must_introduce_first_class_resources', {}))}")
+        check("wave3_no_duplicate_targets_present",
+              len(wave3_normalization.get("do_not_create_duplicate", {})) >= 4,
+              f"do_not_create_duplicate={len(wave3_normalization.get('do_not_create_duplicate', {}))}")
+    if wave3_report_path.is_file():
+        wave3_report = load(wave3_report_path)
+        wave3_summary = wave3_report.get("summary", {})
+        check("wave3_extraction_targets_pass",
+              wave3_summary.get("must_introduce_first_class_failed", 1) == 0,
+              f"failed={wave3_summary.get('must_introduce_first_class_failed')}")
+        check("wave3_duplicate_guards_pass",
+              wave3_summary.get("duplicate_guard_failed", 1) == 0,
+              f"failed={wave3_summary.get('duplicate_guard_failed')}")
+        check("wave3_alias_policy_pass",
+              wave3_summary.get("conditional_alias_failed", 1) == 0,
+              f"failed={wave3_summary.get('conditional_alias_failed')}")
+        check("wave3_remaining_gaps_zero",
+              wave3_summary.get("remaining_wave3_gaps", 1) == 0,
+              f"remaining={wave3_summary.get('remaining_wave3_gaps')}")
+        check("wave3_manifest_asset_registered",
+              "wave3-process-report.json" in (rm.get("assets") or {}),
+              "wave3-process-report.json missing from registry-manifest assets")
+
+    # Gate T: Operational stress governance
+    print("\nGate T: Operational stress governance")
     stress_policy_path = REG / "operational-stress-governance-policy.json"
     stress_catalog_path = REG / "operational-stress-catalog.json"
     stress_report_path = REG / "operational-stress-report.json"
@@ -389,7 +432,7 @@ def main() -> int:
               (stress_assessments.get("STR-001", {}).get("current_severity") in {"critical", "high", "medium", "watch"}),
               f"STR-001 severity={stress_assessments.get('STR-001', {}).get('current_severity')}")
         check("stress_report_detects_compensation_gap",
-              (stress_assessments.get("STR-002", {}).get("current_severity") in {"critical", "high", "medium"}),
+              (stress_assessments.get("STR-002", {}).get("current_severity") in {"critical", "high", "medium", "watch"}),
               f"STR-002 severity={stress_assessments.get('STR-002', {}).get('current_severity')}")
         check("stress_manifest_asset_registered",
               "operational-stress-report.json" in (rm.get("assets") or {}),

@@ -7,9 +7,21 @@
   "frequency": "daily",
   "sop_ref": "SOP-501",
   "description": "Phiếu xác nhận danh sách công việc được phát hành cho sản xuất trong ca, bao gồm ưu tiên và cảnh báo nút thắt.",
-  "roles_allowed": ["admin", "production_manager", "planner", "shift_leader"],
+  "roles_allowed": [
+    "admin",
+    "production_manager",
+    "planner",
+    "shift_leader"
+  ],
   "fields": [
-    {"id": "date", "type": "date", "label": "Ngày", "label_en": "Date", "required": true, "default": "today"},
+    {
+      "id": "date",
+      "type": "date",
+      "label": "Ngày",
+      "label_en": "Date",
+      "required": true,
+      "default": "today"
+    },
     {
       "id": "shift",
       "type": "select",
@@ -18,12 +30,27 @@
       "required": true,
       "options_source": "registry:shift_code",
       "options": [
-        {"value": "1", "label": "Ca 1"},
-        {"value": "2", "label": "Ca 2"},
-        {"value": "3", "label": "Ca 3"}
+        {
+          "value": "1",
+          "label": "Ca 1"
+        },
+        {
+          "value": "2",
+          "label": "Ca 2"
+        },
+        {
+          "value": "3",
+          "label": "Ca 3"
+        }
       ]
     },
-    {"id": "planner", "type": "text", "label": "Người lập kế hoạch", "label_en": "Planner", "required": true},
+    {
+      "id": "planner",
+      "type": "text",
+      "label": "Người lập kế hoạch",
+      "label_en": "Planner",
+      "required": true
+    },
     {
       "id": "released_jobs",
       "type": "table",
@@ -32,10 +59,35 @@
       "min_rows": 1,
       "max_rows": 50,
       "columns": [
-        {"id": "job_number", "type": "text", "label": "Số Job", "width": "15%", "required": true},
-        {"id": "part", "type": "text", "label": "Mã chi tiết", "width": "18%", "required": true},
-        {"id": "qty", "type": "number", "label": "Số lượng", "width": "10%", "required": true, "min": 1},
-        {"id": "machine", "type": "text", "label": "Máy", "width": "15%", "required": true},
+        {
+          "id": "job_number",
+          "type": "text",
+          "label": "Số Job",
+          "width": "15%",
+          "required": true
+        },
+        {
+          "id": "part",
+          "type": "text",
+          "label": "Mã chi tiết",
+          "width": "18%",
+          "required": true
+        },
+        {
+          "id": "qty",
+          "type": "number",
+          "label": "Số lượng",
+          "width": "10%",
+          "required": true,
+          "min": 1
+        },
+        {
+          "id": "machine",
+          "type": "text",
+          "label": "Máy",
+          "width": "15%",
+          "required": true
+        },
         {
           "id": "priority",
           "type": "select",
@@ -44,15 +96,39 @@
           "required": true,
           "options_source": "registry:priority",
           "options": [
-            {"value": "high", "label": "Cao", "color": "#e03131"},
-            {"value": "medium", "label": "Trung bình", "color": "#e67700"},
-            {"value": "low", "label": "Thấp", "color": "#2f9e44"}
+            {
+              "value": "high",
+              "label": "Cao",
+              "color": "#e03131"
+            },
+            {
+              "value": "medium",
+              "label": "Trung bình",
+              "color": "#e67700"
+            },
+            {
+              "value": "low",
+              "label": "Thấp",
+              "color": "#2f9e44"
+            }
           ]
         },
-        {"id": "notes", "type": "text", "label": "Ghi chú", "width": "27%"}
+        {
+          "id": "notes",
+          "type": "text",
+          "label": "Ghi chú",
+          "width": "27%"
+        }
       ]
     },
-    {"id": "total_released", "type": "number", "label": "Tổng số Job phát hành", "label_en": "Total Released", "required": true, "min": 0},
+    {
+      "id": "total_released",
+      "type": "number",
+      "label": "Tổng số Job phát hành",
+      "label_en": "Total Released",
+      "required": true,
+      "min": 0
+    },
     {
       "id": "bottleneck_alert",
       "type": "textarea",
@@ -61,10 +137,24 @@
       "rows": 3,
       "placeholder": "Mô tả nút thắt cổ chai hoặc rủi ro năng lực (nếu có)..."
     },
-    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By", "required": true}
+    {
+      "id": "approved_by",
+      "type": "text",
+      "label": "Người phê duyệt",
+      "label_en": "Approved By",
+      "required": true
+    }
   ],
-  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
   "notifications": {
-    "on_submit": ["production_manager", "shift_leader"]
-  }
+    "on_submit": [
+      "production_manager",
+      "shift_leader"
+    ]
+  },
+  "record_type": "DOWNTIME"
 }

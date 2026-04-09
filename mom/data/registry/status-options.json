@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-09T13:44:52.016Z",
+    "generatedAt": "2026-04-09T14:35:20.092Z",
     "enumCount": 659
   },
   "so_status": {
@@ -12115,39 +12115,110 @@
     "standard": "ISO9001",
     "sourceTable": "improvement_projects",
     "statusColumn": "improvement_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
-        "value": "complete",
-        "label": "Hoàn chỉnh",
-        "labelEn": "Complete",
-        "color": "#10b981",
-        "icon": "fa-circle",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "partial",
-        "label": "Một phần",
-        "labelEn": "Partial",
-        "color": "#f59e0b",
-        "icon": "BarChart3",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "broken",
-        "label": "Đứt gãy",
-        "labelEn": "Broken",
-        "color": "#ef4444",
-        "icon": "fa-circle",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "pending",
-        "label": "Chờ hoàn thiện",
-        "labelEn": "Pending",
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
         "color": "#3b82f6",
-        "icon": "Clock",
+        "icon": "FileEdit",
         "allowedTransitionsFrom": []
+      },
+      {
+        "value": "submitted",
+        "label": "Đã gửi",
+        "labelEn": "Submitted",
+        "color": "#3b82f6",
+        "icon": "Send",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "under_review",
+        "label": "Đang xem xét",
+        "labelEn": "Under Review",
+        "color": "#3b82f6",
+        "icon": "Search",
+        "allowedTransitionsFrom": [
+          "submitted"
+        ]
+      },
+      {
+        "value": "approved",
+        "label": "Đã duyệt",
+        "labelEn": "Approved",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "under_review"
+        ]
+      },
+      {
+        "value": "implemented",
+        "label": "Đã triển khai",
+        "labelEn": "Implemented",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "approved",
+          "on_hold"
+        ]
+      },
+      {
+        "value": "on_hold",
+        "label": "Tạm dừng",
+        "labelEn": "On Hold",
+        "color": "#f59e0b",
+        "icon": "Clock",
+        "allowedTransitionsFrom": [
+          "submitted",
+          "under_review",
+          "approved",
+          "implemented"
+        ]
+      },
+      {
+        "value": "verified",
+        "label": "Đã xác nhận",
+        "labelEn": "Verified",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "implemented"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "verified"
+        ]
+      },
+      {
+        "value": "rejected",
+        "label": "Từ chối",
+        "labelEn": "Rejected",
+        "color": "#ef4444",
+        "icon": "Ban",
+        "allowedTransitionsFrom": [
+          "submitted",
+          "under_review"
+        ]
+      },
+      {
+        "value": "archived",
+        "label": "Lưu trữ",
+        "labelEn": "Archived",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "closed",
+          "rejected"
+        ]
       }
     ]
   },
@@ -13602,39 +13673,90 @@
     "standard": "internal",
     "sourceTable": "mes_dispatch_queue",
     "statusColumn": "queue_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
-        "value": "complete",
-        "label": "Hoàn chỉnh",
-        "labelEn": "Complete",
-        "color": "#10b981",
-        "icon": "fa-circle",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "partial",
-        "label": "Một phần",
-        "labelEn": "Partial",
-        "color": "#f59e0b",
-        "icon": "BarChart3",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "broken",
-        "label": "Đứt gãy",
-        "labelEn": "Broken",
-        "color": "#ef4444",
-        "icon": "fa-circle",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "pending",
-        "label": "Chờ hoàn thiện",
-        "labelEn": "Pending",
+        "value": "planned",
+        "label": "Đã lên kế hoạch",
+        "labelEn": "Planned",
         "color": "#3b82f6",
         "icon": "Clock",
         "allowedTransitionsFrom": []
+      },
+      {
+        "value": "released",
+        "label": "Đã phát hành",
+        "labelEn": "Released",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "planned",
+          "on_hold"
+        ]
+      },
+      {
+        "value": "in_progress",
+        "label": "Đang thực hiện",
+        "labelEn": "In Progress",
+        "color": "#3b82f6",
+        "icon": "Play",
+        "allowedTransitionsFrom": [
+          "released"
+        ]
+      },
+      {
+        "value": "on_hold",
+        "label": "Tạm giữ",
+        "labelEn": "On Hold",
+        "color": "#f59e0b",
+        "icon": "Clock",
+        "allowedTransitionsFrom": [
+          "planned",
+          "released",
+          "in_progress"
+        ]
+      },
+      {
+        "value": "completed",
+        "label": "Hoàn thành",
+        "labelEn": "Completed",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "in_progress"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "completed"
+        ]
+      },
+      {
+        "value": "cancelled",
+        "label": "Đã hủy",
+        "labelEn": "Cancelled",
+        "color": "#ef4444",
+        "icon": "Ban",
+        "allowedTransitionsFrom": [
+          "planned",
+          "released",
+          "on_hold"
+        ]
+      },
+      {
+        "value": "archived",
+        "label": "Lưu trữ",
+        "labelEn": "Archived",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "closed",
+          "cancelled"
+        ]
       }
     ]
   },
@@ -18506,39 +18628,103 @@
     "standard": "internal",
     "sourceTable": "production_schedule",
     "statusColumn": "schedule_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
-        "value": "complete",
-        "label": "Hoàn chỉnh",
-        "labelEn": "Complete",
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#3b82f6",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "under_review",
+        "label": "Đang xem xét",
+        "labelEn": "Under Review",
+        "color": "#3b82f6",
+        "icon": "Search",
+        "allowedTransitionsFrom": [
+          "draft",
+          "on_hold"
+        ]
+      },
+      {
+        "value": "approved",
+        "label": "Đã duyệt",
+        "labelEn": "Approved",
         "color": "#10b981",
-        "icon": "fa-circle",
-        "allowedTransitionsFrom": []
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "under_review"
+        ]
       },
       {
-        "value": "partial",
-        "label": "Một phần",
-        "labelEn": "Partial",
-        "color": "#f59e0b",
-        "icon": "BarChart3",
-        "allowedTransitionsFrom": []
+        "value": "published",
+        "label": "Đã công bố",
+        "labelEn": "Published",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "approved"
+        ]
       },
       {
-        "value": "broken",
-        "label": "Đứt gãy",
-        "labelEn": "Broken",
-        "color": "#ef4444",
-        "icon": "fa-circle",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "pending",
-        "label": "Chờ hoàn thiện",
-        "labelEn": "Pending",
+        "value": "frozen",
+        "label": "Đã đóng băng",
+        "labelEn": "Frozen",
         "color": "#3b82f6",
         "icon": "Clock",
-        "allowedTransitionsFrom": []
+        "allowedTransitionsFrom": [
+          "published"
+        ]
+      },
+      {
+        "value": "on_hold",
+        "label": "Tạm dừng",
+        "labelEn": "On Hold",
+        "color": "#f59e0b",
+        "icon": "Clock",
+        "allowedTransitionsFrom": [
+          "draft",
+          "under_review",
+          "approved",
+          "published",
+          "frozen"
+        ]
+      },
+      {
+        "value": "completed",
+        "label": "Hoàn thành",
+        "labelEn": "Completed",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "published",
+          "frozen"
+        ]
+      },
+      {
+        "value": "cancelled",
+        "label": "Đã hủy",
+        "labelEn": "Cancelled",
+        "color": "#ef4444",
+        "icon": "Ban",
+        "allowedTransitionsFrom": [
+          "draft",
+          "under_review",
+          "approved"
+        ]
+      },
+      {
+        "value": "archived",
+        "label": "Lưu trữ",
+        "labelEn": "Archived",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "completed",
+          "cancelled"
+        ]
       }
     ]
   },

@@ -123,6 +123,8 @@ def main() -> int:
     endpoint_blob = json.dumps(endpoints, ensure_ascii=False)
     idempotency_mentions = endpoint_blob.lower().count("idempotency")
     optimistic_mentions = endpoint_blob.lower().count("optimistic_concurrency")
+    if_match_mentions = endpoint_blob.lower().count("if-match")
+    row_version_mentions = endpoint_blob.lower().count("row_version")
     heartbeat_mentions = endpoint_blob.lower().count("heartbeat")
     escalation_mentions = endpoint_blob.lower().count("escalat")
     canonical_blob = json.dumps(canonical, ensure_ascii=False).lower()
@@ -160,7 +162,12 @@ def main() -> int:
                 severity = "medium"
         elif sid == "OPS-002":
             evidence["optimistic_concurrency_mentions"] = optimistic_mentions
-            if optimistic_mentions > 0:
+            evidence["if_match_mentions"] = if_match_mentions
+            evidence["row_version_mentions"] = row_version_mentions
+            if optimistic_mentions > 0 and if_match_mentions > 0 and row_version_mentions > 0:
+                severity = "watch"
+                rationale.append("Optimistic concurrency, If-Match preconditions, and row-version evidence are all present broadly enough that this is no longer an active structural blind spot.")
+            elif optimistic_mentions > 0:
                 severity = "medium"
                 rationale.append("Optimistic concurrency exists, but recovery still depends on per-action error handling discipline.")
             else:

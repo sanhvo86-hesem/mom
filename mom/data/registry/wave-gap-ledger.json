@@ -1,141 +1,17 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-09T13:45:05.401Z",
-    "publication_run_id": "bf83cd79-c63f-44e0-b3cd-f2c0c1b87a90",
+    "generatedAt": "2026-04-09T14:35:29.022Z",
+    "publication_run_id": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5",
     "generator_name": "canonical_publication_orchestrator",
     "source_catalog": "data/registry/frontend-foundation-catalog.json"
   },
   "summary": {
-    "total_entities": 652,
-    "ready": 646,
-    "partial": 6,
+    "total_entities": 663,
+    "ready": 663,
+    "partial": 0,
     "blocked": 0,
-    "partial_by_reason": {
-      "metadata_only_gap": 6
-    },
-    "closure_modes": {
-      "generator_automatable": 6
-    }
+    "partial_by_reason": {},
+    "closure_modes": {}
   },
-  "entities": {
-    "mes_execution.mes_connectivity_adapters": {
-      "verdict": "partial",
-      "score": 91,
-      "profile": "operator_console",
-      "blockers": [
-        "missing_operation_context"
-      ],
-      "warnings": [
-        "missing_owner_field"
-      ],
-      "publishable": true,
-      "reasons": [
-        "Missing operation context semantic slot"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing operation context semantic slot"
-    },
-    "mes_execution.mes_connectivity_events": {
-      "verdict": "partial",
-      "score": 91,
-      "profile": "operator_console",
-      "blockers": [
-        "missing_operation_context",
-        "missing_traceability_identity"
-      ],
-      "warnings": [
-        "missing_owner_field",
-        "no_reverse_related_lists"
-      ],
-      "publishable": true,
-      "reasons": [
-        "Missing operation context semantic slot",
-        "Missing traceability identity field in table registry"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing operation context semantic slot; Missing traceability identity field in table registry"
-    },
-    "plant_maintenance.pm_equipment_master": {
-      "verdict": "partial",
-      "score": 91,
-      "profile": "operator_console",
-      "blockers": [
-        "missing_operation_context"
-      ],
-      "warnings": [
-        "missing_owner_field",
-        "no_reverse_related_lists"
-      ],
-      "publishable": true,
-      "reasons": [
-        "Missing operation context semantic slot"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing operation context semantic slot"
-    },
-    "plant_maintenance.pm_maintenance_plans": {
-      "verdict": "partial",
-      "score": 91,
-      "profile": "operator_console",
-      "blockers": [
-        "missing_operation_context"
-      ],
-      "warnings": [
-        "missing_owner_field"
-      ],
-      "publishable": true,
-      "reasons": [
-        "Missing operation context semantic slot"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing operation context semantic slot"
-    },
-    "quality_lab.qual_lab_equipment": {
-      "verdict": "partial",
-      "score": 91,
-      "profile": "operator_console",
-      "blockers": [
-        "missing_operation_context"
-      ],
-      "warnings": [
-        "missing_owner_field",
-        "no_reverse_related_lists"
-      ],
-      "publishable": true,
-      "reasons": [
-        "Missing operation context semantic slot"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing operation context semantic slot"
-    },
-    "production.shift_assignments": {
-      "verdict": "partial",
-      "score": 91,
-      "profile": "operator_console",
-      "blockers": [
-        "missing_traceability_identity"
-      ],
-      "warnings": [
-        "no_reverse_related_lists"
-      ],
-      "publishable": true,
-      "reasons": [
-        "Missing traceability identity field in table registry"
-      ],
-      "reason_bucket": "metadata_only_gap",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Missing traceability identity field in table registry"
-    }
-  }
+  "entities": {}
 }

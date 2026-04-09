@@ -436,6 +436,15 @@ final class QuoteService
         ];
 
         $createdSo = $orderService->createSalesOrder($soRecord);
+        $customerPoService = new CustomerPurchaseOrderService($this->dataDir);
+        $linkedCustomerPo = $customerPoService->synchronizeSalesOrder($createdSo, $actingUser);
+        if (is_array($linkedCustomerPo)) {
+            $createdSo = $orderService->linkCustomerPurchaseOrderToSalesOrder(
+                $soNumber,
+                (string)$linkedCustomerPo['customer_po_id'],
+                (string)$linkedCustomerPo['customer_po_number']
+            );
+        }
 
         // Transition quote to converted
         $quotes[$qIdx]['status']         = 'converted';

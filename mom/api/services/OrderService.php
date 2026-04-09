@@ -86,7 +86,8 @@ final class OrderService
             $status = strtolower((string)($so['status'] ?? ''));
             $soNumber = strtolower((string)($so['so_number'] ?? ''));
             $customerName = strtolower((string)($so['customer_name'] ?? ''));
-            $customerPo = strtolower((string)($so['customer_po'] ?? ''));
+            $customerPo = strtolower((string)($so['customer_po'] ?? $so['customer_po_number'] ?? ''));
+            $customerPoId = strtolower((string)($so['customer_po_id'] ?? ''));
             $orderDate = (string)($so['order_date'] ?? '');
 
             if (isset($filters['status']) && $filters['status'] !== '' && $status !== strtolower($filters['status'])) {
@@ -96,7 +97,10 @@ final class OrderService
             $search = trim((string)($filters['search'] ?? $filters['customer'] ?? ''));
             if ($search !== '') {
                 $needle = strtolower($search);
-                if (strpos($soNumber, $needle) === false && strpos($customerName, $needle) === false && strpos($customerPo, $needle) === false) {
+                if (strpos($soNumber, $needle) === false
+                    && strpos($customerName, $needle) === false
+                    && strpos($customerPo, $needle) === false
+                    && strpos($customerPoId, $needle) === false) {
                     continue;
                 }
             }
@@ -472,6 +476,40 @@ final class OrderService
         $store['sales_orders'][] = $so;
         $this->writeStore($store);
         return $so;
+    }
+
+    /**
+     * Attach a canonical customer purchase order reference to an existing SO.
+     *
+     * @return array<string, mixed>
+     */
+    public function linkCustomerPurchaseOrderToSalesOrder(string $soNumber, string $customerPoId, string $customerPoNumber): array
+    {
+        $soNumber = trim($soNumber);
+        $customerPoId = trim($customerPoId);
+        $customerPoNumber = trim($customerPoNumber);
+        if ($soNumber === '' || $customerPoId === '') {
+            throw new RuntimeException('Sales Order and Customer PO identity are required for linkage.');
+        }
+
+        $store = $this->readStore();
+        foreach ((array)($store['sales_orders'] ?? []) as $index => $row) {
+            if (!is_array($row) || (string)($row['so_number'] ?? '') !== $soNumber) {
+                continue;
+            }
+
+            $row['customer_po_id'] = $customerPoId;
+            if ($customerPoNumber !== '') {
+                $row['customer_po_number'] = $customerPoNumber;
+                $row['customer_po'] = $customerPoNumber;
+            }
+            $row['updated_at'] = date('c');
+            $store['sales_orders'][$index] = $row;
+            $this->writeStore($store);
+            return $row;
+        }
+
+        throw new RuntimeException("Sales Order {$soNumber} not found.");
     }
 
     /**

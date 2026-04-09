@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+require_once __DIR__ . '/CircuitBreaker.php';
+
 use RuntimeException;
 
 /**
