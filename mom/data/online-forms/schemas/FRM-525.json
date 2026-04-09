@@ -18,6 +18,7 @@
       "label": "Loại thiết bị",
       "label_en": "Gage Type",
       "required": true,
+      "options_source": "registry:gage_type",
       "options": [
         {"value": "caliper", "label": "Thước cặp (Caliper)"},
         {"value": "micrometer", "label": "Panme (Micrometer)"},
@@ -45,6 +46,7 @@
       "label": "Trạng thái",
       "label_en": "Status",
       "required": true,
+      "options_source": "registry:gage_status",
       "options": [
         {"value": "active", "label": "Đang sử dụng (Active)", "color": "#2f9e44"},
         {"value": "due_calibration", "label": "Sắp đến hạn hiệu chuẩn", "color": "#e67700"},

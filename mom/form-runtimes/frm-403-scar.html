@@ -123,12 +123,8 @@
               </div>
               <div class="qf-field">
                 <label class="qf-label" for="scar_status">SCAR Status <span class="qf-required">*</span><span class="qf-label-vi">Trạng thái SCAR</span></label>
-                <select class="qf-select" id="scar_status" name="scar_status" required>
-                  <option value="open">Mở</option>
-                  <option value="awaiting_response">Chờ phản hồi nhà cung cấp</option>
-                  <option value="under_review">Đang xem xét</option>
-                  <option value="verification">Đang xác nhận</option>
-                  <option value="closed">Đã đóng</option>
+                <select class="qf-select" id="scar_status" name="scar_status" required data-registry="scar_status">
+                  <!-- Options populated from registry:scar_status -->
                 </select>
                 <span class="qf-dv" id="scar_status__dv"></span>
                 <div class="qf-error-msg scar-hidden" data-error-for="scar_status"></div>
@@ -220,24 +216,17 @@
               <div class="qf-field">
                 <label class="qf-label" for="defect_type">Defect Type <span class="qf-required">*</span><span class="qf-label-vi">Loại lỗi</span></label>
                 <input class="qf-input" id="defect_type" list="defectTypeList" name="defect_type" required placeholder="Ví dụ: Dimensional, Surface, Packaging"/>
-                <datalist id="defectTypeList">
-                  <option value="Dimensional"></option>
-                  <option value="Surface"></option>
-                  <option value="Packaging"></option>
-                  <option value="Documentation"></option>
-                  <option value="Material"></option>
-                  <option value="Traceability"></option>
+                <datalist id="defectTypeList" data-registry="defect_type">
+                  <!-- Options populated from registry:defect_type -->
                 </datalist>
                 <span class="qf-dv" id="defect_type__dv"></span>
                 <div class="qf-error-msg scar-hidden" data-error-for="defect_type"></div>
               </div>
               <div class="qf-field">
                 <label class="qf-label" for="severity">Severity <span class="qf-required">*</span><span class="qf-label-vi">Mức độ nghiêm trọng</span></label>
-                <select class="qf-select" id="severity" name="severity" required>
+                <select class="qf-select" id="severity" name="severity" required data-registry="severity">
                   <option value="">Chọn mức độ</option>
-                  <option value="minor">Nhẹ</option>
-                  <option value="major">Nặng</option>
-                  <option value="critical">Nghiêm trọng</option>
+                  <!-- Options populated from registry:severity -->
                 </select>
                 <span class="qf-dv" id="severity__dv"></span>
                 <div class="qf-error-msg scar-hidden" data-error-for="severity"></div>
@@ -372,5 +361,32 @@
 </div>
 
 <script src="../scripts/form-runtimes/frm-403-scar.js"></script>
+<script>
+/* Populate selects and datalists from HmRegistry (single source of truth) */
+(function(){
+  function populateFromRegistry(){
+    if(!window.HmRegistry) return;
+    document.querySelectorAll('select[data-registry], datalist[data-registry]').forEach(function(el){
+      var key = el.getAttribute('data-registry');
+      if(!key) return;
+      var opts = HmRegistry.statusSet(key);
+      if(!opts || !opts.length){ console.warn('[FRM-403-SCAR] Registry key "' + key + '" trống.'); return; }
+      var isDatalist = el.tagName === 'DATALIST';
+      /* Preserve existing placeholder option */
+      var existing = el.querySelector('option[value=""]');
+      el.innerHTML = '';
+      if(existing) el.appendChild(existing);
+      opts.forEach(function(o){
+        var option = document.createElement('option');
+        option.value = o.value || '';
+        if(!isDatalist) option.textContent = o.label || o.value;
+        el.appendChild(option);
+      });
+    });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', populateFromRegistry);
+  else populateFromRegistry();
+})();
+</script>
 </body>
 </html>

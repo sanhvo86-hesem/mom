@@ -29,7 +29,7 @@
         {"id": "qty_received", "type": "text", "label": "SL nhận", "width": "8%", "required": true},
         {"id": "qty_accepted", "type": "text", "label": "SL đạt", "width": "8%"},
         {"id": "qty_rejected", "type": "text", "label": "SL loại", "width": "8%"},
-        {"id": "result", "type": "select", "label": "Kết quả", "width": "12%", "options": [
+        {"id": "result", "type": "select", "label": "Kết quả", "width": "12%", "options_source": "registry:receiving_result", "options": [
           {"value": "accept", "label": "Đạt", "color": "#2f9e44"},
           {"value": "reject", "label": "Loại bỏ", "color": "#e03131"},
           {"value": "conditional", "label": "Có ĐK", "color": "#e67700"},
@@ -43,6 +43,7 @@
       "label": "Tình trạng bao bì",
       "label_en": "Packaging Condition",
       "required": true,
+      "options_source": "registry:packaging_condition",
       "options": [
         {"value": "good", "label": "Tốt (Good)", "color": "#2f9e44"},
         {"value": "damaged", "label": "Bị hư hại (Damaged)", "color": "#e03131"},
@@ -55,6 +56,7 @@
       "label": "Chứng chỉ đi kèm",
       "label_en": "Certificates Received",
       "required": true,
+      "options_source": "registry:certs_received",
       "options": [
         {"value": "complete", "label": "Đầy đủ (Complete)", "color": "#2f9e44"},
         {"value": "partial", "label": "Thiếu (Partial)", "color": "#e67700"},
@@ -68,6 +70,7 @@
       "type": "select",
       "label": "Kiểm tra kích thước",
       "label_en": "Dimensional Check",
+      "options_source": "registry:pass_fail_na",
       "options": [
         {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
         {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"},
@@ -79,6 +82,7 @@
       "type": "select",
       "label": "Xác nhận vật liệu",
       "label_en": "Material Verification",
+      "options_source": "registry:material_verification",
       "options": [
         {"value": "verified", "label": "Đã xác nhận (Verified)", "color": "#2f9e44"},
         {"value": "not_verified", "label": "Chưa xác nhận (Not Verified)", "color": "#e67700"},
@@ -91,6 +95,7 @@
       "label": "Quyết định xử lý",
       "label_en": "Overall Disposition",
       "required": true,
+      "options_source": "registry:receiving_disposition",
       "options": [
         {"value": "accept", "label": "Chấp nhận nhập kho (Accept)", "color": "#2f9e44"},
         {"value": "reject_return", "label": "Từ chối trả NCC (Reject & Return)", "color": "#e03131"},

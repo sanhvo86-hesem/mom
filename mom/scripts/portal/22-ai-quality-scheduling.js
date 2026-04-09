@@ -389,11 +389,7 @@ function _renderPromiseTab(){
   html+='<div><label>'+_t('Thoi gian gia cong (phut)','Machining Time (min)')+'</label><input type="number" id="aq-f-machining-time" value="'+(state.promiseInput&&state.promiseInput.time||'')+'"></div>';
   html+='<div><label>'+_t('Loai may uu tien','Preferred Machine Type')+'</label><select id="aq-f-machine-type">'
     +'<option value="">'+_t('Tat ca','Any')+'</option>'
-    +'<option value="cnc_mill">CNC Mill</option>'
-    +'<option value="cnc_lathe">CNC Lathe</option>'
-    +'<option value="cnc_5axis">CNC 5-Axis</option>'
-    +'<option value="edm">EDM</option>'
-    +'<option value="grinder">Grinder</option>'
+    +(function(){ var optHtml=''; if(window.HmRegistry){ var opts=HmRegistry.statusSet('machine_type'); if(opts&&opts.length) opts.forEach(function(o){ optHtml+='<option value="'+o.value+'">'+((typeof lang!=='undefined'&&lang==='en')?(o.labelEn||o.label):o.label)+'</option>'; }); } if(!optHtml) console.warn('[AQ] Registry key "machine_type" trống — machine type dropdown sẽ bị thiếu.'); return optHtml; })()
   +'</select></div>';
   html+='</div>';
   html+='<div style="margin-top:12px"><button class="aq-btn aq-btn-primary" data-action="calculate-promise">'+_t('Tinh toan','Calculate')+'</button></div>';

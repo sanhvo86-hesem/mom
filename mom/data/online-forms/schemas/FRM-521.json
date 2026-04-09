@@ -69,6 +69,7 @@
       "label_vi": "Loại bảo trì",
       "required": true,
       "width": "third",
+      "options_source": "registry:maintenance_type",
       "options": [
         { "value": "preventive", "label": "Preventive", "label_vi": "Phòng ngừa" },
         { "value": "corrective", "label": "Corrective", "label_vi": "Khắc phục" },
@@ -171,6 +172,7 @@
       "label": "Maintenance Scope",
       "label_vi": "Hạng mục đã thực hiện",
       "required": true,
+      "options_source": "registry:maintenance_scope",
       "options": [
         { "value": "lubrication", "label": "Lubrication", "label_vi": "Bôi trơn" },
         { "value": "coolant_system", "label": "Coolant system", "label_vi": "Hệ thống coolant" },
@@ -222,6 +224,7 @@
       "label_vi": "Tình trạng tổng thể của máy",
       "required": true,
       "width": "third",
+      "options_source": "registry:overall_condition",
       "options": [
         { "value": "good", "label": "Good", "label_vi": "Tốt" },
         { "value": "acceptable", "label": "Acceptable", "label_vi": "Chấp nhận được" },

@@ -3,7 +3,7 @@
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
     "generatedAt": "2026-04-08T10:32:15.543Z",
-    "enumCount": 588
+    "enumCount": 593
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -82,6 +82,14 @@
         "color": "#94a3b8",
         "icon": "Calendar",
         "allowedTransitionsFrom": []
+      },
+      {
+        "value": "engineered",
+        "label": "Đã kỹ thuật",
+        "labelEn": "Engineered",
+        "color": "#6366f1",
+        "icon": "Cog",
+        "allowedTransitionsFrom": ["planned"]
       },
       {
         "value": "released",
@@ -472,27 +480,35 @@
     "standard": "internal",
     "options": [
       {
-        "value": "morning",
-        "label": "Ca sáng",
-        "labelEn": "Morning",
+        "value": "1",
+        "label": "Ca 1",
+        "labelEn": "Shift 1",
         "color": "#fbbf24",
-        "icon": "fa-circle",
+        "icon": "Sun",
         "allowedTransitionsFrom": []
       },
       {
-        "value": "afternoon",
-        "label": "Ca chiều",
-        "labelEn": "Afternoon",
+        "value": "2",
+        "label": "Ca 2",
+        "labelEn": "Shift 2",
         "color": "#60a5fa",
-        "icon": "fa-circle",
+        "icon": "Sunset",
         "allowedTransitionsFrom": []
       },
       {
-        "value": "night",
-        "label": "Ca đêm",
-        "labelEn": "Night",
+        "value": "3",
+        "label": "Ca 3",
+        "labelEn": "Shift 3",
         "color": "#818cf8",
-        "icon": "fa-circle",
+        "icon": "Moon",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "day",
+        "label": "Ca ngày",
+        "labelEn": "Day Shift",
+        "color": "#f97316",
+        "icon": "SunDim",
         "allowedTransitionsFrom": []
       }
     ]
@@ -27353,6 +27369,133 @@
         "color": "#64748b",
         "icon": "fa-circle"
       }
+    ]
+  },
+  "exception_type_catalog": {
+    "label": "Loại ngoại lệ chất lượng",
+    "labelEn": "Quality Exception Type",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "ncr", "label": "NCR", "labelEn": "NCR", "color": "#ef4444", "icon": "AlertTriangle" },
+      { "value": "capa", "label": "CAPA", "labelEn": "CAPA", "color": "#3b82f6", "icon": "Wrench" },
+      { "value": "complaint", "label": "Khiếu nại KH", "labelEn": "Customer Complaint", "color": "#f59e0b", "icon": "Mail" },
+      { "value": "mrb", "label": "MRB", "labelEn": "MRB", "color": "#8b5cf6", "icon": "ClipboardList" },
+      { "value": "deviation", "label": "Sai lệch", "labelEn": "Deviation", "color": "#06b6d4", "icon": "TrendingDown" },
+      { "value": "concession", "label": "Nhượng bộ", "labelEn": "Concession", "color": "#10b981", "icon": "Handshake" }
+    ]
+  },
+  "mrb_disposition": {
+    "label": "Quyết định MRB",
+    "labelEn": "MRB Disposition",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "use_as_is", "label": "Dùng nguyên trạng", "labelEn": "Use As-Is", "color": "#3b82f6", "icon": "CheckCircle2" },
+      { "value": "rework", "label": "Sửa chữa", "labelEn": "Rework", "color": "#f59e0b", "icon": "Wrench" },
+      { "value": "scrap", "label": "Hủy bỏ", "labelEn": "Scrap", "color": "#ef4444", "icon": "Trash2" },
+      { "value": "return_to", "label": "Trả về", "labelEn": "Return", "color": "#94a3b8", "icon": "CornerUpLeft" }
+    ]
+  },
+  "supplier_rating": {
+    "label": "Xếp hạng nhà cung cấp",
+    "labelEn": "Supplier Rating",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "preferred", "label": "Ưu tiên", "labelEn": "Preferred", "color": "#22c55e", "icon": "Star" },
+      { "value": "approved", "label": "Chấp nhận", "labelEn": "Approved", "color": "#3b82f6", "icon": "CheckCircle2" },
+      { "value": "conditional", "label": "Có điều kiện", "labelEn": "Conditional", "color": "#f59e0b", "icon": "AlertCircle" },
+      { "value": "probation", "label": "Thử thách", "labelEn": "Probation", "color": "#ef4444", "icon": "AlertTriangle" },
+      { "value": "suspended", "label": "Tạm ngưng", "labelEn": "Suspended", "color": "#6b7280", "icon": "Ban" }
+    ]
+  },
+  "scar_nc_type": {
+    "label": "Loại NC (SCAR)",
+    "labelEn": "NC Type (SCAR)",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "quality", "label": "Chất lượng", "labelEn": "Quality", "color": "#ef4444", "icon": "ShieldAlert" },
+      { "value": "delivery", "label": "Giao hàng", "labelEn": "Delivery", "color": "#f59e0b", "icon": "Truck" },
+      { "value": "documentation", "label": "Hồ sơ", "labelEn": "Documentation", "color": "#3b82f6", "icon": "FileText" }
+    ]
+  },
+  "supplier_audit_type": {
+    "label": "Loại đánh giá nhà cung cấp",
+    "labelEn": "Supplier Audit Type",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "process", "label": "Quy trình", "labelEn": "Process", "color": "#3b82f6", "icon": "Cog" },
+      { "value": "system", "label": "Hệ thống", "labelEn": "System", "color": "#8b5cf6", "icon": "Server" },
+      { "value": "product", "label": "Sản phẩm", "labelEn": "Product", "color": "#10b981", "icon": "Package" }
+    ]
+  },
+  "cert_doc_type": {
+    "label": "Loại tài liệu chứng nhận",
+    "labelEn": "Certificate / Document Type",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "coc", "label": "Chứng nhận hợp chuẩn", "labelEn": "Certificate of Conformance", "color": "#3b82f6", "icon": "FileCheck" },
+      { "value": "coa", "label": "Chứng nhận phân tích", "labelEn": "Certificate of Analysis", "color": "#8b5cf6", "icon": "FileSearch" },
+      { "value": "fai", "label": "Kiểm tra sản phẩm đầu tiên", "labelEn": "First Article Inspection", "color": "#10b981", "icon": "FileText" },
+      { "value": "material", "label": "Chứng nhận vật liệu", "labelEn": "Material Certificate", "color": "#f59e0b", "icon": "Layers" },
+      { "value": "test", "label": "Báo cáo kiểm tra", "labelEn": "Test Report", "color": "#06b6d4", "icon": "Beaker" }
+    ]
+  },
+  "dept_code": {
+    "label": "Phòng ban",
+    "labelEn": "Department",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "QA", "label": "Chất lượng", "labelEn": "Quality Assurance", "color": "#dc2626", "icon": "ShieldCheck" },
+      { "value": "PRO", "label": "Sản xuất", "labelEn": "Production", "color": "#059669", "icon": "Factory" },
+      { "value": "ENG", "label": "Kỹ thuật", "labelEn": "Engineering", "color": "#0369a1", "icon": "Cog" },
+      { "value": "SCM", "label": "Chuỗi cung ứng", "labelEn": "Supply Chain", "color": "#84cc16", "icon": "Truck" },
+      { "value": "HR", "label": "Nhân sự & Đào tạo", "labelEn": "HR & Training", "color": "#8b5cf6", "icon": "Users" },
+      { "value": "EXE", "label": "Ban giám đốc", "labelEn": "Executive", "color": "#7c3aed", "icon": "Crown" },
+      { "value": "SAL", "label": "Kinh doanh", "labelEn": "Sales", "color": "#f59e0b", "icon": "TrendingUp" },
+      { "value": "WH", "label": "Kho vận", "labelEn": "Warehouse / Logistics", "color": "#d97706", "icon": "Package" },
+      { "value": "IT", "label": "Công nghệ thông tin", "labelEn": "IT / Digital", "color": "#6366f1", "icon": "Monitor" },
+      { "value": "EHS", "label": "An toàn & Môi trường", "labelEn": "EHS / Safety", "color": "#ea580c", "icon": "HardHat" }
+    ]
+  },
+  "pass_fail": {
+    "label": "Kết quả kiểm tra",
+    "labelEn": "Pass / Fail",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "pass", "label": "Đạt", "labelEn": "Pass", "color": "#22c55e", "icon": "CheckCircle2" },
+      { "value": "fail", "label": "Không đạt", "labelEn": "Fail", "color": "#ef4444", "icon": "XCircle" }
+    ]
+  },
+  "pass_fail_na": {
+    "label": "Kết quả kiểm tra (có N/A)",
+    "labelEn": "Pass / Fail / N/A",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "pass", "label": "Đạt", "labelEn": "Pass", "color": "#22c55e", "icon": "CheckCircle2" },
+      { "value": "fail", "label": "Không đạt", "labelEn": "Fail", "color": "#ef4444", "icon": "XCircle" },
+      { "value": "na", "label": "Không áp dụng", "labelEn": "N/A", "color": "#94a3b8", "icon": "MinusCircle" }
+    ]
+  },
+  "root_cause_6m": {
+    "label": "Nhóm nguyên nhân gốc (6M)",
+    "labelEn": "Root Cause Category (6M / Ishikawa)",
+    "source": "portal",
+    "standard": "ISO",
+    "options": [
+      { "value": "man", "label": "Con người", "labelEn": "Man / People", "color": "#3b82f6", "icon": "User" },
+      { "value": "machine", "label": "Máy móc", "labelEn": "Machine / Equipment", "color": "#f59e0b", "icon": "Cog" },
+      { "value": "method", "label": "Phương pháp", "labelEn": "Method / Process", "color": "#8b5cf6", "icon": "ClipboardList" },
+      { "value": "material", "label": "Vật liệu", "labelEn": "Material", "color": "#10b981", "icon": "Layers" },
+      { "value": "measurement", "label": "Đo lường", "labelEn": "Measurement", "color": "#06b6d4", "icon": "Ruler" },
+      { "value": "environment", "label": "Môi trường", "labelEn": "Environment / Mother Nature", "color": "#84cc16", "icon": "CloudSun" }
     ]
   }
 }

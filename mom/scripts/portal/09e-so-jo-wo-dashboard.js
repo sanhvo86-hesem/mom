@@ -15,19 +15,23 @@ var _dragItem = null;
 var _filters = { search:'', type:'all', band:'all', phase:'all' };
 var _lastRefreshAt = '';
 
-/* STATUS — đọc từ HmRegistry → 'so_status', 'jo_status', 'wo_status' */
+/* STATUS — đọc từ HmRegistry → 'so_status', 'jo_status', 'wo_status' (single source of truth) */
 var STATUS = (function(){
   var result = { so:{}, jo:{}, wo:{} };
-  function _fill(key, regKey, fallback){
+  function _fill(key, regKey){
     if(window.HmRegistry){
       var opts = HmRegistry.statusSet(regKey);
-      opts.forEach(function(o){ result[key][o.value] = {vi:o.label, en:o.labelEn, color:o.color}; });
+      if(opts && opts.length){
+        opts.forEach(function(o){ result[key][o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color}; });
+      }
     }
-    if(!Object.keys(result[key]).length) result[key] = fallback;
+    if(!Object.keys(result[key]).length){
+      console.warn('[SO-JO-WO] Registry key "' + regKey + '" trống hoặc chưa tải — dropdown sẽ bị thiếu dữ liệu.');
+    }
   }
-  _fill('so', 'so_status', {draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'},quoted:{vi:'Đã báo giá',en:'Quoted',color:'#3b82f6'},confirmed:{vi:'Đã xác nhận',en:'Confirmed',color:'#8b5cf6'},in_production:{vi:'Đang sản xuất',en:'In Production',color:'#f59e0b'},shipped:{vi:'Đã giao hàng',en:'Shipped',color:'#10b981'},closed:{vi:'Đóng',en:'Closed',color:'#6b7280'},cancelled:{vi:'Đã hủy',en:'Cancelled',color:'#ef4444'}});
-  _fill('jo', 'jo_status', {planned:{vi:'Đã lập kế hoạch',en:'Planned',color:'#94a3b8'},released:{vi:'Đã phát hành',en:'Released',color:'#3b82f6'},active:{vi:'Đang chạy',en:'Active',color:'#f59e0b'},on_hold:{vi:'Tạm dừng',en:'On Hold',color:'#ef4444'},completed:{vi:'Hoàn thành',en:'Completed',color:'#10b981'},closed:{vi:'Đóng',en:'Closed',color:'#6b7280'}});
-  _fill('wo', 'wo_status', {scheduled:{vi:'Đã lên lịch',en:'Scheduled',color:'#94a3b8'},setup:{vi:'Đang setup',en:'Setup',color:'#3b82f6'},running:{vi:'Đang chạy',en:'Running',color:'#f59e0b'},inspection:{vi:'Đang kiểm tra',en:'Inspection',color:'#8b5cf6'},completed:{vi:'Hoàn thành',en:'Completed',color:'#10b981'},on_hold:{vi:'Tạm dừng',en:'On Hold',color:'#ef4444'}});
+  _fill('so', 'so_status');
+  _fill('jo', 'jo_status');
+  _fill('wo', 'wo_status');
   return result;
 })();
 

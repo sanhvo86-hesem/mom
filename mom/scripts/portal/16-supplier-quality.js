@@ -16,6 +16,17 @@ function _api(action, payload, method){
 }
 function _toast(msg, type){ if(typeof showToast==='function') return showToast(msg, type); var box=document.createElement('div'); box.className='sj-toast '+(type||'info'); box.textContent=msg; document.body.appendChild(box); requestAnimationFrame(function(){ box.classList.add('show'); }); setTimeout(function(){ box.classList.remove('show'); setTimeout(function(){ if(box.parentNode) box.remove(); },180); },3200); }
 function _fmtDate(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTime())?String(v):String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+function _buildRegistryOptions(regKey){
+  var html = '<option value="">— '+_t('Chọn','Select')+' —</option>';
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet(regKey);
+    if(opts && opts.length) opts.forEach(function(o){
+      html += '<option value="'+_esc(o.value)+'">'+_esc(_t(o.label, o.labelEn||o.label))+'</option>';
+    });
+  }
+  if(html.indexOf('value="') === html.lastIndexOf('value="')) console.warn('[SQ] Registry key "'+regKey+'" trống — select sẽ không có options.');
+  return html;
+}
 
 /* ── constants ────────────────────────────────────────── */
 var STYLE_ID = 'sq-styles';
@@ -28,35 +39,47 @@ var TABS = [
   { key:'audits',     vi:'Đánh giá',      en:'Audits' }
 ];
 
-var RATING = {
-  preferred:  { vi:'Ưu tiên',    en:'Preferred',  color:'#22c55e' },
-  approved:   { vi:'Đã duyệt',   en:'Approved',   color:'#3b82f6' },
-  conditional:{ vi:'Có điều kiện', en:'Conditional', color:'#f59e0b' },
-  probation:  { vi:'Thử thách',   en:'Probation',  color:'#ef4444' },
-  suspended:  { vi:'Đình chỉ',    en:'Suspended',  color:'#94a3b8' }
-};
+/* RATING — đọc từ HmRegistry → 'supplier_rating' (single source of truth) */
+var RATING = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('supplier_rating');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[SQ] Registry key "supplier_rating" trống — rating options sẽ bị thiếu.');
+  return map;
+})();
 
-/* SCAR_STATUS — đọc từ HmRegistry → 'scar_status' */
+/* SCAR_STATUS — đọc từ HmRegistry → 'scar_status' (single source of truth) */
 var SCAR_STATUS = (function(){
   var map = {};
-  if(window.HmRegistry){ HmRegistry.statusSet('scar_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
-  if(!Object.keys(map).length){ map = {issued:{vi:'Đã phát hành',en:'Issued',color:'#ef4444'},acknowledged:{vi:'Đã nhận',en:'Acknowledged',color:'#f59e0b'},root_cause:{vi:'Phân tích NC',en:'Root Cause',color:'#8b5cf6'},corrective:{vi:'Hành động KP',en:'Corrective',color:'#3b82f6'},verify:{vi:'Xác minh',en:'Verify',color:'#06b6d4'},closed:{vi:'Đóng',en:'Closed',color:'#22c55e'}}; }
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('scar_status');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[SQ] Registry key "scar_status" trống — SCAR status options sẽ bị thiếu.');
   return map;
 })();
 
-/* AUDIT_STATUS — đọc từ HmRegistry → 'supplier_audit_status' */
+/* AUDIT_STATUS — đọc từ HmRegistry → 'supplier_audit_status' (single source of truth) */
 var AUDIT_STATUS = (function(){
   var map = {};
-  if(window.HmRegistry){ HmRegistry.statusSet('supplier_audit_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
-  if(!Object.keys(map).length){ map = {planned:{vi:'Đã lên lịch',en:'Planned',color:'#94a3b8'},in_progress:{vi:'Đang thực hiện',en:'In Progress',color:'#f59e0b'},completed:{vi:'Hoàn thành',en:'Completed',color:'#22c55e'},cancelled:{vi:'Đã hủy',en:'Cancelled',color:'#6b7280'}}; }
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('supplier_audit_status');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[SQ] Registry key "supplier_audit_status" trống — audit status options sẽ bị thiếu.');
   return map;
 })();
 
-/* INSPECTION_STATUS — đọc từ HmRegistry → 'incoming_inspection_status' */
+/* INSPECTION_STATUS — đọc từ HmRegistry → 'incoming_inspection_status' (single source of truth) */
 var INSPECTION_STATUS = (function(){
   var map = {};
-  if(window.HmRegistry){ HmRegistry.statusSet('incoming_inspection_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
-  if(!Object.keys(map).length){ map = {pending:{vi:'Chờ kiểm',en:'Pending',color:'#94a3b8'},pass:{vi:'Đạt',en:'Pass',color:'#22c55e'},fail:{vi:'Không đạt',en:'Fail',color:'#ef4444'},conditional:{vi:'Có điều kiện',en:'Conditional',color:'#f59e0b'}}; }
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('incoming_inspection_status');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[SQ] Registry key "incoming_inspection_status" trống — inspection status sẽ bị thiếu.');
   return map;
 })();
 
@@ -404,7 +427,7 @@ function _showScarForm(){
   el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Tạo SCAR mới','New SCAR')+'</h4>'
     +'<div class="sq-form">'
       +'<div><label>'+_t('Nhà CC','Vendor')+'</label><input type="text" id="sq-f-scar-vendor"></div>'
-      +'<div><label>'+_t('Loại NC','NC Type')+'</label><select id="sq-f-scar-type"><option value="quality">'+_t('Chất lượng','Quality')+'</option><option value="delivery">'+_t('Giao hàng','Delivery')+'</option><option value="documentation">'+_t('Hồ sơ','Documentation')+'</option></select></div>'
+      +'<div><label>'+_t('Loại NC','NC Type')+'</label><select id="sq-f-scar-type">' + _buildRegistryOptions('scar_nc_type') + '</select></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Mô tả','Description')+'</label><textarea id="sq-f-scar-desc"></textarea></div>'
     +'</div>'
     +'<div style="margin-top:12px;display:flex;gap:8px">'
@@ -442,7 +465,7 @@ function _showAuditForm(){
   el.innerHTML='<div class="sq-card"><h4 style="margin:0 0 12px">'+_t('Tạo audit mới','New Audit')+'</h4>'
     +'<div class="sq-form">'
       +'<div><label>'+_t('Nhà CC','Vendor')+'</label><input type="text" id="sq-f-aud-vendor"></div>'
-      +'<div><label>'+_t('Loại','Type')+'</label><select id="sq-f-aud-type"><option value="process">Process</option><option value="system">System</option><option value="product">Product</option></select></div>'
+      +'<div><label>'+_t('Loại','Type')+'</label><select id="sq-f-aud-type">' + _buildRegistryOptions('supplier_audit_type') + '</select></div>'
       +'<div><label>'+_t('Ngày','Date')+'</label><input type="date" id="sq-f-aud-date"></div>'
       +'<div><label>'+_t('Người đánh giá','Auditor')+'</label><input type="text" id="sq-f-aud-auditor"></div>'
       +'<div style="grid-column:1/-1"><label>'+_t('Ghi chú','Notes')+'</label><textarea id="sq-f-aud-notes"></textarea></div>'

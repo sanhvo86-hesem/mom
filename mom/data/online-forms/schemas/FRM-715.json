@@ -70,6 +70,7 @@
       "label": "Phương pháp kiểm tra",
       "label_en": "Inspection Method",
       "required": true,
+      "options_source": "registry:inspection_method",
       "options": [
         {"value": "100_pct", "label": "Kiểm tra 100%"},
         {"value": "sampling", "label": "Lấy mẫu theo AQL"},
@@ -83,6 +84,7 @@
       "label": "Chứng chỉ vật liệu đính kèm",
       "label_en": "Material Certs Attached",
       "required": true,
+      "options_source": "registry:yes_no_na",
       "options": [
         {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
         {"value": "no", "label": "Không (No)", "color": "#e03131"},
@@ -94,6 +96,7 @@
       "type": "select",
       "label": "Chứng chỉ quá trình đặc biệt đính kèm",
       "label_en": "Special Process Certs Attached",
+      "options_source": "registry:yes_no_na",
       "options": [
         {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
         {"value": "no", "label": "Không (No)", "color": "#e03131"},
@@ -112,6 +115,7 @@
       "type": "select",
       "label": "Tuân thủ RoHS",
       "label_en": "RoHS Compliant",
+      "options_source": "registry:yes_no_na",
       "options": [
         {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
         {"value": "no", "label": "Không (No)", "color": "#e03131"},

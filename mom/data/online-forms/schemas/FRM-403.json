@@ -30,6 +30,7 @@
       "label": "Mức độ nghiêm trọng",
       "label_en": "Severity",
       "required": true,
+      "options_source": "registry:severity",
       "options": [
         {"value": "minor", "label": "Nhẹ (Minor)", "color": "#2f9e44"},
         {"value": "major", "label": "Nặng (Major)", "color": "#e67700"},
@@ -51,6 +52,7 @@
       "label_en": "SCAR Status",
       "required": true,
       "default": "open",
+      "options_source": "registry:scar_status",
       "options": [
         {"value": "open", "label": "Mở (Open)", "color": "#e03131"},
         {"value": "awaiting_response", "label": "Chờ phản hồi NCC (Awaiting Response)", "color": "#e67700"},

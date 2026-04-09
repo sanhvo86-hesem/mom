@@ -137,6 +137,7 @@
       "width": "third",
       "helper_vi": "Ph\u00e2n lo\u1ea1i h\u00ecnh th\u1ee9c \u0111\u00e0o t\u1ea1o \u0111\u1ec3 d\u00f9ng \u0111\u00fang logic theo d\u00f5i hi\u1ec7u l\u1ef1c.",
       "helper_en": "Classify the session format so effectiveness tracking stays consistent.",
+      "options_source": "registry:training_type",
       "options": [
         { "value": "classroom", "label_vi": "L\u1edbp h\u1ecdc", "label_en": "Classroom" },
         { "value": "ojt", "label_vi": "\u0110\u00e0o t\u1ea1o t\u1ea1i ch\u1ed7", "label_en": "On-the-job training" },
@@ -152,6 +153,7 @@
       "label_en": "Training trigger",
       "required": true,
       "width": "third",
+      "options_source": "registry:training_trigger",
       "options": [
         { "value": "new_hire", "label_vi": "Nh\u00e2n s\u1ef1 m\u1edbi", "label_en": "New hire" },
         { "value": "annual_refresh", "label_vi": "Nh\u1eafc l\u1ea1i \u0111\u1ecbnh k\u1ef3", "label_en": "Annual refresh" },
@@ -168,6 +170,7 @@
       "label_en": "Department scope",
       "required": true,
       "width": "third",
+      "options_source": "registry:dept_code",
       "options": [
         { "value": "PRO", "label_vi": "S\u1ea3n xu\u1ea5t", "label_en": "Production" },
         { "value": "ENG", "label_vi": "K\u1ef9 thu\u1eadt", "label_en": "Engineering" },
@@ -206,6 +209,7 @@
       "label_vi": "M\u00e3 n\u0103ng l\u1ef1c",
       "label_en": "Competency code",
       "width": "third",
+      "options_source": "registry:competency_code",
       "options": [
         { "value": "C01", "label_vi": "C01 - An to\u00e0n & 5S", "label_en": "C01 - Safety and 5S" },
         { "value": "C02", "label_vi": "C02 - K\u1ef7 lu\u1eadt quy tr\u00ecnh", "label_en": "C02 - Process discipline" },
@@ -310,6 +314,7 @@
           "type": "select",
           "label_vi": "Ki\u1ec3m tra th\u1ef1c h\u00e0nh",
           "label_en": "Practical check",
+          "options_source": "registry:practical_check",
           "options": [
             { "value": "n_a", "label_vi": "Kh\u00f4ng \u00e1p d\u1ee5ng", "label_en": "N/A" },
             { "value": "verified", "label_vi": "\u0110\u00e3 x\u00e1c minh", "label_en": "Verified" },
@@ -322,6 +327,7 @@
           "label_vi": "K\u1ebft qu\u1ea3",
           "label_en": "Result",
           "required": true,
+          "options_source": "registry:trainee_result",
           "options": [
             { "value": "pass", "label_vi": "\u0110\u1ea1t", "label_en": "Pass" },
             { "value": "conditional", "label_vi": "\u0110\u1ea1t c\u00f3 \u0111i\u1ec1u ki\u1ec7n", "label_en": "Conditional pass" },
@@ -338,6 +344,7 @@
       "label_en": "Assessment method",
       "required": true,
       "width": "third",
+      "options_source": "registry:assessment_method",
       "options": [
         { "value": "written_test", "label_vi": "B\u00e0i test vi\u1ebft", "label_en": "Written test" },
         { "value": "practical_demo", "label_vi": "Th\u1ef1c h\u00e0nh minh ch\u1ee9ng", "label_en": "Practical demonstration" },

@@ -20,6 +20,7 @@
       "label": "Phương thức vận chuyển",
       "label_en": "Shipping Method",
       "required": true,
+      "options_source": "registry:shipping_method",
       "options": [
         {"value": "courier", "label": "Chuyển phát nhanh (Courier)"},
         {"value": "freight", "label": "Vận tải hàng hoá (Freight)"},
@@ -54,7 +55,7 @@
       "max_rows": 15,
       "columns": [
         {"id": "check_item", "type": "text", "label": "Hạng mục", "width": "50%", "required": true},
-        {"id": "status", "type": "select", "label": "Trạng thái", "width": "25%", "required": true, "options": [
+        {"id": "status", "type": "select", "label": "Trạng thái", "width": "25%", "required": true, "options_source": "registry:check_status", "options": [
           {"value": "ok", "label": "Đạt (OK)", "color": "#2f9e44"},
           {"value": "ng", "label": "Không đạt (NG)", "color": "#e03131"},
           {"value": "na", "label": "N/A", "color": "#868e96"}
@@ -70,7 +71,7 @@
       "min_rows": 1,
       "max_rows": 10,
       "columns": [
-        {"id": "doc_type", "type": "select", "label": "Loại tài liệu", "width": "40%", "options": [
+        {"id": "doc_type", "type": "select", "label": "Loại tài liệu", "width": "40%", "options_source": "registry:shipping_doc_type", "options": [
           {"value": "coc", "label": "Certificate of Conformance (CoC)"},
           {"value": "inspection_report", "label": "Phiếu kiểm tra (Inspection Report)"},
           {"value": "material_cert", "label": "Chứng nhận vật liệu (Material Cert)"},
@@ -80,7 +81,7 @@
           {"value": "other", "label": "Khác (Other)"}
         ]},
         {"id": "copies", "type": "text", "label": "Số bản", "width": "15%"},
-        {"id": "included", "type": "select", "label": "Đã đính kèm", "width": "20%", "options": [
+        {"id": "included", "type": "select", "label": "Đã đính kèm", "width": "20%", "options_source": "registry:yes_no", "options": [
           {"value": "yes", "label": "Có", "color": "#2f9e44"},
           {"value": "no", "label": "Chưa", "color": "#e03131"}
         ]},

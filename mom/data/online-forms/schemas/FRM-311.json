@@ -16,6 +16,7 @@
       "label": "Loại FAI",
       "label_en": "FAI Type",
       "required": true,
+      "options_source": "registry:fai_type",
       "options": [
         {"value": "full", "label": "Toàn bộ (Full)"},
         {"value": "partial", "label": "Một phần (Partial)"},
@@ -28,6 +29,7 @@
       "label": "Lý do FAI",
       "label_en": "FAI Reason",
       "required": true,
+      "options_source": "registry:fai_reason",
       "options": [
         {"value": "new_part", "label": "Chi tiết mới (New Part)"},
         {"value": "new_process", "label": "Quy trình mới (New Process)"},
@@ -61,7 +63,7 @@
         {"id": "actual_value", "type": "text", "label": "Giá trị thực", "width": "13%", "required": true},
         {"id": "uom", "type": "text", "label": "Đơn vị", "width": "8%", "placeholder": "mm, in"},
         {"id": "tool_used", "type": "text", "label": "Dụng cụ đo", "width": "15%", "placeholder": "VD: Caliper-001"},
-        {"id": "pass_fail", "type": "select", "label": "Kết quả", "width": "10%", "options": [
+        {"id": "pass_fail", "type": "select", "label": "Kết quả", "width": "10%", "options_source": "registry:pass_fail", "options": [
           {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
           {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"}
         ]}
@@ -73,6 +75,7 @@
       "label": "Kết quả tổng thể",
       "label_en": "Overall Result",
       "required": true,
+      "options_source": "registry:overall_result",
       "options": [
         {"value": "accept", "label": "Chấp nhận (Accept)", "color": "#2f9e44"},
         {"value": "reject", "label": "Từ chối (Reject)", "color": "#e03131"},

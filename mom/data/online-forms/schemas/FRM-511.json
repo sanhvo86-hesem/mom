@@ -15,7 +15,7 @@
     {"id": "part_number", "type": "text", "label": "Mã chi tiết", "label_en": "Part Number", "required": true},
     {"id": "part_rev", "type": "text", "label": "Revision", "label_en": "Part Revision", "required": true},
     {"id": "operation_no", "type": "text", "label": "Nguyên công", "label_en": "Operation No.", "required": true, "placeholder": "VD: OP10, OP20"},
-    {"id": "shift", "type": "select", "label": "Ca", "label_en": "Shift", "required": true, "options": [
+    {"id": "shift", "type": "select", "label": "Ca", "label_en": "Shift", "required": true, "options_source": "registry:shift_code", "options": [
       {"value": "1", "label": "Ca 1"},
       {"value": "2", "label": "Ca 2"},
       {"value": "3", "label": "Ca 3"}
@@ -34,7 +34,7 @@
         {"id": "tool_description", "type": "text", "label": "Mô tả dao", "width": "30%", "required": true},
         {"id": "tool_offset", "type": "text", "label": "Offset", "width": "20%"},
         {"id": "wear_offset", "type": "text", "label": "Wear Offset", "width": "15%"},
-        {"id": "condition", "type": "select", "label": "Tình trạng", "width": "20%", "options": [
+        {"id": "condition", "type": "select", "label": "Tình trạng", "width": "20%", "options_source": "registry:wear_condition", "options": [
           {"value": "new", "label": "Mới"},
           {"value": "ok", "label": "Còn tốt"},
           {"value": "replace_soon", "label": "Sắp thay"}
@@ -62,7 +62,7 @@
         {"id": "tolerance", "type": "text", "label": "Dung sai", "width": "15%", "required": true},
         {"id": "actual", "type": "text", "label": "Giá trị đo", "width": "15%", "required": true},
         {"id": "gage_used", "type": "text", "label": "Dụng cụ đo", "width": "15%"},
-        {"id": "result", "type": "select", "label": "Kết quả", "width": "12%", "options": [
+        {"id": "result", "type": "select", "label": "Kết quả", "width": "12%", "options_source": "registry:pass_fail", "options": [
           {"value": "pass", "label": "Đạt", "color": "#2f9e44"},
           {"value": "fail", "label": "Không đạt", "color": "#e03131"}
         ]}
@@ -74,6 +74,7 @@
       "label": "Kiểm tra ngoại quan",
       "label_en": "Visual Check",
       "required": true,
+      "options_source": "registry:pass_fail",
       "options": [
         {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
         {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"}
@@ -85,6 +86,7 @@
       "label": "Kết quả tổng thể",
       "label_en": "Overall Result",
       "required": true,
+      "options_source": "registry:disposition",
       "options": [
         {"value": "approved", "label": "Chấp nhận chạy (Approved)", "color": "#2f9e44"},
         {"value": "rework", "label": "Cần điều chỉnh lại (Rework)", "color": "#e67700"},

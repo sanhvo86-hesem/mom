@@ -17,6 +17,7 @@
       "label": "Nguồn rủi ro",
       "label_en": "Risk Source",
       "required": true,
+      "options_source": "registry:risk_source",
       "options": [
         {"value": "process", "label": "Quy trình (Process)"},
         {"value": "product", "label": "Sản phẩm (Product)"},
@@ -32,6 +33,7 @@
       "label": "Phòng ban",
       "label_en": "Department",
       "required": true,
+      "options_source": "registry:dept_code",
       "options": [
         {"value": "PROD", "label": "Sản xuất"},
         {"value": "ENG", "label": "Kỹ thuật"},
@@ -54,6 +56,7 @@
       "label": "Khả năng xảy ra",
       "label_en": "Likelihood",
       "required": true,
+      "options_source": "registry:likelihood",
       "options": [
         {"value": "1", "label": "1 — Hiếm (Rare)"},
         {"value": "2", "label": "2 — Không chắc (Unlikely)"},
@@ -68,6 +71,7 @@
       "label": "Mức ảnh hưởng",
       "label_en": "Impact",
       "required": true,
+      "options_source": "registry:impact",
       "options": [
         {"value": "1", "label": "1 — Không đáng kể (Negligible)"},
         {"value": "2", "label": "2 — Nhẹ (Minor)"},
@@ -91,6 +95,7 @@
       "label_en": "Status",
       "required": true,
       "default": "identified",
+      "options_source": "registry:risk_status",
       "options": [
         {"value": "identified", "label": "Đã xác định (Identified)", "color": "#e03131"},
         {"value": "assessed", "label": "Đã đánh giá (Assessed)", "color": "#e67700"},

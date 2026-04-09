@@ -19,6 +19,7 @@
       "label": "Loại dao",
       "label_en": "Tool Type",
       "required": true,
+      "options_source": "registry:tool_type",
       "options": [
         {"value": "end_mill", "label": "Dao phay ngón (End Mill)"},
         {"value": "face_mill", "label": "Dao phay mặt (Face Mill)"},
@@ -40,6 +41,7 @@
       "label": "Tình trạng mòn",
       "label_en": "Wear Condition",
       "required": true,
+      "options_source": "registry:wear_condition",
       "options": [
         {"value": "normal", "label": "Bình thường (Normal)", "color": "#2f9e44"},
         {"value": "worn", "label": "Mòn (Worn)", "color": "#e67700"},
@@ -53,6 +55,7 @@
       "label": "Hành động",
       "label_en": "Action",
       "required": true,
+      "options_source": "registry:disposition",
       "options": [
         {"value": "replace", "label": "Thay mới (Replace)"},
         {"value": "regrind", "label": "Mài lại (Regrind)"},

@@ -24,6 +24,7 @@
       "label": "Kế hoạch lấy mẫu",
       "label_en": "Sampling Plan",
       "required": true,
+      "options_source": "registry:sampling_plan",
       "options": [
         {"value": "100_pct", "label": "100%"},
         {"value": "aql_1.0", "label": "AQL 1.0"},
@@ -46,7 +47,7 @@
         {"id": "tolerance", "type": "text", "label": "Dung sai", "width": "12%", "required": true},
         {"id": "actual", "type": "text", "label": "Giá trị đo", "width": "12%", "required": true},
         {"id": "gage_used", "type": "text", "label": "Dụng cụ đo", "width": "14%"},
-        {"id": "result", "type": "select", "label": "Kết quả", "width": "12%", "options": [
+        {"id": "result", "type": "select", "label": "Kết quả", "width": "12%", "options_source": "registry:pass_fail", "options": [
           {"value": "pass", "label": "Đạt", "color": "#2f9e44"},
           {"value": "fail", "label": "NG", "color": "#e03131"}
         ]}
@@ -58,6 +59,7 @@
       "label": "Kiểm tra ngoại quan",
       "label_en": "Visual Inspection",
       "required": true,
+      "options_source": "registry:pass_fail",
       "options": [
         {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
         {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"}
@@ -69,6 +71,7 @@
       "type": "select",
       "label": "Kiểm tra độ nhám bề mặt",
       "label_en": "Surface Finish Check",
+      "options_source": "registry:pass_fail_na",
       "options": [
         {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
         {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"},
@@ -80,6 +83,7 @@
       "type": "select",
       "label": "Kiểm tra ren (nếu có)",
       "label_en": "Thread Gage Check",
+      "options_source": "registry:pass_fail_na",
       "options": [
         {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
         {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"},
@@ -95,6 +99,7 @@
       "label": "Quyết định xử lý",
       "label_en": "Disposition",
       "required": true,
+      "options_source": "registry:final_disposition",
       "options": [
         {"value": "accept", "label": "Chấp nhận (Accept)", "color": "#2f9e44"},
         {"value": "reject", "label": "Từ chối (Reject)", "color": "#e03131"},

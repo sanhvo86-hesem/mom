@@ -30,36 +30,49 @@ var TABS = [
   { key:'trends',    vi:'Xu hướng',      en:'Trends' }
 ];
 
-var EXC_TYPES = {
-  ncr:        { vi:'NCR',                en:'NCR',                icon:'\u26a0\ufe0f', color:'#ef4444' },
-  capa:       { vi:'CAPA',               en:'CAPA',               icon:'\ud83d\udee0\ufe0f', color:'#3b82f6' },
-  complaint:  { vi:'Khiếu nại KH',       en:'Complaint',          icon:'\ud83d\udce9', color:'#f59e0b' },
-  mrb:        { vi:'MRB',                en:'MRB',                icon:'\ud83d\udccb', color:'#8b5cf6' },
-  deviation:  { vi:'Sai lệch',           en:'Deviation',          icon:'\ud83d\udcc9', color:'#06b6d4' },
-  concession: { vi:'Nhượng bộ',          en:'Concession',         icon:'\ud83e\udd1d', color:'#10b981' }
-};
-
-var SEVERITY = {
-  minor:    { vi:'Nhẹ',        en:'Minor',    color:'#22c55e' },
-  major:    { vi:'Nghiêm trọng', en:'Major',  color:'#f59e0b' },
-  critical: { vi:'Nguy hiểm',  en:'Critical', color:'#ef4444' },
-  safety:   { vi:'An toàn',    en:'Safety',   color:'#000000' }
-};
-
-/* STATUS — đọc từ HmRegistry → 'exception_status' */
-var STATUS = (function(){
+/* EXC_TYPES — đọc từ HmRegistry → 'exception_type_catalog' (single source of truth) */
+var EXC_TYPES = (function(){
   var map = {};
-  if(window.HmRegistry){ HmRegistry.statusSet('exception_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
-  if(!Object.keys(map).length){ map = {open:{vi:'Mở',en:'Open',color:'#ef4444'},in_progress:{vi:'Đang xử lý',en:'In Progress',color:'#f59e0b'},pending_review:{vi:'Chờ duyệt',en:'Pending Review',color:'#8b5cf6'},closed:{vi:'Đóng',en:'Closed',color:'#22c55e'},rejected:{vi:'Từ chối',en:'Rejected',color:'#94a3b8'}}; }
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('exception_type_catalog');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, icon:o.icon||'', color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[QEH] Registry key "exception_type_catalog" trống — exception types sẽ bị thiếu.');
   return map;
 })();
 
-var MRB_DISPOSITIONS = {
-  use_as_is: { vi:'Dùng nguyên trạng', en:'Use As-Is', color:'#3b82f6' },
-  rework:    { vi:'Sửa chữa',         en:'Rework',    color:'#f59e0b' },
-  scrap:     { vi:'Hủy bỏ',           en:'Scrap',     color:'#ef4444' },
-  return_to: { vi:'Trả về',           en:'Return',    color:'#94a3b8' }
-};
+/* SEVERITY — đọc từ HmRegistry → 'severity' (single source of truth) */
+var SEVERITY = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('severity');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[QEH] Registry key "severity" trống — severity options sẽ bị thiếu.');
+  return map;
+})();
+
+/* STATUS — đọc từ HmRegistry → 'exception_status' (single source of truth) */
+var STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('exception_status');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn||o.label,color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[QEH] Registry key "exception_status" trống — status options sẽ bị thiếu.');
+  return map;
+})();
+
+/* MRB_DISPOSITIONS — đọc từ HmRegistry → 'mrb_disposition' (single source of truth) */
+var MRB_DISPOSITIONS = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('mrb_disposition');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value] = {vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280'}; });
+  }
+  if(!Object.keys(map).length) console.warn('[QEH] Registry key "mrb_disposition" trống — disposition options sẽ bị thiếu.');
+  return map;
+})();
 
 var D8_STEPS = [
   { key:'d1', vi:'D1 - Thành lập nhóm',         en:'D1 - Team Formation' },

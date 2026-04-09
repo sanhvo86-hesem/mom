@@ -16,6 +16,7 @@
       "label": "Ca",
       "label_en": "Shift",
       "required": true,
+      "options_source": "registry:shift_code",
       "options": [
         {"value": "1", "label": "Ca 1"},
         {"value": "2", "label": "Ca 2"},
@@ -41,6 +42,7 @@
           "label": "Ưu tiên",
           "width": "15%",
           "required": true,
+          "options_source": "registry:priority",
           "options": [
             {"value": "high", "label": "Cao", "color": "#e03131"},
             {"value": "medium", "label": "Trung bình", "color": "#e67700"},

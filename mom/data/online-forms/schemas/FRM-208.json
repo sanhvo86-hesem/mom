@@ -23,6 +23,7 @@
       "label": "Ca",
       "label_en": "Shift",
       "required": true,
+      "options_source": "registry:shift_code",
       "options": [
         {"value": "1", "label": "Ca 1 (06:00–14:00)"},
         {"value": "2", "label": "Ca 2 (14:00–22:00)"},
@@ -35,6 +36,7 @@
       "label": "Cấp Tier",
       "label_en": "Tier Level",
       "required": true,
+      "options_source": "registry:tier_level",
       "options": [
         {"value": "T1", "label": "T1 — Operator/Team Lead (đầu ca)"},
         {"value": "T2", "label": "T2 — Shift Leader/Supervisor (giữa ca)"},
@@ -48,6 +50,7 @@
       "label": "Phòng ban",
       "label_en": "Department",
       "required": true,
+      "options_source": "registry:dept_code",
       "options": [
         {"value": "PROD", "label": "Sản xuất"},
         {"value": "ENG", "label": "Kỹ thuật"},
@@ -90,13 +93,13 @@
       "max_rows": 20,
       "columns": [
         {"id": "issue_desc", "type": "text", "label": "Mô tả vấn đề", "width": "30%", "required": true},
-        {"id": "severity", "type": "select", "label": "Mức độ", "width": "12%", "options": [
+        {"id": "severity", "type": "select", "label": "Mức độ", "width": "12%", "options_source": "registry:severity", "options": [
           {"value": "low", "label": "Low", "color": "#2f9e44"},
           {"value": "medium", "label": "Medium", "color": "#e67700"},
           {"value": "high", "label": "High", "color": "#e03131"},
           {"value": "critical", "label": "Critical", "color": "#862e9c"}
         ]},
-        {"id": "category", "type": "select", "label": "Loại", "width": "12%", "options": [
+        {"id": "category", "type": "select", "label": "Loại", "width": "12%", "options_source": "registry:issue_category", "options": [
           {"value": "quality", "label": "Chất lượng"},
           {"value": "machine", "label": "Máy móc"},
           {"value": "material", "label": "Vật tư"},

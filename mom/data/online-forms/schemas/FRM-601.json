@@ -18,6 +18,7 @@
       "label": "Loại thiết bị",
       "label_en": "Gage Type",
       "required": true,
+      "options_source": "registry:gage_type",
       "options": [
         {"value": "caliper", "label": "Thước cặp (Caliper)"},
         {"value": "micrometer", "label": "Panme (Micrometer)"},
@@ -44,6 +45,7 @@
       "label": "Loại hiệu chuẩn",
       "label_en": "Calibration Type",
       "required": true,
+      "options_source": "registry:calibration_type",
       "options": [
         {"value": "internal", "label": "Nội bộ (Internal)"},
         {"value": "external", "label": "Bên ngoài (External)"}
@@ -65,7 +67,7 @@
         {"id": "reading_1", "type": "text", "label": "Lần 1", "width": "15%", "required": true},
         {"id": "reading_2", "type": "text", "label": "Lần 2", "width": "15%"},
         {"id": "reading_3", "type": "text", "label": "Lần 3", "width": "15%"},
-        {"id": "pass_fail", "type": "select", "label": "Kết quả", "width": "12%", "options": [
+        {"id": "pass_fail", "type": "select", "label": "Kết quả", "width": "12%", "options_source": "registry:pass_fail", "options": [
           {"value": "pass", "label": "Đạt", "color": "#2f9e44"},
           {"value": "fail", "label": "Không đạt", "color": "#e03131"}
         ]}
@@ -77,6 +79,7 @@
       "label": "Kết quả tổng thể",
       "label_en": "Overall Result",
       "required": true,
+      "options_source": "registry:cal_result",
       "options": [
         {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
         {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"},

@@ -70,6 +70,7 @@
       "label_vi": "Ca làm việc",
       "required": true,
       "width": "third",
+      "options_source": "registry:shift_code",
       "options": [
         { "value": "1", "label": "Shift 1", "label_vi": "Ca 1" },
         { "value": "2", "label": "Shift 2", "label_vi": "Ca 2" },
@@ -183,6 +184,7 @@
       "label_vi": "Phân loại dừng máy",
       "required": true,
       "width": "third",
+      "options_source": "registry:downtime_category",
       "options": [
         { "value": "breakdown", "label": "Breakdown", "label_vi": "Hỏng máy" },
         { "value": "planned_pm", "label": "Planned PM", "label_vi": "Bảo trì định kỳ" },
@@ -201,6 +203,7 @@
       "label_vi": "Mức độ ảnh hưởng",
       "required": true,
       "width": "third",
+      "options_source": "registry:severity",
       "options": [
         { "value": "minor", "label": "Minor", "label_vi": "Nhẹ" },
         { "value": "major", "label": "Major", "label_vi": "Lớn" },
@@ -213,6 +216,7 @@
       "label": "Root Cause Categories",
       "label_vi": "Nhóm nguyên nhân 6M",
       "required": true,
+      "options_source": "registry:root_cause_6m",
       "options": [
         { "value": "man", "label": "Man", "label_vi": "Con người" },
         { "value": "machine", "label": "Machine", "label_vi": "Máy móc" },

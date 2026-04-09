@@ -16,6 +16,7 @@
       "label": "Loại thay đổi",
       "label_en": "ECR Type",
       "required": true,
+      "options_source": "registry:ecr_type",
       "options": [
         {"value": "design", "label": "Thiết kế (Design)"},
         {"value": "process", "label": "Quy trình (Process)"},
@@ -30,6 +31,7 @@
       "label": "Phòng ban yêu cầu",
       "label_en": "Department",
       "required": true,
+      "options_source": "registry:dept_code",
       "options": [
         {"value": "ENG", "label": "Kỹ thuật"},
         {"value": "PROD", "label": "Sản xuất"},
@@ -50,6 +52,7 @@
       "label": "Lý do thay đổi",
       "label_en": "Reason for Change",
       "required": true,
+      "options_source": "registry:reason_for_change",
       "options": [
         {"value": "customer_request", "label": "Yêu cầu khách hàng (Customer Request)"},
         {"value": "quality_improvement", "label": "Cải thiện chất lượng (Quality Improvement)"},

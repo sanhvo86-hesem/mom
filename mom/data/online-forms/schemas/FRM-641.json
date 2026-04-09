@@ -16,6 +16,7 @@
       "label": "Loại CAPA",
       "label_en": "CAPA Type",
       "required": true,
+      "options_source": "registry:capa_type",
       "options": [
         {"value": "corrective", "label": "Khắc phục (Corrective)"},
         {"value": "preventive", "label": "Phòng ngừa (Preventive)"}
@@ -27,6 +28,7 @@
       "label": "Nguồn phát sinh",
       "label_en": "Source",
       "required": true,
+      "options_source": "registry:capa_source",
       "options": [
         {"value": "ncr", "label": "NCR"},
         {"value": "audit", "label": "Đánh giá (Audit)"},
@@ -42,6 +44,7 @@
       "label": "Phòng ban liên quan",
       "label_en": "Department",
       "required": true,
+      "options_source": "registry:dept_code",
       "options": [
         {"value": "PROD", "label": "Sản xuất"},
         {"value": "ENG", "label": "Kỹ thuật"},
@@ -59,6 +62,7 @@
       "label": "Phương pháp phân tích nguyên nhân",
       "label_en": "Root Cause Method",
       "required": true,
+      "options_source": "registry:root_cause_method",
       "options": [
         {"value": "5why", "label": "5 Why"},
         {"value": "fishbone", "label": "Fishbone (Ishikawa)"},
@@ -84,6 +88,7 @@
       "label_en": "Status",
       "required": true,
       "default": "open",
+      "options_source": "registry:capa_status",
       "options": [
         {"value": "open", "label": "Mở (Open)", "color": "#e03131"},
         {"value": "investigation", "label": "Đang điều tra (Investigation)", "color": "#e67700"},

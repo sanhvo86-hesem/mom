@@ -29,41 +29,38 @@ var TABS = [
   { key:'trace',   vi:'Truy xuat',      en:'Trace' }
 ];
 
-/* STATUS — đọc từ HmRegistry → 'dpp_status' */
+/* STATUS — đọc từ HmRegistry → 'dpp_status' (single source of truth) */
 var STATUS = (function(){
   var map = {};
   if(window.HmRegistry){
     var opts = HmRegistry.statusSet('dpp_status');
-    opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn, color:o.color }; });
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn||o.label, color:o.color||'#6b7280' }; });
   }
-  if(!Object.keys(map).length){
-    map = {
-      draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'}, active:{vi:'Hoạt động',en:'Active',color:'#3b82f6'},
-      shipped:{vi:'Đã giao',en:'Shipped',color:'#10b981'}, in_service:{vi:'Đang sử dụng',en:'In Service',color:'#8b5cf6'},
-      end_of_life:{vi:'Hết hạn',en:'End of Life',color:'#6b7280'}, recalled:{vi:'Thu hồi',en:'Recalled',color:'#ef4444'}
-    };
-  }
+  if(!Object.keys(map).length) console.warn('[DPP] Registry key "dpp_status" trống — status options sẽ bị thiếu.');
   return map;
 })();
 
-var EVENT_TYPES = {
-  material_received: { vi:'Nhan vat lieu',  en:'Material Received', icon:'\ud83d\udce6' },
-  machining:         { vi:'Gia cong',       en:'Machining',         icon:'\u2699\ufe0f' },
-  treatment:         { vi:'Xu ly',          en:'Treatment',         icon:'\ud83d\udd25' },
-  inspection:        { vi:'Kiem tra',       en:'Inspection',        icon:'\ud83d\udd0d' },
-  certified:         { vi:'Chung nhan',     en:'Certified',         icon:'\u2705' },
-  shipped:           { vi:'Giao hang',      en:'Shipped',           icon:'\ud83d\ude9a' },
-  rework:            { vi:'Sua chua',       en:'Rework',            icon:'\ud83d\udee0\ufe0f' },
-  testing:           { vi:'Thu nghiem',     en:'Testing',           icon:'\ud83e\uddea' }
-};
+/* EVENT_TYPES — đọc từ HmRegistry → 'passport_event_type' (single source of truth) */
+var EVENT_TYPES = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('passport_event_type');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn||o.label, icon:o.icon||'' }; });
+  }
+  if(!Object.keys(map).length) console.warn('[DPP] Registry key "passport_event_type" trống — event types sẽ bị thiếu.');
+  return map;
+})();
 
-var DOC_TYPES = {
-  coc:        { vi:'CoC',           en:'CoC' },
-  coa:        { vi:'CoA',           en:'CoA' },
-  fai:        { vi:'FAI',           en:'FAI' },
-  material:   { vi:'Chung chi VL',  en:'Material Cert' },
-  test:       { vi:'Bao cao TN',    en:'Test Report' }
-};
+/* DOC_TYPES — đọc từ HmRegistry → 'cert_doc_type' (single source of truth) */
+var DOC_TYPES = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('cert_doc_type');
+    if(opts && opts.length) opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn||o.label }; });
+  }
+  if(!Object.keys(map).length) console.warn('[DPP] Registry key "cert_doc_type" trống — document types sẽ bị thiếu.');
+  return map;
+})();
 
 /* ── state ────────────────────────────────────────────── */
 var state = {

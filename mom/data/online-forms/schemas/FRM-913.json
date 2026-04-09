@@ -16,6 +16,7 @@
       "label": "Loại đánh giá",
       "label_en": "Audit Type",
       "required": true,
+      "options_source": "registry:audit_type",
       "options": [
         {"value": "internal", "label": "Nội bộ (Internal)"},
         {"value": "external", "label": "Bên ngoài (External)"},
@@ -31,6 +32,7 @@
       "label": "Tiêu chuẩn áp dụng",
       "label_en": "Audit Standard",
       "required": true,
+      "options_source": "registry:audit_standard",
       "options": [
         {"value": "iso9001", "label": "ISO 9001:2015"},
         {"value": "as9100", "label": "AS9100D"},
@@ -47,6 +49,7 @@
       "label": "Phòng ban được đánh giá",
       "label_en": "Department Audited",
       "required": true,
+      "options_source": "registry:dept_code",
       "options": [
         {"value": "PROD", "label": "Sản xuất"},
         {"value": "ENG", "label": "Kỹ thuật"},
@@ -72,7 +75,7 @@
         {"id": "clause", "type": "text", "label": "Điều khoản", "width": "10%", "required": true, "placeholder": "VD: 8.5.1"},
         {"id": "requirement", "type": "text", "label": "Yêu cầu", "width": "20%", "required": true},
         {"id": "evidence", "type": "text", "label": "Bằng chứng", "width": "20%"},
-        {"id": "finding_type", "type": "select", "label": "Loại phát hiện", "width": "15%", "options": [
+        {"id": "finding_type", "type": "select", "label": "Loại phát hiện", "width": "15%", "options_source": "registry:finding_type", "options": [
           {"value": "conformity", "label": "Phù hợp", "color": "#2f9e44"},
           {"value": "observation", "label": "Nhận xét", "color": "#1971c2"},
           {"value": "minor_nc", "label": "NC nhẹ", "color": "#e67700"},

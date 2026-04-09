@@ -718,14 +718,21 @@ function renderField(field, value, readOnly){
       if(field.options_source) html += '<div class="eqms-helper eqms-registry-hint">' + esc(t('Dữ liệu từ registry: ', 'Data from registry: ') + field.options_source) + '</div>';
       break;
     case 'multi_select':
+      /* Resolve options: prefer registry source over hardcoded */
+      var multiOpts = field.options || [];
+      if(field.options_source){
+        var regMultiOpts = resolveRegistryOptions(field.options_source);
+        if(regMultiOpts && regMultiOpts.length) multiOpts = regMultiOpts;
+      }
       html += '<div class="eqms-multi" role="group" aria-label="' + esc(labelEn) + '">';
       var selected = Array.isArray(val) ? val : [];
-      (field.options || []).forEach(function(opt){
+      multiOpts.forEach(function(opt){
         var ov = typeof opt === 'string' ? opt : (opt.value || '');
         var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
         html += '<label class="eqms-check"><input type="checkbox" data-multi="' + esc(field.id) + '" value="' + esc(ov) + '"' + (selected.indexOf(ov) >= 0 ? ' checked' : '') + disabled + '> ' + esc(ol) + '</label>';
       });
       html += '</div>';
+      if(field.options_source) html += '<div class="eqms-helper eqms-registry-hint">' + esc(t('Dữ liệu từ registry: ', 'Data from registry: ') + field.options_source) + '</div>';
       break;
     case 'textarea':
       html += '<textarea class="eqms-input eqms-textarea" id="' + esc(id) + '" rows="4" placeholder="' + esc(t(field.placeholder || '', field.placeholder_en || '')) + '"' + ariaReq + ariaDesc + disabled + '>' + esc(val) + '</textarea>';
@@ -762,7 +769,25 @@ function renderField(field, value, readOnly){
         cols.forEach(function(col){
           var colId = typeof col === 'string' ? col : (col.id || col.label || '');
           var cellVal = (row && row[colId] !== undefined) ? row[colId] : '';
-          html += '<td><input class="eqms-table-cell eqms-input" type="text" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '" value="' + esc(cellVal) + '"' + disabled + '></td>';
+          var colType = (typeof col === 'object' && col.type) ? col.type : 'text';
+          if(colType === 'select'){
+            /* Resolve column options: prefer registry source over hardcoded */
+            var colOpts = (typeof col === 'object' && col.options) ? col.options : [];
+            if(typeof col === 'object' && col.options_source){
+              var regColOpts = resolveRegistryOptions(col.options_source);
+              if(regColOpts && regColOpts.length) colOpts = regColOpts;
+            }
+            html += '<td><select class="eqms-table-cell eqms-input" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '"' + disabled + '>';
+            html += '<option value="">—</option>';
+            colOpts.forEach(function(opt){
+              var ov = typeof opt === 'string' ? opt : (opt.value || '');
+              var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
+              html += '<option value="' + esc(ov) + '"' + (String(cellVal) === String(ov) ? ' selected' : '') + '>' + esc(ol) + '</option>';
+            });
+            html += '</select></td>';
+          } else {
+            html += '<td><input class="eqms-table-cell eqms-input" type="' + esc(colType === 'number' ? 'number' : 'text') + '" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '" value="' + esc(cellVal) + '"' + disabled + '></td>';
+          }
         });
         if(!readOnly) html += '<td><button type="button" class="eqms-table-del" data-table-del="' + esc(field.id) + '" data-row="' + ri + '">×</button></td>';
         html += '</tr>';

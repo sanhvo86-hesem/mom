@@ -16,6 +16,7 @@
       "label": "Ca",
       "label_en": "Shift",
       "required": true,
+      "options_source": "registry:shift_code",
       "options": [
         {"value": "1", "label": "Ca 1"},
         {"value": "2", "label": "Ca 2"},
@@ -43,6 +44,7 @@
           "label": "Trạng thái",
           "width": "14%",
           "required": true,
+          "options_source": "registry:frm502_status",
           "options": [
             {"value": "pending", "label": "Chờ", "color": "#868e96"},
             {"value": "in_progress", "label": "Đang chạy", "color": "#1971c2"},

@@ -121,6 +121,7 @@
       "label_vi": "Phòng ban phát hiện",
       "required": true,
       "width": "third",
+      "options_source": "registry:dept_code",
       "options": [
         {
           "value": "PRO",
@@ -347,6 +348,7 @@
       "label_vi": "Loại lỗi",
       "required": true,
       "width": "third",
+      "options_source": "registry:defect_type",
       "options": [
         {
           "value": "dimensional",
@@ -387,6 +389,7 @@
       "label_vi": "Mức độ nghiêm trọng",
       "required": true,
       "width": "third",
+      "options_source": "registry:severity",
       "options": [
         {
           "value": "minor",
@@ -433,6 +436,7 @@
       "required": true,
       "width": "third",
       "default": "open",
+      "options_source": "registry:ncr_status",
       "options": [
         {
           "value": "open",
@@ -493,6 +497,7 @@
       "label_vi": "Quyết định xử lý",
       "required": true,
       "width": "third",
+      "options_source": "registry:disposition",
       "options": [
         {
           "value": "rework",
@@ -530,6 +535,7 @@
       "width": "full",
       "helper": "Select all contributing categories, not just one.",
       "helper_vi": "Cho phép chọn nhiều nhóm nguyên nhân đồng thời nếu có liên quan.",
+      "options_source": "registry:root_cause_6m",
       "options": [
         {
           "value": "man",

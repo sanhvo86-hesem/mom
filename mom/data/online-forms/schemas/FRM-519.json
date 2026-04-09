@@ -87,6 +87,7 @@
       "label_vi": "Ca làm việc",
       "required": true,
       "width": "third",
+      "options_source": "registry:shift_code",
       "options": [
         { "value": "1", "label": "Shift 1", "label_vi": "Ca 1" },
         { "value": "2", "label": "Shift 2", "label_vi": "Ca 2" },
@@ -334,6 +335,7 @@
       "label": "Risk Flags",
       "label_vi": "Cờ rủi ro cần chú ý",
       "required": false,
+      "options_source": "registry:pre_run_risk_flags",
       "options": [
         { "value": "new_revision", "label": "New revision", "label_vi": "Revision mới" },
         { "value": "customer_hold_point", "label": "Customer hold point", "label_vi": "Điểm hold khách hàng" },
