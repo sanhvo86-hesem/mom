@@ -121,12 +121,18 @@ def main() -> int:
         expected_table = str(expected.get("expected_table") or "")
         expected_primary_key = str(expected.get("expected_primary_key") or "")
         expected_status_column = expected.get("expected_status_column")
+        has_expected_pattern = "expected_pattern" in expected
+        expected_pattern = expected.get("expected_pattern")
+        has_expected_result_column = "expected_result_column" in expected
+        expected_result_column = expected.get("expected_result_column")
         matched_entities = entity_name_to_keys.get(expected_table, [])
         passed = bool(
             spec
             and str(spec.get("table") or "") == expected_table
             and str(spec.get("primary_key") or "") == expected_primary_key
             and spec.get("status_column") == expected_status_column
+            and (not has_expected_pattern or spec.get("pattern") == expected_pattern)
+            and (not has_expected_result_column or spec.get("result_column") == expected_result_column)
             and matched_entities
         )
         catalog_alignment_rows.append({
@@ -137,6 +143,10 @@ def main() -> int:
             "actual_primary_key": spec.get("primary_key"),
             "expected_status_column": expected_status_column,
             "actual_status_column": spec.get("status_column"),
+            "expected_pattern": expected_pattern if has_expected_pattern else None,
+            "actual_pattern": spec.get("pattern"),
+            "expected_result_column": expected_result_column if has_expected_result_column else None,
+            "actual_result_column": spec.get("result_column"),
             "matched_entities": matched_entities,
             "passed": passed,
         })

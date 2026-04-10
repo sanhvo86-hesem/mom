@@ -1095,11 +1095,15 @@ function portal_system_db_connection() {
     return null;
   }
 
-  $config = (array)(require $configFile);
+  $config = function_exists('runtime_data_layer_effective_config')
+    ? runtime_data_layer_effective_config()
+    : (array)(require $configFile);
   $host = trim((string)($config['host'] ?? ''));
   $database = trim((string)($config['database'] ?? ''));
   $username = trim((string)($config['username'] ?? ''));
-  if ($host === '' || $database === '' || $username === '') {
+  $password = trim((string)($config['password'] ?? ''));
+  $allowEmptyPassword = !empty($config['allow_empty_password']);
+  if ($host === '' || $database === '' || $username === '' || (!$allowEmptyPassword && $password === '')) {
     return null;
   }
 
@@ -1271,6 +1275,55 @@ function portal_system_audit_shadow_write(array $entry): void {
   } catch (Throwable $e) {
     @error_log('[API] audit shadow write failed: ' . $e->getMessage());
   }
+}
+
+function portal_legacy_admin_audit_log(string $action, array $context = [], ?array $user = null): void {
+  global $DATA_DIR;
+
+  $username = trim((string)(($user['username'] ?? null) ?: ($_SESSION['user'] ?? 'anonymous')));
+  $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+  $timestamp = now_iso();
+  $entry = [
+    'action' => $action,
+    'user' => $username,
+    'ip' => $ip,
+    'timestamp' => $timestamp,
+    'context' => $context,
+  ];
+  if (is_string($DATA_DIR) && $DATA_DIR !== '') {
+    $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($line !== false) {
+      @file_put_contents(rtrim($DATA_DIR, '/\\') . '/audit.log', $line . "\n", FILE_APPEND | LOCK_EX);
+    }
+  }
+
+  $aggregateId = '';
+  foreach (['aggregate_id', 'id', 'username', 'code', 'record_id'] as $key) {
+    if (!isset($context[$key]) || !is_scalar($context[$key])) continue;
+    $candidate = trim((string)$context[$key]);
+    if ($candidate === '') continue;
+    $aggregateId = $candidate;
+    break;
+  }
+  if ($aggregateId === '') {
+    $aggregateId = $action;
+  }
+
+  portal_system_audit_shadow_write([
+    'event_type' => $action,
+    'aggregate_type' => 'api_action',
+    'aggregate_id' => $aggregateId,
+    'actor_name' => $username,
+    'ip_address' => $ip,
+    'session_id' => session_status() === PHP_SESSION_ACTIVE ? session_id() : null,
+    'recorded_at' => $timestamp,
+    'payload' => ['context' => $context],
+    'metadata' => [
+      'source' => 'legacy_api',
+      'transport' => 'api.php',
+      'context_keys' => array_values(array_map('strval', array_keys($context))),
+    ],
+  ]);
 }
 
 function portal_system_audit_shadow_read(array $filters = []): ?array {
@@ -3460,17 +3513,39 @@ function orders_store_default(): array {
 function load_orders_store(): array {
   global $ORDERS_FILE;
   ensure_dir(dirname($ORDERS_FILE));
-  $data = read_json_file($ORDERS_FILE);
+  $defaults = orders_store_default();
+  try {
+    $layer = runtime_data_layer();
+    $data = $layer->getRuntimeOrdersStore();
+    $readMeta = $layer->getLastReadMeta();
+    observe_primary_read('orders', $readMeta, [
+      'item_count' => runtime_store_item_count($data),
+      'scope' => 'orders_runtime',
+    ]);
+  } catch (Throwable $e) {
+    $data = read_json_file($ORDERS_FILE);
+    $readMeta = [
+      'source' => 'json_fallback',
+      'fallback' => true,
+      'error' => $e->getMessage(),
+      'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'JSON_ONLY'),
+      'timestamp' => now_iso(),
+    ];
+    observe_primary_read('orders', $readMeta, [
+      'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
+      'scope' => 'orders_runtime',
+    ]);
+  }
   if (!is_array($data)) {
-    $data = orders_store_default();
+    $data = $defaults;
     write_json_file($ORDERS_FILE, $data);
   }
-  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : orders_store_default()['_meta'];
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
   $data['sales_orders'] = array_values(is_array($data['sales_orders'] ?? null) ? $data['sales_orders'] : []);
   $data['job_orders'] = array_values(is_array($data['job_orders'] ?? null) ? $data['job_orders'] : []);
   $data['work_orders'] = array_values(is_array($data['work_orders'] ?? null) ? $data['work_orders'] : []);
   $data['form_links'] = array_values(is_array($data['form_links'] ?? null) ? $data['form_links'] : []);
-  $data['_meta']['counters'] = is_array($data['_meta']['counters'] ?? null) ? $data['_meta']['counters'] : orders_store_default()['_meta']['counters'];
+  $data['_meta']['counters'] = is_array($data['_meta']['counters'] ?? null) ? $data['_meta']['counters'] : $defaults['_meta']['counters'];
   return $data;
 }
 
@@ -3479,6 +3554,9 @@ function save_orders_store(array $data): void {
   ensure_dir(dirname($ORDERS_FILE));
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('orders')) {
+    shadow_sync_orders_store($data);
+  }
   // File locking to prevent concurrent-write data loss (BUG-ORD-04)
   $lockFile = $ORDERS_FILE . '.lock';
   $fp = @fopen($lockFile, 'c');
@@ -3493,7 +3571,9 @@ function save_orders_store(array $data): void {
   } else {
     write_json_file($ORDERS_FILE, $data);
   }
-  shadow_sync_orders_store($data);
+  if (!runtime_domain_requires_postgres_authority('orders')) {
+    shadow_sync_orders_store($data);
+  }
 }
 
 function master_data_store_default(): array {
@@ -3539,19 +3619,83 @@ function master_data_store_default(): array {
   ];
 }
 
+function master_data_normalize_item(string $entity, array $item): array {
+  if ($entity === 'parts') {
+    $partDescription = trim((string)($item['part_description'] ?? ''));
+    $legacyDescription = trim((string)($item['description'] ?? ''));
+    $canonicalDescription = $partDescription !== '' ? $partDescription : $legacyDescription;
+    if ($canonicalDescription !== '') {
+      $item['part_description'] = $canonicalDescription;
+      $item['description'] = $canonicalDescription;
+    }
+  }
+  return $item;
+}
+
+function master_data_normalize_store(array $store): array {
+  foreach ($store as $entity => $rows) {
+    if ($entity === '_meta' || !is_array($rows)) {
+      continue;
+    }
+    $store[$entity] = array_values(array_map(static function($row) use ($entity) {
+      return is_array($row) ? master_data_normalize_item((string)$entity, $row) : $row;
+    }, $rows));
+  }
+  return $store;
+}
+
 function load_master_data_store(): array {
   global $MASTER_DATA_FILE;
   ensure_dir(dirname($MASTER_DATA_FILE));
-  $data = read_json_file($MASTER_DATA_FILE);
+  $defaults = master_data_store_default();
+  try {
+    $layer = runtime_data_layer();
+    $data = $layer->getRuntimeMasterDataStore();
+    $readMeta = $layer->getLastReadMeta();
+    observe_primary_read('master_data', $readMeta, [
+      'item_count' => runtime_store_item_count($data),
+      'scope' => 'master_data_runtime',
+    ]);
+  } catch (Throwable $e) {
+    $data = read_json_file($MASTER_DATA_FILE);
+    $readMeta = [
+      'source' => 'json_fallback',
+      'fallback' => true,
+      'error' => $e->getMessage(),
+      'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'JSON_ONLY'),
+      'timestamp' => now_iso(),
+    ];
+    observe_primary_read('master_data', $readMeta, [
+      'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
+      'scope' => 'master_data_runtime',
+    ]);
+  }
   if (!is_array($data)) {
-    $data = master_data_store_default();
+    $data = $defaults;
     write_json_file($MASTER_DATA_FILE, $data);
   }
-  $defaults = master_data_store_default();
   foreach ($defaults as $key => $value) {
     if ($key === '_meta') continue;
     $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
   }
+  $data = master_data_normalize_store($data);
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
+  return $data;
+}
+
+function load_master_data_active_store(): array {
+  global $MASTER_DATA_FILE;
+  ensure_dir(dirname($MASTER_DATA_FILE));
+  $defaults = master_data_store_default();
+  $data = read_json_file($MASTER_DATA_FILE);
+  if (!is_array($data)) {
+    $data = $defaults;
+  }
+  foreach ($defaults as $key => $value) {
+    if ($key === '_meta') continue;
+    $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
+  }
+  $data = master_data_normalize_store($data);
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
   return $data;
 }
@@ -3559,10 +3703,16 @@ function load_master_data_store(): array {
 function save_master_data_store(array $data): void {
   global $MASTER_DATA_FILE;
   ensure_dir(dirname($MASTER_DATA_FILE));
+  $data = master_data_normalize_store($data);
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('master_data')) {
+    shadow_sync_master_data_store($data);
+  }
   write_json_file($MASTER_DATA_FILE, $data);
-  shadow_sync_master_data_store($data);
+  if (!runtime_domain_requires_postgres_authority('master_data')) {
+    shadow_sync_master_data_store($data);
+  }
 }
 
 function master_data_entity_key(string $entity): ?string {
@@ -3659,6 +3809,9 @@ function runtime_data_layer_sanitize_overrides(array $input): array {
     $username = trim((string)$input['username']);
     if ($username !== '') $out['username'] = substr($username, 0, 128);
   }
+  if (array_key_exists('password', $input)) {
+    $out['password'] = (string)$input['password'];
+  }
   if (array_key_exists('schema', $input)) {
     $schema = trim((string)$input['schema']);
     if ($schema !== '') $out['schema'] = substr($schema, 0, 64);
@@ -3667,6 +3820,9 @@ function runtime_data_layer_sanitize_overrides(array $input): array {
     $allowed = ['disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full'];
     $sslmode = strtolower(trim((string)$input['sslmode']));
     if (in_array($sslmode, $allowed, true)) $out['sslmode'] = $sslmode;
+  }
+  if (array_key_exists('allow_empty_password', $input)) {
+    $out['allow_empty_password'] = runtime_data_layer_parse_bool($input['allow_empty_password'], false);
   }
   if (array_key_exists('connect_timeout', $input)) {
     $out['connect_timeout'] = max(1, min(60, (int)$input['connect_timeout']));
@@ -3688,6 +3844,14 @@ function runtime_data_layer_sanitize_overrides(array $input): array {
   }
   if (array_key_exists('json_fallback', $input)) {
     $out['json_fallback'] = runtime_data_layer_parse_bool($input['json_fallback'], true);
+  }
+  foreach (['master_data', 'orders', 'mes', 'epicor'] as $domain) {
+    $key = $domain . '_read_mode';
+    if (!array_key_exists($key, $input)) continue;
+    $value = strtolower(trim((string)$input[$key]));
+    if (in_array($value, ['default', 'json', 'postgres_primary', 'postgres_only'], true)) {
+      $out[$key] = $value;
+    }
   }
   return $out;
 }
@@ -3731,6 +3895,7 @@ function runtime_data_layer_admin_projection(array $config): array {
     'username' => trim((string)($config['username'] ?? 'mom_app')),
     'schema' => trim((string)($config['schema'] ?? 'public')),
     'sslmode' => trim((string)($config['sslmode'] ?? 'prefer')),
+    'allow_empty_password' => (bool)($config['allow_empty_password'] ?? false),
     'connect_timeout' => max(1, (int)($config['connect_timeout'] ?? 5)),
     'statement_timeout' => max(1000, (int)($config['statement_timeout'] ?? 30000)),
     'read_retry_count' => max(1, (int)($config['read_retry_count'] ?? 3)),
@@ -3738,6 +3903,10 @@ function runtime_data_layer_admin_projection(array $config): array {
     'use_postgres' => (bool)($config['use_postgres'] ?? false),
     'shadow_write' => (bool)($config['shadow_write'] ?? true),
     'json_fallback' => (bool)($config['json_fallback'] ?? true),
+    'master_data_read_mode' => strtolower(trim((string)($config['master_data_read_mode'] ?? 'default'))),
+    'orders_read_mode' => strtolower(trim((string)($config['orders_read_mode'] ?? 'default'))),
+    'mes_read_mode' => strtolower(trim((string)($config['mes_read_mode'] ?? 'default'))),
+    'epicor_read_mode' => strtolower(trim((string)($config['epicor_read_mode'] ?? 'default'))),
   ];
 }
 
@@ -3766,11 +3935,32 @@ function runtime_data_layer_summary(): array {
       'use_postgres' => false,
       'shadow_write' => false,
       'json_fallback' => false,
+      'database_configured' => false,
+      'database_host' => '',
+      'database_port' => 0,
+      'database_name' => '',
+      'database_schema' => 'public',
+      'database_username' => '',
+      'database_probe_reachable' => false,
+      'database_probe_error' => '',
       'postgres_path_active' => false,
       'postgres_reachable' => false,
       'postgres_error' => $e->getMessage(),
     ];
   }
+}
+
+function runtime_domain_read_mode(string $domain): string {
+  $summary = runtime_data_layer_summary();
+  $key = strtolower(trim($domain)) . '_read_mode';
+  $mode = strtolower(trim((string)($summary[$key] ?? 'default')));
+  return in_array($mode, ['default', 'json', 'postgres_primary', 'postgres_only'], true)
+    ? $mode
+    : 'default';
+}
+
+function runtime_domain_requires_postgres_authority(string $domain): bool {
+  return in_array(runtime_domain_read_mode($domain), ['postgres_primary', 'postgres_only'], true);
 }
 
 function mes_runtime_supports_live_stream(array $mode): bool {
@@ -4624,10 +4814,14 @@ function shadow_sync_master_data_store(array $data): void {
     + count((array)($data['revisions'] ?? []))
     + count((array)($data['machines'] ?? []))
     + count((array)($data['work_centers'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('master_data');
   try {
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
     if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_master_data_authority_unavailable');
+      }
       observe_shadow_sync('master_data', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4635,7 +4829,10 @@ function shadow_sync_master_data_store(array $data): void {
       ]);
       return;
     }
-    $layer->syncMasterDataStore($data);
+    $synced = $layer->syncMasterDataStore($data);
+    if ($mustSync && $synced !== true) {
+      throw new RuntimeException('runtime_master_data_shadow_sync_failed');
+    }
     observe_shadow_sync('master_data', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4650,6 +4847,9 @@ function shadow_sync_master_data_store(array $data): void {
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -4659,11 +4859,15 @@ function shadow_sync_orders_store(array $data): void {
     + count((array)($data['job_orders'] ?? []))
     + count((array)($data['work_orders'] ?? []))
     + count((array)($data['form_links'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('orders');
   try {
     $master = load_master_data_store();
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
     if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_orders_authority_unavailable');
+      }
       observe_shadow_sync('orders', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4671,8 +4875,11 @@ function shadow_sync_orders_store(array $data): void {
       ]);
       return;
     }
-    $layer->syncMasterDataStore($master);
-    $layer->syncOrdersStore($data);
+    $masterSynced = $layer->syncMasterDataStore($master);
+    $ordersSynced = $layer->syncOrdersStore($data);
+    if ($mustSync && ($masterSynced !== true || $ordersSynced !== true)) {
+      throw new RuntimeException('runtime_orders_shadow_sync_failed');
+    }
     observe_shadow_sync('orders', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4688,6 +4895,9 @@ function shadow_sync_orders_store(array $data): void {
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -4703,12 +4913,16 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
     + count((array)($data['machine_alarm_events'] ?? []))
     + count((array)($data['nc_download_receipts'] ?? []))
     + count((array)($data['mes_tool_preset_offsets'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('mes');
   try {
     $orders = is_array($orders) ? $orders : load_orders_store();
     $master = is_array($master) ? $master : load_master_data_store();
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
     if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_mes_authority_unavailable');
+      }
       observe_shadow_sync('mes', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4716,9 +4930,12 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
       ]);
       return;
     }
-    $layer->syncMasterDataStore($master);
-    $layer->syncOrdersStore($orders);
-    $layer->syncMesRuntimeStore($data, $orders, $master);
+    $masterSynced = $layer->syncMasterDataStore($master);
+    $ordersSynced = $layer->syncOrdersStore($orders);
+    $mesSynced = $layer->syncMesRuntimeStore($data, $orders, $master);
+    if ($mustSync && ($masterSynced !== true || $ordersSynced !== true || $mesSynced !== true)) {
+      throw new RuntimeException('runtime_mes_shadow_sync_failed');
+    }
     observe_shadow_sync('mes', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4736,6 +4953,9 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -4744,10 +4964,14 @@ function shadow_sync_epicor_runtime_store(array $data): void {
   $itemCount = count((array)($data['sync_runs'] ?? []))
     + count((array)($data['reconciliation_exceptions'] ?? []))
     + count((array)($data['outbox_events'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('epicor');
   try {
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
     if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_epicor_authority_unavailable');
+      }
       observe_shadow_sync('epicor', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4755,7 +4979,10 @@ function shadow_sync_epicor_runtime_store(array $data): void {
       ]);
       return;
     }
-    $layer->syncEpicorRuntimeStore($data);
+    $synced = $layer->syncEpicorRuntimeStore($data);
+    if ($mustSync && $synced !== true) {
+      throw new RuntimeException('runtime_epicor_shadow_sync_failed');
+    }
     observe_shadow_sync('epicor', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -4770,6 +4997,9 @@ function shadow_sync_epicor_runtime_store(array $data): void {
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -4803,11 +5033,33 @@ function load_mes_runtime_store(): array {
   global $MES_RUNTIME_FILE;
   ensure_dir(dirname($MES_RUNTIME_FILE));
   $data = read_json_file($MES_RUNTIME_FILE);
+  $defaults = mes_runtime_default();
+  try {
+    $layer = runtime_data_layer();
+    $data = $layer->getRuntimeMesRuntimeStore();
+    $readMeta = $layer->getLastReadMeta();
+    observe_primary_read('mes', $readMeta, [
+      'item_count' => runtime_store_item_count($data),
+      'scope' => 'mes_runtime',
+    ]);
+  } catch (Throwable $e) {
+    $data = read_json_file($MES_RUNTIME_FILE);
+    $readMeta = [
+      'source' => 'json_fallback',
+      'fallback' => true,
+      'error' => $e->getMessage(),
+      'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'JSON_ONLY'),
+      'timestamp' => now_iso(),
+    ];
+    observe_primary_read('mes', $readMeta, [
+      'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
+      'scope' => 'mes_runtime',
+    ]);
+  }
   if (!is_array($data)) {
-    $data = mes_runtime_default();
+    $data = $defaults;
     write_json_file($MES_RUNTIME_FILE, $data);
   }
-  $defaults = mes_runtime_default();
   foreach ($defaults as $key => $value) {
     if ($key === '_meta') continue;
     $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
@@ -4821,8 +5073,13 @@ function save_mes_runtime_store(array $data): void {
   ensure_dir(dirname($MES_RUNTIME_FILE));
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('mes')) {
+    shadow_sync_mes_runtime_store($data);
+  }
   write_json_file($MES_RUNTIME_FILE, $data);
-  shadow_sync_mes_runtime_store($data);
+  if (!runtime_domain_requires_postgres_authority('mes')) {
+    shadow_sync_mes_runtime_store($data);
+  }
 }
 
 function epicor_runtime_default(): array {
@@ -4895,8 +5152,13 @@ function save_epicor_runtime_store(array $data): void {
   ensure_dir(dirname($EPICOR_RUNTIME_FILE));
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('epicor')) {
+    shadow_sync_epicor_runtime_store($data);
+  }
   write_json_file($EPICOR_RUNTIME_FILE, $data);
-  shadow_sync_epicor_runtime_store($data);
+  if (!runtime_domain_requires_postgres_authority('epicor')) {
+    shadow_sync_epicor_runtime_store($data);
+  }
 }
 
 function release_followup_default_policy_store(): array {
@@ -6875,6 +7137,81 @@ function compute_order_dashboard_stats(array $store, array $hierarchy = [], ?arr
     'launch_blockers' => $launchBlockers,
     'phase_counts' => $phaseCounts,
     'top_exceptions' => order_collect_top_exceptions($hierarchy),
+  ];
+}
+
+function build_manual_runtime_summary(array $master, array $orders): array {
+  $masterCounts = [];
+  foreach (['customers', 'parts', 'revisions', 'work_centers', 'machines', 'operators'] as $key) {
+    $masterCounts[$key] = count(array_values(is_array($master[$key] ?? null) ? $master[$key] : []));
+  }
+
+  $salesOrders = array_values(is_array($orders['sales_orders'] ?? null) ? $orders['sales_orders'] : []);
+  $jobOrders = array_values(is_array($orders['job_orders'] ?? null) ? $orders['job_orders'] : []);
+  $workOrders = array_values(is_array($orders['work_orders'] ?? null) ? $orders['work_orders'] : []);
+  $rows = [];
+
+  foreach ($salesOrders as $so) {
+    if (!is_array($so)) continue;
+    $rows[] = [
+      'type' => 'SO',
+      'id' => (string)($so['so_number'] ?? ''),
+      'title' => implode(' · ', array_values(array_filter([
+        trim((string)($so['customer_name'] ?? $so['customer_id'] ?? '')),
+        trim((string)($so['customer_po'] ?? '')) !== '' ? ('PO ' . trim((string)($so['customer_po'] ?? ''))) : '',
+      ], static fn($value) => $value !== ''))),
+      'status' => (string)($so['status'] ?? ''),
+      'updated_at' => (string)($so['updated_at'] ?? $so['created_at'] ?? ''),
+    ];
+  }
+
+  foreach ($jobOrders as $jo) {
+    if (!is_array($jo)) continue;
+    $rows[] = [
+      'type' => 'JO',
+      'id' => (string)($jo['jo_number'] ?? ''),
+      'title' => implode(' / ', array_values(array_filter([
+        trim((string)($jo['part_number'] ?? '')),
+        trim((string)($jo['part_revision'] ?? '')),
+      ], static fn($value) => $value !== ''))),
+      'status' => (string)($jo['status'] ?? ''),
+      'updated_at' => (string)($jo['updated_at'] ?? $jo['created_at'] ?? ''),
+    ];
+  }
+
+  foreach ($workOrders as $wo) {
+    if (!is_array($wo)) continue;
+    $operation = trim((string)($wo['operation_number'] ?? ''));
+    $rows[] = [
+      'type' => 'WO',
+      'id' => (string)($wo['wo_number'] ?? ''),
+      'title' => implode(' · ', array_values(array_filter([
+        $operation !== '' ? ('OP' . $operation) : '',
+        trim((string)($wo['operation_desc'] ?? '')),
+        trim((string)($wo['machine_id'] ?? '')),
+      ], static fn($value) => $value !== ''))),
+      'status' => (string)($wo['status'] ?? ''),
+      'updated_at' => (string)($wo['updated_at'] ?? $wo['created_at'] ?? ''),
+    ];
+  }
+
+  usort($rows, static function (array $a, array $b): int {
+    return strcmp((string)($b['updated_at'] ?? ''), (string)($a['updated_at'] ?? ''));
+  });
+
+  $recentRows = array_slice($rows, 0, 10);
+
+  return [
+    'master_counts' => $masterCounts,
+    'order_counts' => [
+      'so' => count($salesOrders),
+      'jo' => count($jobOrders),
+      'wo' => count($workOrders),
+    ],
+    'recent_rows' => $recentRows,
+    'last_event_at' => (string)($recentRows[0]['updated_at'] ?? ''),
+    'master_updated_at' => (string)($master['_meta']['updated'] ?? ''),
+    'orders_updated_at' => (string)($orders['_meta']['updated'] ?? ''),
   ];
 }
 
@@ -10679,7 +11016,7 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
   $id = trim((string)($item[$idKey] ?? ''));
   if ($id === '') throw new RuntimeException('missing_master_key');
 
-  $normalized = $item;
+  $normalized = master_data_normalize_item($entity, $item);
   $normalized[$idKey] = $id;
   $normalized['updated_at'] = now_iso();
   $normalized['updated_by'] = $username;
@@ -13170,13 +13507,21 @@ function shell_run(string $command, ?int &$exitCode = null): string {
 }
 
 function git_shell_command(string $repoDir, array $args): string {
+  $safeDirectories = array_values(array_unique(array_filter([
+    str_replace('\\', '/', trim($repoDir)),
+    (($real = realpath($repoDir)) !== false) ? str_replace('\\', '/', $real) : '',
+  ], static fn($value) => is_string($value) && $value !== '')));
   $parts = [
     'GIT_TERMINAL_PROMPT=0',
     'GIT_SSH_COMMAND=' . escapeshellarg('ssh -oBatchMode=yes'),
     'git',
-    '-C',
-    escapeshellarg($repoDir),
   ];
+  foreach ($safeDirectories as $safeDirectory) {
+    $parts[] = '-c';
+    $parts[] = escapeshellarg('safe.directory=' . $safeDirectory);
+  }
+  $parts[] = '-C';
+  $parts[] = escapeshellarg($repoDir);
   foreach ($args as $arg) {
     $parts[] = escapeshellarg((string)$arg);
   }
@@ -14637,6 +14982,10 @@ switch ($action) {
       if ($code !== '') $clean[] = $code;
     }
     save_doc_visibility($DOC_VIS_FILE, $clean);
+    portal_legacy_admin_audit_log('admin_docs_visibility_save', [
+      'count' => count($clean),
+      'hidden' => array_values(array_unique($clean)),
+    ], $me);
     api_json(['ok' => true, 'hidden' => array_values(array_unique($clean)), 'server_time' => now_iso()]);
   }
 
@@ -14660,6 +15009,12 @@ switch ($action) {
 
     $saved = portal_save_display_config($PORTAL_DISPLAY_CONFIG_FILE, $configIn);
     invalidate_scan_cache($DATA_DIR);
+    portal_legacy_admin_audit_log('admin_portal_display_config_save', [
+      'extensions_enabled' => count((array)($saved['extensions']['enabled'] ?? [])),
+      'sidebar_hidden_core_items' => count((array)($saved['sidebar']['hidden_core_items'] ?? [])),
+      'sidebar_hidden_sections' => count((array)($saved['sidebar']['hidden_sections'] ?? [])),
+      'sidebar_hidden_categories' => count((array)($saved['sidebar']['hidden_categories'] ?? [])),
+    ], $me);
     api_json(['ok' => true, 'config' => portal_display_config_public_payload($saved), 'server_time' => now_iso()]);
   }
 
@@ -14681,6 +15036,10 @@ switch ($action) {
     if (!is_array($configIn)) api_json(['ok' => false, 'error' => 'invalid_config'], 400);
 
     $saved = module_access_save_config($MODULE_ACCESS_CONFIG_FILE, $configIn);
+    portal_legacy_admin_audit_log('admin_module_access_save', [
+      'portal_enabled' => count(array_filter((array)($saved['portal_modules'] ?? []), static fn($policy) => is_array($policy) && (($policy['enabled'] ?? true) !== false))),
+      'admin_enabled' => count(array_filter((array)($saved['admin_tabs'] ?? []), static fn($policy) => is_array($policy) && (($policy['enabled'] ?? true) !== false))),
+    ], $me);
     api_json(['ok' => true, 'config' => module_access_public_payload($saved), 'server_time' => now_iso()]);
   }
 
@@ -14715,6 +15074,10 @@ switch ($action) {
       'require_consent' => true,
     ];
     $settings = $store['data_collection'] ?? $defaults;
+    $shadow = portal_system_config_shadow_read('data_collection_settings');
+    if (is_array($shadow)) {
+      $settings = is_array($shadow['settings'] ?? null) ? (array)$shadow['settings'] : $shadow;
+    }
     // merge defaults for any missing keys
     foreach ($defaults as $k => $v) {
       if (!isset($settings[$k])) $settings[$k] = $v;
@@ -14735,14 +15098,38 @@ switch ($action) {
     }
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
     $allowed = ['collect_gps', 'collect_ip', 'collect_device', 'collect_navigation', 'collect_connection', 'require_consent'];
-    $current = $store['data_collection'] ?? [];
+    $before = is_array($store['data_collection'] ?? null) ? (array)$store['data_collection'] : [];
+    $current = $before;
     foreach ($allowed as $key) {
       if (isset($input[$key])) {
         $current[$key] = (bool)$input[$key];
       }
     }
     $store['data_collection'] = $current;
-    users_save($USERS_FILE, $store);
+    $changedKeys = [];
+    foreach ($allowed as $key) {
+      $beforeValue = array_key_exists($key, $before) ? (bool)$before[$key] : null;
+      $afterValue = array_key_exists($key, $current) ? (bool)$current[$key] : null;
+      if ($beforeValue !== $afterValue) {
+        $changedKeys[] = $key;
+      }
+    }
+    try {
+      users_save($USERS_FILE, $store);
+      portal_system_config_shadow_write('data_collection_settings', [
+        'settings' => $current,
+        'updated_by' => (string)($me['username'] ?? ''),
+        'updated_at' => now_iso(),
+      ]);
+    } catch (Throwable $e) {
+      api_json(['ok' => false, 'error' => 'save_failed', 'detail' => $e->getMessage()], 500);
+    }
+    portal_legacy_admin_audit_log('save_data_settings', [
+      'changed_keys' => $changedKeys,
+      'before' => $before,
+      'after' => $current,
+      'count' => count($changedKeys),
+    ], $me);
     api_json(['ok' => true, 'settings' => $current]);
   }
 
@@ -20110,13 +20497,14 @@ if ($username === '') {
     $entity = trim((string)($body['entity'] ?? ''));
     $item = is_array($body['item'] ?? null) ? $body['item'] : null;
     if ($entity === '' || $item === null) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    $item = master_data_normalize_item($entity, $item);
     $idKey = master_data_entity_key($entity);
     if ($idKey === null) api_json(['ok' => false, 'error' => 'invalid_master_entity'], 400);
 
     try {
       $username = (string)($_SESSION['user'] ?? 'system');
       $service = master_data_service();
-      $currentStore = load_master_data_store();
+      $currentStore = load_master_data_active_store();
       $recordId = trim((string)($item[$idKey] ?? ''));
       if ($recordId === '') api_json(['ok' => false, 'error' => 'missing_master_key'], 400);
 
@@ -20145,7 +20533,7 @@ if ($username === '') {
             'data' => $createResult->data,
           ], $statusCode);
         }
-        $currentStore = load_master_data_store();
+        $currentStore = load_master_data_active_store();
         $saved = null;
         foreach (($currentStore[$entity] ?? []) as $row) {
           if (is_array($row) && (string)($row[$idKey] ?? '') === $recordId) {
@@ -20182,6 +20570,17 @@ if ($username === '') {
         }
         $pending = (($updateResult->data['status'] ?? '') === 'pending');
         $pendingMeta = is_array($updateResult->data ?? null) ? $updateResult->data : [];
+        if ($pending) {
+          $changeId = trim((string)($pendingMeta['change_id'] ?? ''));
+          if ($changeId === '' || !$service->approvePendingChange($changeId, $username)) {
+            api_json([
+              'ok' => false,
+              'error' => 'master_data_auto_approve_failed',
+              'message' => 'Không thể tự động duyệt thay đổi dữ liệu nền vừa tạo.',
+            ], 409);
+          }
+          $pending = false;
+        }
       }
 
       if (!$pending && $requestedStatus !== '' && strtolower((string)($existing['status'] ?? '')) !== strtolower($requestedStatus)) {
@@ -20194,7 +20593,7 @@ if ($username === '') {
         }
       }
 
-      $currentStore = load_master_data_store();
+      $currentStore = load_master_data_active_store();
       $saved = $existing;
       foreach (($currentStore[$entity] ?? []) as $row) {
         if (is_array($row) && (string)($row[$idKey] ?? '') === $recordId) {
@@ -20204,7 +20603,7 @@ if ($username === '') {
       }
       $message = $pending
         ? 'Yêu cầu thay đổi đã được đưa vào hàng chờ phê duyệt.'
-        : 'Đã lưu dữ liệu nền có kiểm soát.';
+        : (!empty($pendingMeta['change_id']) ? 'Đã tự động duyệt và lưu dữ liệu nền.' : 'Đã lưu dữ liệu nền có kiểm soát.');
       if (!$pending) {
         shadow_sync_master_data_store($currentStore);
       }
@@ -22098,6 +22497,21 @@ if ($username === '') {
     $hierarchy = build_order_hierarchy($bundle['orders'], $bundle['master'], $mesSnapshot);
     $stats = compute_order_dashboard_stats($bundle['orders'], $hierarchy, $mesSnapshot);
     api_json(['ok' => true, 'data' => $stats, 'read_sources' => $bundle['sources'], 'runtime_mode' => $bundle['runtime_mode']]);
+  }
+
+  case 'manual_runtime_summary': {
+    $me = require_logged_in($store);
+    if (!user_has_any_role($me, admin_roles())) {
+      api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    }
+    $bundle = runtime_read_model_bundle(false);
+    $summary = build_manual_runtime_summary((array)($bundle['master'] ?? []), (array)($bundle['orders'] ?? []));
+    api_json([
+      'ok' => true,
+      'data' => $summary,
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
+    ]);
   }
 
   case 'order_hierarchy': {

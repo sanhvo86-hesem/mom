@@ -1439,7 +1439,7 @@ async function loadAuthoritativeAuditTrail(options={}){
     ADMIN_AUTH_STATE.audit.error = (e && e.message) ? e.message : 'audit_trail_load_failed';
   }finally{
     ADMIN_AUTH_STATE.audit.loading = false;
-    if(currentPage === 'admin' && adminTab === 'activity') renderAdminActivity();
+    if(currentPage === 'admin' && canUserAccessAdminTab('activity')) renderAdmin();
   }
 }
 
@@ -2372,6 +2372,18 @@ function renderModuleBuilderPage(){
   });
 }
 
+function adminTabUsesScopedScroll(tabId){
+  return ['users','dept_title','orgchart','perms','roles','activity'].includes(String(tabId || ''));
+}
+
+function syncPortalScrollMode(page, tabId){
+  const content = document.getElementById('content');
+  const adminPage = document.getElementById('page-admin');
+  const useScopedScroll = page === 'admin' && adminTabUsesScopedScroll(tabId);
+  if(content) content.classList.toggle('admin-scroll-lock', useScopedScroll);
+  if(adminPage) adminPage.classList.toggle('admin-scroll-host', useScopedScroll);
+}
+
 function navigateTo(page, filter, bypassGuard){
   if(page === 'vps-control'){
     if(canUserAccessModule('admin') && canUserAccessAdminTab('infrastructure')){
@@ -2411,6 +2423,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='admin') loadUsersFromServerIfAdmin();
   if(filter !== undefined) currentFilter = filter;
   if(page==='documents' && filter !== undefined) currentFolderPath = []; // Reset folder path on category change
+  syncPortalScrollMode(page, page === 'admin' ? adminTab : '');
   document.querySelectorAll('#content > .page').forEach(p=>p.classList.remove('active'));
   document.getElementById('doc-viewer').classList.remove('active');
   document.getElementById('user-dropdown').classList.remove('show');
@@ -5075,8 +5088,7 @@ let adminUnsaved = false;
 let adminManualRuntimeState = {
   loading:false,
   loaded:false,
-  master:null,
-  hierarchy:[],
+  summary:null,
   lastCreated:null,
   error:''
 };
@@ -5095,6 +5107,7 @@ const ADMIN_TAB_FILTER_DEFAULTS = {
   activity:{search:'',actor:'',eventType:'',aggregateType:''}
 };
 let ADMIN_TAB_FILTERS = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS));
+const ADMIN_RUNTIME_ASSET_VERSION = '20260410d';
 
 function adminFilterState(tab){
   if(!ADMIN_TAB_FILTERS[tab]){
@@ -6369,7 +6382,11 @@ function adminTabGroupCatalog(){
 
 function adminTabBadgeValue(tabId){
   if(tabId === 'users') return USERS.length;
-  if(tabId === 'activity') return canViewActivityLog() ? ADMIN_AUTH_STATE.audit.events.length : '';
+  if(tabId === 'activity'){
+    if(!canViewActivityLog()) return '';
+    if(ADMIN_AUTH_STATE.audit.loading && !ADMIN_AUTH_STATE.audit.loaded) return '…';
+    return ADMIN_AUTH_STATE.audit.events.length;
+  }
   return '';
 }
 
@@ -6406,6 +6423,14 @@ function renderAdminTabNavigation(){
   </div>`;
 }
 
+function adminScopedLayout(headHtml, bodyHtml, bodyClass){
+  return `
+    <section class="admin-scroll-layout">
+      <div class="admin-scroll-head">${headHtml || ''}</div>
+      <div class="admin-scroll-body${bodyClass ? ' ' + bodyClass : ''}">${bodyHtml || ''}</div>
+    </section>`;
+}
+
 function renderAdmin(){
   if(!canUserAccessModule('admin')){
     document.getElementById('page-admin').innerHTML='<div style="text-align:center;padding:60px;color:var(--text-3)">\u26A0 '+T('no_docs')+'</div>';
@@ -6414,26 +6439,18 @@ function renderAdmin(){
   if(!canUserAccessAdminTab(adminTab)){
     adminTab = firstAccessibleAdminTab();
   }
+  syncPortalScrollMode('admin', adminTab);
   const el = document.getElementById('page-admin');
-  const activeUsers = USERS.filter(u=>u.active).length;
   if(['users','dept_title','orgchart'].includes(adminTab)) loadAuthoritativeOrgCatalog({silent:true});
   if(['users','roles','activity'].includes(adminTab)) loadAuthoritativeRoleCatalog({silent:true});
   if(adminTab === 'activity') loadAuthoritativeAuditTrail({silent:true});
   el.innerHTML = `
-    <h2 style="font-size:18px;font-weight:700;margin-bottom:16px">${T('admin_panel')}</h2>
-    <div class="admin-stat-row">
-      <div class="admin-stat"><div class="val">${USERS.length}</div><div class="lbl">${T('admin_total_users')}</div></div>
-      <div class="admin-stat"><div class="val">${DEPARTMENTS.length}</div><div class="lbl">${lang==='en'?'Departments':'Phòng ban'}</div></div>
-      <div class="admin-stat"><div class="val">${Object.keys(ROLES).length}</div><div class="lbl">${T('admin_total_roles')}</div></div>
-      <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">● LIVE</span></div></div>
-      <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
-    </div>
     <div class="admin-console-shell">
       <aside class="admin-console-rail">
         ${renderAdminTabNavigation()}
       </aside>
       <div class="admin-console-main">
-        <div class="admin-panel" id="admin-content"></div>
+        <div class="admin-panel ${adminTabUsesScopedScroll(adminTab) ? 'is-scoped-scroll' : ''}" id="admin-content"></div>
       </div>
     </div>
   `;
@@ -6495,7 +6512,7 @@ function renderAdminMetadataStudio(){
   }
   var script=document.createElement('script');
   script.id='admin-metadata-studio-script';
-  script.src='scripts/portal/32-admin-metadata-studio.js?v=20260409i';
+  script.src='scripts/portal/32-admin-metadata-studio.js?v=' + ADMIN_RUNTIME_ASSET_VERSION;
   script.onload=function(){
     if(typeof window._renderAdminMetadataStudio === 'function'){
       window._renderAdminMetadataStudio(el);
@@ -6510,7 +6527,7 @@ function renderAdminMetadataStudio(){
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
-  var expectedVersion = '20260406a';
+  var expectedVersion = ADMIN_RUNTIME_ASSET_VERSION;
   /* Delegate to external file if loaded, otherwise fallback inline */
   if(typeof window._renderAdminAppearanceFull === 'function' && window._renderAdminAppearanceFullVersion === expectedVersion){
     window._renderAdminAppearanceFull(el, _appSubTab, lang);
@@ -7034,65 +7051,20 @@ function adminFormatRuntimeStamp(value){
   }
 }
 
-function adminManualRuntimeCounts(hierarchy){
-  const counts = { so:0, jo:0, wo:0 };
-  (Array.isArray(hierarchy) ? hierarchy : []).forEach(so => {
-    counts.so += 1;
-    (Array.isArray(so.job_orders) ? so.job_orders : []).forEach(jo => {
-      counts.jo += 1;
-      counts.wo += (Array.isArray(jo.work_orders) ? jo.work_orders.length : 0);
-    });
-  });
-  return counts;
-}
-
-function adminManualRuntimeRecentRows(hierarchy){
-  const rows = [];
-  (Array.isArray(hierarchy) ? hierarchy : []).forEach(so => {
-    rows.push({
-      type:'SO',
-      id:String(so.so_number || ''),
-      title:[so.customer_name || so.customer_id || '', so.customer_po ? ('PO ' + so.customer_po) : ''].filter(Boolean).join(' · '),
-      status:String(so.status || ''),
-      updated_at:String(so.updated_at || so.created_at || '')
-    });
-    (Array.isArray(so.job_orders) ? so.job_orders : []).forEach(jo => {
-      rows.push({
-        type:'JO',
-        id:String(jo.jo_number || ''),
-        title:[jo.part_number || '', jo.part_revision || ''].filter(Boolean).join(' / '),
-        status:String(jo.status || ''),
-        updated_at:String(jo.updated_at || jo.created_at || '')
-      });
-      (Array.isArray(jo.work_orders) ? jo.work_orders : []).forEach(wo => {
-        rows.push({
-          type:'WO',
-          id:String(wo.wo_number || ''),
-          title:['OP' + String(wo.operation_number || '-'), wo.operation_desc || '', wo.machine_id || ''].filter(Boolean).join(' · '),
-          status:String(wo.status || ''),
-          updated_at:String(wo.updated_at || wo.created_at || '')
-        });
-      });
-    });
-  });
-  return rows.sort((a,b) => String(b.updated_at || '').localeCompare(String(a.updated_at || ''))).slice(0, 10);
-}
-
 async function loadAdminManualRuntimeState(options={}){
   if(adminManualRuntimeState.loading && !options.force) return;
   adminManualRuntimeState.loading = true;
   adminManualRuntimeState.error = '';
   if(currentPage === 'admin' && adminTab === 'manual_runtime') renderAdminManualRuntime();
   try{
-    const [masterRes, hierarchyRes] = await Promise.all([
-      apiCall('master_data_snapshot', null, 'GET'),
-      apiCall('order_hierarchy', null, 'GET')
-    ]);
-    if(!(masterRes && masterRes.ok)) throw new Error((masterRes && masterRes.error) || 'master_data_snapshot_failed');
-    if(!(hierarchyRes && hierarchyRes.ok)) throw new Error((hierarchyRes && hierarchyRes.error) || 'order_hierarchy_failed');
-    adminManualRuntimeState.master = masterRes.data || {};
-    adminManualRuntimeState.hierarchy = hierarchyRes.data || hierarchyRes.hierarchy || [];
-    adminManualRuntimeState.lastCreated = adminManualRuntimeRecentRows(adminManualRuntimeState.hierarchy)[0] || null;
+    const summaryRes = await apiCall('manual_runtime_summary', null, 'GET', 15000);
+    if(!(summaryRes && summaryRes.ok)) throw new Error((summaryRes && summaryRes.error) || 'manual_runtime_summary_failed');
+    const summary = Object.assign({}, summaryRes.data || {}, {
+      runtime_mode: summaryRes.runtime_mode || null,
+      read_sources: summaryRes.read_sources || {}
+    });
+    adminManualRuntimeState.summary = summary;
+    adminManualRuntimeState.lastCreated = (Array.isArray(summary.recent_rows) ? summary.recent_rows[0] : null) || null;
     adminManualRuntimeState.loaded = true;
   }catch(e){
     adminManualRuntimeState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load manual runtime data.' : 'Không tải được dữ liệu vận hành thủ công.');
@@ -7145,23 +7117,25 @@ function renderAdminManualRuntime(){
     return;
   }
 
-  const master = adminManualRuntimeState.master || {};
-  const hierarchy = Array.isArray(adminManualRuntimeState.hierarchy) ? adminManualRuntimeState.hierarchy : [];
-  const orderCounts = adminManualRuntimeCounts(hierarchy);
-  const recentRows = adminManualRuntimeRecentRows(hierarchy);
+  const summary = adminManualRuntimeState.summary || {};
+  const masterCounts = summary.master_counts || {};
+  const orderCounts = summary.order_counts || { so:0, jo:0, wo:0 };
+  const recentRows = Array.isArray(summary.recent_rows) ? summary.recent_rows : [];
+  const runtimeMode = (summary.runtime_mode && summary.runtime_mode.mode) ? String(summary.runtime_mode.mode) : 'UNKNOWN';
+  const readSources = summary.read_sources || {};
   const checklist = [
-    { label:lang==='en'?'Customers':'Khách hàng', count:(master.customers || []).length, entity:'customers' },
-    { label:'Part Number', count:(master.parts || []).length, entity:'parts' },
-    { label:'Revision', count:(master.revisions || []).length, entity:'revisions' },
-    { label:'Work center', count:(master.work_centers || []).length, entity:'work_centers' },
-    { label:lang==='en'?'Machines':'Máy', count:(master.machines || []).length, entity:'machines' },
-    { label:lang==='en'?'Operators':'Người vận hành', count:(master.operators || []).length, entity:'operators' }
+    { label:lang==='en'?'Customers':'Khách hàng', count:Number(masterCounts.customers || 0), entity:'customers' },
+    { label:'Part Number', count:Number(masterCounts.parts || 0), entity:'parts' },
+    { label:'Revision', count:Number(masterCounts.revisions || 0), entity:'revisions' },
+    { label:'Work center', count:Number(masterCounts.work_centers || 0), entity:'work_centers' },
+    { label:lang==='en'?'Machines':'Máy', count:Number(masterCounts.machines || 0), entity:'machines' },
+    { label:lang==='en'?'Operators':'Người vận hành', count:Number(masterCounts.operators || 0), entity:'operators' }
   ];
   const missing = checklist.filter(item => Number(item.count || 0) === 0);
   const stats = [
-    { label:lang==='en'?'Customers':'Khách hàng', value:(master.customers || []).length },
-    { label:'Part Number', value:(master.parts || []).length },
-    { label:'Revision', value:(master.revisions || []).length },
+    { label:lang==='en'?'Customers':'Khách hàng', value:Number(masterCounts.customers || 0) },
+    { label:'Part Number', value:Number(masterCounts.parts || 0) },
+    { label:'Revision', value:Number(masterCounts.revisions || 0) },
     { label:'SO', value:orderCounts.so },
     { label:'JO', value:orderCounts.jo },
     { label:'WO', value:orderCounts.wo }
@@ -7180,6 +7154,11 @@ function renderAdminManualRuntime(){
             <div style="margin-top:12px;font-size:13px;color:#486581">${lang==='en'
               ? 'The order create forms now accept manual SO / JO / WO numbers. Leave the field blank if you still want automatic numbering.'
               : 'Biểu mẫu tạo đơn hiện đã cho phép nhập số SO / JO / WO thủ công. Nếu để trống, hệ thống vẫn tự sinh mã như trước.'}</div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Runtime':'Runtime'}: ${escapeHtml(runtimeMode)}</span>
+              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Master source':'Nguồn master'}: ${escapeHtml(String((readSources.master_data || {}).source || '-'))}</span>
+              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Orders source':'Nguồn orders'}: ${escapeHtml(String((readSources.orders || {}).source || '-'))}</span>
+            </div>
           </div>
           <button class="btn-admin secondary" onclick="loadAdminManualRuntimeState({force:true})">⟳ ${lang==='en'?'Refresh':'Làm mới'}</button>
         </div>
@@ -7408,6 +7387,8 @@ function renderAdminDataSources(){
   const launchBlockers = Array.isArray(shadow.launch_blockers) ? shadow.launch_blockers.length : 0;
   const epicorHealth = epicor.health || {};
   const connectorKpis = connector.kpis || {};
+  const dbProbeReachable = !!(runtimeMode.database_probe_reachable || runtimeMode.postgres_reachable);
+  const dbProbeConfigured = !!runtimeMode.database_configured;
 
   el.innerHTML = `
     <div style="display:grid;gap:16px">
@@ -7434,8 +7415,8 @@ function renderAdminDataSources(){
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
           <div style="font-size:12px;color:#486581">PostgreSQL</div>
-          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${runtimeMode.postgres_reachable ? '#0f766e' : '#b45309'}">${runtimeMode.postgres_reachable ? (lang==='en'?'Reachable':'Kết nối được') : (draft.use_postgres ? (lang==='en'?'Unavailable':'Chưa kết nối') : 'JSON')}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.postgres_error || (lang==='en'?'No PostgreSQL error reported':'Không có lỗi PostgreSQL được báo'))}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${dbProbeReachable ? '#0f766e' : '#b45309'}">${dbProbeReachable ? (lang==='en'?'Reachable':'Kết nối được') : (dbProbeConfigured ? (lang==='en'?'Unavailable':'Chưa kết nối') : (lang==='en'?'Not configured':'Chưa cấu hình'))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.database_probe_error || runtimeMode.postgres_error || (dbProbeConfigured ? (lang==='en'?'Runtime path may still be JSON-only even though a DB profile exists.':'Runtime có thể vẫn đang JSON-only dù đã có hồ sơ DB.') : (lang==='en'?'No live DB profile configured yet':'Chưa cấu hình hồ sơ DB thật')))}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
           <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
@@ -7559,20 +7540,18 @@ function renderAdminDataSources(){
 }
 
 function renderAdminUsers(){
-  // Fallback: if no users from server, use demo data
-  if(!USERS.length && typeof DEMO_USERS !== 'undefined') USERS = JSON.parse(JSON.stringify(DEMO_USERS));
   const el = document.getElementById('admin-content');
   const deptMap = {};
   DEPARTMENTS.forEach(d=>deptMap[d.code]=d);
   
-  const viewToggle = `<div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg-surface,#fff)">
-    <button onclick="adminUserViewMode='cards';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;cursor:pointer;background:${adminUserViewMode==='cards'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='cards'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="Card view">&#9638;</button>
-    <button onclick="adminUserViewMode='list';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;border-left:1px solid var(--border);cursor:pointer;background:${adminUserViewMode==='list'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='list'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="List view">☰</button>
+  const viewToggle = `<div class="admin-view-toggle" role="group" aria-label="${lang==='en'?'User view mode':'Chế độ hiển thị người dùng'}">
+    <button type="button" class="admin-view-toggle-btn ${adminUserViewMode==='cards'?'is-active':''}" aria-pressed="${adminUserViewMode==='cards'?'true':'false'}" onclick="adminUserViewMode='cards';renderAdminUsers()" title="${lang==='en'?'Card view':'Xem dạng thẻ'}">&#9638;</button>
+    <button type="button" class="admin-view-toggle-btn ${adminUserViewMode==='list'?'is-active':''}" aria-pressed="${adminUserViewMode==='list'?'true':'false'}" onclick="adminUserViewMode='list';renderAdminUsers()" title="${lang==='en'?'List view':'Xem dạng danh sách'}">☰</button>
   </div>`;
 
   let usersHtml = '';
   if(adminUserViewMode === 'list'){
-    usersHtml = `<div style="overflow-x:auto"><table class="admin-table" id="user-list-table" style="width:100%;font-size:12px">
+    usersHtml = `<div class="admin-table-wrap"><table class="admin-table" id="user-list-table" style="width:100%;font-size:12px">
       <thead><tr style="background:var(--bg-surface-alt,#f8fafc)">
         <th style="padding:8px 10px;text-align:left;font-size:11px">#</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Status':'TT'}</th>
@@ -7636,6 +7615,15 @@ function renderAdminUsers(){
     </div>`;
   }
 
+  if(!USERS.length){
+    usersHtml = `<div style="padding:18px 20px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:16px;background:color-mix(in srgb, var(--amber) 8%, var(--bg-surface,#fff));color:var(--text-secondary,#475569);line-height:1.7">
+      <strong style="display:block;color:var(--amber-dark,#b45309)">${lang==='en'?'No authoritative user records loaded':'Chưa nạp được user authoritative'}</strong>
+      ${lang==='en'
+        ? 'This screen will stay empty until the runtime user store responds. Demo users are no longer injected into the admin workspace.'
+        : 'Màn hình này sẽ để trống cho tới khi runtime user store phản hồi. Hệ thống không còn bơm demo user vào workspace quản trị nữa.'}
+    </div>`;
+  }
+
   const orgNotice = !ADMIN_AUTH_STATE.org.loaded ? `<div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
     ${ADMIN_AUTH_STATE.org.loading
       ? (lang==='en'
@@ -7647,10 +7635,10 @@ function renderAdminUsers(){
     ${ADMIN_AUTH_STATE.org.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.org.error)}</div>` : ''}
   </div>` : '';
 
-  el.innerHTML = `
+  const headHtml = `
     <div class="admin-toolbar">
       <input type="text" placeholder="${lang==='en'?'Search users...':'Tìm người dùng...'}" oninput="filterAdminUserCards(this.value)" id="admin-user-search">
-      <select id="admin-user-dept-filter" onchange="filterAdminUserCards(document.getElementById('admin-user-search').value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:140px;background:var(--bg-surface,#fff);color:var(--text-primary)">
+      <select id="admin-user-dept-filter" onchange="filterAdminUserCards(document.getElementById('admin-user-search').value)" style="min-width:140px">
         <option value="">${lang==='en'?'All departments':'Tất cả phòng ban'}</option>
         ${DEPARTMENTS.map(d=>`<option value="${d.code}">${d.code} — ${lang==='en'?d.labelEn:d.label}</option>`).join('')}
       </select>
@@ -7664,8 +7652,9 @@ function renderAdminUsers(){
       </label>
       ` : ''}
     </div>
-    ${orgNotice}
-    ${usersHtml}`;
+    ${orgNotice}`;
+
+  el.innerHTML = adminScopedLayout(headHtml, usersHtml);
 }
 
 function filterAdminUserCards(q){
@@ -8577,7 +8566,7 @@ function renderAdminPerms(){
     }
   });
 
-  el.innerHTML=`
+  const bodyHtml = `
     <div class="perm-grid">
       <div class="pg-sidebar">
         <div style="padding:8px 12px;font-size:10px;font-weight:700;color:var(--text-3);border-bottom:1px solid var(--border)">${lang==='en'?'SELECT ROLE':'CHỌN VAI TRÒ'}</div>
@@ -8599,11 +8588,15 @@ function renderAdminPerms(){
         ${catHtml}
       </div>
     </div>
-    <div class="admin-save-bar" id="admin-save-bar">
+    <div class="admin-save-bar" id="admin-save-bar" style="${adminUnsaved ? 'display:flex' : 'display:none'}">
       <span class="save-hint">${adminUnsaved?'<b>⚠ '+(lang==='en'?'Unsaved changes':'Có thay đổi chưa lưu')+'</b>':lang==='en'?'Edit permissions then click Save':'Chỉnh phân quyền rồi nhấn Lưu'}</span>
       <button class="btn-admin secondary" onclick="resetAuthoritativeRoleDocsEditor()">↩ Reset</button>
-      <button class="btn-admin primary" onclick="adminSaveAll()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+      <button class="btn-admin primary" onclick="adminSaveAll()">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
     </div>`;
+  el.innerHTML = `
+    <section class="admin-scroll-layout">
+      <div class="admin-scroll-body perm-body">${bodyHtml}</div>
+    </section>`;
 }
 
 // Toggle all docs in a specific subfolder (multi-level aware)
@@ -8711,8 +8704,8 @@ function renderAdminDeptTitleFallback(){
     </article>`;
   }).join('');
 
-  panel.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+  const headHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
       <div>
         <h3 style="font-size:14px;font-weight:700;margin:0">🏢 ${lang==='en'?'Organization units and titles':'Phòng ban & Chức danh'}</h3>
         <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
@@ -8723,15 +8716,16 @@ function renderAdminDeptTitleFallback(){
         <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Retry runtime':'Thử lại runtime'}</button>
       </div>
     </div>
-    <div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
+    <div style="padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
       ${ADMIN_AUTH_STATE.org.loading
         ? (lang==='en'?'Authoritative organization catalog is still loading in the background. Create/update actions will unlock after runtime responds.':'Catalog tổ chức authoritative vẫn đang tải nền. Các thao tác tạo/cập nhật sẽ mở lại sau khi runtime phản hồi.')
         : (lang==='en'?'Authoritative create/update actions are temporarily disabled until the HCM runtime responds.':'Các thao tác tạo/cập nhật authoritative đang tạm khóa cho tới khi runtime HCM phản hồi lại.')}
       ${ADMIN_AUTH_STATE.org.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.org.error)}</div>` : ''}
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
-      ${deptCards || `<div class="hm-empty">${lang==='en'?'No department projection available.':'Chưa có projection phòng ban khả dụng.'}</div>`}
     </div>`;
+  const bodyHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    ${deptCards || `<div class="hm-empty">${lang==='en'?'No department projection available.':'Chưa có projection phòng ban khả dụng.'}</div>`}
+  </div>`;
+  panel.innerHTML = adminScopedLayout(headHtml, bodyHtml);
 }
 
 function renderAdminOrgChartFallback(){
@@ -8762,8 +8756,8 @@ function renderAdminOrgChartFallback(){
       </div>
     </section>`;
   }).join('');
-  el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+  const headHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
       <div>
         <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization chart':'Sơ đồ tổ chức'}</h3>
         <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
@@ -8772,18 +8766,19 @@ function renderAdminOrgChartFallback(){
       </div>
       <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Retry runtime':'Thử lại runtime'}</button>
     </div>
-    <div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
+    <div style="padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
       ${ADMIN_AUTH_STATE.org.error ? escapeHtml(ADMIN_AUTH_STATE.org.error) : (lang==='en'?'The authoritative HCM org chart is still loading.':'Sơ đồ tổ chức HCM authoritative vẫn đang tải.')}
-    </div>
-    <div style="display:grid;gap:12px">${blocks || `<div class="hm-empty">${lang==='en'?'No portal organization projection available.':'Chưa có projection tổ chức portal khả dụng.'}</div>`}</div>`;
+    </div>`;
+  const bodyHtml = `<div style="display:grid;gap:12px">${blocks || `<div class="hm-empty">${lang==='en'?'No portal organization projection available.':'Chưa có projection tổ chức portal khả dụng.'}</div>`}</div>`;
+  el.innerHTML = adminScopedLayout(headHtml, bodyHtml);
 }
 
 function renderAdminRolesFallback(){
   const el = document.getElementById('admin-content');
   if(!el) return;
   const rows = legacyRolesForAdminGrid();
-  el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+  const headHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
       <div>
         <h3 style="font-size:14px;font-weight:700;margin:0">🛡 ${lang==='en'?'Role catalog':'Catalog vai trò'}</h3>
         <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
@@ -8792,13 +8787,13 @@ function renderAdminRolesFallback(){
       </div>
       <button class="btn-admin secondary" onclick="loadAuthoritativeRoleCatalog({force:true})">🔄 ${lang==='en'?'Retry runtime':'Thử lại runtime'}</button>
     </div>
-    <div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
+    <div style="padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--amber-dark,#b45309)">
       ${lang==='en'
         ? 'The tab is available for inspection immediately. Authoritative create/update actions will re-enable automatically when the role runtime responds.'
         : 'Tab vẫn mở để kiểm tra ngay. Các thao tác tạo/cập nhật authoritative sẽ tự mở lại khi runtime vai trò phản hồi.'}
       ${ADMIN_AUTH_STATE.roles.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.roles.error)}</div>` : ''}
-    </div>
-    <div style="overflow-x:auto">
+    </div>`;
+  const bodyHtml = `<div style="overflow-x:auto">
       <table class="admin-table">
         <thead><tr>
           <th></th><th>${lang==='en'?'Role':'Vai trò'}</th><th>Code</th><th>Dept</th><th>Level</th><th>${lang==='en'?'Members':'Thành viên'}</th><th>${lang==='en'?'Mode':'Chế độ'}</th>
@@ -8821,6 +8816,7 @@ function renderAdminRolesFallback(){
         </tbody>
       </table>
     </div>`;
+  el.innerHTML = adminScopedLayout(headHtml, bodyHtml, 'has-x-scroll');
 }
 
 function renderAdminActivityFallback(){
@@ -8828,11 +8824,11 @@ function renderAdminActivityFallback(){
   if(!el) return;
   const auditEvents = legacyAuditEventsForAdmin();
   const uniqueUsers = [...new Set(auditEvents.map(item => item.actor_name).filter(Boolean))];
-  el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+  const headHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'Activity fallback view':'Kiểm soát hành vi (fallback)'}</h3>
       <div style="display:flex;gap:8px;align-items:center">
-        <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">
+        <select id="activity-user-filter" class="hm-input hm-select" onchange="filterActivityLog()" style="width:auto;min-width:160px">
           <option value="">${lang==='en'?'All actors':'Tất cả actor'}</option>
           ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('')}
         </select>
@@ -8840,13 +8836,13 @@ function renderAdminActivityFallback(){
         <button class="btn-admin secondary" onclick="exportActivityCSV()">📥 CSV</button>
       </div>
     </div>
-    <div style="font-size:11px;color:var(--amber-dark,#b45309);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
+    <div style="font-size:11px;color:var(--amber-dark,#b45309);padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
       ${lang==='en'
         ? 'Server-side audit trail is temporarily unavailable. This tab is showing browser-side session telemetry so you can still investigate recent activity.'
         : 'Audit trail phía server đang tạm unavailable. Tab này đang hiển thị telemetry phiên trên trình duyệt để anh vẫn kiểm tra được hoạt động gần đây.'}
       ${ADMIN_AUTH_STATE.audit.error ? `<div style="margin-top:6px"><b>Runtime:</b> ${escapeHtml(ADMIN_AUTH_STATE.audit.error)}</div>` : ''}
-    </div>
-    <div id="activity-sessions-list" style="max-height:550px;overflow-y:auto">
+    </div>`;
+  const bodyHtml = `<div id="activity-sessions-list">
       ${auditEvents.length === 0
         ? `<div style="text-align:center;padding:40px;color:var(--text-3)">${lang==='en'?'No local session telemetry recorded yet':'Chưa có telemetry phiên cục bộ nào được ghi lại'}</div>`
         : auditEvents.map((event, idx) => {
@@ -8877,6 +8873,7 @@ function renderAdminActivityFallback(){
           </div>`;
         }).join('')}
     </div>`;
+  el.innerHTML = adminScopedLayout(headHtml, bodyHtml);
 }
 
 // ═══════════════════════════════════════════════════
@@ -8978,7 +8975,7 @@ function renderAdminDeptTitle(){
     </article>`;
   }).join('');
 
-  panel.innerHTML = `
+  const headHtml = `
     <section class="admin-authority-section">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
         <div>
@@ -8999,14 +8996,11 @@ function renderAdminDeptTitle(){
         <button class="btn-admin primary" onclick="promptCreateAuthoritativeOrgUnit()">＋ Thêm đơn vị</button>
         <button class="btn-admin secondary" onclick="(function(){const code=(prompt('Nhập mã đơn vị để thêm vị trí:','')||'').trim().toUpperCase();if(!code)return;const unit=(ADMIN_AUTH_STATE.org.orgUnits||[]).find(x=>String(x.org_unit_code||'').toUpperCase()===code);if(!unit){showToast('⚠ Không tìm thấy đơn vị','error');return;}promptCreateAuthoritativePosition(unit.hcm_org_unit_id);})();">＋ Thêm vị trí</button>
       </div>
-      <div class="admin-authority-meta-strip">
-        <span>${filteredUnits.length} / ${orgUnits.length} đơn vị hiển thị</span>
-        <span>${positions.length} vị trí trong catalog</span>
-      </div>
-      <div class="admin-authority-grid">
-        ${cards || `<div class="hm-empty">Không có đơn vị nào khớp bộ lọc hiện tại.</div>`}
-      </div>
     </section>`;
+  const bodyHtml = `<div class="admin-authority-grid">
+    ${cards || `<div class="hm-empty">Không có đơn vị nào khớp bộ lọc hiện tại.</div>`}
+  </div>`;
+  panel.innerHTML = adminScopedLayout(headHtml, bodyHtml);
 }
 
 async function promptCreateAuthoritativeOrgUnit(){
@@ -9255,7 +9249,8 @@ function renderAdminOrgChart(){
   const childrenByParent = {};
   const positionsByUnit = {};
   const employeesByPosition = {};
-  const portalUsersByDeptTitle = {};
+  const portalUsersByPosition = {};
+  const portalUsersByUnit = {};
   const unitById = {};
 
   orgUnits.forEach(unit=>{
@@ -9275,21 +9270,37 @@ function renderAdminOrgChart(){
     employeesByPosition[positionId].push(employee);
   });
   USERS.filter(u=>u.active!==false).forEach(user=>{
-    const key = `${String(user.dept||'')}__${String(user.title||'')}`;
-    if(!portalUsersByDeptTitle[key]) portalUsersByDeptTitle[key] = [];
-    portalUsersByDeptTitle[key].push(user);
+    const resolved = resolveAuthoritativeUserAssignment({
+      dept: user.dept,
+      title: user.title,
+      hcm_org_unit_id: user.hcm_org_unit_id,
+      hcm_position_id: user.hcm_position_id
+    });
+    const unitId = String(resolved.orgUnitId || user.hcm_org_unit_id || '');
+    const positionId = String(resolved.positionId || user.hcm_position_id || '');
+    if(unitId){
+      if(!portalUsersByUnit[unitId]) portalUsersByUnit[unitId] = [];
+      portalUsersByUnit[unitId].push(user);
+    }
+    if(positionId){
+      if(!portalUsersByPosition[positionId]) portalUsersByPosition[positionId] = [];
+      portalUsersByPosition[positionId].push(user);
+    }
   });
 
   const unitMatchesFilter = {};
   function matchesUnitSearch(unit){
-    const unitPositions = positionsByUnit[String(unit.hcm_org_unit_id || '')] || [];
-    const deptUsers = USERS.filter(u=>String(u.dept||'') === String(unit.org_unit_code||''));
+    const unitId = String(unit.hcm_org_unit_id || '');
+    const unitPositions = positionsByUnit[unitId] || [];
+    const deptUsers = portalUsersByUnit[unitId] || [];
     return adminContainsNeedle(filters.search, [
       unit.org_unit_code,
       unit.org_unit_name,
       unit.org_unit_type,
+      unit.manager_employee_id,
       ...unitPositions.map(position=>position.position_title),
       ...unitPositions.map(position=>position.position_code),
+      ...unitPositions.map(position=>position.reports_to_position_title),
       ...deptUsers.map(user=>user.name),
       ...deptUsers.map(user=>user.username)
     ]);
@@ -9313,6 +9324,33 @@ function renderAdminOrgChart(){
     return unitMatchesFilter[unitId];
   }
 
+  function renderPositionCard(position){
+    const positionId = String(position.hcm_position_id || '');
+    const activePosition = String(position.status || 'active') !== 'inactive';
+    const assignedEmployees = employeesByPosition[positionId] || [];
+    const portalUsers = portalUsersByPosition[positionId] || [];
+    const badges = [
+      `<span class="admin-inline-badge ${activePosition ? 'is-active' : 'is-inactive'}">${activePosition ? 'active' : 'inactive'}</span>`,
+      `<span class="admin-inline-badge">HC ${escapeHtml(String(position.required_headcount || 1))}</span>`,
+      `<span class="admin-inline-badge">HCM ${assignedEmployees.length}</span>`,
+      `<span class="admin-inline-badge">Portal ${portalUsers.length}</span>`
+    ].join('');
+    const personCloud = [...assignedEmployees.map(emp=>`<span class="admin-inline-badge is-active">${escapeHtml(String(emp.employee_lookup_name || emp.employee_id || 'employee'))}</span>`), ...portalUsers.map(user=>`<span class="admin-inline-badge">@${escapeHtml(String(user.username || ''))}</span>`)].join('');
+
+    return `<article class="admin-org-position ${activePosition ? '' : 'is-inactive'}">
+      <div class="admin-org-position-head">
+        <div>
+          <div class="admin-org-position-title">${escapeHtml(String(position.position_title || ''))}</div>
+          <div class="admin-org-position-meta">${escapeHtml(String(position.position_code || ''))} • reports-to ${escapeHtml(String(position.reports_to_position_title || '—'))}</div>
+        </div>
+        <div class="admin-authority-chip-row">${badges}</div>
+      </div>
+      ${personCloud
+        ? `<div class="admin-authority-chip-row" style="margin-top:8px">${personCloud}</div>`
+        : `<div class="muted" style="margin-top:8px;font-size:11px">Chưa có gán nhân sự cho vị trí này.</div>`}
+    </article>`;
+  }
+
   function renderOrgUnitNode(unit, depth){
     const color = defaultDepartmentColor(unit.org_unit_code);
     const unitId = String(unit.hcm_org_unit_id || '');
@@ -9322,52 +9360,29 @@ function renderAdminOrgChart(){
       .slice()
       .sort((a,b)=>String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||'')));
     const active = String(unit.status || 'active') !== 'inactive';
-    const unitUsers = USERS.filter(u=>String(u.dept||'') === String(unit.org_unit_code||'') && u.active !== false);
-    const marginLeft = depth * 18;
+    const unitUsers = portalUsersByUnit[unitId] || [];
+    const positionHtml = unitPositions.map(position => renderPositionCard(position)).join('');
+    const childHtml = childUnits.map(child => renderOrgUnitNode(child, depth + 1)).join('');
     return `
-      <div style="margin-left:${marginLeft}px;border:1px solid color-mix(in srgb, ${color} 24%, var(--border));border-radius:14px;background:var(--bg-surface,#fff);overflow:hidden">
-        <div style="padding:12px 14px;background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc));border-bottom:1px solid color-mix(in srgb, ${color} 24%, var(--border));display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
-          <div>
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <span style="font-weight:800;color:${color}">${escapeHtml(String(unit.org_unit_code||''))}</span>
-              <span style="font-weight:700">${escapeHtml(String(unit.org_unit_name||''))}</span>
-              <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${active?'color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff))':'color-mix(in srgb, var(--amber) 14%, var(--bg-surface,#fff))'};border:1px solid color-mix(in srgb, ${color} 18%, var(--border));color:${active?'var(--green-dark,#15803d)':'var(--amber-dark,#b45309)'}">${escapeHtml(String(unit.org_unit_type||'department'))}</span>
-            </div>
-            <div class="muted" style="margin-top:4px;font-size:11px">
-              ${unitPositions.length} vị trí • ${unitUsers.length} user portal • ${childUnits.length} đơn vị con
-            </div>
-          </div>
-          <div style="font-size:11px;color:var(--text-3)">
-            Manager employee: <b>${escapeHtml(String(unit.manager_employee_id || '—'))}</b>
-          </div>
-        </div>
-        <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--bg-surface-alt,#f8fafc)">
-          ${unitPositions.length ? unitPositions.map(position=>{
-            const activePosition = String(position.status || 'active') !== 'inactive';
-            const assignedEmployees = employeesByPosition[String(position.hcm_position_id || '')] || [];
-            const portalUsers = portalUsersByDeptTitle[`${String(unit.org_unit_code||'')}__${String(position.position_title||'')}`] || [];
-            return `<div style="border:1px solid var(--border);border-radius:10px;background:var(--bg-surface,#fff);padding:10px 12px">
-              <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
-                <div>
-                  <div style="font-weight:700">${escapeHtml(String(position.position_title || ''))}</div>
-                  <div class="muted" style="font-size:11px;margin-top:2px">${escapeHtml(String(position.position_code || ''))} • reports-to ${escapeHtml(String(position.reports_to_position_title || '—'))}</div>
-                </div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:${activePosition?'var(--bg-surface,#fff)':'color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff))'};color:${activePosition?'var(--text-2,#475569)':'var(--amber-dark,#b45309)'}">${activePosition?'active':'inactive'}</span>
-                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));color:var(--brand-2)">HC ${escapeHtml(String(position.required_headcount || 1))}</span>
-                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 24%, var(--border));color:var(--green-dark,#15803d)">HCM ${assignedEmployees.length}</span>
-                  <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--cyan) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--cyan) 24%, var(--border));color:var(--cyan-dark,#0f766e)">Portal ${portalUsers.length}</span>
-                </div>
+      <section class="admin-org-node" style="--org-accent:${color};--org-indent:${depth * 24}px">
+        <div class="admin-org-node-shell${active ? '' : ' is-inactive'}">
+          <div class="admin-org-node-head">
+            <div>
+              <div class="admin-org-node-title">
+                <span class="admin-org-node-code">${escapeHtml(String(unit.org_unit_code||''))}</span>
+                <span class="admin-org-node-name">${escapeHtml(String(unit.org_unit_name||''))}</span>
+                <span class="admin-org-node-kind">${escapeHtml(String(unit.org_unit_type||'department'))}</span>
               </div>
-              ${(assignedEmployees.length || portalUsers.length) ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                ${assignedEmployees.map(emp=>`<span style="font-size:10px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));color:var(--green-dark,#166534);border:1px solid color-mix(in srgb, var(--green) 22%, var(--border))">${escapeHtml(String(emp.employee_lookup_name || emp.employee_id || 'employee'))}</span>`).join('')}
-                ${portalUsers.map(user=>`<span style="font-size:10px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb, var(--cyan) 10%, var(--bg-surface,#fff));color:var(--cyan-dark,#0f766e);border:1px solid color-mix(in srgb, var(--cyan) 22%, var(--border))">@${escapeHtml(String(user.username || ''))}</span>`).join('')}
-              </div>` : '<div class="muted" style="margin-top:8px;font-size:11px">Chưa có gán nhân sự cho vị trí này.</div>'}
-            </div>`;
-          }).join('') : '<div class="muted" style="padding:10px 12px;background:var(--bg-surface,#fff);border:1px dashed var(--border);border-radius:10px">Đơn vị này chưa có vị trí nào trong HCM runtime.</div>'}
-          ${childUnits.map(child => renderOrgUnitNode(child, depth + 1)).join('')}
+              <div class="admin-org-node-summary">${unitPositions.length} vị trí • ${unitUsers.length} user portal • ${childUnits.length} đơn vị con</div>
+            </div>
+            <div class="admin-org-node-manager">Manager employee: <b>${escapeHtml(String(unit.manager_employee_id || '—'))}</b></div>
+          </div>
+          <div class="admin-org-node-body">
+            ${positionHtml || '<div class="admin-org-placeholder">Đơn vị này chưa có vị trí nào trong HCM runtime.</div>'}
+          </div>
         </div>
-      </div>
+        ${childHtml ? `<div class="admin-org-node-children">${childHtml}</div>` : ''}
+      </section>
     `;
   }
 
@@ -9375,15 +9390,13 @@ function renderAdminOrgChart(){
   const visibleRoots = roots.filter(root => isUnitVisible(String(root.hcm_org_unit_id || '')));
   const html = visibleRoots.map(root => renderOrgUnitNode(root, 0)).join('');
 
-  el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+  const headHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
       <div>
         <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization chart':'Sơ đồ tổ chức authoritative'}</h3>
-        <div style="font-size:11px;color:var(--text-3);margin-top:4px">
-          ${lang==='en'
-            ?'Generated from HCM org units and positions, then cross-checked against portal users. This replaces the old synthetic role-level diagram.'
-            :'Dựng từ HCM org units và positions, sau đó đối chiếu với user portal. Đây là projection authoritative thay cho sơ đồ suy diễn theo level vai trò.'}
-        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
+          ?'Authoritative projection from HCM org units, positions and mapped portal users.'
+          :'Projection authoritative từ HCM org units, positions và user portal đã map.'}</div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
@@ -9399,13 +9412,14 @@ function renderAdminOrgChart(){
       </select>
       <button class="btn-admin secondary" onclick="resetAdminFilters('orgchart')">↺ Reset filter</button>
     </div>
-    <div class="admin-authority-meta-strip" style="margin-bottom:16px">
+    <div class="admin-authority-meta-strip">
       <span>${visibleRoots.length} / ${roots.length} cây gốc hiển thị</span>
       <span>${orgUnits.length} org unit • ${positions.length} position • ${hcmEmployees.length} HCM employee</span>
-    </div>
-    <div style="border:1px solid var(--border);border-radius:12px;overflow:auto;background:var(--bg-surface-alt,#fafbfc);max-height:680px;padding:12px;display:flex;flex-direction:column;gap:10px">
-      ${html || '<div class="hm-empty">Không có org unit nào khớp bộ lọc hiện tại.</div>'}
     </div>`;
+  const bodyHtml = `<div class="admin-org-tree">
+    ${html || '<div class="hm-empty">Không có org unit nào khớp bộ lọc hiện tại.</div>'}
+  </div>`;
+  el.innerHTML = adminScopedLayout(headHtml, bodyHtml);
 }
 
 function exportOrgChartSVG(){
@@ -9445,12 +9459,13 @@ function renderAdminActivity(){
       event.aggregate_type,
       event.aggregate_id,
       event.ip_address,
-      JSON.stringify(event.payload || {})
+      JSON.stringify(event.payload || {}),
+      JSON.stringify(event.metadata || {})
     ]);
   });
 
-  el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+  const headHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
       <div>
         <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'Administrative audit trail':'Kiểm soát hành vi & audit trail'}</h3>
         <div style="font-size:11px;color:var(--text-3);margin-top:4px">${filteredEvents.length} / ${auditEvents.length} event hiển thị</div>
@@ -9477,7 +9492,7 @@ function renderAdminActivity(){
         ${uniqueAggregates.map(aggregateType=>`<option value="${escapeHtml(aggregateType)}"${filters.aggregateType === aggregateType ? ' selected' : ''}>${escapeHtml(aggregateType)}</option>`).join('')}
       </select>
     </div>
-    <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
+    <div id="ds-panel" style="display:none;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
       <div style="padding:12px 16px;font-weight:700;font-size:13px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border)">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
       ${(function(){
         const items=[
@@ -9509,13 +9524,13 @@ function renderAdminActivity(){
       </div>
       <div style="padding:10px 14px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--brand-2)">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
     </div>
-    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 28%, var(--border));border-radius:8px">
+    <div style="font-size:11px;color:var(--text-3);padding:10px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 28%, var(--border));border-radius:8px">
       🛡 <b>${lang==='en'?'Authoritative audit trail':'Audit trail authoritative'}:</b> 
       ${lang==='en'
         ?'Server-side administrative actions are sourced from the system audit layer. This tab no longer relies on browser-local telemetry for governance decisions.'
         :'Các hành động quản trị phía server được lấy từ lớp audit hệ thống. Tab này không còn dựa vào telemetry cục bộ của trình duyệt cho quyết định quản trị.'}
-    </div>
-    <div class="activity-log-scroller">
+    </div>`;
+  const bodyHtml = `<div class="activity-log-scroller">
       ${filteredEvents.length === 0
         ? '<div style="text-align:center;padding:40px;color:var(--text-3)">'+( lang==='en'?'No authoritative audit event recorded yet':'Chưa có audit event authoritative nào')+'</div>'
         : `<table class="activity-log-table">
@@ -9536,8 +9551,17 @@ function renderAdminActivity(){
           const dateStr = recorded && !Number.isNaN(recorded.getTime())
             ? recorded.toLocaleDateString('vi-VN') + ' ' + recorded.toLocaleTimeString('vi-VN')
             : '—';
-          const context = (event.payload && typeof event.payload === 'object') ? (event.payload.context || event.payload) : {};
-          const contextText = escapeHtml(JSON.stringify(context || {}, null, 2));
+          const detailRecord = {
+            recorded_at: event.recorded_at || '',
+            actor_name: event.actor_name || '',
+            event_type: event.event_type || '',
+            aggregate_type: event.aggregate_type || '',
+            aggregate_id: event.aggregate_id || '',
+            ip_address: event.ip_address || '',
+            payload: (event.payload && typeof event.payload === 'object') ? event.payload : {},
+            metadata: (event.metadata && typeof event.metadata === 'object') ? event.metadata : {}
+          };
+          const contextText = escapeHtml(JSON.stringify(detailRecord, null, 2));
           return `<tr data-user="${escapeHtml(event.actor_name || '')}" data-idx="${idx}">
                 <td>${escapeHtml(dateStr)}</td>
                 <td><b>${escapeHtml(event.actor_name || 'system')}</b></td>
@@ -9557,6 +9581,7 @@ function renderAdminActivity(){
           </table>`
       }
     </div>`;
+  el.innerHTML = adminScopedLayout(headHtml, bodyHtml, 'has-x-scroll');
 
 }
 
@@ -9576,13 +9601,15 @@ function exportActivityCSV(){
       event.aggregate_type,
       event.aggregate_id,
       event.ip_address,
-      JSON.stringify(event.payload || {})
+      JSON.stringify(event.payload || {}),
+      JSON.stringify(event.metadata || {})
     ]);
   });
-  let csv = 'Recorded At,Actor,Event Type,Aggregate Type,Aggregate ID,IP,Payload\n';
+  let csv = 'Recorded At,Actor,Event Type,Aggregate Type,Aggregate ID,IP,Payload,Metadata\n';
   events.forEach(event=>{
     const payload = JSON.stringify(event.payload || {}).replace(/"/g, '\'');
-    csv += `"${event.recorded_at||''}","${event.actor_name||''}","${event.event_type||''}","${event.aggregate_type||''}","${event.aggregate_id||''}","${event.ip_address||''}","${payload}"\n`;
+    const metadata = JSON.stringify(event.metadata || {}).replace(/"/g, '\'');
+    csv += `"${event.recorded_at||''}","${event.actor_name||''}","${event.event_type||''}","${event.aggregate_type||''}","${event.aggregate_id||''}","${event.ip_address||''}","${payload}","${metadata}"\n`;
   });
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
@@ -9630,8 +9657,8 @@ function renderAdminRoles(){
       ...members.map(user=>user.username)
     ]);
   });
-  el.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+  const headHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
       <div>
         <h3 style="font-size:14px;font-weight:700;margin:0">🛡 ${lang==='en'?'Authoritative role catalog':'Catalog vai trò authoritative'}</h3>
         <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
@@ -9656,11 +9683,11 @@ function renderAdminRoles(){
         <option value="inactive"${filters.status === 'inactive' ? ' selected' : ''}>Ngừng dùng</option>
       </select>
     </div>
-    <div class="admin-authority-meta-strip" style="margin-bottom:12px">
+    <div class="admin-authority-meta-strip">
       <span>${filteredRows.length} / ${rows.length} vai trò hiển thị</span>
       <span>${deptOptions.length} phòng ban có role authoritative</span>
-    </div>
-    <div style="overflow-x:auto">
+    </div>`;
+  const bodyHtml = `<div style="overflow-x:auto">
       <table class="admin-table">
         <thead><tr>
           <th></th>
@@ -9720,11 +9747,12 @@ function renderAdminRoles(){
         </tbody>
       </table>
     </div>
-    <div style="margin-top:16px;font-size:11px;color:var(--text-3);padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
+      <div style="margin-top:16px;font-size:11px;color:var(--text-3);padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
       ${lang==='en'
         ?'User-to-role assignment should be managed in the user account workflow, not by directly mutating the role catalog grid.'
         :'Gán user vào role cần được quản lý trong quy trình tài khoản người dùng, không nên sửa trực tiếp trong grid catalog vai trò.'}
     </div>`;
+  el.innerHTML = adminScopedLayout(headHtml, bodyHtml, 'has-x-scroll');
 }
 
 async function toggleSystemRoleFlag(roleCode, key, value){

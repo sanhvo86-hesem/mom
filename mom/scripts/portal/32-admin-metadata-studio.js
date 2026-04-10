@@ -115,12 +115,19 @@ function _fmtBytes(value){
 function _dbProbeApplicable(scope){
   return !!(scope && scope.db_probe_applicable);
 }
-function _dbStatusLabel(applicable, present){
+function _dbProbeResolved(scope){
+  return !!(scope && (scope.db_probe_resolved || scope.db_probe_reachable || scope.reachable));
+}
+function _dbProbeReachable(scope){
+  return !!(scope && (scope.db_probe_reachable || scope.reachable));
+}
+function _dbStatusLabel(applicable, resolved, present){
   if(!applicable) return _t('DB N/A', 'DB N/A');
+  if(!resolved) return _t('Unknown', 'Unknown');
   return present ? _t('DB', 'DB') : _t('Missing', 'Missing');
 }
-function _dbStatusTone(applicable, present){
-  if(!applicable) return 'neutral';
+function _dbStatusTone(applicable, resolved, present){
+  if(!applicable || !resolved) return 'neutral';
   return present ? 'good' : 'bad';
 }
 
@@ -754,12 +761,13 @@ function _renderMetricCards(){
   var ws = _workspace();
   var m = ws.metrics || {};
   var connection = ws.connection || {};
-  var dbProbeApplicable = _dbProbeApplicable(m) || _dbProbeApplicable(connection);
+  var dbProbeApplicable = _dbProbeApplicable(connection) || _dbProbeApplicable(m);
+  var dbProbeResolved = _dbProbeResolved(connection) || _dbProbeResolved(m);
   var cards = [
     { label:_t('Endpoint catalog', 'Endpoint catalog'), value:m.endpoint_count, note:_t('Tổng endpoint có contract.', 'Total endpoints under contract.') },
     { label:_t('Tables covered', 'Tables covered'), value:m.table_count, note:_t('Union từ registry + relation map.', 'Union from registry + relation map.') },
-    { label:_t('Present in DB', 'Present in DB'), value:dbProbeApplicable ? m.db_present_table_count : _t('N/A', 'N/A'), note:dbProbeApplicable ? _t('Bảng thật tìm thấy trong PostgreSQL.', 'Tables found in live PostgreSQL.') : _t('Runtime hiện không bật PostgreSQL path, nên metric này không áp dụng.', 'The runtime does not currently use the PostgreSQL path, so this metric is not applicable.') },
-    { label:_t('Structural drift', 'Structural drift'), value:dbProbeApplicable ? m.db_structural_drift_table_count : _t('N/A', 'N/A'), note:dbProbeApplicable ? _t('Bảng live lệch cột/PK so với authority.', 'Live tables drifting in columns or PK from authority.') : _t('Chỉ tính khi PostgreSQL là runtime truth đang hoạt động.', 'Only applies when PostgreSQL is the active runtime truth.') },
+    { label:_t('Present in DB', 'Present in DB'), value:!dbProbeApplicable ? _t('N/A', 'N/A') : (dbProbeResolved ? m.db_present_table_count : '—'), note:!dbProbeApplicable ? _t('Chưa có hồ sơ DB thật để probe trực tiếp.', 'No live DB profile is configured for direct probing.') : (dbProbeResolved ? _t('Bảng thật tìm thấy trong PostgreSQL.', 'Tables found in live PostgreSQL.') : _t('Đã có hồ sơ DB nhưng probe hiện chưa resolve được truth từ PostgreSQL.', 'A DB profile exists, but the probe has not resolved live PostgreSQL truth yet.')) },
+    { label:_t('Structural drift', 'Structural drift'), value:!dbProbeApplicable ? _t('N/A', 'N/A') : (dbProbeResolved ? m.db_structural_drift_table_count : '—'), note:!dbProbeApplicable ? _t('Chưa cấu hình DB probe nên không thể so drift.', 'No DB probe is configured, so structural drift cannot be compared.') : (dbProbeResolved ? _t('Bảng live lệch cột/PK so với authority.', 'Live tables drifting in columns or PK from authority.') : _t('Probe DB đang lỗi hoặc chưa tới được PostgreSQL nên drift chưa thể kết luận.', 'The DB probe is currently failing or cannot reach PostgreSQL, so structural drift is still unknown.')) },
     { label:_t('Operational risks', 'Operational risks'), value:m.operational_risk_count, note:_t('Rủi ro vận hành và logic chưa an toàn.', 'Operational and logic risks that still need treatment.') },
     { label:_t('Blocking risks', 'Blocking risks'), value:m.blocking_operational_risk_count, note:_t('Điểm đang chặn release gate.', 'Risks currently blocking the release gate.') },
     { label:_t('Stale artifacts', 'Stale artifacts'), value:m.stale_artifact_count, note:_t('Artifact quá tuổi hoặc lệch chu kỳ sinh.', 'Artifacts that are stale or generated out of cycle.') },
@@ -780,6 +788,9 @@ function _renderOverview(){
   var connection = ws.connection || {};
   var dataLayer = connection.data_layer || {};
   var dbProbeApplicable = _dbProbeApplicable(connection) || _dbProbeApplicable(metrics);
+  var dbProbeResolved = _dbProbeResolved(connection) || _dbProbeResolved(metrics);
+  var dbProbeReachable = _dbProbeReachable(connection) || _dbProbeReachable(metrics);
+  var runtimePathActive = !!(connection.runtime_path_active || dataLayer.postgres_path_active || metrics.runtime_postgres_path_active);
   var highlights = ws.highlights || {};
   var audits = ws.audits || {};
   var artifacts = ws.artifacts || {};
@@ -803,6 +814,27 @@ function _renderOverview(){
   var saveGuard = operational.saveGuard || ws.save_policy || {};
   var blindSpotSummary = audits.blind_spots && audits.blind_spots.summary ? audits.blind_spots.summary : {};
   var stressSummary = audits.stress && audits.stress.summary ? audits.stress.summary : {};
+  var migrationTablePresent = !!connection.migration_table_present;
+  var appliedMigrationCount = Number(connection.applied_migration_count || 0);
+  var migrationFileCount = Number(connection.migration_file_count || 0);
+  var pendingMigrationCount = Number(connection.pending_migration_count || 0);
+  var migrationLedgerTone = !dbProbeReachable ? 'neutral' : (migrationTablePresent ? (appliedMigrationCount > 0 ? 'good' : 'bad') : 'bad');
+  var migrationLedgerStatus = !dbProbeReachable
+    ? _t('N/A', 'N/A')
+    : (migrationTablePresent
+      ? (appliedMigrationCount > 0 ? _t('Tracked', 'Tracked') : _t('Empty', 'Empty'))
+      : _t('Missing', 'Missing'));
+  var dbHeroTone = !dbProbeApplicable ? 'neutral' : (!dbProbeReachable ? 'bad' : (runtimePathActive ? 'good' : 'warn'));
+  var dbHeroStatus = !dbProbeApplicable
+    ? _t('Not configured', 'Not configured')
+    : (!dbProbeReachable
+      ? _t('Unavailable', 'Unavailable')
+      : (runtimePathActive ? _t('Connected', 'Connected') : _t('Connected / runtime JSON', 'Connected / runtime JSON')));
+  var dbHeroText = !dbProbeApplicable
+    ? _t('Chưa có hồ sơ kết nối DB thật để kiểm tra production truth.', 'No live DB connection profile is configured for production truth checks.')
+    : (dbProbeReachable
+      ? ((connection.database || '—') + ' / ' + (connection.schema || '—') + (runtimePathActive ? '' : ' · ' + _t('runtime vẫn đang JSON_ONLY hoặc shadow gap', 'runtime still runs JSON_ONLY or remains split-brain')))
+      : (connection.error || _t('Không thể tới PostgreSQL bằng profile đang lưu.', 'Could not reach PostgreSQL with the stored connection profile.')));
 
   return [
     '<section class="ds-hero">',
@@ -817,8 +849,8 @@ function _renderOverview(){
       '<div class="ds-hero-side">',
         '<div class="ds-hero-card">',
           '<small>' + _esc(_t('Live DB probe', 'Live DB probe')) + '</small>',
-          '<strong class="tone-' + _esc(dbProbeApplicable ? _boolTone(connection.reachable) : 'neutral') + '">' + _esc(dbProbeApplicable ? (connection.reachable ? _t('Connected', 'Connected') : _t('Unavailable', 'Unavailable')) : _t('Not enabled', 'Not enabled')) + '</strong>',
-          '<p>' + _esc(dbProbeApplicable ? ((connection.database || '—') + ' / ' + (connection.schema || '—')) : _t('Runtime đang dùng JSON_ONLY thay vì PostgreSQL.', 'The runtime is using JSON_ONLY instead of PostgreSQL.')) + '</p>',
+          '<strong class="tone-' + _esc(dbHeroTone) + '">' + _esc(dbHeroStatus) + '</strong>',
+          '<p>' + _esc(dbHeroText) + '</p>',
         '</div>',
         '<div class="ds-hero-card">',
           '<small>' + _esc(_t('Release gate', 'Release gate')) + '</small>',
@@ -838,18 +870,24 @@ function _renderOverview(){
         '<div class="ds-panel-head"><div><small>' + _esc(_t('Connection reality', 'Connection reality')) + '</small><h3>' + _esc(_t('Registry vs PostgreSQL', 'Registry vs PostgreSQL')) + '</h3></div></div>',
         '<div class="ds-panel-body">',
           '<div class="ds-facts">',
-            '<div><span>' + _esc(_t('Reachable', 'Reachable')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? _boolTone(connection.reachable) : 'neutral') + '">' + _esc(dbProbeApplicable ? (connection.reachable ? _t('Yes', 'Yes') : _t('No', 'No')) : _t('N/A', 'N/A')) + '</strong></div>',
-            '<div><span>' + _esc(_t('Present tables', 'Present tables')) + '</span><strong>' + _esc(dbProbeApplicable ? _fmtInt(connection.present_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
-            '<div><span>' + _esc(_t('Missing tables', 'Missing tables')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? (connection.missing_table_count ? 'warn' : 'good') : 'neutral') + '">' + _esc(dbProbeApplicable ? _fmtInt(connection.missing_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
-            '<div><span>' + _esc(_t('Structural drift tables', 'Structural drift tables')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? (connection.structural_drift_table_count ? 'warn' : 'good') : 'neutral') + '">' + _esc(dbProbeApplicable ? _fmtInt(connection.structural_drift_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Probe configured', 'Probe configured')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? 'good' : 'neutral') + '">' + _esc(dbProbeApplicable ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Reachable', 'Reachable')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? (dbProbeReachable ? 'good' : 'bad') : 'neutral') + '">' + _esc(dbProbeApplicable ? (dbProbeReachable ? _t('Yes', 'Yes') : _t('No', 'No')) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Present tables', 'Present tables')) + '</span><strong>' + _esc(dbProbeResolved ? _fmtInt(connection.present_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Missing tables', 'Missing tables')) + '</span><strong class="tone-' + _esc(dbProbeResolved ? (connection.missing_table_count ? 'warn' : 'good') : 'neutral') + '">' + _esc(dbProbeResolved ? _fmtInt(connection.missing_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Structural drift tables', 'Structural drift tables')) + '</span><strong class="tone-' + _esc(dbProbeResolved ? (connection.structural_drift_table_count ? 'warn' : 'good') : 'neutral') + '">' + _esc(dbProbeResolved ? _fmtInt(connection.structural_drift_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
             '<div><span>' + _esc(_t('Authoritative count', 'Authoritative count')) + '</span><strong>' + _esc(_fmtInt(metrics.authoritative_table_count)) + '</strong></div>',
             '<div><span>' + _esc(_t('Registry count', 'Registry count')) + '</span><strong>' + _esc(_fmtInt(metrics.registry_table_count)) + '</strong></div>',
             '<div><span>' + _esc(_t('Registry gaps', 'Registry gaps')) + '</span><strong class="tone-' + _esc(metrics.registry_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(metrics.registry_gap_count)) + '</strong></div>',
             '<div><span>' + _esc(_t('Data layer mode', 'Data layer mode')) + '</span><strong>' + _esc(dataLayer.mode || '—') + '</strong></div>',
-            '<div><span>' + _esc(_t('Postgres path', 'Postgres path')) + '</span><strong class="tone-' + _esc(dataLayer.postgres_path_active ? 'good' : 'neutral') + '">' + _esc(dataLayer.postgres_path_active ? _t('Active', 'Active') : _t('Inactive', 'Inactive')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Postgres path', 'Postgres path')) + '</span><strong class="tone-' + _esc(runtimePathActive ? 'good' : 'warn') + '">' + _esc(runtimePathActive ? _t('Active', 'Active') : _t('Inactive', 'Inactive')) + '</strong></div>',
             '<div><span>' + _esc(_t('JSON fallback', 'JSON fallback')) + '</span><strong class="tone-' + _esc(dataLayer.json_fallback ? 'warn' : 'good') + '">' + _esc(dataLayer.json_fallback ? _t('Enabled', 'Enabled') : _t('Off', 'Off')) + '</strong></div>',
+            '<div><span>' + _esc(_t('DB target', 'DB target')) + '</span><strong>' + _esc((connection.host || '—') + ':' + (connection.port || '—')) + '</strong></div>',
+            '<div><span>' + _esc(_t('Migration ledger', 'Migration ledger')) + '</span><strong class="tone-' + _esc(migrationLedgerTone) + '">' + _esc(migrationLedgerStatus) + '</strong></div>',
+            '<div><span>' + _esc(_t('Applied migrations', 'Applied migrations')) + '</span><strong class="tone-' + _esc(dbProbeReachable && pendingMigrationCount > 0 ? 'warn' : 'good') + '">' + _esc(_fmtInt(appliedMigrationCount) + ' / ' + _fmtInt(migrationFileCount)) + '</strong></div>',
           '</div>',
-          (!dbProbeApplicable ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Live PostgreSQL probe đang được tắt đúng thiết kế vì runtime hiện không chạy PostgreSQL path. Các chỉ số DB được đánh dấu N/A thay vì báo lỗi giả.', 'The live PostgreSQL probe is intentionally disabled because the runtime is not using the PostgreSQL path. DB metrics are marked N/A instead of being reported as false failures.')) + '</div>' : ''),
+          (!dbProbeApplicable ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Chưa có hồ sơ DB thật nên module này chưa thể kiểm tra production truth từ PostgreSQL.', 'No live DB profile is configured yet, so this module cannot verify production truth from PostgreSQL.')) + '</div>' : ''),
+          (dbProbeApplicable && dbProbeReachable && !runtimePathActive ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('DB thật đang reachable, nhưng runtime ứng dụng vẫn chưa chạy trên PostgreSQL. Đây là trạng thái split-brain: Data Schema nhìn thấy DB truth còn app runtime vẫn có thể đọc/ghi qua JSON path.', 'The live DB is reachable, but the application runtime is still not on PostgreSQL. This is a split-brain state: Data Schema can see DB truth while the app runtime may still read/write through the JSON path.')) + '</div>' : ''),
+          (dbProbeReachable && connection.present_table_count > 0 && (!migrationTablePresent || appliedMigrationCount <= 0) ? '<div class="ds-inline-alert tone-bad">' + _esc(_t('PostgreSQL đã có bảng live, nhưng authority ledger schema_migrations đang thiếu hoặc rỗng. Đây là khe hở vận hành: không thể biết DB hiện tại đã được áp những migration nào.', 'PostgreSQL already contains live tables, but the schema_migrations authority ledger is missing or empty. This is an operational gap: the system cannot prove which migrations produced the current DB state.')) + '</div>' : ''),
           (connection.error ? '<div class="ds-inline-alert tone-bad"><strong>' + _esc(_t('DB probe error', 'DB probe error')) + ':</strong> ' + _esc(connection.error) + '</div>' : ''),
         '</div>',
       '</section>',
@@ -1096,15 +1134,15 @@ function _renderTableTab(){
 
   var listHtml = rows.length ? rows.map(function(row){
     var active = String(row.key) === String(state.selectedTableKey);
-    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectTable(' + _js(row.key) + ')\'><div class="ds-list-head"><strong>' + _esc(row.label || row.key) + '</strong>' + _badge(_dbStatusLabel(!!row.db_probe_applicable, row.db_present === true), _dbStatusTone(!!row.db_probe_applicable, row.db_present === true)) + '</div><div class="ds-list-meta">' + _esc(row.key) + '</div><div class="ds-chip-row">' + _badge(row.domain || 'domain', 'neutral') + (row.workflowId ? _badge('WF', 'good') : '') + (row.governance_gap_count ? _badge('GAP ' + row.governance_gap_count, 'warn') : '') + (row.column_drift_count ? _badge('DRIFT ' + row.column_drift_count, 'warn') : '') + (row.pk_drift ? _badge('PK', 'bad') : '') + ((!row.registry_present) ? _badge('NOT IN REGISTRY', 'bad') : '') + '</div></button>';
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectTable(' + _js(row.key) + ')\'><div class="ds-list-head"><strong>' + _esc(row.label || row.key) + '</strong>' + _badge(_dbStatusLabel(!!row.db_probe_applicable, !!row.db_probe_resolved, row.db_present === true), _dbStatusTone(!!row.db_probe_applicable, !!row.db_probe_resolved, row.db_present === true)) + '</div><div class="ds-list-meta">' + _esc(row.key) + '</div><div class="ds-chip-row">' + _badge(row.domain || 'domain', 'neutral') + (row.workflowId ? _badge('WF', 'good') : '') + (row.governance_gap_count ? _badge('GAP ' + row.governance_gap_count, 'warn') : '') + (row.column_drift_count ? _badge('DRIFT ' + row.column_drift_count, 'warn') : '') + (row.pk_drift ? _badge('PK', 'bad') : '') + ((!row.registry_present) ? _badge('NOT IN REGISTRY', 'bad') : '') + '</div></button>';
   }).join('') : _emptyState(_t('Không có bảng', 'No tables'), _t('Không còn bảng phù hợp bộ lọc hiện tại.', 'No tables match the current filters.'));
 
   var detailHtml = item ? [
     '<div class="ds-detail-scroll">',
-      '<div class="ds-detail-head"><div><small>' + _esc(_t('Table detail', 'Table detail')) + '</small><h3>' + _esc(item.label || state.selectedTableKey) + '</h3><p>' + _esc(state.selectedTableKey) + '</p></div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge((item.primaryKey || 'no_pk'), item.primaryKey ? 'good' : 'warn') + _badge(item.db_probe_applicable ? (item.db_present ? 'DB OK' : 'DB MISSING') : _t('DB N/A', 'DB N/A'), item.db_probe_applicable ? (item.db_present ? 'good' : 'bad') : 'neutral') + _badge(item.registry_present === false ? 'RELATION ONLY' : 'REGISTRY', item.registry_present === false ? 'warn' : 'good') + '</div></div>',
+      '<div class="ds-detail-head"><div><small>' + _esc(_t('Table detail', 'Table detail')) + '</small><h3>' + _esc(item.label || state.selectedTableKey) + '</h3><p>' + _esc(state.selectedTableKey) + '</p></div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge((item.primaryKey || 'no_pk'), item.primaryKey ? 'good' : 'warn') + _badge(!item.db_probe_applicable ? _t('DB N/A', 'DB N/A') : (!item.db_probe_resolved ? _t('DB unknown', 'DB unknown') : (item.db_present ? 'DB OK' : 'DB MISSING')), !item.db_probe_applicable || !item.db_probe_resolved ? 'neutral' : (item.db_present ? 'good' : 'bad')) + _badge(item.registry_present === false ? 'RELATION ONLY' : 'REGISTRY', item.registry_present === false ? 'warn' : 'good') + '</div></div>',
       '<div class="ds-facts">',
         '<div><span>' + _esc(_t('Columns', 'Columns')) + '</span><strong>' + _esc(_fmtInt(item.columnCount || columns.length)) + '</strong></div>',
-        '<div><span>' + _esc(_t('DB columns', 'DB columns')) + '</span><strong class="tone-' + _esc(item.db_probe_applicable ? (item.db_present ? 'good' : 'neutral') : 'neutral') + '">' + _esc(item.db_probe_applicable ? _fmtInt(item.db_column_count || 0) : _t('N/A', 'N/A')) + '</strong></div>',
+        '<div><span>' + _esc(_t('DB columns', 'DB columns')) + '</span><strong class="tone-' + _esc(item.db_probe_applicable && item.db_probe_resolved ? (item.db_present ? 'good' : 'neutral') : 'neutral') + '">' + _esc(item.db_probe_applicable && item.db_probe_resolved ? _fmtInt(item.db_column_count || 0) : _t('N/A', 'N/A')) + '</strong></div>',
         '<div><span>' + _esc(_t('Primary key', 'Primary key')) + '</span><strong>' + _esc(item.primaryKey || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Status column', 'Status column')) + '</span><strong>' + _esc(item.statusColumn || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Workflow', 'Workflow')) + '</span><strong>' + _esc(item.workflowId || '—') + '</strong></div>',
@@ -1118,7 +1156,9 @@ function _renderTableTab(){
       '</div>',
       '<section class="ds-detail-section"><h4>' + _esc(_t('Structural drift', 'Structural drift')) + '</h4>' + (
         (!item.db_probe_applicable)
-          ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Runtime hiện không dùng PostgreSQL path, nên so sánh drift cột/PK với DB thật chưa được áp dụng ở bảng này.', 'The runtime is not currently using the PostgreSQL path, so live DB column/PK drift is not applicable for this table yet.')) + '</div>'
+          ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Chưa có hồ sơ DB thật cho bảng này, nên module chưa thể đối chiếu drift với PostgreSQL.', 'No live DB profile is configured for this table yet, so the module cannot compare drift against PostgreSQL.')) + '</div>'
+          : (!item.db_probe_resolved)
+          ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('DB probe đã được cấu hình nhưng hiện chưa resolve được truth từ PostgreSQL, nên chưa thể kết luận drift cột/PK.', 'The DB probe is configured but has not resolved PostgreSQL truth yet, so column/PK drift cannot be concluded.')) + '</div>'
           : (!item.db_present)
           ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('Bảng này chưa hiện diện trong PostgreSQL đang probe, nên chưa thể so drift cột/PK.', 'This table is not present in the probed PostgreSQL database yet, so column/PK drift cannot be compared.')) + '</div>'
           : (

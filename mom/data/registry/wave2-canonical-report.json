@@ -1,28 +1,28 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T14:35:27.458Z",
+    "generatedAt": "2026-04-10T07:51:05.441Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.0",
     "description": "Wave 2 canonical governance verification report."
   },
   "summary": {
-    "canonical_resources": 63,
-    "canonical_catalog_meta_resource_count": 63,
+    "canonical_resources": 64,
+    "canonical_catalog_meta_resource_count": 64,
     "canonical_catalog_meta_mismatch": 0,
     "catalog_alignment_targets": 12,
     "catalog_alignment_failures": 0,
     "service_backed_resources": 5,
     "service_backed_resource_gaps": 0,
-    "planned_canonical_resources_not_yet_in_registry": 4,
-    "archive_isolation_targets": 1,
+    "planned_canonical_resources_not_yet_in_registry": 0,
+    "archive_isolation_targets": 5,
     "archive_isolation_targets_failed": 0,
-    "direct_table_matches": 38,
-    "legacy_table_matches": 16,
+    "direct_table_matches": 45,
+    "legacy_table_matches": 14,
     "service_backed_slice_matches": 5,
     "true_schema_gaps": 0,
     "remaining_unused_candidate_entities": 0,
-    "archive_isolation_entities": 1
+    "archive_isolation_entities": 5
   },
   "policy_gates": {
     "build_questions": [
@@ -69,6 +69,10 @@
       "actual_primary_key": "quote_id",
       "expected_status_column": "status",
       "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "sales.quotes"
       ],
@@ -80,8 +84,12 @@
       "actual_table": "qual_effectiveness_reviews",
       "expected_primary_key": "qual_effectiveness_review_id",
       "actual_primary_key": "qual_effectiveness_review_id",
-      "expected_status_column": "review_result",
-      "actual_status_column": "review_result",
+      "expected_status_column": null,
+      "actual_status_column": null,
+      "expected_pattern": "assessment_record",
+      "actual_pattern": "assessment_record",
+      "expected_result_column": "review_result",
+      "actual_result_column": "review_result",
       "matched_entities": [
         "quality_lab.qual_effectiveness_reviews"
       ],
@@ -95,6 +103,10 @@
       "actual_primary_key": "schedule_id",
       "expected_status_column": "schedule_status",
       "actual_status_column": "schedule_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "production.production_schedule"
       ],
@@ -108,6 +120,10 @@
       "actual_primary_key": "queue_id",
       "expected_status_column": "queue_status",
       "actual_status_column": "queue_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "mes_execution.mes_dispatch_queue"
       ],
@@ -121,6 +137,10 @@
       "actual_primary_key": "ncr_id",
       "expected_status_column": "ncr_status",
       "actual_status_column": "ncr_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "quality_management.ncr_records"
       ],
@@ -134,6 +154,10 @@
       "actual_primary_key": "capa_id",
       "expected_status_column": "capa_status",
       "actual_status_column": "capa_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "quality_management.capa_records"
       ],
@@ -145,8 +169,12 @@
       "actual_table": "calibration_grr_studies",
       "expected_primary_key": "grr_id",
       "actual_primary_key": "grr_id",
-      "expected_status_column": "grr_result",
-      "actual_status_column": "grr_result",
+      "expected_status_column": null,
+      "actual_status_column": null,
+      "expected_pattern": "assessment_record",
+      "actual_pattern": "assessment_record",
+      "expected_result_column": "grr_result",
+      "actual_result_column": "grr_result",
       "matched_entities": [
         "calibration_equipment.calibration_grr_studies"
       ],
@@ -160,6 +188,10 @@
       "actual_primary_key": "qual_audit_program_id",
       "expected_status_column": "status",
       "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "quality_lab.qual_audit_programs"
       ],
@@ -173,6 +205,10 @@
       "actual_primary_key": "improvement_id",
       "expected_status_column": "improvement_status",
       "actual_status_column": "improvement_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "audit_risk.improvement_projects"
       ],
@@ -186,6 +222,10 @@
       "actual_primary_key": "maintenance_plan_id",
       "expected_status_column": "status",
       "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "plant_maintenance.pm_maintenance_plans"
       ],
@@ -199,6 +239,10 @@
       "actual_primary_key": "pm_work_order_id",
       "expected_status_column": "status",
       "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "plant_maintenance.pm_work_orders"
       ],
@@ -212,6 +256,10 @@
       "actual_primary_key": "audit_5s_id",
       "expected_status_column": "status",
       "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
       "matched_entities": [
         "lean_manufacturing.lean_5s_audits"
       ],
@@ -226,7 +274,8 @@
       "required_endpoints": [
         "governance.override_controls.list",
         "governance.override_controls.detail",
-        "governance.override_controls.create"
+        "governance.override_controls.create",
+        "governance.override_controls.transition"
       ],
       "missing_endpoints": [],
       "idempotency_failures": [],
@@ -239,7 +288,8 @@
       "required_endpoints": [
         "finance.period_close_controls.list",
         "finance.period_close_controls.detail",
-        "finance.period_close_controls.create"
+        "finance.period_close_controls.create",
+        "finance.period_close_controls.transition"
       ],
       "missing_endpoints": [],
       "idempotency_failures": [],
@@ -252,7 +302,8 @@
       "required_endpoints": [
         "finance.backdate_exceptions.list",
         "finance.backdate_exceptions.detail",
-        "finance.backdate_exceptions.create"
+        "finance.backdate_exceptions.create",
+        "finance.backdate_exceptions.transition"
       ],
       "missing_endpoints": [],
       "idempotency_failures": [],
@@ -287,10 +338,38 @@
   ],
   "archive_isolation": [
     {
+      "entity_key": "audit_risk.audit_program",
+      "canonical_resource": "quality_improvement.audit-programs",
+      "successor_table": "qual_audit_programs",
+      "reason": "Legacy audit_program alias must stay in archive isolation; live audit governance runs on qual_audit_programs.",
+      "in_archive_isolation": true
+    },
+    {
+      "entity_key": "mes_execution.dispatch_queue",
+      "canonical_resource": "planning_production.dispatch-lists",
+      "successor_table": "mes_dispatch_queue",
+      "reason": "Legacy dispatch_queue alias must be isolated so live dispatch orchestration uses mes_dispatch_queue only.",
+      "in_archive_isolation": true
+    },
+    {
+      "entity_key": "quality_management.capa",
+      "canonical_resource": "quality_improvement.corrective-actions",
+      "successor_table": "capa_records",
+      "reason": "Legacy capa alias must be isolated to prevent duplicate CAPA publication alongside capa_records.",
+      "in_archive_isolation": true
+    },
+    {
       "entity_key": "quality_management.deviation",
       "canonical_resource": "quality_improvement.deviations",
       "successor_table": "deviations",
       "reason": "Legacy singular alias retained only for traceability; active composition must use the canonical deviations object.",
+      "in_archive_isolation": true
+    },
+    {
+      "entity_key": "quality_management.nonconformance",
+      "canonical_resource": "quality_improvement.nonconformances",
+      "successor_table": "ncr_records",
+      "reason": "Legacy nonconformance alias must be isolated so governed NCR execution stays on ncr_records.",
       "in_archive_isolation": true
     }
   ],
@@ -546,15 +625,15 @@
     },
     {
       "resource_key": "procurement_supplier_quality.iqc-inspections",
-      "table": "iqc_inspections",
+      "table": "incoming_inspections",
       "legacy_tables": [
-        "incoming_inspections"
+        "iqc_inspections"
       ],
-      "resolution_mode": "legacy_table_match",
-      "matched_entities": [],
-      "matched_legacy_tables": [
-        "incoming_inspections"
-      ]
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.incoming_inspections"
+      ],
+      "matched_legacy_tables": []
     },
     {
       "resource_key": "planning_production.production-plans",
@@ -725,9 +804,13 @@
       "legacy_tables": [
         "freight_orders"
       ],
-      "resolution_mode": "planned_canonical_resource",
-      "matched_entities": [],
-      "matched_legacy_tables": []
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "transportation.freight_orders"
+      ],
+      "matched_legacy_tables": [
+        "freight_orders"
+      ]
     },
     {
       "resource_key": "inventory_logistics.customer-returns",
@@ -788,6 +871,20 @@
       "matched_legacy_tables": []
     },
     {
+      "resource_key": "quality_improvement.spc-observations",
+      "table": "spc_data",
+      "legacy_tables": [
+        "spc_data"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.spc_data"
+      ],
+      "matched_legacy_tables": [
+        "spc_data"
+      ]
+    },
+    {
       "resource_key": "quality_improvement.oqc-inspections",
       "table": "oqc_inspections",
       "legacy_tables": [
@@ -803,15 +900,15 @@
     },
     {
       "resource_key": "quality_improvement.fqc-inspections",
-      "table": "fqc_inspections",
+      "table": "oqc_inspections",
       "legacy_tables": [
-        "oqc_inspections"
+        "fqc_inspections"
       ],
-      "resolution_mode": "legacy_table_match",
-      "matched_entities": [],
-      "matched_legacy_tables": [
-        "oqc_inspections"
-      ]
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.oqc_inspections"
+      ],
+      "matched_legacy_tables": []
     },
     {
       "resource_key": "quality_improvement.deviations",
@@ -932,9 +1029,13 @@
       "legacy_tables": [
         "safety_observations"
       ],
-      "resolution_mode": "planned_canonical_resource",
-      "matched_entities": [],
-      "matched_legacy_tables": []
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "ehs_sustainability.safety_observations"
+      ],
+      "matched_legacy_tables": [
+        "safety_observations"
+      ]
     },
     {
       "resource_key": "maintenance_ehs.permits",
@@ -1061,9 +1162,13 @@
       "legacy_tables": [
         "inventory_valuations"
       ],
-      "resolution_mode": "planned_canonical_resource",
-      "matched_entities": [],
-      "matched_legacy_tables": []
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "finance.inventory_valuations"
+      ],
+      "matched_legacy_tables": [
+        "inventory_valuations"
+      ]
     },
     {
       "resource_key": "finance.fixed-asset-capitalizations",
@@ -1140,8 +1245,10 @@
         "plant_performance",
         "factory_kpis"
       ],
-      "resolution_mode": "planned_canonical_resource",
-      "matched_entities": [],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "bi_datawarehouse.plant_performance_snapshots"
+      ],
       "matched_legacy_tables": []
     }
   ],

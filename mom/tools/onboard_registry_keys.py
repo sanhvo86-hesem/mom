@@ -28,6 +28,103 @@ REGISTRY_DIR = resolve_registry_dir()
 ENDPOINT_CATALOG = os.path.join(REGISTRY_DIR, "endpoint-catalog.json")
 FRONTEND_CATALOG = os.path.join(REGISTRY_DIR, "frontend-foundation-catalog.json")
 
+
+def deep_merge(base, overlay):
+    if not isinstance(base, dict) or not isinstance(overlay, dict):
+        return overlay
+    merged = dict(base)
+    for key, value in overlay.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def capability_state(recommended, ready, blockers=None):
+    blockers = list(blockers or [])
+    if ready:
+        return "ready"
+    if blockers:
+        return "blocked"
+    if recommended:
+        return "partial"
+    return "not_applicable"
+
+
+def ensure_entity_contract(entity):
+    actions = entity.get("actions")
+    if not isinstance(actions, dict):
+        actions = {}
+        entity["actions"] = actions
+
+    readiness = entity.get("readiness")
+    if not isinstance(readiness, dict):
+        readiness = {}
+        entity["readiness"] = readiness
+
+    caps = entity.get("capabilities")
+    if not isinstance(caps, dict):
+        caps = {}
+        entity["capabilities"] = caps
+
+    if "list" not in caps:
+        list_ready = bool(actions.get("list"))
+        caps["list"] = {
+            "recommended": True,
+            "ready": list_ready,
+            "state": capability_state(True, list_ready, [] if list_ready else ["missing_list_endpoint"]),
+            "blockers": [] if list_ready else ["missing_list_endpoint"],
+            "endpoint": actions.get("list"),
+        }
+
+    if "detail" not in caps:
+        detail_ready = bool(actions.get("detail"))
+        caps["detail"] = {
+            "recommended": True,
+            "ready": detail_ready,
+            "state": capability_state(True, detail_ready, [] if detail_ready else ["missing_detail_endpoint"]),
+            "blockers": [] if detail_ready else ["missing_detail_endpoint"],
+            "endpoint": actions.get("detail"),
+            "sections": ((entity.get("detail_layout") or {}).get("sections") or []),
+        }
+
+    if "form" not in caps:
+        form_ready = bool(actions.get("create") or actions.get("update"))
+        caps["form"] = {
+            "recommended": True,
+            "ready": form_ready,
+            "state": capability_state(True, form_ready, [] if form_ready else ["missing_form_mutation_endpoints"]),
+            "blockers": [] if form_ready else ["missing_form_mutation_endpoints"],
+            "create_endpoint": actions.get("create"),
+            "update_endpoint": actions.get("update"),
+        }
+
+    if readiness.get("workflow_ready") is True and "workflow" not in caps:
+        transition_action = actions.get("transition") or actions.get("decide")
+        workflow_ready = bool(transition_action)
+        caps["workflow"] = {
+            "recommended": True,
+            "ready": workflow_ready,
+            "state": capability_state(True, workflow_ready, [] if workflow_ready else ["missing_transition_endpoint"]),
+            "blockers": [] if workflow_ready else ["missing_transition_endpoint"],
+            "transition_endpoint": transition_action,
+            "execution_mode": "service_backed",
+            "lifecycle_mode": "service_backed_runtime",
+            "transition_targets": [],
+        }
+
+    overall = readiness.get("overall")
+    if "verdict" not in readiness and isinstance(overall, str) and overall:
+        readiness["verdict"] = overall
+    readiness.setdefault("publishable", readiness.get("overall") == "ready")
+    readiness.setdefault("archive_isolation", False)
+    readiness.setdefault("publishability_blockers", [])
+    readiness.setdefault("blockers", [])
+    readiness.setdefault("warnings", [])
+    if "score" not in readiness:
+        readiness["score"] = 90 if readiness.get("verdict") == "ready" else (70 if readiness.get("verdict") == "partial" else 40)
+
 # ── 29 canonical endpoint definitions ──────────────────────────────────────
 NEW_ENDPOINTS = [
     {
@@ -398,6 +495,52 @@ NEW_ENDPOINTS = [
         }
     },
     {
+        "action": "governance.override_controls.transition",
+        "label": "Chuyen trang thai Override Control",
+        "labelEn": "Transition Override Control",
+        "module": "Governance",
+        "moduleEn": "Governance",
+        "method": "POST",
+        "path": "/api/v1/governance/override-controls/{overrideId}:transition",
+        "controller": "OperationalOverrideController",
+        "handler": "transitionOverride",
+        "source": "canonical-onboard",
+        "kind": "transition",
+        "domain": "governance",
+        "entity": "operational_override_controls",
+        "status": "active",
+        "security": {
+            "auth_required": True,
+            "csrf_required": True,
+            "admin_only": False,
+            "permission_keys": ["governance.override_control.create"],
+            "dynamic_permission": True
+        },
+        "request": {
+            "idempotency": {
+                "enabled": True,
+                "required": False,
+                "strongly_recommended": True,
+                "safe_retry_requires_client_key": False,
+                "applied_by_default": True,
+                "accepted_headers": ["Idempotency-Key"],
+                "accepted_query_params": ["idempotency_key", "request_id"],
+                "accepted_body_fields": ["idempotency_key", "request_id"],
+                "replay_strategy": "return_stored_success_response",
+                "conflict_policy": "reject_same_key_different_fingerprint",
+                "retry_window_profile": "short_retry_window",
+                "server_derivation": "identity+payload_retry_window"
+            }
+        },
+        "response": {
+            "idempotency": {
+                "enabled": True,
+                "replay_strategy": "return_stored_success_response",
+                "response_status_reused": True
+            }
+        }
+    },
+    {
         "action": "finance.period_close_controls.list",
         "label": "Danh sach Ky dong so",
         "labelEn": "Period Close Control List",
@@ -490,6 +633,52 @@ NEW_ENDPOINTS = [
         }
     },
     {
+        "action": "finance.period_close_controls.transition",
+        "label": "Chuyen trang thai Ky dong so",
+        "labelEn": "Transition Period Close Control",
+        "module": "Finance",
+        "moduleEn": "Finance",
+        "method": "POST",
+        "path": "/api/v1/finance/period-closes/{periodCloseId}:transition",
+        "controller": "FinanceController",
+        "handler": "transitionPeriodClose",
+        "source": "canonical-onboard",
+        "kind": "transition",
+        "domain": "finance",
+        "entity": "period_close_controls",
+        "status": "active",
+        "security": {
+            "auth_required": True,
+            "csrf_required": True,
+            "admin_only": False,
+            "permission_keys": ["finance.ap_ar_invoices.create", "finance.ap_ar_invoices.update"],
+            "dynamic_permission": True
+        },
+        "request": {
+            "idempotency": {
+                "enabled": True,
+                "required": False,
+                "strongly_recommended": True,
+                "safe_retry_requires_client_key": False,
+                "applied_by_default": True,
+                "accepted_headers": ["Idempotency-Key"],
+                "accepted_query_params": ["idempotency_key", "request_id"],
+                "accepted_body_fields": ["idempotency_key", "request_id"],
+                "replay_strategy": "return_stored_success_response",
+                "conflict_policy": "reject_same_key_different_fingerprint",
+                "retry_window_profile": "short_retry_window",
+                "server_derivation": "identity+payload_retry_window"
+            }
+        },
+        "response": {
+            "idempotency": {
+                "enabled": True,
+                "replay_strategy": "return_stored_success_response",
+                "response_status_reused": True
+            }
+        }
+    },
+    {
         "action": "finance.backdate_exceptions.list",
         "label": "Danh sach Ngoai le Backdate",
         "labelEn": "Backdate Exception List",
@@ -571,6 +760,52 @@ NEW_ENDPOINTS = [
                 "conflict_policy": "reject_same_key_different_fingerprint",
                 "retry_window_profile": "short_retry_window",
                 "server_derivation": "payload_retry_window"
+            }
+        },
+        "response": {
+            "idempotency": {
+                "enabled": True,
+                "replay_strategy": "return_stored_success_response",
+                "response_status_reused": True
+            }
+        }
+    },
+    {
+        "action": "finance.backdate_exceptions.transition",
+        "label": "Chuyen trang thai Ngoai le Backdate",
+        "labelEn": "Transition Backdate Exception",
+        "module": "Finance",
+        "moduleEn": "Finance",
+        "method": "POST",
+        "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
+        "controller": "FinanceController",
+        "handler": "transitionBackdateException",
+        "source": "canonical-onboard",
+        "kind": "transition",
+        "domain": "finance",
+        "entity": "backdate_exceptions",
+        "status": "active",
+        "security": {
+            "auth_required": True,
+            "csrf_required": True,
+            "admin_only": False,
+            "permission_keys": ["finance.ap_ar_invoices.create", "finance.ap_ar_invoices.update"],
+            "dynamic_permission": True
+        },
+        "request": {
+            "idempotency": {
+                "enabled": True,
+                "required": False,
+                "strongly_recommended": True,
+                "safe_retry_requires_client_key": False,
+                "applied_by_default": True,
+                "accepted_headers": ["Idempotency-Key"],
+                "accepted_query_params": ["idempotency_key", "request_id"],
+                "accepted_body_fields": ["idempotency_key", "request_id"],
+                "replay_strategy": "return_stored_success_response",
+                "conflict_policy": "reject_same_key_different_fingerprint",
+                "retry_window_profile": "short_retry_window",
+                "server_derivation": "identity+payload_retry_window"
             }
         },
         "response": {
@@ -1084,7 +1319,8 @@ NEW_ENTITIES = [
         "actions": {
             "list": "governance.override_controls.list",
             "detail": "governance.override_controls.detail",
-            "create": "governance.override_controls.create"
+            "create": "governance.override_controls.create",
+            "transition": "governance.override_controls.transition"
         },
         "semantic_slots": {
             "title_field": "control_code",
@@ -1106,7 +1342,7 @@ NEW_ENTITIES = [
             "list_ready": True,
             "detail_ready": True,
             "create_ready": True,
-            "workflow_ready": False
+            "workflow_ready": True
         }
     },
     {
@@ -1118,7 +1354,8 @@ NEW_ENTITIES = [
         "actions": {
             "list": "finance.period_close_controls.list",
             "detail": "finance.period_close_controls.detail",
-            "create": "finance.period_close_controls.create"
+            "create": "finance.period_close_controls.create",
+            "transition": "finance.period_close_controls.transition"
         },
         "semantic_slots": {
             "title_field": "period_code",
@@ -1140,7 +1377,7 @@ NEW_ENTITIES = [
             "list_ready": True,
             "detail_ready": True,
             "create_ready": True,
-            "workflow_ready": False
+            "workflow_ready": True
         }
     },
     {
@@ -1152,7 +1389,8 @@ NEW_ENTITIES = [
         "actions": {
             "list": "finance.backdate_exceptions.list",
             "detail": "finance.backdate_exceptions.detail",
-            "create": "finance.backdate_exceptions.create"
+            "create": "finance.backdate_exceptions.create",
+            "transition": "finance.backdate_exceptions.transition"
         },
         "semantic_slots": {
             "title_field": "subject_ref",
@@ -1174,7 +1412,7 @@ NEW_ENTITIES = [
             "list_ready": True,
             "detail_ready": True,
             "create_ready": True,
-            "workflow_ready": False
+            "workflow_ready": True
         }
     },
     {
@@ -1334,11 +1572,13 @@ def onboard_entities():
     for ent in NEW_ENTITIES:
         key = ent["entity_key"]
         current = entities.get(key)
+        merged = deep_merge(current, ent) if isinstance(current, dict) else dict(ent)
+        ensure_entity_contract(merged)
         if current is None:
-            entities[key] = ent
+            entities[key] = merged
             added.append(key)
-        elif current != ent:
-            entities[key] = ent
+        elif current != merged:
+            entities[key] = merged
             updated.append(key)
         else:
             skipped.append(key)

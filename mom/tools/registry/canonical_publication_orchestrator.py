@@ -16,10 +16,12 @@ Single entry-point that runs the full publication pipeline in sequence:
   10. generate_wave1_lifecycle_governance.py  (wave-1 lifecycle normalization report)
   11. generate_wave2_canonical_governance.py  (wave-2 canonical exposure/archive report)
   12. generate_wave3_process_governance.py    (wave-3 process-object extraction report)
-  13. generate_operational_stress_report.py   (stress/exception reality assessment)
-  14. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
-  15. Generate publication proof artifact     (_reports/publication-proof-latest.json)
-  16. Generate wave/gap ledger                (wave-gap-ledger.json)
+  13. generate_wave4_production_quality_governance.py (wave-4 production/quality closure report)
+  14. generate_wave5_maintenance_ehs_governance.py (wave-5 maintenance/EHS/compliance closure report)
+  15. generate_operational_stress_report.py   (stress/exception reality assessment)
+  16. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
+  17. Generate publication proof artifact     (_reports/publication-proof-latest.json)
+  18. Generate wave/gap ledger                (wave-gap-ledger.json)
 
 The proof artifact contains checksums, counts, and invariant checks so that
 downstream consumers can verify the publication run is consistent.
@@ -738,7 +740,23 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 12: Operational stress assessment
+    # Step 12: Wave 4 production-quality assessment
+    step_results["wave4_production_quality_governance"] = run_step(
+        "Wave 4 Production Quality Governance (generate_wave4_production_quality_governance.py)",
+        [sys.executable, "generate_wave4_production_quality_governance.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 13: Wave 5 maintenance / EHS assessment
+    step_results["wave5_maintenance_ehs_governance"] = run_step(
+        "Wave 5 Maintenance EHS Governance (generate_wave5_maintenance_ehs_governance.py)",
+        [sys.executable, "generate_wave5_maintenance_ehs_governance.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 14: Operational stress assessment
     step_results["operational_stress_governance"] = run_step(
         "Operational Stress Governance (generate_operational_stress_report.py)",
         [sys.executable, "generate_operational_stress_report.py"],
@@ -746,7 +764,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 13: Compact truth/accounting summaries
+    # Step 15: Compact truth/accounting summaries
     step_results["publication_truth_summaries"] = run_step(
         "Publication Truth Summaries (generate_publication_truth_summaries.py)",
         [sys.executable, "generate_publication_truth_summaries.py"],
@@ -754,7 +772,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 14-15: Proof + wave/gap ledger
+    # Step 15-16: Proof + wave/gap ledger
     print(f"\n{'=' * 72}")
     print("STEP: Wave/Gap Ledger Generation")
     print(f"{'=' * 72}")

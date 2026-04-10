@@ -68,6 +68,71 @@ function now_iso(): string
     return gmdate('c');
 }
 
+function normalize_runtime_dir(string $dir): string
+{
+    return rtrim(str_replace('\\', '/', trim($dir)), '/\\');
+}
+
+function runtime_dir_has_bootstrap_files(string $dir): bool
+{
+    $dir = normalize_runtime_dir($dir);
+    if ($dir === '') {
+        return false;
+    }
+
+    $configDir = $dir . '/config';
+    foreach (['users.json', 'role_permissions.json', 'docs_custom.json', 'form_control_registry.json'] as $marker) {
+        if (is_file($configDir . '/' . $marker)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function runtime_dir_looks_like_legacy_qms(string $dir): bool
+{
+    $dir = normalize_runtime_dir($dir);
+    if ($dir === '') {
+        return false;
+    }
+
+    return strtolower((string)pathinfo($dir, PATHINFO_BASENAME)) === 'qms-data';
+}
+
+function resolve_runtime_data_dir(string $envDir, string $inRepoDir, string $legacyCompatDir): string
+{
+    $envDir = normalize_runtime_dir($envDir);
+    $inRepoDir = normalize_runtime_dir($inRepoDir);
+    $legacyCompatDir = normalize_runtime_dir($legacyCompatDir);
+
+    if ($envDir !== '') {
+        if ($envDir === $inRepoDir) {
+            return $inRepoDir;
+        }
+
+        if (runtime_dir_looks_like_legacy_qms($envDir) && runtime_dir_has_bootstrap_files($inRepoDir)) {
+            return $inRepoDir;
+        }
+
+        if (runtime_dir_has_bootstrap_files($envDir)) {
+            return $envDir;
+        }
+    }
+
+    if (runtime_dir_has_bootstrap_files($inRepoDir)) {
+        return $inRepoDir;
+    }
+    if (runtime_dir_has_bootstrap_files($legacyCompatDir)) {
+        return $legacyCompatDir;
+    }
+    if ($envDir !== '') {
+        return $envDir;
+    }
+
+    return $inRepoDir;
+}
+
 function gen_password(int $len = 14): string
 {
     if ($len < 10) $len = 10;
@@ -96,15 +161,11 @@ function resolve_paths(): array
 {
     $baseDir = realpath(__DIR__ . '/..') ?: dirname(__DIR__);
     $rootDir = realpath($baseDir . '/..') ?: dirname($baseDir);
-    $rootParentDir = realpath($rootDir . '/..') ?: dirname($rootDir);
     $legacyDataDir = $baseDir . '/data';
+    $legacyCompatDataDir = $rootDir . '/qms-data';
 
     $dataDirEnv = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
-    if ($dataDirEnv !== '') {
-        $dataDir = rtrim(str_replace('\\', '/', $dataDirEnv), '/\\');
-    } else {
-        $dataDir = rtrim(str_replace('\\', '/', $rootParentDir), '/\\') . '/data-private';
-    }
+    $dataDir = resolve_runtime_data_dir($dataDirEnv, $legacyDataDir, $legacyCompatDataDir);
 
     if (!is_dir($dataDir)) @mkdir($dataDir, 0775, true);
     if (!is_dir($dataDir) || !is_writable($dataDir)) {

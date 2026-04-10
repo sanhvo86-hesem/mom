@@ -370,8 +370,10 @@ $router->actions([
 $router->actions([
     'finance_period_close_list' => [FinanceController::class, 'listPeriodCloses'],
     'finance_period_close_create' => [FinanceController::class, 'createPeriodClose'],
+    'finance_period_close_transition' => [FinanceController::class, 'transitionPeriodClose'],
     'finance_backdate_exception_list' => [FinanceController::class, 'listBackdateExceptions'],
     'finance_backdate_exception_create' => [FinanceController::class, 'createBackdateException'],
+    'finance_backdate_exception_transition' => [FinanceController::class, 'transitionBackdateException'],
     'finance_credit_memo_list' => [FinanceController::class, 'listCreditMemos'],
     'finance_credit_memo_create' => [FinanceController::class, 'createCreditMemo'],
     'finance_debit_memo_list' => [FinanceController::class, 'listDebitMemos'],
@@ -912,14 +914,17 @@ $router->post('/api/v1/governance/attachments', EvidenceController::class, 'crea
 $router->get('/api/v1/governance/override-controls', OperationalOverrideController::class, 'listOverrides');
 $router->get('/api/v1/governance/override-controls/{overrideId}', OperationalOverrideController::class, 'getOverride');
 $router->post('/api/v1/governance/override-controls', OperationalOverrideController::class, 'createOverride');
+$router->post('/api/v1/governance/override-controls/{overrideId}:transition', OperationalOverrideController::class, 'transitionOverride');
 
 // Finance control objects
 $router->get('/api/v1/finance/period-closes', FinanceController::class, 'listPeriodCloses');
 $router->get('/api/v1/finance/period-closes/{periodCloseId}', FinanceController::class, 'getPeriodClose');
 $router->post('/api/v1/finance/period-closes', FinanceController::class, 'createPeriodClose');
+$router->post('/api/v1/finance/period-closes/{periodCloseId}:transition', FinanceController::class, 'transitionPeriodClose');
 $router->get('/api/v1/finance/backdate-exceptions', FinanceController::class, 'listBackdateExceptions');
 $router->get('/api/v1/finance/backdate-exceptions/{backdateExceptionId}', FinanceController::class, 'getBackdateException');
 $router->post('/api/v1/finance/backdate-exceptions', FinanceController::class, 'createBackdateException');
+$router->post('/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition', FinanceController::class, 'transitionBackdateException');
 $router->get('/api/v1/finance/credit-memos', FinanceController::class, 'listCreditMemos');
 $router->get('/api/v1/finance/credit-memos/{creditMemoId}', FinanceController::class, 'getCreditMemo');
 $router->post('/api/v1/finance/credit-memos', FinanceController::class, 'createCreditMemo');

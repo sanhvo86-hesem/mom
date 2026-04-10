@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Database;
 
+use PDO;
 use RuntimeException;
 
 require_once __DIR__ . '/Connection.php';
@@ -110,6 +111,17 @@ class DataLayer
     }
 
     /**
+     * Return the resolved database configuration for server-side observability
+     * and read-only probes.
+     *
+     * @return array<string, mixed>
+     */
+    public function getDatabaseConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
      * Get the data directory path.
      *
      * @return string
@@ -129,6 +141,7 @@ class DataLayer
         $usesPostgres = $this->usesPostgres();
         $reachable = false;
         $error = '';
+        $databaseProbe = $this->probeConfiguredDatabase();
 
         if ($usesPostgres) {
             try {
@@ -147,10 +160,81 @@ class DataLayer
             'json_fallback' => (bool)($this->config['json_fallback'] ?? false),
             'read_retry_count' => $this->getReadRetryCount(),
             'read_retry_delay_ms' => $this->getReadRetryDelayMs(),
+            'database_configured' => (bool)($databaseProbe['configured'] ?? false),
+            'database_host' => trim((string)($this->config['host'] ?? '')),
+            'database_port' => max(0, (int)($this->config['port'] ?? 0)),
+            'database_name' => trim((string)($this->config['database'] ?? '')),
+            'database_schema' => trim((string)($this->config['schema'] ?? 'public')),
+            'database_username' => trim((string)($this->config['username'] ?? '')),
+            'database_probe_reachable' => (bool)($databaseProbe['reachable'] ?? false),
+            'database_probe_error' => (string)($databaseProbe['error'] ?? ''),
             'postgres_path_active' => $usesPostgres,
             'postgres_reachable' => $reachable,
             'postgres_error' => $error,
+            'master_data_read_mode' => $this->domainReadMode('master_data'),
+            'orders_read_mode' => $this->domainReadMode('orders'),
+            'mes_read_mode' => $this->domainReadMode('mes'),
+            'epicor_read_mode' => $this->domainReadMode('epicor'),
         ];
+    }
+
+    /**
+     * @return array{configured:bool, reachable:bool, error:string}
+     */
+    private function probeConfiguredDatabase(): array
+    {
+        $configured = $this->hasConfiguredDatabaseProfile();
+        $result = [
+            'configured' => $configured,
+            'reachable' => false,
+            'error' => '',
+        ];
+
+        if (!$configured) {
+            return $result;
+        }
+
+        $dsn = sprintf(
+            'pgsql:host=%s;port=%d;dbname=%s;options=--search_path=%s',
+            trim((string)($this->config['host'] ?? 'localhost')),
+            max(1, (int)($this->config['port'] ?? 5432)),
+            trim((string)($this->config['database'] ?? 'mom')),
+            trim((string)($this->config['schema'] ?? 'public')) !== '' ? trim((string)($this->config['schema'] ?? 'public')) : 'public',
+        );
+
+        try {
+            $pdo = new PDO(
+                $dsn,
+                trim((string)($this->config['username'] ?? '')),
+                (string)($this->config['password'] ?? ''),
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                    PDO::ATTR_STRINGIFY_FETCHES => false,
+                    PDO::ATTR_TIMEOUT => max(1, (int)($this->config['connect_timeout'] ?? 5)),
+                ],
+            );
+            $statementTimeout = max(1000, (int)($this->config['statement_timeout'] ?? 30000));
+            $pdo->exec("SET statement_timeout = {$statementTimeout}");
+            $probe = $pdo->query('SELECT 1 AS ok');
+            $row = $probe instanceof \PDOStatement ? $probe->fetch(PDO::FETCH_ASSOC) : false;
+            $result['reachable'] = ((int)($row['ok'] ?? 0) === 1);
+        } catch (\Throwable $e) {
+            $result['error'] = $e->getMessage();
+        }
+
+        return $result;
+    }
+
+    private function hasConfiguredDatabaseProfile(): bool
+    {
+        $allowEmptyPassword = !empty($this->config['allow_empty_password']);
+        return trim((string)($this->config['host'] ?? '')) !== ''
+            && max(0, (int)($this->config['port'] ?? 0)) > 0
+            && trim((string)($this->config['database'] ?? '')) !== ''
+            && trim((string)($this->config['username'] ?? '')) !== ''
+            && ($allowEmptyPassword || trim((string)($this->config['password'] ?? '')) !== '');
     }
 
     /**
@@ -251,10 +335,12 @@ class DataLayer
      */
     public function getRuntimeMasterDataStore(): array
     {
-        return $this->read(
+        $store = $this->readForDomain(
+            'master_data',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/master-data/master-data.json'),
             pgReader: fn(): array => $this->loadRuntimeMasterDataFromPg(),
         );
+        return $this->normalizeRuntimeMasterDataStore(is_array($store) ? $store : []);
     }
 
     /**
@@ -262,7 +348,8 @@ class DataLayer
      */
     public function getRuntimeOrdersStore(): array
     {
-        return $this->read(
+        return $this->readForDomain(
+            'orders',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/orders/orders.json'),
             pgReader: fn(): array => $this->loadRuntimeOrdersFromPg(),
         );
@@ -273,7 +360,8 @@ class DataLayer
      */
     public function getRuntimeMesRuntimeStore(): array
     {
-        return $this->read(
+        return $this->readForDomain(
+            'mes',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/mes/mes-runtime.json'),
             pgReader: fn(): array => $this->loadRuntimeMesRuntimeFromPg(),
         );
@@ -284,7 +372,8 @@ class DataLayer
      */
     public function getRuntimeEpicorIntegrationStore(): array
     {
-        return $this->read(
+        return $this->readForDomain(
+            'epicor',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/erp/epicor-runtime.json'),
             pgReader: fn(): array => $this->loadRuntimeEpicorIntegrationFromPg(),
         );
@@ -1854,6 +1943,27 @@ class DataLayer
     }
 
     /**
+     * Read using the global mode unless a per-domain override is configured.
+     *
+     * Supported override values:
+     * - default          => follow global mode
+     * - json             => force JSON
+     * - postgres_primary => force PostgreSQL with JSON fallback
+     * - postgres_only    => force PostgreSQL only
+     */
+    private function readForDomain(string $domain, callable $jsonReader, callable $pgReader): mixed
+    {
+        $override = $this->domainReadMode($domain);
+
+        return match ($override) {
+            'json' => $this->jsonRead($jsonReader),
+            'postgres_primary' => $this->pgWithFallback($pgReader, $jsonReader),
+            'postgres_only' => $this->pgRead($pgReader),
+            default => $this->read($jsonReader, $pgReader),
+        };
+    }
+
+    /**
      * Strategy dispatcher for WRITE operations.
      *
      * @param callable $jsonWriter Writes to JSON (returns bool).
@@ -1987,6 +2097,15 @@ class DataLayer
     private function usesPostgres(): bool
     {
         return $this->mode !== self::MODE_JSON_ONLY;
+    }
+
+    private function domainReadMode(string $domain): string
+    {
+        $key = strtolower(trim($domain)) . '_read_mode';
+        $raw = strtolower(trim((string)($this->config[$key] ?? 'default')));
+        return in_array($raw, ['default', 'json', 'postgres_primary', 'postgres_only'], true)
+            ? $raw
+            : 'default';
     }
 
     /**
@@ -2232,6 +2351,28 @@ class DataLayer
             'source' => 'postgres_primary_pilot',
             'description' => 'Governed runtime ' . $domain . ' rebuilt from PostgreSQL mirror tables.',
         ];
+    }
+
+    /**
+     * Keep legacy and current field names aligned for master-data consumers.
+     */
+    private function normalizeRuntimeMasterDataStore(array $store): array
+    {
+        $parts = array_values(is_array($store['parts'] ?? null) ? $store['parts'] : []);
+        $store['parts'] = array_map(static function ($row): array {
+            if (!is_array($row)) {
+                return [];
+            }
+            $partDescription = trim((string)($row['part_description'] ?? ''));
+            $legacyDescription = trim((string)($row['description'] ?? ''));
+            $canonicalDescription = $partDescription !== '' ? $partDescription : $legacyDescription;
+            if ($canonicalDescription !== '') {
+                $row['part_description'] = $canonicalDescription;
+                $row['description'] = $canonicalDescription;
+            }
+            return $row;
+        }, $parts);
+        return $store;
     }
 
     /**

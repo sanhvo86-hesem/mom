@@ -29,21 +29,96 @@ function opt(string $name): ?string
 
 function yesNo(bool $v): string { return $v ? 'YES' : 'NO'; }
 
+function normalize_runtime_dir(string $dir): string
+{
+    return rtrim(str_replace('\\', '/', trim($dir)), '/\\');
+}
+
+function runtime_dir_has_bootstrap_files(string $dir): bool
+{
+    $dir = normalize_runtime_dir($dir);
+    if ($dir === '') {
+        return false;
+    }
+
+    $configDir = $dir . '/config';
+    foreach (['users.json', 'role_permissions.json', 'docs_custom.json', 'form_control_registry.json'] as $marker) {
+        if (is_file($configDir . '/' . $marker)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function runtime_dir_looks_like_legacy_qms(string $dir): bool
+{
+    $dir = normalize_runtime_dir($dir);
+    if ($dir === '') {
+        return false;
+    }
+
+    return strtolower((string)pathinfo($dir, PATHINFO_BASENAME)) === 'qms-data';
+}
+
+function resolve_runtime_data_dir(string $envDir, string $inRepoDir, string $legacyCompatDir): string
+{
+    $envDir = normalize_runtime_dir($envDir);
+    $inRepoDir = normalize_runtime_dir($inRepoDir);
+    $legacyCompatDir = normalize_runtime_dir($legacyCompatDir);
+
+    if ($envDir !== '') {
+        if ($envDir === $inRepoDir) {
+            return $inRepoDir;
+        }
+
+        if (runtime_dir_looks_like_legacy_qms($envDir) && runtime_dir_has_bootstrap_files($inRepoDir)) {
+            return $inRepoDir;
+        }
+
+        if (runtime_dir_has_bootstrap_files($envDir)) {
+            return $envDir;
+        }
+    }
+
+    if (runtime_dir_has_bootstrap_files($inRepoDir)) {
+        return $inRepoDir;
+    }
+    if (runtime_dir_has_bootstrap_files($legacyCompatDir)) {
+        return $legacyCompatDir;
+    }
+    if ($envDir !== '') {
+        return $envDir;
+    }
+
+    return $inRepoDir;
+}
+
 function resolve_paths(): array
 {
     $baseDir = realpath(__DIR__ . '/..') ?: dirname(__DIR__);
     $rootDir = realpath($baseDir . '/..') ?: dirname($baseDir);
     $rootParentDir = realpath($rootDir . '/..') ?: dirname($rootDir);
     $legacyDataDir = $baseDir . '/data';
+    $legacyCompatDataDir = $rootDir . '/qms-data';
+    $privateDataDir = normalize_runtime_dir($rootParentDir . '/data-private');
 
     $dataDirEnv = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
     if ($dataDirEnv !== '') {
-        $dataDir = rtrim(str_replace('\\', '/', $dataDirEnv), '/\\');
+        $dataDir = resolve_runtime_data_dir($dataDirEnv, $legacyDataDir, $legacyCompatDataDir);
         $dataSource = 'ENV(QMS_DATA_DIR)';
-    } else {
-        $candidate = rtrim(str_replace('\\', '/', $rootParentDir), '/\\') . '/data-private';
-        $dataDir = $candidate;
+    } elseif (runtime_dir_has_bootstrap_files($legacyDataDir)) {
+        $dataDir = normalize_runtime_dir($legacyDataDir);
+        $dataSource = 'canonical-in-repo';
+    } elseif (runtime_dir_has_bootstrap_files($legacyCompatDataDir)) {
+        $dataDir = normalize_runtime_dir($legacyCompatDataDir);
+        $dataSource = 'legacy-compat';
+    } elseif (runtime_dir_has_bootstrap_files($privateDataDir)) {
+        $dataDir = $privateDataDir;
         $dataSource = 'auto-private';
+    } else {
+        $dataDir = normalize_runtime_dir($legacyDataDir);
+        $dataSource = 'canonical-in-repo-fallback';
     }
 
     if (!is_dir($dataDir)) @mkdir($dataDir, 0775, true);
@@ -90,9 +165,23 @@ function http_status_check(string $apiUrl): array
             'header' => "Accept: application/json\r\n",
         ],
     ]);
-    $body = @file_get_contents($url, false, $ctx);
+    $responseHeaders = [];
+    $body = false;
+    $handle = @fopen($url, 'r', false, $ctx);
+    if (is_resource($handle)) {
+        $meta = stream_get_meta_data($handle);
+        $responseHeaders = is_array($meta['wrapper_data'] ?? null) ? $meta['wrapper_data'] : [];
+        $body = stream_get_contents($handle);
+        fclose($handle);
+    } else {
+        $body = @file_get_contents($url, false, $ctx);
+        if (function_exists('http_get_last_response_headers')) {
+            $responseHeaders = http_get_last_response_headers() ?: [];
+        }
+    }
+
     $code = 0;
-    if (isset($http_response_header[0]) && preg_match('#\s(\d{3})\s#', $http_response_header[0], $m)) {
+    if (isset($responseHeaders[0]) && preg_match('#\s(\d{3})\s#', $responseHeaders[0], $m)) {
         $code = (int)$m[1];
     }
     $ok = false;

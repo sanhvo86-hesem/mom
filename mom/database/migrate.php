@@ -22,7 +22,49 @@ require_once __DIR__ . '/Connection.php';
 
 use MOM\Database\Connection;
 
+function migrate_load_runtime_env_from_pool(): void
+{
+    $dbPass = getenv('DB_PASS');
+    if (is_string($dbPass) && $dbPass !== '') {
+        return;
+    }
+
+    $candidates = array_values(array_filter([
+        getenv('MOM_FPM_POOL_FILE') ?: null,
+        '/etc/php/8.2/fpm/pool.d/mom.conf',
+        '/etc/php/8.3/fpm/pool.d/mom.conf',
+        '/etc/php/8.1/fpm/pool.d/mom.conf',
+    ], static fn($path) => is_string($path) && $path !== ''));
+
+    foreach ($candidates as $poolFile) {
+        if (!is_file($poolFile) || !is_readable($poolFile)) {
+            continue;
+        }
+        $lines = file($poolFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (!is_array($lines)) {
+            continue;
+        }
+        foreach ($lines as $line) {
+            if (!preg_match('/^env\[([^\]]+)\]\s*=\s*(.+)$/', trim($line), $matches)) {
+                continue;
+            }
+            $key = trim((string)($matches[1] ?? ''));
+            $value = trim((string)($matches[2] ?? ''));
+            if ($key === '') {
+                continue;
+            }
+            $value = trim($value, "\"'");
+            putenv($key . '=' . $value);
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+        }
+        return;
+    }
+}
+
 // ── Configuration ────────────────────────────────────────────────────────────
+
+migrate_load_runtime_env_from_pool();
 
 $configFile = __DIR__ . '/config.php';
 if (!file_exists($configFile)) {
@@ -134,7 +176,7 @@ foreach ($files as $file) {
     $startMs = hrtime(true);
 
     try {
-        $db->execute($sql);
+        $db->executeScript($sql);
         $elapsedMs = (int)((hrtime(true) - $startMs) / 1e6);
 
         // Record migration

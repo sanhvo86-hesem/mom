@@ -2861,6 +2861,51 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/governance/override-controls/{overrideId}:transition:
+    post:
+      operationId: transitionOverrideControl
+      tags: [Governance]
+      summary: Transition an operational override control
+      description: |
+        Revokes, expires, or closes an override control with an auditable reason and safe retry support through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: overrideId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionOverrideControlRequest'
+      responses:
+        '200':
+          description: Override control transitioned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OverrideControlEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
   /api/v1/finance/period-closes:
     get:
       operationId: listPeriodCloses
@@ -2944,6 +2989,51 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/finance/period-closes/{periodCloseId}:transition:
+    post:
+      operationId: transitionPeriodClose
+      tags: [Finance]
+      summary: Transition a period close control
+      description: |
+        Reopens or re-closes a governed accounting period with an auditable reason and safe retry support through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: periodCloseId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionPeriodCloseRequest'
+      responses:
+        '200':
+          description: Period close transitioned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeriodCloseEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
   /api/v1/finance/backdate-exceptions:
     get:
       operationId: listBackdateExceptions
@@ -3025,6 +3115,51 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition:
+    post:
+      operationId: transitionBackdateException
+      tags: [Finance]
+      summary: Transition a backdate exception
+      description: |
+        Revokes, expires, or closes a governed backdate exception with an auditable reason and safe retry support through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: backdateExceptionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionBackdateExceptionRequest'
+      responses:
+        '200':
+          description: Backdate exception transitioned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackdateExceptionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
 
   /api/v1/finance/credit-memos:
     get:
@@ -4328,6 +4463,18 @@ components:
           type: object
           additionalProperties: true
 
+    TransitionOverrideControlRequest:
+      type: object
+      required: [transition, reason]
+      properties:
+        transition:
+          type: string
+          enum: [revoke, expire, close]
+        reason:
+          type: string
+        follow_up_status:
+          type: string
+
     PeriodCloseItem:
       type: object
       required: [period_close_id, period_code, ledger_scope, close_status, closed_by, closed_at, reason]
@@ -4379,6 +4526,16 @@ components:
         ledger_scope:
           type: string
           enum: [AP, AR, PLANT]
+        reason:
+          type: string
+
+    TransitionPeriodCloseRequest:
+      type: object
+      required: [transition, reason]
+      properties:
+        transition:
+          type: string
+          enum: [reopen, close]
         reason:
           type: string
 
@@ -4465,6 +4622,16 @@ components:
         expires_at:
           type: string
           format: date-time
+
+    TransitionBackdateExceptionRequest:
+      type: object
+      required: [transition, reason]
+      properties:
+        transition:
+          type: string
+          enum: [revoke, expire, close]
+        reason:
+          type: string
 
     MemoItem:
       type: object

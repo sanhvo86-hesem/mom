@@ -1,0 +1,444 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T16:20:00+07:00",
+    "description": "Wave 5 normalization decisions for maintenance, EHS, compliance, and lean audit lifecycle closure."
+  },
+  "execution_targets": {
+    "maintenance_ehs.maintenance-plans": {
+      "entity_key": "plant_maintenance.pm_maintenance_plans",
+      "workflow_id": "wf_pm_maintenance_plan",
+      "required_endpoints": [
+        "plant_maintenance.pm_maintenance_plans.list",
+        "plant_maintenance.pm_maintenance_plans.detail",
+        "plant_maintenance.pm_maintenance_plans.create",
+        "plant_maintenance.pm_maintenance_plans.transition"
+      ],
+      "expected_table": "pm_maintenance_plans",
+      "expected_primary_key": "maintenance_plan_id",
+      "expected_status_column": "status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "expected_states": [
+        "draft",
+        "approved",
+        "active",
+        "on_hold",
+        "retired",
+        "archived"
+      ],
+      "purpose": "Preventive maintenance plans must hold a real approval and release lifecycle before the factory auto-generates or schedules work."
+    },
+    "maintenance_ehs.maintenance-work-orders": {
+      "entity_key": "plant_maintenance.pm_work_orders",
+      "workflow_id": "wf_pm_work_order",
+      "required_endpoints": [
+        "plant_maintenance.pm_work_orders.list",
+        "plant_maintenance.pm_work_orders.detail",
+        "plant_maintenance.pm_work_orders.create",
+        "plant_maintenance.pm_work_orders.transition"
+      ],
+      "expected_table": "pm_work_orders",
+      "expected_primary_key": "pm_work_order_id",
+      "expected_status_column": "status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "expected_states": [
+        "draft",
+        "planned",
+        "released",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "purpose": "Maintenance work orders must remain a real execution owner from planning through closeout."
+    },
+    "maintenance_ehs.incidents": {
+      "entity_key": "ehs_sustainability.ehs_incidents",
+      "workflow_id": "wf_ehs_incident",
+      "required_endpoints": [
+        "ehs_sustainability.ehs_incidents.list",
+        "ehs_sustainability.ehs_incidents.detail",
+        "ehs_sustainability.ehs_incidents.create",
+        "ehs_sustainability.ehs_incidents.transition"
+      ],
+      "expected_table": "ehs_incidents",
+      "expected_primary_key": "incident_id",
+      "expected_status_column": "incident_status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "expected_states": [
+        "reported",
+        "triaged",
+        "contained",
+        "investigating",
+        "corrective_action",
+        "closed",
+        "archived"
+      ],
+      "purpose": "Incident closure must be a persisted safety workflow so containment, investigation, and closeout cannot fall back to note-only handling."
+    },
+    "master_data.compliance-obligations": {
+      "entity_key": "quality_lab.qual_compliance_obligations",
+      "workflow_id": "wf_quality_obligation",
+      "required_endpoints": [
+        "quality_lab.qual_compliance_obligations.list",
+        "quality_lab.qual_compliance_obligations.detail",
+        "quality_lab.qual_compliance_obligations.create",
+        "quality_lab.qual_compliance_obligations.transition"
+      ],
+      "expected_table": "qual_compliance_obligations",
+      "expected_primary_key": "qual_compliance_obligation_id",
+      "expected_status_column": "obligation_status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "expected_states": [
+        "open",
+        "due",
+        "overdue",
+        "waived",
+        "closed",
+        "archived"
+      ],
+      "purpose": "Compliance obligations must own due, overdue, waiver, and close logic as a real governed compliance anchor."
+    },
+    "maintenance_ehs.permits": {
+      "entity_key": "ehs_sustainability.ehs_permit_register",
+      "workflow_id": "wf_ehs_permit_register",
+      "required_endpoints": [
+        "ehs_sustainability.ehs_permit_register.list",
+        "ehs_sustainability.ehs_permit_register.detail",
+        "ehs_sustainability.ehs_permit_register.create",
+        "ehs_sustainability.ehs_permit_register.transition"
+      ],
+      "expected_table": "ehs_permit_register",
+      "expected_primary_key": "ehs_permit_id",
+      "expected_status_column": "status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "expected_states": [
+        "draft",
+        "submitted",
+        "approved",
+        "active",
+        "suspended",
+        "expired",
+        "closed",
+        "archived"
+      ],
+      "purpose": "Permit-to-work must be a live governed register with approval, activation, suspension, expiry, and closure states."
+    },
+    "maintenance_ehs.safety-observations": {
+      "entity_key": "ehs_sustainability.safety_observations",
+      "workflow_id": "wf_safety_observation",
+      "required_endpoints": [
+        "ehs_sustainability.safety_observations.list",
+        "ehs_sustainability.safety_observations.detail",
+        "ehs_sustainability.safety_observations.create",
+        "ehs_sustainability.safety_observations.transition"
+      ],
+      "expected_table": "safety_observations",
+      "expected_primary_key": "safety_observation_id",
+      "expected_status_column": "observation_status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "expected_states": [
+        "logged",
+        "assigned",
+        "in_progress",
+        "closed",
+        "archived"
+      ],
+      "purpose": "Safety observations must close through a persisted action path so hazards and good catches cannot disappear into free text."
+    },
+    "maintenance_ehs.five-s-audits": {
+      "entity_key": "lean_manufacturing.lean_5s_audits",
+      "workflow_id": "wf_lean_5s_audit",
+      "required_endpoints": [
+        "lean_manufacturing.lean_5s_audits.list",
+        "lean_manufacturing.lean_5s_audits.detail",
+        "lean_manufacturing.lean_5s_audits.create",
+        "lean_manufacturing.lean_5s_audits.transition"
+      ],
+      "expected_table": "lean_5s_audits",
+      "expected_primary_key": "audit_5s_id",
+      "expected_status_column": "status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "expected_states": [
+        "planned",
+        "in_progress",
+        "follow_up",
+        "verified",
+        "closed",
+        "archived"
+      ],
+      "purpose": "5S audits must own execution and follow-up states so lean discipline is measured through closure, not only scoring."
+    }
+  },
+  "practical_state_targets": {
+    "plant_maintenance.pm_maintenance_plans": {
+      "table": "pm_maintenance_plans",
+      "workflow_id": "wf_pm_maintenance_plan",
+      "expected_status_set": "pm_maintenance_plans_status_set",
+      "expected_states": [
+        "draft",
+        "approved",
+        "active",
+        "on_hold",
+        "retired",
+        "archived"
+      ],
+      "forbid_alias_of": "digital_thread_status"
+    },
+    "ehs_sustainability.ehs_permit_register": {
+      "table": "ehs_permit_register",
+      "workflow_id": "wf_ehs_permit_register",
+      "expected_status_set": "ehs_permit_register_status_set",
+      "expected_states": [
+        "draft",
+        "submitted",
+        "approved",
+        "active",
+        "suspended",
+        "expired",
+        "closed",
+        "archived"
+      ],
+      "forbid_alias_of": "digital_thread_status"
+    },
+    "lean_manufacturing.lean_5s_audits": {
+      "table": "lean_5s_audits",
+      "workflow_id": "wf_lean_5s_audit",
+      "expected_status_set": "lean_5s_audits_status_set",
+      "expected_states": [
+        "planned",
+        "in_progress",
+        "follow_up",
+        "verified",
+        "closed",
+        "archived"
+      ],
+      "forbid_alias_of": "digital_thread_status"
+    },
+    "plant_maintenance.pm_equipment_master": {
+      "table": "pm_equipment_master",
+      "workflow_id": "wf_pm_equipment_master",
+      "expected_status_set": "pm_equipment_master_status_set",
+      "expected_states": [
+        "commissioning",
+        "qualified",
+        "active",
+        "on_hold",
+        "lockout",
+        "retired",
+        "archived"
+      ],
+      "forbid_alias_of": "digital_thread_status"
+    }
+  },
+  "canonical_owner_targets": {
+    "maintenance_ehs.maintenance-plans": {
+      "entity_key": "plant_maintenance.pm_maintenance_plans",
+      "expected_table": "pm_maintenance_plans",
+      "expected_primary_key": "maintenance_plan_id",
+      "expected_status_column": "status"
+    },
+    "maintenance_ehs.maintenance-work-orders": {
+      "entity_key": "plant_maintenance.pm_work_orders",
+      "expected_table": "pm_work_orders",
+      "expected_primary_key": "pm_work_order_id",
+      "expected_status_column": "status"
+    },
+    "maintenance_ehs.incidents": {
+      "entity_key": "ehs_sustainability.ehs_incidents",
+      "expected_table": "ehs_incidents",
+      "expected_primary_key": "incident_id",
+      "expected_status_column": "incident_status"
+    },
+    "master_data.compliance-obligations": {
+      "entity_key": "quality_lab.qual_compliance_obligations",
+      "expected_table": "qual_compliance_obligations",
+      "expected_primary_key": "qual_compliance_obligation_id",
+      "expected_status_column": "obligation_status"
+    },
+    "maintenance_ehs.permits": {
+      "entity_key": "ehs_sustainability.ehs_permit_register",
+      "expected_table": "ehs_permit_register",
+      "expected_primary_key": "ehs_permit_id",
+      "expected_status_column": "status"
+    },
+    "maintenance_ehs.safety-observations": {
+      "entity_key": "ehs_sustainability.safety_observations",
+      "expected_table": "safety_observations",
+      "expected_primary_key": "safety_observation_id",
+      "expected_status_column": "observation_status"
+    },
+    "maintenance_ehs.five-s-audits": {
+      "entity_key": "lean_manufacturing.lean_5s_audits",
+      "expected_table": "lean_5s_audits",
+      "expected_primary_key": "audit_5s_id",
+      "expected_status_column": "status"
+    }
+  },
+  "contextual_alias_targets": {
+    "plant_maintenance.pm_equipment_master": {
+      "canonical_resource": "master_data.equipment",
+      "canonical_entity_key": "calibration_equipment.equipment",
+      "expected_link_field": "equipment_id",
+      "required_lookup_endpoint": "calibration_equipment.equipment.list",
+      "expected_state_alignment": [
+        "commissioning",
+        "qualified",
+        "active",
+        "on_hold",
+        "lockout",
+        "retired",
+        "archived"
+      ],
+      "reason": "PM equipment master remains a contextual maintenance shell and must stay linked to the canonical equipment identity instead of introducing a second equipment truth."
+    }
+  },
+  "relationship_truth_targets": {
+    "maintenance_ehs.maintenance-plans": {
+      "expected_key_relationships": [
+        "equipment_id -> equipment.equipment_id"
+      ]
+    },
+    "maintenance_ehs.maintenance-work-orders": {
+      "expected_key_relationships": [
+        "maintenance_plan_id -> pm_maintenance_plans.maintenance_plan_id",
+        "equipment_id -> equipment.equipment_id"
+      ]
+    },
+    "maintenance_ehs.incidents": {
+      "expected_key_relationships": [
+        "reported_by_employee_id -> employees.employee_id",
+        "qual_compliance_obligation_id -> qual_compliance_obligations.qual_compliance_obligation_id"
+      ]
+    },
+    "master_data.compliance-obligations": {
+      "expected_key_relationships": [
+        "qual_compliance_obligation_id -> ehs_incidents.qual_compliance_obligation_id",
+        "owner_id -> employees.employee_id"
+      ]
+    },
+    "maintenance_ehs.safety-observations": {
+      "expected_key_relationships": [
+        "employee_id -> employees.employee_id",
+        "assigned_to_employee_id -> employees.employee_id",
+        "incident_id -> ehs_incidents.incident_id"
+      ]
+    },
+    "maintenance_ehs.permits": {
+      "expected_key_relationships": []
+    },
+    "maintenance_ehs.five-s-audits": {
+      "expected_key_relationships": [
+        "auditor_id -> employees.employee_id"
+      ]
+    }
+  },
+  "workflow_role_overrides": {
+    "wf_pm_maintenance_plan": {
+      "required_transition_roles": {
+        "draft->approved": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "approved->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "on_hold->approved": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "on_hold->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "active->on_hold": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "approved->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "active->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "on_hold->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "retired->archived": ["maintenance_supervisor", "plant_manager", "system_admin"]
+      }
+    },
+    "wf_pm_equipment_master": {
+      "required_transition_roles": {
+        "commissioning->qualified": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "on_hold->qualified": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "qualified->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "on_hold->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "lockout->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "active->on_hold": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "qualified->on_hold": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "active->lockout": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "on_hold->lockout": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "active->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "lockout->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "on_hold->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
+        "retired->archived": ["maintenance_supervisor", "plant_manager", "system_admin"]
+      }
+    },
+    "wf_ehs_incident": {
+      "required_transition_roles": {
+        "reported->triaged": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "triaged->contained": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "investigating->contained": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "triaged->investigating": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "contained->investigating": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "investigating->corrective_action": ["quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "contained->corrective_action": ["quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "corrective_action->closed": ["quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+      }
+    },
+    "wf_quality_obligation": {
+      "required_transition_roles": {
+        "open->due": ["quality_engineer", "quality_manager", "system_admin"],
+        "open->overdue": ["quality_engineer", "quality_manager", "system_admin"],
+        "due->overdue": ["quality_engineer", "quality_manager", "system_admin"],
+        "open->waived": ["quality_manager", "plant_manager", "system_admin"],
+        "due->waived": ["quality_manager", "plant_manager", "system_admin"],
+        "overdue->waived": ["quality_manager", "plant_manager", "system_admin"],
+        "open->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "due->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "overdue->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "waived->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "closed->archived": ["quality_manager", "system_admin"]
+      }
+    },
+    "wf_ehs_permit_register": {
+      "required_transition_roles": {
+        "draft->submitted": ["operations_manager", "plant_manager", "system_admin"],
+        "submitted->approved": ["quality_manager", "plant_manager", "system_admin"],
+        "approved->active": ["operations_manager", "plant_manager", "system_admin"],
+        "suspended->active": ["operations_manager", "plant_manager", "system_admin"],
+        "approved->suspended": ["quality_manager", "plant_manager", "system_admin"],
+        "active->suspended": ["quality_manager", "plant_manager", "system_admin"],
+        "approved->expired": ["quality_manager", "plant_manager", "system_admin"],
+        "active->expired": ["quality_manager", "plant_manager", "system_admin"],
+        "suspended->expired": ["quality_manager", "plant_manager", "system_admin"],
+        "active->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "suspended->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "expired->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+      }
+    },
+    "wf_safety_observation": {
+      "required_transition_roles": {
+        "logged->assigned": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
+        "assigned->in_progress": ["operations_manager", "plant_manager", "system_admin"],
+        "assigned->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "in_progress->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+      }
+    },
+    "wf_lean_5s_audit": {
+      "required_transition_roles": {
+        "planned->in_progress": ["operations_manager", "plant_manager", "system_admin"],
+        "in_progress->follow_up": ["operations_manager", "plant_manager", "system_admin"],
+        "follow_up->verified": ["quality_manager", "plant_manager", "system_admin"],
+        "verified->closed": ["quality_manager", "plant_manager", "system_admin"],
+        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+      }
+    }
+  }
+}

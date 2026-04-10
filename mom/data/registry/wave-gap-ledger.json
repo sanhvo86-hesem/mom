@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-09T14:35:29.022Z",
-    "publication_run_id": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5",
+    "generatedAt": "2026-04-10T07:51:07.409Z",
+    "publication_run_id": "16b4c137-a965-4f41-bc10-785f9b29dac8",
     "generator_name": "canonical_publication_orchestrator",
     "source_catalog": "data/registry/frontend-foundation-catalog.json"
   },
   "summary": {
-    "total_entities": 663,
-    "ready": 663,
+    "total_entities": 669,
+    "ready": 669,
     "partial": 0,
     "blocked": 0,
     "partial_by_reason": {},

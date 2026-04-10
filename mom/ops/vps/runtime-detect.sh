@@ -257,3 +257,55 @@ ensure_nginx_include() {
   cat "$tmp" > "$site"
   rm -f "$tmp"
 }
+
+ensure_fastcgi_param_in_php_location() {
+  local site="$1"
+  local param_name="$2"
+  local param_value="$3"
+
+  if grep -Eq "^[[:space:]]*fastcgi_param[[:space:]]+${param_name}[[:space:]]+${param_value//\//\\/};" "$site"; then
+    return
+  fi
+
+  backup_file "$site"
+
+  python3 - "$site" "$param_name" "$param_value" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+site_path = Path(sys.argv[1])
+param_name = sys.argv[2]
+param_value = sys.argv[3]
+needle = f"        fastcgi_param {param_name} {param_value};\n"
+content = site_path.read_text()
+
+pattern = re.compile(
+    r"(location\s+~\s+\\\.php\$\s*\{.*?include\s+fastcgi_params;\n)",
+    re.DOTALL,
+)
+
+match = pattern.search(content)
+if not match:
+    raise SystemExit(f"Could not locate PHP location block in {site_path}")
+
+block_start = match.start()
+block_end = content.find("\n    }", block_start)
+if block_end == -1:
+    raise SystemExit(f"Could not locate end of PHP location block in {site_path}")
+
+php_block = content[block_start:block_end]
+if re.search(rf"^[ \t]*fastcgi_param[ \t]+{re.escape(param_name)}[ \t]+", php_block, re.MULTILINE):
+    content = re.sub(
+        rf"(^[ \t]*fastcgi_param[ \t]+{re.escape(param_name)}[ \t]+).*$",
+        rf"\1{param_value};",
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+else:
+    content = content[:match.end()] + needle + content[match.end():]
+
+site_path.write_text(content)
+PY
+}

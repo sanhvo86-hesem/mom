@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HESEM MOM — Module Layout Template Design System v3.0 Enterprise</title>
+<style>
+:root {
+  --brand:#0c2d48;--brand-2:#1565c0;--brand-light:#1e88e5;--accent:#f9a825;--accent-light:#fdd835;
+  --bg-page:#f8fafc;--bg-surface:#ffffff;--bg-surface-alt:#f1f5f9;
+  --text-primary:#1e293b;--text-secondary:#64748b;--text-tertiary:#94a3b8;--border:#e2e8f0;
+  --green:#16a34a;--green-bg:rgba(22,163,74,.08);--red:#dc2626;--red-bg:rgba(220,38,38,.08);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,.08);--blue:#2563eb;--blue-bg:rgba(37,99,235,.08);
+  --purple:#7c3aed;--purple-bg:rgba(124,58,237,.08);--cyan:#0891b2;--cyan-bg:rgba(8,145,178,.08);
+  --indigo:#4f46e5;--indigo-bg:rgba(79,70,229,.08);--pink:#db2777;--pink-bg:rgba(219,39,119,.08);
+  --teal:#0d9488;--teal-bg:rgba(13,148,136,.08);
+  --r-sm:4px;--r-md:6px;--r-lg:10px;--r-xl:14px;--r-2xl:18px;
+  --font:-apple-system,'Segoe UI','Noto Sans',Arial,Helvetica,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);--shadow-md:0 4px 6px rgba(0,0,0,.07);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.1);--shadow-xl:0 20px 40px rgba(0,0,0,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.doc-header{background:linear-gradient(135deg,#0a1628 0%,#0c2d48 30%,#1565c0 70%,#1e88e5 100%);color:#fff;padding:56px 48px 48px;position:relative;overflow:hidden}
+.doc-header::before{content:'';position:absolute;top:-50%;right:-15%;width:800px;height:800px;background:radial-gradient(circle,rgba(249,168,37,.12) 0%,transparent 65%);border-radius:50%}
+.doc-header::after{content:'';position:absolute;bottom:-40%;left:30%;width:600px;height:600px;background:radial-gradient(circle,rgba(30,136,229,.15) 0%,transparent 65%);border-radius:50%}
+.doc-header *{position:relative;z-index:1}
+.doc-header h1{font-size:36px;font-weight:900;letter-spacing:-.02em;margin-bottom:8px;line-height:1.2}
+.doc-header .subtitle{font-size:15px;opacity:.88;max-width:900px;line-height:1.7}
+.doc-header .meta{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.doc-header .meta-item{padding:5px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.03em}
+
+/* TOC */
+.toc{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 48px;overflow-x:auto;scrollbar-width:none}
+.toc::-webkit-scrollbar{height:0}
+.toc-inner{display:flex;gap:0;min-width:max-content}
+.toc a{display:flex;align-items:center;gap:5px;padding:12px 14px;font-size:11px;font-weight:600;color:var(--text-secondary);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.toc a:hover{color:var(--brand-2);border-bottom-color:var(--brand-2)}
+
+/* CONTAINER */
+.container{max-width:1400px;margin:0 auto;padding:36px 48px 80px}
+
+/* SECTION */
+.section{margin-bottom:56px;scroll-margin-top:52px}
+.section-title{font-size:24px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px;letter-spacing:-.01em}
+.section-subtitle{font-size:13px;color:var(--text-secondary);margin-bottom:24px;max-width:960px;line-height:1.75}
+.section-number{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:var(--brand-2);color:#fff;border-radius:10px;font-size:14px;font-weight:900}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.03em;line-height:1.4}
+.chip-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(22,163,74,.2)}
+.chip-blue{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(37,99,235,.2)}
+.chip-amber{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,.2)}
+.chip-purple{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(124,58,237,.2)}
+.chip-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,.2)}
+.chip-cyan{background:var(--cyan-bg);color:var(--cyan);border:1px solid rgba(8,145,178,.2)}
+.chip-indigo{background:var(--indigo-bg);color:var(--indigo);border:1px solid rgba(79,70,229,.2)}
+.chip-pink{background:var(--pink-bg);color:var(--pink);border:1px solid rgba(219,39,119,.2)}
+.chip-teal{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(13,148,136,.2)}
+.chip-dark{background:rgba(30,41,59,.08);color:#334155;border:1px solid rgba(30,41,59,.12)}
+
+/* CARDS */
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-sm)}
+.card-header{padding:14px 20px;background:var(--bg-surface-alt);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+@media(max-width:1100px){.grid-4,.grid-5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4,.grid-5{grid-template-columns:1fr}.container{padding:20px}.doc-header{padding:32px 20px}.toc{padding:0 16px}}
+
+/* TEMPLATE CARDS */
+.tpl-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all .2s;cursor:default}
+.tpl-card:hover{border-color:var(--brand-2);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.tpl-card .tpl-thumb{aspect-ratio:16/9.5;background:var(--bg-surface-alt);padding:8px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border)}
+.tpl-card .tpl-info{padding:10px 12px}
+.tpl-card .tpl-name{font-size:12px;font-weight:700;margin-bottom:2px;line-height:1.3}
+.tpl-card .tpl-desc{font-size:10px;color:var(--text-secondary);line-height:1.45}
+.tpl-card .tpl-chips{margin-top:6px;display:flex;gap:3px;flex-wrap:wrap}
+
+/* TABLES */
+.spec-table{width:100%;border-collapse:collapse;font-size:12px}
+.spec-table th{text-align:left;padding:8px 12px;background:var(--bg-surface-alt);font-weight:700;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary);border-bottom:1px solid var(--border)}
+.spec-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.spec-table tr:last-child td{border-bottom:none}
+.spec-table tr:hover td{background:rgba(21,101,192,.02)}
+
+/* CODE */
+.code-block{background:#0f172a;color:#e2e8f0;padding:18px;border-radius:var(--r-lg);font-family:var(--mono);font-size:11px;line-height:1.7;overflow-x:auto;white-space:pre}
+.code-block .k{color:#7dd3fc}.code-block .s{color:#86efac}.code-block .n{color:#fbbf24}.code-block .c{color:#475569;font-style:italic}
+code{background:var(--bg-surface-alt);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:10px;color:var(--brand-2)}
+
+/* INFO BOXES */
+.info-box{padding:14px 18px;border-radius:var(--r-lg);margin-bottom:12px;font-size:12px;line-height:1.7}
+.info-box-blue{background:var(--blue-bg);border:1px solid rgba(37,99,235,.18)}.info-box-green{background:var(--green-bg);border:1px solid rgba(22,163,74,.18)}
+.info-box-amber{background:var(--amber-bg);border:1px solid rgba(217,119,6,.18)}.info-box-purple{background:var(--purple-bg);border:1px solid rgba(124,58,237,.18)}
+.info-box-red{background:var(--red-bg);border:1px solid rgba(220,38,38,.18)}
+.info-box strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:.03em}
+
+/* ZONE DIAGRAM */
+.zone-diagram{display:grid;gap:3px;padding:10px;background:var(--bg-surface-alt);border-radius:var(--r-lg);border:1px solid var(--border)}
+.zone-cell{background:var(--bg-surface);border:2px dashed var(--border);border-radius:var(--r-md);padding:6px 8px;font-size:9px;font-weight:600;color:var(--text-secondary);text-align:center;display:flex;align-items:center;justify-content:center;min-height:28px;transition:all .15s;line-height:1.3}
+.zone-cell:hover{border-color:var(--brand-2);background:rgba(21,101,192,.03);color:var(--brand-2)}
+.zh{background:linear-gradient(135deg,rgba(21,101,192,.06),rgba(21,101,192,.02));border-style:solid;border-color:rgba(21,101,192,.18)}
+.zk{background:rgba(249,168,37,.05);border-color:rgba(249,168,37,.18)}
+.zm{background:rgba(22,163,74,.03);border-color:rgba(22,163,74,.12);min-height:60px}
+.zs{background:rgba(124,58,237,.03);border-color:rgba(124,58,237,.12)}
+.zf{background:rgba(100,116,139,.04);border-color:rgba(100,116,139,.15)}
+.zfl{background:rgba(8,145,178,.04);border-color:rgba(8,145,178,.12)}
+
+/* SCROLL DEMO */
+.scroll-demo{border:2px solid var(--border);border-radius:var(--r-xl);overflow:hidden;height:300px;display:flex;flex-direction:column;background:var(--bg-surface)}
+.scroll-sticky{padding:8px 14px;background:var(--bg-surface);border-bottom:1px solid var(--border);font-size:11px;font-weight:600;flex-shrink:0;display:flex;align-items:center;gap:6px}
+.scroll-data{flex:1;overflow-y:auto;scrollbar-width:none}
+.scroll-data::-webkit-scrollbar{width:0;background:transparent}
+.scroll-data:hover{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.12) transparent}
+.scroll-data:hover::-webkit-scrollbar{width:5px}
+.scroll-data:hover::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:3px}
+.scroll-row{padding:7px 14px;border-bottom:1px solid var(--border);font-size:11px;display:flex;justify-content:space-between;align-items:center}
+.scroll-row:hover{background:var(--bg-surface-alt)}
+
+/* FLOW */
+.flow-row{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin:12px 0}
+.flow-node{padding:8px 14px;background:var(--bg-surface);border:2px solid var(--border);border-radius:var(--r-lg);font-size:11px;font-weight:700;text-align:center;min-width:100px}
+.flow-arrow{width:28px;text-align:center;font-size:14px;color:var(--text-tertiary);flex-shrink:0}
+
+/* ARCH LAYERS */
+.arch-layer{padding:12px 18px;border-radius:var(--r-lg);margin-bottom:3px;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.arch-layer .layer-name{font-weight:800;min-width:180px}
+
+/* CATEGORY HEADER */
+.cat-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px dashed var(--border)}
+.cat-header .cat-chip{font-size:12px;padding:5px 14px;font-weight:800}
+.cat-header .cat-desc{font-size:12px;color:var(--text-secondary)}
+.cat-header .cat-count{font-size:11px;color:var(--text-tertiary);margin-left:auto;font-weight:600}
+
+hr.sep{border:none;border-top:1px solid var(--border);margin:40px 0}
+
+/* MINI WIREFRAME COLORS */
+.wb{fill:#f8fafc}.wh{fill:rgba(21,101,192,.1)}.wk{fill:rgba(249,168,37,.12)}.wm{fill:rgba(22,163,74,.06)}
+.ws{fill:rgba(124,58,237,.06)}.wfl{fill:rgba(8,145,178,.06)}.wft{fill:rgba(100,116,139,.05)}
+.wt{fill:rgba(0,0,0,.025)}.wta{fill:rgba(0,0,0,.04)}.wr{fill:rgba(220,38,38,.06)}
+.wg{fill:rgba(22,163,74,.1)}.wa{fill:rgba(217,119,6,.08)}.wp{fill:rgba(124,58,237,.1)}
+.wbl{fill:rgba(37,99,235,.08)}.win{fill:rgba(79,70,229,.06)}.wpk{fill:rgba(219,39,119,.06)}
+
+/* COMPARISON */
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+.comparison-col{padding:20px}
+.comparison-col:first-child{border-right:1px solid var(--border)}
+
+/* STAT CARD */
+.stat-card{padding:16px;border-radius:var(--r-lg);text-align:center;border:1px solid var(--border);background:var(--bg-surface)}
+.stat-card .stat-value{font-size:28px;font-weight:900;line-height:1.1}
+.stat-card .stat-label{font-size:10px;font-weight:700;color:var(--text-secondary);letter-spacing:.04em;text-transform:uppercase;margin-top:4px}
+
+@media print{.toc{position:relative}.tpl-card:hover{transform:none;box-shadow:none}body{background:#fff}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="doc-header">
+  <h1>Module Layout Template<br>Design System v3.0</h1>
+  <p class="subtitle">
+    Tai lieu thiet ke toan dien — 52 preset templates bao phu 10 core modules, 35+ workspaces, 47 block types.
+    Template la trung tam quyet dinh do hoa. Zone-based architecture. Smart scroll. Cascade token. Governance enforced.
+  </p>
+  <div class="meta">
+    <span class="meta-item">HESEM MOM Platform</span>
+    <span class="meta-item">v3.0 Enterprise</span>
+    <span class="meta-item">2026-04-10</span>
+    <span class="meta-item">52 Templates</span>
+    <span class="meta-item">10 Categories</span>
+    <span class="meta-item">8 Zone Types</span>
+    <span class="meta-item">47 Block Types</span>
+    <span class="meta-item">14 Runtime Presets</span>
+  </div>
+</header>
+
+<!-- TOC -->
+<nav class="toc"><div class="toc-inner">
+  <a href="#exec-summary">Tong quan</a>
+  <a href="#architecture">Kien truc</a>
+  <a href="#tab-redesign">Tab system</a>
+  <a href="#zone-system">Zone system</a>
+  <a href="#cat-dashboard">Dashboard</a>
+  <a href="#cat-data">Data CRUD</a>
+  <a href="#cat-workflow">Workflow</a>
+  <a href="#cat-quality">Quality</a>
+  <a href="#cat-production">Production</a>
+  <a href="#cat-document">Document</a>
+  <a href="#cat-analytics">Analytics</a>
+  <a href="#cat-iot">IoT/SCADA</a>
+  <a href="#cat-portal">Portal</a>
+  <a href="#cat-admin">Admin</a>
+  <a href="#scroll-ux">Scroll UX</a>
+  <a href="#token-cascade">Token cascade</a>
+  <a href="#template-editor">Template editor</a>
+  <a href="#module-binding">Module binding</a>
+  <a href="#data-struct">Data structure</a>
+  <a href="#block-catalog">Block catalog</a>
+  <a href="#responsive">Responsive</a>
+  <a href="#runtime-presets">Runtime presets</a>
+  <a href="#implementation">Ke hoach</a>
+  <a href="#governance">Governance</a>
+</div></nav>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: EXECUTIVE SUMMARY -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" id="exec-summary">
+  <h2 class="section-title"><span class="section-number">1</span> Tong quan dieu hanh</h2>
+  <p class="section-subtitle">He thong Template la trung tam quyet dinh do hoa cua toan bo phan mem HESEM MOM — covering 10 core modules (M1-M10), 35+ portal workspaces, 30+ online forms, 47 block types, 14 runtime presets. Benchmark theo 7 world-class design systems: IBM Carbon, Atlassian, Salesforce SLDS, Material 3, Shopify Polaris, Ant Design, Tailwind CSS.</p>
+
+  <!-- Stats -->
+  <div class="grid-5" style="margin-bottom:24px">
+    <div class="stat-card"><div class="stat-value" style="color:var(--brand-2)">52</div><div class="stat-label">Templates</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--green)">10</div><div class="stat-label">Categories</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--amber)">47</div><div class="stat-label">Block Types</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--purple)">8</div><div class="stat-label">Zone Types</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--cyan)">14</div><div class="stat-label">Runtime Presets</div></div>
+  </div>
+
+  <!-- Coverage matrix -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header">Module Coverage Matrix — Moi module co nhieu template</div>
+    <div class="card-body" style="padding:0;overflow-x:auto">
+      <table class="spec-table">
+        <thead><tr><th>Module</th><th>Route</th><th>Templates</th><th>So luong</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:700">M1 - Quoting</td><td><code>/quoting</code></td><td>Quote Dashboard, Quote List, Quote Form, Quote Comparison</td><td>4</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M2 - Orders</td><td><code>/orders</code></td><td>Order Dashboard, SO List, SO Detail, Fulfillment Tracker, Shipment Gate, Contract Review</td><td>6</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M3 - Planning</td><td><code>/planning</code></td><td>Planning Board, JO/WO List, Dispatch Schedule, Gantt View, Capacity Grid, Shift Roster</td><td>6</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M4 - Purchasing</td><td><code>/purchasing</code></td><td>PO Dashboard, PO List, Receiving/IQC, Supplier Scorecard, PO Form</td><td>5</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M5 - Production</td><td><code>/production</code></td><td>MES Control, Operator Mobile, CNC Programs, Machine Status, Andon Board, OEE Dashboard</td><td>6</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M6 - Quality</td><td><code>/quality</code></td><td>Exception Dashboard, NCR Form, CAPA Board, FMEA Matrix, SPC Chart, 8D Report, Inspection</td><td>7</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M7 - Records</td><td><code>/records</code></td><td>Evidence Vault, Form Builder, Record Timeline, Digital Passport</td><td>4</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M8 - Reports</td><td><code>/reports</code></td><td>Report Viewer, Analytics Hub, Compliance Dashboard, KPI Center</td><td>4</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M9 - Documents</td><td><code>/documents</code></td><td>Document Browser, Doc Detail, Approval Queue, Version History</td><td>4</td><td><span class="chip chip-green">Full</span></td></tr>
+          <tr><td style="font-weight:700">M10 - Admin</td><td><code>/admin</code></td><td>Admin Dashboard, User Management, Config Panel, Schema Studio, Module Builder, Appearance</td><td>6</td><td><span class="chip chip-green">Full</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Before/After -->
+  <div class="comparison-grid">
+    <div class="comparison-col">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px;padding:4px 10px;border-radius:999px;display:inline-block;background:var(--red-bg);color:var(--red)">TRUOC (v2.0)</div>
+      <ul style="font-size:12px;line-height:2;color:var(--text-secondary);padding-left:18px">
+        <li>8 tab doc lap, khong lien ket voi nhau</li>
+        <li>Module tu quyet dinh bo cuc rieng</li>
+        <li>Khong co zone system — block tu sap xep</li>
+        <li>Scroll toan trang, khong smart scroll</li>
+        <li>Khong co template gallery</li>
+        <li>Token thay doi nhung module khong dong bo</li>
+        <li>Chi 3 admin layout preset (compact/default/comfortable)</li>
+        <li>Khong co template editor</li>
+      </ul>
+    </div>
+    <div class="comparison-col">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px;padding:4px 10px;border-radius:999px;display:inline-block;background:var(--green-bg);color:var(--green)">SAU (v3.0)</div>
+      <ul style="font-size:12px;line-height:2;color:var(--text-secondary);padding-left:18px">
+        <li>Template la tab chu dao, tat ca tab phuc vu template</li>
+        <li>Module BAT BUOC chon template, khong tu tao layout</li>
+        <li>Zone system — 8 zone types, scroll/sticky rules</li>
+        <li>Smart scroll: overlay scrollbar, data-only scroll</li>
+        <li>Template gallery voi search/filter/category</li>
+        <li>Token cascade: system &rarr; admin &rarr; template &rarr; zone &rarr; user</li>
+        <li>52 templates bao phu 10 module categories</li>
+        <li>Visual template editor voi live preview</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: ARCHITECTURE -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" id="architecture">
+  <h2 class="section-title"><span class="section-number">2</span> Kien truc 7 lop</h2>
+  <p class="section-subtitle">He thong do hoa theo mo hinh cascade 7 lop. Template nam o trung tam, ket noi foundation tokens (lop tren) voi module instances (lop duoi). Moi lop chi doc tu lop tren, khong di nguoc.</p>
+
+  <div style="margin-bottom:20px">
+    <div class="arch-layer" style="background:linear-gradient(90deg,rgba(100,116,139,.06),transparent)"><span class="layer-name" style="color:var(--text-secondary)">L1: CSS Foundation</span><span style="flex:1;font-size:11px;color:var(--text-tertiary)">hesem-design-tokens.css — CSS custom properties goc, color-mix, @media queries</span><span class="chip chip-dark">Static</span></div>
+    <div style="text-align:center;padding:2px;color:var(--text-tertiary);font-size:12px">&#8595;</div>
+    <div class="arch-layer" style="background:linear-gradient(90deg,rgba(21,101,192,.06),transparent)"><span class="layer-name" style="color:var(--brand-2)">L2: System Tokens</span><span style="flex:1;font-size:11px;color:var(--text-tertiary)">150+ configurable tokens: colors, typography, spacing, radius, motion, shadows, z-index</span><span class="chip chip-blue">Foundation</span></div>
+    <div style="text-align:center;padding:2px;color:var(--text-tertiary);font-size:12px">&#8595;</div>
+    <div class="arch-layer" style="background:linear-gradient(90deg,rgba(124,58,237,.06),transparent)"><span class="layer-name" style="color:var(--purple)">L3: Theme Manager</span><span style="flex:1;font-size:11px;color:var(--text-tertiary)">HmTheme runtime — cascade: user prefs &rarr; admin config &rarr; defaults. Apply CSS vars to &lt;html&gt;</span><span class="chip chip-purple">Runtime</span></div>
+    <div style="text-align:center;padding:2px;color:var(--text-tertiary);font-size:12px">&#8595;</div>
+    <div class="arch-layer" style="background:linear-gradient(90deg,rgba(249,168,37,.1),rgba(249,168,37,.02));border:2px solid rgba(249,168,37,.25)"><span class="layer-name" style="color:#92400e;font-size:14px">L4: MODULE LAYOUT TEMPLATES</span><span style="flex:1;font-size:11px;color:#92400e"><strong>TRUNG TAM</strong> — 52 preset floorplans, zone definitions, token overrides, block restrictions</span><span class="chip chip-amber" style="font-size:11px;padding:4px 12px">CORE</span></div>
+    <div style="text-align:center;padding:2px;color:var(--text-tertiary);font-size:12px">&#8595;</div>
+    <div class="arch-layer" style="background:linear-gradient(90deg,rgba(8,145,178,.06),transparent)"><span class="layer-name" style="color:var(--cyan)">L5: Runtime Presets</span><span style="flex:1;font-size:11px;color:var(--text-tertiary)">14 visual themes (executive-glass, shopfloor-signal, compliance-paper...) — style per context</span><span class="chip chip-cyan">Styling</span></div>
+    <div style="text-align:center;padding:2px;color:var(--text-tertiary);font-size:12px">&#8595;</div>
+    <div class="arch-layer" style="background:linear-gradient(90deg,rgba(22,163,74,.06),transparent)"><span class="layer-name" style="color:var(--green)">L6: Block Engine</span><span style="flex:1;font-size:11px;color:var(--text-tertiary)">47 block types, render vao zone, responsive grid, data binding, events</span><span class="chip chip-green">Rendering</span></div>
+    <div style="text-align:center;padding:2px;color:var(--text-tertiary);font-size:12px">&#8595;</div>
+    <div class="arch-layer" style="background:linear-gradient(90deg,rgba(100,116,139,.06),transparent)"><span class="layer-name" style="color:var(--text-secondary)">L7: Module Instance</span><span style="flex:1;font-size:11px;color:var(--text-tertiary)">M1-M10 modules — ke thua template, chi override data & business logic</span><span class="chip chip-dark">Instance</span></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: TAB REDESIGN -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" id="tab-redesign">
+  <h2 class="section-title"><span class="section-number">3</span> Thiet ke lai Tab System</h2>
+  <p class="section-subtitle">Tab "Giao dien he thong" duoc xay lai hoan toan. Template la tab dau tien va quan trong nhat. Tat ca tab khac phuc vu truc tiep cho template.</p>
+
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header">6 Tabs — Template-centric design</div>
+    <div class="card-body" style="padding:0;overflow-x:auto">
+      <table class="spec-table">
+        <thead><tr><th>#</th><th style="width:200px">Tab</th><th>Noi dung chi tiet</th><th>Vai tro</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:900;color:var(--amber);font-size:16px">1</td>
+            <td style="font-weight:700">Mau bo cuc<br><span style="font-size:10px;color:var(--text-tertiary)">(Template Studio)</span></td>
+            <td>
+              <strong>Gallery</strong>: 52 preset voi wireframe SVG, search bar, category filter (10 categories), sort (ten, ngay, su dung).<br>
+              <strong>Template Detail</strong>: Live preview, zone diagram, thuoc tinh, modules su dung, nut chinh sua/clone/xoa.<br>
+              <strong>Template Editor</strong>: Split pane — controls (zone config, token overrides, block restrictions) + live preview (render template voi mock data).<br>
+              <strong>Template Creator</strong>: Chon preset lam base &rarr; tuy chinh zones &rarr; dat ten &rarr; luu.<br>
+              <strong>Module Assignment</strong>: Gan template cho module, xem danh sach module dang dung template.
+            </td>
+            <td><span class="chip chip-amber">CORE</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Token he thong<br><span style="font-size:10px;color:var(--text-tertiary)">(System Tokens)</span></td>
+            <td>
+              <strong>Typography</strong>: 5 font families (display/heading/body/label/mono), font scale (xs-3xl), line heights, letter spacing, text transform.<br>
+              <strong>Colors</strong>: Brand (6), Status light/dark (12), Surfaces light/dark (12), Text light/dark (10), Borders (8).<br>
+              <strong>Spacing</strong>: 13-step base-8 scale (0px-80px).<br>
+              <strong>Radius</strong>: 8-step scale (0px-9999px).<br>
+              <strong>Layout</strong>: Sidebar, header, content max-width, modal sizes.<br>
+              Moi thay doi hien preview tren template dang chon.
+            </td>
+            <td><span class="chip chip-blue">Serves template</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Thanh phan<br><span style="font-size:10px;color:var(--text-tertiary)">(Components)</span></td>
+            <td>
+              <strong>Core controls</strong> (8): Button, Input, Badge, Tab, Tooltip, Dropdown, Navigation, Pagination.<br>
+              <strong>Data surfaces</strong> (7): Table, Card, Modal, Progress, Empty State, Form Field, Breadcrumb.<br>
+              <strong>Specialized</strong> (4): Flowchart, ISO Box, ISO Note, KPI Card.<br>
+              Moi component co slider/color picker + preview theo template context.
+            </td>
+            <td><span class="chip chip-blue">Serves template</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Hieu ung<br><span style="font-size:10px;color:var(--text-tertiary)">(Effects)</span></td>
+            <td>
+              Motion (4 speeds), Focus ring, Selection color, Caret, Placeholder, Disabled state, Scrollbar (width/track/thumb/radius), Backdrop blur, Overlay opacity, Skeleton loading.
+            </td>
+            <td><span class="chip chip-blue">Serves template</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Tong hop<br><span style="font-size:10px;color:var(--text-tertiary)">(Governance)</span></td>
+            <td>
+              <strong>Template usage report</strong>: Bao nhieu module/template, orphan templates, adoption rate.<br>
+              <strong>Compliance matrix</strong>: Module adoption status per system area.<br>
+              <strong>WCAG checker</strong>: Contrast ratio cho text pairs.<br>
+              <strong>Rules</strong>: Operating model, non-negotiable rules, release gate.
+            </td>
+            <td><span class="chip chip-green">Tracking</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Nang cao<br><span style="font-size:10px;color:var(--text-tertiary)">(Advanced)</span></td>
+            <td>
+              Import/Export theme + templates JSON. Custom CSS injection. WCAG AA check. Core standard enforcement.
+            </td>
+            <td><span class="chip chip-purple">Expert</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: ZONE SYSTEM -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" id="zone-system">
+  <h2 class="section-title"><span class="section-number">4</span> Zone System — 8 zone types</h2>
+  <p class="section-subtitle">Moi template dinh nghia cac Zone. Zone quyet dinh grid area, scroll behavior, allowed block types. Block Engine chi can dat block vao dung zone.</p>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-header">Zone Type Reference</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Zone</th><th>Scroll</th><th>Height</th><th>Position</th><th>Allowed Blocks</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:700;color:var(--brand-2)">header</td><td>No</td><td>auto</td><td>Sticky</td><td>page-header, hero-banner</td></tr>
+            <tr><td style="font-weight:700;color:var(--amber)">kpi-bar</td><td>No</td><td>auto</td><td>Sticky</td><td>kpi-row, insight-stat-callout</td></tr>
+            <tr><td style="font-weight:700;color:var(--cyan)">filter</td><td>No</td><td>auto</td><td>Sticky</td><td>filter-bar, nav-tabs, nav-pills</td></tr>
+            <tr><td style="font-weight:700;color:var(--green)">main</td><td>Data only</td><td>flex</td><td>Static</td><td>ALL data/chart/form blocks</td></tr>
+            <tr><td style="font-weight:700;color:var(--purple)">sidebar</td><td>Data only</td><td>flex</td><td>Static</td><td>data-list, action-summary, chart-*</td></tr>
+            <tr><td style="font-weight:700;color:var(--text-secondary)">footer</td><td>No</td><td>auto/48px</td><td>Sticky</td><td>action-toolbar, nav-pagination</td></tr>
+            <tr><td style="font-weight:700;color:var(--indigo)">tabs</td><td>No</td><td>auto</td><td>Sticky</td><td>nav-tabs, tab-bar</td></tr>
+            <tr><td style="font-weight:700;color:var(--teal)">chart-area</td><td>No</td><td>fixed</td><td>Static</td><td>chart-* only</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="info-box info-box-amber"><strong>SCROLL RULE</strong>Header, KPI, Filter, Footer, Tabs: STICKY — khong scroll. Main, Sidebar: chi data scroll, overlay scrollbar.</div>
+      <div class="info-box info-box-blue"><strong>ZONE OVERRIDE</strong>Moi zone co the override token cua template (vd: sidebar dung font nho hon, main dung spacing lon hon).</div>
+      <div class="info-box info-box-green"><strong>BLOCK RESTRICTION</strong>Moi zone chi chap nhan cac block type phu hop (allowedBlocks). Block Engine enforce quy tac nay.</div>
+    </div>
+  </div>
+
+  <!-- Zone examples for 6 different templates -->
+  <div class="grid-3">
+    <div class="card"><div class="card-header" style="font-size:11px">Executive Dashboard</div><div class="card-body" style="padding:8px"><div class="zone-diagram" style="grid-template-columns:2fr 1fr;grid-template-rows:auto auto auto 1fr auto"><div class="zone-cell zh" style="grid-column:1/-1">HEADER</div><div class="zone-cell zk" style="grid-column:1/-1">KPI BAR (4-6 cards)</div><div class="zone-cell zfl" style="grid-column:1/-1">FILTER</div><div class="zone-cell zm">MAIN (chart + table)</div><div class="zone-cell zs">SIDEBAR (summary)</div><div class="zone-cell zf" style="grid-column:1/-1">FOOTER (actions)</div></div></div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">List Report CRUD</div><div class="card-body" style="padding:8px"><div class="zone-diagram" style="grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto"><div class="zone-cell zh">HEADER</div><div class="zone-cell zfl">FILTER + SEARCH</div><div class="zone-cell zm" style="min-height:80px">MAIN TABLE (scroll data)</div><div class="zone-cell zf">PAGINATION + ACTIONS</div></div></div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Master-Detail</div><div class="card-body" style="padding:8px"><div class="zone-diagram" style="grid-template-columns:1fr 1.5fr;grid-template-rows:auto auto 1fr auto"><div class="zone-cell zh" style="grid-column:1/-1">HEADER</div><div class="zone-cell zfl" style="grid-column:1/-1">FILTER</div><div class="zone-cell zs" style="min-height:70px">LIST (scroll)</div><div class="zone-cell zm" style="min-height:70px">DETAIL (scroll)</div><div class="zone-cell zf" style="grid-column:1/-1">ACTIONS</div></div></div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Kanban Board</div><div class="card-body" style="padding:8px"><div class="zone-diagram" style="grid-template-columns:1fr 1fr 1fr 1fr;grid-template-rows:auto auto 1fr"><div class="zone-cell zh" style="grid-column:1/-1">HEADER</div><div class="zone-cell zfl" style="grid-column:1/-1">TABS + FILTER</div><div class="zone-cell zm" style="min-height:70px;background:rgba(217,119,6,.04);border-color:rgba(217,119,6,.15);font-size:8px">TODO</div><div class="zone-cell zm" style="min-height:70px;background:rgba(37,99,235,.04);border-color:rgba(37,99,235,.15);font-size:8px">IN PROG</div><div class="zone-cell zm" style="min-height:70px;background:rgba(22,163,74,.04);border-color:rgba(22,163,74,.15);font-size:8px">DONE</div><div class="zone-cell zm" style="min-height:70px;background:rgba(124,58,237,.04);border-color:rgba(124,58,237,.15);font-size:8px">CLOSED</div></div></div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Document Browser</div><div class="card-body" style="padding:8px"><div class="zone-diagram" style="grid-template-columns:.7fr 1fr 1.2fr;grid-template-rows:auto 1fr"><div class="zone-cell zh" style="grid-column:1/-1">HEADER + BREADCRUMB</div><div class="zone-cell zs" style="min-height:80px">TREE (scroll)</div><div class="zone-cell zm" style="min-height:80px">DOC LIST (scroll)</div><div class="zone-cell zm" style="min-height:80px;background:rgba(37,99,235,.03);border-color:rgba(37,99,235,.1)">PREVIEW</div></div></div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Form Wizard</div><div class="card-body" style="padding:8px"><div class="zone-diagram" style="grid-template-columns:1fr;grid-template-rows:auto auto auto 1fr auto"><div class="zone-cell zh">HEADER</div><div class="zone-cell" style="background:rgba(22,163,74,.04);border-color:rgba(22,163,74,.12)">STEP INDICATOR (1-2-3-4)</div><div class="zone-cell zfl">SECTION TITLE</div><div class="zone-cell zm" style="min-height:70px">FORM FIELDS (scroll)</div><div class="zone-cell zf">BACK / NEXT / SUBMIT</div></div></div></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- 10 TEMPLATE CATEGORIES — FULL 52 TEMPLATES -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+
+<!-- CAT 1: DASHBOARD (7 templates) -->
+<section class="section" id="cat-dashboard">
+  <h2 class="section-title"><span class="section-number">5</span> Template Catalog — 52 Presets</h2>
+  <p class="section-subtitle">52 preset templates chia thanh 10 categories. Moi template co wireframe, zone diagram, block types, density, va truong hop su dung cu the. Click de xem chi tiet.</p>
+
+  <div class="cat-header"><span class="chip chip-blue cat-chip">DASHBOARD</span><span class="cat-desc">Man hinh tong quan, dieu hanh, giam sat</span><span class="cat-count">7 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="16" rx="3" class="wh"/><rect x="4" y="24" width="45" height="22" rx="2" class="wk"/><rect x="52" y="24" width="45" height="22" rx="2" class="wk"/><rect x="100" y="24" width="45" height="22" rx="2" class="wk"/><rect x="148" y="24" width="48" height="22" rx="2" class="wk"/><rect x="4" y="50" width="130" height="44" rx="3" class="wm"/><rect x="137" y="50" width="59" height="44" rx="3" class="ws"/><rect x="4" y="98" width="192" height="16" rx="2" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T01 Executive Dashboard</div><div class="tpl-desc">KPI hero + chart + sidebar + table. CEO/Director view.</div><div class="tpl-chips"><span class="chip chip-blue">5 zones</span><span class="chip chip-green">comfortable</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="16" rx="2" class="wk"/><rect x="69" y="22" width="62" height="16" rx="2" class="wk"/><rect x="134" y="22" width="62" height="16" rx="2" class="wk"/><rect x="4" y="42" width="95" height="32" rx="2" class="wm"/><rect x="102" y="42" width="94" height="32" rx="2" class="wm"/><rect x="4" y="78" width="95" height="32" rx="2" class="wr"/><rect x="102" y="78" width="94" height="32" rx="2" class="wbl"/></svg></div><div class="tpl-info"><div class="tpl-name">T02 Operations Monitor</div><div class="tpl-desc">Realtime KPI + status grid + alerts. Shop floor monitoring.</div><div class="tpl-chips"><span class="chip chip-blue">6 zones</span><span class="chip chip-amber">dense</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wfl"/><rect x="4" y="40" width="95" height="34" rx="2" class="wm"/><rect x="102" y="40" width="94" height="34" rx="2" class="wm"/><rect x="4" y="78" width="95" height="34" rx="2" class="ws"/><rect x="102" y="78" width="94" height="34" rx="2" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T03 Analytics Hub</div><div class="tpl-desc">Multi-chart grid + filter. Phan tich da chieu.</div><div class="tpl-chips"><span class="chip chip-blue">5 zones</span><span class="chip chip-green">comfortable</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="40" height="18" rx="2" class="wk"/><rect x="47" y="22" width="40" height="18" rx="2" class="wk"/><rect x="90" y="22" width="40" height="18" rx="2" class="wk"/><rect x="133" y="22" width="63" height="18" rx="2" class="wk"/><rect x="4" y="44" width="192" height="68" rx="2" class="wm"/><rect x="12" y="54" width="176" height="6" rx="1" class="wt"/><rect x="12" y="66" width="176" height="6" rx="1" class="wta"/><rect x="12" y="78" width="176" height="6" rx="1" class="wt"/><rect x="12" y="90" width="176" height="6" rx="1" class="wta"/></svg></div><div class="tpl-info"><div class="tpl-name">T04 KPI Center</div><div class="tpl-desc">KPI focus + detail table. Trung tam chi so.</div><div class="tpl-chips"><span class="chip chip-blue">4 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="95" height="44" rx="2" class="wm"/><rect x="102" y="22" width="94" height="44" rx="2" class="wm"/><rect x="4" y="70" width="192" height="42" rx="2" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T05 Shift Summary</div><div class="tpl-desc">Ca truc: production + quality + notes.</div><div class="tpl-chips"><span class="chip chip-blue">4 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="130" height="90" rx="3" class="wm"/><rect x="137" y="22" width="59" height="42" rx="2" class="wk"/><rect x="137" y="68" width="59" height="44" rx="2" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T06 Energy Dashboard</div><div class="tpl-desc">Energy monitoring + consumption trend + alerts.</div><div class="tpl-chips"><span class="chip chip-blue">5 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="42" rx="3" class="wm"/><rect x="69" y="22" width="62" height="42" rx="3" class="wm"/><rect x="134" y="22" width="62" height="42" rx="3" class="wm"/><rect x="4" y="68" width="192" height="44" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T07 Dispatch Overview</div><div class="tpl-desc">JO/WO status grid + dispatch queue.</div><div class="tpl-chips"><span class="chip chip-blue">4 zones</span></div></div></div>
+  </div>
+
+  <!-- CAT 2: DATA CRUD -->
+  <div class="cat-header" id="cat-data"><span class="chip chip-cyan cat-chip">DATA MANAGEMENT</span><span class="cat-desc">CRUD, bang du lieu, form, the du lieu</span><span class="cat-count">8 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="192" height="10" rx="1" class="wh" opacity=".5"/><rect x="4" y="50" width="192" height="8" rx="1" class="wt"/><rect x="4" y="60" width="192" height="8" rx="1" class="wta"/><rect x="4" y="70" width="192" height="8" rx="1" class="wt"/><rect x="4" y="80" width="192" height="8" rx="1" class="wta"/><rect x="4" y="90" width="192" height="8" rx="1" class="wt"/><rect x="4" y="102" width="192" height="12" rx="2" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T08 List Report</div><div class="tpl-desc">Filter + sortable table + pagination. CRUD co ban.</div><div class="tpl-chips"><span class="chip chip-cyan">4 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="72" height="90" rx="3" class="ws"/><rect x="80" y="22" width="116" height="90" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T09 Master-Detail</div><div class="tpl-desc">List panel + detail panel. Click row de xem chi tiet.</div><div class="tpl-chips"><span class="chip chip-cyan">5 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="62" height="36" rx="4" class="wm" stroke="rgba(22,163,74,.12)" stroke-width="1"/><rect x="69" y="38" width="62" height="36" rx="4" class="wm" stroke="rgba(22,163,74,.12)" stroke-width="1"/><rect x="134" y="38" width="62" height="36" rx="4" class="wm" stroke="rgba(22,163,74,.12)" stroke-width="1"/><rect x="4" y="78" width="62" height="36" rx="4" class="wm" stroke="rgba(22,163,74,.08)" stroke-width="1"/><rect x="69" y="78" width="62" height="36" rx="4" class="wm" stroke="rgba(22,163,74,.08)" stroke-width="1"/><rect x="134" y="78" width="62" height="36" rx="4" class="wm" stroke="rgba(22,163,74,.08)" stroke-width="1"/></svg></div><div class="tpl-info"><div class="tpl-name">T10 Data Cards</div><div class="tpl-desc">Responsive card grid + filter. Hien thi dang the.</div><div class="tpl-chips"><span class="chip chip-cyan">4 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="95" height="14" rx="2" class="wm"/><rect x="102" y="22" width="94" height="14" rx="2" class="wm"/><rect x="4" y="40" width="95" height="14" rx="2" class="wm"/><rect x="102" y="40" width="94" height="14" rx="2" class="wm"/><rect x="4" y="58" width="192" height="14" rx="2" class="wm"/><rect x="4" y="76" width="192" height="12" rx="2" class="wa"/><rect x="4" y="92" width="192" height="20" rx="3" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T11 CRUD Form</div><div class="tpl-desc">Multi-section form + validation. Tao/sua ban ghi.</div><div class="tpl-chips"><span class="chip chip-cyan">4 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="130" height="90" rx="3" class="wm"/><rect x="137" y="22" width="59" height="90" rx="3" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T12 Record Detail</div><div class="tpl-desc">Full record view + sidebar metadata.</div><div class="tpl-chips"><span class="chip chip-cyan">4 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="72" height="90" rx="3" class="ws"/><rect x="80" y="22" width="58" height="42" rx="2" class="wm"/><rect x="141" y="22" width="55" height="42" rx="2" class="wm"/><rect x="80" y="68" width="116" height="44" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T13 Hierarchy Manager</div><div class="tpl-desc">Tree nav + node detail. BOM, org chart.</div><div class="tpl-chips"><span class="chip chip-cyan">5 zones</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="38" height="10" rx="2" class="wh" opacity=".4"/><rect x="45" y="38" width="38" height="10" rx="2" class="wh" opacity=".4"/><rect x="86" y="38" width="38" height="10" rx="2" class="wh" opacity=".4"/><rect x="127" y="38" width="38" height="10" rx="2" class="wh" opacity=".4"/><rect x="168" y="38" width="28" height="10" rx="2" class="wh" opacity=".4"/><rect x="4" y="52" width="192" height="6" rx="1" class="wt"/><rect x="4" y="60" width="192" height="6" rx="1" class="wta"/><rect x="4" y="68" width="192" height="6" rx="1" class="wt"/><rect x="4" y="76" width="192" height="6" rx="1" class="wta"/><rect x="4" y="84" width="192" height="28" rx="2" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T14 Pivot Table</div><div class="tpl-desc">Pivot analysis + summary chart. Da chieu.</div><div class="tpl-chips"><span class="chip chip-cyan">5 zones</span><span class="chip chip-amber">dense</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="95" height="90" rx="4" class="wbl" stroke="rgba(37,99,235,.1)" stroke-width="1"/><rect x="102" y="22" width="94" height="90" rx="4" class="wg" stroke="rgba(22,163,74,.1)" stroke-width="1"/></svg></div><div class="tpl-info"><div class="tpl-name">T15 Comparison View</div><div class="tpl-desc">Side-by-side panels. So sanh phien ban.</div><div class="tpl-chips"><span class="chip chip-cyan">4 zones</span></div></div></div>
+  </div>
+
+  <!-- CAT 3: WORKFLOW -->
+  <div class="cat-header" id="cat-workflow"><span class="chip chip-green cat-chip">WORKFLOW</span><span class="cat-desc">Kanban, wizard, approval, status flow</span><span class="cat-count">5 templates</span></div>
+  <div class="grid-5" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="46" height="90" rx="3" class="wa"/><rect x="53" y="22" width="46" height="90" rx="3" class="wbl"/><rect x="102" y="22" width="46" height="90" rx="3" class="wg"/><rect x="151" y="22" width="45" height="90" rx="3" class="wp"/></svg></div><div class="tpl-info"><div class="tpl-name">T16 Kanban Board</div><div class="tpl-desc">Drag-drop columns. Task management.</div><div class="tpl-chips"><span class="chip chip-green">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wg"/><circle cx="40" cy="29" r="5" fill="rgba(22,163,74,.3)"/><circle cx="90" cy="29" r="5" fill="rgba(21,101,192,.3)"/><circle cx="140" cy="29" r="5" fill="rgba(100,116,139,.15)"/><line x1="45" y1="29" x2="85" y2="29" stroke="rgba(22,163,74,.2)" stroke-width="2"/><line x1="95" y1="29" x2="135" y2="29" stroke="rgba(100,116,139,.12)" stroke-width="2"/><rect x="20" y="42" width="160" height="12" rx="2" class="wm"/><rect x="20" y="58" width="160" height="12" rx="2" class="wm"/><rect x="20" y="74" width="80" height="12" rx="2" class="wm"/><rect x="104" y="74" width="76" height="12" rx="2" class="wm"/><rect x="4" y="92" width="192" height="20" rx="3" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T17 Form Wizard</div><div class="tpl-desc">Multi-step + progress. Complex entry.</div><div class="tpl-chips"><span class="chip chip-green">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="130" height="90" rx="3" class="wm"/><rect x="12" y="30" width="114" height="10" rx="2" class="wa"/><rect x="12" y="44" width="114" height="10" rx="2" class="wg"/><rect x="12" y="58" width="114" height="10" rx="2" class="wbl"/><rect x="137" y="22" width="59" height="90" rx="3" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T18 Approval Queue</div><div class="tpl-desc">Pending items + review panel.</div><div class="tpl-chips"><span class="chip chip-green">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="16" rx="2" class="wg"/><rect x="4" y="42" width="130" height="70" rx="3" class="wm"/><rect x="137" y="42" width="59" height="70" rx="3" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T19 Status Flow</div><div class="tpl-desc">Workflow transitions + detail.</div><div class="tpl-chips"><span class="chip chip-green">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="192" height="58" rx="2" class="wm"/><rect x="12" y="46" width="176" height="6" rx="1" class="wt"/><rect x="12" y="56" width="176" height="6" rx="1" class="wta"/><rect x="12" y="66" width="176" height="6" rx="1" class="wt"/><rect x="12" y="76" width="176" height="6" rx="1" class="wta"/><rect x="4" y="100" width="192" height="12" rx="2" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T20 Checklist</div><div class="tpl-desc">Quality check list + sign-off.</div><div class="tpl-chips"><span class="chip chip-green">4z</span></div></div></div>
+  </div>
+
+  <!-- CAT 4: QUALITY -->
+  <div class="cat-header" id="cat-quality"><span class="chip chip-red cat-chip">QUALITY / eQMS</span><span class="cat-desc">NCR, CAPA, SPC, FMEA, inspection, audit</span><span class="cat-count">7 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="18" rx="2" class="wr"/><rect x="69" y="22" width="62" height="18" rx="2" class="wa"/><rect x="134" y="22" width="62" height="18" rx="2" class="wg"/><rect x="4" y="44" width="192" height="68" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T21 Exception Dashboard</div><div class="tpl-desc">NCR/CAPA summary + exception list.</div><div class="tpl-chips"><span class="chip chip-red">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wg"/><rect x="4" y="40" width="95" height="12" rx="2" class="wm"/><rect x="102" y="40" width="94" height="12" rx="2" class="wm"/><rect x="4" y="56" width="192" height="12" rx="2" class="wm"/><rect x="4" y="72" width="192" height="12" rx="2" class="wm"/><rect x="4" y="88" width="192" height="24" rx="3" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T22 NCR/CAPA Form</div><div class="tpl-desc">Exception entry + corrective action.</div><div class="tpl-chips"><span class="chip chip-red">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wfl"/><rect x="4" y="40" width="130" height="72" rx="3" class="wm"/><rect x="137" y="40" width="59" height="72" rx="3" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T23 SPC Chart</div><div class="tpl-desc">Control chart + process capability.</div><div class="tpl-chips"><span class="chip chip-red">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="90" rx="3" class="wm"/><rect x="12" y="30" width="80" height="6" rx="1" class="wt"/><rect x="95" y="30" width="40" height="6" rx="1" class="wr"/><rect x="138" y="30" width="50" height="6" rx="1" class="wa"/><rect x="12" y="42" width="80" height="6" rx="1" class="wta"/><rect x="95" y="42" width="40" height="6" rx="1" class="wg"/><rect x="138" y="42" width="50" height="6" rx="1" class="wg"/></svg></div><div class="tpl-info"><div class="tpl-name">T24 FMEA Matrix</div><div class="tpl-desc">Risk matrix + severity/occurrence/detection.</div><div class="tpl-chips"><span class="chip chip-red">4z</span><span class="chip chip-amber">dense</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wg"/><rect x="4" y="40" width="95" height="12" rx="2" class="wm"/><rect x="102" y="40" width="94" height="12" rx="2" class="wm"/><rect x="4" y="56" width="95" height="12" rx="2" class="wm"/><rect x="102" y="56" width="94" height="12" rx="2" class="wm"/><rect x="4" y="72" width="192" height="12" rx="2" class="wm"/><rect x="4" y="88" width="192" height="24" rx="3" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T25 Inspection Form</div><div class="tpl-desc">FAI/IQC/OQC inspection record.</div><div class="tpl-chips"><span class="chip chip-red">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wg"/><rect x="4" y="40" width="192" height="14" rx="2" class="wm"/><rect x="4" y="58" width="192" height="14" rx="2" class="wm"/><rect x="4" y="76" width="192" height="14" rx="2" class="wm"/><rect x="4" y="94" width="192" height="18" rx="2" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T26 8D Report</div><div class="tpl-desc">8-discipline problem solving wizard.</div><div class="tpl-chips"><span class="chip chip-red">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="95" height="74" rx="3" class="wm"/><rect x="102" y="38" width="94" height="36" rx="2" class="wk"/><rect x="102" y="78" width="94" height="34" rx="2" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T27 Audit Plan</div><div class="tpl-desc">Audit schedule + findings + follow-up.</div><div class="tpl-chips"><span class="chip chip-red">5z</span></div></div></div>
+  </div>
+
+  <!-- CAT 5: PRODUCTION -->
+  <div class="cat-header" id="cat-production"><span class="chip chip-amber cat-chip">PRODUCTION / MES</span><span class="cat-desc">Operator, machine, dispatch, OEE, CNC</span><span class="cat-count">6 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="30" rx="3" class="wg"/><rect x="69" y="22" width="62" height="30" rx="3" class="wa"/><rect x="134" y="22" width="62" height="30" rx="3" class="wr"/><rect x="4" y="56" width="192" height="56" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T28 MES Control Center</div><div class="tpl-desc">Machine status + job queue + alerts.</div><div class="tpl-chips"><span class="chip chip-amber">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="20" rx="3" class="wh"/><rect x="4" y="28" width="192" height="40" rx="3" class="wm"/><rect x="4" y="72" width="95" height="40" rx="3" class="wm"/><rect x="102" y="72" width="94" height="40" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T29 Operator Mobile</div><div class="tpl-desc">Mobile-first operator interface. Large touch.</div><div class="tpl-chips"><span class="chip chip-amber">3z</span><span class="chip chip-green">comfortable</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="90" rx="3" class="wm"/><rect x="12" y="30" width="40" height="74" rx="2" class="wa"/><rect x="55" y="30" width="40" height="74" rx="2" class="wg"/><rect x="98" y="30" width="40" height="74" rx="2" class="wbl"/><rect x="141" y="30" width="47" height="74" rx="2" class="wa"/></svg></div><div class="tpl-info"><div class="tpl-name">T30 Gantt Schedule</div><div class="tpl-desc">Machine x date x shift Gantt chart.</div><div class="tpl-chips"><span class="chip chip-amber">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="24" rx="3" class="wg"/><rect x="69" y="22" width="62" height="24" rx="3" class="wg"/><rect x="134" y="22" width="62" height="24" rx="3" class="wr"/><rect x="4" y="50" width="62" height="24" rx="3" class="wa"/><rect x="69" y="50" width="62" height="24" rx="3" class="wg"/><rect x="134" y="50" width="62" height="24" rx="3" class="wg"/><rect x="4" y="78" width="95" height="34" rx="3" class="wm"/><rect x="102" y="78" width="94" height="34" rx="3" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T31 Machine Status Grid</div><div class="tpl-desc">Machine tiles + OEE + downtime detail.</div><div class="tpl-chips"><span class="chip chip-amber">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="28" rx="3" class="wr"/><rect x="4" y="36" width="192" height="76" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T32 Andon Board</div><div class="tpl-desc">Large alert display. Production floor TV.</div><div class="tpl-chips"><span class="chip chip-amber">2z</span><span class="chip chip-red">alert</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="18" rx="2" class="wk"/><rect x="69" y="22" width="62" height="18" rx="2" class="wk"/><rect x="134" y="22" width="62" height="18" rx="2" class="wk"/><rect x="4" y="44" width="192" height="68" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T33 OEE Dashboard</div><div class="tpl-desc">OEE metrics + availability/performance/quality.</div><div class="tpl-chips"><span class="chip chip-amber">4z</span></div></div></div>
+  </div>
+
+  <!-- CAT 6: DOCUMENT -->
+  <div class="cat-header" id="cat-document"><span class="chip chip-purple cat-chip">DOCUMENT CENTER</span><span class="cat-desc">Duyet tai lieu, report, audit log, evidence</span><span class="cat-count">5 templates</span></div>
+  <div class="grid-5" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="50" height="90" rx="3" class="ws"/><rect x="57" y="22" width="70" height="90" rx="3" class="wm"/><rect x="130" y="22" width="66" height="90" rx="3" class="wbl"/></svg></div><div class="tpl-info"><div class="tpl-name">T34 Doc Browser</div><div class="tpl-desc">Tree + list + preview.</div><div class="tpl-chips"><span class="chip chip-purple">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wfl"/><rect x="4" y="40" width="192" height="72" rx="3" fill="#fff" stroke="rgba(0,0,0,.06)" stroke-width="1"/></svg></div><div class="tpl-info"><div class="tpl-name">T35 Report Viewer</div><div class="tpl-desc">Toolbar + rendered report.</div><div class="tpl-chips"><span class="chip chip-purple">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><line x1="28" y1="42" x2="28" y2="108" stroke="rgba(21,101,192,.12)" stroke-width="2"/><circle cx="28" cy="48" r="4" fill="rgba(22,163,74,.3)"/><rect x="38" y="42" width="150" height="12" rx="2" class="wg"/><circle cx="28" cy="68" r="4" fill="rgba(37,99,235,.3)"/><rect x="38" y="62" width="150" height="12" rx="2" class="wbl"/><circle cx="28" cy="88" r="4" fill="rgba(217,119,6,.3)"/><rect x="38" y="82" width="150" height="12" rx="2" class="wa"/><circle cx="28" cy="108" r="4" fill="rgba(100,116,139,.2)"/><rect x="38" y="102" width="150" height="12" rx="2" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T36 Timeline Log</div><div class="tpl-desc">Audit trail + event detail.</div><div class="tpl-chips"><span class="chip chip-purple">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="130" height="74" rx="3" class="wm"/><rect x="137" y="38" width="59" height="74" rx="3" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T37 Evidence Vault</div><div class="tpl-desc">Evidence list + file preview.</div><div class="tpl-chips"><span class="chip chip-purple">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="95" height="90" rx="3" class="wm"/><rect x="102" y="22" width="94" height="90" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T38 Version Compare</div><div class="tpl-desc">Side-by-side doc versions.</div><div class="tpl-chips"><span class="chip chip-purple">4z</span></div></div></div>
+  </div>
+
+  <!-- CAT 7: ANALYTICS -->
+  <div class="cat-header" id="cat-analytics"><span class="chip chip-indigo cat-chip">ANALYTICS / REPORTS</span><span class="cat-desc">Compliance, KPI center, trend analysis</span><span class="cat-count">4 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="18" rx="2" class="wk"/><rect x="69" y="22" width="62" height="18" rx="2" class="wk"/><rect x="134" y="22" width="62" height="18" rx="2" class="wk"/><rect x="4" y="44" width="95" height="34" rx="3" class="wm"/><rect x="102" y="44" width="94" height="34" rx="3" class="wm"/><rect x="4" y="82" width="192" height="30" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T39 Compliance Dashboard</div><div class="tpl-desc">Compliance KPI + audit status.</div><div class="tpl-chips"><span class="chip chip-indigo">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="14" rx="2" class="wfl"/><rect x="4" y="40" width="192" height="72" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T40 Trend Analysis</div><div class="tpl-desc">Time-series chart + data table.</div><div class="tpl-chips"><span class="chip chip-indigo">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="42" rx="3" class="wm"/><rect x="69" y="22" width="62" height="42" rx="3" class="wm"/><rect x="134" y="22" width="62" height="42" rx="3" class="wm"/><rect x="4" y="68" width="62" height="44" rx="3" class="wm"/><rect x="69" y="68" width="62" height="44" rx="3" class="wm"/><rect x="134" y="68" width="62" height="44" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T41 Scorecard Grid</div><div class="tpl-desc">Multi-metric scorecard tiles.</div><div class="tpl-chips"><span class="chip chip-indigo">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="130" height="90" rx="3" class="wm"/><rect x="137" y="22" width="59" height="44" rx="2" class="wk"/><rect x="137" y="70" width="59" height="42" rx="2" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T42 COPQ Report</div><div class="tpl-desc">Cost of Poor Quality analysis.</div><div class="tpl-chips"><span class="chip chip-indigo">5z</span></div></div></div>
+  </div>
+
+  <!-- CAT 8: IoT/SCADA -->
+  <div class="cat-header" id="cat-iot"><span class="chip chip-teal cat-chip">IoT / SCADA</span><span class="cat-desc">Sensors, machine twin, telemetry, alerts</span><span class="cat-count">4 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="95" height="90" rx="3" class="wm"/><rect x="102" y="22" width="94" height="44" rx="3" class="wm"/><rect x="102" y="70" width="94" height="42" rx="3" class="wr"/></svg></div><div class="tpl-info"><div class="tpl-name">T43 Machine Twin</div><div class="tpl-desc">Digital twin view + sensor data + alarms.</div><div class="tpl-chips"><span class="chip chip-teal">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="56" rx="3" class="wm"/><rect x="4" y="82" width="192" height="30" rx="3" class="wr"/></svg></div><div class="tpl-info"><div class="tpl-name">T44 Live Trend + Alerts</div><div class="tpl-desc">Realtime sensor trend + alarm timeline.</div><div class="tpl-chips"><span class="chip chip-teal">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="46" height="36" rx="3" class="wm"/><rect x="53" y="38" width="46" height="36" rx="3" class="wm"/><rect x="102" y="38" width="46" height="36" rx="3" class="wm"/><rect x="151" y="38" width="45" height="36" rx="3" class="wm"/><rect x="4" y="78" width="192" height="34" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T45 Sensor Grid</div><div class="tpl-desc">Sensor tile grid + detail panel.</div><div class="tpl-chips"><span class="chip chip-teal">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="192" height="74" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T46 Telemetry Table</div><div class="tpl-desc">Sensor data table + export.</div><div class="tpl-chips"><span class="chip chip-teal">4z</span></div></div></div>
+  </div>
+
+  <!-- CAT 9: PORTAL -->
+  <div class="cat-header" id="cat-portal"><span class="chip chip-pink cat-chip">PORTAL / EXTERNAL</span><span class="cat-desc">Customer portal, supplier portal, knowledge base</span><span class="cat-count">3 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="20" rx="3" class="wh"/><rect x="4" y="28" width="192" height="14" rx="2" class="wfl"/><rect x="4" y="46" width="62" height="32" rx="4" class="wm" stroke="rgba(22,163,74,.1)" stroke-width="1"/><rect x="69" y="46" width="62" height="32" rx="4" class="wm" stroke="rgba(22,163,74,.1)" stroke-width="1"/><rect x="134" y="46" width="62" height="32" rx="4" class="wm" stroke="rgba(22,163,74,.1)" stroke-width="1"/><rect x="4" y="82" width="192" height="30" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T47 Customer Portal</div><div class="tpl-desc">Order status + documents for customer.</div><div class="tpl-chips"><span class="chip chip-pink">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="130" height="74" rx="3" class="wm"/><rect x="137" y="38" width="59" height="74" rx="3" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T48 Knowledge Base</div><div class="tpl-desc">Article list + reader + search.</div><div class="tpl-chips"><span class="chip chip-pink">5z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="62" height="18" rx="2" class="wk"/><rect x="69" y="22" width="62" height="18" rx="2" class="wa"/><rect x="134" y="22" width="62" height="18" rx="2" class="wg"/><rect x="4" y="44" width="192" height="68" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T49 Supplier Portal</div><div class="tpl-desc">Supplier scorecard + PO status.</div><div class="tpl-chips"><span class="chip chip-pink">4z</span></div></div></div>
+  </div>
+
+  <!-- CAT 10: ADMIN -->
+  <div class="cat-header" id="cat-admin"><span class="chip chip-dark cat-chip">ADMIN / SYSTEM</span><span class="cat-desc">Cau hinh, user management, schema studio</span><span class="cat-count">3 templates</span></div>
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="28" rx="3" class="wg" stroke="rgba(22,163,74,.1)" stroke-width="1"/><rect x="4" y="54" width="192" height="28" rx="3" class="wbl" stroke="rgba(37,99,235,.1)" stroke-width="1"/><rect x="4" y="86" width="192" height="26" rx="3" class="wp" stroke="rgba(124,58,237,.1)" stroke-width="1"/></svg></div><div class="tpl-info"><div class="tpl-name">T50 Config Panel</div><div class="tpl-desc">Settings groups. System config.</div><div class="tpl-chips"><span class="chip chip-dark">3z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="192" height="74" rx="3" class="wm"/></svg></div><div class="tpl-info"><div class="tpl-name">T51 User Management</div><div class="tpl-desc">User table + role assignment.</div><div class="tpl-chips"><span class="chip chip-dark">4z</span></div></div></div>
+
+    <div class="tpl-card"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="130" height="90" rx="3" class="wm"/><rect x="137" y="22" width="59" height="44" rx="2" class="ws"/><rect x="137" y="70" width="59" height="42" rx="2" class="ws"/></svg></div><div class="tpl-info"><div class="tpl-name">T52 Schema Studio</div><div class="tpl-desc">Schema editor + field inspector.</div><div class="tpl-chips"><span class="chip chip-dark">5z</span></div></div></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SCROLL UX -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<section class="section" id="scroll-ux">
+  <h2 class="section-title"><span class="section-number">6</span> Smart Scroll UX</h2>
+  <p class="section-subtitle">4 quy tac scroll bat buoc. Muc tieu: chi data di chuyen, layout co dinh, scrollbar khong chiem dien tich.</p>
+
+  <div class="grid-2">
+    <div>
+      <div class="info-box info-box-blue"><strong>RULE 1: CHI DATA SCROLL</strong>Header, KPI, filter, footer: LUON STICKY. Chi main/sidebar zones scroll.</div>
+      <div class="info-box info-box-green"><strong>RULE 2: SCROLLBAR AN MAC DINH</strong>scrollbar-width:none &rarr; hover: scrollbar-width:thin. Overlay, khong chiem dien tich.</div>
+      <div class="info-box info-box-amber"><strong>RULE 3: RE CHUOT RA DE SCROLL TRANG</strong>Khi tong zones > viewport, re chuot ra khoi data area de scroll layout. Data area van chi scroll data.</div>
+      <div class="info-box info-box-purple"><strong>RULE 4: SEARCH/FILTER LUON HIEN</strong>Thanh tim kiem, loc luon co dinh phia tren data area. User khong phai scroll de tim kiem.</div>
+
+      <div class="code-block"><span class="c">/* CSS overlay scrollbar */</span>
+<span class="k">.zone-scrollable</span> {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+<span class="k">.zone-scrollable:hover</span> {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,.12) transparent;
+}
+<span class="k">.zone-scrollable:hover::-webkit-scrollbar</span> {
+  width: <span class="n">5px</span>;
+}
+<span class="k">.zone-scrollable:hover::-webkit-scrollbar-thumb</span> {
+  background: rgba(0,0,0,.12);
+  border-radius: <span class="n">3px</span>;
+}
+<span class="k">.template-layout</span> {
+  display: grid;
+  grid-template-rows: auto auto auto <span class="n">1fr</span> auto;
+  height: <span class="n">100vh</span>;
+  overflow: hidden;
+}</div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">Live Demo — Hover vao data de thay scrollbar</div>
+      <div class="scroll-demo">
+        <div class="scroll-sticky" style="background:linear-gradient(135deg,rgba(21,101,192,.05),rgba(21,101,192,.02))"><span style="font-size:13px">&#128202;</span> Executive Dashboard</div>
+        <div class="scroll-sticky" style="border-bottom-color:rgba(249,168,37,.15);background:rgba(249,168,37,.03)">
+          <span style="display:inline-block;width:56px;height:16px;background:rgba(249,168,37,.12);border-radius:3px;text-align:center;font-size:9px;line-height:16px;color:#92400e">$1.2M</span>
+          <span style="display:inline-block;width:56px;height:16px;background:rgba(249,168,37,.12);border-radius:3px;text-align:center;font-size:9px;line-height:16px;color:#92400e">342</span>
+          <span style="display:inline-block;width:56px;height:16px;background:rgba(249,168,37,.12);border-radius:3px;text-align:center;font-size:9px;line-height:16px;color:#92400e">96.2%</span>
+        </div>
+        <div class="scroll-sticky" style="background:rgba(8,145,178,.02)">
+          <span style="display:inline-block;width:100px;height:18px;background:var(--bg-surface-alt);border:1px solid var(--border);border-radius:4px;font-size:9px;line-height:18px;padding:0 6px;color:var(--text-tertiary)">&#128269; Tim kiem...</span>
+          <span style="display:inline-block;width:70px;height:18px;background:var(--bg-surface-alt);border:1px solid var(--border);border-radius:4px;font-size:9px;line-height:18px;padding:0 6px;color:var(--text-tertiary)">Status &#9660;</span>
+        </div>
+        <div class="scroll-data">
+          <div class="scroll-row"><span>SO-2026-001 Alpha</span><span class="chip chip-green" style="font-size:9px">Active</span></div>
+          <div class="scroll-row"><span>SO-2026-002 Beta</span><span class="chip chip-blue" style="font-size:9px">Processing</span></div>
+          <div class="scroll-row"><span>SO-2026-003 Gamma</span><span class="chip chip-amber" style="font-size:9px">Pending</span></div>
+          <div class="scroll-row"><span>SO-2026-004 Delta</span><span class="chip chip-green" style="font-size:9px">Active</span></div>
+          <div class="scroll-row"><span>SO-2026-005 Epsilon</span><span class="chip chip-red" style="font-size:9px">Overdue</span></div>
+          <div class="scroll-row"><span>SO-2026-006 Zeta</span><span class="chip chip-green" style="font-size:9px">Active</span></div>
+          <div class="scroll-row"><span>SO-2026-007 Eta</span><span class="chip chip-blue" style="font-size:9px">Processing</span></div>
+          <div class="scroll-row"><span>SO-2026-008 Theta</span><span class="chip chip-amber" style="font-size:9px">Pending</span></div>
+          <div class="scroll-row"><span>SO-2026-009 Iota</span><span class="chip chip-green" style="font-size:9px">Active</span></div>
+          <div class="scroll-row"><span>SO-2026-010 Kappa</span><span class="chip chip-purple" style="font-size:9px">Review</span></div>
+          <div class="scroll-row"><span>SO-2026-011 Lambda</span><span class="chip chip-green" style="font-size:9px">Active</span></div>
+          <div class="scroll-row"><span>SO-2026-012 Mu</span><span class="chip chip-blue" style="font-size:9px">Processing</span></div>
+          <div class="scroll-row"><span>SO-2026-013 Nu</span><span class="chip chip-amber" style="font-size:9px">Pending</span></div>
+          <div class="scroll-row"><span>SO-2026-014 Xi</span><span class="chip chip-green" style="font-size:9px">Active</span></div>
+        </div>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:var(--text-tertiary)">&#9650; Header/KPI/Filter co dinh. Chi data area scroll. Scrollbar overlay khi hover.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- TOKEN CASCADE + BLOCK CATALOG + RESPONSIVE + RUNTIME PRESETS -->
+<section class="section" id="token-cascade">
+  <h2 class="section-title"><span class="section-number">7</span> Token Cascade — 5 lop do uu tien</h2>
+  <p class="section-subtitle">Moi thay doi token se di qua 5 lop. Template co the override bat ky token nao. Zone override ben trong template. User pref luon thang.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:20px">
+    <div style="padding:12px;background:rgba(21,101,192,.05);border-radius:var(--r-lg);text-align:center"><div style="font-size:9px;font-weight:800;color:var(--brand-2);letter-spacing:.03em">L1: SYSTEM</div><div style="font-size:10px;color:var(--text-tertiary);margin-top:3px">CSS defaults</div><div style="font-family:var(--mono);font-size:9px;margin-top:4px;color:var(--brand-2)">--text-base:14px</div></div>
+    <div style="padding:12px;background:rgba(124,58,237,.05);border-radius:var(--r-lg);text-align:center"><div style="font-size:9px;font-weight:800;color:var(--purple);letter-spacing:.03em">L2: ADMIN</div><div style="font-size:10px;color:var(--text-tertiary);margin-top:3px">Admin config</div><div style="font-family:var(--mono);font-size:9px;margin-top:4px;color:var(--purple)">--text-base:14px</div></div>
+    <div style="padding:12px;background:rgba(249,168,37,.08);border-radius:var(--r-lg);text-align:center;border:2px solid rgba(249,168,37,.2)"><div style="font-size:9px;font-weight:800;color:#92400e;letter-spacing:.03em">L3: TEMPLATE</div><div style="font-size:10px;color:#92400e;margin-top:3px">Override</div><div style="font-family:var(--mono);font-size:9px;margin-top:4px;color:#92400e">--text-base:15px</div></div>
+    <div style="padding:12px;background:rgba(22,163,74,.05);border-radius:var(--r-lg);text-align:center"><div style="font-size:9px;font-weight:800;color:var(--green);letter-spacing:.03em">L4: ZONE</div><div style="font-size:10px;color:var(--text-tertiary);margin-top:3px">sidebar zone</div><div style="font-family:var(--mono);font-size:9px;margin-top:4px;color:var(--green)">--text-base:12px</div></div>
+    <div style="padding:12px;background:rgba(219,39,119,.05);border-radius:var(--r-lg);text-align:center"><div style="font-size:9px;font-weight:800;color:var(--pink);letter-spacing:.03em">L5: USER</div><div style="font-size:10px;color:var(--text-tertiary);margin-top:3px">Luon thang</div><div style="font-family:var(--mono);font-size:9px;margin-top:4px;color:var(--pink)">font-size:+2</div></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<section class="section" id="block-catalog">
+  <h2 class="section-title"><span class="section-number">8</span> Block Type Catalog — 47 core types</h2>
+  <p class="section-subtitle">Toan bo block types ma Block Engine ho tro, to chuc theo 12 category. Moi template chi cho phep cac block types phu hop voi zones cua no.</p>
+
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="card"><div class="card-header" style="font-size:11px">Layout (12)</div><div class="card-body" style="padding:10px;font-size:11px;line-height:2;color:var(--text-secondary)">page-header, kpi-row, tab-bar, filter-bar, section-header, spacer, info-banner, two-column, card-container, divider, hero-banner, sticky-toolbar</div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Data (22)</div><div class="card-body" style="padding:10px;font-size:11px;line-height:2;color:var(--text-secondary)">data-table, data-cards, data-list, data-tree, data-timeline, data-gantt, data-detail, data-kanban, data-stat-compare, pivot-table, matrix-grid, master-detail, tree-view, audit-log, attachment-list, status-board, schedule-grid, calendar-board, heat-table, compliance-log, map-list, kanban-board</div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Form (10)</div><div class="card-body" style="padding:10px;font-size:11px;line-height:2;color:var(--text-secondary)">form-standard, form-wizard, form-inline, form-modal, form-search, approval-form, checklist-form, dynamic-form, subform-table, upload-center</div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Chart (16)</div><div class="card-body" style="padding:10px;font-size:11px;line-height:2;color:var(--text-secondary)">chart-bar, chart-line, chart-area, chart-donut, chart-pie, chart-stacked-bar, chart-combo, chart-radar, chart-scatter, chart-heatmap, chart-gauge, chart-progress, chart-sparkline, chart-waterfall, chart-control, chart-histogram</div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Action (10)</div><div class="card-body" style="padding:10px;font-size:11px;line-height:2;color:var(--text-secondary)">action-toolbar, action-status-flow, action-quick-create, action-summary, action-export, action-bulk, action-approval, action-split, action-launchpad, action-shortcuts</div></div>
+    <div class="card"><div class="card-header" style="font-size:11px">Quality + MFG + IoT + Others</div><div class="card-body" style="padding:10px;font-size:11px;line-height:2;color:var(--text-secondary)">quality-spc-chart, quality-control-chart, quality-checksheet, mfg-machine-status, mfg-job-board, mfg-andon-board, mfg-oee-trend, iot-sensor-strip, iot-live-trend, iot-alarm-timeline, insight-scorecard, nav-breadcrumb, nav-steps, media-document</div></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<section class="section" id="responsive">
+  <h2 class="section-title"><span class="section-number">9</span> Responsive Design — 5 breakpoints</h2>
+  <p class="section-subtitle">12-column grid, base-8 spacing, 5 breakpoints. Template tu dong dieu chinh zone layout theo man hinh.</p>
+
+  <div class="card" style="margin-bottom:20px"><div class="card-body" style="padding:0;overflow-x:auto">
+    <table class="spec-table">
+      <thead><tr><th>Breakpoint</th><th>Width</th><th>Columns</th><th>Gutter</th><th>Template behavior</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:700">sm</td><td>640px</td><td>4</td><td>16px</td><td>Zones stack vertically. Sidebar an hoac collapse. Single column layout.</td></tr>
+        <tr><td style="font-weight:700">md</td><td>768px</td><td>8</td><td>20px</td><td>2-column layout. Sidebar co the hien. KPI bar 2x2 grid.</td></tr>
+        <tr><td style="font-weight:700">lg</td><td>1024px</td><td>12</td><td>24px</td><td>Full layout. Sidebar visible. KPI bar row. Filter bar full width.</td></tr>
+        <tr><td style="font-weight:700">xl</td><td>1280px</td><td>12</td><td>28px</td><td>Spacious layout. Content max-width 1400px.</td></tr>
+        <tr><td style="font-weight:700">2xl</td><td>1536px</td><td>12</td><td>32px</td><td>Wide layout. Extra sidebar or second chart possible.</td></tr>
+      </tbody>
+    </table>
+  </div></div>
+</section>
+
+<hr class="sep">
+
+<section class="section" id="runtime-presets">
+  <h2 class="section-title"><span class="section-number">10</span> Runtime Visual Presets — 14 themes</h2>
+  <p class="section-subtitle">Moi template co the gan mot runtime preset de thay doi tong the visual appearance. Preset anh huong mau sac, gradient, shadow, typography tone.</p>
+
+  <div class="grid-4">
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">executive-glass</div><div style="font-size:10px;color:var(--text-tertiary)">Gradient headers, glass effects</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">boardroom-crystal</div><div style="font-size:10px;color:var(--text-tertiary)">Clean, minimal, professional</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">quality-cleanroom</div><div style="font-size:10px;color:var(--text-tertiary)">Sharp edges, precise metrics</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">operator-command</div><div style="font-size:10px;color:var(--text-tertiary)">Large touch, high contrast</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">shopfloor-signal</div><div style="font-size:10px;color:var(--text-tertiary)">Bold status colors, dense</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">planning-tower</div><div style="font-size:10px;color:var(--text-tertiary)">Data-heavy, Gantt-friendly</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">compliance-paper</div><div style="font-size:10px;color:var(--text-tertiary)">Document focus, serif hints</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">finance-ledger</div><div style="font-size:10px;color:var(--text-tertiary)">Tabular numbers, green/red</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">supplier-radar</div><div style="font-size:10px;color:var(--text-tertiary)">Scorecard layout, teal tones</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">audit-ledger</div><div style="font-size:10px;color:var(--text-tertiary)">Trail focused, timestamps</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">warehouse-handheld</div><div style="font-size:10px;color:var(--text-tertiary)">Mobile-first, large buttons</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">customer-portal</div><div style="font-size:10px;color:var(--text-tertiary)">Friendly, branded external</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">night-ops</div><div style="font-size:10px;color:var(--text-tertiary)">Dark mode, low glare</div></div></div>
+    <div class="card"><div class="card-body" style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700">maintenance-night</div><div style="font-size:10px;color:var(--text-tertiary)">Dark + amber accents</div></div></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- IMPLEMENTATION -->
+<section class="section" id="implementation">
+  <h2 class="section-title"><span class="section-number">11</span> Ke hoach thuc hien — 6 phases</h2>
+  <p class="section-subtitle">Ke hoach chia thanh 6 giai doan, moi giai doan co muc tieu ro rang va deliverables cu the.</p>
+
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="card"><div class="card-header" style="background:rgba(21,101,192,.05)"><span style="background:var(--brand-2);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800">P1</span><span style="margin-left:8px">Template Data Layer + 52 Preset Definitions</span></div><div class="card-body" style="font-size:12px;line-height:1.8;color:var(--text-secondary)"><code>00c-admin-appearance.js</code> — TEMPLATE_PRESETS object (52 entries), template CRUD functions, template storage API.<br><code>00b-theme-manager.js</code> — Add hesem_layout_templates storage, resolveWithTemplate() cascade.<br><code>design-system-config.json</code> — Add templates section.</div></div>
+
+    <div class="card"><div class="card-header" style="background:rgba(22,163,74,.05)"><span style="background:var(--green);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800">P2</span><span style="margin-left:8px">Tab Redesign + Template Gallery UI</span></div><div class="card-body" style="font-size:12px;line-height:1.8;color:var(--text-secondary)"><code>00c-admin-appearance.js</code> — Rewrite render(): 6 new tabs, template gallery with SVG wireframes, search/filter/category pills.<br><code>portal.main.css</code> — Add .tpl-card, .zone-scrollable, overlay scrollbar classes.<br><code>02-state-auth-ui.js</code> — Update expectedVersion.</div></div>
+
+    <div class="card"><div class="card-header" style="background:rgba(249,168,37,.05)"><span style="background:var(--amber);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800">P3</span><span style="margin-left:8px">Template Editor + Zone Configurator</span></div><div class="card-body" style="font-size:12px;line-height:1.8;color:var(--text-secondary)"><code>00c-admin-appearance.js</code> — Template Editor: split pane, zone config (grid area, height, scroll, allowed blocks), token override editor.<br><code>00-block-engine.js</code> — Add renderTemplatePreview() with mock data rendering.</div></div>
+
+    <div class="card"><div class="card-header" style="background:rgba(124,58,237,.05)"><span style="background:var(--purple);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800">P4</span><span style="margin-left:8px">Module Builder Integration</span></div><div class="card-body" style="font-size:12px;line-height:1.8;color:var(--text-secondary)"><code>31-module-builder.js</code> — Add Step 0: choose template (mandatory). Block drag-drop respects zone restrictions.<br><code>01-module-router.js</code> — Read template from module schema, apply zone layout, implement scroll per zone.<br><code>data/modules/*.json</code> — Add templateId field, migrate existing modules.</div></div>
+
+    <div class="card"><div class="card-header" style="background:rgba(8,145,178,.05)"><span style="background:var(--cyan);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800">P5</span><span style="margin-left:8px">Runtime Preset Integration</span></div><div class="card-body" style="font-size:12px;line-height:1.8;color:var(--text-secondary)">Link 14 runtime presets to template system. Each template can specify preferred runtime preset.<br>Add preset selector in Template Editor. Apply preset tokens on top of template tokens.</div></div>
+
+    <div class="card"><div class="card-header" style="background:rgba(220,38,38,.05)"><span style="background:var(--red);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800">P6</span><span style="margin-left:8px">Propagation + Governance + API</span></div><div class="card-body" style="font-size:12px;line-height:1.8;color:var(--text-secondary)"><code>00b-theme-manager.js</code> — Add template-changed event, module re-render on change.<br><code>api.php</code> — Add admin_layout_templates endpoint (save/load/list).<br><code>00c-admin-appearance.js</code> — Governance tab: template usage report, adoption metrics, orphan detection.</div></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- GOVERNANCE -->
+<section class="section" id="governance">
+  <h2 class="section-title"><span class="section-number">12</span> Governance — Quy tac bat buoc</h2>
+
+  <div class="grid-2">
+    <div class="card"><div class="card-header" style="color:var(--green)">10 Quy tac BAT BUOC</div><div class="card-body"><ol style="font-size:11px;line-height:2;padding-left:18px;color:var(--text-secondary)">
+      <li><strong>Moi module phai co templateId</strong> — khong ngoai le.</li>
+      <li><strong>Khong tu tao layout rieng</strong> — dung zone system.</li>
+      <li><strong>Block chi vao zone cho phep</strong> — allowedBlocks enforced.</li>
+      <li><strong>Token override chi o template level</strong> — module KHONG override.</li>
+      <li><strong>Scroll tuan theo zone config</strong> — sticky zone KHONG scroll.</li>
+      <li><strong>Template thay doi = module thay doi</strong> — khong unlink.</li>
+      <li><strong>Custom template phai co toi thieu 3 zones</strong> — header, main, footer.</li>
+      <li><strong>Preset goc KHONG xoa</strong> — chi clone + chinh sua.</li>
+      <li><strong>Search/filter luon sticky</strong> — user khong scroll de tim.</li>
+      <li><strong>Scrollbar overlay</strong> — khong chiem dien tich noi dung.</li>
+    </ol></div></div>
+
+    <div class="card"><div class="card-header" style="color:var(--red)">10 Anti-patterns — KHONG LAM</div><div class="card-body"><ol style="font-size:11px;line-height:2;padding-left:18px;color:var(--text-secondary)">
+      <li style="color:var(--red)">Module tu dinh nghia grid layout rieng</li>
+      <li style="color:var(--red)">Hardcode spacing/color trong module JS</li>
+      <li style="color:var(--red)">Scroll toan trang thay vi data-only scroll</li>
+      <li style="color:var(--red)">Tao module khong chon template</li>
+      <li style="color:var(--red)">Override token tai module instance level</li>
+      <li style="color:var(--red)">Dat block sai zone (vd: form vao kpi-bar)</li>
+      <li style="color:var(--red)">Xoa preset goc</li>
+      <li style="color:var(--red)">Unlink module khoi template</li>
+      <li style="color:var(--red)">An search/filter bar khi scroll</li>
+      <li style="color:var(--red)">Scrollbar chiem dien tich, day noi dung</li>
+    </ol></div></div>
+  </div>
+</section>
+
+</div>
+
+<!-- FOOTER -->
+<footer style="padding:32px 48px;background:var(--brand);color:rgba(255,255,255,.7);font-size:12px;text-align:center">
+  <div style="font-weight:800;color:#fff;margin-bottom:6px">HESEM MOM — Module Layout Template Design System v3.0 Enterprise</div>
+  <div>2026-04-10 | Confidential — Internal Use Only</div>
+  <div style="margin-top:8px;font-size:10px;opacity:.5">
+    Benchmark: SAP Fiori Floorplans, Salesforce Lightning App Builder, Material Canonical Layouts, IBM Carbon, Atlassian DS, Shopify Polaris, Ant Design
+  </div>
+</footer>
+
+</body>
+</html>

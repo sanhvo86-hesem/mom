@@ -37,6 +37,7 @@ return [
     'charset'  => 'utf8',
     'schema'   => 'public',
     'sslmode'  => getenv('DB_SSL') ?: 'prefer',
+    'allow_empty_password' => $envBool('DB_ALLOW_EMPTY_PASSWORD', false),
 
     // Connection Pool
     'connect_timeout' => (int)(getenv('DB_CONNECT_TIMEOUT') ?: 5),

@@ -23,8 +23,9 @@ const STANDARD_BY_DOMAIN = {
   supplier_relationship: 'AS9100',
   shipping_compliance: 'AS9100',
   trade_compliance: 'ITAR/EAR',
-  ehs_sustainability: 'ISO14001',
-  plant_maintenance: 'internal',
+  ehs_sustainability: 'ISO14001/ISO45001',
+  plant_maintenance: 'ISO55000',
+  lean_manufacturing: 'Lean/5S',
   mes_execution: 'internal',
   fmea_apqp: 'AIAG',
   quality_lab: 'ISO17025',
@@ -70,6 +71,8 @@ const ROLE_GUARDS_BY_DOMAIN = {
   audit_risk: ['quality_manager', 'compliance_manager', 'system_admin'],
   calibration_equipment: ['metrology_technician', 'quality_manager', 'system_admin'],
   plant_maintenance: ['maintenance_supervisor', 'plant_manager', 'system_admin'],
+  ehs_sustainability: ['quality_manager', 'operations_manager', 'plant_manager', 'system_admin'],
+  lean_manufacturing: ['operations_manager', 'plant_manager', 'quality_manager', 'system_admin'],
   production: ['production_supervisor', 'operations_manager', 'system_admin'],
   mes_execution: ['production_supervisor', 'operations_manager', 'system_admin'],
   purchasing: ['buyer', 'purchasing_manager', 'system_admin'],
@@ -82,6 +85,7 @@ const ROLE_GUARDS_BY_DOMAIN = {
   shipping_compliance: ['shipping_manager', 'trade_compliance_officer', 'system_admin'],
   trade_compliance: ['trade_compliance_officer', 'export_control_manager', 'system_admin'],
   document_control: ['document_controller', 'quality_manager', 'system_admin'],
+  quality_lab: ['quality_engineer', 'quality_manager', 'system_admin'],
   hcm_workforce: ['hr_manager', 'training_coordinator', 'system_admin'],
   warehouse_management: ['warehouse_supervisor', 'logistics_manager', 'system_admin'],
   customer_portal: ['customer_service_manager', 'system_admin'],
@@ -194,8 +198,30 @@ function loadWave1LifecycleNormalization() {
 
 const WAVE1_LIFECYCLE_NORMALIZATION = loadWave1LifecycleNormalization();
 
+function loadWave4ProductionQualityNormalization() {
+  const filePath = path.join(registryDir, 'wave4-production-quality-normalization.json');
+  return fs.existsSync(filePath) ? readJson(filePath) : {};
+}
+
+const WAVE4_PRODUCTION_QUALITY_NORMALIZATION = loadWave4ProductionQualityNormalization();
+
+function loadWave5MaintenanceEhsNormalization() {
+  const filePath = path.join(registryDir, 'wave5-maintenance-ehs-normalization.json');
+  return fs.existsSync(filePath) ? readJson(filePath) : {};
+}
+
+const WAVE5_MAINTENANCE_EHS_NORMALIZATION = loadWave5MaintenanceEhsNormalization();
+
 function wave1EntityOverride(tableName) {
   return WAVE1_LIFECYCLE_NORMALIZATION?.normalized_entities?.[tableName] || null;
+}
+
+function wave4TransitionRoleOverrides(workflowId) {
+  return WAVE4_PRODUCTION_QUALITY_NORMALIZATION?.qa_qc_role_split_workflows?.[workflowId]?.required_transition_roles || {};
+}
+
+function wave5TransitionRoleOverrides(workflowId) {
+  return WAVE5_MAINTENANCE_EHS_NORMALIZATION?.workflow_role_overrides?.[workflowId]?.required_transition_roles || {};
 }
 
 function effectiveStatusColumn(tableName, table) {
@@ -554,6 +580,35 @@ function buildTransitionsFromStates(states, domain) {
   return transitions;
 }
 
+function applyTransitionRoleOverrides(workflowId, transitions) {
+  const overrides = {
+    ...wave4TransitionRoleOverrides(workflowId),
+    ...wave5TransitionRoleOverrides(workflowId),
+  };
+  if (!overrides || !Object.keys(overrides).length) {
+    return transitions;
+  }
+  return transitions.map((transition) => {
+    const key = `${transition.from}->${transition.to}`;
+    const overrideRoles = overrides[key];
+    if (!Array.isArray(overrideRoles) || !overrideRoles.length) {
+      return transition;
+    }
+    const next = clone(transition);
+    const preservedGuards = Array.isArray(next.guards)
+      ? next.guards.filter((guard) => guard?.type !== 'role')
+      : [];
+    next.guards = [
+      ...preservedGuards,
+      {
+        type: 'role',
+        roles: Array.from(new Set(overrideRoles.map((role) => String(role || '').trim()).filter(Boolean))),
+      },
+    ];
+    return next;
+  });
+}
+
 function defaultStatesForTable(primaryTable, statusSets) {
   const statusColumn = effectiveStatusColumn(primaryTable.tableName, primaryTable);
   const statusSet = effectiveStatusSet(primaryTable.tableName, primaryTable);
@@ -624,7 +679,8 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
 
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
     if (table.supportTable) continue;
-    const workflowId = table.workflowId || `wf_${slug(tableName)}`;
+    const workflowId = String(table.workflowId || '').trim();
+    if (!workflowId) continue;
     const entry = groups.get(workflowId) || [];
     entry.push({ tableName, ...table });
     groups.set(workflowId, entry);
@@ -644,11 +700,11 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
         ? defaultStatesForTable(primaryTable, statusSets)
         : (existingWorkflow?.states?.length ? clone(existingWorkflow.states) : persistedStatesForTable(primaryTable, statusSets)))
       : [];
-    const transitions = hasExplicitTransitionLifecycle
+    const transitions = applyTransitionRoleOverrides(workflowId, hasExplicitTransitionLifecycle
       ? (override?.status_options?.length
         ? buildTransitionsFromStates(states, primaryTable.domain)
         : (existingWorkflow?.transitions?.length ? clone(existingWorkflow.transitions) : buildTransitionsFromStates(states, primaryTable.domain)))
-      : [];
+      : []);
     const relatedTables = Array.from(new Set([
       ...tables.map((table) => table.tableName),
       ...((primaryTable.foreignKeys || []).map((fk) => String(fk.references || '').split('.')[0]).filter(Boolean)),
@@ -685,7 +741,15 @@ function buildWorkflowLibrary(tableRegistry, statusOptionsRaw, existingRaw) {
   }
 
   for (const [workflowId, value] of Object.entries(existing)) {
-    if (!workflows[workflowId]) workflows[workflowId] = clone(value);
+    if (workflows[workflowId]) continue;
+    const primaryTableName = String(value?.primaryTable || '').trim();
+    if (primaryTableName) {
+      const registryTable = tableRegistry.tables?.[primaryTableName] || null;
+      if (registryTable && String(registryTable.workflowId || '').trim() !== workflowId) {
+        continue;
+      }
+    }
+    workflows[workflowId] = clone(value);
   }
 
   return {

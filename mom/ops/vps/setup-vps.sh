@@ -178,6 +178,7 @@ server {
         fastcgi_param USE_POSTGRES true;
         fastcgi_param SHADOW_WRITE false;
         fastcgi_param JSON_FALLBACK false;
+        fastcgi_param QMS_DATA_DIR /var/www/hesem-mom/mom/data;
     }
 
     # SPA fallback

@@ -11,9 +11,11 @@
       "expected_status_column": "status"
     },
     "commercial_customer.quote-effectiveness-reviews": {
+      "expected_pattern": "assessment_record",
       "expected_table": "qual_effectiveness_reviews",
       "expected_primary_key": "qual_effectiveness_review_id",
-      "expected_status_column": "review_result"
+      "expected_status_column": null,
+      "expected_result_column": "review_result"
     },
     "planning_production.production-plans": {
       "expected_table": "production_schedule",
@@ -36,9 +38,11 @@
       "expected_status_column": "capa_status"
     },
     "quality_improvement.msa-studies": {
+      "expected_pattern": "assessment_record",
       "expected_table": "calibration_grr_studies",
       "expected_primary_key": "grr_id",
-      "expected_status_column": "grr_result"
+      "expected_status_column": null,
+      "expected_result_column": "grr_result"
     },
     "quality_improvement.audit-programs": {
       "expected_table": "qual_audit_programs",
@@ -72,7 +76,8 @@
       "required_endpoints": [
         "governance.override_controls.list",
         "governance.override_controls.detail",
-        "governance.override_controls.create"
+        "governance.override_controls.create",
+        "governance.override_controls.transition"
       ]
     },
     "finance.period-closes": {
@@ -80,7 +85,8 @@
       "required_endpoints": [
         "finance.period_close_controls.list",
         "finance.period_close_controls.detail",
-        "finance.period_close_controls.create"
+        "finance.period_close_controls.create",
+        "finance.period_close_controls.transition"
       ]
     },
     "finance.backdate-exceptions": {
@@ -88,7 +94,8 @@
       "required_endpoints": [
         "finance.backdate_exceptions.list",
         "finance.backdate_exceptions.detail",
-        "finance.backdate_exceptions.create"
+        "finance.backdate_exceptions.create",
+        "finance.backdate_exceptions.transition"
       ]
     },
     "finance.credit-memos": {
@@ -109,10 +116,30 @@
     }
   },
   "archive_isolation_targets": {
+    "audit_risk.audit_program": {
+      "canonical_resource": "quality_improvement.audit-programs",
+      "successor_table": "qual_audit_programs",
+      "reason": "Legacy audit_program alias must stay in archive isolation; live audit governance runs on qual_audit_programs."
+    },
+    "mes_execution.dispatch_queue": {
+      "canonical_resource": "planning_production.dispatch-lists",
+      "successor_table": "mes_dispatch_queue",
+      "reason": "Legacy dispatch_queue alias must be isolated so live dispatch orchestration uses mes_dispatch_queue only."
+    },
+    "quality_management.capa": {
+      "canonical_resource": "quality_improvement.corrective-actions",
+      "successor_table": "capa_records",
+      "reason": "Legacy capa alias must be isolated to prevent duplicate CAPA publication alongside capa_records."
+    },
     "quality_management.deviation": {
       "canonical_resource": "quality_improvement.deviations",
       "successor_table": "deviations",
       "reason": "Legacy singular alias retained only for traceability; active composition must use the canonical deviations object."
+    },
+    "quality_management.nonconformance": {
+      "canonical_resource": "quality_improvement.nonconformances",
+      "successor_table": "ncr_records",
+      "reason": "Legacy nonconformance alias must be isolated so governed NCR execution stays on ncr_records."
     }
   }
 }

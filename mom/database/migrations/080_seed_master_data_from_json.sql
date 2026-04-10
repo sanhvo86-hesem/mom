@@ -15,9 +15,9 @@ BEGIN;
 -- ================================================================
 INSERT INTO customers (customer_id, customer_name, customer_name_vi, customer_type, customer_status, primary_contact, contact_email, metadata)
 VALUES
-  ('CUS-LAM', 'Lam Research', 'Lam Research', 'OEM', 'active', 'SQE Desk', 'sqe@lam.example', '{"site_code":"LAM-US"}'::jsonb),
-  ('CUS-ACME', 'ACME Industries', 'ACME Industries', 'Tier 1', 'active', 'John Smith', 'john.smith@acme.example', '{"site_code":"ACME-SG"}'::jsonb),
-  ('CUS-GLOBEX', 'Globex Corporation', 'Globex Corporation', 'Tier 1', 'active', 'Jane Doe', 'jane.doe@globex.example', '{"site_code":"GLOBEX-VN"}'::jsonb)
+  ('CUS-LAM', 'Lam Research', 'Lam Research', 'oem', 'active', 'SQE Desk', 'sqe@lam.example', '{"site_code":"LAM-US"}'::jsonb),
+  ('CUS-ACME', 'ACME Industries', 'ACME Industries', 'tier1', 'active', 'John Smith', 'john.smith@acme.example', '{"site_code":"ACME-SG"}'::jsonb),
+  ('CUS-GLOBEX', 'Globex Corporation', 'Globex Corporation', 'tier1', 'active', 'Jane Doe', 'jane.doe@globex.example', '{"site_code":"GLOBEX-VN"}'::jsonb)
 ON CONFLICT (customer_id) DO NOTHING;
 
 -- ================================================================
@@ -25,9 +25,9 @@ ON CONFLICT (customer_id) DO NOTHING;
 -- ================================================================
 INSERT INTO vendors (vendor_id, vendor_name, vendor_name_vi, vendor_type, vendor_status, primary_contact, contact_email, approved_process_list, metadata)
 VALUES
-  ('SUP-ACOAT', 'A-Coat Surface Treatment', 'A-Coat Surface Treatment', 'special_process', 'approved', 'Planner', 'planner@acoat.example', 'surface_treatment', '{"approved_customers":["CUS-LAM"]}'::jsonb),
-  ('SUP-MITUTOYO', 'Mitutoyo Vietnam', 'Mitutoyo Vietnam', 'calibration', 'approved', 'Service Desk', 'service@mitutoyo.example', 'calibration', '{"approved_customers":["CUS-LAM","CUS-ACME"]}'::jsonb),
-  ('SUP-KIMLONG', 'Kim Long Precision Supply', 'Kim Long Precision Supply', 'raw_material', 'approved', 'Buyer 02', 'buyer@kimlong.example', 'raw_material_supply', '{"approved_customers":["CUS-GLOBEX","CUS-ACME"]}'::jsonb)
+  ('SUP-ACOAT', 'A-Coat Surface Treatment', 'A-Coat Surface Treatment', 'subcontract', 'approved', 'Planner', 'planner@acoat.example', 'surface_treatment', '{"approved_customers":["CUS-LAM"]}'::jsonb),
+  ('SUP-MITUTOYO', 'Mitutoyo Vietnam', 'Mitutoyo Vietnam', 'service', 'approved', 'Service Desk', 'service@mitutoyo.example', 'calibration', '{"approved_customers":["CUS-LAM","CUS-ACME"]}'::jsonb),
+  ('SUP-KIMLONG', 'Kim Long Precision Supply', 'Kim Long Precision Supply', 'material', 'approved', 'Buyer 02', 'buyer@kimlong.example', 'raw_material_supply', '{"approved_customers":["CUS-GLOBEX","CUS-ACME"]}'::jsonb)
 ON CONFLICT (vendor_id) DO NOTHING;
 
 -- ================================================================

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T14:35:26.907Z",
+    "generatedAt": "2026-04-10T07:51:04.897Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
@@ -11,85 +11,36 @@
     "high": 0,
     "medium": 0,
     "watch": 15,
-    "idempotency_mentions": 18081,
+    "idempotency_mentions": 18673,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
     "generic_status_only_core_entities": 0,
-    "missing_transition_contracts_for_core_entities": 6,
+    "missing_transition_contracts_for_core_entities": 0,
     "missing_canonical_resources": 0,
     "unused_candidate_entities": 0
   },
   "current_local_signals": {
     "generic_status_only_core_entities": [],
-    "missing_transition_contracts_for_core_entities": [
-      {
-        "entity_key": "audit_risk.audit_program",
-        "entity": "audit_program",
-        "expected_action": "audit_risk.audit_program.transition",
-        "canonical_resources": [
-          "quality_improvement.audit-programs"
-        ]
-      },
-      {
-        "entity_key": "calibration_equipment.calibration_grr_studies",
-        "entity": "calibration_grr_studies",
-        "expected_action": "calibration_equipment.calibration_grr_studies.transition",
-        "canonical_resources": [
-          "quality_improvement.msa-studies"
-        ]
-      },
-      {
-        "entity_key": "mes_execution.dispatch_queue",
-        "entity": "dispatch_queue",
-        "expected_action": "mes_execution.dispatch_queue.transition",
-        "canonical_resources": [
-          "planning_production.dispatch-lists"
-        ]
-      },
-      {
-        "entity_key": "quality_lab.qual_effectiveness_reviews",
-        "entity": "qual_effectiveness_reviews",
-        "expected_action": "quality_lab.qual_effectiveness_reviews.transition",
-        "canonical_resources": [
-          "commercial_customer.quote-effectiveness-reviews"
-        ]
-      },
-      {
-        "entity_key": "quality_management.capa",
-        "entity": "capa",
-        "expected_action": "quality_management.capa.transition",
-        "canonical_resources": [
-          "quality_improvement.corrective-actions"
-        ]
-      },
-      {
-        "entity_key": "quality_management.nonconformance",
-        "entity": "nonconformance",
-        "expected_action": "quality_management.nonconformance.transition",
-        "canonical_resources": [
-          "quality_improvement.nonconformances"
-        ]
-      }
-    ],
+    "missing_transition_contracts_for_core_entities": [],
     "not_applicable_core_entities": [
       {
-        "entity_key": "audit_risk.audit_program",
-        "entity": "audit_program",
-        "profile": "governed_case",
+        "entity_key": "bi_datawarehouse.plant_performance_snapshots",
+        "entity": "plant_performance_snapshots",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 2,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": [
-          "quality_improvement.audit-programs"
+          "analytics.plant-performance-snapshots"
         ]
       },
       {
         "entity_key": "calibration_equipment.calibration_grr_studies",
         "entity": "calibration_grr_studies",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 7,
@@ -100,9 +51,22 @@
         ]
       },
       {
+        "entity_key": "finance.inventory_valuations",
+        "entity": "inventory_valuations",
+        "profile": "transactional_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "finance.inventory-valuations"
+        ]
+      },
+      {
         "entity_key": "inventory.inventory_balance_snapshot",
         "entity": "inventory_balance_snapshot",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 4,
@@ -115,7 +79,7 @@
       {
         "entity_key": "inventory.stock_balances",
         "entity": "stock_balances",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 8,
@@ -123,19 +87,6 @@
         "readiness": "ready",
         "canonical_resources": [
           "inventory_logistics.stock-balances"
-        ]
-      },
-      {
-        "entity_key": "mes_execution.dispatch_queue",
-        "entity": "dispatch_queue",
-        "profile": "operator_console",
-        "zone": "core_value_stream",
-        "archive_candidate": false,
-        "relation_count": 2,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": [
-          "planning_production.dispatch-lists"
         ]
       },
       {
@@ -154,7 +105,7 @@
       {
         "entity_key": "production.production_order_bom_snapshot",
         "entity": "production_order_bom_snapshot",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 2,
@@ -167,7 +118,7 @@
       {
         "entity_key": "production.production_order_route_snapshot",
         "entity": "production_order_route_snapshot",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 2,
@@ -180,7 +131,7 @@
       {
         "entity_key": "quality_lab.qual_effectiveness_reviews",
         "entity": "qual_effectiveness_reviews",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 6,
@@ -191,38 +142,25 @@
         ]
       },
       {
-        "entity_key": "quality_management.capa",
-        "entity": "capa",
-        "profile": "governed_case",
+        "entity_key": "quality_management.spc_data",
+        "entity": "spc_data",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": [
-          "quality_improvement.corrective-actions"
-        ]
-      },
-      {
-        "entity_key": "quality_management.nonconformance",
-        "entity": "nonconformance",
-        "profile": "governed_case",
-        "zone": "core_value_stream",
-        "archive_candidate": false,
-        "relation_count": 1,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": [
-          "quality_improvement.nonconformances"
+          "quality_improvement.spc-observations"
         ]
       }
     ],
     "unused_candidate_entities": [],
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2213,
-      "idempotent_endpoint_count": 2213,
+      "mutating_endpoint_count": 2295,
+      "idempotent_endpoint_count": 2295,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2213,
+      "default_retry_safe_endpoint_count": 2295,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0
     }
@@ -235,12 +173,12 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 18081,
-        "optimistic_concurrency_mentions": 7016,
-        "mutating_endpoint_count": 2213,
-        "idempotent_endpoint_count": 2213,
+        "idempotency_mentions": 18673,
+        "optimistic_concurrency_mentions": 7198,
+        "mutating_endpoint_count": 2295,
+        "idempotent_endpoint_count": 2295,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2213,
+        "default_retry_safe_endpoint_count": 2295,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0
       },
@@ -260,9 +198,9 @@
         "Optimistic concurrency, If-Match preconditions, and row-version evidence are all present broadly enough that this is no longer an active structural blind spot."
       ],
       "evidence": {
-        "optimistic_concurrency_mentions": 7016,
-        "if_match_mentions": 2408,
-        "row_version_mentions": 19101
+        "optimistic_concurrency_mentions": 7198,
+        "if_match_mentions": 2459,
+        "row_version_mentions": 19517
       },
       "required_controls": [
         "row_version_and_if_match",
@@ -428,7 +366,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 18081
+        "idempotency_mentions": 18673
       },
       "required_controls": [
         "offline_conflict_model",
@@ -464,7 +402,7 @@
       "evidence": {
         "policy_has_job_heartbeat_requirement": true,
         "heartbeat_mentions": 33,
-        "escalation_mentions": 519
+        "escalation_mentions": 527
       },
       "required_controls": [
         "job_heartbeat_and_last_success",

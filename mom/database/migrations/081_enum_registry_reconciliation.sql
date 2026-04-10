@@ -9,6 +9,8 @@
 -- NOTE: ALTER TYPE ... ADD VALUE cannot run inside a transaction in PostgreSQL < 12.
 --       If using PG < 12, run these statements outside BEGIN/COMMIT.
 
+BEGIN;
+
 -- ============================================================================
 -- 1. EXPAND so_status_enum — add registry-side values
 --    Current: open, released, in_progress, shipped, closed, cancelled
@@ -68,6 +70,8 @@ ALTER TYPE record_type_enum ADD VALUE IF NOT EXISTS 'COST-ESTIMATE';
 ALTER TYPE record_type_enum ADD VALUE IF NOT EXISTS 'INTERNAL-AUDIT-PLAN';
 ALTER TYPE record_type_enum ADD VALUE IF NOT EXISTS 'EMPLOYEE-COMPETENCY';
 
+COMMIT;
+
 -- ============================================================================
 -- 4. SEED record_counters for new record types
 --    Only inserts if the type doesn't already have a counter row
@@ -75,7 +79,7 @@ ALTER TYPE record_type_enum ADD VALUE IF NOT EXISTS 'EMPLOYEE-COMPETENCY';
 BEGIN;
 
 INSERT INTO record_counters (record_type, fiscal_year, last_number, counter_digits)
-SELECT t.record_type, 2026, 0, t.digits
+SELECT t.record_type::record_type_enum, 2026, 0, t.digits
 FROM (VALUES
   ('RMA', 3), ('NPI', 3), ('CONCESSION', 3), ('DEVIATION', 3),
   ('REWORK', 3), ('CUSTOMER-COMPLAINT', 3), ('SUPPLIER-AUDIT', 3),
@@ -90,7 +94,7 @@ FROM (VALUES
 ) AS t(record_type, digits)
 WHERE NOT EXISTS (
   SELECT 1 FROM record_counters rc
-  WHERE rc.record_type = t.record_type AND rc.fiscal_year = 2026
+  WHERE rc.record_type = t.record_type::record_type_enum AND rc.fiscal_year = 2026
 );
 
 -- ============================================================================

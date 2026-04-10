@@ -738,9 +738,16 @@ function _clone(obj){ return JSON.parse(JSON.stringify(obj || {})); }
 function _toast(message, type){ if(typeof showToast === 'function') return showToast(message, type); if(window.console) console.log('[mdc]', message); }
 
 function _api(action, payload, method){
-  if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'POST');
+  var requestMethod = method || 'POST';
+  if(requestMethod === 'GET' && typeof apiCall === 'function'){
+    return apiCall(action, Object.assign({}, payload || {}, { _ts:Date.now() }), requestMethod);
+  }
+  if(typeof apiCall === 'function') return apiCall(action, payload || {}, requestMethod);
   var url = 'api.php?action=' + encodeURIComponent(action);
-  var opts = { method: method || 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' } };
+  if(requestMethod === 'GET'){
+    url += '&_ts=' + Date.now();
+  }
+  var opts = { method: requestMethod, credentials: 'include', cache:'no-store', headers: { 'Content-Type': 'application/json', 'Cache-Control':'no-cache' } };
   if(typeof csrfToken !== 'undefined' && csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
   if(opts.method !== 'GET') opts.body = JSON.stringify(payload || {});
   return fetch(url, opts).then(function(r){ return r.json(); });
@@ -769,7 +776,49 @@ function _injectStyles(){
   document.head.appendChild(style);
 }
 
-function _getEntityRows(entity){ return (_mdCache && Array.isArray(_mdCache[entity])) ? _mdCache[entity] : []; }
+function _normalizeEntityRow(entity, row){
+  if(!row || typeof row !== 'object') return row;
+  var item = _clone(row);
+  if(entity === 'parts'){
+    var canonicalDescription = item.part_description || item.description || '';
+    if(canonicalDescription){
+      item.part_description = canonicalDescription;
+      item.description = canonicalDescription;
+    }
+  }
+  return item;
+}
+
+function _normalizeSnapshot(snapshot){
+  if(!snapshot || typeof snapshot !== 'object') return snapshot;
+  var normalized = _clone(snapshot);
+  Object.keys(ENTITY_CONFIG).forEach(function(entity){
+    if(!Array.isArray(normalized[entity])) return;
+    normalized[entity] = normalized[entity].map(function(row){ return _normalizeEntityRow(entity, row); });
+  });
+  return normalized;
+}
+
+function _getEntityRows(entity){
+  return (_mdCache && Array.isArray(_mdCache[entity])) ? _mdCache[entity].map(function(row){ return _normalizeEntityRow(entity, row); }) : [];
+}
+function _upsertEntityRow(entity, row){
+  if(!entity || !ENTITY_CONFIG[entity] || !row || typeof row !== 'object') return null;
+  if(!_mdCache || typeof _mdCache !== 'object') _mdCache = {};
+  var cfg = ENTITY_CONFIG[entity];
+  var id = String(row[cfg.key] || '');
+  var normalized = _normalizeEntityRow(entity, row);
+  var rows = Array.isArray(_mdCache[entity]) ? _mdCache[entity].slice() : [];
+  var replaced = false;
+  rows = rows.map(function(item){
+    if(String((item || {})[cfg.key] || '') !== id) return item;
+    replaced = true;
+    return normalized;
+  });
+  if(!replaced) rows.push(normalized);
+  _mdCache[entity] = rows;
+  return normalized;
+}
 function _normalizeText(value){ return String(value || '').toLowerCase(); }
 function _matchesSearch(item, query){ if(!query) return true; var hay = Object.keys(item || {}).map(function(key){ return _normalizeText(item[key]); }).join(' '); return hay.indexOf(query) >= 0; }
 
@@ -849,7 +898,7 @@ function _defaultDraft(entity){
   if(ENTITY_DEFAULTS[entity]){
     Object.keys(ENTITY_DEFAULTS[entity]).forEach(function(key){ draft[key] = ENTITY_DEFAULTS[entity][key]; });
   }
-  return draft;
+  return _normalizeEntityRow(entity, draft);
 }
 
 function _removeModal(){ var existing = document.getElementById('mdc-overlay'); if(existing) existing.remove(); }
@@ -1007,16 +1056,27 @@ function _renderEditor(){
       payload[field.key] = value;
       if(field.required && !value && !invalidEl) invalidEl = el;
     });
+    payload = _normalizeEntityRow(_mdState.entity, payload);
     if(invalidEl){ invalidEl.focus(); _toast(_t('Vui lòng điền đủ các trường bắt buộc.', 'Please complete the required fields.'), 'warn'); return; }
     _api('master_data_upsert', { entity:_mdState.entity, item:payload }, 'POST').then(function(res){
       if(!res || !res.ok){ _toast(_t('Không thể lưu dữ liệu nền.', 'Could not save master data.'), 'error'); return; }
+      var key = cfg.key;
+      var currentRows = _getEntityRows(_mdState.entity);
+      var currentItem = currentRows.find(function(row){ return String(row[key] || '') === String(payload[key] || ''); }) || null;
+      var authoritativeSource = res.item || currentItem || payload;
+      var savedItem = _normalizeEntityRow(_mdState.entity, _clone(authoritativeSource));
+      if(!res.pending){
+        _upsertEntityRow(_mdState.entity, savedItem);
+      }
+      _mdState.selectedId = String(savedItem[key] || payload[key] || '');
+      _mdState.draft = savedItem;
+      _renderRail(); _renderList(); _renderEditor();
+      _toast(res.message || _t('Đã lưu dữ liệu nền.', 'Master data saved.'), res.pending ? 'warn' : 'success');
       return window._mdEnsureSnapshot(true).then(function(snapshot){
-        var key = cfg.key;
-        _mdState.selectedId = String((res.item || payload)[key] || payload[key] || '');
-        _mdState.draft = _clone(res.pending ? payload : (res.item || payload));
         _renderRail(); _renderList(); _renderEditor();
-        window.dispatchEvent(new CustomEvent('master-data:updated', { detail:{ snapshot:snapshot, entity:_mdState.entity, item:res.item || payload } }));
-        _toast(res.message || _t('Đã lưu dữ liệu nền.', 'Master data saved.'), res.pending ? 'warn' : 'success');
+        window.dispatchEvent(new CustomEvent('master-data:updated', { detail:{ snapshot:snapshot, entity:_mdState.entity, item:savedItem } }));
+      }).catch(function(){
+        window.dispatchEvent(new CustomEvent('master-data:updated', { detail:{ snapshot:_mdCache, entity:_mdState.entity, item:savedItem } }));
       });
     }).catch(function(){ _toast(_t('Lỗi mạng khi lưu dữ liệu nền.', 'Network error while saving master data.'), 'error'); });
   };
@@ -1026,7 +1086,7 @@ window._mdEnsureSnapshot = function(force){
   if(!force && _mdCache) return Promise.resolve(_mdCache);
   if(!force && _mdPromise) return _mdPromise;
   _mdPromise = _api('master_data_snapshot', {}, 'GET').then(function(res){
-    _mdCache = (res && res.ok && res.data) ? res.data : Object.keys(ENTITY_CONFIG).reduce(function(out, key){ out[key] = []; return out; }, {});
+    _mdCache = _normalizeSnapshot((res && res.ok && res.data) ? res.data : Object.keys(ENTITY_CONFIG).reduce(function(out, key){ out[key] = []; return out; }, {}));
     return _mdCache;
   }).finally(function(){ _mdPromise = null; });
   return _mdPromise;
@@ -1037,7 +1097,7 @@ window._mdLookupOptions = function(entity){ return _lookupOptions(entity); };
 window._mdOpenControl = function(entity){
   _injectStyles();
   if(entity && ENTITY_CONFIG[entity]) _mdState.entity = entity;
-  return window._mdEnsureSnapshot(false).then(function(){
+  return window._mdEnsureSnapshot(true).then(function(){
     _mdState.selectedId = '';
     _mdState.search = '';
     _mdState.draft = _defaultDraft(_mdState.entity);

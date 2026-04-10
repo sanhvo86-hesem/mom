@@ -4295,3 +4295,23 @@ textarea.ec-input {
   .ec-ev-filters { flex-direction: column; align-items: stretch; }
   .ec-ev-fsel, .ec-ev-finp { max-width: 100%; }
 }
+
+/* ── Readonly / Auto-filled fields (DB-sourced data) ── */
+.hm-input[readonly] {
+  background: var(--bg-surface-alt, #f1f5f9);
+  color: var(--text-secondary, #64748b);
+  cursor: default;
+  border-color: transparent;
+}
+.hm-input[readonly]:focus {
+  outline: none;
+  box-shadow: none;
+}
+[data-autofilled=true] .hm-label::after {
+  content: ' · DB';
+  font-size: 10px;
+  color: var(--brand-2, #1565c0);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}

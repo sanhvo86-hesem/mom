@@ -73,7 +73,7 @@ COMMENT ON TABLE serial_master IS 'Serial number tracking. / Theo doi so serial.
 -- inventory_transactions / Giao dich ton kho (40 vars from erp_inventory)
 -- ---------------------------------------------------------------------------
 CREATE TABLE inventory_transactions (
-    txn_id              UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    txn_id              UUID            NOT NULL DEFAULT uuid_generate_v4(),
     warehouse_id        VARCHAR(30)     NOT NULL REFERENCES warehouses(warehouse_id),
     location_id         VARCHAR(50)     REFERENCES inventory_locations(location_id),
     item_id             VARCHAR(50)     NOT NULL REFERENCES items(item_id),
@@ -102,7 +102,8 @@ CREATE TABLE inventory_transactions (
     reference_id        VARCHAR(50),
     performed_by        UUID            REFERENCES users(user_id),
     metadata            JSONB           DEFAULT '{}',
-    recorded_at         TIMESTAMPTZ     NOT NULL DEFAULT now()
+    recorded_at         TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    PRIMARY KEY (txn_id, recorded_at)
 ) PARTITION BY RANGE (recorded_at);
 COMMENT ON TABLE inventory_transactions IS 'Inventory transactions with lot/serial tracking. Maps erp_inventory variables. / Giao dich ton kho voi theo doi lo/serial.';
 
@@ -113,6 +114,7 @@ CREATE TABLE inv_txn_2026_h2 PARTITION OF inventory_transactions
 CREATE TABLE inv_txn_2027_h1 PARTITION OF inventory_transactions
     FOR VALUES FROM ('2027-01-01') TO ('2027-07-01');
 CREATE TABLE inv_txn_default PARTITION OF inventory_transactions DEFAULT;
+CREATE INDEX idx_invtxn_txn_id ON inventory_transactions (txn_id, recorded_at);
 
 COMMIT;
 

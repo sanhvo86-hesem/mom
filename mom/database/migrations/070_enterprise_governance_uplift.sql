@@ -6797,7 +6797,12 @@ SELECT
         WHEN f.fai_id IS NOT NULL THEN 'fai'
         ELSE 'record'
     END AS process_entity,
-    COALESCE(n.ncr_status, c.capa_status, f.fai_overall_result, r.status) AS effective_status
+    COALESCE(
+        n.ncr_status::text,
+        c.capa_status::text,
+        f.fai_overall_result::text,
+        r.status::text
+    ) AS effective_status
 FROM records r
 LEFT JOIN ncr_records n ON n.record_id = r.record_id
 LEFT JOIN capa_records c ON c.record_id = r.record_id

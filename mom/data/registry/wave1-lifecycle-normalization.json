@@ -431,7 +431,7 @@
       "audit_class": "workflow_audit_trail",
       "ci_loop": "capa",
       "status_set_key": "ipqc_inspections_inspection_status",
-      "lifecycle_mode": "guarded_transition_runtime",
+      "lifecycle_mode": "persisted",
       "status_options": [
         { "value": "queued", "label": "Đã xếp hàng", "labelEn": "Queued", "allowedTransitionsFrom": [] },
         { "value": "in_progress", "label": "Đang kiểm", "labelEn": "In Progress", "allowedTransitionsFrom": ["queued", "reinspect"] },
@@ -451,7 +451,7 @@
       "ci_loop": "capa",
       "status_field_override": "result",
       "status_set_key": "oqc_inspections_result_status",
-      "lifecycle_mode": "guarded_transition_runtime",
+      "lifecycle_mode": "persisted",
       "status_options": [
         { "value": "pending", "label": "Chờ kết quả", "labelEn": "Pending", "allowedTransitionsFrom": [] },
         { "value": "accepted", "label": "Đạt", "labelEn": "Accepted", "allowedTransitionsFrom": ["pending"] },
@@ -481,6 +481,25 @@
         { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["repaired", "replaced", "credited"] }
       ]
     },
+    "pm_maintenance_plans": {
+      "canonical_resource": "maintenance_ehs.maintenance-plans",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls preventive-maintenance plan approval, release, hold, and retirement so recurring PM cadence stays auditable before work orders are auto-released.",
+      "kpi_family": "availability",
+      "gate_type": "process_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "maintenance_review",
+      "status_set_key": "pm_maintenance_plans_status_set",
+      "lifecycle_mode": "persisted",
+      "status_options": [
+        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["draft", "on_hold"] },
+        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["approved", "on_hold"] },
+        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["approved", "active"] },
+        { "value": "retired", "label": "Ngừng áp dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["approved", "active", "on_hold"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+      ]
+    },
     "ehs_incidents": {
       "canonical_resource": "maintenance_ehs.incidents",
       "usage_zone": "core_value_stream",
@@ -490,7 +509,7 @@
       "audit_class": "workflow_audit_trail",
       "ci_loop": "incident_review",
       "status_set_key": "ehs_incidents_incident_status",
-      "lifecycle_mode": "guarded_transition_runtime",
+      "lifecycle_mode": "persisted",
       "status_options": [
         { "value": "reported", "label": "Đã báo cáo", "labelEn": "Reported", "allowedTransitionsFrom": [] },
         { "value": "triaged", "label": "Đã phân loại", "labelEn": "Triaged", "allowedTransitionsFrom": ["reported"] },
@@ -510,7 +529,7 @@
       "audit_class": "workflow_audit_trail",
       "ci_loop": "management_review",
       "status_set_key": "qual_compliance_obligations_obligation_status",
-      "lifecycle_mode": "guarded_transition_runtime",
+      "lifecycle_mode": "persisted",
       "status_options": [
         { "value": "open", "label": "Mở", "labelEn": "Open", "allowedTransitionsFrom": [] },
         { "value": "due", "label": "Đến hạn", "labelEn": "Due", "allowedTransitionsFrom": ["open"] },
@@ -518,6 +537,158 @@
         { "value": "waived", "label": "Miễn trừ", "labelEn": "Waived", "allowedTransitionsFrom": ["open", "due", "overdue"] },
         { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["open", "due", "overdue", "waived"] },
         { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+      ]
+    },
+    "ehs_permit_register": {
+      "canonical_resource": "maintenance_ehs.permits",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls permit submission, approval, activation, suspension, expiry, and closure so hazardous or regulated work cannot proceed outside a governed permit-to-work register.",
+      "kpi_family": "compliance",
+      "gate_type": "safety_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "permit_review",
+      "status_set_key": "ehs_permit_register_status_set",
+      "lifecycle_mode": "persisted",
+      "status_options": [
+        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["submitted"] },
+        { "value": "active", "label": "Hiệu lực", "labelEn": "Active", "allowedTransitionsFrom": ["approved", "suspended"] },
+        { "value": "suspended", "label": "Tạm ngưng", "labelEn": "Suspended", "allowedTransitionsFrom": ["approved", "active"] },
+        { "value": "expired", "label": "Hết hạn", "labelEn": "Expired", "allowedTransitionsFrom": ["approved", "active", "suspended"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["active", "suspended", "expired"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+      ]
+    },
+    "lean_5s_audits": {
+      "canonical_resource": "maintenance_ehs.five-s-audits",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls 5S audit planning, execution, follow-up, verification, and closure so visual-factory discipline becomes a governed lean loop instead of a score-only snapshot.",
+      "kpi_family": "continuous_improvement",
+      "gate_type": "improvement_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "gemba_review",
+      "status_set_key": "lean_5s_audits_status_set",
+      "lifecycle_mode": "persisted",
+      "status_options": [
+        { "value": "planned", "label": "Đã lập kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+        { "value": "in_progress", "label": "Đang đánh giá", "labelEn": "In Progress", "allowedTransitionsFrom": ["planned"] },
+        { "value": "follow_up", "label": "Theo dõi hành động", "labelEn": "Follow Up", "allowedTransitionsFrom": ["in_progress"] },
+        { "value": "verified", "label": "Đã xác nhận", "labelEn": "Verified", "allowedTransitionsFrom": ["follow_up"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["verified"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+      ]
+    },
+    "pm_equipment_master": {
+      "canonical_resource": "master_data.equipment",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls the maintenance equipment shell that schedules PM, lockout, and lifecycle disposition while remaining state-aligned with the canonical equipment master.",
+      "kpi_family": "availability",
+      "gate_type": "process_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "maintenance_review",
+      "status_set_key": "pm_equipment_master_status_set",
+      "lifecycle_mode": "persisted",
+      "status_options": [
+        { "value": "commissioning", "label": "Đang nghiệm thu", "labelEn": "Commissioning", "allowedTransitionsFrom": [] },
+        { "value": "qualified", "label": "Đủ điều kiện", "labelEn": "Qualified", "allowedTransitionsFrom": ["commissioning", "on_hold"] },
+        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["qualified", "on_hold", "lockout"] },
+        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["qualified", "active"] },
+        { "value": "lockout", "label": "Khóa an toàn", "labelEn": "Lockout", "allowedTransitionsFrom": ["active", "on_hold"] },
+        { "value": "retired", "label": "Ngừng sử dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["active", "on_hold", "lockout"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+      ]
+    },
+    "audit": {
+      "canonical_resource": "quality_improvement.audit-programs",
+      "usage_zone": "governed_support",
+      "purpose": "Controls audit execution, verification, and closure so audit evidence does not depend on a separate workflow engine bridge before backend rollout.",
+      "kpi_family": "quality",
+      "gate_type": "compliance_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "management_review",
+      "status_set_key": "audit_status_code",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+        { "value": "under_review", "label": "Đang xem xét", "labelEn": "Under Review", "allowedTransitionsFrom": ["submitted"] },
+        { "value": "approved", "label": "Đã phê duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
+        { "value": "implemented", "label": "Đã triển khai", "labelEn": "Implemented", "allowedTransitionsFrom": ["approved"] },
+        { "value": "verified", "label": "Đã xác nhận", "labelEn": "Verified", "allowedTransitionsFrom": ["implemented"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["verified", "draft", "submitted", "under_review", "approved", "implemented"] },
+        { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "allowedTransitionsFrom": ["closed", "draft", "submitted", "under_review", "approved", "implemented", "verified"] }
+      ]
+    },
+    "deviation": {
+      "canonical_resource": "quality_improvement.deviations",
+      "usage_zone": "governed_support",
+      "purpose": "Controls legacy deviation records under guarded runtime so exception governance remains auditable without a separate persisted workflow bridge.",
+      "kpi_family": "quality",
+      "gate_type": "exception_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "capa",
+      "status_set_key": "deviation_status_code",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "pending", "label": "Chờ xử lý", "labelEn": "Pending", "allowedTransitionsFrom": [] },
+        { "value": "partial", "label": "Một phần", "labelEn": "Partial", "allowedTransitionsFrom": ["pending", "broken"] },
+        { "value": "complete", "label": "Hoàn chỉnh", "labelEn": "Complete", "allowedTransitionsFrom": ["pending", "partial"] },
+        { "value": "broken", "label": "Đứt gãy", "labelEn": "Broken", "allowedTransitionsFrom": ["pending", "partial"] }
+      ]
+    },
+    "deviations": {
+      "canonical_resource": "quality_improvement.deviations",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls active deviation permits and exception closure in the live quality stream without depending on a deferred workflow engine bridge.",
+      "kpi_family": "quality",
+      "gate_type": "exception_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "capa",
+      "status_field_override": "status",
+      "status_set_key": "exception_status",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "open", "label": "Mở", "labelEn": "Open", "allowedTransitionsFrom": [] },
+        { "value": "in_progress", "label": "Đang xử lý", "labelEn": "In Progress", "allowedTransitionsFrom": ["open"] },
+        { "value": "pending_review", "label": "Chờ xem xét", "labelEn": "Pending Review", "allowedTransitionsFrom": ["in_progress"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["pending_review"] },
+        { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending_review"] }
+      ]
+    },
+    "engineering_change_requests": {
+      "canonical_resource": "maintenance_ehs.improvement-actions",
+      "usage_zone": "governed_support",
+      "purpose": "Controls engineering change request progression under guarded runtime so release governance exists before any separate PLM workflow engine is introduced.",
+      "kpi_family": "engineering",
+      "gate_type": "change_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "engineering_change",
+      "status_set_key": "engineering_change_requests_ecr_status",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "pending", "label": "Chờ xử lý", "labelEn": "Pending", "allowedTransitionsFrom": [] },
+        { "value": "partial", "label": "Một phần", "labelEn": "Partial", "allowedTransitionsFrom": ["pending", "broken"] },
+        { "value": "complete", "label": "Hoàn chỉnh", "labelEn": "Complete", "allowedTransitionsFrom": ["pending", "partial"] },
+        { "value": "broken", "label": "Đứt gãy", "labelEn": "Broken", "allowedTransitionsFrom": ["pending", "partial"] }
+      ]
+    },
+    "item": {
+      "canonical_resource": "inventory_logistics.inventory-items",
+      "usage_zone": "governed_support",
+      "purpose": "Controls legacy single-item master lifecycle under guarded runtime so alias records do not remain blocked on a workflow engine bridge.",
+      "kpi_family": "inventory",
+      "gate_type": "entry_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "engineering_change",
+      "status_set_key": "item_status_code",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["draft", "hold"] },
+        { "value": "hold", "label": "Tạm giữ", "labelEn": "Hold", "allowedTransitionsFrom": ["draft", "active"] },
+        { "value": "obsolete_requested", "label": "Yêu cầu ngưng dùng", "labelEn": "Obsolete Requested", "allowedTransitionsFrom": ["active", "hold"] },
+        { "value": "obsolete", "label": "Ngưng dùng", "labelEn": "Obsolete", "allowedTransitionsFrom": ["obsolete_requested"] }
       ]
     },
     "ap_ar_invoices": {
@@ -556,6 +727,44 @@
         { "value": "retired", "label": "Ngừng sử dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["active", "on_hold"] },
         { "value": "disposed", "label": "Đã thanh lý", "labelEn": "Disposed", "allowedTransitionsFrom": ["retired", "on_hold"] },
         { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["disposed"] }
+      ]
+    },
+    "freight_orders": {
+      "canonical_resource": "inventory_logistics.freight-orders",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls freight execution from booking through delivery closure so shipment release, carrier handoff, and proof-of-delivery stay under governed logistics truth.",
+      "kpi_family": "logistics",
+      "gate_type": "shipment_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "delivery_review",
+      "status_set_key": "freight_orders_freight_status",
+      "lifecycle_mode": "guarded_transition_runtime",
+      "status_options": [
+        { "value": "planned", "label": "Đã lập kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+        { "value": "tendered", "label": "Đã chào vận chuyển", "labelEn": "Tendered", "allowedTransitionsFrom": ["planned"] },
+        { "value": "booked", "label": "Đã đặt chỗ", "labelEn": "Booked", "allowedTransitionsFrom": ["tendered", "planned"] },
+        { "value": "in_transit", "label": "Đang vận chuyển", "labelEn": "In Transit", "allowedTransitionsFrom": ["booked"] },
+        { "value": "delivered", "label": "Đã giao", "labelEn": "Delivered", "allowedTransitionsFrom": ["in_transit"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["delivered"] },
+        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "tendered", "booked"] }
+      ]
+    },
+    "safety_observations": {
+      "canonical_resource": "maintenance_ehs.safety-observations",
+      "usage_zone": "core_value_stream",
+      "purpose": "Controls safety good-catch and hazard observations through assignment, containment, and closure so frontline EHS risks cannot disappear into note-only reporting.",
+      "kpi_family": "safety",
+      "gate_type": "safety_gate",
+      "audit_class": "workflow_audit_trail",
+      "ci_loop": "safety_review",
+      "status_set_key": "safety_observations_observation_status",
+      "lifecycle_mode": "persisted",
+      "status_options": [
+        { "value": "logged", "label": "Đã ghi nhận", "labelEn": "Logged", "allowedTransitionsFrom": [] },
+        { "value": "assigned", "label": "Đã giao xử lý", "labelEn": "Assigned", "allowedTransitionsFrom": ["logged"] },
+        { "value": "in_progress", "label": "Đang xử lý", "labelEn": "In Progress", "allowedTransitionsFrom": ["assigned"] },
+        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["assigned", "in_progress"] },
+        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
       ]
     }
   },

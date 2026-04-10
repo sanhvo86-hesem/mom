@@ -1,23 +1,23 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T14:35:26.130Z",
+    "generatedAt": "2026-04-10T07:51:04.109Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 663,
-    "canonical_resources": 63,
-    "implemented_canonical_resources": 56,
-    "planned_canonical_resources": 7,
-    "core_value_stream_entities": 65,
-    "governed_support_entities": 595,
-    "conditional_extension_entities": 2,
+    "total_frontend_entities": 669,
+    "canonical_resources": 64,
+    "implemented_canonical_resources": 64,
+    "planned_canonical_resources": 0,
+    "core_value_stream_entities": 69,
+    "governed_support_entities": 589,
+    "conditional_extension_entities": 6,
     "unused_candidate_entities": 0,
-    "archive_isolation_entities": 1,
+    "archive_isolation_entities": 5,
     "generic_status_only_core_entities": 0,
-    "missing_transition_contracts_for_core_entities": 6,
+    "missing_transition_contracts_for_core_entities": 0,
     "missing_canonical_resources": 0,
     "split_path_risks_total": 0,
     "critical_split_path_risks": 0,
@@ -66,19 +66,6 @@
   "usage_zones": {
     "core_value_stream": [
       {
-        "entity_key": "audit_risk.audit_program",
-        "entity": "audit_program",
-        "profile": "governed_case",
-        "zone": "core_value_stream",
-        "archive_candidate": false,
-        "relation_count": 2,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": [
-          "quality_improvement.audit-programs"
-        ]
-      },
-      {
         "entity_key": "audit_risk.improvement_projects",
         "entity": "improvement_projects",
         "profile": "governed_case",
@@ -92,9 +79,22 @@
         ]
       },
       {
+        "entity_key": "bi_datawarehouse.plant_performance_snapshots",
+        "entity": "plant_performance_snapshots",
+        "profile": "transactional_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "analytics.plant-performance-snapshots"
+        ]
+      },
+      {
         "entity_key": "calibration_equipment.calibration_grr_studies",
         "entity": "calibration_grr_studies",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 7,
@@ -107,7 +107,7 @@
       {
         "entity_key": "calibration_equipment.equipment",
         "entity": "equipment",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 26,
@@ -133,7 +133,7 @@
       {
         "entity_key": "calibration_equipment.tools",
         "entity": "tools",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 19,
@@ -151,7 +151,7 @@
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 0,
-        "workflow_state": null,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
           "commercial_customer.customer-purchase-orders"
@@ -160,7 +160,7 @@
       {
         "entity_key": "crm.crm_customer_touchpoints",
         "entity": "crm_customer_touchpoints",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 6,
@@ -176,7 +176,7 @@
         "profile": "governed_case",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 9,
+        "relation_count": 10,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -198,9 +198,22 @@
         ]
       },
       {
+        "entity_key": "ehs_sustainability.safety_observations",
+        "entity": "safety_observations",
+        "profile": "governed_case",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 8,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "maintenance_ehs.safety-observations"
+        ]
+      },
+      {
         "entity_key": "finance.ap_ar_invoices",
         "entity": "ap_ar_invoices",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 4,
@@ -216,7 +229,7 @@
       {
         "entity_key": "finance.ap_invoices",
         "entity": "ap_invoices",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 9,
@@ -224,6 +237,19 @@
         "readiness": "ready",
         "canonical_resources": [
           "finance.ap-invoices"
+        ]
+      },
+      {
+        "entity_key": "finance.backdate_exceptions",
+        "entity": "backdate_exceptions",
+        "profile": "governed_case",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "finance.backdate-exceptions"
         ]
       },
       {
@@ -253,9 +279,36 @@
         ]
       },
       {
+        "entity_key": "finance.inventory_valuations",
+        "entity": "inventory_valuations",
+        "profile": "transactional_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "finance.inventory-valuations"
+        ]
+      },
+      {
+        "entity_key": "finance.period_close_controls",
+        "entity": "period_close_controls",
+        "profile": "governed_case",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "finance.period-closes",
+          "finance.backdate-exceptions"
+        ]
+      },
+      {
         "entity_key": "finance_treasury.fin_fixed_assets",
         "entity": "fin_fixed_assets",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 6,
@@ -267,9 +320,22 @@
         ]
       },
       {
+        "entity_key": "governance.override_controls",
+        "entity": "operational_override_controls",
+        "profile": "governed_case",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.override-controls"
+        ]
+      },
+      {
         "entity_key": "hcm_workforce.hcm_employees",
         "entity": "hcm_employees",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 13,
@@ -282,7 +348,7 @@
       {
         "entity_key": "inventory.inventory_balance_snapshot",
         "entity": "inventory_balance_snapshot",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 4,
@@ -295,7 +361,7 @@
       {
         "entity_key": "inventory.inventory_transactions",
         "entity": "inventory_transactions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 9,
@@ -308,7 +374,7 @@
       {
         "entity_key": "inventory.stock_balances",
         "entity": "stock_balances",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 8,
@@ -321,7 +387,7 @@
       {
         "entity_key": "inventory.warehouses",
         "entity": "warehouses",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 21,
@@ -347,7 +413,7 @@
       {
         "entity_key": "master_data.items",
         "entity": "items",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 95,
@@ -355,19 +421,6 @@
         "readiness": "ready",
         "canonical_resources": [
           "inventory_logistics.inventory-items"
-        ]
-      },
-      {
-        "entity_key": "mes_execution.dispatch_queue",
-        "entity": "dispatch_queue",
-        "profile": "operator_console",
-        "zone": "core_value_stream",
-        "archive_candidate": false,
-        "relation_count": 2,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": [
-          "planning_production.dispatch-lists"
         ]
       },
       {
@@ -478,7 +531,7 @@
       {
         "entity_key": "production.job_orders",
         "entity": "job_orders",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 16,
@@ -491,7 +544,7 @@
       {
         "entity_key": "production.production_order_bom_snapshot",
         "entity": "production_order_bom_snapshot",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 2,
@@ -504,7 +557,7 @@
       {
         "entity_key": "production.production_order_route_snapshot",
         "entity": "production_order_route_snapshot",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 2,
@@ -543,7 +596,7 @@
       {
         "entity_key": "purchasing.purchase_orders",
         "entity": "purchase_orders",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 11,
@@ -556,7 +609,7 @@
       {
         "entity_key": "purchasing.purchase_receipt_corrections",
         "entity": "purchase_receipt_corrections",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 10,
@@ -569,7 +622,7 @@
       {
         "entity_key": "purchasing.purchase_receipts",
         "entity": "purchase_receipts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 13,
@@ -582,7 +635,7 @@
       {
         "entity_key": "purchasing.purchase_requisitions",
         "entity": "purchase_requisitions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 10,
@@ -595,7 +648,7 @@
       {
         "entity_key": "purchasing.supplier_asns",
         "entity": "supplier_asns",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 8,
@@ -608,7 +661,7 @@
       {
         "entity_key": "purchasing.vendors",
         "entity": "vendors",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 49,
@@ -647,7 +700,7 @@
       {
         "entity_key": "quality_lab.qual_effectiveness_reviews",
         "entity": "qual_effectiveness_reviews",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 6,
@@ -655,19 +708,6 @@
         "readiness": "ready",
         "canonical_resources": [
           "commercial_customer.quote-effectiveness-reviews"
-        ]
-      },
-      {
-        "entity_key": "quality_management.capa",
-        "entity": "capa",
-        "profile": "governed_case",
-        "zone": "core_value_stream",
-        "archive_candidate": false,
-        "relation_count": 1,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": [
-          "quality_improvement.corrective-actions"
         ]
       },
       {
@@ -763,19 +803,6 @@
         ]
       },
       {
-        "entity_key": "quality_management.nonconformance",
-        "entity": "nonconformance",
-        "profile": "governed_case",
-        "zone": "core_value_stream",
-        "archive_candidate": false,
-        "relation_count": 1,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": [
-          "quality_improvement.nonconformances"
-        ]
-      },
-      {
         "entity_key": "quality_management.oqc_inspections",
         "entity": "oqc_inspections",
         "profile": "governed_case",
@@ -790,9 +817,22 @@
         ]
       },
       {
+        "entity_key": "quality_management.spc_data",
+        "entity": "spc_data",
+        "profile": "transactional_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.spc-observations"
+        ]
+      },
+      {
         "entity_key": "sales.customers",
         "entity": "customers",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 47,
@@ -805,7 +845,7 @@
       {
         "entity_key": "sales.quotes",
         "entity": "quotes",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 12,
@@ -818,7 +858,7 @@
       {
         "entity_key": "sales.sales_orders",
         "entity": "sales_orders",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 19,
@@ -845,7 +885,7 @@
       {
         "entity_key": "service_warranty.svc_customer_assets",
         "entity": "svc_customer_assets",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 5,
@@ -858,10 +898,10 @@
       {
         "entity_key": "shipping_compliance.shipments",
         "entity": "shipments",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 9,
+        "relation_count": 10,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -871,10 +911,10 @@
       {
         "entity_key": "training_hr.employees",
         "entity": "employees",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 19,
+        "relation_count": 22,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -882,12 +922,25 @@
         ]
       },
       {
-        "entity_key": "transportation.tms_shipments",
-        "entity": "tms_shipments",
-        "profile": "governed_case",
+        "entity_key": "transportation.freight_orders",
+        "entity": "freight_orders",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 16,
+        "relation_count": 8,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "inventory_logistics.freight-orders"
+        ]
+      },
+      {
+        "entity_key": "transportation.tms_shipments",
+        "entity": "tms_shipments",
+        "profile": "transactional_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 17,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -897,7 +950,7 @@
       {
         "entity_key": "warehouse_management.wms_cycle_count_plans",
         "entity": "wms_cycle_count_plans",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 8,
@@ -910,7 +963,7 @@
       {
         "entity_key": "warehouse_management.wms_transfer_orders",
         "entity": "wms_transfer_orders",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 9,
@@ -1101,7 +1154,7 @@
       {
         "entity_key": "ai_predictive.prediction_models",
         "entity": "prediction_models",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1112,7 +1165,7 @@
       {
         "entity_key": "ai_predictive.quality_predictions",
         "entity": "quality_predictions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -1123,7 +1176,7 @@
       {
         "entity_key": "ai_predictive.spc_anomaly_rules",
         "entity": "spc_anomaly_rules",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -1138,7 +1191,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -1156,7 +1209,7 @@
       {
         "entity_key": "audit_risk.audit_findings",
         "entity": "audit_findings",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1167,7 +1220,7 @@
       {
         "entity_key": "audit_risk.audit_trail",
         "entity": "audit_trail",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -1178,7 +1231,7 @@
       {
         "entity_key": "audit_risk.audits",
         "entity": "audits",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -1193,14 +1246,14 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "audit_risk.management_reviews",
         "entity": "management_reviews",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1215,14 +1268,14 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "bi_datawarehouse.dw_customer_dim",
         "entity": "dw_customer_dim",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -1233,7 +1286,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_employee_dim",
         "entity": "dw_employee_dim",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -1244,7 +1297,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_etl_runs",
         "entity": "dw_etl_runs",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
@@ -1255,7 +1308,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_fact_delivery",
         "entity": "dw_fact_delivery",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -1266,7 +1319,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_fact_financial",
         "entity": "dw_fact_financial",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -1277,7 +1330,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_fact_production",
         "entity": "dw_fact_production",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -1288,7 +1341,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_fact_quality",
         "entity": "dw_fact_quality",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -1299,21 +1352,10 @@
       {
         "entity_key": "bi_datawarehouse.dw_item_dim",
         "entity": "dw_item_dim",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "bi_datawarehouse.dw_kpi_scorecards",
-        "entity": "dw_kpi_scorecards",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 0,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -1332,7 +1374,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_supplier_dim",
         "entity": "dw_supplier_dim",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -1343,7 +1385,7 @@
       {
         "entity_key": "bi_datawarehouse.dw_time_dim",
         "entity": "dw_time_dim",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -1354,7 +1396,7 @@
       {
         "entity_key": "bi_datawarehouse.kpi_definitions",
         "entity": "kpi_definitions",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -1376,7 +1418,7 @@
       {
         "entity_key": "calibration_equipment.calibration_oot_investigations",
         "entity": "calibration_oot_investigations",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -1387,7 +1429,7 @@
       {
         "entity_key": "calibration_equipment.calibration_records",
         "entity": "calibration_records",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -1398,7 +1440,7 @@
       {
         "entity_key": "calibration_equipment.tool_transactions",
         "entity": "tool_transactions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1409,7 +1451,7 @@
       {
         "entity_key": "cnc_programs.cnc_program_approvals",
         "entity": "cnc_program_approvals",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1420,7 +1462,7 @@
       {
         "entity_key": "cnc_programs.cnc_program_versions",
         "entity": "cnc_program_versions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -1431,7 +1473,7 @@
       {
         "entity_key": "cnc_programs.cnc_programs",
         "entity": "cnc_programs",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -1453,7 +1495,7 @@
       {
         "entity_key": "cnc_programs.setup_sheets",
         "entity": "setup_sheets",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
@@ -1464,7 +1506,7 @@
       {
         "entity_key": "commercial_contracts.com_contract_amendments",
         "entity": "com_contract_amendments",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1486,7 +1528,7 @@
       {
         "entity_key": "commercial_contracts.com_contracts",
         "entity": "com_contracts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -1497,7 +1539,7 @@
       {
         "entity_key": "commercial_contracts.com_credit_profiles",
         "entity": "com_credit_profiles",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1508,7 +1550,7 @@
       {
         "entity_key": "commercial_contracts.com_customer_scorecards",
         "entity": "com_customer_scorecards",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1519,7 +1561,7 @@
       {
         "entity_key": "commercial_contracts.com_incoterms_profiles",
         "entity": "com_incoterms_profiles",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -1530,7 +1572,7 @@
       {
         "entity_key": "commercial_contracts.com_order_promises",
         "entity": "com_order_promises",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1541,7 +1583,7 @@
       {
         "entity_key": "commercial_contracts.com_payment_terms_profiles",
         "entity": "com_payment_terms_profiles",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -1563,7 +1605,7 @@
       {
         "entity_key": "commercial_contracts.com_price_lists",
         "entity": "com_price_lists",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1574,7 +1616,7 @@
       {
         "entity_key": "commercial_contracts.com_rebate_accruals",
         "entity": "com_rebate_accruals",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1585,7 +1627,7 @@
       {
         "entity_key": "commercial_contracts.com_rebate_programs",
         "entity": "com_rebate_programs",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1596,7 +1638,7 @@
       {
         "entity_key": "commercial_contracts.commercial_accounts",
         "entity": "commercial_accounts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1607,7 +1649,7 @@
       {
         "entity_key": "commercial_contracts.machine_rate_cards",
         "entity": "machine_rate_cards",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -1629,7 +1671,7 @@
       {
         "entity_key": "core_system.departments",
         "entity": "departments",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 14,
@@ -1640,7 +1682,7 @@
       {
         "entity_key": "core_system.roles",
         "entity": "roles",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -1651,7 +1693,7 @@
       {
         "entity_key": "core_system.sessions",
         "entity": "sessions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1662,7 +1704,7 @@
       {
         "entity_key": "core_system.user_roles",
         "entity": "user_roles",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -1673,7 +1715,7 @@
       {
         "entity_key": "core_system.users",
         "entity": "users",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 204,
@@ -1684,7 +1726,7 @@
       {
         "entity_key": "crm.crm_accounts",
         "entity": "crm_accounts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 11,
@@ -1695,7 +1737,7 @@
       {
         "entity_key": "crm.crm_activities",
         "entity": "crm_activities",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -1706,7 +1748,7 @@
       {
         "entity_key": "crm.crm_campaigns",
         "entity": "crm_campaigns",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1717,7 +1759,7 @@
       {
         "entity_key": "crm.crm_contacts",
         "entity": "crm_contacts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1728,7 +1770,7 @@
       {
         "entity_key": "crm.crm_forecasts",
         "entity": "crm_forecasts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1739,7 +1781,7 @@
       {
         "entity_key": "crm.crm_leads",
         "entity": "crm_leads",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1750,7 +1792,7 @@
       {
         "entity_key": "crm.crm_opportunities",
         "entity": "crm_opportunities",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
@@ -1772,7 +1814,7 @@
       {
         "entity_key": "crm.crm_quotes_pipeline",
         "entity": "crm_quotes_pipeline",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1783,7 +1825,7 @@
       {
         "entity_key": "customer_portal.portal_access_tokens",
         "entity": "portal_access_tokens",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1805,7 +1847,7 @@
       {
         "entity_key": "customer_portal.portal_document_access",
         "entity": "portal_document_access",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -1816,7 +1858,7 @@
       {
         "entity_key": "customer_portal.portal_order_views",
         "entity": "portal_order_views",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -1827,7 +1869,7 @@
       {
         "entity_key": "customer_portal.portal_sessions",
         "entity": "portal_sessions",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -1838,7 +1880,7 @@
       {
         "entity_key": "customer_portal.portal_users",
         "entity": "portal_users",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
@@ -1864,7 +1906,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -1897,7 +1939,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -1919,7 +1961,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -1941,7 +1983,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -2058,7 +2100,7 @@
       {
         "entity_key": "digital_product_passport.passport_events",
         "entity": "passport_events",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -2069,7 +2111,7 @@
       {
         "entity_key": "digital_product_passport.product_passports",
         "entity": "product_passports",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -2080,18 +2122,18 @@
       {
         "entity_key": "document_control.document",
         "entity": "document",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "document_control.document_distribution",
         "entity": "document_distribution",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2102,7 +2144,7 @@
       {
         "entity_key": "document_control.document_embeddings",
         "entity": "document_embeddings",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2113,18 +2155,18 @@
       {
         "entity_key": "document_control.document_revision",
         "entity": "document_revision",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "document_control.document_versions",
         "entity": "document_versions",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -2135,7 +2177,7 @@
       {
         "entity_key": "document_control.documents",
         "entity": "documents",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 15,
@@ -2146,7 +2188,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_contractors",
         "entity": "ehs_contractors",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2168,7 +2210,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_emergency_drills",
         "entity": "ehs_emergency_drills",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2179,7 +2221,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_emissions_monitoring",
         "entity": "ehs_emissions_monitoring",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2190,7 +2232,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_energy_targets",
         "entity": "ehs_energy_targets",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2201,7 +2243,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_exposure_assessments",
         "entity": "ehs_exposure_assessments",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2212,7 +2254,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_hazardous_materials",
         "entity": "ehs_hazardous_materials",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2223,7 +2265,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_material_safety_data",
         "entity": "ehs_material_safety_data",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2234,7 +2276,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_ppe_issue_logs",
         "entity": "ehs_ppe_issue_logs",
-        "profile": "business_record",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -2245,7 +2287,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_regulatory_submissions",
         "entity": "ehs_regulatory_submissions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2256,7 +2298,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_sustainability_projects",
         "entity": "ehs_sustainability_projects",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2267,7 +2309,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_training_matrix",
         "entity": "ehs_training_matrix",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2278,7 +2320,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_waste_shipments",
         "entity": "ehs_waste_shipments",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2289,7 +2331,7 @@
       {
         "entity_key": "ehs_sustainability.ehs_waste_streams",
         "entity": "ehs_waste_streams",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2298,9 +2340,20 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "ehs_sustainability.safety_observation_actions",
+        "entity": "safety_observation_actions",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "evidence_vault.evidence_chain_custody",
         "entity": "evidence_chain_custody",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2311,7 +2364,7 @@
       {
         "entity_key": "evidence_vault.evidence_fts",
         "entity": "evidence_fts",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2333,7 +2386,7 @@
       {
         "entity_key": "evidence_vault.evidence_vault",
         "entity": "evidence_vault",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -2353,20 +2406,9 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "finance.backdate_exceptions",
-        "entity": "backdate_exceptions",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": null,
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "finance.cost_elements",
         "entity": "cost_elements",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2375,20 +2417,9 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "finance.cost_ledger",
-        "entity": "cost_ledger",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "finance.gl_transactions",
         "entity": "gl_transactions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2399,7 +2430,7 @@
       {
         "entity_key": "finance.job_costing",
         "entity": "job_costing",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2408,20 +2439,9 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "finance.period_close_controls",
-        "entity": "period_close_controls",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": null,
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "finance.wip_ledger",
         "entity": "wip_ledger",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -2432,7 +2452,7 @@
       {
         "entity_key": "finance_extended.fin_country_tax_profiles",
         "entity": "fin_country_tax_profiles",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2443,7 +2463,7 @@
       {
         "entity_key": "finance_extended.fin_currencies",
         "entity": "fin_currencies",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 14,
@@ -2454,7 +2474,7 @@
       {
         "entity_key": "finance_extended.fin_customs_declarations",
         "entity": "fin_customs_declarations",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2465,7 +2485,7 @@
       {
         "entity_key": "finance_extended.fin_customs_tariff_codes",
         "entity": "fin_customs_tariff_codes",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2476,7 +2496,7 @@
       {
         "entity_key": "finance_extended.fin_exchange_rate_types",
         "entity": "fin_exchange_rate_types",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2487,7 +2507,7 @@
       {
         "entity_key": "finance_extended.fin_exchange_rates",
         "entity": "fin_exchange_rates",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2498,7 +2518,7 @@
       {
         "entity_key": "finance_extended.fin_lc_draw_requests",
         "entity": "fin_lc_draw_requests",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2509,7 +2529,7 @@
       {
         "entity_key": "finance_extended.fin_letters_of_credit",
         "entity": "fin_letters_of_credit",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -2520,7 +2540,7 @@
       {
         "entity_key": "finance_extended.fin_multi_book_ledgers",
         "entity": "fin_multi_book_ledgers",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -2531,7 +2551,7 @@
       {
         "entity_key": "finance_extended.fin_realized_fx_gains",
         "entity": "fin_realized_fx_gains",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2542,7 +2562,7 @@
       {
         "entity_key": "finance_extended.fin_withholding_tax_codes",
         "entity": "fin_withholding_tax_codes",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2553,7 +2573,7 @@
       {
         "entity_key": "finance_treasury.fin_asset_depreciation",
         "entity": "fin_asset_depreciation",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2564,7 +2584,7 @@
       {
         "entity_key": "finance_treasury.fin_bank_reconciliations",
         "entity": "fin_bank_reconciliations",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2597,7 +2617,7 @@
       {
         "entity_key": "finance_treasury.fin_cash_accounts",
         "entity": "fin_cash_accounts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2608,7 +2628,7 @@
       {
         "entity_key": "finance_treasury.fin_cash_transactions",
         "entity": "fin_cash_transactions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2630,7 +2650,7 @@
       {
         "entity_key": "finance_treasury.fin_intercompany_pairs",
         "entity": "fin_intercompany_pairs",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2641,7 +2661,7 @@
       {
         "entity_key": "finance_treasury.fin_revenue_schedules",
         "entity": "fin_revenue_schedules",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -2652,7 +2672,7 @@
       {
         "entity_key": "finance_treasury.fin_standard_cost_rollups",
         "entity": "fin_standard_cost_rollups",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2663,7 +2683,7 @@
       {
         "entity_key": "finance_treasury.fin_tax_jurisdictions",
         "entity": "fin_tax_jurisdictions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2674,7 +2694,7 @@
       {
         "entity_key": "fmea_apqp.apqp_gate_reviews",
         "entity": "apqp_gate_reviews",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2685,7 +2705,7 @@
       {
         "entity_key": "fmea_apqp.apqp_projects",
         "entity": "apqp_projects",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 11,
@@ -2696,7 +2716,7 @@
       {
         "entity_key": "fmea_apqp.control_plan_characteristics",
         "entity": "control_plan_characteristics",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2707,7 +2727,7 @@
       {
         "entity_key": "fmea_apqp.control_plans",
         "entity": "control_plans",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 11,
@@ -2718,7 +2738,7 @@
       {
         "entity_key": "fmea_apqp.fmea_actions",
         "entity": "fmea_actions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2729,7 +2749,7 @@
       {
         "entity_key": "fmea_apqp.fmea_failure_modes",
         "entity": "fmea_failure_modes",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -2740,7 +2760,7 @@
       {
         "entity_key": "fmea_apqp.fmea_records",
         "entity": "fmea_records",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 12,
@@ -2762,7 +2782,7 @@
       {
         "entity_key": "fmea_apqp.ppap_submissions",
         "entity": "ppap_submissions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2773,7 +2793,7 @@
       {
         "entity_key": "forms_system.form_attachments",
         "entity": "form_attachments",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -2784,7 +2804,7 @@
       {
         "entity_key": "forms_system.form_drafts",
         "entity": "form_drafts",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -2795,18 +2815,18 @@
       {
         "entity_key": "forms_system.form_entries",
         "entity": "form_entries",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "forms_system.form_schemas",
         "entity": "form_schemas",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -2842,7 +2862,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 24,
+        "relation_count": 25,
         "workflow_state": null,
         "readiness": "ready",
         "canonical_resources": []
@@ -2850,18 +2870,18 @@
       {
         "entity_key": "foundation_governance.approval",
         "entity": "approval",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.attachment",
         "entity": "attachment",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -2872,18 +2892,18 @@
       {
         "entity_key": "foundation_governance.calendar",
         "entity": "calendar",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.electronic_signature",
         "entity": "electronic_signature",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -2894,10 +2914,10 @@
       {
         "entity_key": "foundation_governance.org_companies",
         "entity": "org_companies",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 417,
+        "relation_count": 419,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2905,32 +2925,32 @@
       {
         "entity_key": "foundation_governance.org_company",
         "entity": "org_company",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.org_enterprise",
         "entity": "org_enterprise",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.org_legal_entities",
         "entity": "org_legal_entities",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 418,
+        "relation_count": 420,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2938,21 +2958,21 @@
       {
         "entity_key": "foundation_governance.org_plant",
         "entity": "org_plant",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 5,
-        "workflow_state": "not_applicable",
+        "relation_count": 7,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.org_plants",
         "entity": "org_plants",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 418,
+        "relation_count": 420,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2960,132 +2980,121 @@
       {
         "entity_key": "foundation_governance.org_site",
         "entity": "org_site",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
-        "workflow_state": "not_applicable",
+        "relation_count": 5,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.org_warehouse",
         "entity": "org_warehouse",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.org_work_center",
         "entity": "org_work_center",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.org_work_unit",
         "entity": "org_work_unit",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.party",
         "entity": "party",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 24,
-        "workflow_state": "not_applicable",
+        "relation_count": 25,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.party_contact",
         "entity": "party_contact",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.party_role",
         "entity": "party_role",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.party_site",
         "entity": "party_site",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "foundation_governance.reason_code",
-        "entity": "reason_code",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.shift",
         "entity": "shift",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.status_code",
         "entity": "status_code",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "foundation_governance.uom",
         "entity": "uom",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3112,20 +3121,9 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "governance.override_controls",
-        "entity": "operational_override_controls",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": null,
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "hcm_workforce.hcm_attendance_records",
         "entity": "hcm_attendance_records",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3136,7 +3134,7 @@
       {
         "entity_key": "hcm_workforce.hcm_certifications",
         "entity": "hcm_certifications",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3147,7 +3145,7 @@
       {
         "entity_key": "hcm_workforce.hcm_disciplinary_actions",
         "entity": "hcm_disciplinary_actions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -3158,7 +3156,7 @@
       {
         "entity_key": "hcm_workforce.hcm_employee_certifications",
         "entity": "hcm_employee_certifications",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -3169,7 +3167,7 @@
       {
         "entity_key": "hcm_workforce.hcm_employee_skills",
         "entity": "hcm_employee_skills",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -3180,7 +3178,7 @@
       {
         "entity_key": "hcm_workforce.hcm_leave_balances",
         "entity": "hcm_leave_balances",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3191,7 +3189,7 @@
       {
         "entity_key": "hcm_workforce.hcm_org_units",
         "entity": "hcm_org_units",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -3213,7 +3211,7 @@
       {
         "entity_key": "hcm_workforce.hcm_payroll_periods",
         "entity": "hcm_payroll_periods",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3224,7 +3222,7 @@
       {
         "entity_key": "hcm_workforce.hcm_payroll_runs",
         "entity": "hcm_payroll_runs",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -3235,7 +3233,7 @@
       {
         "entity_key": "hcm_workforce.hcm_positions",
         "entity": "hcm_positions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -3257,7 +3255,7 @@
       {
         "entity_key": "hcm_workforce.hcm_skills_catalog",
         "entity": "hcm_skills_catalog",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3268,18 +3266,18 @@
       {
         "entity_key": "inventory.container",
         "entity": "container",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "inventory.inventory_ledger",
         "entity": "inventory_ledger",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3290,7 +3288,7 @@
       {
         "entity_key": "inventory.inventory_locations",
         "entity": "inventory_locations",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -3301,7 +3299,7 @@
       {
         "entity_key": "inventory.location_balance",
         "entity": "location_balance",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3312,7 +3310,7 @@
       {
         "entity_key": "inventory.lot_master",
         "entity": "lot_master",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 23,
@@ -3323,7 +3321,7 @@
       {
         "entity_key": "inventory.serial_master",
         "entity": "serial_master",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 15,
@@ -3334,7 +3332,7 @@
       {
         "entity_key": "lean_manufacturing.lean_andon_events",
         "entity": "lean_andon_events",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -3345,7 +3343,7 @@
       {
         "entity_key": "lean_manufacturing.lean_gemba_walks",
         "entity": "lean_gemba_walks",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3356,7 +3354,7 @@
       {
         "entity_key": "lean_manufacturing.lean_kaizen_events",
         "entity": "lean_kaizen_events",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -3367,7 +3365,7 @@
       {
         "entity_key": "lean_manufacturing.lean_qrqc_events",
         "entity": "lean_qrqc_events",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -3378,7 +3376,7 @@
       {
         "entity_key": "lean_manufacturing.lean_smed_events",
         "entity": "lean_smed_events",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3389,7 +3387,7 @@
       {
         "entity_key": "lean_manufacturing.lean_tier_escalations",
         "entity": "lean_tier_escalations",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -3400,7 +3398,7 @@
       {
         "entity_key": "lean_manufacturing.lean_tier_meetings",
         "entity": "lean_tier_meetings",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3411,7 +3409,7 @@
       {
         "entity_key": "master_data.bill_of_materials",
         "entity": "bill_of_materials",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3422,7 +3420,7 @@
       {
         "entity_key": "master_data.bom_components",
         "entity": "bom_components",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3433,18 +3431,18 @@
       {
         "entity_key": "master_data.item",
         "entity": "item",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 7,
-        "workflow_state": "not_applicable",
+        "relation_count": 8,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "master_data.item_attr",
         "entity": "item_attr",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -3455,7 +3453,7 @@
       {
         "entity_key": "master_data.item_class",
         "entity": "item_class",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -3466,18 +3464,18 @@
       {
         "entity_key": "master_data.item_revision",
         "entity": "item_revision",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 22,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "master_data.item_revisions",
         "entity": "item_revisions",
-        "profile": "document_record",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -3488,29 +3486,29 @@
       {
         "entity_key": "master_data.item_site",
         "entity": "item_site",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "master_data.item_spec",
         "entity": "item_spec",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "master_data.item_variant",
         "entity": "item_variant",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -3521,11 +3519,11 @@
       {
         "entity_key": "master_data.lot_policy",
         "entity": "lot_policy",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3543,7 +3541,7 @@
       {
         "entity_key": "master_data.routings",
         "entity": "routings",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -3554,29 +3552,29 @@
       {
         "entity_key": "master_data.serial_policy",
         "entity": "serial_policy",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "master_data.shelf_life_policy",
         "entity": "shelf_life_policy",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "master_data.work_centers",
         "entity": "work_centers",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 21,
@@ -3587,7 +3585,7 @@
       {
         "entity_key": "master_data_governance.data_archival_runs",
         "entity": "data_archival_runs",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -3598,7 +3596,7 @@
       {
         "entity_key": "master_data_governance.master_data_store",
         "entity": "master_data_store",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
@@ -3609,7 +3607,7 @@
       {
         "entity_key": "master_data_governance.mdm_approval_policies",
         "entity": "mdm_approval_policies",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3620,7 +3618,7 @@
       {
         "entity_key": "master_data_governance.mdm_attribute_sets",
         "entity": "mdm_attribute_sets",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3631,7 +3629,7 @@
       {
         "entity_key": "master_data_governance.mdm_attribute_values",
         "entity": "mdm_attribute_values",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3642,7 +3640,7 @@
       {
         "entity_key": "master_data_governance.mdm_data_stewards",
         "entity": "mdm_data_stewards",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3653,7 +3651,7 @@
       {
         "entity_key": "master_data_governance.mdm_duplicate_candidates",
         "entity": "mdm_duplicate_candidates",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3664,7 +3662,7 @@
       {
         "entity_key": "master_data_governance.mdm_form_series",
         "entity": "mdm_form_series",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
@@ -3675,7 +3673,7 @@
       {
         "entity_key": "master_data_governance.mdm_governance_issues",
         "entity": "mdm_governance_issues",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3686,7 +3684,7 @@
       {
         "entity_key": "master_data_governance.mdm_incoterms",
         "entity": "mdm_incoterms",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
@@ -3697,7 +3695,7 @@
       {
         "entity_key": "master_data_governance.mdm_item_classes",
         "entity": "mdm_item_classes",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3708,7 +3706,7 @@
       {
         "entity_key": "master_data_governance.mdm_number_series",
         "entity": "mdm_number_series",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3719,7 +3717,7 @@
       {
         "entity_key": "master_data_governance.mdm_payment_terms",
         "entity": "mdm_payment_terms",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
@@ -3730,7 +3728,7 @@
       {
         "entity_key": "master_data_governance.mdm_promise_policies",
         "entity": "mdm_promise_policies",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
@@ -3741,7 +3739,7 @@
       {
         "entity_key": "master_data_governance.mdm_reference_code_values",
         "entity": "mdm_reference_code_values",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3752,7 +3750,7 @@
       {
         "entity_key": "master_data_governance.mdm_reference_codes",
         "entity": "mdm_reference_codes",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3763,7 +3761,7 @@
       {
         "entity_key": "master_data_governance.mdm_shipping_methods",
         "entity": "mdm_shipping_methods",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
@@ -3774,7 +3772,7 @@
       {
         "entity_key": "master_data_governance.mdm_site_parameters",
         "entity": "mdm_site_parameters",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3785,7 +3783,7 @@
       {
         "entity_key": "master_data_governance.mdm_uom_conversions",
         "entity": "mdm_uom_conversions",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -3796,7 +3794,7 @@
       {
         "entity_key": "master_data_governance.retention_policies",
         "entity": "retention_policies",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -3807,7 +3805,7 @@
       {
         "entity_key": "master_data_governance.source_system_registry",
         "entity": "source_system_registry",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -3818,7 +3816,7 @@
       {
         "entity_key": "mes_execution.alarm_event",
         "entity": "alarm_event",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -3829,7 +3827,7 @@
       {
         "entity_key": "mes_execution.downtime_event",
         "entity": "downtime_event",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -3844,7 +3842,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 14,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3873,7 +3871,7 @@
       {
         "entity_key": "mes_execution.machine_event",
         "entity": "machine_event",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -3895,7 +3893,7 @@
       {
         "entity_key": "mes_execution.mes_alarm_catalog",
         "entity": "mes_alarm_catalog",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3906,7 +3904,7 @@
       {
         "entity_key": "mes_execution.mes_alarm_playbooks",
         "entity": "mes_alarm_playbooks",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -3917,7 +3915,7 @@
       {
         "entity_key": "mes_execution.mes_areas",
         "entity": "mes_areas",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -3983,7 +3981,7 @@
       {
         "entity_key": "mes_execution.mes_dpp_passports",
         "entity": "mes_dpp_passports",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4016,7 +4014,7 @@
       {
         "entity_key": "mes_execution.mes_erp_inbound_queue",
         "entity": "mes_erp_inbound_queue",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4027,7 +4025,7 @@
       {
         "entity_key": "mes_execution.mes_erp_outbound_queue",
         "entity": "mes_erp_outbound_queue",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4038,7 +4036,7 @@
       {
         "entity_key": "mes_execution.mes_erp_sync_runs",
         "entity": "mes_erp_sync_runs",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4049,7 +4047,7 @@
       {
         "entity_key": "mes_execution.mes_event_subscriptions",
         "entity": "mes_event_subscriptions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4093,7 +4091,7 @@
       {
         "entity_key": "mes_execution.mes_job_execution",
         "entity": "mes_job_execution",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4192,7 +4190,7 @@
       {
         "entity_key": "mes_execution.mes_on_time_delivery",
         "entity": "mes_on_time_delivery",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4214,7 +4212,7 @@
       {
         "entity_key": "mes_execution.mes_operator_qualifications",
         "entity": "mes_operator_qualifications",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4236,7 +4234,7 @@
       {
         "entity_key": "mes_execution.mes_part_genealogy",
         "entity": "mes_part_genealogy",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4258,7 +4256,7 @@
       {
         "entity_key": "mes_execution.mes_production_kpi_daily",
         "entity": "mes_production_kpi_daily",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4291,7 +4289,7 @@
       {
         "entity_key": "mes_execution.mes_shop_floor_layout",
         "entity": "mes_shop_floor_layout",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -4302,10 +4300,10 @@
       {
         "entity_key": "mes_execution.mes_sites",
         "entity": "mes_sites",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 421,
+        "relation_count": 423,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4324,7 +4322,7 @@
       {
         "entity_key": "mes_execution.mes_spc_control_limits",
         "entity": "mes_spc_control_limits",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4346,7 +4344,7 @@
       {
         "entity_key": "mes_execution.mes_tool_assemblies",
         "entity": "mes_tool_assemblies",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -4379,7 +4377,7 @@
       {
         "entity_key": "mes_execution.mes_wip_location",
         "entity": "mes_wip_location",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4390,7 +4388,7 @@
       {
         "entity_key": "mes_execution.mes_wip_movements",
         "entity": "mes_wip_movements",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4427,7 +4425,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -4493,18 +4491,18 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "mfg_engineering.bom",
         "entity": "bom",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -4522,7 +4520,7 @@
       {
         "entity_key": "mfg_engineering.bom_substitute",
         "entity": "bom_substitute",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -4533,18 +4531,18 @@
       {
         "entity_key": "mfg_engineering.bom_version",
         "entity": "bom_version",
-        "profile": "governed_case",
+        "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "mfg_engineering.eng_capacity_models",
         "entity": "eng_capacity_models",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4555,7 +4553,7 @@
       {
         "entity_key": "mfg_engineering.eng_changeover_standards",
         "entity": "eng_changeover_standards",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4566,7 +4564,7 @@
       {
         "entity_key": "mfg_engineering.eng_factory_calendar_days",
         "entity": "eng_factory_calendar_days",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4577,7 +4575,7 @@
       {
         "entity_key": "mfg_engineering.eng_factory_calendars",
         "entity": "eng_factory_calendars",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4588,7 +4586,7 @@
       {
         "entity_key": "mfg_engineering.eng_line_balancing_studies",
         "entity": "eng_line_balancing_studies",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4599,7 +4597,7 @@
       {
         "entity_key": "mfg_engineering.eng_process_families",
         "entity": "eng_process_families",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4610,7 +4608,7 @@
       {
         "entity_key": "mfg_engineering.eng_process_validation",
         "entity": "eng_process_validation",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -4632,7 +4630,7 @@
       {
         "entity_key": "mfg_engineering.eng_resource_groups",
         "entity": "eng_resource_groups",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4654,7 +4652,7 @@
       {
         "entity_key": "mfg_engineering.eng_time_standards",
         "entity": "eng_time_standards",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4687,7 +4685,7 @@
       {
         "entity_key": "mfg_engineering.eng_work_instructions",
         "entity": "eng_work_instructions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -4698,18 +4696,18 @@
       {
         "entity_key": "mfg_engineering.operation",
         "entity": "operation",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "mfg_engineering.operation_material",
         "entity": "operation_material",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -4720,7 +4718,7 @@
       {
         "entity_key": "mfg_engineering.operation_output",
         "entity": "operation_output",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -4731,7 +4729,7 @@
       {
         "entity_key": "mfg_engineering.operation_resource",
         "entity": "operation_resource",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -4742,29 +4740,29 @@
       {
         "entity_key": "mfg_engineering.work_definition",
         "entity": "work_definition",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "mfg_engineering.work_definition_version",
         "entity": "work_definition_version",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "mfg_engineering.work_instruction",
         "entity": "work_instruction",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -4786,7 +4784,7 @@
       {
         "entity_key": "mobile_operations.mobile_time_entries",
         "entity": "mobile_time_entries",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4797,7 +4795,7 @@
       {
         "entity_key": "mobile_operations.mobile_work_queue",
         "entity": "mobile_work_queue",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4819,7 +4817,7 @@
       {
         "entity_key": "outsource_execution.osc_dispatch_batches",
         "entity": "osc_dispatch_batches",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -4841,7 +4839,7 @@
       {
         "entity_key": "outsource_execution.osc_subcontract_plans",
         "entity": "osc_subcontract_plans",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -4852,7 +4850,7 @@
       {
         "entity_key": "outsource_execution.osc_supplier_capacity_reservations",
         "entity": "osc_supplier_capacity_reservations",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4863,7 +4861,7 @@
       {
         "entity_key": "outsource_execution.osc_supplier_chargebacks",
         "entity": "osc_supplier_chargebacks",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4885,7 +4883,7 @@
       {
         "entity_key": "outsource_execution.osc_supplier_portal_documents",
         "entity": "osc_supplier_portal_documents",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4896,7 +4894,7 @@
       {
         "entity_key": "outsource_execution.osc_supplier_receipts",
         "entity": "osc_supplier_receipts",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -4907,7 +4905,7 @@
       {
         "entity_key": "outsource_execution.osc_supplier_recovery_claims",
         "entity": "osc_supplier_recovery_claims",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4918,7 +4916,7 @@
       {
         "entity_key": "outsource_execution.osc_supplier_score_trends",
         "entity": "osc_supplier_score_trends",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -4929,7 +4927,7 @@
       {
         "entity_key": "outsource_execution.osc_supplier_shipment_notices",
         "entity": "osc_supplier_shipment_notices",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -4940,7 +4938,7 @@
       {
         "entity_key": "outsource_execution.outside_processing_orders",
         "entity": "outside_processing_orders",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -4951,7 +4949,7 @@
       {
         "entity_key": "outsource_execution.subcontract_orders",
         "entity": "subcontract_orders",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -4962,7 +4960,7 @@
       {
         "entity_key": "outsource_execution.subcontract_receipts",
         "entity": "subcontract_receipts",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5006,7 +5004,7 @@
       {
         "entity_key": "plant_maintenance.pm_failure_codes",
         "entity": "pm_failure_codes",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5028,7 +5026,7 @@
       {
         "entity_key": "plant_maintenance.pm_functional_locations",
         "entity": "pm_functional_locations",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5039,7 +5037,7 @@
       {
         "entity_key": "plant_maintenance.pm_maintenance_budgets",
         "entity": "pm_maintenance_budgets",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5072,7 +5070,7 @@
       {
         "entity_key": "plant_maintenance.pm_spare_parts_inventory",
         "entity": "pm_spare_parts_inventory",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5109,7 +5107,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -5127,7 +5125,7 @@
       {
         "entity_key": "plm_change_control.plm_change_order_lines",
         "entity": "plm_change_order_lines",
-        "profile": "business_record",
+        "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -5160,7 +5158,7 @@
       {
         "entity_key": "plm_change_control.plm_change_review_board",
         "entity": "plm_change_review_board",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5171,7 +5169,7 @@
       {
         "entity_key": "plm_change_control.plm_design_reviews",
         "entity": "plm_design_reviews",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5182,7 +5180,7 @@
       {
         "entity_key": "plm_change_control.plm_obsolescence_tracking",
         "entity": "plm_obsolescence_tracking",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5193,7 +5191,7 @@
       {
         "entity_key": "plm_change_control.plm_product_configurations",
         "entity": "plm_product_configurations",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5204,7 +5202,7 @@
       {
         "entity_key": "plm_change_control.plm_requirement_traces",
         "entity": "plm_requirement_traces",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -5226,7 +5224,7 @@
       {
         "entity_key": "plm_change_control.plm_test_plans",
         "entity": "plm_test_plans",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -5248,7 +5246,7 @@
       {
         "entity_key": "production.job_release_gates",
         "entity": "job_release_gates",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5270,11 +5268,11 @@
       {
         "entity_key": "production.production_order",
         "entity": "production_order",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -5292,7 +5290,7 @@
       {
         "entity_key": "production.shift_calendar_holidays",
         "entity": "shift_calendar_holidays",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -5303,7 +5301,7 @@
       {
         "entity_key": "production.shift_definitions",
         "entity": "shift_definitions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -5336,7 +5334,7 @@
       {
         "entity_key": "project_management.npi_projects",
         "entity": "npi_projects",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5347,7 +5345,7 @@
       {
         "entity_key": "project_management.prj_billing_milestones",
         "entity": "prj_billing_milestones",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5369,7 +5367,7 @@
       {
         "entity_key": "project_management.prj_cost_collections",
         "entity": "prj_cost_collections",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5391,7 +5389,7 @@
       {
         "entity_key": "project_management.prj_milestones",
         "entity": "prj_milestones",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5402,7 +5400,7 @@
       {
         "entity_key": "project_management.prj_projects",
         "entity": "prj_projects",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 12,
@@ -5435,7 +5433,7 @@
       {
         "entity_key": "project_management.prj_time_entries",
         "entity": "prj_time_entries",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5446,7 +5444,7 @@
       {
         "entity_key": "project_management.prj_wbs_elements",
         "entity": "prj_wbs_elements",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 13,
@@ -5457,7 +5455,7 @@
       {
         "entity_key": "project_management.project_milestones",
         "entity": "project_milestones",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5468,7 +5466,7 @@
       {
         "entity_key": "project_management.project_resources",
         "entity": "project_resources",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5479,7 +5477,7 @@
       {
         "entity_key": "project_management.projects",
         "entity": "projects",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -5490,11 +5488,11 @@
       {
         "entity_key": "purchasing.purchase_order",
         "entity": "purchase_order",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -5505,14 +5503,14 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "purchasing.purchase_order_lines",
         "entity": "purchase_order_lines",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -5567,7 +5565,7 @@
       {
         "entity_key": "purchasing.vendor_ratings",
         "entity": "vendor_ratings",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5578,7 +5576,7 @@
       {
         "entity_key": "quality_lab.qual_certificate_revisions",
         "entity": "qual_certificate_revisions",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -5589,7 +5587,7 @@
       {
         "entity_key": "quality_lab.qual_certificate_templates",
         "entity": "qual_certificate_templates",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -5600,7 +5598,7 @@
       {
         "entity_key": "quality_lab.qual_compliance_evidence",
         "entity": "qual_compliance_evidence",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -5611,7 +5609,7 @@
       {
         "entity_key": "quality_lab.qual_containment_actions",
         "entity": "qual_containment_actions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5622,7 +5620,7 @@
       {
         "entity_key": "quality_lab.qual_customer_requirements",
         "entity": "qual_customer_requirements",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -5633,7 +5631,7 @@
       {
         "entity_key": "quality_lab.qual_escape_events",
         "entity": "qual_escape_events",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -5644,7 +5642,7 @@
       {
         "entity_key": "quality_lab.qual_first_article_packages",
         "entity": "qual_first_article_packages",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5666,7 +5664,7 @@
       {
         "entity_key": "quality_lab.qual_root_cause_sessions",
         "entity": "qual_root_cause_sessions",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5677,7 +5675,7 @@
       {
         "entity_key": "quality_lab.qual_sample_batches",
         "entity": "qual_sample_batches",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5688,7 +5686,7 @@
       {
         "entity_key": "quality_lab.qual_sample_plans",
         "entity": "qual_sample_plans",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5699,7 +5697,7 @@
       {
         "entity_key": "quality_lab.qual_test_labs",
         "entity": "qual_test_labs",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5710,7 +5708,7 @@
       {
         "entity_key": "quality_lab.qual_test_methods",
         "entity": "qual_test_methods",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5743,7 +5741,7 @@
       {
         "entity_key": "quality_management.certificates",
         "entity": "certificates",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5758,14 +5756,14 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "quality_management.contamination_checks",
         "entity": "contamination_checks",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -5776,7 +5774,7 @@
       {
         "entity_key": "quality_management.copq_ledger",
         "entity": "copq_ledger",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5787,7 +5785,7 @@
       {
         "entity_key": "quality_management.fai_characteristics",
         "entity": "fai_characteristics",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -5798,7 +5796,7 @@
       {
         "entity_key": "quality_management.fai_records",
         "entity": "fai_records",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -5809,7 +5807,7 @@
       {
         "entity_key": "quality_management.fai_trigger_log",
         "entity": "fai_trigger_log",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -5820,7 +5818,7 @@
       {
         "entity_key": "quality_management.incoming_inspection_results",
         "entity": "incoming_inspection_results",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -5831,7 +5829,7 @@
       {
         "entity_key": "quality_management.inspection_characteristic",
         "entity": "inspection_characteristic",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -5857,14 +5855,14 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "quality_management.inspection_plans",
         "entity": "inspection_plans",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
@@ -5875,7 +5873,7 @@
       {
         "entity_key": "quality_management.inspection_result",
         "entity": "inspection_result",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -5886,7 +5884,7 @@
       {
         "entity_key": "quality_management.inspection_results",
         "entity": "inspection_results",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -5897,7 +5895,7 @@
       {
         "entity_key": "quality_management.ipqc_inspection_results",
         "entity": "ipqc_inspection_results",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -5908,7 +5906,7 @@
       {
         "entity_key": "quality_management.material_review_board",
         "entity": "material_review_board",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -5941,7 +5939,7 @@
       {
         "entity_key": "quality_management.quality_case_link",
         "entity": "quality_case_link",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -5952,22 +5950,11 @@
       {
         "entity_key": "quality_management.quality_order",
         "entity": "quality_order",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "quality_management.spc_data",
-        "entity": "spc_data",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 5,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -5985,7 +5972,7 @@
       {
         "entity_key": "record_system.allocations",
         "entity": "allocations",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -5994,20 +5981,9 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "record_system.electronic_signatures",
-        "entity": "electronic_signatures",
-        "profile": "governed_case",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "record_system.record_counters",
         "entity": "record_counters",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -6029,7 +6005,7 @@
       {
         "entity_key": "record_system.records",
         "entity": "records",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 37,
@@ -6040,7 +6016,7 @@
       {
         "entity_key": "sales.contract_review_items",
         "entity": "contract_review_items",
-        "profile": "business_record",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -6051,7 +6027,7 @@
       {
         "entity_key": "sales.customer_sites",
         "entity": "customer_sites",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6084,7 +6060,7 @@
       {
         "entity_key": "sales.order_documents_required",
         "entity": "order_documents_required",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6095,7 +6071,7 @@
       {
         "entity_key": "sales.order_holds",
         "entity": "order_holds",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -6106,7 +6082,7 @@
       {
         "entity_key": "sales.order_milestones",
         "entity": "order_milestones",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -6117,7 +6093,7 @@
       {
         "entity_key": "sales.order_notes",
         "entity": "order_notes",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6139,7 +6115,7 @@
       {
         "entity_key": "sales.quote_history",
         "entity": "quote_history",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -6161,11 +6137,11 @@
       {
         "entity_key": "sales.sales_order",
         "entity": "sales_order",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -6176,14 +6152,14 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "sales.sales_order_lines",
         "entity": "sales_order_lines",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -6205,7 +6181,7 @@
       {
         "entity_key": "service_warranty.svc_field_visit_reports",
         "entity": "svc_field_visit_reports",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6216,7 +6192,7 @@
       {
         "entity_key": "service_warranty.svc_installed_base",
         "entity": "svc_installed_base",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
@@ -6238,7 +6214,7 @@
       {
         "entity_key": "service_warranty.svc_service_contracts",
         "entity": "svc_service_contracts",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6249,7 +6225,7 @@
       {
         "entity_key": "service_warranty.svc_service_kpi_snapshots",
         "entity": "svc_service_kpi_snapshots",
-        "profile": "service_workspace",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -6293,7 +6269,7 @@
       {
         "entity_key": "service_warranty.svc_service_work_orders",
         "entity": "svc_service_work_orders",
-        "profile": "governed_case",
+        "profile": "service_workspace",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
@@ -6315,7 +6291,7 @@
       {
         "entity_key": "shipping_compliance.compliance_records",
         "entity": "compliance_records",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6326,7 +6302,7 @@
       {
         "entity_key": "shipping_compliance.export_licenses",
         "entity": "export_licenses",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -6337,7 +6313,7 @@
       {
         "entity_key": "shipping_compliance.packing_list_items",
         "entity": "packing_list_items",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -6348,7 +6324,7 @@
       {
         "entity_key": "shipping_compliance.packing_lists",
         "entity": "packing_lists",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6359,7 +6335,7 @@
       {
         "entity_key": "shipping_compliance.shipment_packages",
         "entity": "shipment_packages",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6370,7 +6346,7 @@
       {
         "entity_key": "shipping_compliance.shipment_releases",
         "entity": "shipment_releases",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6381,7 +6357,7 @@
       {
         "entity_key": "supplier_relationship.approved_supplier_list",
         "entity": "approved_supplier_list",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6403,7 +6379,7 @@
       {
         "entity_key": "supplier_relationship.skip_lot_tracking",
         "entity": "skip_lot_tracking",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6414,7 +6390,7 @@
       {
         "entity_key": "supplier_relationship.srm_bid_comparisons",
         "entity": "srm_bid_comparisons",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -6425,7 +6401,7 @@
       {
         "entity_key": "supplier_relationship.srm_sourcing_bids",
         "entity": "srm_sourcing_bids",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6436,7 +6412,7 @@
       {
         "entity_key": "supplier_relationship.srm_sourcing_events",
         "entity": "srm_sourcing_events",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -6458,7 +6434,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_capabilities",
         "entity": "srm_supplier_capabilities",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6469,7 +6445,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_capacity",
         "entity": "srm_supplier_capacity",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6480,7 +6456,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_contract_lines",
         "entity": "srm_supplier_contract_lines",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -6491,7 +6467,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_contracts",
         "entity": "srm_supplier_contracts",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -6502,7 +6478,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_development_plans",
         "entity": "srm_supplier_development_plans",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6513,7 +6489,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_portal_messages",
         "entity": "srm_supplier_portal_messages",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6524,7 +6500,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_portal_users",
         "entity": "srm_supplier_portal_users",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6535,7 +6511,7 @@
       {
         "entity_key": "supplier_relationship.srm_supplier_ppap_packages",
         "entity": "srm_supplier_ppap_packages",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6557,7 +6533,7 @@
       {
         "entity_key": "supplier_relationship.srm_vendor_managed_inventory",
         "entity": "srm_vendor_managed_inventory",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -6583,14 +6559,14 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "supplier_relationship.supplier_scorecards",
         "entity": "supplier_scorecards",
-        "profile": "governed_case",
+        "profile": "assessment_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6601,7 +6577,7 @@
       {
         "entity_key": "system_infrastructure.comments",
         "entity": "comments",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -6623,7 +6599,7 @@
       {
         "entity_key": "system_infrastructure.escalation_rules",
         "entity": "escalation_rules",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6634,7 +6610,7 @@
       {
         "entity_key": "system_infrastructure.file_attachments",
         "entity": "file_attachments",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6645,7 +6621,7 @@
       {
         "entity_key": "system_infrastructure.integration_monitors",
         "entity": "integration_monitors",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
@@ -6656,7 +6632,7 @@
       {
         "entity_key": "system_infrastructure.naming_patterns",
         "entity": "naming_patterns",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -6667,7 +6643,7 @@
       {
         "entity_key": "system_infrastructure.notifications",
         "entity": "notifications",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6678,7 +6654,7 @@
       {
         "entity_key": "system_infrastructure.tags",
         "entity": "tags",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6689,7 +6665,7 @@
       {
         "entity_key": "system_infrastructure.variable_registry",
         "entity": "variable_registry",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -6700,22 +6676,22 @@
       {
         "entity_key": "system_infrastructure.workflow_definitions",
         "entity": "workflow_definitions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "system_infrastructure.workflow_instances",
         "entity": "workflow_instances",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -6726,7 +6702,7 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -6744,7 +6720,7 @@
       {
         "entity_key": "tooling_lifecycle.fixture_master",
         "entity": "fixture_master",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -6755,7 +6731,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_assemblies",
         "entity": "tooling_assemblies",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -6777,7 +6753,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_components",
         "entity": "tooling_components",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6788,7 +6764,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_crib_transactions",
         "entity": "tooling_crib_transactions",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -6799,7 +6775,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_families",
         "entity": "tooling_families",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6832,7 +6808,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_life_limits",
         "entity": "tooling_life_limits",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6843,7 +6819,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_life_measurements",
         "entity": "tooling_life_measurements",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6854,7 +6830,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_locations",
         "entity": "tooling_locations",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6865,7 +6841,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_presets",
         "entity": "tooling_presets",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6876,7 +6852,7 @@
       {
         "entity_key": "tooling_lifecycle.tooling_regrind_cycles",
         "entity": "tooling_regrind_cycles",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6898,7 +6874,7 @@
       {
         "entity_key": "traceability_serialization.lot",
         "entity": "lot",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -6909,7 +6885,7 @@
       {
         "entity_key": "traceability_serialization.serial",
         "entity": "serial",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -6931,7 +6907,7 @@
       {
         "entity_key": "traceability_serialization.trace_genealogy_batches",
         "entity": "trace_genealogy_batches",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -6953,7 +6929,7 @@
       {
         "entity_key": "traceability_serialization.trace_heat_lot_register",
         "entity": "trace_heat_lot_register",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -6975,7 +6951,7 @@
       {
         "entity_key": "traceability_serialization.trace_job_travelers",
         "entity": "trace_job_travelers",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -6986,7 +6962,7 @@
       {
         "entity_key": "traceability_serialization.trace_label_print_jobs",
         "entity": "trace_label_print_jobs",
-        "profile": "governed_case",
+        "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7019,7 +6995,7 @@
       {
         "entity_key": "traceability_serialization.trace_material_certificates",
         "entity": "trace_material_certificates",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7052,7 +7028,7 @@
       {
         "entity_key": "trade_compliance.trade_broker_profiles",
         "entity": "trade_broker_profiles",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -7063,7 +7039,7 @@
       {
         "entity_key": "trade_compliance.trade_certificate_of_origin",
         "entity": "trade_certificate_of_origin",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -7085,7 +7061,7 @@
       {
         "entity_key": "trade_compliance.trade_duty_drawbacks",
         "entity": "trade_duty_drawbacks",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -7096,7 +7072,7 @@
       {
         "entity_key": "trade_compliance.trade_eccn_master",
         "entity": "trade_eccn_master",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -7107,7 +7083,7 @@
       {
         "entity_key": "trade_compliance.trade_end_use_certificates",
         "entity": "trade_end_use_certificates",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -7118,7 +7094,7 @@
       {
         "entity_key": "trade_compliance.trade_import_bonds",
         "entity": "trade_import_bonds",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -7129,7 +7105,7 @@
       {
         "entity_key": "trade_compliance.trade_license_exceptions",
         "entity": "trade_license_exceptions",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -7140,7 +7116,7 @@
       {
         "entity_key": "trade_compliance.trade_license_usage_logs",
         "entity": "trade_license_usage_logs",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -7151,7 +7127,7 @@
       {
         "entity_key": "trade_compliance.trade_preference_programs",
         "entity": "trade_preference_programs",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
@@ -7162,7 +7138,7 @@
       {
         "entity_key": "trade_compliance.trade_restricted_party_lists",
         "entity": "trade_restricted_party_lists",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -7173,7 +7149,7 @@
       {
         "entity_key": "trade_compliance.trade_screening_hits",
         "entity": "trade_screening_hits",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -7184,7 +7160,7 @@
       {
         "entity_key": "training_hr.competency",
         "entity": "competency",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
@@ -7195,7 +7171,7 @@
       {
         "entity_key": "training_hr.employee_certifications",
         "entity": "employee_certifications",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -7206,7 +7182,7 @@
       {
         "entity_key": "training_hr.skills_matrix",
         "entity": "skills_matrix",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7217,7 +7193,7 @@
       {
         "entity_key": "training_hr.training_matrix",
         "entity": "training_matrix",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 3,
@@ -7228,18 +7204,18 @@
       {
         "entity_key": "training_hr.training_record",
         "entity": "training_record",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
       {
         "entity_key": "training_hr.training_records",
         "entity": "training_records",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -7248,9 +7224,20 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "transportation.freight_order_stops",
+        "entity": "freight_order_stops",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "transportation.tms_carriers",
         "entity": "tms_carriers",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
@@ -7261,7 +7248,7 @@
       {
         "entity_key": "transportation.tms_customs_documents",
         "entity": "tms_customs_documents",
-        "profile": "governed_case",
+        "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7272,7 +7259,7 @@
       {
         "entity_key": "transportation.tms_dangerous_goods",
         "entity": "tms_dangerous_goods",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7294,7 +7281,7 @@
       {
         "entity_key": "transportation.tms_export_screenings",
         "entity": "tms_export_screenings",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7316,7 +7303,7 @@
       {
         "entity_key": "transportation.tms_freight_quotes",
         "entity": "tms_freight_quotes",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7327,7 +7314,7 @@
       {
         "entity_key": "transportation.tms_routes",
         "entity": "tms_routes",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7349,7 +7336,7 @@
       {
         "entity_key": "warehouse_management.wms_bin_contents",
         "entity": "wms_bin_contents",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -7371,7 +7358,7 @@
       {
         "entity_key": "warehouse_management.wms_material_handling_units",
         "entity": "wms_material_handling_units",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -7393,7 +7380,7 @@
       {
         "entity_key": "warehouse_management.wms_pick_lists",
         "entity": "wms_pick_lists",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 9,
@@ -7404,7 +7391,7 @@
       {
         "entity_key": "warehouse_management.wms_putaway_rules",
         "entity": "wms_putaway_rules",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
@@ -7415,7 +7402,7 @@
       {
         "entity_key": "warehouse_management.wms_quarantine_holds",
         "entity": "wms_quarantine_holds",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 10,
@@ -7426,7 +7413,7 @@
       {
         "entity_key": "warehouse_management.wms_storage_bins",
         "entity": "wms_storage_bins",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 14,
@@ -7448,7 +7435,7 @@
       {
         "entity_key": "warehouse_management.wms_wave_plans",
         "entity": "wms_wave_plans",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
@@ -7459,7 +7446,7 @@
       {
         "entity_key": "warehouse_management.wms_zones",
         "entity": "wms_zones",
-        "profile": "governed_case",
+        "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -7469,6 +7456,17 @@
       }
     ],
     "conditional_extension": [
+      {
+        "entity_key": "bi_datawarehouse.dw_kpi_scorecards",
+        "entity": "dw_kpi_scorecards",
+        "profile": "assessment_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
       {
         "entity_key": "commercial_contracts.material_cost_templates",
         "entity": "material_cost_templates",
@@ -7483,7 +7481,40 @@
       {
         "entity_key": "ehs_sustainability.ehs_ppe_requirements",
         "entity": "ehs_ppe_requirements",
+        "profile": "transactional_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "finance.cost_ledger",
+        "entity": "cost_ledger",
+        "profile": "transactional_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "foundation_governance.reason_code",
+        "entity": "reason_code",
         "profile": "business_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.electronic_signatures",
+        "entity": "electronic_signatures",
+        "profile": "document_record",
         "zone": "conditional_extension",
         "archive_candidate": false,
         "relation_count": 0,
@@ -7495,171 +7526,79 @@
     "unused_candidate": [],
     "archive_isolation": [
       {
+        "entity_key": "audit_risk.audit_program",
+        "entity": "audit_program",
+        "profile": "transactional_record",
+        "zone": "archive_isolation",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.audit-programs"
+        ]
+      },
+      {
+        "entity_key": "mes_execution.dispatch_queue",
+        "entity": "dispatch_queue",
+        "profile": "operator_console",
+        "zone": "archive_isolation",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "planning_production.dispatch-lists"
+        ]
+      },
+      {
+        "entity_key": "quality_management.capa",
+        "entity": "capa",
+        "profile": "governed_case",
+        "zone": "archive_isolation",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.corrective-actions"
+        ]
+      },
+      {
         "entity_key": "quality_management.deviation",
         "entity": "deviation",
         "profile": "governed_case",
         "zone": "archive_isolation",
         "archive_candidate": false,
         "relation_count": 0,
-        "workflow_state": "not_applicable",
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
           "quality_improvement.deviations"
+        ]
+      },
+      {
+        "entity_key": "quality_management.nonconformance",
+        "entity": "nonconformance",
+        "profile": "governed_case",
+        "zone": "archive_isolation",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.nonconformances"
         ]
       }
     ]
   },
   "violations": {
     "generic_status_only_core_entities": [],
-    "missing_transition_contracts_for_core_entities": [
-      {
-        "entity_key": "audit_risk.audit_program",
-        "entity": "audit_program",
-        "expected_action": "audit_risk.audit_program.transition",
-        "canonical_resources": [
-          "quality_improvement.audit-programs"
-        ]
-      },
-      {
-        "entity_key": "calibration_equipment.calibration_grr_studies",
-        "entity": "calibration_grr_studies",
-        "expected_action": "calibration_equipment.calibration_grr_studies.transition",
-        "canonical_resources": [
-          "quality_improvement.msa-studies"
-        ]
-      },
-      {
-        "entity_key": "mes_execution.dispatch_queue",
-        "entity": "dispatch_queue",
-        "expected_action": "mes_execution.dispatch_queue.transition",
-        "canonical_resources": [
-          "planning_production.dispatch-lists"
-        ]
-      },
-      {
-        "entity_key": "quality_lab.qual_effectiveness_reviews",
-        "entity": "qual_effectiveness_reviews",
-        "expected_action": "quality_lab.qual_effectiveness_reviews.transition",
-        "canonical_resources": [
-          "commercial_customer.quote-effectiveness-reviews"
-        ]
-      },
-      {
-        "entity_key": "quality_management.capa",
-        "entity": "capa",
-        "expected_action": "quality_management.capa.transition",
-        "canonical_resources": [
-          "quality_improvement.corrective-actions"
-        ]
-      },
-      {
-        "entity_key": "quality_management.nonconformance",
-        "entity": "nonconformance",
-        "expected_action": "quality_management.nonconformance.transition",
-        "canonical_resources": [
-          "quality_improvement.nonconformances"
-        ]
-      }
-    ],
+    "missing_transition_contracts_for_core_entities": [],
     "critical_split_path_risks": [],
     "all_split_path_risks": [],
     "missing_canonical_resources": [],
-    "planned_canonical_resources_not_yet_in_registry": [
-      {
-        "resource_key": "inventory_logistics.freight-orders",
-        "pattern": "lifecycle_owner",
-        "table": "freight_orders",
-        "legacy_tables": [],
-        "status_column": "freight_status",
-        "recommended_actions": [
-          "tender",
-          "book",
-          "close"
-        ],
-        "implemented_in_registry": false
-      },
-      {
-        "resource_key": "quality_improvement.override-controls",
-        "pattern": "lifecycle_owner",
-        "table": "operational_override_controls",
-        "legacy_tables": [
-          "shipment_gate_overrides"
-        ],
-        "status_column": "override_status",
-        "recommended_actions": [
-          "approve",
-          "expire",
-          "revoke",
-          "close_follow_up"
-        ],
-        "implemented_in_registry": false
-      },
-      {
-        "resource_key": "maintenance_ehs.safety-observations",
-        "pattern": "lifecycle_owner",
-        "table": "safety_observations",
-        "legacy_tables": [],
-        "status_column": "observation_status",
-        "recommended_actions": [
-          "log",
-          "assign",
-          "close"
-        ],
-        "implemented_in_registry": false
-      },
-      {
-        "resource_key": "finance.period-closes",
-        "pattern": "lifecycle_owner",
-        "table": "period_close_controls",
-        "legacy_tables": [
-          "gl_period_close"
-        ],
-        "status_column": "close_status",
-        "recommended_actions": [
-          "prepare",
-          "close",
-          "reopen"
-        ],
-        "implemented_in_registry": false
-      },
-      {
-        "resource_key": "finance.backdate-exceptions",
-        "pattern": "lifecycle_owner",
-        "table": "backdate_exceptions",
-        "legacy_tables": [
-          "period_close_controls"
-        ],
-        "status_column": "exception_status",
-        "recommended_actions": [
-          "submit",
-          "approve",
-          "expire",
-          "close"
-        ],
-        "implemented_in_registry": false
-      },
-      {
-        "resource_key": "finance.inventory-valuations",
-        "pattern": "projection",
-        "table": "inventory_valuations",
-        "legacy_tables": [],
-        "status_column": null,
-        "recommended_actions": [],
-        "implemented_in_registry": false
-      },
-      {
-        "resource_key": "analytics.plant-performance-snapshots",
-        "pattern": "projection",
-        "table": "plant_performance_snapshots",
-        "legacy_tables": [
-          "factory_kpis",
-          "plant_performance"
-        ],
-        "status_column": null,
-        "recommended_actions": [],
-        "implemented_in_registry": false
-      }
-    ]
+    "planned_canonical_resources_not_yet_in_registry": []
   },
   "recommendations": [
     "Block new lifecycle owners unless they declare purpose, KPI family, gate type, audit class, CI loop, and usage zone.",

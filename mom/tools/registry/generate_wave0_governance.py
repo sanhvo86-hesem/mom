@@ -42,6 +42,7 @@ RELATION_PATH = REGISTRY_DIR / "relation-map.json"
 MANIFEST_PATH = REGISTRY_DIR / "registry-manifest.json"
 REPORT_PATH = REGISTRY_DIR / "wave0-governance-report.json"
 TABLE_REGISTRY_PATH = REGISTRY_DIR / "table-registry.json"
+WAVE2_NORMALIZATION_PATH = REGISTRY_DIR / "wave2-canonical-normalization.json"
 OPENAPI_PATH = PORTAL_ROOT / "api" / "openapi.yaml"
 
 CRITICAL_PATH_FILES = [
@@ -74,6 +75,12 @@ def utc_now() -> str:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_optional_json(path: Path) -> dict:
+    if not path.is_file():
+        return {}
+    return load_json(path)
 
 
 def dump_json(path: Path, data: dict) -> None:
@@ -159,6 +166,7 @@ def canonical_resource_index(canonical_catalog: dict) -> tuple[set[str], dict[st
 def canonical_resource_applicability(
     canonical_resources: list[dict],
     registry_tables: set[str],
+    satisfied_resource_keys: set[str],
 ) -> tuple[set[str], dict[str, list[str]], list[dict], list[dict]]:
     applicable_tables: set[str] = set()
     table_to_resources: defaultdict[str, list[str]] = defaultdict(list)
@@ -174,7 +182,7 @@ def canonical_resource_applicability(
             *[str(value or "").strip() for value in (resource.get("legacy_tables") or [])],
         }
         tables = {table for table in tables if table}
-        implemented = any(table in registry_tables for table in tables)
+        implemented = any(table in registry_tables for table in tables) or str(resource.get("resource_key") or "") in satisfied_resource_keys
 
         enriched = dict(resource)
         enriched["implemented_in_registry"] = implemented
@@ -259,6 +267,24 @@ def scan_split_path_risks() -> tuple[list[dict], list[dict]]:
     return all_hits, critical_hits
 
 
+def satisfied_service_backed_resources(
+    normalization: dict,
+    endpoint_map: dict,
+    frontend_entities: dict[str, dict],
+) -> set[str]:
+    satisfied: set[str] = set()
+    for resource_key, spec in (normalization.get("service_backed_resources") or {}).items():
+        entity_key = str(spec.get("entity_key") or "").strip()
+        required_endpoints = [
+            str(item or "").strip()
+            for item in (spec.get("required_endpoints") or [])
+            if str(item or "").strip()
+        ]
+        if entity_key and entity_key in frontend_entities and all(endpoint in endpoint_map for endpoint in required_endpoints):
+            satisfied.add(resource_key)
+    return satisfied
+
+
 def main() -> int:
     policy = load_json(POLICY_PATH)
     canonical_catalog = load_json(CANONICAL_PATH)
@@ -267,16 +293,19 @@ def main() -> int:
     relation_map = load_json(RELATION_PATH)
     manifest = load_json(MANIFEST_PATH)
     table_registry = load_json(TABLE_REGISTRY_PATH)
+    wave2_normalization = load_optional_json(WAVE2_NORMALIZATION_PATH)
 
     entities = load_frontend_entities(frontend_catalog)
     registry_tables = set((table_registry.get("tables") or {}).keys())
     relation_counts = load_relation_counts(relation_map)
+    endpoint_map = endpoint_catalog.get("endpoints") or {}
+    satisfied_service_resources = satisfied_service_backed_resources(wave2_normalization, endpoint_map, entities)
     canonical_tables, table_to_resources, canonical_resources, isolated_legacy_tables = canonical_resource_index(canonical_catalog)
     applicable_canonical_tables, applicable_table_to_resources, applicable_canonical_resources, planned_canonical_resources = canonical_resource_applicability(
         canonical_resources,
         registry_tables,
+        satisfied_service_resources,
     )
-    endpoint_map = endpoint_catalog.get("endpoints") or {}
 
     usage_zones: dict[str, list[dict]] = {
         "core_value_stream": [],
@@ -355,6 +384,7 @@ def main() -> int:
     for entity_row in entity_rows:
         for resource_key in entity_row["canonical_resources"]:
             matched_resource_keys.add(resource_key)
+    matched_resource_keys.update(satisfied_service_resources)
 
     for resource in applicable_canonical_resources:
         if resource["resource_key"] not in matched_resource_keys:

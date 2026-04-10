@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-09T14:35:20.092Z",
-    "formulaCount": 1134
+    "generatedAt": "2026-04-10T07:50:58.252Z",
+    "formulaCount": 1177
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -25116,6 +25116,909 @@
       {
         "type": "endpoint",
         "id": "production.work_orders.transition"
+      }
+    ]
+  },
+  "f_freight_order_stops_record_count": {
+    "formulaId": "f_freight_order_stops_record_count",
+    "name": "Vận chuyển đơn hàng Stop - Số bản ghi",
+    "nameEn": "Freight Order Stops Record Count",
+    "category": "compliance",
+    "domain": "transportation",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM freight_order_stops",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "freight_order_stops_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "transportation.freight_order_stops.list"
+      }
+    ]
+  },
+  "f_freight_orders_record_count": {
+    "formulaId": "f_freight_orders_record_count",
+    "name": "Vận chuyển đơn hàng - Số bản ghi",
+    "nameEn": "Freight Orders Record Count",
+    "category": "compliance",
+    "domain": "transportation",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM freight_orders",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "freight_orders_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "transportation.freight_orders.list"
+      }
+    ]
+  },
+  "f_freight_orders_closed_count": {
+    "formulaId": "f_freight_orders_closed_count",
+    "name": "Vận chuyển đơn hàng - Số hồ sơ đã đóng",
+    "nameEn": "Freight Orders Closed Count",
+    "category": "compliance",
+    "domain": "transportation",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE freight_status IN ('closed','completed','archived','paid','delivered')) FROM freight_orders",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "freight_orders_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "transportation.freight_orders.transition"
+      }
+    ]
+  },
+  "f_inventory_valuations_record_count": {
+    "formulaId": "f_inventory_valuations_record_count",
+    "name": "Tồn kho Valuation - Số bản ghi",
+    "nameEn": "Inventory Valuations Record Count",
+    "category": "finance",
+    "domain": "finance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM inventory_valuations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "inventory_valuations_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "finance.inventory_valuations.list"
+      }
+    ]
+  },
+  "f_plant_performance_snapshots_record_count": {
+    "formulaId": "f_plant_performance_snapshots_record_count",
+    "name": "Plant Hiệu năng ảnh chụp - Số bản ghi",
+    "nameEn": "Plant Performance Snapshots Record Count",
+    "category": "system",
+    "domain": "bi_datawarehouse",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM plant_performance_snapshots",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "plant_performance_snapshots_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "bi_datawarehouse.plant_performance_snapshots.list"
+      }
+    ]
+  },
+  "f_safety_observation_actions_record_count": {
+    "formulaId": "f_safety_observation_actions_record_count",
+    "name": "An toàn Observation Hành động - Số bản ghi",
+    "nameEn": "Safety Observation Actions Record Count",
+    "category": "system",
+    "domain": "ehs_sustainability",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM safety_observation_actions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "safety_observation_actions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "ehs_sustainability.safety_observation_actions.list"
+      }
+    ]
+  },
+  "f_safety_observations_record_count": {
+    "formulaId": "f_safety_observations_record_count",
+    "name": "An toàn Observation - Số bản ghi",
+    "nameEn": "Safety Observations Record Count",
+    "category": "system",
+    "domain": "ehs_sustainability",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM safety_observations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "safety_observations_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "ehs_sustainability.safety_observations.list"
+      }
+    ]
+  },
+  "f_safety_observations_closed_count": {
+    "formulaId": "f_safety_observations_closed_count",
+    "name": "An toàn Observation - Số hồ sơ đã đóng",
+    "nameEn": "Safety Observations Closed Count",
+    "category": "system",
+    "domain": "ehs_sustainability",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE observation_status IN ('closed','completed','archived','paid','delivered')) FROM safety_observations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "safety_observations_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "ehs_sustainability.safety_observations.transition"
+      }
+    ]
+  },
+  "f_bom_version_closed_count": {
+    "formulaId": "f_bom_version_closed_count",
+    "name": "BOM phiên bản - Số hồ sơ đã đóng",
+    "nameEn": "BOM Version Closed Count",
+    "category": "manufacturing",
+    "domain": "mfg_engineering",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE approval_state IN ('closed','completed','archived','paid','delivered')) FROM bom_version",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "bom_version_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "mfg_engineering.bom_version.transition"
+      }
+    ]
+  },
+  "f_capa_closed_count": {
+    "formulaId": "f_capa_closed_count",
+    "name": "CAPA - Số hồ sơ đã đóng",
+    "nameEn": "CAPA Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM capa",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "capa_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.capa.transition"
+      }
+    ]
+  },
+  "f_change_control_closed_count": {
+    "formulaId": "f_change_control_closed_count",
+    "name": "Thay đổi Kiểm soát - Số hồ sơ đã đóng",
+    "nameEn": "Change Control Closed Count",
+    "category": "system",
+    "domain": "plm_change_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE approval_state IN ('closed','completed','archived','paid','delivered')) FROM change_control",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "change_control_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "plm_change_control.change_control.transition"
+      }
+    ]
+  },
+  "f_complaint_closed_count": {
+    "formulaId": "f_complaint_closed_count",
+    "name": "Khiếu nại - Số hồ sơ đã đóng",
+    "nameEn": "Complaint Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM complaint",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "complaint_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.complaint.transition"
+      }
+    ]
+  },
+  "f_container_closed_count": {
+    "formulaId": "f_container_closed_count",
+    "name": "Container - Số hồ sơ đã đóng",
+    "nameEn": "Container Closed Count",
+    "category": "supplier",
+    "domain": "inventory",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM container",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "container_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "inventory.container.transition"
+      }
+    ]
+  },
+  "f_demand_closed_count": {
+    "formulaId": "f_demand_closed_count",
+    "name": "Nhu cầu - Số hồ sơ đã đóng",
+    "nameEn": "Demand Closed Count",
+    "category": "planning",
+    "domain": "demand_supply_planning",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM demand",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "demand_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "demand_supply_planning.demand.transition"
+      }
+    ]
+  },
+  "f_deviation_closed_count": {
+    "formulaId": "f_deviation_closed_count",
+    "name": "Sai lệch - Số hồ sơ đã đóng",
+    "nameEn": "Deviation Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM deviation",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "deviation_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.deviation.transition"
+      }
+    ]
+  },
+  "f_document_revision_closed_count": {
+    "formulaId": "f_document_revision_closed_count",
+    "name": "Tài liệu Phiên bản - Số hồ sơ đã đóng",
+    "nameEn": "Document Revision Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE approval_state IN ('closed','completed','archived','paid','delivered')) FROM document_revision",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "document_revision_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.document_revision.transition"
+      }
+    ]
+  },
+  "f_finding_closed_count": {
+    "formulaId": "f_finding_closed_count",
+    "name": "Phát hiện - Số hồ sơ đã đóng",
+    "nameEn": "Finding Closed Count",
+    "category": "quality",
+    "domain": "audit_risk",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM finding",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "finding_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "audit_risk.finding.transition"
+      }
+    ]
+  },
+  "f_forecast_closed_count": {
+    "formulaId": "f_forecast_closed_count",
+    "name": "Dự báo - Số hồ sơ đã đóng",
+    "nameEn": "Forecast Closed Count",
+    "category": "planning",
+    "domain": "demand_supply_planning",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM forecast",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "forecast_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "demand_supply_planning.forecast.transition"
+      }
+    ]
+  },
+  "f_form_entries_closed_count": {
+    "formulaId": "f_form_entries_closed_count",
+    "name": "Biểu mẫu bản nhập - Số hồ sơ đã đóng",
+    "nameEn": "Form Entries Closed Count",
+    "category": "system",
+    "domain": "forms_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE workflow_state IN ('closed','completed','archived','paid','delivered')) FROM form_entries",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "form_entries_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "forms_system.form_entries.transition"
+      }
+    ]
+  },
+  "f_inspection_plan_closed_count": {
+    "formulaId": "f_inspection_plan_closed_count",
+    "name": "Kiểm tra kế hoạch - Số hồ sơ đã đóng",
+    "nameEn": "Inspection Plan Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM inspection_plan",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "inspection_plan_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.inspection_plan.transition"
+      }
+    ]
+  },
+  "f_item_closed_count": {
+    "formulaId": "f_item_closed_count",
+    "name": "Mã hàng - Số hồ sơ đã đóng",
+    "nameEn": "Item Closed Count",
+    "category": "manufacturing",
+    "domain": "master_data",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM item",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "item_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data.item.transition"
+      }
+    ]
+  },
+  "f_item_site_closed_count": {
+    "formulaId": "f_item_site_closed_count",
+    "name": "Mã hàng địa điểm - Số hồ sơ đã đóng",
+    "nameEn": "Item Site Closed Count",
+    "category": "manufacturing",
+    "domain": "master_data",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM item_site",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "item_site_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data.item_site.transition"
+      }
+    ]
+  },
+  "f_item_spec_closed_count": {
+    "formulaId": "f_item_spec_closed_count",
+    "name": "Mã hàng quy cách - Số hồ sơ đã đóng",
+    "nameEn": "Item Spec Closed Count",
+    "category": "manufacturing",
+    "domain": "master_data",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM item_spec",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "item_spec_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data.item_spec.transition"
+      }
+    ]
+  },
+  "f_job_closed_count": {
+    "formulaId": "f_job_closed_count",
+    "name": "Lệnh - Số hồ sơ đã đóng",
+    "nameEn": "Job Closed Count",
+    "category": "manufacturing",
+    "domain": "mes_execution",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM job",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "job_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "mes_execution.job.transition"
+      }
+    ]
+  },
+  "f_lot_policy_closed_count": {
+    "formulaId": "f_lot_policy_closed_count",
+    "name": "Lô Chính sách - Số hồ sơ đã đóng",
+    "nameEn": "Lot Policy Closed Count",
+    "category": "manufacturing",
+    "domain": "master_data",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM lot_policy",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lot_policy_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data.lot_policy.transition"
+      }
+    ]
+  },
+  "f_mrp_signal_closed_count": {
+    "formulaId": "f_mrp_signal_closed_count",
+    "name": "Mrp Signal - Số hồ sơ đã đóng",
+    "nameEn": "Mrp Signal Closed Count",
+    "category": "planning",
+    "domain": "demand_supply_planning",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM mrp_signal",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mrp_signal_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "demand_supply_planning.mrp_signal.transition"
+      }
+    ]
+  },
+  "f_nonconformance_closed_count": {
+    "formulaId": "f_nonconformance_closed_count",
+    "name": "Không phù hợp - Số hồ sơ đã đóng",
+    "nameEn": "Nonconformance Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM nonconformance",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "nonconformance_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.nonconformance.transition"
+      }
+    ]
+  },
+  "f_operation_closed_count": {
+    "formulaId": "f_operation_closed_count",
+    "name": "Công đoạn - Số hồ sơ đã đóng",
+    "nameEn": "Operation Closed Count",
+    "category": "manufacturing",
+    "domain": "mfg_engineering",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM operation",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "operation_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "mfg_engineering.operation.transition"
+      }
+    ]
+  },
+  "f_planned_supply_closed_count": {
+    "formulaId": "f_planned_supply_closed_count",
+    "name": "Kế hoạch cung ứng - Số hồ sơ đã đóng",
+    "nameEn": "Planned Supply Closed Count",
+    "category": "planning",
+    "domain": "demand_supply_planning",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM planned_supply",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "planned_supply_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "demand_supply_planning.planned_supply.transition"
+      }
+    ]
+  },
+  "f_production_completion_closed_count": {
+    "formulaId": "f_production_completion_closed_count",
+    "name": "Sản xuất Completion - Số hồ sơ đã đóng",
+    "nameEn": "Production Completion Closed Count",
+    "category": "manufacturing",
+    "domain": "mes_execution",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM production_completion",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "production_completion_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "mes_execution.production_completion.transition"
+      }
+    ]
+  },
+  "f_production_order_closed_count": {
+    "formulaId": "f_production_order_closed_count",
+    "name": "Sản xuất đơn hàng - Số hồ sơ đã đóng",
+    "nameEn": "Production Order Closed Count",
+    "category": "manufacturing",
+    "domain": "production",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM production_order",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "production_order_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "production.production_order.transition"
+      }
+    ]
+  },
+  "f_purchase_order_line_closed_count": {
+    "formulaId": "f_purchase_order_line_closed_count",
+    "name": "Đơn hàng dòng mua - Số hồ sơ đã đóng",
+    "nameEn": "Purchase Order Line Closed Count",
+    "category": "supplier",
+    "domain": "purchasing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM purchase_order_line",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "purchase_order_line_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "purchasing.purchase_order_line.transition"
+      }
+    ]
+  },
+  "f_quality_order_closed_count": {
+    "formulaId": "f_quality_order_closed_count",
+    "name": "Đơn hàng Chất lượng - Số hồ sơ đã đóng",
+    "nameEn": "Quality Order Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM quality_order",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "quality_order_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.quality_order.transition"
+      }
+    ]
+  },
+  "f_risk_register_closed_count": {
+    "formulaId": "f_risk_register_closed_count",
+    "name": "Rủi ro Register - Số hồ sơ đã đóng",
+    "nameEn": "Risk Register Closed Count",
+    "category": "quality",
+    "domain": "audit_risk",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM risk_register",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "risk_register_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "audit_risk.risk_register.transition"
+      }
+    ]
+  },
+  "f_sales_order_line_closed_count": {
+    "formulaId": "f_sales_order_line_closed_count",
+    "name": "Đơn hàng dòng Sale - Số hồ sơ đã đóng",
+    "nameEn": "Sales Order Line Closed Count",
+    "category": "planning",
+    "domain": "sales",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM sales_order_line",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "sales_order_line_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "sales.sales_order_line.transition"
+      }
+    ]
+  },
+  "f_serial_policy_closed_count": {
+    "formulaId": "f_serial_policy_closed_count",
+    "name": "Số sê-ri Chính sách - Số hồ sơ đã đóng",
+    "nameEn": "Serial Policy Closed Count",
+    "category": "manufacturing",
+    "domain": "master_data",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM serial_policy",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "serial_policy_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data.serial_policy.transition"
+      }
+    ]
+  },
+  "f_shelf_life_policy_closed_count": {
+    "formulaId": "f_shelf_life_policy_closed_count",
+    "name": "Hạn sử dụng Vòng đời Chính sách - Số hồ sơ đã đóng",
+    "nameEn": "Shelf Life Policy Closed Count",
+    "category": "manufacturing",
+    "domain": "master_data",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM shelf_life_policy",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "shelf_life_policy_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data.shelf_life_policy.transition"
+      }
+    ]
+  },
+  "f_work_definition_closed_count": {
+    "formulaId": "f_work_definition_closed_count",
+    "name": "Định nghĩa công việc - Số hồ sơ đã đóng",
+    "nameEn": "Work Definition Closed Count",
+    "category": "manufacturing",
+    "domain": "mfg_engineering",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM work_definition",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "work_definition_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "mfg_engineering.work_definition.transition"
+      }
+    ]
+  },
+  "f_work_definition_version_closed_count": {
+    "formulaId": "f_work_definition_version_closed_count",
+    "name": "Định nghĩa phiên bản công việc - Số hồ sơ đã đóng",
+    "nameEn": "Work Definition Version Closed Count",
+    "category": "manufacturing",
+    "domain": "mfg_engineering",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE approval_state IN ('closed','completed','archived','paid','delivered')) FROM work_definition_version",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "work_definition_version_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "mfg_engineering.work_definition_version.transition"
+      }
+    ]
+  },
+  "f_work_order_closed_count": {
+    "formulaId": "f_work_order_closed_count",
+    "name": "Đơn hàng công việc - Số hồ sơ đã đóng",
+    "nameEn": "Work Order Closed Count",
+    "category": "manufacturing",
+    "domain": "mes_execution",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status_code IN ('closed','completed','archived','paid','delivered')) FROM work_order",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "work_order_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "mes_execution.work_order.transition"
+      }
+    ]
+  },
+  "f_workflow_definitions_closed_count": {
+    "formulaId": "f_workflow_definitions_closed_count",
+    "name": "Luồng công việc định nghĩa - Số hồ sơ đã đóng",
+    "nameEn": "Workflow Definitions Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE initial_state IN ('closed','completed','archived','paid','delivered')) FROM workflow_definitions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "workflow_definitions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.workflow_definitions.transition"
+      }
+    ]
+  },
+  "f_workflow_instances_closed_count": {
+    "formulaId": "f_workflow_instances_closed_count",
+    "name": "Luồng công việc Instance - Số hồ sơ đã đóng",
+    "nameEn": "Workflow Instances Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE current_state IN ('closed','completed','archived','paid','delivered')) FROM workflow_instances",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "workflow_instances_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.workflow_instances.transition"
+      }
+    ]
+  },
+  "f_workflow_step_data_closed_count": {
+    "formulaId": "f_workflow_step_data_closed_count",
+    "name": "Luồng công việc bước Dữ liệu - Số hồ sơ đã đóng",
+    "nameEn": "Workflow Step Data Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE to_state IN ('closed','completed','archived','paid','delivered')) FROM workflow_step_data",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "workflow_step_data_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.workflow_step_data.transition"
       }
     ]
   }

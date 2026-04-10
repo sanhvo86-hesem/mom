@@ -169,6 +169,92 @@ $rateHandler('vps_terminal_auth', static function (): void {
 $rateHandler('vps_terminal_auth', static function (): void {
 });
 
+$manualRuntimeSummary = build_manual_runtime_summary(
+    [
+        'customers' => [['customer_id' => 'CUST-001']],
+        'parts' => [['part_number' => 'PN-001'], ['part_number' => 'PN-002']],
+        'revisions' => [['revision_id' => 'REV-A']],
+        'work_centers' => [['work_center_id' => 'WC-01']],
+        'machines' => [['machine_id' => 'MC-01']],
+        'operators' => [['operator_id' => 'OP-01']],
+        '_meta' => ['updated' => '2026-04-10T10:00:00+07:00'],
+    ],
+    [
+        'sales_orders' => [[
+            'so_number' => 'SO-2026-0001',
+            'customer_name' => 'HESEM',
+            'customer_po' => 'PO-001',
+            'status' => 'draft',
+            'updated_at' => '2026-04-10T10:01:00+07:00',
+        ]],
+        'job_orders' => [[
+            'jo_number' => 'JO-2026-0001',
+            'part_number' => 'PN-001',
+            'part_revision' => 'A',
+            'status' => 'released',
+            'updated_at' => '2026-04-10T10:02:00+07:00',
+        ]],
+        'work_orders' => [[
+            'wo_number' => 'WO-2026-000001',
+            'operation_number' => 10,
+            'operation_desc' => 'Turning',
+            'machine_id' => 'MC-01',
+            'status' => 'scheduled',
+            'updated_at' => '2026-04-10T10:03:00+07:00',
+        ]],
+        '_meta' => ['updated' => '2026-04-10T10:03:00+07:00'],
+    ]
+);
+smoke_assert(($manualRuntimeSummary['master_counts']['customers'] ?? null) === 1, 'Manual runtime summary should count customers.');
+smoke_assert(($manualRuntimeSummary['order_counts']['wo'] ?? null) === 1, 'Manual runtime summary should count work orders.');
+smoke_assert((($manualRuntimeSummary['recent_rows'][0] ?? [])['type'] ?? null) === 'WO', 'Manual runtime summary should sort recent rows by updated_at desc.');
+smoke_assert(($manualRuntimeSummary['orders_updated_at'] ?? null) === '2026-04-10T10:03:00+07:00', 'Manual runtime summary should expose orders updated timestamp.');
+
+$masterDataFixtureDir = sys_get_temp_dir() . '/qms-master-data-smoke-' . bin2hex(random_bytes(6));
+@mkdir($masterDataFixtureDir . '/master-data', 0775, true);
+$masterDataService = new \MOM\Services\MasterDataService($masterDataFixtureDir);
+$createMasterPart = $masterDataService->create('parts', [
+    'part_number' => 'FLG-200',
+    'part_description' => 'test',
+    'description' => 'test',
+    'status' => 'active',
+], 'tester');
+smoke_assert($createMasterPart->ok, 'MasterDataService should create active part fixture.');
+$pendingUpdate = $masterDataService->update('parts', 'FLG-200', [
+    'part_description' => 'test2',
+    'description' => 'test2',
+], 'tester', 'Regression update');
+smoke_assert($pendingUpdate->ok, 'MasterDataService should accept update for active part.');
+smoke_assert((string)($pendingUpdate->data['status'] ?? '') === 'pending', 'Active part update should queue a pending approval.');
+$changeId = (string)($pendingUpdate->data['change_id'] ?? '');
+smoke_assert($changeId !== '', 'Pending update should return a change id.');
+smoke_assert($masterDataService->approvePendingChange($changeId, 'approver') === true, 'Pending update should be approvable.');
+$approvedStore = json_decode((string)file_get_contents($masterDataFixtureDir . '/master-data/master-data.json'), true);
+$approvedPending = json_decode((string)file_get_contents($masterDataFixtureDir . '/master-data/master-data-pending.json'), true);
+$approvedPart = null;
+foreach (($approvedStore['parts'] ?? []) as $row) {
+    if (($row['part_number'] ?? '') === 'FLG-200') {
+        $approvedPart = $row;
+        break;
+    }
+}
+$approvedEntry = null;
+foreach (($approvedPending['entries'] ?? []) as $entry) {
+    if (($entry['change_id'] ?? '') === $changeId) {
+        $approvedEntry = $entry;
+        break;
+    }
+}
+smoke_assert(is_array($approvedPart), 'Approved part should remain present in active store.');
+smoke_assert(($approvedPart['part_description'] ?? null) === 'test2', 'Approved part should persist canonical part_description.');
+smoke_assert(($approvedPart['description'] ?? null) === 'test2', 'Approved part should keep legacy description in sync.');
+smoke_assert(($approvedEntry['status'] ?? null) === 'approved', 'Pending entry should be marked approved after approval.');
+foreach (glob($masterDataFixtureDir . '/master-data/*') ?: [] as $fixtureFile) {
+    @unlink($fixtureFile);
+}
+@rmdir($masterDataFixtureDir . '/master-data');
+@rmdir($masterDataFixtureDir);
+
 $authStore = [
     'settings' => ['require_mfa' => false],
     'users' => [[
@@ -948,6 +1034,15 @@ foreach ((array)($shipmentReadiness['items'] ?? []) as $item) {
 smoke_assert(is_array($shipmentGateRow), 'Shipment gate readiness must still emit the governed gate row.');
 smoke_assert(($shipmentGateRow['status'] ?? null) === 'waived', 'Shipment gate readiness must apply active governed overrides as waived status.');
 smoke_assert((($shipmentReadiness['overrides']['SG-01'] ?? [])['e_signature']['signature_status'] ?? null) === 'applied', 'Shipment gate readiness must surface signature-backed override evidence.');
+$revokedShipmentOverride = $operationalOverrideService->transitionOverride((string)($shipmentOverride['override_id'] ?? ''), 'revoke', 'qa-user', [
+    'reason' => 'Containment restored and temporary waiver no longer required.',
+]);
+smoke_assert(($revokedShipmentOverride['current_status'] ?? null) === 'revoked', 'Operational override transition must allow governed revocation.');
+$closedShipmentOverride = $operationalOverrideService->transitionOverride((string)($shipmentOverride['override_id'] ?? ''), 'close', 'qa-user', [
+    'reason' => 'Follow-up review completed.',
+    'follow_up_status' => 'closed',
+]);
+smoke_assert(($closedShipmentOverride['current_status'] ?? null) === 'closed', 'Operational override transition must support auditable closure.');
 try {
     $shipmentGateService->overrideGate(
         'SO-TEST',
@@ -1018,6 +1113,22 @@ $debitMemo = $financeControlService->createDebitMemo([
     'currency_code' => 'VND',
 ], 'finance-user');
 smoke_assert(($debitMemo['memo_status'] ?? null) === 'approved', 'Finance debit memo control must create an approved memo record.');
+$reopenedPeriodClose = $financeControlService->transitionPeriodClose((string)($periodClose['period_close_id'] ?? ''), 'reopen', 'finance-user', [
+    'reason' => 'Late approved adjustment requires temporary reopen.',
+]);
+smoke_assert(($reopenedPeriodClose['close_status'] ?? null) === 'reopened', 'Finance period close transition must allow governed reopen.');
+$reclosedPeriodClose = $financeControlService->transitionPeriodClose((string)($periodClose['period_close_id'] ?? ''), 'close', 'finance-user', [
+    'reason' => 'Adjustment posted and period reclosed.',
+]);
+smoke_assert(($reclosedPeriodClose['close_status'] ?? null) === 'closed', 'Finance period close transition must support reclose after governed reopen.');
+$revokedBackdateException = $financeControlService->transitionBackdateException((string)($backdateException['backdate_exception_id'] ?? ''), 'revoke', 'finance-user', [
+    'reason' => 'Controller withdrew the exception before posting.',
+]);
+smoke_assert(($revokedBackdateException['exception_status'] ?? null) === 'revoked', 'Finance backdate exception transition must allow governed revocation.');
+$closedBackdateException = $financeControlService->transitionBackdateException((string)($backdateException['backdate_exception_id'] ?? ''), 'close', 'finance-user', [
+    'reason' => 'Case closed after reconciliation review.',
+]);
+smoke_assert(($closedBackdateException['exception_status'] ?? null) === 'closed', 'Finance backdate exception transition must support auditable closure.');
 smoke_assert(count($financeControlService->listPeriodCloses()) === 1, 'Finance period close listing must expose created close controls.');
 smoke_assert(count($financeControlService->listBackdateExceptions()) === 1, 'Finance backdate exception listing must expose created temporal controls.');
 smoke_assert(count($financeControlService->listCreditMemos()) === 1, 'Finance credit memo listing must expose created correction controls.');
@@ -1258,6 +1369,10 @@ try {
 // Registry runtime assets must keep composite-identity CRUD contracts available.
 $endpointCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/endpoint-catalog.json'), true);
 $endpointMap = is_array($endpointCatalog['endpoints'] ?? null) ? $endpointCatalog['endpoints'] : [];
+$tableRegistryAsset = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/table-registry.json'), true);
+$tableRegistryMap = is_array($tableRegistryAsset['tables'] ?? null) ? $tableRegistryAsset['tables'] : [];
+$workflowLibrary = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/workflow-library.json'), true);
+$workflowMap = is_array($workflowLibrary['workflows'] ?? null) ? $workflowLibrary['workflows'] : [];
 $runtimeAccessPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/runtime-access-policy.json'), true);
 $frontendFoundation = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/frontend-foundation-catalog.json'), true);
 $frontendEntityMap = is_array($frontendFoundation['entities'] ?? null) ? $frontendFoundation['entities'] : [];
@@ -1280,8 +1395,11 @@ smoke_assert((bool)($scenarioUpdate['request']['optimistic_concurrency']['requir
 smoke_assert(($scenarioUpdate['request']['org_scope']['fields'] ?? null) === ['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'], 'APS update endpoint scope fields mismatch.');
 smoke_assert((bool)($scenarioUpdate['response']['optimistic_concurrency']['enabled'] ?? false) === true, 'APS update response must advertise row_version concurrency.');
 smoke_assert(is_array($scenarioTransition), 'APS planning scenario transition endpoint missing from endpoint catalog.');
-smoke_assert(($scenarioTransition['workflow']['lifecycle_mode'] ?? null) === 'generic_status_only', 'APS planning scenario transition must advertise generic status workflow mode.');
-smoke_assert((bool)($scenarioTransition['workflow']['runtime']['generic_runtime_safe'] ?? false) === true, 'APS planning scenario transition must remain generic-runtime safe.');
+smoke_assert(($scenarioTransition['workflow']['lifecycle_mode'] ?? null) === 'persisted', 'APS planning scenario transition must advertise persisted workflow mode once the workflow library is aligned.');
+smoke_assert((bool)($scenarioTransition['workflow']['runtime']['engine_bridge_required'] ?? false) === true, 'APS planning scenario transition must advertise workflow-engine bridge requirement.');
+smoke_assert((bool)($scenarioTransition['workflow']['runtime']['engine_bridge_blocked'] ?? true) === false, 'APS planning scenario transition must not advertise bridge blocking once the state model is aligned.');
+smoke_assert((bool)($scenarioTransition['workflow']['runtime']['engine_bridge']['ready'] ?? false) === true, 'APS planning scenario transition must advertise a ready workflow-engine bridge.');
+smoke_assert(($scenarioTransition['workflow']['runtime']['transition_execution_guard'] ?? null) === 'workflow_engine', 'APS planning scenario transition must advertise workflow-engine execution guard.');
 smoke_assert(is_array($capaTransition), 'CAPA transition endpoint missing from endpoint catalog.');
 smoke_assert(($capaTransition['workflow']['lifecycle_mode'] ?? null) === 'persisted', 'CAPA transition must advertise persisted workflow mode.');
 smoke_assert((bool)($capaTransition['workflow']['runtime']['engine_bridge_required'] ?? false) === true, 'CAPA transition must advertise workflow-engine bridge requirement.');
@@ -1333,6 +1451,7 @@ smoke_assert(in_array('quality_engineer', (array)($runtimeAccessPolicy['domains'
 
 $qualityReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/registry-quality-report.json'), true);
 $registryManifest = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/registry-manifest.json'), true);
+$canonicalCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/canonical-backend-standardization-catalog.json'), true);
 $wave0Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave0-governance-policy.json'), true);
 $wave0Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave0-governance-report.json'), true);
 $operationalBlindSpotCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-blind-spot-catalog.json'), true);
@@ -1346,6 +1465,13 @@ $wave2Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/regis
 $wave3Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave3-process-governance-policy.json'), true);
 $wave3Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave3-process-normalization.json'), true);
 $wave3Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave3-process-report.json'), true);
+$wave4Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave4-production-quality-governance-policy.json'), true);
+$wave4Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave4-production-quality-normalization.json'), true);
+$wave4Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave4-production-quality-report.json'), true);
+$wave5Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave5-maintenance-ehs-governance-policy.json'), true);
+$wave5Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave5-maintenance-ehs-normalization.json'), true);
+$wave5Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave5-maintenance-ehs-report.json'), true);
+$statusOptionsRegistry = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/status-options.json'), true);
 $operationalStressPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-governance-policy.json'), true);
 $operationalStressCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-catalog.json'), true);
 $operationalStressReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-report.json'), true);
@@ -1386,6 +1512,7 @@ smoke_assert(in_array('split_registry_path_or_split_write_model', (array)($wave0
 smoke_assert(is_array($wave0Report), 'Wave 0 governance report asset missing.');
 smoke_assert((int)($wave0Report['summary']['core_value_stream_entities'] ?? 0) > 0, 'Wave 0 governance report must classify core value-stream entities.');
 smoke_assert((int)($wave0Report['summary']['critical_split_path_risks'] ?? -1) === 0, 'Wave 0 governance report must clear critical split-path risks from the publication path.');
+smoke_assert((int)($wave0Report['summary']['planned_canonical_resources'] ?? -1) === 0, 'Wave 0 governance report must clear every planned canonical resource once service-backed slices and schema-backed objects are delivered.');
 smoke_assert(array_key_exists('wave0-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave0-governance-policy.json.');
 smoke_assert(array_key_exists('wave0-governance-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave0-governance-report.json.');
 smoke_assert(is_array($registryManifest['coverage']['wave0_governance'] ?? null), 'Registry manifest must surface Wave 0 governance coverage.');
@@ -1426,6 +1553,7 @@ smoke_assert((int)($wave2Report['summary']['canonical_catalog_meta_mismatch'] ??
 smoke_assert((int)($wave2Report['summary']['service_backed_resource_gaps'] ?? -1) === 0, 'Wave 2 report must expose all reviewed service-backed controls through canonical slices.');
 smoke_assert((int)($wave2Report['summary']['archive_isolation_targets_failed'] ?? -1) === 0, 'Wave 2 report must move declared legacy aliases into archive isolation.');
 smoke_assert((int)($wave2Report['summary']['remaining_unused_candidate_entities'] ?? -1) === 0, 'Wave 2 report must clear unused candidates once archive isolation is formalized.');
+smoke_assert((int)($wave2Report['summary']['planned_canonical_resources_not_yet_in_registry'] ?? -1) === 0, 'Wave 2 report must close every planned canonical resource once the remaining schema-backed objects are introduced.');
 smoke_assert(array_key_exists('wave2-canonical-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-governance-policy.json.');
 smoke_assert(array_key_exists('wave2-canonical-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-normalization.json.');
 smoke_assert(array_key_exists('wave2-canonical-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave2-canonical-report.json.');
@@ -1445,6 +1573,71 @@ smoke_assert(array_key_exists('wave3-process-governance-policy.json', (array)($r
 smoke_assert(array_key_exists('wave3-process-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave3-process-normalization.json.');
 smoke_assert(array_key_exists('wave3-process-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave3-process-report.json.');
 smoke_assert(is_array($registryManifest['coverage']['wave3_process_governance'] ?? null), 'Registry manifest must surface Wave 3 process governance coverage.');
+smoke_assert(is_array($wave4Policy), 'Wave 4 production-quality governance policy asset missing.');
+smoke_assert(count((array)($wave4Policy['build_questions'] ?? [])) >= 8, 'Wave 4 governance policy must force gate-owner, QA/QC split, result-child, alias, and reaction-loop questions.');
+smoke_assert(in_array('inspection_result_or_measurement_row_inherits_parent_workflow_owner', (array)($wave4Policy['rejection_criteria'] ?? []), true), 'Wave 4 governance policy must explicitly reject result or measurement rows inheriting parent workflow ownership.');
+smoke_assert(is_array($wave4Normalization), 'Wave 4 production-quality normalization asset missing.');
+smoke_assert(count((array)($wave4Normalization['quality_execution_targets'] ?? [])) >= 3, 'Wave 4 normalization must register the full IQC/IPQC/OQC execution backbone.');
+smoke_assert(count((array)($wave4Normalization['reaction_loop_targets'] ?? [])) >= 4, 'Wave 4 normalization must register NCR/CAPA/SPC/MSA reaction-loop coverage.');
+smoke_assert(is_array($wave4Report), 'Wave 4 production-quality governance report asset missing.');
+smoke_assert((int)($wave4Report['summary']['quality_execution_failed'] ?? -1) === 0, 'Wave 4 report must pass all IQC/IPQC/OQC execution targets.');
+smoke_assert((int)($wave4Report['summary']['inspection_backbone_failed'] ?? -1) === 0, 'Wave 4 report must keep plans, lots, and result rows in the right lifecycle class.');
+smoke_assert((int)($wave4Report['summary']['reaction_loop_failed'] ?? -1) === 0, 'Wave 4 report must pass NCR/CAPA/SPC/MSA reaction-loop targets.');
+smoke_assert((int)($wave4Report['summary']['qa_qc_role_split_failed'] ?? -1) === 0, 'Wave 4 report must pass the QA/QC role-split workflow targets.');
+smoke_assert((int)($wave4Report['summary']['alias_resolution_failed'] ?? -1) === 0, 'Wave 4 report must keep FQC in alias-only mode until a distinct finished-goods gate exists.');
+smoke_assert((int)($wave4Report['summary']['remaining_wave4_gaps'] ?? -1) === 0, 'Wave 4 report must close every production-quality governance gap.');
+smoke_assert(array_key_exists('wave4-production-quality-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave4-production-quality-governance-policy.json.');
+smoke_assert(array_key_exists('wave4-production-quality-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave4-production-quality-normalization.json.');
+smoke_assert(array_key_exists('wave4-production-quality-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave4-production-quality-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['wave4_production_quality_governance'] ?? null), 'Registry manifest must surface Wave 4 production-quality governance coverage.');
+$incomingInspectionTransitionRuntime = (array)(($endpointMap['quality_management.incoming_inspections.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['quality_management.incoming_inspections.transition']['capabilities']['workflow_runtime'] ?? [])));
+$ipqcTransitionRuntime = (array)(($endpointMap['quality_management.ipqc_inspections.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['quality_management.ipqc_inspections.transition']['capabilities']['workflow_runtime'] ?? [])));
+$oqcTransitionRuntime = (array)(($endpointMap['quality_management.oqc_inspections.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['quality_management.oqc_inspections.transition']['capabilities']['workflow_runtime'] ?? [])));
+$incomingInspectionResultsEntity = (array)($frontendEntityMap['quality_management.incoming_inspection_results'] ?? []);
+$spcEntity = (array)($frontendEntityMap['quality_management.spc_data'] ?? []);
+$grrEntity = (array)($frontendEntityMap['calibration_equipment.calibration_grr_studies'] ?? []);
+$canonicalIqc = (array)($canonicalCatalog['domains']['procurement_supplier_quality']['resources']['iqc-inspections'] ?? []);
+$canonicalOqc = (array)($canonicalCatalog['domains']['quality_improvement']['resources']['oqc-inspections'] ?? []);
+$canonicalFqc = (array)($canonicalCatalog['domains']['quality_improvement']['resources']['fqc-inspections'] ?? []);
+$canonicalSpc = (array)($canonicalCatalog['domains']['quality_improvement']['resources']['spc-observations'] ?? []);
+smoke_assert(($incomingInspectionTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'Incoming inspection transition must remain a persisted workflow gate.');
+smoke_assert(($incomingInspectionTransitionRuntime['transition_execution_guard'] ?? null) === 'workflow_engine', 'Incoming inspection transition must execute through the workflow engine.');
+smoke_assert((bool)(($incomingInspectionTransitionRuntime['engine_bridge']['ready'] ?? false)) === true, 'Incoming inspection transition must advertise a ready workflow-engine bridge.');
+smoke_assert(($ipqcTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'IPQC transition must be upgraded from guarded runtime to persisted workflow execution.');
+smoke_assert(($ipqcTransitionRuntime['transition_execution_guard'] ?? null) === 'workflow_engine', 'IPQC transition must execute through the workflow engine once Wave 4 closes.');
+smoke_assert((bool)(($ipqcTransitionRuntime['engine_bridge']['ready'] ?? false)) === true, 'IPQC transition must advertise a ready workflow-engine bridge.');
+smoke_assert(($oqcTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'OQC transition must be upgraded from guarded runtime to persisted workflow execution.');
+smoke_assert(($oqcTransitionRuntime['transition_execution_guard'] ?? null) === 'workflow_engine', 'OQC transition must execute through the workflow engine once Wave 4 closes.');
+smoke_assert((bool)(($oqcTransitionRuntime['engine_bridge']['ready'] ?? false)) === true, 'OQC transition must advertise a ready workflow-engine bridge.');
+smoke_assert(($incomingInspectionResultsEntity['profile'] ?? null) === 'transactional_record', 'Incoming inspection results must publish as transactional evidence, not governed cases.');
+smoke_assert((($incomingInspectionResultsEntity['capabilities']['workflow']['state'] ?? null) === 'not_applicable'), 'Incoming inspection results must not advertise workflow readiness.');
+smoke_assert(empty($tableRegistryMap['incoming_inspection_results']['workflowId'] ?? null), 'Incoming inspection results must not inherit the parent receiving workflow owner.');
+smoke_assert(($spcEntity['profile'] ?? null) === 'transactional_record', 'SPC must remain a transactional evidence stream.');
+smoke_assert(($grrEntity['profile'] ?? null) === 'assessment_record', 'MSA/GRR must publish as an assessment record.');
+smoke_assert(($canonicalIqc['table'] ?? null) === 'incoming_inspections', 'Canonical IQC resource must point at the live incoming_inspections table.');
+smoke_assert(($canonicalIqc['primary_key'] ?? null) === 'inspection_id', 'Canonical IQC resource must use inspection_id as the primary key.');
+smoke_assert(($canonicalOqc['primary_key'] ?? null) === 'oqc_id', 'Canonical OQC resource must use oqc_id as the primary key.');
+smoke_assert(($canonicalOqc['status_column'] ?? null) === 'result', 'Canonical OQC resource must use result as the quality disposition column.');
+smoke_assert(($canonicalFqc['table'] ?? null) === 'oqc_inspections', 'Canonical FQC resource must stay mapped to OQC until a real split gate exists.');
+smoke_assert((bool)($canonicalFqc['alias_only'] ?? false) === true, 'Canonical FQC resource must be flagged alias_only until a distinct finished-goods gate exists.');
+smoke_assert(($canonicalSpc['table'] ?? null) === 'spc_data', 'Canonical SPC resource must point at the live spc_data table.');
+$ipqcTransitionRoles = [];
+foreach ((array)($workflowMap['wf_ipqc_inspection']['transitions'] ?? []) as $transition) {
+    $key = (string)($transition['from'] ?? '') . '->' . (string)($transition['to'] ?? '');
+    $roles = [];
+    foreach ((array)($transition['guards'] ?? []) as $guard) {
+        if (($guard['type'] ?? null) !== 'role') {
+            continue;
+        }
+        foreach ((array)($guard['roles'] ?? []) as $role) {
+            $roles[] = (string)$role;
+        }
+    }
+    $ipqcTransitionRoles[$key] = array_values(array_unique($roles));
+}
+smoke_assert(in_array('production_planner', (array)($ipqcTransitionRoles['queued->in_progress'] ?? []), true), 'IPQC queued->in_progress must preserve the mixed QA/QC handoff role for production_planner.');
+smoke_assert(in_array('quality_engineer', (array)($ipqcTransitionRoles['queued->in_progress'] ?? []), true), 'IPQC queued->in_progress must preserve QA authority for quality_engineer.');
+smoke_assert(in_array('quality_manager', (array)($ipqcTransitionRoles['in_progress->rejected'] ?? []), true), 'IPQC reject disposition must preserve quality-manager authority.');
 smoke_assert(is_array($operationalStressPolicy), 'Operational stress governance policy asset missing.');
 smoke_assert(count((array)($operationalStressPolicy['build_questions'] ?? [])) >= 10, 'Operational stress governance policy must force retry, compensation, override, archive, and backdate design questions.');
 smoke_assert(in_array('create_or_side_effect_action_without_duplicate_or_retry_control', (array)($operationalStressPolicy['rejection_criteria'] ?? []), true), 'Operational stress governance policy must explicitly reject duplicate-unsafe side-effect actions.');
@@ -1481,5 +1674,49 @@ smoke_assert(($documentDistributionFoundation['interaction_contracts']['comments
 smoke_assert(($documentDistributionFoundation['interaction_contracts']['activities']['list_endpoint'] ?? null) === 'crm.crm_activities.list', 'Document distribution must inherit the generic activity list contract when source_record_id is available.');
 smoke_assert(in_array('attachments', array_column((array)($documentDistributionFoundation['interaction_contracts']['timeline_sources'] ?? []), 'kind'), true), 'Document distribution timeline must include attachment events once interaction contracts exist.');
 smoke_assert(in_array('comments', array_column((array)($documentDistributionFoundation['interaction_contracts']['timeline_sources'] ?? []), 'kind'), true), 'Document distribution timeline must include comment events once interaction contracts exist.');
+
+$dbProfileLayer = new \MOM\Database\DataLayer(QMS_TEST_DATA_DIR, QMS_TEST_ROOT_DIR, [
+    'host' => 'db.example.internal',
+    'port' => 5432,
+    'database' => 'mom',
+    'username' => 'mom_app',
+    'password' => 'secret',
+    'schema' => 'public',
+    'sslmode' => 'prefer',
+    'connect_timeout' => 1,
+    'statement_timeout' => 1000,
+    'use_postgres' => false,
+    'shadow_write' => true,
+    'json_fallback' => true,
+    'allow_empty_password' => false,
+]);
+$dbProfileSummary = $dbProfileLayer->getModeSummary();
+smoke_assert(($dbProfileSummary['database_configured'] ?? false) === true, 'Runtime data layer summary must detect an explicit DB profile even when runtime stays JSON_ONLY.');
+smoke_assert(array_key_exists('database_probe_reachable', $dbProfileSummary), 'Runtime data layer summary must expose direct DB probe reachability.');
+smoke_assert(array_key_exists('database_probe_error', $dbProfileSummary), 'Runtime data layer summary must expose direct DB probe errors without fatals.');
+
+$emptyPasswordLayer = new \MOM\Database\DataLayer(QMS_TEST_DATA_DIR, QMS_TEST_ROOT_DIR, [
+    'host' => 'localhost',
+    'port' => 5432,
+    'database' => 'mom',
+    'username' => 'mom_app',
+    'password' => '',
+    'schema' => 'public',
+    'sslmode' => 'prefer',
+    'connect_timeout' => 1,
+    'statement_timeout' => 1000,
+    'use_postgres' => false,
+    'shadow_write' => true,
+    'json_fallback' => true,
+    'allow_empty_password' => true,
+]);
+$emptyPasswordSummary = $emptyPasswordLayer->getModeSummary();
+smoke_assert(($emptyPasswordSummary['database_configured'] ?? false) === true, 'Runtime data layer summary must only treat empty-password DB profiles as configured when explicitly allowed.');
+
+$gitCommand = git_shell_command(QMS_TEST_ROOT_DIR, ['status', '--short']);
+$normalizedRoot = str_replace('\\', '/', QMS_TEST_ROOT_DIR);
+smoke_assert(strpos($gitCommand, "safe.directory={$normalizedRoot}") !== false, 'Git helper must pin the repository as a safe.directory so Admin git operations work under the web execution user.');
+smoke_assert(strpos($gitCommand, 'status') !== false, 'Git helper must still append the requested git arguments after safe.directory injection.');
+smoke_assert(method_exists(\MOM\Database\Connection::class, 'executeScript'), 'Database connection must expose executeScript() so migration runners can execute multi-statement SQL batches safely.');
 
 echo "backend smoke tests passed\n";

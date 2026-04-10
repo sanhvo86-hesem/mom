@@ -19,28 +19,85 @@
   "linked_excel": "FRM-403",
   "description": "SCAR form for supplier corrective actions. Covers identification, quality issue, containment, supplier response, and verification.",
   "description_vi": "Ghi nhận yêu cầu hành động khắc phục đối với nhà cung cấp khi phát hiện lỗi chất lượng hoặc giao hàng.",
-
   "roles_allowed": {
-    "create": ["qa_manager", "quality_engineer", "buyer", "supply_chain_manager"],
-    "fill": ["qa_manager", "quality_engineer", "buyer", "supply_chain_manager"],
-    "review": ["qa_manager", "supply_chain_manager"],
-    "approve": ["qa_manager"],
-    "view": ["all"]
+    "create": [
+      "qa_manager",
+      "quality_engineer",
+      "buyer",
+      "supply_chain_manager"
+    ],
+    "fill": [
+      "qa_manager",
+      "quality_engineer",
+      "buyer",
+      "supply_chain_manager"
+    ],
+    "review": [
+      "qa_manager",
+      "supply_chain_manager"
+    ],
+    "approve": [
+      "qa_manager"
+    ],
+    "view": [
+      "all"
+    ]
   },
-
   "workflow": {
     "type": "sequential",
-    "states": ["draft", "submitted", "in_review", "approved", "closed", "voided"],
+    "states": [
+      "draft",
+      "submitted",
+      "in_review",
+      "approved",
+      "closed",
+      "voided"
+    ],
     "transitions": {
-      "draft": { "next": ["submitted"], "roles": ["fill"] },
-      "submitted": { "next": ["in_review"], "roles": ["review"] },
-      "in_review": { "next": ["approved", "draft"], "roles": ["approve"] },
-      "approved": { "next": ["closed", "voided"], "roles": ["approve"] },
-      "closed": { "next": [], "terminal": true },
-      "voided": { "next": [], "terminal": true }
+      "draft": {
+        "next": [
+          "submitted"
+        ],
+        "roles": [
+          "fill"
+        ]
+      },
+      "submitted": {
+        "next": [
+          "in_review"
+        ],
+        "roles": [
+          "review"
+        ]
+      },
+      "in_review": {
+        "next": [
+          "approved",
+          "draft"
+        ],
+        "roles": [
+          "approve"
+        ]
+      },
+      "approved": {
+        "next": [
+          "closed",
+          "voided"
+        ],
+        "roles": [
+          "approve"
+        ]
+      },
+      "closed": {
+        "next": [],
+        "terminal": true
+      },
+      "voided": {
+        "next": [],
+        "terminal": true
+      }
     }
   },
-
   "sections": [
     {
       "id": "identification",
@@ -49,7 +106,17 @@
       "description": "Khóa đủ ngữ cảnh phát hành, nhà cung cấp, đầu mối liên hệ và lô bị ảnh hưởng để tạo truy xuất sử dụng được ngay.",
       "description_en": "Lock context, supplier, contact, and affected lot for immediate traceability.",
       "color": "#1971c2",
-      "field_ids": ["scar_date", "supplier_response_due_date", "scar_status", "supplier_id", "supplier_name", "supplier_contact", "po_number", "part_number", "lot_number"]
+      "field_ids": [
+        "scar_date",
+        "supplier_response_due_date",
+        "scar_status",
+        "supplier_id",
+        "supplier_name",
+        "supplier_contact",
+        "po_number",
+        "part_number",
+        "lot_number"
+      ]
     },
     {
       "id": "quality_issue",
@@ -58,7 +125,15 @@
       "description": "Mô tả lỗi rõ ràng, lượng hàng bị ảnh hưởng và mức độ nghiêm trọng để hành động containment và phản hồi được đặt đúng trọng tâm.",
       "description_en": "Describe defect clearly, quantify affected goods and severity for focused containment and response.",
       "color": "#e03131",
-      "field_ids": ["quantity_received", "quantity_rejected", "quantity_accepted", "reject_rate", "defect_type", "severity", "defect_description"]
+      "field_ids": [
+        "quantity_received",
+        "quantity_rejected",
+        "quantity_accepted",
+        "reject_rate",
+        "defect_type",
+        "severity",
+        "defect_description"
+      ]
     },
     {
       "id": "containment",
@@ -67,7 +142,12 @@
       "description": "Ghi nhận hành động chặn lan rộng, chế độ phản hồi bắt buộc và trách nhiệm phát hành để kiểm soát vòng phản hồi nhà cung cấp.",
       "description_en": "Record containment actions, mandatory response mode and issuance responsibility.",
       "color": "#d97706",
-      "field_ids": ["containment_action", "root_cause_required", "issued_by", "approved_by"]
+      "field_ids": [
+        "containment_action",
+        "root_cause_required",
+        "issued_by",
+        "approved_by"
+      ]
     },
     {
       "id": "supplier_response",
@@ -76,7 +156,11 @@
       "description": "Thu thập nguyên nhân gốc, hành động khắc phục và phòng ngừa từ phía nhà cung cấp để đánh giá khả năng đóng hồ sơ.",
       "description_en": "Collect root cause, corrective and preventive actions from supplier.",
       "color": "#1971c2",
-      "field_ids": ["supplier_root_cause", "supplier_corrective_action", "supplier_preventive_action"]
+      "field_ids": [
+        "supplier_root_cause",
+        "supplier_corrective_action",
+        "supplier_preventive_action"
+      ]
     },
     {
       "id": "verification",
@@ -85,10 +169,12 @@
       "description": "Ghi phương pháp xác nhận, kết quả và căn cứ đóng SCAR sau khi phản hồi được đánh giá đầy đủ.",
       "description_en": "Record verification method, results and basis for SCAR closure after response evaluation.",
       "color": "#2f9e44",
-      "field_ids": ["verification_method", "verification_result"]
+      "field_ids": [
+        "verification_method",
+        "verification_result"
+      ]
     }
   ],
-
   "fields": [
     {
       "id": "scar_date",
@@ -120,11 +206,31 @@
       "default": "open",
       "options_source": "registry:scar_status",
       "options": [
-        { "value": "open", "label": "Mở (Open)", "color": "#e03131" },
-        { "value": "awaiting_response", "label": "Chờ phản hồi NCC (Awaiting Response)", "color": "#e67700" },
-        { "value": "under_review", "label": "Đang xem xét (Under Review)", "color": "#1971c2" },
-        { "value": "verification", "label": "Đang xác nhận (Verification)", "color": "#862e9c" },
-        { "value": "closed", "label": "Đã đóng (Closed)", "color": "#2f9e44" }
+        {
+          "value": "open",
+          "label": "Mở (Open)",
+          "color": "#e03131"
+        },
+        {
+          "value": "awaiting_response",
+          "label": "Chờ phản hồi NCC (Awaiting Response)",
+          "color": "#e67700"
+        },
+        {
+          "value": "under_review",
+          "label": "Đang xem xét (Under Review)",
+          "color": "#1971c2"
+        },
+        {
+          "value": "verification",
+          "label": "Đang xác nhận (Verification)",
+          "color": "#862e9c"
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng (Closed)",
+          "color": "#2f9e44"
+        }
       ],
       "audit_tracked": true
     },
@@ -153,7 +259,10 @@
       "required": true,
       "placeholder": "Tự động điền khi chọn nhà cung cấp",
       "placeholder_en": "Auto-filled from supplier selection",
-      "audit_tracked": true
+      "audit_tracked": true,
+      "readonly": true,
+      "helper": "Tự động điền từ dữ liệu hệ thống khi chọn nhà cung cấp.",
+      "helper_en": "Auto-filled from master data when supplier is selected."
     },
     {
       "id": "supplier_contact",
@@ -161,7 +270,10 @@
       "label": "Supplier Contact",
       "label_vi": "Liên hệ nhà cung cấp",
       "placeholder": "Tự động điền hoặc nhập tay",
-      "placeholder_en": "Auto-filled or enter manually"
+      "placeholder_en": "Auto-filled or enter manually",
+      "readonly": true,
+      "helper": "Tự động điền từ dữ liệu hệ thống khi chọn nhà cung cấp.",
+      "helper_en": "Auto-filled from master data when supplier is selected."
     },
     {
       "id": "po_number",
@@ -257,9 +369,21 @@
       "required": true,
       "options_source": "registry:severity_level",
       "options": [
-        { "value": "minor", "label": "Nhẹ (Minor)", "color": "#2f9e44" },
-        { "value": "major", "label": "Nặng (Major)", "color": "#e67700" },
-        { "value": "critical", "label": "Nghiêm trọng (Critical)", "color": "#e03131" }
+        {
+          "value": "minor",
+          "label": "Nhẹ (Minor)",
+          "color": "#2f9e44"
+        },
+        {
+          "value": "major",
+          "label": "Nặng (Major)",
+          "color": "#e67700"
+        },
+        {
+          "value": "critical",
+          "label": "Nghiêm trọng (Critical)",
+          "color": "#e03131"
+        }
       ],
       "audit_tracked": true
     },
@@ -327,7 +451,11 @@
       "required": true,
       "placeholder": "Nhà cung cấp giải thích nguyên nhân gốc của lỗi...",
       "placeholder_en": "Supplier explains root cause of the defect...",
-      "show_if": { "field": "root_cause_required", "op": "==", "value": "true" },
+      "show_if": {
+        "field": "root_cause_required",
+        "op": "==",
+        "value": "true"
+      },
       "audit_tracked": true
     },
     {
@@ -338,7 +466,11 @@
       "required": true,
       "placeholder": "Nêu rõ hành động khắc phục, người chịu trách nhiệm, thời điểm hoàn tất...",
       "placeholder_en": "Describe corrective action, responsible person, completion date...",
-      "show_if": { "field": "root_cause_required", "op": "==", "value": "true" },
+      "show_if": {
+        "field": "root_cause_required",
+        "op": "==",
+        "value": "true"
+      },
       "audit_tracked": true
     },
     {
@@ -370,7 +502,6 @@
       "audit_tracked": true
     }
   ],
-
   "signature_blocks": [
     {
       "id": "originator",
@@ -378,7 +509,9 @@
       "label_en": "Originator",
       "meaning": "Authored",
       "required_on_submit": true,
-      "roles": ["fill"],
+      "roles": [
+        "fill"
+      ],
       "help": "Người tạo và phát hành SCAR",
       "help_en": "Person who creates and issues the SCAR"
     },
@@ -388,7 +521,9 @@
       "label_en": "QA Reviewer",
       "meaning": "Reviewed",
       "required_on_approve": true,
-      "roles": ["review"],
+      "roles": [
+        "review"
+      ],
       "help": "QA xem xét và đánh giá phản hồi NCC",
       "help_en": "QA reviews and evaluates supplier response"
     },
@@ -398,12 +533,13 @@
       "label_en": "Approver",
       "meaning": "Approved",
       "required_on_approve": true,
-      "roles": ["approve"],
+      "roles": [
+        "approve"
+      ],
       "help": "Phê duyệt đóng hồ sơ SCAR",
       "help_en": "Approves SCAR closure"
     }
   ],
-
   "computed_fields": [
     {
       "id": "reject_rate",
@@ -418,33 +554,62 @@
       "label_en": "Days Overdue"
     }
   ],
-
-  "auto_fields": ["record_id", "submitted_by", "submitted_at", "entry_id"],
-
-  "linked_record_types": ["NCR", "CAPA"],
-
+  "auto_fields": [
+    "record_id",
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
+  "linked_record_types": [
+    "NCR",
+    "CAPA"
+  ],
   "notifications": {
-    "on_submit": { "roles": ["review"], "template": "scar_submitted" },
-    "on_approve": { "roles": ["fill"], "template": "scar_approved" },
-    "on_overdue": { "roles": ["review", "approve"], "template": "scar_overdue" },
-    "on_critical": { "roles": ["qa_manager", "supply_chain_manager"], "template": "scar_critical" }
+    "on_submit": {
+      "roles": [
+        "review"
+      ],
+      "template": "scar_submitted"
+    },
+    "on_approve": {
+      "roles": [
+        "fill"
+      ],
+      "template": "scar_approved"
+    },
+    "on_overdue": {
+      "roles": [
+        "review",
+        "approve"
+      ],
+      "template": "scar_overdue"
+    },
+    "on_critical": {
+      "roles": [
+        "qa_manager",
+        "supply_chain_manager"
+      ],
+      "template": "scar_critical"
+    }
   },
-
   "cross_validation": [
     {
       "rule": "quantity_rejected <= quantity_received",
       "message": "Số lượng loại bỏ không được lớn hơn số lượng nhận.",
       "message_en": "Quantity rejected must not exceed quantity received.",
-      "fields": ["quantity_rejected"]
+      "fields": [
+        "quantity_rejected"
+      ]
     },
     {
       "rule": "supplier_response_due_date > scar_date",
       "message": "Hạn phản hồi phải sau ngày phát hành SCAR.",
       "message_en": "Response due date must be after SCAR issue date.",
-      "fields": ["supplier_response_due_date"]
+      "fields": [
+        "supplier_response_due_date"
+      ]
     }
   ],
-
   "evidence_requirements": [
     {
       "id": "defect_photo",
@@ -465,10 +630,16 @@
       "helper_en": "Attach official response document from supplier."
     }
   ],
-
   "pdf_template": {
-    "header": { "logo": true, "form_code": true, "version": true },
-    "footer": { "page_numbers": true, "uncontrolled_warning": true },
+    "header": {
+      "logo": true,
+      "form_code": true,
+      "version": true
+    },
+    "footer": {
+      "page_numbers": true,
+      "uncontrolled_warning": true
+    },
     "watermark_on_draft": "DRAFT — NOT FOR PRODUCTION USE"
   }
 }

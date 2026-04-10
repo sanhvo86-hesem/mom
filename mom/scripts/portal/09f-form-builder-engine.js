@@ -496,8 +496,8 @@ function renderVersionDiff(state){
 
 function designInput(fieldDef){
   if(fieldDef.type === 'textarea') return '<textarea rows="3" placeholder="' + esc(fieldDef.placeholder || '') + '"></textarea>';
-  if(fieldDef.type === 'select' || fieldDef.type === 'lookup') return '<select><option>' + esc((fieldDef.options[0] && (fieldDef.options[0].label || fieldDef.options[0].value)) || 'Select value') + '</option></select>';
-  if(fieldDef.type === 'multi_select') return '<select multiple><option>Option 1</option><option>Option 2</option></select>';
+  if(fieldDef.type === 'select' || fieldDef.type === 'lookup') return '<select class="qf-select"><option>' + esc((fieldDef.options[0] && (fieldDef.options[0].label || fieldDef.options[0].value)) || 'Select value') + '</option></select>';
+  if(fieldDef.type === 'multi_select') return '<select class="qf-select" multiple><option>Option 1</option><option>Option 2</option></select>';
   if(fieldDef.type === 'checkbox') return '<label style="display:flex;align-items:center;gap:var(--space-2,8px);color:var(--text-secondary,#475569)"><input type="checkbox"' + (fieldDef.default ? ' checked' : '') + '> ' + esc(fieldDef.label_vi || fieldDef.label || '') + '</label>';
   if(fieldDef.type === 'file') return '<div class="qf-file-drop"><div class="qf-file-drop-text">Upload area</div><div class="qf-file-drop-hint">' + esc(fieldDef.accept || '.pdf,.png,.jpg') + '</div></div>';
   if(fieldDef.type === 'signature') return '<div class="qf-signature-grid"><div class="qf-signature-block"><div class="qf-signature-pad"></div><div class="qf-signature-name">' + esc(fieldDef.label || 'Signature') + '</div></div></div>';

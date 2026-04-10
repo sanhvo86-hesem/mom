@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T14:35:16.368Z",
-    "description": "Resolution plan for 0 orphan registry fields and 394 orphan DB column names."
+    "generatedAt": "2026-04-10T07:50:54.469Z",
+    "description": "Resolution plan for 0 orphan registry fields and 398 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 326,
+      "count": 330,
       "columns": [
         {
           "column": "item_class",
@@ -4293,6 +4293,58 @@
             "VARCHAR(10)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "tracking_reference",
+          "tables": [
+            "freight_orders"
+          ],
+          "suggestedLabel": "Theo dõi tham chiếu",
+          "suggestedLabelEn": "Tracking Reference",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "tender_deadline",
+          "tables": [
+            "freight_orders"
+          ],
+          "suggestedLabel": "Tender Deadline",
+          "suggestedLabelEn": "Tender Deadline",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "tendered_at",
+          "tables": [
+            "freight_orders"
+          ],
+          "suggestedLabel": "Tendered lúc",
+          "suggestedLabelEn": "Tendered At",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "snapshot_grain",
+          "tables": [
+            "plant_performance_snapshots"
+          ],
+          "suggestedLabel": "Ảnh chụp Grain",
+          "suggestedLabelEn": "Snapshot Grain",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(20)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         }
       ]
     },
@@ -4517,16 +4569,6 @@
           "role": "primary_key"
         },
         {
-          "column": "risk_id",
-          "tables": [
-            "risk_register"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
           "column": "risk_register_id",
           "tables": [
             "risk_register"
@@ -4534,7 +4576,7 @@
           "dbTypes": [
             "UUID"
           ],
-          "role": "primary_key"
+          "role": "foreign_key"
         },
         {
           "column": "gl_txn_id",
@@ -4980,6 +5022,16 @@
           "column": "stock_balance_id",
           "tables": [
             "stock_balances"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "plant_performance_snapshot_id",
+          "tables": [
+            "plant_performance_snapshots"
           ],
           "dbTypes": [
             "UUID"

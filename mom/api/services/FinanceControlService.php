@@ -28,7 +28,7 @@ final class FinanceControlService
      */
     public function listPeriodCloses(): array
     {
-        return $this->readCollection('period_closes');
+        return array_map(fn(array $row): array => $this->decoratePeriodClose($row), $this->readCollection('period_closes'));
     }
 
     /**
@@ -36,7 +36,8 @@ final class FinanceControlService
      */
     public function getPeriodClose(string $periodCloseId): ?array
     {
-        return $this->findById('period_closes', 'period_close_id', $periodCloseId);
+        $row = $this->findById('period_closes', 'period_close_id', $periodCloseId);
+        return $row === null ? null : $this->decoratePeriodClose($row);
     }
 
     /**
@@ -60,8 +61,8 @@ final class FinanceControlService
 
         $rows = $this->readCollection('period_closes');
         foreach ($rows as $row) {
-            if (($row['period_code'] ?? '') === $periodCode && ($row['ledger_scope'] ?? '') === $ledgerScope && ($row['close_status'] ?? '') === 'closed') {
-                throw new RuntimeException('Period is already closed for this ledger scope.');
+            if (($row['period_code'] ?? '') === $periodCode && ($row['ledger_scope'] ?? '') === $ledgerScope) {
+                throw new RuntimeException('A governed period close control already exists for this ledger scope and period.');
             }
         }
 
@@ -83,13 +84,91 @@ final class FinanceControlService
                 'signed_by' => $userId,
                 'signed_at' => $now,
             ],
+            'status_history' => [[
+                'from' => '',
+                'to' => 'closed',
+                'transition' => 'create',
+                'timestamp' => $now,
+                'user' => $userId,
+                'reason' => $reasonText,
+            ]],
             'created_at' => $now,
             'updated_at' => $now,
         ];
 
         $rows[] = $row;
         $this->writeCollection('period_closes', $rows);
-        return $row;
+        return $this->decoratePeriodClose($row);
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>
+     */
+    public function transitionPeriodClose(string $periodCloseId, string $transition, string $userId, array $context = []): array
+    {
+        $transition = strtolower(trim($transition));
+        if ($transition === '') {
+            throw new RuntimeException('Period close transition is required.');
+        }
+
+        $rows = $this->readCollection('period_closes');
+        $index = $this->findIndexById($rows, 'period_close_id', $periodCloseId);
+        if ($index === null) {
+            throw new RuntimeException('Period close not found.');
+        }
+
+        $row = (array)$rows[$index];
+        $currentStatus = trim((string)($row['close_status'] ?? 'closed'));
+        $targetStatus = match ($transition) {
+            'reopen' => 'reopened',
+            'close' => 'closed',
+            default => '',
+        };
+        if ($targetStatus === '') {
+            throw new RuntimeException('Unsupported period close transition.');
+        }
+
+        $allowed = [
+            'closed' => ['reopen'],
+            'reopened' => ['close'],
+        ];
+        if (!in_array($transition, $allowed[$currentStatus] ?? [], true)) {
+            throw new RuntimeException("Transition {$transition} is not allowed from {$currentStatus}.");
+        }
+
+        $reason = trim((string)($context['reason'] ?? ''));
+        if ($reason === '') {
+            throw new RuntimeException('Period close transition requires a reason.');
+        }
+
+        $now = $this->nowIso();
+        $row['close_status'] = $targetStatus;
+        $row['updated_at'] = $now;
+        $row['updated_by'] = $userId;
+        $row['status_history'] = is_array($row['status_history'] ?? null) ? $row['status_history'] : [];
+        $row['status_history'][] = [
+            'from' => $currentStatus,
+            'to' => $targetStatus,
+            'transition' => $transition,
+            'timestamp' => $now,
+            'user' => $userId,
+            'reason' => $reason,
+        ];
+
+        if ($transition === 'reopen') {
+            $row['reopened_by'] = $userId;
+            $row['reopened_at'] = $now;
+            $row['reopen_reason'] = $reason;
+        } else {
+            $row['closed_by'] = $userId;
+            $row['closed_at'] = $now;
+            $row['reason'] = $reason;
+        }
+
+        $rows[$index] = $row;
+        $this->writeCollection('period_closes', $rows);
+        return $this->decoratePeriodClose($row);
     }
 
     /**
@@ -97,7 +176,7 @@ final class FinanceControlService
      */
     public function listBackdateExceptions(): array
     {
-        return $this->readCollection('backdate_exceptions');
+        return array_map(fn(array $row): array => $this->decorateBackdateException($row), $this->readCollection('backdate_exceptions'));
     }
 
     /**
@@ -105,7 +184,8 @@ final class FinanceControlService
      */
     public function getBackdateException(string $backdateExceptionId): ?array
     {
-        return $this->findById('backdate_exceptions', 'backdate_exception_id', $backdateExceptionId);
+        $row = $this->findById('backdate_exceptions', 'backdate_exception_id', $backdateExceptionId);
+        return $row === null ? null : $this->decorateBackdateException($row);
     }
 
     /**
@@ -179,13 +259,98 @@ final class FinanceControlService
                 'signed_by' => $userId,
                 'signed_at' => $nowIso,
             ],
+            'status_history' => [[
+                'from' => '',
+                'to' => 'approved',
+                'transition' => 'create',
+                'timestamp' => $nowIso,
+                'user' => $userId,
+                'reason' => $reasonText,
+            ]],
             'created_at' => $nowIso,
             'updated_at' => $nowIso,
         ];
 
         $rows[] = $row;
         $this->writeCollection('backdate_exceptions', $rows);
-        return $row;
+        return $this->decorateBackdateException($row);
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>
+     */
+    public function transitionBackdateException(string $backdateExceptionId, string $transition, string $userId, array $context = []): array
+    {
+        $transition = strtolower(trim($transition));
+        if ($transition === '') {
+            throw new RuntimeException('Backdate exception transition is required.');
+        }
+
+        $rows = $this->readCollection('backdate_exceptions');
+        $index = $this->findIndexById($rows, 'backdate_exception_id', $backdateExceptionId);
+        if ($index === null) {
+            throw new RuntimeException('Backdate exception not found.');
+        }
+
+        $row = (array)$rows[$index];
+        $currentStatus = $this->effectiveBackdateStatus($row);
+        $targetStatus = match ($transition) {
+            'revoke' => 'revoked',
+            'expire' => 'expired',
+            'close' => 'closed',
+            default => '',
+        };
+        if ($targetStatus === '') {
+            throw new RuntimeException('Unsupported backdate exception transition.');
+        }
+
+        $allowed = [
+            'approved' => ['revoke', 'expire', 'close'],
+            'expired' => ['close'],
+            'revoked' => ['close'],
+            'closed' => [],
+        ];
+        if (!in_array($transition, $allowed[$currentStatus] ?? [], true)) {
+            throw new RuntimeException("Transition {$transition} is not allowed from {$currentStatus}.");
+        }
+
+        $reason = trim((string)($context['reason'] ?? ''));
+        if ($reason === '') {
+            throw new RuntimeException('Backdate exception transition requires a reason.');
+        }
+
+        $now = $this->nowIso();
+        $row['exception_status'] = $targetStatus;
+        $row['updated_at'] = $now;
+        $row['updated_by'] = $userId;
+        $row['status_history'] = is_array($row['status_history'] ?? null) ? $row['status_history'] : [];
+        $row['status_history'][] = [
+            'from' => $currentStatus,
+            'to' => $targetStatus,
+            'transition' => $transition,
+            'timestamp' => $now,
+            'user' => $userId,
+            'reason' => $reason,
+        ];
+
+        if ($transition === 'revoke') {
+            $row['revoked_by'] = $userId;
+            $row['revoked_at'] = $now;
+            $row['revocation_reason'] = $reason;
+        } elseif ($transition === 'expire') {
+            $row['expires_at'] = $now;
+            $row['expired_at'] = $now;
+            $row['expiry_reason'] = $reason;
+        } else {
+            $row['closed_by'] = $userId;
+            $row['closed_at'] = $now;
+            $row['closure_reason'] = $reason;
+        }
+
+        $rows[$index] = $row;
+        $this->writeCollection('backdate_exceptions', $rows);
+        return $this->decorateBackdateException($row);
     }
 
     /**
@@ -326,6 +491,55 @@ final class FinanceControlService
     }
 
     /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function decoratePeriodClose(array $row): array
+    {
+        $row['current_status'] = trim((string)($row['close_status'] ?? 'closed')) ?: 'closed';
+        return $row;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function decorateBackdateException(array $row): array
+    {
+        $effectiveStatus = $this->effectiveBackdateStatus($row);
+        if (($row['exception_status'] ?? null) !== $effectiveStatus) {
+            $row['stored_exception_status'] = $row['exception_status'] ?? null;
+            $row['exception_status'] = $effectiveStatus;
+        }
+        $row['current_status'] = $effectiveStatus;
+        return $row;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function effectiveBackdateStatus(array $row): string
+    {
+        $status = trim((string)($row['exception_status'] ?? 'approved')) ?: 'approved';
+        if (in_array($status, ['revoked', 'expired', 'closed'], true)) {
+            return $status;
+        }
+
+        $expiresAt = trim((string)($row['expires_at'] ?? ''));
+        if ($status === 'approved' && $expiresAt !== '') {
+            try {
+                if ((new DateTimeImmutable($expiresAt)) <= new DateTimeImmutable('now', new \DateTimeZone('+07:00'))) {
+                    return 'expired';
+                }
+            } catch (\Throwable) {
+                return $status;
+            }
+        }
+
+        return $status;
+    }
+
+    /**
      * @return array<string, mixed>|null
      */
     private function findById(string $collection, string $idField, string $recordId): ?array
@@ -341,6 +555,28 @@ final class FinanceControlService
             }
             if ((string)($row[$idField] ?? '') === $needle) {
                 return $row;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     */
+    private function findIndexById(array $rows, string $idField, string $recordId): ?int
+    {
+        $needle = trim($recordId);
+        if ($needle === '') {
+            return null;
+        }
+
+        foreach ($rows as $index => $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            if ((string)($row[$idField] ?? '') === $needle) {
+                return $index;
             }
         }
 

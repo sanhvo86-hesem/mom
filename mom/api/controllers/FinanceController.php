@@ -113,6 +113,53 @@ final class FinanceController extends BaseController
         ];
     }
 
+    /**
+     * @param array<string, mixed> $body
+     * @return array<string, mixed>
+     */
+    private function financeTransitionIdempotency(string $resourceName, string $recordId, array $body, string $actorPartyId): array
+    {
+        $explicitKey = $this->parseIdempotencyKey($this->requestHeader('Idempotency-Key'))
+            ?? $this->parseIdempotencyKey($this->query('idempotency_key'))
+            ?? $this->parseIdempotencyKey($this->query('request_id'))
+            ?? $this->parseIdempotencyKey($body['idempotency_key'] ?? null)
+            ?? $this->parseIdempotencyKey($body['request_id'] ?? null);
+
+        $fingerprint = [
+            'resource' => $resourceName,
+            'record_id' => $recordId,
+            'transition' => trim((string)($body['transition'] ?? '')),
+            'body' => $body,
+        ];
+
+        if ($explicitKey !== null) {
+            return [
+                'scope_key' => implode('|', ['finance_control', $resourceName, 'transition', $recordId, $actorPartyId]),
+                'key' => $explicitKey,
+                'key_source' => 'header_or_body',
+                'mode' => 'client_token',
+                'kind' => 'transition',
+                'domain' => 'finance',
+                'table' => $resourceName,
+                'user_id' => $actorPartyId,
+                'fingerprint' => $fingerprint,
+            ];
+        }
+
+        return [
+            'scope_key' => implode('|', ['finance_control', $resourceName, 'transition', $recordId, $actorPartyId]),
+            'key' => 'drv-finance-' . $resourceName . '-transition-' . hash('sha256', json_encode($fingerprint, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+            'key_source' => 'derived:identity+payload_retry_window',
+            'mode' => 'derived_identity_window',
+            'kind' => 'transition',
+            'domain' => 'finance',
+            'table' => $resourceName,
+            'user_id' => $actorPartyId,
+            'ttl_seconds' => $this->idempotency()->retryWindowSeconds(),
+            'fingerprint' => $fingerprint,
+        ];
+    }
+
     public function listPeriodCloses(): never
     {
         $user = $this->requireAuth();
@@ -212,6 +259,48 @@ final class FinanceController extends BaseController
         }
     }
 
+    public function transitionBackdateException(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireFinanceWrite($user);
+        $this->requireCsrf();
+
+        $backdateExceptionId = trim((string)($this->query('backdateExceptionId') ?? ''));
+        if ($backdateExceptionId === '') {
+            $this->error('missing_backdate_exception_id', 400);
+        }
+
+        try {
+            $body = $this->jsonBody();
+            $transition = trim((string)($body['transition'] ?? ''));
+            if ($transition === '') {
+                $this->error('missing_transition', 400);
+            }
+
+            $execution = $this->idempotency()->execute(
+                $this->financeTransitionIdempotency('backdate_exceptions', $backdateExceptionId, $body, $this->userId($user)),
+                function () use ($backdateExceptionId, $body, $user): array {
+                    $backdateException = $this->controls()->transitionBackdateException(
+                        $backdateExceptionId,
+                        (string)($body['transition'] ?? ''),
+                        $this->userId($user),
+                        $body
+                    );
+                    return [
+                        'status_code' => 200,
+                        'payload' => ['backdate_exception' => $backdateException],
+                    ];
+                }
+            );
+            $this->success((array)($execution['payload'] ?? []), (int)($execution['status_code'] ?? 200));
+        } catch (RecordConflictException $e) {
+            $this->error('finance_backdate_exception_transition_idempotency_conflict', 409, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('finance_backdate_exception_transition_failed', 500, $e->getMessage());
+        }
+    }
+
     public function createPeriodClose(): never
     {
         $user = $this->requireAuth();
@@ -236,6 +325,48 @@ final class FinanceController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('finance_period_close_create_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function transitionPeriodClose(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireFinanceWrite($user);
+        $this->requireCsrf();
+
+        $periodCloseId = trim((string)($this->query('periodCloseId') ?? ''));
+        if ($periodCloseId === '') {
+            $this->error('missing_period_close_id', 400);
+        }
+
+        try {
+            $body = $this->jsonBody();
+            $transition = trim((string)($body['transition'] ?? ''));
+            if ($transition === '') {
+                $this->error('missing_transition', 400);
+            }
+
+            $execution = $this->idempotency()->execute(
+                $this->financeTransitionIdempotency('period_close_controls', $periodCloseId, $body, $this->userId($user)),
+                function () use ($periodCloseId, $body, $user): array {
+                    $periodClose = $this->controls()->transitionPeriodClose(
+                        $periodCloseId,
+                        (string)($body['transition'] ?? ''),
+                        $this->userId($user),
+                        $body
+                    );
+                    return [
+                        'status_code' => 200,
+                        'payload' => ['period_close' => $periodClose],
+                    ];
+                }
+            );
+            $this->success((array)($execution['payload'] ?? []), (int)($execution['status_code'] ?? 200));
+        } catch (RecordConflictException $e) {
+            $this->error('finance_period_close_transition_idempotency_conflict', 409, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('finance_period_close_transition_failed', 500, $e->getMessage());
         }
     }
 

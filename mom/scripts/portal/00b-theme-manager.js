@@ -244,6 +244,15 @@ function _applyCustomVars(){
   _setVarPx('--content-max-w', cfg, 'layout.contentMaxW');
   _setVarPx('--modal-max-w', cfg, 'layout.modalMaxW');
   _setVarPx('--modal-sm-max-w', cfg, 'layout.modalSmMaxW');
+  _setVarPx('--admin-gap-lg', cfg, 'layout.admin.gapLg');
+  _setVarPx('--admin-gap-md', cfg, 'layout.admin.gapMd');
+  _setVarPx('--admin-gap-sm', cfg, 'layout.admin.gapSm');
+  _setVarPx('--admin-panel-padding', cfg, 'layout.admin.panelPadding');
+  _setVarPx('--admin-card-padding', cfg, 'layout.admin.cardPadding');
+  _setVarPx('--admin-row-padding', cfg, 'layout.admin.rowPadding');
+  _setVarPx('--admin-panel-radius', cfg, 'layout.admin.panelRadius');
+  _setVarPx('--admin-surface-radius', cfg, 'layout.admin.surfaceRadius');
+  _setVarPx('--admin-nested-radius', cfg, 'layout.admin.nestedRadius');
 
   /* Spacing */
   _setVarPx('--space-1', cfg, 'spacing.1');

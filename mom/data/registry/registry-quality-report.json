@@ -2,25 +2,25 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-09T14:35:24.626Z",
+    "generatedAt": "2026-04-10T07:51:02.571Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "7a87705f-fd29-4c8c-9473-7a78c5c4cde5"
+    "publication_run_id": "16b4c137-a965-4f41-bc10-785f9b29dac8"
   },
   "summary": {
-    "endpoint_count": 3508,
-    "pack_count": 3912,
-    "relation_edge_count": 2685,
-    "workflow_count": 532,
-    "status_set_count": 659,
-    "validation_rule_count": 41713,
-    "formula_count": 1134,
-    "formula_reference_count": 1134,
-    "field_context_count": 44768,
-    "row_version_tables": 439,
-    "org_scoped_tables": 416,
+    "endpoint_count": 3631,
+    "pack_count": 3948,
+    "relation_edge_count": 2707,
+    "workflow_count": 277,
+    "status_set_count": 733,
+    "validation_rule_count": 42436,
+    "formula_count": 1177,
+    "formula_reference_count": 1177,
+    "field_context_count": 45446,
+    "row_version_tables": 445,
+    "org_scoped_tables": 420,
     "composite_pk_tables": 20,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
@@ -29,28 +29,29 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 123,
-    "workflow_engine_bridge_ready": 124,
+    "transition_runtime_warnings": 256,
+    "workflow_engine_bridge_ready": 257,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 540,
+    "archive_only_tables": 379,
     "soft_delete_tables": 0,
-    "hard_delete_tables": 112,
+    "hard_delete_tables": 279,
     "workflow_lifecycle_modes": {
-      "stateless": 380,
-      "generic_status_only": 118,
-      "guarded_transition_runtime": 31,
-      "persisted": 123,
+      "stateless": 336,
+      "generic_status_only": 31,
+      "guarded_transition_runtime": 35,
+      "persisted": 256,
       "unknown": 0
     },
-    "frontend_foundation_entities": 663,
-    "frontend_ready_entities": 663,
+    "frontend_foundation_entities": 669,
+    "frontend_ready_entities": 669,
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
-    "frontend_publishable_entities": 652,
+    "frontend_archive_isolation_entities": 5,
+    "frontend_publishable_entities": 653,
     "frontend_unpublishable_entities": 0,
-    "attachment_contract_entities": 645,
-    "comment_contract_entities": 645,
-    "activity_contract_entities": 420,
+    "attachment_contract_entities": 651,
+    "comment_contract_entities": 651,
+    "activity_contract_entities": 424,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -73,44 +74,44 @@
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 652,
-      "target": 652
+      "actual": 658,
+      "target": 658
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 652,
-      "target": 652
+      "actual": 658,
+      "target": 658
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 652,
-      "target": 652
+      "actual": 658,
+      "target": 658
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 2685,
-      "target": 2685
+      "actual": 2707,
+      "target": 2707
     },
     {
       "id": "workflow_coverage",
       "passed": true,
-      "actual": 652,
-      "target": 652
+      "actual": 403,
+      "target": 403
     },
     {
       "id": "status_coverage",
       "passed": true,
-      "actual": 248,
-      "target": 248
+      "actual": 309,
+      "target": 309
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 632,
-      "target": 620
+      "actual": 638,
+      "target": 626
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -139,8 +140,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 652,
-      "target": 652
+      "actual": 658,
+      "target": 658
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -163,7 +164,7 @@
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 532,
+      "actual": 277,
       "target": 60
     },
     {
@@ -175,26 +176,26 @@
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 659,
+      "actual": 733,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 41713,
+      "actual": 42436,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 1134,
+      "actual": 1177,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 1134,
-      "target": 1134
+      "actual": 1177,
+      "target": 1177
     }
   ],
   "warnings": {
@@ -1008,6 +1009,14 @@
         ]
       },
       {
+        "table": "inventory_transactions",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "txn_id",
+          "recorded_at"
+        ]
+      },
+      {
         "table": "labor_transactions",
         "primary_key_mode": "composite",
         "primary_key_fields": [
@@ -1122,14 +1131,6 @@
         ]
       },
       {
-        "table": "risk_register",
-        "primary_key_mode": "composite",
-        "primary_key_fields": [
-          "risk_id",
-          "risk_register_id"
-        ]
-      },
-      {
         "table": "routings",
         "primary_key_mode": "composite",
         "primary_key_fields": [
@@ -1155,15 +1156,22 @@
     "workflow_alignment_issues": [],
     "transition_runtime_warnings": [
       {
-        "table": "allocation",
+        "table": "allocations",
         "workflowId": "wf_allocation",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
-        "table": "allocations",
-        "workflowId": "wf_allocation",
+        "table": "approval",
+        "workflowId": "wf_approval",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "approved_supplier_list",
+        "workflowId": "wf_approved_supplier_list",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1190,6 +1198,20 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "aps_planning_scenarios",
+        "workflowId": "wf_aps_scenario",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "aps_schedule_blocks",
+        "workflowId": "wf_aps_schedule_block",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "audit_actions",
         "workflowId": "wf_audit_action",
         "lifecycle_mode": "persisted",
@@ -1197,8 +1219,29 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
-        "table": "calibration_grr_studies",
-        "workflowId": "wf_calibration_control",
+        "table": "bill_of_materials",
+        "workflowId": "wf_bill_of_material",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "bom",
+        "workflowId": "wf_bom",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "bom_version",
+        "workflowId": "wf_bom_version",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "calendar",
+        "workflowId": "wf_calendar",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1206,6 +1249,13 @@
       {
         "table": "calibration_oot_investigations",
         "workflowId": "wf_calibration_control",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "calibration_records",
+        "workflowId": "wf_calibration_record",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1246,6 +1296,13 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "change_control",
+        "workflowId": "wf_change_control",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "cnc_program_approvals",
         "workflowId": "wf_cnc_program_approval",
         "lifecycle_mode": "persisted",
@@ -1267,8 +1324,57 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "com_contracts",
+        "workflowId": "wf_contract_lifecycle",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "com_credit_profiles",
+        "workflowId": "wf_com_credit_profile",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "com_order_promises",
+        "workflowId": "wf_order_promise",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "commercial_accounts",
+        "workflowId": "wf_commercial_account",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "complaint",
+        "workflowId": "wf_complaint",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "compliance_records",
+        "workflowId": "wf_compliance_record",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "concessions",
         "workflowId": "wf_concession",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "container",
+        "workflowId": "wf_container",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1281,6 +1387,41 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "crm_accounts",
+        "workflowId": "wf_crm_account",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "crm_activities",
+        "workflowId": "wf_crm_activity",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "crm_campaigns",
+        "workflowId": "wf_crm_campaign",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "crm_forecasts",
+        "workflowId": "wf_crm_forecast",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "crm_leads",
+        "workflowId": "wf_crm_lead",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "customer_complaints",
         "workflowId": "wf_customer_complaint",
         "lifecycle_mode": "persisted",
@@ -1288,148 +1429,8 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
-        "table": "deviation",
-        "workflowId": "wf_deviation",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "deviations",
-        "workflowId": "wf_deviation",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "document_versions",
-        "workflowId": "wf_document_change_control",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "documents",
-        "workflowId": "wf_document_change_control",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "dw_supplier_dim",
-        "workflowId": "wf_dw_supplier_dim",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "ehs_corrective_actions",
-        "workflowId": "wf_ehs_corrective_action",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "ehs_permit_register",
-        "workflowId": "wf_ehs_permit_register",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "ehs_regulatory_submissions",
-        "workflowId": "wf_ehs_regulatory_submission",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "employee_certifications",
-        "workflowId": "wf_employee_certification",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "export_licenses",
-        "workflowId": "wf_export_licens",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fin_customs_declarations",
-        "workflowId": "wf_fin_customs_declaration",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fin_lc_draw_requests",
-        "workflowId": "wf_fin_lc_draw_request",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fin_letters_of_credit",
-        "workflowId": "wf_fin_letters_of_credit",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fin_multi_book_ledgers",
-        "workflowId": "wf_fin_multi_book_ledger",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fin_withholding_tax_codes",
-        "workflowId": "wf_fin_withholding_tax_code",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fmea_actions",
-        "workflowId": "wf_fmea",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fmea_failure_modes",
-        "workflowId": "wf_fmea",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "fmea_records",
-        "workflowId": "wf_fmea",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "form_schemas",
-        "workflowId": "wf_form_schema",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "hcm_certifications",
-        "workflowId": "wf_hcm_certification",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "hcm_disciplinary_actions",
-        "workflowId": "wf_hcm_disciplinary_action",
+        "table": "customer_sites",
+        "workflowId": "wf_customer_site",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1437,12 +1438,6 @@
     ],
     "workflow_engine_bridge": [],
     "delete_governance": [
-      {
-        "table": "alarm_event",
-        "domain": "mes_execution",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
       {
         "table": "allocation",
         "domain": "demand_supply_planning",
@@ -1492,30 +1487,6 @@
         "governance_level": "governed"
       },
       {
-        "table": "aps_capacity_buckets",
-        "domain": "advanced_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "aps_constraint_resources",
-        "domain": "advanced_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "aps_demand_forecasts",
-        "domain": "advanced_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "aps_material_availability",
-        "domain": "advanced_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
         "table": "aps_planning_horizons",
         "domain": "advanced_planning",
         "mode": "archive_only",
@@ -1530,24 +1501,6 @@
       {
         "table": "aps_schedule_blocks",
         "domain": "advanced_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "aps_schedule_conflicts",
-        "domain": "advanced_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "aps_setup_matrices",
-        "domain": "advanced_planning",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "attachment",
-        "domain": "foundation_governance",
         "mode": "archive_only",
         "governance_level": "governed"
       },
@@ -1595,18 +1548,6 @@
       },
       {
         "table": "bom",
-        "domain": "mfg_engineering",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "bom_components",
-        "domain": "master_data",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "bom_substitute",
         "domain": "mfg_engineering",
         "mode": "archive_only",
         "governance_level": "governed"
@@ -1684,12 +1625,6 @@
         "governance_level": "governed"
       },
       {
-        "table": "com_contract_amendments",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
         "table": "com_contracts",
         "domain": "commercial_contracts",
         "mode": "archive_only",
@@ -1708,56 +1643,14 @@
         "governance_level": "governed"
       },
       {
-        "table": "com_incoterms_profiles",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
         "table": "com_order_promises",
         "domain": "commercial_contracts",
         "mode": "archive_only",
         "governance_level": "governed"
       },
       {
-        "table": "com_payment_terms_profiles",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "com_price_lists",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "com_rebate_accruals",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "com_rebate_programs",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "comments",
-        "domain": "system_infrastructure",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
         "table": "commercial_accounts",
         "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "competency",
-        "domain": "training_hr",
         "mode": "archive_only",
         "governance_level": "governed"
       },
@@ -1792,8 +1685,116 @@
         "governance_level": "governed"
       },
       {
-        "table": "control_plan_characteristics",
+        "table": "control_plans",
         "domain": "fmea_apqp",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "copq_ledger",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_accounts",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_activities",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_campaigns",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_customer_touchpoints",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_forecasts",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_leads",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_opportunities",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "crm_quotes_pipeline",
+        "domain": "crm",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "customer_complaints",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "customer_sites",
+        "domain": "sales",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "customers",
+        "domain": "sales",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "data_archival_runs",
+        "domain": "master_data_governance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "demand",
+        "domain": "demand_supply_planning",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "deviation",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "deviations",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "document",
+        "domain": "document_control",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "document_distribution",
+        "domain": "document_control",
         "mode": "archive_only",
         "governance_level": "governed"
       }

@@ -379,19 +379,37 @@ function toggleDataSetting(key,val){
 }
 async function saveDataSettingsDraft(){
   if(!DATA_SETTINGS_DRAFT) return;
-  const ok=await saveDataSettings(DATA_SETTINGS_DRAFT);
+  const draft = Object.assign({}, DATA_SETTINGS_DRAFT);
+  const ok=await saveDataSettings(draft);
   if(ok){
-    Object.assign(DATA_SETTINGS,DATA_SETTINGS_DRAFT);
+    Object.assign(DATA_SETTINGS,draft);
     DATA_SETTINGS_DRAFT=null;
     showToast(lang==='en'?'✅ Settings saved':'✅ Đã lưu cài đặt');
+    if(typeof loadAuthoritativeAuditTrail === 'function'){
+      try{
+        await loadAuthoritativeAuditTrail({force:true});
+      }catch(e){}
+    }
   } else {
     showToast(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại','error');
   }
-  renderAdminActivity();
+  if(typeof renderAdmin === 'function' && currentPage === 'admin'){
+    renderAdmin();
+    return;
+  }
+  if(typeof renderAdminActivity === 'function'){
+    renderAdminActivity();
+  }
 }
 function cancelDataSettingsDraft(){
   DATA_SETTINGS_DRAFT=null;
-  renderAdminActivity();
+  if(typeof renderAdmin === 'function' && currentPage === 'admin'){
+    renderAdmin();
+    return;
+  }
+  if(typeof renderAdminActivity === 'function'){
+    renderAdminActivity();
+  }
   // Re-open the panel
   setTimeout(()=>{const p=document.getElementById('ds-panel');if(p)p.style.display='';},50);
 }

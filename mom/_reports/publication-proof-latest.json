@@ -1,48 +1,48 @@
 {
-  "publication_run_id": "f87da195-9aa3-4c37-964b-0b2a4908f64d",
-  "generatedAt": "2026-04-09T14:35:29.028Z",
-  "source_commit": "7240d118",
+  "publication_run_id": "886e1be2-baff-4755-8482-9015779e3c99",
+  "generatedAt": "2026-04-10T07:51:07.415Z",
+  "source_commit": "9fe3bd53",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "39e74b90f5ef64fb1a50cf78734282e3538ddb7703c2be641954e1a52fcc8a2d",
-    "frontend-foundation-catalog.json": "720b0fbe0129eca4141117f56f5e0327e876407684bb37b0f0e6f76e77b9c700",
-    "registry-manifest.json": "ab831ff9ac38da09ad2c10446f565e3fda90bbe588ed1fd28554079a3887d579",
-    "registry-quality-report.json": "1fb69c983a3ba707206c4c44c16581dee31f3d7db3f0831864e9540f5e21127c",
-    "domain-field-packs.json": "9d29d0b7551a5ee03a92d6b977f2e898d3d5dbf48e66ea4e9900dc89aef7ce41",
-    "data-fields-part2.json": "04512711a322d1ce15bdc11cb5ebb243e57ce723e61d1c20ee02ffdeb1b170a7",
-    "wave-gap-ledger.json": "eae79f0ba18b37e22ff89fa2583208a3603123920bf37087288f1a2bff51a2f0"
+    "endpoint-catalog.json": "f6da59995a2dd6196a191f88c1d7974357075e5dd3e8fd345cdabc8bde7383bd",
+    "frontend-foundation-catalog.json": "daf744eedd2d4f5db9ededfba9099b1c1d66fad5fa95c3bc507c96f2f22ac625",
+    "registry-manifest.json": "9e7c2f69e45ba2c8801d04a51eb6634345ea86a070a33974d5df669d658d969e",
+    "registry-quality-report.json": "794ab7670abd168de51b97828fe0a56b64668e27d4a68da89f530a97a182d3e0",
+    "domain-field-packs.json": "fb4aa73f83469d0c0ee48f2810737199f6a8dc08f0fb4a72362b2c387e26d132",
+    "data-fields-part2.json": "16a353f0805487192fac28129aabd0f6eaadb97685341650edb9440653fa1b1b",
+    "wave-gap-ledger.json": "a008cfb6418ccda8a78810fa27c614fb1ec01f00ba4dc481b52612399ec3501b"
   },
   "summary_counts": {
-    "ready": 663,
+    "ready": 669,
     "partial": 0,
     "blocked": 0,
-    "wf_ready": 249,
-    "bridge_ready": 124,
+    "wf_ready": 314,
+    "bridge_ready": 257,
     "bridge_blocked": 0,
-    "endpoints": 3537
+    "endpoints": 3631
   },
   "invariant_checks": [
     {
       "name": "endpoint_count_matches_manifest",
       "status": "PASS",
-      "detail": "catalog_meta=3537, actual_keys=3537, manifest=3537"
+      "detail": "catalog_meta=3631, actual_keys=3631, manifest=3631"
     },
     {
       "name": "frontend_entity_counts_consistent",
       "status": "PASS",
-      "detail": "summary.entity_count=663 vs actual=663; ready=663/663; partial=0/0; blocked=0/0"
+      "detail": "summary.entity_count=669 vs actual=669; ready=669/669; partial=0/0; blocked=0/0"
     },
     {
       "name": "bridge_counts_consistent",
       "status": "PASS",
-      "detail": "qr: ready=124, blocked=0; manifest: ready=124, blocked=0"
+      "detail": "qr: ready=257, blocked=0; manifest: ready=257, blocked=0"
     },
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['7a87705f-fd29-4c8c-9473-7a78c5c4cde5']"
+      "detail": "distinct_run_ids=['16b4c137-a965-4f41-bc10-785f9b29dac8']"
     },
     {
       "name": "approval_group_not_split_truth",
@@ -63,6 +63,7 @@
     "wave1_lifecycle_governance": "OK",
     "wave2_canonical_governance": "OK",
     "wave3_process_governance": "OK",
+    "wave4_production_quality_governance": "OK",
     "operational_stress_governance": "OK",
     "publication_truth_summaries": "OK",
     "wave_gap_ledger": "OK"

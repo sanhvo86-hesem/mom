@@ -49,6 +49,26 @@ $rewrittenSample = portal_rewrite_streamed_html(
 smoke_assert(str_contains($rewrittenSample, 'href="/assets/style.css"'), 'Rewritten HTML should expose root-relative stylesheet links.');
 smoke_assert(str_contains($rewrittenSample, 'href="/mom/portal.html"'), 'Rewritten HTML should expose root-relative portal links.');
 
+$portalHtml = file_get_contents(QMS_TEST_ROOT_DIR . '/mom/portal.html');
+smoke_assert($portalHtml !== false, 'Portal shell should be readable for path integrity checks.');
+smoke_assert(str_contains((string) $portalHtml, 'href="/mom/manifest.json"'), 'Portal shell should pin the manifest to the canonical /mom root.');
+smoke_assert(str_contains((string) $portalHtml, 'href="/mom/assets/icons/icon-192x192.png"'), 'Portal shell should pin app icons to the canonical /mom root.');
+smoke_assert(str_contains((string) $portalHtml, 'href="/mom/favicon.ico"'), 'Portal shell should pin the favicon to the canonical /mom root.');
+
+$manifest = json_decode((string) file_get_contents(QMS_TEST_ROOT_DIR . '/mom/manifest.json'), true);
+smoke_assert(is_array($manifest), 'PWA manifest should decode correctly.');
+$manifestIcons = array_map(static fn(array $icon): string => (string) ($icon['src'] ?? ''), is_array($manifest['icons'] ?? null) ? $manifest['icons'] : []);
+$manifestShortcuts = [];
+foreach ((is_array($manifest['shortcuts'] ?? null) ? $manifest['shortcuts'] : []) as $shortcut) {
+    foreach ((is_array($shortcut['icons'] ?? null) ? $shortcut['icons'] : []) as $icon) {
+        $manifestShortcuts[] = (string) ($icon['src'] ?? '');
+    }
+}
+$manifestScreenshots = array_map(static fn(array $shot): string => (string) ($shot['src'] ?? ''), is_array($manifest['screenshots'] ?? null) ? $manifest['screenshots'] : []);
+foreach (array_merge($manifestIcons, $manifestShortcuts, $manifestScreenshots) as $assetPath) {
+    smoke_assert(str_starts_with($assetPath, '/mom/'), 'Manifest assets should use canonical /mom-rooted paths: ' . $assetPath);
+}
+
 $liveRoots = [
     'MAN' => 'mom/docs/system/quality-manual',
     'POL' => 'mom/docs/system/policies',

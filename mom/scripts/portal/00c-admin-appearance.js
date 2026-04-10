@@ -204,7 +204,7 @@ function fontSelect(label, cssVar, path, def, isMono){
   var h = '<div class="adm-control-row" data-control="font" data-css-var="'+esc(cssVar)+'" data-path="'+esc(path)+'" style="margin-bottom:10px">';
   h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">';
   h += '<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>';
-  h += '<select id="'+sid+'" data-role="select" onchange="var v=this.value;if(v===\'__custom__\'){document.getElementById(\''+tid+'\').style.display=\'block\';}else{document.getElementById(\''+tid+'\').style.display=\'none\';_hmSet(\''+cssVar+'\',\''+path+'\',v);}" style="flex:1;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;background:var(--bg-surface)">';
+  h += '<select id="'+sid+'" data-role="select" onchange="var v=this.value;if(v===\'__custom__\'){document.getElementById(\''+tid+'\').style.display=\'block\';}else{document.getElementById(\''+tid+'\').style.display=\'none\';_hmSet(\''+cssVar+'\',\''+path+'\',v);}" style="flex:1;min-height:var(--hds-control-h,32px);height:auto;padding:var(--input-padding-y,0px) var(--hds-control-px,10px);border:var(--input-border-width,1px) solid var(--border);border-radius:var(--hds-control-radius,var(--radius-md));font-size:var(--hds-control-font,13px);line-height:var(--leading-tight,1.25);background:var(--input-bg,var(--bg-surface));color:var(--text-primary);box-sizing:border-box">';
   var matched = false;
   options.forEach(function(o){
     var selected = val === o.value ? 'selected' : '';
@@ -606,6 +606,91 @@ function previewLayoutDimensions(){
     + '<div style="width:min(100%,calc(var(--modal-sm-max-w,480px) / 2));padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-modal)">Modal sm</div>'
     + '</div>'
     + '</div></div></div></div>'
+  );
+}
+
+var ADMIN_LAYOUT_PRESETS = {
+  compact: {
+    gapLg: '16px',
+    gapMd: '12px',
+    gapSm: '6px',
+    panelPadding: '16px',
+    cardPadding: '14px',
+    rowPadding: '10px',
+    panelRadius: '16px',
+    surfaceRadius: '14px',
+    nestedRadius: '10px'
+  },
+  default: {
+    gapLg: '18px',
+    gapMd: '14px',
+    gapSm: '8px',
+    panelPadding: '18px',
+    cardPadding: '18px',
+    rowPadding: '12px',
+    panelRadius: '20px',
+    surfaceRadius: '18px',
+    nestedRadius: '14px'
+  },
+  comfortable: {
+    gapLg: '22px',
+    gapMd: '16px',
+    gapSm: '10px',
+    panelPadding: '20px',
+    cardPadding: '20px',
+    rowPadding: '14px',
+    panelRadius: '22px',
+    surfaceRadius: '20px',
+    nestedRadius: '16px'
+  }
+};
+
+window._hmApplyAdminLayoutTemplate = function(template){
+  var next = String(template || 'default');
+  var payload = { layout: { admin: { template: next } } };
+  if(ADMIN_LAYOUT_PRESETS[next]){
+    payload.layout.admin = Object.assign({ template: next }, ADMIN_LAYOUT_PRESETS[next]);
+  }
+  HmTheme.setAll(payload);
+  if(typeof renderAdminAppearance === 'function') renderAdminAppearance();
+};
+
+function previewAdminLayoutTemplate(){
+  return previewBox(
+    L('Xem trước layout admin', 'Preview admin layout'),
+    '<div style="padding:var(--admin-panel-padding,18px);border:1px solid var(--border);border-radius:var(--admin-panel-radius,20px);background:var(--bg-page)">'
+    + '<div style="display:grid;grid-template-columns:minmax(150px,190px) 1fr;gap:var(--admin-gap-lg,18px);align-items:start">'
+    + '<div style="display:grid;gap:var(--admin-gap-md,14px);padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-panel-radius,20px);background:linear-gradient(165deg,color-mix(in srgb, var(--bg-surface,#fff) 94%, var(--brand-2,#1565c0) 6%) 0%,color-mix(in srgb, var(--bg-surface,#fff) 95%, var(--brand-light,#60a5fa) 5%) 100%)">'
+    + '<div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary)">Rail</div>'
+    + '<div style="display:grid;gap:var(--admin-gap-sm,8px)">'
+    + '<div style="padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:rgba(255,255,255,.78)">Section A</div>'
+    + '<div style="padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:rgba(255,255,255,.78)">Section B</div>'
+    + '</div>'
+    + '</div>'
+    + '<div style="display:grid;gap:var(--admin-gap-lg,18px)">'
+    + '<div style="padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:linear-gradient(135deg,color-mix(in srgb, var(--bg-surface,#fff) 90%, var(--brand-2,#1565c0) 6%) 0%,color-mix(in srgb, var(--bg-surface,#fff) 92%, var(--amber,#f59e0b) 8%) 100%);display:grid;gap:var(--admin-gap-sm,8px)">'
+    + '<div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary)">Hero</div>'
+    + '<div style="height:10px;width:48%;border-radius:999px;background:color-mix(in srgb, var(--brand-2,#1565c0) 18%, transparent)"></div>'
+    + '<div style="height:10px;width:76%;border-radius:999px;background:color-mix(in srgb, var(--brand-2,#1565c0) 10%, transparent)"></div>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--admin-gap-md,14px)">'
+    + '<div style="padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:var(--bg-surface);display:grid;gap:var(--admin-gap-md,14px)">'
+    + '<div style="height:12px;width:56%;border-radius:999px;background:var(--bg-surface-alt,var(--bg-hover))"></div>'
+    + '<div style="padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:var(--bg-surface-alt,var(--bg-hover))"></div>'
+    + '<div style="padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:var(--bg-surface-alt,var(--bg-hover))"></div>'
+    + '</div>'
+    + '<div style="padding:var(--admin-card-padding,18px);border:1px solid var(--border);border-radius:var(--admin-surface-radius,18px);background:var(--bg-surface);display:grid;gap:var(--admin-gap-sm,8px)">'
+    + '<div style="height:12px;width:48%;border-radius:999px;background:var(--bg-surface-alt,var(--bg-hover))"></div>'
+    + '<div style="display:grid;gap:var(--admin-gap-sm,8px)">'
+    + '<div style="padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:var(--bg-surface-alt,var(--bg-hover))"></div>'
+    + '<div style="padding:var(--admin-row-padding,12px);border:1px solid var(--border);border-radius:var(--admin-nested-radius,14px);background:var(--bg-surface-alt,var(--bg-hover))"></div>'
+    + '</div>'
+    + '</div>'
+    + '</div>'
+    + '</div>'
+    + '</div>'
+    + '</div>',
+    L('Preset đổi đồng thời gap, padding và radius của toàn bộ admin shell.', 'Presets update gap, padding, and radius together across the admin shell.')
   );
 }
 
@@ -1211,6 +1296,7 @@ function renderColors(){
 /* ══════════════════════════════════════════════════════════════════════════ */
 function renderLayout(){
   var h = '';
+  var adminLayoutTemplate = cfg('layout.admin.template') || 'default';
 
   h += sectionLead(
     L('Layout controls đã được tách theo phạm vi ảnh hưởng', 'Layout controls are now grouped by impact scope'),
@@ -1270,6 +1356,32 @@ function renderLayout(){
     + slider('Modal small max-width', '--modal-sm-max-w', 'layout.modalSmMaxW', 280, 720, 480, 'px')
     + previewLayoutDimensions()
   , false, statusChip('partial', L('Sidebar / header / modal tốt', 'Sidebar / header / modal strong')) + statusChip('preview', L('Content max width còn giới hạn', 'Content max width still limited')));
+
+  h += sect('🏗️ '+L('Layout template admin', 'Admin layout template'),
+    sectionLead(
+      L('Shell admin giờ có bộ token layout riêng', 'Admin shell now has its own layout token kit'),
+      L('Preset bên dưới điều khiển khoảng cách giữa rail và canvas, khe hở giữa section, padding 4 biên của panel, cùng bán kính card/section trong toàn bộ module admin.', 'The presets below govern rail-to-canvas spacing, section gaps, panel outer padding, and card/section radius across the admin modules.'),
+      statusChip('admin', L('Liên kết trực tiếp tab đồ họa', 'Directly linked to admin graphics tab'))
+      + statusChip('full', L('Áp dụng runtime', 'Runtime tokens'))
+    )
+    + radioRow('adm_adminLayoutTemplate', [
+      {value:'compact', icon:'🗜️', label:T('compact')},
+      {value:'default', icon:'🧭', label:T('default')},
+      {value:'comfortable', icon:'🪟', label:T('comfortable')},
+      {value:'custom', icon:'✏️', label:T('custom')}
+    ], adminLayoutTemplate, "_hmApplyAdminLayoutTemplate(this.value)")
+    + '<div style="margin:12px 0 10px;font-size:11px;line-height:1.6;color:var(--text-secondary)">'+esc(L('Preset là bundle tham chiếu. Các slider phía dưới cho phép tinh chỉnh thủ công tiếp và vẫn lưu cùng runtime config.', 'Presets are reference bundles. The sliders below let you refine manually and persist alongside the runtime config.'))+'</div>'
+    + slider('Shell gap', '--admin-gap-lg', 'layout.admin.gapLg', 8, 32, 18, 'px')
+    + slider('Section / grid gap', '--admin-gap-md', 'layout.admin.gapMd', 8, 24, 14, 'px')
+    + slider('Inline / toolbar gap', '--admin-gap-sm', 'layout.admin.gapSm', 4, 16, 8, 'px')
+    + slider('Panel outer padding', '--admin-panel-padding', 'layout.admin.panelPadding', 8, 32, 18, 'px')
+    + slider('Card / hero padding', '--admin-card-padding', 'layout.admin.cardPadding', 10, 32, 18, 'px')
+    + slider('Nested row padding', '--admin-row-padding', 'layout.admin.rowPadding', 8, 24, 12, 'px')
+    + slider('Panel radius', '--admin-panel-radius', 'layout.admin.panelRadius', 6, 28, 20, 'px')
+    + slider('Surface radius', '--admin-surface-radius', 'layout.admin.surfaceRadius', 6, 24, 18, 'px')
+    + slider('Nested radius', '--admin-nested-radius', 'layout.admin.nestedRadius', 4, 20, 14, 'px')
+    + previewAdminLayoutTemplate()
+  , false, statusChip('full', L('Admin console shell', 'Admin console shell')) + statusChip('admin', L('Preset + manual', 'Preset + manual')));
 
   h += sect('📊 '+T('zIndex')+' (read-only)',
     '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border)">Layer</th><th style="text-align:right;padding:4px 8px;border-bottom:1px solid var(--border)">Value</th></tr></thead><tbody>'
@@ -1775,10 +1887,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260406a';
+window._renderAdminAppearanceFullVersion = '20260410d';
 window._renderAdminAppearanceFull = render;
 
 })();
-
-
-

@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-09T14:35:20.092Z",
-    "enumCount": 659
+    "generatedAt": "2026-04-10T07:50:58.252Z",
+    "enumCount": 733
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -2503,8 +2503,8 @@
     "labelEn": "Item",
     "source": "fusion",
     "standard": "internal",
-    "sourceTable": "items",
-    "statusColumn": "item_status",
+    "sourceTable": "item",
+    "statusColumn": "status_code",
     "options": [
       {
         "value": "draft",
@@ -2709,6 +2709,8 @@
     "labelEn": "NCR",
     "source": "fusion",
     "standard": "internal",
+    "sourceTable": "nonconformance",
+    "statusColumn": "status_code",
     "options": [
       {
         "value": "draft",
@@ -5381,8 +5383,8 @@
     "labelEn": "Digital Thread Status",
     "source": "world",
     "standard": "internal",
-    "sourceTable": "wms_bin_contents",
-    "statusColumn": "content_status",
+    "sourceTable": "workflow_step_data",
+    "statusColumn": "to_state",
     "options": [
       {
         "value": "complete",
@@ -6113,36 +6115,36 @@
         "value": "open",
         "label": "Mở",
         "labelEn": "Open",
-        "color": "#ef4444",
-        "icon": "fa-circle-exclamation",
+        "color": "#3b82f6",
+        "icon": "CircleDot",
         "allowedTransitionsFrom": []
       },
       {
         "value": "in_progress",
         "label": "Đang xử lý",
         "labelEn": "In Progress",
-        "color": "#f59e0b",
-        "icon": "fa-spinner",
+        "color": "#3b82f6",
+        "icon": "Play",
         "allowedTransitionsFrom": [
           "open"
         ]
       },
       {
         "value": "pending_review",
-        "label": "Chờ duyệt",
+        "label": "Chờ xem xét",
         "labelEn": "Pending Review",
-        "color": "#8b5cf6",
-        "icon": "fa-eye",
+        "color": "#3b82f6",
+        "icon": "Search",
         "allowedTransitionsFrom": [
           "in_progress"
         ]
       },
       {
         "value": "closed",
-        "label": "Đóng",
+        "label": "Đã đóng",
         "labelEn": "Closed",
-        "color": "#22c55e",
-        "icon": "fa-check-circle",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
         "allowedTransitionsFrom": [
           "pending_review"
         ]
@@ -6151,8 +6153,8 @@
         "value": "rejected",
         "label": "Từ chối",
         "labelEn": "Rejected",
-        "color": "#94a3b8",
-        "icon": "fa-times-circle",
+        "color": "#ef4444",
+        "icon": "Ban",
         "allowedTransitionsFrom": [
           "pending_review"
         ]
@@ -6428,6 +6430,8 @@
     "labelEn": "Form Submission Status",
     "source": "portal",
     "standard": "internal",
+    "sourceTable": "form_entries",
+    "statusColumn": "workflow_state",
     "options": [
       {
         "value": "draft",
@@ -6676,7 +6680,6 @@
     "standard": "AS9100",
     "sourceTable": "approved_supplier_list",
     "statusColumn": "asl_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -6948,7 +6951,6 @@
     "standard": "internal",
     "sourceTable": "aps_planning_scenarios",
     "statusColumn": "scenario_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7034,7 +7036,6 @@
     "standard": "internal",
     "sourceTable": "aps_schedule_blocks",
     "statusColumn": "block_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7205,7 +7206,6 @@
     "standard": "internal",
     "sourceTable": "bill_of_materials",
     "statusColumn": "bom_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7291,7 +7291,6 @@
     "standard": "ISO17025",
     "sourceTable": "calibration_records",
     "statusColumn": "grr_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7575,7 +7574,6 @@
     "standard": "internal",
     "sourceTable": "com_contracts",
     "statusColumn": "contract_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7661,7 +7659,6 @@
     "standard": "internal",
     "sourceTable": "com_credit_profiles",
     "statusColumn": "credit_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7747,7 +7744,6 @@
     "standard": "internal",
     "sourceTable": "com_order_promises",
     "statusColumn": "promise_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7833,7 +7829,6 @@
     "standard": "internal",
     "sourceTable": "commercial_accounts",
     "statusColumn": "account_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7919,7 +7914,6 @@
     "standard": "AS9100",
     "sourceTable": "compliance_records",
     "statusColumn": "compliance_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -8162,7 +8156,6 @@
     "standard": "internal",
     "sourceTable": "crm_accounts",
     "statusColumn": "account_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -8248,7 +8241,6 @@
     "standard": "internal",
     "sourceTable": "crm_activities",
     "statusColumn": "activity_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -8334,7 +8326,6 @@
     "standard": "internal",
     "sourceTable": "crm_campaigns",
     "statusColumn": "campaign_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -8420,7 +8411,6 @@
     "standard": "internal",
     "sourceTable": "crm_forecasts",
     "statusColumn": "forecast_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -8506,7 +8496,6 @@
     "standard": "internal",
     "sourceTable": "crm_leads",
     "statusColumn": "lead_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -8592,7 +8581,6 @@
     "standard": "internal",
     "sourceTable": "crm_quotes_pipeline",
     "statusColumn": "commercial_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -8737,7 +8725,6 @@
     "standard": "internal",
     "sourceTable": "customer_sites",
     "statusColumn": "site_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9115,7 +9102,6 @@
     "standard": "internal",
     "sourceTable": "dw_customer_dim",
     "statusColumn": "customer_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9201,7 +9187,6 @@
     "standard": "internal",
     "sourceTable": "dw_employee_dim",
     "statusColumn": "employment_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9287,7 +9272,6 @@
     "standard": "internal",
     "sourceTable": "dw_etl_runs",
     "statusColumn": "run_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9866,39 +9850,47 @@
     "standard": "internal",
     "sourceTable": "engineering_change_requests",
     "statusColumn": "ecr_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
-        "value": "complete",
-        "label": "Hoàn chỉnh",
-        "labelEn": "Complete",
-        "color": "#10b981",
-        "icon": "fa-circle",
+        "value": "pending",
+        "label": "Chờ xử lý",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
         "allowedTransitionsFrom": []
       },
       {
         "value": "partial",
         "label": "Một phần",
         "labelEn": "Partial",
-        "color": "#f59e0b",
-        "icon": "BarChart3",
-        "allowedTransitionsFrom": []
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": [
+          "pending",
+          "broken"
+        ]
+      },
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "pending",
+          "partial"
+        ]
       },
       {
         "value": "broken",
         "label": "Đứt gãy",
         "labelEn": "Broken",
         "color": "#ef4444",
-        "icon": "fa-circle",
-        "allowedTransitionsFrom": []
-      },
-      {
-        "value": "pending",
-        "label": "Chờ hoàn thiện",
-        "labelEn": "Pending",
-        "color": "#3b82f6",
-        "icon": "Clock",
-        "allowedTransitionsFrom": []
+        "icon": "Ban",
+        "allowedTransitionsFrom": [
+          "pending",
+          "partial"
+        ]
       }
     ]
   },
@@ -10037,7 +10029,6 @@
     "standard": "internal",
     "sourceTable": "fin_bank_reconciliations",
     "statusColumn": "reconciliation_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10123,7 +10114,6 @@
     "standard": "internal",
     "sourceTable": "fin_budget_versions",
     "statusColumn": "budget_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10209,7 +10199,6 @@
     "standard": "internal",
     "sourceTable": "fin_cash_accounts",
     "statusColumn": "account_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10738,7 +10727,6 @@
     "standard": "internal",
     "sourceTable": "fin_revenue_schedules",
     "statusColumn": "schedule_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10909,7 +10897,6 @@
     "standard": "internal",
     "sourceTable": "fixture_master",
     "statusColumn": "fixture_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11189,7 +11176,6 @@
     "standard": "internal",
     "sourceTable": "hcm_attendance_records",
     "statusColumn": "attendance_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11445,7 +11431,6 @@
     "standard": "internal",
     "sourceTable": "hcm_employee_certifications",
     "statusColumn": "certification_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11816,7 +11801,6 @@
     "standard": "internal",
     "sourceTable": "hcm_payroll_runs",
     "statusColumn": "payroll_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -12627,7 +12611,6 @@
     "standard": "internal",
     "sourceTable": "job_release_gates",
     "statusColumn": "gate_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -12713,7 +12696,6 @@
     "standard": "internal",
     "sourceTable": "kpi_snapshots",
     "statusColumn": "kpi_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -12799,7 +12781,6 @@
     "standard": "internal",
     "sourceTable": "labor_transactions",
     "statusColumn": "approval_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -12885,7 +12866,6 @@
     "standard": "internal",
     "sourceTable": "lot_master",
     "statusColumn": "conformance_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13200,7 +13180,6 @@
     "standard": "internal",
     "sourceTable": "mes_alarm_catalog",
     "statusColumn": "catalog_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13286,7 +13265,6 @@
     "standard": "internal",
     "sourceTable": "mes_alarm_playbooks",
     "statusColumn": "playbook_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13372,7 +13350,6 @@
     "standard": "internal",
     "sourceTable": "mes_connectivity_adapters",
     "statusColumn": "adapter_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13458,7 +13435,6 @@
     "standard": "internal",
     "sourceTable": "mes_connectivity_events",
     "statusColumn": "event_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13544,7 +13520,6 @@
     "standard": "internal",
     "sourceTable": "mes_cost_tracking",
     "statusColumn": "cost_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13767,7 +13742,6 @@
     "standard": "internal",
     "sourceTable": "mes_dpp_passports",
     "statusColumn": "passport_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13853,7 +13827,6 @@
     "standard": "internal",
     "sourceTable": "mes_erp_inbound_queue",
     "statusColumn": "process_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -13939,7 +13912,6 @@
     "standard": "internal",
     "sourceTable": "mes_erp_outbound_queue",
     "statusColumn": "send_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -14245,7 +14217,6 @@
     "standard": "internal",
     "sourceTable": "mes_machine_alarms",
     "statusColumn": "escalation_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -14331,7 +14302,6 @@
     "standard": "internal",
     "sourceTable": "mes_nc_download_receipts",
     "statusColumn": "receipt_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -14417,7 +14387,6 @@
     "standard": "internal",
     "sourceTable": "mes_nc_release_packages",
     "statusColumn": "package_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -14503,7 +14472,6 @@
     "standard": "internal",
     "sourceTable": "mes_shift_handover",
     "statusColumn": "tooling_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -14589,7 +14557,6 @@
     "standard": "internal",
     "sourceTable": "mes_tool_assemblies",
     "statusColumn": "assembly_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -14675,7 +14642,6 @@
     "standard": "internal",
     "sourceTable": "mes_tool_preset_offsets",
     "statusColumn": "verified_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -14761,7 +14727,6 @@
     "standard": "internal",
     "sourceTable": "mes_wip_location",
     "statusColumn": "current_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15153,7 +15118,6 @@
     "standard": "internal",
     "sourceTable": "mrp_planned_orders",
     "statusColumn": "mrp_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15318,7 +15282,6 @@
     "standard": "internal",
     "sourceTable": "npi_projects",
     "statusColumn": "gate_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15404,7 +15367,6 @@
     "standard": "internal",
     "sourceTable": "order_collaboration_events",
     "statusColumn": "event_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15490,7 +15452,6 @@
     "standard": "internal",
     "sourceTable": "order_document_requirements",
     "statusColumn": "requirement_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15576,7 +15537,6 @@
     "standard": "internal",
     "sourceTable": "order_holds",
     "statusColumn": "hold_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15662,7 +15622,6 @@
     "standard": "internal",
     "sourceTable": "order_milestones",
     "statusColumn": "milestone_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15748,7 +15707,6 @@
     "standard": "internal",
     "sourceTable": "osc_dispatch_batches",
     "statusColumn": "batch_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15834,7 +15792,6 @@
     "standard": "internal",
     "sourceTable": "osc_subcontract_plans",
     "statusColumn": "plan_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -15920,7 +15877,6 @@
     "standard": "internal",
     "sourceTable": "osc_supplier_chargebacks",
     "statusColumn": "chargeback_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16006,7 +15962,6 @@
     "standard": "internal",
     "sourceTable": "osc_supplier_nonconformances",
     "statusColumn": "issue_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16092,7 +16047,6 @@
     "standard": "internal",
     "sourceTable": "osc_supplier_receipts",
     "statusColumn": "receipt_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16178,7 +16132,6 @@
     "standard": "internal",
     "sourceTable": "osc_supplier_recovery_claims",
     "statusColumn": "claim_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16264,7 +16217,6 @@
     "standard": "internal",
     "sourceTable": "outside_processing_orders",
     "statusColumn": "osp_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16435,7 +16387,6 @@
     "standard": "internal",
     "sourceTable": "plm_change_order_lines",
     "statusColumn": "implementation_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16776,7 +16727,6 @@
     "standard": "internal",
     "sourceTable": "plm_obsolescence_tracking",
     "statusColumn": "lifecycle_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16862,7 +16812,6 @@
     "standard": "internal",
     "sourceTable": "plm_product_configurations",
     "statusColumn": "configuration_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16948,7 +16897,6 @@
     "standard": "internal",
     "sourceTable": "plm_requirement_traces",
     "statusColumn": "trace_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -17204,7 +17152,6 @@
     "standard": "internal",
     "sourceTable": "plm_test_results",
     "statusColumn": "result_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -17998,7 +17945,6 @@
     "standard": "AIAG",
     "sourceTable": "ppap_submissions",
     "statusColumn": "overall_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18084,7 +18030,6 @@
     "standard": "internal",
     "sourceTable": "prj_billing_milestones",
     "statusColumn": "invoice_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18170,7 +18115,6 @@
     "standard": "internal",
     "sourceTable": "prj_change_requests",
     "statusColumn": "approval_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18256,7 +18200,6 @@
     "standard": "internal",
     "sourceTable": "prj_milestones",
     "statusColumn": "milestone_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18342,7 +18285,6 @@
     "standard": "internal",
     "sourceTable": "prj_projects",
     "statusColumn": "project_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18428,7 +18370,6 @@
     "standard": "internal",
     "sourceTable": "prj_risk_register",
     "statusColumn": "risk_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18820,7 +18761,6 @@
     "standard": "internal",
     "sourceTable": "projects",
     "statusColumn": "project_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19155,7 +19095,6 @@
     "standard": "ISO17025",
     "sourceTable": "qual_escape_events",
     "statusColumn": "containment_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19241,7 +19180,6 @@
     "standard": "ISO17025",
     "sourceTable": "qual_first_article_packages",
     "statusColumn": "package_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19412,7 +19350,6 @@
     "standard": "ISO17025",
     "sourceTable": "qual_sample_batches",
     "statusColumn": "sample_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -20406,7 +20343,6 @@
     "standard": "AS9100",
     "sourceTable": "shipment_releases",
     "statusColumn": "coa_status",
-    "aliasOf": "shipment_release_status",
     "options": [
       {
         "value": "blocked",
@@ -20524,7 +20460,6 @@
     "standard": "AS9100",
     "sourceTable": "shipments",
     "statusColumn": "shipment_status",
-    "aliasOf": "shipment_release_status",
     "options": [
       {
         "value": "blocked",
@@ -20728,7 +20663,6 @@
     "standard": "internal",
     "sourceTable": "sop_plans",
     "statusColumn": "plan_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -20814,7 +20748,6 @@
     "standard": "AS9100",
     "sourceTable": "srm_sourcing_bids",
     "statusColumn": "bid_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -20900,7 +20833,6 @@
     "standard": "AS9100",
     "sourceTable": "srm_sourcing_events",
     "statusColumn": "event_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -20986,7 +20918,6 @@
     "standard": "AS9100",
     "sourceTable": "srm_supplier_action_requests",
     "statusColumn": "request_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21072,7 +21003,6 @@
     "standard": "AS9100",
     "sourceTable": "srm_supplier_contracts",
     "statusColumn": "contract_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21244,7 +21174,6 @@
     "standard": "AS9100",
     "sourceTable": "srm_supplier_portal_messages",
     "statusColumn": "message_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21330,7 +21259,6 @@
     "standard": "AS9100",
     "sourceTable": "srm_supplier_ppap_packages",
     "statusColumn": "approval_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21671,7 +21599,6 @@
     "standard": "internal",
     "sourceTable": "svc_installed_base",
     "statusColumn": "lifecycle_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21757,7 +21684,6 @@
     "standard": "internal",
     "sourceTable": "svc_return_authorizations",
     "statusColumn": "authorization_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21843,7 +21769,6 @@
     "standard": "internal",
     "sourceTable": "svc_service_contracts",
     "statusColumn": "contract_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21929,7 +21854,6 @@
     "standard": "internal",
     "sourceTable": "svc_service_requests",
     "statusColumn": "request_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -22093,7 +22017,6 @@
     "standard": "internal",
     "sourceTable": "svc_warranty_claims",
     "statusColumn": "claim_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -22265,7 +22188,6 @@
     "standard": "internal",
     "sourceTable": "tms_freight_audits",
     "statusColumn": "audit_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -22574,7 +22496,6 @@
     "standard": "internal",
     "sourceTable": "tooling_assemblies",
     "statusColumn": "assembly_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -22660,7 +22581,6 @@
     "standard": "internal",
     "sourceTable": "tooling_kits",
     "statusColumn": "kit_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -22746,7 +22666,6 @@
     "standard": "internal",
     "sourceTable": "tooling_presets",
     "statusColumn": "preset_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -22832,7 +22751,6 @@
     "standard": "internal",
     "sourceTable": "tooling_regrind_cycles",
     "statusColumn": "cycle_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23004,7 +22922,6 @@
     "standard": "internal",
     "sourceTable": "trace_recall_campaigns",
     "statusColumn": "recall_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23090,7 +23007,6 @@
     "standard": "ITAR/EAR",
     "sourceTable": "trade_compliance_audits",
     "statusColumn": "audit_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23176,7 +23092,6 @@
     "standard": "ITAR/EAR",
     "sourceTable": "trade_screening_hits",
     "statusColumn": "hit_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23463,7 +23378,6 @@
     "standard": "internal",
     "sourceTable": "wms_bin_contents",
     "statusColumn": "content_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -24315,7 +24229,6 @@
     "standard": "AS9100",
     "sourceTable": "capa_8d_steps",
     "statusColumn": "step_status",
-    "aliasOf": "capa",
     "options": [
       {
         "value": "draft",
@@ -25062,7 +24975,6 @@
     "standard": "internal",
     "sourceTable": "lean_tier_meetings",
     "statusColumn": "cost_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -25148,7 +25060,6 @@
     "standard": "internal",
     "sourceTable": "org_companies",
     "statusColumn": "company_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -25234,7 +25145,6 @@
     "standard": "internal",
     "sourceTable": "org_legal_entities",
     "statusColumn": "legal_entity_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -25320,7 +25230,6 @@
     "standard": "internal",
     "sourceTable": "org_plants",
     "statusColumn": "plant_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -25406,7 +25315,6 @@
     "standard": "internal",
     "sourceTable": "data_archival_runs",
     "statusColumn": "archive_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -25492,7 +25400,6 @@
     "standard": "internal",
     "sourceTable": "integration_monitors",
     "statusColumn": "monitoring_status",
-    "aliasOf": "integration_monitor_status",
     "options": [
       {
         "value": "draft",
@@ -25531,7 +25438,6 @@
     "standard": "internal",
     "sourceTable": "retention_policies",
     "statusColumn": "policy_status",
-    "aliasOf": "retention_policy_status",
     "options": [
       {
         "value": "draft",
@@ -25570,7 +25476,6 @@
     "standard": "internal",
     "sourceTable": "source_system_registry",
     "statusColumn": "source_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -30288,7 +30193,6 @@
     "standard": "internal",
     "sourceTable": "ap_invoice_lines",
     "statusColumn": "three_way_match_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -30727,7 +30631,6 @@
     "standard": "internal",
     "sourceTable": "electronic_signature",
     "statusColumn": "signature_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -30970,7 +30873,6 @@
     "standard": "AS9100",
     "sourceTable": "inspection_lot",
     "statusColumn": "inspection_status",
-    "aliasOf": "inspection_lot",
     "options": [
       {
         "value": "open",
@@ -31199,7 +31101,6 @@
     "standard": "internal",
     "sourceTable": "lot",
     "statusColumn": "lot_status",
-    "aliasOf": "lot",
     "options": [
       {
         "value": "available",
@@ -31367,7 +31268,6 @@
     "standard": "internal",
     "sourceTable": "purchase_receipt_correction_lines",
     "statusColumn": "disposition_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -31513,7 +31413,6 @@
     "standard": "internal",
     "sourceTable": "purchase_receipt_lines",
     "statusColumn": "hold_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -31817,7 +31716,6 @@
     "standard": "internal",
     "sourceTable": "rework",
     "statusColumn": "rework_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -31903,7 +31801,6 @@
     "standard": "internal",
     "sourceTable": "serial",
     "statusColumn": "serial_status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -32285,6 +32182,3575 @@
           "planned",
           "released"
         ]
+      }
+    ]
+  },
+  "freight_orders_freight_status": {
+    "label": "Vận chuyển đơn hàng - Freight Status",
+    "labelEn": "Freight Orders Freight Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "freight_orders",
+    "statusColumn": "freight_status",
+    "options": [
+      {
+        "value": "planned",
+        "label": "Đã lập kế hoạch",
+        "labelEn": "Planned",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "tendered",
+        "label": "Đã chào vận chuyển",
+        "labelEn": "Tendered",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "planned"
+        ]
+      },
+      {
+        "value": "booked",
+        "label": "Đã đặt chỗ",
+        "labelEn": "Booked",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "tendered",
+          "planned"
+        ]
+      },
+      {
+        "value": "in_transit",
+        "label": "Đang vận chuyển",
+        "labelEn": "In Transit",
+        "color": "#3b82f6",
+        "icon": "Send",
+        "allowedTransitionsFrom": [
+          "booked"
+        ]
+      },
+      {
+        "value": "delivered",
+        "label": "Đã giao",
+        "labelEn": "Delivered",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "in_transit"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "delivered"
+        ]
+      },
+      {
+        "value": "cancelled",
+        "label": "Đã hủy",
+        "labelEn": "Cancelled",
+        "color": "#ef4444",
+        "icon": "Ban",
+        "allowedTransitionsFrom": [
+          "planned",
+          "tendered",
+          "booked"
+        ]
+      }
+    ]
+  },
+  "freight_orders_freight_status_set": {
+    "label": "Vận chuyển đơn hàng - Freight Status",
+    "labelEn": "Freight Orders Freight Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "freight_orders",
+    "statusColumn": "freight_status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "safety_observations_observation_status": {
+    "label": "An toàn Observation - Observation Status",
+    "labelEn": "Safety Observations Observation Status",
+    "source": "table-registry-alias",
+    "standard": "ISO14001",
+    "sourceTable": "safety_observations",
+    "statusColumn": "observation_status",
+    "options": [
+      {
+        "value": "logged",
+        "label": "Đã ghi nhận",
+        "labelEn": "Logged",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "assigned",
+        "label": "Đã giao xử lý",
+        "labelEn": "Assigned",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": [
+          "logged"
+        ]
+      },
+      {
+        "value": "in_progress",
+        "label": "Đang xử lý",
+        "labelEn": "In Progress",
+        "color": "#3b82f6",
+        "icon": "Play",
+        "allowedTransitionsFrom": [
+          "assigned"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "CheckCircle2",
+        "allowedTransitionsFrom": [
+          "assigned",
+          "in_progress"
+        ]
+      },
+      {
+        "value": "archived",
+        "label": "Lưu trữ",
+        "labelEn": "Archived",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "closed"
+        ]
+      }
+    ]
+  },
+  "safety_observations_observation_status_set": {
+    "label": "An toàn Observation - Observation Status",
+    "labelEn": "Safety Observations Observation Status",
+    "source": "table-registry-alias",
+    "standard": "ISO14001",
+    "sourceTable": "safety_observations",
+    "statusColumn": "observation_status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "bom_version_approval_state": {
+    "label": "BOM phiên bản - Approval State",
+    "labelEn": "BOM Version Approval State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "bom_version",
+    "statusColumn": "approval_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "bom_version_approval_state_set": {
+    "label": "BOM phiên bản - Approval State",
+    "labelEn": "BOM Version Approval State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "bom_version",
+    "statusColumn": "approval_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "capa_status_code": {
+    "label": "CAPA - Status Code",
+    "labelEn": "CAPA Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "capa",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "initiated",
+        "label": "Khởi tạo",
+        "labelEn": "Initiated",
+        "color": "#3b82f6",
+        "icon": "Play",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "action_planning",
+        "label": "Lập kế hoạch hành động",
+        "labelEn": "Action Planning",
+        "color": "#f59e0b",
+        "icon": "ListTodo",
+        "allowedTransitionsFrom": [
+          "initiated"
+        ]
+      },
+      {
+        "value": "implementation",
+        "label": "Triển khai",
+        "labelEn": "Implementation",
+        "color": "#8b5cf6",
+        "icon": "Hammer",
+        "allowedTransitionsFrom": [
+          "action_planning"
+        ]
+      },
+      {
+        "value": "effectiveness_review",
+        "label": "Đánh giá hiệu lực",
+        "labelEn": "Effectiveness Review",
+        "color": "#3b82f6",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": [
+          "implementation"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "Lock",
+        "allowedTransitionsFrom": [
+          "effectiveness_review"
+        ]
+      }
+    ]
+  },
+  "capa_status_code_set": {
+    "label": "CAPA - Status Code",
+    "labelEn": "CAPA Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "capa",
+    "statusColumn": "status_code",
+    "aliasOf": "capa_status",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "initiated",
+        "label": "Khởi tạo",
+        "labelEn": "Initiated",
+        "color": "#3b82f6",
+        "icon": "Play",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "action_planning",
+        "label": "Lập kế hoạch hành động",
+        "labelEn": "Action Planning",
+        "color": "#f59e0b",
+        "icon": "ListTodo",
+        "allowedTransitionsFrom": [
+          "initiated"
+        ]
+      },
+      {
+        "value": "implementation",
+        "label": "Triển khai",
+        "labelEn": "Implementation",
+        "color": "#8b5cf6",
+        "icon": "Hammer",
+        "allowedTransitionsFrom": [
+          "action_planning"
+        ]
+      },
+      {
+        "value": "effectiveness_review",
+        "label": "Đánh giá hiệu lực",
+        "labelEn": "Effectiveness Review",
+        "color": "#3b82f6",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": [
+          "implementation"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "Lock",
+        "allowedTransitionsFrom": [
+          "effectiveness_review"
+        ]
+      }
+    ]
+  },
+  "capa_records_capa_status_set": {
+    "label": "Hồ sơ CAPA - Capa Status",
+    "labelEn": "CAPA Records Capa Status",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "capa_records",
+    "statusColumn": "capa_status",
+    "aliasOf": "capa_status",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "initiated",
+        "label": "Khởi tạo",
+        "labelEn": "Initiated",
+        "color": "#3b82f6",
+        "icon": "Play",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "action_planning",
+        "label": "Lập kế hoạch hành động",
+        "labelEn": "Action Planning",
+        "color": "#f59e0b",
+        "icon": "ListTodo",
+        "allowedTransitionsFrom": [
+          "initiated"
+        ]
+      },
+      {
+        "value": "implementation",
+        "label": "Triển khai",
+        "labelEn": "Implementation",
+        "color": "#8b5cf6",
+        "icon": "Hammer",
+        "allowedTransitionsFrom": [
+          "action_planning"
+        ]
+      },
+      {
+        "value": "effectiveness_review",
+        "label": "Đánh giá hiệu lực",
+        "labelEn": "Effectiveness Review",
+        "color": "#3b82f6",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": [
+          "implementation"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "Lock",
+        "allowedTransitionsFrom": [
+          "effectiveness_review"
+        ]
+      }
+    ]
+  },
+  "change_control_approval_state": {
+    "label": "Thay đổi Kiểm soát - Approval State",
+    "labelEn": "Change Control Approval State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "change_control",
+    "statusColumn": "approval_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "change_control_approval_state_set": {
+    "label": "Thay đổi Kiểm soát - Approval State",
+    "labelEn": "Change Control Approval State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "change_control",
+    "statusColumn": "approval_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "complaint_status_code": {
+    "label": "Khiếu nại - Status Code",
+    "labelEn": "Complaint Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "complaint",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "new",
+        "label": "Mới",
+        "labelEn": "New",
+        "color": "#3b82f6",
+        "icon": "fa-plus",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "acknowledged",
+        "label": "Đã nhận",
+        "labelEn": "Acknowledged",
+        "color": "#f59e0b",
+        "icon": "fa-envelope-open",
+        "allowedTransitionsFrom": [
+          "new"
+        ]
+      },
+      {
+        "value": "investigating",
+        "label": "Đang xử lý",
+        "labelEn": "Investigating",
+        "color": "#8b5cf6",
+        "icon": "fa-magnifying-glass",
+        "allowedTransitionsFrom": [
+          "acknowledged"
+        ]
+      },
+      {
+        "value": "resolved",
+        "label": "Đã giải quyết",
+        "labelEn": "Resolved",
+        "color": "#22c55e",
+        "icon": "fa-check",
+        "allowedTransitionsFrom": [
+          "investigating"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đóng",
+        "labelEn": "Closed",
+        "color": "#6b7280",
+        "icon": "fa-lock",
+        "allowedTransitionsFrom": [
+          "resolved"
+        ]
+      }
+    ]
+  },
+  "complaint_status_code_set": {
+    "label": "Khiếu nại - Status Code",
+    "labelEn": "Complaint Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "complaint",
+    "statusColumn": "status_code",
+    "aliasOf": "complaint_status",
+    "options": [
+      {
+        "value": "new",
+        "label": "Mới",
+        "labelEn": "New",
+        "color": "#3b82f6",
+        "icon": "fa-plus",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "acknowledged",
+        "label": "Đã nhận",
+        "labelEn": "Acknowledged",
+        "color": "#f59e0b",
+        "icon": "fa-envelope-open",
+        "allowedTransitionsFrom": [
+          "new"
+        ]
+      },
+      {
+        "value": "investigating",
+        "label": "Đang xử lý",
+        "labelEn": "Investigating",
+        "color": "#8b5cf6",
+        "icon": "fa-magnifying-glass",
+        "allowedTransitionsFrom": [
+          "acknowledged"
+        ]
+      },
+      {
+        "value": "resolved",
+        "label": "Đã giải quyết",
+        "labelEn": "Resolved",
+        "color": "#22c55e",
+        "icon": "fa-check",
+        "allowedTransitionsFrom": [
+          "investigating"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đóng",
+        "labelEn": "Closed",
+        "color": "#6b7280",
+        "icon": "fa-lock",
+        "allowedTransitionsFrom": [
+          "resolved"
+        ]
+      }
+    ]
+  },
+  "container_status_code": {
+    "label": "Container - Status Code",
+    "labelEn": "Container Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "container",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "container_status_code_set": {
+    "label": "Container - Status Code",
+    "labelEn": "Container Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "container",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "customer_complaints_status_set": {
+    "label": "Khiếu nại Khách hàng - Status",
+    "labelEn": "Customer Complaints Status",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "customer_complaints",
+    "statusColumn": "status",
+    "aliasOf": "complaint_status",
+    "options": [
+      {
+        "value": "new",
+        "label": "Mới",
+        "labelEn": "New",
+        "color": "#3b82f6",
+        "icon": "fa-plus",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "acknowledged",
+        "label": "Đã nhận",
+        "labelEn": "Acknowledged",
+        "color": "#f59e0b",
+        "icon": "fa-envelope-open",
+        "allowedTransitionsFrom": [
+          "new"
+        ]
+      },
+      {
+        "value": "investigating",
+        "label": "Đang xử lý",
+        "labelEn": "Investigating",
+        "color": "#8b5cf6",
+        "icon": "fa-magnifying-glass",
+        "allowedTransitionsFrom": [
+          "acknowledged"
+        ]
+      },
+      {
+        "value": "resolved",
+        "label": "Đã giải quyết",
+        "labelEn": "Resolved",
+        "color": "#22c55e",
+        "icon": "fa-check",
+        "allowedTransitionsFrom": [
+          "investigating"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đóng",
+        "labelEn": "Closed",
+        "color": "#6b7280",
+        "icon": "fa-lock",
+        "allowedTransitionsFrom": [
+          "resolved"
+        ]
+      }
+    ]
+  },
+  "demand_status_code": {
+    "label": "Nhu cầu - Status Code",
+    "labelEn": "Demand Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "demand",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "demand_status_code_set": {
+    "label": "Nhu cầu - Status Code",
+    "labelEn": "Demand Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "demand",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "deviation_status_code": {
+    "label": "Sai lệch - Status Code",
+    "labelEn": "Deviation Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "deviation",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "pending",
+        "label": "Chờ xử lý",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": [
+          "pending",
+          "broken"
+        ]
+      },
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "pending",
+          "partial"
+        ]
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "Ban",
+        "allowedTransitionsFrom": [
+          "pending",
+          "partial"
+        ]
+      }
+    ]
+  },
+  "deviation_status_code_set": {
+    "label": "Sai lệch - Status Code",
+    "labelEn": "Deviation Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "deviation",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "document_revision_approval_state": {
+    "label": "Tài liệu Phiên bản - Approval State",
+    "labelEn": "Document Revision Approval State",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "document_revision",
+    "statusColumn": "approval_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "document_revision_approval_state_set": {
+    "label": "Tài liệu Phiên bản - Approval State",
+    "labelEn": "Document Revision Approval State",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "document_revision",
+    "statusColumn": "approval_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "finding_status_code": {
+    "label": "Phát hiện - Status Code",
+    "labelEn": "Finding Status Code",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "finding",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "finding_status_code_set": {
+    "label": "Phát hiện - Status Code",
+    "labelEn": "Finding Status Code",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "finding",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "forecast_status_code": {
+    "label": "Dự báo - Status Code",
+    "labelEn": "Forecast Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "forecast",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "forecast_status_code_set": {
+    "label": "Dự báo - Status Code",
+    "labelEn": "Forecast Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "forecast",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "form_entries_workflow_state": {
+    "label": "Biểu mẫu bản nhập - Workflow State",
+    "labelEn": "Form Entries Workflow State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "form_entries",
+    "statusColumn": "workflow_state",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Bản nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "fa-pencil",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "allocated",
+        "label": "Đã cấp mã",
+        "labelEn": "Allocated",
+        "color": "#64748b",
+        "icon": "fa-hashtag",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "downloaded",
+        "label": "Đã tải biểu mẫu",
+        "labelEn": "Downloaded",
+        "color": "#6366f1",
+        "icon": "fa-download",
+        "allowedTransitionsFrom": [
+          "allocated"
+        ]
+      },
+      {
+        "value": "submitted",
+        "label": "Đã nộp",
+        "labelEn": "Submitted",
+        "color": "#3b82f6",
+        "icon": "fa-paper-plane",
+        "allowedTransitionsFrom": [
+          "downloaded"
+        ]
+      },
+      {
+        "value": "received",
+        "label": "Đã tiếp nhận",
+        "labelEn": "Received",
+        "color": "#8b5cf6",
+        "icon": "fa-inbox",
+        "allowedTransitionsFrom": [
+          "submitted"
+        ]
+      },
+      {
+        "value": "in_review",
+        "label": "Đang xem xét",
+        "labelEn": "In Review",
+        "color": "#f59e0b",
+        "icon": "fa-eye",
+        "allowedTransitionsFrom": [
+          "received"
+        ]
+      },
+      {
+        "value": "approved",
+        "label": "Đã phê duyệt",
+        "labelEn": "Approved",
+        "color": "#16a34a",
+        "icon": "fa-check-circle",
+        "allowedTransitionsFrom": [
+          "in_review"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#6b7280",
+        "icon": "fa-lock",
+        "allowedTransitionsFrom": [
+          "approved"
+        ]
+      },
+      {
+        "value": "rejected",
+        "label": "Bị từ chối",
+        "labelEn": "Rejected",
+        "color": "#ef4444",
+        "icon": "fa-times-circle",
+        "allowedTransitionsFrom": [
+          "in_review"
+        ]
+      },
+      {
+        "value": "voided",
+        "label": "Đã hủy",
+        "labelEn": "Voided",
+        "color": "#dc2626",
+        "icon": "fa-ban",
+        "allowedTransitionsFrom": [
+          "draft",
+          "allocated",
+          "downloaded",
+          "submitted"
+        ]
+      },
+      {
+        "value": "pending",
+        "label": "Chờ xử lý",
+        "labelEn": "Pending",
+        "color": "#f59e0b",
+        "icon": "fa-clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "inspection_plan_status_code": {
+    "label": "Kiểm tra kế hoạch - Status Code",
+    "labelEn": "Inspection Plan Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "inspection_plan",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "inspection_plan_status_code_set": {
+    "label": "Kiểm tra kế hoạch - Status Code",
+    "labelEn": "Inspection Plan Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "inspection_plan",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "item_status_code": {
+    "label": "Mã hàng - Status Code",
+    "labelEn": "Item Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "item",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#3b82f6",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "active",
+        "label": "Hoạt động",
+        "labelEn": "Active",
+        "color": "#10b981",
+        "icon": "Play",
+        "allowedTransitionsFrom": [
+          "draft",
+          "hold"
+        ]
+      },
+      {
+        "value": "hold",
+        "label": "Tạm giữ",
+        "labelEn": "Hold",
+        "color": "#f59e0b",
+        "icon": "Clock",
+        "allowedTransitionsFrom": [
+          "draft",
+          "active"
+        ]
+      },
+      {
+        "value": "obsolete_requested",
+        "label": "Yêu cầu ngưng dùng",
+        "labelEn": "Obsolete Requested",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "active",
+          "hold"
+        ]
+      },
+      {
+        "value": "obsolete",
+        "label": "Ngưng dùng",
+        "labelEn": "Obsolete",
+        "color": "#6b7280",
+        "icon": "CircleDot",
+        "allowedTransitionsFrom": [
+          "obsolete_requested"
+        ]
+      }
+    ]
+  },
+  "item_site_status_code": {
+    "label": "Mã hàng địa điểm - Status Code",
+    "labelEn": "Item Site Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "item_site",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "item_site_status_code_set": {
+    "label": "Mã hàng địa điểm - Status Code",
+    "labelEn": "Item Site Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "item_site",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "item_spec_status_code": {
+    "label": "Mã hàng quy cách - Status Code",
+    "labelEn": "Item Spec Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "item_spec",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "item_spec_status_code_set": {
+    "label": "Mã hàng quy cách - Status Code",
+    "labelEn": "Item Spec Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "item_spec",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "job_status_code": {
+    "label": "Lệnh - Status Code",
+    "labelEn": "Job Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "job",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "job_status_code_set": {
+    "label": "Lệnh - Status Code",
+    "labelEn": "Job Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "job",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lot_policy_status_code": {
+    "label": "Lô Chính sách - Status Code",
+    "labelEn": "Lot Policy Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lot_policy",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lot_policy_status_code_set": {
+    "label": "Lô Chính sách - Status Code",
+    "labelEn": "Lot Policy Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lot_policy",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "mrp_signal_status_code": {
+    "label": "Mrp Signal - Status Code",
+    "labelEn": "Mrp Signal Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "mrp_signal",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "mrp_signal_status_code_set": {
+    "label": "Mrp Signal - Status Code",
+    "labelEn": "Mrp Signal Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "mrp_signal",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "nonconformance_status_code": {
+    "label": "Không phù hợp - Status Code",
+    "labelEn": "Nonconformance Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "nonconformance",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "submitted",
+        "label": "Đã gửi",
+        "labelEn": "Submitted",
+        "color": "#3b82f6",
+        "icon": "Send",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "under_review",
+        "label": "Đang xem xét",
+        "labelEn": "Under Review",
+        "color": "#3b82f6",
+        "icon": "Search",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "disposition_set",
+        "label": "Đã phân loại xử lý",
+        "labelEn": "Disposition Set",
+        "color": "#f59e0b",
+        "icon": "ClipboardList",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "containment_active",
+        "label": "Khắc phục tạm thời đang thực hiện",
+        "labelEn": "Containment Active",
+        "color": "#f59e0b",
+        "icon": "ShieldAlert",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "close_requested",
+        "label": "Yêu cầu đóng",
+        "labelEn": "Close Requested",
+        "color": "#f59e0b",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#94a3b8",
+        "icon": "Lock",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "voided",
+        "label": "Đã hủy bỏ",
+        "labelEn": "Voided",
+        "color": "#94a3b8",
+        "icon": "Slash",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "operation_status_code": {
+    "label": "Công đoạn - Status Code",
+    "labelEn": "Operation Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "operation",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "operation_status_code_set": {
+    "label": "Công đoạn - Status Code",
+    "labelEn": "Operation Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "operation",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "planned_supply_status_code": {
+    "label": "Kế hoạch cung ứng - Status Code",
+    "labelEn": "Planned Supply Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "planned_supply",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "planned_supply_status_code_set": {
+    "label": "Kế hoạch cung ứng - Status Code",
+    "labelEn": "Planned Supply Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "planned_supply",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "production_completion_status_code": {
+    "label": "Sản xuất Completion - Status Code",
+    "labelEn": "Production Completion Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "production_completion",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "production_completion_status_code_set": {
+    "label": "Sản xuất Completion - Status Code",
+    "labelEn": "Production Completion Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "production_completion",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "production_order_status_code": {
+    "label": "Sản xuất đơn hàng - Status Code",
+    "labelEn": "Production Order Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "production_order",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "production_order_status_code_set": {
+    "label": "Sản xuất đơn hàng - Status Code",
+    "labelEn": "Production Order Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "production_order",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "purchase_order_line_status_code": {
+    "label": "Đơn hàng dòng mua - Status Code",
+    "labelEn": "Purchase Order Line Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "purchase_order_line",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "purchase_order_line_status_code_set": {
+    "label": "Đơn hàng dòng mua - Status Code",
+    "labelEn": "Purchase Order Line Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "purchase_order_line",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "quality_order_status_code": {
+    "label": "Đơn hàng Chất lượng - Status Code",
+    "labelEn": "Quality Order Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "quality_order",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "quality_order_status_code_set": {
+    "label": "Đơn hàng Chất lượng - Status Code",
+    "labelEn": "Quality Order Status Code",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "quality_order",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "risk_register_status_code": {
+    "label": "Rủi ro Register - Status Code",
+    "labelEn": "Risk Register Status Code",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "risk_register",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "risk_register_status_code_set": {
+    "label": "Rủi ro Register - Status Code",
+    "labelEn": "Risk Register Status Code",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "risk_register",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "sales_order_line_status_code": {
+    "label": "Đơn hàng dòng Sale - Status Code",
+    "labelEn": "Sales Order Line Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "sales_order_line",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "sales_order_line_status_code_set": {
+    "label": "Đơn hàng dòng Sale - Status Code",
+    "labelEn": "Sales Order Line Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "sales_order_line",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "serial_policy_status_code": {
+    "label": "Số sê-ri Chính sách - Status Code",
+    "labelEn": "Serial Policy Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "serial_policy",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "serial_policy_status_code_set": {
+    "label": "Số sê-ri Chính sách - Status Code",
+    "labelEn": "Serial Policy Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "serial_policy",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "shelf_life_policy_status_code": {
+    "label": "Hạn sử dụng Vòng đời Chính sách - Status Code",
+    "labelEn": "Shelf Life Policy Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "shelf_life_policy",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "shelf_life_policy_status_code_set": {
+    "label": "Hạn sử dụng Vòng đời Chính sách - Status Code",
+    "labelEn": "Shelf Life Policy Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "shelf_life_policy",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "svc_service_work_orders_work_order_status_set": {
+    "label": "Đơn hàng công việc Service SVC - Work Order Status",
+    "labelEn": "SVC Service Work Orders Work Order Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "svc_service_work_orders",
+    "statusColumn": "work_order_status",
+    "aliasOf": "work_order_status",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "planned",
+        "label": "Đã lập kế hoạch",
+        "labelEn": "Planned",
+        "color": "#3b82f6",
+        "icon": "Calendar",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "released",
+        "label": "Đã phát hành",
+        "labelEn": "Released",
+        "color": "#8b5cf6",
+        "icon": "Rocket",
+        "allowedTransitionsFrom": [
+          "planned"
+        ]
+      },
+      {
+        "value": "in_production",
+        "label": "Đang sản xuất",
+        "labelEn": "In Production",
+        "color": "#f59e0b",
+        "icon": "Factory",
+        "allowedTransitionsFrom": [
+          "released",
+          "quality_hold"
+        ]
+      },
+      {
+        "value": "quality_hold",
+        "label": "Giữ chất lượng",
+        "labelEn": "Quality Hold",
+        "color": "#ef4444",
+        "icon": "ShieldAlert",
+        "allowedTransitionsFrom": [
+          "in_production"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "Lock",
+        "allowedTransitionsFrom": [
+          "in_production"
+        ]
+      },
+      {
+        "value": "cancelled",
+        "label": "Đã hủy",
+        "labelEn": "Cancelled",
+        "color": "#64748b",
+        "icon": "Ban",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "work_definition_status_code": {
+    "label": "Định nghĩa công việc - Status Code",
+    "labelEn": "Work Definition Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "work_definition",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "work_definition_status_code_set": {
+    "label": "Định nghĩa công việc - Status Code",
+    "labelEn": "Work Definition Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "work_definition",
+    "statusColumn": "status_code",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "work_definition_version_approval_state": {
+    "label": "Định nghĩa phiên bản công việc - Approval State",
+    "labelEn": "Work Definition Version Approval State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "work_definition_version",
+    "statusColumn": "approval_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "work_definition_version_approval_state_set": {
+    "label": "Định nghĩa phiên bản công việc - Approval State",
+    "labelEn": "Work Definition Version Approval State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "work_definition_version",
+    "statusColumn": "approval_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "work_order_status_code": {
+    "label": "Đơn hàng công việc - Status Code",
+    "labelEn": "Work Order Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "work_order",
+    "statusColumn": "status_code",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "planned",
+        "label": "Đã lập kế hoạch",
+        "labelEn": "Planned",
+        "color": "#3b82f6",
+        "icon": "Calendar",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "released",
+        "label": "Đã phát hành",
+        "labelEn": "Released",
+        "color": "#8b5cf6",
+        "icon": "Rocket",
+        "allowedTransitionsFrom": [
+          "planned"
+        ]
+      },
+      {
+        "value": "in_production",
+        "label": "Đang sản xuất",
+        "labelEn": "In Production",
+        "color": "#f59e0b",
+        "icon": "Factory",
+        "allowedTransitionsFrom": [
+          "released",
+          "quality_hold"
+        ]
+      },
+      {
+        "value": "quality_hold",
+        "label": "Giữ chất lượng",
+        "labelEn": "Quality Hold",
+        "color": "#ef4444",
+        "icon": "ShieldAlert",
+        "allowedTransitionsFrom": [
+          "in_production"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "Lock",
+        "allowedTransitionsFrom": [
+          "in_production"
+        ]
+      },
+      {
+        "value": "cancelled",
+        "label": "Đã hủy",
+        "labelEn": "Cancelled",
+        "color": "#64748b",
+        "icon": "Ban",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "work_order_status_code_set": {
+    "label": "Đơn hàng công việc - Status Code",
+    "labelEn": "Work Order Status Code",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "work_order",
+    "statusColumn": "status_code",
+    "aliasOf": "work_order_status",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "planned",
+        "label": "Đã lập kế hoạch",
+        "labelEn": "Planned",
+        "color": "#3b82f6",
+        "icon": "Calendar",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "released",
+        "label": "Đã phát hành",
+        "labelEn": "Released",
+        "color": "#8b5cf6",
+        "icon": "Rocket",
+        "allowedTransitionsFrom": [
+          "planned"
+        ]
+      },
+      {
+        "value": "in_production",
+        "label": "Đang sản xuất",
+        "labelEn": "In Production",
+        "color": "#f59e0b",
+        "icon": "Factory",
+        "allowedTransitionsFrom": [
+          "released",
+          "quality_hold"
+        ]
+      },
+      {
+        "value": "quality_hold",
+        "label": "Giữ chất lượng",
+        "labelEn": "Quality Hold",
+        "color": "#ef4444",
+        "icon": "ShieldAlert",
+        "allowedTransitionsFrom": [
+          "in_production"
+        ]
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#10b981",
+        "icon": "Lock",
+        "allowedTransitionsFrom": [
+          "in_production"
+        ]
+      },
+      {
+        "value": "cancelled",
+        "label": "Đã hủy",
+        "labelEn": "Cancelled",
+        "color": "#64748b",
+        "icon": "Ban",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "workflow_definitions_initial_state": {
+    "label": "Luồng công việc định nghĩa - Initial State",
+    "labelEn": "Workflow Definitions Initial State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "workflow_definitions",
+    "statusColumn": "initial_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "workflow_definitions_initial_state_set": {
+    "label": "Luồng công việc định nghĩa - Initial State",
+    "labelEn": "Workflow Definitions Initial State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "workflow_definitions",
+    "statusColumn": "initial_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "workflow_instances_current_state": {
+    "label": "Luồng công việc Instance - Current State",
+    "labelEn": "Workflow Instances Current State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "workflow_instances",
+    "statusColumn": "current_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "workflow_instances_current_state_set": {
+    "label": "Luồng công việc Instance - Current State",
+    "labelEn": "Workflow Instances Current State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "workflow_instances",
+    "statusColumn": "current_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "workflow_step_data_to_state": {
+    "label": "Luồng công việc bước Dữ liệu - To State",
+    "labelEn": "Workflow Step Data To State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "workflow_step_data",
+    "statusColumn": "to_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "workflow_step_data_to_state_set": {
+    "label": "Luồng công việc bước Dữ liệu - To State",
+    "labelEn": "Workflow Step Data To State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "workflow_step_data",
+    "statusColumn": "to_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
       }
     ]
   }

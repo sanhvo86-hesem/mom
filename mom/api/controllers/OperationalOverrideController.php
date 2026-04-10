@@ -112,6 +112,52 @@ final class OperationalOverrideController extends BaseController
         ];
     }
 
+    /**
+     * @param array<string, mixed> $body
+     * @return array<string, mixed>
+     */
+    private function transitionIdempotency(string $overrideId, array $body, string $actorPartyId): array
+    {
+        $explicitKey = $this->parseIdempotencyKey($this->requestHeader('Idempotency-Key'))
+            ?? $this->parseIdempotencyKey($this->query('idempotency_key'))
+            ?? $this->parseIdempotencyKey($this->query('request_id'))
+            ?? $this->parseIdempotencyKey($body['idempotency_key'] ?? null)
+            ?? $this->parseIdempotencyKey($body['request_id'] ?? null);
+
+        $fingerprint = [
+            'override_id' => $overrideId,
+            'transition' => trim((string)($body['transition'] ?? '')),
+            'body' => $body,
+        ];
+
+        if ($explicitKey !== null) {
+            return [
+                'scope_key' => implode('|', ['operational_override', 'transition', $overrideId, $actorPartyId]),
+                'key' => $explicitKey,
+                'key_source' => 'header_or_body',
+                'mode' => 'client_token',
+                'kind' => 'transition',
+                'domain' => 'governance',
+                'table' => 'operational_override_controls',
+                'user_id' => $actorPartyId,
+                'fingerprint' => $fingerprint,
+            ];
+        }
+
+        return [
+            'scope_key' => implode('|', ['operational_override', 'transition', $overrideId, $actorPartyId]),
+            'key' => 'drv-override-transition-' . hash('sha256', json_encode($fingerprint, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+            'key_source' => 'derived:identity+payload_retry_window',
+            'mode' => 'derived_identity_window',
+            'kind' => 'transition',
+            'domain' => 'governance',
+            'table' => 'operational_override_controls',
+            'user_id' => $actorPartyId,
+            'ttl_seconds' => $this->idempotency()->retryWindowSeconds(),
+            'fingerprint' => $fingerprint,
+        ];
+    }
+
     public function listOverrides(): never
     {
         $user = $this->requireAuth();
@@ -182,6 +228,49 @@ final class OperationalOverrideController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('override_control_create_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function transitionOverride(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOverrideWrite($user);
+        $this->requireCsrf();
+
+        $overrideId = trim((string)($this->query('overrideId') ?? ''));
+        if ($overrideId === '') {
+            $this->error('missing_override_id', 400);
+        }
+
+        try {
+            $body = $this->jsonBody();
+            $transition = trim((string)($body['transition'] ?? ''));
+            if ($transition === '') {
+                $this->error('missing_transition', 400);
+            }
+
+            $execution = $this->idempotency()->execute(
+                $this->transitionIdempotency($overrideId, $body, $this->userId($user)),
+                function () use ($overrideId, $body, $user): array {
+                    $override = $this->overrides()->transitionOverride(
+                        $overrideId,
+                        (string)($body['transition'] ?? ''),
+                        $this->userId($user),
+                        $body
+                    );
+                    return [
+                        'status_code' => 200,
+                        'payload' => ['override_control' => $override],
+                    ];
+                }
+            );
+
+            $this->success((array)($execution['payload'] ?? []), (int)($execution['status_code'] ?? 200));
+        } catch (RecordConflictException $e) {
+            $this->error('override_control_transition_idempotency_conflict', 409, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('override_control_transition_failed', 500, $e->getMessage());
         }
     }
 }

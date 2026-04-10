@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
-use MOM\Database\Connection;
 use MOM\Database\DataLayer;
 use PDO;
 use Throwable;
@@ -25,6 +24,8 @@ final class DataSchemaService
     private string $registryDir;
     private string $configDir;
     private string $schemaStudioDir;
+    /** @var array<string, int|null> */
+    private array $artifactTimestampCache = [];
 
     public function __construct(DataLayer $data, string $dataDir, string $rootDir)
     {
@@ -88,6 +89,7 @@ final class DataSchemaService
         $stressAudit = $this->buildOperationalAuditSummary($stressReport, 'scenario_id');
 
         $dbProbeApplicable = !empty($connection['db_probe_applicable']);
+        $dbProbeResolved = !empty($connection['db_probe_resolved']);
         $workflowTableCount = 0;
         $supportTableCount = 0;
         $governanceGapCount = 0;
@@ -107,7 +109,7 @@ final class DataSchemaService
             }
             $governanceGapCount += (int)($table['governance_gap_count'] ?? 0) > 0 ? 1 : 0;
             $registryGapCount += (($table['registry_present'] ?? false) === false) ? 1 : 0;
-            if ($dbProbeApplicable) {
+            if ($dbProbeResolved) {
                 $dbPresentCount += (($table['db_present'] ?? false) === true) ? 1 : 0;
                 $dbMissingCount += (($table['db_present'] ?? false) === false) ? 1 : 0;
             }
@@ -143,6 +145,9 @@ final class DataSchemaService
                 'relation_entity_count' => count((array)($relationMap['entities'] ?? [])),
                 'registry_gap_count' => $registryGapCount,
                 'db_probe_applicable' => $dbProbeApplicable,
+                'db_probe_reachable' => !empty($connection['db_probe_reachable']),
+                'db_probe_resolved' => $dbProbeResolved,
+                'runtime_postgres_path_active' => !empty($connection['runtime_path_active']),
                 'db_present_table_count' => $dbPresentCount,
                 'db_missing_table_count' => $dbMissingCount,
                 'workflow_table_count' => $workflowTableCount,
@@ -169,6 +174,10 @@ final class DataSchemaService
                 'db_missing_column_count' => (int)($connection['missing_column_count'] ?? 0),
                 'db_unexpected_column_count' => (int)($connection['unexpected_column_count'] ?? 0),
                 'db_pk_drift_table_count' => (int)($connection['pk_drift_table_count'] ?? 0),
+                'migration_tracking_present' => !empty($connection['migration_table_present']),
+                'applied_migration_count' => (int)($connection['applied_migration_count'] ?? 0),
+                'migration_file_count' => (int)($connection['migration_file_count'] ?? 0),
+                'migration_backlog_count' => (int)($connection['pending_migration_count'] ?? 0),
                 'operational_blind_spot_critical_count' => (int)($blindSpotAudit['summary']['critical'] ?? 0),
                 'operational_blind_spot_high_count' => (int)($blindSpotAudit['summary']['high'] ?? 0),
                 'operational_stress_critical_count' => (int)($stressAudit['summary']['critical'] ?? 0),
@@ -707,6 +716,18 @@ final class DataSchemaService
         $releaseAges = [];
         $largestId = '';
         $largestSize = 0;
+        $knownDependencyTimestamps = [];
+
+        foreach ($specs as $id => $spec) {
+            $path = (string)($spec['path'] ?? '');
+            if ($path === '') {
+                continue;
+            }
+            $knownDependencyTimestamps[$path] = $this->artifactTimestampForPath(
+                $path,
+                (array)($documents[$id] ?? [])
+            );
+        }
 
         foreach ($specs as $id => $spec) {
             $item = $this->artifactInventoryItem(
@@ -717,7 +738,8 @@ final class DataSchemaService
                 (int)$spec['targetAgeSeconds'],
                 (array)($documents[$id] ?? []),
                 !empty($spec['requiredForRelease']),
-                array_values(array_filter((array)($spec['dependencyPaths'] ?? []), 'is_string'))
+                array_values(array_filter((array)($spec['dependencyPaths'] ?? []), 'is_string')),
+                $knownDependencyTimestamps
             );
             $items[] = $item;
             if (($item['exists'] ?? false) === true && is_int($item['ageSeconds'] ?? null)) {
@@ -779,20 +801,21 @@ final class DataSchemaService
     /**
      * @return array<string, mixed>
      */
-    private function artifactInventoryItem(string $id, string $label, string $category, string $path, int $targetAgeSeconds, array $payload, bool $requiredForRelease, array $dependencyPaths): array
+    private function artifactInventoryItem(string $id, string $label, string $category, string $path, int $targetAgeSeconds, array $payload, bool $requiredForRelease, array $dependencyPaths, array $knownDependencyTimestamps = []): array
     {
         clearstatcache(true, $path);
         $exists = is_file($path);
         $sizeBytes = $exists ? (int)(filesize($path) ?: 0) : 0;
         $mtime = $exists ? (int)(filemtime($path) ?: 0) : 0;
         $generatedAt = $this->extractArtifactGeneratedAt($payload);
-        $generatedTimestamp = $this->isoToTimestamp($generatedAt);
-        $basisTimestamp = $generatedTimestamp ?? ($mtime > 0 ? $mtime : null);
+        $basisTimestamp = $this->artifactTimestampForPath($path, $payload);
         $ageSeconds = $basisTimestamp === null ? null : max(0, time() - $basisTimestamp);
         $latestDependencyTimestamp = null;
         $latestDependencyPath = '';
         foreach ($dependencyPaths as $dependencyPath) {
-            $dependencyTimestamp = $this->pathTimestamp($dependencyPath);
+            $dependencyTimestamp = array_key_exists($dependencyPath, $knownDependencyTimestamps)
+                ? $knownDependencyTimestamps[$dependencyPath]
+                : $this->artifactTimestampForPath($dependencyPath);
             if ($dependencyTimestamp === null) {
                 continue;
             }
@@ -837,6 +860,40 @@ final class DataSchemaService
             'latestDependencyAt' => $latestDependencyTimestamp !== null ? gmdate('c', $latestDependencyTimestamp) : '',
             'latestDependencyPath' => $latestDependencyPath !== '' ? ltrim(str_replace($this->rootDir, '', $latestDependencyPath), '/') : '',
         ];
+    }
+
+    private function artifactTimestampForPath(string $path, array $payload = []): ?int
+    {
+        if (array_key_exists($path, $this->artifactTimestampCache)) {
+            return $this->artifactTimestampCache[$path];
+        }
+
+        $generatedAt = $payload !== [] ? $this->extractArtifactGeneratedAt($payload) : $this->extractArtifactGeneratedAtFromPath($path);
+        $generatedTimestamp = $this->isoToTimestamp($generatedAt);
+        $mtime = $this->pathTimestamp($path);
+        $basisTimestamp = $generatedTimestamp ?? $mtime;
+        $this->artifactTimestampCache[$path] = $basisTimestamp;
+
+        return $basisTimestamp;
+    }
+
+    private function extractArtifactGeneratedAtFromPath(string $path): string
+    {
+        if (!is_file($path) || !is_readable($path)) {
+            return '';
+        }
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if ($ext !== 'json') {
+            return '';
+        }
+
+        $payload = $this->readJson($path);
+        if ($payload === []) {
+            return '';
+        }
+
+        return $this->extractArtifactGeneratedAt($payload);
     }
 
     private function extractArtifactGeneratedAt(array $payload): string
@@ -951,9 +1008,16 @@ final class DataSchemaService
         return [
             'data_layer' => (array)($dbProbe['data_layer'] ?? []),
             'db_probe_applicable' => !empty($dbProbe['db_probe_applicable']),
+            'db_probe_reachable' => !empty($dbProbe['db_probe_reachable']),
+            'db_probe_resolved' => !empty($dbProbe['db_probe_resolved']),
+            'configured' => !empty($dbProbe['configured']),
             'reachable' => (bool)($dbProbe['reachable'] ?? false),
+            'host' => (string)($dbProbe['host'] ?? ''),
+            'port' => (int)($dbProbe['port'] ?? 0),
             'database' => (string)($dbProbe['database'] ?? ''),
             'schema' => (string)($dbProbe['schema'] ?? ''),
+            'runtime_path_active' => !empty($dbProbe['runtime_path_active']),
+            'runtime_storage_aligned' => !empty($dbProbe['runtime_storage_aligned']),
             'db_table_count' => (int)($dbProbe['db_table_count'] ?? 0),
             'present_lookup' => (array)($dbProbe['present_lookup'] ?? []),
             'present_table_count' => (int)($dbProbe['present_table_count'] ?? 0),
@@ -961,6 +1025,12 @@ final class DataSchemaService
             'missing_tables' => array_values(array_filter((array)($dbProbe['missing_tables'] ?? []), 'is_scalar')),
             'unexpected_tables' => array_values(array_filter((array)($dbProbe['unexpected_tables'] ?? []), 'is_scalar')),
             'unexpected_table_count' => count((array)($dbProbe['unexpected_tables'] ?? [])),
+            'migration_table_present' => !empty($dbProbe['migration_table_present']),
+            'applied_migration_count' => (int)($dbProbe['applied_migration_count'] ?? 0),
+            'migration_file_count' => (int)($dbProbe['migration_file_count'] ?? 0),
+            'pending_migration_count' => (int)($dbProbe['pending_migration_count'] ?? 0),
+            'latest_migration_id' => (string)($dbProbe['latest_migration_id'] ?? ''),
+            'latest_migration_applied_at' => (string)($dbProbe['latest_migration_applied_at'] ?? ''),
             'structural_drift_table_count' => count($structuralDrift),
             'missing_column_count' => $missingColumnCount,
             'unexpected_column_count' => $unexpectedColumnCount,
@@ -1031,6 +1101,8 @@ final class DataSchemaService
         $dataLayer = (array)($connection['data_layer'] ?? []);
         $postgresPathActive = !empty($dataLayer['postgres_path_active']);
         $postgresConfigured = !empty($dataLayer['use_postgres']);
+        $dbProbeConfigured = !empty($connection['db_probe_applicable']);
+        $dbProbeReachable = !empty($connection['db_probe_reachable']);
         $blindSpotAudit = $this->buildOperationalAuditSummary($blindSpotReport, 'scenario_id');
         $stressAudit = $this->buildOperationalAuditSummary($stressReport, 'scenario_id');
         $endpointCatalogIndexAvailable = is_file($this->registryPath('endpoint-catalog-index'));
@@ -1117,18 +1189,18 @@ final class DataSchemaService
             ];
         }
 
-        if (empty($connection['reachable']) && $postgresPathActive) {
+        if ($dbProbeConfigured && !$dbProbeReachable) {
             $risks[] = [
                 'id' => 'db_probe_unavailable',
                 'severity' => 'critical',
                 'blocking' => true,
-                'title' => 'Live PostgreSQL probe failed',
+                'title' => 'Live PostgreSQL truth cannot be reached',
                 'detail' => (string)($connection['error'] ?? 'Database connection is unavailable.'),
-                'nextAction' => 'Restore PostgreSQL connectivity before treating DB coverage signals as trustworthy.',
+                'nextAction' => 'Restore DB connectivity or repair the stored DB profile before trusting coverage, drift or release posture.',
             ];
         }
 
-        if (!empty($connection['reachable']) && !$postgresPathActive) {
+        if ($dbProbeReachable && !$postgresPathActive) {
             $risks[] = [
                 'id' => 'runtime_storage_split_brain',
                 'severity' => 'high',
@@ -1136,6 +1208,26 @@ final class DataSchemaService
                 'title' => 'DB probe is live but application runtime is not on PostgreSQL',
                 'detail' => 'The control plane can see PostgreSQL, but the active DataLayer path is not writing/reading from PostgreSQL.',
                 'nextAction' => 'Align runtime storage mode before using table coverage or release diagnostics as production truth.',
+            ];
+        }
+
+        if ($dbProbeReachable && (int)($connection['present_table_count'] ?? 0) > 0 && empty($connection['migration_table_present'])) {
+            $risks[] = [
+                'id' => 'migration_tracking_missing',
+                'severity' => 'high',
+                'blocking' => true,
+                'title' => 'Live DB has tables but migration tracking is missing',
+                'detail' => 'schema_migrations does not exist even though PostgreSQL already contains live tables.',
+                'nextAction' => 'Create a governed migration baseline before applying further schema changes or treating PostgreSQL as authoritative.',
+            ];
+        } elseif ($dbProbeReachable && (int)($connection['present_table_count'] ?? 0) > 0 && (int)($connection['applied_migration_count'] ?? 0) === 0) {
+            $risks[] = [
+                'id' => 'migration_tracking_empty',
+                'severity' => 'high',
+                'blocking' => true,
+                'title' => 'Live DB has tables but zero applied migrations are recorded',
+                'detail' => 'schema_migrations exists, but it does not record the live schema baseline.',
+                'nextAction' => 'Backfill the current migration baseline before running new migrations or trusting authority-chain status.',
             ];
         }
 
@@ -1174,7 +1266,7 @@ final class DataSchemaService
             ];
         }
 
-        if ($registryGapCount > 0 || (!empty($connection['reachable']) && ((int)($connection['missing_table_count'] ?? 0) > 0 || (int)($connection['unexpected_table_count'] ?? 0) > 0))) {
+        if ($registryGapCount > 0 || ($dbProbeReachable && ((int)($connection['missing_table_count'] ?? 0) > 0 || (int)($connection['unexpected_table_count'] ?? 0) > 0))) {
             $risks[] = [
                 'id' => 'coverage_drift',
                 'severity' => 'high',
@@ -1422,61 +1514,87 @@ final class DataSchemaService
     private function probeDatabase(array $tableKeys): array
     {
         $modeSummary = $this->data->getModeSummary();
+        $databaseConfig = $this->normalizedDatabaseProbeConfig();
+        $dbProbeConfigured = $this->databaseProbeConfigured($databaseConfig);
         $postgresPathActive = !empty($modeSummary['postgres_path_active']);
         $result = [
             'data_layer' => $modeSummary,
-            'db_probe_applicable' => $postgresPathActive,
+            'db_probe_applicable' => $dbProbeConfigured,
+            'db_probe_reachable' => false,
+            'db_probe_resolved' => false,
+            'configured' => $dbProbeConfigured,
             'reachable' => false,
-            'database' => '',
-            'schema' => '',
+            'host' => (string)($databaseConfig['host'] ?? ''),
+            'port' => (int)($databaseConfig['port'] ?? 0),
+            'database' => (string)($databaseConfig['database'] ?? ''),
+            'schema' => (string)($databaseConfig['schema'] ?? 'public'),
+            'runtime_path_active' => $postgresPathActive,
+            'runtime_storage_aligned' => $postgresPathActive,
             'db_table_count' => 0,
             'present_lookup' => [],
             'column_lookup' => [],
             'pk_lookup' => [],
             'present_table_count' => 0,
-            'missing_table_count' => $postgresPathActive ? count($tableKeys) : 0,
+            'missing_table_count' => 0,
             'missing_tables' => [],
             'unexpected_tables' => [],
+            'migration_table_present' => false,
+            'applied_migration_count' => 0,
+            'migration_file_count' => $this->migrationFileCount(),
+            'pending_migration_count' => 0,
+            'latest_migration_id' => '',
+            'latest_migration_applied_at' => '',
             'error' => '',
         ];
 
-        if (!$postgresPathActive) {
+        if (!$dbProbeConfigured) {
             return $result;
         }
 
         try {
-            $pdo = Connection::getInstance()->getPdo();
+            $pdo = $this->createDatabaseProbePdo($databaseConfig);
             $meta = $pdo->query('SELECT current_database() AS database_name, current_schema() AS schema_name')->fetch(PDO::FETCH_ASSOC) ?: [];
             $schemaName = (string)($meta['schema_name'] ?? 'public');
 
             $stmt = $pdo->prepare("
-                SELECT table_name
-                FROM information_schema.tables
-                WHERE table_schema = :schema
-                  AND table_type = 'BASE TABLE'
-                ORDER BY table_name
+                SELECT c.relname AS table_name
+                FROM pg_class c
+                JOIN pg_namespace n
+                  ON n.oid = c.relnamespace
+                WHERE n.nspname = :schema
+                  AND c.relkind IN ('r', 'p')
+                  AND NOT c.relispartition
+                ORDER BY c.relname
             ");
             $stmt->execute(['schema' => $schemaName]);
             $dbTables = [];
             foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
                 $name = trim((string)($row['table_name'] ?? ''));
-                if ($name !== '') {
+                if ($name !== '' && !$this->isInternalDatabaseTable($name)) {
                     $dbTables[] = $name;
                 }
             }
 
             $columnStmt = $pdo->prepare("
-                SELECT table_name, column_name
-                FROM information_schema.columns
-                WHERE table_schema = :schema
-                ORDER BY table_name, ordinal_position
+                SELECT c.relname AS table_name, a.attname AS column_name
+                FROM pg_class c
+                JOIN pg_namespace n
+                  ON n.oid = c.relnamespace
+                JOIN pg_attribute a
+                  ON a.attrelid = c.oid
+                WHERE n.nspname = :schema
+                  AND c.relkind IN ('r', 'p')
+                  AND NOT c.relispartition
+                  AND a.attnum > 0
+                  AND NOT a.attisdropped
+                ORDER BY c.relname, a.attnum
             ");
             $columnStmt->execute(['schema' => $schemaName]);
             $columnLookup = [];
             foreach ($columnStmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
                 $tableName = trim((string)($row['table_name'] ?? ''));
                 $columnName = trim((string)($row['column_name'] ?? ''));
-                if ($tableName === '' || $columnName === '') {
+                if ($tableName === '' || $columnName === '' || $this->isInternalDatabaseTable($tableName)) {
                     continue;
                 }
                 if (!isset($columnLookup[$tableName])) {
@@ -1486,27 +1604,61 @@ final class DataSchemaService
             }
 
             $pkStmt = $pdo->prepare("
-                SELECT kcu.table_name, kcu.column_name, kcu.ordinal_position
-                FROM information_schema.table_constraints tc
-                JOIN information_schema.key_column_usage kcu
-                  ON tc.constraint_name = kcu.constraint_name
-                 AND tc.table_schema = kcu.table_schema
-                WHERE tc.table_schema = :schema
-                  AND tc.constraint_type = 'PRIMARY KEY'
-                ORDER BY kcu.table_name, kcu.ordinal_position
+                SELECT c.relname AS table_name, a.attname AS column_name, ck.ordinality AS ordinal_position
+                FROM pg_constraint con
+                JOIN pg_class c
+                  ON c.oid = con.conrelid
+                JOIN pg_namespace n
+                  ON n.oid = c.relnamespace
+                JOIN unnest(con.conkey) WITH ORDINALITY AS ck(attnum, ordinality)
+                  ON true
+                JOIN pg_attribute a
+                  ON a.attrelid = con.conrelid
+                 AND a.attnum = ck.attnum
+                WHERE n.nspname = :schema
+                  AND con.contype = 'p'
+                  AND c.relkind IN ('r', 'p')
+                  AND NOT c.relispartition
+                ORDER BY c.relname, ck.ordinality
             ");
             $pkStmt->execute(['schema' => $schemaName]);
             $pkLookup = [];
             foreach ($pkStmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
                 $tableName = trim((string)($row['table_name'] ?? ''));
                 $columnName = trim((string)($row['column_name'] ?? ''));
-                if ($tableName === '' || $columnName === '') {
+                if ($tableName === '' || $columnName === '' || $this->isInternalDatabaseTable($tableName)) {
                     continue;
                 }
                 if (!isset($pkLookup[$tableName])) {
                     $pkLookup[$tableName] = [];
                 }
                 $pkLookup[$tableName][] = $columnName;
+            }
+
+            $migrationMeta = $pdo->query("
+                SELECT
+                    EXISTS (
+                        SELECT 1
+                        FROM information_schema.tables
+                        WHERE table_schema = current_schema()
+                          AND table_name = 'schema_migrations'
+                    ) AS table_present
+            ")->fetch(PDO::FETCH_ASSOC) ?: [];
+            $migrationTablePresent = ((int)($migrationMeta['table_present'] ?? 0) === 1);
+            $appliedMigrationCount = 0;
+            $latestMigrationId = '';
+            $latestMigrationAppliedAt = '';
+            if ($migrationTablePresent) {
+                $migrationSummary = $pdo->query("
+                    SELECT
+                        COUNT(*)::int AS applied_count,
+                        COALESCE(MAX(migration_id), '') AS latest_migration_id,
+                        COALESCE(MAX(applied_at)::text, '') AS latest_applied_at
+                    FROM schema_migrations
+                ")->fetch(PDO::FETCH_ASSOC) ?: [];
+                $appliedMigrationCount = max(0, (int)($migrationSummary['applied_count'] ?? 0));
+                $latestMigrationId = trim((string)($migrationSummary['latest_migration_id'] ?? ''));
+                $latestMigrationAppliedAt = trim((string)($migrationSummary['latest_applied_at'] ?? ''));
             }
 
             $dbLookup = array_fill_keys($dbTables, true);
@@ -1524,6 +1676,8 @@ final class DataSchemaService
                 }
             }
 
+            $result['db_probe_reachable'] = true;
+            $result['db_probe_resolved'] = true;
             $result['reachable'] = true;
             $result['database'] = (string)($meta['database_name'] ?? '');
             $result['schema'] = $schemaName;
@@ -1535,11 +1689,99 @@ final class DataSchemaService
             $result['missing_table_count'] = count($missing);
             $result['missing_tables'] = array_slice($missing, 0, 50);
             $result['unexpected_tables'] = array_slice($unexpected, 0, 50);
+            $result['migration_table_present'] = $migrationTablePresent;
+            $result['applied_migration_count'] = $appliedMigrationCount;
+            $result['pending_migration_count'] = max(0, (int)($result['migration_file_count'] ?? 0) - $appliedMigrationCount);
+            $result['latest_migration_id'] = $latestMigrationId;
+            $result['latest_migration_applied_at'] = $latestMigrationAppliedAt;
         } catch (Throwable $e) {
             $result['error'] = $e->getMessage();
         }
 
         return $result;
+    }
+
+    private function isInternalDatabaseTable(string $tableName): bool
+    {
+        static $internalTables = [
+            'schema_migrations' => true,
+        ];
+
+        return isset($internalTables[$tableName]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizedDatabaseProbeConfig(): array
+    {
+        $config = $this->data->getDatabaseConfig();
+
+        return [
+            'host' => trim((string)($config['host'] ?? '')),
+            'port' => max(0, (int)($config['port'] ?? 0)),
+            'database' => trim((string)($config['database'] ?? '')),
+            'username' => trim((string)($config['username'] ?? '')),
+            'password' => (string)($config['password'] ?? ''),
+            'allow_empty_password' => !empty($config['allow_empty_password']),
+            'schema' => trim((string)($config['schema'] ?? 'public')) !== '' ? trim((string)($config['schema'] ?? 'public')) : 'public',
+            'connect_timeout' => max(1, (int)($config['connect_timeout'] ?? 5)),
+            'statement_timeout' => max(1000, (int)($config['statement_timeout'] ?? 30000)),
+        ];
+    }
+
+    private function migrationFileCount(): int
+    {
+        $dir = $this->rootDir . '/mom/database/migrations';
+        if (!is_dir($dir)) {
+            return 0;
+        }
+
+        $files = glob($dir . '/*.sql');
+        return is_array($files) ? count($files) : 0;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function databaseProbeConfigured(array $config): bool
+    {
+        $allowEmptyPassword = !empty($config['allow_empty_password']);
+        return trim((string)($config['host'] ?? '')) !== ''
+            && max(0, (int)($config['port'] ?? 0)) > 0
+            && trim((string)($config['database'] ?? '')) !== ''
+            && trim((string)($config['username'] ?? '')) !== ''
+            && ($allowEmptyPassword || trim((string)($config['password'] ?? '')) !== '');
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function createDatabaseProbePdo(array $config): PDO
+    {
+        $dsn = sprintf(
+            'pgsql:host=%s;port=%d;dbname=%s;options=--search_path=%s',
+            (string)$config['host'],
+            max(1, (int)($config['port'] ?? 5432)),
+            (string)$config['database'],
+            (string)($config['schema'] ?? 'public'),
+        );
+
+        $pdo = new PDO(
+            $dsn,
+            (string)($config['username'] ?? ''),
+            (string)($config['password'] ?? ''),
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_STRINGIFY_FETCHES => false,
+                PDO::ATTR_TIMEOUT => max(1, (int)($config['connect_timeout'] ?? 5)),
+            ],
+        );
+        $pdo->exec("SET statement_timeout = " . max(1000, (int)($config['statement_timeout'] ?? 30000)));
+
+        return $pdo;
     }
 
     /**
@@ -1555,6 +1797,7 @@ final class DataSchemaService
         $dbColumnLookup = is_array($dbProbe['column_lookup'] ?? null) ? $dbProbe['column_lookup'] : [];
         $dbPkLookup = is_array($dbProbe['pk_lookup'] ?? null) ? $dbProbe['pk_lookup'] : [];
         $dbProbeApplicable = !empty($dbProbe['db_probe_applicable']);
+        $dbProbeResolved = !empty($dbProbe['db_probe_resolved']);
 
         foreach ($this->allTableKeys($tableRegistry, $relationMap) as $key) {
             $table = is_array($tables[$key] ?? null) ? $tables[$key] : [];
@@ -1571,7 +1814,7 @@ final class DataSchemaService
                 }
             }
             $dbPkFields = array_values(array_filter((array)($dbPkLookup[$key] ?? []), 'is_string'));
-            $dbPresent = $dbProbeApplicable ? isset($dbLookup[$key]) : null;
+            $dbPresent = $dbProbeResolved ? isset($dbLookup[$key]) : null;
             $missingColumns = $dbPresent === true ? array_values(array_diff($fieldNames, $dbColumns)) : [];
             $unexpectedColumns = $dbPresent === true ? array_values(array_diff($dbColumns, $fieldNames)) : [];
             $pkDrift = $dbPresent === true && $expectedPkFields !== [] && $dbPkFields !== $expectedPkFields;
@@ -1596,6 +1839,7 @@ final class DataSchemaService
                 'jsonb_field_count' => (int)($entity['jsonbFieldCount'] ?? 0),
                 'digital_thread' => (bool)($entity['digitalThread'] ?? false),
                 'db_probe_applicable' => $dbProbeApplicable,
+                'db_probe_resolved' => $dbProbeResolved,
                 'db_present' => $dbPresent,
                 'db_column_count' => count($dbColumns),
                 'missing_column_count' => count($missingColumns),
@@ -1740,8 +1984,8 @@ final class DataSchemaService
         $domainMeta = is_array($tableRegistry['domains'] ?? null) ? $tableRegistry['domains'] : [];
         $rows = [];
         $domainIds = [];
-        $dbProbeApplicable = array_reduce($tables, static function (bool $carry, $table): bool {
-            return $carry || (is_array($table) && !empty($table['db_probe_applicable']));
+        $dbProbeResolved = array_reduce($tables, static function (bool $carry, $table): bool {
+            return $carry || (is_array($table) && !empty($table['db_probe_resolved']));
         }, false);
 
         foreach ($apis as $api) {
@@ -1773,7 +2017,7 @@ final class DataSchemaService
                     continue;
                 }
                 $tableCount += 1;
-                if ($dbProbeApplicable) {
+                if ($dbProbeResolved) {
                     $presentTableCount += (($table['db_present'] ?? false) === true) ? 1 : 0;
                 }
                 $workflowTableCount += (($table['workflowId'] ?? '') !== '') ? 1 : 0;
@@ -1793,7 +2037,7 @@ final class DataSchemaService
                 'api_count' => $apiCount,
                 'table_count' => $tableCount,
                 'present_table_count' => $presentTableCount,
-                'missing_table_count' => $dbProbeApplicable ? max(0, $tableCount - $presentTableCount) : 0,
+                'missing_table_count' => $dbProbeResolved ? max(0, $tableCount - $presentTableCount) : 0,
                 'workflow_table_count' => $workflowTableCount,
                 'support_table_count' => $supportTableCount,
                 'governance_gap_count' => $governanceGapCount,
@@ -1933,8 +2177,8 @@ final class DataSchemaService
             'recommendations' => array_slice(array_values(array_filter((array)($qualityReport['publishability']['recommended_next_actions'] ?? []), 'is_scalar')), 0, 8),
             'registry_gaps' => array_slice($registryGaps, 0, 12),
             'governance_gaps' => array_slice($governanceGaps, 0, 12),
-            'db_missing_tables' => !empty($connection['db_probe_applicable']) ? array_slice(array_values(array_filter((array)($connection['missing_tables'] ?? []), 'is_scalar')), 0, 12) : [],
-            'db_unexpected_tables' => !empty($connection['db_probe_applicable']) ? array_slice(array_values(array_filter((array)($connection['unexpected_tables'] ?? []), 'is_scalar')), 0, 12) : [],
+            'db_missing_tables' => !empty($connection['db_probe_reachable']) ? array_slice(array_values(array_filter((array)($connection['missing_tables'] ?? []), 'is_scalar')), 0, 12) : [],
+            'db_unexpected_tables' => !empty($connection['db_probe_reachable']) ? array_slice(array_values(array_filter((array)($connection['unexpected_tables'] ?? []), 'is_scalar')), 0, 12) : [],
             'structural_drift' => array_slice($structuralDrift, 0, 12),
             'blind_spots' => array_slice(array_values(array_filter((array)($blindSpotAudit['critical'] ?? []), 'is_array')), 0, 8),
             'stress_scenarios' => array_slice(array_values(array_filter((array)($stressAudit['critical'] ?? []), 'is_array')), 0, 8),

@@ -74,8 +74,8 @@ const WORKFLOW_ENGINE_MODELS = Object.freeze({
   DOCUMENT_CHANGE_CONTROL: ['draft', 'in_review', 'pending_approval', 'approved', 'effective', 'obsolete'],
   DW_SUPPLIER_DIM: ['draft', 'assessment', 'approved', 'conditional', 'hold', 'inactive'],
   EHS_CORRECTIVE_ACTION: ['complete', 'partial', 'broken', 'pending'],
-  EHS_INCIDENT: ['complete', 'partial', 'broken', 'pending'],
-  EHS_PERMIT_REGISTER: ['complete', 'partial', 'broken', 'pending'],
+  EHS_INCIDENT: ['reported', 'triaged', 'contained', 'investigating', 'corrective_action', 'closed', 'archived'],
+  EHS_PERMIT_REGISTER: ['draft', 'submitted', 'approved', 'active', 'suspended', 'expired', 'closed', 'archived'],
   EHS_REGULATORY_SUBMISSION: ['complete', 'partial', 'broken', 'pending'],
   EMPLOYEE_CERTIFICATION: ['complete', 'partial', 'broken', 'pending'],
   EXPORT_LICENS: ['complete', 'partial', 'broken', 'pending'],
@@ -95,7 +95,7 @@ const WORKFLOW_ENGINE_MODELS = Object.freeze({
   INTEGRATION_MONITOR: ['draft', 'active', 'closed'],
   ITEM: ['draft', 'active', 'hold', 'obsolete_requested', 'obsolete'],
   JOB_ORDER: ['draft', 'planned', 'released', 'active', 'completed', 'closed'],
-  LEAN_5S_AUDIT: ['complete', 'partial', 'broken', 'pending'],
+  LEAN_5S_AUDIT: ['planned', 'in_progress', 'follow_up', 'verified', 'closed', 'archived'],
   LEAN_ANDON: ['complete', 'partial', 'broken', 'pending'],
   LEAN_GEMBA_WALK: ['complete', 'partial', 'broken', 'pending'],
   LEAN_KAIZEN: ['complete', 'partial', 'broken', 'pending'],
@@ -113,11 +113,12 @@ const WORKFLOW_ENGINE_MODELS = Object.freeze({
   PLM_CHANGE_REQUEST: ['complete', 'partial', 'broken', 'pending'],
   PLM_DEVIATION_PERMIT: ['complete', 'partial', 'broken', 'pending'],
   PLM_TEST_PLAN: ['complete', 'partial', 'broken', 'pending'],
-  PM_EQUIPMENT_MASTER: ['complete', 'partial', 'broken', 'pending'],
+  PM_EQUIPMENT_MASTER: ['commissioning', 'qualified', 'active', 'on_hold', 'lockout', 'retired', 'archived'],
   PM_FUNCTIONAL_LOCATION: ['complete', 'partial', 'broken', 'pending'],
   PM_MAINTENANCE_BUDGET: ['complete', 'partial', 'broken', 'pending'],
-  PM_MAINTENANCE_PLAN: ['complete', 'partial', 'broken', 'pending'],
+  PM_MAINTENANCE_PLAN: ['draft', 'approved', 'active', 'on_hold', 'retired', 'archived'],
   PM_WORK_ORDER: ['draft', 'planned', 'released', 'in_progress', 'completed', 'cancelled'],
+  QUALITY_OBLIGATION: ['open', 'due', 'overdue', 'waived', 'closed', 'archived'],
   PORTAL_COMPLAINT_SUBMISSION: ['complete', 'partial', 'broken', 'pending'],
   PORTAL_USER: ['active', 'pending', 'deactivated', 'locked'],
   PREDICTIVE_QUALITY: ['planned', 'in_progress', 'passed', 'failed', 'deferred'],
@@ -129,9 +130,12 @@ const WORKFLOW_ENGINE_MODELS = Object.freeze({
   QUAL_LAB_EQUIPMENT: ['complete', 'partial', 'broken', 'pending'],
   QUOTE_LIFECYCLE: ['draft', 'review', 'sent', 'won', 'lost', 'expired'],
   RECEIVING_INSPECTION: ['queued', 'in_progress', 'accepted', 'rejected', 'waived'],
+  IPQC_INSPECTION: ['queued', 'in_progress', 'accepted', 'rejected', 'reinspect', 'closed'],
+  OQC_INSPECTION: ['pending', 'accepted', 'rejected', 'waived'],
   RECORD_LIFECYCLE: ['complete', 'partial', 'broken', 'pending'],
   RETENTION_POLICY: ['draft', 'active', 'closed'],
   ROUTING: ['inactive', 'active'],
+  SAFETY_OBSERVATION: ['logged', 'assigned', 'in_progress', 'closed', 'archived'],
   SALES_ORDER: ['draft', 'confirmed', 'engineering_ready', 'in_production', 'shipped', 'closed'],
   SCAR_RECORD: ['issued', 'acknowledged', 'root_cause_analysis', 'corrective_action', 'verification', 'closed', 'overdue'],
   SERIAL_MASTER: ['complete', 'partial', 'broken', 'pending'],
@@ -230,6 +234,9 @@ const EXPLICIT_WORKFLOW_ENGINE_BRIDGES = Object.freeze({
   wf_qual_lab_equipment: { record_type: 'QUAL_LAB_EQUIPMENT', identity_candidates: ['record_id', 'source_record_id'] },
   wf_quote_lifecycle: { record_type: 'QUOTE_LIFECYCLE', identity_candidates: ['record_id', 'source_record_id', 'history_id', 'quote_id'] },
   wf_receiving_inspection: { record_type: 'RECEIVING_INSPECTION', identity_candidates: ['record_id', 'source_record_id', 'result_id', 'inspection_id'] },
+  wf_ipqc_inspection: { record_type: 'IPQC_INSPECTION', identity_candidates: ['ipqc_inspection_id', 'source_record_id', 'record_id'] },
+  wf_oqc_inspection: { record_type: 'OQC_INSPECTION', identity_candidates: ['oqc_id', 'source_record_id', 'record_id'] },
+  wf_quality_obligation: { record_type: 'QUALITY_OBLIGATION', identity_candidates: ['record_id', 'source_record_id', 'qual_compliance_obligation_id'] },
   wf_record_lifecycle: { record_type: 'RECORD_LIFECYCLE', identity_candidates: ['record_id', 'source_record_id'] },
   wf_retention_policy: { record_type: 'RETENTION_POLICY', identity_candidates: ['record_id', 'source_record_id', 'policy_id'] },
   wf_routing: { record_type: 'ROUTING', identity_candidates: ['record_id', 'source_record_id'] },
@@ -239,6 +246,7 @@ const EXPLICIT_WORKFLOW_ENGINE_BRIDGES = Object.freeze({
   wf_shift_target: { record_type: 'SHIFT_TARGET', identity_candidates: ['record_id', 'source_record_id'] },
   wf_shipment_release: { record_type: 'SHIPMENT_RELEASE', identity_candidates: ['record_id', 'source_record_id'] },
   wf_srm_supplier_development_plan: { record_type: 'SRM_SUPPLIER_DEVELOPMENT_PLAN', identity_candidates: ['record_id', 'source_record_id'] },
+  wf_safety_observation: { record_type: 'SAFETY_OBSERVATION', identity_candidates: ['record_id', 'source_record_id', 'safety_observation_id'] },
   wf_supplier_audit_schedule: { record_type: 'SUPPLIER_AUDIT_SCHEDULE', identity_candidates: ['record_id', 'source_record_id'] },
   wf_svc_customer_asset: { record_type: 'SVC_CUSTOMER_ASSET', identity_candidates: ['record_id', 'source_record_id'] },
   wf_svc_service_work_order: { record_type: 'SVC_SERVICE_WORK_ORDER', identity_candidates: ['record_id', 'source_record_id'] },
@@ -267,6 +275,19 @@ const FRONTEND_SECTION_LABELS = Object.freeze({
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function isolatedLegacyTables(canonicalCatalog) {
+  const isolated = new Set();
+  for (const domain of Object.values(canonicalCatalog?.domains || {})) {
+    for (const resource of Object.values(domain?.resources || {})) {
+      for (const tableName of resource?.legacy_tables_to_isolate || []) {
+        const normalized = String(tableName || '').trim();
+        if (normalized) isolated.add(normalized);
+      }
+    }
+  }
+  return isolated;
 }
 
 function writeJson(filePath, value) {
@@ -1288,11 +1309,55 @@ function sectionLabel(group) {
   };
 }
 
-function frontendProfile(tableName, table) {
+const FRONTEND_PROFILE_OVERRIDES = {
+  capa_records: 'governed_case',
+  calibration_grr_studies: 'assessment_record',
+  com_customer_scorecards: 'assessment_record',
+  dw_kpi_scorecards: 'assessment_record',
+  ehs_emissions_monitoring: 'assessment_record',
+  ehs_waste_shipments: 'transactional_record',
+  engineering_change_requests: 'governed_case',
+  incoming_inspection_results: 'transactional_record',
+  ncr_records: 'governed_case',
+  plm_change_orders: 'governed_case',
+  plm_change_requests: 'governed_case',
+  prj_change_requests: 'governed_case',
+  qual_effectiveness_reviews: 'assessment_record',
+  scar_records: 'governed_case',
+  supplier_scorecards: 'assessment_record',
+};
+
+function isAssessmentRecord(tableName, table, workflowMeta) {
+  const domain = String(table?.domain || '').trim().toLowerCase();
+  const key = String(tableName || '').trim().toLowerCase();
+  const lifecycleMode = String(workflowMeta?.lifecycle_mode || '').trim().toLowerCase();
+  if (lifecycleMode && lifecycleMode !== 'stateless' && lifecycleMode !== 'not_applicable') return false;
+  return /scorecard|review|study|assessment|grr|oot|trend|rating|monitoring|analysis|matrix|kpi/.test(key) ||
+    (/bi_datawarehouse/.test(domain) && /scorecard|kpi/.test(key));
+}
+
+function isGovernedCase(tableName, table, workflowMeta) {
+  const key = String(tableName || '').trim().toLowerCase();
+  const lifecycleMode = String(workflowMeta?.lifecycle_mode || '').trim().toLowerCase();
+  const hasPersistedLifecycle = lifecycleMode && lifecycleMode !== 'stateless' && lifecycleMode !== 'not_applicable';
+  const hasStatusSignal = Boolean(
+    table?.statusColumn ||
+    hasColumn(table, 'status_code') ||
+    hasColumn(table, 'status') ||
+    hasColumn(table, 'approval_state') ||
+    hasColumn(table, 'lifecycle_state') ||
+    hasColumn(table, 'current_status')
+  );
+  const caseLikeKey = /case|complaint|incident|permit|obligation|audit(?!_trail)|finding|risk|ncr|nonconform|capa|scar|deviation|concession|inspection|return_authorization|rma|service_request|warranty_claim|maintenance_plan|change_control|change_request|change_order|improvement|corrective_action|action_request|recall_campaign|close_controls?|exception|override|observation/.test(key);
+  return caseLikeKey && (hasPersistedLifecycle || hasStatusSignal);
+}
+
+function frontendProfile(tableName, table, workflowMeta = null) {
   const domain = String(table?.domain || '').trim().toLowerCase();
   const key = String(tableName || '').trim().toLowerCase();
   const operatorSignals = ['job_id', 'job_no', 'work_order_id', 'operation_id', 'operation_seq', 'resource_id', 'machine_id', 'equipment_id'];
   const hasOperatorSignals = operatorSignals.some((field) => hasColumn(table, field));
+  if (FRONTEND_PROFILE_OVERRIDES[key]) return FRONTEND_PROFILE_OVERRIDES[key];
 
   if (/planning|advanced_planning|dispatch/.test(domain) || /^aps_/.test(key)) {
     return 'planning_console';
@@ -1300,19 +1365,22 @@ function frontendProfile(tableName, table) {
   if ((/mes|production|maintenance|tooling|quality_lab/.test(domain) || /work_order|job_order|machine|dispatch|inspection_lot/.test(key)) && hasOperatorSignals) {
     return 'operator_console';
   }
-  if (table?.workflowId || /quality|audit|calibration|supplier_relationship|trade_compliance|compliance/.test(domain)) {
+  if (/master_data/.test(domain) || /^org_|^item|^bom_|^routing_/.test(key)) {
+    return 'master_data';
+  }
+  if (isGovernedCase(tableName, table, workflowMeta)) {
     return 'governed_case';
   }
   if (/document|record|evidence|training/.test(domain) || /document|record|evidence|passport|certificate|revision/.test(key)) {
     return 'document_record';
   }
-  if (/master_data/.test(domain) || /^org_|^item|^bom_|^routing_/.test(key)) {
-    return 'master_data';
+  if (isAssessmentRecord(tableName, table, workflowMeta)) {
+    return 'assessment_record';
   }
   if (/customer_portal|service/.test(domain)) {
     return 'service_workspace';
   }
-  if (/finance|commercial|crm|warehouse|inventory|purchasing|shipping|transport|logistics/.test(domain)) {
+  if (/finance|commercial|crm|warehouse|inventory|purchasing|shipping|transport|logistics|audit_risk|ehs|supplier_relationship|trade_compliance|quality|bi_datawarehouse|ai_predictive/.test(domain)) {
     return 'transactional_record';
   }
   return 'business_record';
@@ -1326,6 +1394,8 @@ function recommendedPatternsForProfile(profile) {
       return ['dispatch_queue', 'record_shell', 'work_instructions', 'genealogy', 'defect_capture', 'spc', 'offline'];
     case 'document_record':
       return ['record_shell', 'revision_history', 'approval_flow', 'attachments', 'audit_history', 'related_lists'];
+    case 'assessment_record':
+      return ['object_page', 'related_lists', 'timeline', 'attachments', 'audit_history', 'analytics'];
     case 'governed_case':
       return ['object_page', 'related_lists', 'workflow_panel', 'timeline', 'attachments', 'audit_history', 'analytics'];
     case 'master_data':
@@ -1342,7 +1412,7 @@ function recommendedPatternsForProfile(profile) {
 function formulaAliasesForDomain(domain, profile) {
   const key = String(domain || '').trim().toLowerCase();
   const aliases = [key];
-  if (/quality|audit|calibration|supplier_relationship|trade_compliance|compliance/.test(key) || ['governed_case', 'document_record'].includes(profile)) {
+  if (/quality|audit|calibration|supplier_relationship|trade_compliance|compliance/.test(key) || ['governed_case', 'document_record', 'assessment_record'].includes(profile)) {
     aliases.push('quality', 'compliance');
   }
   if (/planning|production|mes|maintenance|tooling/.test(key) || ['planning_console', 'operator_console'].includes(profile)) {
@@ -1357,10 +1427,16 @@ function formulaAliasesForDomain(domain, profile) {
 
 function formulaCountForDomain(formulas, domain, profile) {
   const aliases = new Set(formulaAliasesForDomain(domain, profile));
+  const domainKey = String(domain || '').trim().toLowerCase();
   return Object.entries(formulas || {}).filter(([key, formula]) => {
     if (key === '_meta' || !formula || typeof formula !== 'object') return false;
     const category = String(formula.category || '').trim().toLowerCase();
-    return aliases.has(category);
+    const referencedBy = Array.isArray(formula.referencedBy) ? formula.referencedBy : [];
+    const hasDomainReference = referencedBy.some((reference) => {
+      const refId = String(reference?.id || '').trim().toLowerCase();
+      return refId.includes(`${domainKey}.`) || refId.startsWith(`${domainKey}_`) || refId.includes(`${domainKey}_`);
+    });
+    return aliases.has(category) || hasDomainReference;
   }).length;
 }
 
@@ -1554,14 +1630,16 @@ function interactionContractForSubject(kind, tableName, table, allFields, endpoi
   };
 }
 
-function frontendFoundationContract(tableName, table, dataFields, endpointCatalog, relationMap, tableRegistry, formulas) {
+function frontendFoundationContract(tableName, table, dataFields, endpointCatalog, relationMap, tableRegistry, workflowLibrary, formulas, archiveIsolatedLegacyTables = new Set()) {
   const prefix = `${table.domain}.${tableName}`;
+  const archiveIsolation = archiveIsolatedLegacyTables.has(tableName);
   const listFields = uniqueFields((dataFields[`${prefix}.list`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
   const detailFields = uniqueFields((dataFields[`${prefix}.detail`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
   const createFields = uniqueFields((dataFields[`${prefix}.create`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
   const updateFields = uniqueFields((dataFields[`${prefix}.update`] || []).map((field) => trimFieldForPack(field, tableRegistry)));
   const allFields = uniqueFields([...detailFields, ...listFields, ...createFields, ...updateFields]);
-  const profile = frontendProfile(tableName, table);
+  const workflowMeta = workflowRuntimeContract(tableName, table, workflowLibrary);
+  const profile = frontendProfile(tableName, table, workflowMeta);
   const listEndpoint = endpointCatalog.endpoints?.[`${prefix}.list`] || null;
   const detailEndpoint = endpointCatalog.endpoints?.[`${prefix}.detail`] || null;
   const createEndpoint = endpointCatalog.endpoints?.[`${prefix}.create`] || null;
@@ -2034,7 +2112,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   if (table?.statusColumn && !statusField) workflowBlockers.push('missing_status_field_contract');
   if (workflowRuntime?.execution_mode === 'workflow_engine_required') workflowBlockers.push('workflow_engine_bridge_blocked');
   if ((transitionExpected || table?.statusColumn || profile === 'document_record') && !timelineEvidenceAvailable) timelineBlockers.push('missing_record_timestamps');
-  if (['governed_case', 'document_record', 'transactional_record'].includes(profile) && !attachmentSignal) {
+  if (['governed_case', 'document_record', 'transactional_record', 'assessment_record'].includes(profile) && !attachmentSignal) {
     attachmentBlockers.push('missing_attachment_contract');
   }
   if (profile === 'operator_console' && !attachmentSignal && transitionExpected) {
@@ -2043,7 +2121,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   if ((table?.workflowId || profile === 'service_workspace') && !ownerField && !collaborationSignal) {
     collaborationBlockers.push('missing_assignment_or_activity_contract');
   }
-  if ((profile === 'governed_case' || profile === 'transactional_record' || profile === 'planning_console') && formulaCount === 0) {
+  if ((profile === 'governed_case' || profile === 'transactional_record' || profile === 'planning_console' || profile === 'assessment_record') && formulaCount === 0) {
     analyticsBlockers.push('missing_formula_or_aggregate_contract');
   }
   if (profile === 'planning_console') {
@@ -2099,7 +2177,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
       activity_ready: Boolean(commentContract || activityContract || collaborationSignal),
       sources: timelineSources,
     }, Boolean(timelineTemporalFields.length > 0 || timelineSources.length)),
-    attachments: capabilityContract(['governed_case', 'document_record', 'transactional_record', 'operator_console'].includes(profile), attachmentBlockers.length === 0, attachmentBlockers, {
+    attachments: capabilityContract(['governed_case', 'document_record', 'transactional_record', 'operator_console', 'assessment_record'].includes(profile), attachmentBlockers.length === 0, attachmentBlockers, {
       signal_fields: uniqueStrings(fieldKeys(allFields).filter((field) => /(attachment|document|file|evidence)/.test(String(field || '').toLowerCase()))).slice(0, 8),
       related_entities: relations.incoming.filter((relation) => /(attachment|document|file|evidence|record)/.test(String(relation.entity || '').toLowerCase())),
       contract: attachmentContract,
@@ -2110,7 +2188,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
       comment_contract: commentContract,
       activity_contract: activityContract,
     }, Boolean(ownerField || collaborationSignal)),
-    analytics: capabilityContract(['governed_case', 'transactional_record', 'planning_console', 'operator_console'].includes(profile), formulaCount > 0 && analyticsBlockers.length === 0, analyticsBlockers, {
+    analytics: capabilityContract(['governed_case', 'transactional_record', 'planning_console', 'operator_console', 'assessment_record'].includes(profile), formulaCount > 0 && analyticsBlockers.length === 0, analyticsBlockers, {
       formula_count: formulaCount,
       time_fields: uniqueStrings([createdAtField, updatedAtField, startDateField, endDateField, dueDateField]).slice(0, 5),
       status_field: statusField,
@@ -2160,6 +2238,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
     ...formBlockers,
     ...workflowBlockers,
     ...(['document_record'].includes(profile) ? attachmentBlockers : []),
+    ...(archiveIsolation ? ['archive_isolation_only'] : []),
   ]);
   const warningSet = [];
   if (!subtitleField) warningSet.push('missing_subtitle_field');
@@ -2167,6 +2246,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   if (!updatedAtField) warningSet.push('missing_updated_at_field');
   if (!relations.incoming.length) warningSet.push('no_reverse_related_lists');
   if (!relations.outgoing.length) warningSet.push('no_lookup_reference_panels');
+  if (archiveIsolation) warningSet.push('legacy_alias_isolated_from_live_publication');
 
   return {
     entity_key: prefix,
@@ -2213,7 +2293,8 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
       verdict: blockers.length === 0 && score >= 80
         ? 'ready'
         : (score >= 55 ? 'partial' : 'blocked'),
-      publishable: publishabilityBlockers.length === 0,
+      publishable: !archiveIsolation && publishabilityBlockers.length === 0,
+      archive_isolation: archiveIsolation,
       publishability_blockers: publishabilityBlockers,
       blockers,
       warnings: uniqueStrings(warningSet),
@@ -2221,13 +2302,14 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   };
 }
 
-function buildFrontendFoundationCatalog(tableRegistry, dataFields, endpointCatalog, relationMap, formulas) {
+function buildFrontendFoundationCatalog(tableRegistry, dataFields, endpointCatalog, relationMap, workflowLibrary, formulas, archiveIsolatedLegacyTables = new Set()) {
   const entities = {};
   const summary = {
     entity_count: 0,
     ready_entities: 0,
     partial_entities: 0,
     blocked_entities: 0,
+    archive_isolation_entities: 0,
     workflow_ready_entities: 0,
     related_ready_entities: 0,
     analytics_ready_entities: 0,
@@ -2239,12 +2321,23 @@ function buildFrontendFoundationCatalog(tableRegistry, dataFields, endpointCatal
   };
 
   for (const [tableName, table] of Object.entries(tableRegistry.tables || {})) {
-    const contract = frontendFoundationContract(tableName, table, dataFields, endpointCatalog, relationMap, tableRegistry, formulas);
+    const contract = frontendFoundationContract(
+      tableName,
+      table,
+      dataFields,
+      endpointCatalog,
+      relationMap,
+      tableRegistry,
+      workflowLibrary,
+      formulas,
+      archiveIsolatedLegacyTables,
+    );
     entities[contract.entity_key] = contract;
     summary.entity_count += 1;
     if (contract.readiness.verdict === 'ready') summary.ready_entities += 1;
     if (contract.readiness.verdict === 'partial') summary.partial_entities += 1;
     if (contract.readiness.verdict === 'blocked') summary.blocked_entities += 1;
+    if (contract.readiness.archive_isolation) summary.archive_isolation_entities += 1;
     if (contract.capabilities.workflow.state === 'ready') summary.workflow_ready_entities += 1;
     if (contract.capabilities.related_data.state === 'ready') summary.related_ready_entities += 1;
     if (contract.capabilities.analytics.state === 'ready') summary.analytics_ready_entities += 1;
@@ -2663,17 +2756,31 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
   const fieldContextCount = Object.entries(dataFields).reduce((sum, [key, fields]) => (
     key === '_meta' || !Array.isArray(fields) ? sum : sum + fields.length
   ), 0);
-  const workflowCoverage = tableNames.filter((tableName) => {
+  const workflowRequiredTables = tableNames.filter((tableName) => {
+    const table = tableRegistry.tables[tableName];
+    return !!table.supportTable || !!table.workflowId;
+  });
+  const workflowCoverage = workflowRequiredTables.filter((tableName) => {
     const table = tableRegistry.tables[tableName];
     return !!table.supportTable || !!(table.workflowId && workflowKeys.includes(table.workflowId));
   });
+  const workflowRequiredDomains = Object.keys((tableRegistry.domains || {})).filter((domain) =>
+    tableNames.some((tableName) => {
+      const table = tableRegistry.tables[tableName];
+      return table?.domain === domain && (!!table.supportTable || !!table.workflowId);
+    })
+  );
   const statusTables = tableNames.filter((tableName) => !!tableRegistry.tables[tableName].statusColumn);
   const statusCoverage = statusTables.filter((tableName) => {
     const statusSet = tableRegistry.tables[tableName].statusSet;
     return !!statusSet && statusKeys.includes(statusSet);
   });
-  const domainWorkflowCoverage = Object.keys((tableRegistry.domains || {})).filter((domain) =>
-    workflowKeys.some((workflowId) => (workflowMap[workflowId]?.domain || '') === domain)
+  const domainWorkflowCoverage = workflowRequiredDomains.filter((domain) =>
+    workflowKeys.some((workflowId) => (workflowMap[workflowId]?.domain || '') === domain) ||
+    tableNames.some((tableName) => {
+      const table = tableRegistry.tables[tableName];
+      return table?.domain === domain && !!table.supportTable;
+    })
   );
   const formulaReferenceCount = formulaKeys.filter((formulaId) => Array.isArray(formulas[formulaId]?.referencedBy) && formulas[formulaId].referencedBy.length > 0).length;
   const unsupportedRecordEndpoints = [];
@@ -2698,8 +2805,9 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
   const frontendReadyEntities = frontendContracts.filter((entity) => entity?.readiness?.verdict === 'ready');
   const frontendPartialEntities = frontendContracts.filter((entity) => entity?.readiness?.verdict === 'partial');
   const frontendBlockedEntities = frontendContracts.filter((entity) => entity?.readiness?.verdict === 'blocked');
+  const frontendArchiveIsolatedEntities = frontendContracts.filter((entity) => entity?.readiness?.archive_isolation === true);
   const frontendPublishableEntities = frontendContracts.filter((entity) => entity?.readiness?.publishable === true);
-  const frontendUnpublishableEntities = frontendContracts.filter((entity) => entity?.readiness?.publishable !== true);
+  const frontendUnpublishableEntities = frontendContracts.filter((entity) => entity?.readiness?.publishable !== true && entity?.readiness?.archive_isolation !== true);
   const attachmentContractEntities = frontendContracts.filter((entity) => entity?.interaction_contracts?.attachments?.list_endpoint);
   const commentContractEntities = frontendContracts.filter((entity) => entity?.interaction_contracts?.comments?.list_endpoint);
   const activityContractEntities = frontendContracts.filter((entity) => entity?.interaction_contracts?.activities?.list_endpoint);
@@ -2914,7 +3022,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'tables_have_endpoint_catalog', passed: tableEndpointCoverage.length === tableNames.length, actual: tableEndpointCoverage.length, target: tableNames.length },
     { id: 'tables_have_pack', passed: tablePackCoverage.length === tableNames.length, actual: tablePackCoverage.length, target: tableNames.length },
     { id: 'fk_edges_covered', passed: relationEdges.length === fkCount, actual: relationEdges.length, target: fkCount },
-    { id: 'workflow_coverage', passed: workflowCoverage.length === tableNames.length, actual: workflowCoverage.length, target: tableNames.length },
+    { id: 'workflow_coverage', passed: workflowCoverage.length === workflowRequiredTables.length, actual: workflowCoverage.length, target: workflowRequiredTables.length },
     { id: 'status_coverage', passed: statusCoverage.length === statusTables.length, actual: statusCoverage.length, target: statusTables.length },
     { id: 'scalar_pk_tables', passed: scalarPkTables.length >= (tableNames.length - 32), actual: scalarPkTables.length, target: tableNames.length - 32 },
     { id: 'optimistic_concurrency_contracts', passed: optimisticConcurrencyIssues.length === 0, actual: optimisticConcurrencyIssues.length, target: 0 },
@@ -2926,7 +3034,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'endpoint_contract_readiness', passed: contractIssues.length === 0, actual: contractIssues.length, target: 0 },
     { id: 'workflow_status_alignment', passed: workflowAlignmentIssues.length === 0, actual: workflowAlignmentIssues.length, target: 0 },
     { id: 'workflow_count_target', passed: workflowKeys.length >= 60, actual: workflowKeys.length, target: 60 },
-    { id: 'domain_workflow_target', passed: domainWorkflowCoverage.length === Object.keys(tableRegistry.domains || {}).length, actual: domainWorkflowCoverage.length, target: Object.keys(tableRegistry.domains || {}).length },
+    { id: 'domain_workflow_target', passed: domainWorkflowCoverage.length === workflowRequiredDomains.length, actual: domainWorkflowCoverage.length, target: workflowRequiredDomains.length },
     { id: 'status_set_target', passed: statusKeys.length >= 180, actual: statusKeys.length, target: 180 },
     { id: 'validation_rule_target', passed: validationList.length >= 5000, actual: validationList.length, target: 5000 },
     { id: 'formula_target', passed: formulaKeys.length >= 200, actual: formulaKeys.length, target: 200 },
@@ -2995,6 +3103,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       frontend_ready_entities: frontendReadyEntities.length,
       frontend_partial_entities: frontendPartialEntities.length,
       frontend_blocked_entities: frontendBlockedEntities.length,
+      frontend_archive_isolation_entities: frontendArchiveIsolatedEntities.length,
       frontend_publishable_entities: frontendPublishableEntities.length,
       frontend_unpublishable_entities: frontendUnpublishableEntities.length,
       attachment_contract_entities: attachmentContractEntities.length,
@@ -3067,6 +3176,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
 function main() {
   const tableRegistry = readJson(path.join(registryDir, 'table-registry.json'));
   const domainArchitecture = readJson(path.join(registryDir, 'domain-architecture.json'));
+  const canonicalCatalog = readJson(path.join(registryDir, 'canonical-backend-standardization-catalog.json'));
   const dataFields = loadDataFields();
   const workflowLibrary = readJson(path.join(registryDir, 'workflow-library.json'));
   const wave1LifecycleNormalization = loadWave1LifecycleNormalization(registryDir);
@@ -3081,7 +3191,15 @@ function main() {
   const runtimeAccessPolicy = buildRuntimeAccessPolicy(tableRegistry, domainArchitecture);
   const packs = buildDomainFieldPacks(tableRegistry, dataFields);
   const relationMap = buildRelationMap(tableRegistry);
-  const frontendFoundation = buildFrontendFoundationCatalog(tableRegistry, dataFields, endpointCatalog, relationMap, formulas);
+  const frontendFoundation = buildFrontendFoundationCatalog(
+    tableRegistry,
+    dataFields,
+    endpointCatalog,
+    relationMap,
+    workflowLibrary,
+    formulas,
+    isolatedLegacyTables(canonicalCatalog),
+  );
   const manifest = buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields, frontendFoundation);
   const qualityReport = buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, frontendFoundation);
 

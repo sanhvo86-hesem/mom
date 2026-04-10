@@ -247,6 +247,7 @@ def regenerate_all() -> dict:
     qr["_meta"].update(meta_patch)
 
     s = qr.get("summary", {})
+    s["endpoint_count"] = ec["_meta"]["totalEndpoints"]
     s["frontend_foundation_entities"] = fc["summary"].get("entity_count", len(entities))
     s["frontend_ready_entities"] = ready_count
     s["frontend_partial_entities"] = partial_count
@@ -270,6 +271,9 @@ def regenerate_all() -> dict:
 
     # Fix 528→533 gap: update assets.records to match actual entity count
     assets = rm.get("assets", {})
+    endpoint_asset = assets.get("endpoint-catalog.json", {})
+    if endpoint_asset:
+        endpoint_asset["records"] = ec["_meta"]["totalEndpoints"]
     fc_asset = assets.get("frontend-foundation-catalog.json", {})
     if fc_asset:
         fc_asset["records"] = fc["summary"].get("entity_count", len(entities))

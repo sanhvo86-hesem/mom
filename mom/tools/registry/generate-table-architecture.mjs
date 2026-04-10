@@ -363,7 +363,7 @@ const domainDefinitions = {
     color: '#2563eb',
     description: 'Carrier, route, shipment line, customs docs, freight audit và delivery events.',
     businessProcess: 'Freight planning, routing, customs documents, export screening, and proof of delivery.',
-    workflowPlan: ['wf_tms_shipment', 'wf_freight_audit'],
+    workflowPlan: ['wf_tms_shipment', 'wf_freight_order', 'wf_freight_audit'],
     supportDomain: false,
   },
   bi_datawarehouse: {
@@ -443,7 +443,7 @@ const domainDefinitions = {
     color: '#15803d',
     description: 'Permit, hazardous material, PPE, waste, emissions và sustainability projects.',
     businessProcess: 'EHS compliance, waste/emissions reporting, contractor safety, and sustainability actions.',
-    workflowPlan: ['wf_ehs_incident', 'wf_ehs_corrective_action'],
+    workflowPlan: ['wf_ehs_incident', 'wf_safety_observation', 'wf_ehs_corrective_action'],
     supportDomain: false,
   },
   mfg_engineering: {
@@ -691,6 +691,10 @@ const migrationDomainDefaults = new Map([
   ['083_procurement_recovery_chain.sql', 'purchasing'],
   ['084_execution_quality_projection.sql', 'production'],
   ['085_operational_lifecycle_hardening.sql', 'master_data_governance'],
+  ['086_canonical_transportation_freight_orders.sql', 'transportation'],
+  ['087_canonical_ehs_safety_observations.sql', 'ehs_sustainability'],
+  ['088_canonical_finance_inventory_valuations.sql', 'finance'],
+  ['089_canonical_analytics_plant_performance_snapshots.sql', 'bi_datawarehouse'],
 ]);
 
 const tableDomainOverrides = {
@@ -2300,10 +2304,41 @@ function singularizeTable(tableName) {
   return tableName;
 }
 
-function inferWorkflowId(tableName, supportTable) {
+function hasWorkflowSignal(tableName, table) {
+  const key = String(tableName || '').trim().toLowerCase();
+  const excludedLifecycleCandidates = new Set([
+    'alarm_state',
+    'machine_state',
+    'state_name',
+    'state_since',
+    'state_duration_sec',
+    'e10_state',
+    'e10_substate',
+    'current_e10_state',
+    'current_e10_substate',
+  ]);
+  const nonLifecycleRecords = /(event|snapshot|history|result|results|trail|log|line|package|stop|dim|fact|telemetry|queue|bucket|note|view)$/.test(key)
+    || /(monitoring|scorecard|study|review|analysis|matrix|rating|trend)/.test(key);
+  if (nonLifecycleRecords) return false;
+  const columnNames = [...(table?.columns?.keys?.() || [])].map((name) => String(name || '').trim().toLowerCase());
+  return columnNames.some((name) =>
+    name === 'status' ||
+    name === 'status_code' ||
+    name === 'approval_state' ||
+    name === 'lifecycle_state' ||
+    name === 'workflow_state' ||
+    name === 'current_state' ||
+    name === 'release_state' ||
+    name.endsWith('_status') ||
+    (name.endsWith('_state') && !excludedLifecycleCandidates.has(name) && !name.includes('substate'))
+  );
+}
+
+function inferWorkflowId(tableName, table, supportTable) {
   const overrides = {
     quotes: 'wf_quote_lifecycle',
     quote_history: 'wf_quote_lifecycle',
+    items: 'wf_items',
     sales_orders: 'wf_sales_order',
     sales_order_lines: 'wf_sales_order',
     job_orders: 'wf_job_order',
@@ -2313,7 +2348,7 @@ function inferWorkflowId(tableName, supportTable) {
     warehouses: 'wf_warehouse',
     work_orders: 'wf_work_order_execution',
     incoming_inspections: 'wf_receiving_inspection',
-    incoming_inspection_results: 'wf_receiving_inspection',
+    incoming_inspection_results: null,
     ncr_records: 'wf_ncr',
     capa_records: 'wf_capa',
     fai_records: 'wf_fai',
@@ -2323,7 +2358,7 @@ function inferWorkflowId(tableName, supportTable) {
     shipments: 'wf_shipment_release',
     shipment_releases: 'wf_shipment_release',
     tools: 'wf_tool_life',
-    supplier_scorecards: 'wf_supplier_scorecard',
+    supplier_scorecards: null,
     form_entries: 'wf_form_submission',
     records: 'wf_record_lifecycle',
     cnc_programs: 'wf_cnc_program_approval',
@@ -2381,8 +2416,14 @@ function inferWorkflowId(tableName, supportTable) {
     ncr_human_factors: 'wf_ncr',
     capa_8d_steps: 'wf_capa',
     capa_effectiveness_checks: 'wf_capa',
+    audit_program: 'wf_audit_program',
+    capa: 'wf_capa',
     calibration_oot_investigations: 'wf_calibration_control',
-    calibration_grr_studies: 'wf_calibration_control',
+    calibration_grr_studies: null,
+    dispatch_queue: null,
+    mes_dispatch_queue: 'wf_mes_dispatch_queue',
+    freight_order_stops: null,
+    inventory_valuations: null,
     lean_kaizen_events: 'wf_lean_kaizen',
     lean_qrqc_events: 'wf_lean_qrqc',
     lean_andon_events: 'wf_lean_andon',
@@ -2391,19 +2432,57 @@ function inferWorkflowId(tableName, supportTable) {
     lean_smed_events: 'wf_lean_smed',
     lean_tier_meetings: 'wf_lean_tier_meeting',
     lean_tier_escalations: 'wf_lean_tier_meeting',
+    nonconformance: 'wf_ncr',
+    oqc_inspections: 'wf_oqc_inspection',
+    qual_effectiveness_reviews: null,
+    safety_observation_actions: null,
   };
-  if (overrides[tableName]) return overrides[tableName];
+  if (Object.prototype.hasOwnProperty.call(overrides, tableName)) return overrides[tableName];
   if (supportTable) return null;
+  if (!hasWorkflowSignal(tableName, table)) return null;
   const singular = singularizeTable(tableName);
   return `wf_${singular}`;
 }
 
 function inferStatusColumn(table) {
-  const candidates = [...table.columns.values()].filter((column) => column.name === 'status' || column.name.endsWith('_status'));
+  const explicitOverrides = {
+    audit_program: 'status_code',
+    oqc_inspections: 'result',
+    supplier_quality_case: 'status_code',
+  };
+  const explicitColumn = explicitOverrides[table.tableName];
+  if (explicitColumn && table.columns.has(explicitColumn)) {
+    return table.columns.get(explicitColumn);
+  }
+  const candidates = [...table.columns.values()].filter((column) =>
+    column.name === 'status' ||
+    column.name === 'status_code' ||
+    column.name === 'approval_state' ||
+    column.name === 'lifecycle_state' ||
+    column.name === 'workflow_state' ||
+    column.name === 'current_state' ||
+    column.name === 'release_state' ||
+    column.name.endsWith('_status') ||
+    (
+      column.name.endsWith('_state')
+      && !['alarm_state', 'machine_state', 'state_name', 'state_since', 'state_duration_sec', 'e10_state', 'e10_substate', 'current_e10_state', 'current_e10_substate'].includes(column.name)
+      && !column.name.includes('substate')
+    )
+  );
   if (!candidates.length) return null;
+  const priority = new Map([
+    ['status', 0],
+    ['status_code', 1],
+    ['workflow_state', 2],
+    ['lifecycle_state', 3],
+    ['approval_state', 4],
+    ['current_state', 5],
+    ['release_state', 6],
+  ]);
   candidates.sort((left, right) => {
-    if (left.name === 'status') return -1;
-    if (right.name === 'status') return 1;
+    const leftPriority = priority.has(left.name) ? priority.get(left.name) : 50;
+    const rightPriority = priority.has(right.name) ? priority.get(right.name) : 50;
+    if (leftPriority !== rightPriority) return leftPriority - rightPriority;
     return left.name.length - right.name.length || left.name.localeCompare(right.name);
   });
   return candidates[0];
@@ -2431,9 +2510,13 @@ function inferStatusSet(table, statusOptions, statusSignatures, workflowId) {
     customer_complaints: 'complaint_status',
     deviations: 'exception_status',
     concessions: 'exception_status',
+    mes_dispatch_queue: 'mes_dispatch_queue_queue_status_set',
+    oqc_inspections: 'oqc_inspections_result_status',
     quality_predictions: 'validation',
     pm_work_orders: 'maintenance_order',
     pm_work_order_operations: 'maintenance_order',
+    audit_program: 'supplier_audit_status',
+    supplier_quality_case: 'supplier_quality_case_status_code',
   };
   if (explicitOverride[table.tableName]) return explicitOverride[table.tableName];
 
@@ -2444,6 +2527,8 @@ function inferStatusSet(table, statusOptions, statusSignatures, workflowId) {
 
   const candidates = [
     statusColumn.name,
+    `${singularizeTable(table.tableName)}_${statusColumn.name}`,
+    `${table.tableName}_${statusColumn.name}`,
     `${singularizeTable(table.tableName)}_status`,
     `${table.tableName}_status`,
     singularizeTable(table.tableName),
@@ -2554,7 +2639,7 @@ function buildTableRegistry(parsed, registryMaps) {
 
     const subDomain = domain === 'mes_execution' ? inferMesSubdomain(table.tableName) : null;
     const supportTable = inferSupportTable(table.tableName);
-    const workflowId = inferWorkflowId(table.tableName, supportTable);
+    const workflowId = inferWorkflowId(table.tableName, table, supportTable);
     const statusColumn = inferStatusColumn(table);
     const statusSet = statusColumn ? inferStatusSet(table, registryMaps.statusOptions, statusSignatures, workflowId) : null;
 
@@ -3057,7 +3142,6 @@ function selfAudit(parsed, tableRegistry, domainArchitecture, orphanResolution) 
   for (const [tableName, descriptor] of Object.entries(tableRegistry)) {
     if (!descriptor.domain) throw new Error(`Table ${tableName} missing domain`);
     if (descriptor.statusColumn && !descriptor.statusSet) throw new Error(`Table ${tableName} missing status set`);
-    if (!descriptor.workflowId && !descriptor.supportTable) throw new Error(`Table ${tableName} missing workflow/support flag`);
     for (const [columnName, column] of Object.entries(descriptor.columns)) {
       if (!column.label || !column.labelEn) throw new Error(`Column ${tableName}.${columnName} missing labels`);
     }

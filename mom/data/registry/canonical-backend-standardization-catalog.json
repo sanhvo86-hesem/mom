@@ -3,7 +3,7 @@
     "version": "1.0",
     "generatedAt": "2026-04-09T15:45:00+07:00",
     "description": "Machine-readable authority catalog for international-standard backend normalization across ERP, MES, QMS, EAM, EHS, CRM, SCM, and finance flows.",
-    "resourceCount": 63,
+    "resourceCount": 64,
     "authorityDocs": [
       "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/backend-readiness-gap-analysis-2026-04-09.md",
       "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/global-backend-standardization-blueprint-2026-04-09.md",
@@ -99,6 +99,34 @@
         "owner_id",
         "effective_date",
         "closed_at",
+        "row_version",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "assessment_record": {
+      "required_endpoints": [
+        "GET /api/v1/{resource}",
+        "POST /api/v1/{resource}",
+        "GET /api/v1/{resource}/{id}",
+        "PATCH /api/v1/{resource}/{id}",
+        "GET /api/v1/{resource}/{id}/timeline",
+        "GET /api/v1/{resource}/{id}/attachments",
+        "POST /api/v1/{resource}/{id}/attachments"
+      ],
+      "recommended_endpoints": [
+        "GET /api/v1/{resource}/{id}/comments",
+        "POST /api/v1/{resource}/{id}/comments",
+        "GET /api/v1/{resource}/{id}/activities"
+      ],
+      "minimum_columns": [
+        "id",
+        "source_record_id",
+        "result_code",
+        "owner_id",
+        "review_date",
+        "org_company_id",
+        "org_site_id",
         "row_version",
         "created_at",
         "updated_at"
@@ -279,8 +307,9 @@
             "lockout"
           ],
           "key_relationships": [
-            "equipment_id -> maintenance_plans.equipment_id",
-            "equipment_id -> work_orders.equipment_id"
+            "equipment_id -> pm_maintenance_plans.equipment_id",
+            "equipment_id -> pm_work_orders.equipment_id",
+            "equipment_id -> pm_equipment_master.equipment_id"
           ]
         },
         "tools": {
@@ -323,18 +352,16 @@
             "release"
           ],
           "key_relationships": [
-            "measuring_device_id -> msa_studies.measuring_device_id",
-            "measuring_device_id -> iqc_inspections.measuring_device_id"
+            "measuring_device_id -> msa_studies.measuring_device_id"
           ]
         },
         "compliance-obligations": {
           "pattern": "lifecycle_owner",
-          "table": "compliance_obligations",
-          "primary_key": "compliance_obligation_id",
+          "table": "qual_compliance_obligations",
+          "primary_key": "qual_compliance_obligation_id",
           "status_column": "obligation_status",
           "legacy_tables": [
-            "qual_compliance_obligations",
-            "ehs_permit_register"
+            "compliance_obligations"
           ],
           "child_tables": [
             "obligation_tasks",
@@ -346,8 +373,8 @@
             "close"
           ],
           "key_relationships": [
-            "compliance_obligation_id -> permits.compliance_obligation_id",
-            "compliance_obligation_id -> incidents.compliance_obligation_id"
+            "qual_compliance_obligation_id -> ehs_incidents.qual_compliance_obligation_id",
+            "owner_id -> employees.employee_id"
           ]
         }
       }
@@ -379,10 +406,11 @@
           ]
         },
         "quote-effectiveness-reviews": {
-          "pattern": "lifecycle_owner",
+          "pattern": "assessment_record",
           "table": "qual_effectiveness_reviews",
           "primary_key": "qual_effectiveness_review_id",
-          "status_column": "review_result",
+          "status_column": null,
+          "result_column": "review_result",
           "legacy_tables": [
             "quote_effectiveness_reviews"
           ],
@@ -558,7 +586,7 @@
           ],
           "key_relationships": [
             "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id",
-            "purchase_receipt_id -> iqc_inspections.purchase_receipt_id"
+            "source_record_id -> incoming_inspections.source_record_id"
           ]
         },
         "purchase-receipt-corrections": {
@@ -585,14 +613,14 @@
         },
         "iqc-inspections": {
           "pattern": "lifecycle_owner",
-          "table": "iqc_inspections",
-          "primary_key": "iqc_inspection_id",
-          "status_column": "inspection_status",
+          "table": "incoming_inspections",
+          "primary_key": "inspection_id",
+          "status_column": "status",
           "legacy_tables": [
-            "incoming_inspections"
+            "iqc_inspections"
           ],
           "child_tables": [
-            "iqc_inspection_results"
+            "incoming_inspection_results"
           ],
           "recommended_actions": [
             "queue",
@@ -602,8 +630,9 @@
             "waive"
           ],
           "key_relationships": [
-            "purchase_receipt_id -> purchase_receipts.purchase_receipt_id",
-            "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id"
+            "source_record_id -> purchase_receipts.source_record_id",
+            "po_number -> purchase_orders.po_number",
+            "vendor_id -> purchase_orders.vendor_id"
           ]
         }
       }
@@ -714,6 +743,9 @@
             "dispatch_lists",
             "dispatch_queue"
           ],
+          "legacy_tables_to_isolate": [
+            "dispatch_queue"
+          ],
           "child_tables": [
             "dispatch_list_entries"
           ],
@@ -744,7 +776,7 @@
           ],
           "key_relationships": [
             "work_order_id -> work_orders.work_order_id",
-            "production_operation_id -> production_operations.production_operation_id"
+            "job_op_id -> job_operations.job_op_id"
           ]
         }
       }
@@ -943,6 +975,9 @@
             "nonconformance",
             "nonconformances"
           ],
+          "legacy_tables_to_isolate": [
+            "nonconformance"
+          ],
           "child_tables": [
             "nonconformance_dispositions",
             "nonconformance_evidence"
@@ -953,10 +988,10 @@
             "close"
           ],
           "key_relationships": [
-            "iqc_inspection_id -> iqc_inspections.iqc_inspection_id",
-            "ipqc_inspection_id -> ipqc_inspections.ipqc_inspection_id",
-            "oqc_inspection_id -> oqc_inspections.oqc_inspection_id",
-            "customer_return_id -> customer_returns.customer_return_id"
+            "source_record_id -> incoming_inspections.source_record_id",
+            "source_record_id -> ipqc_inspections.source_record_id",
+            "source_record_id -> oqc_inspections.source_record_id",
+            "source_record_id -> rma_orders.source_record_id"
           ]
         },
         "corrective-actions": {
@@ -968,6 +1003,9 @@
             "capa",
             "capa_actions",
             "corrective_actions"
+          ],
+          "legacy_tables_to_isolate": [
+            "capa"
           ],
           "child_tables": [
             "corrective_action_tasks",
@@ -981,14 +1019,15 @@
           ],
           "key_relationships": [
             "source_ncr_id -> ncr_records.ncr_id",
-            "incident_id -> incidents.incident_id"
+            "source_record_id -> ncr_records.source_record_id"
           ]
         },
         "msa-studies": {
-          "pattern": "lifecycle_owner",
+          "pattern": "assessment_record",
           "table": "calibration_grr_studies",
           "primary_key": "grr_id",
-          "status_column": "grr_result",
+          "status_column": null,
+          "result_column": "grr_result",
           "legacy_tables": [
             "msa_studies"
           ],
@@ -1001,14 +1040,34 @@
             "approve_result"
           ],
           "key_relationships": [
-            "measuring_device_id -> measuring_devices.measuring_device_id"
+            "equipment_id -> equipment.equipment_id"
+          ]
+        },
+        "spc-observations": {
+          "pattern": "assessment_record",
+          "table": "spc_data",
+          "primary_key": "spc_id",
+          "status_column": null,
+          "result_column": "out_of_control",
+          "legacy_tables": [
+            "spc_data"
+          ],
+          "child_tables": [],
+          "recommended_actions": [
+            "record_sample",
+            "evaluate_rule",
+            "escalate_ncr"
+          ],
+          "key_relationships": [
+            "job_number -> job_orders.job_number",
+            "source_record_id -> ipqc_inspections.source_record_id"
           ]
         },
         "oqc-inspections": {
           "pattern": "lifecycle_owner",
           "table": "oqc_inspections",
-          "primary_key": "oqc_inspection_id",
-          "status_column": "inspection_status",
+          "primary_key": "oqc_id",
+          "status_column": "result",
           "legacy_tables": [
             "oqc_inspections"
           ],
@@ -1023,31 +1082,32 @@
             "release_to_shipping"
           ],
           "key_relationships": [
-            "work_order_id -> work_orders.work_order_id",
-            "shipment_id -> shipments.shipment_id"
+            "wo_number -> work_orders.work_order_number",
+            "so_number -> sales_orders.sales_order_number"
           ]
         },
         "fqc-inspections": {
           "pattern": "lifecycle_owner",
-          "table": "fqc_inspections",
-          "primary_key": "fqc_inspection_id",
-          "status_column": "inspection_status",
+          "table": "oqc_inspections",
+          "primary_key": "oqc_id",
+          "status_column": "result",
+          "alias_only": true,
+          "canonical_successor_resource": "quality_improvement.oqc-inspections",
           "legacy_tables": [
-            "oqc_inspections"
+            "fqc_inspections"
           ],
           "child_tables": [
-            "fqc_inspection_results"
+            "oqc_inspection_results"
           ],
           "recommended_actions": [
             "queue",
-            "start",
             "accept",
             "reject",
-            "close"
+            "waive"
           ],
           "key_relationships": [
-            "sales_order_id -> sales_orders.sales_order_id",
-            "shipment_id -> shipments.shipment_id"
+            "wo_number -> work_orders.work_order_number",
+            "so_number -> sales_orders.sales_order_number"
           ]
         },
         "deviations": {
@@ -1116,6 +1176,9 @@
             "audit_program",
             "audit_programs",
             "internal_audits"
+          ],
+          "legacy_tables_to_isolate": [
+            "audit_program"
           ],
           "child_tables": [
             "audit_findings",
@@ -1206,8 +1269,7 @@
             "retire"
           ],
           "key_relationships": [
-            "equipment_id -> equipment.equipment_id",
-            "asset_id -> assets.asset_id"
+            "equipment_id -> equipment.equipment_id"
           ]
         },
         "maintenance-work-orders": {
@@ -1230,17 +1292,16 @@
           ],
           "key_relationships": [
             "maintenance_plan_id -> pm_maintenance_plans.maintenance_plan_id",
-            "asset_id -> assets.asset_id",
             "equipment_id -> equipment.equipment_id"
           ]
         },
         "incidents": {
           "pattern": "lifecycle_owner",
-          "table": "incidents",
+          "table": "ehs_incidents",
           "primary_key": "incident_id",
           "status_column": "incident_status",
           "legacy_tables": [
-            "ehs_incidents"
+            "incidents"
           ],
           "child_tables": [
             "incident_investigations",
@@ -1254,7 +1315,7 @@
           ],
           "key_relationships": [
             "reported_by_employee_id -> employees.employee_id",
-            "corrective_action_id -> corrective_actions.corrective_action_id"
+            "qual_compliance_obligation_id -> qual_compliance_obligations.qual_compliance_obligation_id"
           ]
         },
         "safety-observations": {
@@ -1275,29 +1336,29 @@
           ],
           "key_relationships": [
             "employee_id -> employees.employee_id",
-            "incident_id -> incidents.incident_id"
+            "assigned_to_employee_id -> employees.employee_id",
+            "incident_id -> ehs_incidents.incident_id"
           ]
         },
         "permits": {
           "pattern": "lifecycle_owner",
-          "table": "permits",
-          "primary_key": "permit_id",
-          "status_column": "permit_status",
+          "table": "ehs_permit_register",
+          "primary_key": "ehs_permit_id",
+          "status_column": "status",
           "legacy_tables": [
-            "ehs_permit_register"
+            "permits"
           ],
           "child_tables": [
             "permit_conditions"
           ],
           "recommended_actions": [
-            "apply",
-            "renew",
+            "submit",
+            "approve",
+            "activate",
             "suspend",
             "close"
           ],
-          "key_relationships": [
-            "compliance_obligation_id -> compliance_obligations.compliance_obligation_id"
-          ]
+          "key_relationships": []
         },
         "five-s-audits": {
           "pattern": "lifecycle_owner",
@@ -1317,7 +1378,7 @@
             "close"
           ],
           "key_relationships": [
-            "improvement_action_id -> improvement_projects.improvement_id"
+            "auditor_id -> employees.employee_id"
           ]
         }
       }
@@ -1643,9 +1704,9 @@
       "wave": 4,
       "title": "Production And Quality Closure",
       "objectives": [
-        "introduce_ipqc_and_fqc_as_first_class_objects",
-        "normalize_oqc_and_ncr_capa_linkages",
-        "close_shop_floor_inventory_and_traceability_loops"
+        "stabilize_iqc_ipqc_oqc_as_the_live_quality_execution_backbone",
+        "retain_fqc_as_alias_until_a_distinct_finished_goods_gate_is_real",
+        "close_ncr_capa_spc_msa_reaction_loops_with_server_side_qa_qc_split"
       ]
     },
     {

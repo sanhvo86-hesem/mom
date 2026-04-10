@@ -176,6 +176,14 @@ final class OperationalOverrideService
                 'signature_attestation' => (string)($typePolicy['signature_attestation'] ?? 'Controlled override approved.'),
                 'signature_hash' => hash('sha256', json_encode($signaturePayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
             ],
+            'status_history' => [[
+                'from' => '',
+                'to' => 'active',
+                'transition' => 'create',
+                'timestamp' => $approvedAt,
+                'user' => $approvedBy,
+                'reason' => 'Override activated from approved creation.',
+            ]],
             'created_at' => $approvedAt,
             'updated_at' => $approvedAt,
         ];
@@ -234,6 +242,106 @@ final class OperationalOverrideService
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>
+     */
+    public function transitionOverride(string $overrideId, string $transition, string $userId, array $context = []): array
+    {
+        $needle = trim($overrideId);
+        $transition = strtolower(trim($transition));
+        if ($needle === '') {
+            throw new RuntimeException('Operational override id is required.');
+        }
+        if ($transition === '') {
+            throw new RuntimeException('Operational override transition is required.');
+        }
+
+        $records = $this->readAll();
+        $index = null;
+        foreach ($records as $offset => $record) {
+            if (!is_array($record)) {
+                continue;
+            }
+            if ((string)($record['override_id'] ?? '') === $needle) {
+                $index = $offset;
+                break;
+            }
+        }
+
+        if ($index === null) {
+            throw new RuntimeException('Operational override not found.');
+        }
+
+        $record = (array)$records[$index];
+        $now = $this->now();
+        $currentStatus = $this->effectiveStatus($record, $now);
+        $targetStatus = match ($transition) {
+            'revoke' => 'revoked',
+            'expire' => 'expired',
+            'close' => 'closed',
+            default => '',
+        };
+        if ($targetStatus === '') {
+            throw new RuntimeException('Unsupported operational override transition.');
+        }
+
+        $allowed = [
+            'active' => ['revoke', 'expire', 'close'],
+            'expired' => ['close'],
+            'revoked' => ['close'],
+            'closed' => [],
+        ];
+        if (!in_array($transition, $allowed[$currentStatus] ?? [], true)) {
+            throw new RuntimeException("Transition {$transition} is not allowed from {$currentStatus}.");
+        }
+
+        $reason = trim((string)($context['reason'] ?? $context['reason_text'] ?? ''));
+        if ($reason === '') {
+            throw new RuntimeException('Operational override transition requires a reason.');
+        }
+
+        $nowIso = $this->formatTimestamp($now);
+        $record['override_status'] = $targetStatus;
+        $record['updated_at'] = $nowIso;
+        $record['updated_by'] = $userId;
+        $record['last_transition_at'] = $nowIso;
+        $record['last_transition_by'] = $userId;
+        $record['status_history'] = is_array($record['status_history'] ?? null) ? $record['status_history'] : [];
+        $record['status_history'][] = [
+            'from' => $currentStatus,
+            'to' => $targetStatus,
+            'transition' => $transition,
+            'timestamp' => $nowIso,
+            'user' => $userId,
+            'reason' => $reason,
+        ];
+
+        if ($targetStatus === 'revoked') {
+            $record['revoked_at'] = $nowIso;
+            $record['revoked_by'] = $userId;
+            $record['revocation_reason'] = $reason;
+        }
+        if ($targetStatus === 'expired') {
+            $record['expires_at'] = $nowIso;
+            $record['expired_at'] = $nowIso;
+            $record['expiry_reason'] = $reason;
+        }
+        if ($targetStatus === 'closed') {
+            $record['closed_at'] = $nowIso;
+            $record['closed_by'] = $userId;
+            $record['closure_reason'] = $reason;
+            if (($record['follow_up_status'] ?? 'not_required') !== 'not_required') {
+                $record['follow_up_status'] = trim((string)($context['follow_up_status'] ?? '')) ?: 'closed';
+            }
+        }
+
+        $records[$index] = $record;
+        $this->writeAll($records);
+
+        return $this->decorateRecord($record, $now);
     }
 
     /**
@@ -305,8 +413,8 @@ final class OperationalOverrideService
     private function effectiveStatus(array $record, DateTimeImmutable $now): string
     {
         $status = trim((string)($record['override_status'] ?? 'active'));
-        if ($status === 'revoked') {
-            return 'revoked';
+        if (in_array($status, ['revoked', 'closed', 'expired'], true)) {
+            return $status;
         }
         $expiresAt = $this->parseTimestamp((string)($record['expires_at'] ?? ''), $now);
         if ($expiresAt <= $now) {

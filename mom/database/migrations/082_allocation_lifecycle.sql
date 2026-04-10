@@ -42,6 +42,12 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
+-- Generic priority / Muc do uu tien chung
+DO $$ BEGIN
+    CREATE TYPE priority_enum AS ENUM ('low', 'medium', 'high', 'critical');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
 -- ===========================================================================
 -- allocations / Cap phat ma ho so
 -- ===========================================================================

@@ -45,6 +45,12 @@ REQUIRED_ARTIFACTS = [
     REG / "wave3-process-governance-policy.json",
     REG / "wave3-process-normalization.json",
     REG / "wave3-process-report.json",
+    REG / "wave4-production-quality-governance-policy.json",
+    REG / "wave4-production-quality-normalization.json",
+    REG / "wave4-production-quality-report.json",
+    REG / "wave5-maintenance-ehs-governance-policy.json",
+    REG / "wave5-maintenance-ehs-normalization.json",
+    REG / "wave5-maintenance-ehs-report.json",
     REG / "operational-stress-governance-policy.json",
     REG / "operational-stress-catalog.json",
     REG / "operational-stress-report.json",
@@ -119,11 +125,18 @@ def main() -> int:
     rmr = rm.get("assets",{}).get("frontend-foundation-catalog.json",{}).get("records")
     check("manifest_records_matches_entity_count", rmr == fcs.get("entity_count"),
           f"assets.records={rmr} entity_count={fcs.get('entity_count')}")
+    ec = load(REG / "endpoint-catalog.json")
+    endpoint_actual = len(ec.get("endpoints", {}))
+    manifest_endpoint_records = rm.get("assets", {}).get("endpoint-catalog.json", {}).get("records")
+    check("manifest_endpoint_records_match_actual", manifest_endpoint_records == endpoint_actual,
+          f"manifest={manifest_endpoint_records} actual={endpoint_actual}")
 
     # Gate E: Bridge truth
     print("\nGate E: Bridge truth")
     qr = load(REG / "registry-quality-report.json")
     qrs = qr.get("summary",{})
+    check("quality_report_endpoint_count_matches_actual", qrs.get("endpoint_count") == endpoint_actual,
+          f"quality_report={qrs.get('endpoint_count')} actual={endpoint_actual}")
     rmb = rm.get("coverage",{}).get("workflow_engine_bridge",{})
     check("bridge_ready_matches", qrs.get("workflow_engine_bridge_ready") == rmb.get("ready"),
           f"qr={qrs.get('workflow_engine_bridge_ready')} rm={rmb.get('ready')}")
@@ -170,6 +183,20 @@ def main() -> int:
               "stale workflow_blocker in nested readiness")
     else:
         check("ag_exists", False, "governance.approval_group not in entities")
+
+    print("\nGate I2: Frontend workflow contract consistency")
+    workflow_ready_drifts = []
+    for entity_key, ent in entities.items():
+        if not isinstance(ent, dict):
+            continue
+        readiness = ent.get("readiness", {})
+        capabilities = ent.get("capabilities", {})
+        workflow = capabilities.get("workflow", {}) if isinstance(capabilities, dict) else {}
+        if readiness.get("workflow_ready") is True and workflow.get("state") != "ready":
+            workflow_ready_drifts.append(entity_key)
+    check("workflow_ready_requires_ready_workflow_capability",
+          len(workflow_ready_drifts) == 0,
+          f"drift_entities={workflow_ready_drifts[:10]}")
 
     # Gate J: Schema authority
     print("\nGate J: Schema authority")
@@ -396,8 +423,103 @@ def main() -> int:
               "wave3-process-report.json" in (rm.get("assets") or {}),
               "wave3-process-report.json missing from registry-manifest assets")
 
-    # Gate T: Operational stress governance
-    print("\nGate T: Operational stress governance")
+    # Gate T: Wave 4 production-quality governance
+    print("\nGate T: Wave 4 production-quality governance")
+    wave4_policy_path = REG / "wave4-production-quality-governance-policy.json"
+    wave4_normalization_path = REG / "wave4-production-quality-normalization.json"
+    wave4_report_path = REG / "wave4-production-quality-report.json"
+    if wave4_policy_path.is_file():
+        wave4_policy = load(wave4_policy_path)
+        check("wave4_build_questions_present",
+              len(wave4_policy.get("build_questions", [])) >= 8,
+              f"build_questions={len(wave4_policy.get('build_questions', []))}")
+        check("wave4_rejects_child_workflow_inheritance",
+              "inspection_result_or_measurement_row_inherits_parent_workflow_owner" in (wave4_policy.get("rejection_criteria") or []),
+              "child-workflow-inheritance rejection missing")
+    if wave4_normalization_path.is_file():
+        wave4_normalization = load(wave4_normalization_path)
+        check("wave4_quality_execution_targets_present",
+              len(wave4_normalization.get("quality_execution_targets", {})) >= 3,
+              f"quality_execution_targets={len(wave4_normalization.get('quality_execution_targets', {}))}")
+        check("wave4_reaction_loop_targets_present",
+              len(wave4_normalization.get("reaction_loop_targets", {})) >= 4,
+              f"reaction_loop_targets={len(wave4_normalization.get('reaction_loop_targets', {}))}")
+    if wave4_report_path.is_file():
+        wave4_report = load(wave4_report_path)
+        wave4_summary = wave4_report.get("summary", {})
+        check("wave4_quality_execution_pass",
+              wave4_summary.get("quality_execution_failed", 1) == 0,
+              f"failed={wave4_summary.get('quality_execution_failed')}")
+        check("wave4_inspection_backbone_pass",
+              wave4_summary.get("inspection_backbone_failed", 1) == 0,
+              f"failed={wave4_summary.get('inspection_backbone_failed')}")
+        check("wave4_reaction_loop_pass",
+              wave4_summary.get("reaction_loop_failed", 1) == 0,
+              f"failed={wave4_summary.get('reaction_loop_failed')}")
+        check("wave4_qa_qc_split_pass",
+              wave4_summary.get("qa_qc_role_split_failed", 1) == 0,
+              f"failed={wave4_summary.get('qa_qc_role_split_failed')}")
+        check("wave4_alias_pass",
+              wave4_summary.get("alias_resolution_failed", 1) == 0,
+              f"failed={wave4_summary.get('alias_resolution_failed')}")
+        check("wave4_remaining_gaps_zero",
+              wave4_summary.get("remaining_wave4_gaps", 1) == 0,
+              f"remaining={wave4_summary.get('remaining_wave4_gaps')}")
+        check("wave4_manifest_asset_registered",
+              "wave4-production-quality-report.json" in (rm.get("assets") or {}),
+              "wave4-production-quality-report.json missing from registry-manifest assets")
+
+    # Gate U: Wave 5 maintenance / EHS governance
+    print("\nGate U: Wave 5 maintenance / EHS governance")
+    wave5_policy_path = REG / "wave5-maintenance-ehs-governance-policy.json"
+    wave5_normalization_path = REG / "wave5-maintenance-ehs-normalization.json"
+    wave5_report_path = REG / "wave5-maintenance-ehs-report.json"
+    if wave5_policy_path.is_file():
+        wave5_policy = load(wave5_policy_path)
+        check("wave5_build_questions_present",
+              len(wave5_policy.get("build_questions", [])) >= 8,
+              f"build_questions={len(wave5_policy.get('build_questions', []))}")
+        check("wave5_rejects_placeholder_status_runtime",
+              "live_maintenance_or_ehs_owner_left_on_placeholder_digital_thread_status" in (wave5_policy.get("rejection_criteria") or []),
+              "placeholder-status rejection missing")
+    if wave5_normalization_path.is_file():
+        wave5_normalization = load(wave5_normalization_path)
+        check("wave5_execution_targets_present",
+              len(wave5_normalization.get("execution_targets", {})) >= 7,
+              f"execution_targets={len(wave5_normalization.get('execution_targets', {}))}")
+        check("wave5_practical_state_targets_present",
+              len(wave5_normalization.get("practical_state_targets", {})) >= 4,
+              f"practical_state_targets={len(wave5_normalization.get('practical_state_targets', {}))}")
+    if wave5_report_path.is_file():
+        wave5_report = load(wave5_report_path)
+        wave5_summary = wave5_report.get("summary", {})
+        check("wave5_execution_pass",
+              wave5_summary.get("execution_failed", 1) == 0,
+              f"failed={wave5_summary.get('execution_failed')}")
+        check("wave5_practical_state_pass",
+              wave5_summary.get("practical_state_failed", 1) == 0,
+              f"failed={wave5_summary.get('practical_state_failed')}")
+        check("wave5_canonical_owner_pass",
+              wave5_summary.get("canonical_owner_failed", 1) == 0,
+              f"failed={wave5_summary.get('canonical_owner_failed')}")
+        check("wave5_contextual_alias_pass",
+              wave5_summary.get("contextual_alias_failed", 1) == 0,
+              f"failed={wave5_summary.get('contextual_alias_failed')}")
+        check("wave5_relationship_truth_pass",
+              wave5_summary.get("relationship_truth_failed", 1) == 0,
+              f"failed={wave5_summary.get('relationship_truth_failed')}")
+        check("wave5_role_guard_pass",
+              wave5_summary.get("workflow_role_guard_failed", 1) == 0,
+              f"failed={wave5_summary.get('workflow_role_guard_failed')}")
+        check("wave5_remaining_gaps_zero",
+              wave5_summary.get("remaining_wave5_gaps", 1) == 0,
+              f"remaining={wave5_summary.get('remaining_wave5_gaps')}")
+        check("wave5_manifest_asset_registered",
+              "wave5-maintenance-ehs-report.json" in (rm.get("assets") or {}),
+              "wave5-maintenance-ehs-report.json missing from registry-manifest assets")
+
+    # Gate V: Operational stress governance
+    print("\nGate V: Operational stress governance")
     stress_policy_path = REG / "operational-stress-governance-policy.json"
     stress_catalog_path = REG / "operational-stress-catalog.json"
     stress_report_path = REG / "operational-stress-report.json"

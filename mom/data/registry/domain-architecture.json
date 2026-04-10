@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T14:35:16.368Z",
+    "generatedAt": "2026-04-10T07:50:54.469Z",
     "domainCount": 49,
-    "tableCount": 652,
+    "tableCount": 658,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-09T14:35:20.092Z"
+    "workflowCoverageGeneratedAt": "2026-04-10T07:50:58.252Z"
   },
   "domains": {
     "core_system": {
@@ -269,10 +269,6 @@
         "users"
       ],
       "primaryWorkflows": [
-        "wf_department",
-        "wf_role",
-        "wf_session",
-        "wf_user_role",
         "wf_user"
       ],
       "upstreamDomains": [
@@ -324,11 +320,7 @@
       ],
       "supportDomain": false,
       "workflows": [
-        "wf_department",
-        "wf_role",
-        "wf_session",
-        "wf_user",
-        "wf_user_role"
+        "wf_user"
       ]
     },
     "foundation_governance": {
@@ -364,7 +356,6 @@
       ],
       "primaryWorkflows": [
         "wf_approval",
-        "wf_attachment",
         "wf_calendar",
         "wf_electronic_signature",
         "wf_org_company",
@@ -379,7 +370,6 @@
         "wf_party_contact",
         "wf_party_role",
         "wf_party_site",
-        "wf_reason_code",
         "wf_shift",
         "wf_status_code",
         "wf_uom"
@@ -391,6 +381,7 @@
         "advanced_planning",
         "ai_predictive",
         "audit_risk",
+        "bi_datawarehouse",
         "calibration_equipment",
         "cnc_programs",
         "commercial_contracts",
@@ -439,7 +430,6 @@
       "supportDomain": false,
       "workflows": [
         "wf_approval",
-        "wf_attachment",
         "wf_calendar",
         "wf_electronic_signature",
         "wf_org_company",
@@ -454,7 +444,6 @@
         "wf_party_contact",
         "wf_party_role",
         "wf_party_site",
-        "wf_reason_code",
         "wf_shift",
         "wf_status_code",
         "wf_uom"
@@ -477,8 +466,6 @@
       ],
       "primaryWorkflows": [
         "wf_document",
-        "wf_document_distribution",
-        "wf_document_embedding",
         "wf_document_revision",
         "wf_document_change_control"
       ],
@@ -498,8 +485,6 @@
       "workflows": [
         "wf_document",
         "wf_document_change_control",
-        "wf_document_distribution",
-        "wf_document_embedding",
         "wf_document_revision"
       ]
     },
@@ -531,19 +516,15 @@
       ],
       "primaryWorkflows": [
         "wf_bill_of_material",
-        "wf_bom_component",
         "wf_item",
-        "wf_item_attr",
-        "wf_item_class",
         "wf_item_revision",
         "wf_item_site",
         "wf_item_spec",
-        "wf_item_variant",
+        "wf_items",
         "wf_lot_policy",
         "wf_routing",
         "wf_serial_policy",
-        "wf_shelf_life_policy",
-        "wf_work_center"
+        "wf_shelf_life_policy"
       ],
       "upstreamDomains": [
         "core_system",
@@ -586,19 +567,15 @@
       "supportDomain": false,
       "workflows": [
         "wf_bill_of_material",
-        "wf_bom_component",
         "wf_item",
-        "wf_item_attr",
-        "wf_item_class",
         "wf_item_revision",
         "wf_item_site",
         "wf_item_spec",
-        "wf_item_variant",
+        "wf_items",
         "wf_lot_policy",
         "wf_routing",
         "wf_serial_policy",
-        "wf_shelf_life_policy",
-        "wf_work_center"
+        "wf_shelf_life_policy"
       ]
     },
     "sales": {
@@ -630,10 +607,8 @@
       "primaryWorkflows": [
         "wf_customer_site",
         "wf_customer",
-        "wf_order_documents_required",
         "wf_order_hold",
         "wf_order_milestone",
-        "wf_order_note",
         "wf_quote_lifecycle",
         "wf_sales_order"
       ],
@@ -670,13 +645,10 @@
       "workflows": [
         "wf_customer",
         "wf_customer_site",
-        "wf_order_documents_required",
         "wf_order_hold",
         "wf_order_milestone",
-        "wf_order_note",
         "wf_quote_lifecycle",
-        "wf_sales_order",
-        "wf_sales_order_line"
+        "wf_sales_order"
       ]
     },
     "purchasing": {
@@ -708,7 +680,6 @@
         "wf_purchase_receipt",
         "wf_purchase_requisition",
         "wf_supplier_asn",
-        "wf_vendor_rating",
         "wf_vendor"
       ],
       "upstreamDomains": [
@@ -737,13 +708,11 @@
       "supportDomain": false,
       "workflows": [
         "wf_purchase_order",
-        "wf_purchase_order_line",
         "wf_purchase_receipt",
         "wf_purchase_receipt_correction",
         "wf_purchase_requisition",
         "wf_supplier_asn",
-        "wf_vendor",
-        "wf_vendor_rating"
+        "wf_vendor"
       ]
     },
     "inventory": {
@@ -767,14 +736,9 @@
       ],
       "primaryWorkflows": [
         "wf_container",
-        "wf_inventory_balance_snapshot",
-        "wf_inventory_ledger",
-        "wf_inventory_location",
         "wf_inventory_transaction",
-        "wf_location_balance",
         "wf_lot_master",
         "wf_serial_master",
-        "wf_stock_balance",
         "wf_warehouse"
       ],
       "upstreamDomains": [
@@ -804,15 +768,9 @@
       "supportDomain": false,
       "workflows": [
         "wf_container",
-        "wf_inventory_balance_snapshot",
-        "wf_inventory_ledger",
-        "wf_inventory_location",
         "wf_inventory_transaction",
-        "wf_location_balance",
         "wf_lot_master",
         "wf_serial_master",
-        "wf_stock_balance",
-        "wf_warehous",
         "wf_warehouse"
       ]
     },
@@ -845,11 +803,7 @@
         "wf_job_release_gate",
         "wf_labor_transaction",
         "wf_production_order",
-        "wf_production_order_bom_snapshot",
-        "wf_production_order_route_snapshot",
         "wf_production_schedule",
-        "wf_shift_calendar_holiday",
-        "wf_shift_definition",
         "wf_shift_target",
         "wf_work_order_execution"
       ],
@@ -881,12 +835,7 @@
         "wf_labor_transaction",
         "wf_production_operation",
         "wf_production_order",
-        "wf_production_order_bom_snapshot",
-        "wf_production_order_route_snapshot",
         "wf_production_schedule",
-        "wf_shift_calendar_holiday",
-        "wf_shift_definition",
-        "wf_shift_production_log",
         "wf_shift_target",
         "wf_work_order_execution"
       ]
@@ -939,23 +888,16 @@
         "wf_certificate",
         "wf_complaint",
         "wf_concession",
-        "wf_contamination_check",
-        "wf_copq_ledger",
         "wf_customer_complaint",
         "wf_deviation",
-        "wf_fai_characteristic",
         "wf_fai",
         "wf_receiving_inspection",
-        "wf_inspection_characteristic",
         "wf_inspection_lot",
         "wf_inspection_plan",
         "wf_ipqc_inspection",
-        "wf_material_review_board",
         "wf_ncr",
-        "wf_nonconformance",
         "wf_oqc_inspection",
-        "wf_quality_order",
-        "wf_spc_data"
+        "wf_quality_order"
       ],
       "upstreamDomains": [
         "core_system",
@@ -983,25 +925,16 @@
         "wf_certificate",
         "wf_complaint",
         "wf_concession",
-        "wf_contamination_check",
-        "wf_copq_ledger",
         "wf_customer_complaint",
         "wf_deviation",
         "wf_fai",
-        "wf_fai_characteristic",
-        "wf_inspection_characteristic",
         "wf_inspection_lot",
         "wf_inspection_plan",
-        "wf_inspection_result",
         "wf_ipqc_inspection",
-        "wf_material_review_board",
         "wf_ncr",
-        "wf_nonconformance",
         "wf_oqc_inspection",
-        "wf_quality_case_link",
         "wf_quality_order",
-        "wf_receiving_inspection",
-        "wf_spc_data"
+        "wf_receiving_inspection"
       ]
     },
     "calibration_equipment": {
@@ -1025,7 +958,6 @@
         "wf_calibration_record",
         "wf_equipment",
         "wf_maintenance_work_order",
-        "wf_tool_transaction",
         "wf_tool_life"
       ],
       "upstreamDomains": [
@@ -1050,8 +982,7 @@
         "wf_calibration_record",
         "wf_equipment",
         "wf_maintenance_work_order",
-        "wf_tool_life",
-        "wf_tool_transaction"
+        "wf_tool_life"
       ]
     },
     "audit_risk": {
@@ -1076,12 +1007,9 @@
       "primaryWorkflows": [
         "wf_audit",
         "wf_audit_action",
-        "wf_audit_finding",
         "wf_audit_program",
-        "wf_audit_trail",
         "wf_finding",
         "wf_improvement_project",
-        "wf_management_review",
         "wf_risk_register"
       ],
       "upstreamDomains": [
@@ -1095,12 +1023,9 @@
       "workflows": [
         "wf_audit",
         "wf_audit_action",
-        "wf_audit_finding",
         "wf_audit_program",
-        "wf_audit_trail",
         "wf_finding",
         "wf_improvement_project",
-        "wf_management_review",
         "wf_risk_register"
       ]
     },
@@ -1121,11 +1046,8 @@
         "training_records"
       ],
       "primaryWorkflows": [
-        "wf_competency",
         "wf_employee_certification",
         "wf_employee",
-        "wf_skills_matrix",
-        "wf_training_matrix",
         "wf_training_record",
         "wf_training_qualification"
       ],
@@ -1146,11 +1068,8 @@
       ],
       "supportDomain": false,
       "workflows": [
-        "wf_competency",
         "wf_employee",
         "wf_employee_certification",
-        "wf_skills_matrix",
-        "wf_training_matrix",
         "wf_training_qualification",
         "wf_training_record"
       ]
@@ -1169,17 +1088,13 @@
         "cost_elements",
         "cost_ledger",
         "gl_transactions",
+        "inventory_valuations",
         "job_costing",
         "wip_ledger"
       ],
       "primaryWorkflows": [
         "wf_ap_ar_invoice",
-        "wf_ap_invoice",
-        "wf_cost_element",
-        "wf_cost_ledger",
-        "wf_gl_transaction",
-        "wf_job_costing",
-        "wf_wip_ledger"
+        "wf_ap_invoice"
       ],
       "upstreamDomains": [
         "core_system",
@@ -1195,12 +1110,7 @@
       "supportDomain": false,
       "workflows": [
         "wf_ap_ar_invoice",
-        "wf_ap_invoice",
-        "wf_cost_element",
-        "wf_cost_ledger",
-        "wf_gl_transaction",
-        "wf_job_costing",
-        "wf_wip_ledger"
+        "wf_ap_invoice"
       ]
     },
     "shipping_compliance": {
@@ -1223,7 +1133,6 @@
         "wf_compliance_record",
         "wf_export_licens",
         "wf_packing_list",
-        "wf_shipment_package",
         "wf_shipment_release"
       ],
       "upstreamDomains": [
@@ -1243,7 +1152,6 @@
         "wf_compliance_record",
         "wf_export_licens",
         "wf_packing_list",
-        "wf_shipment_package",
         "wf_shipment_release"
       ]
     },
@@ -1323,60 +1231,23 @@
         "work_order"
       ],
       "primaryWorkflows": [
-        "wf_alarm_event",
-        "wf_dispatch_queue",
-        "wf_downtime_event",
         "wf_job",
-        "wf_job_event",
-        "wf_labor_capture",
-        "wf_machine_event",
-        "wf_material_consumption",
-        "wf_mes_alarm_catalog",
         "wf_mes_alarm_playbook",
-        "wf_mes_area",
         "wf_mes_connectivity_adapter",
         "wf_mes_cost_tracking",
         "wf_mes_dispatch_queue",
         "wf_mes_dpp_passport",
-        "wf_mes_equipment_extended",
-        "wf_mes_erp_inbound_queue",
-        "wf_mes_erp_outbound_queue",
         "wf_mes_erp_reconciliation_exception",
         "wf_mes_erp_sync_run",
-        "wf_mes_event_subscription",
-        "wf_mes_inline_measurement",
-        "wf_mes_job_execution",
         "wf_mes_machine_alarm",
-        "wf_mes_machine_snapshot",
-        "wf_mes_machine_telemetry",
-        "wf_mes_material_consumption",
         "wf_mes_nc_download_receipt",
         "wf_mes_nc_release_package",
-        "wf_mes_on_time_delivery",
-        "wf_mes_operation_execution",
-        "wf_mes_operator_qualification",
-        "wf_mes_operator_session",
-        "wf_mes_part_genealogy",
-        "wf_mes_pm_execution",
-        "wf_mes_production_kpi_daily",
         "wf_mes_shift_handover",
-        "wf_mes_shop_floor_layout",
-        "wf_mes_site",
-        "wf_mes_spare_parts_consumption",
-        "wf_mes_spc_control_limit",
-        "wf_mes_spc_violation",
         "wf_mes_tool_assembly",
         "wf_mes_tool_preset_offset",
         "wf_mes_wip_location",
-        "wf_mes_wip_movement",
-        "wf_pause_resume",
-        "wf_process_param_capture",
         "wf_production_completion",
         "wf_rework",
-        "wf_scrap",
-        "wf_tool_usage",
-        "wf_track_in",
-        "wf_track_out",
         "wf_work_order"
       ],
       "upstreamDomains": [
@@ -1530,60 +1401,23 @@
         }
       },
       "workflows": [
-        "wf_alarm_event",
-        "wf_dispatch_queue",
-        "wf_downtime_event",
         "wf_job",
-        "wf_job_event",
-        "wf_labor_capture",
-        "wf_machine_event",
-        "wf_material_consumption",
-        "wf_mes_alarm_catalog",
         "wf_mes_alarm_playbook",
-        "wf_mes_area",
         "wf_mes_connectivity_adapter",
         "wf_mes_cost_tracking",
         "wf_mes_dispatch_queue",
         "wf_mes_dpp_passport",
-        "wf_mes_equipment_extended",
-        "wf_mes_erp_inbound_queue",
-        "wf_mes_erp_outbound_queue",
         "wf_mes_erp_reconciliation_exception",
         "wf_mes_erp_sync_run",
-        "wf_mes_event_subscription",
-        "wf_mes_inline_measurement",
-        "wf_mes_job_execution",
         "wf_mes_machine_alarm",
-        "wf_mes_machine_snapshot",
-        "wf_mes_machine_telemetry",
-        "wf_mes_material_consumption",
         "wf_mes_nc_download_receipt",
         "wf_mes_nc_release_package",
-        "wf_mes_on_time_delivery",
-        "wf_mes_operation_execution",
-        "wf_mes_operator_qualification",
-        "wf_mes_operator_session",
-        "wf_mes_part_genealogy",
-        "wf_mes_pm_execution",
-        "wf_mes_production_kpi_daily",
         "wf_mes_shift_handover",
-        "wf_mes_shop_floor_layout",
-        "wf_mes_site",
-        "wf_mes_spare_parts_consumption",
-        "wf_mes_spc_control_limit",
-        "wf_mes_spc_violation",
         "wf_mes_tool_assembly",
         "wf_mes_tool_preset_offset",
         "wf_mes_wip_location",
-        "wf_mes_wip_movement",
-        "wf_pause_resume",
-        "wf_process_param_capture",
         "wf_production_completion",
         "wf_rework",
-        "wf_scrap",
-        "wf_tool_usage",
-        "wf_track_in",
-        "wf_track_out",
         "wf_work_order"
       ]
     },
@@ -1612,16 +1446,10 @@
         "pm_work_orders"
       ],
       "primaryWorkflows": [
-        "wf_pm_condition_monitoring",
-        "wf_pm_condition_threshold",
-        "wf_pm_equipment_counter",
         "wf_pm_equipment_master",
-        "wf_pm_failure_code",
         "wf_pm_functional_location",
         "wf_pm_maintenance_budget",
         "wf_pm_maintenance_plan",
-        "wf_pm_reliability_metric",
-        "wf_pm_spare_parts_inventory",
         "wf_pm_work_order"
       ],
       "upstreamDomains": [
@@ -1636,16 +1464,10 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_pm_condition_monitoring",
-        "wf_pm_condition_threshold",
-        "wf_pm_equipment_counter",
         "wf_pm_equipment_master",
-        "wf_pm_failure_code",
         "wf_pm_functional_location",
         "wf_pm_maintenance_budget",
         "wf_pm_maintenance_plan",
-        "wf_pm_reliability_metric",
-        "wf_pm_spare_parts_inventory",
         "wf_pm_work_order"
       ]
     },
@@ -1675,18 +1497,10 @@
         "schedule_conflicts"
       ],
       "primaryWorkflows": [
-        "wf_aps_capacity_bucket",
-        "wf_aps_constraint_resource",
-        "wf_aps_demand_forecast",
-        "wf_aps_material_availability",
         "wf_aps_planning_horizon",
         "wf_aps_scenario",
         "wf_aps_schedule_block",
-        "wf_aps_schedule_conflict",
-        "wf_aps_setup_matrice",
-        "wf_mrp_planned_order",
-        "wf_production_schedule_slot",
-        "wf_schedule_conflict"
+        "wf_mrp_planned_order"
       ],
       "upstreamDomains": [
         "core_system",
@@ -1699,18 +1513,10 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_aps_capacity_bucket",
-        "wf_aps_constraint_resource",
-        "wf_aps_demand_forecast",
-        "wf_aps_material_availability",
         "wf_aps_planning_horizon",
         "wf_aps_scenario",
         "wf_aps_schedule_block",
-        "wf_aps_schedule_conflict",
-        "wf_aps_setup_matrice",
-        "wf_mrp_planned_order",
-        "wf_production_schedule_slot",
-        "wf_schedule_conflict"
+        "wf_mrp_planned_order"
       ]
     },
     "plm_change_control": {
@@ -1741,8 +1547,6 @@
         "wf_engineering_change_request",
         "wf_plm_change_order",
         "wf_plm_change_request",
-        "wf_plm_change_review_board",
-        "wf_plm_design_review",
         "wf_plm_deviation_permit",
         "wf_plm_obsolescence_tracking",
         "wf_plm_product_configuration",
@@ -1766,8 +1570,6 @@
         "wf_engineering_change_request",
         "wf_plm_change_order",
         "wf_plm_change_request",
-        "wf_plm_change_review_board",
-        "wf_plm_design_review",
         "wf_plm_deviation_permit",
         "wf_plm_obsolescence_tracking",
         "wf_plm_product_configuration",
@@ -1803,14 +1605,11 @@
         "wf_hcm_certification",
         "wf_hcm_disciplinary_action",
         "wf_hcm_employee_certification",
-        "wf_hcm_employee_skill",
         "wf_hcm_employee",
-        "wf_hcm_leave_balance",
         "wf_hcm_org_unit",
         "wf_hcm_payroll_period",
         "wf_hcm_payroll_run",
-        "wf_hcm_position",
-        "wf_hcm_skills_catalog"
+        "wf_hcm_position"
       ],
       "upstreamDomains": [
         "core_system",
@@ -1828,13 +1627,10 @@
         "wf_hcm_disciplinary_action",
         "wf_hcm_employee",
         "wf_hcm_employee_certification",
-        "wf_hcm_employee_skill",
-        "wf_hcm_leave_balance",
         "wf_hcm_org_unit",
         "wf_hcm_payroll_period",
         "wf_hcm_payroll_run",
-        "wf_hcm_position",
-        "wf_hcm_skills_catalog"
+        "wf_hcm_position"
       ]
     },
     "warehouse_management": {
@@ -1866,7 +1662,6 @@
         "wf_wms_pick_list",
         "wf_wms_putaway_rule",
         "wf_wms_quarantine_hold",
-        "wf_wms_storage_bin",
         "wf_wms_transfer_order",
         "wf_wms_wave_plan",
         "wf_wms_zone"
@@ -1889,7 +1684,6 @@
         "wf_wms_pick_list",
         "wf_wms_putaway_rule",
         "wf_wms_quarantine_hold",
-        "wf_wms_storage_bin",
         "wf_wms_transfer_order",
         "wf_wms_wave_plan",
         "wf_wms_zone"
@@ -1916,16 +1710,10 @@
         "fin_withholding_tax_codes"
       ],
       "primaryWorkflows": [
-        "wf_fin_country_tax_profile",
-        "wf_fin_currency",
         "wf_fin_customs_declaration",
-        "wf_fin_customs_tariff_code",
-        "wf_fin_exchange_rate_type",
-        "wf_fin_exchange_rate",
         "wf_fin_lc_draw_request",
         "wf_fin_letters_of_credit",
         "wf_fin_multi_book_ledger",
-        "wf_fin_realized_fx_gain",
         "wf_fin_withholding_tax_code"
       ],
       "upstreamDomains": [
@@ -1940,16 +1728,10 @@
       ],
       "supportDomain": false,
       "workflows": [
-        "wf_fin_country_tax_profile",
-        "wf_fin_currency",
         "wf_fin_customs_declaration",
-        "wf_fin_customs_tariff_code",
-        "wf_fin_exchange_rate",
-        "wf_fin_exchange_rate_type",
         "wf_fin_lc_draw_request",
         "wf_fin_letters_of_credit",
         "wf_fin_multi_book_ledger",
-        "wf_fin_realized_fx_gain",
         "wf_fin_withholding_tax_code"
       ]
     },
@@ -1980,14 +1762,10 @@
         "wf_npi_project",
         "wf_prj_billing_milestone",
         "wf_project_change_request",
-        "wf_prj_cost_collection",
         "wf_prj_milestone",
         "wf_project_execution",
         "wf_prj_risk_register",
-        "wf_prj_time_entry",
-        "wf_prj_wbs_element",
         "wf_project_milestone",
-        "wf_project_resource",
         "wf_project"
       ],
       "upstreamDomains": [
@@ -2003,16 +1781,12 @@
       "workflows": [
         "wf_npi_project",
         "wf_prj_billing_milestone",
-        "wf_prj_cost_collection",
         "wf_prj_milestone",
         "wf_prj_risk_register",
-        "wf_prj_time_entry",
-        "wf_prj_wbs_element",
         "wf_project",
         "wf_project_change_request",
         "wf_project_execution",
-        "wf_project_milestone",
-        "wf_project_resource"
+        "wf_project_milestone"
       ]
     },
     "crm": {
@@ -2038,12 +1812,10 @@
         "wf_crm_account",
         "wf_crm_activity",
         "wf_crm_campaign",
-        "wf_crm_contact",
         "wf_crm_customer_touchpoint",
         "wf_crm_forecast",
         "wf_crm_lead",
-        "wf_crm_opportunity",
-        "wf_crm_quotes_pipeline"
+        "wf_crm_opportunity"
       ],
       "upstreamDomains": [
         "core_system",
@@ -2058,12 +1830,10 @@
         "wf_crm_account",
         "wf_crm_activity",
         "wf_crm_campaign",
-        "wf_crm_contact",
         "wf_crm_customer_touchpoint",
         "wf_crm_forecast",
         "wf_crm_lead",
-        "wf_crm_opportunity",
-        "wf_crm_quotes_pipeline"
+        "wf_crm_opportunity"
       ]
     },
     "transportation": {
@@ -2074,6 +1844,8 @@
       "description": "Carrier, route, shipment line, customs docs, freight audit và delivery events.",
       "businessProcess": "Freight planning, routing, customs documents, export screening, and proof of delivery.",
       "tables": [
+        "freight_order_stops",
+        "freight_orders",
         "tms_carriers",
         "tms_customs_documents",
         "tms_dangerous_goods",
@@ -2086,12 +1858,9 @@
         "tms_shipments"
       ],
       "primaryWorkflows": [
+        "wf_freight_order",
         "wf_tms_carrier",
-        "wf_tms_customs_document",
-        "wf_tms_dangerous_good",
-        "wf_tms_export_screening",
         "wf_freight_audit",
-        "wf_tms_freight_quote",
         "wf_tms_route",
         "wf_tms_shipment"
       ],
@@ -2108,11 +1877,8 @@
       "supportDomain": false,
       "workflows": [
         "wf_freight_audit",
+        "wf_freight_order",
         "wf_tms_carrier",
-        "wf_tms_customs_document",
-        "wf_tms_dangerous_good",
-        "wf_tms_export_screening",
-        "wf_tms_freight_quote",
         "wf_tms_route",
         "wf_tms_shipment"
       ]
@@ -2138,26 +1904,16 @@
         "dw_supplier_dim",
         "dw_time_dim",
         "kpi_definitions",
-        "kpi_snapshots"
+        "kpi_snapshots",
+        "plant_performance_snapshots"
       ],
       "primaryWorkflows": [
-        "wf_dw_customer_dim",
-        "wf_dw_employee_dim",
-        "wf_dw_etl_run",
-        "wf_dw_fact_delivery",
-        "wf_dw_fact_financial",
-        "wf_dw_fact_production",
-        "wf_dw_fact_quality",
-        "wf_dw_item_dim",
-        "wf_dw_kpi_scorecard",
-        "wf_dw_machine_dim",
-        "wf_dw_supplier_dim",
-        "wf_dw_time_dim",
-        "wf_kpi_definition"
+        "wf_dw_etl_run"
       ],
       "upstreamDomains": [
         "calibration_equipment",
         "core_system",
+        "foundation_governance",
         "master_data",
         "purchasing",
         "sales",
@@ -2166,19 +1922,7 @@
       "downstreamDomains": [],
       "supportDomain": true,
       "workflows": [
-        "wf_dw_customer_dim",
-        "wf_dw_employee_dim",
-        "wf_dw_etl_run",
-        "wf_dw_fact_delivery",
-        "wf_dw_fact_financial",
-        "wf_dw_fact_production",
-        "wf_dw_fact_quality",
-        "wf_dw_item_dim",
-        "wf_dw_kpi_scorecard",
-        "wf_dw_machine_dim",
-        "wf_dw_supplier_dim",
-        "wf_dw_time_dim",
-        "wf_kpi_definition"
+        "wf_dw_etl_run"
       ]
     },
     "supplier_relationship": {
@@ -2213,21 +1957,14 @@
       "primaryWorkflows": [
         "wf_approved_supplier_list",
         "wf_scar_record",
-        "wf_skip_lot_tracking",
-        "wf_srm_bid_comparison",
         "wf_srm_sourcing_bid",
         "wf_supplier_action_request",
-        "wf_srm_supplier_capability",
-        "wf_srm_supplier_capacity",
         "wf_srm_supplier_contract",
         "wf_srm_supplier_development_plan",
         "wf_srm_supplier_portal_message",
-        "wf_srm_supplier_portal_user",
         "wf_srm_supplier_ppap_package",
-        "wf_srm_vendor_managed_inventory",
         "wf_supplier_audit_schedule",
-        "wf_supplier_quality_case",
-        "wf_supplier_scorecard"
+        "wf_supplier_quality_case"
       ],
       "upstreamDomains": [
         "core_system",
@@ -2243,21 +1980,14 @@
       "workflows": [
         "wf_approved_supplier_list",
         "wf_scar_record",
-        "wf_skip_lot_tracking",
-        "wf_srm_bid_comparison",
         "wf_srm_sourcing_bid",
-        "wf_srm_supplier_capability",
-        "wf_srm_supplier_capacity",
         "wf_srm_supplier_contract",
         "wf_srm_supplier_development_plan",
         "wf_srm_supplier_portal_message",
-        "wf_srm_supplier_portal_user",
         "wf_srm_supplier_ppap_package",
-        "wf_srm_vendor_managed_inventory",
         "wf_supplier_action_request",
         "wf_supplier_audit_schedule",
-        "wf_supplier_quality_case",
-        "wf_supplier_scorecard"
+        "wf_supplier_quality_case"
       ]
     },
     "tooling_lifecycle": {
@@ -2286,13 +2016,8 @@
       "primaryWorkflows": [
         "wf_fixture_master",
         "wf_tooling_assembly",
-        "wf_tooling_component",
-        "wf_tooling_crib_transaction",
-        "wf_tooling_family",
         "wf_tooling_kit",
         "wf_tool_life",
-        "wf_tooling_life_measurement",
-        "wf_tooling_location",
         "wf_tooling_preset",
         "wf_tooling_regrind_cycle"
       ],
@@ -2312,12 +2037,7 @@
       "workflows": [
         "wf_fixture_master",
         "wf_tooling_assembly",
-        "wf_tooling_component",
-        "wf_tooling_crib_transaction",
-        "wf_tooling_family",
         "wf_tooling_kit",
-        "wf_tooling_life_measurement",
-        "wf_tooling_location",
         "wf_tooling_preset",
         "wf_tooling_regrind_cycle"
       ]
@@ -2350,22 +2070,12 @@
         "supply_replenishment_policies"
       ],
       "primaryWorkflows": [
-        "wf_allocation",
         "wf_demand",
-        "wf_demand_classification",
-        "wf_demand_history_bucket",
         "wf_forecast",
-        "wf_inventory_buffer_profile",
         "wf_mrp_signal",
-        "wf_pegging",
         "wf_planned_supply",
-        "wf_sop_demand_consensu",
-        "wf_sop_inventory_policy",
         "wf_sop_cycle",
-        "wf_sop_plan",
-        "wf_sop_scenario_assumption",
-        "wf_sop_supply_consensu",
-        "wf_supply_replenishment_policy"
+        "wf_sop_plan"
       ],
       "upstreamDomains": [
         "core_system",
@@ -2380,20 +2090,11 @@
       "supportDomain": false,
       "workflows": [
         "wf_demand",
-        "wf_demand_classification",
-        "wf_demand_history_bucket",
         "wf_forecast",
-        "wf_inventory_buffer_profile",
         "wf_mrp_signal",
-        "wf_pegging",
         "wf_planned_supply",
         "wf_sop_cycle",
-        "wf_sop_demand_consensu",
-        "wf_sop_inventory_policy",
-        "wf_sop_plan",
-        "wf_sop_scenario_assumption",
-        "wf_sop_supply_consensu",
-        "wf_supply_replenishment_policy"
+        "wf_sop_plan"
       ]
     },
     "service_warranty": {
@@ -2421,7 +2122,6 @@
       "primaryWorkflows": [
         "wf_rma_order",
         "wf_svc_customer_asset",
-        "wf_svc_field_visit_report",
         "wf_svc_installed_base",
         "wf_svc_return_authorization",
         "wf_svc_service_contract",
@@ -2443,7 +2143,6 @@
         "wf_rma_order",
         "wf_service_request",
         "wf_svc_customer_asset",
-        "wf_svc_field_visit_report",
         "wf_svc_installed_base",
         "wf_svc_return_authorization",
         "wf_svc_service_contract",
@@ -2473,15 +2172,10 @@
         "fin_tax_jurisdictions"
       ],
       "primaryWorkflows": [
-        "wf_fin_asset_depreciation",
         "wf_treasury_close",
         "wf_fin_cash_account",
-        "wf_fin_cash_transaction",
         "wf_fin_fixed_asset",
-        "wf_fin_intercompany_pair",
-        "wf_fin_revenue_schedule",
-        "wf_fin_standard_cost_rollup",
-        "wf_fin_tax_jurisdiction"
+        "wf_fin_revenue_schedule"
       ],
       "upstreamDomains": [
         "finance_extended",
@@ -2493,14 +2187,9 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_fin_asset_depreciation",
         "wf_fin_cash_account",
-        "wf_fin_cash_transaction",
         "wf_fin_fixed_asset",
-        "wf_fin_intercompany_pair",
         "wf_fin_revenue_schedule",
-        "wf_fin_standard_cost_rollup",
-        "wf_fin_tax_jurisdiction",
         "wf_treasury_close"
       ]
     },
@@ -2533,14 +2222,9 @@
         "wf_qual_audit_program",
         "wf_quality_obligation",
         "wf_qual_containment_action",
-        "wf_qual_effectiveness_review",
         "wf_qual_first_article_package",
         "wf_qual_lab_equipment",
-        "wf_qual_root_cause_session",
-        "wf_quality_lab_case",
-        "wf_qual_sample_plan",
-        "wf_qual_test_lab",
-        "wf_qual_test_method"
+        "wf_quality_lab_case"
       ],
       "upstreamDomains": [
         "calibration_equipment",
@@ -2561,13 +2245,8 @@
       "workflows": [
         "wf_qual_audit_program",
         "wf_qual_containment_action",
-        "wf_qual_effectiveness_review",
         "wf_qual_first_article_package",
         "wf_qual_lab_equipment",
-        "wf_qual_root_cause_session",
-        "wf_qual_sample_plan",
-        "wf_qual_test_lab",
-        "wf_qual_test_method",
         "wf_quality_lab_case",
         "wf_quality_obligation"
       ]
@@ -2596,23 +2275,16 @@
         "ehs_sustainability_projects",
         "ehs_training_matrix",
         "ehs_waste_shipments",
-        "ehs_waste_streams"
+        "ehs_waste_streams",
+        "safety_observation_actions",
+        "safety_observations"
       ],
       "primaryWorkflows": [
-        "wf_ehs_contractor",
         "wf_ehs_corrective_action",
-        "wf_ehs_emergency_drill",
-        "wf_ehs_emissions_monitoring",
-        "wf_ehs_energy_target",
-        "wf_ehs_exposure_assessment",
-        "wf_ehs_hazardous_material",
         "wf_ehs_incident",
-        "wf_ehs_material_safety_data",
         "wf_ehs_permit_register",
         "wf_ehs_regulatory_submission",
-        "wf_ehs_training_matrix",
-        "wf_ehs_waste_shipment",
-        "wf_ehs_waste_stream"
+        "wf_safety_observation"
       ],
       "upstreamDomains": [
         "core_system",
@@ -2626,20 +2298,11 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_ehs_contractor",
         "wf_ehs_corrective_action",
-        "wf_ehs_emergency_drill",
-        "wf_ehs_emissions_monitoring",
-        "wf_ehs_energy_target",
-        "wf_ehs_exposure_assessment",
-        "wf_ehs_hazardous_material",
         "wf_ehs_incident",
-        "wf_ehs_material_safety_data",
         "wf_ehs_permit_register",
         "wf_ehs_regulatory_submission",
-        "wf_ehs_training_matrix",
-        "wf_ehs_waste_shipment",
-        "wf_ehs_waste_stream"
+        "wf_safety_observation"
       ]
     },
     "mfg_engineering": {
@@ -2678,25 +2341,11 @@
       ],
       "primaryWorkflows": [
         "wf_bom",
-        "wf_bom_substitute",
         "wf_bom_version",
-        "wf_eng_capacity_model",
-        "wf_eng_changeover_standard",
-        "wf_eng_factory_calendar_day",
-        "wf_eng_factory_calendar",
-        "wf_eng_line_balancing_study",
-        "wf_eng_process_family",
-        "wf_eng_process_validation",
-        "wf_eng_resource_group",
-        "wf_eng_time_standard",
         "wf_work_instruction_release",
         "wf_operation",
-        "wf_operation_material",
-        "wf_operation_output",
-        "wf_operation_resource",
         "wf_work_definition",
-        "wf_work_definition_version",
-        "wf_work_instruction"
+        "wf_work_definition_version"
       ],
       "upstreamDomains": [
         "calibration_equipment",
@@ -2713,25 +2362,10 @@
       "supportDomain": false,
       "workflows": [
         "wf_bom",
-        "wf_bom_line",
-        "wf_bom_substitute",
         "wf_bom_version",
-        "wf_eng_capacity_model",
-        "wf_eng_changeover_standard",
-        "wf_eng_factory_calendar",
-        "wf_eng_factory_calendar_day",
-        "wf_eng_line_balancing_study",
-        "wf_eng_process_family",
-        "wf_eng_process_validation",
-        "wf_eng_resource_group",
-        "wf_eng_time_standard",
         "wf_operation",
-        "wf_operation_material",
-        "wf_operation_output",
-        "wf_operation_resource",
         "wf_work_definition",
         "wf_work_definition_version",
-        "wf_work_instruction",
         "wf_work_instruction_release"
       ]
     },
@@ -2768,23 +2402,7 @@
       "primaryWorkflows": [
         "wf_data_archival_run",
         "wf_master_data_store",
-        "wf_mdm_approval_policy",
-        "wf_mdm_attribute_set",
-        "wf_mdm_attribute_value",
-        "wf_mdm_data_steward",
-        "wf_mdm_duplicate_candidate",
-        "wf_mdm_form_sery",
         "wf_mdm_governance",
-        "wf_mdm_incoterm",
-        "wf_mdm_item_class",
-        "wf_mdm_number_sery",
-        "wf_mdm_payment_term",
-        "wf_mdm_promise_policy",
-        "wf_mdm_reference_code_value",
-        "wf_mdm_reference_code",
-        "wf_mdm_shipping_method",
-        "wf_mdm_site_parameter",
-        "wf_mdm_uom_conversion",
         "wf_retention_policy",
         "wf_source_system_registry"
       ],
@@ -2800,23 +2418,7 @@
       "workflows": [
         "wf_data_archival_run",
         "wf_master_data_store",
-        "wf_mdm_approval_policy",
-        "wf_mdm_attribute_set",
-        "wf_mdm_attribute_value",
-        "wf_mdm_data_steward",
-        "wf_mdm_duplicate_candidate",
-        "wf_mdm_form_sery",
         "wf_mdm_governance",
-        "wf_mdm_incoterm",
-        "wf_mdm_item_class",
-        "wf_mdm_number_sery",
-        "wf_mdm_payment_term",
-        "wf_mdm_promise_policy",
-        "wf_mdm_reference_code",
-        "wf_mdm_reference_code_value",
-        "wf_mdm_shipping_method",
-        "wf_mdm_site_parameter",
-        "wf_mdm_uom_conversion",
         "wf_retention_policy",
         "wf_source_system_registry"
       ]
@@ -2846,18 +2448,10 @@
         "material_cost_templates"
       ],
       "primaryWorkflows": [
-        "wf_com_contract_amendment",
         "wf_contract_lifecycle",
         "wf_com_credit_profile",
-        "wf_com_customer_scorecard",
-        "wf_com_incoterms_profile",
         "wf_order_promise",
-        "wf_com_payment_terms_profile",
-        "wf_com_price_list",
-        "wf_com_rebate_accrual",
-        "wf_com_rebate_program",
-        "wf_commercial_account",
-        "wf_machine_rate_card"
+        "wf_commercial_account"
       ],
       "upstreamDomains": [
         "core_system",
@@ -2869,17 +2463,9 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_com_contract_amendment",
         "wf_com_credit_profile",
-        "wf_com_customer_scorecard",
-        "wf_com_incoterms_profile",
-        "wf_com_payment_terms_profile",
-        "wf_com_price_list",
-        "wf_com_rebate_accrual",
-        "wf_com_rebate_program",
         "wf_commercial_account",
         "wf_contract_lifecycle",
-        "wf_machine_rate_card",
         "wf_order_promise"
       ]
     },
@@ -2910,11 +2496,7 @@
       "primaryWorkflows": [
         "wf_lot",
         "wf_serial",
-        "wf_trace_genealogy_batche",
-        "wf_trace_heat_lot_register",
         "wf_traceability_traveler",
-        "wf_trace_label_print_job",
-        "wf_trace_material_certificate",
         "wf_traceability_recall"
       ],
       "upstreamDomains": [
@@ -2932,13 +2514,8 @@
       ],
       "supportDomain": false,
       "workflows": [
-        "wf_genealogy_link",
         "wf_lot",
         "wf_serial",
-        "wf_trace_genealogy_batche",
-        "wf_trace_heat_lot_register",
-        "wf_trace_label_print_job",
-        "wf_trace_material_certificate",
         "wf_traceability_recall",
         "wf_traceability_traveler"
       ]
@@ -2970,17 +2547,11 @@
       "primaryWorkflows": [
         "wf_outsource_dispatch",
         "wf_osc_subcontract_plan",
-        "wf_osc_supplier_capacity_reservation",
         "wf_osc_supplier_chargeback",
         "wf_osc_supplier_nonconformance",
-        "wf_osc_supplier_portal_document",
         "wf_outsource_receipt",
         "wf_osc_supplier_recovery_claim",
-        "wf_osc_supplier_score_trend",
-        "wf_osc_supplier_shipment_notice",
-        "wf_outside_processing_order",
-        "wf_subcontract_order",
-        "wf_subcontract_receipt"
+        "wf_outside_processing_order"
       ],
       "upstreamDomains": [
         "foundation_governance",
@@ -2995,18 +2566,12 @@
       "supportDomain": false,
       "workflows": [
         "wf_osc_subcontract_plan",
-        "wf_osc_supplier_capacity_reservation",
         "wf_osc_supplier_chargeback",
         "wf_osc_supplier_nonconformance",
-        "wf_osc_supplier_portal_document",
         "wf_osc_supplier_recovery_claim",
-        "wf_osc_supplier_score_trend",
-        "wf_osc_supplier_shipment_notice",
         "wf_outside_processing_order",
         "wf_outsource_dispatch",
-        "wf_outsource_receipt",
-        "wf_subcontract_order",
-        "wf_subcontract_receipt"
+        "wf_outsource_receipt"
       ]
     },
     "trade_compliance": {
@@ -3031,16 +2596,7 @@
         "trade_screening_hits"
       ],
       "primaryWorkflows": [
-        "wf_trade_broker_profile",
-        "wf_trade_certificate_of_origin",
         "wf_trade_compliance_audit",
-        "wf_trade_duty_drawback",
-        "wf_trade_eccn_master",
-        "wf_trade_end_use_certificate",
-        "wf_trade_import_bond",
-        "wf_trade_license_exception",
-        "wf_trade_preference_program",
-        "wf_trade_restricted_party_list",
         "wf_trade_screening"
       ],
       "upstreamDomains": [
@@ -3052,16 +2608,7 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_trade_broker_profile",
-        "wf_trade_certificate_of_origin",
         "wf_trade_compliance_audit",
-        "wf_trade_duty_drawback",
-        "wf_trade_eccn_master",
-        "wf_trade_end_use_certificate",
-        "wf_trade_import_bond",
-        "wf_trade_license_exception",
-        "wf_trade_preference_program",
-        "wf_trade_restricted_party_list",
         "wf_trade_screening"
       ]
     },
@@ -3079,8 +2626,6 @@
         "form_schemas"
       ],
       "primaryWorkflows": [
-        "wf_form_attachment",
-        "wf_form_draft",
         "wf_form_submission",
         "wf_form_schema"
       ],
@@ -3095,8 +2640,6 @@
       ],
       "supportDomain": false,
       "workflows": [
-        "wf_form_attachment",
-        "wf_form_draft",
         "wf_form_schema",
         "wf_form_submission"
       ]
@@ -3118,8 +2661,6 @@
       ],
       "primaryWorkflows": [
         "wf_allocation",
-        "wf_electronic_signature",
-        "wf_record_counter",
         "wf_record_lifecycle"
       ],
       "upstreamDomains": [
@@ -3143,7 +2684,6 @@
       "supportDomain": false,
       "workflows": [
         "wf_allocation",
-        "wf_record_counter",
         "wf_record_lifecycle"
       ]
     },
@@ -3169,14 +2709,7 @@
         "workflow_step_data"
       ],
       "primaryWorkflows": [
-        "wf_comment",
-        "wf_escalation_rule",
-        "wf_file_attachment",
         "wf_integration_monitor",
-        "wf_naming_pattern",
-        "wf_notification",
-        "wf_tag",
-        "wf_variable_registry",
         "wf_workflow_definition",
         "wf_workflow_instance"
       ],
@@ -3191,15 +2724,7 @@
       ],
       "supportDomain": true,
       "workflows": [
-        "wf_comment",
-        "wf_escalation_log",
-        "wf_escalation_rule",
-        "wf_file_attachment",
         "wf_integration_monitor",
-        "wf_naming_pattern",
-        "wf_notification",
-        "wf_tag",
-        "wf_variable_registry",
         "wf_workflow_definition",
         "wf_workflow_instance"
       ]
@@ -3220,11 +2745,7 @@
         "portal_users"
       ],
       "primaryWorkflows": [
-        "wf_portal_access_token",
         "wf_portal_complaint_submission",
-        "wf_portal_document_access",
-        "wf_portal_order_view",
-        "wf_portal_session",
         "wf_portal_user"
       ],
       "upstreamDomains": [
@@ -3236,11 +2757,7 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_portal_access_token",
         "wf_portal_complaint_submission",
-        "wf_portal_document_access",
-        "wf_portal_order_view",
-        "wf_portal_session",
         "wf_portal_user"
       ]
     },
@@ -3258,9 +2775,7 @@
         "evidence_vault"
       ],
       "primaryWorkflows": [
-        "wf_evidence_chain_custody",
-        "wf_evidence_ft",
-        "wf_evidence_vault"
+        "wf_evidence_chain"
       ],
       "upstreamDomains": [
         "core_system",
@@ -3269,11 +2784,7 @@
       ],
       "downstreamDomains": [],
       "supportDomain": true,
-      "workflows": [
-        "wf_evidence_chain_custody",
-        "wf_evidence_ft",
-        "wf_evidence_vault"
-      ]
+      "workflows": []
     },
     "cnc_programs": {
       "label": "Chương trình CNC",
@@ -3333,7 +2844,6 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_passport_access_log",
         "wf_product_passport"
       ]
     },
@@ -3350,8 +2860,7 @@
         "spc_anomaly_rules"
       ],
       "primaryWorkflows": [
-        "wf_predictive_quality",
-        "wf_spc_anomaly_rule"
+        "wf_predictive_quality"
       ],
       "upstreamDomains": [
         "core_system",
@@ -3362,8 +2871,7 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
-        "wf_predictive_quality",
-        "wf_spc_anomaly_rule"
+        "wf_predictive_quality"
       ]
     },
     "fmea_apqp": {
@@ -3386,7 +2894,6 @@
       ],
       "primaryWorkflows": [
         "wf_apqp_project",
-        "wf_control_plan_characteristic",
         "wf_fmea",
         "wf_ppap_submission"
       ],
@@ -3404,7 +2911,6 @@
       "supportDomain": false,
       "workflows": [
         "wf_apqp_project",
-        "wf_control_plan_characteristic",
         "wf_fmea",
         "wf_ppap_submission"
       ]
