@@ -1,8 +1,9 @@
 # HESEM MOM — Bộ Prompt Codex: Module Layout Template Design System v4.0
 
 > **Ngày tạo**: 2026-04-10
-> **Tổng cộng**: 6 prompts độc lập, mỗi prompt tự chứa đầy đủ context
-> **Thứ tự thực hiện**: Prompt 1 → 2 → 3 chạy song song được. Prompt 4 phụ thuộc 1+2+3. Prompt 5 + 6 chạy sau 4.
+> **Tổng cộng**: 12 prompts (6 tạo mới + 6 nâng cấp), mỗi prompt tự chứa đầy đủ context
+> **Phần 1 (Prompt 1-6)**: Tạo tài liệu v4.0 + mã nguồn. Prompt 1→2→3 song song. Prompt 4 sau. Prompt 5+6 song song.
+> **Phần 2 (Prompt 7-12)**: Nâng cấp v4.0→v4.1. Prompt 7+8+9 song song. Prompt 10+11 song song. Prompt 12 cuối.
 
 ---
 
@@ -1275,3 +1276,1125 @@ Prompt 6 ─┘── Song song được (mã nguồn JS/CSS)
 | 5 | JavaScript (00c-admin-appearance.js rewrite) | 2500-3000 |
 | 6 | JS + CSS + JSON (supporting files) | 400-600 |
 | **Tổng** | | **6300-8500** |
+
+
+---
+---
+
+# PHẦN 2: NÂNG CẤP v4.0 → v4.1 (Prompt 7-12)
+
+> **Mục tiêu**: Trau chuốt đồ họa chuyên nghiệp, bổ sung chức năng còn thiếu
+> **Thứ tự**: Prompt 7+8+9 chạy song song. Prompt 10+11 chạy song song. Prompt 12 chạy cuối.
+
+
+---
+
+## QUY TẮC CHUNG
+
+```
+1. File cần chỉnh sửa: mom/docs/module-layout-template-design-system-v4.html (hiện 2109 dòng)
+2. Tiếng Việt frontend PHẢI CÓ DẤU đầy đủ
+3. Backend (code, key, variable) dùng tiếng Anh
+4. Không xóa nội dung hiện tại — chỉ SỬA và THÊM
+5. CSS phải đẹp cấp Vercel/Linear/Stripe: gradient tinh tế, micro-animations, smooth transitions
+6. Dữ liệu mẫu thực tế: part numbers (AERO-BRK-2024), máy (DMG MORI NLX 2500), tên Việt (Nguyễn Văn Thành)
+7. Sau khi chỉnh sửa xong, file phải render đẹp khi mở trong browser
+```
+
+---
+
+## PROMPT 7/12: Sửa CSS — Visual Polish Chuyên Nghiệp
+
+### Mục tiêu
+Nâng cấp CSS trong `<style>` của file HTML từ 5/10 lên 9/10 về visual quality. Thêm hover/focus/active states, fix WCAG contrast, thêm transitions mượt, nhất quán base-8 spacing, thêm dark mode, thêm micro-animations.
+
+### File
+`mom/docs/module-layout-template-design-system-v4.html` — chỉ sửa block `<style>` (dòng 7-164)
+
+### Danh sách sửa chi tiết
+
+#### 1.1 Thêm focus states cho TẤT CẢ elements tương tác
+```css
+/* Thêm focus ring cho mọi element clickable */
+a:focus-visible,
+.tpl-card:focus-visible,
+.chip:focus-visible,
+.stat-card:focus-visible {
+  outline: 3px solid rgba(21,101,192,0.4);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+```
+
+#### 1.2 Thêm hover states cho TOC links
+```css
+.toc a {
+  /* Giữ nguyên styles hiện tại, THÊM: */
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.toc a:hover {
+  background: rgba(21,101,192,0.14);
+  color: var(--brand-2);
+  transform: translateY(-1px);
+}
+.toc a:active {
+  transform: translateY(0);
+  background: rgba(21,101,192,0.2);
+}
+```
+
+#### 1.3 Thêm transitions cho stat-cards, info-boxes, chips, cards
+```css
+.stat-card {
+  /* Giữ nguyên, THÊM: */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(12,45,72,0.12);
+}
+
+.info-box {
+  /* Giữ nguyên, THÊM: */
+  transition: border-color 0.15s ease;
+}
+.info-box:hover {
+  border-color: currentColor;
+}
+
+.chip {
+  /* Giữ nguyên, THÊM: */
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.chip:hover {
+  transform: scale(1.05);
+}
+
+.card {
+  /* Giữ nguyên, THÊM: */
+  transition: box-shadow 0.2s ease;
+}
+.card:hover {
+  box-shadow: 0 8px 24px rgba(12,45,72,0.1);
+}
+
+.spec-table tr {
+  transition: background 0.12s ease;
+}
+```
+
+#### 1.4 Fix WCAG contrast
+```css
+/* Thay --accent từ #f9a825 (fail AA trên trắng) sang #b45309 cho text */
+/* Giữ #f9a825 cho backgrounds, dùng #b45309 cho text trên nền sáng */
+
+/* Fix text-tertiary 10px — tăng opacity hoặc font-size */
+.tpl-meta {
+  font-size: 11px; /* tăng từ 10px lên 11px */
+  color: var(--text-secondary); /* đổi từ tertiary sang secondary */
+}
+```
+
+#### 1.5 Nhất quán Base-8 spacing
+Sửa TẤT CẢ padding/margin không phải bội số 4:
+- `padding: 7px 12px` → `padding: 8px 12px` (`.meta-item`)
+- `padding: 9px 12px` → `padding: 8px 12px` (`.spec-table th`, `.spec-table td`)
+- `padding: 34px 34px 28px` → `padding: 32px 32px 28px` (`.doc-header`)
+- `padding: 7px 10px` → `padding: 8px 12px` (`.toc a`)
+- `padding: 7px 12px` → `padding: 8px 12px` (`.cat-count`)
+- `padding: 7px 11px` → `padding: 8px 12px` (`.cat-chip`)
+- `margin: 20px 0` → `margin: 24px 0` (`.section`)
+- Kiểm tra TOÀN BỘ file, sửa mọi giá trị lẻ thành bội số 4
+
+#### 1.6 Nhất quán Border-radius với token scale
+Sửa theo spec: sm(4), md(6), lg(8), xl(12), 2xl(16), 3xl(20), 4xl(24)
+- `.doc-header` border-radius: `28px` → `24px`
+- `.section` border-radius: `24px` → `20px`
+- `.card` border-radius: `20px` → `16px`
+- `.tpl-card` border-radius: `20px` → `16px`
+- `.stat-card` border-radius: `18px` → `16px`
+- `.toc` border-radius: `18px` → `16px`
+- `.code-block` border-radius: `18px` → `16px`
+- `.note` border-radius: `16px` → `12px`
+- `.info-box` border-radius: `16px` → `12px`
+- `.zone-diagram` border-radius: `18px` → `16px`
+- `.flow-node` border-radius: `16px` → `12px`
+- `.scroll-demo` border-radius: `20px` → `16px`
+- `.zone-cell` border-radius: `12px` → `8px`
+
+#### 1.7 Thêm shadow scale đầy đủ (5 cấp)
+```css
+:root {
+  /* Thêm vào existing :root */
+  --shadow-xs: 0 1px 3px rgba(12,45,72,0.04);
+  --shadow-md: 0 8px 24px rgba(12,45,72,0.08);
+  --shadow-xl: 0 24px 56px rgba(12,45,72,0.16);
+}
+```
+
+#### 1.8 Thêm dark mode (prefers-color-scheme)
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-page: #0f172a;
+    --bg-surface: #1e293b;
+    --bg-surface-alt: #162032;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border: #334155;
+    --shadow-sm: 0 4px 14px rgba(0,0,0,0.3);
+    --shadow-lg: 0 18px 40px rgba(0,0,0,0.5);
+    --brand: #60a5fa;
+    --brand-2: #93c5fd;
+  }
+  body {
+    background: var(--bg-page);
+  }
+  .doc-header {
+    background: linear-gradient(135deg, #020617 0%, #0f172a 32%, #1e3a5f 72%, #1e40af 100%);
+  }
+  .toc {
+    background: rgba(30,41,59,0.85);
+    border-color: rgba(51,65,85,0.6);
+  }
+  .toc a {
+    background: rgba(96,165,250,0.1);
+    color: var(--brand);
+  }
+  .section {
+    background: rgba(30,41,59,0.7);
+    border-color: var(--border);
+  }
+  .card {
+    background: var(--bg-surface);
+    border-color: var(--border);
+  }
+  .card-header {
+    background: linear-gradient(180deg, #1e293b, #162032);
+    border-color: var(--border);
+  }
+  .stat-card {
+    background: linear-gradient(180deg, #1e293b, #162032);
+    border-color: var(--border);
+  }
+  .stat-value {
+    color: var(--brand);
+  }
+  .tpl-card {
+    background: var(--bg-surface);
+    border-color: var(--border);
+  }
+  .tpl-thumb {
+    background: linear-gradient(180deg, #162032, #0f172a);
+    border-color: var(--border);
+  }
+  .wb { fill: #1e293b }
+  .code-block {
+    background: #020617;
+  }
+  .spec-table th {
+    background: var(--bg-surface-alt);
+  }
+}
+```
+
+#### 1.9 Thêm micro-animations khi scroll vào view
+```css
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+/* Stagger animation cho template cards */
+.tpl-card {
+  animation: fadeInUp 0.3s ease both;
+}
+.tpl-card:nth-child(2) { animation-delay: 0.05s; }
+.tpl-card:nth-child(3) { animation-delay: 0.1s; }
+.tpl-card:nth-child(4) { animation-delay: 0.15s; }
+```
+
+#### 1.10 Cải thiện print stylesheet
+```css
+@media print {
+  body { background: #fff; color: #000; }
+  .toc { display: none; }
+  .section { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; backdrop-filter: none; background: #fff; }
+  .tpl-card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+  .tpl-card:hover { transform: none; }
+  .doc-header { background: #0c2d48 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .stat-card { box-shadow: none; border: 1px solid #ddd; }
+  .card { box-shadow: none; }
+  a { color: inherit; }
+}
+```
+
+### Lưu ý
+- Chỉ sửa CSS trong `<style>` block
+- KHÔNG thay đổi HTML content
+- Kiểm tra TOÀN BỘ file sau khi sửa — mọi padding/margin phải là bội số 4
+
+---
+
+## PROMPT 8/12: Sửa 28 SVG Wireframes (22 trùng lặp + 6 quá đơn giản)
+
+### Mục tiêu
+Vẽ lại wireframes cho 28 templates bị lỗi. Mỗi wireframe phải UNIQUE và phản ánh đúng layout thực tế của template đó.
+
+### File
+`mom/docs/module-layout-template-design-system-v4.html` — sửa `<svg>` bên trong các `.tpl-thumb` tương ứng
+
+### Quy tắc SVG
+- ViewBox: `0 0 200 118`
+- Tối thiểu **15 SVG elements** mỗi wireframe (trung bình nên 20-25)
+- Dùng CSS classes: `.wb`(bg), `.wh`(header), `.wk`(kpi), `.wm`(main), `.ws`(sidebar), `.wfl`(filter), `.wft`(footer), `.wt`(table-row), `.wta`(table-row-alt), `.wr`(red), `.wg`(green), `.wa`(amber), `.wbl`(blue), `.wp`(purple)
+- Thêm chi tiết: table column headers, chart curves (`<path>`), form field outlines, icon placeholders (`<circle>` nhỏ), data labels (`<rect>` nhỏ nhiều màu), progress bars, separator lines
+- Mỗi template phải KHÁC BIỆT rõ ràng — nhìn vào SVG phải biết ngay đó là template nào
+
+### Danh sách 28 templates cần vẽ lại
+
+#### Nhóm A: 7 templates dùng chung 1 SVG (header + filter + table + sidebar)
+Vẽ lại ĐỘC LẬP cho từng template, phản ánh đúng use case:
+
+| Template | Cần thể hiện trong wireframe |
+|----------|------------------------------|
+| **T20 Quản lý hợp đồng** | Header + filter + TABLE có columns: contract#, customer, value($), expiry date + sidebar với renewal timeline vertical dots |
+| **T21 Danh mục chi tiết (Part Master)** | Header + filter + TABLE columns: PN, name, material, rev + SELECTED ROW highlighted + sidebar showing BOM tree snippet |
+| **T23 Phiếu quy trình (Routing Sheet)** | Header + NUMBERED ROWS (010, 020, 030...) với progress indicators + operation flow arrows giữa rows |
+| **T31 Bảng điểm NCC** | Header + KPI bars (3 colored gauges) + TABLE: supplier name, rating%, delivery%, quality% + sidebar với RADAR chart outline |
+| **T49 Theo dõi lao động** | Header + DATE PICKER filter + TIMESHEET GRID (7 columns cho 7 ngày, rows cho operators) + color cells cho hours |
+| **T50 Phân tích ngừng máy** | Header + KPI cards (MTBF, MTTR) + PARETO CHART (descending bars + cumulative line curve) + footer |
+| **T51 Ca làm việc** | Header + TABS (3 tab indicators) + WEEKLY GRID (7 columns × 3 shift rows) + color-coded shift blocks |
+
+#### Nhóm B: 4 templates wizard dùng chung 1 SVG
+Vẽ lại với KHÁC BIỆT rõ ràng:
+
+| Template | Cần thể hiện |
+|----------|-------------|
+| **T19 Trình tạo báo giá** | Stepper 4 dots + form với PRICING TABLE (item, qty, unit price, total) + sidebar RUNNING TOTAL with currency |
+| **T30 Tạo đơn mua hàng** | Stepper 3 dots + form với SUPPLIER selector dropdown + PO ITEMS list + sidebar with DELIVERY SCHEDULE |
+| **T53 Phiếu NCR/CAPA** | Stepper 8 dots (8D steps) + form WITH severity color indicator (red/yellow) + sidebar TIMELINE vertical |
+| **T57 Báo cáo 8D** | Stepper 8 numbered circles connected + LARGE form area with text blocks + sidebar TEAM avatars (circles) |
+
+#### Nhóm C: 4 templates comparison/viewer dùng chung 1 SVG
+| Template | Cần thể hiện |
+|----------|-------------|
+| **T27 Bản vẽ kỹ thuật** | Sidebar TREE (indented lines) + LARGE viewer canvas with drawing outline (rectangle with dimension lines) + bottom TOOLBAR (zoom icons) |
+| **T28 So sánh phiên bản** | SPLIT PANE (vertical divider line) + left panel text blocks + right panel text blocks + DIFF HIGHLIGHTS (colored lines) |
+| **T33 So sánh RFQ** | 3-COLUMN comparison + header row per column (Supplier A, B, C) + rows with checkmarks/x marks + HIGHLIGHT column (best) |
+| **T36 Nhập hàng** | PO REFERENCE box at top + ITEM LIST with qty fields + LOCATION selector per item + CONFIRM button at bottom |
+
+#### Nhóm D: 7 templates khác dùng chung SVG (scattered duplicates)
+Vẽ lại unique:
+
+| Template | Cần thể hiện |
+|----------|-------------|
+| **T25 Yêu cầu thay đổi (ECR)** | Table WITH priority flags (colored left borders) + sidebar APPROVAL FLOW (vertical steps with check/pending icons) |
+| **T43 Chi tiết lệnh SX** | TABS bar (4 tabs) + form SECTIONS with field labels + sidebar STATUS FLOW (colored circles connected vertically) |
+| **T48 Hồ sơ lô** | TABS bar + form with CHECKLIST items (checkbox + label rows) + sidebar BATCH SUMMARY card with lot# and timestamps |
+| **T60 Phòng thí nghiệm** | TABS (3) + TABLE with test result cells (PASS green / FAIL red dots) + sidebar REPORT preview rectangle |
+| **T63 Theo dõi hành động** | Table WITH PROGRESS BARS inside cells + OVERDUE rows highlighted red + filter bar with date range |
+| **T89 Quản lý đào tạo** | TABS (3) + TABLE with ENROLLMENT progress bars + sidebar SESSION cards with calendar icons |
+| **T102 Quản lý thay đổi** | Table WITH impact badges (High/Med/Low) + sidebar APPROVAL WORKFLOW vertical with status dots |
+
+#### Nhóm E: 6 wireframes quá đơn giản (chỉ 4 shapes)
+Vẽ lại với ít nhất 15-20 elements:
+
+| Template | Cần thể hiện (chi tiết) |
+|----------|------------------------|
+| **T38 Giao diện thợ máy (Operator Mobile)** | LARGE header with machine ID + CURRENT JOB card (part#, qty, progress bar LARGE) + 4 BIG action buttons (Start/Pause/Stop/Report) stacked + text 18px+ feel |
+| **T41 Bảng Andon** | FULL-WIDTH alert banner (red) with exclamation + 6 MACHINE STATUS tiles (2×3 grid) each with colored circle (green/yellow/red) + machine label + LARGE font feel |
+| **T97 Xem báo cáo** | TOOLBAR (zoom, print, export icons as small circles) + LARGE document canvas (white rect with text line placeholders and margins) + page number at bottom |
+| **T100 So sánh phiên bản** | SPLIT VIEW with center divider + LEFT panel (document lines) + RIGHT panel (document lines) + DIFF markers (colored rectangles on changed lines) + toggle buttons top |
+| **T106 Bảng cấu hình** | 3 ACCORDION sections (each with header bar + expanded content with toggle switches and input fields) + SAVE button at bottom |
+| **T108 Ma trận phân quyền** | MATRIX GRID with sticky left column (role names) + top header row (module names) + colored cells (green=full, yellow=limited, blue=read, gray=none) + legend |
+
+### Lưu ý
+- Tìm template bằng tên (ví dụ: search "T20 Quản lý hợp đồng" hoặc "T20")
+- Chỉ thay thế nội dung bên trong `<svg viewBox="0 0 200 118"...>...</svg>`
+- Giữ nguyên wrapper `<div class="tpl-thumb">` và tất cả `<div class="tpl-info">` bên ngoài
+- Mỗi SVG mới phải có `xmlns="http://www.w3.org/2000/svg" aria-hidden="true"`
+
+---
+
+## PROMPT 9/12: Dịch 89 mô tả template sang tiếng Việt có dấu + Viết chi tiết hơn
+
+### Mục tiêu
+Tìm và sửa TẤT CẢ 89 template descriptions đang viết bằng tiếng Anh, dịch sang tiếng Việt có dấu. Đồng thời mở rộng mô tả ngắn thành mô tả chi tiết hơn.
+
+### File
+`mom/docs/module-layout-template-design-system-v4.html`
+
+### Quy tắc dịch
+1. Mỗi `<div class="tpl-desc">` phải viết TIẾNG VIỆT CÓ DẤU
+2. Mô tả phải gồm: (a) chức năng chính, (b) đối tượng sử dụng, (c) 1-2 use case cụ thể
+3. Giữ thuật ngữ chuyên ngành tiếng Anh trong ngoặc khi cần (OEE, SPC, CAPA, FMEA, NCR, BOM, PO, SO, WO, JO, FAI, IQC, IPQC, FQC, OQC)
+4. Độ dài: 30-60 từ mỗi mô tả
+
+### Ví dụ cách dịch
+
+**Trước:**
+```html
+<div class="tpl-desc">Sensor overview + machine map + alert feed</div>
+```
+
+**Sau:**
+```html
+<div class="tpl-desc">Tổng quan cảm biến IoT + bản đồ máy móc + nguồn cấp cảnh báo thời gian thực. Dành cho kỹ sư bảo trì và quản lý thiết bị giám sát tình trạng sản xuất.</div>
+```
+
+**Trước:**
+```html
+<div class="tpl-desc">Tree BOM + component detail + where-used</div>
+```
+
+**Sau:**
+```html
+<div class="tpl-desc">Cây cấu trúc sản phẩm (BOM) + chi tiết linh kiện + truy xuất ngược nơi sử dụng. Dành cho kỹ sư thiết kế và quản lý vật tư khi xây dựng cấu hình sản phẩm.</div>
+```
+
+**Trước:**
+```html
+<div class="tpl-desc">Change requests + approval flow + impact</div>
+```
+
+**Sau:**
+```html
+<div class="tpl-desc">Yêu cầu thay đổi kỹ thuật (ECR/ECN) + luồng phê duyệt nhiều cấp + phân tích tác động. Dành cho quản lý kỹ thuật và QA khi cần thay đổi thiết kế hoặc quy trình.</div>
+```
+
+### Cách tìm template cần sửa
+Search trong file cho tất cả `<div class="tpl-desc">` — kiểm tra từng cái:
+- Nếu nội dung KHÔNG có dấu tiếng Việt (không có ă, â, ê, ô, ơ, ư, đ, à, á, ả, ã, ạ...) → CẦN DỊCH
+- Nếu nội dung đã có dấu tiếng Việt → kiểm tra xem đã đủ chi tiết chưa, nếu quá ngắn (<20 từ) → MỞ RỘNG
+
+### Danh sách mẫu cho các nhóm chưa có tiếng Việt
+
+**Nhóm Kỹ thuật:**
+- Part Master → "Danh mục chi tiết toàn bộ (Part Master) — quản lý mã chi tiết, vật liệu, bản vẽ, phiên bản. Click chọn hàng để xem BOM và Routing tương ứng. Dành cho kỹ sư thiết kế và quản lý NPI."
+- BOM Explorer → "Cây cấu trúc sản phẩm (BOM) dạng phân cấp — hiển thị linh kiện, số lượng, nguồn (mua/sản xuất), truy xuất ngược (where-used). Dành cho kỹ sư và planning."
+
+**Nhóm Chất lượng:**
+- SPC Control Chart → "Biểu đồ kiểm soát quá trình thống kê (SPC): X-bar, R chart, Histogram, Run chart + phân tích năng lực quy trình (Cpk/Ppk). Dành cho kỹ sư chất lượng giám sát ổn định sản xuất."
+- FMEA Risk Matrix → "Ma trận phân tích rủi ro (FMEA): Severity × Occurrence × Detection = RPN. Xếp hạng rủi ro và kế hoạch giảm thiểu. Dành cho QA và kỹ sư quy trình."
+
+**Nhóm Sản xuất:**
+- MES Control Center → "Trung tâm điều khiển MES: lưới trạng thái máy (xanh/vàng/đỏ), hàng đợi công việc, cảnh báo ngừng máy. Dành cho quản đốc và giám sát ca sản xuất."
+- Operator Mobile → "Giao diện thợ máy tối ưu cho di động: nút lớn, dễ chạm (touch-first), hiển thị công việc hiện tại và nút Start/Pause/Stop. Dành cho người vận hành máy CNC."
+
+### Lưu ý
+- Chỉ sửa nội dung bên trong `<div class="tpl-desc">...</div>`
+- KHÔNG sửa `<div class="tpl-name">` (đã đúng) hoặc `<div class="tpl-subname">` (tiếng Anh — OK)
+- KHÔNG sửa `<div class="tpl-meta">` (bố cục — giữ nguyên)
+- Tổng cộng cần sửa ~89 mô tả
+
+---
+
+## PROMPT 10/12: Bổ sung 10 Sections Mới — Design Patterns & States
+
+### Mục tiêu
+Thêm 10 sections mới vào file, chèn SAU section "Quy chuẩn đồ họa" (id="standards") và TRƯỚC section "20 Visual Theme Presets" (id="visual-themes").
+
+### File
+`mom/docs/module-layout-template-design-system-v4.html`
+
+### Vị trí chèn
+Tìm `</section>` đóng section id="standards", chèn ngay sau đó, trước `<section class="section" id="visual-themes">`.
+
+### 10 Sections mới
+
+#### Section D: Ma trận trạng thái thành phần (Component State Matrix)
+```
+Section ID: component-states
+Section number: D
+```
+
+Bảng spec-table cho 12 component types chính. Mỗi component có 8 trạng thái:
+
+| Component | Default | Hover | Active/Pressed | Focus | Disabled | Error | Loading | Selected |
+|-----------|---------|-------|----------------|-------|----------|-------|---------|----------|
+| Button Primary | bg brand-2, text white | bg brand-light, shadow-sm | bg brand, scale(0.98) | ring 3px brand/40 | opacity 0.5, cursor not-allowed | bg red, text white | spinner inside, disabled | N/A |
+| Button Secondary | bg transparent, border 1px | bg surface-alt | bg surface-alt, scale(0.98) | ring 3px | opacity 0.5 | border red | spinner | N/A |
+| Input | border 1px gray | border brand-2 | border brand-2, shadow-sm | ring 3px | bg surface-alt, opacity 0.5 | border red, text red below | N/A | N/A |
+| Checkbox | border 1px, bg white | border brand-2 | scale(0.95) | ring 3px | opacity 0.5 | border red | N/A | bg brand-2, check white |
+| Badge | bg color/10, text color | scale(1.05) | N/A | ring 3px | opacity 0.5 | bg red/10, text red | N/A | ring 2px color |
+| Table Row | bg white | bg surface-alt | bg selected/10 | outline within | N/A | bg red/5 | skeleton shimmer | bg selected/10, check |
+| Card | bg surface, shadow-sm | shadow-md, translateY(-2px) | shadow-sm | ring 3px | opacity 0.6 | border red | skeleton | border brand-2 |
+| Tab | text secondary | text primary | text brand-2 | ring 3px | opacity 0.5 | N/A | N/A | text brand-2, border-bottom brand-2 |
+| Dropdown Item | bg transparent | bg surface-alt | bg selected/10 | bg surface-alt, outline | disabled text | N/A | N/A | bg selected/10, check icon |
+| Modal | shadow-xl, overlay bg | N/A | N/A | trap focus | N/A | N/A | overlay + spinner | N/A |
+| Toast | bg surface, shadow-lg | N/A | N/A | N/A | N/A | bg red, icon error | N/A | N/A |
+| Progress Bar | bg gray-100, fill brand-2 | N/A | N/A | N/A | opacity 0.5 | fill red | animated stripes | N/A |
+
+Mỗi trạng thái ghi: CSS properties chính (bg, border, color, opacity, transform, shadow, outline). Dùng color codes ngắn gọn.
+
+Thêm visual preview cho mỗi component showing all 8 states bằng inline styled divs.
+
+#### Section E: Mẫu trạng thái lỗi (Error State Patterns)
+```
+Section ID: error-patterns
+Section number: E
+```
+
+8 error patterns:
+1. **Form field validation** — inline error text, red border, error icon
+2. **Form-level error summary** — alert box at top listing all errors
+3. **API failure** — toast notification + retry button
+4. **Table data load failure** — empty state with error icon + "Thử lại" button
+5. **Network offline** — persistent banner top with "Mất kết nối mạng"
+6. **Permission denied** — empty state with lock icon + "Bạn không có quyền truy cập"
+7. **404 Not Found** — full page empty state with illustration
+8. **Timeout** — modal with countdown + auto-retry option
+
+Mỗi pattern gồm:
+- Wireframe SVG nhỏ (100×60)
+- Mô tả tiếng Việt
+- CSS variables sử dụng
+- ARIA attributes cần thiết
+- Ví dụ HTML code block
+
+#### Section F: Mẫu tải dữ liệu (Loading & Skeleton Patterns)
+```
+Section ID: loading-patterns
+Section number: F
+```
+
+6 loading patterns:
+1. **Full page skeleton** — page header skeleton + KPI skeletons + table skeletons
+2. **Table skeleton** — header row solid + body rows shimmer
+3. **Card grid skeleton** — card outlines with shimmer fill
+4. **Chart skeleton** — chart area with pulsing placeholder
+5. **Form skeleton** — label + input field outlines
+6. **Inline loading** — spinner inside button or next to text
+
+Thông số:
+- Shimmer animation: `@keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }`
+- Duration: 1.5s infinite
+- Skeleton color: `var(--bg-surface-alt)` with gradient shimmer
+- Skeleton radius: match actual component radius
+- Quy tắc: skeleton phải có cùng kích thước và vị trí với content thực
+
+#### Section G: Trạng thái trống (Empty State Patterns)
+```
+Section ID: empty-states
+Section number: G
+```
+
+6 empty state types:
+1. **Bảng dữ liệu trống** — "Chưa có dữ liệu" + icon 📭 + action button "Tạo mới"
+2. **Kết quả tìm kiếm trống** — "Không tìm thấy kết quả cho '[query]'" + gợi ý thay đổi bộ lọc
+3. **Module mới chưa cấu hình** — "Module chưa được thiết lập" + wizard link
+4. **Lỗi tải dữ liệu** — "Không thể tải dữ liệu" + nút "Thử lại"
+5. **Không có quyền** — "Bạn không có quyền truy cập khu vực này" + liên hệ admin
+6. **Biểu đồ không có dữ liệu** — chart area with "Chưa đủ dữ liệu để hiển thị biểu đồ"
+
+Mỗi type: icon (emoji hoặc SVG), tiêu đề chính, mô tả phụ, CTA button (nếu có), CSS specs.
+
+#### Section H: Mẫu thông báo (Notification & Toast Patterns)
+```
+Section ID: notification-patterns
+Section number: H
+```
+
+Toast system:
+- 4 severity levels: Success (✅ xanh), Error (❌ đỏ), Warning (⚠️ vàng), Info (ℹ️ xanh dương)
+- Position: top-right, stacking downward
+- Auto-dismiss: Success 3s, Info 5s, Warning 8s, Error manual close
+- Max stack: 5 toasts visible
+- Animation: slide-in from right, fade-out
+
+Notification center:
+- Bell icon with badge count
+- Dropdown panel: grouped by date
+- Mark as read/unread
+- Filter by type
+- Link to source entity
+
+Alert banners:
+- Full-width, top of page
+- Persistent until dismissed
+- Types: maintenance (purple), outage (red), info (blue), success (green)
+
+#### Section I: Hướng dẫn trực quan hóa dữ liệu (Data Visualization Guidelines)
+```
+Section ID: data-viz
+Section number: I
+```
+
+Tham khảo IBM Carbon Data Visualization:
+
+1. **Bảng chọn loại biểu đồ:**
+
+| Mục đích | Loại biểu đồ | Ví dụ MOM |
+|----------|-------------|-----------|
+| So sánh giá trị | Bar chart | Doanh thu theo tháng, OEE theo máy |
+| Xu hướng thời gian | Line chart | SPC trend, production output daily |
+| Phân bổ tỷ lệ | Donut/Pie chart | NCR by category, defect distribution |
+| Phân phối | Histogram | Cpk distribution, cycle time spread |
+| Tương quan | Scatter plot | Severity vs Occurrence (risk matrix) |
+| Nhiều chỉ số | Radar chart | Supplier scorecard (quality, delivery, price, responsiveness) |
+| Tiến độ | Gauge | OEE%, machine utilization |
+| Dòng chảy | Sankey | Material flow, cost flow |
+| Nhiệt độ | Heatmap | Competency matrix, shift coverage |
+| Pareto | Bar + line combo | Top defects by frequency + cumulative % |
+
+2. **Màu cho biểu đồ:**
+- Sequential: blue scale (đậm → nhạt cho high → low)
+- Diverging: red → white → green (bad → neutral → good)
+- Categorical: 8 distinct colors (brand-2, green, amber, red, purple, cyan, indigo, pink)
+- Quy tắc: max 8 series per chart, dùng legend khi >3 series
+
+3. **Layout dashboard:**
+- F-pattern reading: KPIs top, trends middle-left, details middle-right, table bottom
+- Information hierarchy: summary → trend → detail
+- Max 4 charts per viewport
+- Chart title phải nêu insight, không chỉ data label ("Doanh thu tăng 12% so với tháng trước" thay vì "Doanh thu theo tháng")
+
+4. **Quy tắc tương tác:**
+- Hover: show tooltip with exact value
+- Click: drill-down to detail
+- Brush: select time range on line charts
+- Legend: click to toggle series visibility
+
+#### Section J: Dark Mode Token Mapping đầy đủ
+```
+Section ID: dark-mode-mapping
+Section number: J
+```
+
+Bảng đầy đủ 50+ token mappings:
+
+| Token | Light | Dark | Ghi chú |
+|-------|-------|------|---------|
+| --bg-page | #f8fafc | #0f172a | Nền trang |
+| --bg-surface | #ffffff | #1e293b | Nền card/panel |
+| --bg-surface-alt | #f1f5f9 | #162032 | Nền card header/stripe |
+| --bg-header | #ffffff | #1e293b | Nền header |
+| --bg-modal | #ffffff | #1e293b | Nền modal |
+| --bg-hover | #f8fafc | #263348 | Hover row/item |
+| --bg-selected | rgba(21,101,192,.08) | rgba(96,165,250,.12) | Selected state |
+| --bg-sidebar | #0c2d48 | #0a1628 | Sidebar navigation |
+| --text-primary | #1e293b | #f1f5f9 | Main text |
+| --text-secondary | #64748b | #94a3b8 | Secondary text |
+| --text-tertiary | #94a3b8 | #64748b | Muted text |
+| --text-link | #1565c0 | #60a5fa | Links |
+| --text-inverse | #ffffff | #0f172a | Text on dark/light bg |
+| --border | #e2e8f0 | #334155 | Borders |
+| --border-focus | #1565c0 | #60a5fa | Focus borders |
+| --border-error | #dc2626 | #f87171 | Error borders |
+| --green | #16a34a | #22c55e | Success |
+| --red | #dc2626 | #f87171 | Error |
+| --amber | #d97706 | #fbbf24 | Warning |
+| --blue | #2563eb | #60a5fa | Info |
+| --purple | #7c3aed | #a78bfa | Review |
+| --cyan | #0891b2 | #22d3ee | Planned |
+| --green-bg | rgba(22,163,74,.08) | rgba(34,197,94,.12) | Success background |
+| --red-bg | rgba(220,38,38,.08) | rgba(248,113,113,.12) | Error background |
+| --amber-bg | rgba(217,119,6,.08) | rgba(251,191,36,.12) | Warning background |
+| --blue-bg | rgba(37,99,235,.08) | rgba(96,165,250,.12) | Info background |
+| --shadow-sm | 0 4px 14px rgba(12,45,72,.06) | 0 4px 14px rgba(0,0,0,.3) | Card shadow |
+| --shadow-lg | 0 18px 40px rgba(15,23,42,.14) | 0 18px 40px rgba(0,0,0,.5) | Modal shadow |
+| --brand | #0c2d48 | #1e3a5f | Brand dark |
+| --brand-2 | #1565c0 | #60a5fa | Brand primary |
+| --accent | #f9a825 | #fbbf24 | Accent |
+
+Thêm info-box: "Quy tắc Dark Mode: Shadow trở thành glow (opacity tăng). Border sáng hơn (từ #e2e8f0 → #334155). Background đậm hơn 1 bậc so với page. Status colors sáng hơn 1 bậc để giữ contrast."
+
+#### Section K: Accessibility (ARIA) Patterns
+```
+Section ID: accessibility
+Section number: K
+```
+
+1. **Landmark regions:** header(banner), nav(navigation), main(main), footer(contentinfo), aside(complementary)
+2. **ARIA attributes per component:**
+   - Button: `role="button"`, `aria-pressed` (toggle), `aria-disabled`
+   - Modal: `role="dialog"`, `aria-modal="true"`, `aria-labelledby`
+   - Tab: `role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected`
+   - Table: `role="table"`, sortable columns `aria-sort`
+   - Alert: `role="alert"`, `aria-live="polite"` (info) / `"assertive"` (error)
+   - Progress: `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`
+   - Tree: `role="tree"`, `role="treeitem"`, `aria-expanded`
+3. **Keyboard patterns:**
+   - Tab: navigate between focusable elements
+   - Enter/Space: activate buttons/links
+   - Escape: close modal/dropdown
+   - Arrow keys: navigate within lists/menus/tabs
+   - Home/End: jump to first/last item
+
+#### Section L: Chế độ mật độ dữ liệu (Data Density Modes)
+```
+Section ID: density-modes
+Section number: L
+```
+
+Bảng chi tiết 3 modes + 1 mode đặc biệt:
+
+| Token | Compact | Default | Comfortable | Shop Floor |
+|-------|---------|---------|-------------|------------|
+| --hds-control-h | 28px | 32px | 40px | 56px |
+| --hds-control-h-sm | 24px | 28px | 36px | 48px |
+| --hds-control-h-lg | 36px | 40px | 48px | 64px |
+| --hds-control-px | 8px | 10px | 14px | 20px |
+| --hds-control-font | 11px | 13px | 14px | 18px |
+| --hds-control-gap | 4px | 6px | 8px | 16px |
+| --hds-table-row-h | 32px | 40px | 48px | 64px |
+| --hds-table-cell-px | 8px | 12px | 16px | 20px |
+| --hds-table-cell-py | 4px | 8px | 12px | 16px |
+| --hds-table-head-font | 10px | 11px | 12px | 14px |
+| --hds-table-body-font | 11px | 13px | 14px | 18px |
+| --hds-icon-sm | 12px | 14px | 16px | 24px |
+| --hds-icon-md | 14px | 16px | 20px | 32px |
+| --hds-card-pad | 12px | 16px | 20px | 24px |
+| --hds-kpi-value-font | 20px | 24px | 32px | 48px |
+| --hds-kpi-label-font | 10px | 11px | 12px | 16px |
+| --hds-tab-px | 12px | 16px | 20px | 24px |
+| --hds-tab-py | 6px | 8px | 10px | 14px |
+| --hds-tab-font | 10px | 11px | 13px | 16px |
+
+Info box: "Shop Floor mode dành cho màn hình xưởng sản xuất: touch targets ≥48px cho thao tác đeo găng tay, font ≥18px cho khoảng cách đọc xa, contrast ≥7:1 cho môi trường ánh sáng kém."
+
+#### Section M: Hướng dẫn nội dung (Content Guidelines)
+```
+Section ID: content-guidelines
+Section number: M
+```
+
+1. **Quy tắc viết hoa:**
+   - Tiêu đề trang: Viết hoa chữ đầu câu (Sentence case) — "Quản lý đơn hàng"
+   - Button labels: Viết hoa chữ đầu — "Tạo mới", "Lưu thay đổi", "Xóa"
+   - Table headers: UPPERCASE tracking-wider — "MÃ ĐƠN", "KHÁCH HÀNG"
+   - Badge/status: UPPERCASE — "HOÀN THÀNH", "ĐANG XỬ LÝ"
+   - Menu items: Sentence case — "Quản lý người dùng"
+
+2. **Định dạng dữ liệu:**
+   - Ngày: `dd/MM/yyyy` (10/04/2026) hoặc relative ("2 giờ trước", "hôm qua")
+   - Tiền: `$1,234.56` hoặc `1.234.560 ₫` — luôn right-aligned
+   - Phần trăm: `98.7%` — kèm trend arrow (▲▼) và color (green/red)
+   - ID: font-mono, text-primary — `NCR-2026-1204`, `PO-2026-0521`
+   - Số lượng: `1,234 pcs` — luôn kèm đơn vị
+
+3. **Thông báo lỗi:**
+   - Cụ thể: "Trường 'Khách hàng' là bắt buộc" (không viết "Có lỗi xảy ra")
+   - Gợi ý sửa: "Số lượng phải lớn hơn 0. Vui lòng nhập lại."
+   - Thân thiện: Không dùng mã lỗi kỹ thuật ("ERR_500") cho người dùng cuối
+
+4. **Placeholder text:**
+   - Input: "Nhập mã đơn hàng..." (dùng "..." cuối)
+   - Search: "Tìm kiếm theo tên, mã, mô tả..."
+   - Select: "— Chọn —"
+
+5. **Confirmation dialogs:**
+   - Tiêu đề: mô tả hành động ("Xóa đơn hàng SO-2026-0892?")
+   - Nội dung: hậu quả ("Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa.")
+   - Buttons: "Hủy" (secondary) + "Xóa" (danger) — action verb, không dùng "OK/Cancel"
+
+### Lưu ý
+- Tất cả 10 sections phải có `<section class="section" id="...">` wrapper
+- Section number dùng chữ cái: D, E, F, G, H, I, J, K, L, M
+- Cập nhật TOC: thêm 10 links mới
+- Tiếng Việt CÓ DẤU mọi nơi
+- Dùng card, spec-table, info-box, grid-2/3 layouts nhất quán với phần còn lại
+- Tổng cộng phần này khoảng 600-800 dòng HTML
+
+---
+
+## PROMPT 11/12: Bổ sung 6 Sections Đặc Thù MOM/eQMS
+
+### Mục tiêu
+Thêm 6 sections chuyên biệt cho ngành sản xuất CNC precision machining, chèn SAU section "Content Guidelines" (id="content-guidelines") và TRƯỚC section "20 Visual Theme Presets" (id="visual-themes").
+
+### File
+`mom/docs/module-layout-template-design-system-v4.html`
+
+### 6 Sections
+
+#### Section N: Chế độ xưởng sản xuất (Shop Floor Display Mode)
+```
+Section ID: shop-floor-mode
+Section number: N
+```
+
+Đặc tả giao diện dành cho:
+- Màn hình TV xưởng sản xuất (Andon boards, status displays)
+- Bảng điều khiển cạnh máy (operator panels)
+- Tablet/kiosk trên sàn (inspection stations)
+
+**Thông số kỹ thuật:**
+| Thuộc tính | Giá trị | Lý do |
+|------------|---------|-------|
+| Touch target tối thiểu | 48px × 48px | WCAG 2.5.5, thao tác đeo găng tay |
+| Font body tối thiểu | 18px | Đọc từ khoảng cách 0.5-1m |
+| Font KPI value | 48-64px | Đọc từ khoảng cách 3-5m |
+| Contrast ratio | ≥7:1 (WCAG AAA) | Ánh sáng mạnh xưởng |
+| Bottom navigation | Preferred | Dễ chạm hơn top nav |
+| Status indicators | ≥24px circle + text label | Không dùng color alone |
+| Button spacing | ≥16px gap | Tránh chạm nhầm |
+| Animation | Disabled | Giảm distraction |
+
+**3 sub-modes:**
+1. **Kiosk mode** — Full screen, no browser chrome, auto-logout 5 phút, barcode scanner focus
+2. **TV Display mode** — Read-only, auto-refresh 10s, font hero 64px+, no interaction needed
+3. **Operator Panel mode** — Touch-first, large buttons, simplified navigation, current job focus
+
+Wireframe SVG cho mỗi sub-mode (3 wireframes 200×118).
+
+**CSS variables riêng:**
+```css
+[data-density="shopfloor"] {
+  --hds-control-h: 56px;
+  --hds-control-font: 18px;
+  --hds-control-gap: 16px;
+  --hds-table-row-h: 64px;
+  --hds-table-body-font: 18px;
+  --hds-icon-md: 32px;
+  --hds-kpi-value-font: 48px;
+}
+```
+
+#### Section O: Mẫu biểu mẫu tuân thủ 21 CFR Part 11
+```
+Section ID: compliance-forms
+Section number: O
+```
+
+Đặc tả cho biểu mẫu tuân thủ FDA 21 CFR Part 11 (electronic records, electronic signatures):
+
+**5 patterns:**
+
+1. **Electronic Signature Capture**
+   - Signer name (auto-filled from session) + meaning dropdown (Phê duyệt / Xem xét / Xác nhận) + password re-entry + timestamp auto
+   - Locked after signing — visual indicator (🔒 icon + gray overlay)
+   - Ví dụ: Phê duyệt phiếu kiểm tra FAI
+
+2. **Audit Trail Visualization**
+   - Timeline dọc: mỗi entry gồm timestamp, user, action, old value → new value, reason
+   - Color-coded by action type: Create (green), Update (blue), Delete (red), Approve (purple)
+   - Filter by date range, user, field
+   - Ví dụ: Lịch sử thay đổi NCR-2026-1204
+
+3. **Record Locking**
+   - Status bar: Draft (editable) → Under Review (partially locked) → Approved (fully locked) → Obsolete (archived)
+   - Visual: unlocked icon → lock icon, fields become read-only with gray background
+   - Unlock requires admin override + reason
+
+4. **Version Comparison**
+   - Split-pane diff view: left = old version, right = new version
+   - Changed fields highlighted yellow, added fields green, deleted fields red
+   - Version selector dropdown at top
+
+5. **Reason Code Entry**
+   - Required for: any edit after initial approval, status changes, deletions
+   - UI: modal dialog with dropdown (predefined reasons) + free text "Ghi chú bổ sung"
+   - Logged to audit trail
+
+#### Section P: Chuyển đổi giao diện theo ca (Shift-Based Theme Switching)
+```
+Section ID: shift-themes
+Section number: P
+```
+
+Tự động đổi visual theme theo ca làm việc:
+
+| Ca | Thời gian | Theme mặc định | Density | Lý do |
+|----|-----------|----------------|---------|-------|
+| Ca sáng | 06:00-14:00 | Professional Light | Default | Ánh sáng tự nhiên, công việc chính |
+| Ca chiều | 14:00-22:00 | Ocean Breeze (nhẹ hơn) | Default | Giảm mỏi mắt buổi chiều |
+| Ca đêm | 22:00-06:00 | Professional Dark | Comfortable | Tối, giảm chói, font lớn hơn |
+
+**Cấu hình:**
+- Admin cấu hình tại: Quản trị > Giao diện > Tab Nâng cao
+- Mỗi facility/department có thể cấu hình riêng
+- User có thể override (preference cá nhân ưu tiên hơn)
+- Chuyển đổi mượt: CSS transition 500ms khi đổi theme
+
+**Diagram:** Flow chart: Kiểm tra giờ → Áp dụng theme ca → Kiểm tra user override → Áp dụng final theme
+
+#### Section Q: Bố cục tối ưu cho in ấn (Print Layout Specifications)
+```
+Section ID: print-layouts
+Section number: Q
+```
+
+Đặc tả `@media print` cho các loại tài liệu:
+
+1. **Phiếu kiểm tra (Inspection Report)**
+   - Page header: Logo + Tên công ty + Mã tài liệu + Phiên bản + Ngày
+   - Page footer: Trang X/Y + "Bản kiểm soát — Cấm photo"
+   - Bảng kết quả: borders đậm, font 10pt, no color backgrounds (tiết kiệm mực)
+   - Chữ ký: 3 blocks (Người kiểm tra / Người phê duyệt / Khách hàng) với đường kẻ
+   - QR code: link đến bản điện tử
+
+2. **Phiếu giao hàng (Packing Slip)**
+   - A4 landscape, item table full-width
+   - Barcode cho mỗi item line
+   - Tổng số kiện, tổng trọng lượng cuối trang
+
+3. **Báo cáo SPC**
+   - Chart render as image (SVG → rasterized)
+   - Data table bên dưới chart
+   - Specification limits in footer
+
+**CSS print tokens:**
+```css
+@media print {
+  --print-font-body: 10pt;
+  --print-font-header: 12pt;
+  --print-font-title: 14pt;
+  --print-margin: 15mm;
+  --print-header-height: 20mm;
+  --print-footer-height: 12mm;
+}
+```
+
+**Quy tắc:**
+- `break-inside: avoid` cho cards, tables, charts
+- `break-after: page` cho mỗi section lớn
+- Ẩn: navigation, filters, action buttons, scrollbars
+- Hiện: page numbers, document control info, watermarks
+
+#### Section R: Giao diện vận hành máy (Machine Operator Interface Patterns)
+```
+Section ID: operator-interface
+Section number: R
+```
+
+Đặc tả cho giao diện operator tại máy CNC:
+
+**Layout chuẩn Operator Panel:**
+```
+┌──────────────────────────────────┐
+│ HEADER: Machine ID + Status LED  │
+├──────────────────────────────────┤
+│ CURRENT JOB                      │
+│ ┌──────────────────────────────┐ │
+│ │ Part: AERO-BRK-2024  Rev: C │ │
+│ │ WO: WO-2026-0891            │ │
+│ │ Qty: 34/50    ████████░░ 68% │ │
+│ └──────────────────────────────┘ │
+├──────────────────────────────────┤
+│ ┌──────┐ ┌──────┐ ┌──────┐     │
+│ │ ▶    │ │ ⏸   │ │ ⏹   │     │
+│ │START │ │PAUSE │ │ STOP │     │
+│ └──────┘ └──────┘ └──────┘     │
+├──────────────────────────────────┤
+│ ┌──────┐ ┌──────┐ ┌──────┐     │
+│ │ 📋  │ │ ⚠️  │ │ 📊  │     │
+│ │CHECK │ │REPORT│ │ OEE  │     │
+│ └──────┘ └──────┘ └──────┘     │
+├──────────────────────────────────┤
+│ FOOTER: Shift B · Op: Nguyễn V.T │
+└──────────────────────────────────┘
+```
+
+**Đặc tả UX:**
+- Auto-focus barcode scanner input khi mở trang
+- Confirmation dialog cho STOP (2 bước: "Bạn chắc chắn?" → nhập lý do)
+- Vibration feedback (nếu thiết bị hỗ trợ) khi nhấn nút chính
+- Color-coded header: Running=xanh, Paused=vàng, Stopped=đỏ, Setup=tím
+- Đồng hồ đếm cycle time lớn (48px font, realtime)
+
+#### Section S: Mẫu dashboard thời gian thực (Realtime Dashboard Patterns)
+```
+Section ID: realtime-dashboard
+Section number: S
+```
+
+Đặc tả cho dashboards cập nhật dữ liệu liên tục:
+
+**Data Freshness Indicator:**
+- Timestamp: "Cập nhật lúc 14:23:45" + nút 🔄 refresh thủ công
+- Stale data warning: nếu >60s không cập nhật → badge "Dữ liệu cũ" (amber)
+- Offline mode: nếu mất kết nối → banner "Đang hiển thị dữ liệu cache từ 14:20:00"
+
+**Tiered Refresh Rates:**
+| Loại dữ liệu | Tần suất | Ví dụ |
+|---------------|----------|-------|
+| Cảnh báo khẩn cấp | 1-3 giây | Machine alarm, safety alert |
+| Trạng thái máy | 5-10 giây | OEE, running/stopped, cycle count |
+| KPI tổng hợp | 30-60 giây | Yield rate, production output |
+| Biểu đồ xu hướng | 1-5 phút | SPC trend, energy consumption |
+| Báo cáo tổng hợp | 15-30 phút | Shift summary, daily report |
+
+**Smooth Data Updates:**
+- Số liệu: animate value change (count up/down)
+- Charts: smooth transition, no blink
+- Tables: highlight changed rows briefly (flash yellow 500ms → fade)
+- Status indicators: pulse animation khi thay đổi trạng thái
+
+**Connection States:**
+```
+🟢 Trực tuyến — Dữ liệu realtime
+🟡 Chậm — Dữ liệu trễ >30s
+🔴 Ngoại tuyến — Hiển thị cache
+⚪ Đang kết nối — Skeleton loading
+```
+
+### Lưu ý
+- Tất cả 6 sections có `<section class="section" id="...">` wrapper
+- Section number: N, O, P, Q, R, S
+- Cập nhật TOC: thêm 6 links mới
+- Tiếng Việt CÓ DẤU
+- Tổng cộng khoảng 500-700 dòng HTML
+
+---
+
+## PROMPT 12/12: Sắp xếp lại Information Architecture + Cross-references
+
+### Mục tiêu
+Sắp xếp lại thứ tự sections trong file cho logic hơn. Thêm cross-references giữa templates, blocks, zones.
+
+### File
+`mom/docs/module-layout-template-design-system-v4.html`
+
+### Thứ tự sections mới (sau khi áp dụng Prompt 1-5)
+
+```
+HEADER
+TOC (cập nhật tương ứng)
+
+═══ PHẦN I: NỀN TẢNG ═══
+0. Tóm tắt thực thi (summary)
+A. Kiến trúc hệ thống (architecture)
+B. Quy chuẩn đồ họa (standards)
+D. Ma trận trạng thái thành phần (component-states)      ← di chuyển lên
+L. Chế độ mật độ dữ liệu (density-modes)                ← di chuyển lên
+J. Dark Mode Token Mapping (dark-mode-mapping)            ← di chuyển lên
+K. Accessibility / ARIA Patterns (accessibility)          ← di chuyển lên
+
+═══ PHẦN II: MẪU THIẾT KẾ ═══
+E. Mẫu trạng thái lỗi (error-patterns)
+F. Mẫu tải dữ liệu (loading-patterns)
+G. Trạng thái trống (empty-states)
+H. Mẫu thông báo (notification-patterns)
+I. Hướng dẫn trực quan hóa dữ liệu (data-viz)
+M. Hướng dẫn nội dung (content-guidelines)
+
+═══ PHẦN III: ĐẶC THÙ MOM ═══
+N. Chế độ xưởng sản xuất (shop-floor-mode)
+O. Biểu mẫu tuân thủ 21 CFR Part 11 (compliance-forms)
+P. Chuyển đổi giao diện theo ca (shift-themes)
+Q. Bố cục in ấn (print-layouts)
+R. Giao diện vận hành máy (operator-interface)
+S. Dashboard thời gian thực (realtime-dashboard)
+
+═══ PHẦN IV: VISUAL THEMES ═══
+C. 20 Visual Theme Presets (visual-themes)
+
+═══ PHẦN V: TEMPLATE CATALOG ═══
+14. Block Engine (block-engine)                           ← di chuyển TRƯỚC templates
+17. Zone System (zone-system)                             ← di chuyển TRƯỚC templates
+18. Smart Scroll UX (scroll-ux)                           ← di chuyển TRƯỚC templates
+1-13. Template Categories (cat-overview → cat-cross)
+
+═══ PHẦN VI: CÔNG CỤ & QUẢN TRỊ ═══
+15. Component Preset Library (component-presets)
+16. Module Editor Tools (module-editor)
+19. Token Cascade (token-cascade)
+20. Governance & Roadmap (governance)
+```
+
+### Cập nhật TOC
+```html
+<nav class="toc"><div class="toc-inner">
+  <!-- Nền tảng -->
+  <a href="#summary">Tóm tắt</a>
+  <a href="#architecture">Kiến trúc</a>
+  <a href="#standards">Quy chuẩn</a>
+  <a href="#component-states">Trạng thái</a>
+  <a href="#density-modes">Mật độ</a>
+  <a href="#dark-mode-mapping">Dark Mode</a>
+  <a href="#accessibility">ARIA</a>
+  <!-- Mẫu thiết kế -->
+  <a href="#error-patterns">Lỗi</a>
+  <a href="#loading-patterns">Loading</a>
+  <a href="#empty-states">Trống</a>
+  <a href="#notification-patterns">Thông báo</a>
+  <a href="#data-viz">Data Viz</a>
+  <a href="#content-guidelines">Nội dung</a>
+  <!-- Đặc thù MOM -->
+  <a href="#shop-floor-mode">Xưởng SX</a>
+  <a href="#compliance-forms">21 CFR</a>
+  <a href="#shift-themes">Ca/Shift</a>
+  <a href="#print-layouts">In ấn</a>
+  <a href="#operator-interface">Operator</a>
+  <a href="#realtime-dashboard">Realtime</a>
+  <!-- Themes + Templates -->
+  <a href="#visual-themes">Themes</a>
+  <a href="#block-engine">Blocks</a>
+  <a href="#zone-system">Zones</a>
+  <a href="#scroll-ux">Scroll</a>
+  <a href="#cat-overview">Templates ▸</a>
+  <!-- Công cụ -->
+  <a href="#component-presets">Presets</a>
+  <a href="#module-editor">Editor</a>
+  <a href="#governance">Governance</a>
+</div></nav>
+```
+
+### Thêm Cross-references
+
+Trong MỖI template card, thêm `data-blocks` và `data-zones` attributes:
+```html
+<div class="tpl-card" data-blocks="kpi-row,data-table,chart-line,filter-bar" data-zones="header,kpi-bar,filter,main,sidebar,footer">
+```
+
+Trong Block Engine bảng, mỗi block type thêm cột "Templates sử dụng":
+```html
+<td><a href="#cat-overview">T01</a>, <a href="#cat-overview">T04</a>, <a href="#cat-sales">T18</a></td>
+```
+
+Trong Zone System bảng, mỗi zone type thêm cột "Templates ví dụ":
+```html
+<td><a href="#cat-overview">T01</a> (main 2/3), <a href="#cat-production">T39</a> (main full)</td>
+```
+
+### Section number renumbering
+Sau khi sắp xếp lại, đánh số lại TẤT CẢ section numbers:
+- Phần I: sections 1-7
+- Phần II: sections 8-13
+- Phần III: sections 14-19
+- Phần IV: section 20
+- Phần V: sections 21-35 (Block Engine=21, Zone=22, Scroll=23, Templates 24-35)
+- Phần VI: sections 36-39
+
+### Lưu ý
+- Di chuyển TOÀN BỘ section HTML (bao gồm cả nội dung bên trong)
+- KHÔNG thay đổi nội dung — chỉ di chuyển và đánh số lại
+- Cập nhật TOC cho khớp với thứ tự mới
+- Kiểm tra tất cả href="#..." links vẫn hoạt động
+
+---
+
+## THỨ TỰ THỰC HIỆN
+
+```
+Prompt 7 (CSS) ─────┐
+Prompt 8 (SVG) ─────┼── Song song
+Prompt 9 (Dịch VN) ─┘
+         ↓
+Prompt 10 (10 sections mới) ──┐
+Prompt 11 (6 sections MOM) ───┘── Song song
+         ↓
+Prompt 12 (Sắp xếp lại IA + Cross-refs) ── Cuối cùng
+```
+
+## ƯỚC LƯỢNG SAU KHI HOÀN TẤT
+
+| Metric | Trước | Sau |
+|--------|-------|-----|
+| Tổng dòng | 2,109 | ~3,800-4,200 |
+| CSS quality | 5/10 | 9/10 |
+| SVG wireframes unique | 101/123 (82%) | 123/123 (100%) |
+| Mô tả tiếng Việt | 34/123 (28%) | 123/123 (100%) |
+| Sections tổng | 24 | 40 |
+| Component states | 0 | 12 components × 8 states |
+| Error patterns | 0 | 8 patterns |
+| Loading patterns | 0 | 6 patterns |
+| Dark mode tokens | 3 | 50+ |
+| MOM-specific sections | 0 | 6 |
+| Cross-references | 0 | Templates ↔ Blocks ↔ Zones |
