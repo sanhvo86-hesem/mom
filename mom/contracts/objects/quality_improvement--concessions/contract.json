@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.concessions",
+  "canonicalName": "concessions",
+  "displayName": "Concessions",
+  "purpose": "Control temporary acceptance or shipment-release exception decisions so quality deviation from requirement cannot bypass governed approval and traceability.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_authority",
+  "storage": {
+    "primaryTable": "concessions",
+    "primaryKey": "concession_id",
+    "statusField": "status",
+    "childTables": [
+      "electronic_signature"
+    ],
+    "legacyTables": [
+      "concessions"
+    ]
+  },
+  "identity": {
+    "strategy": "concession_id",
+    "naturalKeys": [
+      "concession_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "exception_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "customer_escape_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "deviation_or_ncr_reference",
+      "approved_scope_and_duration",
+      "customer_or_internal_approval_trace"
+    ],
+    "kpiSignals": [
+      "concession_volume",
+      "concession_closure_lead_time",
+      "repeat_concession_rate"
+    ],
+    "autoAuditChecks": [
+      "open_concessions_must_have_scope_and_owner",
+      "closed_concessions_must_keep_approval_trace",
+      "concessions_related_to_quality_escape_should_trace_to_ncr_or_oqc"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "concessions_status_set",
+    "stateModelKey": "concessions_status_set",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "open", "label": "Open", "labelEn": "Open", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "In Progress", "labelEn": "In Progress", "allowedTransitionsFrom": ["open"] },
+      { "value": "pending_review", "label": "Pending Review", "labelEn": "Pending Review", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["pending_review"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending_review"] }
+    ],
+    "commands": [
+      { "command": "start_review", "targetState": "in_progress", "description": "Start governed review of the concession request.", "idempotencyScope": "resource+transition" },
+      { "command": "submit_for_review", "targetState": "pending_review", "description": "Move the concession into approval review.", "idempotencyScope": "resource+transition", "preconditions": ["scope_and_reason_recorded"] },
+      { "command": "approve", "targetState": "closed", "description": "Approve and close the concession with explicit evidence.", "idempotencyScope": "resource+transition", "preconditions": ["approval_trace_recorded"] },
+      { "command": "reject", "targetState": "rejected", "description": "Reject the concession under governed reason.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] }
+    ],
+    "notes": [
+      "Expiry is tracked through effective dates and evidence, not a separate terminal workflow state in the current runtime."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "quality_improvement.nonconformances",
+      "quality_improvement.oqc-inspections"
+    ],
+    "downstreamObjects": [
+      "inventory_logistics.shipments"
+    ],
+    "keyRelationships": [
+      "customer_id -> customers.customer_id",
+      "affected_so_number -> sales_orders.sales_order_number"
+    ],
+    "events": [
+      { "eventName": "opened", "description": "Concession was opened for governed review." },
+      { "eventName": "pending-review", "description": "Concession moved into approval review." },
+      { "eventName": "closed", "description": "Concession was approved and closed with trace." },
+      { "eventName": "rejected", "description": "Concession request was rejected." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_management.concessions.* while canonical naming remains quality_improvement.concessions."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "concessions"
+    ],
+    "notes": [
+      "The storage name stays the same, but the canonical domain is quality_improvement so concession control is treated as part of the governed quality-improvement loop."
+    ]
+  },
+  "invariants": [
+    "A concession must preserve explicit scope, duration, and approval evidence.",
+    "A concession affecting shipment release must remain traceable to the related order or inspection.",
+    "Rejected concession requests must keep rejection reason for audit and learning."
+  ]
+}

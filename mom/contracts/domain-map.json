@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "description": "Major canonical ERP+MOM domains used by the business contract authority layer.",
+    "domainCount": 10
+  },
+  "domains": [
+    {
+      "key": "analytics",
+      "label": "Analytics",
+      "canonicalPath": "analytics",
+      "resourceCount": 5,
+      "authoredPackageCount": 5,
+      "resourceKeys": [
+        "inventory-balance-snapshots",
+        "mes-oee-snapshots",
+        "plant-performance-snapshots",
+        "production-bom-snapshots",
+        "production-route-snapshots"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Analytics."
+    },
+    {
+      "key": "commercial_customer",
+      "label": "Commercial Customer",
+      "canonicalPath": "commercial-customer",
+      "resourceCount": 5,
+      "authoredPackageCount": 5,
+      "resourceKeys": [
+        "customer-care-cases",
+        "customer-purchase-orders",
+        "quotations",
+        "quote-effectiveness-reviews",
+        "sales-orders"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Commercial Customer."
+    },
+    {
+      "key": "finance",
+      "label": "Finance",
+      "canonicalPath": "finance",
+      "resourceCount": 8,
+      "authoredPackageCount": 8,
+      "resourceKeys": [
+        "ap-invoices",
+        "ar-invoices",
+        "backdate-exceptions",
+        "credit-memos",
+        "debit-memos",
+        "fixed-asset-capitalizations",
+        "inventory-valuations",
+        "period-closes"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Finance."
+    },
+    {
+      "key": "integration_resilience",
+      "label": "Integration Resilience",
+      "canonicalPath": "integration-resilience",
+      "resourceCount": 1,
+      "authoredPackageCount": 1,
+      "resourceKeys": [
+        "reconciliation-exceptions"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Integration Resilience."
+    },
+    {
+      "key": "inventory_logistics",
+      "label": "Inventory Logistics",
+      "canonicalPath": "inventory-logistics",
+      "resourceCount": 8,
+      "authoredPackageCount": 8,
+      "resourceKeys": [
+        "customer-returns",
+        "cycle-count-plans",
+        "freight-orders",
+        "inventory-items",
+        "inventory-movements",
+        "shipments",
+        "stock-balances",
+        "warehouses"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Inventory Logistics."
+    },
+    {
+      "key": "maintenance_ehs",
+      "label": "Maintenance Ehs",
+      "canonicalPath": "maintenance-ehs",
+      "resourceCount": 6,
+      "authoredPackageCount": 6,
+      "resourceKeys": [
+        "five-s-audits",
+        "incidents",
+        "maintenance-plans",
+        "maintenance-work-orders",
+        "permits",
+        "safety-observations"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Maintenance Ehs."
+    },
+    {
+      "key": "master_data",
+      "label": "Master Data",
+      "canonicalPath": "master-data",
+      "resourceCount": 8,
+      "authoredPackageCount": 8,
+      "resourceKeys": [
+        "assets",
+        "compliance-obligations",
+        "customers",
+        "employees",
+        "equipment",
+        "measuring-devices",
+        "suppliers",
+        "tools"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Master Data."
+    },
+    {
+      "key": "planning_production",
+      "label": "Planning Production",
+      "canonicalPath": "planning-production",
+      "resourceCount": 6,
+      "authoredPackageCount": 6,
+      "resourceKeys": [
+        "dispatch-lists",
+        "ipqc-inspections",
+        "job-orders",
+        "production-operations",
+        "production-plans",
+        "work-orders"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Planning Production."
+    },
+    {
+      "key": "procurement_supplier_quality",
+      "label": "Procurement Supplier Quality",
+      "canonicalPath": "procurement-supplier-quality",
+      "resourceCount": 6,
+      "authoredPackageCount": 6,
+      "resourceKeys": [
+        "iqc-inspections",
+        "purchase-receipt-corrections",
+        "purchase-receipts",
+        "purchase-requisitions",
+        "supplier-asns",
+        "supplier-purchase-orders"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Procurement Supplier Quality."
+    },
+    {
+      "key": "quality_improvement",
+      "label": "Quality Improvement",
+      "canonicalPath": "quality-improvement",
+      "resourceCount": 11,
+      "authoredPackageCount": 11,
+      "resourceKeys": [
+        "audit-programs",
+        "concessions",
+        "corrective-actions",
+        "deviations",
+        "fqc-inspections",
+        "improvement-actions",
+        "msa-studies",
+        "nonconformances",
+        "oqc-inspections",
+        "override-controls",
+        "spc-observations"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Quality Improvement."
+    }
+  ]
+}

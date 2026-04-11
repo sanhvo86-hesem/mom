@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.audit-programs",
+  "canonicalName": "qual_audit_programs",
+  "displayName": "Audit Programs",
+  "purpose": "Control internal and supplier audit planning, execution, verification, and closure so compliance evidence and systemic findings remain governed from schedule through improvement follow-up.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "internal_audit",
+  "storage": {
+    "primaryTable": "qual_audit_programs",
+    "primaryKey": "qual_audit_program_id",
+    "statusField": "status",
+    "childTables": [
+      "audit_checklists",
+      "audit_findings"
+    ],
+    "legacyTables": [
+      "audit_program",
+      "audit_programs",
+      "internal_audits"
+    ],
+    "legacyTablesToIsolate": [
+      "audit_program"
+    ]
+  },
+  "identity": {
+    "strategy": "qual_audit_program_id",
+    "naturalKeys": [
+      "qual_audit_program_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "compliance_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "management_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "audit_scope",
+      "audit_plan",
+      "finding_and_closeout_trace"
+    ],
+    "kpiSignals": [
+      "audit_completion_rate",
+      "finding_closure_lead_time",
+      "repeat_finding_rate"
+    ],
+    "autoAuditChecks": [
+      "scheduled_audits_must_have_scope_and_owner",
+      "closed_audits_must_preserve_finding_trace",
+      "systemic_findings_should_link_to_corrective_or_improvement_action"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + qual_audit_programs_status_set",
+    "stateModelKey": "qual_audit_programs_status_set",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "submitted", "label": "Submitted", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+      { "value": "under_review", "label": "Under Review", "labelEn": "Under Review", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
+      { "value": "implemented", "label": "Implemented", "labelEn": "Implemented", "allowedTransitionsFrom": ["approved"] },
+      { "value": "verified", "label": "Verified", "labelEn": "Verified", "allowedTransitionsFrom": ["implemented"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["verified", "draft", "submitted", "under_review", "approved", "implemented"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["closed", "draft", "submitted", "under_review", "approved", "implemented", "verified"] }
+    ],
+    "commands": [
+      { "command": "schedule", "targetState": "submitted", "description": "Schedule the audit with governed scope and ownership.", "idempotencyScope": "resource+transition" },
+      { "command": "start", "targetState": "under_review", "description": "Start audit execution and evidence capture.", "idempotencyScope": "resource+transition" },
+      { "command": "approve_plan", "targetState": "approved", "description": "Approve the audit plan and finding criteria.", "idempotencyScope": "resource+transition", "preconditions": ["scope_and_owner_recorded"] },
+      { "command": "issue_findings", "targetState": "implemented", "description": "Issue findings and track governed responses.", "idempotencyScope": "resource+transition", "preconditions": ["audit_evidence_complete"] },
+      { "command": "verify", "targetState": "verified", "description": "Verify that findings were effectively addressed.", "idempotencyScope": "resource+transition", "preconditions": ["closeout_evidence_complete"] },
+      { "command": "close", "targetState": "closed", "description": "Close the audit after findings and follow-up are complete.", "idempotencyScope": "resource+transition" },
+      { "command": "reject", "targetState": "rejected", "description": "Reject the audit package or closure path under governed reason.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.compliance-obligations"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.corrective-actions",
+      "quality_improvement.improvement-actions"
+    ],
+    "keyRelationships": [
+      "qual_audit_program_id -> improvement_projects.source_record_id"
+    ],
+    "events": [
+      { "eventName": "scheduled", "description": "Audit program was scheduled under governed scope." },
+      { "eventName": "started", "description": "Audit program entered active execution." },
+      { "eventName": "findings-issued", "description": "Audit findings were recorded and released." },
+      { "eventName": "closed", "description": "Audit program was closed with retained evidence." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_lab.qual_audit_programs.* while canonical naming remains quality_improvement.audit-programs."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "audit_program",
+      "audit_programs",
+      "internal_audits"
+    ],
+    "notes": [
+      "Legacy audit naming remains only as compatibility trace while the canonical business object stays audit-programs."
+    ]
+  },
+  "invariants": [
+    "An audit program must retain scope, owner, and objective before execution.",
+    "Closed audits must preserve finding and closeout evidence.",
+    "Systemic findings should trace to CAPA or improvement follow-up."
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.improvement-actions",
+  "canonicalName": "improvement_projects",
+  "displayName": "Improvement Actions",
+  "purpose": "Control lean improvement intake, approval, implementation, verification, and closure so kaizen and systemic improvement work produces auditable benefit instead of unmanaged ideas.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "continuous_improvement",
+  "storage": {
+    "primaryTable": "improvement_projects",
+    "primaryKey": "improvement_id",
+    "statusField": "improvement_status",
+    "childTables": [
+      "improvement_action_tasks"
+    ],
+    "legacyTables": [
+      "continuous_improvements",
+      "improvement_actions",
+      "kaizen_actions"
+    ]
+  },
+  "identity": {
+    "strategy": "improvement_code",
+    "naturalKeys": [
+      "improvement_code"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "improvement_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "pdca",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "problem_statement",
+      "implemented_countermeasure",
+      "benefit_verification"
+    ],
+    "kpiSignals": [
+      "kaizen_cycle_time",
+      "realized_benefit_rate",
+      "improvement_reopen_rate"
+    ],
+    "autoAuditChecks": [
+      "approved_improvements_must_have_owner_and_target_kpi",
+      "verified_improvements_must_show_benefit_or_learning",
+      "closed_improvements_must_preserve_before_after_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + improvement_projects_improvement_status_set",
+    "stateModelKey": "improvement_projects_improvement_status_set",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "submitted", "label": "Submitted", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+      { "value": "under_review", "label": "Under Review", "labelEn": "Under Review", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
+      { "value": "implemented", "label": "Implemented", "labelEn": "Implemented", "allowedTransitionsFrom": ["approved", "on_hold"] },
+      { "value": "on_hold", "label": "On Hold", "labelEn": "On Hold", "allowedTransitionsFrom": ["submitted", "under_review", "approved", "implemented"] },
+      { "value": "verified", "label": "Verified", "labelEn": "Verified", "allowedTransitionsFrom": ["implemented"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["verified"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["submitted", "under_review"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["closed", "rejected"] }
+    ],
+    "commands": [
+      { "command": "submit", "targetState": "submitted", "description": "Submit an improvement proposal with problem statement and target KPI.", "idempotencyScope": "resource+transition" },
+      { "command": "review", "targetState": "under_review", "description": "Start governance review for feasibility and value impact.", "idempotencyScope": "resource+transition" },
+      { "command": "approve", "targetState": "approved", "description": "Approve the improvement for execution.", "idempotencyScope": "resource+transition", "preconditions": ["owner_and_target_kpi_recorded"] },
+      { "command": "implement", "targetState": "implemented", "description": "Execute the approved countermeasure or kaizen action.", "idempotencyScope": "resource+transition" },
+      { "command": "hold", "targetState": "on_hold", "description": "Pause the improvement with governed reason and recovery plan.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "verify", "targetState": "verified", "description": "Verify realized benefit or learning after implementation.", "idempotencyScope": "resource+transition", "preconditions": ["implementation_evidence_complete"] },
+      { "command": "close", "targetState": "closed", "description": "Close the improvement after verification and benefit confirmation.", "idempotencyScope": "resource+transition", "preconditions": ["benefit_verification_complete"] },
+      { "command": "reject", "targetState": "rejected", "description": "Reject an improvement that does not meet value or readiness criteria.", "idempotencyScope": "resource+transition" },
+      { "command": "archive", "targetState": "archived", "description": "Archive a closed or rejected improvement under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "quality_improvement.audit-programs",
+      "quality_improvement.nonconformances",
+      "quality_improvement.corrective-actions"
+    ],
+    "downstreamObjects": [
+      "maintenance_ehs.five-s-audits",
+      "analytics.plant-performance-snapshots"
+    ],
+    "keyRelationships": [
+      "source_record_id -> qual_audit_programs.qual_audit_program_id",
+      "source_ncr_id -> ncr_records.ncr_id"
+    ],
+    "events": [
+      { "eventName": "submitted", "description": "Improvement action entered governed review." },
+      { "eventName": "approved", "description": "Improvement action was approved for implementation." },
+      { "eventName": "implemented", "description": "Improvement action implementation was completed." },
+      { "eventName": "verified", "description": "Improvement action benefit or learning was verified." },
+      { "eventName": "closed", "description": "Improvement action was closed with retained evidence." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is audit_risk.improvement_projects.* while canonical naming remains quality_improvement.improvement-actions."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "continuous_improvements",
+      "improvement_actions",
+      "kaizen_actions"
+    ],
+    "notes": [
+      "Legacy improvement naming remains only as compatibility trace while the canonical business name is improvement-actions."
+    ]
+  },
+  "invariants": [
+    "Approved improvements must retain owner, target KPI, and expected benefit.",
+    "Verified improvements must preserve before-and-after evidence or documented learning.",
+    "Closed improvements must keep trace back to the originating audit, NCR, or CI signal."
+  ]
+}

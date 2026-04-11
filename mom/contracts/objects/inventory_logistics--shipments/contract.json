@@ -1,0 +1,118 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.shipments",
+  "canonicalName": "shipments",
+  "displayName": "Shipments",
+  "purpose": "Control outbound release, dispatch, delivery confirmation, and closure so OTIF and export-release truth stay governed from shipment creation to proof of delivery.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "shipping_and_logistics",
+  "storage": {
+    "primaryTable": "shipments",
+    "primaryKey": "shipment_id",
+    "statusField": "shipment_status",
+    "childTables": [
+      "shipment_lines",
+      "shipment_packages"
+    ],
+    "legacyTables": [
+      "shipping_records",
+      "tms_shipments"
+    ]
+  },
+  "identity": {
+    "strategy": "shipment_id",
+    "naturalKeys": [
+      "shipment_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "release_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "otif_review",
+    "retentionClass": "shipping_record_7y",
+    "evidenceRequirements": [
+      "release_clearance",
+      "dispatch_trace",
+      "proof_of_delivery"
+    ],
+    "kpiSignals": [
+      "otif_rate",
+      "shipment_hold_rate",
+      "proof_of_delivery_cycle_time"
+    ],
+    "autoAuditChecks": [
+      "cannot_release_without_gate_clearance",
+      "delivered_shipments_must_preserve_pod",
+      "cancelled_shipments_must_not_leave_active_freight_or_invoice_truth"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + tms_shipments_shipment_status",
+    "stateModelKey": "tms_shipments_shipment_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "planned", "label": "Planned", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+      { "value": "blocked", "label": "Blocked", "labelEn": "Blocked", "allowedTransitionsFrom": ["planned", "ready", "released"] },
+      { "value": "ready", "label": "Ready", "labelEn": "Ready", "allowedTransitionsFrom": ["planned", "blocked"] },
+      { "value": "released", "label": "Released", "labelEn": "Released", "allowedTransitionsFrom": ["ready"] },
+      { "value": "dispatched", "label": "Dispatched", "labelEn": "Dispatched", "allowedTransitionsFrom": ["released"] },
+      { "value": "delivered", "label": "Delivered", "labelEn": "Delivered", "allowedTransitionsFrom": ["dispatched"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["delivered"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "blocked", "ready", "released"] }
+    ],
+    "commands": [
+      { "command": "prepare", "targetState": "ready", "description": "Prepare shipment after all release prerequisites are complete.", "idempotencyScope": "resource+transition" },
+      { "command": "release", "targetState": "released", "description": "Release the shipment for dispatch.", "idempotencyScope": "resource+transition", "preconditions": ["shipment_gate_passed"] },
+      { "command": "dispatch", "targetState": "dispatched", "description": "Dispatch the shipment to logistics execution.", "idempotencyScope": "resource+transition" },
+      { "command": "deliver", "targetState": "delivered", "description": "Record proof of delivery.", "idempotencyScope": "resource+transition", "preconditions": ["proof_of_delivery_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the shipment after delivery confirmation and reconciliation.", "idempotencyScope": "resource+transition" },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the shipment before final delivery.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.sales-orders",
+      "planning_production.work-orders",
+      "quality_improvement.oqc-inspections"
+    ],
+    "downstreamObjects": [
+      "finance.ar-invoices",
+      "inventory_logistics.freight-orders",
+      "inventory_logistics.customer-returns"
+    ],
+    "keyRelationships": [
+      "sales_order_id -> sales_orders.sales_order_id",
+      "shipment_id -> customer_returns.original_shipment_id"
+    ],
+    "events": [
+      { "eventName": "ready", "description": "Shipment became ready for release." },
+      { "eventName": "released", "description": "Shipment was released to dispatch." },
+      { "eventName": "dispatched", "description": "Shipment entered transport execution." },
+      { "eventName": "delivered", "description": "Shipment reached delivered state with proof." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is shipping_compliance.shipments.* while canonical naming remains inventory_logistics.shipments."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "shipping_records",
+      "tms_shipments"
+    ],
+    "notes": [
+      "tms_shipments remains part of compatibility lineage, but shipments is the current business object to preserve for frontend/backend reasoning."
+    ]
+  },
+  "invariants": [
+    "A shipment cannot release without shipment-gate clearance.",
+    "Delivered shipments must retain proof of delivery.",
+    "Cancelled shipments must not leave downstream finance or freight truth orphaned."
+  ]
+}

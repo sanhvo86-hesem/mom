@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.assets",
+  "canonicalName": "assets",
+  "displayName": "Assets",
+  "purpose": "Provide a canonical asset identity so finance, maintenance, and customer-installed asset references do not split into separate truths.",
+  "ownerDomain": "master_data",
+  "objectRole": "reference_master",
+  "ownerTeam": "asset_governance",
+  "storage": {
+    "primaryTable": "assets",
+    "primaryKey": "asset_id",
+    "statusField": "asset_status",
+    "childTables": [
+      "asset_locations",
+      "asset_books"
+    ],
+    "legacyTables": [
+      "fin_fixed_assets",
+      "svc_customer_assets",
+      "pm_equipment_master"
+    ]
+  },
+  "identity": {
+    "strategy": "asset_id",
+    "naturalKeys": [
+      "asset_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "asset_review",
+    "retentionClass": "asset_record_10y",
+    "evidenceRequirements": [
+      "asset_identity",
+      "location_or_owner_trace",
+      "retirement_or_disposal_reason"
+    ],
+    "kpiSignals": [
+      "asset_utilization",
+      "asset_transfer_rate",
+      "asset_retirement_accuracy"
+    ],
+    "autoAuditChecks": [
+      "active_assets_must_have_current_location_or_owner_context",
+      "retired_assets_must_not_remain schedulable or capitalizable",
+      "disposed_assets_must_preserve financial_and_operational_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "compatibility_bridge",
+    "source": "fin_fixed_assets_asset_status compatibility bridge",
+    "stateModelKey": "master_data_assets_bridge",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "active", "label": "Active", "labelEn": "Active", "allowedTransitionsFrom": [] },
+      { "value": "on_hold", "label": "On Hold", "labelEn": "On Hold", "allowedTransitionsFrom": ["active"] },
+      { "value": "retired", "label": "Retired", "labelEn": "Retired", "allowedTransitionsFrom": ["active", "on_hold"] },
+      { "value": "disposed", "label": "Disposed", "labelEn": "Disposed", "allowedTransitionsFrom": ["retired", "on_hold"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["disposed"] }
+    ],
+    "commands": [
+      { "command": "hold", "targetState": "on_hold", "description": "Place an asset on governed hold.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] },
+      { "command": "retire", "targetState": "retired", "description": "Retire the asset from active service.", "idempotencyScope": "resource+transition", "preconditions": ["retirement_reason_recorded"] },
+      { "command": "dispose", "targetState": "disposed", "description": "Dispose the asset with preserved financial and operational trace.", "idempotencyScope": "resource+transition", "preconditions": ["disposal_trace_complete"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive a disposed asset under retention policy.", "idempotencyScope": "resource+transition" }
+    ],
+    "notes": [
+      "Canonical asset identity is still partially bridged from finance and service asset legacy surfaces until a dedicated unified asset runtime is completed."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "finance.fixed-asset-capitalizations"
+    ],
+    "downstreamObjects": [
+      "maintenance_ehs.maintenance-work-orders"
+    ],
+    "keyRelationships": [
+      "asset_id -> fixed_asset_capitalizations.asset_id",
+      "asset_id -> maintenance_work_orders.asset_id"
+    ],
+    "events": [
+      { "eventName": "held", "description": "Asset entered governed hold." },
+      { "eventName": "retired", "description": "Asset was retired from active service." },
+      { "eventName": "disposed", "description": "Asset disposal was recorded." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_bridge_only",
+    "notes": [
+      "No single native asset runtime surface is active yet. This package provides the canonical asset meaning across finance, maintenance, and service legacy surfaces."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "fin_fixed_assets",
+      "svc_customer_assets",
+      "pm_equipment_master"
+    ],
+    "notes": [
+      "These legacy surfaces continue to exist for safe migration, but they must not compete as separate asset truths."
+    ]
+  },
+  "invariants": [
+    "Asset identity must remain stable across finance, maintenance, and service contexts.",
+    "Disposed assets must preserve financial and operational lineage.",
+    "Retired assets must not remain available for new work or capitalization."
+  ]
+}

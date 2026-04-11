@@ -1,0 +1,119 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.inventory-movements",
+  "canonicalName": "inventory_movements",
+  "displayName": "Inventory Movements",
+  "purpose": "Controls movement posting, hold, and reversal so inventory truth remains reconcilable under corrections and audit.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "inventory_control",
+  "storage": {
+    "primaryTable": "inventory_movements",
+    "primaryKey": "inventory_movement_id",
+    "statusField": "movement_status",
+    "childTables": [
+      "inventory_movement_lines"
+    ],
+    "legacyTables": [
+      "inventory_transactions",
+      "wms_transfer_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "txn_id+recorded_at",
+    "naturalKeys": [
+      "txn_id",
+      "recorded_at"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "inventory_reconciliation",
+    "retentionClass": "inventory_record_7y",
+    "evidenceRequirements": [
+      "movement_reference",
+      "stock_effect_trace",
+      "reversal_or_hold_reason"
+    ],
+    "kpiSignals": [
+      "posting_cycle_time",
+      "movement_reversal_rate",
+      "inventory_adjustment_accuracy"
+    ],
+    "autoAuditChecks": [
+      "posted_movements_must_preserve_reference_trace",
+      "reversed_movements_must_preserve_correction_reason",
+      "held_movements_must_not_leak_unreconciled_stock_effects"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "inventory_transactions_posting_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "pending_review", "label": "Chờ xem xét", "labelEn": "Pending Review", "allowedTransitionsFrom": ["draft", "on_hold"] },
+      { "value": "posted", "label": "Đã ghi nhận", "labelEn": "Posted", "allowedTransitionsFrom": ["pending_review"] },
+      { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["draft", "pending_review", "posted"] },
+      { "value": "reversed", "label": "Đảo giao dịch", "labelEn": "Reversed", "allowedTransitionsFrom": ["posted", "on_hold"] },
+      { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "pending_review"] }
+    ],
+    "commands": [
+      { "command": "submit_for_review", "targetState": "pending_review", "description": "Submit the movement for governed stock-effect review.", "idempotencyScope": "resource+transition" },
+      { "command": "post", "targetState": "posted", "description": "Post the movement into governed inventory truth.", "idempotencyScope": "resource+transition", "preconditions": ["reference_and_quantity_complete"] },
+      { "command": "hold", "targetState": "on_hold", "description": "Hold the movement under reconciliation or quality concern.", "idempotencyScope": "resource+transition" },
+      { "command": "reverse", "targetState": "reversed", "description": "Reverse the posted movement under controlled correction.", "idempotencyScope": "resource+transition", "preconditions": ["correction_reason_recorded"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the movement before posting.", "idempotencyScope": "resource+transition", "preconditions": ["cancellation_reason_recorded"] }
+    ],
+    "notes": [
+      "Canonical inventory-movements still rides the inventory.inventory_transactions runtime surface while contract naming converges around inventory truth."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.inventory-items",
+      "inventory_logistics.warehouses",
+      "planning_production.work-orders",
+      "procurement_supplier_quality.purchase-receipts"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.nonconformances"
+    ],
+    "keyRelationships": [
+      "warehouse_id -> warehouses.warehouse_id",
+      "work_order_id -> work_orders.work_order_id",
+      "purchase_receipt_id -> purchase_receipts.purchase_receipt_id"
+    ],
+    "events": [
+      { "eventName": "pending_review", "description": "Inventory movement entered controlled review." },
+      { "eventName": "posted", "description": "Inventory movement posted into stock truth." },
+      { "eventName": "on_hold", "description": "Inventory movement was placed on hold." },
+      { "eventName": "reversed", "description": "Inventory movement was reversed under correction control." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is inventory.inventory_transactions.* while canonical naming remains inventory_logistics.inventory-movements."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "inventory_transactions",
+      "wms_transfer_orders",
+      "posting_status"
+    ],
+    "notes": [
+      "Legacy inventory transaction naming remains the API surface. The canonical contract makes correction and reconciliation semantics explicit."
+    ]
+  },
+  "invariants": [
+    "Posted inventory movements must preserve the source reference and stock effect trace.",
+    "Reversed inventory movements must retain governed correction evidence.",
+    "Held inventory movements must not silently remain unreconciled in downstream stock truth."
+  ]
+}

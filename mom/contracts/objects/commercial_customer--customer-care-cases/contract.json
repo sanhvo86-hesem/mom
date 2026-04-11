@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "canonicalResource": "commercial_customer.customer-care-cases",
+  "canonicalName": "customer_care_cases",
+  "displayName": "Customer Care Cases",
+  "purpose": "Control customer complaint, follow-up, escalation, and closure so service issues remain governed and traceable instead of disappearing into touchpoint notes.",
+  "ownerDomain": "commercial_customer",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "customer_success",
+  "storage": {
+    "primaryTable": "crm_customer_touchpoints",
+    "primaryKey": "crm_customer_touchpoint_id",
+    "statusField": "touchpoint_status",
+    "childTables": [
+      "customer_care_case_actions",
+      "customer_care_case_events"
+    ],
+    "legacyTables": [
+      "customer_complaints"
+    ]
+  },
+  "identity": {
+    "strategy": "crm_customer_touchpoint_id",
+    "naturalKeys": [
+      "crm_customer_touchpoint_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "service_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "customer_feedback",
+    "retentionClass": "customer_service_record_7y",
+    "evidenceRequirements": [
+      "customer_issue_trace",
+      "service_action_log",
+      "closure_confirmation"
+    ],
+    "kpiSignals": [
+      "case_acknowledgement_lead_time",
+      "case_closure_lead_time",
+      "repeat_complaint_rate"
+    ],
+    "autoAuditChecks": [
+      "escalated_cases_must_have_owner",
+      "closed_cases_must_have_resolution_evidence",
+      "service_issues_requiring_return_or_ncr_must_link_downstream_records"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + crm_customer_touchpoints_touchpoint_status",
+    "stateModelKey": "crm_customer_touchpoints_touchpoint_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "open", "label": "Open", "labelEn": "Open", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "In Progress", "labelEn": "In Progress", "allowedTransitionsFrom": ["open", "waiting_customer", "escalated"] },
+      { "value": "waiting_customer", "label": "Waiting Customer", "labelEn": "Waiting Customer", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "escalated", "label": "Escalated", "labelEn": "Escalated", "allowedTransitionsFrom": ["open", "in_progress", "waiting_customer"] },
+      { "value": "resolved", "label": "Resolved", "labelEn": "Resolved", "allowedTransitionsFrom": ["in_progress", "escalated"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["resolved"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+    ],
+    "commands": [
+      { "command": "start_work", "targetState": "in_progress", "description": "Assign and start active customer-care handling.", "idempotencyScope": "resource+transition" },
+      { "command": "wait_for_customer", "targetState": "waiting_customer", "description": "Pause the case pending customer response or evidence.", "idempotencyScope": "resource+transition" },
+      { "command": "escalate", "targetState": "escalated", "description": "Escalate the case for higher-level attention.", "idempotencyScope": "resource+transition", "preconditions": ["escalation_reason_recorded"] },
+      { "command": "resolve", "targetState": "resolved", "description": "Record service resolution against the case.", "idempotencyScope": "resource+transition", "preconditions": ["resolution_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the case after the resolution is confirmed.", "idempotencyScope": "resource+transition", "preconditions": ["customer_or_internal_confirmation"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive a closed customer-care case under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.customers",
+      "commercial_customer.sales-orders"
+    ],
+    "downstreamObjects": [
+      "inventory_logistics.customer-returns",
+      "quality_improvement.nonconformances",
+      "quality_improvement.corrective-actions"
+    ],
+    "keyRelationships": [
+      "customer_id -> customers.customer_id",
+      "sales_order_id -> sales_orders.sales_order_id"
+    ],
+    "events": [
+      { "eventName": "started", "description": "Customer-care case entered active handling." },
+      { "eventName": "escalated", "description": "Customer-care case was escalated." },
+      { "eventName": "resolved", "description": "Customer-care case recorded a resolution." },
+      { "eventName": "closed", "description": "Customer-care case was closed." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The current runtime surface remains crm.crm_customer_touchpoints.* while the canonical business name is customer-care-cases."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "crm_customer_touchpoints",
+      "customer_complaints"
+    ],
+    "notes": [
+      "crm_customer_touchpoints is still the live storage/runtime owner. The authored package makes the business-case meaning explicit without requiring a data move."
+    ]
+  },
+  "invariants": [
+    "Closed customer-care cases must retain resolution evidence.",
+    "Escalated cases must keep clear owner assignment.",
+    "Cases that require return, NCR, or CAPA must preserve downstream trace."
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.equipment",
+  "canonicalName": "equipment",
+  "displayName": "Equipment",
+  "purpose": "Controls equipment qualification, lockout, and usable-machine release before maintenance, calibration, and production execution.",
+  "ownerDomain": "master_data",
+  "objectRole": "reference_master",
+  "ownerTeam": "maintenance_engineering",
+  "storage": {
+    "primaryTable": "equipment",
+    "primaryKey": "equipment_id",
+    "statusField": "equipment_status",
+    "childTables": [
+      "equipment_components"
+    ],
+    "legacyTables": [
+      "equipment",
+      "pm_equipment_master"
+    ]
+  },
+  "identity": {
+    "strategy": "equipment_id",
+    "naturalKeys": [
+      "equipment_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "maintenance_review",
+    "retentionClass": "asset_record_10y",
+    "evidenceRequirements": [
+      "equipment_configuration",
+      "qualification_or_commissioning_basis",
+      "lockout_or_retirement_reason"
+    ],
+    "kpiSignals": [
+      "equipment_qualification_lead_time",
+      "lockout_frequency",
+      "equipment_availability"
+    ],
+    "autoAuditChecks": [
+      "active_equipment_must_have_qualification_or_release_basis",
+      "lockout_equipment_must_not_remain_dispatch_eligible",
+      "retired_equipment_must_not_keep_live_pm_or_execution_release"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "equipment_equipment_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "commissioning", "label": "Đang nghiệm thu", "labelEn": "Commissioning", "allowedTransitionsFrom": [] },
+      { "value": "qualified", "label": "Đủ điều kiện", "labelEn": "Qualified", "allowedTransitionsFrom": ["commissioning", "on_hold"] },
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["qualified", "on_hold", "lockout"] },
+      { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["active", "qualified"] },
+      { "value": "lockout", "label": "Khóa an toàn", "labelEn": "Lockout", "allowedTransitionsFrom": ["active", "on_hold"] },
+      { "value": "retired", "label": "Ngừng sử dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["active", "lockout", "on_hold"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+    ],
+    "commands": [
+      { "command": "qualify", "targetState": "qualified", "description": "Qualify the equipment for governed operational use.", "idempotencyScope": "resource+transition", "preconditions": ["commissioning_basis_complete"] },
+      { "command": "activate", "targetState": "active", "description": "Release qualified equipment into active operational use.", "idempotencyScope": "resource+transition", "preconditions": ["qualification_recorded"] },
+      { "command": "hold", "targetState": "on_hold", "description": "Place equipment on hold under governed operational restriction.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "lockout", "targetState": "lockout", "description": "Apply lockout to prevent unsafe operational use.", "idempotencyScope": "resource+transition", "preconditions": ["lockout_reason_recorded"] },
+      { "command": "retire", "targetState": "retired", "description": "Retire the equipment from future maintenance and execution release.", "idempotencyScope": "resource+transition", "preconditions": ["retirement_reason_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive retired equipment under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "maintenance_ehs.maintenance-plans",
+      "maintenance_ehs.maintenance-work-orders",
+      "planning_production.dispatch-lists"
+    ],
+    "keyRelationships": [
+      "equipment_id -> pm_maintenance_plans.equipment_id",
+      "equipment_id -> pm_work_orders.equipment_id",
+      "equipment_id -> pm_equipment_master.equipment_id"
+    ],
+    "events": [
+      { "eventName": "qualified", "description": "Equipment qualification completed." },
+      { "eventName": "active", "description": "Equipment was released for active operational use." },
+      { "eventName": "lockout", "description": "Equipment entered lockout state." },
+      { "eventName": "retired", "description": "Equipment was retired from active use." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is calibration_equipment.equipment.* while canonical naming remains master_data.equipment."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "equipment",
+      "pm_equipment_master",
+      "equipment_status"
+    ],
+    "notes": [
+      "Legacy calibration and PM equipment naming remains for compatibility. The canonical contract prevents equipment identity and release rules from splitting across domains."
+    ]
+  },
+  "invariants": [
+    "Active equipment must retain qualification or commissioning basis.",
+    "Locked-out equipment must not remain available for dispatch or maintenance release without governed override.",
+    "Retired equipment must not continue feeding PM or execution release loops."
+  ]
+}

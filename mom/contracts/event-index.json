@@ -1,0 +1,2200 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "description": "Canonical event inventory for ERP+MOM business objects using CloudEvents-compatible type naming.",
+    "eventCount": 219
+  },
+  "events": [
+    {
+      "key": "analytics.inventory-balance-snapshots.refreshed",
+      "canonicalResource": "analytics.inventory-balance-snapshots",
+      "eventName": "refreshed",
+      "cloudeventType": "hesem.analytics.inventory-balance-snapshots.refreshed",
+      "classification": "projection",
+      "storageTable": "inventory_balance_snapshot",
+      "purpose": "Inventory balance snapshot projection was refreshed from transactional truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "analytics.mes-oee-snapshots.refreshed",
+      "canonicalResource": "analytics.mes-oee-snapshots",
+      "eventName": "refreshed",
+      "cloudeventType": "hesem.analytics.mes-oee-snapshots.refreshed",
+      "classification": "projection",
+      "storageTable": "mes_oee_snapshots",
+      "purpose": "MES OEE snapshot projection was refreshed from execution truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "analytics.plant-performance-snapshots.refreshed",
+      "canonicalResource": "analytics.plant-performance-snapshots",
+      "eventName": "refreshed",
+      "cloudeventType": "hesem.analytics.plant-performance-snapshots.refreshed",
+      "classification": "projection",
+      "storageTable": "plant_performance_snapshots",
+      "purpose": "Plant performance snapshot projection was refreshed from governed KPI sources.",
+      "source": "authored_package"
+    },
+    {
+      "key": "analytics.production-bom-snapshots.refreshed",
+      "canonicalResource": "analytics.production-bom-snapshots",
+      "eventName": "refreshed",
+      "cloudeventType": "hesem.analytics.production-bom-snapshots.refreshed",
+      "classification": "projection",
+      "storageTable": "production_order_bom_snapshot",
+      "purpose": "Production BOM snapshot was refreshed from released order truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "analytics.production-route-snapshots.refreshed",
+      "canonicalResource": "analytics.production-route-snapshots",
+      "eventName": "refreshed",
+      "cloudeventType": "hesem.analytics.production-route-snapshots.refreshed",
+      "classification": "projection",
+      "storageTable": "production_order_route_snapshot",
+      "purpose": "Production route snapshot was refreshed from released order truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases.closed",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "eventName": "closed",
+      "cloudeventType": "hesem.commercial_customer.customer-care-cases.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "purpose": "Customer-care case was closed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases.escalated",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "eventName": "escalated",
+      "cloudeventType": "hesem.commercial_customer.customer-care-cases.escalated",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "purpose": "Customer-care case was escalated.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases.resolved",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "eventName": "resolved",
+      "cloudeventType": "hesem.commercial_customer.customer-care-cases.resolved",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "purpose": "Customer-care case recorded a resolution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases.started",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "eventName": "started",
+      "cloudeventType": "hesem.commercial_customer.customer-care-cases.started",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "purpose": "Customer-care case entered active handling.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders.acknowledged",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "eventName": "acknowledged",
+      "cloudeventType": "hesem.commercial_customer.customer-purchase-orders.acknowledged",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "purpose": "Commercial team acknowledged the customer PO.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders.closed",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "eventName": "closed",
+      "cloudeventType": "hesem.commercial_customer.customer-purchase-orders.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "purpose": "Customer PO was closed after linked fulfillment reached terminal state.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders.confirmed",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "eventName": "confirmed",
+      "cloudeventType": "hesem.commercial_customer.customer-purchase-orders.confirmed",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "purpose": "Customer PO was confirmed against linked sales-order demand.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders.received",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "eventName": "received",
+      "cloudeventType": "hesem.commercial_customer.customer-purchase-orders.received",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "purpose": "Customer PO was captured into governed commercial demand.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations.accepted",
+      "canonicalResource": "commercial_customer.quotations",
+      "eventName": "accepted",
+      "cloudeventType": "hesem.commercial_customer.quotations.accepted",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "purpose": "Quotation was accepted by the customer.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations.converted",
+      "canonicalResource": "commercial_customer.quotations",
+      "eventName": "converted",
+      "cloudeventType": "hesem.commercial_customer.quotations.converted",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "purpose": "Quotation was converted into a sales order.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations.revised",
+      "canonicalResource": "commercial_customer.quotations",
+      "eventName": "revised",
+      "cloudeventType": "hesem.commercial_customer.quotations.revised",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "purpose": "Quotation re-entered controlled revision.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations.sent",
+      "canonicalResource": "commercial_customer.quotations",
+      "eventName": "sent",
+      "cloudeventType": "hesem.commercial_customer.quotations.sent",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "purpose": "Quotation was released to the customer.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quote-effectiveness-reviews.recorded",
+      "canonicalResource": "commercial_customer.quote-effectiveness-reviews",
+      "eventName": "recorded",
+      "cloudeventType": "hesem.commercial_customer.quote-effectiveness-reviews.recorded",
+      "classification": "assessment_record",
+      "storageTable": "qual_effectiveness_reviews",
+      "purpose": "Quote effectiveness review was recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quote-effectiveness-reviews.updated",
+      "canonicalResource": "commercial_customer.quote-effectiveness-reviews",
+      "eventName": "updated",
+      "cloudeventType": "hesem.commercial_customer.quote-effectiveness-reviews.updated",
+      "classification": "assessment_record",
+      "storageTable": "qual_effectiveness_reviews",
+      "purpose": "Quote effectiveness review was updated with additional learning.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders.closed",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "eventName": "closed",
+      "cloudeventType": "hesem.commercial_customer.sales-orders.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "purpose": "Sales order was commercially closed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders.confirmed",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "eventName": "confirmed",
+      "cloudeventType": "hesem.commercial_customer.sales-orders.confirmed",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "purpose": "Sales order was confirmed as executable customer demand.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders.quoted",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "eventName": "quoted",
+      "cloudeventType": "hesem.commercial_customer.sales-orders.quoted",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "purpose": "Sales order entered commercial quotation posture.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders.released-to-production",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "eventName": "released-to-production",
+      "cloudeventType": "hesem.commercial_customer.sales-orders.released-to-production",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "purpose": "Sales order was released into production planning.",
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders.shipped",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "eventName": "shipped",
+      "cloudeventType": "hesem.commercial_customer.sales-orders.shipped",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "purpose": "Sales order shipment was released and completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices.closed",
+      "canonicalResource": "finance.ap-invoices",
+      "eventName": "closed",
+      "cloudeventType": "hesem.finance.ap-invoices.closed",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "purpose": "AP invoice was closed after payment or void.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices.matched",
+      "canonicalResource": "finance.ap-invoices",
+      "eventName": "matched",
+      "cloudeventType": "hesem.finance.ap-invoices.matched",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "purpose": "AP invoice was matched against PO and receipt truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices.paid",
+      "canonicalResource": "finance.ap-invoices",
+      "eventName": "paid",
+      "cloudeventType": "hesem.finance.ap-invoices.paid",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "purpose": "AP invoice payment settlement completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices.posted",
+      "canonicalResource": "finance.ap-invoices",
+      "eventName": "posted",
+      "cloudeventType": "hesem.finance.ap-invoices.posted",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "purpose": "AP invoice was posted into the ledger.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices.closed",
+      "canonicalResource": "finance.ar-invoices",
+      "eventName": "closed",
+      "cloudeventType": "hesem.finance.ar-invoices.closed",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "purpose": "AR invoice was closed after settlement or cancellation.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices.disputed",
+      "canonicalResource": "finance.ar-invoices",
+      "eventName": "disputed",
+      "cloudeventType": "hesem.finance.ar-invoices.disputed",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "purpose": "Customer dispute was raised against the invoice.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices.paid",
+      "canonicalResource": "finance.ar-invoices",
+      "eventName": "paid",
+      "cloudeventType": "hesem.finance.ar-invoices.paid",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "purpose": "Receivable was fully settled.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices.posted",
+      "canonicalResource": "finance.ar-invoices",
+      "eventName": "posted",
+      "cloudeventType": "hesem.finance.ar-invoices.posted",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "purpose": "AR invoice moved into open receivable state.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.backdate-exceptions.approved",
+      "canonicalResource": "finance.backdate-exceptions",
+      "eventName": "approved",
+      "cloudeventType": "hesem.finance.backdate-exceptions.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "backdate_exceptions",
+      "purpose": "Backdate exception was approved and timeboxed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.backdate-exceptions.closed",
+      "canonicalResource": "finance.backdate-exceptions",
+      "eventName": "closed",
+      "cloudeventType": "hesem.finance.backdate-exceptions.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "backdate_exceptions",
+      "purpose": "Backdate exception was closed after governed resolution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.backdate-exceptions.expired",
+      "canonicalResource": "finance.backdate-exceptions",
+      "eventName": "expired",
+      "cloudeventType": "hesem.finance.backdate-exceptions.expired",
+      "classification": "lifecycle_owner",
+      "storageTable": "backdate_exceptions",
+      "purpose": "Backdate exception naturally expired or was expired by control.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.backdate-exceptions.revoked",
+      "canonicalResource": "finance.backdate-exceptions",
+      "eventName": "revoked",
+      "cloudeventType": "hesem.finance.backdate-exceptions.revoked",
+      "classification": "lifecycle_owner",
+      "storageTable": "backdate_exceptions",
+      "purpose": "Backdate exception was revoked before further use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.credit-memos.approved",
+      "canonicalResource": "finance.credit-memos",
+      "eventName": "approved",
+      "cloudeventType": "hesem.finance.credit-memos.approved",
+      "classification": "ledger_document",
+      "storageTable": "credit_memos",
+      "purpose": "Credit memo was approved and recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.debit-memos.approved",
+      "canonicalResource": "finance.debit-memos",
+      "eventName": "approved",
+      "cloudeventType": "hesem.finance.debit-memos.approved",
+      "classification": "ledger_document",
+      "storageTable": "debit_memos",
+      "purpose": "Debit memo was approved and recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.fixed-asset-capitalizations.capitalized",
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "eventName": "capitalized",
+      "cloudeventType": "hesem.finance.fixed-asset-capitalizations.capitalized",
+      "classification": "ledger_document",
+      "storageTable": "fixed_asset_capitalizations",
+      "purpose": "Spend was capitalized into governed asset value.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.fixed-asset-capitalizations.posted",
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "eventName": "posted",
+      "cloudeventType": "hesem.finance.fixed-asset-capitalizations.posted",
+      "classification": "ledger_document",
+      "storageTable": "fixed_asset_capitalizations",
+      "purpose": "Capitalization was posted into finance and asset truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.fixed-asset-capitalizations.retired",
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "eventName": "retired",
+      "cloudeventType": "hesem.finance.fixed-asset-capitalizations.retired",
+      "classification": "ledger_document",
+      "storageTable": "fixed_asset_capitalizations",
+      "purpose": "Capitalized asset value was retired from active use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.inventory-valuations.refreshed",
+      "canonicalResource": "finance.inventory-valuations",
+      "eventName": "refreshed",
+      "cloudeventType": "hesem.finance.inventory-valuations.refreshed",
+      "classification": "projection",
+      "storageTable": "inventory_valuations",
+      "purpose": "Inventory valuation projection was refreshed from governed inventory truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.period-closes.closed",
+      "canonicalResource": "finance.period-closes",
+      "eventName": "closed",
+      "cloudeventType": "hesem.finance.period-closes.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "period_close_controls",
+      "purpose": "Accounting period was formally closed for a governed ledger scope.",
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.period-closes.reopened",
+      "canonicalResource": "finance.period-closes",
+      "eventName": "reopened",
+      "cloudeventType": "hesem.finance.period-closes.reopened",
+      "classification": "lifecycle_owner",
+      "storageTable": "period_close_controls",
+      "purpose": "Accounting period was reopened under governed exception handling.",
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions.closed",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "eventName": "closed",
+      "cloudeventType": "hesem.integration_resilience.reconciliation-exceptions.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "purpose": "Reconciliation exception was closed after recovery.",
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions.compensated",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "eventName": "compensated",
+      "cloudeventType": "hesem.integration_resilience.reconciliation-exceptions.compensated",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "purpose": "Compensating action was recorded against the exception.",
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions.opened",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "eventName": "opened",
+      "cloudeventType": "hesem.integration_resilience.reconciliation-exceptions.opened",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "purpose": "Integration exception was registered from reconciliation drift.",
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions.retry",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "eventName": "retry",
+      "cloudeventType": "hesem.integration_resilience.reconciliation-exceptions.retry",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "purpose": "A retry or replay attempt was initiated.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns.authorized",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "eventName": "authorized",
+      "cloudeventType": "hesem.inventory_logistics.customer-returns.authorized",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "purpose": "Customer return was authorized.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns.closed",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "eventName": "closed",
+      "cloudeventType": "hesem.inventory_logistics.customer-returns.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "purpose": "Customer return reached terminal closure.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns.evaluated",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "eventName": "evaluated",
+      "cloudeventType": "hesem.inventory_logistics.customer-returns.evaluated",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "purpose": "Customer return entered evaluation.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns.received",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "eventName": "received",
+      "cloudeventType": "hesem.inventory_logistics.customer-returns.received",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "purpose": "Customer return was physically received.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.cycle-count-plans.completed",
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "eventName": "completed",
+      "cloudeventType": "hesem.inventory_logistics.cycle-count-plans.completed",
+      "classification": "lifecycle_owner",
+      "storageTable": "wms_cycle_count_plans",
+      "purpose": "Cycle-count plan was completed with governed results.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.cycle-count-plans.paused",
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "eventName": "paused",
+      "cloudeventType": "hesem.inventory_logistics.cycle-count-plans.paused",
+      "classification": "lifecycle_owner",
+      "storageTable": "wms_cycle_count_plans",
+      "purpose": "Cycle-count plan was paused.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.cycle-count-plans.published",
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "eventName": "published",
+      "cloudeventType": "hesem.inventory_logistics.cycle-count-plans.published",
+      "classification": "lifecycle_owner",
+      "storageTable": "wms_cycle_count_plans",
+      "purpose": "Cycle-count plan was released for counting.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders.booked",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "eventName": "booked",
+      "cloudeventType": "hesem.inventory_logistics.freight-orders.booked",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "purpose": "Freight order was booked with a controlled carrier commitment.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders.closed",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "eventName": "closed",
+      "cloudeventType": "hesem.inventory_logistics.freight-orders.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "purpose": "Freight order was closed after reconciliation.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders.delivered",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "eventName": "delivered",
+      "cloudeventType": "hesem.inventory_logistics.freight-orders.delivered",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "purpose": "Freight order recorded delivery completion.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders.in_transit",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "eventName": "in_transit",
+      "cloudeventType": "hesem.inventory_logistics.freight-orders.in_transit",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "purpose": "Freight order entered in-transit execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items.active",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "eventName": "active",
+      "cloudeventType": "hesem.inventory_logistics.inventory-items.active",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "purpose": "Item was released for operational use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items.engineering",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "eventName": "engineering",
+      "cloudeventType": "hesem.inventory_logistics.inventory-items.engineering",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "purpose": "Item entered engineering-controlled state.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items.inactive",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "eventName": "inactive",
+      "cloudeventType": "hesem.inventory_logistics.inventory-items.inactive",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "purpose": "Item was blocked from new operational use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items.obsolete",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "eventName": "obsolete",
+      "cloudeventType": "hesem.inventory_logistics.inventory-items.obsolete",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "purpose": "Item was retired under obsolescence governance.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements.on_hold",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "eventName": "on_hold",
+      "cloudeventType": "hesem.inventory_logistics.inventory-movements.on_hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "purpose": "Inventory movement was placed on hold.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements.pending_review",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "eventName": "pending_review",
+      "cloudeventType": "hesem.inventory_logistics.inventory-movements.pending_review",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "purpose": "Inventory movement entered controlled review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements.posted",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "eventName": "posted",
+      "cloudeventType": "hesem.inventory_logistics.inventory-movements.posted",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "purpose": "Inventory movement posted into stock truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements.reversed",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "eventName": "reversed",
+      "cloudeventType": "hesem.inventory_logistics.inventory-movements.reversed",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "purpose": "Inventory movement was reversed under correction control.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments.delivered",
+      "canonicalResource": "inventory_logistics.shipments",
+      "eventName": "delivered",
+      "cloudeventType": "hesem.inventory_logistics.shipments.delivered",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "purpose": "Shipment reached delivered state with proof.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments.dispatched",
+      "canonicalResource": "inventory_logistics.shipments",
+      "eventName": "dispatched",
+      "cloudeventType": "hesem.inventory_logistics.shipments.dispatched",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "purpose": "Shipment entered transport execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments.ready",
+      "canonicalResource": "inventory_logistics.shipments",
+      "eventName": "ready",
+      "cloudeventType": "hesem.inventory_logistics.shipments.ready",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "purpose": "Shipment became ready for release.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments.released",
+      "canonicalResource": "inventory_logistics.shipments",
+      "eventName": "released",
+      "cloudeventType": "hesem.inventory_logistics.shipments.released",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "purpose": "Shipment was released to dispatch.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.stock-balances.refreshed",
+      "canonicalResource": "inventory_logistics.stock-balances",
+      "eventName": "refreshed",
+      "cloudeventType": "hesem.inventory_logistics.stock-balances.refreshed",
+      "classification": "projection",
+      "storageTable": "stock_balances",
+      "purpose": "Stock balance projection was refreshed from governed inventory movement truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses.active",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "eventName": "active",
+      "cloudeventType": "hesem.inventory_logistics.warehouses.active",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "purpose": "Warehouse was released for operational use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses.archived",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "eventName": "archived",
+      "cloudeventType": "hesem.inventory_logistics.warehouses.archived",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "purpose": "Warehouse was archived from active scope.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses.inactive",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "eventName": "inactive",
+      "cloudeventType": "hesem.inventory_logistics.warehouses.inactive",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "purpose": "Warehouse stopped new operational use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses.on_hold",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "eventName": "on_hold",
+      "cloudeventType": "hesem.inventory_logistics.warehouses.on_hold",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "purpose": "Warehouse entered controlled hold.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits.closed",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "eventName": "closed",
+      "cloudeventType": "hesem.maintenance_ehs.five-s-audits.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "purpose": "5S audit closed under governed lean review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits.follow_up",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "eventName": "follow_up",
+      "cloudeventType": "hesem.maintenance_ehs.five-s-audits.follow_up",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "purpose": "5S audit findings moved into follow-up.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits.in_progress",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "eventName": "in_progress",
+      "cloudeventType": "hesem.maintenance_ehs.five-s-audits.in_progress",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "purpose": "5S audit entered active execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits.verified",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "eventName": "verified",
+      "cloudeventType": "hesem.maintenance_ehs.five-s-audits.verified",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "purpose": "5S audit follow-up was verified.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents.closed",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "eventName": "closed",
+      "cloudeventType": "hesem.maintenance_ehs.incidents.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "purpose": "Incident was closed after corrective action.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents.contained",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "eventName": "contained",
+      "cloudeventType": "hesem.maintenance_ehs.incidents.contained",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "purpose": "Incident containment was recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents.investigating",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "eventName": "investigating",
+      "cloudeventType": "hesem.maintenance_ehs.incidents.investigating",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "purpose": "Incident entered formal investigation.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents.reported",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "eventName": "reported",
+      "cloudeventType": "hesem.maintenance_ehs.incidents.reported",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "purpose": "Incident was reported into the EHS system.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans.active",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "eventName": "active",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-plans.active",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "purpose": "Maintenance plan was released into active scheduling.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans.approved",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "eventName": "approved",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-plans.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "purpose": "Maintenance plan was approved.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans.on_hold",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "eventName": "on_hold",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-plans.on_hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "purpose": "Maintenance plan was placed on hold.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans.retired",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "eventName": "retired",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-plans.retired",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "purpose": "Maintenance plan was retired from future release.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders.cancelled",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "eventName": "cancelled",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-work-orders.cancelled",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "purpose": "Maintenance work order was cancelled.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders.completed",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "eventName": "completed",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-work-orders.completed",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "purpose": "Maintenance work order was completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders.released",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "eventName": "released",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-work-orders.released",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "purpose": "Maintenance work order was released into execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders.started",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "eventName": "started",
+      "cloudeventType": "hesem.maintenance_ehs.maintenance-work-orders.started",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "purpose": "Maintenance work order execution started.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits.active",
+      "canonicalResource": "maintenance_ehs.permits",
+      "eventName": "active",
+      "cloudeventType": "hesem.maintenance_ehs.permits.active",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "purpose": "Permit became active for operational use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits.approved",
+      "canonicalResource": "maintenance_ehs.permits",
+      "eventName": "approved",
+      "cloudeventType": "hesem.maintenance_ehs.permits.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "purpose": "Permit was approved with governed conditions.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits.closed",
+      "canonicalResource": "maintenance_ehs.permits",
+      "eventName": "closed",
+      "cloudeventType": "hesem.maintenance_ehs.permits.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "purpose": "Permit was closed after controlled completion.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits.submitted",
+      "canonicalResource": "maintenance_ehs.permits",
+      "eventName": "submitted",
+      "cloudeventType": "hesem.maintenance_ehs.permits.submitted",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "purpose": "Permit entered approval flow.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations.archived",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "eventName": "archived",
+      "cloudeventType": "hesem.maintenance_ehs.safety-observations.archived",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "purpose": "Safety observation was archived under retention policy.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations.assigned",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "eventName": "assigned",
+      "cloudeventType": "hesem.maintenance_ehs.safety-observations.assigned",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "purpose": "Safety observation was assigned to an owner.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations.closed",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "eventName": "closed",
+      "cloudeventType": "hesem.maintenance_ehs.safety-observations.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "purpose": "Safety observation was closed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations.in_progress",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "eventName": "in_progress",
+      "cloudeventType": "hesem.maintenance_ehs.safety-observations.in_progress",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "purpose": "Safety observation entered active response.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.assets.disposed",
+      "canonicalResource": "master_data.assets",
+      "eventName": "disposed",
+      "cloudeventType": "hesem.master_data.assets.disposed",
+      "classification": "reference_master",
+      "storageTable": "assets",
+      "purpose": "Asset disposal was recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.assets.held",
+      "canonicalResource": "master_data.assets",
+      "eventName": "held",
+      "cloudeventType": "hesem.master_data.assets.held",
+      "classification": "reference_master",
+      "storageTable": "assets",
+      "purpose": "Asset entered governed hold.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.assets.retired",
+      "canonicalResource": "master_data.assets",
+      "eventName": "retired",
+      "cloudeventType": "hesem.master_data.assets.retired",
+      "classification": "reference_master",
+      "storageTable": "assets",
+      "purpose": "Asset was retired from active service.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations.closed",
+      "canonicalResource": "master_data.compliance-obligations",
+      "eventName": "closed",
+      "cloudeventType": "hesem.master_data.compliance-obligations.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "purpose": "Compliance obligation was closed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations.due",
+      "canonicalResource": "master_data.compliance-obligations",
+      "eventName": "due",
+      "cloudeventType": "hesem.master_data.compliance-obligations.due",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "purpose": "Compliance obligation became due.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations.overdue",
+      "canonicalResource": "master_data.compliance-obligations",
+      "eventName": "overdue",
+      "cloudeventType": "hesem.master_data.compliance-obligations.overdue",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "purpose": "Compliance obligation became overdue.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations.waived",
+      "canonicalResource": "master_data.compliance-obligations",
+      "eventName": "waived",
+      "cloudeventType": "hesem.master_data.compliance-obligations.waived",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "purpose": "Compliance obligation was waived under approval.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers.active",
+      "canonicalResource": "master_data.customers",
+      "eventName": "active",
+      "cloudeventType": "hesem.master_data.customers.active",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "purpose": "Customer master was released for commercial use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers.archived",
+      "canonicalResource": "master_data.customers",
+      "eventName": "archived",
+      "cloudeventType": "hesem.master_data.customers.archived",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "purpose": "Customer master was archived from active scope.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers.inactive",
+      "canonicalResource": "master_data.customers",
+      "eventName": "inactive",
+      "cloudeventType": "hesem.master_data.customers.inactive",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "purpose": "Customer master stopped new commercial use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers.on_hold",
+      "canonicalResource": "master_data.customers",
+      "eventName": "on_hold",
+      "cloudeventType": "hesem.master_data.customers.on_hold",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "purpose": "Customer master entered controlled hold.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees.active",
+      "canonicalResource": "master_data.employees",
+      "eventName": "active",
+      "cloudeventType": "hesem.master_data.employees.active",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "purpose": "Employee became operationally active.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees.archived",
+      "canonicalResource": "master_data.employees",
+      "eventName": "archived",
+      "cloudeventType": "hesem.master_data.employees.archived",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "purpose": "Employee record was archived.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees.suspended",
+      "canonicalResource": "master_data.employees",
+      "eventName": "suspended",
+      "cloudeventType": "hesem.master_data.employees.suspended",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "purpose": "Employee was suspended from operational eligibility.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees.terminated",
+      "canonicalResource": "master_data.employees",
+      "eventName": "terminated",
+      "cloudeventType": "hesem.master_data.employees.terminated",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "purpose": "Employee was terminated.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment.active",
+      "canonicalResource": "master_data.equipment",
+      "eventName": "active",
+      "cloudeventType": "hesem.master_data.equipment.active",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "purpose": "Equipment was released for active operational use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment.lockout",
+      "canonicalResource": "master_data.equipment",
+      "eventName": "lockout",
+      "cloudeventType": "hesem.master_data.equipment.lockout",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "purpose": "Equipment entered lockout state.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment.qualified",
+      "canonicalResource": "master_data.equipment",
+      "eventName": "qualified",
+      "cloudeventType": "hesem.master_data.equipment.qualified",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "purpose": "Equipment qualification completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment.retired",
+      "canonicalResource": "master_data.equipment",
+      "eventName": "retired",
+      "cloudeventType": "hesem.master_data.equipment.retired",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "purpose": "Equipment was retired from active use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.measuring-devices.qualified",
+      "canonicalResource": "master_data.measuring-devices",
+      "eventName": "qualified",
+      "cloudeventType": "hesem.master_data.measuring-devices.qualified",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "purpose": "Measuring device was released for governed use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.measuring-devices.quarantined",
+      "canonicalResource": "master_data.measuring-devices",
+      "eventName": "quarantined",
+      "cloudeventType": "hesem.master_data.measuring-devices.quarantined",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "purpose": "Measuring device was blocked because calibration or condition became unacceptable.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.measuring-devices.retired",
+      "canonicalResource": "master_data.measuring-devices",
+      "eventName": "retired",
+      "cloudeventType": "hesem.master_data.measuring-devices.retired",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "purpose": "Measuring device was retired from active use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers.archived",
+      "canonicalResource": "master_data.suppliers",
+      "eventName": "archived",
+      "cloudeventType": "hesem.master_data.suppliers.archived",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "purpose": "Supplier was archived from active sourcing scope.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers.blocked",
+      "canonicalResource": "master_data.suppliers",
+      "eventName": "blocked",
+      "cloudeventType": "hesem.master_data.suppliers.blocked",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "purpose": "Supplier was blocked from new procurement.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers.qualified",
+      "canonicalResource": "master_data.suppliers",
+      "eventName": "qualified",
+      "cloudeventType": "hesem.master_data.suppliers.qualified",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "purpose": "Supplier qualification was approved.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers.spend_authorized",
+      "canonicalResource": "master_data.suppliers",
+      "eventName": "spend_authorized",
+      "cloudeventType": "hesem.master_data.suppliers.spend_authorized",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "purpose": "Supplier became spend-authorized.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools.broken",
+      "canonicalResource": "master_data.tools",
+      "eventName": "broken",
+      "cloudeventType": "hesem.master_data.tools.broken",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "purpose": "Tool was blocked after breakage.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools.in_use",
+      "canonicalResource": "master_data.tools",
+      "eventName": "in_use",
+      "cloudeventType": "hesem.master_data.tools.in_use",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "purpose": "Tool entered active use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools.qualified",
+      "canonicalResource": "master_data.tools",
+      "eventName": "qualified",
+      "cloudeventType": "hesem.master_data.tools.qualified",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "purpose": "Tool was qualified for issue.",
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools.retired",
+      "canonicalResource": "master_data.tools",
+      "eventName": "retired",
+      "cloudeventType": "hesem.master_data.tools.retired",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "purpose": "Tool was retired from use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists.closed",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "eventName": "closed",
+      "cloudeventType": "hesem.planning_production.dispatch-lists.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "purpose": "Dispatch entry was closed after reconciliation.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists.completed",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "eventName": "completed",
+      "cloudeventType": "hesem.planning_production.dispatch-lists.completed",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "purpose": "Dispatch execution completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists.in_progress",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "eventName": "in_progress",
+      "cloudeventType": "hesem.planning_production.dispatch-lists.in_progress",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "purpose": "Dispatch entry entered active execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists.released",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "eventName": "released",
+      "cloudeventType": "hesem.planning_production.dispatch-lists.released",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "purpose": "Dispatch entry was released into shopfloor horizon.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections.accepted",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "eventName": "accepted",
+      "cloudeventType": "hesem.planning_production.ipqc-inspections.accepted",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "purpose": "IPQC inspection accepted the in-process result.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections.reinspect",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "eventName": "reinspect",
+      "cloudeventType": "hesem.planning_production.ipqc-inspections.reinspect",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "purpose": "IPQC inspection was routed back for reinspection.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections.rejected",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "eventName": "rejected",
+      "cloudeventType": "hesem.planning_production.ipqc-inspections.rejected",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "purpose": "IPQC inspection rejected the in-process result.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections.started",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "eventName": "started",
+      "cloudeventType": "hesem.planning_production.ipqc-inspections.started",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "purpose": "IPQC inspection entered active execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders.closed",
+      "canonicalResource": "planning_production.job-orders",
+      "eventName": "closed",
+      "cloudeventType": "hesem.planning_production.job-orders.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "purpose": "Job order was administratively closed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders.completed",
+      "canonicalResource": "planning_production.job-orders",
+      "eventName": "completed",
+      "cloudeventType": "hesem.planning_production.job-orders.completed",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "purpose": "Job order execution completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders.held",
+      "canonicalResource": "planning_production.job-orders",
+      "eventName": "held",
+      "cloudeventType": "hesem.planning_production.job-orders.held",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "purpose": "Job order was placed on hold.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders.released",
+      "canonicalResource": "planning_production.job-orders",
+      "eventName": "released",
+      "cloudeventType": "hesem.planning_production.job-orders.released",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "purpose": "Job order was released into executable production intent.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations.completed",
+      "canonicalResource": "planning_production.production-operations",
+      "eventName": "completed",
+      "cloudeventType": "hesem.planning_production.production-operations.completed",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "purpose": "Production operation completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations.in_progress",
+      "canonicalResource": "planning_production.production-operations",
+      "eventName": "in_progress",
+      "cloudeventType": "hesem.planning_production.production-operations.in_progress",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "purpose": "Production operation entered active execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations.ready",
+      "canonicalResource": "planning_production.production-operations",
+      "eventName": "ready",
+      "cloudeventType": "hesem.planning_production.production-operations.ready",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "purpose": "Production operation became ready for execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations.scrapped",
+      "canonicalResource": "planning_production.production-operations",
+      "eventName": "scrapped",
+      "cloudeventType": "hesem.planning_production.production-operations.scrapped",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "purpose": "Production operation recorded scrap.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans.approved",
+      "canonicalResource": "planning_production.production-plans",
+      "eventName": "approved",
+      "cloudeventType": "hesem.planning_production.production-plans.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "purpose": "Production plan passed review and approval.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans.completed",
+      "canonicalResource": "planning_production.production-plans",
+      "eventName": "completed",
+      "cloudeventType": "hesem.planning_production.production-plans.completed",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "purpose": "Production plan was closed after reconciliation.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans.frozen",
+      "canonicalResource": "planning_production.production-plans",
+      "eventName": "frozen",
+      "cloudeventType": "hesem.planning_production.production-plans.frozen",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "purpose": "Production plan entered frozen schedule control.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans.published",
+      "canonicalResource": "planning_production.production-plans",
+      "eventName": "published",
+      "cloudeventType": "hesem.planning_production.production-plans.published",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "purpose": "Production plan became the released factory plan.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders.closed",
+      "canonicalResource": "planning_production.work-orders",
+      "eventName": "closed",
+      "cloudeventType": "hesem.planning_production.work-orders.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "purpose": "Work order execution closed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders.dispatched",
+      "canonicalResource": "planning_production.work-orders",
+      "eventName": "dispatched",
+      "cloudeventType": "hesem.planning_production.work-orders.dispatched",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "purpose": "Work order was dispatched to the shopfloor.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders.quality-held",
+      "canonicalResource": "planning_production.work-orders",
+      "eventName": "quality-held",
+      "cloudeventType": "hesem.planning_production.work-orders.quality-held",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "purpose": "Work order entered governed quality hold.",
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders.started",
+      "canonicalResource": "planning_production.work-orders",
+      "eventName": "started",
+      "cloudeventType": "hesem.planning_production.work-orders.started",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "purpose": "Work order execution started.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections.accepted",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "eventName": "accepted",
+      "cloudeventType": "hesem.procurement_supplier_quality.iqc-inspections.accepted",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "purpose": "Incoming inspection accepted material into pass state.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections.queued",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "eventName": "queued",
+      "cloudeventType": "hesem.procurement_supplier_quality.iqc-inspections.queued",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "purpose": "Incoming inspection was queued for received material.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections.rejected",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "eventName": "rejected",
+      "cloudeventType": "hesem.procurement_supplier_quality.iqc-inspections.rejected",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "purpose": "Incoming inspection rejected material into fail state.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections.waived",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "eventName": "waived",
+      "cloudeventType": "hesem.procurement_supplier_quality.iqc-inspections.waived",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "purpose": "Incoming inspection completed with conditional disposition.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections.approved",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "eventName": "approved",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipt-corrections.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "purpose": "Receipt correction was approved for posting.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections.posted",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "eventName": "posted",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipt-corrections.posted",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "purpose": "Receipt correction posted its recovery effect into stock and finance truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections.submitted",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "eventName": "submitted",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipt-corrections.submitted",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "purpose": "Receipt correction entered governed review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections.voided",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "eventName": "voided",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipt-corrections.voided",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "purpose": "Receipt correction was voided before completion.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts.accepted",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "eventName": "accepted",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipts.accepted",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "purpose": "Receipt cleared IQC acceptance.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts.quarantined",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "eventName": "quarantined",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipts.quarantined",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "purpose": "Receipt moved into quarantine control.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts.received",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "eventName": "received",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipts.received",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "purpose": "Purchase receipt was recorded for physical inbound material.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts.reversed",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "eventName": "reversed",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-receipts.reversed",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "purpose": "Receipt was reversed under governed correction.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions.approved",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "eventName": "approved",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-requisitions.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "purpose": "Requisition was approved for sourcing.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions.cancelled",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "eventName": "cancelled",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-requisitions.cancelled",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "purpose": "Requisition was cancelled.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions.sourced",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "eventName": "sourced",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-requisitions.sourced",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "purpose": "Requisition demand was transferred into supplier execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions.submitted",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "eventName": "submitted",
+      "cloudeventType": "hesem.procurement_supplier_quality.purchase-requisitions.submitted",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "purpose": "Requisition entered formal approval review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns.closed",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "eventName": "closed",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-asns.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "purpose": "Supplier ASN was closed after downstream receiving completion.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns.confirmed",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "eventName": "confirmed",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-asns.confirmed",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "purpose": "Supplier ASN was confirmed against expected inbound supply.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns.discrepant",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "eventName": "discrepant",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-asns.discrepant",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "purpose": "Supplier ASN recorded a governed discrepancy.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns.received",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "eventName": "received",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-asns.received",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "purpose": "Supplier ASN was physically received and is ready for receipt trace.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns.receiving",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "eventName": "receiving",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-asns.receiving",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "purpose": "Supplier ASN entered active receiving preparation or execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders.approved",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "eventName": "approved",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-purchase-orders.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "purpose": "Supplier PO was approved for spend commitment.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders.closed",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "eventName": "closed",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-purchase-orders.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "purpose": "Supplier PO was closed after downstream receiving completion.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders.received",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "eventName": "received",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-purchase-orders.received",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "purpose": "Supplier PO receiving reached governed received state.",
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders.released",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "eventName": "released",
+      "cloudeventType": "hesem.procurement_supplier_quality.supplier-purchase-orders.released",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "purpose": "Supplier PO was released to the supplier.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs.closed",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "eventName": "closed",
+      "cloudeventType": "hesem.quality_improvement.audit-programs.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "purpose": "Audit program was closed with retained evidence.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs.findings-issued",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "eventName": "findings-issued",
+      "cloudeventType": "hesem.quality_improvement.audit-programs.findings-issued",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "purpose": "Audit findings were recorded and released.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs.scheduled",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "eventName": "scheduled",
+      "cloudeventType": "hesem.quality_improvement.audit-programs.scheduled",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "purpose": "Audit program was scheduled under governed scope.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs.started",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "eventName": "started",
+      "cloudeventType": "hesem.quality_improvement.audit-programs.started",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "purpose": "Audit program entered active execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions.closed",
+      "canonicalResource": "quality_improvement.concessions",
+      "eventName": "closed",
+      "cloudeventType": "hesem.quality_improvement.concessions.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "purpose": "Concession was approved and closed with trace.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions.opened",
+      "canonicalResource": "quality_improvement.concessions",
+      "eventName": "opened",
+      "cloudeventType": "hesem.quality_improvement.concessions.opened",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "purpose": "Concession was opened for governed review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions.pending-review",
+      "canonicalResource": "quality_improvement.concessions",
+      "eventName": "pending-review",
+      "cloudeventType": "hesem.quality_improvement.concessions.pending-review",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "purpose": "Concession moved into approval review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions.rejected",
+      "canonicalResource": "quality_improvement.concessions",
+      "eventName": "rejected",
+      "cloudeventType": "hesem.quality_improvement.concessions.rejected",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "purpose": "Concession request was rejected.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions.closed",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "eventName": "closed",
+      "cloudeventType": "hesem.quality_improvement.corrective-actions.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "purpose": "CAPA was closed after verified effectiveness.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions.effectiveness-reviewed",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "eventName": "effectiveness-reviewed",
+      "cloudeventType": "hesem.quality_improvement.corrective-actions.effectiveness-reviewed",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "purpose": "CAPA entered effectiveness review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions.implemented",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "eventName": "implemented",
+      "cloudeventType": "hesem.quality_improvement.corrective-actions.implemented",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "purpose": "CAPA implementation completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions.initiated",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "eventName": "initiated",
+      "cloudeventType": "hesem.quality_improvement.corrective-actions.initiated",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "purpose": "CAPA was initiated from a quality or risk source.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions.planned",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "eventName": "planned",
+      "cloudeventType": "hesem.quality_improvement.corrective-actions.planned",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "purpose": "CAPA action plan was approved.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations.closed",
+      "canonicalResource": "quality_improvement.deviations",
+      "eventName": "closed",
+      "cloudeventType": "hesem.quality_improvement.deviations.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "purpose": "Deviation was closed with retained evidence.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations.opened",
+      "canonicalResource": "quality_improvement.deviations",
+      "eventName": "opened",
+      "cloudeventType": "hesem.quality_improvement.deviations.opened",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "purpose": "Deviation was opened under governed exception control.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations.pending-review",
+      "canonicalResource": "quality_improvement.deviations",
+      "eventName": "pending-review",
+      "cloudeventType": "hesem.quality_improvement.deviations.pending-review",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "purpose": "Deviation entered approval review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations.rejected",
+      "canonicalResource": "quality_improvement.deviations",
+      "eventName": "rejected",
+      "cloudeventType": "hesem.quality_improvement.deviations.rejected",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "purpose": "Deviation request or closure path was rejected.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.fqc-inspections.accepted",
+      "canonicalResource": "quality_improvement.fqc-inspections",
+      "eventName": "accepted",
+      "cloudeventType": "hesem.quality_improvement.fqc-inspections.accepted",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "purpose": "Final inspection alias resolved to accepted outgoing quality truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.fqc-inspections.rejected",
+      "canonicalResource": "quality_improvement.fqc-inspections",
+      "eventName": "rejected",
+      "cloudeventType": "hesem.quality_improvement.fqc-inspections.rejected",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "purpose": "Final inspection alias resolved to rejected outgoing quality truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.fqc-inspections.waived",
+      "canonicalResource": "quality_improvement.fqc-inspections",
+      "eventName": "waived",
+      "cloudeventType": "hesem.quality_improvement.fqc-inspections.waived",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "purpose": "Final inspection alias resolved to governed waiver truth.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions.approved",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "eventName": "approved",
+      "cloudeventType": "hesem.quality_improvement.improvement-actions.approved",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "purpose": "Improvement action was approved for implementation.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions.closed",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "eventName": "closed",
+      "cloudeventType": "hesem.quality_improvement.improvement-actions.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "purpose": "Improvement action was closed with retained evidence.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions.implemented",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "eventName": "implemented",
+      "cloudeventType": "hesem.quality_improvement.improvement-actions.implemented",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "purpose": "Improvement action implementation was completed.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions.submitted",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "eventName": "submitted",
+      "cloudeventType": "hesem.quality_improvement.improvement-actions.submitted",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "purpose": "Improvement action entered governed review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions.verified",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "eventName": "verified",
+      "cloudeventType": "hesem.quality_improvement.improvement-actions.verified",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "purpose": "Improvement action benefit or learning was verified.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.msa-studies.recorded",
+      "canonicalResource": "quality_improvement.msa-studies",
+      "eventName": "recorded",
+      "cloudeventType": "hesem.quality_improvement.msa-studies.recorded",
+      "classification": "assessment_record",
+      "storageTable": "calibration_grr_studies",
+      "purpose": "MSA study was recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.msa-studies.updated",
+      "canonicalResource": "quality_improvement.msa-studies",
+      "eventName": "updated",
+      "cloudeventType": "hesem.quality_improvement.msa-studies.updated",
+      "classification": "assessment_record",
+      "storageTable": "calibration_grr_studies",
+      "purpose": "MSA study was updated with additional result evidence.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances.closed",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "eventName": "closed",
+      "cloudeventType": "hesem.quality_improvement.nonconformances.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "purpose": "NCR was closed after evidence and closure review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances.containment-activated",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "eventName": "containment-activated",
+      "cloudeventType": "hesem.quality_improvement.nonconformances.containment-activated",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "purpose": "Containment became active against affected material or product.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances.disposition-set",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "eventName": "disposition-set",
+      "cloudeventType": "hesem.quality_improvement.nonconformances.disposition-set",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "purpose": "A formal disposition path was recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances.submitted",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "eventName": "submitted",
+      "cloudeventType": "hesem.quality_improvement.nonconformances.submitted",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "purpose": "NCR was submitted into formal quality review.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.oqc-inspections.accepted",
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "eventName": "accepted",
+      "cloudeventType": "hesem.quality_improvement.oqc-inspections.accepted",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "purpose": "Outgoing inspection accepted the lot or unit.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.oqc-inspections.rejected",
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "eventName": "rejected",
+      "cloudeventType": "hesem.quality_improvement.oqc-inspections.rejected",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "purpose": "Outgoing inspection rejected the lot or unit.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.oqc-inspections.waived",
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "eventName": "waived",
+      "cloudeventType": "hesem.quality_improvement.oqc-inspections.waived",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "purpose": "Outgoing inspection completed under waiver.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.override-controls.active",
+      "canonicalResource": "quality_improvement.override-controls",
+      "eventName": "active",
+      "cloudeventType": "hesem.quality_improvement.override-controls.active",
+      "classification": "lifecycle_owner",
+      "storageTable": "operational_override_controls",
+      "purpose": "Override was activated under governed approval.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.override-controls.closed",
+      "canonicalResource": "quality_improvement.override-controls",
+      "eventName": "closed",
+      "cloudeventType": "hesem.quality_improvement.override-controls.closed",
+      "classification": "lifecycle_owner",
+      "storageTable": "operational_override_controls",
+      "purpose": "Override was closed after follow-up completion.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.override-controls.expired",
+      "canonicalResource": "quality_improvement.override-controls",
+      "eventName": "expired",
+      "cloudeventType": "hesem.quality_improvement.override-controls.expired",
+      "classification": "lifecycle_owner",
+      "storageTable": "operational_override_controls",
+      "purpose": "Override expired after its timebox ended.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.override-controls.revoked",
+      "canonicalResource": "quality_improvement.override-controls",
+      "eventName": "revoked",
+      "cloudeventType": "hesem.quality_improvement.override-controls.revoked",
+      "classification": "lifecycle_owner",
+      "storageTable": "operational_override_controls",
+      "purpose": "Override was revoked before continued use.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.spc-observations.recorded",
+      "canonicalResource": "quality_improvement.spc-observations",
+      "eventName": "recorded",
+      "cloudeventType": "hesem.quality_improvement.spc-observations.recorded",
+      "classification": "assessment_record",
+      "storageTable": "spc_data",
+      "purpose": "SPC observation was recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.spc-observations.updated",
+      "canonicalResource": "quality_improvement.spc-observations",
+      "eventName": "updated",
+      "cloudeventType": "hesem.quality_improvement.spc-observations.updated",
+      "classification": "assessment_record",
+      "storageTable": "spc_data",
+      "purpose": "SPC observation was updated with rule-evaluation detail.",
+      "source": "authored_package"
+    }
+  ]
+}

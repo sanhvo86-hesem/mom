@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+  "canonicalName": "incoming_inspections",
+  "displayName": "IQC Inspections",
+  "purpose": "Gate inbound material before stock release so supplier quality, quarantine, and NCR escalation are recorded from a governed incoming inspection object.",
+  "ownerDomain": "procurement_supplier_quality",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "supplier_quality",
+  "storage": {
+    "primaryTable": "incoming_inspections",
+    "primaryKey": "inspection_id",
+    "statusField": "status",
+    "childTables": [
+      "incoming_inspection_results"
+    ],
+    "legacyTables": [
+      "iqc_inspections"
+    ]
+  },
+  "identity": {
+    "strategy": "inspection_id",
+    "naturalKeys": [
+      "inspection_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "incoming_quality_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "inspection_result_lines",
+      "receipt_trace",
+      "supplier_document_pack"
+    ],
+    "kpiSignals": [
+      "incoming_acceptance_rate",
+      "supplier_defect_ppm",
+      "quarantine_release_lead_time"
+    ],
+    "autoAuditChecks": [
+      "quarantine_required_for_failed_incoming_material",
+      "accepted_material_must_have_result_evidence",
+      "failed_incoming_material_must_route_to_ncr_when_required"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "incoming_inspections_status + M4-purchasing workspace",
+    "stateModelKey": "incoming_inspections_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "pending", "label": "Pending", "labelEn": "Pending", "allowedTransitionsFrom": [] },
+      { "value": "pass", "label": "Pass", "labelEn": "Pass", "allowedTransitionsFrom": ["pending"] },
+      { "value": "fail", "label": "Fail", "labelEn": "Fail", "allowedTransitionsFrom": ["pending"] },
+      { "value": "conditional", "label": "Conditional", "labelEn": "Conditional", "allowedTransitionsFrom": ["pending"] }
+    ],
+    "commands": [
+      { "command": "queue", "targetState": "pending", "description": "Queue an incoming inspection against received material.", "idempotencyScope": "resource+transition" },
+      { "command": "start", "targetState": "pending", "description": "Start the IQC execution while remaining in pending review.", "idempotencyScope": "resource+transition" },
+      { "command": "accept", "targetState": "pass", "description": "Accept received material into governed pass state.", "idempotencyScope": "resource+transition", "preconditions": ["result_evidence_complete"] },
+      { "command": "reject", "targetState": "fail", "description": "Reject material and trigger quarantine or NCR escalation.", "idempotencyScope": "resource+transition", "preconditions": ["disposition_recorded"] },
+      { "command": "waive", "targetState": "conditional", "description": "Waive full acceptance with controlled conditional disposition.", "idempotencyScope": "resource+transition", "preconditions": ["waiver_approval_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "procurement_supplier_quality.purchase-receipts",
+      "procurement_supplier_quality.supplier-purchase-orders"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.nonconformances",
+      "inventory_logistics.stock-balances"
+    ],
+    "keyRelationships": [
+      "source_record_id -> purchase_receipts.source_record_id",
+      "po_number -> purchase_orders.po_number",
+      "vendor_id -> purchase_orders.vendor_id"
+    ],
+    "events": [
+      { "eventName": "queued", "description": "Incoming inspection was queued for received material." },
+      { "eventName": "accepted", "description": "Incoming inspection accepted material into pass state." },
+      { "eventName": "rejected", "description": "Incoming inspection rejected material into fail state." },
+      { "eventName": "waived", "description": "Incoming inspection completed with conditional disposition." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_runtime_api",
+    "notes": [
+      "Current runtime endpoints are quality_management.incoming_inspections.* and are used by the Purchasing workspace."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "iqc_inspections"
+    ],
+    "notes": [
+      "Legacy IQC naming remains for compatibility, but incoming_inspections is the canonical object."
+    ]
+  },
+  "invariants": [
+    "Accepted incoming material must have inspection result evidence.",
+    "Rejected incoming material must preserve quarantine or NCR routing evidence.",
+    "Conditional release requires waiver approval evidence."
+  ]
+}

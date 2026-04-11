@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.customer-returns",
+  "canonicalName": "customer_returns",
+  "displayName": "Customer Returns",
+  "purpose": "Control return authorization, receipt, evaluation, disposition, and closure so reverse-logistics truth stays linked to quality and finance outcomes.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "returns_and_service",
+  "storage": {
+    "primaryTable": "rma_orders",
+    "primaryKey": "rma_id",
+    "statusField": "rma_status",
+    "childTables": [
+      "customer_return_lines"
+    ],
+    "legacyTables": [
+      "customer_returns",
+      "returned_goods"
+    ]
+  },
+  "identity": {
+    "strategy": "rma_number",
+    "naturalKeys": [
+      "rma_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "recovery_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "customer_return_review",
+    "retentionClass": "service_record_7y",
+    "evidenceRequirements": [
+      "return_authorization",
+      "failure_evaluation",
+      "disposition_or_credit_trace"
+    ],
+    "kpiSignals": [
+      "rma_cycle_time",
+      "return_repair_replacement_mix",
+      "repeat_return_rate"
+    ],
+    "autoAuditChecks": [
+      "cannot_receive_without_authorization",
+      "returns_requiring_credit_must_link_financial_adjustment",
+      "closed_returns_must_preserve_disposition"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + rma_orders_rma_status",
+    "stateModelKey": "rma_orders_rma_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "requested", "label": "Requested", "labelEn": "Requested", "allowedTransitionsFrom": [] },
+      { "value": "authorized", "label": "Authorized", "labelEn": "Authorized", "allowedTransitionsFrom": ["requested"] },
+      { "value": "received", "label": "Received", "labelEn": "Received", "allowedTransitionsFrom": ["authorized"] },
+      { "value": "in_evaluation", "label": "In Evaluation", "labelEn": "In Evaluation", "allowedTransitionsFrom": ["received"] },
+      { "value": "repaired", "label": "Repaired", "labelEn": "Repaired", "allowedTransitionsFrom": ["in_evaluation"] },
+      { "value": "replaced", "label": "Replaced", "labelEn": "Replaced", "allowedTransitionsFrom": ["in_evaluation"] },
+      { "value": "credited", "label": "Credited", "labelEn": "Credited", "allowedTransitionsFrom": ["in_evaluation"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["repaired", "replaced", "credited"] }
+    ],
+    "commands": [
+      { "command": "authorize", "targetState": "authorized", "description": "Authorize the customer return before physical receipt.", "idempotencyScope": "resource+transition" },
+      { "command": "receive", "targetState": "received", "description": "Receive the returned item into controlled evaluation.", "idempotencyScope": "resource+transition" },
+      { "command": "evaluate", "targetState": "in_evaluation", "description": "Start technical evaluation of the returned item.", "idempotencyScope": "resource+transition" },
+      { "command": "repair", "targetState": "repaired", "description": "Disposition the return as repaired.", "idempotencyScope": "resource+transition" },
+      { "command": "replace", "targetState": "replaced", "description": "Disposition the return as replaced.", "idempotencyScope": "resource+transition" },
+      { "command": "credit", "targetState": "credited", "description": "Disposition the return through credit issuance.", "idempotencyScope": "resource+transition" },
+      { "command": "close", "targetState": "closed", "description": "Close the customer return after repair, replacement, or credit completion.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.shipments",
+      "commercial_customer.customer-care-cases",
+      "commercial_customer.sales-orders"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.nonconformances",
+      "finance.credit-memos",
+      "quality_improvement.corrective-actions"
+    ],
+    "keyRelationships": [
+      "original_so_number -> sales_orders.sales_order_number",
+      "linked_ncr_number -> ncr_records.ncr_number",
+      "linked_capa_number -> capa_records.capa_number"
+    ],
+    "events": [
+      { "eventName": "authorized", "description": "Customer return was authorized." },
+      { "eventName": "received", "description": "Customer return was physically received." },
+      { "eventName": "evaluated", "description": "Customer return entered evaluation." },
+      { "eventName": "closed", "description": "Customer return reached terminal closure." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is service_warranty.rma_orders.* while canonical naming remains inventory_logistics.customer-returns."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "rma_orders",
+      "customer_returns",
+      "returned_goods"
+    ],
+    "notes": [
+      "rma_orders is the current storage/runtime owner. The package preserves reverse-logistics meaning without moving or renaming live data."
+    ]
+  },
+  "invariants": [
+    "A return cannot be physically received before authorization.",
+    "Returns that end in credit must retain finance linkage.",
+    "Closed returns must preserve disposition and quality trace."
+  ]
+}

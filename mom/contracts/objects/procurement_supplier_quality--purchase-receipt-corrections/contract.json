@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+  "canonicalName": "purchase_receipt_corrections",
+  "displayName": "Purchase Receipt Corrections",
+  "purpose": "Control governed correction and reversal after receipt, IQC, or invoice impact so partial completion can be reconciled through traceable recovery instead of manual patches.",
+  "ownerDomain": "procurement_supplier_quality",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "receiving_financial_control",
+  "storage": {
+    "primaryTable": "purchase_receipt_corrections",
+    "primaryKey": "purchase_receipt_correction_id",
+    "statusField": "correction_status",
+    "childTables": [
+      "purchase_receipt_correction_lines"
+    ],
+    "legacyTables": [
+      "purchase_receipt_corrections"
+    ]
+  },
+  "identity": {
+    "strategy": "correction_number",
+    "naturalKeys": [
+      "correction_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "recovery_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "exception_review",
+    "retentionClass": "procurement_record_7y",
+    "evidenceRequirements": [
+      "receipt_trace",
+      "correction_reason",
+      "financial_impact_trace"
+    ],
+    "kpiSignals": [
+      "receipt_correction_cycle_time",
+      "receipt_recovery_reopen_rate",
+      "supplier_dispute_resolution_time"
+    ],
+    "autoAuditChecks": [
+      "correction_must_reference_receipt",
+      "posted_correction_must_preserve_inventory_and_ap_trace",
+      "voided_correction_must_not_leave_partial_financial_or_stock_effect"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + purchase_receipt_corrections_correction_status",
+    "stateModelKey": "purchase_receipt_corrections_correction_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "submitted", "label": "Submitted", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "posted", "label": "Posted", "labelEn": "Posted", "allowedTransitionsFrom": ["approved"] },
+      { "value": "voided", "label": "Voided", "labelEn": "Voided", "allowedTransitionsFrom": ["draft", "submitted", "approved"] }
+    ],
+    "commands": [
+      { "command": "submit", "targetState": "submitted", "description": "Submit a governed receipt correction request for review.", "idempotencyScope": "resource+transition", "preconditions": ["correction_reason_recorded"] },
+      { "command": "approve", "targetState": "approved", "description": "Approve the correction after inventory, supplier, and AP impact are reviewed.", "idempotencyScope": "resource+transition", "preconditions": ["impact_review_complete"] },
+      { "command": "post", "targetState": "posted", "description": "Post the correction into stock and financial truth.", "idempotencyScope": "resource+transition", "preconditions": ["approval_recorded"] },
+      { "command": "void", "targetState": "voided", "description": "Void a correction before posting or final reconciliation.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "procurement_supplier_quality.purchase-receipts",
+      "procurement_supplier_quality.iqc-inspections",
+      "finance.ap-invoices"
+    ],
+    "downstreamObjects": [
+      "inventory_logistics.inventory-movements",
+      "finance.credit-memos",
+      "finance.debit-memos"
+    ],
+    "keyRelationships": [
+      "purchase_receipt_id -> purchase_receipts.purchase_receipt_id",
+      "ap_invoice_id -> ap_invoices.ap_invoice_id"
+    ],
+    "events": [
+      { "eventName": "submitted", "description": "Receipt correction entered governed review." },
+      { "eventName": "approved", "description": "Receipt correction was approved for posting." },
+      { "eventName": "posted", "description": "Receipt correction posted its recovery effect into stock and finance truth." },
+      { "eventName": "voided", "description": "Receipt correction was voided before completion." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is purchasing.purchase_receipt_corrections.* while canonical naming remains procurement_supplier_quality.purchase-receipt-corrections."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "purchase_receipt_corrections"
+    ],
+    "notes": [
+      "The current purchasing namespace remains live for compatibility while canonical API rollout is still pending."
+    ]
+  },
+  "invariants": [
+    "A receipt correction must retain both the physical receipt trace and the financial impact trace.",
+    "A posted correction must not leave unreconciled inventory or AP side effects.",
+    "A voided correction must preserve the recovery reason and approval history."
+  ]
+}

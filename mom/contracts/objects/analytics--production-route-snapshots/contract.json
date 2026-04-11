@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "canonicalResource": "analytics.production-route-snapshots",
+  "canonicalName": "production_order_route_snapshot",
+  "displayName": "Production Route Snapshots",
+  "purpose": "Provide read-only route snapshot truth per production order so scheduling, traceability, and execution analysis can inspect the released routing structure without depending on mutable route masters.",
+  "ownerDomain": "analytics",
+  "objectRole": "projection",
+  "ownerTeam": "manufacturing_analytics",
+  "storage": {
+    "primaryTable": "production_order_route_snapshot",
+    "primaryKey": "production_order_route_snapshot_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "production_order_route_snapshot"
+    ]
+  },
+  "identity": {
+    "strategy": "production_order_route_snapshot_id",
+    "naturalKeys": [
+      "production_order_route_snapshot_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "analytics_gate",
+    "auditClass": "projection_lineage",
+    "continuousImprovementLoop": "production_review",
+    "retentionClass": "analytics_projection_3y",
+    "evidenceRequirements": [
+      "snapshot_at",
+      "source_system",
+      "source_record_id"
+    ],
+    "kpiSignals": [
+      "route_change_stability",
+      "dispatch_readiness_visibility",
+      "snapshot_refresh_latency"
+    ],
+    "autoAuditChecks": [
+      "route_snapshot_must_preserve_production_order_lineage",
+      "projection_rows_must_be_read_only",
+      "plant_and_site_scope_must_be_explicit"
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.work-orders"
+    ],
+    "downstreamObjects": [
+      "analytics.plant-performance-snapshots"
+    ],
+    "keyRelationships": [
+      "production_order_id -> production_orders.production_order_id",
+      "org_plant_id -> org_plants.plant_id",
+      "org_site_id -> org_sites.site_id"
+    ],
+    "events": [
+      { "eventName": "refreshed", "description": "Production route snapshot was refreshed from released order truth." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is production.production_order_route_snapshot.* while canonical naming remains analytics.production-route-snapshots."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "production_order_route_snapshot"
+    ],
+    "notes": [
+      "The route snapshot is a read-only projection and must not replace route or execution authority."
+    ]
+  },
+  "invariants": [
+    "Route snapshot rows must preserve production-order lineage and snapshot time.",
+    "The projection is read-only and must not replace routing or execution truth.",
+    "Plant and site scope must remain explicit on every snapshot row."
+  ]
+}

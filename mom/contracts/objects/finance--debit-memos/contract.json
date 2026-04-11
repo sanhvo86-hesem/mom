@@ -1,0 +1,101 @@
+{
+  "version": "1.0",
+  "canonicalResource": "finance.debit-memos",
+  "canonicalName": "debit_memos",
+  "displayName": "Debit Memos",
+  "purpose": "Represent governed upward financial adjustments so AP and AR correction exposure stays explicit, traceable, and separate from mixed invoice truth.",
+  "ownerDomain": "finance",
+  "objectRole": "ledger_document",
+  "ownerTeam": "finance_controllership",
+  "storage": {
+    "primaryTable": "debit_memos",
+    "primaryKey": "debit_memo_id",
+    "statusField": "memo_status",
+    "childTables": [
+      "debit_memo_lines"
+    ],
+    "legacyTables": [
+      "ap_ar_invoices"
+    ]
+  },
+  "identity": {
+    "strategy": "original_invoice_ref+reason_code+created_at",
+    "naturalKeys": [
+      "invoice_scope",
+      "original_invoice_ref",
+      "reason_code"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "financial_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "period_close_review",
+    "retentionClass": "financial_record_10y",
+    "evidenceRequirements": [
+      "original_invoice_reference",
+      "reason_code",
+      "approval_trace"
+    ],
+    "kpiSignals": [
+      "debit_memo_volume",
+      "debit_memo_cycle_time",
+      "price_variance_adjustment_rate"
+    ],
+    "autoAuditChecks": [
+      "debit_memo_requires_positive_amount_and_reason",
+      "debit_memo_must_reference_original_invoice",
+      "debit_memo_scope_must_be_ap_or_ar"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "FinanceControlService service-backed memo creation",
+    "stateModelKey": "finance_debit_memos_service_runtime",
+    "lifecycleMode": "service_backed_runtime",
+    "states": [
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": [] }
+    ],
+    "commands": [
+      { "command": "create", "targetState": "approved", "description": "Create an approved debit memo with governed reference and reason.", "idempotencyScope": "resource+payload" }
+    ],
+    "notes": [
+      "The current runtime exposes creation and retrieval only. Posting and settlement remain downstream ERP concerns, so approved is the authoritative state held here."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "finance.ap-invoices",
+      "finance.ar-invoices",
+      "procurement_supplier_quality.purchase-receipt-corrections"
+    ],
+    "downstreamObjects": [],
+    "keyRelationships": [
+      "ap_invoice_id -> ap_invoices.ap_invoice_id",
+      "ar_invoice_id -> ar_invoices.ar_invoice_id"
+    ],
+    "events": [
+      { "eventName": "approved", "description": "Debit memo was approved and recorded." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_canonical_api",
+    "notes": [
+      "Current runtime endpoints are exposed directly as /api/v1/finance/debit-memos* through FinanceController."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "ap_ar_invoices"
+    ],
+    "notes": [
+      "Debit memos are separated from the mixed AP/AR legacy invoice object so correction intent is no longer implicit."
+    ]
+  },
+  "invariants": [
+    "A debit memo requires positive amount, reason, and original invoice reference.",
+    "A debit memo must keep AP or AR scope explicit.",
+    "Debit memo creation must remain idempotent for retry safety."
+  ]
+}

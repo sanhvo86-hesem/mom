@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "canonicalResource": "maintenance_ehs.incidents",
+  "canonicalName": "ehs_incidents",
+  "displayName": "Incidents",
+  "purpose": "Control incident reporting, containment, investigation, corrective action, and closure so safety events cannot escape the EHS governance loop.",
+  "ownerDomain": "maintenance_ehs",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "ehs_management",
+  "storage": {
+    "primaryTable": "ehs_incidents",
+    "primaryKey": "incident_id",
+    "statusField": "incident_status",
+    "childTables": [
+      "incident_actions",
+      "incident_investigations"
+    ],
+    "legacyTables": [
+      "incidents"
+    ]
+  },
+  "identity": {
+    "strategy": "incident_id",
+    "naturalKeys": [
+      "incident_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "safety_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "incident_review",
+    "retentionClass": "ehs_record_10y",
+    "evidenceRequirements": [
+      "incident_report",
+      "containment_record",
+      "investigation_and_corrective_action"
+    ],
+    "kpiSignals": [
+      "near_miss_reporting_rate",
+      "incident_closure_lead_time",
+      "repeat_incident_rate"
+    ],
+    "autoAuditChecks": [
+      "contained_incidents_must_keep_investigation_trace",
+      "closed_incidents_must_have_corrective_action_or_justified_waiver",
+      "obligation_linked_incidents_must_preserve_regulatory_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + ehs_incidents_incident_status",
+    "stateModelKey": "ehs_incidents_incident_status",
+    "lifecycleMode": "persisted",
+    "states": [
+      { "value": "reported", "label": "Reported", "labelEn": "Reported", "allowedTransitionsFrom": [] },
+      { "value": "triaged", "label": "Triaged", "labelEn": "Triaged", "allowedTransitionsFrom": ["reported"] },
+      { "value": "contained", "label": "Contained", "labelEn": "Contained", "allowedTransitionsFrom": ["triaged", "investigating"] },
+      { "value": "investigating", "label": "Investigating", "labelEn": "Investigating", "allowedTransitionsFrom": ["triaged", "contained"] },
+      { "value": "corrective_action", "label": "Corrective Action", "labelEn": "Corrective Action", "allowedTransitionsFrom": ["investigating", "contained"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["corrective_action"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+    ],
+    "commands": [
+      { "command": "triage", "targetState": "triaged", "description": "Triage a newly reported incident.", "idempotencyScope": "resource+transition" },
+      { "command": "contain", "targetState": "contained", "description": "Record immediate containment against the incident.", "idempotencyScope": "resource+transition" },
+      { "command": "investigate", "targetState": "investigating", "description": "Start formal incident investigation.", "idempotencyScope": "resource+transition" },
+      { "command": "launch_corrective_action", "targetState": "corrective_action", "description": "Move the incident into owned corrective action execution.", "idempotencyScope": "resource+transition", "preconditions": ["investigation_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the incident after corrective action or documented justification.", "idempotencyScope": "resource+transition", "preconditions": ["closure_evidence_complete"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive a closed incident under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.employees",
+      "master_data.compliance-obligations",
+      "maintenance_ehs.permits"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.corrective-actions",
+      "maintenance_ehs.safety-observations",
+      "quality_improvement.improvement-actions"
+    ],
+    "keyRelationships": [
+      "reported_by_employee_id -> employees.employee_id",
+      "qual_compliance_obligation_id -> qual_compliance_obligations.qual_compliance_obligation_id"
+    ],
+    "events": [
+      { "eventName": "reported", "description": "Incident was reported into the EHS system." },
+      { "eventName": "contained", "description": "Incident containment was recorded." },
+      { "eventName": "investigating", "description": "Incident entered formal investigation." },
+      { "eventName": "closed", "description": "Incident was closed after corrective action." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is ehs_sustainability.ehs_incidents.* while canonical naming remains maintenance_ehs.incidents."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "incidents"
+    ],
+    "notes": [
+      "The old incidents label remains for compatibility, but ehs_incidents is the governed storage/runtime owner."
+    ]
+  },
+  "invariants": [
+    "Closed incidents must preserve investigation and corrective-action evidence.",
+    "Obligation-linked incidents must retain regulatory trace.",
+    "Containment and corrective-action history must remain auditable."
+  ]
+}

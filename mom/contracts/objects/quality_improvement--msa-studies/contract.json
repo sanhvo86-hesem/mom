@@ -1,0 +1,93 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.msa-studies",
+  "canonicalName": "calibration_grr_studies",
+  "displayName": "MSA Studies",
+  "purpose": "Capture measurement-system-analysis and GRR evidence so acceptance of measurement capability is explicit before relying on data for release, SPC, or capability decisions.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "assessment_record",
+  "ownerTeam": "metrology_qa",
+  "storage": {
+    "primaryTable": "calibration_grr_studies",
+    "primaryKey": "grr_id",
+    "statusField": null,
+    "childTables": [
+      "msa_trials"
+    ],
+    "legacyTables": [
+      "msa_studies"
+    ]
+  },
+  "identity": {
+    "strategy": "grr_id",
+    "naturalKeys": [
+      "grr_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "measurement_system_gate",
+    "auditClass": "assessment_audit_trail",
+    "continuousImprovementLoop": "measurement_system_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "study_protocol",
+      "sample_design",
+      "grr_result"
+    ],
+    "kpiSignals": [
+      "acceptable_grr_rate",
+      "measurement_variation_pct",
+      "revalidation_rate"
+    ],
+    "autoAuditChecks": [
+      "msa_study_must_reference_equipment_or_device_context",
+      "poor_grr_results_should_link_to_follow_up_action",
+      "study_result_must_preserve_operator_and_trial_evidence"
+    ]
+  },
+  "workflow": {
+    "implemented": false,
+    "truthStatus": "implemented_runtime",
+    "source": "calibration_equipment.calibration_grr_studies persisted assessment record",
+    "lifecycleMode": "assessment_record_runtime",
+    "disableGeneratedCommands": true,
+    "commands": [],
+    "states": []
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.equipment",
+      "master_data.measuring-devices"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.improvement-actions"
+    ],
+    "keyRelationships": [
+      "equipment_id -> equipment.equipment_id"
+    ],
+    "events": [
+      { "eventName": "recorded", "description": "MSA study was recorded." },
+      { "eventName": "updated", "description": "MSA study was updated with additional result evidence." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is calibration_equipment.calibration_grr_studies.* while canonical naming remains quality_improvement.msa-studies."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "msa_studies"
+    ],
+    "notes": [
+      "GRR study runtime naming remains in the calibration domain, but the canonical business meaning is measurement-system analysis in the quality-improvement loop."
+    ]
+  },
+  "invariants": [
+    "MSA studies must preserve the protocol and result used to justify measurement capability.",
+    "Studies with unacceptable GRR should remain traceable to follow-up improvement or calibration action.",
+    "MSA evidence must remain attributable to the governed equipment or measuring-device context."
+  ]
+}

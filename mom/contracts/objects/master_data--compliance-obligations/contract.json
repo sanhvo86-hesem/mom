@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.compliance-obligations",
+  "canonicalName": "compliance_obligations",
+  "displayName": "Compliance Obligations",
+  "purpose": "Controls obligation due, waiver, and closure so permits, audits, and regulatory actions have a governed compliance anchor.",
+  "ownerDomain": "master_data",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_compliance",
+  "storage": {
+    "primaryTable": "qual_compliance_obligations",
+    "primaryKey": "qual_compliance_obligation_id",
+    "statusField": "obligation_status",
+    "childTables": [
+      "obligation_evidence",
+      "obligation_tasks"
+    ],
+    "legacyTables": [
+      "compliance_obligations"
+    ]
+  },
+  "identity": {
+    "strategy": "obligation_code",
+    "naturalKeys": [
+      "obligation_code"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "compliance_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "management_review",
+    "retentionClass": "compliance_record_10y",
+    "evidenceRequirements": [
+      "obligation_source",
+      "owner_assignment",
+      "closure_or_waiver_basis"
+    ],
+    "kpiSignals": [
+      "obligation_on_time_closure_rate",
+      "overdue_obligation_count",
+      "waiver_rate"
+    ],
+    "autoAuditChecks": [
+      "overdue_obligations_must_keep_owned_action_trace",
+      "waived_obligations_must_preserve_approval_evidence",
+      "closed_obligations_must_remain_traceable_to_source_and_owner"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "qual_compliance_obligations_obligation_status",
+    "lifecycleMode": "persisted",
+    "states": [
+      { "value": "open", "label": "Mở", "labelEn": "Open", "allowedTransitionsFrom": [] },
+      { "value": "due", "label": "Đến hạn", "labelEn": "Due", "allowedTransitionsFrom": ["open"] },
+      { "value": "overdue", "label": "Quá hạn", "labelEn": "Overdue", "allowedTransitionsFrom": ["open", "due"] },
+      { "value": "waived", "label": "Miễn trừ", "labelEn": "Waived", "allowedTransitionsFrom": ["open", "due", "overdue"] },
+      { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["open", "due", "overdue", "waived"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+    ],
+    "commands": [
+      { "command": "mark_due", "targetState": "due", "description": "Mark the obligation as actively due for controlled follow-up.", "idempotencyScope": "resource+transition" },
+      { "command": "mark_overdue", "targetState": "overdue", "description": "Escalate the obligation into overdue state with management visibility.", "idempotencyScope": "resource+transition" },
+      { "command": "waive", "targetState": "waived", "description": "Waive the obligation under documented approval.", "idempotencyScope": "resource+transition", "preconditions": ["waiver_approval_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the obligation after governed completion or waiver basis.", "idempotencyScope": "resource+transition", "preconditions": ["closure_basis_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the closed obligation under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.employees"
+    ],
+    "downstreamObjects": [
+      "maintenance_ehs.permits",
+      "maintenance_ehs.incidents"
+    ],
+    "keyRelationships": [
+      "qual_compliance_obligation_id -> ehs_incidents.qual_compliance_obligation_id",
+      "owner_id -> employees.employee_id"
+    ],
+    "events": [
+      { "eventName": "due", "description": "Compliance obligation became due." },
+      { "eventName": "overdue", "description": "Compliance obligation became overdue." },
+      { "eventName": "waived", "description": "Compliance obligation was waived under approval." },
+      { "eventName": "closed", "description": "Compliance obligation was closed." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_lab.qual_compliance_obligations.* while canonical naming remains master_data.compliance-obligations."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "qual_compliance_obligations",
+      "compliance_obligations"
+    ],
+    "notes": [
+      "Quality-lab runtime naming remains the live API surface. The canonical contract keeps obligation governance explicit across compliance, permit, and incident flows."
+    ]
+  },
+  "invariants": [
+    "Overdue obligations must preserve owner accountability and action trace.",
+    "Waived obligations require approval evidence and must remain auditable.",
+    "Closed obligations must retain trace to their regulatory or audit source."
+  ]
+}

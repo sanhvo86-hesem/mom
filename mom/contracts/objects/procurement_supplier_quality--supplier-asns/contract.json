@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "canonicalResource": "procurement_supplier_quality.supplier-asns",
+  "canonicalName": "supplier_asns",
+  "displayName": "Supplier ASNs",
+  "purpose": "Control inbound advance shipment notice, discrepancy handling, and receiving readiness so physical receipts cannot outrun supplier intent and dock planning truth.",
+  "ownerDomain": "procurement_supplier_quality",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "receiving_operations",
+  "storage": {
+    "primaryTable": "supplier_asns",
+    "primaryKey": "supplier_asn_id",
+    "statusField": "asn_status",
+    "childTables": [
+      "supplier_asn_lines"
+    ],
+    "legacyTables": [
+      "supplier_asns"
+    ]
+  },
+  "identity": {
+    "strategy": "asn_number",
+    "naturalKeys": [
+      "asn_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "supplier_review",
+    "retentionClass": "procurement_record_7y",
+    "evidenceRequirements": [
+      "po_linkage",
+      "carrier_or_tracking_trace",
+      "discrepancy_record_when_asn_differs_from_po"
+    ],
+    "kpiSignals": [
+      "asn_confirmation_lead_time",
+      "asn_discrepancy_rate",
+      "asn_to_receipt_cycle_time"
+    ],
+    "autoAuditChecks": [
+      "asn_must_reference_governed_supplier_po",
+      "received_asn_must_not_close_without_receipt_trace",
+      "discrepant_asn_must_record_disposition_before_closure"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + supplier_asns_asn_status",
+    "stateModelKey": "supplier_asns_asn_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "planned", "label": "Planned", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+      { "value": "confirmed", "label": "Confirmed", "labelEn": "Confirmed", "allowedTransitionsFrom": ["planned"] },
+      { "value": "receiving", "label": "Receiving", "labelEn": "Receiving", "allowedTransitionsFrom": ["confirmed", "discrepant"] },
+      { "value": "received", "label": "Received", "labelEn": "Received", "allowedTransitionsFrom": ["receiving"] },
+      { "value": "discrepant", "label": "Discrepant", "labelEn": "Discrepant", "allowedTransitionsFrom": ["confirmed", "receiving"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["received", "discrepant"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "confirmed"] }
+    ],
+    "commands": [
+      { "command": "confirm", "targetState": "confirmed", "description": "Confirm the supplier ASN against the governed PO and expected inbound plan.", "idempotencyScope": "resource+transition" },
+      { "command": "start_receiving", "targetState": "receiving", "description": "Move the ASN into active receiving execution.", "idempotencyScope": "resource+transition", "preconditions": ["dock_ready"] },
+      { "command": "mark_received", "targetState": "received", "description": "Mark that the ASN quantity physically arrived for receipt creation.", "idempotencyScope": "resource+transition", "preconditions": ["physical_arrival_recorded"] },
+      { "command": "mark_discrepant", "targetState": "discrepant", "description": "Record ASN discrepancy against PO, packing, or physical inbound condition.", "idempotencyScope": "resource+transition", "preconditions": ["discrepancy_reason_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the ASN after receipt and discrepancy handling are complete.", "idempotencyScope": "resource+transition", "preconditions": ["receipt_or_disposition_complete"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel an ASN before physical receipt enters stock truth.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "procurement_supplier_quality.supplier-purchase-orders",
+      "master_data.suppliers"
+    ],
+    "downstreamObjects": [
+      "procurement_supplier_quality.purchase-receipts",
+      "procurement_supplier_quality.iqc-inspections"
+    ],
+    "keyRelationships": [
+      "po_id -> supplier_purchase_orders.supplier_purchase_order_id",
+      "vendor_id -> vendors.vendor_id"
+    ],
+    "events": [
+      { "eventName": "confirmed", "description": "Supplier ASN was confirmed against expected inbound supply." },
+      { "eventName": "receiving", "description": "Supplier ASN entered active receiving preparation or execution." },
+      { "eventName": "received", "description": "Supplier ASN was physically received and is ready for receipt trace." },
+      { "eventName": "discrepant", "description": "Supplier ASN recorded a governed discrepancy." },
+      { "eventName": "closed", "description": "Supplier ASN was closed after downstream receiving completion." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is purchasing.supplier_asns.* while canonical naming remains procurement_supplier_quality.supplier-asns."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "supplier_asns"
+    ],
+    "notes": [
+      "The supplier_asns runtime name stays in place for compatibility until canonical API rollout is complete."
+    ]
+  },
+  "invariants": [
+    "An ASN must reference a governed supplier purchase order before confirmation.",
+    "A discrepant ASN must preserve discrepancy reason and downstream disposition trace.",
+    "An ASN cannot close without receipt or discrepancy completion trace."
+  ]
+}

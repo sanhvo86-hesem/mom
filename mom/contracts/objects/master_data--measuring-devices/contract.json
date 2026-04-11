@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.measuring-devices",
+  "canonicalName": "measuring_devices",
+  "displayName": "Measuring Devices",
+  "purpose": "Provide a canonical measuring-device contract so calibration release, quarantine, and metrology evidence stop drifting between tool-control naming and legacy gauge terminology.",
+  "ownerDomain": "master_data",
+  "objectRole": "reference_master",
+  "ownerTeam": "metrology_control",
+  "storage": {
+    "primaryTable": "tools",
+    "primaryKey": "tool_id",
+    "statusField": "tool_status",
+    "childTables": [
+      "calibration_records",
+      "calibration_oot_investigations",
+      "calibration_grr_studies"
+    ],
+    "legacyTables": [
+      "gauges",
+      "tools"
+    ]
+  },
+  "identity": {
+    "strategy": "tool_id",
+    "naturalKeys": [
+      "tool_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "measurement_system_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "device_identity",
+      "calibration_due_trace",
+      "traceable_standard_reference"
+    ],
+    "kpiSignals": [
+      "calibration_on_time_rate",
+      "overdue_device_rate",
+      "msa_acceptance_rate"
+    ],
+    "autoAuditChecks": [
+      "current_calibration_evidence_required_before_release",
+      "expired_or_failed_devices_must_not_remain_issuable",
+      "out_of_tolerance_devices_must_preserve_containment_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "compatibility_bridge",
+    "source": "wave1_lifecycle_normalization shared tools status plus calibration evidence bridge",
+    "stateModelKey": "master_data_measuring_devices_bridge",
+    "lifecycleMode": "guarded_transition_runtime",
+    "disableGeneratedCommands": true,
+    "states": [
+      { "value": "new", "label": "New", "labelEn": "New", "allowedTransitionsFrom": [] },
+      { "value": "qualified", "label": "Qualified", "labelEn": "Qualified", "allowedTransitionsFrom": ["new", "worn"] },
+      { "value": "in_use", "label": "In Use", "labelEn": "In Use", "allowedTransitionsFrom": ["qualified"] },
+      { "value": "worn", "label": "Worn", "labelEn": "Worn", "allowedTransitionsFrom": ["in_use"] },
+      { "value": "broken", "label": "Broken", "labelEn": "Broken", "allowedTransitionsFrom": ["in_use", "worn"] },
+      { "value": "retired", "label": "Retired", "labelEn": "Retired", "allowedTransitionsFrom": ["broken", "worn"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+    ],
+    "notes": [
+      "A dedicated measuring_devices table and runtime surface are not materialized yet.",
+      "Current lifecycle truth is bridged through shared tool-status control plus calibration and OOT evidence."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "quality_improvement.msa-studies"
+    ],
+    "keyRelationships": [],
+    "events": [
+      { "eventName": "qualified", "description": "Measuring device was released for governed use." },
+      { "eventName": "quarantined", "description": "Measuring device was blocked because calibration or condition became unacceptable." },
+      { "eventName": "retired", "description": "Measuring device was retired from active use." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_bridge_only",
+    "notes": [
+      "No dedicated measuring-device API is active yet.",
+      "Runtime truth is partially bridged from calibration_equipment.tools.* plus calibration evidence records."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "gauges",
+      "tools"
+    ],
+    "notes": [
+      "The canonical measuring-device meaning is explicit even though current storage and runtime still piggyback on tooling control."
+    ]
+  },
+  "invariants": [
+    "A measuring device must not be released without current calibration evidence.",
+    "Failed or expired measuring devices must remain quarantined until governed disposition.",
+    "Measurement-system studies must preserve the link back to the governed device identity."
+  ]
+}

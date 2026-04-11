@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "canonicalResource": "maintenance_ehs.maintenance-plans",
+  "canonicalName": "maintenance_plans",
+  "displayName": "Maintenance Plans",
+  "purpose": "Controls preventive-maintenance plan approval, release, hold, and retirement so recurring PM cadence stays auditable before work orders are auto-released.",
+  "ownerDomain": "maintenance_ehs",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "maintenance_planning",
+  "storage": {
+    "primaryTable": "pm_maintenance_plans",
+    "primaryKey": "maintenance_plan_id",
+    "statusField": "status",
+    "childTables": [
+      "maintenance_plan_tasks"
+    ],
+    "legacyTables": [
+      "maintenance_plans",
+      "pm_plans"
+    ]
+  },
+  "identity": {
+    "strategy": "plan_number",
+    "naturalKeys": [
+      "plan_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "maintenance_review",
+    "retentionClass": "maintenance_record_10y",
+    "evidenceRequirements": [
+      "maintenance_scope_definition",
+      "approved_pm_interval",
+      "equipment_link_and_release_basis"
+    ],
+    "kpiSignals": [
+      "pm_schedule_adherence",
+      "pm_plan_activation_lead_time",
+      "deferred_pm_rate"
+    ],
+    "autoAuditChecks": [
+      "active_plans_must_reference_released_equipment",
+      "retired_plans_must_not_auto_release_new_work",
+      "on_hold_plans_must_preserve_deferral_reason"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "pm_maintenance_plans_status_set",
+    "lifecycleMode": "persisted",
+    "states": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["draft", "on_hold"] },
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["approved", "on_hold"] },
+      { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["approved", "active"] },
+      { "value": "retired", "label": "Ngừng áp dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["approved", "active", "on_hold"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+    ],
+    "commands": [
+      { "command": "approve", "targetState": "approved", "description": "Approve the preventive-maintenance plan for operational use.", "idempotencyScope": "resource+transition", "preconditions": ["scope_and_frequency_complete"] },
+      { "command": "activate", "targetState": "active", "description": "Activate the approved plan for governed scheduling and release.", "idempotencyScope": "resource+transition", "preconditions": ["equipment_released"] },
+      { "command": "hold", "targetState": "on_hold", "description": "Hold the maintenance plan under deferral or equipment constraint.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "retire", "targetState": "retired", "description": "Retire the maintenance plan from future release.", "idempotencyScope": "resource+transition", "preconditions": ["retirement_reason_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the retired maintenance plan under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.equipment"
+    ],
+    "downstreamObjects": [
+      "maintenance_ehs.maintenance-work-orders"
+    ],
+    "keyRelationships": [
+      "equipment_id -> equipment.equipment_id"
+    ],
+    "events": [
+      { "eventName": "approved", "description": "Maintenance plan was approved." },
+      { "eventName": "active", "description": "Maintenance plan was released into active scheduling." },
+      { "eventName": "on_hold", "description": "Maintenance plan was placed on hold." },
+      { "eventName": "retired", "description": "Maintenance plan was retired from future release." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is plant_maintenance.pm_maintenance_plans.* while canonical naming remains maintenance_ehs.maintenance-plans."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "maintenance_plans",
+      "pm_plans"
+    ],
+    "notes": [
+      "Plant-maintenance runtime naming remains the active API surface. The canonical contract keeps PM plan meaning explicit for ERP+MOM orchestration."
+    ]
+  },
+  "invariants": [
+    "Active maintenance plans must reference released equipment and valid PM cadence.",
+    "On-hold plans must preserve the deferral reason and approver trace.",
+    "Retired plans must not continue auto-releasing maintenance work."
+  ]
+}

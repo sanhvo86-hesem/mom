@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "canonicalResource": "planning_production.production-operations",
+  "canonicalName": "production_operations",
+  "displayName": "Production Operations",
+  "purpose": "Controls operation-level execution, hold, completion, and scrap so genealogy and in-process quality can anchor to the actual operation step.",
+  "ownerDomain": "planning_production",
+  "objectRole": "contained_child",
+  "ownerTeam": "shopfloor_execution",
+  "storage": {
+    "primaryTable": "production_operations",
+    "primaryKey": "production_operation_id",
+    "statusField": "operation_status",
+    "childTables": [],
+    "legacyTables": [
+      "job_operations",
+      "job_order_operations",
+      "routing_steps",
+      "work_order_operations"
+    ]
+  },
+  "identity": {
+    "strategy": "job_order_id+operation_seq",
+    "naturalKeys": [
+      "job_order_id",
+      "operation_seq"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "qrqc",
+    "retentionClass": "production_record_7y",
+    "evidenceRequirements": [
+      "operation_execution_trace",
+      "quality_hold_or_scrap_basis",
+      "completion_or_cancellation_record"
+    ],
+    "kpiSignals": [
+      "operation_cycle_adherence",
+      "operation_hold_rate",
+      "operation_scrap_rate"
+    ],
+    "autoAuditChecks": [
+      "completed_operations_must_preserve_execution_totals",
+      "quality_hold_operations_must_link_ipqc_or_ncr_trace",
+      "scrapped_operations_must_preserve_loss_reason"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "job_operations_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "pending", "label": "Chờ xử lý", "labelEn": "Pending", "allowedTransitionsFrom": [] },
+      { "value": "ready", "label": "Sẵn sàng", "labelEn": "Ready", "allowedTransitionsFrom": ["pending", "quality_hold"] },
+      { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "allowedTransitionsFrom": ["ready"] },
+      { "value": "quality_hold", "label": "Giữ chất lượng", "labelEn": "Quality Hold", "allowedTransitionsFrom": ["ready", "in_progress"] },
+      { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "scrapped", "label": "Loại bỏ", "labelEn": "Scrapped", "allowedTransitionsFrom": ["in_progress", "quality_hold"] },
+      { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["pending", "ready"] }
+    ],
+    "commands": [
+      { "command": "ready", "targetState": "ready", "description": "Declare the operation ready for governed execution.", "idempotencyScope": "resource+transition", "preconditions": ["dispatch_released"] },
+      { "command": "start", "targetState": "in_progress", "description": "Start the production operation.", "idempotencyScope": "resource+transition" },
+      { "command": "hold_for_quality", "targetState": "quality_hold", "description": "Hold the operation under quality concern.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "complete", "targetState": "completed", "description": "Complete the production operation with governed execution totals.", "idempotencyScope": "resource+transition", "preconditions": ["execution_totals_recorded"] },
+      { "command": "scrap", "targetState": "scrapped", "description": "Record scrap against the production operation.", "idempotencyScope": "resource+transition", "preconditions": ["scrap_reason_recorded"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the operation before execution begins.", "idempotencyScope": "resource+transition", "preconditions": ["cancellation_reason_recorded"] }
+    ],
+    "notes": [
+      "Production operations are contained-child workflow records. They must not be treated as an independent parent lifecycle authority."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.dispatch-lists",
+      "planning_production.work-orders"
+    ],
+    "downstreamObjects": [
+      "planning_production.ipqc-inspections",
+      "quality_improvement.nonconformances",
+      "inventory_logistics.inventory-movements"
+    ],
+    "keyRelationships": [
+      "work_order_id -> work_orders.work_order_id",
+      "job_order_id -> job_orders.job_order_id"
+    ],
+    "events": [
+      { "eventName": "ready", "description": "Production operation became ready for execution." },
+      { "eventName": "in_progress", "description": "Production operation entered active execution." },
+      { "eventName": "completed", "description": "Production operation completed." },
+      { "eventName": "scrapped", "description": "Production operation recorded scrap." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is production.job_operations.* while canonical naming remains planning_production.production-operations."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "job_operations",
+      "job_order_operations",
+      "work_order_operations"
+    ],
+    "notes": [
+      "Legacy operation tables remain for compatibility, but the canonical contract fixes the business meaning as a contained child under production execution."
+    ]
+  },
+  "invariants": [
+    "Production operations must remain subordinate to governed parent production execution records.",
+    "Quality-hold operations must preserve IPQC or NCR trace before release.",
+    "Completed or scrapped operations must retain execution totals and disposition evidence."
+  ]
+}

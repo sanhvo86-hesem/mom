@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.inventory-items",
+  "canonicalName": "inventory_items",
+  "displayName": "Inventory Items",
+  "purpose": "Controls release, obsolescence, and inventory-usable truth for the shared item master without duplicating inventory item identity.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "reference_master",
+  "ownerTeam": "item_master_control",
+  "storage": {
+    "primaryTable": "inventory_items",
+    "primaryKey": "inventory_item_id",
+    "statusField": "item_status",
+    "childTables": [
+      "inventory_item_revisions",
+      "inventory_item_uoms"
+    ],
+    "legacyTables": [
+      "items"
+    ]
+  },
+  "identity": {
+    "strategy": "item_id",
+    "naturalKeys": [
+      "item_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "engineering_change",
+    "retentionClass": "master_data_record_10y",
+    "evidenceRequirements": [
+      "item_specification",
+      "released_revision",
+      "uom_and_planning_definition"
+    ],
+    "kpiSignals": [
+      "item_master_completeness",
+      "engineering_release_lead_time",
+      "obsolete_item_cleanup_rate"
+    ],
+    "autoAuditChecks": [
+      "active_items_must_have_released_revision_trace",
+      "obsolete_items_must_not_remain_planning_eligible",
+      "item_identity_must_not_fork_between_canonical_and_legacy_surfaces"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "items_item_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "prototype", "label": "Mẫu thử", "labelEn": "Prototype", "allowedTransitionsFrom": [] },
+      { "value": "engineering", "label": "Kỹ thuật", "labelEn": "Engineering", "allowedTransitionsFrom": ["prototype"] },
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["engineering", "inactive"] },
+      { "value": "inactive", "label": "Ngưng dùng", "labelEn": "Inactive", "allowedTransitionsFrom": ["active"] },
+      { "value": "obsolete", "label": "Lỗi thời", "labelEn": "Obsolete", "allowedTransitionsFrom": ["inactive", "engineering"] }
+    ],
+    "commands": [
+      { "command": "promote_to_engineering", "targetState": "engineering", "description": "Promote the item into controlled engineering release.", "idempotencyScope": "resource+transition" },
+      { "command": "activate", "targetState": "active", "description": "Release the item for governed commercial, planning, and inventory use.", "idempotencyScope": "resource+transition", "preconditions": ["released_revision_exists"] },
+      { "command": "inactivate", "targetState": "inactive", "description": "Block the item from new operational use without deleting history.", "idempotencyScope": "resource+transition" },
+      { "command": "obsolesce", "targetState": "obsolete", "description": "Retire the item from future operational use under controlled obsolescence.", "idempotencyScope": "resource+transition", "preconditions": ["obsolescence_reason_recorded"] }
+    ],
+    "notes": [
+      "Canonical inventory-items still converges from the legacy items runtime surface. The contract locks business meaning before API/domain renaming."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "commercial_customer.sales-orders",
+      "planning_production.job-orders",
+      "procurement_supplier_quality.supplier-purchase-orders",
+      "inventory_logistics.inventory-movements"
+    ],
+    "keyRelationships": [
+      "inventory_item_id -> stock_balances.inventory_item_id",
+      "inventory_item_id -> sales_order_lines.inventory_item_id",
+      "inventory_item_id -> supplier_purchase_order_lines.inventory_item_id"
+    ],
+    "events": [
+      { "eventName": "engineering", "description": "Item entered engineering-controlled state." },
+      { "eventName": "active", "description": "Item was released for operational use." },
+      { "eventName": "inactive", "description": "Item was blocked from new operational use." },
+      { "eventName": "obsolete", "description": "Item was retired under obsolescence governance." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface remains master_data.items.* while canonical naming remains inventory_logistics.inventory-items."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "items",
+      "item_status",
+      "item_id"
+    ],
+    "notes": [
+      "Legacy items runtime still carries the operational surface. The canonical contract forbids identity fork between item_id and inventory_item_id naming."
+    ]
+  },
+  "invariants": [
+    "Active inventory items must retain released specification and revision trace.",
+    "Obsolete items must not remain eligible for new demand or purchasing release.",
+    "Item identity must remain stable across canonical and legacy runtime names."
+  ]
+}

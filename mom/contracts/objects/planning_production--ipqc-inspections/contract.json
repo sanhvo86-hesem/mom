@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "canonicalResource": "planning_production.ipqc-inspections",
+  "canonicalName": "ipqc_inspections",
+  "displayName": "IPQC Inspections",
+  "purpose": "Control in-process quality checks so process escapes trigger hold, reinspection, or NCR before final inspection and shipment release.",
+  "ownerDomain": "planning_production",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_control",
+  "storage": {
+    "primaryTable": "ipqc_inspections",
+    "primaryKey": "ipqc_inspection_id",
+    "statusField": "inspection_status",
+    "childTables": [
+      "ipqc_inspection_results"
+    ],
+    "legacyTables": []
+  },
+  "identity": {
+    "strategy": "ipqc_number",
+    "naturalKeys": [
+      "ipqc_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "process_quality_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "inspection_results",
+      "work_order_trace",
+      "containment_or_reinspection_decision"
+    ],
+    "kpiSignals": [
+      "in_process_first_pass_yield",
+      "reinspection_rate",
+      "hold_response_time"
+    ],
+    "autoAuditChecks": [
+      "rejected_ipqc_must_trigger_containment_or_ncr",
+      "closed_ipqc_must_have_result_evidence",
+      "reinspection_must_trace_to_prior_rejection"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + ipqc_inspections_inspection_status",
+    "stateModelKey": "ipqc_inspections_inspection_status",
+    "lifecycleMode": "persisted",
+    "states": [
+      { "value": "queued", "label": "Queued", "labelEn": "Queued", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "In Progress", "labelEn": "In Progress", "allowedTransitionsFrom": ["queued", "reinspect"] },
+      { "value": "accepted", "label": "Accepted", "labelEn": "Accepted", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "reinspect", "label": "Reinspect", "labelEn": "Reinspect", "allowedTransitionsFrom": ["rejected"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["accepted", "rejected"] }
+    ],
+    "commands": [
+      { "command": "start", "targetState": "in_progress", "description": "Start in-process inspection execution.", "idempotencyScope": "resource+transition" },
+      { "command": "accept", "targetState": "accepted", "description": "Accept the in-process check after evidence review.", "idempotencyScope": "resource+transition", "preconditions": ["results_recorded"] },
+      { "command": "reject", "targetState": "rejected", "description": "Reject the in-process check and trigger containment.", "idempotencyScope": "resource+transition", "preconditions": ["results_recorded"] },
+      { "command": "reinspect", "targetState": "reinspect", "description": "Send the inspection back for reinspection after corrective action.", "idempotencyScope": "resource+transition" },
+      { "command": "close", "targetState": "closed", "description": "Close the IPQC record after acceptance or managed rejection.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.work-orders",
+      "planning_production.production-operations"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.nonconformances",
+      "quality_improvement.oqc-inspections",
+      "quality_improvement.corrective-actions"
+    ],
+    "keyRelationships": [
+      "work_order_id -> work_orders.work_order_id",
+      "job_op_id -> job_operations.job_op_id"
+    ],
+    "events": [
+      { "eventName": "started", "description": "IPQC inspection entered active execution." },
+      { "eventName": "accepted", "description": "IPQC inspection accepted the in-process result." },
+      { "eventName": "rejected", "description": "IPQC inspection rejected the in-process result." },
+      { "eventName": "reinspect", "description": "IPQC inspection was routed back for reinspection." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_management.ipqc_inspections.* while canonical naming remains planning_production.ipqc-inspections."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "ipqc_inspections"
+    ],
+    "notes": [
+      "The table name already matches the business object, but the runtime endpoint domain still sits under quality_management for compatibility."
+    ]
+  },
+  "invariants": [
+    "Rejected IPQC results must preserve containment or NCR trace.",
+    "Closed IPQC records must retain result evidence.",
+    "Reinspection must reference the prior rejected inspection path."
+  ]
+}

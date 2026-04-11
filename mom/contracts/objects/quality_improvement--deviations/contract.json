@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.deviations",
+  "canonicalName": "deviations",
+  "displayName": "Deviations",
+  "purpose": "Control temporary process, product, or documentation deviations so exception handling remains explicit, time-bounded, and auditable instead of disappearing inside generic status notes.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_systems",
+  "storage": {
+    "primaryTable": "deviations",
+    "primaryKey": "deviation_id",
+    "statusField": "status",
+    "childTables": [
+      "electronic_signature"
+    ],
+    "legacyTables": [
+      "deviation",
+      "deviations",
+      "plm_deviation_permits"
+    ],
+    "legacyTablesToIsolate": [
+      "deviation"
+    ]
+  },
+  "identity": {
+    "strategy": "deviation_id",
+    "naturalKeys": [
+      "deviation_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "exception_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "capa",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "deviation_scope",
+      "risk_assessment",
+      "approval_or_rejection_trace"
+    ],
+    "kpiSignals": [
+      "deviation_open_count",
+      "deviation_closure_lead_time",
+      "repeat_deviation_rate"
+    ],
+    "autoAuditChecks": [
+      "open_deviations_must_define_scope_and_owner",
+      "closed_deviations_must_keep_disposition_and_reason",
+      "systemic_deviations_should_link_to_corrective_action"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + deviations exception_status alignment",
+    "stateModelKey": "deviations_exception_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "open", "label": "Open", "labelEn": "Open", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "In Progress", "labelEn": "In Progress", "allowedTransitionsFrom": ["open"] },
+      { "value": "pending_review", "label": "Pending Review", "labelEn": "Pending Review", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["pending_review"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending_review"] }
+    ],
+    "commands": [
+      { "command": "start_work", "targetState": "in_progress", "description": "Start governed investigation or mitigation for the deviation.", "idempotencyScope": "resource+transition" },
+      { "command": "submit_for_review", "targetState": "pending_review", "description": "Move the deviation into approval review.", "idempotencyScope": "resource+transition", "preconditions": ["risk_and_scope_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the deviation after approved disposition and evidence review.", "idempotencyScope": "resource+transition", "preconditions": ["disposition_recorded"] },
+      { "command": "reject", "targetState": "rejected", "description": "Reject the deviation path under governed reason.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.sales-orders",
+      "planning_production.job-orders"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.corrective-actions"
+    ],
+    "keyRelationships": [
+      "linked_so_number -> sales_orders.sales_order_number",
+      "linked_jo_number -> job_orders.job_order_number"
+    ],
+    "events": [
+      { "eventName": "opened", "description": "Deviation was opened under governed exception control." },
+      { "eventName": "pending-review", "description": "Deviation entered approval review." },
+      { "eventName": "closed", "description": "Deviation was closed with retained evidence." },
+      { "eventName": "rejected", "description": "Deviation request or closure path was rejected." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_management.deviations.* while canonical naming remains quality_improvement.deviations."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "deviation",
+      "deviations",
+      "plm_deviation_permits"
+    ],
+    "notes": [
+      "Deviation naming is retained for migration safety, but the canonical contract clarifies that this is a governed exception object, not a generic workflow placeholder."
+    ]
+  },
+  "invariants": [
+    "Deviation scope and risk must be explicit before review.",
+    "Closed deviations must preserve disposition, reason, and approval trace.",
+    "Systemic deviations should link to CAPA or equivalent follow-up."
+  ]
+}

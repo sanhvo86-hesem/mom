@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.customers",
+  "canonicalName": "customers",
+  "displayName": "Customers",
+  "purpose": "Controls customer commercial release eligibility, order acceptance, and evidence retention on the customer master.",
+  "ownerDomain": "master_data",
+  "objectRole": "reference_master",
+  "ownerTeam": "commercial_operations",
+  "storage": {
+    "primaryTable": "customers",
+    "primaryKey": "customer_id",
+    "statusField": "customer_status",
+    "childTables": [
+      "customer_addresses",
+      "customer_contacts"
+    ],
+    "legacyTables": [
+      "customers"
+    ]
+  },
+  "identity": {
+    "strategy": "customer_id",
+    "naturalKeys": [
+      "customer_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "management_review",
+    "retentionClass": "commercial_master_record_10y",
+    "evidenceRequirements": [
+      "commercial_profile",
+      "shipping_and_payment_defaults",
+      "customer_specific_requirements"
+    ],
+    "kpiSignals": [
+      "customer_master_completeness",
+      "customer_activation_lead_time",
+      "customer_hold_rate"
+    ],
+    "autoAuditChecks": [
+      "active_customers_must_have_operational_defaults_defined",
+      "on_hold_customers_must_not_accept_new_order_commitments_without_override",
+      "archived_customers_must_not_remain_selectable_for_new_quotes_or_orders"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "customers_customer_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "prospective", "label": "Tiềm năng", "labelEn": "Prospective", "allowedTransitionsFrom": [] },
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["prospective", "inactive", "on_hold"] },
+      { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["active"] },
+      { "value": "inactive", "label": "Ngưng hoạt động", "labelEn": "Inactive", "allowedTransitionsFrom": ["active", "on_hold"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["inactive"] }
+    ],
+    "commands": [
+      { "command": "activate", "targetState": "active", "description": "Release the customer for governed commercial use.", "idempotencyScope": "resource+transition", "preconditions": ["commercial_profile_complete"] },
+      { "command": "hold", "targetState": "on_hold", "description": "Place the customer on controlled commercial hold.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "inactivate", "targetState": "inactive", "description": "Stop new commercial use while preserving historical trace.", "idempotencyScope": "resource+transition" },
+      { "command": "archive", "targetState": "archived", "description": "Archive the inactive customer under retention policy.", "idempotencyScope": "resource+transition", "preconditions": ["no_open_commercial_dependents"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "commercial_customer.quotations",
+      "commercial_customer.customer-purchase-orders",
+      "commercial_customer.sales-orders",
+      "commercial_customer.customer-care-cases"
+    ],
+    "keyRelationships": [
+      "customer_id -> quotations.customer_id",
+      "customer_id -> customer_purchase_orders.customer_id",
+      "customer_id -> sales_orders.customer_id"
+    ],
+    "events": [
+      { "eventName": "active", "description": "Customer master was released for commercial use." },
+      { "eventName": "on_hold", "description": "Customer master entered controlled hold." },
+      { "eventName": "inactive", "description": "Customer master stopped new commercial use." },
+      { "eventName": "archived", "description": "Customer master was archived from active scope." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is sales.customers.* while canonical naming remains master_data.customers."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "customers",
+      "customer_status"
+    ],
+    "notes": [
+      "Sales runtime naming remains the active API surface. The canonical contract keeps customer-master meaning separate from downstream commercial documents."
+    ]
+  },
+  "invariants": [
+    "Active customers must retain required commercial defaults and requirement trace.",
+    "On-hold customers must not accept new commitments without governed override.",
+    "Archived customers must not remain selectable for new quotes or orders."
+  ]
+}

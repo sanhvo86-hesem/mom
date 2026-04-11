@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "canonicalResource": "commercial_customer.quotations",
+  "canonicalName": "quotes",
+  "displayName": "Quotations",
+  "purpose": "Control commercial estimation, review, offer release, and conversion so customer demand does not bypass governed quote truth before SO commitment.",
+  "ownerDomain": "commercial_customer",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "estimating_and_sales",
+  "storage": {
+    "primaryTable": "quotes",
+    "primaryKey": "quote_id",
+    "statusField": "status",
+    "childTables": [
+      "quotation_lines"
+    ],
+    "legacyTables": [
+      "quotations",
+      "crm_quotes_pipeline"
+    ]
+  },
+  "identity": {
+    "strategy": "quote_number",
+    "naturalKeys": [
+      "quote_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "commercial_commitment_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "quote_win_loss_review",
+    "retentionClass": "commercial_document_7y",
+    "evidenceRequirements": [
+      "cost_breakdown",
+      "commercial_review",
+      "customer_offer_release"
+    ],
+    "kpiSignals": [
+      "quote_cycle_time",
+      "win_rate",
+      "quote_revision_rate"
+    ],
+    "autoAuditChecks": [
+      "cannot_send_without_estimation_complete",
+      "accepted_quotes_should_convert_or_expire_with_trace",
+      "converted_quotes_must_reference_resulting_sales_order"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "QuoteService::TRANSITIONS",
+    "stateModelKey": "quotes_status_quote_runtime",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "internal_review", "label": "Internal Review", "labelEn": "Internal Review", "allowedTransitionsFrom": ["draft", "revised"] },
+      { "value": "sent", "label": "Sent", "labelEn": "Sent", "allowedTransitionsFrom": ["internal_review"] },
+      { "value": "accepted", "label": "Accepted", "labelEn": "Accepted", "allowedTransitionsFrom": ["sent"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["sent"] },
+      { "value": "expired", "label": "Expired", "labelEn": "Expired", "allowedTransitionsFrom": ["sent"] },
+      { "value": "revised", "label": "Revised", "labelEn": "Revised", "allowedTransitionsFrom": ["sent", "expired"] },
+      { "value": "converted", "label": "Converted", "labelEn": "Converted", "allowedTransitionsFrom": ["accepted"] }
+    ],
+    "commands": [
+      { "command": "submit_for_review", "targetState": "internal_review", "description": "Move the quote from draft into governed commercial review.", "idempotencyScope": "resource+transition" },
+      { "command": "send", "targetState": "sent", "description": "Release the quote to the customer after review.", "idempotencyScope": "resource+transition", "preconditions": ["commercial_review_complete"] },
+      { "command": "accept", "targetState": "accepted", "description": "Record customer acceptance of the quotation.", "idempotencyScope": "resource+transition" },
+      { "command": "reject", "targetState": "rejected", "description": "Record customer rejection of the quotation.", "idempotencyScope": "resource+transition" },
+      { "command": "expire", "targetState": "expired", "description": "Expire an unanswered quotation after validity lapse.", "idempotencyScope": "resource+transition" },
+      { "command": "revise", "targetState": "revised", "description": "Reopen the quote for revision after response or expiry.", "idempotencyScope": "resource+transition" },
+      { "command": "convert_to_sales_order", "targetState": "converted", "description": "Convert an accepted quote into governed sales-order demand.", "idempotencyScope": "resource+transition", "preconditions": ["accepted"] }
+    ],
+    "notes": [
+      "The live quote runtime uses internal_review/accepted/rejected/revised/converted. Legacy status-options aliases still expose review/won/lost and must not override QuoteService truth."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.customers"
+    ],
+    "downstreamObjects": [
+      "commercial_customer.customer-purchase-orders",
+      "commercial_customer.sales-orders",
+      "commercial_customer.quote-effectiveness-reviews"
+    ],
+    "keyRelationships": [
+      "customer_id -> customers.customer_id",
+      "quote_id -> customer_purchase_orders.quote_id",
+      "quote_id -> sales_orders.quote_id"
+    ],
+    "events": [
+      { "eventName": "sent", "description": "Quotation was released to the customer." },
+      { "eventName": "accepted", "description": "Quotation was accepted by the customer." },
+      { "eventName": "revised", "description": "Quotation re-entered controlled revision." },
+      { "eventName": "converted", "description": "Quotation was converted into a sales order." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is sales.quotes.* while canonical naming remains commercial_customer.quotations."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "quotations",
+      "quote_status"
+    ],
+    "notes": [
+      "crm_quotes_pipeline remains analytical or compatibility context and must not be treated as the lifecycle authority."
+    ]
+  },
+  "invariants": [
+    "A quotation cannot be sent without completed review evidence.",
+    "Only accepted quotations can convert into sales orders.",
+    "A converted quotation must preserve trace to the resulting sales order."
+  ]
+}

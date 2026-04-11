@@ -1,0 +1,118 @@
+{
+  "version": "1.0",
+  "canonicalResource": "planning_production.production-plans",
+  "canonicalName": "production_schedule",
+  "displayName": "Production Plans",
+  "purpose": "Control factory plan review, publication, freeze, and completion so dispatch, capacity, and OTIF commitments all read the same released schedule truth.",
+  "ownerDomain": "planning_production",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "production_planning",
+  "storage": {
+    "primaryTable": "production_schedule",
+    "primaryKey": "schedule_id",
+    "statusField": "schedule_status",
+    "childTables": [
+      "production_plan_lines",
+      "production_schedule_slots"
+    ],
+    "legacyTables": [
+      "production_plans"
+    ]
+  },
+  "identity": {
+    "strategy": "schedule_id",
+    "naturalKeys": [
+      "schedule_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "planning_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "s_and_op_review",
+    "retentionClass": "planning_record_5y",
+    "evidenceRequirements": [
+      "demand_plan_alignment",
+      "capacity_review",
+      "publication_or_freeze_record"
+    ],
+    "kpiSignals": [
+      "schedule_stability",
+      "plan_to_actual_adherence",
+      "capacity_load_accuracy"
+    ],
+    "autoAuditChecks": [
+      "cannot_publish_without_review_and_approval",
+      "frozen_schedule_changes_require_traceable_override",
+      "completed_plans_must_reconcile_to_execution"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + production_schedule_schedule_status_set",
+    "stateModelKey": "production_schedule_schedule_status_set",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "under_review", "label": "Under Review", "labelEn": "Under Review", "allowedTransitionsFrom": ["draft", "on_hold"] },
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
+      { "value": "published", "label": "Published", "labelEn": "Published", "allowedTransitionsFrom": ["approved"] },
+      { "value": "frozen", "label": "Frozen", "labelEn": "Frozen", "allowedTransitionsFrom": ["published"] },
+      { "value": "on_hold", "label": "On Hold", "labelEn": "On Hold", "allowedTransitionsFrom": ["draft", "under_review", "approved", "published", "frozen"] },
+      { "value": "completed", "label": "Completed", "labelEn": "Completed", "allowedTransitionsFrom": ["published", "frozen"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "under_review", "approved"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["completed", "cancelled"] }
+    ],
+    "commands": [
+      { "command": "submit_for_review", "targetState": "under_review", "description": "Submit the production plan for review.", "idempotencyScope": "resource+transition" },
+      { "command": "approve", "targetState": "approved", "description": "Approve the reviewed production plan.", "idempotencyScope": "resource+transition", "preconditions": ["capacity_review_complete"] },
+      { "command": "publish", "targetState": "published", "description": "Publish the approved plan into dispatch and execution truth.", "idempotencyScope": "resource+transition" },
+      { "command": "freeze", "targetState": "frozen", "description": "Freeze the published plan under controlled schedule discipline.", "idempotencyScope": "resource+transition" },
+      { "command": "hold", "targetState": "on_hold", "description": "Put the plan on hold pending decision or disruption handling.", "idempotencyScope": "resource+transition" },
+      { "command": "complete", "targetState": "completed", "description": "Complete the plan after execution reconciliation.", "idempotencyScope": "resource+transition", "preconditions": ["execution_reconciled"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive a terminal production plan under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.sales-orders",
+      "inventory_logistics.inventory-items"
+    ],
+    "downstreamObjects": [
+      "planning_production.job-orders",
+      "planning_production.dispatch-lists",
+      "planning_production.work-orders"
+    ],
+    "keyRelationships": [
+      "schedule_id -> mes_dispatch_queue.source_schedule_id",
+      "sales_order_id -> sales_orders.sales_order_id"
+    ],
+    "events": [
+      { "eventName": "approved", "description": "Production plan passed review and approval." },
+      { "eventName": "published", "description": "Production plan became the released factory plan." },
+      { "eventName": "frozen", "description": "Production plan entered frozen schedule control." },
+      { "eventName": "completed", "description": "Production plan was closed after reconciliation." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is production.production_schedule.* while canonical naming remains planning_production.production-plans."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "production_schedule",
+      "production_plans"
+    ],
+    "notes": [
+      "The current storage/runtime owner is production_schedule. The package makes the business-plan semantics explicit without moving data."
+    ]
+  },
+  "invariants": [
+    "A production plan cannot publish without completed review and approval.",
+    "Frozen plans require traceable override or controlled replanning.",
+    "Completed plans must reconcile to execution truth."
+  ]
+}

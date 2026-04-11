@@ -1,0 +1,117 @@
+{
+  "version": "1.0",
+  "canonicalResource": "planning_production.job-orders",
+  "canonicalName": "job_orders",
+  "displayName": "Job Orders",
+  "purpose": "Translate confirmed sales demand into governed production intent so materials, routing, and downstream WO dispatch stay synchronized with commercial commitment.",
+  "ownerDomain": "planning_production",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "production_planning",
+  "storage": {
+    "primaryTable": "job_orders",
+    "primaryKey": "job_order_id",
+    "statusField": "job_status",
+    "childTables": [
+      "job_order_materials",
+      "job_order_operations"
+    ],
+    "legacyTables": [
+      "job_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "jo_number",
+    "naturalKeys": [
+      "jo_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "production_planning_review",
+    "retentionClass": "production_record_7y",
+    "evidenceRequirements": [
+      "released_bom",
+      "released_routing",
+      "capacity_commitment"
+    ],
+    "kpiSignals": [
+      "job_release_lead_time",
+      "job_schedule_adherence",
+      "material_readiness_at_release"
+    ],
+    "autoAuditChecks": [
+      "cannot_release_without_sales_order_link",
+      "cannot_close_while_work_orders_remain_open",
+      "job_status_must_reflect_material_and_operation_truth"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "OrderService::JO_STATUSES",
+    "stateModelKey": "job_orders_job_status_order_runtime",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "planned", "label": "Planned", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+      { "value": "released", "label": "Released", "labelEn": "Released", "allowedTransitionsFrom": ["planned"] },
+      { "value": "active", "label": "Active", "labelEn": "Active", "allowedTransitionsFrom": ["released", "on_hold"] },
+      { "value": "on_hold", "label": "On Hold", "labelEn": "On Hold", "allowedTransitionsFrom": ["released", "active"] },
+      { "value": "completed", "label": "Completed", "labelEn": "Completed", "allowedTransitionsFrom": ["active"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["completed"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "released", "on_hold"] }
+    ],
+    "commands": [
+      { "command": "release", "targetState": "released", "description": "Release the job order for executable downstream work preparation.", "idempotencyScope": "resource+transition", "preconditions": ["sales_order_confirmed"] },
+      { "command": "start_execution", "targetState": "active", "description": "Move the job order into active execution supervision.", "idempotencyScope": "resource+transition" },
+      { "command": "hold", "targetState": "on_hold", "description": "Put the job order on hold for shortage, engineering, or quality reasons.", "idempotencyScope": "resource+transition" },
+      { "command": "complete", "targetState": "completed", "description": "Mark the job order execution complete before administrative close.", "idempotencyScope": "resource+transition", "preconditions": ["work_orders_terminal"] },
+      { "command": "close", "targetState": "closed", "description": "Close the job order after completion and reconciliation.", "idempotencyScope": "resource+transition" },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the job order before irreversible downstream execution.", "idempotencyScope": "resource+transition" }
+    ],
+    "notes": [
+      "Legacy status registry still exposes draft and omits on_hold/cancelled. The authored package follows the governed order runtime."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.sales-orders",
+      "planning_production.production-plans"
+    ],
+    "downstreamObjects": [
+      "planning_production.work-orders",
+      "procurement_supplier_quality.purchase-requisitions"
+    ],
+    "keyRelationships": [
+      "sales_order_id -> sales_orders.sales_order_id",
+      "job_order_id -> work_orders.job_order_id",
+      "job_order_id -> purchase_requisitions.job_order_id"
+    ],
+    "events": [
+      { "eventName": "released", "description": "Job order was released into executable production intent." },
+      { "eventName": "held", "description": "Job order was placed on hold." },
+      { "eventName": "completed", "description": "Job order execution completed." },
+      { "eventName": "closed", "description": "Job order was administratively closed." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_runtime_api",
+    "notes": [
+      "Current runtime endpoints are production.job_orders.* backed by the governed order store."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "job_status"
+    ],
+    "notes": [
+      "Status aliasing still needs convergence between status registry and governed order runtime."
+    ]
+  },
+  "invariants": [
+    "A job order cannot release without linked confirmed sales demand.",
+    "A job order cannot close while child work orders remain open.",
+    "Completed job orders must reflect reconciled execution totals."
+  ]
+}

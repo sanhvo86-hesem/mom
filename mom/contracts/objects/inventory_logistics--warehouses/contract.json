@@ -1,0 +1,107 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.warehouses",
+  "canonicalName": "warehouses",
+  "displayName": "Warehouses",
+  "purpose": "Controls warehouse release, hold, and archive so blocked storage areas cannot silently remain active for receiving, picking, or shipment.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "reference_master",
+  "ownerTeam": "warehouse_operations",
+  "storage": {
+    "primaryTable": "warehouses",
+    "primaryKey": "warehouse_id",
+    "statusField": "warehouse_status",
+    "childTables": [
+      "warehouse_bins"
+    ],
+    "legacyTables": [
+      "warehouses"
+    ]
+  },
+  "identity": {
+    "strategy": "warehouse_id",
+    "naturalKeys": [
+      "warehouse_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "warehouse_review",
+    "retentionClass": "master_data_record_10y",
+    "evidenceRequirements": [
+      "warehouse_release_decision",
+      "storage_scope_definition",
+      "hold_or_archive_reason"
+    ],
+    "kpiSignals": [
+      "warehouse_utilization",
+      "warehouse_hold_frequency",
+      "location_master_accuracy"
+    ],
+    "autoAuditChecks": [
+      "active_warehouses_must_have_storage_scope_defined",
+      "on_hold_warehouses_must_not_accept_new_receipts",
+      "archived_warehouses_must_not_remain_selectable_for_shipments"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "warehouses_warehouse_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "planned", "label": "Kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["planned", "inactive", "on_hold"] },
+      { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["active"] },
+      { "value": "inactive", "label": "Ngưng hoạt động", "labelEn": "Inactive", "allowedTransitionsFrom": ["active", "on_hold"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["inactive"] }
+    ],
+    "commands": [
+      { "command": "activate", "targetState": "active", "description": "Release the warehouse for governed receiving, stocking, and shipment use.", "idempotencyScope": "resource+transition", "preconditions": ["storage_scope_defined"] },
+      { "command": "hold", "targetState": "on_hold", "description": "Place the warehouse on controlled hold.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "inactivate", "targetState": "inactive", "description": "Stop new operational use while retaining history.", "idempotencyScope": "resource+transition" },
+      { "command": "archive", "targetState": "archived", "description": "Archive the warehouse after operational retirement.", "idempotencyScope": "resource+transition", "preconditions": ["no_open_operational_dependents"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "inventory_logistics.inventory-movements",
+      "inventory_logistics.shipments",
+      "procurement_supplier_quality.purchase-receipts"
+    ],
+    "keyRelationships": [
+      "warehouse_id -> stock_balances.warehouse_id",
+      "warehouse_id -> shipments.origin_warehouse_id"
+    ],
+    "events": [
+      { "eventName": "active", "description": "Warehouse was released for operational use." },
+      { "eventName": "on_hold", "description": "Warehouse entered controlled hold." },
+      { "eventName": "inactive", "description": "Warehouse stopped new operational use." },
+      { "eventName": "archived", "description": "Warehouse was archived from active scope." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is inventory.warehouses.* while canonical naming remains inventory_logistics.warehouses."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "warehouses",
+      "warehouse_status"
+    ],
+    "notes": [
+      "Runtime naming is still inventory.warehouses.* even though the canonical contract sits under inventory_logistics."
+    ]
+  },
+  "invariants": [
+    "On-hold warehouses must not accept new receipt or picking activity without governed override.",
+    "Archived warehouses must not remain selectable for shipment or stock movement.",
+    "Warehouse identity must remain stable across storage and runtime surfaces."
+  ]
+}

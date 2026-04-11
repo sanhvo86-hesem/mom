@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "canonicalResource": "maintenance_ehs.permits",
+  "canonicalName": "permits",
+  "displayName": "Permits",
+  "purpose": "Controls permit submission, approval, activation, suspension, expiry, and closure so hazardous or regulated work cannot proceed outside a governed permit-to-work register.",
+  "ownerDomain": "maintenance_ehs",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "ehs_management",
+  "storage": {
+    "primaryTable": "ehs_permit_register",
+    "primaryKey": "ehs_permit_id",
+    "statusField": "status",
+    "childTables": [
+      "permit_conditions"
+    ],
+    "legacyTables": [
+      "permits"
+    ]
+  },
+  "identity": {
+    "strategy": "permit_number",
+    "naturalKeys": [
+      "permit_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "safety_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "permit_review",
+    "retentionClass": "ehs_record_10y",
+    "evidenceRequirements": [
+      "permit_request",
+      "approval_conditions",
+      "closure_or_expiry_record"
+    ],
+    "kpiSignals": [
+      "permit_approval_lead_time",
+      "permit_expiry_breach_rate",
+      "suspended_permit_rate"
+    ],
+    "autoAuditChecks": [
+      "active_permits_must_preserve_approval_conditions",
+      "expired_permits_must_not_remain_work_enabling",
+      "closed_permits_must_preserve_completion_or_cancellation_evidence"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "ehs_permit_register_status_set",
+    "lifecycleMode": "persisted",
+    "states": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+      { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "active", "label": "Hiệu lực", "labelEn": "Active", "allowedTransitionsFrom": ["approved", "suspended"] },
+      { "value": "suspended", "label": "Tạm ngưng", "labelEn": "Suspended", "allowedTransitionsFrom": ["approved", "active"] },
+      { "value": "expired", "label": "Hết hạn", "labelEn": "Expired", "allowedTransitionsFrom": ["approved", "active", "suspended"] },
+      { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["active", "suspended", "expired"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+    ],
+    "commands": [
+      { "command": "submit", "targetState": "submitted", "description": "Submit the permit for governed approval.", "idempotencyScope": "resource+transition" },
+      { "command": "approve", "targetState": "approved", "description": "Approve the permit with controlled conditions.", "idempotencyScope": "resource+transition", "preconditions": ["approval_conditions_recorded"] },
+      { "command": "activate", "targetState": "active", "description": "Activate the permit for governed field execution.", "idempotencyScope": "resource+transition", "preconditions": ["permit_conditions_acknowledged"] },
+      { "command": "suspend", "targetState": "suspended", "description": "Suspend the permit when conditions are no longer safe or valid.", "idempotencyScope": "resource+transition", "preconditions": ["suspension_reason_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the permit after work completion or controlled shutdown.", "idempotencyScope": "resource+transition", "preconditions": ["closure_evidence_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the closed permit under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.compliance-obligations",
+      "master_data.employees"
+    ],
+    "downstreamObjects": [
+      "maintenance_ehs.incidents"
+    ],
+    "keyRelationships": [],
+    "events": [
+      { "eventName": "submitted", "description": "Permit entered approval flow." },
+      { "eventName": "approved", "description": "Permit was approved with governed conditions." },
+      { "eventName": "active", "description": "Permit became active for operational use." },
+      { "eventName": "closed", "description": "Permit was closed after controlled completion." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is ehs_sustainability.ehs_permit_register.* while canonical naming remains maintenance_ehs.permits."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "permits",
+      "ehs_permit_register"
+    ],
+    "notes": [
+      "Permit register runtime naming remains the live API surface. The canonical contract keeps permit-to-work meaning explicit across ERP+MOM orchestration."
+    ]
+  },
+  "invariants": [
+    "Active permits must retain approved conditions and validity trace.",
+    "Expired or suspended permits must not remain work-enabling.",
+    "Closed permits must preserve completion or cancellation evidence."
+  ]
+}

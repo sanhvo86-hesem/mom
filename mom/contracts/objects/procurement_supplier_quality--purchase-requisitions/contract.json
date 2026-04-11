@@ -1,0 +1,108 @@
+{
+  "version": "1.0",
+  "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+  "canonicalName": "purchase_requisitions",
+  "displayName": "Purchase Requisitions",
+  "purpose": "Authorize buy demand before sourcing or PO release so procurement cannot bypass planning, budget, or gate controls.",
+  "ownerDomain": "procurement_supplier_quality",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "procurement_planning",
+  "storage": {
+    "primaryTable": "purchase_requisitions",
+    "primaryKey": "purchase_requisition_id",
+    "statusField": "requisition_status",
+    "childTables": [
+      "purchase_requisition_lines"
+    ],
+    "legacyTables": [
+      "purchase_requisitions"
+    ]
+  },
+  "identity": {
+    "strategy": "requisition_number",
+    "naturalKeys": [
+      "requisition_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "sourcing_review",
+    "retentionClass": "procurement_document_7y",
+    "evidenceRequirements": [
+      "demand_justification",
+      "approval_trace",
+      "sourcing_decision"
+    ],
+    "kpiSignals": [
+      "requisition_approval_lead_time",
+      "requisition_to_po_cycle_time",
+      "unplanned_buy_rate"
+    ],
+    "autoAuditChecks": [
+      "cannot_source_without_approval",
+      "requisition_should_trace_to_governed_demand",
+      "cancelled_requisitions_must_preserve_reason"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + purchase_requisitions_requisition_status",
+    "stateModelKey": "purchase_requisitions_requisition_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "submitted", "label": "Submitted", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "sourced", "label": "Sourced", "labelEn": "Sourced", "allowedTransitionsFrom": ["approved"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "submitted", "approved"] }
+    ],
+    "commands": [
+      { "command": "submit", "targetState": "submitted", "description": "Submit a requisition for approval.", "idempotencyScope": "resource+transition" },
+      { "command": "approve", "targetState": "approved", "description": "Approve requisition demand for sourcing.", "idempotencyScope": "resource+transition", "preconditions": ["approval_basis_recorded"] },
+      { "command": "source", "targetState": "sourced", "description": "Mark the requisition as sourced into supplier execution.", "idempotencyScope": "resource+transition", "preconditions": ["supplier_commitment_or_po_exists"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the requisition before sourcing finishes.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.job-orders",
+      "planning_production.work-orders",
+      "inventory_logistics.inventory-items"
+    ],
+    "downstreamObjects": [
+      "procurement_supplier_quality.supplier-purchase-orders"
+    ],
+    "keyRelationships": [
+      "job_order_id -> job_orders.job_order_id",
+      "purchase_requisition_id -> supplier_purchase_orders.purchase_requisition_id"
+    ],
+    "events": [
+      { "eventName": "submitted", "description": "Requisition entered formal approval review." },
+      { "eventName": "approved", "description": "Requisition was approved for sourcing." },
+      { "eventName": "sourced", "description": "Requisition demand was transferred into supplier execution." },
+      { "eventName": "cancelled", "description": "Requisition was cancelled." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is purchasing.purchase_requisitions.* while canonical naming remains procurement_supplier_quality.purchase-requisitions."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "purchase_requisitions"
+    ],
+    "notes": [
+      "No data move is required; the authored package clarifies requisition intent while retaining the current purchasing runtime."
+    ]
+  },
+  "invariants": [
+    "A requisition cannot source before approval.",
+    "A requisition should trace back to governed production or inventory demand.",
+    "Cancelled requisitions must preserve cancellation reason and audit trail."
+  ]
+}

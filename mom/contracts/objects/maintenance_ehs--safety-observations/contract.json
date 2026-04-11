@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "canonicalResource": "maintenance_ehs.safety-observations",
+  "canonicalName": "safety_observations",
+  "displayName": "Safety Observations",
+  "purpose": "Controls safety good-catch and hazard observations through assignment, containment, and closure so frontline EHS risks cannot disappear into note-only reporting.",
+  "ownerDomain": "maintenance_ehs",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "ehs_management",
+  "storage": {
+    "primaryTable": "safety_observations",
+    "primaryKey": "safety_observation_id",
+    "statusField": "observation_status",
+    "childTables": [
+      "safety_observation_actions"
+    ],
+    "legacyTables": [
+      "safety_observations"
+    ]
+  },
+  "identity": {
+    "strategy": "observation_number",
+    "naturalKeys": [
+      "observation_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "safety_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "safety_review",
+    "retentionClass": "ehs_record_10y",
+    "evidenceRequirements": [
+      "observation_summary",
+      "containment_or_action_trace",
+      "closure_notes"
+    ],
+    "kpiSignals": [
+      "observation_response_time",
+      "good_catch_reporting_rate",
+      "observation_repeat_rate"
+    ],
+    "autoAuditChecks": [
+      "assigned_observations_must_have_owner",
+      "closed_observations_must_preserve_action_or_justification",
+      "incident_linked_observations_must_preserve_cross_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "safety_observations_observation_status",
+    "lifecycleMode": "persisted",
+    "states": [
+      { "value": "logged", "label": "Đã ghi nhận", "labelEn": "Logged", "allowedTransitionsFrom": [] },
+      { "value": "assigned", "label": "Đã giao xử lý", "labelEn": "Assigned", "allowedTransitionsFrom": ["logged"] },
+      { "value": "in_progress", "label": "Đang xử lý", "labelEn": "In Progress", "allowedTransitionsFrom": ["assigned"] },
+      { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["assigned", "in_progress"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+    ],
+    "commands": [
+      { "command": "assign", "targetState": "assigned", "description": "Assign the observation to a responsible owner.", "idempotencyScope": "resource+transition", "preconditions": ["owner_selected"] },
+      { "command": "start_action", "targetState": "in_progress", "description": "Start active containment or corrective response.", "idempotencyScope": "resource+transition" },
+      { "command": "close", "targetState": "closed", "description": "Close the observation after action or controlled justification.", "idempotencyScope": "resource+transition", "preconditions": ["closure_basis_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the closed observation under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.employees",
+      "maintenance_ehs.incidents"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.corrective-actions"
+    ],
+    "keyRelationships": [
+      "employee_id -> employees.employee_id",
+      "assigned_to_employee_id -> employees.employee_id",
+      "incident_id -> ehs_incidents.incident_id"
+    ],
+    "events": [
+      { "eventName": "assigned", "description": "Safety observation was assigned to an owner." },
+      { "eventName": "in_progress", "description": "Safety observation entered active response." },
+      { "eventName": "closed", "description": "Safety observation was closed." },
+      { "eventName": "archived", "description": "Safety observation was archived under retention policy." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is ehs_sustainability.safety_observations.* while canonical naming remains maintenance_ehs.safety-observations."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "safety_observations",
+      "observation_status"
+    ],
+    "notes": [
+      "Canonical naming is separated from the legacy runtime domain so AI and downstream tooling do not confuse EHS observations with note-only reporting."
+    ]
+  },
+  "invariants": [
+    "Assigned safety observations must preserve accountable ownership.",
+    "Closed safety observations must retain action trace or justified closure basis.",
+    "Observation-to-incident trace must remain auditable when the observation escalates or links to an incident."
+  ]
+}

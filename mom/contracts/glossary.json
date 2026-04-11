@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "description": "Core terminology lock for ERP+MOM backend authority, registry, workspace, and projection semantics."
+  },
+  "terms": [
+    {
+      "term": "storage authority",
+      "definition": "Executable database source of truth defined by ordered SQL migrations and the generated schema snapshot.",
+      "source_of_truth": [
+        "database/migrations/*.sql",
+        "database/schema.sql"
+      ]
+    },
+    {
+      "term": "business contract authority",
+      "definition": "Machine-readable layer that defines canonical object meaning, lifecycle, commands, events, and deprecation policy.",
+      "source_of_truth": [
+        "mom/contracts/*.json",
+        "mom/contracts/objects/*/contract.json"
+      ]
+    },
+    {
+      "term": "authored object package",
+      "definition": "Per-object contract package that explicitly records purpose, workflow truth, invariants, command/event semantics, and migration notes for core ERP+MOM objects.",
+      "source_of_truth": [
+        "mom/contracts/objects/*/contract.json"
+      ]
+    },
+    {
+      "term": "generated runtime registry",
+      "definition": "Compiled machine-readable runtime catalog derived from storage authority plus business contract authority.",
+      "source_of_truth": [
+        "mom/data/registry/table-registry.json",
+        "mom/data/registry/endpoint-catalog.json",
+        "mom/data/registry/relation-map.json"
+      ]
+    },
+    {
+      "term": "workspace design",
+      "definition": "Curated editable design artifact used for visualization and architecture work, not for full backend authority.",
+      "source_of_truth": [
+        "mom/data/schema-studio/designs/workspace.json"
+      ]
+    },
+    {
+      "term": "system contract registry",
+      "definition": "Read-only full-platform contract view compiled from registry artifacts and business contracts.",
+      "source_of_truth": [
+        "mom/data/registry/table-registry.json",
+        "mom/data/registry/relation-map.json",
+        "mom/data/registry/endpoint-catalog.json"
+      ]
+    },
+    {
+      "term": "projection record",
+      "definition": "Read-only derived model used for KPI, search, analytics, or release snapshots with lineage back to transactional truth.",
+      "source_of_truth": [
+        "mom/data/registry/canonical-backend-standardization-catalog.json"
+      ]
+    },
+    {
+      "term": "compatibility alias",
+      "definition": "Legacy name or storage surface retained temporarily for migration safety and round-trip compatibility.",
+      "source_of_truth": [
+        "mom/contracts/deprecation-ledger.json"
+      ]
+    },
+    {
+      "term": "unused candidate",
+      "definition": "Element with no current supported business purpose pending isolation, archive, or retirement review.",
+      "source_of_truth": [
+        "mom/contracts/deprecation-ledger.json"
+      ]
+    },
+    {
+      "term": "lifecycle owner",
+      "definition": "Top-level business object with governed states, transitions, gate rules, and audit expectations.",
+      "source_of_truth": [
+        "mom/contracts/object-index.json",
+        "mom/contracts/state-model-index.json"
+      ]
+    },
+    {
+      "term": "contained child",
+      "definition": "Dependent record that belongs to a parent lifecycle owner and must not pretend to be a separate workflow authority.",
+      "source_of_truth": [
+        "mom/contracts/object-index.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "version": "1.0",
+  "canonicalResource": "analytics.mes-oee-snapshots",
+  "canonicalName": "mes_oee_snapshots",
+  "displayName": "MES OEE Snapshots",
+  "purpose": "Provide read-only OEE projection by equipment and shift so performance review, loss analysis, and gate meetings use stable snapshot truth rather than recalculating from mutable execution events.",
+  "ownerDomain": "analytics",
+  "objectRole": "projection",
+  "ownerTeam": "manufacturing_analytics",
+  "storage": {
+    "primaryTable": "mes_oee_snapshots",
+    "primaryKey": "snapshot_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "mes_oee_snapshots"
+    ]
+  },
+  "identity": {
+    "strategy": "snapshot_id",
+    "naturalKeys": [
+      "snapshot_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "analytics_gate",
+    "auditClass": "projection_lineage",
+    "continuousImprovementLoop": "oee_review",
+    "retentionClass": "analytics_projection_3y",
+    "evidenceRequirements": [
+      "snapshot_date",
+      "source_system",
+      "source_record_id"
+    ],
+    "kpiSignals": [
+      "oee_pct",
+      "availability_pct",
+      "performance_pct",
+      "quality_pct"
+    ],
+    "autoAuditChecks": [
+      "oee_snapshots_must_preserve_equipment_and_shift_scope",
+      "projection_rows_must_keep_source_lineage",
+      "read_model_must_not_become_execution_authority"
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.production-operations",
+      "master_data.equipment"
+    ],
+    "downstreamObjects": [
+      "analytics.plant-performance-snapshots"
+    ],
+    "keyRelationships": [
+      "equipment_id -> equipment.equipment_id",
+      "org_plant_id -> org_plants.plant_id",
+      "org_site_id -> org_sites.site_id"
+    ],
+    "events": [
+      { "eventName": "refreshed", "description": "MES OEE snapshot projection was refreshed from execution truth." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is mes_execution.mes_oee_snapshots.* while canonical naming remains analytics.mes-oee-snapshots."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "mes_oee_snapshots"
+    ],
+    "notes": [
+      "The snapshot remains read-only and should feed analytics, not replace execution truth."
+    ]
+  },
+  "invariants": [
+    "OEE snapshots must preserve equipment, shift, and lineage context.",
+    "The projection is read-only and must not become execution authority.",
+    "OEE components must remain reproducible from upstream execution data."
+  ]
+}

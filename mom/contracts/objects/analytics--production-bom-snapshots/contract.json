@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "canonicalResource": "analytics.production-bom-snapshots",
+  "canonicalName": "production_order_bom_snapshot",
+  "displayName": "Production BOM Snapshots",
+  "purpose": "Provide read-only BOM snapshot truth per production order so planning, costing, and traceability review can inspect the released material structure without re-querying mutable planning records.",
+  "ownerDomain": "analytics",
+  "objectRole": "projection",
+  "ownerTeam": "manufacturing_analytics",
+  "storage": {
+    "primaryTable": "production_order_bom_snapshot",
+    "primaryKey": "production_order_bom_snapshot_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "production_order_bom_snapshot"
+    ]
+  },
+  "identity": {
+    "strategy": "production_order_bom_snapshot_id",
+    "naturalKeys": [
+      "production_order_bom_snapshot_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "analytics_gate",
+    "auditClass": "projection_lineage",
+    "continuousImprovementLoop": "production_review",
+    "retentionClass": "analytics_projection_3y",
+    "evidenceRequirements": [
+      "snapshot_at",
+      "source_system",
+      "source_record_id"
+    ],
+    "kpiSignals": [
+      "bom_change_stability",
+      "material_trace_readiness",
+      "snapshot_refresh_latency"
+    ],
+    "autoAuditChecks": [
+      "bom_snapshot_must_preserve_production_order_lineage",
+      "projection_rows_must_be_read_only",
+      "plant_and_site_scope_must_be_explicit"
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.work-orders"
+    ],
+    "downstreamObjects": [
+      "analytics.plant-performance-snapshots"
+    ],
+    "keyRelationships": [
+      "production_order_id -> production_orders.production_order_id",
+      "org_plant_id -> org_plants.plant_id",
+      "org_site_id -> org_sites.site_id"
+    ],
+    "events": [
+      { "eventName": "refreshed", "description": "Production BOM snapshot was refreshed from released order truth." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is production.production_order_bom_snapshot.* while canonical naming remains analytics.production-bom-snapshots."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "production_order_bom_snapshot"
+    ],
+    "notes": [
+      "The BOM snapshot is a read-only projection and must not become planning or order-authority truth."
+    ]
+  },
+  "invariants": [
+    "BOM snapshot rows must preserve production-order lineage and snapshot time.",
+    "The projection is read-only and must not replace planning truth.",
+    "Plant and site scope must remain explicit on every snapshot row."
+  ]
+}

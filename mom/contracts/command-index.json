@@ -1,0 +1,3704 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "description": "Canonical business command catalog derived from authored object packages with generator fallback.",
+    "commandCount": 262
+  },
+  "commands": [
+    {
+      "key": "commercial_customer.customer-care-cases:archive",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "command": "archive",
+      "purpose": "Archive a closed customer-care case under retention policy.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-care-cases/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases:close",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "command": "close",
+      "purpose": "Close the case after the resolution is confirmed.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-care-cases/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "customer_or_internal_confirmation"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases:escalate",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "command": "escalate",
+      "purpose": "Escalate the case for higher-level attention.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-care-cases/{id}:escalate",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "targetState": "escalated",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "escalation_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases:resolve",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "command": "resolve",
+      "purpose": "Record service resolution against the case.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-care-cases/{id}:resolve",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "targetState": "resolved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "resolution_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases:start_work",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "command": "start_work",
+      "purpose": "Assign and start active customer-care handling.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-care-cases/{id}:start_work",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-care-cases:wait_for_customer",
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "command": "wait_for_customer",
+      "purpose": "Pause the case pending customer response or evidence.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-care-cases/{id}:wait_for_customer",
+      "classification": "lifecycle_owner",
+      "storageTable": "crm_customer_touchpoints",
+      "targetState": "waiting_customer",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders:acknowledge",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "command": "acknowledge",
+      "purpose": "Acknowledge receipt of the customer PO before firm order confirmation.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-purchase-orders/{id}:acknowledge",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "targetState": "acknowledged",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders:cancel",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "command": "cancel",
+      "purpose": "Cancel the customer PO only while linked sales orders are not active.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-purchase-orders/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "no_active_linked_sales_order"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders:close",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "command": "close",
+      "purpose": "Close the customer PO after all linked sales orders reach terminal states.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-purchase-orders/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "all_linked_sales_orders_terminal"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.customer-purchase-orders:confirm",
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "command": "confirm",
+      "purpose": "Confirm the customer PO only after at least one governed sales order link exists.",
+      "targetApiPath": "/api/v1/commercial-customer/customer-purchase-orders/{id}:confirm",
+      "classification": "lifecycle_owner",
+      "storageTable": "customer_purchase_orders",
+      "targetState": "confirmed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "linked_sales_order_exists"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations:accept",
+      "canonicalResource": "commercial_customer.quotations",
+      "command": "accept",
+      "purpose": "Record customer acceptance of the quotation.",
+      "targetApiPath": "/api/v1/commercial-customer/quotations/{id}:accept",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "targetState": "accepted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations:convert_to_sales_order",
+      "canonicalResource": "commercial_customer.quotations",
+      "command": "convert_to_sales_order",
+      "purpose": "Convert an accepted quote into governed sales-order demand.",
+      "targetApiPath": "/api/v1/commercial-customer/quotations/{id}:convert_to_sales_order",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "targetState": "converted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "accepted"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations:expire",
+      "canonicalResource": "commercial_customer.quotations",
+      "command": "expire",
+      "purpose": "Expire an unanswered quotation after validity lapse.",
+      "targetApiPath": "/api/v1/commercial-customer/quotations/{id}:expire",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "targetState": "expired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations:reject",
+      "canonicalResource": "commercial_customer.quotations",
+      "command": "reject",
+      "purpose": "Record customer rejection of the quotation.",
+      "targetApiPath": "/api/v1/commercial-customer/quotations/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations:revise",
+      "canonicalResource": "commercial_customer.quotations",
+      "command": "revise",
+      "purpose": "Reopen the quote for revision after response or expiry.",
+      "targetApiPath": "/api/v1/commercial-customer/quotations/{id}:revise",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "targetState": "revised",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations:send",
+      "canonicalResource": "commercial_customer.quotations",
+      "command": "send",
+      "purpose": "Release the quote to the customer after review.",
+      "targetApiPath": "/api/v1/commercial-customer/quotations/{id}:send",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "targetState": "sent",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "commercial_review_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.quotations:submit_for_review",
+      "canonicalResource": "commercial_customer.quotations",
+      "command": "submit_for_review",
+      "purpose": "Move the quote from draft into governed commercial review.",
+      "targetApiPath": "/api/v1/commercial-customer/quotations/{id}:submit_for_review",
+      "classification": "lifecycle_owner",
+      "storageTable": "quotes",
+      "targetState": "internal_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders:cancel",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "command": "cancel",
+      "purpose": "Cancel the sales order before final shipment closure.",
+      "targetApiPath": "/api/v1/commercial-customer/sales-orders/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders:close",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "command": "close",
+      "purpose": "Close the sales order after shipment completion and commercial closure.",
+      "targetApiPath": "/api/v1/commercial-customer/sales-orders/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "shipment_terminal"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders:confirm",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "command": "confirm",
+      "purpose": "Confirm the order after quote acceptance or customer PO linkage.",
+      "targetApiPath": "/api/v1/commercial-customer/sales-orders/{id}:confirm",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "targetState": "confirmed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders:quote",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "command": "quote",
+      "purpose": "Move draft demand into quoted commercial offer posture.",
+      "targetApiPath": "/api/v1/commercial-customer/sales-orders/{id}:quote",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "targetState": "quoted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders:release_shipment",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "command": "release_shipment",
+      "purpose": "Ship only after production and shipment gate controls pass.",
+      "targetApiPath": "/api/v1/commercial-customer/sales-orders/{id}:release_shipment",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "targetState": "shipped",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "shipment_gate_passed"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "commercial_customer.sales-orders:release_to_production",
+      "canonicalResource": "commercial_customer.sales-orders",
+      "command": "release_to_production",
+      "purpose": "Release confirmed order into production planning and JO/WO generation.",
+      "targetApiPath": "/api/v1/commercial-customer/sales-orders/{id}:release_to_production",
+      "classification": "lifecycle_owner",
+      "storageTable": "sales_orders",
+      "targetState": "in_production",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "commercial_confirmation_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices:close",
+      "canonicalResource": "finance.ap-invoices",
+      "command": "close",
+      "purpose": "Close the invoice after payment or void is final.",
+      "targetApiPath": "/api/v1/finance/ap-invoices/{id}:close",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "paid_or_voided"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices:hold",
+      "canonicalResource": "finance.ap-invoices",
+      "command": "hold",
+      "purpose": "Place invoice on governed hold for discrepancy resolution.",
+      "targetApiPath": "/api/v1/finance/ap-invoices/{id}:hold",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices:match",
+      "canonicalResource": "finance.ap-invoices",
+      "command": "match",
+      "purpose": "Complete three-way match for supplier invoice.",
+      "targetApiPath": "/api/v1/finance/ap-invoices/{id}:match",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "targetState": "matched",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "po_and_receipt_available"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices:post",
+      "canonicalResource": "finance.ap-invoices",
+      "command": "post",
+      "purpose": "Post the matched invoice into the ledger.",
+      "targetApiPath": "/api/v1/finance/ap-invoices/{id}:post",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "targetState": "posted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "matched"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices:settle",
+      "canonicalResource": "finance.ap-invoices",
+      "command": "settle",
+      "purpose": "Settle the AP invoice after payment execution.",
+      "targetApiPath": "/api/v1/finance/ap-invoices/{id}:settle",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "targetState": "paid",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "posted"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ap-invoices:void",
+      "canonicalResource": "finance.ap-invoices",
+      "command": "void",
+      "purpose": "Void the AP invoice before final close.",
+      "targetApiPath": "/api/v1/finance/ap-invoices/{id}:void",
+      "classification": "ledger_document",
+      "storageTable": "ap_invoices",
+      "targetState": "voided",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices:close",
+      "canonicalResource": "finance.ar-invoices",
+      "command": "close",
+      "purpose": "Close the AR invoice once settled or cancelled.",
+      "targetApiPath": "/api/v1/finance/ar-invoices/{id}:close",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "paid_or_cancelled"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices:post",
+      "canonicalResource": "finance.ar-invoices",
+      "command": "post",
+      "purpose": "Post AR invoice into open receivable state.",
+      "targetApiPath": "/api/v1/finance/ar-invoices/{id}:post",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "targetState": "open",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices:raise_dispute",
+      "canonicalResource": "finance.ar-invoices",
+      "command": "raise_dispute",
+      "purpose": "Raise a governed customer dispute against the receivable.",
+      "targetApiPath": "/api/v1/finance/ar-invoices/{id}:raise_dispute",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "targetState": "disputed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices:settle",
+      "canonicalResource": "finance.ar-invoices",
+      "command": "settle",
+      "purpose": "Settle AR invoice after cash application.",
+      "targetApiPath": "/api/v1/finance/ar-invoices/{id}:settle",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "targetState": "paid",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "cash_received"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.ar-invoices:void",
+      "canonicalResource": "finance.ar-invoices",
+      "command": "void",
+      "purpose": "Void or cancel the receivable before final close.",
+      "targetApiPath": "/api/v1/finance/ar-invoices/{id}:void",
+      "classification": "ledger_document",
+      "storageTable": "ar_invoices",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.backdate-exceptions:close",
+      "canonicalResource": "finance.backdate-exceptions",
+      "command": "close",
+      "purpose": "Close an exception after governed resolution or expiry handling.",
+      "targetApiPath": "/api/v1/finance/backdate-exceptions/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "backdate_exceptions",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.backdate-exceptions:expire",
+      "canonicalResource": "finance.backdate-exceptions",
+      "command": "expire",
+      "purpose": "Expire a timeboxed backdate exception once its window is no longer valid.",
+      "targetApiPath": "/api/v1/finance/backdate-exceptions/{id}:expire",
+      "classification": "lifecycle_owner",
+      "storageTable": "backdate_exceptions",
+      "targetState": "expired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.backdate-exceptions:revoke",
+      "canonicalResource": "finance.backdate-exceptions",
+      "command": "revoke",
+      "purpose": "Revoke an approved backdate exception before it is used or after issue detection.",
+      "targetApiPath": "/api/v1/finance/backdate-exceptions/{id}:revoke",
+      "classification": "lifecycle_owner",
+      "storageTable": "backdate_exceptions",
+      "targetState": "revoked",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.credit-memos:create",
+      "canonicalResource": "finance.credit-memos",
+      "command": "create",
+      "purpose": "Create an approved credit memo with governed reference and reason.",
+      "targetApiPath": "/api/v1/finance/credit-memos/{id}:create",
+      "classification": "ledger_document",
+      "storageTable": "credit_memos",
+      "targetState": "approved",
+      "idempotencyScope": "resource+payload",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.debit-memos:create",
+      "canonicalResource": "finance.debit-memos",
+      "command": "create",
+      "purpose": "Create an approved debit memo with governed reference and reason.",
+      "targetApiPath": "/api/v1/finance/debit-memos/{id}:create",
+      "classification": "ledger_document",
+      "storageTable": "debit_memos",
+      "targetState": "approved",
+      "idempotencyScope": "resource+payload",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.fixed-asset-capitalizations:capitalize",
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "command": "capitalize",
+      "purpose": "Approve and capitalize the governed asset value.",
+      "targetApiPath": "/api/v1/finance/fixed-asset-capitalizations/{id}:capitalize",
+      "classification": "ledger_document",
+      "storageTable": "fixed_asset_capitalizations",
+      "targetState": "capitalized",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.fixed-asset-capitalizations:post",
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "command": "post",
+      "purpose": "Post capitalization into asset and ledger truth.",
+      "targetApiPath": "/api/v1/finance/fixed-asset-capitalizations/{id}:post",
+      "classification": "ledger_document",
+      "storageTable": "fixed_asset_capitalizations",
+      "targetState": "posted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.fixed-asset-capitalizations:retire",
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "command": "retire",
+      "purpose": "Retire capitalized value from active service.",
+      "targetApiPath": "/api/v1/finance/fixed-asset-capitalizations/{id}:retire",
+      "classification": "ledger_document",
+      "storageTable": "fixed_asset_capitalizations",
+      "targetState": "retired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.fixed-asset-capitalizations:void",
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "command": "void",
+      "purpose": "Void a prepared capitalization before posting.",
+      "targetApiPath": "/api/v1/finance/fixed-asset-capitalizations/{id}:void",
+      "classification": "ledger_document",
+      "storageTable": "fixed_asset_capitalizations",
+      "targetState": "voided",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.period-closes:close",
+      "canonicalResource": "finance.period-closes",
+      "command": "close",
+      "purpose": "Close or re-close a governed period after review.",
+      "targetApiPath": "/api/v1/finance/period-closes/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "period_close_controls",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "finance.period-closes:reopen",
+      "canonicalResource": "finance.period-closes",
+      "command": "reopen",
+      "purpose": "Reopen a period under controlled exception handling.",
+      "targetApiPath": "/api/v1/finance/period-closes/{id}:reopen",
+      "classification": "lifecycle_owner",
+      "storageTable": "period_close_controls",
+      "targetState": "reopened",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions:acknowledge",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "command": "acknowledge",
+      "purpose": "Acknowledge and own the reconciliation exception for active triage.",
+      "targetApiPath": "/api/v1/integration-resilience/reconciliation-exceptions/{id}:acknowledge",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions:close",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "command": "close",
+      "purpose": "Close the exception after reconciliation truth is restored.",
+      "targetApiPath": "/api/v1/integration-resilience/reconciliation-exceptions/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "resolution_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions:compensate",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "command": "compensate",
+      "purpose": "Apply controlled compensating action and move exception to review.",
+      "targetApiPath": "/api/v1/integration-resilience/reconciliation-exceptions/{id}:compensate",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "targetState": "pending_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "compensation_trace_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions:reject",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "command": "reject",
+      "purpose": "Reject the current resolution path and return the issue for redesign or escalation.",
+      "targetApiPath": "/api/v1/integration-resilience/reconciliation-exceptions/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "integration_resilience.reconciliation-exceptions:retry",
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "command": "retry",
+      "purpose": "Retry sync or replay after corrective action, pending review of effect.",
+      "targetApiPath": "/api/v1/integration-resilience/reconciliation-exceptions/{id}:retry",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_erp_reconciliation_exceptions",
+      "targetState": "pending_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns:authorize",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "command": "authorize",
+      "purpose": "Authorize the customer return before physical receipt.",
+      "targetApiPath": "/api/v1/inventory-logistics/customer-returns/{id}:authorize",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "targetState": "authorized",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns:close",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "command": "close",
+      "purpose": "Close the customer return after repair, replacement, or credit completion.",
+      "targetApiPath": "/api/v1/inventory-logistics/customer-returns/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns:credit",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "command": "credit",
+      "purpose": "Disposition the return through credit issuance.",
+      "targetApiPath": "/api/v1/inventory-logistics/customer-returns/{id}:credit",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "targetState": "credited",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns:evaluate",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "command": "evaluate",
+      "purpose": "Start technical evaluation of the returned item.",
+      "targetApiPath": "/api/v1/inventory-logistics/customer-returns/{id}:evaluate",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "targetState": "in_evaluation",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns:receive",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "command": "receive",
+      "purpose": "Receive the returned item into controlled evaluation.",
+      "targetApiPath": "/api/v1/inventory-logistics/customer-returns/{id}:receive",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "targetState": "received",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns:repair",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "command": "repair",
+      "purpose": "Disposition the return as repaired.",
+      "targetApiPath": "/api/v1/inventory-logistics/customer-returns/{id}:repair",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "targetState": "repaired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.customer-returns:replace",
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "command": "replace",
+      "purpose": "Disposition the return as replaced.",
+      "targetApiPath": "/api/v1/inventory-logistics/customer-returns/{id}:replace",
+      "classification": "lifecycle_owner",
+      "storageTable": "rma_orders",
+      "targetState": "replaced",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.cycle-count-plans:close",
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "command": "close",
+      "purpose": "Close the plan once all count adjustments are resolved.",
+      "targetApiPath": "/api/v1/inventory-logistics/cycle-count-plans/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "wms_cycle_count_plans",
+      "targetState": "completed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "variance_resolution_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.cycle-count-plans:complete",
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "command": "complete",
+      "purpose": "Complete the count plan after results and variances are recorded.",
+      "targetApiPath": "/api/v1/inventory-logistics/cycle-count-plans/{id}:complete",
+      "classification": "lifecycle_owner",
+      "storageTable": "wms_cycle_count_plans",
+      "targetState": "completed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "count_results_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.cycle-count-plans:pause",
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "command": "pause",
+      "purpose": "Pause a cycle-count plan under governed reason.",
+      "targetApiPath": "/api/v1/inventory-logistics/cycle-count-plans/{id}:pause",
+      "classification": "lifecycle_owner",
+      "storageTable": "wms_cycle_count_plans",
+      "targetState": "paused",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.cycle-count-plans:publish",
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "command": "publish",
+      "purpose": "Release a cycle-count plan for active execution.",
+      "targetApiPath": "/api/v1/inventory-logistics/cycle-count-plans/{id}:publish",
+      "classification": "lifecycle_owner",
+      "storageTable": "wms_cycle_count_plans",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "warehouse_scope_defined"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders:book",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "command": "book",
+      "purpose": "Book the carrier and lock the governed freight commitment.",
+      "targetApiPath": "/api/v1/inventory-logistics/freight-orders/{id}:book",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "targetState": "booked",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "carrier_selected"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders:cancel",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "command": "cancel",
+      "purpose": "Cancel the freight order before terminal execution.",
+      "targetApiPath": "/api/v1/inventory-logistics/freight-orders/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "cancellation_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders:close",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "command": "close",
+      "purpose": "Close the freight order after delivery reconciliation.",
+      "targetApiPath": "/api/v1/inventory-logistics/freight-orders/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "delivery_reconciled"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders:confirm_delivery",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "command": "confirm_delivery",
+      "purpose": "Record delivery confirmation and proof-of-delivery trace.",
+      "targetApiPath": "/api/v1/inventory-logistics/freight-orders/{id}:confirm_delivery",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "targetState": "delivered",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "delivery_evidence_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders:dispatch",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "command": "dispatch",
+      "purpose": "Start in-transit execution for the booked freight order.",
+      "targetApiPath": "/api/v1/inventory-logistics/freight-orders/{id}:dispatch",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "targetState": "in_transit",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "loading_confirmed"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.freight-orders:tender",
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "command": "tender",
+      "purpose": "Tender the freight requirement to controlled carrier selection.",
+      "targetApiPath": "/api/v1/inventory-logistics/freight-orders/{id}:tender",
+      "classification": "lifecycle_owner",
+      "storageTable": "freight_orders",
+      "targetState": "tendered",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items:activate",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "command": "activate",
+      "purpose": "Release the item for governed commercial, planning, and inventory use.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-items/{id}:activate",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "released_revision_exists"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items:inactivate",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "command": "inactivate",
+      "purpose": "Block the item from new operational use without deleting history.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-items/{id}:inactivate",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "targetState": "inactive",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items:obsolesce",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "command": "obsolesce",
+      "purpose": "Retire the item from future operational use under controlled obsolescence.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-items/{id}:obsolesce",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "targetState": "obsolete",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "obsolescence_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-items:promote_to_engineering",
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "command": "promote_to_engineering",
+      "purpose": "Promote the item into controlled engineering release.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-items/{id}:promote_to_engineering",
+      "classification": "reference_master",
+      "storageTable": "inventory_items",
+      "targetState": "engineering",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements:cancel",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "command": "cancel",
+      "purpose": "Cancel the movement before posting.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-movements/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "cancellation_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements:hold",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "command": "hold",
+      "purpose": "Hold the movement under reconciliation or quality concern.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-movements/{id}:hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements:post",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "command": "post",
+      "purpose": "Post the movement into governed inventory truth.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-movements/{id}:post",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "targetState": "posted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reference_and_quantity_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements:reverse",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "command": "reverse",
+      "purpose": "Reverse the posted movement under controlled correction.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-movements/{id}:reverse",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "targetState": "reversed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "correction_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.inventory-movements:submit_for_review",
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "command": "submit_for_review",
+      "purpose": "Submit the movement for governed stock-effect review.",
+      "targetApiPath": "/api/v1/inventory-logistics/inventory-movements/{id}:submit_for_review",
+      "classification": "lifecycle_owner",
+      "storageTable": "inventory_movements",
+      "targetState": "pending_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments:cancel",
+      "canonicalResource": "inventory_logistics.shipments",
+      "command": "cancel",
+      "purpose": "Cancel the shipment before final delivery.",
+      "targetApiPath": "/api/v1/inventory-logistics/shipments/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments:close",
+      "canonicalResource": "inventory_logistics.shipments",
+      "command": "close",
+      "purpose": "Close the shipment after delivery confirmation and reconciliation.",
+      "targetApiPath": "/api/v1/inventory-logistics/shipments/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments:deliver",
+      "canonicalResource": "inventory_logistics.shipments",
+      "command": "deliver",
+      "purpose": "Record proof of delivery.",
+      "targetApiPath": "/api/v1/inventory-logistics/shipments/{id}:deliver",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "targetState": "delivered",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "proof_of_delivery_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments:dispatch",
+      "canonicalResource": "inventory_logistics.shipments",
+      "command": "dispatch",
+      "purpose": "Dispatch the shipment to logistics execution.",
+      "targetApiPath": "/api/v1/inventory-logistics/shipments/{id}:dispatch",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "targetState": "dispatched",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments:prepare",
+      "canonicalResource": "inventory_logistics.shipments",
+      "command": "prepare",
+      "purpose": "Prepare shipment after all release prerequisites are complete.",
+      "targetApiPath": "/api/v1/inventory-logistics/shipments/{id}:prepare",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "targetState": "ready",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.shipments:release",
+      "canonicalResource": "inventory_logistics.shipments",
+      "command": "release",
+      "purpose": "Release the shipment for dispatch.",
+      "targetApiPath": "/api/v1/inventory-logistics/shipments/{id}:release",
+      "classification": "lifecycle_owner",
+      "storageTable": "shipments",
+      "targetState": "released",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "shipment_gate_passed"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses:activate",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "command": "activate",
+      "purpose": "Release the warehouse for governed receiving, stocking, and shipment use.",
+      "targetApiPath": "/api/v1/inventory-logistics/warehouses/{id}:activate",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "storage_scope_defined"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses:archive",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "command": "archive",
+      "purpose": "Archive the warehouse after operational retirement.",
+      "targetApiPath": "/api/v1/inventory-logistics/warehouses/{id}:archive",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "no_open_operational_dependents"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses:hold",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "command": "hold",
+      "purpose": "Place the warehouse on controlled hold.",
+      "targetApiPath": "/api/v1/inventory-logistics/warehouses/{id}:hold",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "inventory_logistics.warehouses:inactivate",
+      "canonicalResource": "inventory_logistics.warehouses",
+      "command": "inactivate",
+      "purpose": "Stop new operational use while retaining history.",
+      "targetApiPath": "/api/v1/inventory-logistics/warehouses/{id}:inactivate",
+      "classification": "reference_master",
+      "storageTable": "warehouses",
+      "targetState": "inactive",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits:archive",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "command": "archive",
+      "purpose": "Archive the closed 5S audit under retention policy.",
+      "targetApiPath": "/api/v1/maintenance-ehs/five-s-audits/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits:close",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "command": "close",
+      "purpose": "Close the 5S audit after verification is complete.",
+      "targetApiPath": "/api/v1/maintenance-ehs/five-s-audits/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "all_findings_closed_or_waived"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits:launch_follow_up",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "command": "launch_follow_up",
+      "purpose": "Launch follow-up for findings and corrective ownership.",
+      "targetApiPath": "/api/v1/maintenance-ehs/five-s-audits/{id}:launch_follow_up",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "targetState": "follow_up",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "findings_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits:start_audit",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "command": "start_audit",
+      "purpose": "Start the 5S audit execution against the planned scope.",
+      "targetApiPath": "/api/v1/maintenance-ehs/five-s-audits/{id}:start_audit",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.five-s-audits:verify",
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "command": "verify",
+      "purpose": "Verify that follow-up actions restored the expected 5S condition.",
+      "targetApiPath": "/api/v1/maintenance-ehs/five-s-audits/{id}:verify",
+      "classification": "lifecycle_owner",
+      "storageTable": "lean_5s_audits",
+      "targetState": "verified",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "verification_evidence_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents:archive",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "command": "archive",
+      "purpose": "Archive a closed incident under retention policy.",
+      "targetApiPath": "/api/v1/maintenance-ehs/incidents/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents:close",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "command": "close",
+      "purpose": "Close the incident after corrective action or documented justification.",
+      "targetApiPath": "/api/v1/maintenance-ehs/incidents/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "closure_evidence_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents:contain",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "command": "contain",
+      "purpose": "Record immediate containment against the incident.",
+      "targetApiPath": "/api/v1/maintenance-ehs/incidents/{id}:contain",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "targetState": "contained",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents:investigate",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "command": "investigate",
+      "purpose": "Start formal incident investigation.",
+      "targetApiPath": "/api/v1/maintenance-ehs/incidents/{id}:investigate",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "targetState": "investigating",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents:launch_corrective_action",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "command": "launch_corrective_action",
+      "purpose": "Move the incident into owned corrective action execution.",
+      "targetApiPath": "/api/v1/maintenance-ehs/incidents/{id}:launch_corrective_action",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "targetState": "corrective_action",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "investigation_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.incidents:triage",
+      "canonicalResource": "maintenance_ehs.incidents",
+      "command": "triage",
+      "purpose": "Triage a newly reported incident.",
+      "targetApiPath": "/api/v1/maintenance-ehs/incidents/{id}:triage",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_incidents",
+      "targetState": "triaged",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans:activate",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "command": "activate",
+      "purpose": "Activate the approved plan for governed scheduling and release.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-plans/{id}:activate",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "equipment_released"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans:approve",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "command": "approve",
+      "purpose": "Approve the preventive-maintenance plan for operational use.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-plans/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "scope_and_frequency_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans:archive",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "command": "archive",
+      "purpose": "Archive the retired maintenance plan under retention policy.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-plans/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans:hold",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "command": "hold",
+      "purpose": "Hold the maintenance plan under deferral or equipment constraint.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-plans/{id}:hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-plans:retire",
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "command": "retire",
+      "purpose": "Retire the maintenance plan from future release.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-plans/{id}:retire",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_maintenance_plans",
+      "targetState": "retired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "retirement_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders:cancel",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "command": "cancel",
+      "purpose": "Cancel the maintenance work order before completion.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-work-orders/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders:complete",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "command": "complete",
+      "purpose": "Complete maintenance execution with closeout trace.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-work-orders/{id}:complete",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "targetState": "completed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "closeout_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders:plan",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "command": "plan",
+      "purpose": "Prepare the work order with governed maintenance scope.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-work-orders/{id}:plan",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "targetState": "planned",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders:release",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "command": "release",
+      "purpose": "Release the maintenance work order into execution.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-work-orders/{id}:release",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "targetState": "released",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "equipment_ready"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.maintenance-work-orders:start",
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "command": "start",
+      "purpose": "Start maintenance execution on the governed work order.",
+      "targetApiPath": "/api/v1/maintenance-ehs/maintenance-work-orders/{id}:start",
+      "classification": "lifecycle_owner",
+      "storageTable": "pm_work_orders",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits:activate",
+      "canonicalResource": "maintenance_ehs.permits",
+      "command": "activate",
+      "purpose": "Activate the permit for governed field execution.",
+      "targetApiPath": "/api/v1/maintenance-ehs/permits/{id}:activate",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "permit_conditions_acknowledged"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits:approve",
+      "canonicalResource": "maintenance_ehs.permits",
+      "command": "approve",
+      "purpose": "Approve the permit with controlled conditions.",
+      "targetApiPath": "/api/v1/maintenance-ehs/permits/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "approval_conditions_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits:archive",
+      "canonicalResource": "maintenance_ehs.permits",
+      "command": "archive",
+      "purpose": "Archive the closed permit under retention policy.",
+      "targetApiPath": "/api/v1/maintenance-ehs/permits/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits:close",
+      "canonicalResource": "maintenance_ehs.permits",
+      "command": "close",
+      "purpose": "Close the permit after work completion or controlled shutdown.",
+      "targetApiPath": "/api/v1/maintenance-ehs/permits/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "closure_evidence_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits:submit",
+      "canonicalResource": "maintenance_ehs.permits",
+      "command": "submit",
+      "purpose": "Submit the permit for governed approval.",
+      "targetApiPath": "/api/v1/maintenance-ehs/permits/{id}:submit",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "targetState": "submitted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.permits:suspend",
+      "canonicalResource": "maintenance_ehs.permits",
+      "command": "suspend",
+      "purpose": "Suspend the permit when conditions are no longer safe or valid.",
+      "targetApiPath": "/api/v1/maintenance-ehs/permits/{id}:suspend",
+      "classification": "lifecycle_owner",
+      "storageTable": "ehs_permit_register",
+      "targetState": "suspended",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "suspension_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations:archive",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "command": "archive",
+      "purpose": "Archive the closed observation under retention policy.",
+      "targetApiPath": "/api/v1/maintenance-ehs/safety-observations/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations:assign",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "command": "assign",
+      "purpose": "Assign the observation to a responsible owner.",
+      "targetApiPath": "/api/v1/maintenance-ehs/safety-observations/{id}:assign",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "targetState": "assigned",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "owner_selected"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations:close",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "command": "close",
+      "purpose": "Close the observation after action or controlled justification.",
+      "targetApiPath": "/api/v1/maintenance-ehs/safety-observations/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "closure_basis_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "maintenance_ehs.safety-observations:start_action",
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "command": "start_action",
+      "purpose": "Start active containment or corrective response.",
+      "targetApiPath": "/api/v1/maintenance-ehs/safety-observations/{id}:start_action",
+      "classification": "lifecycle_owner",
+      "storageTable": "safety_observations",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.assets:archive",
+      "canonicalResource": "master_data.assets",
+      "command": "archive",
+      "purpose": "Archive a disposed asset under retention policy.",
+      "targetApiPath": "/api/v1/master-data/assets/{id}:archive",
+      "classification": "reference_master",
+      "storageTable": "assets",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.assets:dispose",
+      "canonicalResource": "master_data.assets",
+      "command": "dispose",
+      "purpose": "Dispose the asset with preserved financial and operational trace.",
+      "targetApiPath": "/api/v1/master-data/assets/{id}:dispose",
+      "classification": "reference_master",
+      "storageTable": "assets",
+      "targetState": "disposed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "disposal_trace_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.assets:hold",
+      "canonicalResource": "master_data.assets",
+      "command": "hold",
+      "purpose": "Place an asset on governed hold.",
+      "targetApiPath": "/api/v1/master-data/assets/{id}:hold",
+      "classification": "reference_master",
+      "storageTable": "assets",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.assets:retire",
+      "canonicalResource": "master_data.assets",
+      "command": "retire",
+      "purpose": "Retire the asset from active service.",
+      "targetApiPath": "/api/v1/master-data/assets/{id}:retire",
+      "classification": "reference_master",
+      "storageTable": "assets",
+      "targetState": "retired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "retirement_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations:archive",
+      "canonicalResource": "master_data.compliance-obligations",
+      "command": "archive",
+      "purpose": "Archive the closed obligation under retention policy.",
+      "targetApiPath": "/api/v1/master-data/compliance-obligations/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations:close",
+      "canonicalResource": "master_data.compliance-obligations",
+      "command": "close",
+      "purpose": "Close the obligation after governed completion or waiver basis.",
+      "targetApiPath": "/api/v1/master-data/compliance-obligations/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "closure_basis_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations:mark_due",
+      "canonicalResource": "master_data.compliance-obligations",
+      "command": "mark_due",
+      "purpose": "Mark the obligation as actively due for controlled follow-up.",
+      "targetApiPath": "/api/v1/master-data/compliance-obligations/{id}:mark_due",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "targetState": "due",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations:mark_overdue",
+      "canonicalResource": "master_data.compliance-obligations",
+      "command": "mark_overdue",
+      "purpose": "Escalate the obligation into overdue state with management visibility.",
+      "targetApiPath": "/api/v1/master-data/compliance-obligations/{id}:mark_overdue",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "targetState": "overdue",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.compliance-obligations:waive",
+      "canonicalResource": "master_data.compliance-obligations",
+      "command": "waive",
+      "purpose": "Waive the obligation under documented approval.",
+      "targetApiPath": "/api/v1/master-data/compliance-obligations/{id}:waive",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_compliance_obligations",
+      "targetState": "waived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "waiver_approval_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers:activate",
+      "canonicalResource": "master_data.customers",
+      "command": "activate",
+      "purpose": "Release the customer for governed commercial use.",
+      "targetApiPath": "/api/v1/master-data/customers/{id}:activate",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "commercial_profile_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers:archive",
+      "canonicalResource": "master_data.customers",
+      "command": "archive",
+      "purpose": "Archive the inactive customer under retention policy.",
+      "targetApiPath": "/api/v1/master-data/customers/{id}:archive",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "no_open_commercial_dependents"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers:hold",
+      "canonicalResource": "master_data.customers",
+      "command": "hold",
+      "purpose": "Place the customer on controlled commercial hold.",
+      "targetApiPath": "/api/v1/master-data/customers/{id}:hold",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.customers:inactivate",
+      "canonicalResource": "master_data.customers",
+      "command": "inactivate",
+      "purpose": "Stop new commercial use while preserving historical trace.",
+      "targetApiPath": "/api/v1/master-data/customers/{id}:inactivate",
+      "classification": "reference_master",
+      "storageTable": "customers",
+      "targetState": "inactive",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees:activate",
+      "canonicalResource": "master_data.employees",
+      "command": "activate",
+      "purpose": "Release the employee into governed operational scope.",
+      "targetApiPath": "/api/v1/master-data/employees/{id}:activate",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "assignment_and_access_ready"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees:archive",
+      "canonicalResource": "master_data.employees",
+      "command": "archive",
+      "purpose": "Archive the terminated employee under retention policy.",
+      "targetApiPath": "/api/v1/master-data/employees/{id}:archive",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees:inactivate",
+      "canonicalResource": "master_data.employees",
+      "command": "inactivate",
+      "purpose": "Move the employee out of active assignment while preserving history.",
+      "targetApiPath": "/api/v1/master-data/employees/{id}:inactivate",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "targetState": "inactive",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees:suspend",
+      "canonicalResource": "master_data.employees",
+      "command": "suspend",
+      "purpose": "Suspend the employee from active operational eligibility.",
+      "targetApiPath": "/api/v1/master-data/employees/{id}:suspend",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "targetState": "suspended",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "suspension_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.employees:terminate",
+      "canonicalResource": "master_data.employees",
+      "command": "terminate",
+      "purpose": "Terminate the employee under governed HR control.",
+      "targetApiPath": "/api/v1/master-data/employees/{id}:terminate",
+      "classification": "reference_master",
+      "storageTable": "employees",
+      "targetState": "terminated",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "termination_basis_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment:activate",
+      "canonicalResource": "master_data.equipment",
+      "command": "activate",
+      "purpose": "Release qualified equipment into active operational use.",
+      "targetApiPath": "/api/v1/master-data/equipment/{id}:activate",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "qualification_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment:archive",
+      "canonicalResource": "master_data.equipment",
+      "command": "archive",
+      "purpose": "Archive retired equipment under retention policy.",
+      "targetApiPath": "/api/v1/master-data/equipment/{id}:archive",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment:hold",
+      "canonicalResource": "master_data.equipment",
+      "command": "hold",
+      "purpose": "Place equipment on hold under governed operational restriction.",
+      "targetApiPath": "/api/v1/master-data/equipment/{id}:hold",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment:lockout",
+      "canonicalResource": "master_data.equipment",
+      "command": "lockout",
+      "purpose": "Apply lockout to prevent unsafe operational use.",
+      "targetApiPath": "/api/v1/master-data/equipment/{id}:lockout",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "targetState": "lockout",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "lockout_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment:qualify",
+      "canonicalResource": "master_data.equipment",
+      "command": "qualify",
+      "purpose": "Qualify the equipment for governed operational use.",
+      "targetApiPath": "/api/v1/master-data/equipment/{id}:qualify",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "targetState": "qualified",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "commissioning_basis_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.equipment:retire",
+      "canonicalResource": "master_data.equipment",
+      "command": "retire",
+      "purpose": "Retire the equipment from future maintenance and execution release.",
+      "targetApiPath": "/api/v1/master-data/equipment/{id}:retire",
+      "classification": "reference_master",
+      "storageTable": "equipment",
+      "targetState": "retired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "retirement_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers:archive",
+      "canonicalResource": "master_data.suppliers",
+      "command": "archive",
+      "purpose": "Archive the blocked supplier under retention policy.",
+      "targetApiPath": "/api/v1/master-data/suppliers/{id}:archive",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers:authorize_spend",
+      "canonicalResource": "master_data.suppliers",
+      "command": "authorize_spend",
+      "purpose": "Authorize governed spend with the qualified supplier.",
+      "targetApiPath": "/api/v1/master-data/suppliers/{id}:authorize_spend",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "targetState": "spend_authorized",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "commercial_terms_approved"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers:block",
+      "canonicalResource": "master_data.suppliers",
+      "command": "block",
+      "purpose": "Block the supplier from new procurement release.",
+      "targetApiPath": "/api/v1/master-data/suppliers/{id}:block",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "targetState": "blocked",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "blocking_basis_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers:hold",
+      "canonicalResource": "master_data.suppliers",
+      "command": "hold",
+      "purpose": "Place the supplier on controlled hold.",
+      "targetApiPath": "/api/v1/master-data/suppliers/{id}:hold",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.suppliers:qualify",
+      "canonicalResource": "master_data.suppliers",
+      "command": "qualify",
+      "purpose": "Qualify the supplier for controlled sourcing use.",
+      "targetApiPath": "/api/v1/master-data/suppliers/{id}:qualify",
+      "classification": "reference_master",
+      "storageTable": "suppliers",
+      "targetState": "qualified",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "qualification_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools:archive",
+      "canonicalResource": "master_data.tools",
+      "command": "archive",
+      "purpose": "Archive the retired tool under retention policy.",
+      "targetApiPath": "/api/v1/master-data/tools/{id}:archive",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools:issue",
+      "canonicalResource": "master_data.tools",
+      "command": "issue",
+      "purpose": "Issue the tool into active operational use.",
+      "targetApiPath": "/api/v1/master-data/tools/{id}:issue",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "targetState": "in_use",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "qualified"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools:mark_broken",
+      "canonicalResource": "master_data.tools",
+      "command": "mark_broken",
+      "purpose": "Block the tool after breakage or unsafe condition is detected.",
+      "targetApiPath": "/api/v1/master-data/tools/{id}:mark_broken",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "targetState": "broken",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools:mark_worn",
+      "canonicalResource": "master_data.tools",
+      "command": "mark_worn",
+      "purpose": "Mark the tool as worn based on usage or inspection.",
+      "targetApiPath": "/api/v1/master-data/tools/{id}:mark_worn",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "targetState": "worn",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools:qualify",
+      "canonicalResource": "master_data.tools",
+      "command": "qualify",
+      "purpose": "Release a new or restored tool into governed issue readiness.",
+      "targetApiPath": "/api/v1/master-data/tools/{id}:qualify",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "targetState": "qualified",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "master_data.tools:retire",
+      "canonicalResource": "master_data.tools",
+      "command": "retire",
+      "purpose": "Retire the tool from further issue or use.",
+      "targetApiPath": "/api/v1/master-data/tools/{id}:retire",
+      "classification": "reference_master",
+      "storageTable": "tools",
+      "targetState": "retired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists:archive",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "command": "archive",
+      "purpose": "Archive the closed or cancelled dispatch entry.",
+      "targetApiPath": "/api/v1/planning-production/dispatch-lists/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists:cancel",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "command": "cancel",
+      "purpose": "Cancel the dispatch entry before terminal execution.",
+      "targetApiPath": "/api/v1/planning-production/dispatch-lists/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "cancellation_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists:close",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "command": "close",
+      "purpose": "Close the dispatch entry after completion reconciliation.",
+      "targetApiPath": "/api/v1/planning-production/dispatch-lists/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists:complete",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "command": "complete",
+      "purpose": "Complete the dispatch execution after governed shopfloor confirmation.",
+      "targetApiPath": "/api/v1/planning-production/dispatch-lists/{id}:complete",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "targetState": "completed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "execution_trace_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists:hold",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "command": "hold",
+      "purpose": "Place the dispatch entry on hold under controlled reason.",
+      "targetApiPath": "/api/v1/planning-production/dispatch-lists/{id}:hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists:release",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "command": "release",
+      "purpose": "Release the dispatch entry into governed shopfloor execution.",
+      "targetApiPath": "/api/v1/planning-production/dispatch-lists/{id}:release",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "targetState": "released",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "constraints_met"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.dispatch-lists:start_execution",
+      "canonicalResource": "planning_production.dispatch-lists",
+      "command": "start_execution",
+      "purpose": "Start execution against the released dispatch entry.",
+      "targetApiPath": "/api/v1/planning-production/dispatch-lists/{id}:start_execution",
+      "classification": "lifecycle_owner",
+      "storageTable": "mes_dispatch_queue",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections:accept",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "command": "accept",
+      "purpose": "Accept the in-process check after evidence review.",
+      "targetApiPath": "/api/v1/planning-production/ipqc-inspections/{id}:accept",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "targetState": "accepted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "results_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections:close",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "command": "close",
+      "purpose": "Close the IPQC record after acceptance or managed rejection.",
+      "targetApiPath": "/api/v1/planning-production/ipqc-inspections/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections:reinspect",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "command": "reinspect",
+      "purpose": "Send the inspection back for reinspection after corrective action.",
+      "targetApiPath": "/api/v1/planning-production/ipqc-inspections/{id}:reinspect",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "targetState": "reinspect",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections:reject",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "command": "reject",
+      "purpose": "Reject the in-process check and trigger containment.",
+      "targetApiPath": "/api/v1/planning-production/ipqc-inspections/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "results_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.ipqc-inspections:start",
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "command": "start",
+      "purpose": "Start in-process inspection execution.",
+      "targetApiPath": "/api/v1/planning-production/ipqc-inspections/{id}:start",
+      "classification": "lifecycle_owner",
+      "storageTable": "ipqc_inspections",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders:cancel",
+      "canonicalResource": "planning_production.job-orders",
+      "command": "cancel",
+      "purpose": "Cancel the job order before irreversible downstream execution.",
+      "targetApiPath": "/api/v1/planning-production/job-orders/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders:close",
+      "canonicalResource": "planning_production.job-orders",
+      "command": "close",
+      "purpose": "Close the job order after completion and reconciliation.",
+      "targetApiPath": "/api/v1/planning-production/job-orders/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders:complete",
+      "canonicalResource": "planning_production.job-orders",
+      "command": "complete",
+      "purpose": "Mark the job order execution complete before administrative close.",
+      "targetApiPath": "/api/v1/planning-production/job-orders/{id}:complete",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "targetState": "completed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "work_orders_terminal"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders:hold",
+      "canonicalResource": "planning_production.job-orders",
+      "command": "hold",
+      "purpose": "Put the job order on hold for shortage, engineering, or quality reasons.",
+      "targetApiPath": "/api/v1/planning-production/job-orders/{id}:hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders:release",
+      "canonicalResource": "planning_production.job-orders",
+      "command": "release",
+      "purpose": "Release the job order for executable downstream work preparation.",
+      "targetApiPath": "/api/v1/planning-production/job-orders/{id}:release",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "targetState": "released",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "sales_order_confirmed"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.job-orders:start_execution",
+      "canonicalResource": "planning_production.job-orders",
+      "command": "start_execution",
+      "purpose": "Move the job order into active execution supervision.",
+      "targetApiPath": "/api/v1/planning-production/job-orders/{id}:start_execution",
+      "classification": "lifecycle_owner",
+      "storageTable": "job_orders",
+      "targetState": "active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations:cancel",
+      "canonicalResource": "planning_production.production-operations",
+      "command": "cancel",
+      "purpose": "Cancel the operation before execution begins.",
+      "targetApiPath": "/api/v1/planning-production/production-operations/{id}:cancel",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "cancellation_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations:complete",
+      "canonicalResource": "planning_production.production-operations",
+      "command": "complete",
+      "purpose": "Complete the production operation with governed execution totals.",
+      "targetApiPath": "/api/v1/planning-production/production-operations/{id}:complete",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "targetState": "completed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "execution_totals_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations:hold_for_quality",
+      "canonicalResource": "planning_production.production-operations",
+      "command": "hold_for_quality",
+      "purpose": "Hold the operation under quality concern.",
+      "targetApiPath": "/api/v1/planning-production/production-operations/{id}:hold_for_quality",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "targetState": "quality_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations:ready",
+      "canonicalResource": "planning_production.production-operations",
+      "command": "ready",
+      "purpose": "Declare the operation ready for governed execution.",
+      "targetApiPath": "/api/v1/planning-production/production-operations/{id}:ready",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "targetState": "ready",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "dispatch_released"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations:scrap",
+      "canonicalResource": "planning_production.production-operations",
+      "command": "scrap",
+      "purpose": "Record scrap against the production operation.",
+      "targetApiPath": "/api/v1/planning-production/production-operations/{id}:scrap",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "targetState": "scrapped",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "scrap_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-operations:start",
+      "canonicalResource": "planning_production.production-operations",
+      "command": "start",
+      "purpose": "Start the production operation.",
+      "targetApiPath": "/api/v1/planning-production/production-operations/{id}:start",
+      "classification": "contained_child",
+      "storageTable": "production_operations",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans:approve",
+      "canonicalResource": "planning_production.production-plans",
+      "command": "approve",
+      "purpose": "Approve the reviewed production plan.",
+      "targetApiPath": "/api/v1/planning-production/production-plans/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "capacity_review_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans:archive",
+      "canonicalResource": "planning_production.production-plans",
+      "command": "archive",
+      "purpose": "Archive a terminal production plan under retention policy.",
+      "targetApiPath": "/api/v1/planning-production/production-plans/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans:complete",
+      "canonicalResource": "planning_production.production-plans",
+      "command": "complete",
+      "purpose": "Complete the plan after execution reconciliation.",
+      "targetApiPath": "/api/v1/planning-production/production-plans/{id}:complete",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "targetState": "completed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "execution_reconciled"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans:freeze",
+      "canonicalResource": "planning_production.production-plans",
+      "command": "freeze",
+      "purpose": "Freeze the published plan under controlled schedule discipline.",
+      "targetApiPath": "/api/v1/planning-production/production-plans/{id}:freeze",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "targetState": "frozen",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans:hold",
+      "canonicalResource": "planning_production.production-plans",
+      "command": "hold",
+      "purpose": "Put the plan on hold pending decision or disruption handling.",
+      "targetApiPath": "/api/v1/planning-production/production-plans/{id}:hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans:publish",
+      "canonicalResource": "planning_production.production-plans",
+      "command": "publish",
+      "purpose": "Publish the approved plan into dispatch and execution truth.",
+      "targetApiPath": "/api/v1/planning-production/production-plans/{id}:publish",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "targetState": "published",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.production-plans:submit_for_review",
+      "canonicalResource": "planning_production.production-plans",
+      "command": "submit_for_review",
+      "purpose": "Submit the production plan for review.",
+      "targetApiPath": "/api/v1/planning-production/production-plans/{id}:submit_for_review",
+      "classification": "lifecycle_owner",
+      "storageTable": "production_schedule",
+      "targetState": "under_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders:cancel",
+      "canonicalResource": "planning_production.work-orders",
+      "command": "cancel",
+      "purpose": "Cancel a non-started or non-terminal work order.",
+      "targetApiPath": "/api/v1/planning-production/work-orders/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders:close",
+      "canonicalResource": "planning_production.work-orders",
+      "command": "close",
+      "purpose": "Close execution after production trace is complete.",
+      "targetApiPath": "/api/v1/planning-production/work-orders/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "execution_trace_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders:dispatch",
+      "canonicalResource": "planning_production.work-orders",
+      "command": "dispatch",
+      "purpose": "Dispatch the work order to the shopfloor.",
+      "targetApiPath": "/api/v1/planning-production/work-orders/{id}:dispatch",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "targetState": "released",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "job_order_released"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders:pause_for_quality",
+      "canonicalResource": "planning_production.work-orders",
+      "command": "pause_for_quality",
+      "purpose": "Pause execution under a controlled quality hold.",
+      "targetApiPath": "/api/v1/planning-production/work-orders/{id}:pause_for_quality",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "targetState": "quality_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders:resume",
+      "canonicalResource": "planning_production.work-orders",
+      "command": "resume",
+      "purpose": "Resume execution after quality hold resolution.",
+      "targetApiPath": "/api/v1/planning-production/work-orders/{id}:resume",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "targetState": "in_production",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "quality_hold_resolved"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "planning_production.work-orders:start",
+      "canonicalResource": "planning_production.work-orders",
+      "command": "start",
+      "purpose": "Start shopfloor execution.",
+      "targetApiPath": "/api/v1/planning-production/work-orders/{id}:start",
+      "classification": "lifecycle_owner",
+      "storageTable": "work_orders",
+      "targetState": "in_production",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections:accept",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "command": "accept",
+      "purpose": "Accept received material into governed pass state.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/iqc-inspections/{id}:accept",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "targetState": "pass",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "result_evidence_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections:queue",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "command": "queue",
+      "purpose": "Queue an incoming inspection against received material.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/iqc-inspections/{id}:queue",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "targetState": "pending",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections:reject",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "command": "reject",
+      "purpose": "Reject material and trigger quarantine or NCR escalation.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/iqc-inspections/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "targetState": "fail",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "disposition_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections:start",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "command": "start",
+      "purpose": "Start the IQC execution while remaining in pending review.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/iqc-inspections/{id}:start",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "targetState": "pending",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.iqc-inspections:waive",
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "command": "waive",
+      "purpose": "Waive full acceptance with controlled conditional disposition.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/iqc-inspections/{id}:waive",
+      "classification": "lifecycle_owner",
+      "storageTable": "incoming_inspections",
+      "targetState": "conditional",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "waiver_approval_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections:approve",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "command": "approve",
+      "purpose": "Approve the correction after inventory, supplier, and AP impact are reviewed.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipt-corrections/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "impact_review_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections:post",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "command": "post",
+      "purpose": "Post the correction into stock and financial truth.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipt-corrections/{id}:post",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "targetState": "posted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "approval_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections:submit",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "command": "submit",
+      "purpose": "Submit a governed receipt correction request for review.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipt-corrections/{id}:submit",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "targetState": "submitted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "correction_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipt-corrections:void",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "command": "void",
+      "purpose": "Void a correction before posting or final reconciliation.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipt-corrections/{id}:void",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipt_corrections",
+      "targetState": "voided",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts:accept",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "command": "accept",
+      "purpose": "Accept received material after IQC completion.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipts/{id}:accept",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "targetState": "accepted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "iqc_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts:close",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "command": "close",
+      "purpose": "Close the receipt after physical and financial completion.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipts/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts:putaway",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "command": "putaway",
+      "purpose": "Put away accepted material into controlled stock.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipts/{id}:putaway",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "targetState": "putaway",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "accepted"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts:quarantine",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "command": "quarantine",
+      "purpose": "Quarantine receipt pending disposition.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipts/{id}:quarantine",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "targetState": "quarantined",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts:reverse",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "command": "reverse",
+      "purpose": "Reverse a receipt under controlled correction rules.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipts/{id}:reverse",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "targetState": "reversed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "correction_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-receipts:start_iqc",
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "command": "start_iqc",
+      "purpose": "Move received material into governed IQC review.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-receipts/{id}:start_iqc",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_receipts",
+      "targetState": "under_iqc",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions:approve",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "command": "approve",
+      "purpose": "Approve requisition demand for sourcing.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-requisitions/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "approval_basis_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions:cancel",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "command": "cancel",
+      "purpose": "Cancel the requisition before sourcing finishes.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-requisitions/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions:source",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "command": "source",
+      "purpose": "Mark the requisition as sourced into supplier execution.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-requisitions/{id}:source",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "targetState": "sourced",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "supplier_commitment_or_po_exists"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.purchase-requisitions:submit",
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "command": "submit",
+      "purpose": "Submit a requisition for approval.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/purchase-requisitions/{id}:submit",
+      "classification": "lifecycle_owner",
+      "storageTable": "purchase_requisitions",
+      "targetState": "submitted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns:cancel",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "command": "cancel",
+      "purpose": "Cancel an ASN before physical receipt enters stock truth.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-asns/{id}:cancel",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "targetState": "cancelled",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns:close",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "command": "close",
+      "purpose": "Close the ASN after receipt and discrepancy handling are complete.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-asns/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "receipt_or_disposition_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns:confirm",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "command": "confirm",
+      "purpose": "Confirm the supplier ASN against the governed PO and expected inbound plan.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-asns/{id}:confirm",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "targetState": "confirmed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns:mark_discrepant",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "command": "mark_discrepant",
+      "purpose": "Record ASN discrepancy against PO, packing, or physical inbound condition.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-asns/{id}:mark_discrepant",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "targetState": "discrepant",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "discrepancy_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns:mark_received",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "command": "mark_received",
+      "purpose": "Mark that the ASN quantity physically arrived for receipt creation.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-asns/{id}:mark_received",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "targetState": "received",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "physical_arrival_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-asns:start_receiving",
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "command": "start_receiving",
+      "purpose": "Move the ASN into active receiving execution.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-asns/{id}:start_receiving",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_asns",
+      "targetState": "receiving",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "dock_ready"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders:approve",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "command": "approve",
+      "purpose": "Approve supplier PO for supplier commitment.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-purchase-orders/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "approved_requisition_exists"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders:close",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "command": "close",
+      "purpose": "Close supplier PO after governed receiving completion.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-purchase-orders/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "receiving_terminal"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders:receive_full",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "command": "receive_full",
+      "purpose": "Record full receipt against the released supplier PO.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-purchase-orders/{id}:receive_full",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "targetState": "received",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders:receive_partial",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "command": "receive_partial",
+      "purpose": "Record partial receipt against the released supplier PO.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-purchase-orders/{id}:receive_partial",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "targetState": "partial",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders:release",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "command": "release",
+      "purpose": "Release the PO to the supplier after approval.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-purchase-orders/{id}:release",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "targetState": "released",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "procurement_supplier_quality.supplier-purchase-orders:submit_for_approval",
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "command": "submit_for_approval",
+      "purpose": "Submit supplier PO for governed approval.",
+      "targetApiPath": "/api/v1/procurement-supplier-quality/supplier-purchase-orders/{id}:submit_for_approval",
+      "classification": "lifecycle_owner",
+      "storageTable": "supplier_purchase_orders",
+      "targetState": "pending_approval",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs:approve_plan",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "command": "approve_plan",
+      "purpose": "Approve the audit plan and finding criteria.",
+      "targetApiPath": "/api/v1/quality-improvement/audit-programs/{id}:approve_plan",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "scope_and_owner_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs:close",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "command": "close",
+      "purpose": "Close the audit after findings and follow-up are complete.",
+      "targetApiPath": "/api/v1/quality-improvement/audit-programs/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs:issue_findings",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "command": "issue_findings",
+      "purpose": "Issue findings and track governed responses.",
+      "targetApiPath": "/api/v1/quality-improvement/audit-programs/{id}:issue_findings",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "targetState": "implemented",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "audit_evidence_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs:reject",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "command": "reject",
+      "purpose": "Reject the audit package or closure path under governed reason.",
+      "targetApiPath": "/api/v1/quality-improvement/audit-programs/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs:schedule",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "command": "schedule",
+      "purpose": "Schedule the audit with governed scope and ownership.",
+      "targetApiPath": "/api/v1/quality-improvement/audit-programs/{id}:schedule",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "targetState": "submitted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs:start",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "command": "start",
+      "purpose": "Start audit execution and evidence capture.",
+      "targetApiPath": "/api/v1/quality-improvement/audit-programs/{id}:start",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "targetState": "under_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.audit-programs:verify",
+      "canonicalResource": "quality_improvement.audit-programs",
+      "command": "verify",
+      "purpose": "Verify that findings were effectively addressed.",
+      "targetApiPath": "/api/v1/quality-improvement/audit-programs/{id}:verify",
+      "classification": "lifecycle_owner",
+      "storageTable": "qual_audit_programs",
+      "targetState": "verified",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "closeout_evidence_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions:approve",
+      "canonicalResource": "quality_improvement.concessions",
+      "command": "approve",
+      "purpose": "Approve and close the concession with explicit evidence.",
+      "targetApiPath": "/api/v1/quality-improvement/concessions/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "approval_trace_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions:reject",
+      "canonicalResource": "quality_improvement.concessions",
+      "command": "reject",
+      "purpose": "Reject the concession under governed reason.",
+      "targetApiPath": "/api/v1/quality-improvement/concessions/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions:start_review",
+      "canonicalResource": "quality_improvement.concessions",
+      "command": "start_review",
+      "purpose": "Start governed review of the concession request.",
+      "targetApiPath": "/api/v1/quality-improvement/concessions/{id}:start_review",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.concessions:submit_for_review",
+      "canonicalResource": "quality_improvement.concessions",
+      "command": "submit_for_review",
+      "purpose": "Move the concession into approval review.",
+      "targetApiPath": "/api/v1/quality-improvement/concessions/{id}:submit_for_review",
+      "classification": "lifecycle_owner",
+      "storageTable": "concessions",
+      "targetState": "pending_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "scope_and_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions:close",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "command": "close",
+      "purpose": "Close the CAPA after effectiveness is verified.",
+      "targetApiPath": "/api/v1/quality-improvement/corrective-actions/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "effectiveness_verified"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions:implement",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "command": "implement",
+      "purpose": "Execute approved corrective actions.",
+      "targetApiPath": "/api/v1/quality-improvement/corrective-actions/{id}:implement",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "targetState": "implementation",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions:initiate",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "command": "initiate",
+      "purpose": "Initiate CAPA from NCR, audit, or systemic signal.",
+      "targetApiPath": "/api/v1/quality-improvement/corrective-actions/{id}:initiate",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "targetState": "initiated",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions:plan_actions",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "command": "plan_actions",
+      "purpose": "Record owned CAPA tasks and deadlines.",
+      "targetApiPath": "/api/v1/quality-improvement/corrective-actions/{id}:plan_actions",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "targetState": "action_planning",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "root_cause_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.corrective-actions:verify_effectiveness",
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "command": "verify_effectiveness",
+      "purpose": "Run effectiveness review against implemented action.",
+      "targetApiPath": "/api/v1/quality-improvement/corrective-actions/{id}:verify_effectiveness",
+      "classification": "lifecycle_owner",
+      "storageTable": "capa_records",
+      "targetState": "effectiveness_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "implementation_evidence_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations:close",
+      "canonicalResource": "quality_improvement.deviations",
+      "command": "close",
+      "purpose": "Close the deviation after approved disposition and evidence review.",
+      "targetApiPath": "/api/v1/quality-improvement/deviations/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "disposition_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations:reject",
+      "canonicalResource": "quality_improvement.deviations",
+      "command": "reject",
+      "purpose": "Reject the deviation path under governed reason.",
+      "targetApiPath": "/api/v1/quality-improvement/deviations/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations:start_work",
+      "canonicalResource": "quality_improvement.deviations",
+      "command": "start_work",
+      "purpose": "Start governed investigation or mitigation for the deviation.",
+      "targetApiPath": "/api/v1/quality-improvement/deviations/{id}:start_work",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "targetState": "in_progress",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.deviations:submit_for_review",
+      "canonicalResource": "quality_improvement.deviations",
+      "command": "submit_for_review",
+      "purpose": "Move the deviation into approval review.",
+      "targetApiPath": "/api/v1/quality-improvement/deviations/{id}:submit_for_review",
+      "classification": "lifecycle_owner",
+      "storageTable": "deviations",
+      "targetState": "pending_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "risk_and_scope_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:approve",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "approve",
+      "purpose": "Approve the improvement for execution.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:approve",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "owner_and_target_kpi_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:archive",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "archive",
+      "purpose": "Archive a closed or rejected improvement under retention policy.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:archive",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "archived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:close",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "close",
+      "purpose": "Close the improvement after verification and benefit confirmation.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "benefit_verification_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:hold",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "hold",
+      "purpose": "Pause the improvement with governed reason and recovery plan.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:hold",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "on_hold",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "hold_reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:implement",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "implement",
+      "purpose": "Execute the approved countermeasure or kaizen action.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:implement",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "implemented",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:reject",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "reject",
+      "purpose": "Reject an improvement that does not meet value or readiness criteria.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:review",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "review",
+      "purpose": "Start governance review for feasibility and value impact.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:review",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "under_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:submit",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "submit",
+      "purpose": "Submit an improvement proposal with problem statement and target KPI.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:submit",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "submitted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.improvement-actions:verify",
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "command": "verify",
+      "purpose": "Verify realized benefit or learning after implementation.",
+      "targetApiPath": "/api/v1/quality-improvement/improvement-actions/{id}:verify",
+      "classification": "lifecycle_owner",
+      "storageTable": "improvement_projects",
+      "targetState": "verified",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "implementation_evidence_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances:activate_containment",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "command": "activate_containment",
+      "purpose": "Activate containment against affected stock, WIP, or shipment.",
+      "targetApiPath": "/api/v1/quality-improvement/nonconformances/{id}:activate_containment",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "targetState": "containment_active",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances:close",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "command": "close",
+      "purpose": "Close the NCR after all required evidence and linked actions are complete.",
+      "targetApiPath": "/api/v1/quality-improvement/nonconformances/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "disposition_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances:request_close",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "command": "request_close",
+      "purpose": "Request closure after containment and disposition evidence are complete.",
+      "targetApiPath": "/api/v1/quality-improvement/nonconformances/{id}:request_close",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "targetState": "close_requested",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances:review",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "command": "review",
+      "purpose": "Start formal quality review.",
+      "targetApiPath": "/api/v1/quality-improvement/nonconformances/{id}:review",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "targetState": "under_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances:set_disposition",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "command": "set_disposition",
+      "purpose": "Record the approved disposition path.",
+      "targetApiPath": "/api/v1/quality-improvement/nonconformances/{id}:set_disposition",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "targetState": "disposition_set",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "defect_evidence_complete"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.nonconformances:submit",
+      "canonicalResource": "quality_improvement.nonconformances",
+      "command": "submit",
+      "purpose": "Submit the nonconformance for formal review.",
+      "targetApiPath": "/api/v1/quality-improvement/nonconformances/{id}:submit",
+      "classification": "lifecycle_owner",
+      "storageTable": "ncr_records",
+      "targetState": "submitted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.oqc-inspections:accept",
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "command": "accept",
+      "purpose": "Accept the outgoing lot or unit for shipment release.",
+      "targetApiPath": "/api/v1/quality-improvement/oqc-inspections/{id}:accept",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "targetState": "accepted",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "results_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.oqc-inspections:reject",
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "command": "reject",
+      "purpose": "Reject the outgoing inspection and block shipment release.",
+      "targetApiPath": "/api/v1/quality-improvement/oqc-inspections/{id}:reject",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "targetState": "rejected",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "results_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.oqc-inspections:start",
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "command": "start",
+      "purpose": "Start the outgoing inspection while maintaining pending status.",
+      "targetApiPath": "/api/v1/quality-improvement/oqc-inspections/{id}:start",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "targetState": "pending",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.oqc-inspections:waive",
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "command": "waive",
+      "purpose": "Waive the inspection under controlled approval.",
+      "targetApiPath": "/api/v1/quality-improvement/oqc-inspections/{id}:waive",
+      "classification": "lifecycle_owner",
+      "storageTable": "oqc_inspections",
+      "targetState": "waived",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "waiver_approval_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.override-controls:close",
+      "canonicalResource": "quality_improvement.override-controls",
+      "command": "close",
+      "purpose": "Close the override after follow-up and exception handling are completed.",
+      "targetApiPath": "/api/v1/quality-improvement/override-controls/{id}:close",
+      "classification": "lifecycle_owner",
+      "storageTable": "operational_override_controls",
+      "targetState": "closed",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.override-controls:expire",
+      "canonicalResource": "quality_improvement.override-controls",
+      "command": "expire",
+      "purpose": "Expire an active override at the governed end of its validity window.",
+      "targetApiPath": "/api/v1/quality-improvement/override-controls/{id}:expire",
+      "classification": "lifecycle_owner",
+      "storageTable": "operational_override_controls",
+      "targetState": "expired",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.override-controls:revoke",
+      "canonicalResource": "quality_improvement.override-controls",
+      "command": "revoke",
+      "purpose": "Revoke an active override before the exception remains valid.",
+      "targetApiPath": "/api/v1/quality-improvement/override-controls/{id}:revoke",
+      "classification": "lifecycle_owner",
+      "storageTable": "operational_override_controls",
+      "targetState": "revoked",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "reason_recorded"
+      ],
+      "source": "authored_package"
+    }
+  ]
+}

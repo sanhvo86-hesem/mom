@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.freight-orders",
+  "canonicalName": "freight_orders",
+  "displayName": "Freight Orders",
+  "purpose": "Controls freight execution from booking through delivery closure so shipment release, carrier handoff, and proof-of-delivery stay under governed logistics truth.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "logistics_operations",
+  "storage": {
+    "primaryTable": "freight_orders",
+    "primaryKey": "freight_order_id",
+    "statusField": "freight_status",
+    "childTables": [
+      "freight_order_stops"
+    ],
+    "legacyTables": [
+      "freight_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "freight_order_number",
+    "naturalKeys": [
+      "freight_order_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "shipment_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "delivery_review",
+    "retentionClass": "logistics_record_7y",
+    "evidenceRequirements": [
+      "carrier_commitment",
+      "booking_reference",
+      "proof_of_delivery"
+    ],
+    "kpiSignals": [
+      "freight_booking_lead_time",
+      "on_time_delivery_rate",
+      "proof_of_delivery_closure_time"
+    ],
+    "autoAuditChecks": [
+      "booked_freight_orders_must_preserve_carrier_reference",
+      "delivered_freight_orders_must_preserve_delivery_evidence",
+      "closed_freight_orders_must_trace_back_to_shipment"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "freight_orders_freight_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "planned", "label": "Đã lập kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+      { "value": "tendered", "label": "Đã chào vận chuyển", "labelEn": "Tendered", "allowedTransitionsFrom": ["planned"] },
+      { "value": "booked", "label": "Đã đặt chỗ", "labelEn": "Booked", "allowedTransitionsFrom": ["tendered", "planned"] },
+      { "value": "in_transit", "label": "Đang vận chuyển", "labelEn": "In Transit", "allowedTransitionsFrom": ["booked"] },
+      { "value": "delivered", "label": "Đã giao", "labelEn": "Delivered", "allowedTransitionsFrom": ["in_transit"] },
+      { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["delivered"] },
+      { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "tendered", "booked"] }
+    ],
+    "commands": [
+      { "command": "tender", "targetState": "tendered", "description": "Tender the freight requirement to controlled carrier selection.", "idempotencyScope": "resource+transition" },
+      { "command": "book", "targetState": "booked", "description": "Book the carrier and lock the governed freight commitment.", "idempotencyScope": "resource+transition", "preconditions": ["carrier_selected"] },
+      { "command": "dispatch", "targetState": "in_transit", "description": "Start in-transit execution for the booked freight order.", "idempotencyScope": "resource+transition", "preconditions": ["loading_confirmed"] },
+      { "command": "confirm_delivery", "targetState": "delivered", "description": "Record delivery confirmation and proof-of-delivery trace.", "idempotencyScope": "resource+transition", "preconditions": ["delivery_evidence_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the freight order after delivery reconciliation.", "idempotencyScope": "resource+transition", "preconditions": ["delivery_reconciled"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the freight order before terminal execution.", "idempotencyScope": "resource+transition", "preconditions": ["cancellation_reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.shipments",
+      "commercial_customer.sales-orders"
+    ],
+    "downstreamObjects": [
+      "commercial_customer.customer-care-cases"
+    ],
+    "keyRelationships": [
+      "shipment_id -> shipments.shipment_id"
+    ],
+    "events": [
+      { "eventName": "booked", "description": "Freight order was booked with a controlled carrier commitment." },
+      { "eventName": "in_transit", "description": "Freight order entered in-transit execution." },
+      { "eventName": "delivered", "description": "Freight order recorded delivery completion." },
+      { "eventName": "closed", "description": "Freight order was closed after reconciliation." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is transportation.freight_orders.* while canonical naming remains inventory_logistics.freight-orders."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "freight_orders",
+      "freight_status"
+    ],
+    "notes": [
+      "Transportation runtime naming remains the live API surface, but freight_orders is already the governed storage owner."
+    ]
+  },
+  "invariants": [
+    "A freight order cannot move to booked without carrier commitment trace.",
+    "Delivered freight orders must retain proof-of-delivery evidence.",
+    "Closed freight orders must remain linked to governed shipment truth."
+  ]
+}

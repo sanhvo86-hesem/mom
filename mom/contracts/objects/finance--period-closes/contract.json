@@ -1,0 +1,104 @@
+{
+  "version": "1.0",
+  "canonicalResource": "finance.period-closes",
+  "canonicalName": "period_closes",
+  "displayName": "Period Closes",
+  "purpose": "Control accounting period close and reopen decisions so posting gates remain explicit, auditable, and separable from invoice records.",
+  "ownerDomain": "finance",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "finance_controllership",
+  "storage": {
+    "primaryTable": "period_close_controls",
+    "primaryKey": "period_close_id",
+    "statusField": "close_status",
+    "childTables": [
+      "period_close_steps",
+      "electronic_signature"
+    ],
+    "legacyTables": [
+      "gl_period_close"
+    ]
+  },
+  "identity": {
+    "strategy": "period_code+ledger_scope",
+    "naturalKeys": [
+      "period_code",
+      "ledger_scope"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "financial_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "period_close_review",
+    "retentionClass": "financial_record_10y",
+    "evidenceRequirements": [
+      "close_reason",
+      "electronic_signature",
+      "status_history"
+    ],
+    "kpiSignals": [
+      "period_close_cycle_time",
+      "reopen_rate",
+      "backdated_exception_volume"
+    ],
+    "autoAuditChecks": [
+      "same_period_and_scope_must_not_have_duplicate_close_controls",
+      "reopen_requires_reason_trace",
+      "close_control_must_preserve_signature_evidence"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "FinanceControlService service-backed lifecycle",
+    "stateModelKey": "finance_period_close_controls_service_runtime",
+    "lifecycleMode": "service_backed_runtime",
+    "states": [
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": [] },
+      { "value": "reopened", "label": "Reopened", "labelEn": "Reopened", "allowedTransitionsFrom": ["closed"] }
+    ],
+    "commands": [
+      { "command": "close", "targetState": "closed", "description": "Close or re-close a governed period after review.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] },
+      { "command": "reopen", "targetState": "reopened", "description": "Reopen a period under controlled exception handling.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] }
+    ],
+    "notes": [
+      "The service creates a close control directly in closed state and allows governed reopen/close transitions afterward."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "finance.ap-invoices",
+      "finance.ar-invoices",
+      "finance.backdate-exceptions"
+    ],
+    "downstreamObjects": [],
+    "keyRelationships": [
+      "period_code -> ap_invoices.accounting_period",
+      "period_code -> ar_invoices.accounting_period"
+    ],
+    "events": [
+      { "eventName": "closed", "description": "Accounting period was formally closed for a governed ledger scope." },
+      { "eventName": "reopened", "description": "Accounting period was reopened under governed exception handling." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_canonical_api",
+    "notes": [
+      "Current runtime endpoints are exposed directly as /api/v1/finance/period-closes* through FinanceController."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "gl_period_close"
+    ],
+    "notes": [
+      "Legacy GL period-close naming remains only as compatibility trace while the explicit control object becomes system authority."
+    ]
+  },
+  "invariants": [
+    "A period close control must be unique per period_code and ledger_scope.",
+    "Reopen requires a governed reason and preserved close history.",
+    "Close controls must retain electronic-signature evidence."
+  ]
+}

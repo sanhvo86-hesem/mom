@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "canonicalResource": "finance.ar-invoices",
+  "canonicalName": "ar_invoices",
+  "displayName": "AR Invoices",
+  "purpose": "Represent customer receivable truth from shipment or billing release through dispute and settlement, without depending on a mixed AP/AR legacy object.",
+  "ownerDomain": "finance",
+  "objectRole": "ledger_document",
+  "ownerTeam": "accounts_receivable",
+  "storage": {
+    "primaryTable": "ar_invoices",
+    "primaryKey": "ar_invoice_id",
+    "statusField": "invoice_status",
+    "childTables": [
+      "ar_invoice_lines"
+    ],
+    "legacyTables": [
+      "ap_ar_invoices"
+    ]
+  },
+  "identity": {
+    "strategy": "invoice_number",
+    "naturalKeys": [
+      "invoice_number",
+      "customer_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "financial_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "cash_collection_review",
+    "retentionClass": "financial_record_10y",
+    "evidenceRequirements": [
+      "shipment_or_billing_reference",
+      "posting_reference",
+      "cash_application_trace"
+    ],
+    "kpiSignals": [
+      "invoice_to_cash_cycle_time",
+      "dispute_rate",
+      "collection_effectiveness"
+    ],
+    "autoAuditChecks": [
+      "cannot_close_before_paid_or_cancelled",
+      "disputes_must_preserve_root_cause_trace",
+      "ar_invoice_must_trace_to_sales_or_shipping_truth"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "compatibility_bridge",
+    "source": "ap_ar_invoices_payment_status compatibility bridge",
+    "stateModelKey": "ar_invoices_payment_status_compatibility_bridge",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "open", "label": "Open", "labelEn": "Open", "allowedTransitionsFrom": ["draft", "disputed"] },
+      { "value": "partial", "label": "Partial", "labelEn": "Partial", "allowedTransitionsFrom": ["open"] },
+      { "value": "paid", "label": "Paid", "labelEn": "Paid", "allowedTransitionsFrom": ["open", "partial", "disputed"] },
+      { "value": "disputed", "label": "Disputed", "labelEn": "Disputed", "allowedTransitionsFrom": ["open", "partial"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "open", "partial", "disputed"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["paid", "cancelled"] }
+    ],
+    "commands": [
+      { "command": "post", "targetState": "open", "description": "Post AR invoice into open receivable state.", "idempotencyScope": "resource+transition" },
+      { "command": "settle", "targetState": "paid", "description": "Settle AR invoice after cash application.", "idempotencyScope": "resource+transition", "preconditions": ["cash_received"] },
+      { "command": "raise_dispute", "targetState": "disputed", "description": "Raise a governed customer dispute against the receivable.", "idempotencyScope": "resource+transition" },
+      { "command": "void", "targetState": "cancelled", "description": "Void or cancel the receivable before final close.", "idempotencyScope": "resource+transition" },
+      { "command": "close", "targetState": "closed", "description": "Close the AR invoice once settled or cancelled.", "idempotencyScope": "resource+transition", "preconditions": ["paid_or_cancelled"] }
+    ],
+    "notes": [
+      "AR still relies on the legacy ap_ar_invoices payment-state contract for workflow truth. A dedicated AR lifecycle surface should replace this bridge in a later phase."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.sales-orders",
+      "inventory_logistics.shipments"
+    ],
+    "downstreamObjects": [
+      "finance.credit-memos",
+      "finance.debit-memos"
+    ],
+    "keyRelationships": [
+      "sales_order_id -> sales_orders.sales_order_id",
+      "shipment_id -> shipments.shipment_id"
+    ],
+    "events": [
+      { "eventName": "posted", "description": "AR invoice moved into open receivable state." },
+      { "eventName": "disputed", "description": "Customer dispute was raised against the invoice." },
+      { "eventName": "paid", "description": "Receivable was fully settled." },
+      { "eventName": "closed", "description": "AR invoice was closed after settlement or cancellation." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_bridge_only",
+    "notes": [
+      "No dedicated AR invoice controller is active yet. The contract is explicit so downstream tooling stops inferring behavior from mixed AP/AR legacy tables."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "ap_ar_invoices"
+    ],
+    "notes": [
+      "AR workflow truth is temporarily bridged from the mixed AP/AR status set until the dedicated AR runtime surface is completed."
+    ]
+  },
+  "invariants": [
+    "An AR invoice must trace to sales-order or shipment truth.",
+    "An AR invoice cannot close before paid or cancelled state.",
+    "Disputed AR invoices must preserve customer-resolution trace."
+  ]
+}

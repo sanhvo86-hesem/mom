@@ -1,0 +1,4107 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "description": "Explicit lifecycle and state-contract index for canonical business objects.",
+    "stateModelCount": 62
+  },
+  "stateModels": [
+    {
+      "canonicalResource": "commercial_customer.customer-care-cases",
+      "storageTables": [
+        "crm_customer_touchpoints"
+      ],
+      "statusSetKey": "crm_customer_touchpoints_touchpoint_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control customer complaint, follow-up, escalation, and closure so service issues remain governed and traceable instead of disappearing into touchpoint notes.",
+      "usageZone": "core_value_stream",
+      "gateType": "service_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "customer_feedback",
+      "statusOptions": [
+        {
+          "value": "open",
+          "label": "Open",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "In Progress",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "open",
+            "waiting_customer",
+            "escalated"
+          ]
+        },
+        {
+          "value": "waiting_customer",
+          "label": "Waiting Customer",
+          "labelEn": "Waiting Customer",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "escalated",
+          "label": "Escalated",
+          "labelEn": "Escalated",
+          "allowedTransitionsFrom": [
+            "open",
+            "in_progress",
+            "waiting_customer"
+          ]
+        },
+        {
+          "value": "resolved",
+          "label": "Resolved",
+          "labelEn": "Resolved",
+          "allowedTransitionsFrom": [
+            "in_progress",
+            "escalated"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "resolved"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + crm_customer_touchpoints_touchpoint_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/commercial_customer--customer-care-cases/contract.json"
+    },
+    {
+      "canonicalResource": "commercial_customer.customer-purchase-orders",
+      "storageTables": [
+        "customer_purchase_orders"
+      ],
+      "statusOptions": [
+        {
+          "value": "received",
+          "label": "Received",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "acknowledged",
+          "label": "Acknowledged",
+          "labelEn": "Acknowledged",
+          "allowedTransitionsFrom": [
+            "received"
+          ]
+        },
+        {
+          "value": "confirmed",
+          "label": "Confirmed",
+          "labelEn": "Confirmed",
+          "allowedTransitionsFrom": [
+            "received",
+            "acknowledged"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "confirmed"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "received",
+            "acknowledged"
+          ]
+        }
+      ],
+      "statusSetKey": "customer_purchase_orders_po_status_service_runtime",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Capture customer commitment as governed demand so commercial promise, SO linkage, and downstream delivery remain traceable from the first accepted PO.",
+      "usageZone": "core_value_stream",
+      "gateType": "demand_commitment_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "customer_order_review",
+      "workflowSource": "CustomerPurchaseOrderService",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/commercial_customer--customer-purchase-orders/contract.json",
+      "notes": [
+        "There is no separate status-options registry set yet; service logic is the current runtime truth."
+      ]
+    },
+    {
+      "canonicalResource": "commercial_customer.quotations",
+      "storageTables": [
+        "quotes"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "internal_review",
+          "label": "Internal Review",
+          "labelEn": "Internal Review",
+          "allowedTransitionsFrom": [
+            "draft",
+            "revised"
+          ]
+        },
+        {
+          "value": "sent",
+          "label": "Sent",
+          "labelEn": "Sent",
+          "allowedTransitionsFrom": [
+            "internal_review"
+          ]
+        },
+        {
+          "value": "accepted",
+          "label": "Accepted",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "sent"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "sent"
+          ]
+        },
+        {
+          "value": "expired",
+          "label": "Expired",
+          "labelEn": "Expired",
+          "allowedTransitionsFrom": [
+            "sent"
+          ]
+        },
+        {
+          "value": "revised",
+          "label": "Revised",
+          "labelEn": "Revised",
+          "allowedTransitionsFrom": [
+            "sent",
+            "expired"
+          ]
+        },
+        {
+          "value": "converted",
+          "label": "Converted",
+          "labelEn": "Converted",
+          "allowedTransitionsFrom": [
+            "accepted"
+          ]
+        }
+      ],
+      "statusSetKey": "quotes_status_quote_runtime",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control commercial estimation, review, offer release, and conversion so customer demand does not bypass governed quote truth before SO commitment.",
+      "usageZone": "core_value_stream",
+      "gateType": "commercial_commitment_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "quote_win_loss_review",
+      "workflowSource": "QuoteService::TRANSITIONS",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/commercial_customer--quotations/contract.json",
+      "notes": [
+        "The live quote runtime uses internal_review/accepted/rejected/revised/converted. Legacy status-options aliases still expose review/won/lost and must not override QuoteService truth."
+      ]
+    },
+    {
+      "canonicalResource": "commercial_customer.quote-effectiveness-reviews",
+      "storageTables": [
+        "qual_effectiveness_reviews"
+      ],
+      "statusOptions": [],
+      "statusSetKey": null,
+      "lifecycleMode": "assessment_record_runtime",
+      "purpose": "Capture structured quote win-loss and effectiveness analysis so commercial learning, margin review, and continuous improvement are preserved as governed assessment records instead of ad hoc notes.",
+      "usageZone": "governed_support",
+      "gateType": "learning_gate",
+      "auditClass": "assessment_audit_trail",
+      "continuousImprovementLoop": "quote_win_loss_review",
+      "workflowSource": "quality_lab.qual_effectiveness_reviews persisted assessment record",
+      "implemented": false,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/commercial_customer--quote-effectiveness-reviews/contract.json"
+    },
+    {
+      "canonicalResource": "commercial_customer.sales-orders",
+      "storageTables": [
+        "sales_orders"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "quoted",
+          "label": "Quoted",
+          "labelEn": "Quoted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "confirmed",
+          "label": "Confirmed",
+          "labelEn": "Confirmed",
+          "allowedTransitionsFrom": [
+            "quoted"
+          ]
+        },
+        {
+          "value": "in_production",
+          "label": "In Production",
+          "labelEn": "In Production",
+          "allowedTransitionsFrom": [
+            "confirmed"
+          ]
+        },
+        {
+          "value": "shipped",
+          "label": "Shipped",
+          "labelEn": "Shipped",
+          "allowedTransitionsFrom": [
+            "in_production"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "shipped"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "quoted",
+            "confirmed",
+            "in_production"
+          ]
+        }
+      ],
+      "statusSetKey": "sales_orders_so_status_order_runtime",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Turn accepted commercial demand into governed revenue-producing execution demand spanning engineering, production release, shipment gate, and financial realization.",
+      "usageZone": "core_value_stream",
+      "gateType": "commercial_commitment_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "order_fulfillment_review",
+      "workflowSource": "M2-orders.json + OrderService::SO_STATUSES",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/commercial_customer--sales-orders/contract.json",
+      "notes": [
+        "The runtime sales-order workflow uses quoted/cancelled, while the legacy status-options alias still exposes engineering_ready and omits cancelled. The authored package is the current runtime truth."
+      ]
+    },
+    {
+      "canonicalResource": "finance.ap-invoices",
+      "storageTables": [
+        "ap_invoices"
+      ],
+      "statusSetKey": "ap_invoices_invoice_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control AP three-way match, hold, posting, payment, and close so procurement correction cannot bypass financial truth.",
+      "usageZone": "core_value_stream",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "period_close_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "matched",
+          "label": "Matched",
+          "labelEn": "Matched",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "On Hold",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "draft",
+            "matched",
+            "posted"
+          ]
+        },
+        {
+          "value": "posted",
+          "label": "Posted",
+          "labelEn": "Posted",
+          "allowedTransitionsFrom": [
+            "matched"
+          ]
+        },
+        {
+          "value": "partially_paid",
+          "label": "Partially Paid",
+          "labelEn": "Partially Paid",
+          "allowedTransitionsFrom": [
+            "posted"
+          ]
+        },
+        {
+          "value": "paid",
+          "label": "Paid",
+          "labelEn": "Paid",
+          "allowedTransitionsFrom": [
+            "posted",
+            "partially_paid"
+          ]
+        },
+        {
+          "value": "voided",
+          "label": "Voided",
+          "labelEn": "Voided",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "paid",
+            "voided"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + ap_invoices_invoice_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/finance--ap-invoices/contract.json",
+      "notes": [
+        "The operational status source is dispute_status. invoice_status may still exist as descriptive or compatibility data and must not override workflow truth."
+      ]
+    },
+    {
+      "canonicalResource": "finance.ap-invoices|finance.ar-invoices",
+      "storageTables": [
+        "ap_ar_invoices"
+      ],
+      "statusSetKey": "ap_ar_invoices_payment_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls invoice payment state, dispute handling, and financial close visibility before cash recognition is considered complete.",
+      "usageZone": "core_value_stream",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "open",
+          "label": "Mở",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": [
+            "draft",
+            "disputed"
+          ]
+        },
+        {
+          "value": "partial",
+          "label": "Thanh toán một phần",
+          "labelEn": "Partially Paid",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "paid",
+          "label": "Đã thanh toán",
+          "labelEn": "Paid",
+          "allowedTransitionsFrom": [
+            "open",
+            "partial",
+            "disputed"
+          ]
+        },
+        {
+          "value": "disputed",
+          "label": "Tranh chấp",
+          "labelEn": "Disputed",
+          "allowedTransitionsFrom": [
+            "open",
+            "partial"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "open",
+            "partial",
+            "disputed"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "paid",
+            "cancelled"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime"
+    },
+    {
+      "canonicalResource": "finance.ar-invoices",
+      "storageTables": [
+        "ar_invoices"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "open",
+          "label": "Open",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": [
+            "draft",
+            "disputed"
+          ]
+        },
+        {
+          "value": "partial",
+          "label": "Partial",
+          "labelEn": "Partial",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "paid",
+          "label": "Paid",
+          "labelEn": "Paid",
+          "allowedTransitionsFrom": [
+            "open",
+            "partial",
+            "disputed"
+          ]
+        },
+        {
+          "value": "disputed",
+          "label": "Disputed",
+          "labelEn": "Disputed",
+          "allowedTransitionsFrom": [
+            "open",
+            "partial"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "open",
+            "partial",
+            "disputed"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "paid",
+            "cancelled"
+          ]
+        }
+      ],
+      "statusSetKey": "ar_invoices_payment_status_compatibility_bridge",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Represent customer receivable truth from shipment or billing release through dispute and settlement, without depending on a mixed AP/AR legacy object.",
+      "usageZone": "core_value_stream",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "cash_collection_review",
+      "workflowSource": "ap_ar_invoices_payment_status compatibility bridge",
+      "implemented": true,
+      "truthStatus": "compatibility_bridge",
+      "contractPackagePath": "contracts/objects/finance--ar-invoices/contract.json",
+      "notes": [
+        "AR still relies on the legacy ap_ar_invoices payment-state contract for workflow truth. A dedicated AR lifecycle surface should replace this bridge in a later phase."
+      ]
+    },
+    {
+      "canonicalResource": "finance.backdate-exceptions",
+      "storageTables": [
+        "backdate_exceptions"
+      ],
+      "statusOptions": [
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "expired",
+          "label": "Expired",
+          "labelEn": "Expired",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "revoked",
+          "label": "Revoked",
+          "labelEn": "Revoked",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "approved",
+            "expired",
+            "revoked"
+          ]
+        }
+      ],
+      "statusSetKey": "finance_backdate_exceptions_service_runtime",
+      "lifecycleMode": "service_backed_runtime",
+      "purpose": "Control governed posting-date exceptions so backdated financial or logistics adjustments cannot bypass closed-period discipline.",
+      "usageZone": "governed_support",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "period_close_review",
+      "workflowSource": "FinanceControlService service-backed lifecycle",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/finance--backdate-exceptions/contract.json",
+      "notes": [
+        "Creation immediately grants approved status when the exception passes validation and signature requirements."
+      ]
+    },
+    {
+      "canonicalResource": "finance.credit-memos",
+      "storageTables": [
+        "credit_memos"
+      ],
+      "statusOptions": [
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "statusSetKey": "finance_credit_memos_service_runtime",
+      "lifecycleMode": "service_backed_runtime",
+      "purpose": "Represent governed downward financial adjustments so AP and AR corrections remain explicit and auditable instead of hiding inside a mixed invoice object.",
+      "usageZone": "governed_support",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "period_close_review",
+      "workflowSource": "FinanceControlService service-backed memo creation",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/finance--credit-memos/contract.json",
+      "notes": [
+        "The current runtime exposes creation and retrieval only. Posting and settlement remain downstream ERP concerns, so approved is the authoritative state held here."
+      ]
+    },
+    {
+      "canonicalResource": "finance.debit-memos",
+      "storageTables": [
+        "debit_memos"
+      ],
+      "statusOptions": [
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "statusSetKey": "finance_debit_memos_service_runtime",
+      "lifecycleMode": "service_backed_runtime",
+      "purpose": "Represent governed upward financial adjustments so AP and AR correction exposure stays explicit, traceable, and separate from mixed invoice truth.",
+      "usageZone": "governed_support",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "period_close_review",
+      "workflowSource": "FinanceControlService service-backed memo creation",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/finance--debit-memos/contract.json",
+      "notes": [
+        "The current runtime exposes creation and retrieval only. Posting and settlement remain downstream ERP concerns, so approved is the authoritative state held here."
+      ]
+    },
+    {
+      "canonicalResource": "finance.fixed-asset-capitalizations",
+      "storageTables": [
+        "fixed_asset_capitalizations"
+      ],
+      "statusOptions": [
+        {
+          "value": "prepared",
+          "label": "Prepared",
+          "labelEn": "Prepared",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "capitalized",
+          "label": "Capitalized",
+          "labelEn": "Capitalized",
+          "allowedTransitionsFrom": [
+            "prepared"
+          ]
+        },
+        {
+          "value": "posted",
+          "label": "Posted",
+          "labelEn": "Posted",
+          "allowedTransitionsFrom": [
+            "capitalized"
+          ]
+        },
+        {
+          "value": "voided",
+          "label": "Voided",
+          "labelEn": "Voided",
+          "allowedTransitionsFrom": [
+            "prepared",
+            "capitalized"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Retired",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "posted"
+          ]
+        }
+      ],
+      "statusSetKey": "finance_fixed_asset_capitalizations_bridge",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Represent capitalization decisions that convert spend into governed asset value so maintenance, finance, and asset master stay aligned.",
+      "usageZone": "governed_support",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "asset_review",
+      "workflowSource": "fin_fixed_assets asset-status bridge pending dedicated capitalization runtime",
+      "implemented": true,
+      "truthStatus": "compatibility_bridge",
+      "contractPackagePath": "contracts/objects/finance--fixed-asset-capitalizations/contract.json",
+      "notes": [
+        "Dedicated capitalization runtime is not active yet. This package makes the business meaning explicit while workflow truth is still partially bridged from asset accounting surfaces."
+      ]
+    },
+    {
+      "canonicalResource": "finance.period-closes",
+      "storageTables": [
+        "period_close_controls"
+      ],
+      "statusOptions": [
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "reopened",
+          "label": "Reopened",
+          "labelEn": "Reopened",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
+      ],
+      "statusSetKey": "finance_period_close_controls_service_runtime",
+      "lifecycleMode": "service_backed_runtime",
+      "purpose": "Control accounting period close and reopen decisions so posting gates remain explicit, auditable, and separable from invoice records.",
+      "usageZone": "governed_support",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "period_close_review",
+      "workflowSource": "FinanceControlService service-backed lifecycle",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/finance--period-closes/contract.json",
+      "notes": [
+        "The service creates a close control directly in closed state and allows governed reopen/close transitions afterward."
+      ]
+    },
+    {
+      "canonicalResource": "integration_resilience.reconciliation-exceptions",
+      "storageTables": [
+        "mes_erp_reconciliation_exceptions"
+      ],
+      "statusOptions": [
+        {
+          "value": "open",
+          "label": "Open",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "In Progress",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "pending_review",
+          "label": "Pending Review",
+          "labelEn": "Pending Review",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        }
+      ],
+      "statusSetKey": "mes_erp_reconciliation_exceptions_exception_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control MES-ERP mismatch handling so interface drift is triaged, compensated, and closed instead of patched outside governed integration flow.",
+      "usageZone": "governed_support",
+      "gateType": "recovery_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "integration_review",
+      "workflowSource": "mes_erp_reconciliation_exceptions_exception_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/integration_resilience--reconciliation-exceptions/contract.json"
+    },
+    {
+      "canonicalResource": "inventory_logistics.customer-returns",
+      "storageTables": [
+        "rma_orders"
+      ],
+      "statusSetKey": "rma_orders_rma_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control return authorization, receipt, evaluation, disposition, and closure so reverse-logistics truth stays linked to quality and finance outcomes.",
+      "usageZone": "core_value_stream",
+      "gateType": "recovery_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "customer_return_review",
+      "statusOptions": [
+        {
+          "value": "requested",
+          "label": "Requested",
+          "labelEn": "Requested",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "authorized",
+          "label": "Authorized",
+          "labelEn": "Authorized",
+          "allowedTransitionsFrom": [
+            "requested"
+          ]
+        },
+        {
+          "value": "received",
+          "label": "Received",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": [
+            "authorized"
+          ]
+        },
+        {
+          "value": "in_evaluation",
+          "label": "In Evaluation",
+          "labelEn": "In Evaluation",
+          "allowedTransitionsFrom": [
+            "received"
+          ]
+        },
+        {
+          "value": "repaired",
+          "label": "Repaired",
+          "labelEn": "Repaired",
+          "allowedTransitionsFrom": [
+            "in_evaluation"
+          ]
+        },
+        {
+          "value": "replaced",
+          "label": "Replaced",
+          "labelEn": "Replaced",
+          "allowedTransitionsFrom": [
+            "in_evaluation"
+          ]
+        },
+        {
+          "value": "credited",
+          "label": "Credited",
+          "labelEn": "Credited",
+          "allowedTransitionsFrom": [
+            "in_evaluation"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "repaired",
+            "replaced",
+            "credited"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + rma_orders_rma_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/inventory_logistics--customer-returns/contract.json"
+    },
+    {
+      "canonicalResource": "inventory_logistics.cycle-count-plans",
+      "storageTables": [
+        "wms_cycle_count_plans"
+      ],
+      "statusOptions": [
+        {
+          "value": "active",
+          "label": "Active",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "paused",
+          "label": "Paused",
+          "labelEn": "Paused",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Completed",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "active",
+            "paused"
+          ]
+        }
+      ],
+      "statusSetKey": "inventory_cycle_count_plans_bridge",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control cycle-count scheduling and closure so stock accuracy is corrected through governed counting instead of ad hoc inventory adjustment.",
+      "usageZone": "governed_support",
+      "gateType": "inventory_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "inventory_accuracy_review",
+      "workflowSource": "wms_cycle_count_plans status plus warehouse governance bridge",
+      "implemented": true,
+      "truthStatus": "compatibility_bridge",
+      "contractPackagePath": "contracts/objects/inventory_logistics--cycle-count-plans/contract.json",
+      "notes": [
+        "The underlying status column remains simple, so this contract provides the governed meaning of publish/pause/complete/close until a richer native state surface is introduced."
+      ]
+    },
+    {
+      "canonicalResource": "inventory_logistics.freight-orders",
+      "storageTables": [
+        "freight_orders"
+      ],
+      "statusSetKey": "freight_orders_freight_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls freight execution from booking through delivery closure so shipment release, carrier handoff, and proof-of-delivery stay under governed logistics truth.",
+      "usageZone": "core_value_stream",
+      "gateType": "shipment_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "delivery_review",
+      "statusOptions": [
+        {
+          "value": "planned",
+          "label": "Đã lập kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "tendered",
+          "label": "Đã chào vận chuyển",
+          "labelEn": "Tendered",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "booked",
+          "label": "Đã đặt chỗ",
+          "labelEn": "Booked",
+          "allowedTransitionsFrom": [
+            "tendered",
+            "planned"
+          ]
+        },
+        {
+          "value": "in_transit",
+          "label": "Đang vận chuyển",
+          "labelEn": "In Transit",
+          "allowedTransitionsFrom": [
+            "booked"
+          ]
+        },
+        {
+          "value": "delivered",
+          "label": "Đã giao",
+          "labelEn": "Delivered",
+          "allowedTransitionsFrom": [
+            "in_transit"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "delivered"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "tendered",
+            "booked"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/inventory_logistics--freight-orders/contract.json"
+    },
+    {
+      "canonicalResource": "inventory_logistics.inventory-items",
+      "storageTables": [
+        "inventory_items",
+        "item",
+        "items"
+      ],
+      "statusSetKey": "items_item_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls release, obsolescence, and inventory-usable truth for the shared item master without duplicating inventory item identity.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "engineering_change",
+      "statusOptions": [
+        {
+          "value": "prototype",
+          "label": "Mẫu thử",
+          "labelEn": "Prototype",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "engineering",
+          "label": "Kỹ thuật",
+          "labelEn": "Engineering",
+          "allowedTransitionsFrom": [
+            "prototype"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "engineering",
+            "inactive"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng dùng",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "obsolete",
+          "label": "Lỗi thời",
+          "labelEn": "Obsolete",
+          "allowedTransitionsFrom": [
+            "inactive",
+            "engineering"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/inventory_logistics--inventory-items/contract.json",
+      "notes": [
+        "Canonical inventory-items still converges from the legacy items runtime surface. The contract locks business meaning before API/domain renaming."
+      ]
+    },
+    {
+      "canonicalResource": "inventory_logistics.inventory-movements",
+      "storageTables": [
+        "inventory_movements",
+        "inventory_transactions"
+      ],
+      "statusSetKey": "inventory_transactions_posting_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls movement posting, hold, and reversal so inventory truth remains reconcilable under corrections and audit.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "inventory_reconciliation",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "pending_review",
+          "label": "Chờ xem xét",
+          "labelEn": "Pending Review",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "posted",
+          "label": "Đã ghi nhận",
+          "labelEn": "Posted",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "draft",
+            "pending_review",
+            "posted"
+          ]
+        },
+        {
+          "value": "reversed",
+          "label": "Đảo giao dịch",
+          "labelEn": "Reversed",
+          "allowedTransitionsFrom": [
+            "posted",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "pending_review"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/inventory_logistics--inventory-movements/contract.json",
+      "notes": [
+        "Canonical inventory-movements still rides the inventory.inventory_transactions runtime surface while contract naming converges around inventory truth."
+      ]
+    },
+    {
+      "canonicalResource": "inventory_logistics.shipments",
+      "storageTables": [
+        "shipments",
+        "tms_shipments"
+      ],
+      "statusSetKey": "tms_shipments_shipment_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control outbound release, dispatch, delivery confirmation, and closure so OTIF and export-release truth stay governed from shipment creation to proof of delivery.",
+      "usageZone": "core_value_stream",
+      "gateType": "release_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "otif_review",
+      "statusOptions": [
+        {
+          "value": "planned",
+          "label": "Planned",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "blocked",
+          "label": "Blocked",
+          "labelEn": "Blocked",
+          "allowedTransitionsFrom": [
+            "planned",
+            "ready",
+            "released"
+          ]
+        },
+        {
+          "value": "ready",
+          "label": "Ready",
+          "labelEn": "Ready",
+          "allowedTransitionsFrom": [
+            "planned",
+            "blocked"
+          ]
+        },
+        {
+          "value": "released",
+          "label": "Released",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "ready"
+          ]
+        },
+        {
+          "value": "dispatched",
+          "label": "Dispatched",
+          "labelEn": "Dispatched",
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "value": "delivered",
+          "label": "Delivered",
+          "labelEn": "Delivered",
+          "allowedTransitionsFrom": [
+            "dispatched"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "delivered"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "blocked",
+            "ready",
+            "released"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + tms_shipments_shipment_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/inventory_logistics--shipments/contract.json"
+    },
+    {
+      "canonicalResource": "inventory_logistics.warehouses",
+      "storageTables": [
+        "warehouses"
+      ],
+      "statusSetKey": "warehouses_warehouse_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls warehouse release, hold, and archive so blocked storage areas cannot silently remain active for receiving, picking, or shipment.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "warehouse_review",
+      "statusOptions": [
+        {
+          "value": "planned",
+          "label": "Kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "planned",
+            "inactive",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng hoạt động",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "inactive"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/inventory_logistics--warehouses/contract.json"
+    },
+    {
+      "canonicalResource": "maintenance_ehs.five-s-audits",
+      "storageTables": [
+        "lean_5s_audits"
+      ],
+      "statusSetKey": "lean_5s_audits_status_set",
+      "lifecycleMode": "persisted",
+      "purpose": "Controls 5S audit planning, execution, follow-up, verification, and closure so visual-factory discipline becomes a governed lean loop instead of a score-only snapshot.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "5s_review",
+      "statusOptions": [
+        {
+          "value": "planned",
+          "label": "Đã lập kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang đánh giá",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "follow_up",
+          "label": "Theo dõi hành động",
+          "labelEn": "Follow Up",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "verified",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "allowedTransitionsFrom": [
+            "follow_up"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "verified"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/maintenance_ehs--five-s-audits/contract.json"
+    },
+    {
+      "canonicalResource": "maintenance_ehs.improvement-actions",
+      "storageTables": [
+        "engineering_change_requests"
+      ],
+      "statusSetKey": "engineering_change_requests_ecr_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls engineering change request progression under guarded runtime so release governance exists before any separate PLM workflow engine is introduced.",
+      "usageZone": "governed_support",
+      "gateType": "change_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "engineering_change",
+      "statusOptions": [
+        {
+          "value": "pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "allowedTransitionsFrom": [
+            "pending",
+            "broken"
+          ]
+        },
+        {
+          "value": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "allowedTransitionsFrom": [
+            "pending",
+            "partial"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "pending",
+            "partial"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime"
+    },
+    {
+      "canonicalResource": "maintenance_ehs.incidents",
+      "storageTables": [
+        "ehs_incidents"
+      ],
+      "statusSetKey": "ehs_incidents_incident_status",
+      "lifecycleMode": "persisted",
+      "purpose": "Control incident reporting, containment, investigation, corrective action, and closure so safety events cannot escape the EHS governance loop.",
+      "usageZone": "core_value_stream",
+      "gateType": "safety_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "incident_review",
+      "statusOptions": [
+        {
+          "value": "reported",
+          "label": "Reported",
+          "labelEn": "Reported",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "triaged",
+          "label": "Triaged",
+          "labelEn": "Triaged",
+          "allowedTransitionsFrom": [
+            "reported"
+          ]
+        },
+        {
+          "value": "contained",
+          "label": "Contained",
+          "labelEn": "Contained",
+          "allowedTransitionsFrom": [
+            "triaged",
+            "investigating"
+          ]
+        },
+        {
+          "value": "investigating",
+          "label": "Investigating",
+          "labelEn": "Investigating",
+          "allowedTransitionsFrom": [
+            "triaged",
+            "contained"
+          ]
+        },
+        {
+          "value": "corrective_action",
+          "label": "Corrective Action",
+          "labelEn": "Corrective Action",
+          "allowedTransitionsFrom": [
+            "investigating",
+            "contained"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "corrective_action"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + ehs_incidents_incident_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/maintenance_ehs--incidents/contract.json"
+    },
+    {
+      "canonicalResource": "maintenance_ehs.maintenance-plans",
+      "storageTables": [
+        "pm_maintenance_plans"
+      ],
+      "statusSetKey": "pm_maintenance_plans_status_set",
+      "lifecycleMode": "persisted",
+      "purpose": "Controls preventive-maintenance plan approval, release, hold, and retirement so recurring PM cadence stays auditable before work orders are auto-released.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "maintenance_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "approved",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Ngừng áp dụng",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/maintenance_ehs--maintenance-plans/contract.json"
+    },
+    {
+      "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+      "storageTables": [
+        "pm_work_orders"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "planned",
+          "label": "Planned",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "released",
+          "label": "Released",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "in_progress",
+          "label": "In Progress",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Completed",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "planned",
+            "released"
+          ]
+        }
+      ],
+      "statusSetKey": "pm_work_orders_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control preventive and corrective maintenance execution so equipment intervention, spare usage, and closeout stay governed instead of being hidden in note-only maintenance history.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "maintenance_review",
+      "workflowSource": "pm_work_orders_status_set",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/maintenance_ehs--maintenance-work-orders/contract.json"
+    },
+    {
+      "canonicalResource": "maintenance_ehs.permits",
+      "storageTables": [
+        "ehs_permit_register"
+      ],
+      "statusSetKey": "ehs_permit_register_status_set",
+      "lifecycleMode": "persisted",
+      "purpose": "Controls permit submission, approval, activation, suspension, expiry, and closure so hazardous or regulated work cannot proceed outside a governed permit-to-work register.",
+      "usageZone": "core_value_stream",
+      "gateType": "safety_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "permit_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hiệu lực",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "approved",
+            "suspended"
+          ]
+        },
+        {
+          "value": "suspended",
+          "label": "Tạm ngưng",
+          "labelEn": "Suspended",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active"
+          ]
+        },
+        {
+          "value": "expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active",
+            "suspended"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "active",
+            "suspended",
+            "expired"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/maintenance_ehs--permits/contract.json"
+    },
+    {
+      "canonicalResource": "maintenance_ehs.safety-observations",
+      "storageTables": [
+        "safety_observations"
+      ],
+      "statusSetKey": "safety_observations_observation_status",
+      "lifecycleMode": "persisted",
+      "purpose": "Controls safety good-catch and hazard observations through assignment, containment, and closure so frontline EHS risks cannot disappear into note-only reporting.",
+      "usageZone": "core_value_stream",
+      "gateType": "safety_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "safety_review",
+      "statusOptions": [
+        {
+          "value": "logged",
+          "label": "Đã ghi nhận",
+          "labelEn": "Logged",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "assigned",
+          "label": "Đã giao xử lý",
+          "labelEn": "Assigned",
+          "allowedTransitionsFrom": [
+            "logged"
+          ]
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang xử lý",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "assigned"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "assigned",
+            "in_progress"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/maintenance_ehs--safety-observations/contract.json"
+    },
+    {
+      "canonicalResource": "master_data.assets",
+      "storageTables": [
+        "assets"
+      ],
+      "statusOptions": [
+        {
+          "value": "active",
+          "label": "Active",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "on_hold",
+          "label": "On Hold",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Retired",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "disposed",
+          "label": "Disposed",
+          "labelEn": "Disposed",
+          "allowedTransitionsFrom": [
+            "retired",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "disposed"
+          ]
+        }
+      ],
+      "statusSetKey": "master_data_assets_bridge",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Provide a canonical asset identity so finance, maintenance, and customer-installed asset references do not split into separate truths.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "asset_review",
+      "workflowSource": "fin_fixed_assets_asset_status compatibility bridge",
+      "implemented": true,
+      "truthStatus": "compatibility_bridge",
+      "contractPackagePath": "contracts/objects/master_data--assets/contract.json",
+      "notes": [
+        "Canonical asset identity is still partially bridged from finance and service asset legacy surfaces until a dedicated unified asset runtime is completed."
+      ]
+    },
+    {
+      "canonicalResource": "master_data.assets|finance.fixed-asset-capitalizations",
+      "storageTables": [
+        "fin_fixed_assets"
+      ],
+      "statusSetKey": "fin_fixed_assets_asset_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls fixed-asset operational availability, hold, retirement, and disposal governance for accounting and maintenance alignment.",
+      "usageZone": "core_value_stream",
+      "gateType": "financial_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "statusOptions": [
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "disposed",
+          "label": "Đã thanh lý",
+          "labelEn": "Disposed",
+          "allowedTransitionsFrom": [
+            "retired",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "disposed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime"
+    },
+    {
+      "canonicalResource": "master_data.compliance-obligations",
+      "storageTables": [
+        "qual_compliance_obligations"
+      ],
+      "statusSetKey": "qual_compliance_obligations_obligation_status",
+      "lifecycleMode": "persisted",
+      "purpose": "Controls obligation due, waiver, and closure so permits, audits, and regulatory actions have a governed compliance anchor.",
+      "usageZone": "core_value_stream",
+      "gateType": "compliance_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "statusOptions": [
+        {
+          "value": "open",
+          "label": "Mở",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "due",
+          "label": "Đến hạn",
+          "labelEn": "Due",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "overdue",
+          "label": "Quá hạn",
+          "labelEn": "Overdue",
+          "allowedTransitionsFrom": [
+            "open",
+            "due"
+          ]
+        },
+        {
+          "value": "waived",
+          "label": "Miễn trừ",
+          "labelEn": "Waived",
+          "allowedTransitionsFrom": [
+            "open",
+            "due",
+            "overdue"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "open",
+            "due",
+            "overdue",
+            "waived"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/master_data--compliance-obligations/contract.json"
+    },
+    {
+      "canonicalResource": "master_data.customers",
+      "storageTables": [
+        "customers"
+      ],
+      "statusSetKey": "customers_customer_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls customer commercial release eligibility, order acceptance, and evidence retention on the customer master.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "statusOptions": [
+        {
+          "value": "prospective",
+          "label": "Tiềm năng",
+          "labelEn": "Prospective",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "prospective",
+            "inactive",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng hoạt động",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "inactive"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/master_data--customers/contract.json"
+    },
+    {
+      "canonicalResource": "master_data.employees",
+      "storageTables": [
+        "employees",
+        "hcm_employees"
+      ],
+      "statusSetKey": "hcm_employees_employment_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls labor qualification, access eligibility, and employee release into production and compliance scopes.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "statusOptions": [
+        {
+          "value": "preboarding",
+          "label": "Tiền nhận việc",
+          "labelEn": "Preboarding",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Đang làm việc",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "preboarding",
+            "inactive",
+            "suspended"
+          ]
+        },
+        {
+          "value": "suspended",
+          "label": "Tạm đình chỉ",
+          "labelEn": "Suspended",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng công tác",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active",
+            "suspended"
+          ]
+        },
+        {
+          "value": "terminated",
+          "label": "Chấm dứt",
+          "labelEn": "Terminated",
+          "allowedTransitionsFrom": [
+            "inactive",
+            "suspended"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "terminated"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/master_data--employees/contract.json"
+    },
+    {
+      "canonicalResource": "master_data.equipment",
+      "storageTables": [
+        "equipment",
+        "pm_equipment_master"
+      ],
+      "statusSetKey": "equipment_equipment_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls equipment qualification, lockout, and usable-machine release before maintenance, calibration, and production execution.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "maintenance_review",
+      "statusOptions": [
+        {
+          "value": "commissioning",
+          "label": "Đang nghiệm thu",
+          "labelEn": "Commissioning",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "commissioning",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "on_hold",
+            "lockout"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active",
+            "qualified"
+          ]
+        },
+        {
+          "value": "lockout",
+          "label": "Khóa an toàn",
+          "labelEn": "Lockout",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "active",
+            "lockout",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/master_data--equipment/contract.json"
+    },
+    {
+      "canonicalResource": "master_data.measuring-devices",
+      "storageTables": [
+        "tools"
+      ],
+      "statusOptions": [
+        {
+          "value": "new",
+          "label": "New",
+          "labelEn": "New",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Qualified",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "new",
+            "worn"
+          ]
+        },
+        {
+          "value": "in_use",
+          "label": "In Use",
+          "labelEn": "In Use",
+          "allowedTransitionsFrom": [
+            "qualified"
+          ]
+        },
+        {
+          "value": "worn",
+          "label": "Worn",
+          "labelEn": "Worn",
+          "allowedTransitionsFrom": [
+            "in_use"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Broken",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "in_use",
+            "worn"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Retired",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "broken",
+            "worn"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
+      ],
+      "statusSetKey": "master_data_measuring_devices_bridge",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Provide a canonical measuring-device contract so calibration release, quarantine, and metrology evidence stop drifting between tool-control naming and legacy gauge terminology.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "measurement_system_review",
+      "workflowSource": "wave1_lifecycle_normalization shared tools status plus calibration evidence bridge",
+      "implemented": true,
+      "truthStatus": "compatibility_bridge",
+      "contractPackagePath": "contracts/objects/master_data--measuring-devices/contract.json",
+      "notes": [
+        "A dedicated measuring_devices table and runtime surface are not materialized yet.",
+        "Current lifecycle truth is bridged through shared tool-status control plus calibration and OOT evidence."
+      ]
+    },
+    {
+      "canonicalResource": "master_data.suppliers",
+      "storageTables": [
+        "suppliers",
+        "vendors"
+      ],
+      "statusSetKey": "vendors_vendor_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls supplier qualification and spend authorization before purchasing or receiving release.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "supplier_review",
+      "statusOptions": [
+        {
+          "value": "pending",
+          "label": "Chờ đánh giá",
+          "labelEn": "Pending Qualification",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Đạt đánh giá",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "pending",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "spend_authorized",
+          "label": "Được phép mua",
+          "labelEn": "Spend Authorized",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "spend_authorized",
+            "blocked"
+          ]
+        },
+        {
+          "value": "blocked",
+          "label": "Bị khóa",
+          "labelEn": "Blocked",
+          "allowedTransitionsFrom": [
+            "spend_authorized",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "blocked"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/master_data--suppliers/contract.json",
+      "notes": [
+        "Canonical suppliers still rides the purchasing.vendors runtime surface. The contract makes supplier-master meaning explicit without a data move."
+      ]
+    },
+    {
+      "canonicalResource": "master_data.tools",
+      "storageTables": [
+        "tools"
+      ],
+      "statusOptions": [
+        {
+          "value": "new",
+          "label": "New",
+          "labelEn": "New",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Qualified",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "new",
+            "worn"
+          ]
+        },
+        {
+          "value": "in_use",
+          "label": "In Use",
+          "labelEn": "In Use",
+          "allowedTransitionsFrom": [
+            "qualified"
+          ]
+        },
+        {
+          "value": "worn",
+          "label": "Worn",
+          "labelEn": "Worn",
+          "allowedTransitionsFrom": [
+            "in_use"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Broken",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "in_use",
+            "worn"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Retired",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "broken",
+            "worn"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
+      ],
+      "statusSetKey": "tools_tool_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control tool readiness, wear containment, and retirement before a tool can be issued to production, maintenance, or calibration use.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "tool_life_review",
+      "workflowSource": "tools_tool_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/master_data--tools/contract.json"
+    },
+    {
+      "canonicalResource": "master_data.tools|master_data.measuring-devices",
+      "storageTables": [
+        "tools"
+      ],
+      "statusSetKey": "tools_tool_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls tool and measuring-device release, wear containment, and retirement before use on production or inspection operations.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "tool_life_review",
+      "statusOptions": [
+        {
+          "value": "new",
+          "label": "Mới",
+          "labelEn": "New",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "new",
+            "worn"
+          ]
+        },
+        {
+          "value": "in_use",
+          "label": "Đang sử dụng",
+          "labelEn": "In Use",
+          "allowedTransitionsFrom": [
+            "qualified"
+          ]
+        },
+        {
+          "value": "worn",
+          "label": "Mòn",
+          "labelEn": "Worn",
+          "allowedTransitionsFrom": [
+            "in_use"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Hỏng",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "in_use",
+            "worn"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Loại bỏ",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "broken",
+            "worn"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime"
+    },
+    {
+      "canonicalResource": "planning_production.dispatch-lists",
+      "storageTables": [
+        "mes_dispatch_queue"
+      ],
+      "statusSetKey": "mes_dispatch_queue_queue_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls shopfloor dispatch release, hold, and execution closure so operations cannot start or disappear from queue outside the governed MES release horizon.",
+      "usageZone": "core_value_stream",
+      "gateType": "release_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "tier_review",
+      "statusOptions": [
+        {
+          "value": "planned",
+          "label": "Đã lên kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "planned",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "planned",
+            "released",
+            "in_progress"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "completed"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "released",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed",
+            "cancelled"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/planning_production--dispatch-lists/contract.json"
+    },
+    {
+      "canonicalResource": "planning_production.ipqc-inspections",
+      "storageTables": [
+        "ipqc_inspections"
+      ],
+      "statusSetKey": "ipqc_inspections_inspection_status",
+      "lifecycleMode": "persisted",
+      "purpose": "Control in-process quality checks so process escapes trigger hold, reinspection, or NCR before final inspection and shipment release.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "process_quality_review",
+      "statusOptions": [
+        {
+          "value": "queued",
+          "label": "Queued",
+          "labelEn": "Queued",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "In Progress",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "queued",
+            "reinspect"
+          ]
+        },
+        {
+          "value": "accepted",
+          "label": "Accepted",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "reinspect",
+          "label": "Reinspect",
+          "labelEn": "Reinspect",
+          "allowedTransitionsFrom": [
+            "rejected"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "accepted",
+            "rejected"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + ipqc_inspections_inspection_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/planning_production--ipqc-inspections/contract.json"
+    },
+    {
+      "canonicalResource": "planning_production.job-orders",
+      "storageTables": [
+        "job_orders"
+      ],
+      "statusOptions": [
+        {
+          "value": "planned",
+          "label": "Planned",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "released",
+          "label": "Released",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Active",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "released",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "On Hold",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "released",
+            "active"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Completed",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "completed"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "released",
+            "on_hold"
+          ]
+        }
+      ],
+      "statusSetKey": "job_orders_job_status_order_runtime",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Translate confirmed sales demand into governed production intent so materials, routing, and downstream WO dispatch stay synchronized with commercial commitment.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "production_planning_review",
+      "workflowSource": "OrderService::JO_STATUSES",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/planning_production--job-orders/contract.json",
+      "notes": [
+        "Legacy status registry still exposes draft and omits on_hold/cancelled. The authored package follows the governed order runtime."
+      ]
+    },
+    {
+      "canonicalResource": "planning_production.production-operations",
+      "storageTables": [
+        "job_operations",
+        "production_operations"
+      ],
+      "statusSetKey": "job_operations_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Controls operation-level execution, hold, completion, and scrap so genealogy and in-process quality can anchor to the actual operation step.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "qrqc",
+      "statusOptions": [
+        {
+          "value": "pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "ready",
+          "label": "Sẵn sàng",
+          "labelEn": "Ready",
+          "allowedTransitionsFrom": [
+            "pending",
+            "quality_hold"
+          ]
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "ready"
+          ]
+        },
+        {
+          "value": "quality_hold",
+          "label": "Giữ chất lượng",
+          "labelEn": "Quality Hold",
+          "allowedTransitionsFrom": [
+            "ready",
+            "in_progress"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "scrapped",
+          "label": "Loại bỏ",
+          "labelEn": "Scrapped",
+          "allowedTransitionsFrom": [
+            "in_progress",
+            "quality_hold"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "pending",
+            "ready"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/planning_production--production-operations/contract.json",
+      "notes": [
+        "Production operations are contained-child workflow records. They must not be treated as an independent parent lifecycle authority."
+      ]
+    },
+    {
+      "canonicalResource": "planning_production.production-plans",
+      "storageTables": [
+        "production_schedule"
+      ],
+      "statusSetKey": "production_schedule_schedule_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control factory plan review, publication, freeze, and completion so dispatch, capacity, and OTIF commitments all read the same released schedule truth.",
+      "usageZone": "core_value_stream",
+      "gateType": "planning_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "s_and_op_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "under_review",
+          "label": "Under Review",
+          "labelEn": "Under Review",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "value": "published",
+          "label": "Published",
+          "labelEn": "Published",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "frozen",
+          "label": "Frozen",
+          "labelEn": "Frozen",
+          "allowedTransitionsFrom": [
+            "published"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "On Hold",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "draft",
+            "under_review",
+            "approved",
+            "published",
+            "frozen"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Completed",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "published",
+            "frozen"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "under_review",
+            "approved"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "completed",
+            "cancelled"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + production_schedule_schedule_status_set",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/planning_production--production-plans/contract.json"
+    },
+    {
+      "canonicalResource": "planning_production.work-orders",
+      "storageTables": [
+        "work_orders"
+      ],
+      "statusSetKey": "work_orders_work_order_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control executable shopfloor release, execution, and quality hold at the operation level so production truth is governed where work is actually performed.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "shopfloor_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "planned",
+          "label": "Planned",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "released",
+          "label": "Released",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "in_production",
+          "label": "In Production",
+          "labelEn": "In Production",
+          "allowedTransitionsFrom": [
+            "released",
+            "quality_hold"
+          ]
+        },
+        {
+          "value": "quality_hold",
+          "label": "Quality Hold",
+          "labelEn": "Quality Hold",
+          "allowedTransitionsFrom": [
+            "released",
+            "in_production"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "in_production"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "planned",
+            "released"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/planning_production--work-orders/contract.json"
+    },
+    {
+      "canonicalResource": "procurement_supplier_quality.iqc-inspections",
+      "storageTables": [
+        "incoming_inspections"
+      ],
+      "statusOptions": [
+        {
+          "value": "pending",
+          "label": "Pending",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "pass",
+          "label": "Pass",
+          "labelEn": "Pass",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "fail",
+          "label": "Fail",
+          "labelEn": "Fail",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "conditional",
+          "label": "Conditional",
+          "labelEn": "Conditional",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        }
+      ],
+      "statusSetKey": "incoming_inspections_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Gate inbound material before stock release so supplier quality, quarantine, and NCR escalation are recorded from a governed incoming inspection object.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "incoming_quality_review",
+      "workflowSource": "incoming_inspections_status + M4-purchasing workspace",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/procurement_supplier_quality--iqc-inspections/contract.json"
+    },
+    {
+      "canonicalResource": "procurement_supplier_quality.purchase-receipt-corrections",
+      "storageTables": [
+        "purchase_receipt_corrections"
+      ],
+      "statusSetKey": "purchase_receipt_corrections_correction_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control governed correction and reversal after receipt, IQC, or invoice impact so partial completion can be reconciled through traceable recovery instead of manual patches.",
+      "usageZone": "core_value_stream",
+      "gateType": "recovery_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "exception_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Submitted",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "posted",
+          "label": "Posted",
+          "labelEn": "Posted",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "voided",
+          "label": "Voided",
+          "labelEn": "Voided",
+          "allowedTransitionsFrom": [
+            "draft",
+            "submitted",
+            "approved"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + purchase_receipt_corrections_correction_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/procurement_supplier_quality--purchase-receipt-corrections/contract.json"
+    },
+    {
+      "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+      "storageTables": [
+        "purchase_receipts"
+      ],
+      "statusSetKey": "purchase_receipts_receipt_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control physical receipt, quarantine, acceptance, putaway, and reversal so stock and AP matching cannot outrun receiving truth.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "receiving_review",
+      "statusOptions": [
+        {
+          "value": "received",
+          "label": "Received",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "under_iqc",
+          "label": "Under IQC",
+          "labelEn": "Under IQC",
+          "allowedTransitionsFrom": [
+            "received",
+            "quarantined"
+          ]
+        },
+        {
+          "value": "accepted",
+          "label": "Accepted",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "under_iqc"
+          ]
+        },
+        {
+          "value": "quarantined",
+          "label": "Quarantined",
+          "labelEn": "Quarantined",
+          "allowedTransitionsFrom": [
+            "received",
+            "under_iqc",
+            "accepted"
+          ]
+        },
+        {
+          "value": "putaway",
+          "label": "Put Away",
+          "labelEn": "Put Away",
+          "allowedTransitionsFrom": [
+            "accepted"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "putaway",
+            "accepted"
+          ]
+        },
+        {
+          "value": "reversed",
+          "label": "Reversed",
+          "labelEn": "Reversed",
+          "allowedTransitionsFrom": [
+            "quarantined",
+            "accepted",
+            "closed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + purchase_receipts_receipt_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/procurement_supplier_quality--purchase-receipts/contract.json"
+    },
+    {
+      "canonicalResource": "procurement_supplier_quality.purchase-requisitions",
+      "storageTables": [
+        "purchase_requisitions"
+      ],
+      "statusSetKey": "purchase_requisitions_requisition_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Authorize buy demand before sourcing or PO release so procurement cannot bypass planning, budget, or gate controls.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "sourcing_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Submitted",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "sourced",
+          "label": "Sourced",
+          "labelEn": "Sourced",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "submitted",
+            "approved"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + purchase_requisitions_requisition_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/procurement_supplier_quality--purchase-requisitions/contract.json"
+    },
+    {
+      "canonicalResource": "procurement_supplier_quality.supplier-asns",
+      "storageTables": [
+        "supplier_asns"
+      ],
+      "statusSetKey": "supplier_asns_asn_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control inbound advance shipment notice, discrepancy handling, and receiving readiness so physical receipts cannot outrun supplier intent and dock planning truth.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "supplier_review",
+      "statusOptions": [
+        {
+          "value": "planned",
+          "label": "Planned",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "confirmed",
+          "label": "Confirmed",
+          "labelEn": "Confirmed",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "receiving",
+          "label": "Receiving",
+          "labelEn": "Receiving",
+          "allowedTransitionsFrom": [
+            "confirmed",
+            "discrepant"
+          ]
+        },
+        {
+          "value": "received",
+          "label": "Received",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": [
+            "receiving"
+          ]
+        },
+        {
+          "value": "discrepant",
+          "label": "Discrepant",
+          "labelEn": "Discrepant",
+          "allowedTransitionsFrom": [
+            "confirmed",
+            "receiving"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "received",
+            "discrepant"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Cancelled",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "confirmed"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + supplier_asns_asn_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/procurement_supplier_quality--supplier-asns/contract.json"
+    },
+    {
+      "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "storageTables": [
+        "supplier_purchase_orders"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "pending_approval",
+          "label": "Pending Approval",
+          "labelEn": "Pending Approval",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "pending_approval"
+          ]
+        },
+        {
+          "value": "released",
+          "label": "Released",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "partial",
+          "label": "Partial",
+          "labelEn": "Partial",
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "value": "received",
+          "label": "Received",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": [
+            "released",
+            "partial"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "received"
+          ]
+        }
+      ],
+      "statusSetKey": "supplier_purchase_orders_po_status_purchasing_runtime",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Authorize governed external spend and supplier commitment so receiving, IQC, and AP matching cannot bypass approved procurement intent.",
+      "usageZone": "core_value_stream",
+      "gateType": "entry_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "sourcing_review",
+      "workflowSource": "M4-purchasing.json workflow + purchase_orders_po_status alias",
+      "implemented": true,
+      "truthStatus": "compatibility_alias_runtime",
+      "contractPackagePath": "contracts/objects/procurement_supplier_quality--supplier-purchase-orders/contract.json",
+      "notes": [
+        "Canonical supplier-purchase-orders still rides the purchasing.purchase_orders runtime surface. The authored package records that compatibility alias explicitly."
+      ]
+    },
+    {
+      "canonicalResource": "quality_improvement.audit-programs",
+      "storageTables": [
+        "audit",
+        "qual_audit_programs"
+      ],
+      "statusSetKey": "qual_audit_programs_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control internal and supplier audit planning, execution, verification, and closure so compliance evidence and systemic findings remain governed from schedule through improvement follow-up.",
+      "usageZone": "governed_support",
+      "gateType": "compliance_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Submitted",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "under_review",
+          "label": "Under Review",
+          "labelEn": "Under Review",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "value": "implemented",
+          "label": "Implemented",
+          "labelEn": "Implemented",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "verified",
+          "label": "Verified",
+          "labelEn": "Verified",
+          "allowedTransitionsFrom": [
+            "implemented"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "verified",
+            "draft",
+            "submitted",
+            "under_review",
+            "approved",
+            "implemented"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "closed",
+            "draft",
+            "submitted",
+            "under_review",
+            "approved",
+            "implemented",
+            "verified"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + qual_audit_programs_status_set",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--audit-programs/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.concessions",
+      "storageTables": [
+        "concessions"
+      ],
+      "statusOptions": [
+        {
+          "value": "open",
+          "label": "Open",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "In Progress",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "pending_review",
+          "label": "Pending Review",
+          "labelEn": "Pending Review",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        }
+      ],
+      "statusSetKey": "concessions_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control temporary acceptance or shipment-release exception decisions so quality deviation from requirement cannot bypass governed approval and traceability.",
+      "usageZone": "governed_support",
+      "gateType": "exception_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "customer_escape_review",
+      "workflowSource": "concessions_status_set",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--concessions/contract.json",
+      "notes": [
+        "Expiry is tracked through effective dates and evidence, not a separate terminal workflow state in the current runtime."
+      ]
+    },
+    {
+      "canonicalResource": "quality_improvement.corrective-actions",
+      "storageTables": [
+        "capa_records"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "initiated",
+          "label": "Initiated",
+          "labelEn": "Initiated",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "action_planning",
+          "label": "Action Planning",
+          "labelEn": "Action Planning",
+          "allowedTransitionsFrom": [
+            "initiated"
+          ]
+        },
+        {
+          "value": "implementation",
+          "label": "Implementation",
+          "labelEn": "Implementation",
+          "allowedTransitionsFrom": [
+            "action_planning"
+          ]
+        },
+        {
+          "value": "effectiveness_review",
+          "label": "Effectiveness Review",
+          "labelEn": "Effectiveness Review",
+          "allowedTransitionsFrom": [
+            "implementation"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "effectiveness_review"
+          ]
+        }
+      ],
+      "statusSetKey": "capa_records_capa_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Drive verified corrective and preventive action so recurring quality loss is closed through owned tasks, effectiveness review, and audit trace.",
+      "usageZone": "core_value_stream",
+      "gateType": "improvement_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "workflowSource": "capa_records_capa_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--corrective-actions/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.deviations",
+      "storageTables": [
+        "deviation",
+        "deviations"
+      ],
+      "statusSetKey": "deviations_exception_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control temporary process, product, or documentation deviations so exception handling remains explicit, time-bounded, and auditable instead of disappearing inside generic status notes.",
+      "usageZone": "governed_support",
+      "gateType": "exception_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "capa",
+      "statusOptions": [
+        {
+          "value": "open",
+          "label": "Open",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "In Progress",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "pending_review",
+          "label": "Pending Review",
+          "labelEn": "Pending Review",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + deviations exception_status alignment",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--deviations/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.fqc-inspections",
+      "storageTables": [
+        "oqc_inspections"
+      ],
+      "statusOptions": [
+        {
+          "value": "pending",
+          "label": "Pending",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "accepted",
+          "label": "Accepted",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "waived",
+          "label": "Waived",
+          "labelEn": "Waived",
+          "allowedTransitionsFrom": [
+            "pending",
+            "rejected"
+          ]
+        }
+      ],
+      "statusSetKey": "fqc_oqc_alias_runtime",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Preserve the final-quality-control vocabulary used by operations while resolving it onto the governed outgoing-inspection truth so frontend and AI tooling stop treating FQC as a separate storage authority.",
+      "usageZone": "core_value_stream",
+      "gateType": "release_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "outgoing_quality_review",
+      "workflowSource": "quality_improvement.oqc-inspections alias runtime",
+      "implemented": true,
+      "truthStatus": "compatibility_alias_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--fqc-inspections/contract.json",
+      "notes": [
+        "FQC is retained as an operational alias only.",
+        "The live runtime and storage truth remain OQC, and no second FQC controller should be introduced."
+      ]
+    },
+    {
+      "canonicalResource": "quality_improvement.improvement-actions",
+      "storageTables": [
+        "improvement_projects"
+      ],
+      "statusSetKey": "improvement_projects_improvement_status_set",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control lean improvement intake, approval, implementation, verification, and closure so kaizen and systemic improvement work produces auditable benefit instead of unmanaged ideas.",
+      "usageZone": "core_value_stream",
+      "gateType": "improvement_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "pdca",
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Submitted",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "under_review",
+          "label": "Under Review",
+          "labelEn": "Under Review",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "value": "implemented",
+          "label": "Implemented",
+          "labelEn": "Implemented",
+          "allowedTransitionsFrom": [
+            "approved",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "On Hold",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "submitted",
+            "under_review",
+            "approved",
+            "implemented"
+          ]
+        },
+        {
+          "value": "verified",
+          "label": "Verified",
+          "labelEn": "Verified",
+          "allowedTransitionsFrom": [
+            "implemented"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "verified"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "submitted",
+            "under_review"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed",
+            "rejected"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization + improvement_projects_improvement_status_set",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--improvement-actions/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.msa-studies",
+      "storageTables": [
+        "calibration_grr_studies"
+      ],
+      "statusOptions": [],
+      "statusSetKey": null,
+      "lifecycleMode": "assessment_record_runtime",
+      "purpose": "Capture measurement-system-analysis and GRR evidence so acceptance of measurement capability is explicit before relying on data for release, SPC, or capability decisions.",
+      "usageZone": "governed_support",
+      "gateType": "measurement_system_gate",
+      "auditClass": "assessment_audit_trail",
+      "continuousImprovementLoop": "measurement_system_review",
+      "workflowSource": "calibration_equipment.calibration_grr_studies persisted assessment record",
+      "implemented": false,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--msa-studies/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.nonconformances",
+      "storageTables": [
+        "ncr_records"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Submitted",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "under_review",
+          "label": "Under Review",
+          "labelEn": "Under Review",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "disposition_set",
+          "label": "Disposition Set",
+          "labelEn": "Disposition Set",
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "value": "containment_active",
+          "label": "Containment Active",
+          "labelEn": "Containment Active",
+          "allowedTransitionsFrom": [
+            "disposition_set"
+          ]
+        },
+        {
+          "value": "close_requested",
+          "label": "Close Requested",
+          "labelEn": "Close Requested",
+          "allowedTransitionsFrom": [
+            "containment_active"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "close_requested"
+          ]
+        }
+      ],
+      "statusSetKey": "ncr_records_ncr_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Contain and disposition quality escapes from incoming, in-process, outgoing, or returned product so no defect signal disappears outside a governed NCR record.",
+      "usageZone": "core_value_stream",
+      "gateType": "containment_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "quality_review_board",
+      "workflowSource": "ncr_records_ncr_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--nonconformances/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.oqc-inspections",
+      "storageTables": [
+        "oqc_inspections"
+      ],
+      "statusOptions": [
+        {
+          "value": "pending",
+          "label": "Pending",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "accepted",
+          "label": "Accepted",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Rejected",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "waived",
+          "label": "Waived",
+          "labelEn": "Waived",
+          "allowedTransitionsFrom": [
+            "pending",
+            "rejected"
+          ]
+        }
+      ],
+      "statusSetKey": "oqc_inspections_result_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Control outgoing quality release so finished goods cannot pass to shipment without governed final inspection truth.",
+      "usageZone": "core_value_stream",
+      "gateType": "release_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "outgoing_quality_review",
+      "workflowSource": "oqc_inspections_result_status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--oqc-inspections/contract.json",
+      "notes": [
+        "Legacy LogisticsController paths still use pass/fail/conditional values in some compatibility flows. The governed runtime truth for the canonical object is pending/accepted/rejected/waived."
+      ]
+    },
+    {
+      "canonicalResource": "quality_improvement.oqc-inspections|quality_improvement.fqc-inspections",
+      "storageTables": [
+        "oqc_inspections"
+      ],
+      "statusSetKey": "oqc_inspections_result_status",
+      "lifecycleMode": "persisted",
+      "purpose": "Controls final and outbound quality disposition using the existing result column until a richer outbound inspection split is required.",
+      "usageZone": "core_value_stream",
+      "gateType": "exit_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "capa",
+      "statusOptions": [
+        {
+          "value": "pending",
+          "label": "Chờ kết quả",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "accepted",
+          "label": "Đạt",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Không đạt",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "waived",
+          "label": "Miễn kiểm",
+          "labelEn": "Waived",
+          "allowedTransitionsFrom": [
+            "pending",
+            "rejected"
+          ]
+        }
+      ],
+      "workflowSource": "wave1_lifecycle_normalization",
+      "implemented": true,
+      "truthStatus": "implemented_runtime"
+    },
+    {
+      "canonicalResource": "quality_improvement.override-controls",
+      "storageTables": [
+        "operational_override_controls"
+      ],
+      "statusOptions": [
+        {
+          "value": "active",
+          "label": "Active",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "expired",
+          "label": "Expired",
+          "labelEn": "Expired",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "revoked",
+          "label": "Revoked",
+          "labelEn": "Revoked",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Closed",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "active",
+            "expired",
+            "revoked"
+          ]
+        }
+      ],
+      "statusSetKey": "operational_override_controls_service_runtime",
+      "lifecycleMode": "service_backed_runtime",
+      "purpose": "Govern temporary override, waiver, and release bypass decisions so exceptional shipments or process gates remain explicit, timeboxed, signed, and reviewable.",
+      "usageZone": "governed_support",
+      "gateType": "override_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "gate_review",
+      "workflowSource": "OperationalOverrideService service-backed lifecycle",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--override-controls/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.spc-observations",
+      "storageTables": [
+        "spc_data"
+      ],
+      "statusOptions": [],
+      "statusSetKey": null,
+      "lifecycleMode": "assessment_record_runtime",
+      "purpose": "Preserve structured statistical-process-control observations so process capability, rule violations, and escalation triggers are governed assessment evidence instead of spreadsheet-only history.",
+      "usageZone": "core_value_stream",
+      "gateType": "process_gate",
+      "auditClass": "assessment_audit_trail",
+      "continuousImprovementLoop": "process_capability_review",
+      "workflowSource": "quality_management.spc_data persisted assessment record",
+      "implemented": false,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--spc-observations/contract.json"
+    }
+  ]
+}

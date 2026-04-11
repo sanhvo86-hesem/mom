@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "canonicalResource": "commercial_customer.customer-purchase-orders",
+  "canonicalName": "customer_purchase_orders",
+  "displayName": "Customer Purchase Orders",
+  "purpose": "Capture customer commitment as governed demand so commercial promise, SO linkage, and downstream delivery remain traceable from the first accepted PO.",
+  "ownerDomain": "commercial_customer",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "commercial_operations",
+  "storage": {
+    "primaryTable": "customer_purchase_orders",
+    "primaryKey": "customer_po_id",
+    "statusField": "po_status",
+    "childTables": [
+      "customer_purchase_order_lines"
+    ],
+    "legacyTables": [
+      "sales_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "customer_id+customer_po_number",
+    "naturalKeys": [
+      "customer_id",
+      "customer_po_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "demand_commitment_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "customer_order_review",
+    "retentionClass": "commercial_document_7y",
+    "evidenceRequirements": [
+      "customer_po_document",
+      "linked_sales_order",
+      "commercial_acknowledgement"
+    ],
+    "kpiSignals": [
+      "customer_po_confirmation_lead_time",
+      "so_linkage_coverage",
+      "commercial_commitment_accuracy"
+    ],
+    "autoAuditChecks": [
+      "cannot_confirm_without_sales_order_link",
+      "cannot_close_while_linked_sales_orders_are_open",
+      "cannot_cancel_when_linked_sales_orders_are_active"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "CustomerPurchaseOrderService",
+    "stateModelKey": "customer_purchase_orders_po_status_service_runtime",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "received", "label": "Received", "labelEn": "Received", "allowedTransitionsFrom": [] },
+      { "value": "acknowledged", "label": "Acknowledged", "labelEn": "Acknowledged", "allowedTransitionsFrom": ["received"] },
+      { "value": "confirmed", "label": "Confirmed", "labelEn": "Confirmed", "allowedTransitionsFrom": ["received", "acknowledged"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["confirmed"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["received", "acknowledged"] }
+    ],
+    "commands": [
+      { "command": "acknowledge", "targetState": "acknowledged", "description": "Acknowledge receipt of the customer PO before firm order confirmation.", "idempotencyScope": "resource+transition" },
+      { "command": "confirm", "targetState": "confirmed", "description": "Confirm the customer PO only after at least one governed sales order link exists.", "idempotencyScope": "resource+transition", "preconditions": ["linked_sales_order_exists"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the customer PO only while linked sales orders are not active.", "idempotencyScope": "resource+transition", "preconditions": ["no_active_linked_sales_order"] },
+      { "command": "close", "targetState": "closed", "description": "Close the customer PO after all linked sales orders reach terminal states.", "idempotencyScope": "resource+transition", "preconditions": ["all_linked_sales_orders_terminal"] }
+    ],
+    "notes": [
+      "There is no separate status-options registry set yet; service logic is the current runtime truth."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.quotations",
+      "master_data.customers"
+    ],
+    "downstreamObjects": [
+      "commercial_customer.sales-orders",
+      "finance.ar-invoices"
+    ],
+    "keyRelationships": [
+      "customer_id -> customers.customer_id",
+      "quote_id -> quotations.quote_id",
+      "sales_order_id -> sales_orders.sales_order_id"
+    ],
+    "events": [
+      { "eventName": "received", "description": "Customer PO was captured into governed commercial demand." },
+      { "eventName": "acknowledged", "description": "Commercial team acknowledged the customer PO." },
+      { "eventName": "confirmed", "description": "Customer PO was confirmed against linked sales-order demand." },
+      { "eventName": "closed", "description": "Customer PO was closed after linked fulfillment reached terminal state." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_canonical_api",
+    "notes": [
+      "Canonical create/list/detail/transition endpoints exist under commercial_customer.customer_purchase_orders.*."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "customer_po",
+      "customer_po_number"
+    ],
+    "notes": [
+      "Legacy sales order fields still carry customer PO references during compatibility migration."
+    ]
+  },
+  "invariants": [
+    "A customer PO cannot be confirmed without at least one linked sales order.",
+    "A customer PO cannot close while any linked sales order remains non-terminal.",
+    "A customer PO cannot cancel while linked sales orders are active."
+  ]
+}

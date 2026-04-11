@@ -1,0 +1,104 @@
+{
+  "version": "1.0",
+  "canonicalResource": "integration_resilience.reconciliation-exceptions",
+  "canonicalName": "mes_erp_reconciliation_exceptions",
+  "displayName": "Reconciliation Exceptions",
+  "purpose": "Control MES-ERP mismatch handling so interface drift is triaged, compensated, and closed instead of patched outside governed integration flow.",
+  "ownerDomain": "integration_resilience",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "digital_integration_control",
+  "storage": {
+    "primaryTable": "mes_erp_reconciliation_exceptions",
+    "primaryKey": "reconciliation_id",
+    "statusField": "exception_status",
+    "childTables": [],
+    "legacyTables": [
+      "mes_erp_reconciliation_exceptions"
+    ]
+  },
+  "identity": {
+    "strategy": "reconciliation_id",
+    "naturalKeys": [
+      "reconciliation_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "recovery_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "integration_review",
+    "retentionClass": "integration_record_7y",
+    "evidenceRequirements": [
+      "expected_vs_actual_payload",
+      "difference_summary",
+      "resolution_trace"
+    ],
+    "kpiSignals": [
+      "reconciliation_exception_lead_time",
+      "retry_success_rate",
+      "compensation_rate"
+    ],
+    "autoAuditChecks": [
+      "open_exception_must_have_owner_or_role",
+      "closed_exception_must_preserve_resolution_trace",
+      "compensated_exception_must_not_reopen_without_new_drift"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "mes_erp_reconciliation_exceptions_exception_status",
+    "stateModelKey": "mes_erp_reconciliation_exceptions_exception_status_set",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "open", "label": "Open", "labelEn": "Open", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "In Progress", "labelEn": "In Progress", "allowedTransitionsFrom": ["open"] },
+      { "value": "pending_review", "label": "Pending Review", "labelEn": "Pending Review", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["pending_review"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending_review"] }
+    ],
+    "commands": [
+      { "command": "acknowledge", "targetState": "in_progress", "description": "Acknowledge and own the reconciliation exception for active triage.", "idempotencyScope": "resource+transition" },
+      { "command": "retry", "targetState": "pending_review", "description": "Retry sync or replay after corrective action, pending review of effect.", "idempotencyScope": "resource+transition" },
+      { "command": "compensate", "targetState": "pending_review", "description": "Apply controlled compensating action and move exception to review.", "idempotencyScope": "resource+transition", "preconditions": ["compensation_trace_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the exception after reconciliation truth is restored.", "idempotencyScope": "resource+transition", "preconditions": ["resolution_recorded"] },
+      { "command": "reject", "targetState": "rejected", "description": "Reject the current resolution path and return the issue for redesign or escalation.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "planning_production.production-operations",
+      "inventory_logistics.inventory-movements",
+      "finance.ap-invoices"
+    ],
+    "keyRelationships": [
+      "org_site_id -> org_sites.org_site_id"
+    ],
+    "events": [
+      { "eventName": "opened", "description": "Integration exception was registered from reconciliation drift." },
+      { "eventName": "retry", "description": "A retry or replay attempt was initiated." },
+      { "eventName": "compensated", "description": "Compensating action was recorded against the exception." },
+      { "eventName": "closed", "description": "Reconciliation exception was closed after recovery." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is mes_execution.mes_erp_reconciliation_exceptions.* while canonical naming remains integration_resilience.reconciliation-exceptions."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "mes_erp_reconciliation_exceptions"
+    ],
+    "notes": [
+      "The runtime remains under the MES execution namespace, but the contract makes it explicit that this is an integration-control object."
+    ]
+  },
+  "invariants": [
+    "A reconciliation exception must preserve expected and actual payload trace.",
+    "Compensation must be governed and reviewable before closure.",
+    "Closed exceptions must retain recovery evidence."
+  ]
+}

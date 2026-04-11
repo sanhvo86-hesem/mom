@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "canonicalResource": "planning_production.dispatch-lists",
+  "canonicalName": "dispatch_lists",
+  "displayName": "Dispatch Lists",
+  "purpose": "Controls shopfloor dispatch release, hold, and execution closure so operations cannot start or disappear from queue outside the governed MES release horizon.",
+  "ownerDomain": "planning_production",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "shopfloor_control",
+  "storage": {
+    "primaryTable": "mes_dispatch_queue",
+    "primaryKey": "queue_id",
+    "statusField": "queue_status",
+    "childTables": [
+      "dispatch_list_entries"
+    ],
+    "legacyTables": [
+      "dispatch_lists",
+      "dispatch_queue"
+    ]
+  },
+  "identity": {
+    "strategy": "queue_id",
+    "naturalKeys": [
+      "queue_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "release_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "tier_review",
+    "retentionClass": "production_record_7y",
+    "evidenceRequirements": [
+      "dispatch_release_basis",
+      "constraint_readiness_snapshot",
+      "closure_or_cancellation_trace"
+    ],
+    "kpiSignals": [
+      "dispatch_release_adherence",
+      "queue_hold_rate",
+      "dispatch_to_start_lead_time"
+    ],
+    "autoAuditChecks": [
+      "released_dispatch_entries_must_have_constraint_readiness",
+      "completed_dispatch_entries_must_preserve_execution_trace",
+      "cancelled_dispatch_entries_must_preserve_reason_and_parent_plan_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "mes_dispatch_queue_queue_status_set",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "planned", "label": "Đã lên kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+      { "value": "released", "label": "Đã phát hành", "labelEn": "Released", "allowedTransitionsFrom": ["planned", "on_hold"] },
+      { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "allowedTransitionsFrom": ["released"] },
+      { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["planned", "released", "in_progress"] },
+      { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["completed"] },
+      { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "released", "on_hold"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed", "cancelled"] }
+    ],
+    "commands": [
+      { "command": "release", "targetState": "released", "description": "Release the dispatch entry into governed shopfloor execution.", "idempotencyScope": "resource+transition", "preconditions": ["constraints_met"] },
+      { "command": "start_execution", "targetState": "in_progress", "description": "Start execution against the released dispatch entry.", "idempotencyScope": "resource+transition" },
+      { "command": "hold", "targetState": "on_hold", "description": "Place the dispatch entry on hold under controlled reason.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "complete", "targetState": "completed", "description": "Complete the dispatch execution after governed shopfloor confirmation.", "idempotencyScope": "resource+transition", "preconditions": ["execution_trace_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the dispatch entry after completion reconciliation.", "idempotencyScope": "resource+transition" },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the dispatch entry before terminal execution.", "idempotencyScope": "resource+transition", "preconditions": ["cancellation_reason_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the closed or cancelled dispatch entry.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.production-plans",
+      "planning_production.job-orders"
+    ],
+    "downstreamObjects": [
+      "planning_production.production-operations",
+      "planning_production.ipqc-inspections"
+    ],
+    "keyRelationships": [
+      "source_schedule_id -> production_schedule.schedule_id"
+    ],
+    "events": [
+      { "eventName": "released", "description": "Dispatch entry was released into shopfloor horizon." },
+      { "eventName": "in_progress", "description": "Dispatch entry entered active execution." },
+      { "eventName": "completed", "description": "Dispatch execution completed." },
+      { "eventName": "closed", "description": "Dispatch entry was closed after reconciliation." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is mes_execution.mes_dispatch_queue.* while canonical naming remains planning_production.dispatch-lists."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "dispatch_lists",
+      "dispatch_queue",
+      "mes_dispatch_queue"
+    ],
+    "notes": [
+      "MES runtime naming remains the live API surface. The canonical contract keeps dispatch intent separated from raw queue mechanics."
+    ]
+  },
+  "invariants": [
+    "Released dispatch entries must retain a readiness snapshot for constraints and resource availability.",
+    "Completed dispatch entries must preserve execution trace before closure.",
+    "Cancelled dispatch entries must retain reason and upstream plan trace."
+  ]
+}

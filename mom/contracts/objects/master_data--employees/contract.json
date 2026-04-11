@@ -1,0 +1,112 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.employees",
+  "canonicalName": "employees",
+  "displayName": "Employees",
+  "purpose": "Controls labor qualification, access eligibility, and employee release into production and compliance scopes.",
+  "ownerDomain": "master_data",
+  "objectRole": "reference_master",
+  "ownerTeam": "human_resources",
+  "storage": {
+    "primaryTable": "employees",
+    "primaryKey": "employee_id",
+    "statusField": "employment_status",
+    "childTables": [
+      "employee_assignments",
+      "employee_qualifications"
+    ],
+    "legacyTables": [
+      "hcm_employees"
+    ]
+  },
+  "identity": {
+    "strategy": "employee_id",
+    "naturalKeys": [
+      "employee_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "management_review",
+    "retentionClass": "hr_record_10y",
+    "evidenceRequirements": [
+      "role_and_department_assignment",
+      "qualification_or_training_trace",
+      "termination_or_suspension_basis"
+    ],
+    "kpiSignals": [
+      "qualification_completeness",
+      "employee_activation_lead_time",
+      "suspension_rate"
+    ],
+    "autoAuditChecks": [
+      "active_employees_must_have_role_and_assignment",
+      "suspended_employees_must_not_remain_operationally_eligible",
+      "terminated_employees_must_not_keep_live_execution_access"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "hcm_employees_employment_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "preboarding", "label": "Tiền nhận việc", "labelEn": "Preboarding", "allowedTransitionsFrom": [] },
+      { "value": "active", "label": "Đang làm việc", "labelEn": "Active", "allowedTransitionsFrom": ["preboarding", "inactive", "suspended"] },
+      { "value": "suspended", "label": "Tạm đình chỉ", "labelEn": "Suspended", "allowedTransitionsFrom": ["active"] },
+      { "value": "inactive", "label": "Ngưng công tác", "labelEn": "Inactive", "allowedTransitionsFrom": ["active", "suspended"] },
+      { "value": "terminated", "label": "Chấm dứt", "labelEn": "Terminated", "allowedTransitionsFrom": ["inactive", "suspended"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["terminated"] }
+    ],
+    "commands": [
+      { "command": "activate", "targetState": "active", "description": "Release the employee into governed operational scope.", "idempotencyScope": "resource+transition", "preconditions": ["assignment_and_access_ready"] },
+      { "command": "suspend", "targetState": "suspended", "description": "Suspend the employee from active operational eligibility.", "idempotencyScope": "resource+transition", "preconditions": ["suspension_reason_recorded"] },
+      { "command": "inactivate", "targetState": "inactive", "description": "Move the employee out of active assignment while preserving history.", "idempotencyScope": "resource+transition" },
+      { "command": "terminate", "targetState": "terminated", "description": "Terminate the employee under governed HR control.", "idempotencyScope": "resource+transition", "preconditions": ["termination_basis_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the terminated employee under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "maintenance_ehs.incidents",
+      "maintenance_ehs.safety-observations",
+      "maintenance_ehs.permits"
+    ],
+    "keyRelationships": [
+      "employee_id -> quotations.owner_id",
+      "employee_id -> sales_orders.owner_id",
+      "employee_id -> incidents.reported_by_employee_id"
+    ],
+    "events": [
+      { "eventName": "active", "description": "Employee became operationally active." },
+      { "eventName": "suspended", "description": "Employee was suspended from operational eligibility." },
+      { "eventName": "terminated", "description": "Employee was terminated." },
+      { "eventName": "archived", "description": "Employee record was archived." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is training_hr.employees.* while canonical naming remains master_data.employees."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "employees",
+      "hcm_employees",
+      "employment_status"
+    ],
+    "notes": [
+      "Legacy HCM naming remains for compatibility. The canonical contract prevents labor identity and eligibility rules from splitting across HR and operations."
+    ]
+  },
+  "invariants": [
+    "Active employees must retain assignment and qualification evidence.",
+    "Suspended or terminated employees must not remain operationally eligible without governed override.",
+    "Employee identity must remain stable across HR and operational runtime surfaces."
+  ]
+}

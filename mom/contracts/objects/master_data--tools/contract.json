@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.tools",
+  "canonicalName": "tools",
+  "displayName": "Tools",
+  "purpose": "Control tool readiness, wear containment, and retirement before a tool can be issued to production, maintenance, or calibration use.",
+  "ownerDomain": "master_data",
+  "objectRole": "reference_master",
+  "ownerTeam": "tooling_control",
+  "storage": {
+    "primaryTable": "tools",
+    "primaryKey": "tool_id",
+    "statusField": "tool_status",
+    "childTables": [
+      "tool_transactions"
+    ],
+    "legacyTables": [
+      "tools"
+    ]
+  },
+  "identity": {
+    "strategy": "tool_id",
+    "naturalKeys": [
+      "tool_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "tool_life_review",
+    "retentionClass": "tooling_record_7y",
+    "evidenceRequirements": [
+      "tool_identity",
+      "tool_life_or_condition_trace",
+      "retirement_reason"
+    ],
+    "kpiSignals": [
+      "tool_breakage_rate",
+      "tool_life_utilization",
+      "tool_issue_turnaround"
+    ],
+    "autoAuditChecks": [
+      "qualified_tools_only_may_enter_issue_flow",
+      "broken_or_retired_tools_must_not_remain_issuable",
+      "tool_life_degradation_must_preserve history"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "tools_tool_status",
+    "stateModelKey": "tools_tool_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "new", "label": "New", "labelEn": "New", "allowedTransitionsFrom": [] },
+      { "value": "qualified", "label": "Qualified", "labelEn": "Qualified", "allowedTransitionsFrom": ["new", "worn"] },
+      { "value": "in_use", "label": "In Use", "labelEn": "In Use", "allowedTransitionsFrom": ["qualified"] },
+      { "value": "worn", "label": "Worn", "labelEn": "Worn", "allowedTransitionsFrom": ["in_use"] },
+      { "value": "broken", "label": "Broken", "labelEn": "Broken", "allowedTransitionsFrom": ["in_use", "worn"] },
+      { "value": "retired", "label": "Retired", "labelEn": "Retired", "allowedTransitionsFrom": ["broken", "worn"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+    ],
+    "commands": [
+      { "command": "qualify", "targetState": "qualified", "description": "Release a new or restored tool into governed issue readiness.", "idempotencyScope": "resource+transition" },
+      { "command": "issue", "targetState": "in_use", "description": "Issue the tool into active operational use.", "idempotencyScope": "resource+transition", "preconditions": ["qualified"] },
+      { "command": "mark_worn", "targetState": "worn", "description": "Mark the tool as worn based on usage or inspection.", "idempotencyScope": "resource+transition" },
+      { "command": "mark_broken", "targetState": "broken", "description": "Block the tool after breakage or unsafe condition is detected.", "idempotencyScope": "resource+transition" },
+      { "command": "retire", "targetState": "retired", "description": "Retire the tool from further issue or use.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the retired tool under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "planning_production.work-orders",
+      "planning_production.production-operations"
+    ],
+    "keyRelationships": [
+      "tool_id -> work_orders.tool_id",
+      "tool_id -> calibration_events.tool_id"
+    ],
+    "events": [
+      { "eventName": "qualified", "description": "Tool was qualified for issue." },
+      { "eventName": "in_use", "description": "Tool entered active use." },
+      { "eventName": "broken", "description": "Tool was blocked after breakage." },
+      { "eventName": "retired", "description": "Tool was retired from use." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is calibration_equipment.tools.* while canonical naming remains master_data.tools."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "tools"
+    ],
+    "notes": [
+      "Calibration/equipment runtime naming remains active, but the canonical contract keeps tool control separate from measuring-system control."
+    ]
+  },
+  "invariants": [
+    "Only qualified tools may enter issue or in-use state.",
+    "Broken or retired tools must not remain available for new operations.",
+    "Tool condition history must remain auditable across regrind, issue, and return cycles."
+  ]
+}

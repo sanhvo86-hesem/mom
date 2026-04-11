@@ -1,0 +1,84 @@
+{
+  "version": "1.0",
+  "canonicalResource": "analytics.plant-performance-snapshots",
+  "canonicalName": "plant_performance_snapshots",
+  "displayName": "Plant Performance Snapshots",
+  "purpose": "Provide read-only plant KPI snapshots so lean review, management review, and continuous-improvement boards consume a stable multi-signal projection with preserved lineage.",
+  "ownerDomain": "analytics",
+  "objectRole": "projection",
+  "ownerTeam": "enterprise_analytics",
+  "storage": {
+    "primaryTable": "plant_performance_snapshots",
+    "primaryKey": "plant_performance_snapshot_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "factory_kpis",
+      "plant_performance"
+    ]
+  },
+  "identity": {
+    "strategy": "plant_performance_snapshot_id",
+    "naturalKeys": [
+      "plant_performance_snapshot_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "analytics_gate",
+    "auditClass": "projection_lineage",
+    "continuousImprovementLoop": "management_review",
+    "retentionClass": "analytics_projection_3y",
+    "evidenceRequirements": [
+      "snapshot_at",
+      "source_system",
+      "source_record_id"
+    ],
+    "kpiSignals": [
+      "oee_pct",
+      "first_pass_yield_pct",
+      "on_time_delivery_pct",
+      "safety_event_rate"
+    ],
+    "autoAuditChecks": [
+      "plant_performance_projection_must_preserve_scope_and_lineage",
+      "projection_rows_must_be_refreshable_from_upstream_sources",
+      "read_model_must_not_replace_operational_truth"
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "analytics.mes-oee-snapshots",
+      "analytics.inventory-balance-snapshots",
+      "quality_improvement.improvement-actions"
+    ],
+    "downstreamObjects": [],
+    "keyRelationships": [
+      "org_plant_id -> org_plants.plant_id",
+      "org_site_id -> org_sites.site_id"
+    ],
+    "events": [
+      { "eventName": "refreshed", "description": "Plant performance snapshot projection was refreshed from governed KPI sources." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is bi_datawarehouse.plant_performance_snapshots.* while canonical naming remains analytics.plant-performance-snapshots."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "factory_kpis",
+      "plant_performance"
+    ],
+    "notes": [
+      "Legacy KPI naming remains for migration trace, but the canonical snapshot is a read-only analytics projection."
+    ]
+  },
+  "invariants": [
+    "Plant performance snapshots must preserve lineage to upstream KPI sources.",
+    "The projection is read-only and must not replace operational truth.",
+    "Plant and site scope must remain explicit on every snapshot row."
+  ]
+}

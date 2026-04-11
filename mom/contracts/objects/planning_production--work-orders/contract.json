@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "canonicalResource": "planning_production.work-orders",
+  "canonicalName": "work_orders",
+  "displayName": "Work Orders",
+  "purpose": "Control executable shopfloor release, execution, and quality hold at the operation level so production truth is governed where work is actually performed.",
+  "ownerDomain": "planning_production",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "shopfloor_control",
+  "storage": {
+    "primaryTable": "work_orders",
+    "primaryKey": "work_order_id",
+    "statusField": "work_order_status",
+    "childTables": [
+      "work_order_material_issues",
+      "work_order_operations"
+    ],
+    "legacyTables": [
+      "work_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "wo_number",
+    "naturalKeys": [
+      "wo_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "shopfloor_review",
+    "retentionClass": "production_record_7y",
+    "evidenceRequirements": [
+      "dispatch_record",
+      "labor_machine_execution_trace",
+      "quality_hold_resolution"
+    ],
+    "kpiSignals": [
+      "wo_cycle_time",
+      "wo_first_pass_yield",
+      "wo_schedule_adherence"
+    ],
+    "autoAuditChecks": [
+      "cannot_start_before_release",
+      "quality_hold_must_block_normal_execution",
+      "closed_work_orders_must_have_execution_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "work_orders_work_order_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "planned", "label": "Planned", "labelEn": "Planned", "allowedTransitionsFrom": ["draft"] },
+      { "value": "released", "label": "Released", "labelEn": "Released", "allowedTransitionsFrom": ["planned"] },
+      { "value": "in_production", "label": "In Production", "labelEn": "In Production", "allowedTransitionsFrom": ["released", "quality_hold"] },
+      { "value": "quality_hold", "label": "Quality Hold", "labelEn": "Quality Hold", "allowedTransitionsFrom": ["released", "in_production"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["in_production"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "planned", "released"] }
+    ],
+    "commands": [
+      { "command": "dispatch", "targetState": "released", "description": "Dispatch the work order to the shopfloor.", "idempotencyScope": "resource+transition", "preconditions": ["job_order_released"] },
+      { "command": "start", "targetState": "in_production", "description": "Start shopfloor execution.", "idempotencyScope": "resource+transition" },
+      { "command": "pause_for_quality", "targetState": "quality_hold", "description": "Pause execution under a controlled quality hold.", "idempotencyScope": "resource+transition" },
+      { "command": "resume", "targetState": "in_production", "description": "Resume execution after quality hold resolution.", "idempotencyScope": "resource+transition", "preconditions": ["quality_hold_resolved"] },
+      { "command": "close", "targetState": "closed", "description": "Close execution after production trace is complete.", "idempotencyScope": "resource+transition", "preconditions": ["execution_trace_complete"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel a non-started or non-terminal work order.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.job-orders"
+    ],
+    "downstreamObjects": [
+      "planning_production.ipqc-inspections",
+      "quality_improvement.oqc-inspections",
+      "inventory_logistics.inventory-movements"
+    ],
+    "keyRelationships": [
+      "job_order_id -> job_orders.job_order_id",
+      "work_order_id -> ipqc_inspections.work_order_id",
+      "work_order_id -> oqc_inspections.work_order_id"
+    ],
+    "events": [
+      { "eventName": "dispatched", "description": "Work order was dispatched to the shopfloor." },
+      { "eventName": "started", "description": "Work order execution started." },
+      { "eventName": "quality-held", "description": "Work order entered governed quality hold." },
+      { "eventName": "closed", "description": "Work order execution closed." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_runtime_api",
+    "notes": [
+      "Current runtime endpoints are production.work_orders.* with wave1-governed transition semantics."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "work_order_status"
+    ],
+    "notes": [
+      "This object already has aligned lifecycle metadata from wave1 and serves as the reference style for authored packages."
+    ]
+  },
+  "invariants": [
+    "A work order cannot start before release.",
+    "Quality hold must interrupt normal execution truth.",
+    "A closed work order must retain execution evidence and downstream quality linkage."
+  ]
+}

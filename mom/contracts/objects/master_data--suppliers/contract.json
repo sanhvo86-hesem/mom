@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "canonicalResource": "master_data.suppliers",
+  "canonicalName": "suppliers",
+  "displayName": "Suppliers",
+  "purpose": "Controls supplier qualification and spend authorization before purchasing or receiving release.",
+  "ownerDomain": "master_data",
+  "objectRole": "reference_master",
+  "ownerTeam": "supplier_quality_and_procurement",
+  "storage": {
+    "primaryTable": "suppliers",
+    "primaryKey": "supplier_id",
+    "statusField": "supplier_status",
+    "childTables": [
+      "supplier_addresses",
+      "supplier_contacts",
+      "supplier_qualifications"
+    ],
+    "legacyTables": [
+      "vendors"
+    ]
+  },
+  "identity": {
+    "strategy": "vendor_id",
+    "naturalKeys": [
+      "vendor_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "supplier_review",
+    "retentionClass": "supplier_master_record_10y",
+    "evidenceRequirements": [
+      "qualification_record",
+      "commercial_and_quality_profile",
+      "spend_authorization_basis"
+    ],
+    "kpiSignals": [
+      "supplier_qualification_lead_time",
+      "supplier_block_rate",
+      "qualified_supplier_utilization"
+    ],
+    "autoAuditChecks": [
+      "qualified_suppliers_must_keep_qualification_trace",
+      "spend_authorized_suppliers_must_not_bypass_quality_or_commercial_review",
+      "blocked_suppliers_must_not_remain_purchasing_eligible"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "vendors_vendor_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "pending", "label": "Chờ đánh giá", "labelEn": "Pending Qualification", "allowedTransitionsFrom": [] },
+      { "value": "qualified", "label": "Đạt đánh giá", "labelEn": "Qualified", "allowedTransitionsFrom": ["pending", "on_hold"] },
+      { "value": "spend_authorized", "label": "Được phép mua", "labelEn": "Spend Authorized", "allowedTransitionsFrom": ["qualified", "on_hold"] },
+      { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["qualified", "spend_authorized", "blocked"] },
+      { "value": "blocked", "label": "Bị khóa", "labelEn": "Blocked", "allowedTransitionsFrom": ["spend_authorized", "on_hold"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["blocked"] }
+    ],
+    "commands": [
+      { "command": "qualify", "targetState": "qualified", "description": "Qualify the supplier for controlled sourcing use.", "idempotencyScope": "resource+transition", "preconditions": ["qualification_recorded"] },
+      { "command": "authorize_spend", "targetState": "spend_authorized", "description": "Authorize governed spend with the qualified supplier.", "idempotencyScope": "resource+transition", "preconditions": ["commercial_terms_approved"] },
+      { "command": "hold", "targetState": "on_hold", "description": "Place the supplier on controlled hold.", "idempotencyScope": "resource+transition", "preconditions": ["hold_reason_recorded"] },
+      { "command": "block", "targetState": "blocked", "description": "Block the supplier from new procurement release.", "idempotencyScope": "resource+transition", "preconditions": ["blocking_basis_recorded"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the blocked supplier under retention policy.", "idempotencyScope": "resource+transition" }
+    ],
+    "notes": [
+      "Canonical suppliers still rides the purchasing.vendors runtime surface. The contract makes supplier-master meaning explicit without a data move."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [],
+    "downstreamObjects": [
+      "procurement_supplier_quality.supplier-purchase-orders",
+      "procurement_supplier_quality.iqc-inspections",
+      "quality_improvement.nonconformances"
+    ],
+    "keyRelationships": [
+      "supplier_id -> supplier_purchase_orders.supplier_id",
+      "supplier_id -> incoming_inspections.supplier_id",
+      "supplier_id -> nonconformances.supplier_id"
+    ],
+    "events": [
+      { "eventName": "qualified", "description": "Supplier qualification was approved." },
+      { "eventName": "spend_authorized", "description": "Supplier became spend-authorized." },
+      { "eventName": "blocked", "description": "Supplier was blocked from new procurement." },
+      { "eventName": "archived", "description": "Supplier was archived from active sourcing scope." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface remains purchasing.vendors.* while canonical naming remains master_data.suppliers."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "vendors",
+      "vendor_status",
+      "vendor_id"
+    ],
+    "notes": [
+      "Legacy vendor runtime naming remains for compatibility. The canonical contract prevents supplier-master meaning from splitting across sourcing and quality modules."
+    ]
+  },
+  "invariants": [
+    "Spend-authorized suppliers must retain qualification and commercial approval trace.",
+    "Blocked suppliers must not remain eligible for new procurement or receiving release.",
+    "Supplier identity must remain stable across vendor and canonical supplier naming."
+  ]
+}

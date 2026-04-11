@@ -1,0 +1,93 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.spc-observations",
+  "canonicalName": "spc_data",
+  "displayName": "SPC Observations",
+  "purpose": "Preserve structured statistical-process-control observations so process capability, rule violations, and escalation triggers are governed assessment evidence instead of spreadsheet-only history.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "assessment_record",
+  "ownerTeam": "process_quality_engineering",
+  "storage": {
+    "primaryTable": "spc_data",
+    "primaryKey": "spc_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "spc_data"
+    ]
+  },
+  "identity": {
+    "strategy": "spc_id",
+    "naturalKeys": [
+      "spc_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "assessment_audit_trail",
+    "continuousImprovementLoop": "process_capability_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "sampling_context",
+      "measured_value",
+      "rule_evaluation_trace"
+    ],
+    "kpiSignals": [
+      "out_of_control_rate",
+      "capability_index_trend",
+      "spc_signal_response_time"
+    ],
+    "autoAuditChecks": [
+      "spc_observation_must_reference_process_or_job_context",
+      "out_of_control_signals_should_link_to_ncr_or_follow_up",
+      "sampling_trace_must_preserve_operator_and_timestamp"
+    ]
+  },
+  "workflow": {
+    "implemented": false,
+    "truthStatus": "implemented_runtime",
+    "source": "quality_management.spc_data persisted assessment record",
+    "lifecycleMode": "assessment_record_runtime",
+    "disableGeneratedCommands": true,
+    "commands": [],
+    "states": []
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.ipqc-inspections",
+      "planning_production.production-operations"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.nonconformances",
+      "quality_improvement.improvement-actions"
+    ],
+    "keyRelationships": [
+      "job_number -> job_orders.job_number",
+      "source_record_id -> ipqc_inspections.source_record_id"
+    ],
+    "events": [
+      { "eventName": "recorded", "description": "SPC observation was recorded." },
+      { "eventName": "updated", "description": "SPC observation was updated with rule-evaluation detail." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_management.spc_data.* while canonical naming remains quality_improvement.spc-observations."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "spc_data"
+    ],
+    "notes": [
+      "The stored table name remains spc_data, but the canonical object clarifies that these rows are governed SPC observations in the quality loop."
+    ]
+  },
+  "invariants": [
+    "Every SPC observation must keep process and sampling context.",
+    "Out-of-control signals should remain traceable to follow-up NCR or improvement action.",
+    "Capability and rule-evaluation evidence must remain reproducible from the recorded observation."
+  ]
+}

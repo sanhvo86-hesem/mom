@@ -1,0 +1,117 @@
+{
+  "version": "1.0",
+  "canonicalResource": "finance.ap-invoices",
+  "canonicalName": "ap_invoices",
+  "displayName": "AP Invoices",
+  "purpose": "Control AP three-way match, hold, posting, payment, and close so procurement correction cannot bypass financial truth.",
+  "ownerDomain": "finance",
+  "objectRole": "ledger_document",
+  "ownerTeam": "accounts_payable",
+  "storage": {
+    "primaryTable": "ap_invoices",
+    "primaryKey": "ap_invoice_id",
+    "statusField": "dispute_status",
+    "childTables": [
+      "ap_invoice_lines"
+    ],
+    "legacyTables": [
+      "ap_ar_invoices"
+    ]
+  },
+  "identity": {
+    "strategy": "supplier_invoice_number",
+    "naturalKeys": [
+      "supplier_invoice_number",
+      "supplier_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "financial_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "period_close_review",
+    "retentionClass": "financial_record_10y",
+    "evidenceRequirements": [
+      "three_way_match_evidence",
+      "posting_reference",
+      "payment_settlement_trace"
+    ],
+    "kpiSignals": [
+      "three_way_match_cycle_time",
+      "invoice_hold_rate",
+      "period_close_cleanliness"
+    ],
+    "autoAuditChecks": [
+      "cannot_post_before_match",
+      "cannot_close_before_paid_or_voided",
+      "backdated_changes_require_governed_exception"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + ap_invoices_invoice_status",
+    "stateModelKey": "ap_invoices_invoice_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "matched", "label": "Matched", "labelEn": "Matched", "allowedTransitionsFrom": ["draft", "on_hold"] },
+      { "value": "on_hold", "label": "On Hold", "labelEn": "On Hold", "allowedTransitionsFrom": ["draft", "matched", "posted"] },
+      { "value": "posted", "label": "Posted", "labelEn": "Posted", "allowedTransitionsFrom": ["matched"] },
+      { "value": "partially_paid", "label": "Partially Paid", "labelEn": "Partially Paid", "allowedTransitionsFrom": ["posted"] },
+      { "value": "paid", "label": "Paid", "labelEn": "Paid", "allowedTransitionsFrom": ["posted", "partially_paid"] },
+      { "value": "voided", "label": "Voided", "labelEn": "Voided", "allowedTransitionsFrom": ["draft", "on_hold"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["paid", "voided"] }
+    ],
+    "commands": [
+      { "command": "match", "targetState": "matched", "description": "Complete three-way match for supplier invoice.", "idempotencyScope": "resource+transition", "preconditions": ["po_and_receipt_available"] },
+      { "command": "hold", "targetState": "on_hold", "description": "Place invoice on governed hold for discrepancy resolution.", "idempotencyScope": "resource+transition" },
+      { "command": "post", "targetState": "posted", "description": "Post the matched invoice into the ledger.", "idempotencyScope": "resource+transition", "preconditions": ["matched"] },
+      { "command": "settle", "targetState": "paid", "description": "Settle the AP invoice after payment execution.", "idempotencyScope": "resource+transition", "preconditions": ["posted"] },
+      { "command": "void", "targetState": "voided", "description": "Void the AP invoice before final close.", "idempotencyScope": "resource+transition" },
+      { "command": "close", "targetState": "closed", "description": "Close the invoice after payment or void is final.", "idempotencyScope": "resource+transition", "preconditions": ["paid_or_voided"] }
+    ],
+    "notes": [
+      "The operational status source is dispute_status. invoice_status may still exist as descriptive or compatibility data and must not override workflow truth."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "procurement_supplier_quality.supplier-purchase-orders",
+      "procurement_supplier_quality.purchase-receipts"
+    ],
+    "downstreamObjects": [
+      "finance.period-closes",
+      "finance.credit-memos"
+    ],
+    "keyRelationships": [
+      "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id",
+      "purchase_receipt_id -> purchase_receipts.purchase_receipt_id"
+    ],
+    "events": [
+      { "eventName": "matched", "description": "AP invoice was matched against PO and receipt truth." },
+      { "eventName": "posted", "description": "AP invoice was posted into the ledger." },
+      { "eventName": "paid", "description": "AP invoice payment settlement completed." },
+      { "eventName": "closed", "description": "AP invoice was closed after payment or void." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_runtime_api",
+    "notes": [
+      "Current runtime endpoints are finance.ap_invoices.*."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "ap_ar_invoices"
+    ],
+    "notes": [
+      "The split AP object supersedes the mixed AP/AR invoice legacy surface."
+    ]
+  },
+  "invariants": [
+    "An AP invoice cannot post before three-way match.",
+    "An AP invoice cannot close before paid or voided state.",
+    "Backdated AP invoice changes require governed exception control."
+  ]
+}

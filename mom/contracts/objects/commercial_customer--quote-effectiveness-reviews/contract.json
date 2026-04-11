@@ -1,0 +1,93 @@
+{
+  "version": "1.0",
+  "canonicalResource": "commercial_customer.quote-effectiveness-reviews",
+  "canonicalName": "qual_effectiveness_reviews",
+  "displayName": "Quote Effectiveness Reviews",
+  "purpose": "Capture structured quote win-loss and effectiveness analysis so commercial learning, margin review, and continuous improvement are preserved as governed assessment records instead of ad hoc notes.",
+  "ownerDomain": "commercial_customer",
+  "objectRole": "assessment_record",
+  "ownerTeam": "commercial_excellence",
+  "storage": {
+    "primaryTable": "qual_effectiveness_reviews",
+    "primaryKey": "qual_effectiveness_review_id",
+    "statusField": null,
+    "childTables": [
+      "quote_effectiveness_metrics"
+    ],
+    "legacyTables": [
+      "quote_effectiveness_reviews"
+    ]
+  },
+  "identity": {
+    "strategy": "related_record_id+created_at",
+    "naturalKeys": [
+      "related_record_id",
+      "created_at"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "learning_gate",
+    "auditClass": "assessment_audit_trail",
+    "continuousImprovementLoop": "quote_win_loss_review",
+    "retentionClass": "commercial_record_7y",
+    "evidenceRequirements": [
+      "quote_reference",
+      "review_summary",
+      "improvement_recommendation"
+    ],
+    "kpiSignals": [
+      "quote_win_rate",
+      "quote_margin_accuracy",
+      "quote_review_completion_rate"
+    ],
+    "autoAuditChecks": [
+      "review_must_reference_governed_quote",
+      "effectiveness_review_should_capture_reason_codes",
+      "improvement_recommendations_should_link_forward_when_actioned"
+    ]
+  },
+  "workflow": {
+    "implemented": false,
+    "truthStatus": "implemented_runtime",
+    "source": "quality_lab.qual_effectiveness_reviews persisted assessment record",
+    "lifecycleMode": "assessment_record_runtime",
+    "disableGeneratedCommands": true,
+    "commands": [],
+    "states": []
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.quotations"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.improvement-actions"
+    ],
+    "keyRelationships": [
+      "related_record_id -> quotes.quote_id"
+    ],
+    "events": [
+      { "eventName": "recorded", "description": "Quote effectiveness review was recorded." },
+      { "eventName": "updated", "description": "Quote effectiveness review was updated with additional learning." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_lab.qual_effectiveness_reviews.* while canonical naming remains commercial_customer.quote-effectiveness-reviews."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "quote_effectiveness_reviews"
+    ],
+    "notes": [
+      "The assessment remains stored under quality-lab naming, but its business meaning belongs to the commercial quote-learning loop."
+    ]
+  },
+  "invariants": [
+    "Each review must reference a governed quotation.",
+    "Review evidence must preserve outcome and learning, not just a score.",
+    "Improvement recommendations should remain traceable when converted into follow-up actions."
+  ]
+}

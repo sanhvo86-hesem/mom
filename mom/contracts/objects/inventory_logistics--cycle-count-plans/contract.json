@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.cycle-count-plans",
+  "canonicalName": "wms_cycle_count_plans",
+  "displayName": "Cycle Count Plans",
+  "purpose": "Control cycle-count scheduling and closure so stock accuracy is corrected through governed counting instead of ad hoc inventory adjustment.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "warehouse_operations",
+  "storage": {
+    "primaryTable": "wms_cycle_count_plans",
+    "primaryKey": "wms_cycle_count_plan_id",
+    "statusField": "status",
+    "childTables": [
+      "wms_cycle_count_results"
+    ],
+    "legacyTables": [
+      "wms_cycle_count_plans"
+    ]
+  },
+  "identity": {
+    "strategy": "plan_number",
+    "naturalKeys": [
+      "plan_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "inventory_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "inventory_accuracy_review",
+    "retentionClass": "inventory_record_7y",
+    "evidenceRequirements": [
+      "count_scope",
+      "count_owner",
+      "variance_resolution_trace"
+    ],
+    "kpiSignals": [
+      "inventory_accuracy",
+      "count_completion_rate",
+      "variance_adjustment_rate"
+    ],
+    "autoAuditChecks": [
+      "active_plan_must_reference_warehouse_scope",
+      "completed_plan_must_keep_result_and_adjustment_trace",
+      "paused_plan_must_preserve_hold_reason"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "compatibility_bridge",
+    "source": "wms_cycle_count_plans status plus warehouse governance bridge",
+    "stateModelKey": "inventory_cycle_count_plans_bridge",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "active", "label": "Active", "labelEn": "Active", "allowedTransitionsFrom": [] },
+      { "value": "paused", "label": "Paused", "labelEn": "Paused", "allowedTransitionsFrom": ["active"] },
+      { "value": "completed", "label": "Completed", "labelEn": "Completed", "allowedTransitionsFrom": ["active", "paused"] }
+    ],
+    "commands": [
+      { "command": "publish", "targetState": "active", "description": "Release a cycle-count plan for active execution.", "idempotencyScope": "resource+transition", "preconditions": ["warehouse_scope_defined"] },
+      { "command": "pause", "targetState": "paused", "description": "Pause a cycle-count plan under governed reason.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] },
+      { "command": "complete", "targetState": "completed", "description": "Complete the count plan after results and variances are recorded.", "idempotencyScope": "resource+transition", "preconditions": ["count_results_recorded"] },
+      { "command": "close", "targetState": "completed", "description": "Close the plan once all count adjustments are resolved.", "idempotencyScope": "resource+transition", "preconditions": ["variance_resolution_complete"] }
+    ],
+    "notes": [
+      "The underlying status column remains simple, so this contract provides the governed meaning of publish/pause/complete/close until a richer native state surface is introduced."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.warehouses"
+    ],
+    "downstreamObjects": [
+      "inventory_logistics.inventory-movements"
+    ],
+    "keyRelationships": [
+      "warehouse_id -> warehouses.warehouse_id",
+      "wms_zone_id -> wms_zones.wms_zone_id"
+    ],
+    "events": [
+      { "eventName": "published", "description": "Cycle-count plan was released for counting." },
+      { "eventName": "paused", "description": "Cycle-count plan was paused." },
+      { "eventName": "completed", "description": "Cycle-count plan was completed with governed results." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is warehouse_management.wms_cycle_count_plans.* while canonical naming remains inventory_logistics.cycle-count-plans."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "wms_cycle_count_plans"
+    ],
+    "notes": [
+      "Warehouse-management runtime naming remains active. The contract makes count-plan governance explicit for ERP/MOM orchestration."
+    ]
+  },
+  "invariants": [
+    "A cycle-count plan must preserve warehouse and zone scope.",
+    "Completed plans must retain count-result and variance trace.",
+    "Count adjustments must not occur without governed count evidence."
+  ]
+}

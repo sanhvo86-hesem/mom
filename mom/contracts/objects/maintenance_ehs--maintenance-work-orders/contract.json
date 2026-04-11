@@ -1,0 +1,108 @@
+{
+  "version": "1.0",
+  "canonicalResource": "maintenance_ehs.maintenance-work-orders",
+  "canonicalName": "pm_work_orders",
+  "displayName": "Maintenance Work Orders",
+  "purpose": "Control preventive and corrective maintenance execution so equipment intervention, spare usage, and closeout stay governed instead of being hidden in note-only maintenance history.",
+  "ownerDomain": "maintenance_ehs",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "maintenance_execution",
+  "storage": {
+    "primaryTable": "pm_work_orders",
+    "primaryKey": "pm_work_order_id",
+    "statusField": "status",
+    "childTables": [
+      "pm_work_order_operations",
+      "pm_work_order_parts"
+    ],
+    "legacyTables": [
+      "maintenance_work_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "work_order_number",
+    "naturalKeys": [
+      "work_order_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "maintenance_review",
+    "retentionClass": "maintenance_record_10y",
+    "evidenceRequirements": [
+      "equipment_reference",
+      "work_scope_and_type",
+      "closeout_notes_or_root_cause"
+    ],
+    "kpiSignals": [
+      "mean_time_to_repair",
+      "pm_completion_rate",
+      "downtime_minutes"
+    ],
+    "autoAuditChecks": [
+      "released_work_order_must_reference_equipment",
+      "completed_work_order_must_preserve operation_and_parts_trace",
+      "cancelled_work_order_must_keep_reason_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "pm_work_orders_status_set",
+    "stateModelKey": "pm_work_orders_status_set",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "planned", "label": "Planned", "labelEn": "Planned", "allowedTransitionsFrom": ["draft"] },
+      { "value": "released", "label": "Released", "labelEn": "Released", "allowedTransitionsFrom": ["planned"] },
+      { "value": "in_progress", "label": "In Progress", "labelEn": "In Progress", "allowedTransitionsFrom": ["released"] },
+      { "value": "completed", "label": "Completed", "labelEn": "Completed", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "planned", "released"] }
+    ],
+    "commands": [
+      { "command": "plan", "targetState": "planned", "description": "Prepare the work order with governed maintenance scope.", "idempotencyScope": "resource+transition" },
+      { "command": "release", "targetState": "released", "description": "Release the maintenance work order into execution.", "idempotencyScope": "resource+transition", "preconditions": ["equipment_ready"] },
+      { "command": "start", "targetState": "in_progress", "description": "Start maintenance execution on the governed work order.", "idempotencyScope": "resource+transition" },
+      { "command": "complete", "targetState": "completed", "description": "Complete maintenance execution with closeout trace.", "idempotencyScope": "resource+transition", "preconditions": ["closeout_recorded"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the maintenance work order before completion.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "maintenance_ehs.maintenance-plans",
+      "master_data.equipment"
+    ],
+    "downstreamObjects": [],
+    "keyRelationships": [
+      "maintenance_plan_id -> pm_maintenance_plans.maintenance_plan_id",
+      "equipment_id -> equipment.equipment_id"
+    ],
+    "events": [
+      { "eventName": "released", "description": "Maintenance work order was released into execution." },
+      { "eventName": "started", "description": "Maintenance work order execution started." },
+      { "eventName": "completed", "description": "Maintenance work order was completed." },
+      { "eventName": "cancelled", "description": "Maintenance work order was cancelled." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is plant_maintenance.pm_work_orders.* while canonical naming remains maintenance_ehs.maintenance-work-orders."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "maintenance_work_orders"
+    ],
+    "notes": [
+      "Plant-maintenance runtime naming remains active while the canonical contract prevents maintenance execution from being confused with production work orders."
+    ]
+  },
+  "invariants": [
+    "A maintenance work order must reference equipment before release.",
+    "Completed maintenance work orders must preserve operation or closeout trace.",
+    "Cancelled work orders must preserve cancellation reason."
+  ]
+}

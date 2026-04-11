@@ -1,0 +1,119 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.corrective-actions",
+  "canonicalName": "capa_records",
+  "displayName": "Corrective Actions",
+  "purpose": "Drive verified corrective and preventive action so recurring quality loss is closed through owned tasks, effectiveness review, and audit trace.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_systems",
+  "storage": {
+    "primaryTable": "capa_records",
+    "primaryKey": "capa_id",
+    "statusField": "capa_status",
+    "childTables": [
+      "corrective_action_tasks",
+      "corrective_action_verifications"
+    ],
+    "legacyTables": [
+      "capa",
+      "capa_actions",
+      "corrective_actions"
+    ],
+    "legacyTablesToIsolate": [
+      "capa"
+    ]
+  },
+  "identity": {
+    "strategy": "capa_number",
+    "naturalKeys": [
+      "capa_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "improvement_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "management_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "root_cause_record",
+      "action_plan",
+      "effectiveness_verification"
+    ],
+    "kpiSignals": [
+      "capa_cycle_time",
+      "capa_effectiveness_rate",
+      "repeat_issue_recurrence"
+    ],
+    "autoAuditChecks": [
+      "capa_requires_root_cause",
+      "capa_cannot_close_without_effectiveness_review",
+      "capa_tasks_must_trace_back_to_ncr_or_risk_source"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "capa_records_capa_status",
+    "stateModelKey": "capa_records_capa_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "initiated", "label": "Initiated", "labelEn": "Initiated", "allowedTransitionsFrom": ["draft"] },
+      { "value": "action_planning", "label": "Action Planning", "labelEn": "Action Planning", "allowedTransitionsFrom": ["initiated"] },
+      { "value": "implementation", "label": "Implementation", "labelEn": "Implementation", "allowedTransitionsFrom": ["action_planning"] },
+      { "value": "effectiveness_review", "label": "Effectiveness Review", "labelEn": "Effectiveness Review", "allowedTransitionsFrom": ["implementation"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["effectiveness_review"] }
+    ],
+    "commands": [
+      { "command": "initiate", "targetState": "initiated", "description": "Initiate CAPA from NCR, audit, or systemic signal.", "idempotencyScope": "resource+transition" },
+      { "command": "plan_actions", "targetState": "action_planning", "description": "Record owned CAPA tasks and deadlines.", "idempotencyScope": "resource+transition", "preconditions": ["root_cause_recorded"] },
+      { "command": "implement", "targetState": "implementation", "description": "Execute approved corrective actions.", "idempotencyScope": "resource+transition" },
+      { "command": "verify_effectiveness", "targetState": "effectiveness_review", "description": "Run effectiveness review against implemented action.", "idempotencyScope": "resource+transition", "preconditions": ["implementation_evidence_complete"] },
+      { "command": "close", "targetState": "closed", "description": "Close the CAPA after effectiveness is verified.", "idempotencyScope": "resource+transition", "preconditions": ["effectiveness_verified"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "quality_improvement.nonconformances",
+      "quality_improvement.audit-programs"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.improvement-actions"
+    ],
+    "keyRelationships": [
+      "source_ncr_id -> ncr_records.ncr_id",
+      "source_record_id -> ncr_records.source_record_id"
+    ],
+    "events": [
+      { "eventName": "initiated", "description": "CAPA was initiated from a quality or risk source." },
+      { "eventName": "planned", "description": "CAPA action plan was approved." },
+      { "eventName": "implemented", "description": "CAPA implementation completed." },
+      { "eventName": "effectiveness-reviewed", "description": "CAPA entered effectiveness review." },
+      { "eventName": "closed", "description": "CAPA was closed after verified effectiveness." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_runtime_api",
+    "notes": [
+      "Current runtime endpoints are quality_management.capa_records.*."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "capa",
+      "capa_actions",
+      "corrective_actions"
+    ],
+    "notes": [
+      "The short capa alias is retained only for compatibility and should not be treated as the canonical business name.",
+      "Training and document updates remain required outcomes for some CAPA actions, but they are not modeled yet as first-class canonical resources and therefore stay in evidence/work-instruction traces instead of upstream/downstream object references."
+    ]
+  },
+  "invariants": [
+    "A CAPA requires root cause evidence before action planning.",
+    "A CAPA cannot close without effectiveness verification.",
+    "CAPA tasks must remain linked to the originating NCR, audit, or systemic signal."
+  ]
+}

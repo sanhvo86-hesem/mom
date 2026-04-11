@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "canonicalResource": "procurement_supplier_quality.purchase-receipts",
+  "canonicalName": "purchase_receipts",
+  "displayName": "Purchase Receipts",
+  "purpose": "Control physical receipt, quarantine, acceptance, putaway, and reversal so stock and AP matching cannot outrun receiving truth.",
+  "ownerDomain": "procurement_supplier_quality",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "receiving_operations",
+  "storage": {
+    "primaryTable": "purchase_receipts",
+    "primaryKey": "purchase_receipt_id",
+    "statusField": "receipt_status",
+    "childTables": [
+      "purchase_receipt_lines"
+    ],
+    "legacyTables": [
+      "goods_receipts",
+      "incoming_inspections"
+    ]
+  },
+  "identity": {
+    "strategy": "receipt_number",
+    "naturalKeys": [
+      "receipt_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "receiving_review",
+    "retentionClass": "procurement_record_7y",
+    "evidenceRequirements": [
+      "supplier_receipt_trace",
+      "iqc_disposition",
+      "putaway_or_reversal_record"
+    ],
+    "kpiSignals": [
+      "receipt_to_iqc_cycle_time",
+      "receipt_reversal_rate",
+      "quarantine_dwell_time"
+    ],
+    "autoAuditChecks": [
+      "cannot_putaway_before_iqc_acceptance",
+      "reversals_must_preserve_reason_and_financial_trace",
+      "quarantined_receipts_must_not_leak_to_free_stock"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization + purchase_receipts_receipt_status",
+    "stateModelKey": "purchase_receipts_receipt_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "received", "label": "Received", "labelEn": "Received", "allowedTransitionsFrom": [] },
+      { "value": "under_iqc", "label": "Under IQC", "labelEn": "Under IQC", "allowedTransitionsFrom": ["received", "quarantined"] },
+      { "value": "accepted", "label": "Accepted", "labelEn": "Accepted", "allowedTransitionsFrom": ["under_iqc"] },
+      { "value": "quarantined", "label": "Quarantined", "labelEn": "Quarantined", "allowedTransitionsFrom": ["received", "under_iqc", "accepted"] },
+      { "value": "putaway", "label": "Put Away", "labelEn": "Put Away", "allowedTransitionsFrom": ["accepted"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["putaway", "accepted"] },
+      { "value": "reversed", "label": "Reversed", "labelEn": "Reversed", "allowedTransitionsFrom": ["quarantined", "accepted", "closed"] }
+    ],
+    "commands": [
+      { "command": "start_iqc", "targetState": "under_iqc", "description": "Move received material into governed IQC review.", "idempotencyScope": "resource+transition" },
+      { "command": "accept", "targetState": "accepted", "description": "Accept received material after IQC completion.", "idempotencyScope": "resource+transition", "preconditions": ["iqc_complete"] },
+      { "command": "quarantine", "targetState": "quarantined", "description": "Quarantine receipt pending disposition.", "idempotencyScope": "resource+transition" },
+      { "command": "putaway", "targetState": "putaway", "description": "Put away accepted material into controlled stock.", "idempotencyScope": "resource+transition", "preconditions": ["accepted"] },
+      { "command": "close", "targetState": "closed", "description": "Close the receipt after physical and financial completion.", "idempotencyScope": "resource+transition" },
+      { "command": "reverse", "targetState": "reversed", "description": "Reverse a receipt under controlled correction rules.", "idempotencyScope": "resource+transition", "preconditions": ["correction_reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "procurement_supplier_quality.supplier-purchase-orders",
+      "procurement_supplier_quality.supplier-asns"
+    ],
+    "downstreamObjects": [
+      "procurement_supplier_quality.iqc-inspections",
+      "finance.ap-invoices",
+      "inventory_logistics.stock-balances"
+    ],
+    "keyRelationships": [
+      "po_id -> supplier_purchase_orders.supplier_purchase_order_id",
+      "supplier_asn_id -> supplier_asns.supplier_asn_id",
+      "purchase_receipt_id -> ap_invoices.purchase_receipt_id"
+    ],
+    "events": [
+      { "eventName": "received", "description": "Purchase receipt was recorded for physical inbound material." },
+      { "eventName": "accepted", "description": "Receipt cleared IQC acceptance." },
+      { "eventName": "quarantined", "description": "Receipt moved into quarantine control." },
+      { "eventName": "reversed", "description": "Receipt was reversed under governed correction." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is purchasing.purchase_receipts.* while canonical naming remains procurement_supplier_quality.purchase-receipts."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "goods_receipts"
+    ],
+    "notes": [
+      "Legacy goods-receipt naming remains for compatibility, but purchase_receipts is the canonical lifecycle owner."
+    ]
+  },
+  "invariants": [
+    "A receipt cannot put away material before IQC acceptance.",
+    "Quarantined receipts must not release uncontrolled stock.",
+    "Receipt reversals must preserve correction and AP impact trace."
+  ]
+}

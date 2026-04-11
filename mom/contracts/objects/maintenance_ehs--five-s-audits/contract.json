@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "canonicalResource": "maintenance_ehs.five-s-audits",
+  "canonicalName": "five_s_audits",
+  "displayName": "5S Audits",
+  "purpose": "Controls 5S audit planning, execution, follow-up, verification, and closure so visual-factory discipline becomes a governed lean loop instead of a score-only snapshot.",
+  "ownerDomain": "maintenance_ehs",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "lean_operations",
+  "storage": {
+    "primaryTable": "lean_5s_audits",
+    "primaryKey": "audit_5s_id",
+    "statusField": "status",
+    "childTables": [
+      "five_s_audit_findings"
+    ],
+    "legacyTables": [
+      "five_s_audits",
+      "workplace_audits"
+    ]
+  },
+  "identity": {
+    "strategy": "audit_number",
+    "naturalKeys": [
+      "audit_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "process_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "5s_review",
+    "retentionClass": "lean_record_7y",
+    "evidenceRequirements": [
+      "audit_checklist",
+      "finding_evidence",
+      "verification_record"
+    ],
+    "kpiSignals": [
+      "5s_score_trend",
+      "finding_closure_lead_time",
+      "repeat_5s_gap_rate"
+    ],
+    "autoAuditChecks": [
+      "follow_up_audits_must_preserve_open_finding_trace",
+      "verified_audits_must_keep_verification_evidence",
+      "closed_audits_must_not_leave_unowned_findings"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "wave1_lifecycle_normalization",
+    "stateModelKey": "lean_5s_audits_status_set",
+    "lifecycleMode": "persisted",
+    "states": [
+      { "value": "planned", "label": "Đã lập kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "Đang đánh giá", "labelEn": "In Progress", "allowedTransitionsFrom": ["planned"] },
+      { "value": "follow_up", "label": "Theo dõi hành động", "labelEn": "Follow Up", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "verified", "label": "Đã xác nhận", "labelEn": "Verified", "allowedTransitionsFrom": ["follow_up"] },
+      { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["verified"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+    ],
+    "commands": [
+      { "command": "start_audit", "targetState": "in_progress", "description": "Start the 5S audit execution against the planned scope.", "idempotencyScope": "resource+transition" },
+      { "command": "launch_follow_up", "targetState": "follow_up", "description": "Launch follow-up for findings and corrective ownership.", "idempotencyScope": "resource+transition", "preconditions": ["findings_recorded"] },
+      { "command": "verify", "targetState": "verified", "description": "Verify that follow-up actions restored the expected 5S condition.", "idempotencyScope": "resource+transition", "preconditions": ["verification_evidence_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close the 5S audit after verification is complete.", "idempotencyScope": "resource+transition", "preconditions": ["all_findings_closed_or_waived"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive the closed 5S audit under retention policy.", "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.employees"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.improvement-actions",
+      "quality_improvement.corrective-actions"
+    ],
+    "keyRelationships": [
+      "auditor_id -> employees.employee_id"
+    ],
+    "events": [
+      { "eventName": "in_progress", "description": "5S audit entered active execution." },
+      { "eventName": "follow_up", "description": "5S audit findings moved into follow-up." },
+      { "eventName": "verified", "description": "5S audit follow-up was verified." },
+      { "eventName": "closed", "description": "5S audit closed under governed lean review." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is lean_manufacturing.lean_5s_audits.* while canonical naming remains maintenance_ehs.five-s-audits."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "five_s_audits",
+      "workplace_audits"
+    ],
+    "notes": [
+      "Legacy 5S/workplace audit naming remains for compatibility, but lean_5s_audits is the governed storage/runtime owner."
+    ]
+  },
+  "invariants": [
+    "Verified 5S audits must preserve verification evidence.",
+    "Closed 5S audits must not leave unowned findings open.",
+    "5S follow-up must remain traceable to the originating audit evidence."
+  ]
+}

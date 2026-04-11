@@ -1,0 +1,118 @@
+{
+  "version": "1.0",
+  "canonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+  "canonicalName": "supplier_purchase_orders",
+  "displayName": "Supplier Purchase Orders",
+  "purpose": "Authorize governed external spend and supplier commitment so receiving, IQC, and AP matching cannot bypass approved procurement intent.",
+  "ownerDomain": "procurement_supplier_quality",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "procurement_operations",
+  "storage": {
+    "primaryTable": "supplier_purchase_orders",
+    "primaryKey": "supplier_purchase_order_id",
+    "statusField": "po_status",
+    "childTables": [
+      "supplier_purchase_order_lines"
+    ],
+    "legacyTables": [
+      "purchase_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "supplier_purchase_order_number",
+    "naturalKeys": [
+      "supplier_purchase_order_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "entry_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "sourcing_review",
+    "retentionClass": "procurement_document_7y",
+    "evidenceRequirements": [
+      "approved_requisition",
+      "supplier_commitment",
+      "receiving_trace"
+    ],
+    "kpiSignals": [
+      "po_approval_lead_time",
+      "supplier_otd_commitment",
+      "three_way_match_readiness"
+    ],
+    "autoAuditChecks": [
+      "cannot_release_without_approval",
+      "cannot_close_before_receiving_terminal",
+      "po_must_reference_governed_demand"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "compatibility_alias_runtime",
+    "source": "M4-purchasing.json workflow + purchase_orders_po_status alias",
+    "stateModelKey": "supplier_purchase_orders_po_status_purchasing_runtime",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "pending_approval", "label": "Pending Approval", "labelEn": "Pending Approval", "allowedTransitionsFrom": ["draft"] },
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": ["pending_approval"] },
+      { "value": "released", "label": "Released", "labelEn": "Released", "allowedTransitionsFrom": ["approved"] },
+      { "value": "partial", "label": "Partial", "labelEn": "Partial", "allowedTransitionsFrom": ["released"] },
+      { "value": "received", "label": "Received", "labelEn": "Received", "allowedTransitionsFrom": ["released", "partial"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["received"] }
+    ],
+    "commands": [
+      { "command": "submit_for_approval", "targetState": "pending_approval", "description": "Submit supplier PO for governed approval.", "idempotencyScope": "resource+transition" },
+      { "command": "approve", "targetState": "approved", "description": "Approve supplier PO for supplier commitment.", "idempotencyScope": "resource+transition", "preconditions": ["approved_requisition_exists"] },
+      { "command": "release", "targetState": "released", "description": "Release the PO to the supplier after approval.", "idempotencyScope": "resource+transition" },
+      { "command": "receive_partial", "targetState": "partial", "description": "Record partial receipt against the released supplier PO.", "idempotencyScope": "resource+transition" },
+      { "command": "receive_full", "targetState": "received", "description": "Record full receipt against the released supplier PO.", "idempotencyScope": "resource+transition" },
+      { "command": "close", "targetState": "closed", "description": "Close supplier PO after governed receiving completion.", "idempotencyScope": "resource+transition", "preconditions": ["receiving_terminal"] }
+    ],
+    "notes": [
+      "Canonical supplier-purchase-orders still rides the purchasing.purchase_orders runtime surface. The authored package records that compatibility alias explicitly."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "procurement_supplier_quality.purchase-requisitions",
+      "master_data.suppliers"
+    ],
+    "downstreamObjects": [
+      "procurement_supplier_quality.purchase-receipts",
+      "procurement_supplier_quality.iqc-inspections",
+      "finance.ap-invoices"
+    ],
+    "keyRelationships": [
+      "supplier_id -> suppliers.supplier_id",
+      "purchase_requisition_id -> purchase_requisitions.purchase_requisition_id",
+      "supplier_purchase_order_id -> purchase_receipts.supplier_purchase_order_id"
+    ],
+    "events": [
+      { "eventName": "approved", "description": "Supplier PO was approved for spend commitment." },
+      { "eventName": "released", "description": "Supplier PO was released to the supplier." },
+      { "eventName": "received", "description": "Supplier PO receiving reached governed received state." },
+      { "eventName": "closed", "description": "Supplier PO was closed after downstream receiving completion." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "Current workflow surface is the Purchasing workspace and purchasing.purchase_orders.* endpoints."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "purchase_orders",
+      "po_status"
+    ],
+    "notes": [
+      "A dedicated supplier_purchase_orders controller is still pending; the purchasing alias remains the live runtime surface."
+    ]
+  },
+  "invariants": [
+    "A supplier PO cannot release before approval.",
+    "A supplier PO cannot close before governed receiving reaches terminal state.",
+    "A supplier PO must remain linked to an approved requisition or other governed demand source."
+  ]
+}

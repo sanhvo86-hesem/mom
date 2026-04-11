@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.oqc-inspections",
+  "canonicalName": "oqc_inspections",
+  "displayName": "OQC Inspections",
+  "purpose": "Control outgoing quality release so finished goods cannot pass to shipment without governed final inspection truth.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_assurance",
+  "storage": {
+    "primaryTable": "oqc_inspections",
+    "primaryKey": "oqc_id",
+    "statusField": "result",
+    "childTables": [
+      "oqc_inspection_results"
+    ],
+    "legacyTables": [
+      "oqc_inspections"
+    ]
+  },
+  "identity": {
+    "strategy": "oqc_number",
+    "naturalKeys": [
+      "oqc_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "release_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "outgoing_quality_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "inspection_results",
+      "lot_or_serial_trace",
+      "release_or_rejection_decision"
+    ],
+    "kpiSignals": [
+      "outgoing_first_pass_yield",
+      "shipment_release_hold_rate",
+      "customer_escape_rate"
+    ],
+    "autoAuditChecks": [
+      "accepted_oqc_required_before_shipment_release",
+      "rejected_oqc_must_trigger_ncr_or_concession",
+      "waived_oqc_must_preserve_approval_evidence"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "oqc_inspections_result_status",
+    "stateModelKey": "oqc_inspections_result_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "pending", "label": "Pending", "labelEn": "Pending", "allowedTransitionsFrom": [] },
+      { "value": "accepted", "label": "Accepted", "labelEn": "Accepted", "allowedTransitionsFrom": ["pending"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending"] },
+      { "value": "waived", "label": "Waived", "labelEn": "Waived", "allowedTransitionsFrom": ["pending", "rejected"] }
+    ],
+    "commands": [
+      { "command": "start", "targetState": "pending", "description": "Start the outgoing inspection while maintaining pending status.", "idempotencyScope": "resource+transition" },
+      { "command": "accept", "targetState": "accepted", "description": "Accept the outgoing lot or unit for shipment release.", "idempotencyScope": "resource+transition", "preconditions": ["results_recorded"] },
+      { "command": "reject", "targetState": "rejected", "description": "Reject the outgoing inspection and block shipment release.", "idempotencyScope": "resource+transition", "preconditions": ["results_recorded"] },
+      { "command": "waive", "targetState": "waived", "description": "Waive the inspection under controlled approval.", "idempotencyScope": "resource+transition", "preconditions": ["waiver_approval_recorded"] }
+    ],
+    "notes": [
+      "Legacy LogisticsController paths still use pass/fail/conditional values in some compatibility flows. The governed runtime truth for the canonical object is pending/accepted/rejected/waived."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.work-orders",
+      "commercial_customer.sales-orders"
+    ],
+    "downstreamObjects": [
+      "inventory_logistics.shipments",
+      "quality_improvement.nonconformances",
+      "quality_improvement.concessions"
+    ],
+    "keyRelationships": [
+      "wo_number -> work_orders.work_order_number",
+      "so_number -> sales_orders.sales_order_number"
+    ],
+    "events": [
+      { "eventName": "accepted", "description": "Outgoing inspection accepted the lot or unit." },
+      { "eventName": "rejected", "description": "Outgoing inspection rejected the lot or unit." },
+      { "eventName": "waived", "description": "Outgoing inspection completed under waiver." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is quality_management.oqc_inspections.* while canonical naming remains quality_improvement.oqc-inspections."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "oqc_result",
+      "pass",
+      "fail",
+      "conditional"
+    ],
+    "notes": [
+      "Legacy pass/fail/conditional phrasing remains in some older handlers and reports, but the canonical outgoing-gate truth is accepted/rejected/waived."
+    ]
+  },
+  "invariants": [
+    "Shipment release requires accepted OQC or governed waiver.",
+    "Rejected OQC must preserve NCR or concession trace.",
+    "Waived OQC requires approval evidence."
+  ]
+}

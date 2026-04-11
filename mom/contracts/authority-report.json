@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "description": "Authored business-contract authority coverage report for ERP+MOM canonical resources."
+  },
+  "summary": {
+    "totalCanonicalObjects": 64,
+    "authoredPackageCount": 64,
+    "authoredCoverageRatio": 1.0,
+    "lifecycleLikeObjectCount": 53,
+    "authoredLifecycleLikeCount": 53,
+    "lifecycleLikeCoverageRatio": 1.0,
+    "coreValueStreamObjectCount": 44,
+    "authoredCoreValueStreamCount": 44,
+    "coreValueStreamCoverageRatio": 1.0,
+    "priorityGapCount": 0
+  },
+  "domains": [
+    {
+      "domain": "master_data",
+      "totalObjects": 8,
+      "authoredPackages": 8,
+      "coreValueStreamObjects": 8,
+      "authoredCoreValueStreamObjects": 8,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "quality_improvement",
+      "totalObjects": 11,
+      "authoredPackages": 11,
+      "coreValueStreamObjects": 6,
+      "authoredCoreValueStreamObjects": 6,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "inventory_logistics",
+      "totalObjects": 8,
+      "authoredPackages": 8,
+      "coreValueStreamObjects": 6,
+      "authoredCoreValueStreamObjects": 6,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "maintenance_ehs",
+      "totalObjects": 6,
+      "authoredPackages": 6,
+      "coreValueStreamObjects": 6,
+      "authoredCoreValueStreamObjects": 6,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "planning_production",
+      "totalObjects": 6,
+      "authoredPackages": 6,
+      "coreValueStreamObjects": 6,
+      "authoredCoreValueStreamObjects": 6,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "procurement_supplier_quality",
+      "totalObjects": 6,
+      "authoredPackages": 6,
+      "coreValueStreamObjects": 6,
+      "authoredCoreValueStreamObjects": 6,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "commercial_customer",
+      "totalObjects": 5,
+      "authoredPackages": 5,
+      "coreValueStreamObjects": 4,
+      "authoredCoreValueStreamObjects": 4,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "finance",
+      "totalObjects": 8,
+      "authoredPackages": 8,
+      "coreValueStreamObjects": 2,
+      "authoredCoreValueStreamObjects": 2,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
+      "domain": "analytics",
+      "totalObjects": 5,
+      "authoredPackages": 5,
+      "coreValueStreamObjects": 0,
+      "authoredCoreValueStreamObjects": 0,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": null
+    },
+    {
+      "domain": "integration_resilience",
+      "totalObjects": 1,
+      "authoredPackages": 1,
+      "coreValueStreamObjects": 0,
+      "authoredCoreValueStreamObjects": 0,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": null
+    }
+  ],
+  "priorityGaps": []
+}

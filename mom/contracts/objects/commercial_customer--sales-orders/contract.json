@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "canonicalResource": "commercial_customer.sales-orders",
+  "canonicalName": "sales_orders",
+  "displayName": "Sales Orders",
+  "purpose": "Turn accepted commercial demand into governed revenue-producing execution demand spanning engineering, production release, shipment gate, and financial realization.",
+  "ownerDomain": "commercial_customer",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "commercial_and_program_management",
+  "storage": {
+    "primaryTable": "sales_orders",
+    "primaryKey": "sales_order_id",
+    "statusField": "so_status",
+    "childTables": [
+      "sales_order_lines"
+    ],
+    "legacyTables": [
+      "sales_orders"
+    ]
+  },
+  "identity": {
+    "strategy": "so_number",
+    "naturalKeys": [
+      "so_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "commercial_commitment_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "order_fulfillment_review",
+    "retentionClass": "commercial_document_7y",
+    "evidenceRequirements": [
+      "approved_quote_or_customer_po",
+      "contract_review_record",
+      "shipment_gate_clearance"
+    ],
+    "kpiSignals": [
+      "quote_to_order_conversion",
+      "on_time_delivery_commit_rate",
+      "shipment_gate_pass_rate"
+    ],
+    "autoAuditChecks": [
+      "cannot_release_production_before_order_confirmation",
+      "cannot_ship_before_production_gate_is_clear",
+      "closed_orders_must_have_terminal_shipment_state"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "M2-orders.json + OrderService::SO_STATUSES",
+    "stateModelKey": "sales_orders_so_status_order_runtime",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "quoted", "label": "Quoted", "labelEn": "Quoted", "allowedTransitionsFrom": ["draft"] },
+      { "value": "confirmed", "label": "Confirmed", "labelEn": "Confirmed", "allowedTransitionsFrom": ["quoted"] },
+      { "value": "in_production", "label": "In Production", "labelEn": "In Production", "allowedTransitionsFrom": ["confirmed"] },
+      { "value": "shipped", "label": "Shipped", "labelEn": "Shipped", "allowedTransitionsFrom": ["in_production"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["shipped"] },
+      { "value": "cancelled", "label": "Cancelled", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "quoted", "confirmed", "in_production"] }
+    ],
+    "commands": [
+      { "command": "quote", "targetState": "quoted", "description": "Move draft demand into quoted commercial offer posture.", "idempotencyScope": "resource+transition" },
+      { "command": "confirm", "targetState": "confirmed", "description": "Confirm the order after quote acceptance or customer PO linkage.", "idempotencyScope": "resource+transition" },
+      { "command": "release_to_production", "targetState": "in_production", "description": "Release confirmed order into production planning and JO/WO generation.", "idempotencyScope": "resource+transition", "preconditions": ["commercial_confirmation_complete"] },
+      { "command": "release_shipment", "targetState": "shipped", "description": "Ship only after production and shipment gate controls pass.", "idempotencyScope": "resource+transition", "preconditions": ["shipment_gate_passed"] },
+      { "command": "close", "targetState": "closed", "description": "Close the sales order after shipment completion and commercial closure.", "idempotencyScope": "resource+transition", "preconditions": ["shipment_terminal"] },
+      { "command": "cancel", "targetState": "cancelled", "description": "Cancel the sales order before final shipment closure.", "idempotencyScope": "resource+transition" }
+    ],
+    "notes": [
+      "The runtime sales-order workflow uses quoted/cancelled, while the legacy status-options alias still exposes engineering_ready and omits cancelled. The authored package is the current runtime truth."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "commercial_customer.customer-purchase-orders",
+      "commercial_customer.quotations"
+    ],
+    "downstreamObjects": [
+      "planning_production.job-orders",
+      "planning_production.work-orders",
+      "inventory_logistics.shipments",
+      "finance.ar-invoices"
+    ],
+    "keyRelationships": [
+      "customer_po_id -> customer_purchase_orders.customer_po_id",
+      "sales_order_id -> job_orders.sales_order_id",
+      "sales_order_id -> shipments.sales_order_id"
+    ],
+    "events": [
+      { "eventName": "quoted", "description": "Sales order entered commercial quotation posture." },
+      { "eventName": "confirmed", "description": "Sales order was confirmed as executable customer demand." },
+      { "eventName": "released-to-production", "description": "Sales order was released into production planning." },
+      { "eventName": "shipped", "description": "Sales order shipment was released and completed." },
+      { "eventName": "closed", "description": "Sales order was commercially closed." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_runtime_api",
+    "notes": [
+      "Current runtime endpoints are sales.sales_orders.* while canonical naming remains commercial_customer.sales-orders."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "sales_order",
+      "so_status"
+    ],
+    "notes": [
+      "Status alias drift remains between legacy status-options and the governed order runtime. The package records the runtime truth explicitly."
+    ]
+  },
+  "invariants": [
+    "A sales order cannot enter production before commercial confirmation.",
+    "A sales order cannot ship before shipment gate controls pass.",
+    "A closed sales order must have terminal shipment evidence."
+  ]
+}

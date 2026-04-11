@@ -1,0 +1,124 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.nonconformances",
+  "canonicalName": "ncr_records",
+  "displayName": "Nonconformances",
+  "purpose": "Contain and disposition quality escapes from incoming, in-process, outgoing, or returned product so no defect signal disappears outside a governed NCR record.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_assurance",
+  "storage": {
+    "primaryTable": "ncr_records",
+    "primaryKey": "ncr_id",
+    "statusField": "ncr_status",
+    "childTables": [
+      "nonconformance_dispositions",
+      "nonconformance_evidence"
+    ],
+    "legacyTables": [
+      "ncr_cases",
+      "nonconformance",
+      "nonconformances"
+    ],
+    "legacyTablesToIsolate": [
+      "nonconformance"
+    ]
+  },
+  "identity": {
+    "strategy": "ncr_number",
+    "naturalKeys": [
+      "ncr_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "containment_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "quality_review_board",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "defect_evidence",
+      "containment_decision",
+      "disposition_record"
+    ],
+    "kpiSignals": [
+      "ncr_closure_lead_time",
+      "repeat_defect_rate",
+      "containment_effectiveness"
+    ],
+    "autoAuditChecks": [
+      "ncr_requires_source_trace",
+      "ncr_cannot_close_without_disposition",
+      "ncr_with_systemic_cause_should_link_to_capa"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "ncr_records_ncr_status",
+    "stateModelKey": "ncr_records_ncr_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "submitted", "label": "Submitted", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
+      { "value": "under_review", "label": "Under Review", "labelEn": "Under Review", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "disposition_set", "label": "Disposition Set", "labelEn": "Disposition Set", "allowedTransitionsFrom": ["under_review"] },
+      { "value": "containment_active", "label": "Containment Active", "labelEn": "Containment Active", "allowedTransitionsFrom": ["disposition_set"] },
+      { "value": "close_requested", "label": "Close Requested", "labelEn": "Close Requested", "allowedTransitionsFrom": ["containment_active"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["close_requested"] }
+    ],
+    "commands": [
+      { "command": "submit", "targetState": "submitted", "description": "Submit the nonconformance for formal review.", "idempotencyScope": "resource+transition" },
+      { "command": "review", "targetState": "under_review", "description": "Start formal quality review.", "idempotencyScope": "resource+transition" },
+      { "command": "set_disposition", "targetState": "disposition_set", "description": "Record the approved disposition path.", "idempotencyScope": "resource+transition", "preconditions": ["defect_evidence_complete"] },
+      { "command": "activate_containment", "targetState": "containment_active", "description": "Activate containment against affected stock, WIP, or shipment.", "idempotencyScope": "resource+transition" },
+      { "command": "request_close", "targetState": "close_requested", "description": "Request closure after containment and disposition evidence are complete.", "idempotencyScope": "resource+transition" },
+      { "command": "close", "targetState": "closed", "description": "Close the NCR after all required evidence and linked actions are complete.", "idempotencyScope": "resource+transition", "preconditions": ["disposition_complete"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "procurement_supplier_quality.iqc-inspections",
+      "planning_production.ipqc-inspections",
+      "quality_improvement.oqc-inspections",
+      "inventory_logistics.customer-returns"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.corrective-actions",
+      "quality_improvement.concessions"
+    ],
+    "keyRelationships": [
+      "source_record_id -> incoming_inspections.source_record_id",
+      "source_record_id -> ipqc_inspections.source_record_id",
+      "source_record_id -> oqc_inspections.source_record_id",
+      "source_record_id -> rma_orders.source_record_id"
+    ],
+    "events": [
+      { "eventName": "submitted", "description": "NCR was submitted into formal quality review." },
+      { "eventName": "containment-activated", "description": "Containment became active against affected material or product." },
+      { "eventName": "disposition-set", "description": "A formal disposition path was recorded." },
+      { "eventName": "closed", "description": "NCR was closed after evidence and closure review." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_runtime_api",
+    "notes": [
+      "Current runtime endpoints are quality_management.ncr_records.*."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "ncr_cases",
+      "nonconformance",
+      "nonconformances"
+    ],
+    "notes": [
+      "The singular nonconformance alias is marked for archive isolation once all readers migrate."
+    ]
+  },
+  "invariants": [
+    "An NCR must retain source trace back to the originating inspection, process, or return event.",
+    "An NCR cannot close without disposition evidence.",
+    "Systemic NCRs should link to CAPA when root cause requires corrective action."
+  ]
+}

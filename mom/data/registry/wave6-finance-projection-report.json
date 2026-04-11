@@ -1,0 +1,599 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-10T12:22:45.721Z",
+    "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
+    "policyVersion": "1.0",
+    "description": "Wave 6 finance posting, valuation, and plant-performance governance verification report."
+  },
+  "summary": {
+    "service_finance_gate_targets": 4,
+    "service_finance_gate_failed": 0,
+    "projection_read_model_targets": 6,
+    "projection_read_model_failed": 0,
+    "projection_lineage_targets": 6,
+    "projection_lineage_failed": 0,
+    "relationship_truth_targets": 7,
+    "relationship_truth_failed": 0,
+    "remaining_wave6_gaps": 0
+  },
+  "policy_gates": {
+    "build_questions": [
+      {
+        "id": "wave6_birth_purpose",
+        "question": "Which close control, posting decision, valuation checkpoint, or plant KPI review is this object born to serve, and what false financial or operational truth appears if it does not exist?"
+      },
+      {
+        "id": "wave6_gate_owner",
+        "question": "Is this object a first-class finance gate owner such as period close, backdate exception, or governed memo, or is it only a projection that must remain read-only?"
+      },
+      {
+        "id": "wave6_projection_boundary",
+        "question": "If this record is a valuation or snapshot projection, why would manual create, update, delete, or transition ever be allowed, and what downstream KPI distortion would that permit?"
+      },
+      {
+        "id": "wave6_lineage_truth",
+        "question": "Does the record preserve snapshot time, source system, source record, and organization scope so an auditor can trace the value or KPI back to a real source event?"
+      },
+      {
+        "id": "wave6_relationship_truth",
+        "question": "Do the canonical relationships cover the real subject types used in runtime, or is a dynamic control still pretending that only one invoice or one source path exists?"
+      },
+      {
+        "id": "wave6_signature_and_reason",
+        "question": "For posting-period and correction controls, are reason, approval, signature meaning, and expiry enforced at the backend rather than left as optional notes?"
+      },
+      {
+        "id": "wave6_plant_kpi_integrity",
+        "question": "Can plant OEE, quality, delivery, and valuation metrics be regenerated from governed projections without allowing a user to rewrite history directly in the KPI table?"
+      },
+      {
+        "id": "wave6_auto_audit",
+        "question": "Can the backend prove from one chain of records why a period was closed, reopened, adjusted, valued, and reported, with enough evidence for auto-audit and management review?"
+      },
+      {
+        "id": "wave6_unused_isolation",
+        "question": "If a finance or analytics element adds no unique control purpose, has it been isolated as archive or unused instead of left live as a second reporting truth?"
+      }
+    ],
+    "acceptance_criteria": {
+      "required_for_service_finance_gate": [
+        "service_backed_finance_gate_has_canonical_list_and_detail_surface",
+        "reason_signature_and_expiry_controls_exist_where_required",
+        "transition_or_command_path_is_auditable",
+        "no_generic_placeholder_workflow_is_used_for_close_or_exception_control"
+      ],
+      "required_for_projection_read_model": [
+        "projection_published_with_list_and_detail_only",
+        "generic_runtime_mutation_denied_by_runtime_access_policy",
+        "frontend_foundation_form_state_is_not_applicable",
+        "projection_keeps_lineage_fields_for_traceability"
+      ],
+      "required_for_relationship_truth": [
+        "canonical_key_relationships_cover_live_subject_types",
+        "valuation_and_plant_kpi_resources_reference_real_org_and_source_fields",
+        "release_snapshot_semantics_declared_where_snapshot_truth_must_be_preserved"
+      ]
+    },
+    "rejection_criteria": [
+      "projection_or_snapshot_published_with_generic_create_update_delete_surface",
+      "finance_control_missing_reason_signature_or_temporal_guard",
+      "backdate_exception_relationship_truth_only_covers_one_subject_type",
+      "valuation_or_plant_kpi_projection_lacks_source_lineage_fields",
+      "projection_read_model_promoted_as_manual_workflow_owner",
+      "wave6_control_or_projection_exists_without_a_concrete_gate_or_kpi_purpose"
+    ]
+  },
+  "service_finance_gate_targets": [
+    {
+      "entity_key": "finance.period_close_controls",
+      "canonical_resource": "finance.period-closes",
+      "expected_profile": "governed_case",
+      "actual_profile": "governed_case",
+      "required_actions": [
+        "list",
+        "detail",
+        "create",
+        "transition"
+      ],
+      "missing_actions": [],
+      "expected_canonical_pattern": "lifecycle_owner",
+      "actual_canonical_pattern": "lifecycle_owner",
+      "require_signature_child": true,
+      "actual_child_tables": [
+        "period_close_steps",
+        "electronic_signature"
+      ],
+      "require_signature": false,
+      "actual_e_signature_required": false,
+      "require_reason_code": false,
+      "actual_reason_code_field": null,
+      "require_timeboxed_expiry": false,
+      "actual_timeboxed_expiry_required": false,
+      "purpose": "Period close is the governed accounting gate that blocks false late posting and enables auditable reopen and reclose.",
+      "passed": true
+    },
+    {
+      "entity_key": "finance.backdate_exceptions",
+      "canonical_resource": "finance.backdate-exceptions",
+      "expected_profile": "governed_case",
+      "actual_profile": "governed_case",
+      "required_actions": [
+        "list",
+        "detail",
+        "create",
+        "transition"
+      ],
+      "missing_actions": [],
+      "expected_canonical_pattern": "lifecycle_owner",
+      "actual_canonical_pattern": "lifecycle_owner",
+      "require_signature_child": false,
+      "actual_child_tables": [
+        "electronic_signature"
+      ],
+      "require_signature": true,
+      "actual_e_signature_required": true,
+      "require_reason_code": true,
+      "actual_reason_code_field": "reason_code",
+      "require_timeboxed_expiry": true,
+      "actual_timeboxed_expiry_required": true,
+      "purpose": "Backdate exception is the timeboxed override gate for closed-period adjustments and must stay signed, reason-coded, and expiring.",
+      "passed": true
+    },
+    {
+      "entity_key": "finance.credit_memos",
+      "canonical_resource": "finance.credit-memos",
+      "expected_profile": "transactional_record",
+      "actual_profile": "transactional_record",
+      "required_actions": [
+        "list",
+        "detail",
+        "create"
+      ],
+      "missing_actions": [],
+      "expected_canonical_pattern": "ledger_document",
+      "actual_canonical_pattern": "ledger_document",
+      "require_signature_child": false,
+      "actual_child_tables": [
+        "credit_memo_lines"
+      ],
+      "require_signature": false,
+      "actual_e_signature_required": false,
+      "require_reason_code": false,
+      "actual_reason_code_field": null,
+      "require_timeboxed_expiry": false,
+      "actual_timeboxed_expiry_required": false,
+      "purpose": "Credit memo is a first-class financial correction document and must not be hidden inside a generic invoice row.",
+      "passed": true
+    },
+    {
+      "entity_key": "finance.debit_memos",
+      "canonical_resource": "finance.debit-memos",
+      "expected_profile": "transactional_record",
+      "actual_profile": "transactional_record",
+      "required_actions": [
+        "list",
+        "detail",
+        "create"
+      ],
+      "missing_actions": [],
+      "expected_canonical_pattern": "ledger_document",
+      "actual_canonical_pattern": "ledger_document",
+      "require_signature_child": false,
+      "actual_child_tables": [
+        "debit_memo_lines"
+      ],
+      "require_signature": false,
+      "actual_e_signature_required": false,
+      "require_reason_code": false,
+      "actual_reason_code_field": null,
+      "require_timeboxed_expiry": false,
+      "actual_timeboxed_expiry_required": false,
+      "purpose": "Debit memo is a first-class financial correction document and must not be hidden inside a generic invoice row.",
+      "passed": true
+    }
+  ],
+  "projection_read_model_targets": [
+    {
+      "entity_key": "finance.inventory_valuations",
+      "table": "inventory_valuations",
+      "canonical_resource": "finance.inventory-valuations",
+      "expected_profile": "projection_record",
+      "actual_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "missing_actions": [],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "unexpected_live_actions": [],
+      "form_state": "not_applicable",
+      "runtime_access_policy": {
+        "create": [],
+        "update": [],
+        "transition": [],
+        "delete": []
+      },
+      "runtime_policy_failures": [],
+      "actual_canonical_pattern": "projection",
+      "purpose": "Inventory valuation is a derived valuation truth at a time boundary and must not be manually rewritten through generic CRUD.",
+      "passed": true
+    },
+    {
+      "entity_key": "inventory.inventory_balance_snapshot",
+      "table": "inventory_balance_snapshot",
+      "canonical_resource": "analytics.inventory-balance-snapshots",
+      "expected_profile": "projection_record",
+      "actual_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "missing_actions": [],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "unexpected_live_actions": [],
+      "form_state": "not_applicable",
+      "runtime_access_policy": {
+        "create": [],
+        "update": [],
+        "transition": [],
+        "delete": []
+      },
+      "runtime_policy_failures": [],
+      "actual_canonical_pattern": "projection",
+      "purpose": "Inventory balance snapshots preserve released inventory truth against later stock drift and therefore must remain read-only.",
+      "passed": true
+    },
+    {
+      "entity_key": "production.production_order_bom_snapshot",
+      "table": "production_order_bom_snapshot",
+      "canonical_resource": "analytics.production-bom-snapshots",
+      "expected_profile": "projection_record",
+      "actual_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "missing_actions": [],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "unexpected_live_actions": [],
+      "form_state": "not_applicable",
+      "runtime_access_policy": {
+        "create": [],
+        "update": [],
+        "transition": [],
+        "delete": []
+      },
+      "runtime_policy_failures": [],
+      "actual_canonical_pattern": "projection",
+      "purpose": "Released BOM snapshots must freeze the manufacturing structure used at execution time instead of letting users rewrite history.",
+      "passed": true
+    },
+    {
+      "entity_key": "production.production_order_route_snapshot",
+      "table": "production_order_route_snapshot",
+      "canonical_resource": "analytics.production-route-snapshots",
+      "expected_profile": "projection_record",
+      "actual_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "missing_actions": [],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "unexpected_live_actions": [],
+      "form_state": "not_applicable",
+      "runtime_access_policy": {
+        "create": [],
+        "update": [],
+        "transition": [],
+        "delete": []
+      },
+      "runtime_policy_failures": [],
+      "actual_canonical_pattern": "projection",
+      "purpose": "Released route snapshots must preserve the executable routing truth used when the order was released.",
+      "passed": true
+    },
+    {
+      "entity_key": "mes_execution.mes_oee_snapshots",
+      "table": "mes_oee_snapshots",
+      "canonical_resource": "analytics.mes-oee-snapshots",
+      "expected_profile": "projection_record",
+      "actual_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "missing_actions": [],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "unexpected_live_actions": [],
+      "form_state": "not_applicable",
+      "runtime_access_policy": {
+        "create": [],
+        "update": [],
+        "transition": [],
+        "delete": []
+      },
+      "runtime_policy_failures": [],
+      "actual_canonical_pattern": "projection",
+      "purpose": "MES OEE snapshots must stay a derived execution read model so equipment performance cannot be manually restated.",
+      "passed": true
+    },
+    {
+      "entity_key": "bi_datawarehouse.plant_performance_snapshots",
+      "table": "plant_performance_snapshots",
+      "canonical_resource": "analytics.plant-performance-snapshots",
+      "expected_profile": "projection_record",
+      "actual_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "missing_actions": [],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "unexpected_live_actions": [],
+      "form_state": "not_applicable",
+      "runtime_access_policy": {
+        "create": [],
+        "update": [],
+        "transition": [],
+        "delete": []
+      },
+      "runtime_policy_failures": [],
+      "actual_canonical_pattern": "projection",
+      "purpose": "Plant performance snapshots aggregate OEE, quality, delivery, energy, and safety signals and must remain read-only KPI truth.",
+      "passed": true
+    }
+  ],
+  "projection_lineage_targets": [
+    {
+      "table": "inventory_valuations",
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ],
+      "missing_columns": [],
+      "passed": true
+    },
+    {
+      "table": "inventory_balance_snapshot",
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ],
+      "missing_columns": [],
+      "passed": true
+    },
+    {
+      "table": "production_order_bom_snapshot",
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ],
+      "missing_columns": [],
+      "passed": true
+    },
+    {
+      "table": "production_order_route_snapshot",
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ],
+      "missing_columns": [],
+      "passed": true
+    },
+    {
+      "table": "mes_oee_snapshots",
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ],
+      "missing_columns": [],
+      "passed": true
+    },
+    {
+      "table": "plant_performance_snapshots",
+      "required_columns": [
+        "snapshot_at",
+        "snapshot_grain",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ],
+      "missing_columns": [],
+      "passed": true
+    }
+  ],
+  "relationship_truth_targets": [
+    {
+      "resource_key": "finance.backdate-exceptions",
+      "expected_relationships": [
+        "approved_period_code -> period_close_controls.period_code",
+        "subject_ref -> ap_invoices.ap_invoice_id",
+        "subject_ref -> ar_invoices.ar_invoice_id",
+        "subject_ref -> inventory_transactions.inventory_transaction_id",
+        "subject_ref -> tms_shipments.shipment_id"
+      ],
+      "actual_relationships": [
+        "approved_period_code -> period_close_controls.period_code",
+        "subject_ref -> ap_invoices.ap_invoice_id",
+        "subject_ref -> ar_invoices.ar_invoice_id",
+        "subject_ref -> inventory_transactions.inventory_transaction_id",
+        "subject_ref -> tms_shipments.shipment_id"
+      ],
+      "missing_relationships": [],
+      "expected_release_snapshot_of": null,
+      "actual_release_snapshot_of": null,
+      "passed": true
+    },
+    {
+      "resource_key": "finance.inventory-valuations",
+      "expected_relationships": [
+        "inventory_item_id -> inventory_items.inventory_item_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id",
+        "source_record_id -> inventory_transactions.inventory_transaction_id"
+      ],
+      "actual_relationships": [
+        "inventory_item_id -> inventory_items.inventory_item_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id",
+        "source_record_id -> inventory_transactions.inventory_transaction_id"
+      ],
+      "missing_relationships": [],
+      "expected_release_snapshot_of": null,
+      "actual_release_snapshot_of": null,
+      "passed": true
+    },
+    {
+      "resource_key": "analytics.inventory-balance-snapshots",
+      "expected_relationships": [
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id",
+        "warehouse_id -> org_warehouses.warehouse_id",
+        "lot_id -> lot.lot_id",
+        "source_record_id -> inventory_transactions.inventory_transaction_id"
+      ],
+      "actual_relationships": [
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id",
+        "warehouse_id -> org_warehouses.warehouse_id",
+        "lot_id -> lot.lot_id",
+        "source_record_id -> inventory_transactions.inventory_transaction_id"
+      ],
+      "missing_relationships": [],
+      "expected_release_snapshot_of": "inventory_balance",
+      "actual_release_snapshot_of": "inventory_balance",
+      "passed": true
+    },
+    {
+      "resource_key": "analytics.production-bom-snapshots",
+      "expected_relationships": [
+        "production_order_id -> production_orders.production_order_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "actual_relationships": [
+        "production_order_id -> production_orders.production_order_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "missing_relationships": [],
+      "expected_release_snapshot_of": "production_order_bom",
+      "actual_release_snapshot_of": "production_order_bom",
+      "passed": true
+    },
+    {
+      "resource_key": "analytics.production-route-snapshots",
+      "expected_relationships": [
+        "production_order_id -> production_orders.production_order_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "actual_relationships": [
+        "production_order_id -> production_orders.production_order_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "missing_relationships": [],
+      "expected_release_snapshot_of": "production_order_route",
+      "actual_release_snapshot_of": "production_order_route",
+      "passed": true
+    },
+    {
+      "resource_key": "analytics.mes-oee-snapshots",
+      "expected_relationships": [
+        "equipment_id -> equipment.equipment_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "actual_relationships": [
+        "equipment_id -> equipment.equipment_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "missing_relationships": [],
+      "expected_release_snapshot_of": "mes_execution_oee",
+      "actual_release_snapshot_of": "mes_execution_oee",
+      "passed": true
+    },
+    {
+      "resource_key": "analytics.plant-performance-snapshots",
+      "expected_relationships": [
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "actual_relationships": [
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "missing_relationships": [],
+      "expected_release_snapshot_of": "plant_performance",
+      "actual_release_snapshot_of": "plant_performance",
+      "passed": true
+    }
+  ],
+  "recommendations": [
+    "Treat valuation and KPI snapshots as governed read models only; do not republish them as editable CRUD surfaces.",
+    "Keep close, backdate, and memo controls as the only first-class finance mutation path for period-bound corrections.",
+    "Require lineage fields on every released valuation or KPI snapshot so plant reviews and financial audits can rebuild the truth from source records."
+  ]
+}

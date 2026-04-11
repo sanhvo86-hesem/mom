@@ -1,0 +1,108 @@
+{
+  "version": "1.0",
+  "canonicalResource": "finance.fixed-asset-capitalizations",
+  "canonicalName": "fixed_asset_capitalizations",
+  "displayName": "Fixed Asset Capitalizations",
+  "purpose": "Represent capitalization decisions that convert spend into governed asset value so maintenance, finance, and asset master stay aligned.",
+  "ownerDomain": "finance",
+  "objectRole": "ledger_document",
+  "ownerTeam": "fixed_asset_accounting",
+  "storage": {
+    "primaryTable": "fixed_asset_capitalizations",
+    "primaryKey": "fixed_asset_capitalization_id",
+    "statusField": "capitalization_status",
+    "childTables": [
+      "fixed_asset_capitalization_lines"
+    ],
+    "legacyTables": [
+      "fin_fixed_assets"
+    ]
+  },
+  "identity": {
+    "strategy": "asset_id+ap_invoice_id+created_at",
+    "naturalKeys": [
+      "asset_id",
+      "ap_invoice_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "financial_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "asset_review",
+    "retentionClass": "financial_record_10y",
+    "evidenceRequirements": [
+      "asset_reference",
+      "capitalization_basis",
+      "invoice_or_spend_trace"
+    ],
+    "kpiSignals": [
+      "capitalization_cycle_time",
+      "capitalization_reversal_rate",
+      "asset_activation_lead_time"
+    ],
+    "autoAuditChecks": [
+      "capitalization_must_reference_asset_or_asset_candidate",
+      "capitalized_value_must_trace_to_invoice_or_spend",
+      "retirement_or_void_must_preserve_financial_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "compatibility_bridge",
+    "source": "fin_fixed_assets asset-status bridge pending dedicated capitalization runtime",
+    "stateModelKey": "finance_fixed_asset_capitalizations_bridge",
+    "lifecycleMode": "guarded_transition_runtime",
+    "states": [
+      { "value": "prepared", "label": "Prepared", "labelEn": "Prepared", "allowedTransitionsFrom": [] },
+      { "value": "capitalized", "label": "Capitalized", "labelEn": "Capitalized", "allowedTransitionsFrom": ["prepared"] },
+      { "value": "posted", "label": "Posted", "labelEn": "Posted", "allowedTransitionsFrom": ["capitalized"] },
+      { "value": "voided", "label": "Voided", "labelEn": "Voided", "allowedTransitionsFrom": ["prepared", "capitalized"] },
+      { "value": "retired", "label": "Retired", "labelEn": "Retired", "allowedTransitionsFrom": ["posted"] }
+    ],
+    "commands": [
+      { "command": "capitalize", "targetState": "capitalized", "description": "Approve and capitalize the governed asset value.", "idempotencyScope": "resource+transition" },
+      { "command": "post", "targetState": "posted", "description": "Post capitalization into asset and ledger truth.", "idempotencyScope": "resource+transition" },
+      { "command": "void", "targetState": "voided", "description": "Void a prepared capitalization before posting.", "idempotencyScope": "resource+transition" },
+      { "command": "retire", "targetState": "retired", "description": "Retire capitalized value from active service.", "idempotencyScope": "resource+transition" }
+    ],
+    "notes": [
+      "Dedicated capitalization runtime is not active yet. This package makes the business meaning explicit while workflow truth is still partially bridged from asset accounting surfaces."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.assets",
+      "finance.ap-invoices"
+    ],
+    "downstreamObjects": [],
+    "keyRelationships": [
+      "asset_id -> assets.asset_id",
+      "ap_invoice_id -> ap_invoices.ap_invoice_id"
+    ],
+    "events": [
+      { "eventName": "capitalized", "description": "Spend was capitalized into governed asset value." },
+      { "eventName": "posted", "description": "Capitalization was posted into finance and asset truth." },
+      { "eventName": "retired", "description": "Capitalized asset value was retired from active use." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_bridge_only",
+    "notes": [
+      "No dedicated capitalization controller is active yet. The contract is explicit so downstream tooling stops inferring capitalization behavior from mixed asset records."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "fin_fixed_assets"
+    ],
+    "notes": [
+      "Capitalization meaning is still partially bridged through fixed-asset records until a dedicated runtime surface is completed."
+    ]
+  },
+  "invariants": [
+    "Capitalization must trace to asset identity and financial source.",
+    "Posted capitalization must not lose the link to AP or governed spend evidence.",
+    "Void and retirement actions must preserve audit trail."
+  ]
+}

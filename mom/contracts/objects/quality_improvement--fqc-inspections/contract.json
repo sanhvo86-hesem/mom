@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.fqc-inspections",
+  "canonicalName": "fqc_inspections",
+  "displayName": "FQC Inspections",
+  "purpose": "Preserve the final-quality-control vocabulary used by operations while resolving it onto the governed outgoing-inspection truth so frontend and AI tooling stop treating FQC as a separate storage authority.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_assurance",
+  "storage": {
+    "primaryTable": "oqc_inspections",
+    "primaryKey": "oqc_id",
+    "statusField": "result",
+    "childTables": [
+      "oqc_inspection_results"
+    ],
+    "legacyTables": [
+      "fqc_inspections"
+    ]
+  },
+  "identity": {
+    "strategy": "oqc_number",
+    "naturalKeys": [
+      "oqc_number"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "release_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "outgoing_quality_review",
+    "retentionClass": "quality_record_7y",
+    "evidenceRequirements": [
+      "inspection_results",
+      "lot_or_serial_trace",
+      "release_or_rejection_decision"
+    ],
+    "kpiSignals": [
+      "final_quality_first_pass_yield",
+      "shipment_hold_rate",
+      "customer_escape_rate"
+    ],
+    "autoAuditChecks": [
+      "fqc_alias_must_not_create_second_storage_truth",
+      "shipment_release_requires_accepted_or_waived_final_inspection",
+      "rejected_final_inspection_must_preserve_ncr_or_concession_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "compatibility_alias_runtime",
+    "source": "quality_improvement.oqc-inspections alias runtime",
+    "stateModelKey": "fqc_oqc_alias_runtime",
+    "lifecycleMode": "guarded_transition_runtime",
+    "disableGeneratedCommands": true,
+    "states": [
+      { "value": "pending", "label": "Pending", "labelEn": "Pending", "allowedTransitionsFrom": [] },
+      { "value": "accepted", "label": "Accepted", "labelEn": "Accepted", "allowedTransitionsFrom": ["pending"] },
+      { "value": "rejected", "label": "Rejected", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending"] },
+      { "value": "waived", "label": "Waived", "labelEn": "Waived", "allowedTransitionsFrom": ["pending", "rejected"] }
+    ],
+    "notes": [
+      "FQC is retained as an operational alias only.",
+      "The live runtime and storage truth remain OQC, and no second FQC controller should be introduced."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "planning_production.work-orders",
+      "commercial_customer.sales-orders"
+    ],
+    "downstreamObjects": [
+      "inventory_logistics.shipments",
+      "quality_improvement.nonconformances",
+      "quality_improvement.concessions"
+    ],
+    "keyRelationships": [
+      "wo_number -> work_orders.work_order_number",
+      "so_number -> sales_orders.sales_order_number"
+    ],
+    "events": [
+      { "eventName": "accepted", "description": "Final inspection alias resolved to accepted outgoing quality truth." },
+      { "eventName": "rejected", "description": "Final inspection alias resolved to rejected outgoing quality truth." },
+      { "eventName": "waived", "description": "Final inspection alias resolved to governed waiver truth." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface remains quality_management.oqc_inspections.* while FQC stays an alias label for final-stage outgoing inspection."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "fqc_inspections"
+    ],
+    "notes": [
+      "FQC remains for language continuity only and must not become an independent storage or workflow authority."
+    ]
+  },
+  "invariants": [
+    "FQC aliasing must not create split truth with OQC.",
+    "Rejected final inspection must retain NCR or concession linkage.",
+    "Shipment release requires accepted or governed waived final inspection."
+  ]
+}

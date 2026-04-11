@@ -1,0 +1,84 @@
+{
+  "version": "1.0",
+  "canonicalResource": "finance.inventory-valuations",
+  "canonicalName": "inventory_valuations",
+  "displayName": "Inventory Valuations",
+  "purpose": "Provide read-only inventory valuation projection per item, site, date, and valuation method so finance review and period close consume stable valuation truth with preserved lineage.",
+  "ownerDomain": "finance",
+  "objectRole": "projection",
+  "ownerTeam": "cost_accounting",
+  "storage": {
+    "primaryTable": "inventory_valuations",
+    "primaryKey": "inventory_valuation_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "inventory_valuations"
+    ]
+  },
+  "identity": {
+    "strategy": "inventory_valuation_id",
+    "naturalKeys": [
+      "inventory_valuation_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "financial_gate",
+    "auditClass": "projection_lineage",
+    "continuousImprovementLoop": "period_close_review",
+    "retentionClass": "financial_record_10y",
+    "evidenceRequirements": [
+      "snapshot_at",
+      "valuation_method",
+      "source_record_id"
+    ],
+    "kpiSignals": [
+      "valuation_refresh_latency",
+      "inventory_value_variance",
+      "cost_rollup_consistency"
+    ],
+    "autoAuditChecks": [
+      "valuation_projection_must_preserve_item_and_scope_lineage",
+      "projection_rows_must_be_read_only",
+      "period_close_must_not_mutate_projection_history"
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.stock-balances",
+      "inventory_logistics.inventory-movements"
+    ],
+    "downstreamObjects": [
+      "finance.period-closes"
+    ],
+    "keyRelationships": [
+      "inventory_item_id -> inventory_items.inventory_item_id",
+      "org_plant_id -> org_plants.plant_id",
+      "org_site_id -> org_sites.site_id",
+      "source_record_id -> inventory_transactions.inventory_transaction_id"
+    ],
+    "events": [
+      { "eventName": "refreshed", "description": "Inventory valuation projection was refreshed from governed inventory truth." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is finance.inventory_valuations.* while canonical naming remains finance.inventory-valuations."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "inventory_valuations"
+    ],
+    "notes": [
+      "This valuation object is a projection for finance review and must not replace transactional inventory truth."
+    ]
+  },
+  "invariants": [
+    "Inventory valuation rows must preserve source lineage and valuation context.",
+    "The projection is read-only and must not become transactional authority.",
+    "Valuation history must remain stable across period-close review."
+  ]
+}

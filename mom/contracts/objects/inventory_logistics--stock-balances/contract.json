@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "canonicalResource": "inventory_logistics.stock-balances",
+  "canonicalName": "stock_balances",
+  "displayName": "Stock Balances",
+  "purpose": "Provide read-only consolidated stock balance truth by item and warehouse so planning, cycle counting, and valuation can consume stable balance projections without mutating source transactions.",
+  "ownerDomain": "inventory_logistics",
+  "objectRole": "projection",
+  "ownerTeam": "warehouse_control",
+  "storage": {
+    "primaryTable": "stock_balances",
+    "primaryKey": "stock_balance_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "inventory_balances",
+      "wms_stock"
+    ]
+  },
+  "identity": {
+    "strategy": "stock_balance_id",
+    "naturalKeys": [
+      "stock_balance_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "inventory_gate",
+    "auditClass": "projection_lineage",
+    "continuousImprovementLoop": "inventory_accuracy_review",
+    "retentionClass": "inventory_record_7y",
+    "evidenceRequirements": [
+      "stock_snapshot_at",
+      "source_system",
+      "source_record_id"
+    ],
+    "kpiSignals": [
+      "inventory_accuracy",
+      "stock_visibility_latency",
+      "negative_balance_incidence"
+    ],
+    "autoAuditChecks": [
+      "stock_balance_projection_must_preserve_item_and_warehouse_lineage",
+      "projection_rows_must_be_read_only",
+      "balance_projection_must_not_replace_transaction_authority"
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.inventory-items",
+      "inventory_logistics.inventory-movements",
+      "inventory_logistics.warehouses"
+    ],
+    "downstreamObjects": [
+      "analytics.inventory-balance-snapshots",
+      "finance.inventory-valuations"
+    ],
+    "keyRelationships": [
+      "inventory_item_id -> inventory_items.inventory_item_id",
+      "warehouse_id -> warehouses.warehouse_id"
+    ],
+    "events": [
+      { "eventName": "refreshed", "description": "Stock balance projection was refreshed from governed inventory movement truth." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is inventory.stock_balances.* while canonical naming remains inventory_logistics.stock-balances."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "inventory_balances",
+      "wms_stock"
+    ],
+    "notes": [
+      "Legacy balance naming remains only for migration and traceability while the canonical stock-balance object remains a read-only projection."
+    ]
+  },
+  "invariants": [
+    "Stock balance rows must preserve item and warehouse lineage.",
+    "The projection is read-only and must not replace inventory transaction truth.",
+    "Snapshot timing and source trace must remain explicit."
+  ]
+}

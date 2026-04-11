@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "canonicalResource": "finance.backdate-exceptions",
+  "canonicalName": "backdate_exceptions",
+  "displayName": "Backdate Exceptions",
+  "purpose": "Control governed posting-date exceptions so backdated financial or logistics adjustments cannot bypass closed-period discipline.",
+  "ownerDomain": "finance",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "finance_controllership",
+  "storage": {
+    "primaryTable": "backdate_exceptions",
+    "primaryKey": "backdate_exception_id",
+    "statusField": "exception_status",
+    "childTables": [
+      "electronic_signature"
+    ],
+    "legacyTables": [
+      "period_close_controls"
+    ]
+  },
+  "identity": {
+    "strategy": "subject_type+subject_ref+requested_posting_date",
+    "naturalKeys": [
+      "ledger_scope",
+      "subject_type",
+      "subject_ref",
+      "requested_posting_date"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "financial_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "period_close_review",
+    "retentionClass": "financial_record_10y",
+    "evidenceRequirements": [
+      "reason_code",
+      "approval_reference",
+      "electronic_signature"
+    ],
+    "kpiSignals": [
+      "backdate_exception_frequency",
+      "backdate_exception_expiry_rate",
+      "late_posting_root_cause_rate"
+    ],
+    "autoAuditChecks": [
+      "active_exception_must_be_timeboxed",
+      "same_subject_and_posting_date_must_not_have_duplicate_active_exception",
+      "close_or_revoke_requires_reason_trace"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "FinanceControlService service-backed lifecycle",
+    "stateModelKey": "finance_backdate_exceptions_service_runtime",
+    "lifecycleMode": "service_backed_runtime",
+    "states": [
+      { "value": "approved", "label": "Approved", "labelEn": "Approved", "allowedTransitionsFrom": [] },
+      { "value": "expired", "label": "Expired", "labelEn": "Expired", "allowedTransitionsFrom": ["approved"] },
+      { "value": "revoked", "label": "Revoked", "labelEn": "Revoked", "allowedTransitionsFrom": ["approved"] },
+      { "value": "closed", "label": "Closed", "labelEn": "Closed", "allowedTransitionsFrom": ["approved", "expired", "revoked"] }
+    ],
+    "commands": [
+      { "command": "revoke", "targetState": "revoked", "description": "Revoke an approved backdate exception before it is used or after issue detection.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] },
+      { "command": "expire", "targetState": "expired", "description": "Expire a timeboxed backdate exception once its window is no longer valid.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] },
+      { "command": "close", "targetState": "closed", "description": "Close an exception after governed resolution or expiry handling.", "idempotencyScope": "resource+transition", "preconditions": ["reason_recorded"] }
+    ],
+    "notes": [
+      "Creation immediately grants approved status when the exception passes validation and signature requirements."
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "finance.period-closes",
+      "finance.ap-invoices",
+      "finance.ar-invoices",
+      "inventory_logistics.shipments"
+    ],
+    "downstreamObjects": [],
+    "keyRelationships": [
+      "approved_period_code -> period_close_controls.period_code",
+      "subject_ref -> ap_invoices.ap_invoice_id",
+      "subject_ref -> ar_invoices.ar_invoice_id",
+      "subject_ref -> tms_shipments.shipment_id"
+    ],
+    "events": [
+      { "eventName": "approved", "description": "Backdate exception was approved and timeboxed." },
+      { "eventName": "revoked", "description": "Backdate exception was revoked before further use." },
+      { "eventName": "expired", "description": "Backdate exception naturally expired or was expired by control." },
+      { "eventName": "closed", "description": "Backdate exception was closed after governed resolution." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "native_canonical_api",
+    "notes": [
+      "Current runtime endpoints are exposed directly as /api/v1/finance/backdate-exceptions* through FinanceController."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "period_close_controls"
+    ],
+    "notes": [
+      "Backdate exceptions remain tied to period-close governance, but they are distinct first-class controls and must not collapse back into generic close metadata."
+    ]
+  },
+  "invariants": [
+    "An active backdate exception must be timeboxed and signed.",
+    "The same subject and posting date must not receive duplicate active exceptions.",
+    "Closure, revocation, and expiry must preserve reason trace."
+  ]
+}

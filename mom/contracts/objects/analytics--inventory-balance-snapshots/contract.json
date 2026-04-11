@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "canonicalResource": "analytics.inventory-balance-snapshots",
+  "canonicalName": "inventory_balance_snapshot",
+  "displayName": "Inventory Balance Snapshots",
+  "purpose": "Provide read-only snapshot truth for inventory position by site, warehouse, lot, and lineage so KPI, audit, and exception review do not query mutable transaction tables directly.",
+  "ownerDomain": "analytics",
+  "objectRole": "projection",
+  "ownerTeam": "supply_chain_analytics",
+  "storage": {
+    "primaryTable": "inventory_balance_snapshot",
+    "primaryKey": "inventory_balance_snapshot_id",
+    "statusField": null,
+    "childTables": [],
+    "legacyTables": [
+      "inventory_balance_snapshot"
+    ]
+  },
+  "identity": {
+    "strategy": "inventory_balance_snapshot_id",
+    "naturalKeys": [
+      "inventory_balance_snapshot_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "governed_support",
+    "gateType": "analytics_gate",
+    "auditClass": "projection_lineage",
+    "continuousImprovementLoop": "inventory_accuracy_review",
+    "retentionClass": "analytics_projection_3y",
+    "evidenceRequirements": [
+      "snapshot_at",
+      "source_system",
+      "source_record_id"
+    ],
+    "kpiSignals": [
+      "inventory_accuracy",
+      "lot_balance_visibility",
+      "snapshot_refresh_latency"
+    ],
+    "autoAuditChecks": [
+      "projection_rows_must_preserve_source_lineage",
+      "snapshot_scope_must_identify_site_and_plant",
+      "read_model_must_not_become_mutation_authority"
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.stock-balances",
+      "inventory_logistics.inventory-movements"
+    ],
+    "downstreamObjects": [
+      "finance.inventory-valuations",
+      "analytics.plant-performance-snapshots"
+    ],
+    "keyRelationships": [
+      "org_plant_id -> org_plants.plant_id",
+      "org_site_id -> org_sites.site_id",
+      "warehouse_id -> org_warehouses.warehouse_id",
+      "lot_id -> lot.lot_id",
+      "source_record_id -> inventory_transactions.inventory_transaction_id"
+    ],
+    "events": [
+      { "eventName": "refreshed", "description": "Inventory balance snapshot projection was refreshed from transactional truth." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "compatibility_alias_api",
+    "notes": [
+      "The live runtime surface is inventory.inventory_balance_snapshot.* while canonical naming remains analytics.inventory-balance-snapshots."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "inventory_balance_snapshot"
+    ],
+    "notes": [
+      "This projection is intentionally read-only and must never be treated as the mutation authority for inventory truth."
+    ]
+  },
+  "invariants": [
+    "Snapshot rows must preserve source lineage and snapshot time.",
+    "The projection is read-only and must not become the mutation authority.",
+    "Site, plant, and warehouse scope must remain explicit on every row."
+  ]
+}
