@@ -306,21 +306,39 @@ Tìm và thay thế trong CSS hiện tại:
 
 ## PROMPT 2/8: Component Interaction Specs — 8 mẫu tương tác mới
 
+### Cách ghi file — QUAN TRỌNG (Cách 2: file tạm riêng)
+```
+KHÔNG sửa file chính module-layout-template-design-system-v4.html
+THAY VÀO ĐÓ: Ghi nội dung HTML thuần của section mới ra file:
+  mom/docs/tmp/v4.3-p2-interaction.html
+
+File này chứa DUY NHẤT HTML của section (từ <section...> đến </section>)
+KHÔNG có <html>, <head>, <body> wrapper
+KHÔNG có CSS styles
+KHÔNG có TOC hoặc header
+Chỉ là đoạn HTML của 1 section để Prompt 8 chèn vào đúng vị trí
+
+Tạo thư mục mom/docs/tmp/ nếu chưa có.
+```
+
 ### Mục tiêu
-Thêm 1 section mới `interaction-patterns` (chèn SAU section 30 `toast-precise`, TRƯỚC section 31 `visual-themes`) chứa 8 mẫu tương tác chính xác mà developer PHẢI TUÂN THỦ. Đây là lỗ hổng lớn nhất từ Expert 2 (71/100).
+Tạo file `mom/docs/tmp/v4.3-p2-interaction.html` chứa HTML của section `interaction-patterns` — 8 mẫu tương tác chính xác mà developer PHẢI TUÂN THỦ. Đây là lỗ hổng lớn nhất từ Expert 2 (71/100).
 
 ### Phải đọc trước khi làm
-- Section 4 (component-states): xem state matrix format hiện có
-- Section 21 (form-rules): xem form specs hiện có
-- Section 22 (table-rules): xem table specs hiện có
-- Section 23 (modal-rules): xem modal specs hiện có
-- Section 29 (block-schema): xem JSON schema format
+- File chính (để hiểu format section, CSS classes đang dùng):
+  `mom/docs/module-layout-template-design-system-v4.html` dòng 1-204 (CSS) và dòng 263-290 (section 1 — xem shell format)
+- Section 4 (component-states, dòng 473): xem state matrix format hiện có
+- Section 21 (form-rules, dòng 2038): xem form specs hiện có
+- Section 22 (table-rules, dòng 2075): xem table specs hiện có
+- Section 23 (modal-rules, dòng 2110): xem modal specs hiện có
+- Section 29 (block-schema, dòng 2401): xem JSON schema format
 
 ### Section mới: `interaction-patterns`
 ```
 Section ID: interaction-patterns
-Section number: 31 (renumber visual-themes → 32, và tất cả sections sau +1)
+Section number: để trống (Prompt 8 sẽ điền số đúng khi renumber)
 Title: Quy chuẩn Tương tác Chuyên sâu
+Vị trí chèn (do Prompt 8 xử lý): SAU section id="toast-precise", TRƯỚC section id="visual-themes"
 ```
 
 #### Pattern 1: Drag & Drop — CHƯA CÓ GÌ, phải viết từ đầu
@@ -500,23 +518,37 @@ COMMENT / DISCUSSION THREAD SPEC
 
 ### Acceptance criteria
 ```
-- Section mới có id="interaction-patterns", section number chính xác (nối tiếp section trước)
+OUTPUT FILE: mom/docs/tmp/v4.3-p2-interaction.html
+- File tồn tại và chứa HTML hợp lệ
+- Bắt đầu bằng <section class="section" id="interaction-patterns">
+- Kết thúc bằng </section>
 - Có ≥ 8 pattern specs, mỗi pattern có ≥ 5 quy tắc chính xác
 - Drag & Drop spec có ≥ 7 sub-sections (initiation, preview, drop zones, animation, multi-item, cross-zone, a11y)
 - URL Structure có ≥ 3 ví dụ URL thực tế
 - Concurrent Editing có split-pane diff modal spec
 - Mỗi pattern dùng CSS token names (var(--...)), KHÔNG hardcode hex/px
 - Tiếng Việt CÓ DẤU đầy đủ
-- KHÔNG có mâu thuẫn với section 4, 21, 22, 23
-- Tất cả sections sau section mới này được renumber +1
+- KHÔNG chứa <html>, <head>, <body>, <style> tags
+- section-number để trống hoặc để "??" (Prompt 8 sẽ điền)
 ```
 
 ---
 
 ## PROMPT 3/8: Manufacturing Domain Precision — 7 spec quan trọng cho MES/eQMS
 
+### Cách ghi file — QUAN TRỌNG (Cách 2: file tạm riêng)
+```
+KHÔNG sửa file chính module-layout-template-design-system-v4.html
+THAY VÀO ĐÓ: Ghi ra file:
+  mom/docs/tmp/v4.3-p3-manufacturing.html
+
+Chứa DUY NHẤT HTML của section (từ <section...> đến </section>)
+KHÔNG có wrapper HTML, CSS, TOC, header
+Tạo thư mục mom/docs/tmp/ nếu chưa có.
+```
+
 ### Mục tiêu
-Thêm 1 section mới `manufacturing-precision` (chèn SAU section mới `interaction-patterns` từ Prompt 2) chứa 7 quy chuẩn chính xác cho MES/eQMS. Đây là lỗ hổng từ Expert 3 (64/100).
+Tạo file `mom/docs/tmp/v4.3-p3-manufacturing.html` chứa HTML của section `manufacturing-precision` — 7 quy chuẩn chính xác cho MES/eQMS. Đây là lỗ hổng từ Expert 3 (64/100).
 
 ### Phải đọc trước khi làm
 - Section 14 (shop-floor-mode): xem touch targets hiện có
@@ -565,13 +597,15 @@ Success: green flash 300ms + beep tone 1000Hz 100ms + haptic. Failure: red flash
 
 ### Acceptance criteria
 ```
-- Section mới có id="manufacturing-precision"
+OUTPUT FILE: mom/docs/tmp/v4.3-p3-manufacturing.html
+- File tồn tại, bắt đầu bằng <section class="section" id="manufacturing-precision">
 - Có ≥ 7 sub-sections, mỗi sub-section có spec-table hoặc JSON schema
 - Machine status colors có EXACT hex cho cả light và dark mode
 - SPC spec có ≥ 8 Western Electric rules liệt kê đầy đủ
 - CAPA 8D có JSON schema hoàn chỉnh (type, props, events, allowedZones, accessibility)
 - Glove mode có token overrides cụ thể
-- KHÔNG mâu thuẫn với section 14, 15, 18
+- KHÔNG chứa HTML/head/body/style wrapper
+- section-number để trống hoặc "??"
 - Tiếng Việt CÓ DẤU
 ```
 
@@ -579,12 +613,23 @@ Success: green flash 300ms + beep tone 1000Hz 100ms + haptic. Failure: red flash
 
 ## PROMPT 4/8: Regulatory Compliance & Data Security — 5 spec quan trọng
 
+### Cách ghi file — QUAN TRỌNG (Cách 2: file tạm riêng)
+```
+KHÔNG sửa file chính module-layout-template-design-system-v4.html
+THAY VÀO ĐÓ: Ghi ra file:
+  mom/docs/tmp/v4.3-p4-regulatory.html
+
+Chứa DUY NHẤT HTML của section (từ <section...> đến </section>)
+KHÔNG có wrapper HTML, CSS, TOC, header
+Tạo thư mục mom/docs/tmp/ nếu chưa có.
+```
+
 ### Mục tiêu
-Thêm 1 section mới `regulatory-precision` (chèn SAU `manufacturing-precision`) chứa 5 quy chuẩn tuân thủ chính xác. Expert 3 đánh giá regulatory ở mức 55/100 — quá thấp cho phần mềm eQMS.
+Tạo file `mom/docs/tmp/v4.3-p4-regulatory.html` chứa HTML của section `regulatory-precision` — 5 quy chuẩn tuân thủ chính xác. Expert 3 đánh giá regulatory ở mức 55/100 — quá thấp cho phần mềm eQMS.
 
 ### Phải đọc trước khi làm
-- Section 15 (compliance-forms): xem 21 CFR Part 11 hiện có
-- Section 22 (table-rules): xem data-table spec
+- Section 15 (compliance-forms, dòng 1355): xem 21 CFR Part 11 hiện có
+- Section 22 (table-rules, dòng 2075): xem data-table spec
 
 ### Nội dung — 5 phần
 
@@ -613,24 +658,48 @@ Sections: Event Description, Classification (Major/Minor/Critical dropdown), Ris
 
 ### Acceptance criteria
 ```
+OUTPUT FILE: mom/docs/tmp/v4.3-p4-regulatory.html
+- File tồn tại, bắt đầu bằng <section class="section" id="regulatory-precision">
 - E-signature spec có 3 steps rõ ràng với wireframe hoặc flow diagram
 - Audit trail có exact column widths, data types, alignment
 - ITAR spec có banner HTML structure + print watermark CSS
 - Change Control có status flow diagram
-- KHÔNG mâu thuẫn với section 15
+- KHÔNG chứa HTML/head/body/style wrapper
+- section-number để trống hoặc "??"
+- Tiếng Việt CÓ DẤU
 ```
 
 ---
 
 ## PROMPT 5/8: Accessibility & Internationalization — Sửa mọi lỗi WCAG + i18n
 
+### Cách ghi file — QUAN TRỌNG (Cách 2: file tạm riêng)
+```
+Prompt này CÓ 2 tác vụ:
+
+TÁC VỤ A — Ghi file tạm:
+  mom/docs/tmp/v4.3-p5-a11y.html
+  Chứa DUY NHẤT HTML của section mới a11y-i18n-precision
+
+TÁC VỤ B — Ghi file diff riêng:
+  mom/docs/tmp/v4.3-p5-section7-patch.html
+  Chứa CHỈ đoạn HTML CẦN THÊM vào cuối section 7 (accessibility) hiện có
+  (không phải toàn bộ section 7, chỉ phần bổ sung)
+
+Prompt 8 sẽ: chèn file A vào đúng vị trí, và append nội dung file B vào section 7
+```
+
 ### Mục tiêu
-Thêm 1 section mới `a11y-i18n-precision` (chèn SAU `regulatory-precision`) + SỬA section 7 (accessibility) hiện có. Expert 3 đánh giá WCAG ở 68%, phải nâng lên ≥ 85%.
+Tạo 2 files:
+1. `mom/docs/tmp/v4.3-p5-a11y.html` — section mới `a11y-i18n-precision`
+2. `mom/docs/tmp/v4.3-p5-section7-patch.html` — bổ sung cho section 7 (accessibility) hiện có
+
+Expert 3 đánh giá WCAG ở 68%, phải nâng lên ≥ 85%.
 
 ### Phải đọc trước khi làm
-- Section 7 (accessibility, dòng 643-755): nội dung hiện có
-- Section 33 (zone-system): zone types và cấu trúc
-- Section 3 (standards): focus ring và contrast specs hiện có
+- Section 7 (accessibility, dòng 643-755): nội dung hiện có TOÀN BỘ
+- Section 33 (zone-system, dòng 3007): zone types và cấu trúc
+- Section 3 (standards, dòng 329): focus ring và contrast specs hiện có
 
 ### Nội dung section mới — 6 phần
 
@@ -682,29 +751,51 @@ Bảng kiểm tra contrast ratio cho MỌI cặp text/background:
 
 ### Acceptance criteria
 ```
-- Landmark mapping table có ≥ 7 zone mappings
-- Roving tabindex có ≥ 5 patterns với code examples
-- Contrast verification table có ≥ 8 color pairs với ratio và pass/fail
-- Vietnamese typography spec có font stack + line-height + test pangram
-- i18n spec có date, number, currency format rules
-- Section 7 được update (thêm cross-ref, thêm alt text guideline)
+OUTPUT FILES:
+  A) mom/docs/tmp/v4.3-p5-a11y.html
+     - Bắt đầu bằng <section class="section" id="a11y-i18n-precision">
+     - Landmark mapping table có ≥ 7 zone mappings
+     - Roving tabindex có ≥ 5 patterns với code examples
+     - Contrast verification table có ≥ 8 color pairs với ratio và pass/fail
+     - Vietnamese typography spec có font stack + line-height + test pangram
+     - i18n spec có date, number, currency format rules
+     - KHÔNG chứa HTML/head/body/style wrapper
+
+  B) mom/docs/tmp/v4.3-p5-section7-patch.html
+     - Chứa HTML snippet để append vào section 7
+     - Có info-box cross-reference đến a11y-i18n-precision
+     - Có alt text authoring guideline
+     - KHÔNG chứa HTML/head/body/style wrapper
+
 - KHÔNG mâu thuẫn với section 3, 7, 20
+- Tiếng Việt CÓ DẤU
 ```
 
 ---
 
 ## PROMPT 6/8: Block Engine Runtime & API Specification
 
+### Cách ghi file — QUAN TRỌNG (Cách 2: file tạm riêng)
+```
+KHÔNG sửa file chính module-layout-template-design-system-v4.html
+THAY VÀO ĐÓ: Ghi ra file:
+  mom/docs/tmp/v4.3-p6-runtime.html
+
+Chứa DUY NHẤT HTML của section (từ <section...> đến </section>)
+KHÔNG có wrapper HTML, CSS, TOC, header
+Tạo thư mục mom/docs/tmp/ nếu chưa có.
+```
+
 ### Mục tiêu
-Thêm 1 section mới `runtime-api-spec` (chèn SAU `a11y-i18n-precision`) chứa specification đầy đủ cho runtime rendering pipeline, block lifecycle, API contracts, state management, và performance targets. Expert 4 cho điểm 38/100 — thấp nhất — vì tài liệu mô tả WHAT nhưng thiếu HOW.
+Tạo file `mom/docs/tmp/v4.3-p6-runtime.html` chứa HTML của section `runtime-api-spec` — specification đầy đủ cho runtime rendering pipeline, block lifecycle, API contracts, state management, và performance targets. Expert 4 cho điểm 38/100 — thấp nhất — vì tài liệu mô tả WHAT nhưng thiếu HOW.
 
 ### Phải đọc trước khi làm
-- Section 32 (block-engine): block types hiện có
-- Section 33 (zone-system): zone types
-- Section 29 (block-schema): JSON schema format
-- Section 50 (token-cascade): cascade logic hiện có
-- File JS: `mom/scripts/portal/00c-admin-appearance.js` — xem TEMPLATE_SEED, VISUAL_THEMES
-- File JS: `mom/scripts/portal/00b-theme-manager.js` — xem VISUAL_THEME_PRESETS, _mergedConfig, localStorage keys
+- Section 32 (block-engine, dòng 2779): block types hiện có
+- Section 33 (zone-system, dòng 3007): zone types
+- Section 29 (block-schema, dòng 2401): JSON schema format
+- Section 50 (token-cascade, dòng 4266): cascade logic hiện có
+- File JS: `mom/scripts/portal/00c-admin-appearance.js` dòng 996-1182 — TEMPLATE_SEED, VISUAL_THEMES
+- File JS: `mom/scripts/portal/00b-theme-manager.js` dòng 746-835 — VISUAL_THEME_PRESETS, _mergedConfig, localStorage keys
 
 ### QUAN TRỌNG: Doc-vs-Code mismatches cần ghi nhận
 ```
@@ -863,6 +954,8 @@ Max offline before full reload: 5 minutes
 
 ### Acceptance criteria
 ```
+OUTPUT FILE: mom/docs/tmp/v4.3-p6-runtime.html
+- Bắt đầu bằng <section class="section" id="runtime-api-spec">
 - Rendering pipeline có pseudocode ≥ 7 steps
 - Block lifecycle có ≥ 8 hooks defined
 - Block registration API có type, version, allowedZones, schema, factory, lazyLoad
@@ -873,20 +966,46 @@ Max offline before full reload: 5 minutes
 - WebSocket spec có event types, reconnection strategy
 - Performance targets có ≥ 8 metrics với specific values
 - Doc-vs-code mismatches ACKNOWLEDGED trong info-box
+- KHÔNG chứa HTML/head/body/style wrapper
+- section-number để trống hoặc "??"
 ```
 
 ---
 
 ## PROMPT 7/8: Visual Theme Token Maps + Block JSON Schemas bổ sung
 
+### Cách ghi file — QUAN TRỌNG (Cách 2: file tạm riêng)
+```
+Prompt này CÓ 2 tác vụ sửa nội dung HIỆN CÓ trong file chính:
+
+TÁC VỤ A — Ghi file diff cho section 31 (visual-themes):
+  mom/docs/tmp/v4.3-p7-themes-patch.html
+  Chứa ĐOẠN HTML CẦN THÊM vào trong từng theme card
+  (token map JSON cho cả 20 themes, được đặt sau phần color swatch của mỗi theme)
+  Format: dùng comment để đánh dấu vị trí chèn:
+    <!-- INSERT AFTER: theme card id="theme-1" -->
+    <div class="code-block">{ "id": "professional-light", ... }</div>
+    <!-- INSERT AFTER: theme card id="theme-2" -->
+    ...
+
+TÁC VỤ B — Ghi file diff cho section 29 (block-schema):
+  mom/docs/tmp/v4.3-p7-schemas-patch.html
+  Chứa HTML của 5 block JSON schemas mới (kanban-board, data-timeline, signature-pad, gantt-chart, barcode-input)
+  Giống format các schemas hiện có trong section 29
+  Prompt 8 sẽ append nội dung này vào cuối section 29
+
+Tạo thư mục mom/docs/tmp/ nếu chưa có.
+```
+
 ### Mục tiêu
-1. Sửa section 31 (visual-themes): thêm machine-readable token map cho TẤT CẢ 20 themes
-2. Mở rộng section 29 (block-schema): thêm 5 block schemas còn thiếu
+Tạo 2 files patch:
+1. `mom/docs/tmp/v4.3-p7-themes-patch.html` — token maps cho 20 themes (chèn vào section 31)
+2. `mom/docs/tmp/v4.3-p7-schemas-patch.html` — 5 block schemas mới (append vào section 29)
 
 ### Phải đọc trước khi làm
-- Section 31 (visual-themes, dòng 2652-2778): 20 theme cards hiện có
-- Section 29 (block-schema, dòng 2401-2618): 5 schemas hiện có
-- File JS: `mom/scripts/portal/00c-admin-appearance.js` dòng 1161-1182: VISUAL_THEMES data
+- Section 31 (visual-themes, dòng 2652-2778): 20 theme cards hiện có — xem CHÍNH XÁC ID của mỗi theme card
+- Section 29 (block-schema, dòng 2401-2618): 5 schemas hiện có — xem format để match
+- File JS: `mom/scripts/portal/00c-admin-appearance.js` dòng 1161-1182: VISUAL_THEMES data (hex values)
 - File JS: `mom/scripts/portal/00b-theme-manager.js` dòng 746-835: VISUAL_THEME_PRESETS
 
 ### Yêu cầu chi tiết
@@ -958,64 +1077,123 @@ barcode-input:
 
 ### Acceptance criteria
 ```
-- Tất cả 20 themes có JSON token map trong code-block
-- Mỗi token map có ≥ 9 tokens (brand, brand-2, accent, bg-page, bg-surface, bg-surface-alt, text-primary, text-secondary, border)
-- 5 block schemas mới hoàn chỉnh (props, events, allowedZones, accessibility)
-- Block schemas dùng cùng format với 5 schemas hiện có
-- Hex values trong theme maps KHỚP với 00c-admin-appearance.js VISUAL_THEMES
+OUTPUT FILES:
+  A) mom/docs/tmp/v4.3-p7-themes-patch.html
+     - 20 theme token maps với comment markers <!-- INSERT AFTER: theme card id="..." -->
+     - Mỗi token map có ≥ 9 tokens
+     - Hex values KHỚP với 00c-admin-appearance.js VISUAL_THEMES
+
+  B) mom/docs/tmp/v4.3-p7-schemas-patch.html
+     - 5 block JSON schemas hoàn chỉnh (kanban-board, data-timeline, signature-pad, gantt-chart, barcode-input)
+     - Cùng format với 5 schemas trong section 29
+     - KHÔNG chứa HTML/head/body/style wrapper
 ```
 
 ---
 
-## PROMPT 8/8: Final Assembly — Renumber, TOC, Version, Cross-reference, Validation
+## PROMPT 8/8: Final Assembly — Merge, Renumber, TOC, Version, Validation
 
 ### Mục tiêu
-Sau khi Prompt 1-7 hoàn thành, prompt này thực hiện final assembly:
-1. Renumber TẤT CẢ sections tuần tự (1 đến N, không trùng, không nhảy)
-2. Update TOC với tất cả section links mới
-3. Bump version v4.2 → v4.3
-4. Cross-reference audit (mọi section tham chiếu đúng section number)
-5. Update summary stats (section 1)
-6. Update footer
+Đây là bước cuối cùng — đọc file chính + TẤT CẢ 7 file tạm từ Prompts 2-7, merge vào file chính, renumber, update TOC, version bump, validate.
 
-### Phải đọc TOÀN BỘ file trước khi làm
+**Đây là prompt DUY NHẤT được phép sửa file chính:**
+```
+mom/docs/module-layout-template-design-system-v4.html
+```
+
+### Phải đọc trước khi làm
+```
+FILE CHÍNH:
+  mom/docs/module-layout-template-design-system-v4.html (toàn bộ)
+
+FILE TẠM từ Prompt 1 (đã sửa trực tiếp file chính, không có file tạm):
+  ✅ Không cần đọc thêm — CSS đã được update trong file chính bởi Prompt 1
+
+FILE TẠM từ Prompt 2-7 (đọc tất cả):
+  mom/docs/tmp/v4.3-p2-interaction.html        → section mới: interaction-patterns
+  mom/docs/tmp/v4.3-p3-manufacturing.html       → section mới: manufacturing-precision
+  mom/docs/tmp/v4.3-p4-regulatory.html          → section mới: regulatory-precision
+  mom/docs/tmp/v4.3-p5-a11y.html               → section mới: a11y-i18n-precision
+  mom/docs/tmp/v4.3-p5-section7-patch.html      → bổ sung cho section 7 (accessibility)
+  mom/docs/tmp/v4.3-p6-runtime.html             → section mới: runtime-api-spec
+  mom/docs/tmp/v4.3-p7-themes-patch.html        → token maps cho 20 themes (section 31)
+  mom/docs/tmp/v4.3-p7-schemas-patch.html       → 5 block schemas (section 29)
+```
 
 ### Yêu cầu chi tiết
 
-#### 8.1 Renumber
+#### 8.1 Merge — Chèn sections mới vào đúng vị trí
+```
+VỊ TRÍ CHÈN (theo thứ tự trong file):
+
+1. v4.3-p2-interaction.html
+   → Chèn SAU </section> của section id="toast-precise"
+   → TRƯỚC <section ... id="visual-themes">
+
+2. v4.3-p3-manufacturing.html
+   → Chèn SAU </section> của section id="interaction-patterns" (vừa chèn)
+
+3. v4.3-p4-regulatory.html
+   → Chèn SAU </section> của section id="manufacturing-precision"
+
+4. v4.3-p5-a11y.html
+   → Chèn SAU </section> của section id="regulatory-precision"
+
+5. v4.3-p6-runtime.html
+   → Chèn SAU </section> của section id="a11y-i18n-precision"
+
+6. v4.3-p5-section7-patch.html
+   → Append nội dung vào TRƯỚC </section> của section id="accessibility"
+
+7. v4.3-p7-themes-patch.html
+   → Dùng comment markers <!-- INSERT AFTER: theme card id="..." -->
+   → để tìm vị trí chèn token map cho từng theme trong section id="visual-themes"
+
+8. v4.3-p7-schemas-patch.html
+   → Append nội dung vào TRƯỚC </section> của section id="block-schema"
+```
+
+#### 8.2 Renumber TẤT CẢ sections
 - Tìm TẤT CẢ `<span class="section-number">N</span>` và renumber tuần tự 1 → N
-- Expected N: khoảng 57-62 sections (51 hiện có + 5-7 sections mới từ prompts 2-6 + possible sub-splits)
+- Expected N: khoảng 57-62 sections
 
-#### 8.2 Update TOC
-- Thêm links cho mọi section mới: interaction-patterns, manufacturing-precision, regulatory-precision, a11y-i18n-precision, runtime-api-spec
-- Nhóm mới trong TOC: `<!-- Quy chuẩn nâng cao -->`
-- Giữ TOC compact (short labels, 2-3 words per link)
+#### 8.3 Update TOC
+- Thêm links cho mọi section mới với nhóm `<!-- Quy chuẩn nâng cao -->`:
+  ```html
+  <!-- Quy chuẩn nâng cao -->
+  <a href="#interaction-patterns">Tương tác</a>
+  <a href="#manufacturing-precision">MES Chính xác</a>
+  <a href="#regulatory-precision">Tuân thủ</a>
+  <a href="#a11y-i18n-precision">A11y & i18n</a>
+  <a href="#runtime-api-spec">Runtime & API</a>
+  ```
+- Giữ TOC compact (short labels)
 
-#### 8.3 Version bump
+#### 8.4 Version bump
 Tìm và thay TẤT CẢ:
 - "v4.2" → "v4.3" (title, h1, meta-item, section-lead, footer-note)
-- Update date "2026-04-11" → ngày thực thi
+- Update date "2026-04-11" → ngày thực thi prompt này
 
-#### 8.4 Cross-reference audit
-- Tìm mọi `href="#..."` và `Section N` text references → verify section numbers đúng
-- Tìm mọi block type references → verify chúng tồn tại trong section 32 (block-engine)
-- Tìm mọi token references → verify chúng tồn tại trong :root CSS
+#### 8.5 Cross-reference audit
+- Tìm mọi `href="#..."` → verify target ID tồn tại trong file
+- Tìm mọi `Section N` text references → verify N đúng sau renumber
+- Tìm mọi token references (var(--...)) → verify token có trong :root CSS
 
-#### 8.5 Update section 1 (summary)
+#### 8.6 Update section 1 (summary)
 ```
 Stat cards update:
 - Templates: 123 (giữ nguyên)
-- Sections: N (cập nhật)
-- Block Types: 90+ (nếu thêm blocks mới)
+- Sections: N (cập nhật số thực)
+- Block Types: 95+ (90 cũ + 5 mới từ Prompt 7)
 - CSS Tokens: 120+ (sau Prompt 1)
 ```
 
-#### 8.6 Update footer
+#### 8.7 Update footer
 ```
-HESEM MOM — Module Layout Template Design System v4.3 Enterprise — 123 templates · 90+ block types · 20 visual themes · 30 component presets · 34 modules · 120+ CSS tokens · N sections — {date}
+HESEM MOM — Module Layout Template Design System v4.3 Enterprise — 123 templates · 95+ block types · 20 visual themes · 30 component presets · 34 modules · 120+ CSS tokens · N sections — {date}
 ```
 
-#### 8.7 Final validation
+#### 8.8 Final validation
 - HTML validation: mọi tag đóng đúng, không nested sai
 - Section number sequence: 1, 2, 3, ..., N không trùng
 - TOC links: mọi href="#..." target tồn tại
@@ -1045,15 +1223,43 @@ HESEM MOM — Module Layout Template Design System v4.3 Enterprise — 123 templ
 
 ---
 
-## EXECUTION ORDER
+## EXECUTION ORDER — CÁC 2 (FILE TẠM RIÊNG)
 
 ```
-PHASE 1 (Nền tảng):     Prompt 1 — CHẠY ĐẦU TIÊN (CSS tokens ảnh hưởng tất cả prompts sau)
-PHASE 2 (Song song):    Prompt 2 + Prompt 3 + Prompt 4 + Prompt 5 — CHẠY SONG SONG
-                         (4 sections mới độc lập, chèn theo thứ tự nhưng nội dung không phụ thuộc)
-PHASE 3 (Song song):    Prompt 6 + Prompt 7 — CHẠY SONG SONG
-                         (runtime spec + theme maps/schemas độc lập)
-PHASE 4 (Cuối cùng):    Prompt 8 — CHẠY SAU TẤT CẢ (renumber, TOC, version, validation)
+NGUYÊN TẮC CÁCH 2:
+- Prompts 2-7 KHÔNG đụng file chính — chỉ ghi file tạm vào mom/docs/tmp/
+- Prompt 8 là bước DUY NHẤT merge tất cả vào file chính + renumber + validate
+- An toàn tuyệt đối — không bao giờ conflict
+
+PHASE 1 — ĐÃ CHẠY (không chạy lại):
+  Prompt 1: Sửa CSS :root trực tiếp trong file chính
+  ✅ Đang chạy — chờ hoàn thành trước khi chạy Phase 2
+
+PHASE 2 — SONG SONG (mở 4 Codex agents cùng lúc sau khi Prompt 1 xong):
+  Prompt 2 → ghi: mom/docs/tmp/v4.3-p2-interaction.html
+  Prompt 3 → ghi: mom/docs/tmp/v4.3-p3-manufacturing.html
+  Prompt 4 → ghi: mom/docs/tmp/v4.3-p4-regulatory.html
+  Prompt 5 → ghi: mom/docs/tmp/v4.3-p5-a11y.html
+             ghi: mom/docs/tmp/v4.3-p5-section7-patch.html
+  ─────────────────────────────────────────────────────────
+  Không file nào conflict vì mỗi agent ghi 1 file riêng!
+
+PHASE 3 — SONG SONG (mở 2 Codex agents cùng lúc sau khi Phase 2 xong):
+  Prompt 6 → ghi: mom/docs/tmp/v4.3-p6-runtime.html
+  Prompt 7 → ghi: mom/docs/tmp/v4.3-p7-themes-patch.html
+             ghi: mom/docs/tmp/v4.3-p7-schemas-patch.html
+
+PHASE 4 — SEQUENTIAL (chạy duy nhất 1 agent cuối cùng):
+  Prompt 8 → đọc file chính + 7 file tạm → merge → renumber → TOC → version v4.3
+           → ghi ra: mom/docs/module-layout-template-design-system-v4.html (file chính)
+```
+
+### Kiểm tra sau mỗi phase
+```
+Sau Phase 1: verify file chính có ≥ 120 CSS vars trong :root
+Sau Phase 2: verify 5 files tạm tồn tại trong mom/docs/tmp/
+Sau Phase 3: verify 7 files tạm tồn tại trong mom/docs/tmp/
+Sau Phase 4: verify file chính render đúng, sections tuần tự, không duplicate IDs
 ```
 
 ### Lưu ý quan trọng cho Codex
