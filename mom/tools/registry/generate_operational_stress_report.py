@@ -138,6 +138,13 @@ def endpoint_idempotency_metrics(endpoints: dict) -> dict:
 def main() -> int:
     policy = load_json(POLICY_PATH)
     catalog = load_json(CATALOG_PATH)
+    generated_at = now_utc()
+    policy.setdefault("_meta", {})
+    policy["_meta"]["generatedAt"] = generated_at
+    catalog.setdefault("_meta", {})
+    catalog["_meta"]["generatedAt"] = generated_at
+    save_json(POLICY_PATH, policy)
+    save_json(CATALOG_PATH, catalog)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     canonical = load_json(CANONICAL_PATH)
     blind_report = load_json(BLIND_PATH)
@@ -472,7 +479,7 @@ def main() -> int:
     report = {
         "_meta": {
             "version": "1.0",
-            "generatedAt": now_utc(),
+            "generatedAt": generated_at,
             "registryDir": str(REGISTRY_DIR),
             "description": "Operational stress assessment for real-world backend failure and recovery conditions.",
         },

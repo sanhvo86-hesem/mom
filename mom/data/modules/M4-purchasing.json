@@ -1,5 +1,6 @@
 {
   "moduleId": "M4-purchasing",
+  "templateId": "T29",
   "title": { "vi": "Mua hàng", "en": "Purchasing" },
   "subtitle": {
     "vi": "Chuẩn hóa supplier PO, PO line và receiving/IQC trên cùng một digital thread có truy xuất nguồn",

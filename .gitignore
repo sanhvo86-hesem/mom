@@ -1,3 +1,16 @@
+# Workspace hygiene
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# MOM runtime noise and archives
+mom/data/php_error.log
+mom/data/audit.log
+mom/data/sessions/**
+!mom/data/sessions/README.md
+mom/data/log-archive/**
+!mom/data/log-archive/README.md
+
 # Runtime-generated portal data (keep README markers tracked)
 01-QMS-Portal/qms-data/audit.log
 01-QMS-Portal/qms-data/php_error.log

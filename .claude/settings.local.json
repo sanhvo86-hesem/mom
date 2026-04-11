@@ -27,7 +27,16 @@
       "Bash(find mom/ -name '*.css' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' '{}' +)",
       "Bash(find mom/ -name '*.html' -exec sed -i '' -e s/hesem-qms/hesem-mom/g -e s/hesemeqms/mom/g -e 's/HESEM QMS/HESEM MOM/g' '{}' +)",
       "Bash(ls -1d mom/docs/*/)",
-      "Bash(grep -l \"docs_custom\\\\|loadDocument\\\\|getDocs\\\\|getCategories\" \"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/scripts/portal\"/*.js)"
+      "Bash(grep -l \"docs_custom\\\\|loadDocument\\\\|getDocs\\\\|getCategories\" \"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/scripts/portal\"/*.js)",
+      "Bash(pkill -f \"git.*hesemeqms\")",
+      "Bash(git -C \"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms\" add mom/docs/module-layout-template-design-system-v4.html mom/scripts/portal/00c-admin-appearance.js mom/styles/portal.main.css)",
+      "Bash(kill 64916 64938)",
+      "Bash(pkill -9 -f \"git.*hesemeqms\")",
+      "Bash(git -C '/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms' commit -m 'feat\\(design-system\\): v4.1 — CSS polish, 16 new sections, Vietnamese translations:*)",
+      "Bash(git -C \"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms\" push origin main)",
+      "Bash(git -C '/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms' commit -m 'feat\\(design-system\\): v4.1 upgrade — CSS polish, 16 new sections, Vietnamese:*)",
+      "Bash(pkill -9 -f \"git.*status.*porcelain\")",
+      "Bash(git -C '/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms' commit -m 'feat\\(design-system\\): v4.1 upgrade:*)"
     ]
   }
 }

@@ -15,6 +15,7 @@
 
 var STORAGE_KEY = 'hesem_user_appearance';
 var ADMIN_STORAGE_KEY = 'hesem_admin_appearance_cache';
+var TEMPLATE_STORAGE_KEY = 'hesem_layout_templates';
 var ROOT = document.documentElement;
 
 /* ── Default values ─────────────────────────────────────────────────────── */
@@ -31,6 +32,7 @@ var DEFAULTS = {
 
 var _adminConfig = null;
 var _userPrefs = null;
+var _templateStore = null;
 var _listeners = [];
 var _scheduleTimer = null;
 var _colorSchemeMedia = null;
@@ -46,6 +48,21 @@ function _loadUserPrefs(){
 
 function _saveUserPrefs(){
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_userPrefs || {})); } catch(e){}
+}
+
+function _loadTemplates(){
+  if(_templateStore) return _templateStore;
+  try {
+    var raw = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+    _templateStore = raw ? JSON.parse(raw) : {};
+  } catch(e){
+    _templateStore = {};
+  }
+  return _templateStore;
+}
+
+function _saveTemplates(){
+  try { localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(_templateStore || {})); } catch(e){}
 }
 
 function _loadAdminConfig(callback){
@@ -726,6 +743,163 @@ function importTheme(jsonStr){
   } catch(e){ return false; }
 }
 
+var VISUAL_THEME_PRESETS = {
+  'professional-light': {
+    brandPrimary: '#1565c0',
+    brandLight: '#60a5fa',
+    brandDark: '#0c2d48',
+    brandDarkest: '#07121f',
+    accent: '#f9a825',
+    accentLight: '#fcd34d',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#f1f5f9' },
+    colorsDark: { bgPage: '#0f172a', bgSurface: '#1e293b', bgSurfaceAlt: '#334155' },
+    colorMode: 'light'
+  },
+  'professional-dark': {
+    brandPrimary: '#60a5fa',
+    brandLight: '#93c5fd',
+    brandDark: '#0c2d48',
+    brandDarkest: '#050d1a',
+    accent: '#f9a825',
+    accentLight: '#fcd34d',
+    colorsLight: { bgPage: '#eef4ff', bgSurface: '#ffffff', bgSurfaceAlt: '#dbeafe' },
+    colorsDark: { bgPage: '#0f172a', bgSurface: '#1e293b', bgSurfaceAlt: '#334155' },
+    colorMode: 'dark'
+  },
+  'midnight-navy': {
+    brandPrimary: '#0891b2',
+    brandLight: '#67e8f9',
+    brandDark: '#0f172a',
+    brandDarkest: '#020617',
+    accent: '#22d3ee',
+    accentLight: '#a5f3fc',
+    colorsLight: { bgPage: '#e0f2fe', bgSurface: '#f8fafc', bgSurfaceAlt: '#dbeafe' },
+    colorsDark: { bgPage: '#020617', bgSurface: '#0f172a', bgSurfaceAlt: '#1e293b' },
+    colorMode: 'dark'
+  },
+  'ocean-breeze': {
+    brandPrimary: '#0ea5e9',
+    brandLight: '#7dd3fc',
+    brandDark: '#0369a1',
+    brandDarkest: '#0c4a6e',
+    accent: '#06b6d4',
+    accentLight: '#67e8f9',
+    colorsLight: { bgPage: '#f0f9ff', bgSurface: '#ffffff', bgSurfaceAlt: '#e0f2fe' },
+    colorsDark: { bgPage: '#082f49', bgSurface: '#0c4a6e', bgSurfaceAlt: '#075985' },
+    colorMode: 'light'
+  },
+  'forest-calm': {
+    brandPrimary: '#22c55e',
+    brandLight: '#86efac',
+    brandDark: '#166534',
+    brandDarkest: '#14532d',
+    accent: '#84cc16',
+    accentLight: '#bef264',
+    colorsLight: { bgPage: '#f0fdf4', bgSurface: '#ffffff', bgSurfaceAlt: '#dcfce7' },
+    colorsDark: { bgPage: '#052e16', bgSurface: '#14532d', bgSurfaceAlt: '#166534' },
+    colorMode: 'light'
+  },
+  'ember-industrial': {
+    brandPrimary: '#f97316',
+    brandLight: '#fdba74',
+    brandDark: '#9a3412',
+    brandDarkest: '#7c2d12',
+    accent: '#facc15',
+    accentLight: '#fde68a',
+    colorsLight: { bgPage: '#fff7ed', bgSurface: '#ffffff', bgSurfaceAlt: '#ffedd5' },
+    colorsDark: { bgPage: '#431407', bgSurface: '#7c2d12', bgSurfaceAlt: '#9a3412' },
+    colorMode: 'light'
+  },
+  'graphite-amber': {
+    brandPrimary: '#f59e0b',
+    brandLight: '#fcd34d',
+    brandDark: '#334155',
+    brandDarkest: '#0f172a',
+    accent: '#fbbf24',
+    accentLight: '#fde68a',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#e2e8f0' },
+    colorsDark: { bgPage: '#111827', bgSurface: '#1f2937', bgSurfaceAlt: '#334155' },
+    colorMode: 'dark'
+  },
+  'slate-ice': {
+    brandPrimary: '#38bdf8',
+    brandLight: '#bae6fd',
+    brandDark: '#1e293b',
+    brandDarkest: '#0f172a',
+    accent: '#14b8a6',
+    accentLight: '#99f6e4',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#e2e8f0' },
+    colorsDark: { bgPage: '#0f172a', bgSurface: '#1e293b', bgSurfaceAlt: '#334155' },
+    colorMode: 'light'
+  }
+};
+
+function getTemplates(){
+  return _loadTemplates();
+}
+
+function saveTemplate(templateId, config){
+  if(!templateId) return false;
+  var templates = _loadTemplates();
+  templates[String(templateId)] = config || {};
+  _saveTemplates();
+  _emit('template-change', { action: 'save', templateId: String(templateId), config: config || {} });
+  return true;
+}
+
+function deleteTemplate(templateId){
+  if(!templateId) return false;
+  var templates = _loadTemplates();
+  delete templates[String(templateId)];
+  _saveTemplates();
+  _emit('template-change', { action: 'delete', templateId: String(templateId) });
+  return true;
+}
+
+function resolveWithTemplate(templateId){
+  var base = getFullConfig();
+  var templates = _loadTemplates();
+  var tpl = templates[String(templateId || '')];
+  if(!tpl || !tpl.tokenOverrides || typeof tpl.tokenOverrides !== 'object') return base;
+  return _deepMerge(base, tpl.tokenOverrides);
+}
+
+function applyVisualTheme(themeId){
+  var theme = VISUAL_THEME_PRESETS[String(themeId || '')];
+  if(!theme) return false;
+  var patch = {
+    visualTheme: String(themeId || ''),
+    colorMode: theme.colorMode || 'light',
+    brand: {
+      primary: theme.brandPrimary,
+      light: theme.brandLight || theme.brandPrimary,
+      dark: theme.brandDark,
+      darkest: theme.brandDarkest || theme.brandDark,
+      accent: theme.accent,
+      accentLight: theme.accentLight || theme.accent
+    },
+    colorsLight: {
+      bgPage: theme.colorsLight.bgPage,
+      bgSurface: theme.colorsLight.bgSurface,
+      bgSurfaceAlt: theme.colorsLight.bgSurfaceAlt || theme.colorsLight.bgSurface,
+      bgHeader: theme.colorsLight.bgHeader || theme.colorsLight.bgSurface,
+      bgModal: theme.colorsLight.bgModal || theme.colorsLight.bgSurface,
+      bgHover: theme.colorsLight.bgHover || theme.colorsLight.bgSurfaceAlt || theme.colorsLight.bgPage
+    },
+    colorsDark: {
+      bgPage: theme.colorsDark.bgPage,
+      bgSurface: theme.colorsDark.bgSurface,
+      bgSurfaceAlt: theme.colorsDark.bgSurfaceAlt || theme.colorsDark.bgSurface,
+      bgHeader: theme.colorsDark.bgHeader || theme.colorsDark.bgSurface,
+      bgModal: theme.colorsDark.bgModal || theme.colorsDark.bgSurface,
+      bgHover: theme.colorsDark.bgHover || theme.colorsDark.bgSurfaceAlt || theme.colorsDark.bgPage
+    }
+  };
+  setAll(patch);
+  _emit('theme-preset', { themeId: String(themeId || ''), patch: patch });
+  return true;
+}
+
 /* ── EXPOSE ────────────────────────────────────────────────────────────── */
 window.HmTheme = {
   init: init,
@@ -746,6 +920,11 @@ window.HmTheme = {
   contrastRatio: contrastRatio,
   exportTheme: exportTheme,
   importTheme: importTheme,
+  getTemplates: getTemplates,
+  saveTemplate: saveTemplate,
+  deleteTemplate: deleteTemplate,
+  resolveWithTemplate: resolveWithTemplate,
+  applyVisualTheme: applyVisualTheme,
   DEFAULTS: DEFAULTS
 };
 

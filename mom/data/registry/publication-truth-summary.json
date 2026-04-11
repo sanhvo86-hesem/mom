@@ -2,8 +2,8 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "16b4c137-a965-4f41-bc10-785f9b29dac8",
-    "generated_at": "2026-04-10T07:51:07.164Z",
+    "publication_run_id": "c6ca5fcd-23b1-4f28-8661-e672b97d3859",
+    "generated_at": "2026-04-10T12:22:49.571Z",
     "schema_authority": "table-registry.json backed by database/migrations and publication generators",
     "table_count": 658,
     "entity_counts": {
@@ -19,9 +19,9 @@
       "explanation": "All registered tables currently have field coverage."
     },
     "workflow_engine_bridge": {
-      "ready": 257,
+      "ready": 261,
       "blocked": 0,
-      "unneeded": 412,
+      "unneeded": 408,
       "counting_model": "Entities with persisted or guarded runtime workflows need an explicit bridge; stateless or generic status flows do not."
     },
     "openapi": {

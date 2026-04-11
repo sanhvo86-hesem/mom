@@ -4760,16 +4760,20 @@ var SchemaLib = {
   _autoLoadedSystem: false,
 
   withSystemEntries: function(designs){
-    var items = Array.isArray(designs) ? designs.slice() : [];
-    items.unshift({
-      id: '__system_registry__',
-      name: _t('HESEM System Registry', 'HESEM System Registry'),
-      version: 'registry',
-      updatedAt: '',
-      author: 'system',
-      tableCount: 528,
-      isSystem: true
-    });
+    var items = Array.isArray(designs) ? designs.filter(function(item){
+      return item && String(item.id || '') === 'workspace';
+    }) : [];
+    if(!items.length){
+      items.push({
+        id: 'workspace',
+        name: _t('HESEM Workspace Design', 'HESEM Workspace Design'),
+        version: '1.0.0',
+        updatedAt: '',
+        author: 'system',
+        tableCount: 0,
+        isSystem: true
+      });
+    }
     return items;
   },
 
@@ -4796,27 +4800,15 @@ var SchemaLib = {
     var select = document.getElementById('ss-schema-select');
     var currentValue = STORE.currentDesignId || '';
     if(!select) return;
-    select.setAttribute('aria-label', _t('Chọn schema làm việc', 'Select active schema'));
-    select.setAttribute('title', _t('Chọn schema làm việc', 'Select active schema'));
-    select.innerHTML = '<option value="">' + _esc(_t('-- Chọn schema --', '-- Select schema --')) + '</option>' + (STORE.designs || []).map(function(item){
-      return '<option value="' + _esc(item.id) + '"' + (item.id === currentValue ? ' selected' : '') + '>' + _esc(item.name) + (item.isSystem ? ' [' + _esc(_t('Hệ thống', 'System')) + ']' : '') + '</option>';
-    }).join('') + '<option value="__new__">+ ' + _esc(_t('Tạo mới', 'Create new')) + '</option><option value="__load_live__">DB ' + _esc(_t('Nạp từ DB', 'Load DB')) + '</option>';
+    select.setAttribute('aria-label', _t('Chọn workspace design đang dùng', 'Select active workspace design'));
+    select.setAttribute('title', _t('Chọn workspace design đang dùng', 'Select active workspace design'));
+    select.innerHTML = (STORE.designs || []).map(function(item){
+      return '<option value="' + _esc(item.id) + '"' + (item.id === currentValue ? ' selected' : '') + '>' + _esc(item.name) + (item.isSystem ? ' [' + _esc(_t('Thiết kế', 'Workspace Design')) + ']' : '') + '</option>';
+    }).join('');
   },
 
   onSelectChange: function(value){
-    if(value === '__new__'){
-      SchemaLib.createNew();
-      return;
-    }
-    if(value === '__load_live__'){
-      SchemaLib.loadFromLiveDB();
-      return;
-    }
-    if(value === '__system_registry__'){
-      SchemaLib.loadSystemRegistry(false);
-      return;
-    }
-    if(value){
+    if(value === 'workspace'){
       SchemaLib.load(value);
     }
   },
@@ -4884,22 +4876,23 @@ var SchemaLib = {
     return _api('schema_studio_load_registry', {}, 'POST').then(function(res){
       if(res && res.schema){
         STORE.schema = res.schema;
-        STORE.currentDesignId = '__system_registry__';
+        STORE.currentDesignId = 'workspace';
         STORE.baseline = null;
         STORE.undo = [];
         STORE.redo = [];
         STORE.dirty = false;
         STORE.schema._meta = STORE.schema._meta || {};
-        STORE.schema._meta.source = 'system_registry';
+        STORE.schema._meta.id = 'workspace';
+        STORE.schema._meta.source = 'workspace_registry_import';
         renderShell();
         Inspector.close();
         scheduleZoomToFit(120);
         if(!silent){
-          toast(_t('Đã nạp schema hệ thống từ registry', 'Loaded system schema from registry'), 'success');
+          toast(_t('Đã nạp workspace design đang dùng', 'Loaded the active workspace design'), 'success');
         }
       }
     }).catch(function(err){
-      toast(_t('Không nạp được schema hệ thống', 'Failed to load system schema') + ': ' + (err.message || ''), 'error');
+      toast(_t('Không nạp được workspace design', 'Failed to load the workspace design') + ': ' + (err.message || ''), 'error');
     });
   },
 
@@ -9820,7 +9813,7 @@ window._renderSchemaStudio = function(page){
 /* Round 13 Lite fix: registry-only workspace + detail options + performance hardening */
 (function(){
   var LITE_PREFS_KEY = LS_PREFIX + 'round13-lite';
-  var LITE_SYSTEM_ONLY_ID = '__system_registry__';
+  var LITE_SYSTEM_ONLY_ID = 'workspace';
   var LITE_STYLE_ID = 'ss-round13-lite-style';
   var LITE_DEFAULTS = {
     tableDetailMode: 'minimal',
@@ -9855,13 +9848,14 @@ window._renderSchemaStudio = function(page){
   }
 
   function liteSystemEntry(){
-    var tableCount = STORE.schema && STORE.currentDesignId === LITE_SYSTEM_ONLY_ID && STORE.schema.tables ? STORE.schema.tables.length : 628;
+    var tableCount = STORE.schema && STORE.currentDesignId === LITE_SYSTEM_ONLY_ID && STORE.schema.tables ? STORE.schema.tables.length : 0;
+    var schemaMeta = STORE.schema && STORE.schema._meta ? STORE.schema._meta : {};
     return {
       id: LITE_SYSTEM_ONLY_ID,
-      name: _t('HESEM System Registry', 'HESEM System Registry'),
-      version: 'registry',
-      updatedAt: '',
-      author: 'system',
+      name: schemaMeta.name || _t('HESEM Workspace Design', 'HESEM Workspace Design'),
+      version: schemaMeta.version || '1.0.0',
+      updatedAt: schemaMeta.updatedAt || schemaMeta.generated_at || '',
+      author: schemaMeta.author || 'system',
       tableCount: tableCount,
       isSystem: true
     };
@@ -9979,8 +9973,8 @@ window._renderSchemaStudio = function(page){
             '</div>',
             '<div class="ss-lite-option-card">',
               '<div class="ss-lite-option-title">' + _esc(_t('Phạm vi schema hiện hành', 'Current schema scope')) + '</div>',
-              '<div class="ss-lite-system-chip"><span class="ss-lite-toolbar-dot"></span><strong>' + _esc(_t('Đã khóa vào HESEM System Registry', 'Locked to HESEM System Registry')) + '</strong></div>',
-              '<div class="ss-lite-lock-note">' + _esc(_t('Bản vá này chỉ giữ lại schema hệ thống trong selector để loại bỏ danh sách schema khác khỏi giao diện hiện tại. Dữ liệu cũ trên server không bị xóa vật lý, nhưng sẽ không còn xuất hiện trong studio này.', 'This patch keeps only the system schema in the selector to remove other schemas from the current interface. Older server-side records are not physically deleted, but they are no longer exposed in this studio.')) + '</div>',
+              '<div class="ss-lite-system-chip"><span class="ss-lite-toolbar-dot"></span><strong>' + _esc(_t('Một workspace design duy nhất', 'Single workspace design')) + '</strong></div>',
+              '<div class="ss-lite-lock-note">' + _esc(_t('Studio này chỉ cho chỉnh sửa đúng `workspace` design. Full System Contract Registry vẫn là lớp read-only riêng cho toàn nền tảng.', 'This studio allows editing only the `workspace` design. The full System Contract Registry remains a separate read-only layer for the whole platform.')) + '</div>',
             '</div>',
           '</div>',
         '</div>',
@@ -10203,7 +10197,10 @@ window._renderSchemaStudio = function(page){
   };
 
   SchemaLib.withSystemEntries = function(){
-    return [liteSystemEntry()];
+    var filtered = (STORE.designs || []).filter(function(item){
+      return item && String(item.id || '') === LITE_SYSTEM_ONLY_ID;
+    });
+    return filtered.length ? filtered : [liteSystemEntry()];
   };
 
   var originalRenderSelector = SchemaLib.renderSelector;
@@ -10212,21 +10209,29 @@ window._renderSchemaStudio = function(page){
     if(!select){
       return originalRenderSelector ? originalRenderSelector.apply(this, arguments) : undefined;
     }
-    select.setAttribute('aria-label', _t('Schema hệ thống đang dùng', 'Active system schema'));
-    select.setAttribute('title', _t('HESEM System Registry đang được khóa để giảm tải giao diện', 'HESEM System Registry is locked to reduce UI load'));
-    select.innerHTML = '<option value="' + LITE_SYSTEM_ONLY_ID + '">' + _esc(_t('HESEM System Registry [Hệ thống]', 'HESEM System Registry [System]')) + '</option>';
+    select.setAttribute('aria-label', _t('Workspace design đang dùng', 'Active workspace design'));
+    select.setAttribute('title', _t('Workspace design duy nhất có thể chỉnh sửa trong studio này', 'The only editable workspace design in this studio'));
+    select.innerHTML = SchemaLib.withSystemEntries().map(function(item){
+      var label = item && item.name ? item.name : _t('HESEM Workspace Design', 'HESEM Workspace Design');
+      return '<option value="' + LITE_SYSTEM_ONLY_ID + '">' + _esc(label) + ' [' + _esc(_t('Thiết kế', 'Workspace Design')) + ']</option>';
+    }).join('');
     select.value = LITE_SYSTEM_ONLY_ID;
-    select.disabled = true;
+    select.disabled = false;
   };
 
   var originalLoadList = SchemaLib.loadList;
   SchemaLib.loadList = function(){
     liteEnsureState();
     return Promise.resolve(originalLoadList ? originalLoadList.apply(this, arguments) : undefined).then(function(result){
-      STORE.designs = [liteSystemEntry()];
+      STORE.designs = (STORE.designs || []).filter(function(item){
+        return item && String(item.id || '') === LITE_SYSTEM_ONLY_ID;
+      });
+      if(!STORE.designs.length){
+        STORE.designs = [liteSystemEntry()];
+      }
       SchemaLib.renderSelector();
       if(STORE.currentDesignId !== LITE_SYSTEM_ONLY_ID || !STORE.schema || !((STORE.schema.tables || []).length)){
-        return SchemaLib.loadSystemRegistry(true).then(function(){ return result; });
+        return SchemaLib.load(LITE_SYSTEM_ONLY_ID).then(function(){ return result; });
       }
       liteRefreshRelationLabels();
       return result;
@@ -10234,78 +10239,51 @@ window._renderSchemaStudio = function(page){
       STORE.designs = [liteSystemEntry()];
       SchemaLib.renderSelector();
       if(STORE.currentDesignId !== LITE_SYSTEM_ONLY_ID || !STORE.schema || !((STORE.schema.tables || []).length)){
-        return SchemaLib.loadSystemRegistry(true);
+        return SchemaLib.load(LITE_SYSTEM_ONLY_ID);
       }
       throw err;
     });
   };
 
-  SchemaLib.onSelectChange = function(){
-    return SchemaLib.loadSystemRegistry(false);
+  SchemaLib.onSelectChange = function(value){
+    if(String(value || '') !== LITE_SYSTEM_ONLY_ID){
+      return Promise.resolve();
+    }
+    return SchemaLib.load(LITE_SYSTEM_ONLY_ID);
   };
 
   SchemaLib.createNew = function(){
-    toast(_t('Đã khóa chế độ tạo schema mới. Studio hiện chỉ dùng HESEM System Registry.', 'New schema creation is locked. This studio now works only with HESEM System Registry.'), 'info');
+    toast(_t('Studio chỉ giữ một workspace design có thể chỉnh sửa. Không tạo thêm schema phụ.', 'This studio keeps a single editable workspace design. Additional parallel schema creation is disabled.'), 'info');
     return Promise.resolve();
   };
 
   SchemaLib.loadFromLiveDB = function(){
-    toast(_t('Đã tắt nạp schema từ DB trong bản vá tối ưu giao diện này.', 'Loading schema from DB is disabled in this optimized UI patch.'), 'info');
+    toast(_t('Reverse engineer trực tiếp đã bị chặn trong studio này để tránh sinh thêm schema phụ.', 'Direct reverse engineering is disabled here to avoid creating parallel schema tracks.'), 'info');
     return Promise.resolve();
   };
 
+  var originalLoad = SchemaLib.load;
   var originalLoadSystemRegistry = SchemaLib.loadSystemRegistry;
   SchemaLib.loadSystemRegistry = function(silent){
-    liteEnsureState();
-    liteEnsureStyles();
-    return Promise.resolve(originalLoadSystemRegistry.call(this, true)).then(function(result){
-      var draftRaw = loadDraft(LITE_SYSTEM_ONLY_ID);
-      var draftDoc;
-      if(draftRaw){
-        try{
-          draftDoc = JSON.parse(draftRaw);
-        }catch(ignoreErr){
-          draftDoc = null;
-        }
-      }
-      if(draftDoc){
-        STORE.schema = draftDoc;
-        STORE.currentDesignId = LITE_SYSTEM_ONLY_ID;
-        STORE.baseline = null;
-        STORE.undo = [];
-        STORE.redo = [];
-        STORE.dirty = false;
-        renderShell();
-        Inspector.close();
-        scheduleZoomToFit(120);
-        liteRefreshRelationLabels();
-        if(!silent){
-          toast(_t('Đã nạp HESEM System Registry từ nháp cục bộ', 'Loaded HESEM System Registry from local draft'), 'success');
-        }
-        return result;
-      }
-      STORE.currentDesignId = LITE_SYSTEM_ONLY_ID;
-      if(refs.toolbar) renderToolbar(refs.toolbar);
+    return Promise.resolve(SchemaLib.load(LITE_SYSTEM_ONLY_ID)).then(function(result){
       liteRefreshRelationLabels();
       if(!silent){
-        toast(_t('Đã nạp HESEM System Registry', 'Loaded HESEM System Registry'), 'success');
+        toast(_t('Đã nạp workspace design đang dùng', 'Loaded the active workspace design'), 'success');
       }
       return result;
     });
   };
 
   SchemaLib.load = function(){
-    return SchemaLib.loadSystemRegistry(false);
+    return originalLoad.apply(this, [LITE_SYSTEM_ONLY_ID]);
   };
 
   var originalSave = SchemaLib.save;
   SchemaLib.save = function(){
-    if(STORE.currentDesignId === LITE_SYSTEM_ONLY_ID || (STORE.schema && STORE.schema._meta && STORE.schema._meta.source === 'system_registry')){
-      saveDraft();
-      STORE.dirty = false;
-      if(refs.toolbar) renderToolbar(refs.toolbar);
-      toast(_t('Đã lưu nháp cục bộ cho HESEM System Registry', 'Saved a local draft for HESEM System Registry'), 'success');
-      return Promise.resolve({ localDraft:true });
+    if(STORE.schema){
+      STORE.schema._meta = STORE.schema._meta || {};
+      STORE.schema._meta.id = LITE_SYSTEM_ONLY_ID;
+      STORE.currentDesignId = LITE_SYSTEM_ONLY_ID;
     }
     return originalSave.apply(this, arguments);
   };
@@ -10322,7 +10300,6 @@ window._renderSchemaStudio = function(page){
     if(!container) return;
     selector = container.querySelector('#ss-schema-select');
     if(selector){
-      selector.disabled = true;
       selector.value = LITE_SYSTEM_ONLY_ID;
     }
     right = container.querySelector('.ss-toolbar-right');
@@ -10331,7 +10308,7 @@ window._renderSchemaStudio = function(page){
     if(!note){
       note = document.createElement('span');
       note.className = 'ss-lite-toolbar-note';
-      note.textContent = _t('Chế độ nhẹ • chỉ HESEM System Registry', 'Lite mode • HESEM System Registry only');
+      note.textContent = _t('Editable layer • Workspace Design', 'Editable layer • Workspace Design');
       right.insertBefore(note, right.firstChild || null);
     }
     button = right.querySelector('.ss-lite-toolbar-btn');
@@ -10362,8 +10339,8 @@ window._renderSchemaStudio = function(page){
     liteEnsureState();
     liteEnsureStyles();
     result = originalInit(page);
-    if(STORE.currentDesignId && STORE.currentDesignId !== LITE_SYSTEM_ONLY_ID){
-      SchemaLib.loadSystemRegistry(true);
+    if(!STORE.currentDesignId || STORE.currentDesignId !== LITE_SYSTEM_ONLY_ID || !STORE.schema || !((STORE.schema.tables || []).length)){
+      SchemaLib.load(LITE_SYSTEM_ONLY_ID);
     }
     if(window.SchemaStudio){
       window.SchemaStudio.openLiteOptions = liteOpenOptions;

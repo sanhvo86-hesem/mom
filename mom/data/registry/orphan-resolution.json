@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T07:50:54.469Z",
-    "description": "Resolution plan for 0 orphan registry fields and 398 orphan DB column names."
+    "generatedAt": "2026-04-10T12:22:32.233Z",
+    "description": "Resolution plan for 0 orphan registry fields and 408 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 330,
+      "count": 340,
       "columns": [
         {
           "column": "item_class",
@@ -3111,6 +3111,58 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "total_pieces",
+          "tables": [
+            "mes_oee_snapshots"
+          ],
+          "suggestedLabel": "Tổng chi tiết",
+          "suggestedLabelEn": "Total Pieces",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "performance",
+          "tables": [
+            "mes_oee_snapshots"
+          ],
+          "suggestedLabel": "Hiệu năng",
+          "suggestedLabelEn": "Performance",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(5,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "rework_pieces",
+          "tables": [
+            "mes_oee_snapshots"
+          ],
+          "suggestedLabel": "Rework chi tiết",
+          "suggestedLabelEn": "Rework Pieces",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "quality",
+          "tables": [
+            "mes_oee_snapshots"
+          ],
+          "suggestedLabel": "Chất lượng",
+          "suggestedLabelEn": "Quality",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(5,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "spc_subgroup",
           "tables": [
             "mes_inline_measurements"
@@ -4295,6 +4347,45 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "stock_snapshot_at",
+          "tables": [
+            "stock_balances"
+          ],
+          "suggestedLabel": "Stock ảnh chụp lúc",
+          "suggestedLabelEn": "Stock Snapshot At",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "source_txn_recorded_at",
+          "tables": [
+            "stock_balances"
+          ],
+          "suggestedLabel": "Nguồn Txn Recorded lúc",
+          "suggestedLabelEn": "Source Txn Recorded At",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "snapshot_reason",
+          "tables": [
+            "stock_balances"
+          ],
+          "suggestedLabel": "Ảnh chụp Lý do",
+          "suggestedLabelEn": "Snapshot Reason",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(30)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "tracking_reference",
           "tables": [
             "freight_orders"
@@ -4334,6 +4425,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "valuation_method",
+          "tables": [
+            "inventory_valuations"
+          ],
+          "suggestedLabel": "Valuation Phương pháp",
+          "suggestedLabelEn": "Valuation Method",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(30)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "snapshot_grain",
           "tables": [
             "plant_performance_snapshots"
@@ -4343,6 +4447,32 @@
           "suggestedType": "string",
           "dbTypes": [
             "VARCHAR(20)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "planned_minutes",
+          "tables": [
+            "plant_performance_snapshots"
+          ],
+          "suggestedLabel": "Kế hoạch phút",
+          "suggestedLabelEn": "Planned Minutes",
+          "suggestedType": "duration",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "performance_pct",
+          "tables": [
+            "plant_performance_snapshots"
+          ],
+          "suggestedLabel": "Tỷ lệ Hiệu năng",
+          "suggestedLabelEn": "Performance Pct",
+          "suggestedType": "percentage",
+          "dbTypes": [
+            "NUMERIC(6,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         }

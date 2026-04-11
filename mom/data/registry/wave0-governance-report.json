@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T07:51:04.109Z",
+    "generatedAt": "2026-04-10T12:22:43.091Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
@@ -81,7 +81,7 @@
       {
         "entity_key": "bi_datawarehouse.plant_performance_snapshots",
         "entity": "plant_performance_snapshots",
-        "profile": "transactional_record",
+        "profile": "projection_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 2,
@@ -193,7 +193,6 @@
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
-          "master_data.compliance-obligations",
           "maintenance_ehs.permits"
         ]
       },
@@ -268,7 +267,7 @@
       {
         "entity_key": "finance.debit_memos",
         "entity": "debit_memos",
-        "profile": "transactional",
+        "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 0,
@@ -281,7 +280,7 @@
       {
         "entity_key": "finance.inventory_valuations",
         "entity": "inventory_valuations",
-        "profile": "transactional_record",
+        "profile": "projection_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 3,
@@ -348,10 +347,10 @@
       {
         "entity_key": "inventory.inventory_balance_snapshot",
         "entity": "inventory_balance_snapshot",
-        "profile": "transactional_record",
+        "profile": "projection_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 4,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": [
@@ -374,7 +373,7 @@
       {
         "entity_key": "inventory.stock_balances",
         "entity": "stock_balances",
-        "profile": "transactional_record",
+        "profile": "projection_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 8,
@@ -452,10 +451,10 @@
       {
         "entity_key": "mes_execution.mes_oee_snapshots",
         "entity": "mes_oee_snapshots",
-        "profile": "operator_console",
+        "profile": "projection_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 2,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": [
@@ -544,10 +543,10 @@
       {
         "entity_key": "production.production_order_bom_snapshot",
         "entity": "production_order_bom_snapshot",
-        "profile": "business_record",
+        "profile": "projection_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": [
@@ -557,10 +556,10 @@
       {
         "entity_key": "production.production_order_route_snapshot",
         "entity": "production_order_route_snapshot",
-        "profile": "business_record",
+        "profile": "projection_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": [
@@ -2961,7 +2960,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 7,
+        "relation_count": 11,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2983,7 +2982,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 5,
+        "relation_count": 9,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []

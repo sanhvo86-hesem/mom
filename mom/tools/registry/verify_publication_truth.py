@@ -26,6 +26,7 @@ def resolve_registry_dir() -> Path:
 
 
 REG = resolve_registry_dir()
+CONTRACTS = PORTAL / "contracts"
 
 REQUIRED_ARTIFACTS = [
     REG / "endpoint-catalog.json",
@@ -51,6 +52,9 @@ REQUIRED_ARTIFACTS = [
     REG / "wave5-maintenance-ehs-governance-policy.json",
     REG / "wave5-maintenance-ehs-normalization.json",
     REG / "wave5-maintenance-ehs-report.json",
+    REG / "wave6-finance-projection-governance-policy.json",
+    REG / "wave6-finance-projection-normalization.json",
+    REG / "wave6-finance-projection-report.json",
     REG / "operational-stress-governance-policy.json",
     REG / "operational-stress-catalog.json",
     REG / "operational-stress-report.json",
@@ -58,6 +62,19 @@ REQUIRED_ARTIFACTS = [
     REG / "publication-truth-summary.json",
     REG / "publication-entity-accounting.json",
     REG / "foundation-governance-publication-summary.json",
+]
+
+CONTRACT_ARTIFACTS = [
+    CONTRACTS / "glossary.json",
+    CONTRACTS / "domain-map.json",
+    CONTRACTS / "authority-report.json",
+    CONTRACTS / "package-index.json",
+    CONTRACTS / "object-index.json",
+    CONTRACTS / "state-model-index.json",
+    CONTRACTS / "command-index.json",
+    CONTRACTS / "event-index.json",
+    CONTRACTS / "deprecation-ledger.json",
+    CONTRACTS / "migration-manifest.json",
 ]
 
 SCHEMA_AUTHORITY = PORTAL / "database" / "schema-authority-summary.json"
@@ -86,6 +103,8 @@ def main() -> int:
     # Gate A: Artifact existence
     print("Gate A: Artifact existence")
     for p in REQUIRED_ARTIFACTS:
+        check(f"exists:{p.name}", p.is_file(), f"Missing: {p}")
+    for p in CONTRACT_ARTIFACTS:
         check(f"exists:{p.name}", p.is_file(), f"Missing: {p}")
     check("exists:openapi.yaml", (PORTAL / "api" / "openapi.yaml").is_file())
 
@@ -170,6 +189,37 @@ def main() -> int:
                 check(f"fresh:{name}", age_hours < 24, f"age={age_hours:.1f}h")
             except Exception:
                 check(f"fresh:{name}", False, f"unparseable: {ts}")
+    for artifact in CONTRACT_ARTIFACTS:
+        if not artifact.is_file():
+            continue
+        ts = load(artifact).get("_meta", {}).get("generatedAt")
+        if ts:
+            try:
+                gen_time = datetime.fromisoformat(ts.replace("Z","+00:00"))
+                age_hours = (now - gen_time).total_seconds() / 3600
+                check(f"fresh:{artifact.name}", age_hours < 24, f"age={age_hours:.1f}h")
+            except Exception:
+                check(f"fresh:{artifact.name}", False, f"unparseable: {ts}")
+
+    # Gate H2: Contract authority depth
+    print("\nGate H2: Contract authority depth")
+    authority_report = load(CONTRACTS / "authority-report.json")
+    authority_summary = authority_report.get("summary", {})
+    check(
+        "contract_authored_coverage_floor",
+        float(authority_summary.get("authoredCoverageRatio", 0.0)) >= 0.50,
+        f"authoredCoverageRatio={authority_summary.get('authoredCoverageRatio')}",
+    )
+    check(
+        "contract_lifecycle_like_coverage_floor",
+        float(authority_summary.get("lifecycleLikeCoverageRatio", 0.0)) >= 0.60,
+        f"lifecycleLikeCoverageRatio={authority_summary.get('lifecycleLikeCoverageRatio')}",
+    )
+    check(
+        "contract_core_value_stream_coverage_floor",
+        float(authority_summary.get("coreValueStreamCoverageRatio", 0.0)) >= 0.90,
+        f"coreValueStreamCoverageRatio={authority_summary.get('coreValueStreamCoverageRatio')}",
+    )
 
     # Gate I: approval_group not split-truth
     print("\nGate I: Approval-group consistency")
@@ -518,8 +568,51 @@ def main() -> int:
               "wave5-maintenance-ehs-report.json" in (rm.get("assets") or {}),
               "wave5-maintenance-ehs-report.json missing from registry-manifest assets")
 
-    # Gate V: Operational stress governance
-    print("\nGate V: Operational stress governance")
+    # Gate V: Wave 6 finance / projection governance
+    print("\nGate V: Wave 6 finance / projection governance")
+    wave6_policy_path = REG / "wave6-finance-projection-governance-policy.json"
+    wave6_normalization_path = REG / "wave6-finance-projection-normalization.json"
+    wave6_report_path = REG / "wave6-finance-projection-report.json"
+    if wave6_policy_path.is_file():
+        wave6_policy = load(wave6_policy_path)
+        check("wave6_build_questions_present",
+              len(wave6_policy.get("build_questions", [])) >= 8,
+              f"build_questions={len(wave6_policy.get('build_questions', []))}")
+        check("wave6_rejects_projection_crud_surface",
+              "projection_or_snapshot_published_with_generic_create_update_delete_surface" in (wave6_policy.get("rejection_criteria") or []),
+              "projection CRUD rejection missing")
+    if wave6_normalization_path.is_file():
+        wave6_normalization = load(wave6_normalization_path)
+        check("wave6_service_gate_targets_present",
+              len(wave6_normalization.get("service_finance_gate_targets", {})) >= 4,
+              f"service_finance_gate_targets={len(wave6_normalization.get('service_finance_gate_targets', {}))}")
+        check("wave6_projection_targets_present",
+              len(wave6_normalization.get("projection_read_model_targets", {})) >= 6,
+              f"projection_read_model_targets={len(wave6_normalization.get('projection_read_model_targets', {}))}")
+    if wave6_report_path.is_file():
+        wave6_report = load(wave6_report_path)
+        wave6_summary = wave6_report.get("summary", {})
+        check("wave6_service_finance_gate_pass",
+              wave6_summary.get("service_finance_gate_failed", 1) == 0,
+              f"failed={wave6_summary.get('service_finance_gate_failed')}")
+        check("wave6_projection_read_model_pass",
+              wave6_summary.get("projection_read_model_failed", 1) == 0,
+              f"failed={wave6_summary.get('projection_read_model_failed')}")
+        check("wave6_projection_lineage_pass",
+              wave6_summary.get("projection_lineage_failed", 1) == 0,
+              f"failed={wave6_summary.get('projection_lineage_failed')}")
+        check("wave6_relationship_truth_pass",
+              wave6_summary.get("relationship_truth_failed", 1) == 0,
+              f"failed={wave6_summary.get('relationship_truth_failed')}")
+        check("wave6_remaining_gaps_zero",
+              wave6_summary.get("remaining_wave6_gaps", 1) == 0,
+              f"remaining={wave6_summary.get('remaining_wave6_gaps')}")
+        check("wave6_manifest_asset_registered",
+              "wave6-finance-projection-report.json" in (rm.get("assets") or {}),
+              "wave6-finance-projection-report.json missing from registry-manifest assets")
+
+    # Gate W: Operational stress governance
+    print("\nGate W: Operational stress governance")
     stress_policy_path = REG / "operational-stress-governance-policy.json"
     stress_catalog_path = REG / "operational-stress-catalog.json"
     stress_report_path = REG / "operational-stress-report.json"

@@ -1890,3 +1890,153 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 
 /* Hide sync indicator and offline bar */
 #qms-sync-indicator, #qms-offline-bar { display: none !important; }
+
+/* ═══ TEMPLATE GALLERY ═══ */
+.tpl-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.tpl-gallery-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 8px);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--bg-surface, #fff);
+}
+.tpl-gallery-card:hover {
+  border-color: var(--brand-2);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,.1));
+}
+.tpl-gallery-thumb {
+  aspect-ratio: 16/10;
+  background: var(--bg-surface-alt, #f1f5f9);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+}
+.tpl-gallery-info {
+  padding: 8px 10px;
+}
+.tpl-gallery-name {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.tpl-gallery-desc {
+  font-size: 10px;
+  color: var(--text-secondary, #64748b);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.tpl-gallery-chips {
+  margin-top: 4px;
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.tpl-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* ═══ TEMPLATE DETAIL ═══ */
+.tpl-detail-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.tpl-detail-preview {
+  width: 280px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 8px);
+  overflow: hidden;
+  background: var(--bg-surface-alt, #f1f5f9);
+  padding: 12px;
+}
+.tpl-detail-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ═══ ZONE DIAGRAM ═══ */
+.zone-config-grid {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  background: var(--bg-surface-alt, #f1f5f9);
+  border-radius: var(--radius-lg, 8px);
+  border: 1px solid var(--border);
+}
+.zone-config-cell {
+  background: var(--bg-surface, #fff);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md, 6px);
+  padding: 6px 8px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  transition: all 0.15s;
+}
+.zone-config-cell:hover {
+  border-color: var(--brand-2);
+  background: rgba(21,101,192,0.03);
+  color: var(--brand-2);
+}
+
+/* Zone type colors */
+.zone-header { background: linear-gradient(135deg,rgba(21,101,192,.06),rgba(21,101,192,.02)); border-style: solid; border-color: rgba(21,101,192,.18); }
+.zone-kpi { background: rgba(249,168,37,.05); border-color: rgba(249,168,37,.18); }
+.zone-filter { background: rgba(8,145,178,.04); border-color: rgba(8,145,178,.12); }
+.zone-main { background: rgba(22,163,74,.03); border-color: rgba(22,163,74,.12); min-height: 60px; }
+.zone-sidebar { background: rgba(124,58,237,.03); border-color: rgba(124,58,237,.12); }
+.zone-footer { background: rgba(100,116,139,.04); border-color: rgba(100,116,139,.15); }
+.zone-tabs { background: rgba(79,70,229,.03); border-color: rgba(79,70,229,.12); }
+.zone-chart { background: rgba(13,148,136,.03); border-color: rgba(13,148,136,.12); }
+
+/* ═══ VISUAL THEME SWATCHES ═══ */
+.theme-swatch-bar {
+  display: flex;
+  gap: 2px;
+  height: 32px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.theme-swatch-bar > div {
+  transition: flex 0.2s;
+}
+.theme-swatch-bar:hover > div:hover {
+  flex: 3 !important;
+}
+
+/* ═══ SMART SCROLL ZONES ═══ */
+.zone-scrollable {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.zone-scrollable:hover {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,.12) transparent;
+}
+.zone-scrollable::-webkit-scrollbar { width: 0; background: transparent; }
+.zone-scrollable:hover::-webkit-scrollbar { width: 5px; }
+.zone-scrollable:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 3px; }

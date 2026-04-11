@@ -44,6 +44,14 @@ def save_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def refresh_generated_at(document: dict) -> dict:
+    refreshed = dict(document)
+    meta = dict(refreshed.get("_meta") or {})
+    meta["generatedAt"] = now_utc()
+    refreshed["_meta"] = meta
+    return refreshed
+
+
 def now_utc() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
@@ -102,7 +110,7 @@ def endpoint_idempotency_metrics(endpoints: dict) -> dict:
 
 
 def main() -> int:
-    catalog = load_json(CATALOG_PATH)
+    catalog = refresh_generated_at(load_json(CATALOG_PATH))
     policy = load_json(POLICY_PATH)
     wave0 = load_json(WAVE0_PATH)
     canonical = load_json(CANONICAL_PATH)
@@ -334,6 +342,8 @@ def main() -> int:
             "evidence": evidence,
             "required_controls": scenario.get("required_controls") or [],
         })
+
+    save_json(CATALOG_PATH, catalog)
 
     report = {
         "_meta": {

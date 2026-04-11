@@ -87,6 +87,14 @@ def dump_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def refresh_generated_at(document: dict) -> dict:
+    refreshed = dict(document)
+    meta = dict(refreshed.get("_meta") or {})
+    meta["generatedAt"] = utc_now()
+    refreshed["_meta"] = meta
+    return refreshed
+
+
 def openapi_version() -> str:
     if not OPENAPI_PATH.is_file():
         return "missing"
@@ -286,7 +294,7 @@ def satisfied_service_backed_resources(
 
 
 def main() -> int:
-    policy = load_json(POLICY_PATH)
+    policy = refresh_generated_at(load_json(POLICY_PATH))
     canonical_catalog = load_json(CANONICAL_PATH)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     frontend_catalog = load_json(FRONTEND_PATH)
@@ -411,6 +419,8 @@ def main() -> int:
         "critical_split_path_risks": len(critical_split_path_risks),
         "openapi_version": openapi,
     }
+
+    dump_json(POLICY_PATH, policy)
 
     report = {
         "_meta": {

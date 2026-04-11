@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-10T07:50:58.252Z",
+    "generatedAt": "2026-04-10T12:22:36.549Z",
     "workflowCount": 277
   },
   "workflows": {
@@ -9370,7 +9370,7 @@
       ],
       "stateField": "incident_status",
       "statusSet": "ehs_incidents_incident_status",
-      "lifecycleMode": "guarded_transition_runtime",
+      "lifecycleMode": "persisted",
       "states": [
         {
           "id": "reported",
@@ -9458,11 +9458,22 @@
           "trigger": "move_to_triaged",
           "label": "Triaged",
           "labelEn": "Triaged",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_triaged"
             }
           ]
@@ -9473,11 +9484,22 @@
           "trigger": "move_to_contained",
           "label": "Contained",
           "labelEn": "Contained",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_contained"
             }
           ]
@@ -9488,11 +9510,22 @@
           "trigger": "move_to_contained",
           "label": "Contained",
           "labelEn": "Contained",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_contained"
             }
           ]
@@ -9503,11 +9536,22 @@
           "trigger": "move_to_investigating",
           "label": "Investigating",
           "labelEn": "Investigating",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_investigating"
             }
           ]
@@ -9518,11 +9562,22 @@
           "trigger": "move_to_investigating",
           "label": "Investigating",
           "labelEn": "Investigating",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_investigating"
             }
           ]
@@ -9533,11 +9588,21 @@
           "trigger": "move_to_corrective_action",
           "label": "Corrective Action",
           "labelEn": "Corrective Action",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_corrective_action"
             }
           ]
@@ -9548,11 +9613,21 @@
           "trigger": "move_to_corrective_action",
           "label": "Corrective Action",
           "labelEn": "Corrective Action",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_corrective_action"
             }
           ]
@@ -9567,7 +9642,9 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -9575,7 +9652,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_closed"
             },
             {
@@ -9595,7 +9672,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -9603,7 +9681,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_archived"
             },
             {
@@ -9617,39 +9695,39 @@
       "sla": {
         "reported_to_triaged": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "triaged_to_contained": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "investigating_to_contained": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "triaged_to_investigating": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "contained_to_investigating": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "investigating_to_corrective_action": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "contained_to_corrective_action": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "corrective_action_to_closed": {
           "hours": 72,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "closed_to_archived": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         }
       },
       "digitalThread": {
@@ -9673,105 +9751,498 @@
         "mes_sites"
       ],
       "stateField": "status",
-      "statusSet": "ehs_permit_register_status",
+      "statusSet": "ehs_permit_register_status_set",
       "lifecycleMode": "persisted",
       "states": [
         {
-          "id": "complete",
-          "label": "Hoàn chỉnh",
-          "labelEn": "Complete",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "broken",
-          "label": "Đứt gãy",
-          "labelEn": "Broken",
-          "color": "#ef4444",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "pending",
-          "label": "Chờ hoàn thiện",
-          "labelEn": "Pending",
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
           "color": "#3b82f6",
           "entryActions": [],
           "exitActions": [],
           "allowedTransitionsFrom": []
+        },
+        {
+          "id": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "id": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Hiệu lực",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved",
+            "suspended"
+          ]
+        },
+        {
+          "id": "suspended",
+          "label": "Tạm ngưng",
+          "labelEn": "Suspended",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved",
+            "active"
+          ]
+        },
+        {
+          "id": "expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved",
+            "active",
+            "suspended"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "active",
+            "suspended",
+            "expired"
+          ]
+        },
+        {
+          "id": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
         }
       ],
       "transitions": [
         {
-          "from": "complete",
-          "to": "partial",
-          "trigger": "move_to_partial",
-          "label": "Mot phan",
-          "labelEn": "Partial",
-          "guards": [],
+          "from": "draft",
+          "to": "submitted",
+          "trigger": "submit",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
-              "template": "ehs_sustainability_partial"
+              "to": "quality_manager",
+              "template": "ehs_sustainability_submitted"
+            },
+            {
+              "type": "setField",
+              "field": "submitted_at",
+              "value": "NOW()"
             }
           ]
         },
         {
-          "from": "partial",
-          "to": "broken",
-          "trigger": "move_to_broken",
-          "label": "Dut gay",
-          "labelEn": "Broken",
-          "guards": [],
+          "from": "submitted",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
-              "template": "ehs_sustainability_broken"
+              "to": "quality_manager",
+              "template": "ehs_sustainability_approved"
+            },
+            {
+              "type": "setField",
+              "field": "approved_at",
+              "value": "NOW()"
             }
           ]
         },
         {
-          "from": "broken",
-          "to": "pending",
-          "trigger": "move_to_pending",
-          "label": "Cho xu ly",
-          "labelEn": "Pending",
-          "guards": [],
+          "from": "approved",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
-              "template": "ehs_sustainability_pending"
+              "to": "quality_manager",
+              "template": "ehs_sustainability_active"
+            }
+          ]
+        },
+        {
+          "from": "suspended",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_active"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "suspended",
+          "trigger": "suspend",
+          "label": "Tạm đình chỉ",
+          "labelEn": "Suspended",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_suspended"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "suspended",
+          "trigger": "suspend",
+          "label": "Tạm đình chỉ",
+          "labelEn": "Suspended",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_suspended"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "expired",
+          "trigger": "move_to_expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_expired"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "expired",
+          "trigger": "move_to_expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_expired"
+            }
+          ]
+        },
+        {
+          "from": "suspended",
+          "to": "expired",
+          "trigger": "move_to_expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_expired"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "suspended",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "expired",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "closed",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_manager",
+              "template": "ehs_sustainability_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
             }
           ]
         }
       ],
       "sla": {
-        "complete_to_partial": {
+        "draft_to_submitted": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
-        "partial_to_broken": {
-          "hours": 24,
-          "escalateTo": "module_admin"
+        "submitted_to_approved": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
         },
-        "broken_to_pending": {
+        "approved_to_active": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
+        },
+        "suspended_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "approved_to_suspended": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_suspended": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "approved_to_expired": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_expired": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "suspended_to_expired": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        },
+        "suspended_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        },
+        "expired_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        },
+        "closed_to_archived": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
         }
       },
       "digitalThread": {
@@ -19347,105 +19818,231 @@
         "mes_sites"
       ],
       "stateField": "status",
-      "statusSet": "lean_5s_audits_status",
+      "statusSet": "lean_5s_audits_status_set",
       "lifecycleMode": "persisted",
       "states": [
         {
-          "id": "complete",
-          "label": "Hoàn chỉnh",
-          "labelEn": "Complete",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "broken",
-          "label": "Đứt gãy",
-          "labelEn": "Broken",
-          "color": "#ef4444",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "pending",
-          "label": "Chờ hoàn thiện",
-          "labelEn": "Pending",
+          "id": "planned",
+          "label": "Đã lập kế hoạch",
+          "labelEn": "Planned",
           "color": "#3b82f6",
           "entryActions": [],
           "exitActions": [],
           "allowedTransitionsFrom": []
+        },
+        {
+          "id": "in_progress",
+          "label": "Đang đánh giá",
+          "labelEn": "In Progress",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "id": "follow_up",
+          "label": "Theo dõi hành động",
+          "labelEn": "Follow Up",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "id": "verified",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "follow_up"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "verified"
+          ]
+        },
+        {
+          "id": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
         }
       ],
       "transitions": [
         {
-          "from": "complete",
-          "to": "partial",
-          "trigger": "move_to_partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
-          "guards": [],
+          "from": "planned",
+          "to": "in_progress",
+          "trigger": "start",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
-              "template": "lean_manufacturing_partial"
+              "to": "operations_manager",
+              "template": "lean_manufacturing_in_progress"
             }
           ]
         },
         {
-          "from": "partial",
-          "to": "broken",
-          "trigger": "move_to_broken",
-          "label": "Đứt gãy",
-          "labelEn": "Broken",
-          "guards": [],
+          "from": "in_progress",
+          "to": "follow_up",
+          "trigger": "move_to_follow_up",
+          "label": "Follow Up",
+          "labelEn": "Follow Up",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
-              "template": "lean_manufacturing_broken"
+              "to": "operations_manager",
+              "template": "lean_manufacturing_follow_up"
             }
           ]
         },
         {
-          "from": "broken",
-          "to": "pending",
-          "trigger": "move_to_pending",
-          "label": "Chờ xử lý",
-          "labelEn": "Pending",
-          "guards": [],
+          "from": "follow_up",
+          "to": "verified",
+          "trigger": "verify",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
-              "template": "lean_manufacturing_pending"
+              "to": "operations_manager",
+              "template": "lean_manufacturing_verified"
+            },
+            {
+              "type": "setField",
+              "field": "verified_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "verified",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "operations_manager",
+              "template": "lean_manufacturing_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "closed",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "operations_manager",
+              "template": "lean_manufacturing_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
             }
           ]
         }
       ],
       "sla": {
-        "complete_to_partial": {
+        "planned_to_in_progress": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "operations_manager"
         },
-        "partial_to_broken": {
+        "in_progress_to_follow_up": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "operations_manager"
         },
-        "broken_to_pending": {
+        "follow_up_to_verified": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "operations_manager"
+        },
+        "verified_to_closed": {
+          "hours": 72,
+          "escalateTo": "operations_manager"
+        },
+        "closed_to_archived": {
+          "hours": 24,
+          "escalateTo": "operations_manager"
         }
       },
       "digitalThread": {
@@ -26897,11 +27494,15 @@
         "org_plant",
         "org_plants",
         "org_site",
+        "inventory_balance_snapshot",
         "inventory_valuations",
+        "mes_oee_snapshots",
         "org_warehouse",
         "org_work_center",
         "plant_performance_snapshots",
         "production_order",
+        "production_order_bom_snapshot",
+        "production_order_route_snapshot",
         "work_definition"
       ],
       "stateField": "status_code",
@@ -27689,10 +28290,14 @@
       "relatedTables": [
         "org_site",
         "org_company",
+        "inventory_balance_snapshot",
         "inventory_valuations",
         "item_site",
+        "mes_oee_snapshots",
         "org_plant",
-        "plant_performance_snapshots"
+        "plant_performance_snapshots",
+        "production_order_bom_snapshot",
+        "production_order_route_snapshot"
       ],
       "stateField": "status_code",
       "statusSet": "org_site_status_code",
@@ -32959,103 +33564,476 @@
         "mes_sites"
       ],
       "stateField": "status",
-      "statusSet": "pm_equipment_master_status",
+      "statusSet": "pm_equipment_master_status_set",
       "lifecycleMode": "persisted",
       "states": [
         {
-          "id": "complete",
-          "label": "Hoàn chỉnh",
-          "labelEn": "Complete",
+          "id": "commissioning",
+          "label": "Đang nghiệm thu",
+          "labelEn": "Commissioning",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
           "color": "#10b981",
           "entryActions": [],
           "exitActions": [],
-          "allowedTransitionsFrom": []
+          "allowedTransitionsFrom": [
+            "commissioning",
+            "on_hold"
+          ]
         },
         {
-          "id": "partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
+          "id": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "qualified",
+            "on_hold",
+            "lockout"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
           "color": "#f59e0b",
           "entryActions": [],
           "exitActions": [],
-          "allowedTransitionsFrom": []
+          "allowedTransitionsFrom": [
+            "qualified",
+            "active"
+          ]
         },
         {
-          "id": "broken",
-          "label": "Đứt gãy",
-          "labelEn": "Broken",
+          "id": "lockout",
+          "label": "Khóa an toàn",
+          "labelEn": "Lockout",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "retired",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
           "color": "#ef4444",
           "entryActions": [],
           "exitActions": [],
-          "allowedTransitionsFrom": []
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold",
+            "lockout"
+          ]
         },
         {
-          "id": "pending",
-          "label": "Chờ hoàn thiện",
-          "labelEn": "Pending",
-          "color": "#3b82f6",
+          "id": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "color": "#6b7280",
           "entryActions": [],
           "exitActions": [],
-          "allowedTransitionsFrom": []
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
         }
       ],
       "transitions": [
         {
-          "from": "complete",
-          "to": "partial",
-          "trigger": "move_to_partial",
-          "label": "Mot phan",
-          "labelEn": "Partial",
-          "guards": [],
+          "from": "commissioning",
+          "to": "qualified",
+          "trigger": "move_to_qualified",
+          "label": "Qualified",
+          "labelEn": "Qualified",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
               "to": "maintenance_supervisor",
-              "template": "plant_maintenance_partial"
+              "template": "plant_maintenance_qualified"
             }
           ]
         },
         {
-          "from": "partial",
-          "to": "broken",
-          "trigger": "move_to_broken",
-          "label": "Dut gay",
-          "labelEn": "Broken",
-          "guards": [],
+          "from": "on_hold",
+          "to": "qualified",
+          "trigger": "move_to_qualified",
+          "label": "Qualified",
+          "labelEn": "Qualified",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
               "to": "maintenance_supervisor",
-              "template": "plant_maintenance_broken"
+              "template": "plant_maintenance_qualified"
             }
           ]
         },
         {
-          "from": "broken",
-          "to": "pending",
-          "trigger": "move_to_pending",
-          "label": "Cho xu ly",
-          "labelEn": "Pending",
-          "guards": [],
+          "from": "qualified",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
               "to": "maintenance_supervisor",
-              "template": "plant_maintenance_pending"
+              "template": "plant_maintenance_active"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_active"
+            }
+          ]
+        },
+        {
+          "from": "lockout",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_active"
+            }
+          ]
+        },
+        {
+          "from": "qualified",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "lockout",
+          "trigger": "move_to_lockout",
+          "label": "Lockout",
+          "labelEn": "Lockout",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_lockout"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "lockout",
+          "trigger": "move_to_lockout",
+          "label": "Lockout",
+          "labelEn": "Lockout",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_lockout"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "retired",
+          "trigger": "retire",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_retired"
+            },
+            {
+              "type": "setField",
+              "field": "retired_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "retired",
+          "trigger": "retire",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_retired"
+            },
+            {
+              "type": "setField",
+              "field": "retired_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "lockout",
+          "to": "retired",
+          "trigger": "retire",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_retired"
+            },
+            {
+              "type": "setField",
+              "field": "retired_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "retired",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
             }
           ]
         }
       ],
       "sla": {
-        "complete_to_partial": {
+        "commissioning_to_qualified": {
           "hours": 24,
           "escalateTo": "maintenance_supervisor"
         },
-        "partial_to_broken": {
+        "on_hold_to_qualified": {
           "hours": 24,
           "escalateTo": "maintenance_supervisor"
         },
-        "broken_to_pending": {
+        "qualified_to_active": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "on_hold_to_active": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "lockout_to_active": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "qualified_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "active_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "active_to_lockout": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "on_hold_to_lockout": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "active_to_retired": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "on_hold_to_retired": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "lockout_to_retired": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "retired_to_archived": {
           "hours": 24,
           "escalateTo": "maintenance_supervisor"
         }
@@ -33341,103 +34319,380 @@
         "pm_work_orders"
       ],
       "stateField": "status",
-      "statusSet": "pm_maintenance_plans_status",
+      "statusSet": "pm_maintenance_plans_status_set",
       "lifecycleMode": "persisted",
       "states": [
         {
-          "id": "complete",
-          "label": "Hoàn chỉnh",
-          "labelEn": "Complete",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "broken",
-          "label": "Đứt gãy",
-          "labelEn": "Broken",
-          "color": "#ef4444",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "pending",
-          "label": "Chờ hoàn thiện",
-          "labelEn": "Pending",
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
           "color": "#3b82f6",
           "entryActions": [],
           "exitActions": [],
           "allowedTransitionsFrom": []
+        },
+        {
+          "id": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved",
+            "active"
+          ]
+        },
+        {
+          "id": "retired",
+          "label": "Ngừng áp dụng",
+          "labelEn": "Retired",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "approved",
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
         }
       ],
       "transitions": [
         {
-          "from": "complete",
-          "to": "partial",
-          "trigger": "move_to_partial",
-          "label": "Mot phan",
-          "labelEn": "Partial",
-          "guards": [],
+          "from": "draft",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
               "to": "maintenance_supervisor",
-              "template": "plant_maintenance_partial"
+              "template": "plant_maintenance_approved"
+            },
+            {
+              "type": "setField",
+              "field": "approved_at",
+              "value": "NOW()"
             }
           ]
         },
         {
-          "from": "partial",
-          "to": "broken",
-          "trigger": "move_to_broken",
-          "label": "Dut gay",
-          "labelEn": "Broken",
-          "guards": [],
+          "from": "on_hold",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
               "to": "maintenance_supervisor",
-              "template": "plant_maintenance_broken"
+              "template": "plant_maintenance_approved"
+            },
+            {
+              "type": "setField",
+              "field": "approved_at",
+              "value": "NOW()"
             }
           ]
         },
         {
-          "from": "broken",
-          "to": "pending",
-          "trigger": "move_to_pending",
-          "label": "Cho xu ly",
-          "labelEn": "Pending",
+          "from": "approved",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_active"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_active"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
           "guards": [],
           "actions": [
             {
               "type": "notify",
               "to": "maintenance_supervisor",
-              "template": "plant_maintenance_pending"
+              "template": "plant_maintenance_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "retired",
+          "trigger": "retire",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_retired"
+            },
+            {
+              "type": "setField",
+              "field": "retired_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "retired",
+          "trigger": "retire",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_retired"
+            },
+            {
+              "type": "setField",
+              "field": "retired_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "retired",
+          "trigger": "retire",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_retired"
+            },
+            {
+              "type": "setField",
+              "field": "retired_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "retired",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Đã lưu trữ",
+          "labelEn": "Archived",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "maintenance_supervisor",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "maintenance_supervisor",
+              "template": "plant_maintenance_archived"
+            },
+            {
+              "type": "setField",
+              "field": "archived_at",
+              "value": "NOW()"
             }
           ]
         }
       ],
       "sla": {
-        "complete_to_partial": {
+        "draft_to_approved": {
+          "hours": 72,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "on_hold_to_approved": {
+          "hours": 72,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "approved_to_active": {
           "hours": 24,
           "escalateTo": "maintenance_supervisor"
         },
-        "partial_to_broken": {
+        "on_hold_to_active": {
           "hours": 24,
           "escalateTo": "maintenance_supervisor"
         },
-        "broken_to_pending": {
+        "approved_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "active_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "approved_to_retired": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "active_to_retired": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "on_hold_to_retired": {
+          "hours": 24,
+          "escalateTo": "maintenance_supervisor"
+        },
+        "retired_to_archived": {
           "hours": 24,
           "escalateTo": "maintenance_supervisor"
         }
@@ -37529,7 +38784,7 @@
       ],
       "stateField": "obligation_status",
       "statusSet": "qual_compliance_obligations_obligation_status",
-      "lifecycleMode": "guarded_transition_runtime",
+      "lifecycleMode": "persisted",
       "states": [
         {
           "id": "open",
@@ -37609,11 +38864,20 @@
           "trigger": "move_to_due",
           "label": "Due",
           "labelEn": "Due",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_due"
             }
           ]
@@ -37624,11 +38888,20 @@
           "trigger": "move_to_overdue",
           "label": "Quá hạn",
           "labelEn": "Overdue",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_overdue"
             }
           ]
@@ -37639,11 +38912,20 @@
           "trigger": "move_to_overdue",
           "label": "Quá hạn",
           "labelEn": "Overdue",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_overdue"
             }
           ]
@@ -37658,7 +38940,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -37666,7 +38949,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_waived"
             },
             {
@@ -37686,7 +38969,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -37694,7 +38978,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_waived"
             },
             {
@@ -37714,7 +38998,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -37722,7 +39007,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_waived"
             },
             {
@@ -37742,7 +39027,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -37750,7 +39036,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_closed"
             },
             {
@@ -37770,7 +39056,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -37778,7 +39065,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_closed"
             },
             {
@@ -37798,7 +39085,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -37806,7 +39094,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_closed"
             },
             {
@@ -37826,7 +39114,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -37834,7 +39123,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_closed"
             },
             {
@@ -37854,7 +39143,7 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
                 "system_admin"
               ]
             }
@@ -37862,7 +39151,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_engineer",
               "template": "quality_lab_archived"
             },
             {
@@ -37876,47 +39165,47 @@
       "sla": {
         "open_to_due": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "open_to_overdue": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "due_to_overdue": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "open_to_waived": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "due_to_waived": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "overdue_to_waived": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "open_to_closed": {
           "hours": 72,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "due_to_closed": {
           "hours": 72,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "overdue_to_closed": {
           "hours": 72,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "waived_to_closed": {
           "hours": 72,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         },
         "closed_to_archived": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_engineer"
         }
       },
       "digitalThread": {
@@ -39771,7 +41060,7 @@
       ],
       "stateField": "observation_status",
       "statusSet": "safety_observations_observation_status",
-      "lifecycleMode": "guarded_transition_runtime",
+      "lifecycleMode": "persisted",
       "states": [
         {
           "id": "logged",
@@ -39835,11 +41124,22 @@
           "trigger": "move_to_assigned",
           "label": "Đã phân công",
           "labelEn": "Assigned",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_assigned"
             }
           ]
@@ -39850,11 +41150,20 @@
           "trigger": "start",
           "label": "Đang thực hiện",
           "labelEn": "In Progress",
-          "guards": [],
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "operations_manager",
+                "plant_manager",
+                "system_admin"
+              ]
+            }
+          ],
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_in_progress"
             }
           ]
@@ -39869,7 +41178,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -39877,7 +41187,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_closed"
             },
             {
@@ -39897,7 +41207,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -39905,7 +41216,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_closed"
             },
             {
@@ -39925,7 +41236,8 @@
             {
               "type": "role",
               "roles": [
-                "module_admin",
+                "quality_manager",
+                "plant_manager",
                 "system_admin"
               ]
             }
@@ -39933,7 +41245,7 @@
           "actions": [
             {
               "type": "notify",
-              "to": "module_admin",
+              "to": "quality_manager",
               "template": "ehs_sustainability_archived"
             },
             {
@@ -39947,23 +41259,23 @@
       "sla": {
         "logged_to_assigned": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "assigned_to_in_progress": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "assigned_to_closed": {
           "hours": 72,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "in_progress_to_closed": {
           "hours": 72,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         },
         "closed_to_archived": {
           "hours": 24,
-          "escalateTo": "module_admin"
+          "escalateTo": "quality_manager"
         }
       },
       "digitalThread": {

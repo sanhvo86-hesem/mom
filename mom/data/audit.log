@@ -16,3 +16,4 @@
 {"action":"admin_role_perms_save","user":"admin-user","ip":"127.0.0.1","timestamp":"2026-04-09T13:14:13+00:00","context":[]}
 {"action":"admin_user_doc_overrides_save","user":"admin-user","ip":"127.0.0.1","timestamp":"2026-04-09T13:14:13+00:00","context":{"count":1}}
 {"action":"admin_user_upsert","user":"admin-user","ip":"127.0.0.1","timestamp":"2026-04-09T13:14:14+00:00","context":{"username":"linked.user"}}
+{"action":"schema_studio_compile_registry","user":"admin-user","ip":"127.0.0.1","timestamp":"2026-04-10T10:18:37+00:00","context":{"design_id":"workspace","bundle_id":"schema_compiler_workspace_20260410_101837"}}

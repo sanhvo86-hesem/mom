@@ -1493,7 +1493,10 @@
           ],
           "key_relationships": [
             "approved_period_code -> period_close_controls.period_code",
-            "subject_ref -> ap_invoices.ap_invoice_id"
+            "subject_ref -> ap_invoices.ap_invoice_id",
+            "subject_ref -> ar_invoices.ar_invoice_id",
+            "subject_ref -> inventory_transactions.inventory_transaction_id",
+            "subject_ref -> tms_shipments.shipment_id"
           ],
           "e_signature_required": true,
           "signature_meaning_field": "signature_meaning",
@@ -1555,7 +1558,10 @@
           "child_tables": [],
           "recommended_actions": [],
           "key_relationships": [
-            "inventory_item_id -> inventory_items.inventory_item_id"
+            "inventory_item_id -> inventory_items.inventory_item_id",
+            "org_plant_id -> org_plants.plant_id",
+            "org_site_id -> org_sites.site_id",
+            "source_record_id -> inventory_transactions.inventory_transaction_id"
           ]
         },
         "fixed-asset-capitalizations": {
@@ -1595,8 +1601,11 @@
           "child_tables": [],
           "recommended_actions": [],
           "key_relationships": [
+            "org_plant_id -> org_plants.plant_id",
+            "org_site_id -> org_sites.site_id",
             "warehouse_id -> org_warehouses.warehouse_id",
-            "lot_id -> lot.lot_id"
+            "lot_id -> lot.lot_id",
+            "source_record_id -> inventory_transactions.inventory_transaction_id"
           ],
           "release_snapshot_of": "inventory_balance"
         },
@@ -1611,7 +1620,9 @@
           "child_tables": [],
           "recommended_actions": [],
           "key_relationships": [
-            "production_order_id -> production_orders.production_order_id"
+            "production_order_id -> production_orders.production_order_id",
+            "org_plant_id -> org_plants.plant_id",
+            "org_site_id -> org_sites.site_id"
           ],
           "release_snapshot_of": "production_order_bom"
         },
@@ -1626,7 +1637,9 @@
           "child_tables": [],
           "recommended_actions": [],
           "key_relationships": [
-            "production_order_id -> production_orders.production_order_id"
+            "production_order_id -> production_orders.production_order_id",
+            "org_plant_id -> org_plants.plant_id",
+            "org_site_id -> org_sites.site_id"
           ],
           "release_snapshot_of": "production_order_route"
         },
@@ -1641,7 +1654,9 @@
           "child_tables": [],
           "recommended_actions": [],
           "key_relationships": [
-            "equipment_id -> equipment.equipment_id"
+            "equipment_id -> equipment.equipment_id",
+            "org_plant_id -> org_plants.plant_id",
+            "org_site_id -> org_sites.site_id"
           ],
           "release_snapshot_of": "mes_execution_oee"
         },
@@ -1657,8 +1672,10 @@
           "child_tables": [],
           "recommended_actions": [],
           "key_relationships": [
-            "org_site_id -> org_sites.org_site_id"
-          ]
+            "org_plant_id -> org_plants.plant_id",
+            "org_site_id -> org_sites.site_id"
+          ],
+          "release_snapshot_of": "plant_performance"
         }
       }
     }

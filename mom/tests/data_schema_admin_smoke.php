@@ -127,6 +127,11 @@ smoke_assert(array_key_exists('db_probe_resolved', (array)($workspace['metrics']
 smoke_assert(array_key_exists('migration_tracking_present', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether schema_migrations tracking exists.');
 smoke_assert(array_key_exists('applied_migration_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose how many migrations are recorded as applied.');
 smoke_assert(array_key_exists('migration_backlog_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose the migration backlog count.');
+smoke_assert(array_key_exists('business_contract_domain_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose business contract domain counts.');
+smoke_assert(array_key_exists('business_contract_package_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose authored business contract package counts.');
+smoke_assert(array_key_exists('business_contract_object_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose business contract object counts.');
+smoke_assert(array_key_exists('business_contract_state_model_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose business contract state model counts.');
+smoke_assert(array_key_exists('business_contract_deprecation_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose business contract deprecation counts.');
 smoke_assert(array_key_exists('operational_blind_spot_critical_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include critical operational blind-spot counts.');
 smoke_assert(array_key_exists('operational_stress_critical_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include critical operational stress counts.');
 smoke_assert(array_key_exists('present_lookup', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose DB table lookup data.');
@@ -171,6 +176,16 @@ smoke_assert(array_key_exists('column_drift_count', $firstTable), 'Table summari
 smoke_assert(array_key_exists('pk_drift', $firstTable), 'Table summaries should expose primary-key drift posture.');
 smoke_assert(isset($firstSchema['key']), 'At least one schema blueprint should expose a key.');
 smoke_assert(isset($firstVariable['key']), 'At least one variable category should expose a key.');
+smoke_assert(count((array)($workspace['lists']['designs'] ?? [])) === 1, 'Data Schema workspace should expose exactly one active design.');
+smoke_assert((string)((($workspace['lists']['designs'] ?? [])[0]['id'] ?? '')) === 'workspace', 'Data Schema workspace should expose workspace as the single active design.');
+smoke_assert(is_array(($workspace['artifacts']['business_contract_bundle'] ?? null)), 'Data Schema workspace should expose the business contract bundle summary.');
+smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary']['packageCount'] ?? 0) > 0, 'Business contract bundle summary should expose authored package coverage.');
+smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary']['objectCount'] ?? 0) > 0, 'Business contract bundle summary should expose canonical object coverage.');
+smoke_assert((float)($workspace['artifacts']['business_contract_bundle']['summary']['authoredCoverageRatio'] ?? 0) >= 0.50, 'Business contract bundle summary should keep at least 50% authored coverage across canonical objects.');
+smoke_assert((float)($workspace['artifacts']['business_contract_bundle']['summary']['lifecycleLikeCoverageRatio'] ?? 0) >= 0.60, 'Business contract bundle summary should keep at least 60% authored coverage across lifecycle-like objects.');
+smoke_assert((float)($workspace['artifacts']['business_contract_bundle']['summary']['coreValueStreamCoverageRatio'] ?? 0) >= 0.90, 'Business contract bundle summary should keep near-total authored coverage for core value-stream objects.');
+smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary']['priorityGapCount'] ?? -1) >= 0, 'Business contract bundle summary should expose the remaining priority gap count.');
+smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary']['stateModelCount'] ?? 0) > 0, 'Business contract bundle summary should expose state model coverage.');
 
 $buildTableSummaries = new ReflectionMethod(DataSchemaService::class, 'buildTableSummaries');
 $buildTableSummaries->setAccessible(true);

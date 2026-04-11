@@ -1,16 +1,25 @@
 ﻿/* ============================================================================
    HESEM MOM — Admin Appearance Editor v2.0
-   Enterprise-grade theme editor with 8 sub-tabs, 150+ controls.
+   Enterprise-grade template + appearance studio with 6 sub-tabs, 150+ controls.
    Loaded on-demand when admin navigates to Appearance tab.
    ============================================================================ */
 (function(){
 'use strict';
 
-var _subTab = 'overview';
+var _subTab = 'templates';
 
 function T(k){
   var en={
     overview:'Overview',typography:'Typography',colors:'Colors',layout:'Layout & Sizing',effects:'Effects',governance:'Governance',advanced:'Advanced',
+    templates:'Templates',tokens:'System Tokens',templateStudio:'Template Studio',searchTemplate:'Search template...',filterCategory:'Filter category',allCategories:'All categories',
+    zoneCount:'Zone count',density:'Density',noTemplate:'No template selected',editTemplate:'Edit template',cloneTemplate:'Clone template',deleteTemplate:'Delete template',
+    createTemplate:'Create template',templateUsage:'Template usage',modulesUsing:'Modules using',zoneConfig:'Zone configuration',gallery:'Gallery',detail:'Detail',
+    editor:'Editor',backToGallery:'Back to gallery',sortByName:'Sort by name',sortByZones:'Sort by zones',sortByCategory:'Sort by category',themeLibrary:'Visual themes',
+    previewTheme:'Preview theme',applyTheme:'Apply theme',templatePreset:'Template preset',templateEditor:'Template editor',templateSearchHint:'Find by name, category, density...',
+    saveTemplate:'Save template',newTemplate:'New template',templateCategory:'Template category',templateZones:'Template zones',templateDetail:'Template detail',templateCount:'Templates',
+    selectedTemplate:'Selected template',noTemplatesFound:'No templates found',templateModules:'Bound modules',templateMeta:'Template metadata',templateState:'Template state',
+    layoutContract:'Layout contract',exportTemplates:'Export templates',importTemplates:'Import templates',templateView:'Template view',themePreset:'Theme preset',
+    error:'Error',
     presets:'Quick Presets',livePreview:'Live Component Preview',
     compact:'Compact',default:'Default',comfortable:'Comfortable',custom:'Custom',
     light:'Light',dark:'Dark',auto:'Auto (OS)',schedule:'Scheduled',
@@ -53,6 +62,15 @@ function T(k){
   };
   var vi={
     overview:'Tổng quan',typography:'Kiểu chữ',colors:'Màu sắc',layout:'Bố cục',effects:'Hiệu ứng',governance:'Quản trị tuân thủ',advanced:'Nâng cao',
+    templates:'Mẫu bố cục',tokens:'Token hệ thống',templateStudio:'Template Studio',searchTemplate:'Tìm kiếm template...',filterCategory:'Lọc nhóm',allCategories:'Tất cả nhóm',
+    zoneCount:'Số zone',density:'Mật độ',noTemplate:'Chưa chọn template',editTemplate:'Chỉnh template',cloneTemplate:'Nhân bản template',deleteTemplate:'Xóa template',
+    createTemplate:'Tạo template',templateUsage:'Mức sử dụng template',modulesUsing:'Module đang dùng',zoneConfig:'Cấu hình zone',gallery:'Thư viện',detail:'Chi tiết',
+    editor:'Biên tập',backToGallery:'Quay lại thư viện',sortByName:'Theo tên',sortByZones:'Theo zones',sortByCategory:'Theo nhóm',themeLibrary:'Bộ giao diện',
+    previewTheme:'Xem thử theme',applyTheme:'Áp dụng theme',templatePreset:'Preset template',templateEditor:'Trình biên tập template',templateSearchHint:'Tìm theo tên, nhóm, mật độ...',
+    saveTemplate:'Lưu template',newTemplate:'Template mới',templateCategory:'Nhóm template',templateZones:'Các zone',templateDetail:'Chi tiết template',templateCount:'Số template',
+    selectedTemplate:'Template đã chọn',noTemplatesFound:'Không tìm thấy template',templateModules:'Module liên kết',templateMeta:'Metadata template',templateState:'Trạng thái template',
+    layoutContract:'Hợp đồng bố cục',exportTemplates:'Xuất templates',importTemplates:'Nhập templates',templateView:'Chế độ xem template',themePreset:'Preset giao diện',
+    error:'Lỗi',
     presets:'Thiết lập nhanh',livePreview:'Xem trước thành phần',
     compact:'Gọn',default:'Mặc định',comfortable:'Thoải mái',custom:'Tùy chỉnh',
     light:'Sáng',dark:'Tối',auto:'Tự động (OS)',schedule:'Hẹn giờ',
@@ -279,6 +297,11 @@ function infoCard(title, body, kind){
       bg: 'rgba(37,99,235,0.08)',
       border: 'rgba(37,99,235,0.22)',
       title: 'var(--blue,#2563eb)'
+    },
+    admin: {
+      bg: 'rgba(79,70,229,0.08)',
+      border: 'rgba(79,70,229,0.22)',
+      title: 'var(--indigo,#4f46e5)'
     },
     neutral: {
       bg: 'var(--bg-surface-alt,var(--bg-hover))',
@@ -958,19 +981,671 @@ function previewBreadcrumb(){
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
+/* ── TEMPLATE STUDIO DATA + STORAGE ────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+var TEMPLATE_STORAGE_KEY = 'hesem_layout_templates';
+var TEMPLATE_BINDING_KEY = 'hesem_module_template_binding';
+var _templateSearch = '';
+var _templateCategory = 'all';
+var _templateSort = 'name';
+var _selectedTemplate = null;
+var _templateView = 'gallery';
+var _templateThemePreview = 'professional-light';
+
+var TEMPLATE_SEED = {
+  overview: [
+    ["T01","Bảng điều khiển tổng hợp","Executive Dashboard","KPI hero 4-6 thẻ + biểu đồ xu hướng + sidebar tóm tắt + bảng dữ liệu. CEO/Giám đốc","header + kpi-bar + filter + main(2/3) + sidebar(1/3) + footer",5,"comfortable",["overview-t01"]],
+    ["T02","Giám sát vận hành","Operations Monitor","KPI realtime + lưới trạng thái máy + cảnh báo. Giám sát sàn sản xuất","header + kpi-bar(4) + main(grid 2x2 status cards) + footer",6,"dense",["overview-t02"]],
+    ["T03","Trung tâm phân tích","Analytics Hub","Lưới đa biểu đồ + bộ lọc thời gian. Phân tích đa chiều","header + filter + main(grid 2x2 charts)",5,"comfortable",["overview-t03"]],
+    ["T04","Trung tâm chỉ số","KPI Center","KPI focus 4 thẻ lớn + bảng chi tiết bên dưới","header + kpi-bar(4 large) + main(table) + footer",4,"default",["overview-t04"]],
+    ["T05","Tổng kết ca","Shift Summary","Sản lượng ca + chất lượng + ghi chú bàn giao","header + main(2-col: production + quality) + main(notes)",4,"default",["overview-t05"]],
+    ["T06","Bảng năng lượng","Energy Dashboard","Giám sát năng lượng + xu hướng tiêu thụ + cảnh báo","header + main(chart large) + sidebar(kpi + alerts)",5,"comfortable",["overview-t06"]],
+    ["T07","Tổng quan điều phối","Dispatch Overview","Trạng thái JO/WO + hàng đợi điều phối","header + kpi-bar(3) + main(grid 3-col cards) + main(queue table)",4,"default",["overview-t07"]],
+    ["T08","Dashboard phòng ban","Department Dashboard","KPI phòng ban + tiến độ công việc + nhân sự","header + kpi-bar(4) + main(2/3 charts) + sidebar(1/3 team list)",5,"comfortable",["overview-t08"]],
+    ["T09","Cockpit quản lý","Management Cockpit","Bảng điểm đa module + compliance + tài chính","header + kpi-bar(6) + tabs + main(multi-section scorecard)",6,"comfortable",["overview-t09"]],
+    ["T10","Tổng quan IoT","IoT Overview","Sensor overview + machine map + alert feed","header + filter + main(sensor grid) + sidebar(alert feed)",5,"default",["overview-t10"]],
+    ["T11","Dashboard an toàn","Safety Dashboard","Chỉ số HSE + sự cố + đào tạo an toàn","header + kpi-bar(4: incidents, near-miss, training, days-safe) + main(chart + table)",5,"comfortable",["overview-t11"]],
+    ["T12","Bảng Lean Manufacturing","Lean Board","5S scores + kaizen tracker + waste reduction","header + kpi-bar(5S scores) + main(2-col: kaizen board + metrics)",4,"default",["overview-t12"]]
+  ],
+  sales: [
+    ["T13","Danh sách đơn hàng","Sales Order List","Bảng SO + bộ lọc + pagination. CRUD cơ bản","header + filter + main(table) + footer(pagination)",4,"default",["sales-t13"]],
+    ["T14","Chi tiết đơn hàng","Order Detail","Thông tin SO + items + timeline + sidebar metadata","header + tabs + main(form sections) + sidebar(metadata + timeline)",5,"default",["sales-t14"]],
+    ["T15","Bảng theo dõi đơn hàng","Order Tracking Board","Pipeline stages: Lead → Qualified → Proposal → Won","header + filter + main(pipeline funnel + kanban)",4,"default",["sales-t15"]],
+    ["T16","Lịch giao hàng","Delivery Schedule","Calendar view + Gantt timeline + job list","header + tabs(calendar/gantt/list) + main + footer",4,"default",["sales-t16"]],
+    ["T17","Cổng khách hàng","Customer Order Portal","Khách hàng xem trạng thái đơn + tài liệu","header(hero) + filter + main(order cards) + footer",4,"default",["sales-t17"]],
+    ["T18","Phân tích đơn hàng","Order Analytics","Doanh thu trend + backlog + OTD analysis","header + kpi-bar(4) + main(charts 2x2) + footer",5,"default",["sales-t18"]],
+    ["T19","Trình tạo báo giá","Quotation Wizard","Multi-step wizard: Info → Items → Pricing → Review","header + stepper + main(form) + sidebar(summary) + footer(actions)",5,"default",["sales-t19"]],
+    ["T20","Quản lý hợp đồng","Contract Management","Bảng hợp đồng + chi tiết + renewal tracking","header + filter + main(table) + sidebar(detail panel)",5,"default",["sales-t20"]]
+  ],
+  engineering: [
+    ["T21","Danh mục chi tiết","Part Master","Bảng part master + click row → BOM + Routing","header + filter + main(table) + sidebar(selected part detail)",5,"default",["engineering-t21"]],
+    ["T22","Cấu trúc sản phẩm","BOM Explorer","Tree BOM + component detail + where-used","header + sidebar(tree nav) + main(BOM table + detail)",5,"default",["engineering-t22"]],
+    ["T23","Phiếu quy trình","Routing Sheet","Operation sequence + work centers + tooling","header + filter + main(routing table) + footer",4,"default",["engineering-t23"]],
+    ["T24","Quản lý CAM","CAM Program Manager","Chương trình CNC + G-code + version tracking","header + filter + main(program table) + sidebar(code preview)",5,"default",["engineering-t24"]],
+    ["T25","Yêu cầu thay đổi","ECR/ECN Manager","Change requests + approval flow + impact","header + filter + main(ECR table) + sidebar(approval timeline)",5,"default",["engineering-t25"]],
+    ["T26","Thiết kế sản phẩm mới","NPI Dashboard","New product pipeline + milestone tracking","header + kpi-bar(3) + main(pipeline kanban) + footer",5,"default",["engineering-t26"]],
+    ["T27","Bản vẽ kỹ thuật","Drawing Viewer","Document tree + drawing preview + markup","header + sidebar(tree) + main(viewer canvas) + footer(tools)",5,"default",["engineering-t27"]],
+    ["T28","So sánh phiên bản","Revision Compare","Side-by-side BOM/routing comparison","header + main(split-pane comparison) + footer",4,"default",["engineering-t28"]]
+  ],
+  purchasing: [
+    ["T29","Danh sách đặt mua","Purchase Order List","PO table + status filter + supplier filter","header + filter + main(table) + footer(pagination)",4,"default",["purchasing-t29"]],
+    ["T30","Tạo đơn mua hàng","PO Creation Wizard","Wizard: Supplier → Items → Terms → Review","header + stepper + main(form) + sidebar(running total) + footer",5,"default",["purchasing-t30"]],
+    ["T31","Bảng điểm NCC","Supplier Scorecard","Supplier performance: quality, delivery, price","header + kpi-bar(4) + main(chart + table) + sidebar(rating detail)",5,"default",["purchasing-t31"]],
+    ["T32","Cổng nhà cung cấp","Supplier Portal","NCC xem PO + gửi hóa đơn + cập nhật giao hàng","header + filter + main(PO cards) + footer",4,"default",["purchasing-t32"]],
+    ["T33","So sánh RFQ","RFQ Comparison","Side-by-side supplier quotes comparison","header + main(comparison table with highlight) + footer",4,"default",["purchasing-t33"]],
+    ["T34","Phân tích mua hàng","Procurement Analytics","Spend analysis + supplier breakdown + trends","header + kpi-bar(4) + main(charts) + footer",5,"default",["purchasing-t34"]],
+    ["T35","Dashboard mua hàng","Procurement Dashboard","PR pending + PO open + receiving status","header + kpi-bar(5) + tabs(PR/PO/Suppliers) + main(table)",5,"default",["purchasing-t35"]],
+    ["T36","Nhập hàng","Goods Receipt","Receiving form + inspection + put-away","header + main(form: PO items + qty check + location) + footer",4,"default",["purchasing-t36"]]
+  ],
+  production: [
+    ["T37","Trung tâm điều khiển MES","MES Control Center","Machine status grid + job queue + alerts","header + kpi-bar(3: Running/Setup/Down) + main(machine grid) + footer",5,"dense",["production-t37"]],
+    ["T38","Giao diện thợ máy","Operator Mobile","Mobile-first, nút lớn, touch-friendly","header(large) + main(current job card + action buttons)",3,"comfortable",["production-t38"]],
+    ["T39","Biểu đồ Gantt sản xuất","Gantt Schedule","Machine × Date × Shift Gantt chart","header + filter(date range) + main(gantt: left=machines, right=timeline)",4,"dense",["production-t39"]],
+    ["T40","Lưới trạng thái máy","Machine Status Grid","Machine tiles với OEE + downtime detail","header + kpi-bar(4: OEE/Running/Uptime/PM) + main(machine cards grid)",5,"default",["production-t40"]],
+    ["T41","Bảng Andon","Andon Board","Hiển thị cảnh báo lớn, dành cho TV xưởng","header(alert banner large) + main(status grid large font)",2,"comfortable",["production-t41"]],
+    ["T42","Dashboard OEE","OEE Dashboard","OEE metrics + Availability/Performance/Quality breakdown","header + kpi-bar(3: A/P/Q) + main(OEE trend chart + table)",4,"default",["production-t42"]],
+    ["T43","Chi tiết lệnh sản xuất","Work Order Detail","WO info + operations + materials + quality","header + tabs(info/ops/materials/quality) + main(form) + sidebar(status flow)",5,"default",["production-t43"]],
+    ["T44","Trình tạo quy trình","Routing Builder","Drag-drop operation sequence builder","header + sidebar(operation library) + main(routing canvas) + footer(save)",5,"default",["production-t44"]],
+    ["T45","Cây BOM sản xuất","BOM Production View","BOM tree + availability check + shortage alerts","header + sidebar(BOM tree) + main(component detail + availability)",5,"default",["production-t45"]],
+    ["T46","Điều phối công việc","Job Dispatch Queue","Priority queue + machine assignment + scheduling","header + filter + main(dispatch table sortable) + sidebar(machine list) + footer",5,"dense",["production-t46"]],
+    ["T47","Theo dõi sản xuất","Production Timeline","Timeline view of job progress + milestones","header + filter + main(vertical timeline) + footer",4,"default",["production-t47"]],
+    ["T48","Hồ sơ lô","Batch Record","Batch traveler: materials + process + tests + sign-off","header + tabs + main(multi-section form) + sidebar(batch summary)",5,"default",["production-t48"]],
+    ["T49","Theo dõi lao động","Labor Tracking","Time entry + operator assignment + efficiency","header + filter + main(timesheet table) + footer",4,"default",["production-t49"]],
+    ["T50","Phân tích ngừng máy","Downtime Analysis","Downtime categories + Pareto + trend","header + kpi-bar(MTBF/MTTR) + main(pareto + trend charts) + footer",5,"default",["production-t50"]],
+    ["T51","Ca làm việc","Shift Management","Weekly schedule grid + shift definitions + handover","header + tabs(schedule/definitions/handover) + main(grid/form)",4,"default",["production-t51"]]
+  ],
+  quality: [
+    ["T52","Dashboard ngoại lệ","Exception Dashboard","NCR/CAPA summary + exception trend + category breakdown","header + kpi-bar(4: Open NCR/Critical/Avg Resolution/Scrap Cost) + main(charts 2x1) + footer",5,"default",["quality-t52"]],
+    ["T53","Phiếu NCR/CAPA","NCR/CAPA Form","Exception entry form + corrective action + 8D steps","header + stepper(8D) + main(form sections) + sidebar(related items) + footer",5,"default",["quality-t53"]],
+    ["T54","Biểu đồ kiểm soát SPC","SPC Control Chart","X-bar, R chart, Histogram, Run chart + process capability","header + filter(process selector) + tabs(X-bar/R/Histogram/Run) + main(chart) + sidebar(Cpk summary)",5,"default",["quality-t54"]],
+    ["T55","Ma trận FMEA","FMEA Risk Matrix","S×O×D matrix + RPN ranking + mitigation","header + filter + main(FMEA table S/O/D/RPN) + footer",4,"dense",["quality-t55"]],
+    ["T56","Phiếu kiểm tra","Inspection Form","FAI/IQC/IPQC/FQC/OQC inspection record","header + tabs(IQC/IPQC/FQC/OQC/MSA) + main(inspection table) + footer",5,"default",["quality-t56"]],
+    ["T57","Báo cáo 8D","8D Report Wizard","8-discipline problem solving wizard","header + stepper(8 steps) + main(step form) + sidebar(team + timeline) + footer",5,"default",["quality-t57"]],
+    ["T58","Kế hoạch đánh giá","Audit Plan","Audit schedule + findings + follow-up","header + kpi-bar(4) + main(stacked bar + table) + sidebar(finding detail)",5,"default",["quality-t58"]],
+    ["T59","Quản lý hiệu chuẩn","Calibration Manager","Instrument register + calibration schedule + status","header + filter(status + type) + kpi-bar(4) + main(instrument table) + footer",5,"default",["quality-t59"]],
+    ["T60","Phòng thí nghiệm","Quality Test Lab","Test orders + results entry + report generation","header + tabs(orders/results/reports) + main(table/form) + sidebar",5,"default",["quality-t60"]],
+    ["T61","Năng lực quy trình","Process Capability","Cpk/Ppk analysis + capability matrix + trending","header + filter + main(capability bar chart) + sidebar(threshold legend)",5,"default",["quality-t61"]],
+    ["T62","Kiểm soát đầu vào","Incoming Quality Control","IQC lot inspection + supplier quality trend","header + kpi-bar(3) + main(lot table) + sidebar(supplier trend)",5,"default",["quality-t62"]],
+    ["T63","Theo dõi hành động","Corrective Action Tracker","CAPA pipeline + overdue alerts + effectiveness","header + filter + main(CAPA table with progress bars) + footer",5,"default",["quality-t63"]],
+    ["T64","Ma trận rủi ro","Risk Assessment Matrix","5×5 risk matrix + risk register + mitigation plan","header + main(2/3: risk scatter chart + matrix grid) + sidebar(1/3: register)",5,"default",["quality-t64"]],
+    ["T65","MSA/GR&amp;R","MSA Analysis","Gauge R&R study + operator comparison + trending","header + tabs(Studies/GR&R/Operator/Trending) + main(chart + table)",5,"default",["quality-t65"]]
+  ],
+  warehouse: [
+    ["T66","Dashboard kho","Inventory Dashboard","Tổng quan tồn kho + SKU + alerts + warehouse zones","header + kpi-bar(4) + main(donut + bar chart) + sidebar(warehouse zones)",5,"comfortable",["warehouse-t66"]],
+    ["T67","Lưới tồn kho","Stock Level Grid","Bảng vật tư + search + status ok, low, critical","header + filter + main(material register table) + footer",4,"dense",["warehouse-t67"]],
+    ["T68","Bản đồ kho","Warehouse Map","Visual warehouse layout + bin locations + heat map","header + filter + main(warehouse visual map)",4,"comfortable",["warehouse-t68"]],
+    ["T69","Phiếu nhập kho","Receiving Form","Nhập hàng theo PO + kiểm tra số lượng + put-away","header + main(form: PO lookup + items + location) + footer",4,"default",["warehouse-t69"]],
+    ["T70","Kiểm kê","Cycle Count","Cycle count schedule + variance report","header + filter + main(count sheet table) + footer",4,"default",["warehouse-t70"]],
+    ["T71","Danh mục vật tư","Material Master","Material register + specs + suppliers + history","header + filter + main(table) + sidebar(material detail)",5,"dense",["warehouse-t71"]],
+    ["T72","Nhật ký xuất nhập","Movement Log","Inventory transactions timeline + filter","header + filter + main(timeline log) + footer",4,"dense",["warehouse-t72"]],
+    ["T73","Hoạch định Min/Max","Min/Max Planning","Reorder point analysis + safety stock calculation","header + filter + main(planning table) + footer",4,"default",["warehouse-t73"]],
+    ["T74","Truy xuất lô","Lot Traceability","Lot genealogy tree + forward/backward trace","header + filter + sidebar(lot tree) + main(trace detail)",4,"comfortable",["warehouse-t74"]],
+    ["T75","Quản lý dụng cụ","Tool Crib","Tool inventory + life tracking + checkout and return","header + kpi-bar(3) + main(tool table with life bars) + sidebar(checkout log)",5,"default",["warehouse-t75"]],
+    ["T76","Danh sách giao hàng","Shipment List","Shipment table + status pipeline + documents","header + filter + main(table) + footer",4,"dense",["warehouse-t76"]],
+    ["T77","Lập phiếu giao","Shipping Wizard","Pack list creation + weight + carrier selection","header + stepper + main(form) + sidebar(package summary) + footer",5,"comfortable",["warehouse-t77"]],
+    ["T78","Theo dõi vận chuyển","Delivery Tracking","Tracking timeline + carrier status + proof of delivery","header + main(tracking timeline + map placeholder) + footer",4,"comfortable",["warehouse-t78"]],
+    ["T79","Lịch giao hàng","Delivery Calendar","Calendar view + scheduled vs actual delivery","header + filter + main(calendar grid) + footer",4,"default",["warehouse-t79"]]
+  ],
+  finance: [
+    ["T80","Dashboard tài chính","Finance Dashboard","Doanh thu + chi phí + lợi nhuận + AR/AP","header + kpi-bar(4) + main(bar + pie charts) + sidebar(recent txns)",5,"comfortable",["finance-t80"]],
+    ["T81","Sổ cái công việc","Job Costing","Cost breakdown by job: material + labor + overhead","header + filter + main(job cost table) + sidebar(cost waterfall chart)",5,"dense",["finance-t81"]],
+    ["T82","Hóa đơn &amp; Thanh toán","Invoice Management","AR/AP aging + invoice table + payment status","header + kpi-bar(3: overdue, pending, paid) + main(table) + footer",4,"dense",["finance-t82"]],
+    ["T83","Hồ sơ công việc","Job Evidence","Job folder: drawings + inspection + certifications","header + sidebar(job tree) + main(document list + preview)",5,"default",["finance-t83"]],
+    ["T84","Báo cáo chi phí chất lượng","COPQ Report","Cost of Poor Quality analysis + Pareto + trend","header + kpi-bar(3) + main(pareto + trend charts) + footer",5,"comfortable",["finance-t84"]],
+    ["T85","Bảng lương","Payroll Summary","Payroll summary + personnel cost analysis","header + kpi-bar(4) + main(payroll table) + footer",4,"dense",["finance-t85"]]
+  ],
+  hr: [
+    ["T86","Danh bạ nhân viên","Employee Directory","Bảng NV + click row tới detail panel với avatar, KPI, phép","header + filter + main(table) + sidebar(employee detail card)",5,"dense",["hr-t86"]],
+    ["T87","Quản lý nghỉ phép","Leave Management","Bảng đơn phép + approve, reject + calendar view","header + tabs(requests/calendar) + main(table/calendar) + footer",4,"default",["hr-t87"]],
+    ["T88","Đánh giá KPI","KPI Evaluation","Bảng KPI nhân viên + target vs actual + leaderboard","header + kpi-bar(3) + main(KPI table) + sidebar(top performers)",5,"comfortable",["hr-t88"]],
+    ["T89","Quản lý đào tạo","Training Records","Khóa đào tạo + enrollment + progress tracking","header + tabs(courses/matrix/sessions) + main + footer",5,"default",["hr-t89"]],
+    ["T90","Ma trận năng lực","Competency Matrix","Heatmap nhân viên × kỹ năng × mức độ","header + filter + main(heatmap grid color-coded)",3,"dense",["hr-t90"]],
+    ["T91","Bảng chấm công","Attendance Sheet","Bảng chấm công tháng + thống kê","header + filter(month) + main(attendance grid) + footer",4,"dense",["hr-t91"]],
+    ["T92","Ca làm việc","Shift Schedule","Lịch ca tuần + machine assignment + handover","header + tabs(weekly/definitions) + main(schedule grid)",3,"default",["hr-t92"]],
+    ["T93","Thông tin lương","Salary Info","Phiếu lương cá nhân + deductions + net pay","header + main(payslip form) + footer",3,"comfortable",["hr-t93"]],
+    ["T94","Thông báo công ty","Announcements","Feed thông báo + pin + priority + likes/comments","header + main(announcement feed cards) + sidebar(quick links)",4,"comfortable",["hr-t94"]],
+    ["T95","Cổng thông tin","Company Portal","Portal tổng hợp announcements + policies + calendar","header(hero banner) + main(3-col: news + policies + calendar)",4,"comfortable",["hr-t95"]]
+  ],
+  document: [
+    ["T96","Duyệt tài liệu","Document Browser","Tree nav + document list + preview pane","header + sidebar(tree) + main(list) + sidebar-right(preview)",4,"default",["document-t96"]],
+    ["T97","Xem báo cáo","Report Viewer","Toolbar + rendered report content + export","header + filter(toolbar) + main(report canvas)",3,"comfortable",["document-t97"]],
+    ["T98","Nhật ký sự kiện","Timeline Log","Audit trail + event detail + filter by type","header + filter + main(vertical timeline) + footer",4,"dense",["document-t98"]],
+    ["T99","Kho bằng chứng","Evidence Vault","Evidence list + file preview + compliance tags","header + filter + main(evidence table) + sidebar(file preview)",5,"default",["document-t99"]],
+    ["T100","So sánh phiên bản","Version Compare","Side-by-side document version comparison","header + main(split-pane diff view) + footer",3,"default",["document-t100"]],
+    ["T101","Trình soạn SOP","SOP Editor","Rich text editor + template structure + approval","header + sidebar(outline) + main(rich editor) + footer(actions)",4,"comfortable",["document-t101"]],
+    ["T102","Quản lý thay đổi","Change Control","ECR/ECN table + impact analysis + approval flow","header + filter + main(change request table) + sidebar(approval workflow)",5,"default",["document-t102"]],
+    ["T103","Đánh giá nội bộ","Audit Management","Audit schedule + findings + scoring","header + kpi-bar(4) + main(stacked bar + table) + sidebar(finding detail)",5,"default",["document-t103"]],
+    ["T104","Quản lý rủi ro","Risk Management","5×5 risk matrix + FMEA register + mitigation","header + main(scatter chart + matrix grid) + sidebar(risk register)",4,"dense",["document-t104"]],
+    ["T105","Hồ sơ đào tạo tuân thủ","Compliance Training","Training completion matrix + certification tracking","header + filter + main(compliance matrix) + footer",4,"dense",["document-t105"]]
+  ],
+  admin: [
+    ["T106","Bảng cấu hình","Config Panel","Settings groups accordion + save + reset","header + main(settings accordion sections) + footer",3,"default",["admin-t106"]],
+    ["T107","Quản lý người dùng","User Management","User table + role assignment + permissions","header + filter + main(user table) + footer",4,"dense",["admin-t107"]],
+    ["T108","Ma trận phân quyền","Permission Matrix","Roles × modules matrix + CRUD toggles","header + main(scrollable matrix with sticky first column) + footer",3,"dense",["admin-t108"]],
+    ["T109","Sơ đồ tổ chức","Org Chart","Expandable tree org chart + department badges","header + main(recursive tree diagram) + footer",3,"comfortable",["admin-t109"]],
+    ["T110","Hiển thị module","Module Visibility","Toggle on/off modules per role","header + main(module toggle grid grouped by section) + footer",3,"dense",["admin-t110"]],
+    ["T111","Trung tâm bảo mật","Security Center","Login logs + session management + 2FA settings","header + kpi-bar(3) + tabs(logs/sessions/settings) + main(table)",5,"default",["admin-t111"]],
+    ["T112","Schema Studio","Schema Studio","Schema editor + field inspector + relation map","header + sidebar(table list) + main(field editor) + sidebar-right(inspector)",4,"dense",["admin-t112"]],
+    ["T113","Giám sát hệ thống","System Health","Server status + API response times + error rates","header + kpi-bar(4) + main(charts: CPU, RAM, API latency) + footer",4,"comfortable",["admin-t113"]]
+  ],
+  generic: [
+    ["T114","Bảng danh sách","Generic List Report","Filter + sortable table + pagination","header + filter + main(table) + footer",4,"dense",["generic-t114"]],
+    ["T115","Chi tiết bản ghi","Generic Record Detail","Full record view + sidebar metadata","header + main(detail form) + sidebar(metadata) + footer",4,"default",["generic-t115"]],
+    ["T116","Lưới thẻ","Generic Card Grid","Responsive card grid + filter + sort","header + filter + main(card grid)",3,"comfortable",["generic-t116"]],
+    ["T117","Biểu mẫu wizard","Generic Form Wizard","Multi-step form + progress stepper","header + stepper + main(step form) + footer(back/next)",4,"comfortable",["generic-t117"]],
+    ["T118","Bảng Kanban","Generic Kanban Board","Drag-drop columns + card detail","header + filter + main(kanban columns)",3,"default",["generic-t118"]],
+    ["T119","Biểu đồ Gantt","Generic Gantt Chart","Resource × time Gantt + zoom + drag resize","header + filter + main(gantt: left resources + right timeline)",4,"dense",["generic-t119"]],
+    ["T120","Master-Detail","Generic Master-Detail","List panel + detail panel click-to-view","header + sidebar(list panel) + main(detail panel) + footer",4,"default",["generic-t120"]],
+    ["T121","Trống / Empty","Empty State Template","Beautiful empty state with illustration + CTA","header + main(centered empty state)",2,"comfortable",["generic-t121"]],
+    ["T122","Dashboard trống","Blank Dashboard","Customizable grid + add widget buttons","header + main(grid with add-widget actions)",2,"comfortable",["generic-t122"]],
+    ["T123","Trang in","Print Layout","Print-optimized layout + header + footer","header(print) + main(content) + footer(page number)",3,"default",["generic-t123"]]
+  ]
+};
+
+var TEMPLATE_CATEGORIES = [
+  { key:'overview', label:{ vi:'Tổng quan', en:'Overview' }, icon:'📊', color:'blue', count:12 },
+  { key:'sales', label:{ vi:'Bán hàng', en:'Sales' }, icon:'💰', color:'cyan', count:8 },
+  { key:'engineering', label:{ vi:'Kỹ thuật', en:'Engineering' }, icon:'⚙️', color:'indigo', count:8 },
+  { key:'purchasing', label:{ vi:'Mua hàng', en:'Purchasing' }, icon:'🛒', color:'amber', count:8 },
+  { key:'production', label:{ vi:'Sản xuất', en:'Production' }, icon:'🏭', color:'green', count:15 },
+  { key:'quality', label:{ vi:'Chất lượng', en:'Quality' }, icon:'✅', color:'red', count:14 },
+  { key:'warehouse', label:{ vi:'Kho vận', en:'Warehouse' }, icon:'📦', color:'teal', count:14 },
+  { key:'finance', label:{ vi:'Tài chính', en:'Finance' }, icon:'💵', color:'amber', count:6 },
+  { key:'hr', label:{ vi:'Nhân sự', en:'HR' }, icon:'👥', color:'pink', count:10 },
+  { key:'document', label:{ vi:'Tài liệu', en:'Documents' }, icon:'📄', color:'purple', count:10 },
+  { key:'admin', label:{ vi:'Quản trị', en:'Admin' }, icon:'🔧', color:'dark', count:8 },
+  { key:'generic', label:{ vi:'Mẫu chung', en:'Generic' }, icon:'📐', color:'dark', count:10 }
+];
+
+var VISUAL_THEMES = [
+  { id:'professional-light', name:{vi:'Chuyên nghiệp Sáng',en:'Professional Light'}, colors:{brand:'#0c2d48',brand2:'#1565c0',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#f9a825'}, desc:{vi:'Mặc định. Tương phản cao, dễ đọc.',en:'Default. High contrast, easy to read.'} },
+  { id:'professional-dark', name:{vi:'Chuyên nghiệp Tối',en:'Professional Dark'}, colors:{brand:'#1e293b',brand2:'#60a5fa',bgPage:'#0f172a',bgSurface:'#1e293b',accent:'#f9a825'}, desc:{vi:'Surface tối, hợp dashboard đêm.',en:'Dark surfaces for night operations.'} },
+  { id:'midnight-navy', name:{vi:'Nửa đêm',en:'Midnight Navy'}, colors:{brand:'#0f172a',brand2:'#0891b2',bgPage:'#020617',bgSurface:'#111827',accent:'#22d3ee'}, desc:{vi:'Navy sâu cho ca đêm và control room.',en:'Deep navy for night shift control rooms.'} },
+  { id:'ocean-breeze', name:{vi:'Đại dương',en:'Ocean Breeze'}, colors:{brand:'#0369a1',brand2:'#0891b2',bgPage:'#f0f9ff',bgSurface:'#ffffff',accent:'#38bdf8'}, desc:{vi:'Sáng, tươi và nhiều cyan.',en:'Fresh cyan-heavy visual direction.'} },
+  { id:'forest-calm', name:{vi:'Rừng xanh',en:'Forest Calm'}, colors:{brand:'#166534',brand2:'#16a34a',bgPage:'#f0fdf4',bgSurface:'#ffffff',accent:'#84cc16'}, desc:{vi:'Mềm, xanh và yên tĩnh.',en:'Calm green palette for steady review.'} },
+  { id:'sunrise-warm', name:{vi:'Bình minh',en:'Sunrise Warm'}, colors:{brand:'#9a3412',brand2:'#ea580c',bgPage:'#fffbeb',bgSurface:'#fff7ed',accent:'#f59e0b'}, desc:{vi:'Ấm áp, phù hợp sales hoặc portal.',en:'Warm palette for sales and portals.'} },
+  { id:'sunset-ember', name:{vi:'Hoàng hôn',en:'Sunset Ember'}, colors:{brand:'#7c2d12',brand2:'#dc2626',bgPage:'#fef2f2',bgSurface:'#fff7ed',accent:'#fb7185'}, desc:{vi:'Mạnh, thiên đỏ cam.',en:'Strong red-orange emphasis.'} },
+  { id:'arctic-snow', name:{vi:'Bắc Cực',en:'Arctic Snow'}, colors:{brand:'#1e3a5f',brand2:'#3b82f6',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#94a3b8'}, desc:{vi:'Sạch, lạnh, tương phản rõ.',en:'Clean high-contrast icy palette.'} },
+  { id:'cherry-blossom', name:{vi:'Hoa Anh Đào',en:'Cherry Blossom'}, colors:{brand:'#9d174d',brand2:'#db2777',bgPage:'#fdf2f8',bgSurface:'#ffffff',accent:'#f9a8d4'}, desc:{vi:'Hồng nhẹ cho HR và portal mềm.',en:'Soft pink for HR and friendly portal flows.'} },
+  { id:'lavender-dream', name:{vi:'Oải hương',en:'Lavender Dream'}, colors:{brand:'#6d28d9',brand2:'#8b5cf6',bgPage:'#faf5ff',bgSurface:'#ffffff',accent:'#c084fc'}, desc:{vi:'Sáng tạo và hơi premium.',en:'Creative and premium purple tone.'} },
+  { id:'industrial-steel', name:{vi:'Thép công nghiệp',en:'Industrial Steel'}, colors:{brand:'#374151',brand2:'#6b7280',bgPage:'#f3f4f6',bgSurface:'#ffffff',accent:'#94a3b8'}, desc:{vi:'Khô, chắc, thiên công nghiệp.',en:'Dry industrial gray palette.'} },
+  { id:'shopfloor-signal', name:{vi:'Tín hiệu xưởng',en:'Shopfloor Signal'}, colors:{brand:'#dc2626',brand2:'#16a34a',bgPage:'#fff7ed',bgSurface:'#ffffff',accent:'#d97706'}, desc:{vi:'High contrast cho màn hình xưởng.',en:'High-contrast for shop floor screens.'} },
+  { id:'executive-glass', name:{vi:'Kính điều hành',en:'Executive Glass'}, colors:{brand:'#0f172a',brand2:'#2563eb',bgPage:'#eef4ff',bgSurface:'#ffffff',accent:'#38bdf8'}, desc:{vi:'Glass nhẹ và sang trọng.',en:'Light glassy executive finish.'} },
+  { id:'compliance-paper', name:{vi:'Giấy tuân thủ',en:'Compliance Paper'}, colors:{brand:'#57534e',brand2:'#78716c',bgPage:'#fafaf9',bgSurface:'#fffbeb',accent:'#a16207'}, desc:{vi:'Document-like, trung tính và dễ in.',en:'Document-first neutral paper tone.'} },
+  { id:'focus-mode', name:{vi:'Tập trung',en:'Focus Mode'}, colors:{brand:'#18181b',brand2:'#3f3f46',bgPage:'#fafafa',bgSurface:'#ffffff',accent:'#27272a'}, desc:{vi:'Tối giản, ít nhiễu.',en:'Minimal and distraction-free.'} },
+  { id:'vibrant-energy', name:{vi:'Năng lượng',en:'Vibrant Energy'}, colors:{brand:'#7c3aed',brand2:'#06b6d4',bgPage:'#f5f3ff',bgSurface:'#ffffff',accent:'#f97316'}, desc:{vi:'Sinh động, nhiều gradient.',en:'Energetic, gradient-friendly preset.'} },
+  { id:'soft-pastel', name:{vi:'Pastel mềm',en:'Soft Pastel'}, colors:{brand:'#6366f1',brand2:'#a5b4fc',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#f9a8d4'}, desc:{vi:'Dịu, phù hợp HR và onboarding.',en:'Soft pastel for onboarding and HR flows.'} },
+  { id:'earth-tone', name:{vi:'Đất',en:'Earth Tone'}, colors:{brand:'#78350f',brand2:'#92400e',bgPage:'#fefce8',bgSurface:'#fff7ed',accent:'#ca8a04'}, desc:{vi:'Nâu ấm, organic.',en:'Warm organic brown palette.'} },
+  { id:'neon-pulse', name:{vi:'Neon',en:'Neon Pulse'}, colors:{brand:'#09090b',brand2:'#22c55e',bgPage:'#09090b',bgSurface:'#18181b',accent:'#06b6d4'}, desc:{vi:'Dark tech với accent neon.',en:'Dark tech preset with neon accents.'} },
+  { id:'zen-minimal', name:{vi:'Thiền',en:'Zen Minimal'}, colors:{brand:'#737373',brand2:'#a3a3a3',bgPage:'#fafafa',bgSurface:'#ffffff',accent:'#d4d4d4'}, desc:{vi:'Whitespace tối đa, trang nhã.',en:'Maximum whitespace, minimal chrome.'} }
+];
+
+function normalizeSubTab(subTab){
+  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens' };
+  return aliases[subTab] || subTab || 'templates';
+}
+
+function decodeHtmlText(v){
+  return String(v || '').replace(/&amp;/g, '&');
+}
+
+function inferZones(layoutMeta, zoneCount){
+  var text = String(layoutMeta || '').toLowerCase();
+  var zones = [];
+  function push(z){ if(zones.indexOf(z) === -1) zones.push(z); }
+  if(text.indexOf('header') >= 0) push('header');
+  if(text.indexOf('kpi-bar') >= 0) push('kpi-bar');
+  if(text.indexOf('tabs') >= 0 || text.indexOf('stepper') >= 0) push('tabs');
+  if(text.indexOf('filter') >= 0) push('filter');
+  if(text.indexOf('sidebar') >= 0) push('sidebar');
+  if(text.indexOf('chart') >= 0 && text.indexOf('main(chart') >= 0) push('chart-area');
+  if(text.indexOf('main') >= 0 || zoneCount >= 2) push('main');
+  if(text.indexOf('footer') >= 0) push('footer');
+  ['header','kpi-bar','tabs','filter','main','sidebar','chart-area','footer'].forEach(function(z){
+    if(zones.length < zoneCount) push(z);
+  });
+  return zones.slice(0, Math.max(2, zoneCount || zones.length || 2));
+}
+
+function inferZoneLayout(zones){
+  var hasSidebar = zones.indexOf('sidebar') >= 0;
+  var hasKpi = zones.indexOf('kpi-bar') >= 0;
+  var hasTabs = zones.indexOf('tabs') >= 0;
+  var hasFilter = zones.indexOf('filter') >= 0;
+  var hasFooter = zones.indexOf('footer') >= 0;
+  if(hasSidebar && hasKpi && hasFilter && hasFooter) return { gridCols:'2fr 1fr', gridRows:'auto auto auto 1fr auto' };
+  if(hasSidebar && hasFooter) return { gridCols:'1fr 1.4fr', gridRows:'auto auto 1fr auto' };
+  if(hasTabs && hasFooter) return { gridCols:'1fr', gridRows:'auto auto 1fr auto' };
+  if(hasFilter && hasFooter) return { gridCols:'1fr', gridRows:'auto auto 1fr auto' };
+  if(hasSidebar) return { gridCols:'2fr 1fr', gridRows:'auto 1fr auto' };
+  return { gridCols:'1fr', gridRows:'auto 1fr auto' };
+}
+
+function buildTemplatePresets(){
+  var presets = [];
+  TEMPLATE_CATEGORIES.forEach(function(cat){
+    (TEMPLATE_SEED[cat.key] || []).forEach(function(row){
+      var zones = inferZones(row[4], row[5]);
+      presets.push({
+        id: row[0],
+        name: { vi: decodeHtmlText(row[1]), en: decodeHtmlText(row[2]) },
+        desc: { vi: decodeHtmlText(row[3]), en: decodeHtmlText(row[3]) },
+        category: cat.key,
+        categoryLabel: cat.label,
+        categoryColor: cat.color,
+        categoryIcon: cat.icon,
+        zones: zones,
+        zoneCount: row[5],
+        zoneLayout: inferZoneLayout(zones),
+        density: row[6],
+        modules: row[7] || [],
+        layoutMeta: decodeHtmlText(row[4]),
+        zoneSettings: zones.map(function(z){
+          return { name:z, type:z, scroll:(z==='main' || z==='sidebar') ? 'data-only' : 'sticky', allowed:(z==='main') ? 'ALL data/chart/form blocks' : (z==='sidebar' ? 'summary/list/chart blocks' : 'layout/navigation/action blocks') };
+        })
+      });
+    });
+  });
+  return presets;
+}
+
+var TEMPLATE_PRESETS = buildTemplatePresets();
+var BASE_TEMPLATE_PRESETS = TEMPLATE_PRESETS;
+
+function readTemplateStore(){
+  try {
+    if(window.HmTheme && typeof HmTheme.getTemplates === 'function') return HmTheme.getTemplates() || {};
+    var raw = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+
+function writeTemplateStore(store){
+  try { localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(store || {})); } catch(e){}
+}
+
+function cloneTemplateData(tpl){
+  return JSON.parse(JSON.stringify(tpl));
+}
+
+function saveTemplateRecord(tpl){
+  if(!tpl || !tpl.id) return;
+  if(window.HmTheme && typeof HmTheme.saveTemplate === 'function'){
+    HmTheme.saveTemplate(tpl.id, cloneTemplateData(tpl));
+    return;
+  }
+  var store = readTemplateStore();
+  store[tpl.id] = cloneTemplateData(tpl);
+  writeTemplateStore(store);
+}
+
+function deleteTemplateRecord(id){
+  if(window.HmTheme && typeof HmTheme.deleteTemplate === 'function'){
+    HmTheme.deleteTemplate(id);
+    return;
+  }
+  var store = readTemplateStore();
+  delete store[id];
+  writeTemplateStore(store);
+}
+
+function getAllTemplates(){
+  var store = readTemplateStore();
+  var map = {};
+  BASE_TEMPLATE_PRESETS.forEach(function(tpl){ map[tpl.id] = cloneTemplateData(tpl); });
+  Object.keys(store).forEach(function(id){
+    if(map[id]){
+      var base = map[id];
+      var custom = store[id];
+      Object.keys(custom).forEach(function(k){ base[k] = custom[k]; });
+      map[id] = base;
+    } else {
+      map[id] = cloneTemplateData(store[id]);
+    }
+  });
+  return Object.keys(map).map(function(id){ return map[id]; });
+}
+
+function getTemplates(){
+  var list = getAllTemplates().filter(function(tpl){
+    var hay = [tpl.id, tpl.name.vi, tpl.name.en, tpl.desc.vi, tpl.category, tpl.density].join(' ').toLowerCase();
+    var passSearch = !_templateSearch || hay.indexOf(String(_templateSearch).toLowerCase()) >= 0;
+    var passCat = !_templateCategory || _templateCategory === 'all' || tpl.category === _templateCategory;
+    return passSearch && passCat;
+  });
+  list.sort(function(a, b){
+    if(_templateSort === 'zones') return (b.zoneCount || 0) - (a.zoneCount || 0) || a.id.localeCompare(b.id);
+    if(_templateSort === 'category') return String(a.category).localeCompare(String(b.category)) || a.id.localeCompare(b.id);
+    var aName = String(((lang === 'en' ? a.name.en : a.name.vi) || a.name.vi || a.id)).toLowerCase();
+    var bName = String(((lang === 'en' ? b.name.en : b.name.vi) || b.name.vi || b.id)).toLowerCase();
+    return aName.localeCompare(bName) || a.id.localeCompare(b.id);
+  });
+  return list;
+}
+
+function getTemplateById(id){
+  return getAllTemplates().find(function(tpl){ return tpl.id === id; }) || null;
+}
+
+function getModuleTemplateBinding(){
+  try {
+    var raw = localStorage.getItem(TEMPLATE_BINDING_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+
+function getModulesUsingTemplate(tpl){
+  var found = {};
+  (tpl.modules || []).forEach(function(m){ found[m] = true; });
+  var binding = getModuleTemplateBinding();
+  Object.keys(binding || {}).forEach(function(key){
+    if(Array.isArray(binding[key]) && key === tpl.id){
+      binding[key].forEach(function(m){ found[m] = true; });
+      return;
+    }
+    if(binding[key] === tpl.id) found[key] = true;
+  });
+  return Object.keys(found);
+}
+
+function densityChipStyle(density){
+  if(density === 'dense') return 'background:rgba(217,119,6,.12);color:#b45309;border:1px solid rgba(217,119,6,.18)';
+  if(density === 'comfortable') return 'background:rgba(22,163,74,.12);color:#15803d;border:1px solid rgba(22,163,74,.18)';
+  return 'background:rgba(79,70,229,.10);color:#4338ca;border:1px solid rgba(79,70,229,.18)';
+}
+
+function renderTemplateSvg(tpl){
+  var zones = tpl.zones || [];
+  var has = function(z){ return zones.indexOf(z) >= 0; };
+  var s = '<svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+  s += '<rect x="0" y="0" width="200" height="118" rx="4" fill="#f8fbff"/>';
+  if(has('header')) s += '<rect x="4" y="4" width="192" height="14" rx="3" fill="rgba(21,101,192,.10)"/>';
+  if(has('kpi-bar')) s += '<rect x="4" y="22" width="45" height="16" rx="2" fill="rgba(249,168,37,.14)"/><rect x="52" y="22" width="45" height="16" rx="2" fill="rgba(249,168,37,.14)"/><rect x="100" y="22" width="45" height="16" rx="2" fill="rgba(249,168,37,.14)"/><rect x="148" y="22" width="48" height="16" rx="2" fill="rgba(249,168,37,.14)"/>';
+  if(has('tabs')) s += '<rect x="4" y="22" width="192" height="12" rx="2" fill="rgba(8,145,178,.08)"/>';
+  if(has('filter')) s += '<rect x="4" y="40" width="192" height="10" rx="2" fill="rgba(8,145,178,.08)"/>';
+  if(has('sidebar')){
+    s += '<rect x="4" y="54" width="128" height="50" rx="3" fill="rgba(22,163,74,.07)"/>';
+    s += '<rect x="136" y="54" width="60" height="50" rx="3" fill="rgba(124,58,237,.07)"/>';
+  } else {
+    s += '<rect x="4" y="54" width="192" height="50" rx="3" fill="rgba(22,163,74,.07)"/>';
+  }
+  if(has('chart-area')) s += '<rect x="12" y="62" width="176" height="8" rx="2" fill="rgba(37,99,235,.11)"/><rect x="12" y="76" width="140" height="8" rx="2" fill="rgba(37,99,235,.11)"/>';
+  if(has('footer')) s += '<rect x="4" y="108" width="192" height="8" rx="2" fill="rgba(100,116,139,.08)"/>';
+  s += '</svg>';
+  return s;
+}
+
+function renderZoneMiniDiagram(tpl){
+  var zones = tpl.zones || [];
+  var cols = tpl.zoneLayout && tpl.zoneLayout.gridCols ? tpl.zoneLayout.gridCols : '1fr';
+  var rows = tpl.zoneLayout && tpl.zoneLayout.gridRows ? tpl.zoneLayout.gridRows : 'auto 1fr auto';
+  function zoneClass(z){
+    var map = {
+      header:'zone-header',
+      'kpi-bar':'zone-kpi',
+      tabs:'zone-tabs',
+      filter:'zone-filter',
+      main:'zone-main',
+      sidebar:'zone-sidebar',
+      'chart-area':'zone-chart',
+      footer:'zone-footer'
+    };
+    return map[z] || '';
+  }
+  var html = '<div class="zone-config-grid" style="grid-template-columns:'+cols+';grid-template-rows:'+rows+'">';
+  zones.forEach(function(z){
+    var spanAll = (z === 'header' || z === 'kpi-bar' || z === 'tabs' || z === 'filter' || z === 'footer') ? 'grid-column:1/-1;' : '';
+    html += '<div class="zone-config-cell '+zoneClass(z)+'" style="'+spanAll+'min-height:'+(z === 'main' || z === 'sidebar' ? '72px' : '32px')+'">'+esc(z.toUpperCase())+'</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+window._admTplSetState = function(key, value){
+  if(key === 'search') _templateSearch = value || '';
+  if(key === 'category') _templateCategory = value || 'all';
+  if(key === 'sort') _templateSort = value || 'name';
+  if(key === 'view') _templateView = value || 'gallery';
+  if(key === 'theme') _templateThemePreview = value || 'professional-light';
+  if(key === 'template') _selectedTemplate = value || null;
+  renderAdminAppearance();
+};
+
+window._admTplPick = function(id){
+  _selectedTemplate = id;
+  _templateView = 'detail';
+  _subTab = 'templates';
+  renderAdminAppearance();
+};
+
+window._admTplEdit = function(id){
+  _selectedTemplate = id;
+  _templateView = 'editor';
+  _subTab = 'templates';
+  renderAdminAppearance();
+};
+
+window._admTplBack = function(){
+  _templateView = 'gallery';
+  renderAdminAppearance();
+};
+
+window._admTplCreate = function(){
+  var base = getTemplateById('T122') || getAllTemplates()[0];
+  var clone = cloneTemplateData(base);
+  clone.id = 'C' + String(Date.now()).slice(-6);
+  clone.name.vi = clone.name.vi + ' (Bản sao)';
+  clone.name.en = clone.name.en + ' Copy';
+  clone.modules = [];
+  clone.source = 'custom';
+  saveTemplateRecord(clone);
+  _selectedTemplate = clone.id;
+  _templateView = 'editor';
+  if(typeof showToast === 'function') showToast(L('Đã tạo template mới','Template created'), 'success');
+  renderAdminAppearance();
+};
+
+window._admTplClone = function(id){
+  var tpl = getTemplateById(id);
+  if(!tpl) return;
+  var clone = cloneTemplateData(tpl);
+  clone.id = 'C' + String(Date.now()).slice(-6);
+  clone.name.vi = clone.name.vi + ' (Bản sao)';
+  clone.name.en = clone.name.en + ' Copy';
+  clone.modules = [];
+  clone.source = 'custom';
+  saveTemplateRecord(clone);
+  _selectedTemplate = clone.id;
+  _templateView = 'detail';
+  if(typeof showToast === 'function') showToast(L('Đã nhân bản template','Template cloned'), 'success');
+  renderAdminAppearance();
+};
+
+window._admTplDelete = function(id){
+  if(!id) return;
+  deleteTemplateRecord(id);
+  if(_selectedTemplate === id){ _selectedTemplate = null; _templateView = 'gallery'; }
+  if(typeof showToast === 'function') showToast(L('Đã xóa template lưu cục bộ','Template removed from local storage'), 'success');
+  renderAdminAppearance();
+};
+
+window._admTplSaveField = function(id, field, value){
+  var tpl = cloneTemplateData(getTemplateById(id));
+  if(!tpl) return;
+  if(field === 'name.vi') tpl.name.vi = value;
+  if(field === 'name.en') tpl.name.en = value;
+  if(field === 'desc.vi') tpl.desc.vi = value;
+  if(field === 'themePreset') tpl.themePreset = value;
+  saveTemplateRecord(tpl);
+};
+
+window._admTplSaveZone = function(id, index, key, value){
+  var tpl = cloneTemplateData(getTemplateById(id));
+  if(!tpl || !tpl.zoneSettings || !tpl.zoneSettings[index]) return;
+  tpl.zoneSettings[index][key] = value;
+  saveTemplateRecord(tpl);
+};
+
+window._admTplApplyTheme = function(themeId){
+  if(!window.HmTheme) return;
+  _templateThemePreview = themeId;
+  var applied = false;
+  if(typeof HmTheme.applyVisualTheme === 'function'){
+    applied = HmTheme.applyVisualTheme(themeId) === true;
+  }
+  if(!applied){
+    var theme = VISUAL_THEMES.find(function(item){ return item.id === themeId; });
+    if(!theme) return;
+    window._hmSet('--brand', 'brand.dark', theme.colors.brand);
+    window._hmSet('--brand-2', 'brand.primary', theme.colors.brand2);
+    window._hmSet('--accent', 'brand.accent', theme.colors.accent);
+    window._hmSet('--bg-page-light', 'colorsLight.bgPage', theme.colors.bgPage);
+    window._hmSet('--bg-surface-light', 'colorsLight.bgSurface', theme.colors.bgSurface);
+    HmTheme.setDeep('appearance.visualThemePreset', themeId);
+  }
+  if(typeof showToast === 'function') showToast(L('Đã áp dụng preset giao diện','Visual theme applied'), 'success');
+  renderAdminAppearance();
+};
+
+function renderTemplateCard(tpl){
+  return '<div class="tpl-gallery-card"'
+    +' onclick="_admTplPick(\''+tpl.id+'\')"'
+    +' onmouseover="this.style.borderColor=\'var(--brand-2)\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'var(--shadow-lg)\'"'
+    +' onmouseout="this.style.borderColor=\'var(--border)\';this.style.transform=\'\';this.style.boxShadow=\'\'">'
+    + '<div class="tpl-gallery-thumb">'+renderTemplateSvg(tpl)+'</div>'
+    + '<div class="tpl-gallery-info">'
+    +   '<div class="tpl-gallery-name">'+esc(tpl.id+' '+tpl.name.vi)+'</div>'
+    +   '<div class="tpl-gallery-desc">'+esc(tpl.name.en)+'</div>'
+    +   '<div class="tpl-gallery-desc" style="margin-top:4px;color:var(--text-tertiary)">'+esc(tpl.desc.vi)+'</div>'
+    +   '<div class="tpl-gallery-chips">'
+    +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+tpl.zoneCount+' zones</span>'
+    +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span>'
+    +   '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function renderTemplateGallery(){
+  var templates = getTemplates();
+  var h = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;position:sticky;top:0;z-index:10;background:var(--bg-surface);padding:8px 0">';
+  h += '<input type="text" placeholder="'+esc(T('templateSearchHint'))+'" value="'+esc(_templateSearch)+'" oninput="_admTplSetState(\'search\',this.value)" style="flex:1;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-surface)">';
+  h += '<select onchange="_admTplSetState(\'category\',this.value)" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-surface)">';
+  h += '<option value="all">'+esc(T('allCategories'))+'</option>';
+  TEMPLATE_CATEGORIES.forEach(function(cat){
+    h += '<option value="'+cat.key+'" '+(_templateCategory === cat.key ? 'selected' : '')+'>'+esc(cat.label[lang === 'en' ? 'en' : 'vi'])+'</option>';
+  });
+  h += '</select>';
+  h += '<select onchange="_admTplSetState(\'sort\',this.value)" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-surface)">';
+  h += '<option value="name" '+(_templateSort === 'name' ? 'selected' : '')+'>'+esc(T('sortByName'))+'</option>';
+  h += '<option value="zones" '+(_templateSort === 'zones' ? 'selected' : '')+'>'+esc(T('sortByZones'))+'</option>';
+  h += '<option value="category" '+(_templateSort === 'category' ? 'selected' : '')+'>'+esc(T('sortByCategory'))+'</option>';
+  h += '</select>';
+  h += '<button class="hm-btn hm-btn-secondary" onclick="_admTplCreate()">'+T('createTemplate')+'</button>';
+  h += '</div>';
+  if(!templates.length){
+    h += '<div class="hm-empty">'+esc(T('noTemplatesFound'))+'</div>';
+    return h;
+  }
+  h += '<div class="tpl-gallery-grid">';
+  templates.forEach(function(tpl){ h += renderTemplateCard(tpl); });
+  h += '</div>';
+  return h;
+}
+
+function renderTemplateDetail(id){
+  var tpl = getTemplateById(id);
+  if(!tpl) return '<div class="hm-empty">'+esc(T('noTemplate'))+'</div>';
+  var modulesUsing = getModulesUsingTemplate(tpl);
+  var cat = TEMPLATE_CATEGORIES.find(function(item){ return item.key === tpl.category; });
+  var canDelete = /^C/.test(tpl.id) || tpl.source === 'custom';
+  var h = '<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px">';
+  h += '<div><div style="font-size:18px;font-weight:800;color:var(--text-primary)">'+esc(tpl.id+' '+tpl.name.vi)+'</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px">'+esc(tpl.name.en)+'</div><div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;max-width:780px">'+esc(tpl.desc.vi)+'</div></div>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-secondary" onclick="_admTplBack()">'+T('backToGallery')+'</button><button class="hm-btn hm-btn-secondary" onclick="_admTplClone(\''+tpl.id+'\')">'+T('cloneTemplate')+'</button>'+(canDelete ? '<button class="hm-btn hm-btn-secondary" onclick="_admTplDelete(\''+tpl.id+'\')">'+T('deleteTemplate')+'</button>' : '')+'<button class="hm-btn hm-btn-primary" onclick="_admTplEdit(\''+tpl.id+'\')">'+T('editTemplate')+'</button></div>';
+  h += '</div>';
+  h += '<div class="tpl-detail-header" style="display:grid;grid-template-columns:minmax(280px,360px) 1fr;align-items:stretch">';
+  h += '<div class="tpl-detail-preview" style="width:auto"><div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center">'+renderTemplateSvg(tpl)+'</div></div>';
+  h += '<div class="tpl-detail-meta"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="hm-badge">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+tpl.zoneCount+' zones</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span></div><div style="font-size:11px;color:var(--text-secondary);margin-top:10px;line-height:1.6"><strong>'+esc(T('layoutContract'))+':</strong> '+esc(tpl.layoutMeta)+'</div><div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.6"><strong>'+esc(T('modulesUsing'))+':</strong> '+esc(modulesUsing.join(', ') || '-')+'</div></div>';
+  h += '</div>';
+  h += '<div class="zone-scrollable" style="display:grid;gap:14px;max-height:620px;padding-right:4px">';
+  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('zoneConfig'))+'</div>'+renderZoneMiniDiagram(tpl)+'</div>';
+  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('templateUsage'))+'</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('templateCategory'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('zoneCount'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(tpl.zoneCount))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('modulesUsing'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(modulesUsing.length))+'</td></tr></table></div>';
+  h += '</div></div>';
+  return h;
+}
+
+function renderTemplateEditor(id){
+  var tpl = getTemplateById(id);
+  if(!tpl) return '<div class="hm-empty">'+esc(T('noTemplate'))+'</div>';
+  var canDelete = /^C/.test(tpl.id) || tpl.source === 'custom';
+  var h = '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><div style="font-size:16px;font-weight:800;color:var(--text-primary)">'+esc(T('templateEditor'))+': '+tpl.id+' '+tpl.name.vi+'</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-secondary" onclick="_admTplPick(\''+tpl.id+'\')">'+T('detail')+'</button><button class="hm-btn hm-btn-secondary" onclick="_admTplBack()">'+T('backToGallery')+'</button>'+(canDelete ? '<button class="hm-btn hm-btn-secondary" onclick="_admTplDelete(\''+tpl.id+'\')">'+T('deleteTemplate')+'</button>' : '')+'</div></div>';
+  h += '<div style="display:grid;grid-template-columns:minmax(320px,40%) 1fr;gap:14px">';
+  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)">';
+  h += '<div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--text-primary)">'+esc(T('zoneConfig'))+'</div>';
+  h += textInput(L('Tên template (VI)','Template name (VI)'), '', 'template.editor.nameVi', tpl.name.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.nameVi\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.vi\',this.value)"');
+  h += textInput(L('Tên template (EN)','Template name (EN)'), '', 'template.editor.nameEn', tpl.name.en, '').replace('oninput="_hmSet(\'\',\'template.editor.nameEn\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.en\',this.value)"');
+  h += textInput(L('Mô tả ngắn','Short description'), '', 'template.editor.desc', tpl.desc.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.desc\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'desc.vi\',this.value)"');
+  h += '<div style="margin:12px 0 8px;font-size:12px;font-weight:700;color:var(--text-secondary)">'+esc(T('templateZones'))+'</div>';
+  (tpl.zoneSettings || []).forEach(function(zone, idx){
+    h += '<div style="padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg-surface-alt,#f8fafc);margin-bottom:8px">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:6px">'+esc(zone.name)+'</div>';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    h += '<input type="text" value="'+esc(zone.type || zone.name)+'" oninput="_admTplSaveZone(\''+tpl.id+'\','+idx+',\'type\',this.value)" style="height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-surface)">';
+    h += '<select onchange="_admTplSaveZone(\''+tpl.id+'\','+idx+',\'scroll\',this.value)" style="height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-surface)"><option value="sticky" '+((zone.scroll || '') === 'sticky' ? 'selected' : '')+'>sticky</option><option value="data-only" '+((zone.scroll || '') === 'data-only' ? 'selected' : '')+'>data-only</option><option value="none" '+((zone.scroll || '') === 'none' ? 'selected' : '')+'>none</option></select>';
+    h += '</div>';
+    h += '<input type="text" value="'+esc(zone.allowed || '')+'" oninput="_admTplSaveZone(\''+tpl.id+'\','+idx+',\'allowed\',this.value)" style="margin-top:8px;width:100%;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-surface)">';
+    h += '</div>';
+  });
+  h += '</div>';
+  h += '<div style="display:grid;gap:14px">';
+  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">Live Preview</div>'+renderZoneMiniDiagram(tpl)+'<div style="margin-top:10px;padding:10px;border:1px dashed var(--border);border-radius:10px;background:var(--bg-surface-alt,#f8fafc)">'+renderTemplateSvg(tpl)+'</div></div>';
+  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('themeLibrary'))+'</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">';
+  VISUAL_THEMES.slice(0,8).forEach(function(theme){
+    h += '<button type="button" onclick="_admTplApplyTheme(\''+theme.id+'\')" style="text-align:left;padding:10px;border:1px solid '+(_templateThemePreview === theme.id ? 'var(--brand-2)' : 'var(--border)')+';border-radius:10px;background:var(--bg-surface);cursor:pointer"><div class="theme-swatch-bar"><div style="flex:2;border-radius:4px;background:'+theme.colors.brand+'"></div><div style="flex:2;border-radius:4px;background:'+theme.colors.brand2+'"></div><div style="flex:3;border-radius:4px;background:'+theme.colors.bgSurface+';border:1px solid rgba(148,163,184,.24)"></div><div style="flex:1;border-radius:4px;background:'+theme.colors.accent+'"></div></div><div style="font-size:11px;font-weight:700;color:var(--text-primary)">'+esc(theme.name[lang === 'en' ? 'en' : 'vi'])+'</div><div style="font-size:10px;color:var(--text-secondary);margin-top:3px">'+esc(theme.desc[lang === 'en' ? 'en' : 'vi'])+'</div></button>';
+  });
+  h += '</div></div>';
+  h += '</div></div>';
+  return h;
+}
+
+function renderTemplates(){
+  var count = getAllTemplates().length;
+  var selected = _selectedTemplate ? getTemplateById(_selectedTemplate) : null;
+  var intro = sectionLead(
+    L('Template Studio là tab lõi của hệ mới', 'Template Studio is the core tab of the new system'),
+    L('Mọi module phải bắt đầu từ template preset. Gallery dùng để chọn preset, detail để audit contract, editor để tinh chỉnh zone và preview theme/device trước khi sang builder.', 'Every module must start from a template preset. Use the gallery to choose, detail to audit the contract, and editor to adjust zones and preview theme/device before entering the builder.'),
+    statusChip('admin', count + ' ' + T('templateCount')) + (selected ? statusChip('preview', selected.id) : '')
+  );
+  if(!_selectedTemplate && _templateView !== 'gallery') _templateView = 'gallery';
+  if(_templateView === 'detail' && _selectedTemplate) return intro + renderTemplateDetail(_selectedTemplate);
+  if(_templateView === 'editor' && _selectedTemplate) return intro + renderTemplateEditor(_selectedTemplate);
+  return intro + renderTemplateGallery();
+}
+
+function renderTokens(){
+  var h = sectionLead(
+    L('Token hệ thống gom Typography + Colors + Layout', 'System Tokens merge Typography + Colors + Layout'),
+    L('Prompt 5 gộp ba tab cũ thành một tab Tokens để token cascade rõ hơn. Toàn bộ controls và preview cũ được giữ lại, chỉ thay lớp điều hướng bên trên.', 'Prompt 5 merges the former Typography, Colors, and Layout tabs into one Tokens tab. Existing controls and previews remain, only the orchestration layer changes.'),
+    statusChip('full', L('Merged tab', 'Merged tab'))
+  );
+  h += renderTypography();
+  h += renderColors();
+  h += renderLayout();
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
 /* ── RENDER MAIN ────────────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
 function render(el, subTab, currentLang){
-  _subTab = subTab || _subTab;
+  _subTab = normalizeSubTab(subTab || _subTab);
 
   var tabs = [
-    {key:'overview', icon:'🎛️', label:T('overview')},
-    {key:'typography', icon:'🔤', label:T('typography')},
-    {key:'colors', icon:'🎨', label:T('colors')},
-    {key:'layout', icon:'📐', label:T('layout')},
-    {key:'effects', icon:'✨', label:T('effects')},
+    {key:'templates', icon:'📐', label:T('templates')},
+    {key:'tokens', icon:'🎨', label:T('tokens')},
     {key:'components', icon:'🧱', label:T('components')},
+    {key:'effects', icon:'✨', label:T('effects')},
     {key:'governance', icon:'🛡️', label:T('governance')},
     {key:'advanced', icon:'🧩', label:T('advanced')}
   ];
@@ -979,7 +1654,7 @@ function render(el, subTab, currentLang){
 
   /* Title */
   h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
-  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">🎨 '+(typeof lang!=='undefined'&&lang==='en'?'System Appearance':'Giao diện hệ thống')+'</h3>';
+  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">📐 '+(typeof lang!=='undefined'&&lang==='en'?'Template & Appearance Studio':'Template & Giao diện Studio')+'</h3>';
   h += '<div style="margin-top:6px;padding:5px 10px;background:var(--blue-bg,rgba(37,99,235,0.08));border:1px solid var(--blue,#2563eb);border-radius:6px;font-size:11px;color:var(--blue,#2563eb)">💡 '+T('liveHint')+'</div></div>';
   h += '</div>';
 
@@ -993,15 +1668,13 @@ function render(el, subTab, currentLang){
 
   /* Sub-tab content */
   switch(_subTab){
-    case 'overview': h += renderOverview(); break;
-    case 'typography': h += renderTypography(); break;
-    case 'colors': h += renderColors(); break;
-    case 'layout': h += renderLayout(); break;
-    case 'effects': h += renderEffects(); break;
+    case 'templates': h += renderTemplates(); break;
+    case 'tokens': h += renderTokens(); break;
     case 'components': h += renderComponents(); break;
+    case 'effects': h += renderEffects(); break;
     case 'governance': h += renderGovernance(); break;
     case 'advanced': h += renderAdvanced(); break;
-    default: h += renderOverview();
+    default: h += renderTemplates();
   }
 
   /* Global actions */
@@ -1679,6 +2352,20 @@ function renderComponents(){
 /* ══════════════════════════════════════════════════════════════════════════ */
 function renderGovernance(){
   var h = '';
+  var allTemplates = getAllTemplates();
+  var customTemplates = allTemplates.filter(function(tpl){ return /^C/.test(tpl.id); });
+  var themeCards = VISUAL_THEMES.map(function(theme){
+    return '<button type="button" onclick="_admTplApplyTheme(\''+theme.id+'\')" style="text-align:left;padding:10px;border:1px solid '+(_templateThemePreview === theme.id ? 'var(--brand-2)' : 'var(--border)')+';border-radius:10px;background:var(--bg-surface);cursor:pointer">'
+      + '<div style="display:flex;gap:4px;height:18px;margin-bottom:8px">'
+      + '<span style="flex:2;border-radius:4px;background:'+theme.colors.brand+'"></span>'
+      + '<span style="flex:2;border-radius:4px;background:'+theme.colors.brand2+'"></span>'
+      + '<span style="flex:3;border-radius:4px;background:'+theme.colors.bgSurface+';border:1px solid rgba(148,163,184,.24)"></span>'
+      + '<span style="flex:1;border-radius:4px;background:'+theme.colors.accent+'"></span>'
+      + '</div>'
+      + '<div style="font-size:11px;font-weight:700;color:var(--text-primary)">'+esc(theme.name[lang === 'en' ? 'en' : 'vi'])+'</div>'
+      + '<div style="font-size:10px;color:var(--text-secondary);margin-top:3px">'+esc(theme.desc[lang === 'en' ? 'en' : 'vi'])+'</div>'
+      + '</button>';
+  }).join('');
   var modules = [
     {
       area: L('Document browser, search, dictionary, matrix', 'Document browser, search, dictionary, matrix'),
@@ -1716,6 +2403,49 @@ function renderGovernance(){
       note: L('Da duoc chinh mot phan, nhung van con mot so render inline can refactor tiep. Tu gio khong module moi nao duoc copy pattern nay.', 'This area has been improved, but some inline legacy rendering remains. No new module is allowed to copy that pattern.')
     }
   ];
+
+  h += sectionLead(
+    L('Governance theo template đã được kích hoạt', 'Template-centric governance is now active'),
+    L('Tab này tổng hợp mức sử dụng template, compliance matrix cho contract mới, WCAG snapshot và bộ theme presets để preview/apply ngay trong studio.', 'This tab now centralizes template usage, compliance checks for the new contract, WCAG snapshots, and the visual themes library for direct preview/apply flows.'),
+    statusChip('full', allTemplates.length + ' ' + T('templateCount')) + statusChip('preview', customTemplates.length + ' custom')
+  );
+
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px">'
+    + infoCard(L('Preset gốc', 'Base presets'), String(BASE_TEMPLATE_PRESETS.length), 'full')
+    + infoCard(L('Template tùy chỉnh', 'Custom templates'), String(customTemplates.length), customTemplates.length ? 'preview' : 'partial')
+    + infoCard(L('Theme presets', 'Theme presets'), String(VISUAL_THEMES.length), 'full')
+    + infoCard(L('Default builder entry', 'Default builder entry'), 'templates → detail → editor', 'admin')
+    + '</div>';
+
+  h += sect(
+    L('Template usage report', 'Template usage report'),
+    '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+      + '<thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Template</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Category</th>'
+      + '<th style="text-align:right;padding:8px;border-bottom:1px solid var(--border)">Zones</th>'
+      + '<th style="text-align:right;padding:8px;border-bottom:1px solid var(--border)">Modules</th>'
+      + '</tr></thead><tbody>'
+      + allTemplates.slice(0, 18).map(function(tpl){
+          var cat = TEMPLATE_CATEGORIES.find(function(item){ return item.key === tpl.category; });
+          return '<tr>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border)"><strong>'+esc(tpl.id)+'</strong> '+esc(tpl.name.vi)+'</td>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono)">'+esc(String(tpl.zoneCount))+'</td>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono)">'+esc(String(getModulesUsingTemplate(tpl).length))+'</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>',
+    true,
+    statusChip('full', L('Template contract visible', 'Template contract visible'))
+  );
+
+  h += sect(
+    L('Visual theme manager', 'Visual theme manager'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">'+themeCards+'</div>',
+    false,
+    statusChip('preview', L('Apply + preview', 'Apply + preview'))
+  );
 
   h += sectionLead(
     L('Governance contract for the world-class document platform', 'Governance contract for the world-class document platform'),
@@ -1841,6 +2571,8 @@ function renderAdvanced(){
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'
     +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=HmTheme.exportTheme();var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-theme.json\';a.click()})()">📥 Export JSON</button>'
     +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){if(HmTheme.importTheme(r.result)){renderAdminAppearance();if(typeof showToast===\'function\')showToast(\'Theme imported\',\'success\')}};r.readAsText(i.files[0])};i.click()})()">📤 Import JSON</button>'
+    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=JSON.stringify(readTemplateStore(),null,2);var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-templates.json\';a.click()})()">🧾 '+T('exportTemplates')+'</button>'
+    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){try{writeTemplateStore(JSON.parse(r.result||\'{}\'));renderAdminAppearance();if(typeof showToast===\'function\')showToast(\''+L('Đã nhập templates','Templates imported')+'\',\'success\')}catch(e){if(typeof showToast===\'function\')showToast(\''+L('JSON không hợp lệ','Invalid JSON')+'\',\'error\')}};r.readAsText(i.files[0])};i.click()})()">📂 '+T('importTemplates')+'</button>'
     +'</div>'
   , true);
 
@@ -1887,7 +2619,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260410d';
+window._renderAdminAppearanceFullVersion = '20260410e';
 window._renderAdminAppearanceFull = render;
 
 })();

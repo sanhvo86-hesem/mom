@@ -1453,7 +1453,7 @@ NEW_ENTITIES = [
         "entity_key": "finance.debit_memos",
         "domain": "finance",
         "entity": "debit_memos",
-        "profile": "transactional",
+        "profile": "transactional_record",
         "recommended_patterns": ["object_page", "related_lists"],
         "actions": {
             "list": "finance.debit_memos.list",

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T07:51:05.441Z",
+    "generatedAt": "2026-04-10T12:22:44.623Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.0",
     "description": "Wave 2 canonical governance verification report."
@@ -17,8 +17,8 @@
     "planned_canonical_resources_not_yet_in_registry": 0,
     "archive_isolation_targets": 5,
     "archive_isolation_targets_failed": 0,
-    "direct_table_matches": 45,
-    "legacy_table_matches": 14,
+    "direct_table_matches": 48,
+    "legacy_table_matches": 11,
     "service_backed_slice_matches": 5,
     "true_schema_gaps": 0,
     "remaining_unused_candidate_entities": 0,
@@ -476,17 +476,15 @@
     },
     {
       "resource_key": "master_data.compliance-obligations",
-      "table": "compliance_obligations",
+      "table": "qual_compliance_obligations",
       "legacy_tables": [
-        "qual_compliance_obligations",
-        "ehs_permit_register"
+        "compliance_obligations"
       ],
-      "resolution_mode": "legacy_table_match",
-      "matched_entities": [],
-      "matched_legacy_tables": [
-        "qual_compliance_obligations",
-        "ehs_permit_register"
-      ]
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_lab.qual_compliance_obligations"
+      ],
+      "matched_legacy_tables": []
     },
     {
       "resource_key": "commercial_customer.quotations",
@@ -1013,15 +1011,15 @@
     },
     {
       "resource_key": "maintenance_ehs.incidents",
-      "table": "incidents",
+      "table": "ehs_incidents",
       "legacy_tables": [
-        "ehs_incidents"
+        "incidents"
       ],
-      "resolution_mode": "legacy_table_match",
-      "matched_entities": [],
-      "matched_legacy_tables": [
-        "ehs_incidents"
-      ]
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "ehs_sustainability.ehs_incidents"
+      ],
+      "matched_legacy_tables": []
     },
     {
       "resource_key": "maintenance_ehs.safety-observations",
@@ -1039,15 +1037,15 @@
     },
     {
       "resource_key": "maintenance_ehs.permits",
-      "table": "permits",
+      "table": "ehs_permit_register",
       "legacy_tables": [
-        "ehs_permit_register"
+        "permits"
       ],
-      "resolution_mode": "legacy_table_match",
-      "matched_entities": [],
-      "matched_legacy_tables": [
-        "ehs_permit_register"
-      ]
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "ehs_sustainability.ehs_permit_register"
+      ],
+      "matched_legacy_tables": []
     },
     {
       "resource_key": "maintenance_ehs.five-s-audits",

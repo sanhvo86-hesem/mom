@@ -24,6 +24,7 @@ final class DataSchemaService
     private string $registryDir;
     private string $configDir;
     private string $schemaStudioDir;
+    private string $contractsDir;
     /** @var array<string, int|null> */
     private array $artifactTimestampCache = [];
 
@@ -35,6 +36,7 @@ final class DataSchemaService
         $this->registryDir = $this->dataDir . '/registry';
         $this->configDir = $this->dataDir . '/config';
         $this->schemaStudioDir = $this->dataDir . '/schema-studio';
+        $this->contractsDir = $this->rootDir . '/mom/contracts';
     }
 
     public function getWorkspace(): array
@@ -56,6 +58,16 @@ final class DataSchemaService
         $dataFieldsIndex = $this->readJson($this->registryPath('data-fields-index'));
         $blindSpotReport = $this->readJson($this->registryPath('operational-blind-spot-report'));
         $stressReport = $this->readJson($this->registryPath('operational-stress-report'));
+        $contractGlossary = $this->readJson($this->contractsPath('glossary.json'));
+        $contractDomainMap = $this->readJson($this->contractsPath('domain-map.json'));
+        $contractAuthorityReport = $this->readJson($this->contractsPath('authority-report.json'));
+        $contractPackageIndex = $this->readJson($this->contractsPath('package-index.json'));
+        $contractObjectIndex = $this->readJson($this->contractsPath('object-index.json'));
+        $contractStateModels = $this->readJson($this->contractsPath('state-model-index.json'));
+        $contractCommands = $this->readJson($this->contractsPath('command-index.json'));
+        $contractEvents = $this->readJson($this->contractsPath('event-index.json'));
+        $contractDeprecationLedger = $this->readJson($this->contractsPath('deprecation-ledger.json'));
+        $contractMigrationManifest = $this->readJson($this->contractsPath('migration-manifest.json'));
 
         $apis = $this->buildApiSummaries($endpointCatalogWorkspace);
         $tableKeys = $this->allTableKeys($tableRegistry, $relationMap);
@@ -73,6 +85,16 @@ final class DataSchemaService
             'relation_map' => $relationMap,
             'registry_quality' => $qualityReport,
             'table_registry' => $tableRegistry,
+            'contract_glossary' => $contractGlossary,
+            'contract_domain_map' => $contractDomainMap,
+            'contract_authority_report' => $contractAuthorityReport,
+            'contract_package_index' => $contractPackageIndex,
+            'contract_object_index' => $contractObjectIndex,
+            'contract_state_models' => $contractStateModels,
+            'contract_commands' => $contractCommands,
+            'contract_events' => $contractEvents,
+            'contract_deprecation_ledger' => $contractDeprecationLedger,
+            'contract_migration_manifest' => $contractMigrationManifest,
             'schema_diagnostics' => $diagnostics,
             'schema_manifest' => $manifest,
             'registry_manifest' => $registryManifest,
@@ -154,6 +176,13 @@ final class DataSchemaService
                 'support_table_count' => $supportTableCount,
                 'governance_gap_count' => $governanceGapCount,
                 'domain_count' => count($domains),
+                'business_contract_domain_count' => count((array)($contractDomainMap['domains'] ?? [])),
+                'business_contract_package_count' => count((array)($contractPackageIndex['packages'] ?? [])),
+                'business_contract_object_count' => count((array)($contractObjectIndex['objects'] ?? [])),
+                'business_contract_state_model_count' => count((array)($contractStateModels['stateModels'] ?? [])),
+                'business_contract_command_count' => count((array)($contractCommands['commands'] ?? [])),
+                'business_contract_event_count' => count((array)($contractEvents['events'] ?? [])),
+                'business_contract_deprecation_count' => count((array)($contractDeprecationLedger['entries'] ?? [])),
                 'blueprint_count' => count($blueprints),
                 'variable_category_count' => count($variables),
                 'variable_count' => $variableCount,
@@ -227,6 +256,35 @@ final class DataSchemaService
                     'authoritativeSchemaFile' => (string)($schemaAuthoritySummary['authoritative_schema_file'] ?? ''),
                     'tableCount' => (int)($schemaAuthoritySummary['table_count'] ?? 0),
                 ],
+                'business_contract_bundle' => [
+                    'generatedAt' => (string)(
+                        $contractObjectIndex['_meta']['generatedAt']
+                        ?? $contractPackageIndex['_meta']['generatedAt']
+                        ?? $contractAuthorityReport['_meta']['generatedAt']
+                        ?? $contractDomainMap['_meta']['generatedAt']
+                        ?? $contractGlossary['_meta']['generatedAt']
+                        ?? ''
+                    ),
+                    'summary' => [
+                        'domainCount' => count((array)($contractDomainMap['domains'] ?? [])),
+                        'packageCount' => count((array)($contractPackageIndex['packages'] ?? [])),
+                        'objectCount' => count((array)($contractObjectIndex['objects'] ?? [])),
+                        'authoredCoverageRatio' => (float)($contractAuthorityReport['summary']['authoredCoverageRatio'] ?? 0),
+                        'lifecycleLikeCoverageRatio' => (float)($contractAuthorityReport['summary']['lifecycleLikeCoverageRatio'] ?? 0),
+                        'coreValueStreamCoverageRatio' => (float)($contractAuthorityReport['summary']['coreValueStreamCoverageRatio'] ?? 0),
+                        'priorityGapCount' => (int)($contractAuthorityReport['summary']['priorityGapCount'] ?? 0),
+                        'stateModelCount' => count((array)($contractStateModels['stateModels'] ?? [])),
+                        'commandCount' => count((array)($contractCommands['commands'] ?? [])),
+                        'eventCount' => count((array)($contractEvents['events'] ?? [])),
+                        'deprecationEntryCount' => count((array)($contractDeprecationLedger['entries'] ?? [])),
+                        'authoredPackageCount' => (int)($contractPackageIndex['_meta']['authoredObjectCount'] ?? 0),
+                    ],
+                    'migration' => [
+                        'storageAuthoritySource' => (string)($contractMigrationManifest['storageAuthority']['databaseSchemaSource'] ?? ''),
+                        'tableCount' => (int)($contractMigrationManifest['storageAuthority']['tableCount'] ?? 0),
+                        'compatibilityRules' => array_values(array_filter((array)($contractMigrationManifest['compatibility']['rules'] ?? []), 'is_string')),
+                    ],
+                ],
                 'registry_manifest' => [
                     'generatedAt' => (string)($registryManifest['_meta']['generatedAt'] ?? ''),
                     'coverage' => [
@@ -286,6 +344,11 @@ final class DataSchemaService
     private function registryPath(string $name): string
     {
         return $this->registryDir . '/' . $name . '.json';
+    }
+
+    private function contractsPath(string $name): string
+    {
+        return $this->contractsDir . '/' . ltrim($name, '/');
     }
 
     private function schemaStudioPath(string $segment): string
@@ -591,12 +654,97 @@ final class DataSchemaService
                 ],
             ],
             'table_registry' => [
-                'label' => 'Table registry',
+                'label' => 'System contract registry (generated)',
                 'category' => 'authority',
                 'path' => $this->registryPath('table-registry'),
                 'targetAgeSeconds' => 14400,
                 'requiredForRelease' => true,
                 'dependencyPaths' => [],
+            ],
+            'contract_glossary' => [
+                'label' => 'Business contract glossary',
+                'category' => 'authority',
+                'path' => $this->contractsPath('glossary.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [],
+            ],
+            'contract_domain_map' => [
+                'label' => 'Business contract domain map',
+                'category' => 'authority',
+                'path' => $this->contractsPath('domain-map.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [
+                    $this->contractsPath('glossary.json'),
+                ],
+            ],
+            'contract_authority_report' => [
+                'label' => 'Business contract authority report',
+                'category' => 'authority',
+                'path' => $this->contractsPath('authority-report.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [
+                    $this->contractsPath('domain-map.json'),
+                    $this->contractsPath('object-index.json'),
+                ],
+            ],
+            'contract_package_index' => [
+                'label' => 'Business contract package index',
+                'category' => 'authority',
+                'path' => $this->contractsPath('package-index.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [
+                    $this->contractsPath('authority-report.json'),
+                    $this->contractsPath('domain-map.json'),
+                ],
+            ],
+            'contract_object_index' => [
+                'label' => 'Business contract object index',
+                'category' => 'authority',
+                'path' => $this->contractsPath('object-index.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [
+                    $this->contractsPath('package-index.json'),
+                    $this->contractsPath('domain-map.json'),
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('endpoint-catalog'),
+                ],
+            ],
+            'contract_state_models' => [
+                'label' => 'Business contract state models',
+                'category' => 'authority',
+                'path' => $this->contractsPath('state-model-index.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [
+                    $this->contractsPath('object-index.json'),
+                ],
+            ],
+            'contract_deprecation_ledger' => [
+                'label' => 'Business contract deprecation ledger',
+                'category' => 'authority',
+                'path' => $this->contractsPath('deprecation-ledger.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [
+                    $this->contractsPath('object-index.json'),
+                ],
+            ],
+            'contract_migration_manifest' => [
+                'label' => 'Business contract migration manifest',
+                'category' => 'authority',
+                'path' => $this->contractsPath('migration-manifest.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => false,
+                'dependencyPaths' => [
+                    $this->contractsPath('object-index.json'),
+                    $this->contractsPath('state-model-index.json'),
+                    $this->contractsPath('deprecation-ledger.json'),
+                ],
             ],
             'schema_diagnostics' => [
                 'label' => 'Schema diagnostics',
@@ -1911,18 +2059,15 @@ final class DataSchemaService
     private function buildDesignSummaries(): array
     {
         $rows = [];
-        foreach (glob($this->schemaStudioPath('designs/*.json')) ?: [] as $file) {
-            $payload = $this->readJson((string)$file);
-            if ($payload === []) {
-                continue;
-            }
+        $file = $this->schemaStudioPath('designs/workspace.json');
+        $payload = $this->readJson($file);
+        if ($payload !== []) {
             $meta = is_array($payload['_meta'] ?? null) ? $payload['_meta'] : [];
             $enterprise = is_array($meta['enterprise'] ?? null) ? $meta['enterprise'] : [];
-            $id = (string)($meta['id'] ?? basename((string)$file, '.json'));
 
             $rows[] = [
-                'id' => $id,
-                'name' => (string)($meta['name'] ?? $id),
+                'id' => 'workspace',
+                'name' => (string)($meta['name'] ?? 'HESEM Workspace Design'),
                 'version' => (string)($meta['version'] ?? '1.0.0'),
                 'updatedAt' => (string)($meta['updatedAt'] ?? $meta['generated_at'] ?? ''),
                 'author' => (string)($meta['author'] ?? $enterprise['generated_by'] ?? ''),
@@ -1931,10 +2076,13 @@ final class DataSchemaService
                 'tableCount' => count((array)($payload['tables'] ?? [])),
                 'relationCount' => count((array)($payload['relations'] ?? [])),
                 'groupCount' => count((array)($payload['groups'] ?? [])),
-                'baselineAvailable' => is_file($this->schemaStudioPath('snapshots/' . $id . '.baseline.json')),
+                'baselineAvailable' => is_file($this->schemaStudioPath('snapshots/workspace.baseline.json')),
                 'lastCompiledAt' => (string)($enterprise['last_compiled_at'] ?? ''),
                 'lastReleaseId' => (string)($enterprise['last_release_id'] ?? ''),
                 'lastReleaseAt' => (string)($enterprise['last_release_at'] ?? ''),
+                'designType' => 'workspace_design',
+                'authorityLayer' => 'design_workspace',
+                'isSystem' => true,
             ];
         }
 

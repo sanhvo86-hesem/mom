@@ -695,6 +695,7 @@ const migrationDomainDefaults = new Map([
   ['087_canonical_ehs_safety_observations.sql', 'ehs_sustainability'],
   ['088_canonical_finance_inventory_valuations.sql', 'finance'],
   ['089_canonical_analytics_plant_performance_snapshots.sql', 'bi_datawarehouse'],
+  ['090_canonical_projection_lineage_hardening.sql', 'bi_datawarehouse'],
 ]);
 
 const tableDomainOverrides = {

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T16:55:00+07:00",
+    "generatedAt": "2026-04-10T12:22:47.722Z",
     "description": "Operational reality and blind-spot scenario catalog for backend-first manufacturing governance."
   },
   "source_authority": {
@@ -58,7 +58,13 @@
         "server_side_retry_safe_actions",
         "alert_on_duplicate_attempts"
       ],
-      "process_families": ["commercial", "procurement", "inventory", "finance", "logistics"],
+      "process_families": [
+        "commercial",
+        "procurement",
+        "inventory",
+        "finance",
+        "logistics"
+      ],
       "priority": "critical"
     },
     {
@@ -71,7 +77,9 @@
         "state_transition_guards",
         "conflict_error_with_problem_details"
       ],
-      "process_families": ["all_lifecycle_owners"],
+      "process_families": [
+        "all_lifecycle_owners"
+      ],
       "priority": "critical"
     },
     {
@@ -85,7 +93,12 @@
         "reverse_and_correction_transactions",
         "supplier_notification_and_exception_queue"
       ],
-      "process_families": ["procurement", "iqc", "finance", "warehouse"],
+      "process_families": [
+        "procurement",
+        "iqc",
+        "finance",
+        "warehouse"
+      ],
       "priority": "critical"
     },
     {
@@ -99,7 +112,13 @@
         "authorized_release_only",
         "blocked_pick_ship_issue_while_on_hold"
       ],
-      "process_families": ["iqc", "ipqc", "oqc", "warehouse", "shipping"],
+      "process_families": [
+        "iqc",
+        "ipqc",
+        "oqc",
+        "warehouse",
+        "shipping"
+      ],
       "priority": "critical"
     },
     {
@@ -113,7 +132,13 @@
         "trace_forward_and_trace_back_queries",
         "recall_case_linkage"
       ],
-      "process_families": ["production", "quality", "warehouse", "returns", "shipping"],
+      "process_families": [
+        "production",
+        "quality",
+        "warehouse",
+        "returns",
+        "shipping"
+      ],
       "priority": "critical"
     },
     {
@@ -127,7 +152,14 @@
         "effective_date_gate_on_revision_change",
         "affected_order_hold_and_resume"
       ],
-      "process_families": ["quoting", "so", "jo", "wo", "quality", "shipping"],
+      "process_families": [
+        "quoting",
+        "so",
+        "jo",
+        "wo",
+        "quality",
+        "shipping"
+      ],
       "priority": "high"
     },
     {
@@ -141,7 +173,13 @@
         "blocked_execution_with_escalation",
         "forced_requalification_or_waiver_workflow"
       ],
-      "process_families": ["maintenance", "production", "quality", "ehs", "hcm"],
+      "process_families": [
+        "maintenance",
+        "production",
+        "quality",
+        "ehs",
+        "hcm"
+      ],
       "priority": "critical"
     },
     {
@@ -155,7 +193,12 @@
         "lockout_tagout_and_master_tag_control",
         "tool_and_worker_competency_check"
       ],
-      "process_families": ["maintenance", "production", "ehs", "warehouse"],
+      "process_families": [
+        "maintenance",
+        "production",
+        "ehs",
+        "warehouse"
+      ],
       "priority": "critical"
     },
     {
@@ -169,7 +212,12 @@
         "material_issue_reconciliation",
         "variance_hold_and_review"
       ],
-      "process_families": ["warehouse", "planning", "production", "finance"],
+      "process_families": [
+        "warehouse",
+        "planning",
+        "production",
+        "finance"
+      ],
       "priority": "high"
     },
     {
@@ -183,7 +231,13 @@
         "replacement_and_credit_decision_gate",
         "return_reason_and_disposition_codes"
       ],
-      "process_families": ["customer_care", "returns", "quality", "shipping", "finance"],
+      "process_families": [
+        "customer_care",
+        "returns",
+        "quality",
+        "shipping",
+        "finance"
+      ],
       "priority": "high"
     },
     {
@@ -197,7 +251,11 @@
         "two_three_four_way_match_holds",
         "manual_hold_release_audit"
       ],
-      "process_families": ["finance", "procurement", "shipping"],
+      "process_families": [
+        "finance",
+        "procurement",
+        "shipping"
+      ],
       "priority": "critical"
     },
     {
@@ -211,7 +269,12 @@
         "synchronization_status_visibility",
         "late_sync_reconciliation_queue"
       ],
-      "process_families": ["mobile", "maintenance", "quality", "shop_floor"],
+      "process_families": [
+        "mobile",
+        "maintenance",
+        "quality",
+        "shop_floor"
+      ],
       "priority": "high"
     },
     {
@@ -225,7 +288,9 @@
         "electronic_signature_for_override",
         "mandatory_follow_up_review"
       ],
-      "process_families": ["all_control_points"],
+      "process_families": [
+        "all_control_points"
+      ],
       "priority": "critical"
     },
     {
@@ -239,7 +304,13 @@
         "dead_letter_or_retry_queue",
         "operator_visible_control_tower_status"
       ],
-      "process_families": ["platform", "quality", "ehs", "maintenance", "finance"],
+      "process_families": [
+        "platform",
+        "quality",
+        "ehs",
+        "maintenance",
+        "finance"
+      ],
       "priority": "high"
     },
     {
@@ -253,7 +324,9 @@
         "dependency_block_on_unused_elements",
         "periodic_usage_review"
       ],
-      "process_families": ["platform_governance"],
+      "process_families": [
+        "platform_governance"
+      ],
       "priority": "high"
     }
   ]

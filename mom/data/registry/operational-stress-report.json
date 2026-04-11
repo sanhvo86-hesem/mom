@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T07:51:06.869Z",
+    "generatedAt": "2026-04-10T12:24:30.138Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -11,7 +11,7 @@
     "high": 0,
     "medium": 0,
     "watch": 12,
-    "idempotency_mentions": 18696,
+    "idempotency_mentions": 18549,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
@@ -84,35 +84,35 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 18696,
-      "optimistic_concurrency_mentions": 7198,
-      "if_match_mentions": 2463,
-      "row_version_mentions": 19523,
+      "idempotency_mentions": 18549,
+      "optimistic_concurrency_mentions": 7156,
+      "if_match_mentions": 2462,
+      "row_version_mentions": 19518,
       "compensation_markers": 2,
       "correction_markers": 339,
       "effective_dating_markers": 701,
       "override_mentions": 123,
       "waiver_mentions": 24,
       "heartbeat_mentions": 33,
-      "quarantine_mentions": 303,
+      "quarantine_mentions": 298,
       "disposition_mentions": 417,
       "period_close_mentions": 36,
       "credit_memo_mentions": 18,
       "debit_memo_mentions": 18,
       "backdate_exception_mentions": 28,
-      "archive_mentions": 14801,
-      "snapshot_mentions": 1406,
+      "archive_mentions": 15247,
+      "snapshot_mentions": 1062,
       "esign_mentions": 169,
       "cycle_count_mentions": 339
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2295,
-      "idempotent_endpoint_count": 2295,
+      "mutating_endpoint_count": 2274,
+      "idempotent_endpoint_count": 2274,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2295,
+      "default_retry_safe_endpoint_count": 2274,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2295
+      "response_replay_documented_count": 2274
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -146,16 +146,16 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 18696,
-        "if_match_mentions": 2463,
-        "row_version_mentions": 19523,
-        "mutating_endpoint_count": 2295,
-        "idempotent_endpoint_count": 2295,
+        "idempotency_mentions": 18549,
+        "if_match_mentions": 2462,
+        "row_version_mentions": 19518,
+        "mutating_endpoint_count": 2274,
+        "idempotent_endpoint_count": 2274,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2295,
+        "default_retry_safe_endpoint_count": 2274,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2295
+        "response_replay_documented_count": 2274
       },
       "required_controls": [
         "idempotency_key_or_equivalent_duplicate_suppression",
@@ -220,7 +220,7 @@
       ],
       "evidence": {
         "effective_dating_markers": 701,
-        "snapshot_mentions": 1406,
+        "snapshot_mentions": 1062,
         "snapshot_resources": [
           "analytics.inventory-balance-snapshots",
           "analytics.mes-oee-snapshots",
@@ -296,7 +296,7 @@
       ],
       "evidence": {
         "heartbeat_mentions": 33,
-        "idempotency_mentions": 18696,
+        "idempotency_mentions": 18549,
         "compensation_markers": 2,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -318,7 +318,7 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 14801,
+        "archive_mentions": 15247,
         "correction_markers": 339,
         "esign_mentions": 169
       },

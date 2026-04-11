@@ -4355,8 +4355,14 @@
     "item_site_id",
     "lot_id",
     "on_hand_qty",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "row_version",
     "serial_id",
     "snapshot_at",
+    "source_record_id",
+    "source_system",
     "warehouse_id"
   ],
   "inventory_buffer_profiles": [
@@ -6472,15 +6478,22 @@
     "metadata",
     "oee",
     "operator_ids",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
     "performance",
     "planned_production_time_sec",
     "primary_job_number",
     "quality",
     "rework_pieces",
+    "row_version",
     "setup_time_sec",
     "shift_code",
+    "snapshot_at",
     "snapshot_date",
     "snapshot_id",
+    "source_record_id",
+    "source_system",
     "total_pieces"
   ],
   "mes_on_time_delivery": [
@@ -9039,15 +9052,29 @@
   "production_order_bom_snapshot": [
     "bom_version_id",
     "frozen_at",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
     "production_order_bom_snapshot_id",
     "production_order_id",
-    "snapshot_json"
+    "row_version",
+    "snapshot_at",
+    "snapshot_json",
+    "source_record_id",
+    "source_system"
   ],
   "production_order_route_snapshot": [
     "frozen_at",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
     "production_order_id",
     "production_order_route_snapshot_id",
+    "row_version",
+    "snapshot_at",
     "snapshot_json",
+    "source_record_id",
+    "source_system",
     "work_definition_version_id"
   ],
   "production_schedule": [

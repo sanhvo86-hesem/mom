@@ -13,8 +13,22 @@ require dirname(__DIR__, 2) . '/api/services/DataSchemaService.php';
 $portalRoot = dirname(__DIR__, 2);
 $projectRoot = dirname($portalRoot);
 $dataDir = $portalRoot . '/data';
-$designId = preg_replace('/[^A-Za-z0-9_-]+/', '_', (string)($argv[1] ?? 'workspace')) ?: 'workspace';
 $actor = 'schema_authority_refresh_cli';
+$args = array_slice($argv, 1);
+$skipPublication = false;
+$designId = 'workspace';
+
+foreach ($args as $arg) {
+    if ($arg === '--skip-publication') {
+        $skipPublication = true;
+        continue;
+    }
+    if (strncmp((string)$arg, '--', 2) === 0) {
+        continue;
+    }
+    $designId = preg_replace('/[^A-Za-z0-9_-]+/', '_', (string)$arg) ?: 'workspace';
+    break;
+}
 
 if (!function_exists('ensure_dir')) {
     function ensure_dir(string $dir): void
@@ -138,14 +152,18 @@ function refresh_portal_only_migration_gap_report(string $portalRoot, string $da
 }
 
 $myProjectRoot = $projectRoot . '/../my-project';
-if (is_dir($myProjectRoot)) {
-    run_refresh_command(['node', $portalRoot . '/tools/registry/generate-registry-v3.mjs'], $projectRoot, false);
-} else {
-    fwrite(STDOUT, "[refresh_data_schema_authority] skipped generate-registry-v3.mjs because my-project source is unavailable." . PHP_EOL);
+if (!$skipPublication) {
+    if (is_dir($myProjectRoot)) {
+        run_refresh_command(['node', $portalRoot . '/tools/registry/generate-registry-v3.mjs'], $projectRoot, false);
+    } else {
+        fwrite(STDOUT, "[refresh_data_schema_authority] skipped generate-registry-v3.mjs because my-project source is unavailable." . PHP_EOL);
+        refresh_portal_only_migration_gap_report($portalRoot, $dataDir, $projectRoot);
+    }
+
+    run_refresh_command(['python3', $portalRoot . '/tools/registry/canonical_publication_orchestrator.py'], $projectRoot);
+} elseif (!is_dir($myProjectRoot)) {
     refresh_portal_only_migration_gap_report($portalRoot, $dataDir, $projectRoot);
 }
-
-run_refresh_command(['python3', $portalRoot . '/tools/registry/canonical_publication_orchestrator.py'], $projectRoot);
 
 $dataLayer = new DataLayer($dataDir, $projectRoot);
 $controller = new SchemaStudioController($dataLayer, $projectRoot, $dataDir);

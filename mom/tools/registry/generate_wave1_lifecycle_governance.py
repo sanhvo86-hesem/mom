@@ -86,6 +86,15 @@ def runtime_for_action(endpoint_map: dict, action: str) -> dict:
 
 def main() -> int:
     policy = load_json(POLICY_PATH)
+    policy.setdefault("_meta", {})
+    policy["_meta"]["version"] = str(policy["_meta"].get("version") or "1.0")
+    policy["_meta"]["generatedAt"] = utc_now()
+    policy["_meta"]["description"] = str(
+        policy["_meta"].get("description")
+        or "Wave 1 lifecycle normalization policy for backend-first operational control."
+    )
+    dump_json(POLICY_PATH, policy)
+
     normalization = load_json(NORMALIZATION_PATH)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     frontend_catalog = load_json(FRONTEND_PATH)

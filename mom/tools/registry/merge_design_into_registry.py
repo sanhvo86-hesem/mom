@@ -17,9 +17,9 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 PORTAL = Path(__file__).resolve().parent.parent.parent
-DESIGN_FILE = PORTAL / "qms-data" / "schema-studio" / "designs" / "canonical_erp_mes_eqms_7layer_core.json"
-TABLE_REGISTRY = PORTAL / "qms-data" / "registry" / "table-registry.json"
-RELATION_MAP = PORTAL / "qms-data" / "registry" / "relation-map.json"
+DESIGN_FILE = PORTAL / "mom" / "data" / "schema-studio" / "designs" / "workspace.json"
+TABLE_REGISTRY = PORTAL / "mom" / "data" / "registry" / "table-registry.json"
+RELATION_MAP = PORTAL / "mom" / "data" / "registry" / "relation-map.json"
 
 # Domain assignments for canonical tables based on ISA-95 layers
 DOMAIN_MAP = {

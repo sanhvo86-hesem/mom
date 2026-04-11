@@ -581,7 +581,10 @@ try {
     throw new RuntimeException('Schema Studio list did not terminate through the response pipeline.');
 } catch (ExitException $e) {
     smoke_assert($e->getStatusCode() === 200, 'Schema Studio read returned wrong status for builder role.');
-    smoke_assert(is_array($e->getPayload()['designs'] ?? null), 'Schema Studio read payload missing designs array.');
+    $designs = $e->getPayload()['designs'] ?? null;
+    smoke_assert(is_array($designs), 'Schema Studio read payload missing designs array.');
+    smoke_assert(count((array)$designs) === 1, 'Schema Studio should expose exactly one active system design.');
+    smoke_assert((string)(($designs[0]['id'] ?? '')) === 'workspace', 'Schema Studio should expose workspace as the single active design.');
 }
 
 smoke_reset_request_state();
@@ -1376,6 +1379,17 @@ $workflowMap = is_array($workflowLibrary['workflows'] ?? null) ? $workflowLibrar
 $runtimeAccessPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/runtime-access-policy.json'), true);
 $frontendFoundation = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/frontend-foundation-catalog.json'), true);
 $frontendEntityMap = is_array($frontendFoundation['entities'] ?? null) ? $frontendFoundation['entities'] : [];
+$contractGlossaryPath = QMS_TEST_BASE_DIR . '/contracts/glossary.json';
+$contractAuthorityReportPath = QMS_TEST_BASE_DIR . '/contracts/authority-report.json';
+$contractPackageIndexPath = QMS_TEST_BASE_DIR . '/contracts/package-index.json';
+$contractObjectIndexPath = QMS_TEST_BASE_DIR . '/contracts/object-index.json';
+$contractStateModelPath = QMS_TEST_BASE_DIR . '/contracts/state-model-index.json';
+$contractMigrationManifestPath = QMS_TEST_BASE_DIR . '/contracts/migration-manifest.json';
+$contractAuthorityReport = json_decode((string)file_get_contents($contractAuthorityReportPath), true);
+$contractPackageIndex = json_decode((string)file_get_contents($contractPackageIndexPath), true);
+$contractObjectIndex = json_decode((string)file_get_contents($contractObjectIndexPath), true);
+$contractStateModels = json_decode((string)file_get_contents($contractStateModelPath), true);
+$contractMigrationManifest = json_decode((string)file_get_contents($contractMigrationManifestPath), true);
 $telemetryDetail = $endpointMap['mes_execution.mes_machine_telemetry.detail'] ?? null;
 $bomDetail = $endpointMap['master_data.bill_of_materials.detail'] ?? null;
 $scenarioUpdate = $endpointMap['advanced_planning.aps_planning_scenarios.update'] ?? null;
@@ -1385,6 +1399,69 @@ $capaDelete = $endpointMap['quality_management.capa_records.delete'] ?? null;
 $capaFoundation = $frontendEntityMap['quality_management.capa_records'] ?? null;
 $apsFoundation = $frontendEntityMap['advanced_planning.aps_planning_scenarios'] ?? null;
 [$persistedTransitionCount, $genericTransitionCount] = [0, 0];
+smoke_assert(is_file($contractGlossaryPath), 'Business contract glossary must exist.');
+smoke_assert(is_file($contractAuthorityReportPath), 'Business contract authority report must exist.');
+smoke_assert(is_file($contractPackageIndexPath), 'Business contract package index must exist.');
+smoke_assert(is_file($contractObjectIndexPath), 'Business contract object index must exist.');
+smoke_assert(is_file($contractStateModelPath), 'Business contract state-model index must exist.');
+smoke_assert(is_file($contractMigrationManifestPath), 'Business contract migration manifest must exist.');
+smoke_assert((int)($contractPackageIndex['_meta']['packageCount'] ?? 0) > 0, 'Business contract package index must expose authored packages.');
+smoke_assert((int)($contractObjectIndex['_meta']['objectCount'] ?? 0) > 0, 'Business contract object index must expose canonical objects.');
+smoke_assert((int)($contractObjectIndex['_meta']['authoredPackageCount'] ?? 0) > 0, 'Business contract object index must report authored package coverage.');
+smoke_assert((int)($contractAuthorityReport['summary']['authoredPackageCount'] ?? -1) === (int)($contractPackageIndex['_meta']['packageCount'] ?? 0), 'Business contract authority report must stay aligned with authored package inventory.');
+smoke_assert((int)($contractAuthorityReport['summary']['totalCanonicalObjects'] ?? -1) === (int)($contractObjectIndex['_meta']['objectCount'] ?? 0), 'Business contract authority report must stay aligned with canonical object inventory.');
+smoke_assert((float)($contractAuthorityReport['summary']['authoredCoverageRatio'] ?? 0) >= 0.50, 'Business contract authority must keep at least 50% authored coverage across canonical resources.');
+smoke_assert((float)($contractAuthorityReport['summary']['lifecycleLikeCoverageRatio'] ?? 0) >= 0.60, 'Business contract authority must keep at least 60% authored coverage across lifecycle-like resources.');
+smoke_assert((float)($contractAuthorityReport['summary']['coreValueStreamCoverageRatio'] ?? 0) >= 0.90, 'Business contract authority must keep near-total authored coverage across core value-stream resources.');
+smoke_assert((int)($contractStateModels['_meta']['stateModelCount'] ?? 0) > 0, 'Business contract state-model index must expose lifecycle definitions.');
+smoke_assert((string)($contractMigrationManifest['storageAuthority']['databaseSchemaSource'] ?? '') !== '', 'Business contract migration manifest must point back to storage authority.');
+smoke_assert((int)($contractMigrationManifest['businessContractAuthority']['authoredPackageCount'] ?? 0) > 0, 'Business contract migration manifest must report authored package coverage.');
+$contractObjectsByKey = [];
+foreach ((array)($contractObjectIndex['objects'] ?? []) as $contractObject) {
+    if (is_array($contractObject) && isset($contractObject['key'])) {
+        $contractObjectsByKey[(string)$contractObject['key']] = $contractObject;
+    }
+}
+foreach ([
+    'commercial_customer.quotations',
+    'commercial_customer.customer-care-cases',
+    'commercial_customer.customer-purchase-orders',
+    'commercial_customer.sales-orders',
+    'procurement_supplier_quality.purchase-requisitions',
+    'procurement_supplier_quality.purchase-receipts',
+    'procurement_supplier_quality.supplier-purchase-orders',
+    'procurement_supplier_quality.iqc-inspections',
+    'planning_production.production-plans',
+    'planning_production.job-orders',
+    'planning_production.work-orders',
+    'planning_production.ipqc-inspections',
+    'inventory_logistics.shipments',
+    'inventory_logistics.freight-orders',
+    'inventory_logistics.inventory-items',
+    'inventory_logistics.inventory-movements',
+    'inventory_logistics.warehouses',
+    'inventory_logistics.customer-returns',
+    'quality_improvement.nonconformances',
+    'quality_improvement.corrective-actions',
+    'quality_improvement.oqc-inspections',
+    'maintenance_ehs.five-s-audits',
+    'maintenance_ehs.incidents',
+    'maintenance_ehs.maintenance-plans',
+    'maintenance_ehs.permits',
+    'maintenance_ehs.safety-observations',
+    'master_data.compliance-obligations',
+    'master_data.customers',
+    'master_data.employees',
+    'master_data.equipment',
+    'master_data.suppliers',
+    'planning_production.dispatch-lists',
+    'planning_production.production-operations',
+    'finance.ap-invoices',
+    'finance.ar-invoices',
+] as $contractKey) {
+    smoke_assert(is_array($contractObjectsByKey[$contractKey] ?? null), 'Missing authored contract object ' . $contractKey . '.');
+    smoke_assert(($contractObjectsByKey[$contractKey]['contractAuthority'] ?? null) === 'authored_package', 'Contract object must be backed by an authored package: ' . $contractKey . '.');
+}
 smoke_assert(is_array($telemetryDetail), 'Composite telemetry detail endpoint missing from endpoint catalog.');
 smoke_assert(($telemetryDetail['record_addressing'] ?? null) === 'composite', 'Telemetry detail endpoint must advertise composite addressing.');
 smoke_assert(($telemetryDetail['request']['identity_fields'] ?? null) === ['equipment_id', 'ts'], 'Telemetry detail endpoint identity fields mismatch.');
@@ -1471,6 +1548,9 @@ $wave4Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/regis
 $wave5Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave5-maintenance-ehs-governance-policy.json'), true);
 $wave5Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave5-maintenance-ehs-normalization.json'), true);
 $wave5Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave5-maintenance-ehs-report.json'), true);
+$wave6Policy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave6-finance-projection-governance-policy.json'), true);
+$wave6Normalization = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave6-finance-projection-normalization.json'), true);
+$wave6Report = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/wave6-finance-projection-report.json'), true);
 $statusOptionsRegistry = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/status-options.json'), true);
 $operationalStressPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-governance-policy.json'), true);
 $operationalStressCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/operational-stress-catalog.json'), true);
@@ -1590,9 +1670,93 @@ smoke_assert(array_key_exists('wave4-production-quality-governance-policy.json',
 smoke_assert(array_key_exists('wave4-production-quality-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave4-production-quality-normalization.json.');
 smoke_assert(array_key_exists('wave4-production-quality-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave4-production-quality-report.json.');
 smoke_assert(is_array($registryManifest['coverage']['wave4_production_quality_governance'] ?? null), 'Registry manifest must surface Wave 4 production-quality governance coverage.');
+smoke_assert(is_array($wave5Policy), 'Wave 5 maintenance/EHS governance policy asset missing.');
+smoke_assert(count((array)($wave5Policy['build_questions'] ?? [])) >= 8, 'Wave 5 governance policy must force purpose, state-practicality, canonical-owner, role-guard, and alias-boundary questions.');
+smoke_assert(in_array('live_maintenance_or_ehs_owner_left_on_placeholder_digital_thread_status', (array)($wave5Policy['rejection_criteria'] ?? []), true), 'Wave 5 governance policy must explicitly reject placeholder digital-thread states for live maintenance or EHS owners.');
+smoke_assert(is_array($wave5Normalization), 'Wave 5 maintenance/EHS normalization asset missing.');
+smoke_assert(count((array)($wave5Normalization['execution_targets'] ?? [])) >= 7, 'Wave 5 normalization must register the maintenance/EHS/compliance execution owners.');
+smoke_assert(count((array)($wave5Normalization['practical_state_targets'] ?? [])) >= 4, 'Wave 5 normalization must register the live owners that must leave placeholder status sets behind.');
+smoke_assert(is_array($wave5Report), 'Wave 5 maintenance/EHS governance report asset missing.');
+smoke_assert((int)($wave5Report['summary']['execution_failed'] ?? -1) === 0, 'Wave 5 report must pass the maintenance/EHS/compliance execution targets.');
+smoke_assert((int)($wave5Report['summary']['practical_state_failed'] ?? -1) === 0, 'Wave 5 report must eliminate placeholder digital-thread state models from live Wave 5 owners.');
+smoke_assert((int)($wave5Report['summary']['canonical_owner_failed'] ?? -1) === 0, 'Wave 5 report must align canonical maintenance/EHS resources to live tables.');
+smoke_assert((int)($wave5Report['summary']['contextual_alias_failed'] ?? -1) === 0, 'Wave 5 report must keep maintenance aliases linked back to canonical equipment identity.');
+smoke_assert((int)($wave5Report['summary']['relationship_truth_failed'] ?? -1) === 0, 'Wave 5 report must remove false maintenance/EHS relationship claims.');
+smoke_assert((int)($wave5Report['summary']['workflow_role_guard_failed'] ?? -1) === 0, 'Wave 5 report must enforce role-guard coverage on critical maintenance/EHS close transitions.');
+smoke_assert((int)($wave5Report['summary']['remaining_wave5_gaps'] ?? -1) === 0, 'Wave 5 report must classify and close every remaining maintenance/EHS governance gap.');
+smoke_assert(array_key_exists('wave5-maintenance-ehs-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave5-maintenance-ehs-governance-policy.json.');
+smoke_assert(array_key_exists('wave5-maintenance-ehs-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave5-maintenance-ehs-normalization.json.');
+smoke_assert(array_key_exists('wave5-maintenance-ehs-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave5-maintenance-ehs-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['wave5_maintenance_ehs_governance'] ?? null), 'Registry manifest must surface Wave 5 maintenance/EHS governance coverage.');
+smoke_assert(is_array($wave6Policy), 'Wave 6 finance/projection governance policy asset missing.');
+smoke_assert(count((array)($wave6Policy['build_questions'] ?? [])) >= 8, 'Wave 6 governance policy must force gate-purpose, projection-boundary, lineage, and audit questions.');
+smoke_assert(in_array('projection_or_snapshot_published_with_generic_create_update_delete_surface', (array)($wave6Policy['rejection_criteria'] ?? []), true), 'Wave 6 governance policy must explicitly reject editable CRUD publication for projections and snapshots.');
+smoke_assert(is_array($wave6Normalization), 'Wave 6 finance/projection normalization asset missing.');
+smoke_assert(count((array)($wave6Normalization['service_finance_gate_targets'] ?? [])) >= 4, 'Wave 6 normalization must register the service-backed finance control owners.');
+smoke_assert(count((array)($wave6Normalization['projection_read_model_targets'] ?? [])) >= 6, 'Wave 6 normalization must register the released projection read models that must become read-only.');
+smoke_assert(is_array($wave6Report), 'Wave 6 finance/projection governance report asset missing.');
+smoke_assert((int)($wave6Report['summary']['service_finance_gate_failed'] ?? -1) === 0, 'Wave 6 report must pass the service-backed finance gate targets.');
+smoke_assert((int)($wave6Report['summary']['projection_read_model_failed'] ?? -1) === 0, 'Wave 6 report must remove editable CRUD publication from valuation and snapshot projections.');
+smoke_assert((int)($wave6Report['summary']['projection_lineage_failed'] ?? -1) === 0, 'Wave 6 report must enforce lineage fields on every governed valuation or KPI projection.');
+smoke_assert((int)($wave6Report['summary']['relationship_truth_failed'] ?? -1) === 0, 'Wave 6 report must close relationship-truth gaps for finance and plant-performance projections.');
+smoke_assert((int)($wave6Report['summary']['remaining_wave6_gaps'] ?? -1) === 0, 'Wave 6 report must classify and close every finance/projection governance gap.');
+smoke_assert(array_key_exists('wave6-finance-projection-governance-policy.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave6-finance-projection-governance-policy.json.');
+smoke_assert(array_key_exists('wave6-finance-projection-normalization.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave6-finance-projection-normalization.json.');
+smoke_assert(array_key_exists('wave6-finance-projection-report.json', (array)($registryManifest['assets'] ?? [])), 'Registry manifest must register wave6-finance-projection-report.json.');
+smoke_assert(is_array($registryManifest['coverage']['wave6_finance_projection_governance'] ?? null), 'Registry manifest must surface Wave 6 finance/projection governance coverage.');
+$wave6RelationshipTargets = (array)($wave6Normalization['relationship_truth_targets'] ?? []);
+foreach ($wave6RelationshipTargets as $resourceKey => $spec) {
+    [$domainKey, $resourceName] = array_pad(explode('.', (string)$resourceKey, 2), 2, null);
+    $canonicalResource = (array)((($canonicalCatalog['domains'][$domainKey]['resources'] ?? [])[$resourceName] ?? []) ?: []);
+    $actualRelationships = (array)($canonicalResource['key_relationships'] ?? []);
+    foreach ((array)($spec['expected_relationships'] ?? []) as $expectedRelationship) {
+        smoke_assert(
+            in_array($expectedRelationship, $actualRelationships, true),
+            "Wave 6 relationship truth for {$resourceKey} must include {$expectedRelationship}."
+        );
+    }
+    if (array_key_exists('expected_release_snapshot_of', (array)$spec)) {
+        smoke_assert(
+            ($canonicalResource['release_snapshot_of'] ?? null) === $spec['expected_release_snapshot_of'],
+            "Wave 6 relationship truth for {$resourceKey} must preserve release_snapshot_of={$spec['expected_release_snapshot_of']}."
+        );
+    }
+}
+$wave6ProjectionTargets = (array)($wave6Normalization['projection_read_model_targets'] ?? []);
+foreach ($wave6ProjectionTargets as $entityKey => $spec) {
+    $entity = (array)($frontendEntityMap[$entityKey] ?? []);
+    $actions = (array)($entity['actions'] ?? []);
+    $formState = $entity['capabilities']['form']['state'] ?? null;
+    smoke_assert(($entity['profile'] ?? null) === ($spec['expected_profile'] ?? null), "Wave 6 projection {$entityKey} must publish with profile {$spec['expected_profile']}.");
+    foreach ((array)($spec['required_actions'] ?? []) as $requiredAction) {
+        smoke_assert(!empty($actions[$requiredAction] ?? null), "Wave 6 projection {$entityKey} must retain {$requiredAction}.");
+    }
+    foreach ((array)($spec['forbidden_actions'] ?? []) as $forbiddenAction) {
+        smoke_assert(empty($actions[$forbiddenAction] ?? null), "Wave 6 projection {$entityKey} must not publish {$forbiddenAction}.");
+    }
+    smoke_assert($formState === 'not_applicable', "Wave 6 projection {$entityKey} must not publish editable forms.");
+    $tablePolicy = (array)($runtimeAccessPolicy['tables'][$spec['table']] ?? []);
+    foreach ((array)($spec['forbidden_actions'] ?? []) as $forbiddenAction) {
+        smoke_assert((array)($tablePolicy[$forbiddenAction] ?? ['unexpected']) === [], "Wave 6 runtime policy must block {$forbiddenAction} for {$spec['table']}.");
+    }
+}
+$wave6LineageTargets = (array)($wave6Normalization['projection_lineage_targets'] ?? []);
+foreach ($wave6LineageTargets as $tableName => $spec) {
+    $columns = array_keys((array)($tableRegistryMap[$tableName]['columns'] ?? []));
+    foreach ((array)($spec['required_columns'] ?? []) as $columnName) {
+        smoke_assert(in_array($columnName, $columns, true), "Wave 6 projection table {$tableName} must include lineage column {$columnName}.");
+    }
+}
 $incomingInspectionTransitionRuntime = (array)(($endpointMap['quality_management.incoming_inspections.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['quality_management.incoming_inspections.transition']['capabilities']['workflow_runtime'] ?? [])));
 $ipqcTransitionRuntime = (array)(($endpointMap['quality_management.ipqc_inspections.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['quality_management.ipqc_inspections.transition']['capabilities']['workflow_runtime'] ?? [])));
 $oqcTransitionRuntime = (array)(($endpointMap['quality_management.oqc_inspections.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['quality_management.oqc_inspections.transition']['capabilities']['workflow_runtime'] ?? [])));
+$pmPlanTransitionRuntime = (array)(($endpointMap['plant_maintenance.pm_maintenance_plans.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['plant_maintenance.pm_maintenance_plans.transition']['capabilities']['workflow_runtime'] ?? [])));
+$pmEquipmentTransitionRuntime = (array)(($endpointMap['plant_maintenance.pm_equipment_master.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['plant_maintenance.pm_equipment_master.transition']['capabilities']['workflow_runtime'] ?? [])));
+$incidentTransitionRuntime = (array)(($endpointMap['ehs_sustainability.ehs_incidents.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['ehs_sustainability.ehs_incidents.transition']['capabilities']['workflow_runtime'] ?? [])));
+$permitTransitionRuntime = (array)(($endpointMap['ehs_sustainability.ehs_permit_register.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['ehs_sustainability.ehs_permit_register.transition']['capabilities']['workflow_runtime'] ?? [])));
+$safetyObservationTransitionRuntime = (array)(($endpointMap['ehs_sustainability.safety_observations.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['ehs_sustainability.safety_observations.transition']['capabilities']['workflow_runtime'] ?? [])));
+$complianceObligationTransitionRuntime = (array)(($endpointMap['quality_lab.qual_compliance_obligations.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['quality_lab.qual_compliance_obligations.transition']['capabilities']['workflow_runtime'] ?? [])));
+$fiveSAuditTransitionRuntime = (array)(($endpointMap['lean_manufacturing.lean_5s_audits.transition']['workflow']['runtime'] ?? []) ?: (($endpointMap['lean_manufacturing.lean_5s_audits.transition']['capabilities']['workflow_runtime'] ?? [])));
 $incomingInspectionResultsEntity = (array)($frontendEntityMap['quality_management.incoming_inspection_results'] ?? []);
 $spcEntity = (array)($frontendEntityMap['quality_management.spc_data'] ?? []);
 $grrEntity = (array)($frontendEntityMap['calibration_equipment.calibration_grr_studies'] ?? []);
@@ -1638,6 +1802,72 @@ foreach ((array)($workflowMap['wf_ipqc_inspection']['transitions'] ?? []) as $tr
 smoke_assert(in_array('production_planner', (array)($ipqcTransitionRoles['queued->in_progress'] ?? []), true), 'IPQC queued->in_progress must preserve the mixed QA/QC handoff role for production_planner.');
 smoke_assert(in_array('quality_engineer', (array)($ipqcTransitionRoles['queued->in_progress'] ?? []), true), 'IPQC queued->in_progress must preserve QA authority for quality_engineer.');
 smoke_assert(in_array('quality_manager', (array)($ipqcTransitionRoles['in_progress->rejected'] ?? []), true), 'IPQC reject disposition must preserve quality-manager authority.');
+smoke_assert(($pmPlanTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'PM maintenance plans must run on a persisted workflow lifecycle, not placeholder status aliases.');
+smoke_assert(($pmPlanTransitionRuntime['transition_execution_guard'] ?? null) === 'workflow_engine', 'PM maintenance plans must execute transitions through the workflow engine.');
+smoke_assert(($pmEquipmentTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'PM equipment master must run on a persisted workflow lifecycle.');
+smoke_assert(($incidentTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'EHS incidents must be upgraded from guarded runtime to persisted workflow execution.');
+smoke_assert(($permitTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'EHS permits must remain persisted once Wave 5 replaces placeholder status aliases.');
+smoke_assert(($safetyObservationTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'Safety observations must be upgraded from guarded runtime to persisted workflow execution.');
+smoke_assert(($complianceObligationTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', 'Compliance obligations must be upgraded from guarded runtime to persisted workflow execution.');
+smoke_assert(($fiveSAuditTransitionRuntime['lifecycle_mode'] ?? null) === 'persisted', '5S audits must run on a persisted workflow lifecycle.');
+$canonicalIncident = (array)($canonicalCatalog['domains']['maintenance_ehs']['resources']['incidents'] ?? []);
+$canonicalPermit = (array)($canonicalCatalog['domains']['maintenance_ehs']['resources']['permits'] ?? []);
+$canonicalFiveS = (array)($canonicalCatalog['domains']['maintenance_ehs']['resources']['five-s-audits'] ?? []);
+$canonicalComplianceObligation = (array)($canonicalCatalog['domains']['master_data']['resources']['compliance-obligations'] ?? []);
+smoke_assert(($canonicalIncident['table'] ?? null) === 'ehs_incidents', 'Canonical incident resource must point at the live ehs_incidents table.');
+smoke_assert(($canonicalPermit['table'] ?? null) === 'ehs_permit_register', 'Canonical permit resource must point at the live ehs_permit_register table.');
+smoke_assert(($canonicalComplianceObligation['table'] ?? null) === 'qual_compliance_obligations', 'Canonical compliance-obligation resource must point at the live qual_compliance_obligations table.');
+smoke_assert(($canonicalFiveS['table'] ?? null) === 'lean_5s_audits', 'Canonical 5S audit resource must point at the live lean_5s_audits table.');
+$permitStates = array_column((array)($statusOptionsRegistry['ehs_permit_register_status_set']['options'] ?? []), 'value');
+$pmEquipmentStates = array_column((array)($statusOptionsRegistry['pm_equipment_master_status_set']['options'] ?? []), 'value');
+$pmPlanStates = array_column((array)($statusOptionsRegistry['pm_maintenance_plans_status_set']['options'] ?? []), 'value');
+$fiveSStates = array_column((array)($statusOptionsRegistry['lean_5s_audits_status_set']['options'] ?? []), 'value');
+smoke_assert(($statusOptionsRegistry['ehs_permit_register_status_set']['aliasOf'] ?? null) === null, 'EHS permit register status set must stop aliasing digital_thread_status.');
+smoke_assert(($statusOptionsRegistry['pm_equipment_master_status_set']['aliasOf'] ?? null) === null, 'PM equipment master status set must stop aliasing digital_thread_status.');
+smoke_assert(($statusOptionsRegistry['pm_maintenance_plans_status_set']['aliasOf'] ?? null) === null, 'PM maintenance plan status set must stop aliasing digital_thread_status.');
+smoke_assert(($statusOptionsRegistry['lean_5s_audits_status_set']['aliasOf'] ?? null) === null, '5S audit status set must stop aliasing digital_thread_status.');
+smoke_assert($permitStates === ['draft', 'submitted', 'approved', 'active', 'suspended', 'expired', 'closed', 'archived'], 'EHS permit register must publish the practical permit-to-work lifecycle.');
+smoke_assert($pmEquipmentStates === ['commissioning', 'qualified', 'active', 'on_hold', 'lockout', 'retired', 'archived'], 'PM equipment master must publish the practical equipment lifecycle.');
+smoke_assert($pmPlanStates === ['draft', 'approved', 'active', 'on_hold', 'retired', 'archived'], 'PM maintenance plans must publish the practical PM-plan lifecycle.');
+smoke_assert($fiveSStates === ['planned', 'in_progress', 'follow_up', 'verified', 'closed', 'archived'], '5S audits must publish the practical lean follow-up lifecycle.');
+$pmEquipmentEntity = (array)($frontendEntityMap['plant_maintenance.pm_equipment_master'] ?? []);
+$pmEquipmentQuickRefs = (array)($pmEquipmentEntity['detail_layout']['quick_view_refs'] ?? []);
+$pmEquipmentLookupFound = false;
+foreach ($pmEquipmentQuickRefs as $ref) {
+    if (($ref['endpoint'] ?? null) === 'calibration_equipment.equipment.list' && ($ref['via_field'] ?? null) === 'equipment_id') {
+        $pmEquipmentLookupFound = true;
+        break;
+    }
+}
+smoke_assert($pmEquipmentLookupFound === true, 'PM equipment master must keep a quick-view link back to the canonical equipment entity via equipment_id.');
+$wave5RoleChecks = [
+    'wf_pm_maintenance_plan' => ['draft->approved' => 'maintenance_supervisor'],
+    'wf_pm_equipment_master' => ['active->lockout' => 'plant_manager'],
+    'wf_ehs_incident' => ['corrective_action->closed' => 'quality_manager'],
+    'wf_quality_obligation' => ['open->waived' => 'plant_manager'],
+    'wf_ehs_permit_register' => ['submitted->approved' => 'quality_manager'],
+    'wf_safety_observation' => ['in_progress->closed' => 'quality_manager'],
+    'wf_lean_5s_audit' => ['follow_up->verified' => 'quality_manager'],
+];
+foreach ($wave5RoleChecks as $workflowId => $checks) {
+    $transitionRoles = [];
+    foreach ((array)($workflowMap[$workflowId]['transitions'] ?? []) as $transition) {
+        $key = (string)($transition['from'] ?? '') . '->' . (string)($transition['to'] ?? '');
+        $roles = [];
+        foreach ((array)($transition['guards'] ?? []) as $guard) {
+            if (($guard['type'] ?? null) !== 'role') {
+                continue;
+            }
+            foreach ((array)($guard['roles'] ?? []) as $role) {
+                $roles[] = (string)$role;
+            }
+        }
+        $transitionRoles[$key] = array_values(array_unique($roles));
+    }
+    foreach ($checks as $transitionKey => $expectedRole) {
+        smoke_assert(in_array($expectedRole, (array)($transitionRoles[$transitionKey] ?? []), true), "Wave 5 workflow {$workflowId} must guard {$transitionKey} with {$expectedRole}.");
+    }
+}
 smoke_assert(is_array($operationalStressPolicy), 'Operational stress governance policy asset missing.');
 smoke_assert(count((array)($operationalStressPolicy['build_questions'] ?? [])) >= 10, 'Operational stress governance policy must force retry, compensation, override, archive, and backdate design questions.');
 smoke_assert(in_array('create_or_side_effect_action_without_duplicate_or_retry_control', (array)($operationalStressPolicy['rejection_criteria'] ?? []), true), 'Operational stress governance policy must explicitly reject duplicate-unsafe side-effect actions.');

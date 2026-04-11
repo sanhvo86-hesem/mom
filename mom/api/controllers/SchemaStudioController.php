@@ -13,6 +13,7 @@ use Throwable;
 class SchemaStudioController extends BaseController
 {
     private const DESIGN_SAVE_MAX_BYTES = 6291456;
+    private const SYSTEM_DESIGN_ID = 'workspace';
 
     private string $studioDir;
     private string $designDir;
@@ -83,6 +84,11 @@ class SchemaStudioController extends BaseController
         $clean = preg_replace('/[^A-Za-z0-9_-]+/', '_', trim($value));
         $clean = trim((string)$clean, '_');
         return $clean !== '' ? $clean : $fallback . '_' . gmdate('Ymd_His');
+    }
+
+    private function normalizeDesignId(string $designId): string
+    {
+        return self::SYSTEM_DESIGN_ID;
     }
 
     private function endsWith(string $value, string $suffix): bool
@@ -1613,20 +1619,8 @@ class SchemaStudioController extends BaseController
      */
     private function designCandidatePaths(string $designId): array
     {
-        $id = $this->safeId($designId, 'workspace');
-        $paths = [$this->designPath($id)];
-        if (in_array($id, ['workspace', 'canonical', 'canonical_erp_mes_eqms_7layer_core'], true)) {
-            foreach ([
-                $this->designDir . '/workspace.json',
-                $this->designDir . '/canonical_erp_mes_eqms_7layer_core.json',
-                $this->designDir . '/canonical_erp_mes_eqms_7layer_core.enterprise.json',
-            ] as $alias) {
-                if (!in_array($alias, $paths, true)) {
-                    $paths[] = $alias;
-                }
-            }
-        }
-        return $paths;
+        $id = $this->normalizeDesignId($designId);
+        return [$this->designPath($id)];
     }
 
     private function loadDesignDocument(string $designId): ?array
@@ -1642,18 +1636,8 @@ class SchemaStudioController extends BaseController
 
     private function loadBaselineDocument(string $designId, ?array $design = null): array
     {
-        $id = $this->safeId($designId, 'workspace');
+        $id = $this->normalizeDesignId($designId);
         $paths = [$this->baselinePath($id)];
-        if (in_array($id, ['workspace', 'canonical', 'canonical_erp_mes_eqms_7layer_core'], true)) {
-            foreach ([
-                $this->snapshotDir . '/workspace.baseline.json',
-                $this->baselinePath('canonical_erp_mes_eqms_7layer_core'),
-            ] as $alias) {
-                if (!in_array($alias, $paths, true)) {
-                    $paths[] = $alias;
-                }
-            }
-        }
         foreach ($paths as $path) {
             $doc = $this->readJsonFile($path);
             if (is_array($doc)) {
@@ -4901,22 +4885,22 @@ class SchemaStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireReadAccess($user);
         $this->requireCsrf();
+        $workspace = $this->loadDesignDocument(self::SYSTEM_DESIGN_ID);
         $designs = [];
-        foreach (glob($this->designDir . '/*.json') ?: [] as $file) {
-            $data = $this->readJsonFile($file);
-            if (!$data) {
-                continue;
-            }
+        if (is_array($workspace)) {
+            $meta = is_array($workspace['_meta'] ?? null) ? $workspace['_meta'] : [];
             $designs[] = [
-                'id' => (string)($data['_meta']['id'] ?? basename($file, '.json')),
-                'name' => (string)($data['_meta']['name'] ?? basename($file, '.json')),
-                'version' => (string)($data['_meta']['version'] ?? '1.0.0'),
-                'updatedAt' => (string)($data['_meta']['updatedAt'] ?? ''),
-                'author' => (string)($data['_meta']['author'] ?? ''),
-                'tableCount' => count($data['tables'] ?? []),
+                'id' => self::SYSTEM_DESIGN_ID,
+                'name' => (string)($meta['name'] ?? 'HESEM Workspace Design'),
+                'version' => (string)($meta['version'] ?? '1.0.0'),
+                'updatedAt' => (string)($meta['updatedAt'] ?? $meta['generated_at'] ?? ''),
+                'author' => (string)($meta['author'] ?? ''),
+                'tableCount' => count($workspace['tables'] ?? []),
+                'designType' => 'workspace_design',
+                'authorityLayer' => 'design_workspace',
+                'isSystem' => true,
             ];
         }
-        usort($designs, static fn(array $a, array $b): int => strcmp((string)$b['updatedAt'], (string)$a['updatedAt']));
         $this->success(['designs' => $designs]);
     }
 
@@ -4929,6 +4913,7 @@ class SchemaStudioController extends BaseController
         if ($id === '') {
             $this->error('missing_id', 400);
         }
+        $id = $this->normalizeDesignId($id);
         $schema = $this->loadDesignDocument($id);
         if (!$schema) {
             $this->error('not_found', 404);
@@ -4958,7 +4943,7 @@ class SchemaStudioController extends BaseController
             $this->error('invalid_schema', 400);
         }
         $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
-        $schema['_meta']['id'] = $this->safeId((string)($schema['_meta']['id'] ?? ''));
+        $schema['_meta']['id'] = self::SYSTEM_DESIGN_ID;
         $this->assertRevisionToken((string)$schema['_meta']['id'], $body['revisions'] ?? null, ['design']);
         $schema['_meta']['updatedAt'] = $this->nowIso();
         $schema['_meta']['author'] = (string)($user['username'] ?? 'system');
@@ -4990,6 +4975,10 @@ class SchemaStudioController extends BaseController
         if ($id === '') {
             $this->error('missing_id', 400);
         }
+        $id = $this->normalizeDesignId($id);
+        if ($id === self::SYSTEM_DESIGN_ID) {
+            $this->error('system_design_locked', 409, 'The active system schema cannot be deleted.');
+        }
         $path = $this->designPath($id);
         if (is_file($path)) {
             @unlink($path);
@@ -5009,7 +4998,7 @@ class SchemaStudioController extends BaseController
         $this->requireCsrf();
         $this->ensureSavePayloadLimit();
         $body = $this->jsonBody();
-        $designId = $this->safeId((string)($body['design_id'] ?? ''));
+        $designId = $this->normalizeDesignId((string)($body['design_id'] ?? self::SYSTEM_DESIGN_ID));
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : null;
         if ($designId === '' || !$schema) {
             $this->error('missing_payload', 400);
@@ -5047,11 +5036,13 @@ class SchemaStudioController extends BaseController
 
         $schema = [
             '_meta' => [
-                'id' => 'registry_' . gmdate('Ymd_His'),
-                'name' => 'Registry Import',
+                'id' => self::SYSTEM_DESIGN_ID,
+                'name' => 'HESEM Workspace Design',
                 'version' => '1.0.0',
-                'description' => 'Imported from data/registry',
-                'source' => 'registry',
+                'description' => 'Editable workspace design imported from the generated system contract registry.',
+                'source' => 'workspace_registry_import',
+                'designType' => 'workspace_design',
+                'authorityLayer' => 'design_workspace',
                 'validation_profile' => 'logical_registry',
                 'createdAt' => $this->nowIso(),
                 'updatedAt' => $this->nowIso(),
@@ -5285,10 +5276,12 @@ class SchemaStudioController extends BaseController
 
             $schema = [
                 '_meta' => [
-                    'id' => 'live_' . gmdate('Ymd_His'),
-                    'name' => 'Live DB ' . gmdate('Y-m-d H:i'),
+                    'id' => self::SYSTEM_DESIGN_ID,
+                    'name' => 'HESEM Workspace Design',
                     'version' => '1.0.0',
-                    'description' => 'Reverse engineered from PostgreSQL',
+                    'description' => 'Editable workspace design reverse engineered from PostgreSQL for controlled design review.',
+                    'designType' => 'workspace_design',
+                    'authorityLayer' => 'design_workspace',
                     'createdAt' => $this->nowIso(),
                     'updatedAt' => $this->nowIso(),
                     'author' => (string)($user['username'] ?? 'system'),

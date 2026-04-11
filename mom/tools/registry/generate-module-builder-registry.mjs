@@ -290,6 +290,39 @@ function isolatedLegacyTables(canonicalCatalog) {
   return isolated;
 }
 
+function canonicalResourceEntries(canonicalCatalog) {
+  const entries = [];
+  for (const [domainKey, domain] of Object.entries(canonicalCatalog?.domains || {})) {
+    for (const [resourceKey, resource] of Object.entries(domain?.resources || {})) {
+      entries.push({
+        domain: domainKey,
+        resource: resourceKey,
+        ...resource,
+      });
+    }
+  }
+  return entries;
+}
+
+function applyCanonicalPatternOverrides(tableRegistry, canonicalCatalog) {
+  for (const resource of canonicalResourceEntries(canonicalCatalog)) {
+    const tableName = String(resource?.table || '').trim();
+    if (!tableName) continue;
+    const table = tableRegistry?.tables?.[tableName];
+    if (!table || typeof table !== 'object') continue;
+    table.canonicalPattern = String(resource?.pattern || '').trim() || null;
+    table.canonicalResource = `${resource.domain}.${resource.resource}`;
+    if (resource?.release_snapshot_of) {
+      table.releaseSnapshotOf = resource.release_snapshot_of;
+    }
+    if (table.canonicalPattern === 'projection') {
+      table.readOnlyProjection = true;
+      table.publicationMode = 'projection_read_only';
+    }
+  }
+  return tableRegistry;
+}
+
 function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
@@ -455,6 +488,15 @@ function runtimeAccessProfileForTable(tableName, table) {
     return null;
   }
 
+  if (table?.readOnlyProjection) {
+    return {
+      create: [],
+      update: [],
+      transition: [],
+      delete: [],
+    };
+  }
+
   if (['users', 'roles', 'user_roles'].includes(key)) {
     return runtimeAccessTemplate({
       list: expandRuntimeRoles('admin'),
@@ -551,6 +593,9 @@ function primaryKeyMeta(table) {
 
 function supportedEndpointKinds(table) {
   const pk = primaryKeyMeta(table);
+  if (table?.readOnlyProjection) {
+    return pk.mode === 'missing' ? ['list'] : ['list', 'detail'];
+  }
   const kinds = ['list', 'create'];
   if (pk.mode !== 'missing') {
     kinds.push('detail', 'update', 'delete');
@@ -1358,6 +1403,7 @@ function frontendProfile(tableName, table, workflowMeta = null) {
   const operatorSignals = ['job_id', 'job_no', 'work_order_id', 'operation_id', 'operation_seq', 'resource_id', 'machine_id', 'equipment_id'];
   const hasOperatorSignals = operatorSignals.some((field) => hasColumn(table, field));
   if (FRONTEND_PROFILE_OVERRIDES[key]) return FRONTEND_PROFILE_OVERRIDES[key];
+  if (table?.readOnlyProjection) return 'projection_record';
 
   if (/planning|advanced_planning|dispatch/.test(domain) || /^aps_/.test(key)) {
     return 'planning_console';
@@ -1388,6 +1434,8 @@ function frontendProfile(tableName, table, workflowMeta = null) {
 
 function recommendedPatternsForProfile(profile) {
   switch (profile) {
+    case 'projection_record':
+      return ['list_report', 'object_page', 'analytics', 'time_series', 'snapshot_compare', 'related_lists'];
     case 'planning_console':
       return ['list_report', 'scenario_compare', 'planning_board', 'timeline_grid', 'related_lists', 'analytics'];
     case 'operator_console':
@@ -2152,7 +2200,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
       quick_view_refs: relations.outgoing,
       related_lists: relations.incoming,
     }),
-    form: capabilityContract(true, formBlockers.length === 0, formBlockers, {
+    form: capabilityContract(!table?.readOnlyProjection, !table?.readOnlyProjection && formBlockers.length === 0, formBlockers, {
       create_endpoint: createEndpoint?.action || null,
       update_endpoint: updateEndpoint?.action || null,
       editable_fields: fieldKeys(uniqueFields([...createFields, ...updateFields])).slice(0, 20),
@@ -2188,7 +2236,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
       comment_contract: commentContract,
       activity_contract: activityContract,
     }, Boolean(ownerField || collaborationSignal)),
-    analytics: capabilityContract(['governed_case', 'transactional_record', 'planning_console', 'operator_console', 'assessment_record'].includes(profile), formulaCount > 0 && analyticsBlockers.length === 0, analyticsBlockers, {
+    analytics: capabilityContract(['governed_case', 'transactional_record', 'planning_console', 'operator_console', 'assessment_record', 'projection_record'].includes(profile), formulaCount > 0 && analyticsBlockers.length === 0, analyticsBlockers, {
       formula_count: formulaCount,
       time_fields: uniqueStrings([createdAtField, updatedAtField, startDateField, endDateField, dueDateField]).slice(0, 5),
       status_field: statusField,
@@ -2235,7 +2283,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   const publishabilityBlockers = uniqueStrings([
     ...listBlockers,
     ...detailBlockers,
-    ...formBlockers,
+    ...(capabilities.form.recommended ? formBlockers : []),
     ...workflowBlockers,
     ...(['document_record'].includes(profile) ? attachmentBlockers : []),
     ...(archiveIsolation ? ['archive_isolation_only'] : []),
@@ -2531,7 +2579,9 @@ function buildDomainFieldPacks(tableRegistry, dataFields) {
     packs[`${tableName}_header`] = detailFields.slice(0, 12);
     packs[`${tableName}_list_columns`] = listFields.slice(0, 16);
     packs[`${tableName}_filters`] = uniqueFields(listFields.filter((field) => field.filterable).slice(0, 12));
-    packs[`${tableName}_create_form`] = uniqueFields([...createFields, ...updateFields]).slice(0, 20);
+    packs[`${tableName}_create_form`] = table?.readOnlyProjection
+      ? []
+      : uniqueFields([...createFields, ...updateFields]).slice(0, 20);
     packs[`${tableName}_search`] = uniqueFields(listFields.filter((field) => /identification|general|status/.test(String(field.group || ''))).slice(0, 10));
     packs[`${tableName}_status`] = uniqueFields(transitionFields.length ? transitionFields : listFields.filter((field) => /status/i.test(field.key)).slice(0, 6));
   }
@@ -3185,6 +3235,7 @@ function main() {
   const statusOptions = readJson(path.join(registryDir, 'status-options.json'));
   const fieldTypes = readJson(path.join(registryDir, 'field-types.json'));
   applyWave1LifecycleOverrides(tableRegistry, workflowLibrary, wave1LifecycleNormalization);
+  applyCanonicalPatternOverrides(tableRegistry, canonicalCatalog);
 
   const endpointCatalog = buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, workflowLibrary, statusOptions);
   const endpointCatalogIndex = buildEndpointCatalogIndex(endpointCatalog);

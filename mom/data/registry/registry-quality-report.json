@@ -2,25 +2,25 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-10T07:51:02.571Z",
+    "generatedAt": "2026-04-10T12:22:41.451Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "16b4c137-a965-4f41-bc10-785f9b29dac8"
+    "publication_run_id": "c6ca5fcd-23b1-4f28-8661-e672b97d3859"
   },
   "summary": {
-    "endpoint_count": 3631,
+    "endpoint_count": 3610,
     "pack_count": 3948,
-    "relation_edge_count": 2707,
+    "relation_edge_count": 2715,
     "workflow_count": 277,
     "status_set_count": 733,
-    "validation_rule_count": 42436,
+    "validation_rule_count": 42478,
     "formula_count": 1177,
     "formula_reference_count": 1177,
-    "field_context_count": 45446,
-    "row_version_tables": 445,
-    "org_scoped_tables": 420,
+    "field_context_count": 45534,
+    "row_version_tables": 449,
+    "org_scoped_tables": 424,
     "composite_pk_tables": 20,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
@@ -29,8 +29,8 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 256,
-    "workflow_engine_bridge_ready": 257,
+    "transition_runtime_warnings": 260,
+    "workflow_engine_bridge_ready": 261,
     "workflow_engine_bridge_blocked": 0,
     "archive_only_tables": 379,
     "soft_delete_tables": 0,
@@ -38,8 +38,8 @@
     "workflow_lifecycle_modes": {
       "stateless": 336,
       "generic_status_only": 31,
-      "guarded_transition_runtime": 35,
-      "persisted": 256,
+      "guarded_transition_runtime": 31,
+      "persisted": 260,
       "unknown": 0
     },
     "frontend_foundation_entities": 669,
@@ -51,7 +51,7 @@
     "frontend_unpublishable_entities": 0,
     "attachment_contract_entities": 651,
     "comment_contract_entities": 651,
-    "activity_contract_entities": 424,
+    "activity_contract_entities": 428,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -92,8 +92,8 @@
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 2707,
-      "target": 2707
+      "actual": 2715,
+      "target": 2715
     },
     {
       "id": "workflow_coverage",
@@ -182,7 +182,7 @@
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 42436,
+      "actual": 42478,
       "target": 5000
     },
     {

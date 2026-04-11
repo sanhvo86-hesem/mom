@@ -8,7 +8,7 @@ const outputPath = path.join(
   'data',
   'schema-studio',
   'designs',
-  'canonical_erp_mes_eqms_7layer_core.json'
+  'workspace.json'
 );
 
 let seq = 1;
@@ -300,8 +300,8 @@ addTable('eqms_compliance', 'audit_trail', 'Immutable audit ledger.', [pk('audit
 
 const schema = {
   _meta: {
-    id: 'canonical_erp_mes_eqms_7layer_core',
-    name: 'Canonical ERP+MES+eQMS 7-Layer Core',
+    id: 'workspace',
+    name: 'Workspace Canonical ERP+MES+eQMS 7-Layer',
     version: '1.0',
     profile: 'canonical_architecture',
     generated_at: new Date().toISOString(),

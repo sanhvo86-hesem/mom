@@ -18,10 +18,13 @@ Single entry-point that runs the full publication pipeline in sequence:
   12. generate_wave3_process_governance.py    (wave-3 process-object extraction report)
   13. generate_wave4_production_quality_governance.py (wave-4 production/quality closure report)
   14. generate_wave5_maintenance_ehs_governance.py (wave-5 maintenance/EHS/compliance closure report)
-  15. generate_operational_stress_report.py   (stress/exception reality assessment)
-  16. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
-  17. Generate publication proof artifact     (_reports/publication-proof-latest.json)
-  18. Generate wave/gap ledger                (wave-gap-ledger.json)
+  15. generate_wave6_finance_projection_governance.py (wave-6 finance/projection closure report)
+  16. generate_operational_stress_report.py   (stress/exception reality assessment)
+  17. generate_business_contract_bundle.py    (authored object package bundle)
+  18. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
+  19. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
+  20. Generate publication proof artifact     (_reports/publication-proof-latest.json)
+  21. Generate wave/gap ledger                (wave-gap-ledger.json)
 
 The proof artifact contains checksums, counts, and invariant checks so that
 downstream consumers can verify the publication run is consistent.
@@ -756,7 +759,15 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 14: Operational stress assessment
+    # Step 14: Wave 6 finance / projection assessment
+    step_results["wave6_finance_projection_governance"] = run_step(
+        "Wave 6 Finance Projection Governance (generate_wave6_finance_projection_governance.py)",
+        [sys.executable, "generate_wave6_finance_projection_governance.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 15: Operational stress assessment
     step_results["operational_stress_governance"] = run_step(
         "Operational Stress Governance (generate_operational_stress_report.py)",
         [sys.executable, "generate_operational_stress_report.py"],
@@ -764,7 +775,15 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 15: Compact truth/accounting summaries
+    # Step 16: Business contract bundle from authored object packages
+    step_results["business_contract_bundle"] = run_step(
+        "Business Contract Bundle (generate_business_contract_bundle.py)",
+        [sys.executable, str(PORTAL_ROOT / "tools" / "contracts" / "generate_business_contract_bundle.py")],
+        cwd=PORTAL_ROOT.parent,
+        dry_run=dry_run,
+    )
+
+    # Step 17: Compact truth/accounting summaries
     step_results["publication_truth_summaries"] = run_step(
         "Publication Truth Summaries (generate_publication_truth_summaries.py)",
         [sys.executable, "generate_publication_truth_summaries.py"],
@@ -772,7 +791,15 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 15-16: Proof + wave/gap ledger
+    # Step 18: Synchronize workspace-design / authority artifacts to the same publication cycle
+    step_results["schema_authority_sync"] = run_step(
+        "Schema Authority Sync (refresh_data_schema_authority.php --skip-publication)",
+        ["php", str(PORTAL_ROOT / "tools" / "schema" / "refresh_data_schema_authority.php"), "--skip-publication"],
+        cwd=PORTAL_ROOT.parent,
+        dry_run=dry_run,
+    )
+
+    # Step 19-20: Proof + wave/gap ledger
     print(f"\n{'=' * 72}")
     print("STEP: Wave/Gap Ledger Generation")
     print(f"{'=' * 72}")

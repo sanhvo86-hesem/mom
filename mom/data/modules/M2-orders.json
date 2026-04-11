@@ -1,5 +1,6 @@
 {
   "moduleId": "M2-orders",
+  "templateId": "T13",
   "title": { "vi": "Đơn hàng", "en": "Orders" },
   "subtitle": {
     "vi": "Chuẩn hóa commercial promise, release JO/WO và shipment readiness trên một luồng thống nhất",

@@ -1,10 +1,10 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T07:50:58.823Z",
+    "generatedAt": "2026-04-10T12:22:37.243Z",
     "description": "Runtime access policy generated from domain architecture and table-registry defaults.",
     "domainPolicyCount": 49,
-    "tableOverrideCount": 125
+    "tableOverrideCount": 130
   },
   "defaults": {
     "list": [
@@ -3748,6 +3748,18 @@
       ],
       "delete": []
     },
+    "inventory_balance_snapshot": {
+      "create": [],
+      "update": [],
+      "transition": [],
+      "delete": []
+    },
+    "inventory_valuations": {
+      "create": [],
+      "update": [],
+      "transition": [],
+      "delete": []
+    },
     "ipqc_inspection_results": {
       "list": [
         "authenticated"
@@ -4109,33 +4121,9 @@
       "delete": []
     },
     "mes_oee_snapshots": {
-      "list": [
-        "authenticated"
-      ],
-      "detail": [
-        "authenticated"
-      ],
-      "create": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer"
-      ],
-      "update": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer"
-      ],
-      "transition": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer"
-      ],
+      "create": [],
+      "update": [],
+      "transition": [],
       "delete": []
     },
     "mes_program_events": {
@@ -4670,33 +4658,9 @@
       "delete": []
     },
     "plant_performance_snapshots": {
-      "list": [
-        "authenticated"
-      ],
-      "detail": [
-        "authenticated"
-      ],
-      "create": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer"
-      ],
-      "update": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer"
-      ],
-      "transition": [
-        "it_admin",
-        "ceo",
-        "qa_manager",
-        "quality_manager",
-        "qms_engineer"
-      ],
+      "create": [],
+      "update": [],
+      "transition": [],
       "delete": []
     },
     "plm_change_order_lines": {
@@ -4967,6 +4931,18 @@
         "quality_manager",
         "qms_engineer"
       ],
+      "delete": []
+    },
+    "production_order_bom_snapshot": {
+      "create": [],
+      "update": [],
+      "transition": [],
+      "delete": []
+    },
+    "production_order_route_snapshot": {
+      "create": [],
+      "update": [],
+      "transition": [],
       "delete": []
     },
     "purchase_order_line": {
@@ -5755,6 +5731,12 @@
         "quality_manager",
         "qms_engineer"
       ],
+      "delete": []
+    },
+    "stock_balances": {
+      "create": [],
+      "update": [],
+      "transition": [],
       "delete": []
     },
     "supplier_asn_lines": {

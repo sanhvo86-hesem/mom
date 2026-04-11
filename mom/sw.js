@@ -21,7 +21,7 @@
 
 // ── Cache Configuration ─────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1.3.26';
+const CACHE_VERSION = 'v1.3.27';
 const CACHE_PREFIX  = 'hesem-mom';
 
 /** Named caches with version stamps. */

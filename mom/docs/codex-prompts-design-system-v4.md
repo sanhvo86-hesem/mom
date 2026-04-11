@@ -3,7 +3,7 @@
 > **Ngày tạo**: 2026-04-10
 > **Tổng cộng**: 12 prompts (6 tạo mới + 6 nâng cấp), mỗi prompt tự chứa đầy đủ context
 > **Phần 1 (Prompt 1-6)**: Tạo tài liệu v4.0 + mã nguồn. Prompt 1→2→3 song song. Prompt 4 sau. Prompt 5+6 song song.
-> **Phần 2 (Prompt 7-12)**: Nâng cấp v4.0→v4.1. Prompt 7+8+9 song song. Prompt 10+11 song song. Prompt 12 cuối.
+> **Phần 2 (Prompt 7-12)**: Nâng cấp v4.0→v4.1. Prompt 7+8+9 song song. Prompt 10 trước, Prompt 11 sau Prompt 10. Prompt 12 cuối.
 
 ---
 
@@ -1284,7 +1284,7 @@ Prompt 6 ─┘── Song song được (mã nguồn JS/CSS)
 # PHẦN 2: NÂNG CẤP v4.0 → v4.1 (Prompt 7-12)
 
 > **Mục tiêu**: Trau chuốt đồ họa chuyên nghiệp, bổ sung chức năng còn thiếu
-> **Thứ tự**: Prompt 7+8+9 chạy song song. Prompt 10+11 chạy song song. Prompt 12 chạy cuối.
+> **Thứ tự**: Prompt 7+8+9 chạy song song. Prompt 10 chạy trước. Prompt 11 chạy sau Prompt 10. Prompt 12 chạy cuối.
 
 
 ---
@@ -1303,240 +1303,194 @@ Prompt 6 ─┘── Song song được (mã nguồn JS/CSS)
 
 ---
 
-## PROMPT 7/12: Sửa CSS — Visual Polish Chuyên Nghiệp
+## PROMPT 7/12: Reaudit CSS Foundation — Visual Polish v4.1
 
 ### Mục tiêu
-Nâng cấp CSS trong `<style>` của file HTML từ 5/10 lên 9/10 về visual quality. Thêm hover/focus/active states, fix WCAG contrast, thêm transitions mượt, nhất quán base-8 spacing, thêm dark mode, thêm micro-animations.
+Tái audit và nâng cấp shared CSS foundation của file `mom/docs/module-layout-template-design-system-v4.html` để nâng chất lượng thị giác từ mức “ổn” lên mức enterprise polished. Prompt này chỉ xử lý CSS nền tảng dùng chung: trạng thái tương tác, token scale, contrast, dark mode, reduced motion và print.
+
+Prompt 7 phải an toàn để chạy song song với Prompt 8 và Prompt 9, nên chỉ được chạm vào CSS dùng chung, không được đụng tới SVG wireframes, mô tả template, tên section hay nội dung HTML.
 
 ### File
-`mom/docs/module-layout-template-design-system-v4.html` — chỉ sửa block `<style>` (dòng 7-164)
+`mom/docs/module-layout-template-design-system-v4.html`
 
-### Danh sách sửa chi tiết
+### Benchmark bắt buộc phải vận dụng
+- **WCAG + MDN**: dùng `:focus-visible` đúng ngữ cảnh, focus indicator phải đủ nhìn thấy, tôn trọng `prefers-reduced-motion`, có `@media print` riêng.
+- **Fluent 2 + Carbon**: states phải rõ `hover / active / pressed / selected / disabled`, không dùng một style chung cho mọi trạng thái.
+- **Material 3 + Fluent + USWDS**: dark mode phải đi từ role tokens trước, sau đó mới selector overrides; không “invert màu” một cách mù quáng.
+- **GOV.UK / USWDS**: spacing, radius, typography và print behavior phải nhất quán, ít tùy hứng, đọc tốt hơn là màu mè.
 
-#### 1.1 Thêm focus states cho TẤT CẢ elements tương tác
-```css
-/* Thêm focus ring cho mọi element clickable */
-a:focus-visible,
-.tpl-card:focus-visible,
-.chip:focus-visible,
-.stat-card:focus-visible {
-  outline: 3px solid rgba(21,101,192,0.4);
-  outline-offset: 2px;
-  border-radius: inherit;
-}
-```
+### Contract thực thi
+1. Luôn đọc file hiện trạng trước khi sửa. **Nội dung file hiện tại là nguồn sự thật duy nhất.**
+2. Không dùng line number làm contract. Dòng chỉ là tham khảo, vì file có thể đã thay đổi trước đó.
+3. Chỉ được sửa **block `<style> ... </style>` đầu tiên** trong file.
+4. Không được sửa HTML bên ngoài `<style>`.
+5. Không được đổi class names, IDs, section order, text hiển thị, cấu trúc DOM, hoặc SVG markup.
+6. Không được thêm CSS cho selector không tồn tại trong HTML hiện tại, trừ pseudo-classes/pseudo-elements của selector đã tồn tại.
+7. Không được broad rewrite toàn bộ CSS. Chỉ refactor tối thiểu theo các anchors bên dưới.
+8. Không được phá contract downstream của Prompt 8-12.
 
-#### 1.2 Thêm hover states cho TOC links
-```css
-.toc a {
-  /* Giữ nguyên styles hiện tại, THÊM: */
-  transition: all 0.15s ease;
-  cursor: pointer;
-}
-.toc a:hover {
-  background: rgba(21,101,192,0.14);
-  color: var(--brand-2);
-  transform: translateY(-1px);
-}
-.toc a:active {
-  transform: translateY(0);
-  background: rgba(21,101,192,0.2);
-}
-```
+### Anchors được phép chạm tới
+- `:root`
+- `body`
+- `.shell`
+- `.doc-header`
+- `.toc`, `.toc-inner`, `.toc a`
+- `.section`, `.section-title`, `.section-number`
+- `.card`, `.card-header`, `.card-body`
+- `.stat-card`, `.stat-value`, `.stat-label`
+- `.info-box`
+- `.cat-header`, `.cat-count`, `.cat-chip`
+- `.tpl-card`, `.tpl-thumb`, `.tpl-info`, `.tpl-meta`, `.tpl-chips`
+- `.chip`
+- `.spec-table`
+- `.code-block`
+- `.zone-diagram`
+- `.flow-node`
+- `.scroll-*`
+- Existing `@media` rules
 
-#### 1.3 Thêm transitions cho stat-cards, info-boxes, chips, cards
-```css
-.stat-card {
-  /* Giữ nguyên, THÊM: */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(12,45,72,0.12);
-}
+Nếu một anchor không tồn tại trong file hiện tại thì bỏ qua, không tự phát minh selector mới để “đủ checklist”.
 
-.info-box {
-  /* Giữ nguyên, THÊM: */
-  transition: border-color 0.15s ease;
-}
-.info-box:hover {
-  border-color: currentColor;
-}
+### Các nhóm thay đổi bắt buộc
 
-.chip {
-  /* Giữ nguyên, THÊM: */
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.chip:hover {
-  transform: scale(1.05);
-}
+#### 1. Token normalization trong `:root`
+Hoàn thiện bộ token nền tảng, giữ nguyên HESEM visual direction hiện có:
+- Spacing scale theo nhịp **4px**: `4, 8, 12, 16, 20, 24, 32, 40, 48`
+- Radius scale: `4, 6, 8, 12, 16, 20, 24`
+- Shadow scale: `xs, sm, md, lg, xl`
+- Motion tokens: `fast, normal, slow`
+- Focus token: ring color + ring width + offset
+- Nếu cần tách use case màu accent, ưu tiên token kiểu `--accent-fill` và `--accent-text` thay vì dùng một màu cho cả nền lẫn text
+- Nếu cần text màu accent trên nền sáng, thêm token kiểu `--accent-ink` hoặc tương đương thay vì lạm dụng `--accent`
 
-.card {
-  /* Giữ nguyên, THÊM: */
-  transition: box-shadow 0.2s ease;
-}
-.card:hover {
-  box-shadow: 0 8px 24px rgba(12,45,72,0.1);
-}
+Không đổi palette thương hiệu HESEM một cách phá vỡ bản sắc. Chỉ tinh chỉnh semantic usage.
 
-.spec-table tr {
-  transition: background 0.12s ease;
-}
-```
+#### 2. Hover / active / pressed polish
+Thêm hoặc cải thiện trạng thái cho các selector thực sự đang dùng:
+- `.toc a`
+- `.card`
+- `.stat-card`
+- `.chip`
+- `.info-box`
+- `.tpl-card`
+- `.spec-table tr`
 
-#### 1.4 Fix WCAG contrast
-```css
-/* Thay --accent từ #f9a825 (fail AA trên trắng) sang #b45309 cho text */
-/* Giữ #f9a825 cho backgrounds, dùng #b45309 cho text trên nền sáng */
+Yêu cầu:
+- Không dùng `transition: all`
+- Chỉ animate các properties cần thiết: `background-color`, `border-color`, `box-shadow`, `transform`, `color`
+- Các hover-only refinements nên đặt trong `@media (hover: hover)` khi hợp lý để tránh hiệu ứng thừa trên thiết bị touch
+- `active/pressed` chỉ áp khi selector đó có ý nghĩa tương tác thực tế
+- Pressed/active nên giảm elevation, tăng state layer, hoặc trả transform về neutral; không làm animation “giật”
 
-/* Fix text-tertiary 10px — tăng opacity hoặc font-size */
-.tpl-meta {
-  font-size: 11px; /* tăng từ 10px lên 11px */
-  color: var(--text-secondary); /* đổi từ tertiary sang secondary */
-}
-```
+#### 3. Keyboard focus đúng ngữ cảnh
+Chỉ thêm `:focus-visible` cho **phần tử focusable thật** đang có trong HTML hiện tại, ví dụ:
+- `a`
+- `button` nếu có
+- `[tabindex]` nếu có
+- `[role="button"]` nếu có
 
-#### 1.5 Nhất quán Base-8 spacing
-Sửa TẤT CẢ padding/margin không phải bội số 4:
-- `padding: 7px 12px` → `padding: 8px 12px` (`.meta-item`)
-- `padding: 9px 12px` → `padding: 8px 12px` (`.spec-table th`, `.spec-table td`)
-- `padding: 34px 34px 28px` → `padding: 32px 32px 28px` (`.doc-header`)
-- `padding: 7px 10px` → `padding: 8px 12px` (`.toc a`)
-- `padding: 7px 12px` → `padding: 8px 12px` (`.cat-count`)
-- `padding: 7px 11px` → `padding: 8px 12px` (`.cat-chip`)
-- `margin: 20px 0` → `margin: 24px 0` (`.section`)
-- Kiểm tra TOÀN BỘ file, sửa mọi giá trị lẻ thành bội số 4
+Không thêm `:focus-visible` cho `.tpl-card`, `.chip`, `.stat-card` nếu chúng chỉ là `div/span` không focusable.
 
-#### 1.6 Nhất quán Border-radius với token scale
-Sửa theo spec: sm(4), md(6), lg(8), xl(12), 2xl(16), 3xl(20), 4xl(24)
-- `.doc-header` border-radius: `28px` → `24px`
-- `.section` border-radius: `24px` → `20px`
-- `.card` border-radius: `20px` → `16px`
-- `.tpl-card` border-radius: `20px` → `16px`
-- `.stat-card` border-radius: `18px` → `16px`
-- `.toc` border-radius: `18px` → `16px`
-- `.code-block` border-radius: `18px` → `16px`
-- `.note` border-radius: `16px` → `12px`
-- `.info-box` border-radius: `16px` → `12px`
-- `.zone-diagram` border-radius: `18px` → `16px`
-- `.flow-node` border-radius: `16px` → `12px`
-- `.scroll-demo` border-radius: `20px` → `16px`
-- `.zone-cell` border-radius: `12px` → `8px`
+Focus rules:
+- Focus indicator phải đủ rõ trên nền sáng và tối
+- Ưu tiên outline/ring solid, nhìn rõ, có contrast tốt với vùng kề bên
+- Focus indicator nên hướng tới ngưỡng non-text contrast tối thiểu `3:1`
+- Nếu dùng fallback cũ, có thể thêm `@supports not selector(:focus-visible)` nhưng không bắt buộc
 
-#### 1.7 Thêm shadow scale đầy đủ (5 cấp)
-```css
-:root {
-  /* Thêm vào existing :root */
-  --shadow-xs: 0 1px 3px rgba(12,45,72,0.04);
-  --shadow-md: 0 8px 24px rgba(12,45,72,0.08);
-  --shadow-xl: 0 24px 56px rgba(12,45,72,0.16);
-}
-```
+#### 4. Contrast cleanup
+Cải thiện readability thực tế thay vì sửa tượng trưng:
+- Rà lại text nhỏ như `.tpl-meta`, text tertiary trên nền sáng, badge text, header phụ, table header
+- Nếu text nhỏ đang quá mờ, tăng cỡ chữ hoặc nâng từ tertiary lên secondary khi cần
+- Không dùng màu accent vàng làm text chính trên nền trắng
+- Các cặp màu chạm tới phải hướng tới đọc tốt và phù hợp WCAG AA ở ngữ cảnh thực
 
-#### 1.8 Thêm dark mode (prefers-color-scheme)
-```css
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-page: #0f172a;
-    --bg-surface: #1e293b;
-    --bg-surface-alt: #162032;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-tertiary: #64748b;
-    --border: #334155;
-    --shadow-sm: 0 4px 14px rgba(0,0,0,0.3);
-    --shadow-lg: 0 18px 40px rgba(0,0,0,0.5);
-    --brand: #60a5fa;
-    --brand-2: #93c5fd;
-  }
-  body {
-    background: var(--bg-page);
-  }
-  .doc-header {
-    background: linear-gradient(135deg, #020617 0%, #0f172a 32%, #1e3a5f 72%, #1e40af 100%);
-  }
-  .toc {
-    background: rgba(30,41,59,0.85);
-    border-color: rgba(51,65,85,0.6);
-  }
-  .toc a {
-    background: rgba(96,165,250,0.1);
-    color: var(--brand);
-  }
-  .section {
-    background: rgba(30,41,59,0.7);
-    border-color: var(--border);
-  }
-  .card {
-    background: var(--bg-surface);
-    border-color: var(--border);
-  }
-  .card-header {
-    background: linear-gradient(180deg, #1e293b, #162032);
-    border-color: var(--border);
-  }
-  .stat-card {
-    background: linear-gradient(180deg, #1e293b, #162032);
-    border-color: var(--border);
-  }
-  .stat-value {
-    color: var(--brand);
-  }
-  .tpl-card {
-    background: var(--bg-surface);
-    border-color: var(--border);
-  }
-  .tpl-thumb {
-    background: linear-gradient(180deg, #162032, #0f172a);
-    border-color: var(--border);
-  }
-  .wb { fill: #1e293b }
-  .code-block {
-    background: #020617;
-  }
-  .spec-table th {
-    background: var(--bg-surface-alt);
-  }
-}
-```
+#### 5. Spacing và radius consistency
+Trong **các selector đã chạm tới**, chuẩn hóa các giá trị lẻ về scale 4px nơi hợp lý:
+- padding/margin của header, TOC, cards, badges, tables, chips, section shells
+- border-radius của các shared surfaces
 
-#### 1.9 Thêm micro-animations khi scroll vào view
-```css
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.section {
-  animation: fadeInUp 0.4s ease both;
-}
-/* Stagger animation cho template cards */
-.tpl-card {
-  animation: fadeInUp 0.3s ease both;
-}
-.tpl-card:nth-child(2) { animation-delay: 0.05s; }
-.tpl-card:nth-child(3) { animation-delay: 0.1s; }
-.tpl-card:nth-child(4) { animation-delay: 0.15s; }
-```
+Lưu ý:
+- Không brute-force thay mọi số trong file
+- Không đụng phần trăm, `clamp()`, gradient stops, SVG geometry, shadow blur radii nếu không cần
+- “Base-8” ở đây được hiểu là nhịp 8 với sub-step 4px cho UI enterprise
 
-#### 1.10 Cải thiện print stylesheet
-```css
-@media print {
-  body { background: #fff; color: #000; }
-  .toc { display: none; }
-  .section { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; backdrop-filter: none; background: #fff; }
-  .tpl-card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
-  .tpl-card:hover { transform: none; }
-  .doc-header { background: #0c2d48 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .stat-card { box-shadow: none; border: 1px solid #ddd; }
-  .card { box-shadow: none; }
-  a { color: inherit; }
-}
-```
+#### 6. Dark mode — shared shell only
+Thêm `@media (prefers-color-scheme: dark)` cho **shared shell**:
+- `:root` token mapping
+- `body`
+- `.doc-header`
+- `.toc`
+- `.section`
+- `.card`, `.card-header`
+- `.stat-card`
+- `.tpl-card`, `.tpl-thumb`
+- `.spec-table th`
+- `.code-block`
+- `.wb` nếu cần để SVG wireframe không bị chìm
 
-### Lưu ý
-- Chỉ sửa CSS trong `<style>` block
-- KHÔNG thay đổi HTML content
-- Kiểm tra TOÀN BỘ file sau khi sửa — mọi padding/margin phải là bội số 4
+Quan trọng:
+- Đây là **partial dark mode cho shared shell**, không claim full-file dark mode nếu file còn nhiều inline style hardcoded ngoài CSS shared
+- Ưu tiên token overrides trước, selector overrides sau
+- Mapping nên đi theo semantic roles như `surface / surface-alt / on-surface / outline / focus-ring / accent-fill / accent-text`, không vá từng component bằng hex rời rạc nếu có thể tránh
+
+#### 7. Motion và reduced motion
+Thêm micro-polish vừa đủ:
+- Hover lift nhẹ cho cards nếu chưa đủ tốt
+- Transition duration nhất quán qua motion tokens
+- Có thể thêm animation load nhẹ cho surfaces nếu thật sự tiết chế
+
+Nhưng bắt buộc:
+- Phải có `@media (prefers-reduced-motion: reduce)`
+- Trong reduced motion: tắt animation không cần thiết, tắt transform transitions, tắt smooth scrolling nếu cần
+- Không mô tả “scroll-into-view” giả bằng CSS page-load animation
+- Không animate đồng loạt mọi `.section` chỉ để tạo cảm giác “wow”; tài liệu enterprise ưu tiên ổn định hơn phô diễn
+
+#### 8. Print stylesheet
+Cải thiện `@media print` để tài liệu in sạch và chuyên nghiệp:
+- Ẩn `.toc` và các interactive affordances không cần thiết
+- Bỏ shadow, blur, hover transforms
+- Giữ `.doc-header` in ra vẫn có brand color bằng `print-color-adjust`
+- Cards, sections, template cards cần tránh vỡ trang xấu (`break-inside: avoid` khi hợp lý)
+- Links in ra không bị xanh chói vô nghĩa
+- Có thể thêm `@page` và `break-inside`/`break-after` khi hữu ích, nhưng chỉ ở mức layout-aware vừa đủ
+- Chỉ dùng `print-color-adjust: exact` ở khối thương hiệu hoặc phần thật sự cần giữ màu
+
+### Guardrails quan trọng
+- Giữ nguyên visual language hiện tại của HESEM. Đây là **polish pass**, không phải redesign pass.
+- Không xóa rule hiện có nếu nó vẫn đúng; chỉ thay khi có lý do rõ và thay bằng bản tốt hơn.
+- Không thêm CSS chết.
+- Không sửa ownership của Prompt 8-12:
+  - Prompt 7 không chịu trách nhiệm vẽ lại SVG
+  - Prompt 7 không chịu trách nhiệm dịch mô tả
+  - Prompt 7 không chịu trách nhiệm full accessibility narrative sections, density matrix đầy đủ hay print-spec chuyên ngành
+
+### Acceptance criteria đo được
+Kết quả sau khi làm xong phải thỏa tất cả:
+- Chỉ block `<style>` đầu tiên bị thay đổi
+- Không có thay đổi HTML ngoài CSS
+- Có token shadow scale đầy đủ hoặc equivalent rõ ràng
+- Có motion tokens hoặc equivalent rõ ràng
+- Có `:focus-visible` cho phần tử focusable thật
+- Có `@media (prefers-color-scheme: dark)`
+- Có `@media (prefers-reduced-motion: reduce)`
+- Có `@media print`
+- `.toc a`, `.tpl-card`, `.card`, `.stat-card`, `.chip`, `.info-box`, `.spec-table tr` có hover/transition hợp lý nếu selector đó tồn tại
+- `.tpl-meta` và text nhỏ tương tự không còn quá mờ hoặc quá nhỏ
+- Các spacing/radius đã chạm tới tuân theo scale 4px
+- Không có selector rename hoặc rule removal gây ảnh hưởng Prompt 8-12
+
+### Quy trình thực thi bắt buộc
+1. Đọc file hiện tại và map các anchors thực tế.
+2. Xác định những rule nào đã tồn tại để tránh churn không cần thiết.
+3. Sửa CSS theo 8 nhóm thay đổi ở trên.
+4. Tự review lại từng acceptance criteria trước khi kết thúc.
+
+### Output mong muốn từ Codex sau khi thực thi
+Trả về báo cáo ngắn gồm:
+1. Nhóm CSS đã chỉnh
+2. Anchors đã chạm tới
+3. Checklist pass/fail cho từng acceptance criteria
+4. Mục nào bị skip và lý do
 
 ---
 
@@ -1694,312 +1648,368 @@ Search trong file cho tất cả `<div class="tpl-desc">` — kiểm tra từng 
 
 ---
 
-## PROMPT 10/12: Bổ sung 10 Sections Mới — Design Patterns & States
+## PROMPT 10/12: Rebuild Insertion Block — Design Patterns & States v4.1
 
 ### Mục tiêu
-Thêm 10 sections mới vào file, chèn SAU section "Quy chuẩn đồ họa" (id="standards") và TRƯỚC section "20 Visual Theme Presets" (id="visual-themes").
+Tái thiết kế Prompt 10 theo hướng **anchor-based, conflict-safe, content-architecture-first**. Prompt này chỉ sở hữu một block chèn liên tục gồm 10 sections mới về design patterns, states, accessibility, density và content governance.
+
+Block này phải được chèn **sau** section `id="standards"` và **trước** section `id="visual-themes"` trong file hiện trạng, đồng thời phải an toàn để Prompt 11 và Prompt 12 chạy tiếp mà không bị overlap ownership.
+
+### Benchmark bắt buộc phải vận dụng
+- **Carbon + Fluent 2**: state modeling, loading, notification, density phải có cấu trúc rõ `variant / trigger / behavior / fallback`, không viết kiểu “liệt kê cảm tính”.
+- **GOV.UK + USWDS**: error patterns, plain language, validation caveats và content writing phải rõ, cụ thể, không phô trương UI mà bỏ quên khả năng hiểu.
+- **WAI-ARIA APG + MDN**: modal, alert, `aria-live`, `aria-busy`, keyboard model và focus movement phải đúng semantics.
+- **Carbon Data Visualization + USWDS**: data-viz nên thiên về governance và chart choice, không nhồi code vô ích.
+- **Carbon / Fluent / Android**: dark mode mapping phải đi từ semantic tokens hoặc semantic roles trước; không spec theo raw hex một cách máy móc.
+
+Nếu các design system lớn có khác biệt policy, **không được ép thành một “best practice” duy nhất**. Hãy biến khác biệt đó thành governance note, ví dụ:
+- Required field indicator có thể khác giữa GOV.UK và USWDS
+- Live validation không được mặc định là luôn tốt
 
 ### File
 `mom/docs/module-layout-template-design-system-v4.html`
 
-### Vị trí chèn
-Tìm `</section>` đóng section id="standards", chèn ngay sau đó, trước `<section class="section" id="visual-themes">`.
+### Contract thực thi
+1. Luôn đọc HTML hiện trạng trước khi sửa. **File hiện tại là nguồn sự thật duy nhất.**
+2. Prompt này chỉ được sửa **vùng chèn giữa `#standards` và `#visual-themes`**.
+3. Không dùng line number làm contract. Nếu anchor thiếu, trùng hoặc mơ hồ, trả về `BLOCKED`.
+4. Không được sửa TOC. **Prompt 12 là owner duy nhất của TOC, IA reorder và final renumbering.**
+5. Không được sửa shared `<style>` đầu tiên.
+6. Ưu tiên tái sử dụng primitives và pattern có sẵn trong file. Nếu thật sự bắt buộc phải thêm CSS cho block mới, chỉ được thêm **một** local `<style>` ngay trước section đầu tiên mới, prefix toàn bộ selector bằng `.p10-`, và không override selector shared đã có.
+7. Không được đổi, xóa, reorder hoặc rewrite các sections hiện hữu: `summary`, `architecture`, `standards`, `visual-themes`.
+8. Không được đổi text, ID, class hay cấu trúc section `#visual-themes`.
+9. Không được chạm tới ownership của Prompt 11:
+   - MOM/eQMS-specific sections
+   - Shop Floor Display Mode đầy đủ
+   - Operator-facing production display details
+10. Dark tokens, naming, tone, palette và shared terminology phải **derive from actual artifact**, đặc biệt các token có thể đã được Prompt 7 normalize trước đó.
 
-### 10 Sections mới
+### Anchor window
+- **Start anchor:** thẻ `</section>` đóng section `id="standards"`
+- **End anchor:** thẻ mở `<section class="section" id="visual-themes">`
+- Chèn đúng một block liên tục nằm giữa hai anchor này
+- `#standards` và `#visual-themes` là **no-touch boundaries**
 
-#### Section D: Ma trận trạng thái thành phần (Component State Matrix)
+Nếu trong vùng này đã tồn tại một trong các IDs mục tiêu bên dưới, coi là xung đột và trả về `BLOCKED` thay vì merge đoán mò.
+
+### Exact section shell bắt buộc
+Mỗi section mới PHẢI dùng đúng shell sau:
+
+```html
+<section class="section" id="...">
+  <h2 class="section-title"><span class="section-number">X</span>...</h2>
+  <p class="section-subtitle">...</p>
+  ...
+</section>
 ```
+
+Quy ước:
+- Section number tạm thời: `D, E, F, G, H, I, J, K, L, M`
+- Không đổi visible number của section `C`
+- Không tự renumber các section cũ
+
+### Primitive và visual language phải reuse
+Ưu tiên dùng các primitive đã tồn tại trong file:
+- `.grid-2`, `.grid-3`
+- `.card`, `.card-header`, `.card-body`
+- `.spec-table`
+- `.info-box`
+- `.code-block`
+- Existing wireframe palette classes như `.wb`, `.wh`, `.wk`, `.wm`, `.ws`, `.wfl`, `.wft`, `.wt`, `.wta`, `.wr`, `.wg`, `.wa`, `.wbl`, `.wp`
+
+Không biến Prompt 10 thành một đợt “phát minh component mới”. Nếu một ý có thể diễn đạt bằng card + table + info-box thì không tạo thêm cấu trúc bespoke.
+
+### Format rules theo từng nhóm section
+- **Table-first:** `component-states`, `loading-patterns`, `notification-patterns`, `dark-mode-mapping`, `density-modes`
+- **Pattern-card-first:** `error-patterns`, `empty-states`, `data-viz`, `accessibility`
+- **Governance-first:** `content-guidelines`
+- **Example code chỉ dùng ở nơi semantics/hành vi dễ sai**, cụ thể:
+  - error summary + field linking
+  - `aria-live` / `role="status"` / `aria-busy`
+  - modal dialog
+  - retry / load-state snippet
+  - token alias mapping
+- **Governance notes là bắt buộc** cho các điểm:
+  - disabled vs read-only
+  - auto-dismiss policy
+  - required-field policy differences
+  - live-validation caveats
+  - dark-mode token aliasing
+
+### Giới hạn độ dài và độ sâu
+- Giữ block này ở mức **gọn nhưng đủ chiều sâu**
+- Mỗi section tối đa:
+  - `1` main table hoặc `1` main grid
+  - `1` info-box chính
+  - `1-2` example blocks nếu thật sự cần
+- Ưu tiên chất lượng cấu trúc hơn số lượng card
+
+### 10 section contracts
+
+#### Section D: Component State Matrix
+```text
 Section ID: component-states
 Section number: D
+Primary structure: spec-table + 2-3 support cards
 ```
 
-Bảng spec-table cho 12 component types chính. Mỗi component có 8 trạng thái:
+Bắt buộc có:
+- `1` bảng state matrix chuẩn cho các component chính
+- Cột nên bao gồm tối thiểu: `component/state`, `trigger`, `visual delta`, `interaction delta`, `semantic/ARIA delta`, `token delta`, `exit condition`, `test note`
+- Các hàng bắt buộc phải cover tối thiểu: button, input, checkbox, table row, card, tab, toast/notification, progress
+- `2-3` support cards cho các cặp dễ nhầm như:
+  - `disabled` vs `read-only`
+  - `active` vs `selected`
+  - `error` vs `warning`
 
-| Component | Default | Hover | Active/Pressed | Focus | Disabled | Error | Loading | Selected |
-|-----------|---------|-------|----------------|-------|----------|-------|---------|----------|
-| Button Primary | bg brand-2, text white | bg brand-light, shadow-sm | bg brand, scale(0.98) | ring 3px brand/40 | opacity 0.5, cursor not-allowed | bg red, text white | spinner inside, disabled | N/A |
-| Button Secondary | bg transparent, border 1px | bg surface-alt | bg surface-alt, scale(0.98) | ring 3px | opacity 0.5 | border red | spinner | N/A |
-| Input | border 1px gray | border brand-2 | border brand-2, shadow-sm | ring 3px | bg surface-alt, opacity 0.5 | border red, text red below | N/A | N/A |
-| Checkbox | border 1px, bg white | border brand-2 | scale(0.95) | ring 3px | opacity 0.5 | border red | N/A | bg brand-2, check white |
-| Badge | bg color/10, text color | scale(1.05) | N/A | ring 3px | opacity 0.5 | bg red/10, text red | N/A | ring 2px color |
-| Table Row | bg white | bg surface-alt | bg selected/10 | outline within | N/A | bg red/5 | skeleton shimmer | bg selected/10, check |
-| Card | bg surface, shadow-sm | shadow-md, translateY(-2px) | shadow-sm | ring 3px | opacity 0.6 | border red | skeleton | border brand-2 |
-| Tab | text secondary | text primary | text brand-2 | ring 3px | opacity 0.5 | N/A | N/A | text brand-2, border-bottom brand-2 |
-| Dropdown Item | bg transparent | bg surface-alt | bg selected/10 | bg surface-alt, outline | disabled text | N/A | N/A | bg selected/10, check icon |
-| Modal | shadow-xl, overlay bg | N/A | N/A | trap focus | N/A | N/A | overlay + spinner | N/A |
-| Toast | bg surface, shadow-lg | N/A | N/A | N/A | N/A | bg red, icon error | N/A | N/A |
-| Progress Bar | bg gray-100, fill brand-2 | N/A | N/A | N/A | opacity 0.5 | fill red | animated stripes | N/A |
+Không làm:
+- Không cần visual preview 8 trạng thái cho mọi component
+- Không nhồi inline demo vô tội vạ
 
-Mỗi trạng thái ghi: CSS properties chính (bg, border, color, opacity, transform, shadow, outline). Dùng color codes ngắn gọn.
-
-Thêm visual preview cho mỗi component showing all 8 states bằng inline styled divs.
-
-#### Section E: Mẫu trạng thái lỗi (Error State Patterns)
-```
+#### Section E: Error State Patterns
+```text
 Section ID: error-patterns
 Section number: E
+Primary structure: taxonomy table + pattern cards + code examples
 ```
 
-8 error patterns:
-1. **Form field validation** — inline error text, red border, error icon
-2. **Form-level error summary** — alert box at top listing all errors
-3. **API failure** — toast notification + retry button
-4. **Table data load failure** — empty state with error icon + "Thử lại" button
-5. **Network offline** — persistent banner top with "Mất kết nối mạng"
-6. **Permission denied** — empty state with lock icon + "Bạn không có quyền truy cập"
-7. **404 Not Found** — full page empty state with illustration
-8. **Timeout** — modal with countdown + auto-retry option
+Bắt buộc có:
+- `1` taxonomy table ngắn để phân nhóm lỗi
+- Tối thiểu `6` pattern cards, phải cover:
+  - field validation
+  - form-level summary
+  - service/API failure
+  - permission / ineligibility
+  - network / offline / timeout
+  - empty-result-like failure state
+- Mỗi card nên có: `context`, `what user sees`, `recovery action`, `ARIA / announcement`, `copy rule`
+- `2` code examples bắt buộc:
+  - field + `aria-describedby`
+  - error summary + link xuống field / retry action
 
-Mỗi pattern gồm:
-- Wireframe SVG nhỏ (100×60)
-- Mô tả tiếng Việt
-- CSS variables sử dụng
-- ARIA attributes cần thiết
-- Ví dụ HTML code block
+Không làm:
+- Không biến mọi lỗi thành toast
+- Không dùng một generic message cho mọi tình huống
 
-#### Section F: Mẫu tải dữ liệu (Loading & Skeleton Patterns)
-```
+#### Section F: Loading & Skeleton Patterns
+```text
 Section ID: loading-patterns
 Section number: F
+Primary structure: decision table + pattern cards + one code example
 ```
 
-6 loading patterns:
-1. **Full page skeleton** — page header skeleton + KPI skeletons + table skeletons
-2. **Table skeleton** — header row solid + body rows shimmer
-3. **Card grid skeleton** — card outlines with shimmer fill
-4. **Chart skeleton** — chart area with pulsing placeholder
-5. **Form skeleton** — label + input field outlines
-6. **Inline loading** — spinner inside button or next to text
+Bắt buộc có:
+- `1` decision table để phân biệt `skeleton`, `spinner`, `progress`, `retry/error`
+- Cột nên gồm: `scenario`, `known structure`, `blocking level`, `duration expectation`, `recommended pattern`, `ARIA/state note`
+- Tối thiểu `4` pattern cards:
+  - initial page load
+  - table/list load
+  - inline action in button/form
+  - long-running task with progress
+- `1` code example cho `aria-busy` hoặc `role="status"`
 
-Thông số:
-- Shimmer animation: `@keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }`
-- Duration: 1.5s infinite
-- Skeleton color: `var(--bg-surface-alt)` with gradient shimmer
-- Skeleton radius: match actual component radius
-- Quy tắc: skeleton phải có cùng kích thước và vị trí với content thực
+Không làm:
+- Không mặc định spinner cho mọi case
+- Không viết animation spec quá chi tiết nếu section chỉ là governance/documentation
 
-#### Section G: Trạng thái trống (Empty State Patterns)
-```
+#### Section G: Empty State Patterns
+```text
 Section ID: empty-states
 Section number: G
+Primary structure: pattern cards + short classification table
 ```
 
-6 empty state types:
-1. **Bảng dữ liệu trống** — "Chưa có dữ liệu" + icon 📭 + action button "Tạo mới"
-2. **Kết quả tìm kiếm trống** — "Không tìm thấy kết quả cho '[query]'" + gợi ý thay đổi bộ lọc
-3. **Module mới chưa cấu hình** — "Module chưa được thiết lập" + wizard link
-4. **Lỗi tải dữ liệu** — "Không thể tải dữ liệu" + nút "Thử lại"
-5. **Không có quyền** — "Bạn không có quyền truy cập khu vực này" + liên hệ admin
-6. **Biểu đồ không có dữ liệu** — chart area with "Chưa đủ dữ liệu để hiển thị biểu đồ"
+Bắt buộc có:
+- `1` bảng phân loại ngắn: first use, no results, permissions, system failure, cleared/filter state
+- Tối thiểu `6` pattern cards
+- Mỗi card phải có: `context`, `user problem`, `what to show`, `primary action`, `copy pattern`
+- Có ít nhất `1` note nêu khi nào text-only state tốt hơn illustration-heavy state
 
-Mỗi type: icon (emoji hoặc SVG), tiêu đề chính, mô tả phụ, CTA button (nếu có), CSS specs.
+Không làm:
+- Không lạm dụng emoji nếu nó phá tone enterprise
 
-#### Section H: Mẫu thông báo (Notification & Toast Patterns)
-```
+#### Section H: Notification & Toast Patterns
+```text
 Section ID: notification-patterns
 Section number: H
+Primary structure: variant table + 4 severity cards
 ```
 
-Toast system:
-- 4 severity levels: Success (✅ xanh), Error (❌ đỏ), Warning (⚠️ vàng), Info (ℹ️ xanh dương)
-- Position: top-right, stacking downward
-- Auto-dismiss: Success 3s, Info 5s, Warning 8s, Error manual close
-- Max stack: 5 toasts visible
-- Animation: slide-in from right, fade-out
+Bắt buộc có:
+- `1` variant table cho `inline`, `toast`, `actionable`, `banner/callout`
+- Cột nên gồm: `disruption`, `placement`, `duration`, `actionability`, `focus behavior`, `announcement role`
+- `4` severity cards: success, info, warning, error
+- Có governance note cho:
+  - auto-dismiss policy
+  - manual dismissal cho lỗi nghiêm trọng
+  - stacking limit
 
-Notification center:
-- Bell icon with badge count
-- Dropdown panel: grouped by date
-- Mark as read/unread
-- Filter by type
-- Link to source entity
+Không làm:
+- Không claim một thời lượng auto-dismiss là “chuẩn tuyệt đối”
+- Không merge alert banner và toast thành một pattern duy nhất
 
-Alert banners:
-- Full-width, top of page
-- Persistent until dismissed
-- Types: maintenance (purple), outage (red), info (blue), success (green)
-
-#### Section I: Hướng dẫn trực quan hóa dữ liệu (Data Visualization Guidelines)
-```
+#### Section I: Data Visualization Guidelines
+```text
 Section ID: data-viz
 Section number: I
+Primary structure: chart-choice table + do/don't governance cards
 ```
 
-Tham khảo IBM Carbon Data Visualization:
+Bắt buộc có:
+- `1` chart-choice table: mục đích, loại biểu đồ, ví dụ MOM
+- `1` do/don't block cho:
+  - start-at-zero
+  - missing data
+  - legend usage
+  - label clarity
+  - fallback table / textual summary
+- `3-4` governance cards theo chart family: comparison, time series, distribution, composition
 
-1. **Bảng chọn loại biểu đồ:**
+Không làm:
+- Không nhồi code chart implementation
+- Không yêu cầu quá nhiều chart types nếu không có ví dụ sử dụng rõ
 
-| Mục đích | Loại biểu đồ | Ví dụ MOM |
-|----------|-------------|-----------|
-| So sánh giá trị | Bar chart | Doanh thu theo tháng, OEE theo máy |
-| Xu hướng thời gian | Line chart | SPC trend, production output daily |
-| Phân bổ tỷ lệ | Donut/Pie chart | NCR by category, defect distribution |
-| Phân phối | Histogram | Cpk distribution, cycle time spread |
-| Tương quan | Scatter plot | Severity vs Occurrence (risk matrix) |
-| Nhiều chỉ số | Radar chart | Supplier scorecard (quality, delivery, price, responsiveness) |
-| Tiến độ | Gauge | OEE%, machine utilization |
-| Dòng chảy | Sankey | Material flow, cost flow |
-| Nhiệt độ | Heatmap | Competency matrix, shift coverage |
-| Pareto | Bar + line combo | Top defects by frequency + cumulative % |
-
-2. **Màu cho biểu đồ:**
-- Sequential: blue scale (đậm → nhạt cho high → low)
-- Diverging: red → white → green (bad → neutral → good)
-- Categorical: 8 distinct colors (brand-2, green, amber, red, purple, cyan, indigo, pink)
-- Quy tắc: max 8 series per chart, dùng legend khi >3 series
-
-3. **Layout dashboard:**
-- F-pattern reading: KPIs top, trends middle-left, details middle-right, table bottom
-- Information hierarchy: summary → trend → detail
-- Max 4 charts per viewport
-- Chart title phải nêu insight, không chỉ data label ("Doanh thu tăng 12% so với tháng trước" thay vì "Doanh thu theo tháng")
-
-4. **Quy tắc tương tác:**
-- Hover: show tooltip with exact value
-- Click: drill-down to detail
-- Brush: select time range on line charts
-- Legend: click to toggle series visibility
-
-#### Section J: Dark Mode Token Mapping đầy đủ
-```
+#### Section J: Dark Mode Token Mapping
+```text
 Section ID: dark-mode-mapping
 Section number: J
+Primary structure: spec-table + info-box
 ```
 
-Bảng đầy đủ 50+ token mappings:
+Bắt buộc có:
+- `1` mapping table dùng semantic roles trước, không raw hex trước
+- Cột nên gồm: `semantic role`, `light token`, `dark token`, `high-contrast fallback`, `notes`
+- Phải derive từ token thật đang có trong artifact sau các prompt trước
+- `1` info-box giải thích các nguyên tắc:
+  - surface hierarchy
+  - text on-surface
+  - outline/focus
+  - status color adjustment
 
-| Token | Light | Dark | Ghi chú |
-|-------|-------|------|---------|
-| --bg-page | #f8fafc | #0f172a | Nền trang |
-| --bg-surface | #ffffff | #1e293b | Nền card/panel |
-| --bg-surface-alt | #f1f5f9 | #162032 | Nền card header/stripe |
-| --bg-header | #ffffff | #1e293b | Nền header |
-| --bg-modal | #ffffff | #1e293b | Nền modal |
-| --bg-hover | #f8fafc | #263348 | Hover row/item |
-| --bg-selected | rgba(21,101,192,.08) | rgba(96,165,250,.12) | Selected state |
-| --bg-sidebar | #0c2d48 | #0a1628 | Sidebar navigation |
-| --text-primary | #1e293b | #f1f5f9 | Main text |
-| --text-secondary | #64748b | #94a3b8 | Secondary text |
-| --text-tertiary | #94a3b8 | #64748b | Muted text |
-| --text-link | #1565c0 | #60a5fa | Links |
-| --text-inverse | #ffffff | #0f172a | Text on dark/light bg |
-| --border | #e2e8f0 | #334155 | Borders |
-| --border-focus | #1565c0 | #60a5fa | Focus borders |
-| --border-error | #dc2626 | #f87171 | Error borders |
-| --green | #16a34a | #22c55e | Success |
-| --red | #dc2626 | #f87171 | Error |
-| --amber | #d97706 | #fbbf24 | Warning |
-| --blue | #2563eb | #60a5fa | Info |
-| --purple | #7c3aed | #a78bfa | Review |
-| --cyan | #0891b2 | #22d3ee | Planned |
-| --green-bg | rgba(22,163,74,.08) | rgba(34,197,94,.12) | Success background |
-| --red-bg | rgba(220,38,38,.08) | rgba(248,113,113,.12) | Error background |
-| --amber-bg | rgba(217,119,6,.08) | rgba(251,191,36,.12) | Warning background |
-| --blue-bg | rgba(37,99,235,.08) | rgba(96,165,250,.12) | Info background |
-| --shadow-sm | 0 4px 14px rgba(12,45,72,.06) | 0 4px 14px rgba(0,0,0,.3) | Card shadow |
-| --shadow-lg | 0 18px 40px rgba(15,23,42,.14) | 0 18px 40px rgba(0,0,0,.5) | Modal shadow |
-| --brand | #0c2d48 | #1e3a5f | Brand dark |
-| --brand-2 | #1565c0 | #60a5fa | Brand primary |
-| --accent | #f9a825 | #fbbf24 | Accent |
+Không làm:
+- Không tạo bảng 50+ raw hex mappings nếu file thực không có ngần ấy global tokens
+- Không định nghĩa thêm global token pack mới chỉ để “đủ bảng”
 
-Thêm info-box: "Quy tắc Dark Mode: Shadow trở thành glow (opacity tăng). Border sáng hơn (từ #e2e8f0 → #334155). Background đậm hơn 1 bậc so với page. Status colors sáng hơn 1 bậc để giữ contrast."
-
-#### Section K: Accessibility (ARIA) Patterns
-```
+#### Section K: Accessibility / ARIA Patterns
+```text
 Section ID: accessibility
 Section number: K
+Primary structure: pattern cards + code examples
 ```
 
-1. **Landmark regions:** header(banner), nav(navigation), main(main), footer(contentinfo), aside(complementary)
-2. **ARIA attributes per component:**
-   - Button: `role="button"`, `aria-pressed` (toggle), `aria-disabled`
-   - Modal: `role="dialog"`, `aria-modal="true"`, `aria-labelledby`
-   - Tab: `role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected`
-   - Table: `role="table"`, sortable columns `aria-sort`
-   - Alert: `role="alert"`, `aria-live="polite"` (info) / `"assertive"` (error)
-   - Progress: `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`
-   - Tree: `role="tree"`, `role="treeitem"`, `aria-expanded`
-3. **Keyboard patterns:**
-   - Tab: navigate between focusable elements
-   - Enter/Space: activate buttons/links
-   - Escape: close modal/dropdown
-   - Arrow keys: navigate within lists/menus/tabs
-   - Home/End: jump to first/last item
+Bắt buộc có:
+- Tối thiểu `5` pattern cards, phải cover:
+  - dialog/modal
+  - tabs
+  - sortable table
+  - alert/status/live region
+  - progressbar/loading
+- Mỗi card nên có block cố định:
+  - `role / landmark`
+  - `accessible name`
+  - `focus movement`
+  - `keyboard model`
+  - `live region / error association`
+- `2` code examples bắt buộc:
+  - modal dialog
+  - live region / status / progress
 
-#### Section L: Chế độ mật độ dữ liệu (Data Density Modes)
-```
+Không làm:
+- Không chỉ liệt kê attributes rời rạc
+- Không viết prose chung chung kiểu “accessible by default”
+
+#### Section L: Data Density Modes
+```text
 Section ID: density-modes
 Section number: L
+Primary structure: spec-table + governance note
 ```
 
-Bảng chi tiết 3 modes + 1 mode đặc biệt:
+Bắt buộc có:
+- `1` table cho **3 core modes**: `Compact`, `Default`, `Comfortable`
+- Cột nên gồm tối thiểu: `control height`, `table row height`, `padding`, `font size`, `icon size`, `touch target note`, `reflow / wrap note`
+- `1` governance note nói rõ:
+  - `Shop Floor Display Mode` được định nghĩa đầy đủ ở Prompt 11
+  - Section này chỉ chốt core density system, không owner shop-floor token pack
 
-| Token | Compact | Default | Comfortable | Shop Floor |
-|-------|---------|---------|-------------|------------|
-| --hds-control-h | 28px | 32px | 40px | 56px |
-| --hds-control-h-sm | 24px | 28px | 36px | 48px |
-| --hds-control-h-lg | 36px | 40px | 48px | 64px |
-| --hds-control-px | 8px | 10px | 14px | 20px |
-| --hds-control-font | 11px | 13px | 14px | 18px |
-| --hds-control-gap | 4px | 6px | 8px | 16px |
-| --hds-table-row-h | 32px | 40px | 48px | 64px |
-| --hds-table-cell-px | 8px | 12px | 16px | 20px |
-| --hds-table-cell-py | 4px | 8px | 12px | 16px |
-| --hds-table-head-font | 10px | 11px | 12px | 14px |
-| --hds-table-body-font | 11px | 13px | 14px | 18px |
-| --hds-icon-sm | 12px | 14px | 16px | 24px |
-| --hds-icon-md | 14px | 16px | 20px | 32px |
-| --hds-card-pad | 12px | 16px | 20px | 24px |
-| --hds-kpi-value-font | 20px | 24px | 32px | 48px |
-| --hds-kpi-label-font | 10px | 11px | 12px | 16px |
-| --hds-tab-px | 12px | 16px | 20px | 24px |
-| --hds-tab-py | 6px | 8px | 10px | 14px |
-| --hds-tab-font | 10px | 11px | 13px | 16px |
+Không làm:
+- Không spec chi tiết mode `shopfloor` ở đây
+- Không overlap với Prompt 11
 
-Info box: "Shop Floor mode dành cho màn hình xưởng sản xuất: touch targets ≥48px cho thao tác đeo găng tay, font ≥18px cho khoảng cách đọc xa, contrast ≥7:1 cho môi trường ánh sáng kém."
-
-#### Section M: Hướng dẫn nội dung (Content Guidelines)
-```
+#### Section M: Content Guidelines
+```text
 Section ID: content-guidelines
 Section number: M
+Primary structure: governance cards + good/bad table
 ```
 
-1. **Quy tắc viết hoa:**
-   - Tiêu đề trang: Viết hoa chữ đầu câu (Sentence case) — "Quản lý đơn hàng"
-   - Button labels: Viết hoa chữ đầu — "Tạo mới", "Lưu thay đổi", "Xóa"
-   - Table headers: UPPERCASE tracking-wider — "MÃ ĐƠN", "KHÁCH HÀNG"
-   - Badge/status: UPPERCASE — "HOÀN THÀNH", "ĐANG XỬ LÝ"
-   - Menu items: Sentence case — "Quản lý người dùng"
+Bắt buộc có:
+- Governance cards cho:
+  - sentence case / uppercase usage
+  - data formatting
+  - placeholder & hint text
+  - error wording
+  - progress / loading wording
+  - CTA / confirmation wording
+- `1` bảng `Good / Bad` ngắn cho copy examples
+- Tone phải cụ thể, thân thiện, enterprise, không kỹ thuật hóa lỗi cho end user
 
-2. **Định dạng dữ liệu:**
-   - Ngày: `dd/MM/yyyy` (10/04/2026) hoặc relative ("2 giờ trước", "hôm qua")
-   - Tiền: `$1,234.56` hoặc `1.234.560 ₫` — luôn right-aligned
-   - Phần trăm: `98.7%` — kèm trend arrow (▲▼) và color (green/red)
-   - ID: font-mono, text-primary — `NCR-2026-1204`, `PO-2026-0521`
-   - Số lượng: `1,234 pcs` — luôn kèm đơn vị
+Không làm:
+- Không hard-code duy nhất một required-field policy
+- Không mặc định live validation là recommended default
 
-3. **Thông báo lỗi:**
-   - Cụ thể: "Trường 'Khách hàng' là bắt buộc" (không viết "Có lỗi xảy ra")
-   - Gợi ý sửa: "Số lượng phải lớn hơn 0. Vui lòng nhập lại."
-   - Thân thiện: Không dùng mã lỗi kỹ thuật ("ERR_500") cho người dùng cuối
+### Guardrails quan trọng
+- Không update TOC trong Prompt 10
+- Không final-reorder information architecture trong Prompt 10
+- Không final-renumber sections trong Prompt 10
+- Không sửa shared CSS foundation của Prompt 7
+- Không lấn sang MOM/eQMS-specific sections của Prompt 11
+- Không dùng narrative dài thay cho bảng ở các section table-first
+- Không dùng bảng khổng lồ thay cho pattern cards ở các section card-first
 
-4. **Placeholder text:**
-   - Input: "Nhập mã đơn hàng..." (dùng "..." cuối)
-   - Search: "Tìm kiếm theo tên, mã, mô tả..."
-   - Select: "— Chọn —"
+### Acceptance criteria đo được
+Kết quả sau khi thực thi phải thỏa tất cả:
+- Có đúng `10` sections mới với các IDs sau, mỗi ID xuất hiện đúng `1` lần:
+  - `component-states`
+  - `error-patterns`
+  - `loading-patterns`
+  - `empty-states`
+  - `notification-patterns`
+  - `data-viz`
+  - `dark-mode-mapping`
+  - `accessibility`
+  - `density-modes`
+  - `content-guidelines`
+- Cả block mới nằm đúng giữa `#standards` và `#visual-themes`
+- `#visual-themes` vẫn đứng ngay sau `#content-guidelines`
+- Không có chỉnh sửa TOC
+- Không có chỉnh sửa shared `<style>` đầu tiên
+- Nếu có local style block thì chỉ có `1` block và selector đều prefix `.p10-`
+- `#standards` và `#visual-themes` không bị rewrite
+- Tất cả section mới dùng đúng shell `.section / .section-title / .section-number / .section-subtitle`
+- Các section table-first thật sự có table chính
+- Các section card-first thật sự có pattern cards chính
+- `dark-mode-mapping` dùng semantic token mapping, không raw-hex-first
+- `density-modes` không định nghĩa đầy đủ `shopfloor`
+- Có example code ở đúng các mục semantics dễ sai
+- Có governance notes cho required-field policy và live-validation caveat
+- Nội dung tiếng Việt có dấu, không lẫn tiếng Anh thừa trừ tên pattern/tokens khi cần
+- HTML nesting hợp lệ
 
-5. **Confirmation dialogs:**
-   - Tiêu đề: mô tả hành động ("Xóa đơn hàng SO-2026-0892?")
-   - Nội dung: hậu quả ("Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa.")
-   - Buttons: "Hủy" (secondary) + "Xóa" (danger) — action verb, không dùng "OK/Cancel"
+### Quy trình thực thi bắt buộc
+1. Đọc HTML hiện trạng và xác nhận hai anchors thực tế.
+2. Xác nhận các primitives và token names đang tồn tại trong artifact.
+3. Lên block insertion plan cho 10 sections theo đúng thứ tự D → M.
+4. Chèn block mới mà không đụng boundary sections.
+5. Tự review lại từng acceptance criteria trước khi kết thúc.
 
-### Lưu ý
-- Tất cả 10 sections phải có `<section class="section" id="...">` wrapper
-- Section number dùng chữ cái: D, E, F, G, H, I, J, K, L, M
-- Cập nhật TOC: thêm 10 links mới
-- Tiếng Việt CÓ DẤU mọi nơi
-- Dùng card, spec-table, info-box, grid-2/3 layouts nhất quán với phần còn lại
-- Tổng cộng phần này khoảng 600-800 dòng HTML
+### Output mong muốn từ Codex sau khi thực thi
+Trả về báo cáo ngắn gồm:
+1. Anchors đã dùng để chèn
+2. 10 section IDs đã thêm
+3. Có hay không có local style block
+4. Checklist pass/fail cho từng acceptance criterion
+5. Mục nào bị skip và lý do
 
 ---
 

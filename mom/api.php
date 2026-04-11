@@ -13241,12 +13241,27 @@ function session_dir_candidates(): array {
 function session_init(): void {
   if (session_status() === PHP_SESSION_ACTIVE) return;
 
+  $isCliLike = in_array(PHP_SAPI, ['cli', 'phpdbg'], true);
   $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https')
     || ((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on');
   $headersMutable = !headers_sent();
+  $headerlessSessionMode = $isCliLike || !$headersMutable;
 
-  if ($headersMutable) {
+  // Smoke tests and CLI helpers may touch session_init() after writing output.
+  // In that case we only need an in-memory session array, not HTTP cookie/session I/O.
+  if ($isCliLike && !$headersMutable) {
+    if (!is_array($_SESSION ?? null)) {
+      $_SESSION = [];
+    }
+    return;
+  }
+
+  if ($headerlessSessionMode) {
+    @ini_set('session.use_cookies', '0');
+    @ini_set('session.use_only_cookies', '0');
+    @ini_set('session.cache_limiter', '');
+  } else {
     @ini_set('session.use_only_cookies', '1');
     @ini_set('session.use_strict_mode', '1');
     @ini_set('session.cookie_httponly', '1');
@@ -13260,7 +13275,7 @@ function session_init(): void {
   $domain = '';
   $sessionName = $https ? '__Host-HESEMSESSID' : 'HESEMSESSID';
 
-  if ($headersMutable) {
+  if (!$headerlessSessionMode) {
     session_name($sessionName);
     session_set_cookie_params([
       'lifetime' => 0,
@@ -13281,6 +13296,10 @@ function session_init(): void {
 
     if ($headersMutable) {
       @session_save_path($sessDir);
+    }
+
+    if ($headerlessSessionMode && session_id() === '') {
+      @session_id(bin2hex(random_bytes(16)));
     }
 
     try {
@@ -13317,6 +13336,13 @@ function session_exception_allows_fresh_start(\Throwable $e): bool {
 }
 
 function session_start_with_fresh_id(): bool {
+  if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true) && headers_sent()) {
+    if (!is_array($_SESSION ?? null)) {
+      $_SESSION = [];
+    }
+    return true;
+  }
+
   $cookieName = session_name();
   if ($cookieName !== '' && isset($_COOKIE[$cookieName])) {
     unset($_COOKIE[$cookieName]);
@@ -13326,6 +13352,9 @@ function session_start_with_fresh_id(): bool {
     @session_write_close();
   }
 
+  @ini_set('session.use_cookies', '0');
+  @ini_set('session.use_only_cookies', '0');
+  @ini_set('session.cache_limiter', '');
   @session_id(bin2hex(random_bytes(16)));
 
   try {
