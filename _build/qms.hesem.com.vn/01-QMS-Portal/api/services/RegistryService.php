@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace HESEM\QMS\Api\Services;
+namespace MOM\Api\Services;
 
 use RuntimeException;
 
@@ -256,6 +256,25 @@ class RegistryService
             return ['allowed' => false, 'reason' => 'Workflow not found: ' . $entityType];
         }
 
+        $lifecycleMode = strtolower(trim((string)($wf['lifecycleMode'] ?? '')));
+        if ($lifecycleMode === 'generic_status_only') {
+            if ($fromState === $toState) {
+                return ['allowed' => false, 'reason' => 'Target state must differ from current state'];
+            }
+
+            $statusSet = trim((string)($wf['statusSet'] ?? ''));
+            $allowedStates = array_values(array_filter(array_map(
+                static fn(array $option): string => (string)($option['value'] ?? ''),
+                $this->statusSet($statusSet)
+            )));
+
+            if ($allowedStates !== [] && !in_array($toState, $allowedStates, true)) {
+                return ['allowed' => false, 'reason' => 'Invalid target state for status set: ' . $statusSet];
+            }
+
+            return ['allowed' => true, 'reason' => ''];
+        }
+
         $transitions = $wf['transitions'] ?? [];
         $trans = null;
 
@@ -299,6 +318,30 @@ class RegistryService
     {
         $wf = $this->workflow($entityType);
         if ($wf === null) return [];
+
+        $lifecycleMode = strtolower(trim((string)($wf['lifecycleMode'] ?? '')));
+        if ($lifecycleMode === 'generic_status_only') {
+            $statusSet = trim((string)($wf['statusSet'] ?? ''));
+            $result = [];
+            foreach ($this->statusSet($statusSet) as $option) {
+                if (!is_array($option)) {
+                    continue;
+                }
+                $toState = (string)($option['value'] ?? '');
+                if ($toState === '' || $toState === $fromState) {
+                    continue;
+                }
+                $check = $this->canTransition($entityType, $fromState, $toState, $userRoles);
+                $result[] = [
+                    'to' => $toState,
+                    'label' => $option['label'] ?? $toState,
+                    'labelEn' => $option['labelEn'] ?? $option['label'] ?? $toState,
+                    'allowed' => $check['allowed'],
+                    'reason' => $check['reason'],
+                ];
+            }
+            return $result;
+        }
 
         $transitions = $wf['transitions'] ?? [];
         $result = [];
@@ -436,6 +479,117 @@ class RegistryService
         }
 
         return array_values(array_filter($catalog, static fn($value, $key) => $key !== '_meta' && is_array($value), ARRAY_FILTER_USE_BOTH));
+    }
+
+    /**
+     * Get a single endpoint definition by action key.
+     */
+    public function endpoint(string $action): ?array
+    {
+        $catalog = $this->load('endpoint-catalog');
+        if (isset($catalog['endpoints'][$action]) && is_array($catalog['endpoints'][$action])) {
+            return $catalog['endpoints'][$action];
+        }
+
+        return is_array($catalog[$action] ?? null) ? $catalog[$action] : null;
+    }
+
+    /**
+     * Get workflow runtime metadata for a transition endpoint.
+     *
+     * @return array<string, mixed>
+     */
+    public function transitionRuntime(string $domain, string $tableName): array
+    {
+        $action = strtolower(trim($domain)) . '.' . strtolower(trim($tableName)) . '.transition';
+        $endpoint = $this->endpoint($action);
+        if (!is_array($endpoint)) {
+            return [];
+        }
+
+        $runtime = $endpoint['capabilities']['workflow_runtime']
+            ?? $endpoint['workflow']['runtime']
+            ?? [];
+
+        return is_array($runtime) ? $runtime : [];
+    }
+
+    /**
+     * Get the frontend foundation catalog or a single entity contract.
+     *
+     * @return array<string, mixed>
+     */
+    public function frontendFoundation(?string $entityKey = null): array
+    {
+        $catalog = $this->load('frontend-foundation-catalog');
+        if (!is_array($catalog)) {
+            return [];
+        }
+
+        if ($entityKey === null || trim($entityKey) === '') {
+            return $catalog;
+        }
+
+        $entities = $catalog['entities'] ?? [];
+        if (!is_array($entities)) {
+            return [];
+        }
+
+        $normalized = strtolower(trim($entityKey));
+        $contract = $entities[$normalized] ?? null;
+
+        return is_array($contract) ? $contract : [];
+    }
+
+    /**
+     * Get the frontend foundation contract for a specific table.
+     *
+     * @return array<string, mixed>
+     */
+    public function frontendFoundationEntity(string $domain, string $tableName): array
+    {
+        $entityKey = strtolower(trim($domain)) . '.' . strtolower(trim($tableName));
+        return $this->frontendFoundation($entityKey);
+    }
+
+    /**
+     * Get the runtime access policy, optionally narrowed to a domain or table.
+     *
+     * @return array<string, mixed>
+     */
+    public function runtimeAccessPolicy(?string $domain = null, ?string $tableName = null): array
+    {
+        $policy = $this->load('runtime-access-policy');
+        if (!is_array($policy)) {
+            return [];
+        }
+
+        if ($tableName !== null && trim($tableName) !== '') {
+            $tables = $policy['tables'] ?? [];
+            $normalized = strtolower(trim($tableName));
+            $override = $tables[$normalized] ?? null;
+            return is_array($override) ? $override : [];
+        }
+
+        if ($domain !== null && trim($domain) !== '') {
+            $domains = $policy['domains'] ?? [];
+            $normalized = strtolower(trim($domain));
+            $domainPolicy = $domains[$normalized] ?? null;
+            return is_array($domainPolicy) ? $domainPolicy : [];
+        }
+
+        return $policy;
+    }
+
+    /**
+     * Get the registry quality report including publishability metadata.
+     *
+     * @return array<string, mixed>
+     */
+    public function qualityReport(): array
+    {
+        $report = $this->load('registry-quality-report');
+        return is_array($report) ? $report : [];
     }
 
     /* ── Domain Packs API ─────────────────────────────────────────────── */

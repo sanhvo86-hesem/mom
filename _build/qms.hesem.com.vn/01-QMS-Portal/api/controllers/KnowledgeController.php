@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
+use MOM\Api\Controllers\BaseController;
 use Throwable;
 
 /**
- * Knowledge Base controller for HESEM QMS Portal.
+ * Knowledge Base controller for HESEM MOM Portal.
  *
  * Provides API endpoints for shop floor knowledge tips including
  * CRUD, voting (helpful/not_helpful), commenting, and search/filter
  * by machine, material, part, and category.
  *
- * Data stored in `qms-data/knowledge/` with per-entity JSON files.
+ * Data stored in `data/knowledge/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class KnowledgeController extends BaseController

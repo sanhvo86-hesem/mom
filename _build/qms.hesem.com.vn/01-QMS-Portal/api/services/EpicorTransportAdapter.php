@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
+
+require_once __DIR__ . '/CircuitBreaker.php';
 
 use RuntimeException;
 

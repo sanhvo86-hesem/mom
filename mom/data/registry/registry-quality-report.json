@@ -2,23 +2,23 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-11T06:15:25.107Z",
+    "generatedAt": "2026-04-11T08:49:04.263Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "8074b143-180a-4fdc-b838-a3bd4e63a2d2"
+    "publication_run_id": "f2594699-0b3e-43dd-a3c3-f21ed31618ad"
   },
   "summary": {
     "endpoint_count": 3610,
     "pack_count": 3948,
-    "relation_edge_count": 3127,
+    "relation_edge_count": 3128,
     "workflow_count": 277,
     "status_set_count": 733,
-    "validation_rule_count": 43701,
+    "validation_rule_count": 43733,
     "formula_count": 1177,
     "formula_reference_count": 1177,
-    "field_context_count": 48601,
+    "field_context_count": 48637,
     "row_version_tables": 542,
     "org_scoped_tables": 527,
     "composite_pk_tables": 20,
@@ -92,8 +92,8 @@
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3127,
-      "target": 3127
+      "actual": 3128,
+      "target": 3128
     },
     {
       "id": "workflow_coverage",
@@ -182,7 +182,7 @@
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 43701,
+      "actual": 43733,
       "target": 5000
     },
     {

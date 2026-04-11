@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 
 /**
- * Atomic Record-ID Generator for HESEM QMS.
+ * Atomic Record-ID Generator for HESEM MOM.
  *
  * Generates unique, sequential identifiers for every QMS record type following
  * the pattern defined in document_type_registry.json (e.g. NCR-2026-001).
@@ -16,7 +16,7 @@ use RuntimeException;
  * Supports PostgreSQL sequences for race-free atomic generation, with a
  * file-based fallback using LOCK_EX for environments without a live database.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class RecordIdGenerator
@@ -40,7 +40,7 @@ final class RecordIdGenerator
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string          $dataDir  Absolute path to qms-data directory.
+     * @param string          $dataDir  Absolute path to data directory.
      * @param Connection|null $db       Optional database connection for PG sequences.
      */
     public function __construct(
@@ -67,7 +67,7 @@ final class RecordIdGenerator
     public function generateId(string $recordType, ?string $department = null): string
     {
         $type = strtoupper(trim($recordType));
-        $meta = $this->getRecordTypeMeta($type);
+        $meta = $this->getRecordTypeMeta($type, true); // allow fallback for any form type
         $year = (int) date('Y');
         $next = $this->nextSequenceValue($type, $year);
         $digits = $this->resolveDigits($meta);
@@ -92,7 +92,7 @@ final class RecordIdGenerator
         }
 
         $type = strtoupper(trim($recordType));
-        $meta = $this->getRecordTypeMeta($type);
+        $meta = $this->getRecordTypeMeta($type, true); // allow fallback for any form type
         $year = (int) date('Y');
         $digits = $this->resolveDigits($meta);
         $ids = [];
@@ -115,7 +115,7 @@ final class RecordIdGenerator
     public function peekNextId(string $recordType, ?string $department = null): string
     {
         $type = strtoupper(trim($recordType));
-        $meta = $this->getRecordTypeMeta($type);
+        $meta = $this->getRecordTypeMeta($type, true);
         $year = (int) date('Y');
         $digits = $this->resolveDigits($meta);
         $next = $this->peekSequenceValue($type, $year);
@@ -152,23 +152,51 @@ final class RecordIdGenerator
     /**
      * Get metadata for a specific record type.
      *
-     * @param string $recordType Record type code.
+     * When $allowFallback is true, an unknown type gets auto-generated metadata
+     * instead of throwing — enabling allocation for any form without requiring a
+     * registry entry. The fallback pattern is: {TYPE}-{YYYY}-{NNN}.
+     *
+     * @param string $recordType   Record type code.
+     * @param bool   $allowFallback Return auto-generated meta instead of throwing.
      * @return array Registry metadata for the type.
      *
-     * @throws RuntimeException If the type is unknown.
+     * @throws RuntimeException If the type is unknown and $allowFallback is false.
      */
-    public function getRecordTypeMeta(string $recordType): array
+    public function getRecordTypeMeta(string $recordType, bool $allowFallback = false): array
     {
         $types = $this->loadRecordTypes();
         $type = strtoupper(trim($recordType));
 
         if (!isset($types[$type])) {
+            if ($allowFallback) {
+                return $this->buildFallbackMeta($type);
+            }
             throw new RuntimeException(
                 "Unknown record type: {$type}. Supported: " . implode(', ', array_keys($types))
             );
         }
 
         return $types[$type];
+    }
+
+    /**
+     * Build a minimal metadata block for a record type not in the registry.
+     *
+     * Used by generateId() when $allowFallback is true, so every form can
+     * receive a traceable code even if its record type has not yet been added
+     * to document_type_registry.json.
+     *
+     * @param string $type Normalised (upper-case) record type code.
+     * @return array Synthetic metadata array.
+     */
+    private function buildFallbackMeta(string $type): array
+    {
+        return [
+            'label'          => $type . ' Record',
+            'label_vi'       => 'Hồ sơ ' . $type,
+            'counter_digits' => self::DEFAULT_DIGITS,
+            'naming_pattern' => $type . '-{YYYY}-{NNN}',
+        ];
     }
 
     // ── Sequence Backend ────────────────────────────────────────────────────

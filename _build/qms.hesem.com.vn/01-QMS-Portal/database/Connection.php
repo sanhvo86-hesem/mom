@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Database;
+namespace MOM\Database;
 
 use PDO;
 use PDOException;
@@ -10,7 +10,7 @@ use PDOStatement;
 use RuntimeException;
 
 /**
- * PDO Connection Manager for HESEM QMS Portal.
+ * PDO Connection Manager for HESEM MOM Portal.
  *
  * Provides singleton access to a PostgreSQL PDO connection with:
  * - Lazy connection (connects on first query, not on instantiation)
@@ -19,7 +19,7 @@ use RuntimeException;
  * - Transaction helpers (begin / commit / rollback / transactional closure)
  * - Prepared statement convenience methods
  *
- * @package HESEM\QMS\Database
+ * @package MOM\Database
  * @since   1.0.0
  */
 class Connection
@@ -240,6 +240,42 @@ class Connection
     }
 
     /**
+     * Execute a raw SQL script that may contain multiple statements.
+     *
+     * This bypasses prepared statements intentionally because PostgreSQL does
+     * not allow multi-command migration batches in a single prepared query.
+     *
+     * @param string $sql Raw SQL script text.
+     * @return void
+     */
+    public function executeScript(string $sql): void
+    {
+        $attempts = 0;
+        $startTime = microtime(true);
+
+        while (true) {
+            try {
+                $pdo = $this->getPdo();
+                $pdo->exec($sql);
+                $this->logQuery($sql, [], $startTime);
+                return;
+            } catch (PDOException $e) {
+                $attempts++;
+                if ($attempts <= self::MAX_RECONNECT_ATTEMPTS && $this->isConnectionError($e)) {
+                    $this->reconnect();
+                    continue;
+                }
+                $this->logQuery($sql, [], $startTime, $e->getMessage());
+                throw new RuntimeException(
+                    'Query failed: ' . $e->getMessage(),
+                    (int)$e->getCode(),
+                    $e,
+                );
+            }
+        }
+    }
+
+    /**
      * Execute an INSERT ... RETURNING and return the first row.
      *
      * @param string $sql    SQL with RETURNING clause.
@@ -270,7 +306,16 @@ class Connection
             try {
                 $pdo = $this->getPdo();
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute($params);
+                foreach ($params as $key => $value) {
+                    $paramType = match (true) {
+                        is_bool($value) => PDO::PARAM_BOOL,
+                        is_int($value) => PDO::PARAM_INT,
+                        $value === null => PDO::PARAM_NULL,
+                        default => PDO::PARAM_STR,
+                    };
+                    $stmt->bindValue($key, $value, $paramType);
+                }
+                $stmt->execute();
                 $this->logQuery($sql, $params, $startTime);
                 return $stmt;
             } catch (PDOException $e) {

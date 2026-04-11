@@ -2,87 +2,80 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Order service for HESEM QMS Portal.
+ * Governed order read/write service backed by the shared runtime order store.
  *
- * Manages Sales Orders (SO), Job Orders (JO), Work Orders (WO),
- * order hierarchy, form-to-job linking, and dashboard statistics.
- *
- * Uses JSON file storage in `qms-data/orders/` with an index file
- * for fast lookups and per-SO detail files.
- *
- * @package HESEM\QMS\Services
- * @since   3.0.0
+ * The live portal still uses `data/orders/orders.json` as the operational
+ * read-model/write-model compatibility layer. This service must therefore read
+ * and write the same file as the legacy `api.php` actions so that list/detail,
+ * workflow, and create flows stay consistent.
  */
 final class OrderService
 {
-    /** Valid SO statuses (aligned with OrderWorkflowService & frontend). */
+    /** Valid SO statuses (aligned with workflow/runtime config). */
     private const SO_STATUSES = ['draft', 'quoted', 'confirmed', 'in_production', 'shipped', 'closed', 'cancelled'];
 
-    /** Valid JO statuses (aligned with OrderWorkflowService & frontend). */
-    private const JO_STATUSES = ['planned', 'released', 'active', 'on_hold', 'completed', 'closed'];
+    /** Valid JO statuses (aligned with workflow/runtime config). */
+    private const JO_STATUSES = ['planned', 'released', 'active', 'on_hold', 'completed', 'closed', 'cancelled'];
 
-    /** Valid WO statuses (aligned with OrderWorkflowService & frontend). */
-    private const WO_STATUSES = ['scheduled', 'setup', 'running', 'inspection', 'completed', 'on_hold'];
+    /** Valid WO statuses (aligned with workflow/runtime config). */
+    private const WO_STATUSES = ['scheduled', 'setup', 'running', 'inspection', 'completed', 'on_hold', 'cancelled'];
 
-    /** @var string Absolute path to qms-data directory. */
+    /** @var string Absolute path to data directory. */
     private readonly string $dataDir;
 
     /** @var string Absolute path to the orders directory. */
     private readonly string $ordersDir;
 
-    /** @var string Absolute path to the order index file. */
-    private readonly string $indexFile;
+    /** @var string Absolute path to the governed runtime order store. */
+    private readonly string $ordersFile;
 
-    /** @var string Absolute path to the form links file. */
-    private readonly string $linksFile;
+    /** @var string Absolute path to the store lock file. */
+    private readonly string $lockFile;
 
-    // ── Construction ────────────────────────────────────────────────────────
+    /** @var string Absolute path to the legacy index file, kept for fallback migration only. */
+    private readonly string $legacyIndexFile;
+
+    /** @var string Absolute path to the legacy links file, kept for fallback migration only. */
+    private readonly string $legacyLinksFile;
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string $dataDir Absolute path to data directory.
      */
     public function __construct(string $dataDir)
     {
-        $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
-        $this->ordersDir = $this->dataDir . '/orders';
-        $this->indexFile = $this->ordersDir . '/index.json';
-        $this->linksFile = $this->ordersDir . '/links/form_links.json';
+        $this->dataDir         = rtrim(str_replace('\\', '/', $dataDir), '/');
+        $this->ordersDir       = $this->dataDir . '/orders';
+        $this->ordersFile      = $this->ordersDir . '/orders.json';
+        $this->lockFile        = $this->ordersFile . '.lock';
+        $this->legacyIndexFile = $this->ordersDir . '/index.json';
+        $this->legacyLinksFile = $this->ordersDir . '/links/form_links.json';
 
-        // Ensure directories exist
-        foreach ([
-            $this->ordersDir,
-            $this->ordersDir . '/so',
-            $this->ordersDir . '/links',
-        ] as $dir) {
-            if (!is_dir($dir)) {
-                @mkdir($dir, 0775, true);
-            }
+        if (!is_dir($this->ordersDir)) {
+            @mkdir($this->ordersDir, 0775, true);
         }
     }
-
-    // ── Public API ──────────────────────────────────────────────────────────
 
     /**
      * List Sales Orders with optional filters.
      *
      * Supported filters:
      *   - status    (string): Exact match on SO status.
-     *   - customer  (string): Partial match (case-insensitive) on customer name.
+     *   - search    (string): Partial match on SO number, customer name, or PO.
+     *   - customer  (string): Legacy alias for `search`.
      *   - date_from (string): YYYY-MM-DD inclusive lower bound on order_date.
      *   - date_to   (string): YYYY-MM-DD inclusive upper bound on order_date.
      *
      * @param array<string, string> $filters Key-value filter pairs.
-     * @return array<int, array<string, mixed>> Filtered SO records (summary).
+     * @return array<int, array<string, mixed>>
      */
     public function listSalesOrders(array $filters = []): array
     {
-        $index  = $this->readIndex();
-        $orders = $index['sales_orders'] ?? [];
+        $orders = array_values((array)($this->readStore()['sales_orders'] ?? []));
         $result = [];
 
         foreach ($orders as $so) {
@@ -90,39 +83,43 @@ final class OrderService
                 continue;
             }
 
-            // Status filter (case-insensitive, stored as lowercase)
-            if (isset($filters['status']) && $filters['status'] !== '') {
-                if (strtolower($so['status'] ?? '') !== strtolower($filters['status'])) {
+            $status = strtolower((string)($so['status'] ?? ''));
+            $soNumber = strtolower((string)($so['so_number'] ?? ''));
+            $customerName = strtolower((string)($so['customer_name'] ?? ''));
+            $customerPo = strtolower((string)($so['customer_po'] ?? $so['customer_po_number'] ?? ''));
+            $customerPoId = strtolower((string)($so['customer_po_id'] ?? ''));
+            $orderDate = (string)($so['order_date'] ?? '');
+
+            if (isset($filters['status']) && $filters['status'] !== '' && $status !== strtolower($filters['status'])) {
+                continue;
+            }
+
+            $search = trim((string)($filters['search'] ?? $filters['customer'] ?? ''));
+            if ($search !== '') {
+                $needle = strtolower($search);
+                if (strpos($soNumber, $needle) === false
+                    && strpos($customerName, $needle) === false
+                    && strpos($customerPo, $needle) === false
+                    && strpos($customerPoId, $needle) === false) {
                     continue;
                 }
             }
 
-            // Customer filter (partial, case-insensitive)
-            if (isset($filters['customer']) && $filters['customer'] !== '') {
-                $customer = strtolower($so['customer'] ?? '');
-                if (strpos($customer, strtolower($filters['customer'])) === false) {
-                    continue;
-                }
+            if (isset($filters['date_from']) && $filters['date_from'] !== '' && $orderDate !== '' && $orderDate < $filters['date_from']) {
+                continue;
             }
 
-            // Date range filter
-            $orderDate = $so['order_date'] ?? '';
-            if (isset($filters['date_from']) && $filters['date_from'] !== '') {
-                if ($orderDate < $filters['date_from']) {
-                    continue;
-                }
-            }
-            if (isset($filters['date_to']) && $filters['date_to'] !== '') {
-                if ($orderDate > $filters['date_to']) {
-                    continue;
-                }
+            if (isset($filters['date_to']) && $filters['date_to'] !== '' && $orderDate !== '' && $orderDate > $filters['date_to']) {
+                continue;
             }
 
             $result[] = $so;
         }
 
-        // Sort by order_date descending
-        usort($result, fn(array $a, array $b) => strcmp($b['order_date'] ?? '', $a['order_date'] ?? ''));
+        usort(
+            $result,
+            static fn(array $a, array $b): int => strcmp((string)($b['order_date'] ?? ''), (string)($a['order_date'] ?? '')),
+        );
 
         return $result;
     }
@@ -130,29 +127,19 @@ final class OrderService
     /**
      * Get full details of a single Sales Order.
      *
-     * Loads from the per-SO detail file if available, otherwise
-     * returns the index summary.
-     *
-     * @param string $soNumber Sales Order number (e.g. "SO-2026-0150").
-     * @return array<string, mixed>|null SO details or null if not found.
+     * @param string $soNumber Sales Order number.
+     * @return array<string, mixed>|null
      */
     public function getSalesOrder(string $soNumber): ?array
     {
-        // Try per-SO detail file first
-        $detailFile = $this->ordersDir . '/so/' . $this->safeFilename($soNumber) . '.json';
-        if (file_exists($detailFile)) {
-            $detail = $this->readJsonFile($detailFile);
-            if ($detail !== null) {
-                return $detail;
-            }
+        $store = $this->readStore();
+        $hierarchy = $this->getHierarchy($soNumber);
+        if ($hierarchy !== []) {
+            return $hierarchy[0];
         }
 
-        // Fall back to index
-        $index  = $this->readIndex();
-        $orders = $index['sales_orders'] ?? [];
-
-        foreach ($orders as $so) {
-            if (($so['so_number'] ?? '') === $soNumber) {
+        foreach ((array)($store['sales_orders'] ?? []) as $so) {
+            if (is_array($so) && (string)($so['so_number'] ?? '') === $soNumber) {
                 return $so;
             }
         }
@@ -163,18 +150,13 @@ final class OrderService
     /**
      * List Job Orders with optional SO and status filters.
      *
-     * Supported filters:
-     *   - status (string): Exact match on JO status.
-     *   - part   (string): Partial match (case-insensitive) on part number.
-     *
      * @param string|null           $soNumber Filter by parent SO number.
      * @param array<string, string> $filters  Additional filters.
-     * @return array<int, array<string, mixed>> Filtered JO records.
+     * @return array<int, array<string, mixed>>
      */
     public function listJobOrders(?string $soNumber = null, array $filters = []): array
     {
-        $index = $this->readIndex();
-        $jobs  = $index['job_orders'] ?? [];
+        $jobs = array_values((array)($this->readStore()['job_orders'] ?? []));
         $result = [];
 
         foreach ($jobs as $jo) {
@@ -182,22 +164,21 @@ final class OrderService
                 continue;
             }
 
-            // SO filter
-            if ($soNumber !== null && ($jo['so_number'] ?? '') !== $soNumber) {
+            if ($soNumber !== null && (string)($jo['so_number'] ?? '') !== $soNumber) {
                 continue;
             }
 
-            // Status filter
             if (isset($filters['status']) && $filters['status'] !== '') {
-                if (strtoupper($jo['status'] ?? '') !== strtoupper($filters['status'])) {
+                if (strtolower((string)($jo['status'] ?? '')) !== strtolower($filters['status'])) {
                     continue;
                 }
             }
 
-            // Part number filter (partial, case-insensitive)
             if (isset($filters['part']) && $filters['part'] !== '') {
-                $part = strtolower($jo['part_number'] ?? '');
-                if (strpos($part, strtolower($filters['part'])) === false) {
+                $needle = strtolower($filters['part']);
+                $partNumber = strtolower((string)($jo['part_number'] ?? ''));
+                $partDescription = strtolower((string)($jo['part_description'] ?? ''));
+                if (strpos($partNumber, $needle) === false && strpos($partDescription, $needle) === false) {
                     continue;
                 }
             }
@@ -205,8 +186,10 @@ final class OrderService
             $result[] = $jo;
         }
 
-        // Sort by created_at descending
-        usort($result, fn(array $a, array $b) => strcmp($b['created_at'] ?? '', $a['created_at'] ?? ''));
+        usort(
+            $result,
+            static fn(array $a, array $b): int => strcmp((string)($b['created_at'] ?? ''), (string)($a['created_at'] ?? '')),
+        );
 
         return $result;
     }
@@ -214,22 +197,20 @@ final class OrderService
     /**
      * Get full details of a single Job Order.
      *
-     * Returns the JO record including its operations (WOs).
-     *
-     * @param string $joNumber Job Order number (e.g. "JOB-2026-0042").
-     * @return array<string, mixed>|null JO details or null if not found.
+     * @param string $joNumber Job Order number.
+     * @return array<string, mixed>|null
      */
     public function getJobOrder(string $joNumber): ?array
     {
-        $index = $this->readIndex();
-        $jobs  = $index['job_orders'] ?? [];
-
-        foreach ($jobs as $jo) {
-            if (($jo['jo_number'] ?? '') === $joNumber) {
-                // Enrich with work orders
-                $jo['work_orders'] = $this->getWorkOrdersForJob($joNumber);
-                return $jo;
+        $store = $this->readStore();
+        foreach ((array)($store['job_orders'] ?? []) as $jo) {
+            if (!is_array($jo) || (string)($jo['jo_number'] ?? '') !== $joNumber) {
+                continue;
             }
+
+            $jo['work_orders'] = $this->getWorkOrdersForJobFromStore($store, $joNumber);
+            $jo['linked_forms'] = $this->getLinkedFormsForOrder($store, 'jo', $joNumber);
+            return $jo;
         }
 
         return null;
@@ -239,61 +220,66 @@ final class OrderService
      * Get the full SO -> JO -> WO hierarchy as a nested tree.
      *
      * @param string|null $soNumber Optional: restrict to a single SO tree.
-     * @return array<int, array<string, mixed>> Array of SO nodes with nested JOs and WOs.
+     * @return array<int, array<string, mixed>>
      */
     public function getHierarchy(?string $soNumber = null): array
     {
-        $index = $this->readIndex();
-        $salesOrders = $index['sales_orders'] ?? [];
-        $jobOrders   = $index['job_orders'] ?? [];
-        $workOrders  = $index['work_orders'] ?? [];
+        $store = $this->readStore();
+        $salesOrders = array_values((array)($store['sales_orders'] ?? []));
+        $jobOrders = array_values((array)($store['job_orders'] ?? []));
+        $workOrders = array_values((array)($store['work_orders'] ?? []));
 
-        // Index JOs by so_number
         $josBySo = [];
         foreach ($jobOrders as $jo) {
-            $so = $jo['so_number'] ?? '';
-            $josBySo[$so][] = $jo;
+            if (!is_array($jo)) {
+                continue;
+            }
+            $josBySo[(string)($jo['so_number'] ?? '')][] = $jo;
         }
 
-        // Index WOs by jo_number
         $wosByJo = [];
         foreach ($workOrders as $wo) {
-            $joNum = $wo['jo_number'] ?? '';
-            $wosByJo[$joNum][] = $wo;
-        }
-
-        // Load form links
-        $links     = $this->readFormLinks();
-        $linksByJo = [];
-        foreach ($links as $link) {
-            $joNum = $link['jo_number'] ?? '';
-            $linksByJo[$joNum][] = $link;
+            if (!is_array($wo)) {
+                continue;
+            }
+            $wosByJo[(string)($wo['jo_number'] ?? '')][] = $wo;
         }
 
         $tree = [];
-
         foreach ($salesOrders as $so) {
             if (!is_array($so)) {
                 continue;
             }
 
-            $soNum = $so['so_number'] ?? '';
-
+            $soNum = (string)($so['so_number'] ?? '');
             if ($soNumber !== null && $soNum !== $soNumber) {
                 continue;
             }
 
             $soNode = $so;
+            $soNode['linked_forms'] = $this->getLinkedFormsForOrder($store, 'so', $soNum);
             $soNode['job_orders'] = [];
 
-            foreach (($josBySo[$soNum] ?? []) as $jo) {
-                $joNum  = $jo['jo_number'] ?? '';
+            foreach ((array)($josBySo[$soNum] ?? []) as $jo) {
+                $joNum = (string)($jo['jo_number'] ?? '');
                 $joNode = $jo;
-                $joNode['work_orders']  = $wosByJo[$joNum] ?? [];
-                $joNode['linked_forms'] = $linksByJo[$joNum] ?? [];
+                $joNode['linked_forms'] = $this->getLinkedFormsForOrder($store, 'jo', $joNum);
+                $joNode['work_orders'] = [];
+
+                foreach ((array)($wosByJo[$joNum] ?? []) as $wo) {
+                    $woNode = $wo;
+                    $woNode['linked_forms'] = $this->getLinkedFormsForOrder($store, 'wo', (string)($wo['wo_number'] ?? ''));
+                    $joNode['work_orders'][] = $woNode;
+                }
+
+                usort($joNode['work_orders'], [$this, 'compareOperationNumber']);
                 $soNode['job_orders'][] = $joNode;
             }
 
+            usort(
+                $soNode['job_orders'],
+                static fn(array $a, array $b): int => strcmp((string)($a['created_at'] ?? ''), (string)($b['created_at'] ?? '')),
+            );
             $tree[] = $soNode;
         }
 
@@ -304,39 +290,50 @@ final class OrderService
      * Link a form record to a Job Order.
      *
      * @param string $joNumber Job Order number.
-     * @param string $formCode Form code (e.g. "FRM-631").
-     * @param string $recordId Record-ID (e.g. "NCR-2026-043").
-     * @return bool True if linked, false if JO not found or link already exists.
+     * @param string $formCode Form code.
+     * @param string $recordId Record ID.
+     * @return bool
      */
     public function linkFormToJob(string $joNumber, string $formCode, string $recordId): bool
     {
-        // Verify JO exists
-        $jo = $this->getJobOrder($joNumber);
+        $store = $this->readStore();
+        $jo = $this->findOrderRecord($store, 'jo', $joNumber);
         if ($jo === null) {
             return false;
         }
 
-        $links = $this->readFormLinks();
-
-        // Check for duplicate link
+        $links = array_values((array)($store['form_links'] ?? []));
         foreach ($links as $link) {
-            if (($link['jo_number'] ?? '') === $joNumber
-                && ($link['record_id'] ?? '') === $recordId) {
-                return false; // Already linked
+            if (!is_array($link)) {
+                continue;
+            }
+
+            $sameLegacyLink = (string)($link['jo_number'] ?? '') === $joNumber && (string)($link['record_id'] ?? '') === $recordId;
+            $sameNormalizedLink = (string)($link['order_type'] ?? '') === 'jo'
+                && (string)($link['order_id'] ?? '') === $joNumber
+                && (string)($link['record_id'] ?? '') === $recordId;
+
+            if ($sameLegacyLink || $sameNormalizedLink) {
+                return false;
             }
         }
 
         $links[] = [
-            'link_id'    => $this->generateUuidV4(),
-            'jo_number'  => $joNumber,
-            'so_number'  => $jo['so_number'] ?? '',
-            'form_code'  => $formCode,
-            'record_id'  => $recordId,
-            'linked_at'  => gmdate('c'),
-            'linked_by'  => (string)($_SESSION['user'] ?? 'system'),
+            'link_id'     => $this->generateUuidV4(),
+            'order_type'  => 'jo',
+            'order_id'    => $joNumber,
+            'jo_number'   => $joNumber,
+            'so_number'   => (string)($jo['so_number'] ?? ''),
+            'form_code'   => $formCode,
+            'record_id'   => $recordId,
+            'status'      => 'linked',
+            'auto_linked' => false,
+            'linked_at'   => gmdate('c'),
+            'linked_by'   => (string)($_SESSION['user'] ?? 'system'),
         ];
 
-        $this->writeFormLinks($links);
+        $store['form_links'] = array_values($links);
+        $this->writeStore($store);
 
         return true;
     }
@@ -345,72 +342,64 @@ final class OrderService
      * Get all form records linked to a Job Order.
      *
      * @param string $joNumber Job Order number.
-     * @return array<int, array<string, mixed>> Linked form records.
+     * @return array<int, array<string, mixed>>
      */
     public function getLinkedForms(string $joNumber): array
     {
-        $links  = $this->readFormLinks();
-        $result = [];
-
-        foreach ($links as $link) {
-            if (($link['jo_number'] ?? '') === $joNumber) {
-                $result[] = $link;
-            }
-        }
-
-        // Sort by linked_at descending
-        usort($result, fn(array $a, array $b) => strcmp($b['linked_at'] ?? '', $a['linked_at'] ?? ''));
-
-        return $result;
+        $links = $this->getLinkedFormsForOrder($this->readStore(), 'jo', $joNumber);
+        usort(
+            $links,
+            static fn(array $a, array $b): int => strcmp((string)($b['linked_at'] ?? ''), (string)($a['linked_at'] ?? '')),
+        );
+        return $links;
     }
 
     /**
      * Get dashboard statistics for orders.
      *
-     * Returns KPIs:
-     *   - active_so_count: Number of non-completed/cancelled SOs.
-     *   - active_jo_count: Number of non-completed/cancelled JOs.
-     *   - on_time_pct:     Percentage of completed JOs delivered on time.
-     *   - overdue_count:   Number of overdue active JOs (past due_date).
-     *   - by_status:       JO count breakdown by status.
-     *   - recent_completions: Last 5 completed JOs.
-     *
-     * @return array<string, mixed> Dashboard statistics.
+     * @return array<string, mixed>
      */
     public function getDashboardStats(): array
     {
-        $index = $this->readIndex();
-        $salesOrders = $index['sales_orders'] ?? [];
-        $jobOrders   = $index['job_orders'] ?? [];
+        $store = $this->readStore();
+        $salesOrders = array_values((array)($store['sales_orders'] ?? []));
+        $jobOrders = array_values((array)($store['job_orders'] ?? []));
 
         $activeSoCount = 0;
         $activeJoCount = 0;
-        $overdueCount  = 0;
+        $overdueCount = 0;
         $completedOnTime = 0;
-        $completedTotal  = 0;
-        $byStatus        = [];
+        $completedTotal = 0;
+        $backlogValue = 0.0;
+        $byStatus = [];
         $recentCompleted = [];
 
         $now = date('Y-m-d');
 
         foreach ($salesOrders as $so) {
-            $status = strtolower($so['status'] ?? '');
+            if (!is_array($so)) {
+                continue;
+            }
+
+            $status = strtolower((string)($so['status'] ?? ''));
             if (!in_array($status, ['closed', 'shipped', 'cancelled'], true)) {
                 $activeSoCount++;
+                $backlogValue += (float)($so['total_value'] ?? 0);
             }
         }
 
         foreach ($jobOrders as $jo) {
-            $status  = strtolower($jo['status'] ?? '');
-            $dueDate = $jo['due_date'] ?? '';
+            if (!is_array($jo)) {
+                continue;
+            }
 
-            // Count by status
+            $status = strtolower((string)($jo['status'] ?? ''));
+            $dueDate = (string)($jo['due_date'] ?? '');
+
             $byStatus[$status] = ($byStatus[$status] ?? 0) + 1;
 
             if (!in_array($status, ['completed', 'closed', 'cancelled'], true)) {
                 $activeJoCount++;
-
-                // Check overdue
                 if ($dueDate !== '' && $dueDate < $now) {
                     $overdueCount++;
                 }
@@ -418,8 +407,7 @@ final class OrderService
 
             if ($status === 'completed') {
                 $completedTotal++;
-
-                $completedAt = $jo['completed_at'] ?? $jo['updated_at'] ?? '';
+                $completedAt = (string)($jo['completed_at'] ?? $jo['updated_at'] ?? '');
                 $completedDate = substr($completedAt, 0, 10);
 
                 if ($dueDate !== '' && $completedDate !== '' && $completedDate <= $dueDate) {
@@ -427,177 +415,276 @@ final class OrderService
                 }
 
                 $recentCompleted[] = [
-                    'jo_number'    => $jo['jo_number'] ?? '',
-                    'part_number'  => $jo['part_number'] ?? '',
+                    'jo_number'    => (string)($jo['jo_number'] ?? ''),
+                    'part_number'  => (string)($jo['part_number'] ?? ''),
                     'completed_at' => $completedAt,
                 ];
             }
         }
 
-        // On-time percentage
-        $onTimePct = ($completedTotal > 0)
-            ? round(($completedOnTime / $completedTotal) * 100, 1)
-            : 0.0;
-
-        // Sort recent completions and take last 5
-        usort($recentCompleted, fn(array $a, array $b) =>
-            strcmp($b['completed_at'] ?? '', $a['completed_at'] ?? ''));
-        $recentCompleted = array_slice($recentCompleted, 0, 5);
+        usort(
+            $recentCompleted,
+            static fn(array $a, array $b): int => strcmp((string)($b['completed_at'] ?? ''), (string)($a['completed_at'] ?? '')),
+        );
 
         return [
-            'active_so_count'     => $activeSoCount,
-            'active_jo_count'     => $activeJoCount,
-            'on_time_pct'         => $onTimePct,
-            'overdue_count'       => $overdueCount,
-            'completed_total'     => $completedTotal,
-            'completed_on_time'   => $completedOnTime,
-            'by_status'           => $byStatus,
-            'recent_completions'  => $recentCompleted,
+            'active_so_count'    => $activeSoCount,
+            'active_jo_count'    => $activeJoCount,
+            'on_time_pct'        => $completedTotal > 0 ? round(($completedOnTime / $completedTotal) * 100, 1) : 0.0,
+            'overdue_count'      => $overdueCount,
+            'completed_total'    => $completedTotal,
+            'completed_on_time'  => $completedOnTime,
+            'backlog_value'      => round($backlogValue, 2),
+            'by_status'          => $byStatus,
+            'recent_completions' => array_slice($recentCompleted, 0, 5),
         ];
     }
-
-    // ── Create Operations ─────────────────────────────────────────────────
 
     /**
      * Generate the next order number for a given type.
      *
      * @param string $type 'so', 'jo', or 'wo'.
-     * @return string Generated order number.
+     * @return string
      */
     public function generateOrderNumber(string $type): string
     {
-        $prefixMap = ['so' => 'SO', 'jo' => 'JO', 'wo' => 'WO'];
-        $digitsMap = ['so' => 4, 'jo' => 4, 'wo' => 6];
-
-        $prefix = $prefixMap[$type] ?? 'ORD';
-        $digits = $digitsMap[$type] ?? 4;
-        $year   = date('Y');
-
-        $counterFile = $this->dataDir . '/counters/order_' . $type . '_' . $year . '.json';
-        $counterDir  = dirname($counterFile);
-        if (!is_dir($counterDir)) {
-            @mkdir($counterDir, 0775, true);
-        }
-
-        $counter = 0;
-        if (file_exists($counterFile)) {
-            $raw = @file_get_contents($counterFile);
-            $data = json_decode($raw ?: '', true);
-            $counter = (int)($data['counter'] ?? 0);
-        }
-        $counter++;
-
-        $this->writeJsonFileAtomic($counterFile, ['counter' => $counter, 'updated' => gmdate('c')]);
-
-        return $prefix . '-' . $year . '-' . str_pad((string)$counter, $digits, '0', STR_PAD_LEFT);
+        $store = $this->readStore();
+        $next = $this->nextOrderNumber($store, $type);
+        $this->writeStore($store);
+        return $next;
     }
 
     /**
      * Create a new Sales Order.
      *
-     * @param array $so SO record data.
-     * @return array The saved SO record.
+     * @param array<string, mixed> $so
+     * @return array<string, mixed>
      */
     public function createSalesOrder(array $so): array
     {
-        $index = $this->readIndex();
-        $index['sales_orders'][] = $so;
-        $this->writeIndex($index);
+        $soNumber = trim((string)($so['so_number'] ?? ''));
+        if ($soNumber === '') {
+            throw new RuntimeException('Sales Order number is required.');
+        }
 
-        // Also save per-SO detail file
-        $detailFile = $this->ordersDir . '/so/' . $this->safeFilename($so['so_number'] ?? '') . '.json';
-        $this->writeJsonFileAtomic($detailFile, $so);
+        $store = $this->readStore();
+        if ($this->findOrderRecord($store, 'so', $soNumber) !== null) {
+            throw new RuntimeException("Sales Order {$soNumber} already exists.");
+        }
 
+        $this->syncCounterWithNumber($store, 'so', $soNumber);
+        $store['sales_orders'][] = $so;
+        $this->writeStore($store);
         return $so;
+    }
+
+    /**
+     * Attach a canonical customer purchase order reference to an existing SO.
+     *
+     * @return array<string, mixed>
+     */
+    public function linkCustomerPurchaseOrderToSalesOrder(string $soNumber, string $customerPoId, string $customerPoNumber): array
+    {
+        $soNumber = trim($soNumber);
+        $customerPoId = trim($customerPoId);
+        $customerPoNumber = trim($customerPoNumber);
+        if ($soNumber === '' || $customerPoId === '') {
+            throw new RuntimeException('Sales Order and Customer PO identity are required for linkage.');
+        }
+
+        $store = $this->readStore();
+        foreach ((array)($store['sales_orders'] ?? []) as $index => $row) {
+            if (!is_array($row) || (string)($row['so_number'] ?? '') !== $soNumber) {
+                continue;
+            }
+
+            $row['customer_po_id'] = $customerPoId;
+            if ($customerPoNumber !== '') {
+                $row['customer_po_number'] = $customerPoNumber;
+                $row['customer_po'] = $customerPoNumber;
+            }
+            $row['updated_at'] = date('c');
+            $store['sales_orders'][$index] = $row;
+            $this->writeStore($store);
+            return $row;
+        }
+
+        throw new RuntimeException("Sales Order {$soNumber} not found.");
     }
 
     /**
      * Create a new Job Order.
      *
-     * @param array $jo JO record data.
-     * @return array The saved JO record.
+     * @param array<string, mixed> $jo
+     * @return array<string, mixed>
      */
     public function createJobOrder(array $jo): array
     {
-        $index = $this->readIndex();
-        $index['job_orders'][] = $jo;
-        $this->writeIndex($index);
+        $joNumber = trim((string)($jo['jo_number'] ?? ''));
+        $soNumber = trim((string)($jo['so_number'] ?? ''));
+        if ($joNumber === '') {
+            throw new RuntimeException('Job Order number is required.');
+        }
+        if ($soNumber === '') {
+            throw new RuntimeException('Parent Sales Order is required.');
+        }
+
+        $store = $this->readStore();
+        if ($this->findOrderRecord($store, 'jo', $joNumber) !== null) {
+            throw new RuntimeException("Job Order {$joNumber} already exists.");
+        }
+        if ($this->findOrderRecord($store, 'so', $soNumber) === null) {
+            throw new RuntimeException("Parent Sales Order {$soNumber} not found.");
+        }
+
+        $this->syncCounterWithNumber($store, 'jo', $joNumber);
+        $store['job_orders'][] = $jo;
+        $this->writeStore($store);
         return $jo;
     }
 
     /**
      * Create a new Work Order.
      *
-     * @param array $wo WO record data.
-     * @return array The saved WO record.
+     * @param array<string, mixed> $wo
+     * @return array<string, mixed>
      */
     public function createWorkOrder(array $wo): array
     {
-        $index = $this->readIndex();
-        $index['work_orders'][] = $wo;
-        $this->writeIndex($index);
+        $woNumber = trim((string)($wo['wo_number'] ?? ''));
+        $joNumber = trim((string)($wo['jo_number'] ?? ''));
+        if ($woNumber === '') {
+            throw new RuntimeException('Work Order number is required.');
+        }
+        if ($joNumber === '') {
+            throw new RuntimeException('Parent Job Order is required.');
+        }
+
+        $store = $this->readStore();
+        if ($this->findOrderRecord($store, 'wo', $woNumber) !== null) {
+            throw new RuntimeException("Work Order {$woNumber} already exists.");
+        }
+        if ($this->findOrderRecord($store, 'jo', $joNumber) === null) {
+            throw new RuntimeException("Parent Job Order {$joNumber} not found.");
+        }
+
+        $this->syncCounterWithNumber($store, 'wo', $woNumber);
+        $store['work_orders'][] = $wo;
+        $this->writeStore($store);
         return $wo;
     }
 
-    // ── Private Helpers ─────────────────────────────────────────────────────
+    /**
+     * @return array<string, mixed>
+     */
+    private function readStore(): array
+    {
+        $store = $this->readJsonFile($this->ordersFile);
+        if (is_array($store)) {
+            return $this->normalizeStore($store);
+        }
+
+        $legacyIndex = $this->readJsonFile($this->legacyIndexFile);
+        if (is_array($legacyIndex)) {
+            $migrated = $this->buildDefaultStore();
+            $migrated['sales_orders'] = array_values((array)($legacyIndex['sales_orders'] ?? []));
+            $migrated['job_orders'] = array_values((array)($legacyIndex['job_orders'] ?? []));
+            $migrated['work_orders'] = array_values((array)($legacyIndex['work_orders'] ?? []));
+            $legacyLinks = $this->readJsonListFile($this->legacyLinksFile);
+            if ($legacyLinks !== []) {
+                $migrated['form_links'] = $legacyLinks;
+            }
+            $this->writeStore($migrated);
+            return $this->normalizeStore($migrated);
+        }
+
+        $default = $this->buildDefaultStore();
+        $this->writeStore($default);
+        return $default;
+    }
 
     /**
-     * Get work orders for a specific Job Order.
-     *
-     * @param string $joNumber Job Order number.
-     * @return array<int, array<string, mixed>>
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
      */
-    private function getWorkOrdersForJob(string $joNumber): array
+    private function normalizeStore(array $data): array
     {
-        $index      = $this->readIndex();
-        $workOrders = $index['work_orders'] ?? [];
-        $result     = [];
+        $default = $this->buildDefaultStore();
+        $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $default['_meta'];
+        $data['_meta']['counters'] = is_array($data['_meta']['counters'] ?? null) ? $data['_meta']['counters'] : $default['_meta']['counters'];
+        $data['sales_orders'] = array_values(is_array($data['sales_orders'] ?? null) ? $data['sales_orders'] : []);
+        $data['job_orders'] = array_values(is_array($data['job_orders'] ?? null) ? $data['job_orders'] : []);
+        $data['work_orders'] = array_values(is_array($data['work_orders'] ?? null) ? $data['work_orders'] : []);
+        $data['form_links'] = array_values(is_array($data['form_links'] ?? null) ? $data['form_links'] : []);
 
-        foreach ($workOrders as $wo) {
-            if (($wo['jo_number'] ?? '') === $joNumber) {
-                $result[] = $wo;
+        if ($data['form_links'] === []) {
+            $legacyLinks = $this->readJsonListFile($this->legacyLinksFile);
+            if ($legacyLinks !== []) {
+                $data['form_links'] = $legacyLinks;
             }
         }
 
-        // Sort by operation number
-        usort($result, function (array $a, array $b): int {
-            $opA = (int)preg_replace('/\D/', '', $a['operation'] ?? '0');
-            $opB = (int)preg_replace('/\D/', '', $b['operation'] ?? '0');
-            return $opA <=> $opB;
-        });
-
-        return $result;
+        return $data;
     }
 
     /**
-     * Read the order index file.
-     *
      * @return array<string, mixed>
      */
-    private function readIndex(): array
+    private function buildDefaultStore(): array
     {
-        if (!file_exists($this->indexFile)) {
-            return ['sales_orders' => [], 'job_orders' => [], 'work_orders' => []];
-        }
-
-        $raw = @file_get_contents($this->indexFile);
-        if ($raw === false || trim($raw) === '') {
-            return ['sales_orders' => [], 'job_orders' => [], 'work_orders' => []];
-        }
-
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : ['sales_orders' => [], 'job_orders' => [], 'work_orders' => []];
+        $year = date('Y');
+        return [
+            '_meta' => [
+                'version' => '1.1',
+                'updated' => gmdate('c'),
+                'description' => 'Sales Order -> Job Order -> Work Order hierarchy managed inside the QMS Portal.',
+                'counters' => [
+                    'last_so' => 'SO-' . $year . '-0000',
+                    'last_jo' => 'JO-' . $year . '-0000',
+                    'last_wo' => 'WO-' . $year . '-000000',
+                ],
+            ],
+            'sales_orders' => [],
+            'job_orders' => [],
+            'work_orders' => [],
+            'form_links' => [],
+        ];
     }
 
     /**
-     * Read a JSON file from disk.
-     *
+     * @param array<string, mixed> $data
+     */
+    private function writeStore(array $data): void
+    {
+        $data = $this->normalizeStore($data);
+        $data['_meta']['updated'] = gmdate('c');
+
+        $lockHandle = @fopen($this->lockFile, 'c');
+        if ($lockHandle === false) {
+            $this->writeJsonFileAtomic($this->ordersFile, $data);
+            return;
+        }
+
+        try {
+            if (@flock($lockHandle, LOCK_EX)) {
+                $this->writeJsonFileAtomic($this->ordersFile, $data);
+                @flock($lockHandle, LOCK_UN);
+                return;
+            }
+        } finally {
+            @fclose($lockHandle);
+        }
+
+        $this->writeJsonFileAtomic($this->ordersFile, $data);
+    }
+
+    /**
      * @param string $path Absolute path.
      * @return array<string, mixed>|null
      */
     private function readJsonFile(string $path): ?array
     {
-        if (!file_exists($path)) {
+        if (!is_file($path)) {
             return null;
         }
 
@@ -611,79 +698,18 @@ final class OrderService
     }
 
     /**
-     * Read form links from disk.
-     *
+     * @param string $path Absolute path.
      * @return array<int, array<string, mixed>>
      */
-    private function readFormLinks(): array
+    private function readJsonListFile(string $path): array
     {
-        if (!file_exists($this->linksFile)) {
-            return [];
-        }
-
-        $raw = @file_get_contents($this->linksFile);
-        if ($raw === false || trim($raw) === '') {
-            return [];
-        }
-
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
+        $data = $this->readJsonFile($path);
+        return is_array($data) ? array_values($data) : [];
     }
 
     /**
-     * Write form links to disk atomically.
-     *
-     * @param array<int, array<string, mixed>> $links Form links array.
-     * @return void
-     *
-     * @throws RuntimeException If write fails.
-     */
-    private function writeFormLinks(array $links): void
-    {
-        $json = json_encode(
-            array_values($links),
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
-        );
-
-        if ($json === false) {
-            throw new RuntimeException('Failed to encode form links as JSON.');
-        }
-
-        $tmpFile = $this->linksFile . '.tmp.' . getmypid();
-        $written = @file_put_contents($tmpFile, $json, LOCK_EX);
-
-        if ($written === false) {
-            @unlink($tmpFile);
-            throw new RuntimeException('Failed to write form links file.');
-        }
-
-        // On Windows, rename() fails if destination exists; unlink first
-        if (file_exists($this->linksFile)) {
-            @unlink($this->linksFile);
-        }
-        if (!@rename($tmpFile, $this->linksFile)) {
-            @unlink($tmpFile);
-            throw new RuntimeException('Failed to atomically replace form links file.');
-        }
-    }
-
-    /**
-     * Write the order index file atomically.
-     *
-     * @param array $data Index data.
-     * @return void
-     */
-    private function writeIndex(array $data): void
-    {
-        $this->writeJsonFileAtomic($this->indexFile, $data);
-    }
-
-    /**
-     * Write a JSON file atomically (tmp + rename).
-     *
-     * @param string $path File path.
-     * @param array  $data Data to encode.
-     * @return void
+     * @param string               $path Absolute path.
+     * @param array<string, mixed> $data Data to encode.
      */
     private function writeJsonFileAtomic(string $path, array $data): void
     {
@@ -713,26 +739,158 @@ final class OrderService
     }
 
     /**
-     * Convert a string to a safe filename.
-     *
-     * @param string $name Raw name.
-     * @return string Safe filename.
+     * @param array<string, mixed> $store
+     * @return array<string, mixed>|null
      */
-    private function safeFilename(string $name): string
+    private function findOrderRecord(array $store, string $type, string $orderNumber): ?array
     {
-        return preg_replace('/[^A-Za-z0-9\-_]/', '_', $name) ?? $name;
+        $meta = $this->orderMeta($type);
+        foreach ((array)($store[$meta['store_key']] ?? []) as $row) {
+            if (is_array($row) && (string)($row[$meta['number_key']] ?? '') === $orderNumber) {
+                return $row;
+            }
+        }
+        return null;
     }
 
     /**
-     * Generate a UUID v4.
-     *
-     * @return string UUID in lowercase 8-4-4-4-12 format.
+     * @param array<string, mixed> $store
+     * @return array<int, array<string, mixed>>
      */
+    private function getWorkOrdersForJobFromStore(array $store, string $joNumber): array
+    {
+        $result = [];
+        foreach ((array)($store['work_orders'] ?? []) as $wo) {
+            if (is_array($wo) && (string)($wo['jo_number'] ?? '') === $joNumber) {
+                $result[] = $wo;
+            }
+        }
+
+        usort($result, [$this, 'compareOperationNumber']);
+        return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $store
+     * @return array<int, array<string, mixed>>
+     */
+    private function getLinkedFormsForOrder(array $store, string $orderType, string $orderId): array
+    {
+        $links = [];
+        foreach ((array)($store['form_links'] ?? []) as $link) {
+            if (!is_array($link)) {
+                continue;
+            }
+
+            $normalizedMatch = strtolower((string)($link['order_type'] ?? '')) === $orderType
+                && (string)($link['order_id'] ?? '') === $orderId;
+
+            $legacyMatch = false;
+            if ($orderType === 'jo') {
+                $legacyMatch = (string)($link['jo_number'] ?? '') === $orderId;
+            } elseif ($orderType === 'so') {
+                $legacyMatch = (string)($link['so_number'] ?? '') === $orderId;
+            } elseif ($orderType === 'wo') {
+                $legacyMatch = (string)($link['wo_number'] ?? '') === $orderId;
+            }
+
+            if ($normalizedMatch || $legacyMatch) {
+                $links[] = $link;
+            }
+        }
+
+        return $links;
+    }
+
+    /**
+     * @param array<string, mixed> $store
+     */
+    private function nextOrderNumber(array &$store, string $type): string
+    {
+        $meta = $this->orderMeta($type);
+        $counterKey = $meta['counter_key'];
+        $current = (string)($store['_meta']['counters'][$counterKey] ?? '');
+
+        if (!preg_match($this->orderNumberPattern($type), $current, $matches)) {
+            $currentYear = (int)date('Y');
+            $sequence = 0;
+        } else {
+            $currentYear = (int)$matches[1];
+            $sequence = (int)$matches[2];
+        }
+
+        $year = (int)date('Y');
+        if ($currentYear !== $year) {
+            $sequence = 0;
+        }
+
+        $sequence++;
+        $next = $meta['prefix'] . '-' . $year . '-' . str_pad((string)$sequence, $meta['digits'], '0', STR_PAD_LEFT);
+        $store['_meta']['counters'][$counterKey] = $next;
+
+        return $next;
+    }
+
+    /**
+     * @param array<string, mixed> $store
+     */
+    private function syncCounterWithNumber(array &$store, string $type, string $orderNumber): void
+    {
+        if (!preg_match($this->orderNumberPattern($type), strtoupper(trim($orderNumber)), $manualMatch)) {
+            return;
+        }
+
+        $meta = $this->orderMeta($type);
+        $counterKey = $meta['counter_key'];
+        $manualYear = (int)$manualMatch[1];
+        $manualSequence = (int)$manualMatch[2];
+        $current = (string)($store['_meta']['counters'][$counterKey] ?? '');
+
+        if (!preg_match($this->orderNumberPattern($type), $current, $currentMatch)) {
+            $store['_meta']['counters'][$counterKey] = strtoupper(trim($orderNumber));
+            return;
+        }
+
+        $currentYear = (int)$currentMatch[1];
+        $currentSequence = (int)$currentMatch[2];
+
+        if ($manualYear > $currentYear || ($manualYear === $currentYear && $manualSequence > $currentSequence)) {
+            $store['_meta']['counters'][$counterKey] = strtoupper(trim($orderNumber));
+        }
+    }
+
+    private function orderNumberPattern(string $type): string
+    {
+        return '/^' . preg_quote($this->orderMeta($type)['prefix'], '/') . '-([0-9]{4})-([0-9]+)$/';
+    }
+
+    /**
+     * @return array<string, string|int>
+     */
+    private function orderMeta(string $type): array
+    {
+        return match ($type) {
+            'so' => ['store_key' => 'sales_orders', 'number_key' => 'so_number', 'counter_key' => 'last_so', 'prefix' => 'SO', 'digits' => 4],
+            'jo' => ['store_key' => 'job_orders', 'number_key' => 'jo_number', 'counter_key' => 'last_jo', 'prefix' => 'JO', 'digits' => 4],
+            'wo' => ['store_key' => 'work_orders', 'number_key' => 'wo_number', 'counter_key' => 'last_wo', 'prefix' => 'WO', 'digits' => 6],
+            default => throw new RuntimeException('Unsupported order type: ' . $type),
+        };
+    }
+
+    /**
+     * @param array<string, mixed> $a
+     * @param array<string, mixed> $b
+     */
+    private function compareOperationNumber(array $a, array $b): int
+    {
+        return (int)($a['operation_number'] ?? 0) <=> (int)($b['operation_number'] ?? 0);
+    }
+
     private function generateUuidV4(): string
     {
-        $data    = random_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // Version 4
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // Variant RFC 4122
+        $data = random_bytes(16);
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }

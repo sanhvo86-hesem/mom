@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-11T06:15:38.735Z",
+    "generatedAt": "2026-04-11T08:49:13.302Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "8074b143-180a-4fdc-b838-a3bd4e63a2d2",
+    "publication_run_id": "f2594699-0b3e-43dd-a3c3-f21ed31618ad",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,7 +24,7 @@
   },
   "summary": {
     "tableCount": 658,
-    "relationCount": 3127,
+    "relationCount": 3128,
     "relationEntityCount": 658,
     "endpointCount": 3610,
     "endpointBoundTableCount": 658,
@@ -930,7 +930,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 11,
+      "columnCount": 12,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8086,7 +8086,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 10,
+      "columnCount": 12,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8354,7 +8354,7 @@
       "workflowId": "wf_production_operation",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 44,
+      "columnCount": 46,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -9964,7 +9964,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 14,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -10105,7 +10105,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 32,
+      "columnCount": 34,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10205,7 +10205,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 40,
+      "columnCount": 41,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10306,7 +10306,7 @@
       "workflowId": "wf_mes_erp_reconciliation_exception",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 24,
+      "columnCount": 25,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -10340,7 +10340,7 @@
       "workflowId": "wf_mes_erp_sync_run",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 26,
+      "columnCount": 27,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -10545,7 +10545,7 @@
       "workflowId": "wf_mes_machine_alarm",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 33,
+      "columnCount": 35,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -10684,7 +10684,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 26,
+      "columnCount": 27,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10884,7 +10884,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 47,
+      "columnCount": 48,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11123,7 +11123,7 @@
       "workflowId": "wf_mes_shift_handover",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 26,
+      "columnCount": 27,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -16698,7 +16698,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 18,
+      "columnCount": 19,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -21144,7 +21144,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 14,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -21211,7 +21211,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 22,
+      "columnCount": 26,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,

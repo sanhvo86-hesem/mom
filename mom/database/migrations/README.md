@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains ordered PostgreSQL migration files that compose the full HESEM QMS Portal database schema. The migration set now spans `001` through `078`, and the current world-class manufacturing expansion brings the stack to roughly `518` operational tables plus a new canonical `ERP + MES + eQMS` backbone across ERP, QMS, MES, APS, PLM, WMS, HCM, CRM, TMS, trade, SRM, tooling, EHS, service, and analytics domains.
+This directory contains ordered PostgreSQL migration files that compose the full HESEM MOM/ERP/MES/eQMS database schema. The migration set now spans `001` through `091`, and the current authority registry tracks the full platform contract across ERP, MOM, MES, APS, PLM, WMS, HCM, CRM, TMS, trade, SRM, tooling, EHS, finance, quality, maintenance, and analytics domains.
 
 ## Prerequisites
 
@@ -10,6 +10,7 @@ This directory contains ordered PostgreSQL migration files that compose the full
 - Extensions available on the server: `uuid-ossp`, `pgcrypto`, `pg_trgm`, `btree_gist`, `pgvector`
 - A database created and ready to receive the schema
 - `psql` client installed
+- A migration/owner account for DDL. The application runtime user should not be used for live DDL.
 
 ## Migration File Order
 
@@ -52,6 +53,7 @@ This directory contains ordered PostgreSQL migration files that compose the full
 | `061`-`068` | Quality lab/compliance, EHS/ESG, manufacturing engineering, MDM, pricing/contracts, traceability, outsource execution, advanced trade compliance |
 | `069`-`071` | Lean manufacturing uplift, enterprise governance uplift, and MES identity hardening |
 | `072`-`078` | Canonical ERP + MES + eQMS 7-layer backbone: foundation, master data, engineering, planning, MES execution, inventory/traceability, and eQMS compliance |
+| `079`-`095` | Runtime hardening, JSON seed migration, enum reconciliation, allocation/procurement/quality projections, canonical logistics/EHS/finance/analytics projections, lineage governance, risk-register contract reconciliation, runtime-observed contract columns, and production department-code alignment |
 
 ## Running Migrations
 
@@ -64,11 +66,14 @@ This directory contains ordered PostgreSQL migration files that compose the full
 # Specify host, port, and user
 ./migrate.sh -h localhost -p 5432 -U postgres -d qms_portal
 
+# Show status without applying DDL
+./migrate.sh -h localhost -p 5432 -U postgres -d qms_portal --status
+
 # Run a single migration
 psql -h localhost -d qms_portal -f migrations/001_extensions_and_types.sql
 ```
 
-The script auto-discovers all `*.sql` files in `migrations/` and executes them in lexical order, so newly added zero-padded migrations do not require manual edits to the runner.
+The script auto-discovers all `*.sql` files in `migrations/` and executes them in lexical order, so newly added zero-padded migrations do not require manual edits to the runner. Applied files are recorded in `schema_migrations` with checksum and execution time. Existing live databases with zero applied ledger rows are blocked by default; promote those through a clone-tested no-data-loss baseline process instead of running the ordered migration chain directly.
 
 ### Regenerating the schema snapshot
 
@@ -93,7 +98,7 @@ done
 
 ## Rolling Back
 
-Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (`078` first, then `077`, and so on).
+Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (`096` first, then `095`, and so on).
 
 ## Notes
 
@@ -101,4 +106,5 @@ Each migration file contains rollback instructions in comments at the bottom of 
 - Each migration is independently runnable given its dependencies are met
 - The `020_indexes.sql` file creates all indexes; if running tables and indexes together, you can skip the inline index creation in table files (they are duplicated in 020 for the split-file approach)
 - Partitioned tables (audit_events, inventory_transactions, labor_transactions) include partition definitions in their respective migration files
-- The current migration set expands the platform to roughly 518 tables and pushes HESEM into full-stack manufacturing ERP territory rather than a partial ERP/QMS portal
+- Production-like databases with existing untracked data must use `mom/tools/schema/probe_live_db_promotion.sh` first and `mom/tools/schema/apply_live_db_promotion.sh --execute` only after the clone probe reaches `dataschema_status=aligned`.
+- The current migration set contains `001` through `096`, with 658 active registry tables plus the internal `schema_migrations` ledger. This is the ERP+MOM/MES/eQMS system contract authority used by Data Schema.

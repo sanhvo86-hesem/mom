@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS fin_customs_declarations (
     customs_office               VARCHAR(120),
     fin_customs_tariff_code_id   UUID            REFERENCES fin_customs_tariff_codes(fin_customs_tariff_code_id),
     sales_order_id               UUID            REFERENCES sales_orders(sales_order_id),
-    purchase_order_id            UUID            REFERENCES purchase_orders(purchase_order_id),
+    purchase_order_id            UUID            REFERENCES purchase_orders(po_id),
     origin_country               CHAR(2),
     destination_country          CHAR(2),
     declared_value               NUMERIC(14,2),

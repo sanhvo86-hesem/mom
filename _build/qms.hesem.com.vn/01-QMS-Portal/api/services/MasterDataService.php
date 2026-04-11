@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
@@ -36,13 +36,13 @@ final class MasterDataResult
  * checks, change-history logging, pending-approval workflow, and archival
  * for all master-data entity types (customers, suppliers, parts, revisions, capas).
  *
- * JSON storage layout under qms-data/master-data/:
+ * JSON storage layout under data/master-data/:
  *   master-data.json         -- active records
  *   master-data-history.json -- change-history log
  *   master-data-pending.json -- pending-approval changes
  *   master-data-archive.json -- obsolete / archived records
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class MasterDataService
@@ -211,7 +211,7 @@ final class MasterDataService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string $dataDir Absolute path to data directory.
      */
     public function __construct(private readonly string $dataDir)
     {

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * APS Lite Scheduling Service for HESEM QMS Portal.
+ * APS Lite Scheduling Service for HESEM MOM Portal.
  *
  * Manages production schedule slots, conflict detection/resolution,
  * capacity heatmaps, and promise-date suggestions.
  *
- * Uses JSON file storage in `qms-data/scheduling/`.
+ * Uses JSON file storage in `data/scheduling/`.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class SchedulingService
@@ -32,7 +32,7 @@ final class SchedulingService
         'night' => ['start' => '22:00', 'end' => '06:00', 'minutes' => 480],
     ];
 
-    /** @var string Absolute path to qms-data directory. */
+    /** @var string Absolute path to data directory. */
     private readonly string $dataDir;
 
     /** @var string Absolute path to scheduling directory. */
@@ -52,7 +52,7 @@ final class SchedulingService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string $dataDir Absolute path to data directory.
      */
     public function __construct(string $dataDir, ?object $db = null)
     {

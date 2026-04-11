@@ -1,0 +1,280 @@
+<!-- v4.5 Prompt 3: Manufacturing domain sections.
+     Insert these sections after component architecture additions and before Detailed TOC. -->
+
+<section class="section" id="oee-calculation-contract" data-v45-section="manufacturing">
+  <h2 class="section-title"><span class="section-number">??</span>OEE Calculation Contract</h2>
+  <p class="section-subtitle">OEE trong HESEM MOM phải tính từ raw fields thống nhất để Production, Quality, Finance và Executive dashboard không lệch số khi dùng cùng một shift hoặc work order.</p>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">Formula definition</div>
+      <div class="card-body">
+        <pre class="code-block">OEE = Availability x Performance x Quality
+
+Availability = Run Time / Planned Production Time
+  Planned Production Time = Shift Duration - Planned Breaks
+  Run Time = Planned Production Time - Unplanned Downtime
+
+Performance = (Ideal Cycle Time x Total Pieces) / Run Time
+Quality = Good Pieces / Total Pieces
+  Good Pieces = Total Pieces - Reject Pieces</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">OEE gauge visual rules</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>OEE range</th><th>Color token</th><th>Label</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><code>&gt;= 85%</code></td><td><code>--color-success-600</code></td><td>Xuất sắc</td><td>Duy trì, hiển thị trend sparkline.</td></tr>
+            <tr><td><code>65-84%</code></td><td><code>--color-warning-600</code></td><td>Trung bình</td><td>Mở drill-down A/P/Q khi click gauge.</td></tr>
+            <tr><td><code>&lt; 65%</code></td><td><code>--color-error-600</code></td><td>Cần cải thiện</td><td>Hiển thị waterfall loss và link NCR/downtime.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header">Data schema</div>
+    <div class="card-body">
+      <pre class="code-block">{
+  "oeeDataContract": {
+    "shiftDurationMin": "number (phút)",
+    "plannedBreaksMin": "number (phút)",
+    "unplannedDowntimeMin": "number (phút)",
+    "idealCycleTimeSec": "number (giây/chi tiết)",
+    "totalPieces": "integer",
+    "rejectPieces": "integer",
+    "computed": {
+      "availability": "0-1 float",
+      "performance": "0-1 float",
+      "quality": "0-1 float",
+      "oee": "0-1 float"
+    }
+  }
+}</pre>
+    </div>
+  </div>
+  <div class="info-box info-box-blue"><strong>DRILL-DOWN</strong>Click vào gauge Availability, Performance hoặc Quality phải expand detail panel với waterfall chart: planned time, downtime, speed loss, reject loss và các event liên quan.</div>
+</section>
+
+<section class="section" id="receiving-iqc-workflow" data-v45-section="manufacturing">
+  <h2 class="section-title"><span class="section-number">??</span>Receiving Inspection IQC Workflow</h2>
+  <p class="section-subtitle">IQC kiểm soát chất lượng đầu vào từ PO receipt đến disposition, đồng thời đưa kết quả vào supplier scorecard để quyết định qualified, conditional hoặc probation.</p>
+  <div class="flow-row" style="margin-bottom:18px">
+    <div class="flow-node">PO Receipt</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Sample Selection</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Inspection</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Disposition</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Close</div>
+  </div>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">AQL sampling contract</div>
+      <div class="card-body">
+        <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.9">
+          <li>Sampling reference: ISO 2859-1 AQL tables.</li>
+          <li>Lot size range → sample size code → accept/reject numbers.</li>
+          <li>Inspector không được override sample size nếu không có deviation đã duyệt.</li>
+          <li>Skip-lot chỉ được dùng với supplier qualified và history đạt yêu cầu.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Disposition options</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Disposition</th><th>Meaning</th><th>Required evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Accept</td><td>Lot đạt yêu cầu.</td><td>Inspection record và inspector signature.</td></tr>
+            <tr><td>Reject / Return</td><td>Lot không đạt, trả supplier hoặc cách ly.</td><td>NCR, ảnh lỗi, supplier notification.</td></tr>
+            <tr><td>Conditional Accept</td><td>Chấp nhận có deviation.</td><td>Deviation approval, risk assessment, expiry condition.</td></tr>
+            <tr><td>Skip-Lot</td><td>Bỏ kiểm theo supplier qualification.</td><td>ASL status, scorecard history, approval rule.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="info-box info-box-green"><strong>FORM LAYOUT</strong>Supplier, PO#, Material, Lot#, Qty, Sample Size, Inspection Results table, Disposition và Inspector signature phải nằm trên cùng record IQC; kết quả IQC tự động feed vào supplier quality rating.</div>
+</section>
+
+<section class="section" id="preventive-maintenance-workflow" data-v45-section="manufacturing">
+  <h2 class="section-title"><span class="section-number">??</span>Preventive Maintenance Workflow</h2>
+  <p class="section-subtitle">PM workflow kết nối lịch bảo trì, work order maintenance, checklist kỹ thuật và KPI MTBF/MTTR để giảm downtime không kế hoạch.</p>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">PM work order form</div>
+      <div class="card-body">
+        <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.9">
+          <li>Machine ID, PM Type: daily, weekly, monthly, annual.</li>
+          <li>Checklist items với pass/fail/comment và evidence attachment.</li>
+          <li>Parts used, time spent, next PM date, technician signature.</li>
+          <li>PM task tự động tạo WO type <code>Maintenance</code> khi đến hạn.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">MTBF / MTTR KPI display</div>
+      <div class="card-body">
+        <pre class="code-block">MTBF = Total Operating Time / Number of Failures
+MTTR = Total Repair Time / Number of Repairs</pre>
+        <div class="tpl-meta">Display bằng KPI cards có trend sparkline, drill-down theo machine, line, failure mode và technician.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">PM status tokens</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>Status</th><th>Token</th><th>Color</th><th>UI rule</th></tr></thead>
+        <tbody>
+          <tr><td>Scheduled</td><td><code>--pm-scheduled</code></td><td><code>var(--brand-2)</code></td><td>Calendar item planned.</td></tr>
+          <tr><td>In-Progress</td><td><code>--pm-in-progress</code></td><td><code>var(--amber)</code></td><td>WO đang thực hiện.</td></tr>
+          <tr><td>Completed</td><td><code>--pm-completed</code></td><td><code>var(--green)</code></td><td>Checklist và signature đủ.</td></tr>
+          <tr><td>Overdue</td><td><code>--pm-overdue</code></td><td><code>var(--red)</code></td><td>Escalate maintenance lead.</td></tr>
+          <tr><td>Skipped (approved)</td><td><code>--pm-skipped</code></td><td><code>var(--purple)</code></td><td>Cần reason và approval.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="material-lot-genealogy" data-v45-section="manufacturing">
+  <h2 class="section-title"><span class="section-number">??</span>Material Traceability Lot Genealogy</h2>
+  <p class="section-subtitle">Lot genealogy cho phép trace backward từ finished good về raw material và trace forward từ raw material đến mọi shipment/customer bị ảnh hưởng.</p>
+  <div class="flow-row" style="margin-bottom:18px">
+    <div class="flow-node">Raw Material<br><span style="font-size:var(--text-overline);color:var(--text-secondary)">Heat# / supplier lot</span></div><div class="flow-arrow">→</div>
+    <div class="flow-node">Receiving IQC</div><div class="flow-arrow">→</div>
+    <div class="flow-node">WIP<br><span style="font-size:var(--text-overline);color:var(--text-secondary)">WO# / operation</span></div><div class="flow-arrow">→</div>
+    <div class="flow-node">Finished Good<br><span style="font-size:var(--text-overline);color:var(--text-secondary)">Serial#</span></div><div class="flow-arrow">→</div>
+    <div class="flow-node">Shipment<br><span style="font-size:var(--text-overline);color:var(--text-secondary)">Packing list / customer</span></div>
+  </div>
+  <div class="grid-3">
+    <div class="info-box info-box-blue"><strong>BACKWARD TRACE</strong>Từ finished good hoặc serial, trace ngược về raw material, heat number, supplier lot, IQC record và work order operations.</div>
+    <div class="info-box info-box-green"><strong>FORWARD TRACE</strong>Từ raw material hoặc supplier lot, trace xuôi đến WIP, finished goods, shipments, customer PO và affected inventory.</div>
+    <div class="info-box info-box-purple"><strong>REGULATORY CONTEXT</strong>FDA yêu cầu trace trong 24h cho recall. AS9100 yêu cầu lot traceability đủ bằng chứng vật liệu, process và shipment.</div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="card-header">Visual rules</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>Element</th><th>Rule</th><th>Interaction</th></tr></thead>
+        <tbody>
+          <tr><td>Node</td><td>Card nhỏ: type icon, ID, date, status badge.</td><td>Click node mở detail panel.</td></tr>
+          <tr><td>Connector</td><td>Solid = direct transform; dashed = reference link.</td><td>Hover node highlight toàn path.</td></tr>
+          <tr><td>Recall mode</td><td>Filter affected lots, shipments, customers.</td><td>Export affected list kèm timestamp và user.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="training-effectiveness-verification" data-v45-section="manufacturing">
+  <h2 class="section-title"><span class="section-number">??</span>Training Effectiveness Verification</h2>
+  <p class="section-subtitle">Training không kết thúc ở attendance. HESEM MOM phải xác minh năng lực thực tế trước khi cho operator chạy máy, ký record hoặc nhận work order có rủi ro chất lượng.</p>
+  <div class="flow-row" style="margin-bottom:18px">
+    <div class="flow-node">Assign</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Schedule</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Attend</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Assess</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Verify</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Certify</div>
+  </div>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">Assessment form pattern</div>
+      <div class="card-body">
+        <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.9">
+          <li>Multiple choice cho kiến thức quy trình.</li>
+          <li>Practical checklist tại máy hoặc process thật.</li>
+          <li>Supervisor sign-off với timestamp và competency scope.</li>
+          <li>Evidence attachment cho bài kiểm tra hoặc quan sát thực tế.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Competency matrix</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Employee x Process/Machine</th><th>Status</th><th>Gate</th></tr></thead>
+          <tbody>
+            <tr><td>Qualified</td><td><span class="chip chip-green">Qualified</span></td><td>Được assign WO/process.</td></tr>
+            <tr><td>In training</td><td><span class="chip chip-amber">In-Training</span></td><td>Chỉ thao tác dưới supervision.</td></tr>
+            <tr><td>Expired</td><td><span class="chip chip-red">Expired</span></td><td>Block WO assignment.</td></tr>
+            <tr><td>Not required</td><td><span class="chip chip-dark">Not-Required</span></td><td>Không ảnh hưởng routing.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="info-box info-box-red"><strong>OPERATOR AUTHORIZATION GATE</strong>Operator KHÔNG được chạy máy hoặc process nếu training expired hoặc chưa qualified. System phải block WO assignment và log reason. Retraining trigger gồm score thấp hơn pass threshold, qualification expired, process change/ECO và incident/NCR liên quan.</div>
+</section>
+
+<section class="section" id="gauge-rr-msa-pattern" data-v45-section="manufacturing">
+  <h2 class="section-title"><span class="section-number">??</span>Gauge R&amp;R / MSA Pattern</h2>
+  <p class="section-subtitle">MSA pattern chuẩn hóa cách nhập, tính và hiển thị độ tin cậy hệ thống đo trước khi dùng dữ liệu inspection để quyết định chất lượng.</p>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">MSA types</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Type</th><th>Use case</th><th>Minimum data</th></tr></thead>
+          <tbody>
+            <tr><td>Gauge R&amp;R (crossed)</td><td>Repeatability and reproducibility.</td><td>3 operators, 10 parts, 2 trials recommended.</td></tr>
+            <tr><td>Bias</td><td>Average measurement bias vs reference.</td><td>Reference standard and repeated readings.</td></tr>
+            <tr><td>Linearity</td><td>Bias across measurement range.</td><td>Multiple reference values.</td></tr>
+            <tr><td>Stability</td><td>Measurement drift over time.</td><td>Time series on control sample.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Results display</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>%GRR</th><th>Status</th><th>Token</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><code>&lt; 10%</code></td><td>Acceptable</td><td><code>--color-success-600</code></td><td>Cho phép dùng gauge.</td></tr>
+            <tr><td><code>10-30%</code></td><td>Marginal</td><td><code>--color-warning-600</code></td><td>Review process và training.</td></tr>
+            <tr><td><code>&gt; 30%</code></td><td>Unacceptable</td><td><code>--color-error-600</code></td><td>Không dùng gauge cho release decision.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="info-box info-box-blue"><strong>VISUALIZATION</strong>Hiển thị X-bar R chart cho R&amp;R data và bar chart cho %Contribution gồm Equipment Variation, Appraiser Variation và Part Variation. Form phải có Gauge ID, Part#, Operators, Trials và measurement table.</div>
+</section>
+
+<section class="section" id="supplier-quality-management" data-v45-section="manufacturing">
+  <h2 class="section-title"><span class="section-number">??</span>Supplier Quality Management</h2>
+  <p class="section-subtitle">Supplier quality kết nối Approved Supplier List, IQC, SCAR, supplier audit và scorecard để ra quyết định mua hàng có kiểm soát.</p>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">Approved Supplier List (ASL)</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Status</th><th>Meaning</th><th>Purchasing rule</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-green">Approved</span></td><td>Supplier qualified and active.</td><td>PO allowed.</td></tr>
+            <tr><td><span class="chip chip-amber">Conditional</span></td><td>Limited approval with conditions.</td><td>PO requires condition check.</td></tr>
+            <tr><td><span class="chip chip-purple">Probation</span></td><td>Performance under monitoring.</td><td>PO requires manager review.</td></tr>
+            <tr><td><span class="chip chip-red">Disqualified</span></td><td>Supplier blocked.</td><td>PO blocked unless deviation approved.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Supplier quality dashboard</div>
+      <div class="card-body">
+        <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.9">
+          <li>Delivery OTD%, IQC pass rate%, SCAR count, quality score trend.</li>
+          <li>Drill-down by supplier, commodity, material, buyer and quarter.</li>
+          <li>Scorecard history links back to IQC and SCAR records.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-red"><strong>SCAR FORM</strong>Supplier Corrective Action Request phải có nonconformance description, containment, root cause, corrective action, verification, due date, owner và supplier response signature.</div>
+    <div class="info-box info-box-blue"><strong>SUPPLIER AUDIT TEMPLATE</strong>Checklist gồm QMS, Process Control, Measurement, Material Control và Packaging; mỗi section có score, evidence, finding severity và overall rating.</div>
+  </div>
+</section>

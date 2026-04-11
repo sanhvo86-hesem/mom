@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 
 // ── Value Objects ────────────────────────────────────────────────────────────
@@ -74,13 +74,13 @@ final readonly class ReportResult
 // ── Report Generator ────────────────────────────────────────────────────────
 
 /**
- * Report generation service for HESEM QMS management review and audits.
+ * Report generation service for HESEM MOM management review and audits.
  *
  * Generates structured reports from workflow states, form entries, and audit
  * trail data. Supports JSON (for dashboards), HTML (for portal rendering),
  * and CSV (for export). Includes caching for expensive aggregation queries.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class ReportGenerator
@@ -100,7 +100,7 @@ final class ReportGenerator
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string               $dataDir    Absolute path to qms-data directory.
+     * @param string               $dataDir    Absolute path to data directory.
      * @param Connection|null      $db         Optional database connection.
      * @param WorkflowEngine|null  $workflow   Optional workflow engine.
      * @param AuditTrail|null      $auditTrail Optional audit trail.
@@ -695,7 +695,7 @@ final class ReportGenerator
             <h1>{$title}</h1>
             <div class="meta">Period: {$period} | Records: {$count} | Generated: {$generated}</div>
             {$body}
-            <div class="footer">HESEM QMS Portal - Auto-generated report. Do not modify.</div>
+            <div class="footer">HESEM MOM Portal - Auto-generated report. Do not modify.</div>
         </body>
         </html>
         HTML;

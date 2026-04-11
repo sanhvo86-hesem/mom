@@ -2,18 +2,20 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Services\MasterDataService;
+use MOM\Services\MasterDataService;
+use MOM\Services\FoundationGovernanceService;
 use Throwable;
 
 /**
- * Master Data Controller â€” CRUD for machines, parts, operators, shifts,
+ * Master Data Controller — CRUD for machines, parts, operators, shifts,
  * work centers, and all 30+ master data entity types.
  */
 class MasterDataController extends BaseController
 {
     private ?MasterDataService $mdService = null;
+    private ?FoundationGovernanceService $fgService = null;
 
     private function mdService(): MasterDataService
     {
@@ -21,6 +23,14 @@ class MasterDataController extends BaseController
             $this->mdService = new MasterDataService($this->dataDir, $this->rootDir);
         }
         return $this->mdService;
+    }
+
+    private function fgService(): FoundationGovernanceService
+    {
+        if ($this->fgService === null) {
+            $this->fgService = new FoundationGovernanceService($this->data);
+        }
+        return $this->fgService;
     }
 
     private function userId(array $user): string
@@ -112,10 +122,10 @@ class MasterDataController extends BaseController
         return $dir;
     }
 
-    // â”€â”€ Generic Master Data CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Generic Master Data CRUD ────────────────────────────────────────
 
     /**
-     * GET list â€” List records for any entity type.
+     * GET list — List records for any entity type.
      * Query: entity (required), search, status, offset, limit
      */
     public function listRecords(): never
@@ -156,7 +166,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * GET detail â€” Get single record.
+     * GET detail — Get single record.
      * Query: entity, id (required)
      */
     public function getDetail(): never
@@ -178,7 +188,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * POST create â€” Create new master data record.
+     * POST create — Create new master data record.
      * Body: entity (required), data (required)
      */
     public function createRecord(): never
@@ -210,7 +220,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * POST update â€” Update existing master data record.
+     * POST update — Update existing master data record.
      * Body: entity, id, data (required)
      */
     public function updateRecord(): never
@@ -244,7 +254,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * POST delete â€” Delete master data record (with referential integrity check).
+     * POST delete — Delete master data record (with referential integrity check).
      * Body: entity, id (required)
      */
     public function deleteRecord(): never
@@ -280,7 +290,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * POST changeStatus â€” Change status of a master data record.
+     * POST changeStatus — Change status of a master data record.
      * Body: entity, id, target_status (required)
      */
     public function changeStatus(): never
@@ -309,7 +319,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * GET history â€” Get change history for a record.
+     * GET history — Get change history for a record.
      */
     public function getHistory(): never
     {
@@ -329,38 +339,38 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * GET entities â€” List all available entity types with labels.
+     * GET entities — List all available entity types with labels.
      */
     public function listEntities(): never
     {
         $this->requireAuth();
 
         $entities = [
-            ['key' => 'machines',           'label' => 'MÃ¡y', 'label_en' => 'Machines', 'icon' => 'ðŸ­'],
-            ['key' => 'work_centers',       'label' => 'Work Center', 'label_en' => 'Work Centers', 'icon' => 'ðŸ”§'],
-            ['key' => 'parts',              'label' => 'Chi tiáº¿t / Part Number', 'label_en' => 'Parts', 'icon' => 'âš™'],
-            ['key' => 'revisions',          'label' => 'Revision', 'label_en' => 'Revisions', 'icon' => 'ðŸ”„'],
-            ['key' => 'operators',          'label' => 'NgÆ°á»i váº­n hÃ nh', 'label_en' => 'Operators', 'icon' => 'ðŸ‘·'],
-            ['key' => 'customers',          'label' => 'KhÃ¡ch hÃ ng', 'label_en' => 'Customers', 'icon' => 'ðŸ¢'],
-            ['key' => 'suppliers',          'label' => 'NhÃ  cung cáº¥p', 'label_en' => 'Suppliers', 'icon' => 'ðŸšš'],
-            ['key' => 'routing_library',    'label' => 'Routing', 'label_en' => 'Routings', 'icon' => 'ðŸ›¤'],
-            ['key' => 'bom_library',        'label' => 'BOM', 'label_en' => 'Bill of Materials', 'icon' => 'ðŸ“‹'],
-            ['key' => 'control_plans',      'label' => 'Control Plan', 'label_en' => 'Control Plans', 'icon' => 'ðŸ“Š'],
-            ['key' => 'inspection_plans',   'label' => 'Káº¿ hoáº¡ch kiá»ƒm tra', 'label_en' => 'Inspection Plans', 'icon' => 'ðŸ”'],
-            ['key' => 'tooling_assets',     'label' => 'Dá»¥ng cá»¥ cáº¯t', 'label_en' => 'Tooling Assets', 'icon' => 'ðŸ”©'],
-            ['key' => 'defect_catalog',     'label' => 'Danh má»¥c lá»—i', 'label_en' => 'Defect Catalog', 'icon' => 'ðŸ›'],
-            ['key' => 'shipping_methods',   'label' => 'PhÆ°Æ¡ng thá»©c giao', 'label_en' => 'Shipping Methods', 'icon' => 'ðŸ“¦'],
-            ['key' => 'payment_terms',      'label' => 'Äiá»u khoáº£n thanh toÃ¡n', 'label_en' => 'Payment Terms', 'icon' => 'ðŸ’³'],
-            ['key' => 'incoterms',          'label' => 'Incoterms', 'label_en' => 'Incoterms', 'icon' => 'ðŸŒ'],
+            ['key' => 'machines',           'label' => 'Máy', 'label_en' => 'Machines', 'icon' => '🏭'],
+            ['key' => 'work_centers',       'label' => 'Work Center', 'label_en' => 'Work Centers', 'icon' => '🔧'],
+            ['key' => 'parts',              'label' => 'Chi tiết / Part Number', 'label_en' => 'Parts', 'icon' => '⚙'],
+            ['key' => 'revisions',          'label' => 'Revision', 'label_en' => 'Revisions', 'icon' => '🔄'],
+            ['key' => 'operators',          'label' => 'Người vận hành', 'label_en' => 'Operators', 'icon' => '👷'],
+            ['key' => 'customers',          'label' => 'Khách hàng', 'label_en' => 'Customers', 'icon' => '🏢'],
+            ['key' => 'suppliers',          'label' => 'Nhà cung cấp', 'label_en' => 'Suppliers', 'icon' => '🚚'],
+            ['key' => 'routing_library',    'label' => 'Routing', 'label_en' => 'Routings', 'icon' => '🛤'],
+            ['key' => 'bom_library',        'label' => 'BOM', 'label_en' => 'Bill of Materials', 'icon' => '📋'],
+            ['key' => 'control_plans',      'label' => 'Control Plan', 'label_en' => 'Control Plans', 'icon' => '📊'],
+            ['key' => 'inspection_plans',   'label' => 'Kế hoạch kiểm tra', 'label_en' => 'Inspection Plans', 'icon' => '🔍'],
+            ['key' => 'tooling_assets',     'label' => 'Dụng cụ cắt', 'label_en' => 'Tooling Assets', 'icon' => '🔩'],
+            ['key' => 'defect_catalog',     'label' => 'Danh mục lỗi', 'label_en' => 'Defect Catalog', 'icon' => '🐛'],
+            ['key' => 'shipping_methods',   'label' => 'Phương thức giao', 'label_en' => 'Shipping Methods', 'icon' => '📦'],
+            ['key' => 'payment_terms',      'label' => 'Điều khoản thanh toán', 'label_en' => 'Payment Terms', 'icon' => '💳'],
+            ['key' => 'incoterms',          'label' => 'Incoterms', 'label_en' => 'Incoterms', 'icon' => '🌍'],
         ];
 
         $this->success(['entities' => $entities]);
     }
 
-    // â”€â”€ Shift Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Shift Management ────────────────────────────────────────────────
 
     /**
-     * GET listShifts â€” List all shift definitions.
+     * GET listShifts — List all shift definitions.
      */
     public function listShifts(): never
     {
@@ -400,7 +410,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * POST saveShift â€” Create or update a shift definition.
+     * POST saveShift — Create or update a shift definition.
      */
     public function saveShift(): never
     {
@@ -455,7 +465,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * GET listShiftAssignments â€” Get shift assignments for operators.
+     * GET listShiftAssignments — Get shift assignments for operators.
      * Query: employee_id, start_date, end_date
      */
     public function listShiftAssignments(): never
@@ -485,7 +495,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * POST saveShiftAssignment â€” Assign operator to shift.
+     * POST saveShiftAssignment — Assign operator to shift.
      */
     public function saveShiftAssignment(): never
     {
@@ -536,7 +546,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * GET listHolidays â€” Get holiday calendar.
+     * GET listHolidays — Get holiday calendar.
      */
     public function listHolidays(): never
     {
@@ -553,7 +563,7 @@ class MasterDataController extends BaseController
     }
 
     /**
-     * POST saveHoliday â€” Add or update a holiday.
+     * POST saveHoliday — Add or update a holiday.
      */
     public function saveHoliday(): never
     {
@@ -599,6 +609,304 @@ class MasterDataController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('holiday_save_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ══ Canonical Foundation Governance Contract Slice ═══════════════════
+
+    /**
+     * Emit an RFC 9457 problem detail from this controller.
+     */
+    private function sliceProblem(string $type, string $title, int $status, ?string $detail = null): never
+    {
+        $body = ['type' => $type, 'title' => $title, 'status' => $status];
+        if ($detail !== null) {
+            $body['detail'] = $detail;
+        }
+        throw ExitException::json($body, $status, ['Content-Type' => 'application/problem+json']);
+    }
+
+    /**
+     * Emit a canonical slice success envelope.
+     */
+    private function sliceSuccess(array $payload, int $code = 200): never
+    {
+        throw ExitException::json($payload, $code, ['Content-Type' => 'application/json']);
+    }
+
+    // ── Public: GET /api/v1/foundation/organizations ──────────────────────
+
+    public function listFoundationOrganizations(): never
+    {
+        $this->requireAuth();
+
+        try {
+            $result = $this->fgService()->listOrganizations([
+                'limit'                => $this->query('limit'),
+                'cursor'               => $this->query('cursor'),
+                'organizationType'     => $this->query('organizationType'),
+                'parentOrganizationId' => $this->query('parentOrganizationId'),
+                'statusCode'           => $this->query('statusCode'),
+                'search'               => $this->query('search'),
+            ]);
+            $this->sliceSuccess($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Invalid request', 400, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    // ── Public: GET /api/v1/foundation/parties ────────────────────────────
+
+    public function listFoundationParties(): never
+    {
+        $this->requireAuth();
+
+        try {
+            $result = $this->fgService()->listParties([
+                'limit'      => $this->query('limit'),
+                'cursor'     => $this->query('cursor'),
+                'partyType'  => $this->query('partyType'),
+                'roleCode'   => $this->query('roleCode'),
+                'statusCode' => $this->query('statusCode'),
+                'search'     => $this->query('search'),
+            ]);
+            $this->sliceSuccess($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Invalid request', 400, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    // ── Public: GET /api/v1/foundation/calendars ──────────────────────────
+
+    public function listFoundationCalendars(): never
+    {
+        $this->requireAuth();
+
+        try {
+            $result = $this->fgService()->listCalendars([
+                'limit'        => $this->query('limit'),
+                'cursor'       => $this->query('cursor'),
+                'statusCode'   => $this->query('statusCode'),
+                'baseTimezone' => $this->query('baseTimezone'),
+                'search'       => $this->query('search'),
+            ]);
+            $this->sliceSuccess($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Invalid request', 400, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    // ── Internal commands (Router action keys) ────────────────────────────
+    // All commands now persist to canonical 072 tables with concurrency protection.
+
+    public function registerOrganizationNode(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function amendOrganizationNode(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->amendOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function reparentOrganizationNode(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->reparentOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function deactivateOrganizationNode(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->deactivateOrganizationNode($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function registerParty(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerParty($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function amendPartyIdentity(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->amendPartyIdentity($body, $uid);
+            $this->sliceSuccess(['data' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem($code === 412 ? 'urn:qms:problem:etag-mismatch' : 'urn:qms:problem:server-error',
+                $code === 412 ? 'ETag mismatch' : 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function assignPartyRole(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->assignPartyRole($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function registerPartySite(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerPartySite($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function registerPartyContact(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerPartyContact($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function registerCalendar(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerCalendar($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
+        }
+    }
+
+    public function registerShiftEntry(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $uid  = $this->userId($user);
+        try {
+            $result = $this->fgService()->registerShift($body, $uid);
+            $this->sliceSuccess(['data' => $result], 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Validation error', 422, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            $code = (int)$e->getCode() ?: 500;
+            $this->sliceProblem('urn:qms:problem:server-error', 'Write failed', $code, $e->getMessage());
         }
     }
 }

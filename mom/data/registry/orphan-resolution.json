@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T06:15:14.145Z",
-    "description": "Resolution plan for 0 orphan registry fields and 408 orphan DB column names."
+    "generatedAt": "2026-04-11T08:48:55.576Z",
+    "description": "Resolution plan for 0 orphan registry fields and 413 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 340,
+      "count": 341,
       "columns": [
         {
           "column": "item_class",
@@ -3111,6 +3111,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "tool_list_used",
+          "tables": [
+            "mes_cycle_events"
+          ],
+          "suggestedLabel": "Dao cụ Danh sách Used",
+          "suggestedLabelEn": "Tool List Used",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT[]"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "total_pieces",
           "tables": [
             "mes_oee_snapshots"
@@ -4485,7 +4498,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 68,
+      "count": 72,
       "columns": [
         {
           "column": "substitute_item_id",
@@ -4889,6 +4902,16 @@
           "role": "primary_key"
         },
         {
+          "column": "template_id",
+          "tables": [
+            "material_cost_templates"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
           "column": "token_id",
           "tables": [
             "portal_access_tokens"
@@ -5147,6 +5170,36 @@
             "UUID"
           ],
           "role": "foreign_key"
+        },
+        {
+          "column": "work_instruction_id",
+          "tables": [
+            "work_instruction"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "wip_ledger_id",
+          "tables": [
+            "wip_ledger"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "signature_id",
+          "tables": [
+            "electronic_signatures"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
         },
         {
           "column": "stock_balance_id",

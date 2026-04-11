@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 
 // ── Value Objects ────────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ final readonly class TransitionResult
 // ── Workflow Engine ─────────────────────────────────────────────────────────
 
 /**
- * State-machine workflow engine for HESEM QMS record lifecycle management.
+ * State-machine workflow engine for HESEM MOM record lifecycle management.
  *
  * Defines and enforces the allowed state transitions for every QMS record type
  * (NCR, CAPA, FAI, Calibration, Audit, Training, ECR, SCAR, Risk, Improvement,
@@ -56,7 +56,7 @@ final readonly class TransitionResult
  * - Delegation support (approve on behalf of)
  * - Full state-change history with audit trail integration
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class WorkflowEngine
@@ -80,7 +80,7 @@ final class WorkflowEngine
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string               $dataDir             Absolute path to qms-data directory.
+     * @param string               $dataDir             Absolute path to data directory.
      * @param Connection|null      $db                  Optional database connection.
      * @param AuditTrail|null      $auditTrail          Optional audit trail for logging transitions.
      * @param NotificationService|null $notificationService Optional notification service.
@@ -1017,6 +1017,49 @@ final class WorkflowEngine
     private function buildWorkflowDefinitions(): array
     {
         return [
+            // Foundation Governance Contract Slice: approval-step lifecycle
+            'APPROVAL_STEP' => [
+                'initial'  => 'pending',
+                'terminal' => ['approved', 'rejected'],
+                'states'   => ['pending', 'approved', 'rejected', 'changes_requested'],
+                'transitions' => [
+                    'pending' => [
+                        'approved' => [
+                            'label'    => 'Approve',
+                            'label_vi' => 'Phe duyet',
+                            'roles'    => ['qa_manager', 'admin', 'general_manager', 'approver'],
+                            'actions'  => ['audit_decision'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject',
+                            'label_vi' => 'Tu choi',
+                            'roles'    => ['qa_manager', 'admin', 'general_manager', 'approver'],
+                            'actions'  => ['audit_decision'],
+                            'requires' => [],
+                        ],
+                        'changes_requested' => [
+                            'label'    => 'Request Changes',
+                            'label_vi' => 'Yeu cau thay doi',
+                            'roles'    => ['qa_manager', 'admin', 'general_manager', 'approver'],
+                            'actions'  => ['audit_decision'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'approved' => [],
+                    'rejected' => [],
+                    'changes_requested' => [
+                        'pending' => [
+                            'label'    => 'Resubmit for Review',
+                            'label_vi' => 'Gui lai xem xet',
+                            'roles'    => ['owner', 'admin', 'requester'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                ],
+            ],
+
             'DOC' => [
                 'initial'  => 'draft',
                 'terminal' => ['obsolete'],

@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-11T06:15:19.567Z",
+    "generatedAt": "2026-04-11T08:49:00.003Z",
     "workflowCount": 277
   },
   "workflows": {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
@@ -88,7 +88,7 @@ final readonly class VerificationResult
 // ── Service ─────────────────────────────────────────────────────────────────
 
 /**
- * Excel Verification Service for HESEM QMS Portal.
+ * Excel Verification Service for HESEM MOM Portal.
  *
  * Handles the download-to-upload lifecycle of offline Excel forms by embedding
  * a hidden `_QMS_VERIFY` sheet (or JSON sidecar fallback) with tamper-detection
@@ -97,7 +97,7 @@ final readonly class VerificationResult
  * Gracefully degrades when PhpSpreadsheet is not installed: verification data
  * is stored in a `.qms.json` sidecar file alongside the Excel template.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class ExcelVerificationService
@@ -106,13 +106,13 @@ final class ExcelVerificationService
     private const SHEET_NAME = '_QMS_VERIFY';
 
     /** System origin identifier. */
-    private const SYSTEM_ORIGIN = 'HESEM-QMS-v3';
+    private const SYSTEM_ORIGIN = 'HESEM-MOM-v3';
 
     /** Sheet visibility constant for xlVeryHidden. */
     private const VISIBILITY_VERY_HIDDEN = 'xlVeryHidden';
 
     /** Default server salt fallback. */
-    private const DEFAULT_SALT = 'HESEM-QMS-2026-SALT-KEY';
+    private const DEFAULT_SALT = 'HESEM-MOM-2026-SALT-KEY';
 
     /** Default max file size in MB. */
     private const DEFAULT_MAX_FILE_SIZE_MB = 25;
@@ -120,10 +120,10 @@ final class ExcelVerificationService
     /** Allocation statuses that accept uploads. */
     private const UPLOADABLE_STATUSES = ['ALLOCATED', 'DOWNLOADED', 'SUBMITTED', 'RECEIVED'];
 
-    /** @var string Absolute path to the qms-data directory. */
+    /** @var string Absolute path to the data directory. */
     private readonly string $dataDir;
 
-    /** @var string Absolute path to the portal root (parent of qms-data). */
+    /** @var string Absolute path to the portal root (parent of data). */
     private readonly string $portalRoot;
 
     /** @var string Absolute path to the forms template directory. */
@@ -138,13 +138,13 @@ final class ExcelVerificationService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string $dataDir Absolute path to data directory.
      */
     public function __construct(string $dataDir)
     {
         $this->dataDir    = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->portalRoot = dirname($this->dataDir);
-        $this->formsDir   = dirname($this->portalRoot) . '/04-Bieu-Mau';
+        $this->formsDir   = dirname($this->portalRoot) . '/mom/docs/forms';
 
         $this->hasSpreadsheet = class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class);
     }
@@ -661,7 +661,7 @@ final class ExcelVerificationService
     /**
      * Locate the form template file for a given form code.
      *
-     * Searches in `04-Bieu-Mau/{series}/FRM-{code}_*.xlsx`.
+     * Searches in `mom/docs/forms/{series}/FRM-{code}_*.xlsx`.
      *
      * @param string $formCode e.g. "FRM-631"
      *

@@ -1,0 +1,191 @@
+<!-- v4.5 Prompt 2: Component & Architecture patches.
+     Merge targets: #wcag-22-compliance-checklist, #governance, #runtime-api-spec,
+     #container-queries-preview, #accessibility, #toast-precise, #a11y-i18n-precision.
+     These fragments intentionally omit html/head/style wrappers. -->
+
+<!-- PATCH TARGET: Section 63 #wcag-22-compliance-checklist / replace WCAG status rows for fixed SC -->
+<div class="card" data-v45-patch="p2-wcag-status-update" data-patch-target="#wcag-22-compliance-checklist" data-patch-position="replace-fixed-sc-status-rows">
+  <div class="card-header"><span class="chip chip-green">v4.5</span>WCAG status reconciliation</div>
+  <div class="card-body" style="padding:0">
+    <table class="spec-table">
+      <thead><tr><th>SC</th><th>Trạng thái mới</th><th>Lý do đạt</th><th>Section chứng cứ</th></tr></thead>
+      <tbody>
+        <tr><td><code>1.3.5</code></td><td><span class="chip chip-green">Đạt</span></td><td>Đã bổ sung bảng <code>autocomplete</code> cho form user, supplier, employee và contact.</td><td><a href="#form-rules">Section 21</a></td></tr>
+        <tr><td><code>1.4.3</code></td><td><span class="chip chip-green">Đạt</span></td><td>Root <code>--text-tertiary</code> đã đổi sang <code>#6b7280</code>; dark mode dùng <code>#94a3b8</code>.</td><td><a href="#token-reference">Section 20</a>, <a href="#a11y-i18n-precision">Section 34</a></td></tr>
+        <tr><td><code>1.4.4</code></td><td><span class="chip chip-green">Đạt</span></td><td><code>--text-overline</code> khóa ở <code>11px</code>, không còn dùng overline <code>10px</code> cho tiếng Việt.</td><td><a href="#token-reference">Section 20</a></td></tr>
+        <tr><td><code>1.4.12</code></td><td><span class="chip chip-green">Đạt</span></td><td><code>--text-overline-leading</code> đã là <code>1.4</code>, đủ khoảng cách cho dấu tiếng Việt.</td><td><a href="#token-reference">Section 20</a></td></tr>
+        <tr><td><code>1.4.13</code></td><td><span class="chip chip-green">Đạt</span></td><td>Tooltip/popover đã có rule dismissible, hoverable và persistent.</td><td><a href="#interaction-patterns">Section 31</a></td></tr>
+        <tr><td><code>2.2.1</code></td><td><span class="chip chip-green">Đạt</span></td><td>Kiosk timeout có cảnh báo 60 giây, nút gia hạn và countdown đọc được.</td><td><a href="#shop-floor-mode">Section 14</a></td></tr>
+        <tr><td><code>2.4.1</code></td><td><span class="chip chip-green">Đạt</span></td><td><code>.skip-link</code> đã có CSS hiển thị khi focus và z-index đủ cao.</td><td><a href="#a11y-i18n-precision">Section 34</a></td></tr>
+        <tr><td><code>2.5.7</code></td><td><span class="chip chip-green">Đạt</span></td><td>Column resize có keyboard alternative bằng <code>Ctrl+Left</code>/<code>Ctrl+Right</code>, <code>Home</code> và <code>End</code>.</td><td><a href="#table-rules">Section 22</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH TARGET: Section 56 #governance / insert after section lead -->
+<div class="info-box info-box-blue" data-v45-patch="p2-patch-architecture" data-patch-target="#governance" data-patch-position="after-section-lead">
+  <strong>PATCH ARCHITECTURE</strong>
+  File này sử dụng <code>data-patch-target</code> và <code>data-patch-position</code> để đánh dấu các bổ sung v4.4+. Developer PHẢI đọc patch cards ngay sau parent section. Build tools nên merge patches vào parent trước khi render bản phát hành. Patch targets hiện có: <code>#component-states</code>, <code>#density-modes</code>, <code>#form-rules</code>, <code>#table-rules</code>, <code>#modal-rules</code>, <code>#toast-precise</code>, <code>#interaction-patterns</code>, <code>#token-cascade</code>, <code>#runtime-api-spec</code>, <code>#wcag-22-compliance-checklist</code>, <code>#container-queries-preview</code>, <code>#accessibility</code>, <code>#a11y-i18n-precision</code>.
+</div>
+
+<!-- NEW SECTION: insert after Section 67 and before Detailed TOC -->
+<section class="section" id="error-boundary-fallback-ui" data-v45-section="component-architecture">
+  <h2 class="section-title"><span class="section-number">??</span>Error Boundary &amp; Fallback UI</h2>
+  <p class="section-subtitle">Error boundary là lớp cô lập lỗi của block, zone, page và network để một lỗi runtime không phá toàn bộ template hoặc làm mất ngữ cảnh thao tác của người dùng.</p>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-red">Contract</span>Fallback behavior by scope</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>Scope</th><th>Behavior</th><th>Visual</th><th>Recovery</th><th>ARIA</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Block-level</strong></td><td>Block crash → render fallback trong zone, không remount zone.</td><td>Card với icon alert-triangle, message “Khối chức năng gặp lỗi”, retry button.</td><td>Retry reload block; Report log lỗi lên server.</td><td><code>role="alert"</code>, <code>aria-live="polite"</code>.</td></tr>
+          <tr><td><strong>Zone-level</strong></td><td>Zone không load được → full zone fallback nhưng giữ shell.</td><td>Zone placeholder, border dashed <code>var(--border-error)</code>, message và retry.</td><td>Retry zone; Skip zone collapse nếu không critical.</td><td><code>role="alert"</code>.</td></tr>
+          <tr><td><strong>Page-level</strong></td><td>Uncaught error → error page có action rõ.</td><td>Full screen error với illustration, message, retry và go home.</td><td>Retry reload page; Go Home; Report Bug.</td><td><code>role="alert"</code>, <code>aria-live="assertive"</code>.</td></tr>
+          <tr><td><strong>Network</strong></td><td>API timeout hoặc 500 → inline error nơi phát sinh.</td><td>Toast error và inline retry nếu action có context.</td><td>Retry; chuyển offline mode nếu module hỗ trợ.</td><td><code>role="status"</code> cho non-blocking retry state.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">Token table</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Token</th><th>Map</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td><code>--error-boundary-bg</code></td><td><code>var(--bg-error)</code></td><td>Fallback card background.</td></tr>
+            <tr><td><code>--error-boundary-border</code></td><td><code>var(--border-error)</code></td><td>Fallback border and zone dashed outline.</td></tr>
+            <tr><td><code>--error-boundary-icon</code></td><td><code>var(--color-error-600)</code></td><td>Alert icon color.</td></tr>
+            <tr><td><code>--error-boundary-text</code></td><td><code>var(--text-primary)</code></td><td>Main message.</td></tr>
+            <tr><td><code>--error-boundary-radius</code></td><td><code>var(--radius-xl)</code></td><td>Fallback card radius.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">HTML sample</div>
+      <div class="card-body">
+        <pre class="code-block">&lt;div class="block-error-boundary" role="alert" aria-live="polite"&gt;
+  &lt;svg aria-hidden="true"&gt;&lt;!-- alert-triangle icon --&gt;&lt;/svg&gt;
+  &lt;p&gt;Khối chức năng gặp lỗi. Vui lòng thử lại.&lt;/p&gt;
+  &lt;button onclick="retryBlock(blockId)"&gt;Thử lại&lt;/button&gt;
+  &lt;button onclick="reportError(blockId)"&gt;Báo lỗi&lt;/button&gt;
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box info-box-red">
+    <strong>DON'T</strong>
+    Không để lỗi block làm trắng toàn bộ trang. Không ghi stack trace có dữ liệu khách hàng, lot, serial, token hoặc thông tin Part 11 vào UI.
+  </div>
+</section>
+
+<!-- NEW SECTION: insert after Error Boundary section -->
+<section class="section" id="reduced-motion-global-contract" data-v45-section="component-architecture">
+  <h2 class="section-title"><span class="section-number">??</span>Reduced-Motion Global Contract</h2>
+  <p class="section-subtitle">Reduced motion là contract toàn hệ thống, không phải tuỳ chọn riêng của từng component. Khi user bật giảm chuyển động, runtime phải ưu tiên ổn định nhận thức và không làm mất thông tin thiết yếu.</p>
+  <div class="grid-2">
+    <div class="info-box info-box-blue">
+      <strong>GLOBAL REDUCED-MOTION CONTRACT</strong>
+      Khi <code>prefers-reduced-motion: reduce</code> active: tất cả <code>--duration-*</code> tokens bằng <code>0ms</code>; animation và transition không chạy; scroll dùng <code>scroll-behavior:auto</code>; drag-drop dùng teleport thay vì FLIP animation; chart transitions render instant.
+    </div>
+    <div class="info-box info-box-amber">
+      <strong>ESSENTIAL MOTION EXCEPTION</strong>
+      Progress indicators và loading spinners vẫn được phép chạy nếu chúng truyền tải tiến độ xử lý thật. Decorative pulse, shimmer kéo dài, chart grow animation và hover lift phải tắt.
+    </div>
+  </div>
+</section>
+
+<!-- PATCH TARGET: Section 67 #container-queries-preview / upgrade preview to spec -->
+<div class="card" data-v45-patch="p2-container-query-spec" data-patch-target="#container-queries-preview" data-patch-position="after-intro-grid">
+  <div class="card-header"><span class="chip chip-green">v4.5 Spec</span>Container Queries &amp; Zone Responsiveness</div>
+  <div class="card-body">
+    <div class="info-box info-box-green" style="margin-bottom:14px">
+      <strong>TITLE UPDATE</strong>
+      Đổi title section từ <code>Container Queries (v4.4 Preview)</code> thành <code>Container Queries &amp; Zone Responsiveness</code>. Section này là spec v4.5, không còn preview.
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Feature</th><th>Status</th><th>Fallback</th></tr></thead>
+      <tbody>
+        <tr><td><code>@container</code> on zones</td><td><span class="chip chip-green">Spec (v4.5 CSS ready)</span></td><td><code>@media</code> viewport fallback.</td></tr>
+        <tr><td><code>container-name</code> per zone</td><td><span class="chip chip-green">Spec</span></td><td>Class-based layout.</td></tr>
+        <tr><td>Block responsive rules</td><td><span class="chip chip-green">Spec</span></td><td>Min-width media queries.</td></tr>
+      </tbody>
+    </table>
+    <pre class="code-block" style="margin-top:14px">/* Tokenized thresholds */
+@container zone-main (max-width: var(--cq-lg)){
+  .block-data-table{/* card view or intentional table scroller */}
+}
+@container zone-sidebar (max-width: var(--cq-sm)){
+  .block-filter-panel{/* collapse to summary button */}
+}
+@container zone-kpi (max-width: var(--cq-md)){
+  .block-kpi-row{/* two-column grid */}
+}
+
+@supports not (container-type: inline-size){
+  @media (max-width: 768px){
+    .block-data-table{overflow-x:auto}
+    .block-filter-panel{display:block}
+    .block-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+}</pre>
+  </div>
+</div>
+
+<!-- PATCH TARGET: Section 30 #toast-precise / append interaction rule -->
+<div class="card" data-v45-patch="p2-toast-pause-hover" data-patch-target="#toast-precise" data-patch-position="after-duration-table">
+  <div class="card-header"><span class="chip chip-blue">v4.5</span>Toast pause-on-hover contract</div>
+  <div class="card-body">
+    <div class="info-box info-box-blue" style="margin-bottom:14px">
+      <strong>RULE</strong>
+      TẤT CẢ toast types tự đóng (<code>success</code>, <code>info</code>, <code>warning</code>) PHẢI pause countdown khi user hover hoặc focus vào toast. Resume countdown khi mouse leave hoặc blur. Error toast có infinite duration nên không áp dụng pause countdown.
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>State</th><th>Timer</th><th>Progress bar</th><th>ARIA</th></tr></thead>
+      <tbody>
+        <tr><td>Hover/focus</td><td>Clear dismiss timer, lưu <code>remainingMs</code>.</td><td>Pause shrinking animation cùng thời điểm.</td><td>Không announce lại message.</td></tr>
+        <tr><td>Mouse leave/blur</td><td>Reset timer với <code>remainingMs</code>.</td><td>Resume từ vị trí hiện tại, không restart từ 100%.</td><td>Không làm mất focus khỏi nút Undo/Close.</td></tr>
+      </tbody>
+    </table>
+    <pre class="code-block" style="margin-top:14px">toast.addEventListener("mouseenter", () =&gt; clearTimeout(dismissTimer));
+toast.addEventListener("mouseleave", () =&gt; resetTimer(remainingMs));
+toast.addEventListener("focusin", () =&gt; clearTimeout(dismissTimer));
+toast.addEventListener("focusout", () =&gt; resetTimer(remainingMs));</pre>
+  </div>
+</div>
+
+<!-- PATCH TARGET: Section 34 #a11y-i18n-precision / append RTL readiness note -->
+<div class="info-box info-box-blue" data-v45-patch="p2-rtl-layout-readiness" data-patch-target="#a11y-i18n-precision" data-patch-position="after-i18n-formatting">
+  <strong>RTL LAYOUT READINESS (v4.5)</strong>
+  Spacing tokens nên dùng logical properties khi có thể: <code>margin-inline-start</code> thay vì <code>margin-left</code>, <code>padding-inline-start/end</code> thay vì <code>padding-left/right</code>. Text alignment dùng <code>start</code>/<code>end</code>. Icon điều hướng như arrows và chevrons phải mirror trong RTL. HIỆN TẠI HESEM MOM chỉ target Vietnamese và English (LTR); RTL là P2 cho future Arabic/Hebrew markets. Developer không được hardcode left/right cho layout spacing mới.
+</div>
+
+<!-- PATCH TARGET: Section 35 #runtime-api-spec / insert after implementation status table -->
+<div class="grid-2" data-v45-patch="p2-runtime-architecture-fixes" data-patch-target="#runtime-api-spec" data-patch-position="after-implementation-status-table">
+  <div class="info-box info-box-amber">
+    <strong>STALE LABEL UPDATE</strong>
+    Trong Section 35, đổi mọi nhãn <code>v4.3 target</code> thành <code>v4.5 target</code> và mọi nhãn <code>v4.4 Preview</code> thành <code>v4.5 Spec</code>. Các nhãn này là deployment contract, không phải ghi chú lịch sử.
+  </div>
+  <div class="info-box info-box-red">
+    <strong>CASCADE INVERSION BAN</strong>
+    <code>resolveWithTemplate()</code> không được để Template thắng User Preference. Cascade đúng là System CSS → Admin config → Template → Zone → User preference. Nếu code hiện tại đảo thứ tự, phải sửa trước khi coi token cascade là runtime-enforced.
+  </div>
+  <div class="info-box info-box-blue">
+    <strong>THEME TOKEN SHAPE CONTRACT</strong>
+    Mọi preset trong <code>00b-theme-manager.js</code> phải có đủ <code>--text-primary</code>, <code>--text-secondary</code>, <code>--text-tertiary</code>, <code>--border</code>, <code>--bg-page</code>, <code>--bg-surface</code>, <code>--bg-surface-alt</code> và on-color tokens. Preset thiếu token không được selectable từ Theme Manager.
+  </div>
+  <div class="info-box info-box-purple">
+    <strong>PSEUDOCODE CAVEAT</strong>
+    Thêm comment vào pseudocode pipeline: <code>Steps 5.d.iv (block.mount), 8 (ResizeObserver/IntersectionObserver), 9 (runtime:template-ready emit) are SPEC-ONLY. Current code uses template-based HTML generation.</code>
+  </div>
+</div>
+
+<!-- PATCH TARGET: Section 35 #runtime-api-spec / insert inside Template DOM Rendering Pipeline code block -->
+<pre class="code-block" data-v45-patch="p2-runtime-pseudocode-caveat" data-patch-target="#runtime-api-spec" data-patch-position="inside-rendering-pipeline-code-block-after-title">/* NOTE: Steps 5.d.iv (block.mount), 8 (ResizeObserver/IntersectionObserver),
+   9 (runtime:template-ready emit) are SPEC-ONLY — see Implementation Status table above.
+   Current code uses template-based HTML generation. */</pre>

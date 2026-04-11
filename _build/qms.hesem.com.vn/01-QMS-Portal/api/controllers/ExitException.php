@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 use RuntimeException;
 

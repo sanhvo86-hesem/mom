@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T06:15:37.260Z",
+    "generatedAt": "2026-04-11T08:49:11.451Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -90,7 +90,7 @@
       "row_version_mentions": 23621,
       "compensation_markers": 2,
       "correction_markers": 339,
-      "effective_dating_markers": 701,
+      "effective_dating_markers": 696,
       "override_mentions": 123,
       "waiver_mentions": 24,
       "heartbeat_mentions": 33,
@@ -219,7 +219,7 @@
         "Effective dating and release-snapshot resources are both present at meaningful breadth, so the remaining risk is no longer an active design blocker."
       ],
       "evidence": {
-        "effective_dating_markers": 701,
+        "effective_dating_markers": 696,
         "snapshot_mentions": 1062,
         "snapshot_resources": [
           "analytics.inventory-balance-snapshots",

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Cascading dropdown service for HESEM QMS Portal.
+ * Cascading dropdown service for HESEM MOM Portal.
  *
  * Provides hierarchical option resolution for form dropdowns that depend
  * on parent selections. Supports two primary contexts:
@@ -18,7 +18,7 @@ use RuntimeException;
  * Data is sourced from `document_type_registry.json` and
  * `form_control_registry.json` in the config directory.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class CascadingDropdownService
@@ -26,10 +26,10 @@ final class CascadingDropdownService
     /** Supported cascading contexts. */
     private const CONTEXTS = ['fill_download', 'record_id'];
 
-    /** @var string Absolute path to qms-data/config directory. */
+    /** @var string Absolute path to data/config directory. */
     private readonly string $confDir;
 
-    /** @var string Absolute path to qms-data directory. */
+    /** @var string Absolute path to data directory. */
     private readonly string $dataDir;
 
     /** @var array|null Cached document_type_registry. */
@@ -41,7 +41,7 @@ final class CascadingDropdownService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string $dataDir Absolute path to data directory.
      */
     public function __construct(string $dataDir)
     {

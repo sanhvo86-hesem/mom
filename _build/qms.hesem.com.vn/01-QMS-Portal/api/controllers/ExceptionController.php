@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\ExceptionService;
+use MOM\Api\Controllers\BaseController;
+use MOM\Services\ExceptionService;
 use Throwable;
 
 /**
- * Exception controller for HESEM QMS Portal.
+ * Exception controller for HESEM MOM Portal.
  *
  * Provides unified API endpoints for exception management including
  * customer complaints, MRB sessions, deviations, concessions,
@@ -17,9 +17,9 @@ use Throwable;
  *
  * Reads NCR and CAPA data from existing stores and combines with
  * complaint, MRB, deviation, and concession records stored in
- * `qms-data/exceptions/`.
+ * `data/exceptions/`.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class ExceptionController extends BaseController

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 use Throwable;
 
 /**
- * Scheduled job definitions for HESEM QMS Portal.
+ * Scheduled job definitions for HESEM MOM Portal.
  *
  * Each method is designed to be invoked by a cron runner (e.g. system cron,
  * Epicor scheduler, or the portal's own job dispatcher). All jobs are
@@ -22,7 +22,7 @@ use Throwable;
  *   - Monthly 1st 03:00: runSupplierScoring
  *   - Monthly 1st 04:00: runDataPurge
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class ScheduledJobs
@@ -32,7 +32,7 @@ final class ScheduledJobs
     private SpcEngine        $spc;
     private DashboardService $dashboard;
 
-    /** Absolute path to qms-data directory. */
+    /** Absolute path to data directory. */
     private readonly string $dataDir;
 
     /** Job execution log directory. */
@@ -41,7 +41,7 @@ final class ScheduledJobs
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string          $dataDir Absolute path to qms-data directory.
+     * @param string          $dataDir Absolute path to data directory.
      * @param Connection|null $db      Database connection override.
      */
     public function __construct(string $dataDir, ?Connection $db = null)

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * FMEA & Control Plan Service for HESEM QMS Portal.
+ * FMEA & Control Plan Service for HESEM MOM Portal.
  *
  * Manages FMEA records (DFMEA/PFMEA per AIAG/VDA 2019), failure modes,
  * recommended actions with Action Priority calculation, Control Plans,
  * and cross-links to NCR/NPI.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class FmeaService

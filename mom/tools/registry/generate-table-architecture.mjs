@@ -1964,6 +1964,15 @@ function parseType(rest) {
   return parts.join(' ');
 }
 
+function normalizeTypeForRegistry(type) {
+  return String(type || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/^"?public"?\./i, '')
+    .replace(/"([^"]+)"/g, '$1')
+    .toUpperCase();
+}
+
 function parseCheckValues(text, columnName) {
   const patterns = [
     new RegExp(`CHECK\\s*\\(\\s*${columnName}\\s+IN\\s*\\(([^)]+)\\)`, 'i'),
@@ -1988,7 +1997,7 @@ function parseColumnDefinition(entry) {
   const referencesMatch = rest.match(/REFERENCES\s+("?[\w.]+"?)\s*\(([^)]+)\)/i);
   return {
     name,
-    type: rawType.toUpperCase(),
+    type: normalizeTypeForRegistry(rawType),
     required: /\bNOT\s+NULL\b/i.test(rest),
     pk: /\bPRIMARY\s+KEY\b/i.test(rest),
     unique: /\bUNIQUE\b/i.test(rest),
@@ -2002,6 +2011,33 @@ function parseColumnDefinition(entry) {
       : null,
     checkValues: parseCheckValues(rest, name),
   };
+}
+
+function parseAlterColumnTypeClause(table, clause) {
+  const match = clause.match(/^ALTER\s+(?:COLUMN\s+)?("?[\w]+"?)\s+(?:SET\s+DATA\s+)?TYPE\s+([\s\S]+)$/i);
+  if (!match) return false;
+  const name = normalizeIdentifier(match[1]);
+  const typeExpression = match[2]
+    .replace(/\s+(?:COLLATE|USING)\b[\s\S]*$/i, '')
+    .trim();
+  if (!typeExpression) return true;
+  const existing = table.columns.get(name);
+  if (existing) {
+    existing.type = normalizeTypeForRegistry(typeExpression);
+    return true;
+  }
+  table.columns.set(name, {
+    name,
+    type: normalizeTypeForRegistry(typeExpression),
+    required: false,
+    pk: false,
+    unique: false,
+    generated: false,
+    default: null,
+    references: null,
+    checkValues: [],
+  });
+  return true;
 }
 
 function parseConstraint(table, entry) {
@@ -2080,16 +2116,21 @@ function parseAlterTableStatement(stmt, tables, migration) {
   const masked = maskSingleQuotedLiterals(stmt);
   const match = masked.match(/ALTER\s+TABLE\s+(?:ONLY\s+)?("?[\w.]+"?)/i);
   if (!match) return false;
-  if (!/\bADD\s+(?:COLUMN|CONSTRAINT|PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY)\b/i.test(masked)) return true;
+  if (!/\bADD\s+(?:COLUMN|CONSTRAINT|PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY)\b/i.test(masked)
+      && !/\bALTER\s+(?:COLUMN\s+)?"?[\w]+"?\s+(?:SET\s+DATA\s+)?TYPE\b/i.test(masked)) {
+    return true;
+  }
   const tableName = normalizeIdentifier(match[1]);
   const table = ensureTable(tables, tableName, migration);
   const actionText = stmt.slice(match.index + match[0].length).trim();
   const clauses = splitTopLevel(actionText);
   for (const clause of clauses) {
     if (/^ADD\s+COLUMN\b/i.test(clause)) {
+      const idempotentAdd = /^ADD\s+COLUMN\s+IF\s+NOT\s+EXISTS\b/i.test(clause);
       const normalized = clause.replace(/^ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?/i, '');
       const column = parseColumnDefinition(normalized);
       if (!column) continue;
+      if (idempotentAdd && table.columns.has(column.name)) continue;
       mergeColumn(table, column);
       if (column.references) {
         table.foreignKeys.push({
@@ -2098,6 +2139,9 @@ function parseAlterTableStatement(stmt, tables, migration) {
           referencesColumns: column.references.columns,
         });
       }
+      continue;
+    }
+    if (parseAlterColumnTypeClause(table, clause)) {
       continue;
     }
     if (/^ADD\s+CONSTRAINT\b/i.test(clause) || /^ADD\s+FOREIGN KEY\b/i.test(clause) || /^ADD\s+PRIMARY KEY\b/i.test(clause) || /^ADD\s+UNIQUE\b/i.test(clause)) {

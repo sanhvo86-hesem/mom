@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * MES-to-Evidence Vault Bridge for HESEM QMS Portal.
+ * MES-to-Evidence Vault Bridge for HESEM MOM Portal.
  *
  * Captures machine events (operation completions, alarm resolutions,
  * first-piece approvals, incoming inspections) and stores them as
  * tamper-evident records in the Evidence Vault with automatic
  * entity linking and custody logging.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class MesEvidenceBridge
@@ -27,7 +27,7 @@ final class MesEvidenceBridge
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string               $dataDir Absolute path to qms-data directory.
+     * @param string               $dataDir Absolute path to data directory.
      * @param EvidenceVaultService $vault   Evidence vault service instance.
      */
     public function __construct(string $dataDir, EvidenceVaultService $vault)

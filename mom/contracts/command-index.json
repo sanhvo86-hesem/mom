@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T06:15:30.637453+00:00",
+    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
     "description": "Canonical business command catalog derived from authored object packages with generator fallback.",
     "commandCount": 262
   },

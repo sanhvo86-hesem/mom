@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 /**
- * Dictionary (Glossary) controller for HESEM QMS Portal.
+ * Dictionary (Glossary) controller for HESEM MOM Portal.
  *
  * Handles listing, upserting, and deleting glossary terms.
  * Persists to both JSON and JS files for offline usage.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   2.0.0
  */
 class DictController extends BaseController
@@ -26,7 +26,7 @@ class DictController extends BaseController
     {
         $this->requireAuth();
 
-        $jsonFile = $this->rootDir . '/11-Glossary/dict-data.json';
+        $jsonFile = $this->rootDir . '/mom/docs/glossary/dict-data.json';
         $items = [];
         if (is_file($jsonFile)) {
             $items = load_dict_items($jsonFile);
@@ -60,8 +60,8 @@ class DictController extends BaseController
 
         $newItem = dict_prepare_item($data);
 
-        $jsonFile = $this->rootDir . '/11-Glossary/dict-data.json';
-        $jsFile   = $this->rootDir . '/11-Glossary/dict-data.js';
+        $jsonFile = $this->rootDir . '/mom/docs/glossary/dict-data.json';
+        $jsFile   = $this->rootDir . '/mom/docs/glossary/dict-data.js';
 
         $items = is_file($jsonFile) ? load_dict_items($jsonFile) : [];
         $found = false;
@@ -100,8 +100,8 @@ class DictController extends BaseController
 
         if ($term === '') $this->error('missing_term', 400);
 
-        $jsonFile = $this->rootDir . '/11-Glossary/dict-data.json';
-        $jsFile   = $this->rootDir . '/11-Glossary/dict-data.js';
+        $jsonFile = $this->rootDir . '/mom/docs/glossary/dict-data.json';
+        $jsFile   = $this->rootDir . '/mom/docs/glossary/dict-data.js';
 
         $items = is_file($jsonFile) ? load_dict_items($jsonFile) : [];
         $filtered = [];

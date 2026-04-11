@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
+use MOM\Api\Controllers\BaseController;
 use Throwable;
 
 /**
- * AI Quality Scheduling controller for HESEM QMS Portal.
+ * AI Quality Scheduling controller for HESEM MOM Portal.
  *
  * Provides API endpoints for AI-driven quality predictions, SPC anomaly
  * detection, tool wear predictions, scheduling slot management,
  * capacity heatmaps, and promise date suggestions.
  *
- * Data stored in `qms-data/ai-scheduling/` with per-entity JSON files.
+ * Data stored in `data/ai-scheduling/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class AiSchedulingController extends BaseController

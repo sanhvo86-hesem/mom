@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS aps_schedule_blocks (
     aps_schedule_block_id        UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
     aps_scenario_id              UUID            NOT NULL REFERENCES aps_planning_scenarios(aps_scenario_id) ON DELETE CASCADE,
     job_number                   VARCHAR(50)     REFERENCES job_orders(job_number),
-    operation_id                 UUID            REFERENCES job_operations(operation_id),
+    operation_id                 UUID            REFERENCES job_operations(job_op_id),
     resource_type                VARCHAR(20)     NOT NULL
                                  CHECK (resource_type IN ('machine', 'operator', 'tool', 'work_center')),
     resource_id                  VARCHAR(80)     NOT NULL,

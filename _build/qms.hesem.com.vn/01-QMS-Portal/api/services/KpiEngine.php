@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 
 // ── Value Objects ────────────────────────────────────────────────────────────
@@ -157,7 +157,7 @@ final readonly class DashboardData
  * All formulas follow industry-standard definitions aligned with
  * HESEM's QMS quality manual.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class KpiEngine

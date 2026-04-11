@@ -164,8 +164,8 @@ SELECT a.adapter_id,
        a.adapter_type,
        a.adapter_status,
        a.last_validated_at,
-       e.current_state,
-       e.last_seen_at
+       e.current_e10_state AS current_state,
+       e.last_heartbeat_at AS last_seen_at
 FROM mes_connectivity_adapters a
 LEFT JOIN mes_equipment_extended e ON e.equipment_id = a.equipment_id;
 

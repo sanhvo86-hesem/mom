@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 
 /**
@@ -35,7 +35,7 @@ enum NotificationPriority: string
 }
 
 /**
- * Notification system for HESEM QMS workflow events.
+ * Notification system for HESEM MOM workflow events.
  *
  * Provides in-app notifications with optional email queuing. Supports:
  * - Per-user notification storage and retrieval
@@ -45,7 +45,7 @@ enum NotificationPriority: string
  * - Auto-expiry for stale notifications
  * - Bilingual messages (EN/VI)
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class NotificationService
@@ -68,7 +68,7 @@ final class NotificationService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string          $dataDir Absolute path to qms-data directory.
+     * @param string          $dataDir Absolute path to data directory.
      * @param Connection|null $db      Optional database connection.
      */
     public function __construct(
@@ -553,7 +553,7 @@ final class NotificationService
             'to'          => $prefs['email'] ?? '',
             'user_id'     => $userId,
             'type'        => $notification['type'],
-            'subject'     => '[HESEM QMS] ' . $notification['message'],
+            'subject'     => '[HESEM MOM] ' . $notification['message'],
             'message'     => $notification['message'],
             'message_vi'  => $notification['message_vi'] ?? null,
             'priority'    => $notification['priority'],

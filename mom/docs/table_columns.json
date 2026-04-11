@@ -567,7 +567,8 @@
     "metadata",
     "payload",
     "recorded_at",
-    "session_id"
+    "session_id",
+    "source_event_hash"
   ],
   "audit_findings": [
     "audit_id",
@@ -4891,6 +4892,7 @@
   ],
   "item_revisions": [
     "change_type",
+    "created_at",
     "description",
     "eco_number",
     "item_id",
@@ -4898,6 +4900,7 @@
     "metadata",
     "recorded_at",
     "rev",
+    "updated_at",
     "valid_from",
     "valid_to"
   ],
@@ -5072,6 +5075,7 @@
     "actual_start_time",
     "completed_at",
     "connector_last_heartbeat_at",
+    "created_at",
     "cycle_time_seconds",
     "description",
     "dispatch_priority",
@@ -5109,6 +5113,7 @@
     "status",
     "tool_id_used",
     "tool_life_at_start",
+    "updated_at",
     "work_center_id"
   ],
   "job_orders": [
@@ -6217,6 +6222,7 @@
     "acknowledged_by",
     "adapter_event_id",
     "adapter_id",
+    "created_at",
     "equipment_id",
     "event_status",
     "event_time",
@@ -6226,7 +6232,8 @@
     "payload_excerpt",
     "recorded_at",
     "recorded_by",
-    "severity"
+    "severity",
+    "updated_at"
   ],
   "mes_cost_tracking": [
     "actual_cost_total",
@@ -6325,6 +6332,7 @@
     "updated_at"
   ],
   "mes_downtime_events": [
+    "created_at",
     "detection_method",
     "downtime_category",
     "downtime_id",
@@ -6356,7 +6364,8 @@
     "start_time",
     "state_event_id",
     "state_from",
-    "state_to"
+    "state_to",
+    "updated_at"
   ],
   "mes_dpp_passports": [
     "carbon_footprint_kg_co2e",
@@ -6419,6 +6428,7 @@
     "controller_type",
     "controller_version",
     "coolant_type",
+    "created_at",
     "current_e10_state",
     "current_job_number",
     "current_operator_id",
@@ -6497,6 +6507,7 @@
   ],
   "mes_erp_reconciliation_exceptions": [
     "actual_value",
+    "created_at",
     "detected_at",
     "difference_summary",
     "discrepancy_type",
@@ -6525,6 +6536,7 @@
     "checkpoint_key",
     "checkpoint_value",
     "completed_at",
+    "created_at",
     "integration_system",
     "latency_ms",
     "metadata",
@@ -6707,6 +6719,7 @@
     "caused_downtime",
     "cleared_at",
     "cleared_by",
+    "created_at",
     "duration_seconds",
     "equipment_id",
     "escalated_at",
@@ -6727,7 +6740,8 @@
     "row_version",
     "source",
     "source_record_id",
-    "source_system"
+    "source_system",
+    "updated_at"
   ],
   "mes_machine_snapshot": [
     "active_alarm_count",
@@ -6872,6 +6886,7 @@
     "row_version",
     "source_record_id",
     "source_system",
+    "updated_at",
     "warehouse_id"
   ],
   "mes_nc_download_receipts": [
@@ -7007,6 +7022,7 @@
   ],
   "mes_operation_execution": [
     "avg_cycle_time_sec",
+    "created_at",
     "down_time_total",
     "equipment_id",
     "first_piece_at",
@@ -7243,7 +7259,8 @@
     "shift_to",
     "source_record_id",
     "source_system",
-    "tooling_status"
+    "tooling_status",
+    "updated_at"
   ],
   "mes_shop_floor_layout": [
     "area_id",
@@ -10643,6 +10660,7 @@
     "dept_code",
     "description",
     "is_active",
+    "metadata",
     "org_company_code",
     "org_legal_entity_code",
     "org_plant_id",
@@ -13228,6 +13246,7 @@
   "user_roles": [
     "assigned_at",
     "assigned_by",
+    "created_at",
     "org_company_code",
     "org_legal_entity_code",
     "org_plant_id",
@@ -13237,6 +13256,7 @@
     "row_version",
     "source_record_id",
     "source_system",
+    "updated_at",
     "user_id",
     "valid_from",
     "valid_to"
@@ -13272,6 +13292,7 @@
   ],
   "variable_registry": [
     "category",
+    "created_at",
     "data_type",
     "description",
     "enum_values",
@@ -13280,6 +13301,7 @@
     "key",
     "label",
     "label_vi",
+    "metadata",
     "org_company_code",
     "org_legal_entity_code",
     "org_plant_id",
@@ -13290,9 +13312,11 @@
     "source",
     "source_record_id",
     "source_system",
+    "updated_at",
     "used_in",
     "validation",
-    "variable_id"
+    "variable_id",
+    "variable_registry_id"
   ],
   "vendor_ratings": [
     "notes",

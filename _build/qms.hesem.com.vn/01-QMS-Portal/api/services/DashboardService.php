@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 
 /**
- * Dashboard data aggregation service for HESEM QMS Portal.
+ * Dashboard data aggregation service for HESEM MOM Portal.
  *
  * Orchestrates KpiEngine, SpcEngine, and direct database queries to
  * build the data payloads consumed by the executive, quality,
  * production, supplier, and department dashboards.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class DashboardService
@@ -32,7 +32,7 @@ final class DashboardService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string          $dataDir Path to qms-data directory.
+     * @param string          $dataDir Path to data directory.
      * @param Connection|null $db      Database connection.
      * @param KpiEngine|null  $kpi     KPI engine instance.
      * @param SpcEngine|null  $spc     SPC engine instance.

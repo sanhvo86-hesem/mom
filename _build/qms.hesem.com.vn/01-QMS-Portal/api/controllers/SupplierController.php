@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\SupplierQualityService;
+use MOM\Api\Controllers\BaseController;
+use MOM\Services\SupplierQualityService;
 use Throwable;
 
 /**
- * Supplier quality controller for HESEM QMS Portal.
+ * Supplier quality controller for HESEM MOM Portal.
  *
  * Provides API endpoints for supplier scorecards, incoming inspections,
  * skip-lot tracking, approved supplier list (ASL), SCAR management,
  * and supplier audit scheduling.
  *
- * Data stored in `qms-data/supplier-quality/` with per-entity JSON files.
+ * Data stored in `data/supplier-quality/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class SupplierController extends BaseController

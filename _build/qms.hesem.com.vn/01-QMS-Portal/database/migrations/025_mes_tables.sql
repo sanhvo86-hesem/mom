@@ -654,10 +654,12 @@ CREATE TABLE IF NOT EXISTS mes_spc_control_limits (
     is_current          BOOLEAN         NOT NULL DEFAULT TRUE,
     metadata            JSONB           DEFAULT '{}',
     valid_from          TIMESTAMPTZ     NOT NULL DEFAULT now(),
-    valid_to            TIMESTAMPTZ,
-    UNIQUE (item_id, characteristic_id) WHERE (is_current = TRUE)
+    valid_to            TIMESTAMPTZ
 );
 COMMENT ON TABLE mes_spc_control_limits IS 'SPC control limit definitions per characteristic.';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_mspc_current_unique
+    ON mes_spc_control_limits (item_id, characteristic_id)
+    WHERE is_current = TRUE;
 CREATE INDEX IF NOT EXISTS idx_mspc_item ON mes_spc_control_limits (item_id, characteristic_id);
 
 -- ---------------------------------------------------------------------------
@@ -1141,7 +1143,7 @@ CREATE TABLE IF NOT EXISTS mes_production_kpi_daily (
     kpi_date            DATE            NOT NULL,
     dimension_type      VARCHAR(20)     NOT NULL,
     dimension_id        VARCHAR(50)     NOT NULL,
-    shift_code          VARCHAR(5),
+    shift_code          VARCHAR(5)      NOT NULL DEFAULT 'ALL',
     total_parts_produced NUMERIC(12,2),
     total_parts_good    NUMERIC(12,2),
     total_parts_scrap   NUMERIC(12,2),
@@ -1161,7 +1163,7 @@ CREATE TABLE IF NOT EXISTS mes_production_kpi_daily (
     top_downtime_reasons JSONB          DEFAULT '[]',
     top_scrap_reasons   JSONB           DEFAULT '[]',
     metadata            JSONB           DEFAULT '{}',
-    PRIMARY KEY (kpi_date, dimension_type, dimension_id, COALESCE(shift_code, 'ALL'))
+    PRIMARY KEY (kpi_date, dimension_type, dimension_id, shift_code)
 );
 COMMENT ON TABLE mes_production_kpi_daily IS 'Daily production KPI roll-ups.';
 CREATE INDEX IF NOT EXISTS idx_mpkpi_dim ON mes_production_kpi_daily (dimension_type, dimension_id, kpi_date DESC);

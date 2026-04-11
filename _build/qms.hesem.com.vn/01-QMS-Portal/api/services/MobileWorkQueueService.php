@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Mobile Work Queue Service for HESEM QMS Portal.
+ * Mobile Work Queue Service for HESEM MOM Portal.
  *
  * Manages operator work queues, time clock entries, first-piece and
  * in-process inspection captures from tablets, offline sync, and
  * shop floor overview dashboards.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class MobileWorkQueueService

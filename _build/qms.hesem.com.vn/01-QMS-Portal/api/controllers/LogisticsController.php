@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 use Throwable;
 
@@ -104,7 +104,7 @@ class LogisticsController extends BaseController
     /**
      * Generate a sequential number: PREFIX-YYYY-NNNN.
      *
-     * Reads/increments a counter stored in qms-data/counters/logistics_{type}_{year}.json
+     * Reads/increments a counter stored in data/counters/logistics_{type}_{year}.json
      *
      * @param string $prefix e.g. 'SC', 'OQC', 'PK'
      * @param string $type   Counter type key (subcontract, oqc, packing)

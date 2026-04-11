@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 use RuntimeException;
 use Throwable;
 
 /**
- * Document management controller for HESEM QMS Portal.
+ * Document management controller for HESEM MOM Portal.
  *
  * Handles document creation, draft saving, review submission, approval,
  * rejection, metadata updates, version management, and document streaming.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   2.0.0
  */
 class DocumentController extends BaseController
@@ -167,7 +167,7 @@ class DocumentController extends BaseController
             ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
-            if ($e instanceof \HESEM\QMS\Api\Controllers\ExitException) throw $e;
+            if ($e instanceof \MOM\Api\Controllers\ExitException) throw $e;
             $this->error('doc_create_failed', 500, $e->getMessage());
         }
     }
@@ -835,7 +835,7 @@ class DocumentController extends BaseController
         $customDocsFile      = $this->confDir . '/docs_custom.json';
         $docVisFile          = $this->confDir . '/docs_visibility.json';
         $displayConfigFile   = $this->confDir . '/portal_display_config.json';
-        $portalConfigJsFile  = $this->rootDir . '/01-QMS-Portal/scripts/portal/01-data-config.js';
+        $portalConfigJsFile  = $this->rootDir . '/mom/scripts/portal/01-data-config.js';
 
         $docs          = load_custom_docs($customDocsFile);
         $displayConfig = portal_load_display_config($displayConfigFile);
@@ -980,7 +980,7 @@ class DocumentController extends BaseController
      */
     private function portalConfigJsFile(): string
     {
-        return $this->rootDir . '/01-QMS-Portal/scripts/portal/01-data-config.js';
+        return $this->rootDir . '/mom/scripts/portal/01-data-config.js';
     }
 
     /**
@@ -1091,7 +1091,7 @@ class DocumentController extends BaseController
         $folderTrim = trim($folder, '/');
         $depth = ($folderTrim === '') ? 0 : count(array_filter(explode('/', $folderTrim)));
         $rootBase  = str_repeat('../', $depth);
-        $rootHref  = $rootBase . '01-QMS-Portal/portal.html';
+        $rootHref  = $rootBase . 'mom/portal.html';
         $assetsCss = $rootBase . 'assets/style.css';
         $assetsJs  = $rootBase . 'assets/app.js';
         $logoHref  = $rootBase . 'assets/hesem-logo.svg';
@@ -1103,7 +1103,7 @@ class DocumentController extends BaseController
             '<head>' . "\n" .
             '  <meta charset="utf-8"/>' . "\n" .
             '  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>' . "\n" .
-            '  <title>' . $safeCode . ' - ' . $safeTitle . ' | HESEM QMS</title>' . "\n" .
+            '  <title>' . $safeCode . ' - ' . $safeTitle . ' | HESEM MOM</title>' . "\n" .
             '  <link rel="stylesheet" href="' . $assetsCss . '"/>' . "\n" .
             '</head>' . "\n" .
             '<body>' . "\n" .
@@ -1140,24 +1140,24 @@ class DocumentController extends BaseController
     private function buildHeaderActorClusterHtml(string $rootBase, string $rawValue, bool $allowFallbackCluster): string
     {
         $map = [
-            'QA' => ['kind' => 'role', 'code' => 'QA', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html', 'title' => 'QA Manager (Truong bo phan dam bao chat luong)'],
-            'QMS' => ['kind' => 'role', 'code' => 'QMS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html', 'title' => 'QMS Engineer (Ky su he thong QMS)'],
-            'CEO' => ['kind' => 'role', 'code' => 'CEO', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html', 'title' => 'Chief Executive Officer (Tong Giam doc)'],
-            'PD' => ['kind' => 'role', 'code' => 'PD', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html', 'title' => 'Production Director (Giam doc san xuat)'],
-            'ENGM' => ['kind' => 'role', 'code' => 'ENGM', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html', 'title' => 'Engineering Lead / Manager (Truong nhom / quan ly ky thuat)'],
-            'SCM' => ['kind' => 'role', 'code' => 'SCM', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html', 'title' => 'Supply Chain Manager (Quan ly chuoi cung ung)'],
-            'FIN' => ['kind' => 'role', 'code' => 'FIN', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html', 'title' => 'Finance Manager (Quan ly tai chinh)'],
-            'HR' => ['kind' => 'role', 'code' => 'HR', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html', 'title' => 'HR Manager (Quan ly nhan su)'],
-            'EHS' => ['kind' => 'role', 'code' => 'EHS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html', 'title' => 'EHS Specialist (Chuyen vien EHS)'],
-            'QC' => ['kind' => 'role', 'code' => 'QC', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html', 'title' => 'QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)'],
-            'CS' => ['kind' => 'role', 'code' => 'CS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html', 'title' => 'Customer Service (Nhan vien dich vu khach hang)'],
-            'EST' => ['kind' => 'role', 'code' => 'EST', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html', 'title' => 'Estimator (Nhan vien bao gia)'],
-            'D-ENG' => ['kind' => 'dept', 'code' => 'D-ENG', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html', 'title' => 'Engineering Department (Phong Ky thuat)'],
-            'D-HR' => ['kind' => 'dept', 'code' => 'D-HR', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html', 'title' => 'Human Resources Department (Phong Nhan su)'],
-            'D-SCS' => ['kind' => 'dept', 'code' => 'D-SCS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html', 'title' => 'Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)'],
-            'D-SCM' => ['kind' => 'dept', 'code' => 'D-SCM', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html', 'title' => 'Supply Chain Department (Phong Chuoi cung ung)'],
-            'D-WHS' => ['kind' => 'dept', 'code' => 'D-WHS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html', 'title' => 'Warehouse Function (Bo phan Kho)'],
-            'D-FIN' => ['kind' => 'dept', 'code' => 'D-FIN', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html', 'title' => 'Finance Department (Phong Tai chinh)'],
+            'QA' => ['kind' => 'role', 'code' => 'QA', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html', 'title' => 'QA Manager (Truong bo phan dam bao chat luong)'],
+            'QMS' => ['kind' => 'role', 'code' => 'QMS', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html', 'title' => 'QMS Engineer (Ky su he thong QMS)'],
+            'CEO' => ['kind' => 'role', 'code' => 'CEO', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html', 'title' => 'Chief Executive Officer (Tong Giam doc)'],
+            'PD' => ['kind' => 'role', 'code' => 'PD', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html', 'title' => 'Production Director (Giam doc san xuat)'],
+            'ENGM' => ['kind' => 'role', 'code' => 'ENGM', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html', 'title' => 'Engineering Lead / Manager (Truong nhom / quan ly ky thuat)'],
+            'SCM' => ['kind' => 'role', 'code' => 'SCM', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html', 'title' => 'Supply Chain Manager (Quan ly chuoi cung ung)'],
+            'FIN' => ['kind' => 'role', 'code' => 'FIN', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html', 'title' => 'Finance Manager (Quan ly tai chinh)'],
+            'HR' => ['kind' => 'role', 'code' => 'HR', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html', 'title' => 'HR Manager (Quan ly nhan su)'],
+            'EHS' => ['kind' => 'role', 'code' => 'EHS', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html', 'title' => 'EHS Specialist (Chuyen vien EHS)'],
+            'QC' => ['kind' => 'role', 'code' => 'QC', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html', 'title' => 'QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)'],
+            'CS' => ['kind' => 'role', 'code' => 'CS', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html', 'title' => 'Customer Service (Nhan vien dich vu khach hang)'],
+            'EST' => ['kind' => 'role', 'code' => 'EST', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html', 'title' => 'Estimator (Nhan vien bao gia)'],
+            'D-ENG' => ['kind' => 'dept', 'code' => 'D-ENG', 'path' => 'mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html', 'title' => 'Engineering Department (Phong Ky thuat)'],
+            'D-HR' => ['kind' => 'dept', 'code' => 'D-HR', 'path' => 'mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html', 'title' => 'Human Resources Department (Phong Nhan su)'],
+            'D-SCS' => ['kind' => 'dept', 'code' => 'D-SCS', 'path' => 'mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html', 'title' => 'Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)'],
+            'D-SCM' => ['kind' => 'dept', 'code' => 'D-SCM', 'path' => 'mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html', 'title' => 'Supply Chain Department (Phong Chuoi cung ung)'],
+            'D-WHS' => ['kind' => 'dept', 'code' => 'D-WHS', 'path' => 'mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html', 'title' => 'Warehouse Function (Bo phan Kho)'],
+            'D-FIN' => ['kind' => 'dept', 'code' => 'D-FIN', 'path' => 'mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html', 'title' => 'Finance Department (Phong Tai chinh)'],
         ];
 
         $normalized = strtoupper(trim($rawValue));
@@ -1182,7 +1182,7 @@ class DocumentController extends BaseController
             return $this->buildHeaderActorClusterHtml($rootBase, 'QA/QMS', false);
         }
         if (!$chips) {
-            $chips[] = '<a class="entity-link role-link" href="' . htmlspecialchars($rootBase . '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a>';
+            $chips[] = '<a class="entity-link role-link" href="' . htmlspecialchars($rootBase . 'mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a>';
         }
 
         return '<span class="entity-cluster role-cluster">' . implode('<span class="entity-sep role-sep">/</span>', $chips) . '</span>';

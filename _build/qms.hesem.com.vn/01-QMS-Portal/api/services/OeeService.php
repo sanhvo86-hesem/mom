@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
@@ -23,7 +23,7 @@ use RuntimeException;
  * - Kaizen: Auto-generate improvement event when OEE < target
  * - Tier Meetings: Feed SQDCP daily management boards
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.1.0
  */
 final class OeeService
@@ -56,7 +56,7 @@ final class OeeService
     private ?object $db = null;
 
     /**
-     * @param string      $dataDir Absolute path to qms-data directory.
+     * @param string      $dataDir Absolute path to data directory.
      * @param object|null $db      Optional database connection for PostgreSQL dual-write.
      */
     public function __construct(string $dataDir, ?object $db = null)

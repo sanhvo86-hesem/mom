@@ -1,0 +1,135 @@
+<!-- v4.6 Prompt 2: Module Archetypes & Template Naming.
+     Merge before Changelog as Sections 79 and 80. -->
+
+<section class="section" id="module-archetypes-standard-36" data-v46-section="standard-36-archetypes">
+  <h2 class="section-title"><span class="section-number">79</span>Module Archetypes — Phân loại màn hình theo Standard 36 <span class="chip chip-green" style="margin-left:12px;font-size:10px;vertical-align:middle">ENFORCED NOW</span></h2>
+  <p class="section-subtitle">Mỗi màn hình trong hệ thống PHẢI thuộc 1 trong 14 archetypes. Archetype xác định zones bắt buộc, template mặc định, density gợi ý và QA gates áp dụng.</p>
+
+  <div class="info-box info-box-purple" style="margin-bottom:18px">
+    <strong>CROSS-REF: Standard 36 Section 10</strong>
+    Standard 36 định nghĩa 14 approved module archetypes để ngăn freeform page design. Xem authority tại <a href="../../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 10</a> và zone behavior tại <a href="#zone-system">Section 38</a>.
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-green">14 archetypes</span>Taxonomy bắt buộc cho Module Builder</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Archetype</th>
+            <th>Mô tả</th>
+            <th>Required Zones</th>
+            <th>Template mặc định</th>
+            <th>Ví dụ module</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><code>list-report</code></td><td>Danh sách đọc hoặc thao tác nhẹ với filter, sort, export và pagination.</td><td>header, filter, main, action-bar, footer</td><td><code>T-list-report-default</code></td><td>Báo cáo sản lượng, lịch sử audit, danh sách đơn hàng.</td></tr>
+          <tr><td>2</td><td><code>analytical-list</code></td><td>Danh sách phân tích có KPI, chart area, drill-down và bảng dữ liệu liên kết.</td><td>header, visual-filter, chart-area, main, action-bar</td><td><code>T-analytical-list-default</code></td><td>OEE dashboard, SPC analysis, COPQ report.</td></tr>
+          <tr><td>3</td><td><code>object-page</code></td><td>Trang chi tiết 1 đối tượng nghiệp vụ với header, summary, tabs, related sections.</td><td>header, summary, tabs, main, sidebar, footer</td><td><code>T-object-page-default</code></td><td>Work Order Detail, Part Master, Sales Order Detail.</td></tr>
+          <tr><td>4</td><td><code>transactional-form</code></td><td>Form tạo hoặc cập nhật dữ liệu có validation, submit, approval hoặc e-sign nếu regulated.</td><td>header, workflow-status, main, validation-summary, action-bar</td><td><code>T-transactional-form-default</code></td><td>NCR Form, IQC Form, CAPA 8D.</td></tr>
+          <tr><td>5</td><td><code>approval-queue</code></td><td>Hàng đợi phê duyệt nhiều quyết định với priority sort, preview và actions.</td><td>header, filter, queue-list, detail-preview, decision-actions</td><td><code>T-approval-queue-default</code></td><td>ECO Approval, Document Review, Purchase Approval.</td></tr>
+          <tr><td>6</td><td><code>exception-hub</code></td><td>Trung tâm điều tra ngoại lệ: alerts, NCR, CAPA, deviation, blocked work.</td><td>header, severity-kpi, filter, main, detail, evidence-sidebar</td><td><code>T-exception-hub-default</code></td><td>NCR Hub, Deviation Tracker, Alarm Investigation.</td></tr>
+          <tr><td>7</td><td><code>operator-execution</code></td><td>Màn hình thao tác tại điểm sử dụng cho operator, traveler, scan và thao tác lớn.</td><td>task-header, instruction, scan-input, status, large-actions, escalation</td><td><code>T-operator-execution-default</code></td><td>Traveler Execution, Shop Floor Entry, Receiving Scan.</td></tr>
+          <tr><td>8</td><td><code>shopfloor-board</code></td><td>Bảng hiển thị shop floor lớn, realtime, Andon, machine status và event ticker.</td><td>kpi-status, machine-grid, alert-rail, event-ticker</td><td><code>T-shopfloor-board-default</code></td><td>Andon Board, Machine Status Board, IoT Overview.</td></tr>
+          <tr><td>9</td><td><code>planning-board</code></td><td>Bảng kế hoạch, Gantt, dispatch, resource allocation và conflict resolution.</td><td>filter, timeline-grid, resource-sidebar, conflict-panel, action-bar</td><td><code>T-planning-board-default</code></td><td>Production Schedule, Capacity Planning, Delivery Calendar.</td></tr>
+          <tr><td>10</td><td><code>control-tower</code></td><td>Dashboard điều hành cross-module, read-mostly, KPI, alerts và drill-down.</td><td>kpi-row, map-flow-chart, exception-list, drilldown, refresh-status</td><td><code>T-control-tower-default</code></td><td>Plant Overview, Quality Dashboard, Finance Dashboard.</td></tr>
+          <tr><td>11</td><td><code>evidence-workspace</code></td><td>Không gian làm việc bằng chứng: attachments, signatures, review và audit package.</td><td>record-header, evidence-list, viewer, signature-audit, actions</td><td><code>T-evidence-workspace-default</code></td><td>FAI Package, PPAP Submission, Audit Evidence.</td></tr>
+          <tr><td>12</td><td><code>admin-studio</code></td><td>Khu vực cấu hình templates, tokens, roles, registries và system settings.</td><td>navigation, editor-canvas, inspector, preview, validation-panel</td><td><code>T-admin-studio-default</code></td><td>Template Studio, User Management, System Config.</td></tr>
+          <tr><td>13</td><td><code>mobile-scanner</code></td><td>Màn hình mobile dùng barcode/QR, quick entry, offline status và error recovery.</td><td>scan-area, result-card, next-action, offline-status, error-recovery</td><td><code>T-mobile-scanner-default</code></td><td>Receiving Scan, WIP Move, Inventory Count.</td></tr>
+          <tr><td>14</td><td><code>document-view</code></td><td>Xem hoặc in tài liệu QMS, chứng từ, report và artifact trong portal.</td><td>document-header, body, index-sidebar, print-export-actions</td><td><code>T-document-view-default</code></td><td>CoC Print, Traveler Print, Report Export.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:18px">
+    <div class="card"><div class="card-header"><code>list-report</code></div><div class="card-body"><div class="tpl-meta">header → filter → main table → action-bar → footer</div></div></div>
+    <div class="card"><div class="card-header"><code>object-page</code></div><div class="card-body"><div class="tpl-meta">header → summary → tabs → main + sidebar → footer</div></div></div>
+    <div class="card"><div class="card-header"><code>transactional-form</code></div><div class="card-body"><div class="tpl-meta">header → workflow-status → main form → validation → action-bar</div></div></div>
+    <div class="card"><div class="card-header"><code>shopfloor-board</code></div><div class="card-body"><div class="tpl-meta">kpi-status → machine-grid → alert-rail → event-ticker</div></div></div>
+    <div class="card"><div class="card-header"><code>planning-board</code></div><div class="card-body"><div class="tpl-meta">filter → timeline-grid → resource-sidebar → conflict-panel → actions</div></div></div>
+    <div class="card"><div class="card-header"><code>control-tower</code></div><div class="card-body"><div class="tpl-meta">kpi-row → flow/chart → exception-list → drilldown → refresh-status</div></div></div>
+    <div class="card"><div class="card-header"><code>admin-studio</code></div><div class="card-body"><div class="tpl-meta">navigation → editor-canvas → inspector → preview → validation-panel</div></div></div>
+    <div class="card"><div class="card-header"><code>mobile-scanner</code></div><div class="card-body"><div class="tpl-meta">scan-area → result-card → next-action → offline-status → recovery</div></div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="info-box info-box-green">
+      <strong>DO</strong>
+      Mỗi module trong Module Builder PHẢI chọn 1 archetype trước khi bắt đầu thiết kế. Archetype xác định zones mặc định, template suggestions, density mặc định và QA gates áp dụng.
+    </div>
+    <div class="info-box info-box-red">
+      <strong>DON'T</strong>
+      KHÔNG tạo module không thuộc archetype nào. Nếu use case mới không fit 14 archetypes, đề xuất archetype mới qua quy trình governance ở <a href="#governance">Section 56</a> và cập nhật Standard 36 trước.
+    </div>
+  </div>
+</section>
+
+<section class="section" id="template-naming-standard-archetype" data-v46-section="standard-36-template-naming">
+  <h2 class="section-title"><span class="section-number">80</span>Quy ước đặt tên Template theo Archetype <span class="chip chip-blue" style="margin-left:12px;font-size:10px;vertical-align:middle">TARGET</span></h2>
+  <p class="section-subtitle">Template ID mới phải encode archetype, domain và variant để registry, Module Builder, QA gate và runtime lookup hiểu đúng mục đích layout mà không cần đọc mô tả dài.</p>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="info-box info-box-blue">
+      <strong>PATTERN</strong>
+      <code>T-&lt;archetype&gt;-&lt;domain&gt;-&lt;variant&gt;</code>
+      <br><br>
+      Ví dụ: <code>T-list-report-production-default</code>, <code>T-analytical-list-quality-oee</code>, <code>T-object-page-inventory-part-master</code>, <code>T-transactional-form-quality-ncr</code>, <code>T-approval-queue-engineering-eco</code>.
+    </div>
+    <div class="info-box info-box-purple">
+      <strong>CROSS-REF: Standard 36 Section 20</strong>
+      Naming standard cho frontend runtime yêu cầu Template ID dùng pattern <code>T-&lt;archetype&gt;-&lt;domain&gt;-&lt;variant&gt;</code>. Xem <a href="../../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 20</a>.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Alias mapping</span>Legacy templates → suggested Standard 36 IDs</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Template cũ</th>
+            <th>Archetype</th>
+            <th>Tên mới suggested</th>
+            <th>Ghi chú migration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>T01 Bảng điều khiển tổng hợp</td><td><code>control-tower</code></td><td><code>T-control-tower-management-executive-dashboard</code></td><td>Alias giữ <code>T01</code> cho modules hiện hữu.</td></tr>
+          <tr><td>T02 Giám sát vận hành</td><td><code>shopfloor-board</code></td><td><code>T-shopfloor-board-production-operations-monitor</code></td><td>Dùng cho line/cell realtime view.</td></tr>
+          <tr><td>T03 Trung tâm phân tích</td><td><code>analytical-list</code></td><td><code>T-analytical-list-operations-analytics-hub</code></td><td>Chart + filter + table drill-down.</td></tr>
+          <tr><td>T04 Trung tâm chỉ số</td><td><code>control-tower</code></td><td><code>T-control-tower-management-kpi-center</code></td><td>KPI summary với bảng detail.</td></tr>
+          <tr><td>T05 Tổng kết ca</td><td><code>operator-execution</code></td><td><code>T-operator-execution-production-shift-summary</code></td><td>Gắn với handover và shop-floor evidence.</td></tr>
+          <tr><td>T06 Bảng năng lượng</td><td><code>analytical-list</code></td><td><code>T-analytical-list-ehs-energy-dashboard</code></td><td>Energy trend, threshold và alert.</td></tr>
+          <tr><td>T07 Tổng quan điều phối</td><td><code>planning-board</code></td><td><code>T-planning-board-production-dispatch-overview</code></td><td>Queue, priority và resource balancing.</td></tr>
+          <tr><td>T08 Dashboard phòng ban</td><td><code>control-tower</code></td><td><code>T-control-tower-management-department-dashboard</code></td><td>Department KPI và team context.</td></tr>
+          <tr><td>T09 Cockpit quản lý</td><td><code>control-tower</code></td><td><code>T-control-tower-management-cockpit</code></td><td>Executive multi-module overview.</td></tr>
+          <tr><td>T10 Tổng quan IoT</td><td><code>shopfloor-board</code></td><td><code>T-shopfloor-board-iot-overview</code></td><td>Machine grid, sensor cards, alarm rail.</td></tr>
+          <tr><td>T11 Dashboard an toàn</td><td><code>control-tower</code></td><td><code>T-control-tower-ehs-safety-dashboard</code></td><td>Safety KPI, near-miss và training compliance.</td></tr>
+          <tr><td>T12 Bảng Lean Manufacturing</td><td><code>control-tower</code></td><td><code>T-control-tower-production-lean-board</code></td><td>5S, Kaizen, waste reduction metrics.</td></tr>
+          <tr><td>T13 Danh sách đơn hàng</td><td><code>list-report</code></td><td><code>T-list-report-sales-order-list</code></td><td>Filter + table + pagination.</td></tr>
+          <tr><td>T14 Chi tiết đơn hàng</td><td><code>object-page</code></td><td><code>T-object-page-sales-order-detail</code></td><td>Header, tabs, main form và sidebar timeline.</td></tr>
+          <tr><td>T15 Bảng theo dõi đơn hàng</td><td><code>planning-board</code></td><td><code>T-planning-board-sales-order-tracking</code></td><td>Pipeline, kanban hoặc funnel.</td></tr>
+          <tr><td>T16 Lịch giao hàng</td><td><code>planning-board</code></td><td><code>T-planning-board-shipping-delivery-schedule</code></td><td>Calendar/Gantt/list hybrid.</td></tr>
+          <tr><td>T17 Cổng khách hàng</td><td><code>object-page</code></td><td><code>T-object-page-customer-order-portal</code></td><td>Customer-facing object summary và documents.</td></tr>
+          <tr><td>T18 Phân tích đơn hàng</td><td><code>analytical-list</code></td><td><code>T-analytical-list-sales-order-analysis</code></td><td>KPI, chart và order table.</td></tr>
+          <tr><td>T19 Trình tạo báo giá</td><td><code>transactional-form</code></td><td><code>T-transactional-form-sales-quote-builder</code></td><td>Governed form, pricing validation và submit.</td></tr>
+          <tr><td>T20 Quản lý hợp đồng</td><td><code>evidence-workspace</code></td><td><code>T-evidence-workspace-sales-contract-management</code></td><td>Contract documents, signatures, audit trail.</td></tr>
+          <tr><td>T25 Yêu cầu thay đổi</td><td><code>approval-queue</code></td><td><code>T-approval-queue-engineering-change-request</code></td><td>ECO/ECN decision routing.</td></tr>
+          <tr><td>T53 Biểu mẫu NCR</td><td><code>transactional-form</code></td><td><code>T-transactional-form-quality-ncr</code></td><td>Regulated quality form.</td></tr>
+          <tr><td>T70 Kiểm kê</td><td><code>mobile-scanner</code></td><td><code>T-mobile-scanner-inventory-cycle-count</code></td><td>Scanner-first count execution.</td></tr>
+          <tr><td>T97 Xem báo cáo</td><td><code>document-view</code></td><td><code>T-document-view-documents-report-viewer</code></td><td>Print/export artifact viewer.</td></tr>
+          <tr><td>T106 Bảng cấu hình</td><td><code>admin-studio</code></td><td><code>T-admin-studio-admin-config-panel</code></td><td>Settings, validation panel, preview.</td></tr>
+          <tr><td>T114 Bảng danh sách</td><td><code>list-report</code></td><td><code>T-list-report-general-default</code></td><td>Default fallback template for legacy modules.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="info-box info-box-amber">
+    <strong>WARNING</strong>
+    Việc đổi tên templates sẽ ảnh hưởng tới tất cả modules đang dùng <code>templateId</code> cũ. Áp dụng naming standard mới cho templates mới trước. Templates cũ giữ tên cũ và thêm alias mapping trong template registry cho tới khi migration hoàn tất.
+  </div>
+</section>

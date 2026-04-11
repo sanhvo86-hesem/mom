@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Quality Exception Management Service for HESEM QMS Portal.
+ * Quality Exception Management Service for HESEM MOM Portal.
  *
  * Manages Customer Complaints, MRB dispositions, Deviations, and Concessions.
  * Provides unified query, repeat-pattern detection, quarantine support,
  * and COPQ dashboard KPIs.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class ExceptionService

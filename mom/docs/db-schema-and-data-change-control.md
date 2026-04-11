@@ -30,13 +30,15 @@ Normal path:
 1. Create a new ordered migration file under `mom/database/migrations/NNN_descriptive_name.sql`.
 2. Make it idempotent where practical and transactional when the DB operation supports it.
 3. Include explicit rollback notes when destructive changes are unavoidable.
-4. Run `php mom/database/migrate.php --dry-run` to confirm pending migration selection.
-5. Apply migrations through `php mom/database/migrate.php` on the target environment.
+4. Run `php mom/database/migrate.php --status` and `php mom/database/migrate.php --dry-run` to confirm pending migration selection.
+5. Apply migrations through `php mom/database/migrate.php` on the target environment using a migration/owner account, not the application runtime account.
 6. Regenerate `mom/database/schema.sql` with `php mom/database/build_schema_snapshot.php`.
 7. Refresh generated authority artifacts with `php mom/tools/schema/refresh_data_schema_authority.php --skip-publication`.
 8. Run smoke and truth checks before frontend work depends on the new contract.
 
 Do not manually edit `schema.sql`, `table-registry.json`, or workspace draft to pretend the DB schema changed. Those are generated or design surfaces, not executable DDL authority.
+
+If a live database already contains operational tables but `schema_migrations` is missing or empty, do not run the ordered migration chain directly. First take a backup, restore to a clone, classify overlap/primary-key drift, generate additive-only DDL for missing tables/nullable columns, verify Data Schema coverage on the clone, then baseline the migration ledger only after the physical schema is proven. This protects production data from destructive table recreation or incompatible primary-key changes.
 
 ## Inspect DB Data
 

@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * AI Predictive Quality Engine for HESEM QMS Portal.
+ * AI Predictive Quality Engine for HESEM MOM Portal.
  *
  * Provides SPC anomaly detection (Western Electric + Nelson rules),
  * tool-wear prediction via linear regression, defect probability
  * scoring, and process drift detection.
  *
- * Uses JSON file storage in `qms-data/predictions/`.
+ * Uses JSON file storage in `data/predictions/`.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class PredictiveQualityEngine
@@ -29,7 +29,7 @@ final class PredictiveQualityEngine
     /** Severity levels. */
     private const SEVERITIES = ['info', 'watch', 'warning', 'critical'];
 
-    /** @var string Absolute path to qms-data directory. */
+    /** @var string Absolute path to data directory. */
     private readonly string $dataDir;
 
     /** @var string Absolute path to predictions directory. */
@@ -49,7 +49,7 @@ final class PredictiveQualityEngine
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string $dataDir Absolute path to data directory.
      */
     public function __construct(string $dataDir, ?object $db = null)
     {

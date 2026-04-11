@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use DateTimeImmutable;
-use HESEM\QMS\Database\DataLayer;
+use MOM\Database\DataLayer;
 use RuntimeException;
 use Throwable;
 

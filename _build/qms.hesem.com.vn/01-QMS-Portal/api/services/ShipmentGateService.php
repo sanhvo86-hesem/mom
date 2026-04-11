@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Shipment Readiness Gate Service for HESEM QMS Portal.
+ * Shipment Readiness Gate Service for HESEM MOM Portal.
  *
  * Evaluates a 10-point checklist to determine whether a Sales Order
  * is ready for shipment. Checks contract review, JO completion,
  * NCR/CAPA status, holds, documents, FAI, export control, and more.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class ShipmentGateService
@@ -21,6 +21,7 @@ final class ShipmentGateService
     private readonly string $dataDir;
     private readonly string $confDir;
     private ?object $db = null;
+    private ?OperationalOverrideService $overrideService = null;
 
     /** Roles permitted to invoke shipment readiness checks. */
     private const ALLOWED_ROLES = [
@@ -51,8 +52,8 @@ final class ShipmentGateService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
-     * @param string $confDir Absolute path to qms-data/config directory.
+     * @param string $dataDir Absolute path to data directory.
+     * @param string $confDir Absolute path to data/config directory.
      */
     public function __construct(string $dataDir, string $confDir, ?object $db = null)
     {
@@ -76,6 +77,15 @@ final class ShipmentGateService
         } catch (\Throwable $e) {
             error_log("[ShipmentGateService] Shadow write to {$table} failed: " . $e->getMessage());
         }
+    }
+
+    private function overrideService(): OperationalOverrideService
+    {
+        if ($this->overrideService === null) {
+            $this->overrideService = new OperationalOverrideService($this->dataDir, $this->confDir);
+        }
+
+        return $this->overrideService;
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -127,7 +137,7 @@ final class ShipmentGateService
             if ($required && $status === 'fail' && isset($overrides[$code])) {
                 $overridden = true;
                 $status     = 'waived';
-                $detail     = 'Overridden: ' . ($overrides[$code]['reason'] ?? '');
+                $detail     = 'Overridden: ' . ($overrides[$code]['reason_text'] ?? $overrides[$code]['reason'] ?? '');
             }
 
             if ($required && $status === 'fail') {
@@ -193,6 +203,9 @@ final class ShipmentGateService
         string $reason,
         string $userId,
         string $userRole,
+        ?string $reasonCode = null,
+        ?string $expiresAt = null,
+        ?string $approvalReference = null,
     ): array {
         if (!$this->isRoleAllowed($userRole, self::OVERRIDE_ROLES)) {
             throw new RuntimeException(
@@ -213,31 +226,53 @@ final class ShipmentGateService
             throw new RuntimeException("Invalid gate code '{$gateCode}'. Valid codes: " . implode(', ', $validCodes));
         }
 
-        $now      = $this->nowIso();
-        $override = [
-            'gate_code'   => $gateCode,
-            'reason'      => $reason,
+        $override = $this->overrideService()->createOverride([
+            'override_type' => 'shipment_gate_override',
+            'subject_type' => 'sales_order',
+            'subject_id' => $soNumber,
+            'control_family' => 'shipment_gate',
+            'control_code' => $gateCode,
+            'reason_code' => trim((string)($reasonCode ?: 'risk_accepted_by_quality')),
+            'reason_text' => $reason,
+            'requested_by' => $userId,
+            'requested_role' => $userRole,
             'approved_by' => $userId,
             'approved_role' => $userRole,
-            'approved_at' => $now,
-        ];
-
-        // Persist override
-        $overrides = $this->loadOverrides($soNumber);
-        $overrides[$gateCode] = $override;
-        $this->saveOverrides($soNumber, $overrides);
+            'expires_at' => trim((string)$expiresAt),
+            'approval_reference' => trim((string)$approvalReference),
+            'source_context' => [
+                'so_number' => $soNumber,
+                'gate_code' => $gateCode,
+            ],
+        ]);
 
         // Audit trail
         $this->appendAuditLog($soNumber, [
             'action'     => 'gate_override',
             'gate_code'  => $gateCode,
+            'override_id' => $override['override_id'] ?? null,
+            'reason_code' => $override['reason_code'] ?? null,
             'reason'     => $reason,
             'user'       => $userId,
             'role'       => $userRole,
-            'timestamp'  => $now,
+            'timestamp'  => $override['approved_at'] ?? $this->nowIso(),
         ]);
 
         return $override;
+    }
+
+    /**
+     * List shipment gate overrides for one SO, newest first.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function listOverrides(string $soNumber): array
+    {
+        return $this->overrideService()->listOverrides([
+            'subject_type' => 'sales_order',
+            'subject_id' => $soNumber,
+            'control_family' => 'shipment_gate',
+        ]);
     }
 
     /**
@@ -778,7 +813,28 @@ final class ShipmentGateService
 
     private function loadOverrides(string $soNumber): array
     {
-        return $this->readJson($this->overridesPath($soNumber)) ?? [];
+        $mapped = [];
+        foreach ($this->overrideService()->activeOverridesForSubject('sales_order', $soNumber, 'shipment_gate') as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $code = (string)($row['control_code'] ?? '');
+            if ($code !== '') {
+                $mapped[$code] = $row;
+            }
+        }
+
+        // Backward-compatibility for legacy per-SO waiver files until migration completes.
+        $legacy = $this->readJson($this->overridesPath($soNumber)) ?? [];
+        foreach ($legacy as $code => $row) {
+            if (!isset($mapped[$code]) && is_array($row)) {
+                $row['control_code'] = $row['control_code'] ?? $row['gate_code'] ?? $code;
+                $row['current_status'] = 'active';
+                $mapped[$code] = $row;
+            }
+        }
+
+        return $mapped;
     }
 
     private function saveOverrides(string $soNumber, array $overrides): void

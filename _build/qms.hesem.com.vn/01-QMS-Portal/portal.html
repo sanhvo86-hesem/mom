@@ -1,33 +1,36 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" data-density="default" data-color-mode="light" data-radius="rounded" data-motion="normal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>HESEM QMS Portal — Hệ thống Quản lý Chất lượng</title>
+<title>HESEM MOM Portal — Hệ thống Quản lý Chất lượng</title>
 <link rel="stylesheet" href="../assets/style_scoped.css">
-<link rel="stylesheet" href="./styles/hesem-design-tokens.css">
-<link rel="stylesheet" href="./styles/portal.main.css?v=20260401k">
+<link rel="stylesheet" href="./styles/hesem-design-tokens.css?v=20260406a">
+<link rel="stylesheet" href="./styles/portal.main.css?v=20260410d">
 <link rel="stylesheet" href="./styles/deploy-dashboard.css">
-<link rel="stylesheet" href="./styles/online-forms.css">
+<link rel="stylesheet" href="./styles/data-schema-control.css?v=20260409i">
+<link rel="stylesheet" href="./styles/vps-control-tower.css?v=20260411-zipdblclick">
+<link rel="stylesheet" href="./styles/online-forms.css?v=20260409b">
 <link rel="stylesheet" href="./styles/so-jo-wo-dashboard.css">
 <link rel="stylesheet" href="./styles/order-management.css">
 <link rel="stylesheet" href="./styles/quality-exception.css">
 <link rel="stylesheet" href="./styles/supplier-quality.css">
 <link rel="stylesheet" href="./styles/quoting.css">
-<link rel="stylesheet" href="./styles/evidence-vault.css">
+<link rel="stylesheet" href="./styles/evidence-vault.css?v=20260405ag">
+<link rel="stylesheet" href="./styles/compliance-reports.css?v=20260405ag">
 <link rel="stylesheet" href="../assets/style.css"/>
 <link rel="stylesheet" href="./styles/form-builder.css">
-  <link rel="stylesheet" href="./styles/schema-studio.css?v=20260404c">
-<link rel="stylesheet" href="./styles/eqms-form.css">
+<link rel="stylesheet" href="./styles/schema-studio.css?v=20260406a">
+<link rel="stylesheet" href="./styles/eqms-form.css?v=20260405ag">
 <link rel="stylesheet" href="./styles/FORM-DESIGN-SYSTEM-SPEC.css">
 <link rel="stylesheet" href="./assets/css/mobile.css">
 <!-- Design System v2: density + dark mode — MUST BE LAST to override all -->
-<link rel="stylesheet" href="./styles/density-darkmode.css?v=20260403c">
-<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="./styles/density-darkmode.css?v=20260405ag">
+<link rel="manifest" href="/mom/manifest.json">
 <link rel="icon" type="image/svg+xml" href="./assets/hesem-logo.svg">
-<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192x192.png">
-<link rel="shortcut icon" href="./favicon.ico">
-<link rel="apple-touch-icon" href="./assets/icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/mom/assets/icons/icon-192x192.png">
+<link rel="shortcut icon" href="/mom/favicon.ico">
+<link rel="apple-touch-icon" href="/mom/assets/icons/icon-192x192.png">
 <meta name="theme-color" content="#0c2d48">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -86,7 +89,7 @@
  <div class="mobile-login-header">
  <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIENyZWF0b3I6IENvcmVsRFJBVyAyMDIxICg2NC1CaXQpIC0tPg0KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyODkzcHgiIGhlaWdodD0iMjg1MXB4IiB2ZXJzaW9uPSIxLjEiIHN0eWxlPSJzaGFwZS1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyB0ZXh0LXJlbmRlcmluZzpnZW9tZXRyaWNQcmVjaXNpb247IGltYWdlLXJlbmRlcmluZzpvcHRpbWl6ZVF1YWxpdHk7IGZpbGwtcnVsZTpldmVub2RkOyBjbGlwLXJ1bGU6ZXZlbm9kZCINCnZpZXdCb3g9IjAgMCA4NDkgODM3Ig0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIg0KIHhtbG5zOnhvZG09Imh0dHA6Ly93d3cuY29yZWwuY29tL2NvcmVsZHJhdy9vZG0vMjAwMyI+DQogPGRlZnM+DQogIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+DQogICA8IVtDREFUQVsNCiAgICAuZmlsMCB7ZmlsbDojMjA5OUQ1O2ZpbGwtcnVsZTpub256ZXJvfQ0KICAgXV0+DQogIDwvc3R5bGU+DQogPC9kZWZzPg0KIDxnIGlkPSJMYXllcl94MDAyMF8xIj4NCiAgPG1ldGFkYXRhIGlkPSJDb3JlbENvcnBJRF8wQ29yZWwtTGF5ZXIiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDAiIGQ9Ik03OTQgMzI1Yy0yOCwtMTYgLTYwLC0xOCAtODgsLTlsLTM2IC02MiAtOTYgLTE2NiAtMTkxIDAgLTcyIDBjLTEwLC00OSAtNTQsLTg2IC0xMDcsLTg2IC02MCwwIC0xMDksNDkgLTEwOSwxMDkgMCwzMiAxNCw2MSAzNiw4MWwtMzYgNjIgLTk2IDE2NiA5NiAxNjYgMzYgNjJjLTM3LDM0IC00OCw5MCAtMjEsMTM1IDMwLDUyIDk3LDcwIDE0OSw0MCAyOCwtMTYgNDYsLTQyIDUyLC03Mmw3MiAwIDE5MSAwIDk2IC0xNjYgMzYgLTYyYzQ4LDE2IDEwMiwtNCAxMjgsLTQ5IDMwLC01MiAxMiwtMTE5IC00MCwtMTQ5em0tNTUyIDMwMWMtMjMsLTggLTQ4LC05IC03MiwtMWwtMTE5IC0yMDYgMTE5IC0yMDZjMTEsNCAyMyw2IDM1LDYgMTMsMCAyNiwtMiAzNywtNmw0NiA4MGMtMTcsMTIgLTMxLDI4IC00Miw0NyAtNDAsNzAgLTIxLDE1OCA0MiwyMDZsLTQ2IDgwem0zMDcgODFsLTIzNyAwYy0yLC0xMSAtNiwtMjIgLTEzLC0zMyAtNiwtMTEgLTE1LC0yMSAtMjQsLTI5bDQ2IC04MGM3MywzMSAxNTksNCAxOTksLTY3IDExLC0xOSAxOCwtMzkgMjAsLTYwbDkyIDBjNCwyNCAxNiw0NiAzNSw2M2wtMTE5IDIwNnptOTYgLTM0MmMtNywxMSAtMTEsMjMgLTEzLDM1bC05MiAwYy02LC00OCAtMzMsLTkyIC03OCwtMTE4IC00NSwtMjYgLTk3LC0yNyAtMTQxLC05bC00NiAtODBjMTksLTE2IDMyLC0zNyAzNywtNjJsMjM3IDAgMTE5IDIwNmMtOSw4IC0xNiwxNyAtMjIsMjd6Ii8+DQogPC9nPg0KPC9zdmc+" alt="HESEM" style="border-radius:8px">
  <div class="mlh-text">
- <h3>HESEM QMS</h3>
+ <h3>HESEM MOM</h3>
  <span>Hệ thống quản lý chất lượng</span>
  </div>
  </div>
@@ -149,7 +152,7 @@
  <div class="sidebar-header">
  <div class="logo-mark"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIENyZWF0b3I6IENvcmVsRFJBVyAyMDIxICg2NC1CaXQpIC0tPg0KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyODkzcHgiIGhlaWdodD0iMjg1MXB4IiB2ZXJzaW9uPSIxLjEiIHN0eWxlPSJzaGFwZS1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyB0ZXh0LXJlbmRlcmluZzpnZW9tZXRyaWNQcmVjaXNpb247IGltYWdlLXJlbmRlcmluZzpvcHRpbWl6ZVF1YWxpdHk7IGZpbGwtcnVsZTpldmVub2RkOyBjbGlwLXJ1bGU6ZXZlbm9kZCINCnZpZXdCb3g9IjAgMCA4NDkgODM3Ig0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIg0KIHhtbG5zOnhvZG09Imh0dHA6Ly93d3cuY29yZWwuY29tL2NvcmVsZHJhdy9vZG0vMjAwMyI+DQogPGRlZnM+DQogIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+DQogICA8IVtDREFUQVsNCiAgICAuZmlsMCB7ZmlsbDojMjA5OUQ1O2ZpbGwtcnVsZTpub256ZXJvfQ0KICAgXV0+DQogIDwvc3R5bGU+DQogPC9kZWZzPg0KIDxnIGlkPSJMYXllcl94MDAyMF8xIj4NCiAgPG1ldGFkYXRhIGlkPSJDb3JlbENvcnBJRF8wQ29yZWwtTGF5ZXIiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDAiIGQ9Ik03OTQgMzI1Yy0yOCwtMTYgLTYwLC0xOCAtODgsLTlsLTM2IC02MiAtOTYgLTE2NiAtMTkxIDAgLTcyIDBjLTEwLC00OSAtNTQsLTg2IC0xMDcsLTg2IC02MCwwIC0xMDksNDkgLTEwOSwxMDkgMCwzMiAxNCw2MSAzNiw4MWwtMzYgNjIgLTk2IDE2NiA5NiAxNjYgMzYgNjJjLTM3LDM0IC00OCw5MCAtMjEsMTM1IDMwLDUyIDk3LDcwIDE0OSw0MCAyOCwtMTYgNDYsLTQyIDUyLC03Mmw3MiAwIDE5MSAwIDk2IC0xNjYgMzYgLTYyYzQ4LDE2IDEwMiwtNCAxMjgsLTQ5IDMwLC01MiAxMiwtMTE5IC00MCwtMTQ5em0tNTUyIDMwMWMtMjMsLTggLTQ4LC05IC03MiwtMWwtMTE5IC0yMDYgMTE5IC0yMDZjMTEsNCAyMyw2IDM1LDYgMTMsMCAyNiwtMiAzNywtNmw0NiA4MGMtMTcsMTIgLTMxLDI4IC00Miw0NyAtNDAsNzAgLTIxLDE1OCA0MiwyMDZsLTQ2IDgwem0zMDcgODFsLTIzNyAwYy0yLC0xMSAtNiwtMjIgLTEzLC0zMyAtNiwtMTEgLTE1LC0yMSAtMjQsLTI5bDQ2IC04MGM3MywzMSAxNTksNCAxOTksLTY3IDExLC0xOSAxOCwtMzkgMjAsLTYwbDkyIDBjNCwyNCAxNiw0NiAzNSw2M2wtMTE5IDIwNnptOTYgLTM0MmMtNywxMSAtMTEsMjMgLTEzLDM1bC05MiAwYy02LC00OCAtMzMsLTkyIC03OCwtMTE4IC00NSwtMjYgLTk3LC0yNyAtMTQxLC05bC00NiAtODBjMTksLTE2IDMyLC0zNyAzNywtNjJsMjM3IDAgMTE5IDIwNmMtOSw4IC0xNiwxNyAtMjIsMjd6bTEyNSAtMzY1YzEzLDAgMjYsMyAzOSwxMCAxMyw3IDIyLDE2IDMwLDI5IDcsMTMgMTAsMjYgMTAsNDAgMCwxMyAtMywyNyAtMTAsMzkgLTcsMTIgLTE2LDIyIC0yOSwyOSAtMTIsNyAtMjUsMTAgLTM5LDEwIC0xNCwwIC0yNywtMyAtMzksLTEwIC0xMiwtNyAtMjIsLTE3IC0yOSwtMjkgLTcsLTEzIC0xMCwtMjYgLTEwLC0zOSAwLC0xNCA0LC0yNyAxMSwtNDAgNywtMTMgMTcsLTIyIDMwLC0yOSAxMywtNyAyNSwtMTAgMzksLTEwem0wIDEzYy0xMSwwIC0yMiwzIC0zMiw5IC0xMCw2IC0xOSwxNCAtMjUsMjQgLTYsMTAgLTksMjEgLTksMzMgMCwxMSAzLDIyIDksMzMgNiwxMCAxNCwxOSAyNCwyNCAxMCw2IDIxLDkgMzMsOSAxMSwwIDIyLC0zIDMzLC05IDEwLC02IDE5LC0xNCAyNCwtMjQgNiwtMTAgOSwtMjEgOSwtMzMgMCwtMTIgLTMsLTIyIC05LC0zMyAtNiwtMTEgLTE0LC0xOSAtMjUsLTI0IC0xMCwtNiAtMjEsLTkgLTMyLC05em0tMzUgMTA5bDAgLTg1IDI5IDBjMTAsMCAxNywxIDIyLDIgNSwyIDgsNCAxMSw4IDMsNCA0LDggNCwxMiAwLDYgLTIsMTIgLTcsMTYgLTQsNCAtMTAsNyAtMTgsOCAzLDEgNiwzIDcsNCAzLDMgOCw5IDEzLDE3bDEwIDE3IC0xNyAwIC03IC0xM2MtNiwtMTEgLTExLC0xNyAtMTQsLTIwIC0zLC0yIC02LC0zIC0xMSwtM2wtOCAwIDAgMzYgLTE0IDB6bTE0IC00OGwxNyAwYzgsMCAxMywtMSAxNiwtNCAzLC0yIDQsLTUgNCwtOSAwLC0zIC0xLC01IC0yLC03IC0xLC0yIC0zLC0zIC02LC00IC0yLC0xIC03LC0yIC0xNCwtMmwtMTYgMCAwIDI1eiIvPg0KIDwvZz4NCjwvc3ZnPg0K" alt="HESEM"></div>
  <div class="text">
- <h3>HESEM QMS</h3>
+ <h3>HESEM MOM</h3>
  <span>ISO 9001:2026</span>
  </div>
  <div class="lang-toggle" id="lang-toggle">
@@ -198,7 +201,7 @@
  <header id="header">
  <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
  <div class="breadcrumb" id="header-breadcrumb">
- <span>HESEM QMS</span>
+ <span>HESEM MOM</span>
  <span>›</span>
  <span class="current" id="breadcrumb-current">Bảng điều khiển</span>
  </div>
@@ -240,6 +243,8 @@
  <div class="page" id="page-exceptions"></div>
  <!-- Order Management (SO-JO-WO) -->
  <div class="page" id="page-orders"></div>
+ <!-- Purchasing Workspace -->
+ <div class="page" id="page-purchasing"></div>
  <!-- Evidence Control (Kiểm soát chứng cứ) -->
  <div class="page" id="page-forms"></div>
  <!-- Admin Panel -->
@@ -256,10 +261,10 @@
  <div class="page" id="page-fmea"></div>
  <div class="page" id="page-apqp-ppap"></div>
  <div class="page" id="page-mobile-shopfloor"></div>
- <div class="page" id="page-knowledge-base"></div>
- <div class="page" id="page-continuous-improvement"></div>
- <div class="page" id="page-energy-dashboard"></div>
- <div class="page" id="page-dispatch"></div>
+<div class="page" id="page-knowledge-base"></div>
+<div class="page" id="page-continuous-improvement"></div>
+<div class="page" id="page-energy-dashboard"></div>
+<div class="page" id="page-dispatch"></div>
 <div class="page" id="page-template-demo"></div>
 <div class="page" id="page-module-builder"></div>
 <div class="page" id="page-schema-studio"></div>
@@ -329,57 +334,59 @@
 
 <!-- Modal root OUTSIDE all containers to avoid stacking context traps -->
 
-<script charset="UTF-8" src="./scripts/portal/00a-registry-service.js?v=20260402"></script>
-<script charset="UTF-8" src="./scripts/portal/00b-theme-manager.js?v=20260403"></script>
+<script charset="UTF-8" src="./scripts/portal/00a-registry-service.js?v=20260409n"></script>
+<script charset="UTF-8" src="./scripts/portal/00b-theme-manager.js?v=20260406a"></script>
 <script>if(window.HmTheme) HmTheme.init();</script>
-<script charset="UTF-8" src="./scripts/portal/00-block-engine.js"></script>
+<script charset="UTF-8" src="./scripts/portal/00-block-engine.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/01-module-router.js"></script>
-<script charset="UTF-8" src="./scripts/portal/01-data-config.js"></script>
-<script charset="UTF-8" src="./scripts/portal/02-state-auth-ui.js"></script>
-<script charset="UTF-8" src="./scripts/portal/03-editor-core.js?v=20260401n"></script>
+<script charset="UTF-8" src="./scripts/portal/01-data-config.js?v=20260410d"></script>
+<script charset="UTF-8" src="./scripts/portal/02-state-auth-ui.js?v=20260411e"></script>
+<script charset="UTF-8" src="./scripts/portal/03-editor-core.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/03-commands-link.js"></script>
 <script charset="UTF-8" src="./scripts/portal/03-commands-table.js"></script>
 <script charset="UTF-8" src="./scripts/portal/03-commands-layout.js"></script>
-<script charset="UTF-8" src="./scripts/portal/04-workflow-actions.js?v=20260401n"></script>
+<script charset="UTF-8" src="./scripts/portal/04-workflow-actions.js?v=20260405y"></script>
 <script charset="UTF-8" src="./scripts/portal/05-workflow-panel.js"></script>
 <script charset="UTF-8" src="./scripts/portal/06-tiptap-pilot.js"></script>
 <script charset="UTF-8" src="./scripts/portal/08-deploy-dashboard.js"></script>
 <script charset="UTF-8" src="./scripts/portal/09g-cascading-dropdown.js"></script>
 <script charset="UTF-8" src="./scripts/portal/09h-allocation-tracker.js"></script>
-<script charset="UTF-8" src="./scripts/portal/09b-form-fill-download.js"></script>
+<script charset="UTF-8" src="./scripts/portal/09b-form-fill-download.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/09c-record-id-generator.js"></script>
 <script charset="UTF-8" src="./scripts/portal/09d-upload-verify.js"></script>
 <script charset="UTF-8" src="./scripts/portal/09e-so-jo-wo-dashboard.js"></script>
-<script charset="UTF-8" src="./scripts/portal/11-e-signature.js?v=20260401n"></script>
+<script charset="UTF-8" src="./scripts/portal/34-purchasing-workspace.js?v=20260409a"></script>
+<script charset="UTF-8" src="./scripts/portal/11-e-signature.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/12-searchable-input.js"></script>
-<script charset="UTF-8" src="./scripts/portal/13-master-data-control.js"></script>
+<script charset="UTF-8" src="./scripts/portal/13-master-data-control.js?v=20260410h"></script>
 <script charset="UTF-8" src="./scripts/portal/14-mes-control-center.js"></script>
 <script charset="UTF-8" src="./scripts/portal/14-exception-dashboard.js"></script>
 <script charset="UTF-8" src="./scripts/portal/15-quality-exception-hub.js"></script>
 <script charset="UTF-8" src="./scripts/portal/16-supplier-quality.js"></script>
 <script charset="UTF-8" src="./scripts/portal/17-quoting-engine.js"></script>
-<script charset="UTF-8" src="./scripts/portal/18-evidence-vault.js"></script>
+<!-- 18-evidence-vault.js removed — Evidence Vault rebuilt inside 09-online-forms.js -->
 <script charset="UTF-8" src="./scripts/portal/19-customer-portal-admin.js"></script>
 <script charset="UTF-8" src="./scripts/portal/20-cnc-programs.js"></script>
 <script charset="UTF-8" src="./scripts/portal/21-product-passport.js"></script>
 <script charset="UTF-8" src="./scripts/portal/22-ai-quality-scheduling.js"></script>
-<script charset="UTF-8" src="./scripts/portal/23-compliance-reports.js"></script>
+<script charset="UTF-8" src="./scripts/portal/23-compliance-reports.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/24-fmea-control-plan.js"></script>
 <script charset="UTF-8" src="./scripts/portal/25-apqp-ppap.js"></script>
-<script charset="UTF-8" src="./scripts/portal/26-mobile-shopfloor.js"></script>
+<script charset="UTF-8" src="./scripts/portal/26-mobile-shopfloor.js?v=20260405x"></script>
 <script charset="UTF-8" src="./scripts/portal/27-knowledge-base.js"></script>
 <script charset="UTF-8" src="./scripts/portal/28-continuous-improvement.js"></script>
 <script charset="UTF-8" src="./scripts/portal/29-energy-dashboard.js"></script>
 <script charset="UTF-8" src="./scripts/portal/30-production-dispatch.js"></script>
+<script charset="UTF-8" src="./scripts/portal/33-vps-control-tower.js?v=20260411-zipdblclick"></script>
 <script charset="UTF-8" src="./scripts/portal/TEMPLATE-module.js"></script>
-<script charset="UTF-8" src="./scripts/portal/31-module-builder.js"></script>
-  <script charset="UTF-8" src="./scripts/portal/32-schema-studio.js?v=20260404c"></script>
-<script charset="UTF-8" src="./scripts/portal/10-eqms-form-runtime.js?v=20260401n"></script>
-<script charset="UTF-8" src="./scripts/portal/09-online-forms.js"></script>
+<script charset="UTF-8" src="./scripts/portal/31-module-builder.js?v=20260409n"></script>
+  <script charset="UTF-8" src="./scripts/portal/32-schema-studio.js?v=20260411e"></script>
+<script charset="UTF-8" src="./scripts/portal/10-eqms-form-runtime.js?v=20260410d"></script>
+<script charset="UTF-8" src="./scripts/portal/09-online-forms.js?v=20260409b"></script>
 <script charset="UTF-8" src="./scripts/portal/90-qrcodegen.js"></script>
 <script charset="UTF-8" src="./scripts/portal/99-bootstrap.js"></script>
-<script src="assets/js/offline-store.js"></script>
-<script src="assets/js/sync-manager.js"></script>
-<script src="assets/js/pwa-init.js"></script>
+<script src="assets/js/offline-store.js?v=20260410d"></script>
+<script src="assets/js/sync-manager.js?v=20260410d"></script>
+<script src="assets/js/pwa-init.js?v=20260411e"></script>
 </body>
 </html>

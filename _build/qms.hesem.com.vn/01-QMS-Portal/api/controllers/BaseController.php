@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Database\DataLayer;
+use MOM\Database\DataLayer;
 use RuntimeException;
 use Throwable;
 
@@ -14,7 +14,7 @@ use Throwable;
  * Provides DataLayer injection, request parsing, response helpers,
  * permission checking, input validation, and audit logging shortcuts.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   2.0.0
  */
 abstract class BaseController
@@ -25,7 +25,7 @@ abstract class BaseController
     /** @var string Absolute path to project root. */
     protected string $rootDir;
 
-    /** @var string Absolute path to qms-data directory. */
+    /** @var string Absolute path to data directory. */
     protected string $dataDir;
 
     /** @var string Absolute path to config directory. */
@@ -42,7 +42,7 @@ abstract class BaseController
     /**
      * @param DataLayer $data    Shared data layer instance.
      * @param string    $rootDir Absolute path to project root.
-     * @param string    $dataDir Absolute path to qms-data directory.
+     * @param string    $dataDir Absolute path to data directory.
      */
     public function __construct(DataLayer $data, string $rootDir, string $dataDir)
     {
@@ -125,6 +125,38 @@ abstract class BaseController
     }
 
     /**
+     * Get a request header value by case-insensitive name.
+     *
+     * @param string $name Header name.
+     * @return string|null
+     */
+    protected function requestHeader(string $name): ?string
+    {
+        $target = strtolower(trim($name));
+        if ($target === '') {
+            return null;
+        }
+
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            if (is_array($headers)) {
+                foreach ($headers as $headerName => $value) {
+                    if (strtolower(trim((string)$headerName)) === $target) {
+                        return is_scalar($value) ? (string)$value : null;
+                    }
+                }
+            }
+        }
+
+        $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+        if (isset($_SERVER[$serverKey]) && is_scalar($_SERVER[$serverKey])) {
+            return (string)$_SERVER[$serverKey];
+        }
+
+        return null;
+    }
+
+    /**
      * Get the HTTP request method (uppercase).
      *
      * @return string
@@ -183,6 +215,86 @@ abstract class BaseController
     protected function success(array $extra = [], int $code = 200): never
     {
         $this->json(array_merge(['ok' => true, 'server_time' => $this->nowIso()], $extra), $code);
+    }
+
+    /**
+     * Send an empty response body.
+     *
+     * @param int                    $code    HTTP status code.
+     * @param array<string, string>  $headers Extra response headers.
+     * @return never
+     */
+    protected function emptyResponse(int $code = 204, array $headers = []): never
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
+
+        $headers = array_merge([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'SAMEORIGIN',
+            'Referrer-Policy' => 'same-origin',
+        ], $headers);
+
+        if (defined('API_THROW_RESPONSES') && API_THROW_RESPONSES) {
+            throw ExitException::empty($code, $headers);
+        }
+
+        http_response_code($code);
+        foreach ($headers as $name => $value) {
+            header($name . ': ' . $value);
+        }
+        exit;
+    }
+
+    /**
+     * Send a raw response body.
+     *
+     * @param string                 $body    Raw response body.
+     * @param int                    $code    HTTP status code.
+     * @param array<string, string>  $headers Extra response headers.
+     * @return never
+     */
+    protected function rawResponse(string $body, int $code = 200, array $headers = []): never
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
+
+        $headers = array_merge([
+            'Content-Type' => 'text/plain; charset=utf-8',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'SAMEORIGIN',
+            'Referrer-Policy' => 'same-origin',
+        ], $headers);
+
+        if (defined('API_THROW_RESPONSES') && API_THROW_RESPONSES) {
+            throw ExitException::raw($body, $code, $headers);
+        }
+
+        http_response_code($code);
+        foreach ($headers as $name => $value) {
+            header($name . ': ' . $value);
+        }
+        echo $body;
+        exit;
+    }
+
+    /**
+     * Send an HTML response body.
+     *
+     * @param string                 $html    HTML body.
+     * @param int                    $code    HTTP status code.
+     * @param array<string, string>  $headers Extra response headers.
+     * @return never
+     */
+    protected function htmlResponse(string $html, int $code = 200, array $headers = []): never
+    {
+        $this->rawResponse($html, $code, array_merge([
+            'Content-Type' => 'text/html; charset=utf-8',
+        ], $headers));
     }
 
     /**
@@ -334,10 +446,41 @@ abstract class BaseController
      */
     protected function hasPermission(array $user, string $permission): bool
     {
-        $rolePermsFile = $this->confDir . '/role_permissions.json';
-        $perms = load_role_permissions($rolePermsFile);
-        $role  = (string)($user['role'] ?? '');
-        return (bool)($perms[$role][$permission] ?? false);
+        return $this->hasAnyPermission($user, [$permission]);
+    }
+
+    /**
+     * @param array<int, string> $permissions
+     */
+    protected function hasAnyPermission(array $user, array $permissions): bool
+    {
+        return user_has_any_permission($user, $permissions, $this->confDir . '/role_permissions.json');
+    }
+
+    /**
+     * @param array<int, string> $permissions
+     */
+    protected function permissionMatrixManages(array $permissions): bool
+    {
+        return permission_matrix_manages_permission($permissions, $this->confDir . '/role_permissions.json');
+    }
+
+    protected function userPermissionMatrixConfigured(array $user): bool
+    {
+        return user_permission_matrix_configured($user, $this->confDir . '/role_permissions.json');
+    }
+
+    /**
+     * @param array<int, string> $permissions
+     */
+    protected function requireAnyPermission(array $user, array $permissions, bool $allowAdminBypass = true): void
+    {
+        if ($allowAdminBypass && user_is_admin($user)) {
+            return;
+        }
+        if (!$this->hasAnyPermission($user, $permissions)) {
+            $this->error('forbidden', 403);
+        }
     }
 
     // ── Validation Helpers ──────────────────────────────────────────────────
@@ -409,6 +552,47 @@ abstract class BaseController
         $logFile = $this->dataDir . '/audit.log';
         $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
+
+        try {
+            $aggregateId = '';
+            foreach (['aggregate_id', 'id', 'username', 'code', 'record_id'] as $key) {
+                if (!isset($context[$key]) || !is_scalar($context[$key])) {
+                    continue;
+                }
+                $candidate = trim((string)$context[$key]);
+                if ($candidate === '') {
+                    continue;
+                }
+                $aggregateId = $candidate;
+                break;
+            }
+            if ($aggregateId === '') {
+                $aggregateId = $action;
+            }
+
+            $metadata = [
+                'source' => 'api_controller',
+                'controller' => static::class,
+            ];
+            if ($context !== []) {
+                $metadata['context_keys'] = array_values(array_map('strval', array_keys($context)));
+            }
+
+            $this->data->logEvent(
+                $action,
+                'api_action',
+                $aggregateId,
+                ['context' => $context],
+                [
+                    'actor_name' => $user,
+                    'ip_address' => $this->clientIp(),
+                    'session_id' => session_status() === PHP_SESSION_ACTIVE ? session_id() : null,
+                    'metadata' => $metadata,
+                ]
+            );
+        } catch (Throwable $e) {
+            @error_log('[BaseController] audit write failed: ' . $e->getMessage());
+        }
     }
 
     // ── Utility ─────────────────────────────────────────────────────────────

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 /**
- * Unified Notification Gateway for HESEM QMS.
+ * Unified Notification Gateway for HESEM MOM.
  * Consolidates all notification channels: email queue, in-app, JSONL log.
  * Every workflow can send notifications through this single service.
  */

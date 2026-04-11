@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
+use MOM\Api\Controllers\BaseController;
 use Throwable;
 
 /**
- * Continuous Improvement controller for HESEM QMS Portal.
+ * Continuous Improvement controller for HESEM MOM Portal.
  *
  * Provides API endpoints for the CI module including suggestions,
  * improvement projects with PDCA phase tracking, ROI summaries,
  * and a CI dashboard with KPIs.
  *
- * Data stored in `qms-data/improvement/` with per-entity JSON files.
+ * Data stored in `data/improvement/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class CiController extends BaseController

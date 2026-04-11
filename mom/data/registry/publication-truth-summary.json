@@ -2,8 +2,8 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "8074b143-180a-4fdc-b838-a3bd4e63a2d2",
-    "generated_at": "2026-04-11T06:15:38.280Z",
+    "publication_run_id": "f2594699-0b3e-43dd-a3c3-f21ed31618ad",
+    "generated_at": "2026-04-11T08:49:12.436Z",
     "schema_authority": "table-registry.json backed by database/migrations and publication generators",
     "table_count": 658,
     "entity_counts": {

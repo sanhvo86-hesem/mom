@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use RuntimeException;
 
 // ── Value Objects ────────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ final readonly class SubmissionResult
 // ── Form Engine ─────────────────────────────────────────────────────────────
 
 /**
- * Form processing engine for HESEM QMS online forms.
+ * Form processing engine for HESEM MOM online forms.
  *
  * Handles the full lifecycle of form submissions: schema loading, validation,
  * data enrichment, storage, and workflow triggering. Supports:
@@ -97,7 +97,7 @@ final readonly class SubmissionResult
  * - Online vs. offline decision scoring
  * - Bilingual error messages (EN/VI)
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class FormEngine
@@ -130,7 +130,7 @@ final class FormEngine
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string                    $dataDir    Absolute path to qms-data directory.
+     * @param string                    $dataDir    Absolute path to data directory.
      * @param string                    $rootDir    Absolute path to project root.
      * @param Connection|null           $db         Optional database connection.
      * @param RecordIdGenerator|null    $idGen      Optional record ID generator.

@@ -1,0 +1,624 @@
+<!-- v4.6 Prompt 3: Module Build Packet & Block Contract Enhancement.
+     Merge before Changelog as Sections 81 and 82. -->
+
+<section class="section" id="module-build-packet-standard-36" data-v46-section="standard-36-build-packet">
+  <h2 class="section-title"><span class="section-number">81</span>Module Build Packet — 24 trường bắt buộc khi build module <span class="chip chip-blue" style="margin-left:12px;font-size:10px;vertical-align:middle">TARGET</span></h2>
+  <p class="section-subtitle">Module Build Packet là tập hợp tất cả thông tin cần thiết để build, test, deploy và audit một module. Mỗi module PHẢI có một build packet trước khi submit QA gate.</p>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="info-box info-box-purple">
+      <strong>CROSS-REF: Standard 36 Sections 8 và 9</strong>
+      Build packet là artifact machine-readable được Standard 36 yêu cầu cho mọi module mới hoặc thay đổi. Xem <a href="../../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 8</a> cho module build packet và <a href="../../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 9</a> cho template registry contract.
+    </div>
+    <div class="info-box info-box-amber">
+      <strong>IMPLEMENTATION STATUS</strong>
+      Đây là TARGET cho v4.6. Module Builder cần generate skeleton JSON, validate schema, kiểm tra template registry và block contracts trước khi cho module vào QA gate ở <a href="#governance">Section 56</a>.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">24 fields</span>Build packet required fields</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Mô tả</th>
+            <th>Ví dụ</th>
+            <th>Bắt buộc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><code>moduleId</code></td><td>string</td><td>ID duy nhất của module, ổn định qua route và registry.</td><td><code>mod-ncr-form</code></td><td>Có</td></tr>
+          <tr><td>2</td><td><code>moduleArchetype</code></td><td>enum</td><td>1 trong 14 archetypes ở <a href="#module-archetypes-standard-36">Section 79</a>.</td><td><code>transactional-form</code></td><td>Có</td></tr>
+          <tr><td>3</td><td><code>templateId</code></td><td>string</td><td>Template sử dụng; phải tồn tại trong template registry machine-readable.</td><td><code>T-transactional-form-quality-ncr</code></td><td>Có</td></tr>
+          <tr><td>4</td><td><code>version</code></td><td>semver</td><td>Phiên bản module, dùng để audit và rollback.</td><td><code>1.2.0</code></td><td>Có</td></tr>
+          <tr><td>5</td><td><code>owner</code></td><td>string</td><td>Team hoặc người chịu trách nhiệm release; khi xuất artifact chuẩn có thể tách thành ownerTeam và processOwner.</td><td><code>Quality Team</code></td><td>Có</td></tr>
+          <tr><td>6</td><td><code>screens</code></td><td>array</td><td>Danh sách screens trong module, mỗi screen phải có archetype và route rõ.</td><td><code>["ncr-create","ncr-detail","ncr-list"]</code></td><td>Có</td></tr>
+          <tr><td>7</td><td><code>zones</code></td><td>object</td><td>Map zone -> block assignments theo <a href="#zone-system">Section 38</a>.</td><td><code>{"header":["ncr-header"],"main":["ncr-form"]}</code></td><td>Có</td></tr>
+          <tr><td>8</td><td><code>blocks</code></td><td>array</td><td>Danh sách blocks sử dụng, gồm block id, type, version, zone và permission.</td><td><code>["form-standard","data-table","action-bar"]</code></td><td>Có</td></tr>
+          <tr><td>9</td><td><code>apiBindings</code></td><td>object</td><td>Map endpoint -> data fields; chỉ dùng endpoint đã đăng ký.</td><td><code>{"GET /api/ncr/{id}":{"recordId":"id"}}</code></td><td>Có</td></tr>
+          <tr><td>10</td><td><code>permissions</code></td><td>object</td><td>Required permissions, field locks, action locks và negative tests.</td><td><code>{"view":"ncr.read","edit":"ncr.write"}</code></td><td>Có</td></tr>
+          <tr><td>11</td><td><code>workflows</code></td><td>array</td><td>Business workflows involved: states, transitions, actors và guards.</td><td><code>["ncr-disposition","capa-link"]</code></td><td>Có</td></tr>
+          <tr><td>12</td><td><code>regulatoryScope</code></td><td>array</td><td>Quy định áp dụng cho module, audit và retention.</td><td><code>["21CFR11","AS9100"]</code></td><td>Có</td></tr>
+          <tr><td>13</td><td><code>auditFields</code></td><td>object</td><td>Audit trail configuration, e-signature, retention và correction model.</td><td><code>{"esign":true,"immutable":true}</code></td><td>Có</td></tr>
+          <tr><td>14</td><td><code>accessibilityLevel</code></td><td>string</td><td>WCAG target level cho module.</td><td><code>"AA"</code></td><td>Có</td></tr>
+          <tr><td>15</td><td><code>a11yChecklist</code></td><td>object</td><td>Keyboard, screen reader, focus, contrast và reflow status.</td><td><code>{"keyboard":"pass","sr":"pass"}</code></td><td>Có</td></tr>
+          <tr><td>16</td><td><code>responsiveBreakpoints</code></td><td>array</td><td>Supported breakpoints; phải khớp token ở <a href="#responsive-rules">Section 28</a>.</td><td><code>["sm","md","lg","xl","2xl"]</code></td><td>Có</td></tr>
+          <tr><td>17</td><td><code>densityModes</code></td><td>array</td><td>Supported density modes theo <a href="#density-modes">Section 5</a>.</td><td><code>["default","comfortable"]</code></td><td>Có</td></tr>
+          <tr><td>18</td><td><code>printSupport</code></td><td>object</td><td>Print layout configuration, page format và export behavior.</td><td><code>{"enabled":true,"format":"A4"}</code></td><td>Có</td></tr>
+          <tr><td>19</td><td><code>offlineSupport</code></td><td>boolean</td><td>Có hỗ trợ offline/PWA không, kèm sync policy nếu true.</td><td><code>false</code></td><td>Có</td></tr>
+          <tr><td>20</td><td><code>performanceBudget</code></td><td>object</td><td>LCP, FID, CLS, first render, data refresh và interaction latency targets.</td><td><code>{"lcp":2500,"fid":100,"cls":0.1}</code></td><td>Có</td></tr>
+          <tr><td>21</td><td><code>testIds</code></td><td>object</td><td><code>data-testid</code> mapping ổn định cho Playwright và QA evidence.</td><td><code>{"form":"ncr-form","submit":"ncr-submit"}</code></td><td>Có</td></tr>
+          <tr><td>22</td><td><code>qaEvidence</code></td><td>object</td><td>Screenshot, test results, a11y report, audit log và sign-off links.</td><td><code>{"screenshot":"url","tests":"url"}</code></td><td>Có</td></tr>
+          <tr><td>23</td><td><code>traceabilityMatrix</code></td><td>object</td><td>Requirements -> implementation -> endpoint -> UI block -> test -> evidence map.</td><td><code>{"REQ-001":"screen-ncr-create"}</code></td><td>Có</td></tr>
+          <tr><td>24</td><td><code>releaseDate</code></td><td>date</td><td>Ngày release plan, dùng để kiểm soát readiness và changelog.</td><td><code>"2026-05-01"</code></td><td>Có</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-purple">JSON</span>Ví dụ build packet đầy đủ cho NCR Form</div>
+    <div class="card-body">
+      <div class="code-block">{
+  "moduleId": "mod-ncr-form",
+  "moduleArchetype": "transactional-form",
+  "templateId": "T-transactional-form-quality-ncr",
+  "version": "1.0.0",
+  "owner": "Quality Team",
+  "screens": ["ncr-create", "ncr-detail", "ncr-list"],
+  "zones": {
+    "header": ["ncr-page-header", "ncr-status-chip"],
+    "main": ["ncr-form", "ncr-disposition-section", "ncr-attachments"],
+    "sidebar": ["ncr-audit-summary", "ncr-related-capa"],
+    "footer": ["ncr-action-bar"]
+  },
+  "blocks": [
+    {
+      "blockId": "ncr-page-header",
+      "blockType": "page-header",
+      "version": "1.0.0",
+      "zone": "header"
+    },
+    {
+      "blockId": "ncr-form",
+      "blockType": "form-standard",
+      "version": "2.0.0",
+      "zone": "main"
+    },
+    {
+      "blockId": "ncr-action-bar",
+      "blockType": "action-bar",
+      "version": "1.1.0",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": {
+    "GET /api/ncr/{id}": {
+      "purpose": "Read NCR detail",
+      "fields": ["id", "severity", "status", "disposition", "auditTrail"]
+    },
+    "POST /api/ncr": {
+      "purpose": "Create NCR",
+      "fields": ["partNumber", "lotNumber", "defectCode", "quantityAffected"]
+    },
+    "POST /api/ncr/{id}/disposition": {
+      "purpose": "Submit MRB disposition",
+      "fields": ["disposition", "reasonCode", "signature"]
+    }
+  },
+  "permissions": {
+    "view": "ncr.read",
+    "create": "ncr.create",
+    "edit": "ncr.write",
+    "disposition": "ncr.disposition",
+    "sign": "ncr.esign"
+  },
+  "workflows": ["ncr-disposition", "capa-link", "mrb-review"],
+  "regulatoryScope": ["21CFR11", "AS9100", "ISO9001"],
+  "auditFields": {
+    "esign": true,
+    "immutable": true,
+    "reasonCodeRequired": ["status-change", "post-approval-edit", "disposition"],
+    "retentionYears": 10
+  },
+  "accessibilityLevel": "AA",
+  "a11yChecklist": {
+    "keyboard": "pending",
+    "screenReader": "pending",
+    "contrast": "pending",
+    "reflow320": "pending",
+    "forcedColors": "pending"
+  },
+  "responsiveBreakpoints": ["sm", "md", "lg", "xl", "2xl"],
+  "densityModes": ["default", "comfortable", "shopfloor"],
+  "printSupport": {
+    "enabled": true,
+    "format": "A4",
+    "templates": ["ncr-summary", "mrb-disposition"],
+    "watermarkWhenDraft": true
+  },
+  "offlineSupport": false,
+  "performanceBudget": {
+    "lcp": 2500,
+    "fid": 100,
+    "cls": 0.1,
+    "firstRenderMs": 1200,
+    "apiRefreshMs": 1500
+  },
+  "testIds": {
+    "form": "ncr-form",
+    "severity": "ncr-severity",
+    "submit": "ncr-submit",
+    "disposition": "ncr-disposition",
+    "signature": "ncr-esign"
+  },
+  "qaEvidence": {
+    "screenshot": "mom/docs/evidence/mod-ncr-form/screenshots/",
+    "tests": "mom/docs/evidence/mod-ncr-form/tests/",
+    "a11y": "mom/docs/evidence/mod-ncr-form/a11y/",
+    "audit": "mom/docs/evidence/mod-ncr-form/audit/"
+  },
+  "traceabilityMatrix": {
+    "REQ-NCR-001": "screen:ncr-create block:ncr-form test:ncr-create.spec.js",
+    "REQ-NCR-014": "screen:ncr-detail block:ncr-action-bar test:ncr-disposition.spec.js"
+  },
+  "releaseDate": "2026-05-01"
+}</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="info-box info-box-green">
+      <strong>DO</strong>
+      Tạo build packet JSON file cho mỗi module tại <code>mom/data/build-packets/{moduleId}.json</code>. Module Builder sẽ tự generate skeleton build packet khi tạo module mới và chỉ cho submit QA khi đủ 24 fields.
+    </div>
+    <div class="info-box info-box-red">
+      <strong>DON'T</strong>
+      Không cho module vào QA gate nếu build packet thiếu <code>templateId</code>, <code>blocks</code>, <code>apiBindings</code>, <code>permissions</code>, <code>auditFields</code>, <code>qaEvidence</code> hoặc <code>traceabilityMatrix</code>.
+    </div>
+  </div>
+</section>
+
+<section class="section" id="block-contract-standard-36" data-v46-section="standard-36-block-contract">
+  <h2 class="section-title"><span class="section-number">82</span>Block Contract — 14 trường bắt buộc theo Standard 36 <span class="chip chip-blue" style="margin-left:12px;font-size:10px;vertical-align:middle">TARGET</span></h2>
+  <p class="section-subtitle">Mỗi block type phải có contract machine-readable trước khi dùng trong production. Contract này nâng cấp catalog ở <a href="#block-engine">Section 37</a> và schema nền ở <a href="#block-schema">Section 29</a> bằng các field còn thiếu cho runtime, QA, accessibility, permission, responsive và print/export.</p>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="info-box info-box-purple">
+      <strong>CROSS-REF: Standard 36 Sections 8, 9 và 12</strong>
+      Standard 36 định nghĩa đầy đủ build packet, template registry và block contract requirements. Xem <a href="../../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 8</a>, <a href="../../standards/36-frontend-module-layout-template-standard.md">Section 9</a> và <a href="../../standards/36-frontend-module-layout-template-standard.md">Section 12</a>.
+    </div>
+    <div class="info-box info-box-amber">
+      <strong>WARNING</strong>
+      Đây là TARGET. Block contracts chưa bắt buộc cho modules hiện tại. Từ v4.7, Module Builder sẽ validate block contracts khi build. Các modules cũ có grace period 2 sprint để bổ sung.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">14 fields</span>Block contract required fields</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Mô tả</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>blockType</code></td><td>string</td><td>Tên block ổn định, ví dụ <code>data-table</code>.</td></tr>
+          <tr><td><code>version</code></td><td>semver</td><td>Phiên bản block contract; breaking change phải tăng major.</td></tr>
+          <tr><td><code>owner</code></td><td>string</td><td>Team chịu trách nhiệm maintain, test và release block.</td></tr>
+          <tr><td><code>propsSchema</code></td><td>JSON Schema</td><td>Schema cho props input, required fields, enum và default values.</td></tr>
+          <tr><td><code>dataSourceSchema</code></td><td>JSON Schema</td><td>Endpoint, query, variables, refresh và cache model.</td></tr>
+          <tr><td><code>eventContract</code></td><td>object</td><td>Events block emit và listen, payload shape và failure behavior.</td></tr>
+          <tr><td><code>stateContract</code></td><td>object</td><td>Internal state: loading, empty, error, readonly, disabled, dirty, saving, saved, conflict, permission-denied.</td></tr>
+          <tr><td><code>permissionContract</code></td><td>object</td><td>Required permissions, visible/enabled/masked/denied behavior.</td></tr>
+          <tr><td><code>a11yContract</code></td><td>object</td><td>ARIA roles, keyboard, focus management, live region và labels.</td></tr>
+          <tr><td><code>responsiveContract</code></td><td>object</td><td>Behavior tại mỗi breakpoint/container, min/max dimensions và overflow.</td></tr>
+          <tr><td><code>themeContract</code></td><td>object</td><td>Tokens block sử dụng, contrast rules và high-contrast behavior.</td></tr>
+          <tr><td><code>printExportContract</code></td><td>object</td><td>Print, PDF, CSV, XLSX hoặc not applicable.</td></tr>
+          <tr><td><code>testIds</code></td><td>object</td><td>Stable <code>data-testid</code> map cho UI tests.</td></tr>
+          <tr><td><code>qaEvidence</code></td><td>object</td><td>Test results, screenshots, a11y audit và review evidence.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-green">Full example</span><code>data-table</code> block contract</div>
+    <div class="card-body">
+      <div class="code-block">{
+  "blockType": "data-table",
+  "version": "2.1.0",
+  "owner": "Platform Team",
+  "propsSchema": {
+    "type": "object",
+    "required": ["columns", "dataSource"],
+    "properties": {
+      "columns": {
+        "type": "array",
+        "items": {
+          "$ref": "#/defs/column"
+        }
+      },
+      "dataSource": {
+        "type": "string",
+        "description": "API endpoint"
+      },
+      "pagination": {
+        "type": "boolean",
+        "default": true
+      },
+      "selectable": {
+        "type": "boolean",
+        "default": false
+      }
+    }
+  },
+  "dataSourceSchema": {
+    "type": "object",
+    "properties": {
+      "endpoint": {
+        "type": "string"
+      },
+      "method": {
+        "type": "string",
+        "enum": ["GET", "POST"]
+      },
+      "params": {
+        "type": "object"
+      },
+      "refreshSec": {
+        "type": "number",
+        "minimum": 0
+      },
+      "cacheKey": {
+        "type": "string"
+      }
+    }
+  },
+  "eventContract": {
+    "emits": ["row-click", "row-select", "sort-change", "page-change", "export-request"],
+    "listens": ["filter-apply", "refresh", "selection-clear"]
+  },
+  "stateContract": {
+    "rows": "array",
+    "selectedIds": "Set",
+    "sortColumn": "string|null",
+    "sortDirection": "asc|desc",
+    "currentPage": "number",
+    "pageSize": "number",
+    "loading": "boolean",
+    "error": "string|null",
+    "permissionDenied": "boolean"
+  },
+  "permissionContract": {
+    "view": "module.{domain}.read",
+    "export": "module.{domain}.export",
+    "bulkAction": "module.{domain}.write"
+  },
+  "a11yContract": {
+    "role": "grid",
+    "ariaLabel": "required - mô tả bảng",
+    "keyboardNav": "arrow keys row/cell, Enter activate, Space select",
+    "focusManagement": "roving tabindex trên rows",
+    "sortAnnounce": "aria-sort trên column headers",
+    "liveRegion": "aria-live polite cho loading/error states"
+  },
+  "responsiveContract": {
+    "xl": "full columns",
+    "lg": "hide priority-3 columns",
+    "md": "hide priority-2+3, horizontal scroll",
+    "sm": "card view hoặc stacked rows"
+  },
+  "themeContract": {
+    "tokens": ["--table-header-bg", "--table-row-hover", "--table-border", "--table-stripe-bg", "--table-selected-bg"],
+    "contrast": "AA minimum for text and 3:1 non-text focus indicators"
+  },
+  "printExportContract": {
+    "printLayout": "landscape A4, all rows without pagination",
+    "exportFormats": ["csv", "xlsx", "pdf"],
+    "headerRepeat": true
+  },
+  "testIds": {
+    "container": "block-data-table",
+    "header": "dt-header-{columnId}",
+    "row": "dt-row-{index}",
+    "cell": "dt-cell-{columnId}-{index}",
+    "pagination": "dt-pagination",
+    "export": "dt-export-btn"
+  },
+  "qaEvidence": {
+    "unitTests": "tests/blocks/data-table.test.js",
+    "a11yAudit": "reports/a11y/data-table.html",
+    "screenshot": "screenshots/data-table-{breakpoint}.png"
+  }
+}</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><span class="chip chip-green">Transactional form</span><code>form-standard</code></div>
+      <div class="card-body">
+        <div class="code-block">{
+  "blockType": "form-standard",
+  "version": "2.0.0",
+  "owner": "Platform Team",
+  "propsSchema": {
+    "required": ["fields", "submitAction"],
+    "properties": {
+      "fields": "array&lt;FieldContract&gt;",
+      "sections": "array&lt;FormSection&gt;",
+      "validationMode": "on-submit|on-blur|live"
+    }
+  },
+  "dataSourceSchema": {
+    "loadEndpoint": "string|null",
+    "submitEndpoint": "string",
+    "method": "POST|PUT|PATCH"
+  },
+  "eventContract": {
+    "emits": ["submit", "validation-error", "dirty-change"],
+    "listens": ["record-load", "permission-change"]
+  },
+  "stateContract": {
+    "dirty": "boolean",
+    "saving": "boolean",
+    "errors": "object",
+    "readonly": "boolean"
+  },
+  "permissionContract": {
+    "edit": "module.{domain}.write",
+    "fieldLocks": "per-field permission map"
+  },
+  "a11yContract": {
+    "role": "form",
+    "labels": "explicit label for every control",
+    "errors": "aria-errormessage and summary focus"
+  },
+  "responsiveContract": {
+    "xl": "2-3 columns",
+    "lg": "2 columns",
+    "md": "1-2 columns",
+    "sm": "1 column"
+  },
+  "themeContract": {
+    "tokens": ["--bg-input", "--border", "--focus-ring", "--text-error"]
+  },
+  "printExportContract": {
+    "printLayout": "read-only form summary",
+    "exportFormats": ["pdf"]
+  },
+  "testIds": {
+    "container": "block-form-standard",
+    "field": "form-field-{fieldId}",
+    "submit": "form-submit"
+  },
+  "qaEvidence": {
+    "unitTests": "tests/blocks/form-standard.test.js",
+    "a11yAudit": "reports/a11y/form-standard.html",
+    "screenshot": "screenshots/form-standard-{breakpoint}.png"
+  }
+}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="chip chip-blue">Control tower</span><code>kpi-card</code></div>
+      <div class="card-body">
+        <div class="code-block">{
+  "blockType": "kpi-card",
+  "version": "1.4.0",
+  "owner": "Analytics Team",
+  "propsSchema": {
+    "required": ["label", "value", "unit"],
+    "properties": {
+      "label": "i18n string",
+      "value": "number|string",
+      "unit": "string",
+      "trend": "object|null",
+      "freshness": "datetime|null"
+    }
+  },
+  "dataSourceSchema": {
+    "endpoint": "string",
+    "refreshSec": "number",
+    "staleAfterSec": "number"
+  },
+  "eventContract": {
+    "emits": ["kpi-drilldown"],
+    "listens": ["refresh", "filter-change"]
+  },
+  "stateContract": {
+    "loading": "boolean",
+    "stale": "boolean",
+    "error": "string|null"
+  },
+  "permissionContract": {
+    "view": "module.{domain}.read",
+    "masked": "module.{domain}.masked"
+  },
+  "a11yContract": {
+    "role": "group",
+    "ariaLabel": "label, value, unit, trend and freshness",
+    "liveRegion": "polite when value refreshes"
+  },
+  "responsiveContract": {
+    "xl": "large value",
+    "lg": "default value",
+    "md": "compact value",
+    "sm": "stacked label/value"
+  },
+  "themeContract": {
+    "tokens": ["--bg-surface", "--text-primary", "--text-secondary", "--border"]
+  },
+  "printExportContract": {
+    "printLayout": "summary metric row",
+    "exportFormats": ["pdf"]
+  },
+  "testIds": {
+    "container": "block-kpi-card",
+    "value": "kpi-value",
+    "trend": "kpi-trend"
+  },
+  "qaEvidence": {
+    "unitTests": "tests/blocks/kpi-card.test.js",
+    "a11yAudit": "reports/a11y/kpi-card.html",
+    "screenshot": "screenshots/kpi-card-{breakpoint}.png"
+  }
+}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="chip chip-purple">Planning board</span><code>gantt-chart</code></div>
+      <div class="card-body">
+        <div class="code-block">{
+  "blockType": "gantt-chart",
+  "version": "1.2.0",
+  "owner": "Planning Team",
+  "propsSchema": {
+    "required": ["resources", "tasks", "timeScale"],
+    "properties": {
+      "resources": "array&lt;Resource&gt;",
+      "tasks": "array&lt;Task&gt;",
+      "timeScale": "day|week|month",
+      "editable": "boolean"
+    }
+  },
+  "dataSourceSchema": {
+    "endpoint": "string",
+    "method": "GET",
+    "refreshSec": "number"
+  },
+  "eventContract": {
+    "emits": ["task-open", "task-reschedule", "dependency-change"],
+    "listens": ["filter-change", "capacity-refresh"]
+  },
+  "stateContract": {
+    "loading": "boolean",
+    "selectedTaskId": "string|null",
+    "dragging": "boolean",
+    "conflicts": "array"
+  },
+  "permissionContract": {
+    "view": "planning.read",
+    "reschedule": "planning.write",
+    "approveConflict": "planning.approve"
+  },
+  "a11yContract": {
+    "role": "grid",
+    "keyboard": "arrow navigation by resource/time cell",
+    "alternativeView": "table list required"
+  },
+  "responsiveContract": {
+    "xl": "full timeline",
+    "lg": "resource sidebar narrow",
+    "md": "horizontal scroll",
+    "sm": "list fallback"
+  },
+  "themeContract": {
+    "tokens": ["--chart-1", "--chart-2", "--border", "--bg-surface-alt"]
+  },
+  "printExportContract": {
+    "printLayout": "landscape A3 or tiled A4",
+    "exportFormats": ["pdf", "xlsx"]
+  },
+  "testIds": {
+    "container": "block-gantt-chart",
+    "task": "gantt-task-{taskId}",
+    "resource": "gantt-resource-{resourceId}"
+  },
+  "qaEvidence": {
+    "unitTests": "tests/blocks/gantt-chart.test.js",
+    "a11yAudit": "reports/a11y/gantt-chart.html",
+    "screenshot": "screenshots/gantt-chart-{breakpoint}.png"
+  }
+}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="chip chip-amber">Multi-archetype</span><code>action-bar</code></div>
+      <div class="card-body">
+        <div class="code-block">{
+  "blockType": "action-bar",
+  "version": "1.1.0",
+  "owner": "Platform Team",
+  "propsSchema": {
+    "required": ["actions"],
+    "properties": {
+      "actions": "array&lt;Action&gt;",
+      "layout": "left|right|split|sticky",
+      "confirmPolicy": "object"
+    }
+  },
+  "dataSourceSchema": {
+    "endpoint": "string|null",
+    "method": "POST|PATCH|null"
+  },
+  "eventContract": {
+    "emits": ["action-click", "action-confirm", "action-cancel"],
+    "listens": ["dirty-change", "permission-change", "selection-change"]
+  },
+  "stateContract": {
+    "disabledActions": "array",
+    "pendingAction": "string|null",
+    "dirty": "boolean",
+    "saving": "boolean"
+  },
+  "permissionContract": {
+    "visible": "per-action permission",
+    "enabled": "per-action guard",
+    "danger": "requires explicit reason when configured"
+  },
+  "a11yContract": {
+    "role": "toolbar",
+    "keyboard": "Tab order follows visual order",
+    "confirm": "modal focus trap for destructive action"
+  },
+  "responsiveContract": {
+    "xl": "inline",
+    "lg": "inline",
+    "md": "wrap",
+    "sm": "stack full-width buttons"
+  },
+  "themeContract": {
+    "tokens": ["--brand-2", "--red", "--border", "--focus-ring"]
+  },
+  "printExportContract": {
+    "printLayout": "hidden unless export metadata action",
+    "exportFormats": []
+  },
+  "testIds": {
+    "container": "block-action-bar",
+    "action": "action-{actionId}",
+    "confirm": "action-confirm"
+  },
+  "qaEvidence": {
+    "unitTests": "tests/blocks/action-bar.test.js",
+    "a11yAudit": "reports/a11y/action-bar.html",
+    "screenshot": "screenshots/action-bar-{breakpoint}.png"
+  }
+}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="info-box info-box-green">
+      <strong>DO</strong>
+      Lưu mỗi block contract ở dạng JSON machine-readable, ví dụ <code>mom/data/block-contracts/{blockType}.json</code>. Template registry không được cho phép block type chưa có contract.
+    </div>
+    <div class="info-box info-box-red">
+      <strong>DON'T</strong>
+      Không coi bảng mô tả block ở <a href="#block-engine">Section 37</a> là contract production. Bảng đó là catalog tham khảo; contract production phải có schema, permissions, a11y, responsive, test ids và QA evidence.
+    </div>
+  </div>
+</section>

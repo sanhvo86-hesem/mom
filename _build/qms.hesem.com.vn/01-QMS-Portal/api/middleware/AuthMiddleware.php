@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Middleware;
+namespace MOM\Api\Middleware;
 
-use HESEM\QMS\Api\Controllers\ExitException;
+use MOM\Api\Controllers\ExitException;
 
 /**
- * Authentication middleware for HESEM QMS API.
+ * Authentication middleware for HESEM MOM API.
  *
  * Performs session-based auth checks and TOTP 2FA verification.
  * Skips authentication for public endpoints (login, status).
  *
- * @package HESEM\QMS\Api\Middleware
+ * @package MOM\Api\Middleware
  * @since   2.0.0
  */
 class AuthMiddleware

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * HESEM QMS - Secure Server-Side API (single-file)
+ * HESEM MOM - Secure Server-Side API (single-file)
  * - Session auth
  * - CSRF token
  * - TOTP 2FA (Authenticator)
@@ -19,21 +19,66 @@ ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
 $BASE_DIR   = __DIR__;
-// Project root (one level above /01-QMS-Portal)
+// Project root (one level above /mom)
 $ROOT_DIR = realpath($BASE_DIR . '/..') ?: dirname($BASE_DIR);
 $ROOT_PARENT_DIR = realpath($ROOT_DIR . '/..') ?: dirname($ROOT_DIR);
 
-$LEGACY_DATA_DIR = $BASE_DIR . '/qms-data';
-$DATA_DIR_ENV = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
-
-if ($DATA_DIR_ENV !== '') {
-  $DATA_DIR = rtrim(str_replace('\\', '/', $DATA_DIR_ENV), '/\\');
-} else {
-  // NOTE: Always use in-repo qms-data dir. Do NOT create qms-data-private outside
-  // the repo — it breaks git deploy (files outside repo are not synced by git pull).
-  // All config/data lives in 01-QMS-Portal/qms-data/ which is protected by .htaccess.
-  $DATA_DIR = $LEGACY_DATA_DIR;
+function normalize_runtime_dir(string $dir): string {
+  return rtrim(str_replace('\\', '/', trim($dir)), '/\\');
 }
+
+function runtime_dir_has_bootstrap_files(string $dir): bool {
+  $dir = normalize_runtime_dir($dir);
+  if ($dir === '') return false;
+  $configDir = $dir . '/config';
+  $markers = [
+    'users.json',
+    'role_permissions.json',
+    'docs_custom.json',
+    'form_control_registry.json',
+  ];
+  foreach ($markers as $marker) {
+    if (is_file($configDir . '/' . $marker)) return true;
+  }
+  return false;
+}
+
+function runtime_dir_looks_like_legacy_qms(string $dir): bool {
+  $dir = normalize_runtime_dir($dir);
+  if ($dir === '') return false;
+  return strtolower((string)pathinfo($dir, PATHINFO_BASENAME)) === 'qms-data';
+}
+
+function resolve_runtime_data_dir(string $envDir, string $inRepoDir, string $legacyCompatDir): string {
+  $envDir = normalize_runtime_dir($envDir);
+  $inRepoDir = normalize_runtime_dir($inRepoDir);
+  $legacyCompatDir = normalize_runtime_dir($legacyCompatDir);
+
+  if ($envDir !== '') {
+    if ($envDir === $inRepoDir) return $inRepoDir;
+
+    // The MOM/VPS migration changed the canonical runtime path from `qms-data`
+    // to `mom/data`. If the environment still points to a legacy `qms-data`
+    // directory, prefer the in-repo runtime tree when it is already initialized
+    // so stale migrated config cannot shadow the current portal.
+    if (runtime_dir_looks_like_legacy_qms($envDir) && runtime_dir_has_bootstrap_files($inRepoDir)) {
+      @error_log('[API] QMS_DATA_DIR points to legacy qms-data; preferring in-repo mom/data: ' . $envDir);
+      return $inRepoDir;
+    }
+
+    if (runtime_dir_has_bootstrap_files($envDir)) return $envDir;
+  }
+
+  if (runtime_dir_has_bootstrap_files($inRepoDir)) return $inRepoDir;
+  if (runtime_dir_has_bootstrap_files($legacyCompatDir)) return $legacyCompatDir;
+  if ($envDir !== '') return $envDir;
+  return $inRepoDir;
+}
+
+$LEGACY_DATA_DIR = is_dir($BASE_DIR . '/qms-data') ? $BASE_DIR . '/qms-data' : $BASE_DIR . '/data';
+$LEGACY_COMPAT_DATA_DIR = $ROOT_DIR . '/qms-data';
+$DATA_DIR_ENV = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
+$DATA_DIR = resolve_runtime_data_dir($DATA_DIR_ENV, $LEGACY_DATA_DIR, $LEGACY_COMPAT_DATA_DIR);
 
 if (!is_dir($DATA_DIR)) @mkdir($DATA_DIR, 0775, true);
 
@@ -43,6 +88,7 @@ $ROLE_PERMS_FILE   = $CONF_DIR . '/role_permissions.json';
 $CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.local.json';
 $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
 $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
+$MODULE_ACCESS_CONFIG_FILE = $CONF_DIR . '/module_access_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $EVIDENCE_RETENTION_POLICY_FILE = $CONF_DIR . '/evidence_retention_policy.json';
 $EVIDENCE_REVIEW_SLA_POLICY_FILE = $CONF_DIR . '/evidence_review_sla_policy.json';
@@ -55,6 +101,7 @@ $RELEASE_FOLLOWUP_STORE_FILE = $DATA_DIR . '/training/release-followup.json';
 $EPICOR_POLICY_FILE = $CONF_DIR . '/epicor_integration_policy.json';
 $RUNTIME_DATA_LAYER_OVERRIDE_FILE = $CONF_DIR . '/runtime_data_layer_overrides.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
+$PORTAL_ROLE_DOCS_FILE = $CONF_DIR . '/portal_role_docs.json';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
 $MAX_FORM_UPLOAD_BYTES = 25 * 1024 * 1024;
@@ -64,8 +111,8 @@ $PENDING_AUTH_TTL_SECONDS = 10 * 60;
 $ARCHIVE_DIR = $ROOT_DIR . '/archive';
 
 // Dictionary data file (editable via Admin)
-$DICT_JSON_FILE = $ROOT_DIR . '/11-Glossary/dict-data.json';
-$DICT_JS_FILE   = $ROOT_DIR . '/11-Glossary/dict-data.js';
+$DICT_JSON_FILE = $ROOT_DIR . '/mom/docs/glossary/dict-data.json';
+$DICT_JS_FILE   = $ROOT_DIR . '/mom/docs/glossary/dict-data.js';
 
 @ini_set('error_log', $LOG_FILE);
 
@@ -80,10 +127,41 @@ register_shutdown_function(function () {
 
 set_exception_handler(function (Throwable $e) {
   @error_log('[API] Uncaught: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-  api_json(['ok' => false, 'error' => 'server_error'], 500);
+  // ExitException is the MVC router's structured response mechanism.
+  // When it escapes (e.g. from within the Router's emitResponse path or from
+  // within this very handler), emit its payload directly rather than calling
+  // api_json(), which would re-throw ExitException when API_THROW_RESPONSES
+  // is true (test mode), causing a fatal "Uncaught ExitException" loop.
+  if ($e instanceof \MOM\Api\Controllers\ExitException) {
+    if (!headers_sent()) {
+      http_response_code($e->getStatusCode());
+      foreach ($e->getHeaders() as $name => $value) {
+        header($name . ': ' . $value);
+      }
+    }
+    $body = $e->getBody();
+    if ($body !== '') {
+      echo $body;
+    }
+    exit;
+  }
+  // For all other uncaught exceptions, send a plain server_error JSON response.
+  // Use echo+exit directly here to avoid the ExitException re-throw loop that
+  // would occur if api_json() is called while API_THROW_RESPONSES is true.
+  if (!headers_sent()) {
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('X-Content-Type-Options: nosniff');
+  }
+  echo json_encode(['ok' => false, 'error' => 'server_error', 'server_time' => gmdate('c')], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  exit;
 });
 
 set_error_handler(function (int $severity, string $message, string $file, int $line) {
+  if (!(error_reporting() & $severity)) {
+    return false;
+  }
   throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
@@ -95,7 +173,7 @@ function api_json(array $payload, int $code = 200): void {
   }
 
   if (defined('API_THROW_RESPONSES') && API_THROW_RESPONSES) {
-    throw \HESEM\QMS\Api\Controllers\ExitException::json($payload, $code, [
+    throw \MOM\Api\Controllers\ExitException::json($payload, $code, [
       'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
       'X-Content-Type-Options' => 'nosniff',
       'X-Frame-Options' => 'SAMEORIGIN',
@@ -126,7 +204,12 @@ function ensure_dir(string $dir): void {
   }
   // Try to ensure directory is writable (shared hosting / CGI setups)
   if (is_dir($dir) && !is_writable($dir)) {
-    @chmod($dir, 0775);
+    $ownerId = @fileowner($dir);
+    $effectiveUserId = function_exists('posix_geteuid') ? @posix_geteuid() : false;
+    if ($ownerId !== false && $effectiveUserId !== false && (int)$ownerId !== (int)$effectiveUserId) {
+      return;
+    }
+    try { @chmod($dir, 0775); } catch (\Throwable $e) {}
   }
 }
 
@@ -184,7 +267,7 @@ function migrate_role(string $role): string {
 }
 
 function admin_roles(): array {
-  return ['it_admin', 'ceo', 'qa_manager',
+  return ['admin', 'it_admin', 'ceo', 'qa_manager',
           // Legacy names (pre-v10)
           'general_director', 'qms_supervisor', 'doc_controller'];
 }
@@ -244,7 +327,7 @@ function is_inside_root(string $absPath, string $rootDir): bool {
 function is_reserved_root_segment(string $relPath): bool {
   $relPath = safe_rel_path($relPath);
   $first = explode('/', $relPath, 2)[0] ?? '';
-  $reserved = ['01-QMS-Portal', 'assets', '11-Glossary', 'archive', '_Deleted', '.git'];
+  $reserved = ['mom', 'assets', 'mom/docs/glossary', 'archive', '_Deleted', '.git'];
   return in_array($first, $reserved, true);
 }
 
@@ -259,15 +342,15 @@ function first_existing_rel_dir(array $candidates, string $rootDir): string {
 
 function default_folder_for_cat(string $cat, string $rootDir): string {
   $candidates = match ($cat) {
-    'MAN' => ['02-Tai-Lieu-He-Thong/01-Quality-Manual'],
-    'POL' => ['02-Tai-Lieu-He-Thong/02-Policies-Objectives'],
-    'ORG', 'JD', 'DEP' => ['02-Tai-Lieu-He-Thong/03-Organization'],
-    'SOP', 'PROC' => ['03-Tai-Lieu-Van-Hanh/01-SOPs'],
-    'WI' => ['03-Tai-Lieu-Van-Hanh/02-Work-Instructions'],
-    'ANNEX' => ['03-Tai-Lieu-Van-Hanh/03-Reference'],
-    'FRM' => ['04-Bieu-Mau'],
-    'TRN' => ['10-Training-Academy'],
-    default => ['03-Tai-Lieu-Van-Hanh/01-SOPs'],
+    'MAN' => ['mom/docs/system/quality-manual', '02-Tai-Lieu-He-Thong/01-Quality-Manual'],
+    'POL' => ['mom/docs/system/policies', '02-Tai-Lieu-He-Thong/02-Policies-Objectives'],
+    'ORG', 'JD', 'DEP' => ['mom/docs/system/organization', '02-Tai-Lieu-He-Thong/03-Organization'],
+    'SOP', 'PROC' => ['mom/docs/operations/sops', '03-Tai-Lieu-Van-Hanh/01-SOPs'],
+    'WI' => ['mom/docs/operations/work-instructions', '03-Tai-Lieu-Van-Hanh/02-Work-Instructions'],
+    'ANNEX' => ['mom/docs/operations/references', '03-Tai-Lieu-Van-Hanh/03-Reference'],
+    'FRM' => ['mom/docs/forms', '04-Bieu-Mau'],
+    'TRN' => ['mom/docs/training', '10-Training-Academy'],
+    default => ['mom/docs/operations/sops', '03-Tai-Lieu-Van-Hanh/01-SOPs'],
   };
   return first_existing_rel_dir($candidates, $rootDir);
 }
@@ -310,13 +393,21 @@ function scan_cat_from_filename(string $fn): ?string {
 
 function scan_cat_from_subfolder(string $subName): ?string {
   $map = [
-    'Quality-Manual' => 'MAN', 'Policies-Objectives' => 'POL',
-    'SOPs' => 'SOP', 'Work-Instructions' => 'WI', 'Reference' => 'ANNEX',
+    'Quality-Manual' => 'MAN', 'quality-manual' => 'MAN', 'Quality Manual' => 'MAN', 'quality manual' => 'MAN',
+    'Policies-Objectives' => 'POL', 'policies' => 'POL', 'Policies Objectives' => 'POL', 'policies objectives' => 'POL',
+    'SOPs' => 'SOP', 'sops' => 'SOP',
+    'Work-Instructions' => 'WI', 'work-instructions' => 'WI', 'Work Instructions' => 'WI', 'work instructions' => 'WI',
+    'Reference' => 'ANNEX', 'references' => 'ANNEX',
     'ANNEX-System' => 'ANNEX', 'ANNEX-Standards' => 'ANNEX', 'ANNEX-Digital' => 'ANNEX',
-    'Organization' => 'ORG', 'Org-Chart' => 'ORG', 'Department-Handbooks' => 'ORG',
-    'Job-Descriptions' => 'ORG', 'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
+    'Organization' => 'ORG', 'organization' => 'ORG', 'Org-Chart' => 'ORG',
+    'Department-Handbooks' => 'ORG', 'Department Handbooks' => 'ORG',
+    'Job-Descriptions' => 'ORG', 'Job Descriptions' => 'ORG',
+    'RACI-Authority' => 'ORG', 'RACI Authority' => 'ORG', 'Labor-Relations' => 'ORG', 'Labor Relations' => 'ORG',
     'Bieu-Mau' => 'FRM',
-    'Competency-System' => 'TRN', 'Training-Content' => 'TRN', 'System-Operations' => 'TRN',
+    'Competency-System' => 'TRN', 'Competency System' => 'TRN', 'competency' => 'TRN',
+    'Training-Content' => 'TRN', 'content' => 'TRN',
+    'System-Operations' => 'TRN', 'System Operations' => 'TRN', 'system-ops' => 'TRN', 'System Ops' => 'TRN',
+    'templates' => 'TRN', 'Templates' => 'TRN',
   ];
   foreach ($map as $k => $v) {
     if (stripos($subName, $k) !== false) return $v;
@@ -352,6 +443,139 @@ function scan_classify_doc_cat(string $topCat, ?string $subName, string $fn): st
     return scan_cat_from_subfolder((string)$subName) ?? scan_cat_from_filename($fn) ?? $topCat;
   }
   return $topCat !== '' ? $topCat : (scan_cat_from_filename($fn) ?? 'SOP');
+}
+
+function portal_doc_legacy_to_canonical_prefix_map(): array {
+  static $map = [
+    '10-Training-Academy/01-Competency-System/' => 'mom/docs/training/competency/',
+    '10-Training-Academy/02-Training-Content/' => 'mom/docs/training/content/',
+    '10-Training-Academy/03-System-Operations/' => 'mom/docs/training/system-ops/',
+    '10-Training-Academy/04-Templates/' => 'mom/docs/training/templates/',
+    '02-Tai-Lieu-He-Thong/01-Quality-Manual/' => 'mom/docs/system/quality-manual/',
+    '02-Tai-Lieu-He-Thong/02-Policies-Objectives/' => 'mom/docs/system/policies/',
+    '02-Tai-Lieu-He-Thong/03-Organization/' => 'mom/docs/system/organization/',
+    '03-Tai-Lieu-Van-Hanh/01-SOPs/' => 'mom/docs/operations/sops/',
+    '03-Tai-Lieu-Van-Hanh/02-Work-Instructions/' => 'mom/docs/operations/work-instructions/',
+    '03-Tai-Lieu-Van-Hanh/03-Reference/' => 'mom/docs/operations/references/',
+    '04-Bieu-Mau/' => 'mom/docs/forms/',
+    '10-Training-Academy/' => 'mom/docs/training/',
+    '01-QMS-Portal/' => 'mom/',
+  ];
+  return $map;
+}
+
+function portal_doc_canonical_to_legacy_prefix_map(): array {
+  static $map = [
+    'mom/docs/training/competency/' => '10-Training-Academy/01-Competency-System/',
+    'mom/docs/training/content/' => '10-Training-Academy/02-Training-Content/',
+    'mom/docs/training/system-ops/' => '10-Training-Academy/03-System-Operations/',
+    'mom/docs/training/templates/' => '10-Training-Academy/04-Templates/',
+    'mom/docs/system/quality-manual/' => '02-Tai-Lieu-He-Thong/01-Quality-Manual/',
+    'mom/docs/system/policies/' => '02-Tai-Lieu-He-Thong/02-Policies-Objectives/',
+    'mom/docs/system/organization/' => '02-Tai-Lieu-He-Thong/03-Organization/',
+    'mom/docs/operations/sops/' => '03-Tai-Lieu-Van-Hanh/01-SOPs/',
+    'mom/docs/operations/work-instructions/' => '03-Tai-Lieu-Van-Hanh/02-Work-Instructions/',
+    'mom/docs/operations/references/' => '03-Tai-Lieu-Van-Hanh/03-Reference/',
+    'mom/docs/forms/' => '04-Bieu-Mau/',
+    'mom/docs/training/' => '10-Training-Academy/',
+    'mom/' => '01-QMS-Portal/',
+  ];
+  return $map;
+}
+
+function portal_apply_prefix_map(string $path, array $map): string {
+  $normalized = ltrim(str_replace('\\', '/', trim($path)), '/');
+  foreach ($map as $from => $to) {
+    $from = ltrim((string)$from, '/');
+    $to = ltrim((string)$to, '/');
+    $fromTrimmed = rtrim($from, '/');
+    $toTrimmed = rtrim($to, '/');
+    if ($normalized === $fromTrimmed) return $toTrimmed;
+    if (str_starts_with($normalized, $from)) return $to . substr($normalized, strlen($from));
+  }
+  return $normalized;
+}
+
+function portal_map_legacy_doc_path_to_canonical(string $path): string {
+  return portal_apply_prefix_map($path, portal_doc_legacy_to_canonical_prefix_map());
+}
+
+function portal_map_canonical_doc_path_to_legacy(string $path): string {
+  return portal_apply_prefix_map($path, portal_doc_canonical_to_legacy_prefix_map());
+}
+
+function portal_normalize_rel_like_path(string $path): string {
+  $path = str_replace('\\', '/', trim($path));
+  $absolute = str_starts_with($path, '/');
+  $parts = explode('/', $path);
+  $stack = [];
+  foreach ($parts as $part) {
+    $part = trim($part);
+    if ($part === '' || $part === '.') continue;
+    if ($part === '..') {
+      if (!empty($stack)) array_pop($stack);
+      continue;
+    }
+    $stack[] = $part;
+  }
+  $normalized = implode('/', $stack);
+  if ($absolute) return '/' . $normalized;
+  return $normalized;
+}
+
+function portal_resolve_relative_doc_path(string $baseDir, string $path): string {
+  $baseDir = trim(str_replace('\\', '/', $baseDir), '/');
+  $path = str_replace('\\', '/', trim($path));
+  if ($path === '') return $baseDir;
+  if (str_starts_with($path, '/')) return ltrim(portal_normalize_rel_like_path($path), '/');
+  return portal_normalize_rel_like_path($baseDir === '' ? $path : ($baseDir . '/' . $path));
+}
+
+function portal_doc_url_is_passthrough(string $url): bool {
+  $url = trim($url);
+  if ($url === '' || $url[0] === '#') return true;
+  if (str_starts_with($url, '//')) return true;
+  return preg_match('/^[a-z][a-z0-9+.-]*:/i', $url) === 1;
+}
+
+function portal_doc_url_looks_root_relative(string $path): bool {
+  return preg_match('#^(assets/|mom/|01-QMS-Portal/|02-Tai-Lieu-He-Thong/|03-Tai-Lieu-Van-Hanh/|04-Bieu-Mau/|10-Training-Academy/)#', $path) === 1;
+}
+
+function portal_normalize_streamed_doc_url(string $docRelPath, string $url): string {
+  $url = trim($url);
+  if (portal_doc_url_is_passthrough($url)) return $url;
+
+  if (!preg_match('/^([^?#]*)([?#].*)?$/', $url, $matches)) return $url;
+  $pathPart = trim((string)($matches[1] ?? ''));
+  $suffix = (string)($matches[2] ?? '');
+  if ($pathPart === '') return $url;
+
+  if (str_starts_with($pathPart, '/')) {
+    $resolved = ltrim($pathPart, '/');
+  } elseif (portal_doc_url_looks_root_relative($pathPart)) {
+    $resolved = $pathPart;
+  } else {
+    $legacyAlias = portal_map_canonical_doc_path_to_legacy($docRelPath);
+    $resolved = portal_resolve_relative_doc_path(dirname($legacyAlias), $pathPart);
+  }
+
+  $canonical = portal_map_legacy_doc_path_to_canonical($resolved);
+  if ($canonical === '') return $url;
+  return '/' . ltrim($canonical, '/') . $suffix;
+}
+
+function portal_rewrite_streamed_html(string $html, string $docRelPath): string {
+  $rewritten = preg_replace_callback('/\b(href|src)=("|\')(.*?)\2/i', function(array $matches) use ($docRelPath): string {
+    $attr = (string)($matches[1] ?? '');
+    $quote = (string)($matches[2] ?? '"');
+    $value = (string)($matches[3] ?? '');
+    $normalized = portal_normalize_streamed_doc_url($docRelPath, html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    if ($normalized === $value) return $matches[0];
+    return $attr . '=' . $quote . htmlspecialchars($normalized, ENT_QUOTES | ENT_HTML5, 'UTF-8') . $quote;
+  }, $html);
+
+  return is_string($rewritten) ? $rewritten : $html;
 }
 
 function rrmdir(string $dir): bool {
@@ -434,8 +658,14 @@ function write_json_file(string $path, array $data): void {
   $tmp = $path . '.tmp';
   $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
   if ($json === false) throw new RuntimeException('Failed to encode json');
-  if (@file_put_contents($tmp, $json, LOCK_EX) === false) throw new RuntimeException('Cannot write json');
-  @rename($tmp, $path);
+  $tmpWriteOk = @file_put_contents($tmp, $json, LOCK_EX);
+  if ($tmpWriteOk !== false) {
+    if (@rename($tmp, $path)) {
+      return;
+    }
+    @unlink($tmp);
+  }
+  if (@file_put_contents($path, $json, LOCK_EX) === false) throw new RuntimeException('Cannot write json');
 }
 
 function ts_compact(): string {
@@ -454,25 +684,837 @@ function sanitize_code(string $code): string {
 
 
 // ---------- Role permissions (server-backed) ----------
+function normalize_permission_value_list($value): array {
+  if (!is_array($value)) return [];
+  $patterns = [];
+  foreach ($value as $item) {
+    if (!is_scalar($item)) continue;
+    $pattern = trim((string)$item);
+    if ($pattern === '') continue;
+    $patterns[] = $pattern;
+  }
+  return array_values(array_unique($patterns));
+}
+
+function sanitize_role_permission_row(array $row): array {
+  $clean = [
+    'canCreateDocs' => (bool)($row['canCreateDocs'] ?? false),
+  ];
+
+  if (!empty($row['allowAllPermissions'])) {
+    $clean['allowAllPermissions'] = true;
+  }
+
+  $patterns = [];
+  foreach (['permissions', 'permission_keys', 'grants'] as $field) {
+    $patterns = array_merge($patterns, normalize_permission_value_list($row[$field] ?? null));
+  }
+  $patterns = array_values(array_unique($patterns));
+  if ($patterns !== []) {
+    $clean['permissions'] = $patterns;
+  }
+
+  $denies = normalize_permission_value_list($row['denies'] ?? null);
+  if ($denies !== []) {
+    $clean['denies'] = $denies;
+  }
+
+  foreach ($row as $key => $value) {
+    $permissionKey = trim((string)$key);
+    if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
+      continue;
+    }
+    if (!is_bool($value)) continue;
+    $clean[$permissionKey] = (bool)$value;
+  }
+
+  return $clean;
+}
+
 function default_role_permissions(): array {
-  // Roles that can create new documents by default
+  $nonDestructive = ['*.delete'];
+  $genericCrudRestrictedDomains = ['core_system.*', 'system_infrastructure.*', 'forms_system.*', 'record_system.*', 'master_data_governance.*', 'customer_portal.*'];
+  $restrictedMetadata = ['module_schema.*', 'registry.*', 'schema_studio.*'];
+  $businessRole = static function (array $permissions, bool $canCreateDocs = false) use ($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains): array {
+    return sanitize_role_permission_row([
+      'canCreateDocs' => $canCreateDocs,
+      'permissions' => array_values(array_unique(array_merge(['*.read'], $permissions))),
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains))),
+    ]);
+  };
+  $scopedRole = static function (array $permissions, bool $canCreateDocs = false) use ($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains): array {
+    return sanitize_role_permission_row([
+      'canCreateDocs' => $canCreateDocs,
+      'permissions' => array_values(array_unique($permissions)),
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains))),
+    ]);
+  };
+  $domainReadRole = static function (array $domains, bool $canCreateDocs = false) use ($scopedRole): array {
+    return $scopedRole(array_map(static fn(string $domain): string => $domain . '.*.read', $domains), $canCreateDocs);
+  };
+  $domainWriteRole = static function (array $domains, bool $canCreateDocs = false) use ($scopedRole): array {
+    return $scopedRole(array_map(static fn(string $domain): string => $domain . '.*', $domains), $canCreateDocs);
+  };
+  $noGenericCrudRole = static function (bool $canCreateDocs = false) use ($scopedRole): array {
+    return $scopedRole([], $canCreateDocs);
+  };
   return [
-    'ceo' => ['canCreateDocs' => true],
-    'qa_manager' => ['canCreateDocs' => true],
-    'qms_engineer' => ['canCreateDocs' => true],
-    'it_admin' => ['canCreateDocs' => true],
-    'production_director' => ['canCreateDocs' => true],
+    'ceo' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'allowAllPermissions' => true,
+      'permissions' => ['*'],
+    ]),
+    'it_admin' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'allowAllPermissions' => true,
+      'permissions' => ['*'],
+    ]),
+    'qa_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'allowAllPermissions' => true,
+      'permissions' => ['*'],
+    ]),
+    'quality_manager' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'permissions' => [
+        '*.read',
+        'audit_risk.*',
+        'calibration_equipment.*',
+        'document_control.*',
+        'evidence_vault.*',
+        'fmea_apqp.*',
+        'module_schema.read',
+        'module_schema.write',
+        'quality_lab.*',
+        'quality_management.*',
+        'registry.read',
+        'registry.write',
+        'supplier_relationship.*',
+        'schema_studio.*',
+      ],
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
+    ]),
+    'quality_engineer' => $domainWriteRole([
+      'audit_risk',
+      'calibration_equipment',
+      'quality_lab',
+      'quality_management',
+      'supplier_relationship',
+    ]),
+    'qc_inspector' => $domainWriteRole([
+      'audit_risk',
+      'calibration_equipment',
+      'quality_lab',
+      'quality_management',
+      'supplier_relationship',
+    ]),
+    'internal_auditor' => $noGenericCrudRole(),
+    'qms_engineer' => sanitize_role_permission_row([
+      'canCreateDocs' => true,
+      'permissions' => [
+        '*.read',
+        'audit_risk.*',
+        'calibration_equipment.*',
+        'document_control.*',
+        'evidence_vault.*',
+        'fmea_apqp.*',
+        'module_schema.read',
+        'module_schema.write',
+        'quality_lab.*',
+        'quality_management.*',
+        'registry.read',
+        'registry.write',
+        'supplier_relationship.*',
+        'schema_studio.*',
+      ],
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
+    ]),
+    'developer' => sanitize_role_permission_row([
+      'canCreateDocs' => false,
+      'permissions' => ['schema_studio.*'],
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
+    ]),
+    'shift_leader' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+    ]),
+    'setup_technician' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+    ]),
+    'cnc_operator' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+    ]),
+    'deburr_team_lead' => $noGenericCrudRole(),
+    'deburr_technician' => $noGenericCrudRole(),
+    'maintenance_technician' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+    ]),
+    'production_manager' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'mes_execution.*',
+      'mobile_operations.*',
+      'plant_maintenance.*',
+      'production.*',
+      'tooling_lifecycle.*',
+    ]),
+    'cnc_workshop_manager' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'mes_execution.*',
+      'mobile_operations.*',
+      'plant_maintenance.*',
+      'production.*',
+      'tooling_lifecycle.*',
+    ]),
+    'production_planner' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'production.*.read',
+      'production.*.update',
+      'production.*.transition',
+    ]),
+    'cleaning_packaging_supervisor' => $noGenericCrudRole(),
+    'cleaning_packaging_technician' => $noGenericCrudRole(),
+    'engineering_manager' => $businessRole([
+      'cnc_programs.*',
+      'fmea_apqp.*',
+      'mfg_engineering.*',
+      'plm_change_control.*',
+      'tooling_lifecycle.*',
+    ]),
+    'engineering_lead' => $businessRole([
+      'cnc_programs.*',
+      'fmea_apqp.*',
+      'mfg_engineering.*',
+      'plm_change_control.*',
+      'tooling_lifecycle.*',
+    ]),
+    'process_engineer' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+      'cnc_programs',
+      'fmea_apqp',
+      'mfg_engineering',
+      'plm_change_control',
+    ]),
+    'cam_nc_programmer' => $domainReadRole([
+      'advanced_planning',
+      'demand_supply_planning',
+      'mes_execution',
+      'mobile_operations',
+      'plant_maintenance',
+      'production',
+      'tooling_lifecycle',
+      'cnc_programs',
+      'fmea_apqp',
+      'mfg_engineering',
+      'plm_change_control',
+    ]),
+    'supply_chain_manager' => $businessRole([
+      'inventory.*',
+      'outsource_execution.*',
+      'purchasing.*',
+      'shipping_compliance.*',
+      'supplier_relationship.*',
+      'traceability_serialization.*',
+      'transportation.*',
+      'warehouse_management.*',
+    ]),
+    'buyer' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
+    ]),
+    'warehouse_clerk' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
+    ]),
+    'tool_storekeeper' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
+    ]),
+    'logistics_coordinator' => $domainReadRole([
+      'inventory',
+      'outsource_execution',
+      'purchasing',
+      'shipping_compliance',
+      'supplier_relationship',
+      'traceability_serialization',
+      'transportation',
+      'warehouse_management',
+    ]),
+    'finance_manager' => $businessRole([
+      'commercial_contracts.*',
+      'finance.*',
+      'finance_extended.*',
+      'finance_treasury.*',
+    ]),
+    'gl_payroll_accountant' => $businessRole([
+      'finance.*',
+      'finance_extended.*.read',
+      'finance_treasury.*.read',
+    ]),
+    'ap_ar_accountant' => $businessRole([
+      'finance.*',
+      'finance_extended.*.read',
+    ]),
+    'hr_manager' => $businessRole([
+      'hcm_workforce.*',
+      'training_hr.*',
+    ], true),
+    'ehs_specialist' => $noGenericCrudRole(),
+    'estimator' => $domainWriteRole([
+      'commercial_contracts',
+    ]),
+    'customer_service' => $domainWriteRole([
+      'commercial_contracts',
+    ]),
+    'sales_manager' => $domainWriteRole([
+      'commercial_contracts',
+    ]),
+    'epicor_admin' => $noGenericCrudRole(),
+    'production_director' => $businessRole([
+      'advanced_planning.*',
+      'demand_supply_planning.*',
+      'mes_execution.*',
+      'mobile_operations.*',
+      'plant_maintenance.*',
+      'production.*',
+      'tooling_lifecycle.*',
+    ], true),
   ];
 }
 
+function merge_role_permission_row(array $base, array $override): array {
+  $merged = $base;
+
+  if (array_key_exists('canCreateDocs', $override)) {
+    $merged['canCreateDocs'] = (bool)$override['canCreateDocs'];
+  }
+
+  if (!empty($base['allowAllPermissions']) || !empty($override['allowAllPermissions'])) {
+    $merged['allowAllPermissions'] = true;
+  } else {
+    unset($merged['allowAllPermissions']);
+  }
+
+  $mergedPermissions = array_values(array_unique(array_merge(
+    normalize_permission_value_list($base['permissions'] ?? null),
+    normalize_permission_value_list($override['permissions'] ?? null),
+    normalize_permission_value_list($override['permission_keys'] ?? null),
+    normalize_permission_value_list($override['grants'] ?? null)
+  )));
+  if ($mergedPermissions !== []) {
+    $merged['permissions'] = $mergedPermissions;
+  } else {
+    unset($merged['permissions']);
+  }
+
+  $mergedDenies = array_values(array_unique(array_merge(
+    normalize_permission_value_list($base['denies'] ?? null),
+    normalize_permission_value_list($override['denies'] ?? null)
+  )));
+  if ($mergedDenies !== []) {
+    $merged['denies'] = $mergedDenies;
+  } else {
+    unset($merged['denies']);
+  }
+
+  foreach ($override as $key => $value) {
+    $permissionKey = trim((string)$key);
+    if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
+      continue;
+    }
+    if (!is_bool($value)) {
+      continue;
+    }
+    $merged[$permissionKey] = $value;
+  }
+
+  return sanitize_role_permission_row($merged);
+}
+
+function portal_system_db_connection() {
+  static $initialized = false;
+  static $connection = null;
+
+  if ($initialized) {
+    return $connection;
+  }
+  $initialized = true;
+
+  $configFile = __DIR__ . '/database/config.php';
+  $connectionFile = __DIR__ . '/database/Connection.php';
+  if (!is_file($configFile) || !is_file($connectionFile)) {
+    return null;
+  }
+
+  $config = function_exists('runtime_data_layer_effective_config')
+    ? runtime_data_layer_effective_config()
+    : (array)(require $configFile);
+  $host = trim((string)($config['host'] ?? ''));
+  $database = trim((string)($config['database'] ?? ''));
+  $username = trim((string)($config['username'] ?? ''));
+  $password = trim((string)($config['password'] ?? ''));
+  $allowEmptyPassword = !empty($config['allow_empty_password']);
+  if ($host === '' || $database === '' || $username === '' || (!$allowEmptyPassword && $password === '')) {
+    return null;
+  }
+
+  require_once $connectionFile;
+  if (!class_exists('\MOM\Database\Connection')) {
+    return null;
+  }
+
+  try {
+    $connection = \MOM\Database\Connection::getInstance($config);
+  } catch (Throwable $e) {
+    @error_log('[API] system DB connection unavailable: ' . $e->getMessage());
+    $connection = null;
+  }
+
+  return $connection;
+}
+
+function portal_system_config_shadow_read(string $key): ?array {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return null;
+  }
+
+  try {
+    $row = $connection->queryOne(
+      "SELECT enum_values
+         FROM variable_registry
+        WHERE category = 'config' AND key = :key
+        LIMIT 1",
+      [':key' => $key]
+    );
+    if (!is_array($row) || !array_key_exists('enum_values', $row)) {
+      return null;
+    }
+    $value = $row['enum_values'];
+    if (is_array($value)) {
+      return $value;
+    }
+    if (is_string($value)) {
+      $decoded = json_decode($value, true);
+      return is_array($decoded) ? $decoded : null;
+    }
+  } catch (Throwable $e) {
+    @error_log('[API] config shadow read failed for ' . $key . ': ' . $e->getMessage());
+  }
+
+  return null;
+}
+
+function portal_system_config_shadow_write(string $key, array $value): void {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return;
+  }
+
+  try {
+    $connection->execute(
+      "INSERT INTO variable_registry (category, key, label, data_type, enum_values)
+       VALUES ('config', :key, :label, 'json', :value::jsonb)
+       ON CONFLICT (category, key) DO UPDATE SET
+         label = EXCLUDED.label,
+         data_type = EXCLUDED.data_type,
+         enum_values = EXCLUDED.enum_values",
+      [
+        ':key' => $key,
+        ':label' => $key,
+        ':value' => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+      ]
+    );
+  } catch (Throwable $e) {
+    @error_log('[API] config shadow write failed for ' . $key . ': ' . $e->getMessage());
+  }
+}
+
+function portal_system_normalize_uuid(?string $value): ?string {
+  $candidate = trim((string)$value);
+  if ($candidate === '') {
+    return null;
+  }
+  return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $candidate)
+    ? strtolower($candidate)
+    : null;
+}
+
+function portal_system_normalize_ip(?string $value): ?string {
+  $candidate = trim((string)$value);
+  if ($candidate === '') {
+    return null;
+  }
+  return filter_var($candidate, FILTER_VALIDATE_IP) ? $candidate : null;
+}
+
+function portal_system_audit_shadow_write(array $entry): void {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return;
+  }
+
+  $eventType = trim((string)($entry['event_type'] ?? ''));
+  if ($eventType === '') {
+    return;
+  }
+
+  $aggregateType = trim((string)($entry['aggregate_type'] ?? 'api_action'));
+  $aggregateId = trim((string)($entry['aggregate_id'] ?? ''));
+  $actorName = trim((string)($entry['actor_name'] ?? ''));
+  $actorId = trim((string)($entry['actor_id'] ?? ''));
+  $payload = is_array($entry['payload'] ?? null) ? (array)$entry['payload'] : [];
+  $metadata = is_array($entry['metadata'] ?? null) ? (array)$entry['metadata'] : [];
+  $recordedAt = trim((string)($entry['recorded_at'] ?? ''));
+  $recordedAt = $recordedAt !== '' ? $recordedAt : gmdate('c');
+  $ipAddress = portal_system_normalize_ip((string)($entry['ip_address'] ?? ''));
+  $sessionId = portal_system_normalize_uuid((string)($entry['session_id'] ?? ''));
+  $eventHash = sha1(json_encode([
+    'event_type' => $eventType,
+    'aggregate_type' => $aggregateType,
+    'aggregate_id' => $aggregateId,
+    'actor_id' => $actorId,
+    'actor_name' => $actorName,
+    'recorded_at' => $recordedAt,
+    'payload' => $payload,
+    'metadata' => $metadata,
+    'ip_address' => $ipAddress,
+  ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+  try {
+    $connection->execute(
+      'INSERT INTO audit_events (
+          event_type,
+          aggregate_type,
+          aggregate_id,
+          actor_id,
+          actor_name,
+          payload,
+          metadata,
+          ip_address,
+          session_id,
+          recorded_at,
+          source_event_hash
+       ) VALUES (
+          :event_type,
+          :aggregate_type,
+          :aggregate_id,
+          :actor_id,
+          :actor_name,
+          :payload::jsonb,
+          :metadata::jsonb,
+          :ip_address::inet,
+          :session_id::uuid,
+          :recorded_at::timestamptz,
+          :event_hash
+       )
+       ON CONFLICT (source_event_hash) DO NOTHING',
+      [
+        ':event_type' => $eventType,
+        ':aggregate_type' => $aggregateType,
+        ':aggregate_id' => $aggregateId !== '' ? $aggregateId : null,
+        ':actor_id' => $actorId !== '' ? $actorId : null,
+        ':actor_name' => $actorName !== '' ? $actorName : null,
+        ':payload' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        ':metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        ':ip_address' => $ipAddress,
+        ':session_id' => $sessionId,
+        ':recorded_at' => $recordedAt,
+        ':event_hash' => $eventHash,
+      ]
+    );
+  } catch (Throwable $e) {
+    @error_log('[API] audit shadow write failed: ' . $e->getMessage());
+  }
+}
+
+function portal_legacy_admin_audit_log(string $action, array $context = [], ?array $user = null): void {
+  global $DATA_DIR;
+
+  $username = trim((string)(($user['username'] ?? null) ?: ($_SESSION['user'] ?? 'anonymous')));
+  $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+  $timestamp = now_iso();
+  $entry = [
+    'action' => $action,
+    'user' => $username,
+    'ip' => $ip,
+    'timestamp' => $timestamp,
+    'context' => $context,
+  ];
+  if (is_string($DATA_DIR) && $DATA_DIR !== '') {
+    $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($line !== false) {
+      @file_put_contents(rtrim($DATA_DIR, '/\\') . '/audit.log', $line . "\n", FILE_APPEND | LOCK_EX);
+    }
+  }
+
+  $aggregateId = '';
+  foreach (['aggregate_id', 'id', 'username', 'code', 'record_id'] as $key) {
+    if (!isset($context[$key]) || !is_scalar($context[$key])) continue;
+    $candidate = trim((string)$context[$key]);
+    if ($candidate === '') continue;
+    $aggregateId = $candidate;
+    break;
+  }
+  if ($aggregateId === '') {
+    $aggregateId = $action;
+  }
+
+  portal_system_audit_shadow_write([
+    'event_type' => $action,
+    'aggregate_type' => 'api_action',
+    'aggregate_id' => $aggregateId,
+    'actor_name' => $username,
+    'ip_address' => $ip,
+    'session_id' => session_status() === PHP_SESSION_ACTIVE ? session_id() : null,
+    'recorded_at' => $timestamp,
+    'payload' => ['context' => $context],
+    'metadata' => [
+      'source' => 'legacy_api',
+      'transport' => 'api.php',
+      'context_keys' => array_values(array_map('strval', array_keys($context))),
+    ],
+  ]);
+}
+
+function portal_system_audit_shadow_read(array $filters = []): ?array {
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    return null;
+  }
+
+  $limit = max(1, min(1000, (int)($filters['limit'] ?? 200)));
+  $where = [];
+  $params = [':limit' => $limit];
+
+  $scalarFilters = [
+    'event_type' => 'event_type',
+    'aggregate_type' => 'aggregate_type',
+    'aggregate_id' => 'aggregate_id',
+    'actor_name' => 'actor_name',
+  ];
+  foreach ($scalarFilters as $key => $column) {
+    $value = trim((string)($filters[$key] ?? ''));
+    if ($value === '') {
+      continue;
+    }
+    $param = ':' . $key;
+    $where[] = $column . ' = ' . $param;
+    $params[$param] = $value;
+  }
+
+  $from = trim((string)($filters['from'] ?? ''));
+  if ($from !== '') {
+    $where[] = 'recorded_at >= :from::timestamptz';
+    $params[':from'] = $from;
+  }
+  $to = trim((string)($filters['to'] ?? ''));
+  if ($to !== '') {
+    $where[] = 'recorded_at <= :to::timestamptz';
+    $params[':to'] = $to;
+  }
+
+  $search = trim((string)($filters['search'] ?? ''));
+  if ($search !== '') {
+    $where[] = "(coalesce(actor_name,'') ILIKE :search OR coalesce(event_type,'') ILIKE :search OR coalesce(aggregate_type,'') ILIKE :search OR coalesce(aggregate_id,'') ILIKE :search OR CAST(payload AS text) ILIKE :search)";
+    $params[':search'] = '%' . $search . '%';
+  }
+
+  $sql = 'SELECT event_type, aggregate_type, aggregate_id, actor_id, actor_name, payload, metadata, ip_address::text AS ip_address, session_id::text AS session_id, recorded_at
+            FROM audit_events';
+  if ($where !== []) {
+    $sql .= ' WHERE ' . implode(' AND ', $where);
+  }
+  $sql .= ' ORDER BY recorded_at DESC LIMIT :limit';
+
+  try {
+    $rows = $connection->query($sql, $params);
+    return array_values(array_map(static function ($row): array {
+      return [
+        'event_type' => (string)($row['event_type'] ?? ''),
+        'aggregate_type' => (string)($row['aggregate_type'] ?? ''),
+        'aggregate_id' => (string)($row['aggregate_id'] ?? ''),
+        'actor_id' => (string)($row['actor_id'] ?? ''),
+        'actor_name' => (string)($row['actor_name'] ?? ''),
+        'payload' => is_array($row['payload'] ?? null) ? (array)$row['payload'] : (json_decode((string)($row['payload'] ?? '{}'), true) ?: []),
+        'metadata' => is_array($row['metadata'] ?? null) ? (array)$row['metadata'] : (json_decode((string)($row['metadata'] ?? '{}'), true) ?: []),
+        'ip_address' => (string)($row['ip_address'] ?? ''),
+        'session_id' => (string)($row['session_id'] ?? ''),
+        'recorded_at' => (string)($row['recorded_at'] ?? ''),
+      ];
+    }, is_array($rows) ? $rows : []));
+  } catch (Throwable $e) {
+    @error_log('[API] audit shadow read failed: ' . $e->getMessage());
+    return null;
+  }
+}
+
+function portal_auth_shadow_sync_service(string $rootDir) {
+  static $loaded = false;
+  static $serviceClassReady = false;
+
+  if (!$loaded) {
+    $loaded = true;
+    $connectionFile = __DIR__ . '/database/Connection.php';
+    $serviceFile = __DIR__ . '/api/services/AuthUserShadowSyncService.php';
+    if (is_file($connectionFile)) require_once $connectionFile;
+    if (is_file($serviceFile)) require_once $serviceFile;
+    $serviceClassReady = class_exists('\MOM\Api\Services\AuthUserShadowSyncService');
+  }
+
+  if (!$serviceClassReady) {
+    return null;
+  }
+
+  try {
+    return new \MOM\Api\Services\AuthUserShadowSyncService($rootDir);
+  } catch (Throwable $e) {
+    @error_log('[API] auth shadow sync service unavailable: ' . $e->getMessage());
+    return null;
+  }
+}
+
+function portal_auth_employee_id_for_user(array $user): string {
+  $existing = strtoupper(trim((string)($user['employee_id'] ?? '')));
+  if ($existing !== '') {
+    $sanitized = preg_replace('/[^A-Z0-9_-]/', '', $existing);
+    return substr((string)$sanitized, 0, 20);
+  }
+
+  $service = portal_auth_shadow_sync_service(__DIR__);
+  if ($service && method_exists($service, 'canonicalEmployeeIdForUser')) {
+    try {
+      return \MOM\Api\Services\AuthUserShadowSyncService::canonicalEmployeeIdForUser($user);
+    } catch (Throwable $e) {
+      @error_log('[API] employee ID generation via shadow service failed: ' . $e->getMessage());
+    }
+  }
+
+  $seed = strtolower(trim((string)($user['username'] ?? '')));
+  if ($seed === '') $seed = strtolower(trim((string)($user['personal_email'] ?? $user['email'] ?? '')));
+  if ($seed === '') $seed = strtolower(trim((string)($user['cccd'] ?? '')));
+  if ($seed === '') $seed = json_encode($user, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: uniqid('emp', true);
+  return 'EMP' . strtoupper(substr(sha1($seed), 0, 12));
+}
+
+function portal_auth_normalize_user_linkage(array $user, string $rootDir): array {
+  $fallback = [
+    'dept_code' => trim((string)($user['dept'] ?? '')) !== '' ? trim((string)$user['dept']) : null,
+    'hcm_org_unit_id' => trim((string)($user['hcm_org_unit_id'] ?? '')) !== '' ? trim((string)$user['hcm_org_unit_id']) : null,
+    'hcm_position_id' => trim((string)($user['hcm_position_id'] ?? '')) !== '' ? trim((string)$user['hcm_position_id']) : null,
+    'position_title' => trim((string)($user['title'] ?? '')),
+  ];
+
+  $service = portal_auth_shadow_sync_service($rootDir);
+  if (!$service || !method_exists($service, 'normalizeUserLinkage')) {
+    return $fallback;
+  }
+
+  try {
+    $normalized = $service->normalizeUserLinkage($user);
+    return is_array($normalized) ? array_merge($fallback, $normalized) : $fallback;
+  } catch (Throwable $e) {
+    @error_log('[API] auth user linkage normalize failed: ' . $e->getMessage());
+    return $fallback;
+  }
+}
+
+function portal_auth_shadow_sync_user(array $user, string $rootDir): void {
+  $service = portal_auth_shadow_sync_service($rootDir);
+  if (!$service || !method_exists($service, 'syncUser')) {
+    return;
+  }
+  try {
+    $service->syncUser($user);
+  } catch (Throwable $e) {
+    @error_log('[API] auth user shadow sync failed: ' . $e->getMessage());
+  }
+}
+
+function portal_auth_shadow_deactivate_user(string $username, ?string $employeeId, string $rootDir): void {
+  $service = portal_auth_shadow_sync_service($rootDir);
+  if (!$service || !method_exists($service, 'deactivateUser')) {
+    return;
+  }
+  try {
+    $service->deactivateUser($username, $employeeId);
+  } catch (Throwable $e) {
+    @error_log('[API] auth user shadow deactivate failed: ' . $e->getMessage());
+  }
+}
+
 function load_role_permissions(string $file): array {
-  $j = read_json_file($file);
-  if (is_array($j)) return $j;
-  return default_role_permissions();
+  $defaults = default_role_permissions();
+  $j = portal_system_config_shadow_read('role_permissions');
+  if (!is_array($j)) {
+    $j = read_json_file($file);
+  }
+  if (!is_array($j)) return $defaults;
+
+  $merged = $defaults;
+  foreach ($j as $role => $entry) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    if ($normalizedRole === '' || !is_array($entry)) {
+      continue;
+    }
+    $merged[$normalizedRole] = merge_role_permission_row($defaults[$normalizedRole] ?? [], $entry);
+  }
+
+  return $merged;
 }
 
 function save_role_permissions(string $file, array $perms): void {
   write_json_file($file, $perms);
+  portal_system_config_shadow_write('role_permissions', $perms);
 }
 
 function role_can_create_docs(array $user, string $file): bool {
@@ -485,6 +1527,172 @@ function role_can_create_docs(array $user, string $file): bool {
   $mRole = migrate_role($role);
   $creators = ['qa_manager', 'ceo', 'qms_engineer', 'it_admin', 'production_director'];
   return in_array($role, $creators, true) || in_array($mRole, $creators, true);
+}
+
+function normalize_permission_key(string $permission): string {
+  return strtolower(trim($permission));
+}
+
+/**
+ * @return array<int, string>
+ */
+function normalize_permission_patterns($patterns): array {
+  if (!is_array($patterns)) return [];
+  $normalized = [];
+  foreach ($patterns as $pattern) {
+    $value = normalize_permission_key((string)$pattern);
+    if ($value !== '' && !in_array($value, $normalized, true)) {
+      $normalized[] = $value;
+    }
+  }
+  return $normalized;
+}
+
+function permission_pattern_matches(string $permission, string $pattern): bool {
+  $permission = normalize_permission_key($permission);
+  $pattern = normalize_permission_key($pattern);
+
+  if ($permission === '' || $pattern === '') {
+    return false;
+  }
+  if ($pattern === '*') {
+    return true;
+  }
+
+  $regex = '/^' . str_replace('\*', '.*', preg_quote($pattern, '/')) . '$/';
+  return preg_match($regex, $permission) === 1;
+}
+
+/**
+ * @param array<string, mixed> $entry
+ * @return array<int, string>
+ */
+function role_permission_grants(array $entry): array {
+  $grants = normalize_permission_patterns($entry['permissions'] ?? []);
+  if (!empty($entry['allowAllPermissions']) && !in_array('*', $grants, true)) {
+    $grants[] = '*';
+  }
+  foreach ($entry as $key => $value) {
+    if (in_array($key, ['canCreateDocs', 'permissions', 'denies', 'allowAllPermissions'], true)) {
+      continue;
+    }
+    if (is_bool($value) && $value) {
+      $normalized = normalize_permission_key((string)$key);
+      if ($normalized !== '' && !in_array($normalized, $grants, true)) {
+        $grants[] = $normalized;
+      }
+    }
+  }
+  return $grants;
+}
+
+/**
+ * @param array<string, mixed> $entry
+ * @return array<int, string>
+ */
+function role_permission_denies(array $entry): array {
+  return normalize_permission_patterns($entry['denies'] ?? []);
+}
+
+/**
+ * @param string|array<int, string> $permissions
+ */
+function permission_matrix_manages_permission($permissions, string $file): bool {
+  $required = is_array($permissions) ? $permissions : [$permissions];
+  $required = normalize_permission_patterns($required);
+  if ($required === []) return false;
+
+  $perms = load_role_permissions($file);
+  foreach ($perms as $entry) {
+    if (!is_array($entry)) {
+      continue;
+    }
+    $patterns = array_merge(role_permission_grants($entry), role_permission_denies($entry));
+    foreach ($required as $permission) {
+      foreach ($patterns as $pattern) {
+        if ($pattern === '*') {
+          continue;
+        }
+        if (permission_pattern_matches($permission, $pattern)) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * @param string|array<int, string> $permissions
+ */
+function user_permission_matrix_configured(array $user, string $file): bool {
+  $perms = load_role_permissions($file);
+  $userRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+
+  foreach ($userRoles as $role) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    if ($normalizedRole === '') {
+      continue;
+    }
+    $entry = $perms[$normalizedRole] ?? null;
+    if (!is_array($entry)) {
+      continue;
+    }
+    if (!empty($entry['allowAllPermissions'])) {
+      return true;
+    }
+    if (role_permission_grants($entry) !== [] || role_permission_denies($entry) !== []) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * @param string|array<int, string> $permissions
+ */
+function user_has_any_permission(array $user, $permissions, string $file): bool {
+  $required = is_array($permissions) ? $permissions : [$permissions];
+  $required = normalize_permission_patterns($required);
+  if ($required === []) return false;
+
+  $perms = load_role_permissions($file);
+  $userRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+
+  $grants = [];
+  $denies = [];
+  foreach ($userRoles as $role) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    if ($normalizedRole === '') {
+      continue;
+    }
+    $entry = $perms[$normalizedRole] ?? null;
+    if (!is_array($entry)) {
+      continue;
+    }
+    $grants = array_merge($grants, role_permission_grants($entry));
+    $denies = array_merge($denies, role_permission_denies($entry));
+  }
+
+  foreach ($required as $permission) {
+    foreach ($denies as $pattern) {
+      if (permission_pattern_matches($permission, $pattern)) {
+        return false;
+      }
+    }
+  }
+
+  foreach ($required as $permission) {
+    foreach ($grants as $pattern) {
+      if (permission_pattern_matches($permission, $pattern)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 function user_is_admin(array $user): bool {
@@ -592,7 +1800,10 @@ function patch_custom_doc_entries(string $file, string $code, array $patch): boo
 
 // ---------- Document visibility (Effective docs) ----------
 function load_doc_visibility(string $file): array {
-  $j = read_json_file($file);
+  $j = portal_system_config_shadow_read('docs_visibility');
+  if (!is_array($j)) {
+    $j = read_json_file($file);
+  }
   if (is_array($j)) {
     $hidden = $j['hidden'] ?? null;
     if (is_array($hidden)) return array_values($hidden);
@@ -603,7 +1814,9 @@ function load_doc_visibility(string $file): array {
 function save_doc_visibility(string $file, array $hidden): void {
   // Store as object for extensibility
   $hidden = array_values(array_unique(array_map('strval', $hidden)));
-  write_json_file($file, ['hidden' => $hidden, 'updated_at' => now_iso()]);
+  $payload = ['hidden' => $hidden, 'updated_at' => now_iso()];
+  write_json_file($file, $payload);
+  portal_system_config_shadow_write('docs_visibility', $payload);
 }
 
 function portal_default_doc_extensions(): array {
@@ -779,6 +1992,192 @@ function portal_display_config_public_payload(array $config): array {
   ];
 }
 
+function module_access_portal_catalog(): array {
+  return [
+    ['id' => 'dashboard', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'documents', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'search', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'dictionary', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'access', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'deploy', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'exceptions', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'orders', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'dispatch', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'mes', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'mobile-shopfloor', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'quoting', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'purchasing', 'default_access' => 'roles', 'default_roles' => [
+      'admin',
+      'it_admin',
+      'ceo',
+      'qa_manager',
+      'quality_manager',
+      'qms_engineer',
+      'quality_engineer',
+      'qc_inspector',
+      'supply_chain_manager',
+      'buyer',
+      'warehouse_clerk',
+      'tool_storekeeper',
+      'logistics_coordinator',
+      'production_planner',
+    ]],
+    ['id' => 'quality-exceptions', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'supplier-quality', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'fmea', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'apqp-ppap', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'ai-scheduling', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'forms', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'evidence', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'compliance-reports', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'continuous-improvement', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'knowledge-base', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'cnc-programs', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'product-passport', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'schema-studio', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'energy-dashboard', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'customer-portal', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'admin', 'default_access' => 'admin', 'default_roles' => [], 'locked' => true],
+    ['id' => 'template-demo', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'module-builder', 'default_access' => 'admin', 'default_roles' => []],
+  ];
+}
+
+function module_access_admin_tab_catalog(): array {
+  return [
+    ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'dept_title', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'roles', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'orgchart', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'perms', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'module_access', 'default_access' => 'admin', 'default_roles' => [], 'locked' => true],
+    ['id' => 'activity', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'docs', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'portal_display', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'retention', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'data_sources', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'metadata_studio', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'infrastructure', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'manual_runtime', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'version_control', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'mfa', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'appearance', 'default_access' => 'admin', 'default_roles' => []],
+  ];
+}
+
+function module_access_policy_defaults(array $meta): array {
+  return [
+    'enabled' => true,
+    'access' => in_array((string)($meta['default_access'] ?? 'all'), ['all', 'admin', 'roles'], true)
+      ? (string)$meta['default_access']
+      : 'all',
+    'roles' => array_values(array_map('migrate_role', portal_normalize_lower_id_list((array)($meta['default_roles'] ?? [])))),
+  ];
+}
+
+function module_access_normalize_mode($value, string $default = 'all'): string {
+  $mode = strtolower(trim((string)$value));
+  return in_array($mode, ['all', 'admin', 'roles'], true) ? $mode : $default;
+}
+
+function module_access_normalize_policy(array $raw, array $meta): array {
+  $default = module_access_policy_defaults($meta);
+  if (!empty($meta['locked'])) {
+    return $default;
+  }
+
+  $roles = [];
+  $seenRoles = [];
+  foreach ((array)($raw['roles'] ?? $default['roles']) as $role) {
+    $normalizedRole = migrate_role(strtolower(trim((string)$role)));
+    $normalizedRole = preg_replace('/[^a-z0-9_-]+/', '', $normalizedRole);
+    if ($normalizedRole === '' || isset($seenRoles[$normalizedRole])) continue;
+    $seenRoles[$normalizedRole] = true;
+    $roles[] = $normalizedRole;
+  }
+
+  return [
+    'enabled' => array_key_exists('enabled', $raw) ? (bool)$raw['enabled'] : $default['enabled'],
+    'access' => module_access_normalize_mode($raw['access'] ?? $default['access'], $default['access']),
+    'roles' => $roles,
+  ];
+}
+
+function module_access_config_defaults(): array {
+  $portal = [];
+  foreach (module_access_portal_catalog() as $meta) {
+    $portal[(string)$meta['id']] = module_access_policy_defaults($meta);
+  }
+
+  $adminTabs = [];
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $adminTabs[(string)$meta['id']] = module_access_policy_defaults($meta);
+  }
+
+  return [
+    'portal_modules' => $portal,
+    'admin_tabs' => $adminTabs,
+  ];
+}
+
+function module_access_load_config(string $file): array {
+  $raw = portal_system_config_shadow_read('module_access_config');
+  if (!is_array($raw)) {
+    $raw = read_json_file($file);
+  }
+  if (!is_array($raw)) {
+    $raw = [];
+  }
+
+  $config = module_access_config_defaults();
+  foreach (module_access_portal_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $config['portal_modules'][$id] = module_access_normalize_policy((array)($raw['portal_modules'][$id] ?? []), $meta);
+  }
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $config['admin_tabs'][$id] = module_access_normalize_policy((array)($raw['admin_tabs'][$id] ?? []), $meta);
+  }
+
+  return $config;
+}
+
+function module_access_save_config(string $file, array $config): array {
+  $normalized = module_access_config_defaults();
+  foreach (module_access_portal_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['portal_modules'][$id] = module_access_normalize_policy((array)($config['portal_modules'][$id] ?? []), $meta);
+  }
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
+  }
+
+  $payload = [
+    'portal_modules' => $normalized['portal_modules'],
+    'admin_tabs' => $normalized['admin_tabs'],
+    'updated_at' => now_iso(),
+  ];
+
+  write_json_file($file, $payload);
+  portal_system_config_shadow_write('module_access_config', $payload);
+
+  return $normalized;
+}
+
+function module_access_public_payload(array $config): array {
+  $normalized = module_access_config_defaults();
+  foreach (module_access_portal_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['portal_modules'][$id] = module_access_normalize_policy((array)($config['portal_modules'][$id] ?? []), $meta);
+  }
+  foreach (module_access_admin_tab_catalog() as $meta) {
+    $id = (string)$meta['id'];
+    $normalized['admin_tabs'][$id] = module_access_normalize_policy((array)($config['admin_tabs'][$id] ?? []), $meta);
+  }
+  return $normalized;
+}
+
 function portal_doc_extension_is_enabled(string $ext, array $displayConfig): bool {
   $ext = strtolower(trim($ext));
   if ($ext === '') return false;
@@ -814,12 +2213,10 @@ function portal_parse_js_string_array(string $src, string $constName): array {
   return array_values(array_map('stripcslashes', $matches[1] ?? []));
 }
 
-function portal_load_role_docs(string $jsFile): array {
-  static $cache = [];
-  if (isset($cache[$jsFile])) return $cache[$jsFile];
-  if (!is_file($jsFile)) return $cache[$jsFile] = [];
+function portal_parse_role_docs_from_js(string $jsFile): array {
+  if (!is_file($jsFile)) return [];
   $src = (string)@file_get_contents($jsFile);
-  if ($src === '') return $cache[$jsFile] = [];
+  if ($src === '') return [];
 
   $shared = [
     '_UNI' => portal_parse_js_string_array($src, '_UNI'),
@@ -827,7 +2224,7 @@ function portal_load_role_docs(string $jsFile): array {
   ];
 
   if (!preg_match('/const\s+ROLE_DOCS\s*=\s*\{(.*?)\n\};/s', $src, $m)) {
-    return $cache[$jsFile] = [];
+    return [];
   }
 
   $body = (string)$m[1];
@@ -869,7 +2266,104 @@ function portal_load_role_docs(string $jsFile): array {
     }
   }
 
-  return $cache[$jsFile] = $roleDocs;
+  return $roleDocs;
+}
+
+/**
+ * @param mixed $entry
+ * @return string|array<int, string>|null
+ */
+function portal_normalize_role_docs_entry($entry) {
+  if (is_string($entry) && strtoupper(trim($entry)) === 'ALL') {
+    return 'ALL';
+  }
+  if (!is_array($entry)) {
+    return null;
+  }
+  $patterns = [];
+  foreach ($entry as $value) {
+    foreach (portal_normalize_doc_pattern((string)$value) as $normalized) {
+      $normalized = strtoupper(trim((string)$normalized));
+      if ($normalized === '') continue;
+      $patterns[$normalized] = true;
+    }
+  }
+  return array_keys($patterns);
+}
+
+/**
+ * @param array<string, mixed> $raw
+ * @param array<string, mixed> $defaults
+ * @return array<string, string|array<int, string>>
+ */
+function portal_normalize_role_docs_map(array $raw, array $defaults = []): array {
+  $normalized = [];
+  foreach ($defaults as $role => $entry) {
+    $roleKey = migrate_role(strtolower(trim((string)$role)));
+    if ($roleKey === '') continue;
+    $normalizedEntry = portal_normalize_role_docs_entry($entry);
+    if ($normalizedEntry === null) continue;
+    $normalized[$roleKey] = $normalizedEntry;
+  }
+  foreach ($raw as $role => $entry) {
+    $roleKey = migrate_role(strtolower(trim((string)$role)));
+    if ($roleKey === '') continue;
+    $normalizedEntry = portal_normalize_role_docs_entry($entry);
+    if ($normalizedEntry === null) continue;
+    $normalized[$roleKey] = $normalizedEntry;
+  }
+  return $normalized;
+}
+
+/**
+ * @return array<string, array<string, string|array<int, string>>>
+ */
+function &portal_role_docs_cache_store(): array {
+  static $cache = [];
+  return $cache;
+}
+
+function portal_load_role_docs(string $jsFile, ?string $jsonFile = null): array {
+  $cache = &portal_role_docs_cache_store();
+  global $CONF_DIR;
+  $jsonFile = $jsonFile ?: ($CONF_DIR . '/portal_role_docs.json');
+  $cacheKey = $jsFile . '|' . $jsonFile;
+  if (isset($cache[$cacheKey])) return $cache[$cacheKey];
+
+  $defaults = portal_parse_role_docs_from_js($jsFile);
+  $stored = portal_system_config_shadow_read('portal_role_docs');
+  if (!is_array($stored) && is_file($jsonFile)) {
+    $stored = read_json_file($jsonFile);
+  }
+  if (is_array($stored) && isset($stored['role_docs']) && is_array($stored['role_docs'])) {
+    $stored = $stored['role_docs'];
+  }
+  if (!is_array($stored)) {
+    $stored = [];
+  }
+
+  return $cache[$cacheKey] = portal_normalize_role_docs_map($stored, $defaults);
+}
+
+/**
+ * @param array<string, mixed> $roleDocs
+ * @return array<string, string|array<int, string>>
+ */
+function portal_save_role_docs(string $file, array $roleDocs, string $jsFile): array {
+  $cache = &portal_role_docs_cache_store();
+  $normalized = portal_normalize_role_docs_map($roleDocs, portal_parse_role_docs_from_js($jsFile));
+  $payload = [
+    'role_docs' => $normalized,
+    'updated_at' => now_iso(),
+  ];
+  write_json_file($file, $payload);
+  portal_system_config_shadow_write('portal_role_docs', $payload);
+  foreach (array_keys($cache) as $cacheKey) {
+    if (str_starts_with($cacheKey, $jsFile . '|')) {
+      unset($cache[$cacheKey]);
+    }
+  }
+  return $normalized;
 }
 
 function portal_normalize_doc_pattern(string $pattern): array {
@@ -1455,7 +2949,7 @@ function portal_strip_doc_code_prefix(string $text, string $code = ''): string {
   if ($codeNorm !== '') {
     $clean = preg_replace('/^' . preg_quote($codeNorm, '/') . '\s*(?:—|-|:)\s*/u', '', $clean, 1) ?? $clean;
   }
-  $clean = preg_replace('/\|\s*HESEM QMS$/u', '', $clean, 1) ?? $clean;
+  $clean = preg_replace('/\|\s*HESEM MOM$/u', '', $clean, 1) ?? $clean;
   return trim((string)$clean);
 }
 
@@ -1497,7 +2991,7 @@ function portal_sync_doc_title_blocks(string $html, string $docCode, string $tit
   $title = trim($title);
   if ($docCode === '' || $title === '') return $html;
 
-  $safeTitleTag = htmlspecialchars($docCode . ' - ' . $title . ' | HESEM QMS', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  $safeTitleTag = htmlspecialchars($docCode . ' - ' . $title . ' | HESEM MOM', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   $safeCode = htmlspecialchars($docCode, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   $safeDocLabel = htmlspecialchars($docCode . ' - ' . $title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   $safeDocName = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -1783,7 +3277,7 @@ function inject_base_href_archive(string $html): string {
   $html = repair_broken_doc_style_html($html);
   // Version-controlled files are stored in a per-folder _Archive directory.
   // That makes them one level deeper than the live document, so any relative
-  // links like "../assets/..." or "../01-QMS-Portal/..." would break.
+  // links like "../assets/..." or "../mom/..." would break.
   //
   // Adding <base href="../"> makes all relative URLs resolve as if the file
   // was located in the parent (document) folder, preserving graphics + CSS.
@@ -2019,17 +3513,39 @@ function orders_store_default(): array {
 function load_orders_store(): array {
   global $ORDERS_FILE;
   ensure_dir(dirname($ORDERS_FILE));
-  $data = read_json_file($ORDERS_FILE);
+  $defaults = orders_store_default();
+  try {
+    $layer = runtime_data_layer();
+    $data = $layer->getRuntimeOrdersStore();
+    $readMeta = $layer->getLastReadMeta();
+    observe_primary_read('orders', $readMeta, [
+      'item_count' => runtime_store_item_count($data),
+      'scope' => 'orders_runtime',
+    ]);
+  } catch (Throwable $e) {
+    $data = read_json_file($ORDERS_FILE);
+    $readMeta = [
+      'source' => 'json_fallback',
+      'fallback' => true,
+      'error' => $e->getMessage(),
+      'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'JSON_ONLY'),
+      'timestamp' => now_iso(),
+    ];
+    observe_primary_read('orders', $readMeta, [
+      'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
+      'scope' => 'orders_runtime',
+    ]);
+  }
   if (!is_array($data)) {
-    $data = orders_store_default();
+    $data = $defaults;
     write_json_file($ORDERS_FILE, $data);
   }
-  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : orders_store_default()['_meta'];
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
   $data['sales_orders'] = array_values(is_array($data['sales_orders'] ?? null) ? $data['sales_orders'] : []);
   $data['job_orders'] = array_values(is_array($data['job_orders'] ?? null) ? $data['job_orders'] : []);
   $data['work_orders'] = array_values(is_array($data['work_orders'] ?? null) ? $data['work_orders'] : []);
   $data['form_links'] = array_values(is_array($data['form_links'] ?? null) ? $data['form_links'] : []);
-  $data['_meta']['counters'] = is_array($data['_meta']['counters'] ?? null) ? $data['_meta']['counters'] : orders_store_default()['_meta']['counters'];
+  $data['_meta']['counters'] = is_array($data['_meta']['counters'] ?? null) ? $data['_meta']['counters'] : $defaults['_meta']['counters'];
   return $data;
 }
 
@@ -2038,6 +3554,9 @@ function save_orders_store(array $data): void {
   ensure_dir(dirname($ORDERS_FILE));
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('orders')) {
+    shadow_sync_orders_store($data);
+  }
   // File locking to prevent concurrent-write data loss (BUG-ORD-04)
   $lockFile = $ORDERS_FILE . '.lock';
   $fp = @fopen($lockFile, 'c');
@@ -2052,7 +3571,9 @@ function save_orders_store(array $data): void {
   } else {
     write_json_file($ORDERS_FILE, $data);
   }
-  shadow_sync_orders_store($data);
+  if (!runtime_domain_requires_postgres_authority('orders')) {
+    shadow_sync_orders_store($data);
+  }
 }
 
 function master_data_store_default(): array {
@@ -2098,19 +3619,83 @@ function master_data_store_default(): array {
   ];
 }
 
+function master_data_normalize_item(string $entity, array $item): array {
+  if ($entity === 'parts') {
+    $partDescription = trim((string)($item['part_description'] ?? ''));
+    $legacyDescription = trim((string)($item['description'] ?? ''));
+    $canonicalDescription = $partDescription !== '' ? $partDescription : $legacyDescription;
+    if ($canonicalDescription !== '') {
+      $item['part_description'] = $canonicalDescription;
+      $item['description'] = $canonicalDescription;
+    }
+  }
+  return $item;
+}
+
+function master_data_normalize_store(array $store): array {
+  foreach ($store as $entity => $rows) {
+    if ($entity === '_meta' || !is_array($rows)) {
+      continue;
+    }
+    $store[$entity] = array_values(array_map(static function($row) use ($entity) {
+      return is_array($row) ? master_data_normalize_item((string)$entity, $row) : $row;
+    }, $rows));
+  }
+  return $store;
+}
+
 function load_master_data_store(): array {
   global $MASTER_DATA_FILE;
   ensure_dir(dirname($MASTER_DATA_FILE));
-  $data = read_json_file($MASTER_DATA_FILE);
+  $defaults = master_data_store_default();
+  try {
+    $layer = runtime_data_layer();
+    $data = $layer->getRuntimeMasterDataStore();
+    $readMeta = $layer->getLastReadMeta();
+    observe_primary_read('master_data', $readMeta, [
+      'item_count' => runtime_store_item_count($data),
+      'scope' => 'master_data_runtime',
+    ]);
+  } catch (Throwable $e) {
+    $data = read_json_file($MASTER_DATA_FILE);
+    $readMeta = [
+      'source' => 'json_fallback',
+      'fallback' => true,
+      'error' => $e->getMessage(),
+      'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'JSON_ONLY'),
+      'timestamp' => now_iso(),
+    ];
+    observe_primary_read('master_data', $readMeta, [
+      'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
+      'scope' => 'master_data_runtime',
+    ]);
+  }
   if (!is_array($data)) {
-    $data = master_data_store_default();
+    $data = $defaults;
     write_json_file($MASTER_DATA_FILE, $data);
   }
-  $defaults = master_data_store_default();
   foreach ($defaults as $key => $value) {
     if ($key === '_meta') continue;
     $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
   }
+  $data = master_data_normalize_store($data);
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
+  return $data;
+}
+
+function load_master_data_active_store(): array {
+  global $MASTER_DATA_FILE;
+  ensure_dir(dirname($MASTER_DATA_FILE));
+  $defaults = master_data_store_default();
+  $data = read_json_file($MASTER_DATA_FILE);
+  if (!is_array($data)) {
+    $data = $defaults;
+  }
+  foreach ($defaults as $key => $value) {
+    if ($key === '_meta') continue;
+    $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
+  }
+  $data = master_data_normalize_store($data);
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
   return $data;
 }
@@ -2118,10 +3703,16 @@ function load_master_data_store(): array {
 function save_master_data_store(array $data): void {
   global $MASTER_DATA_FILE;
   ensure_dir(dirname($MASTER_DATA_FILE));
+  $data = master_data_normalize_store($data);
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('master_data')) {
+    shadow_sync_master_data_store($data);
+  }
   write_json_file($MASTER_DATA_FILE, $data);
-  shadow_sync_master_data_store($data);
+  if (!runtime_domain_requires_postgres_authority('master_data')) {
+    shadow_sync_master_data_store($data);
+  }
 }
 
 function master_data_entity_key(string $entity): ?string {
@@ -2163,22 +3754,22 @@ function master_data_entity_key(string $entity): ?string {
   return $map[$entity] ?? null;
 }
 
-function master_data_service(): \HESEM\QMS\Services\MasterDataService {
+function master_data_service(): \MOM\Services\MasterDataService {
   global $DATA_DIR;
   require_once __DIR__ . '/api/services/MasterDataService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\MasterDataService($DATA_DIR);
+    $service = new \MOM\Services\MasterDataService($DATA_DIR);
   }
   return $service;
 }
 
-function order_workflow_service(): \HESEM\QMS\Services\OrderWorkflowService {
+function order_workflow_service(): \MOM\Services\OrderWorkflowService {
   global $DATA_DIR;
   require_once __DIR__ . '/api/services/OrderWorkflowService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\OrderWorkflowService($DATA_DIR);
+    $service = new \MOM\Services\OrderWorkflowService($DATA_DIR);
   }
   return $service;
 }
@@ -2218,6 +3809,9 @@ function runtime_data_layer_sanitize_overrides(array $input): array {
     $username = trim((string)$input['username']);
     if ($username !== '') $out['username'] = substr($username, 0, 128);
   }
+  if (array_key_exists('password', $input)) {
+    $out['password'] = (string)$input['password'];
+  }
   if (array_key_exists('schema', $input)) {
     $schema = trim((string)$input['schema']);
     if ($schema !== '') $out['schema'] = substr($schema, 0, 64);
@@ -2226,6 +3820,9 @@ function runtime_data_layer_sanitize_overrides(array $input): array {
     $allowed = ['disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full'];
     $sslmode = strtolower(trim((string)$input['sslmode']));
     if (in_array($sslmode, $allowed, true)) $out['sslmode'] = $sslmode;
+  }
+  if (array_key_exists('allow_empty_password', $input)) {
+    $out['allow_empty_password'] = runtime_data_layer_parse_bool($input['allow_empty_password'], false);
   }
   if (array_key_exists('connect_timeout', $input)) {
     $out['connect_timeout'] = max(1, min(60, (int)$input['connect_timeout']));
@@ -2247,6 +3844,14 @@ function runtime_data_layer_sanitize_overrides(array $input): array {
   }
   if (array_key_exists('json_fallback', $input)) {
     $out['json_fallback'] = runtime_data_layer_parse_bool($input['json_fallback'], true);
+  }
+  foreach (['master_data', 'orders', 'mes', 'epicor'] as $domain) {
+    $key = $domain . '_read_mode';
+    if (!array_key_exists($key, $input)) continue;
+    $value = strtolower(trim((string)$input[$key]));
+    if (in_array($value, ['default', 'json', 'postgres_primary', 'postgres_only'], true)) {
+      $out[$key] = $value;
+    }
   }
   return $out;
 }
@@ -2286,10 +3891,11 @@ function runtime_data_layer_admin_projection(array $config): array {
   return [
     'host' => trim((string)($config['host'] ?? 'localhost')),
     'port' => max(1, (int)($config['port'] ?? 5432)),
-    'database' => trim((string)($config['database'] ?? 'hesem_qms')),
-    'username' => trim((string)($config['username'] ?? 'qms_app')),
+    'database' => trim((string)($config['database'] ?? 'mom')),
+    'username' => trim((string)($config['username'] ?? 'mom_app')),
     'schema' => trim((string)($config['schema'] ?? 'public')),
     'sslmode' => trim((string)($config['sslmode'] ?? 'prefer')),
+    'allow_empty_password' => (bool)($config['allow_empty_password'] ?? false),
     'connect_timeout' => max(1, (int)($config['connect_timeout'] ?? 5)),
     'statement_timeout' => max(1000, (int)($config['statement_timeout'] ?? 30000)),
     'read_retry_count' => max(1, (int)($config['read_retry_count'] ?? 3)),
@@ -2297,10 +3903,14 @@ function runtime_data_layer_admin_projection(array $config): array {
     'use_postgres' => (bool)($config['use_postgres'] ?? false),
     'shadow_write' => (bool)($config['shadow_write'] ?? true),
     'json_fallback' => (bool)($config['json_fallback'] ?? true),
+    'master_data_read_mode' => strtolower(trim((string)($config['master_data_read_mode'] ?? 'default'))),
+    'orders_read_mode' => strtolower(trim((string)($config['orders_read_mode'] ?? 'default'))),
+    'mes_read_mode' => strtolower(trim((string)($config['mes_read_mode'] ?? 'default'))),
+    'epicor_read_mode' => strtolower(trim((string)($config['epicor_read_mode'] ?? 'default'))),
   ];
 }
 
-function runtime_data_layer(): \HESEM\QMS\Database\DataLayer {
+function runtime_data_layer(): \MOM\Database\DataLayer {
   global $DATA_DIR;
   static $layer = null;
   static $fingerprint = '';
@@ -2310,7 +3920,7 @@ function runtime_data_layer(): \HESEM\QMS\Database\DataLayer {
     require_once __DIR__ . '/database/Connection.php';
     require_once __DIR__ . '/database/RuntimeShadowSync.php';
     require_once __DIR__ . '/database/DataLayer.php';
-    $layer = new \HESEM\QMS\Database\DataLayer($DATA_DIR, dirname(__DIR__), $config);
+    $layer = new \MOM\Database\DataLayer($DATA_DIR, dirname(__DIR__), $config);
     $fingerprint = $nextFingerprint;
   }
   return $layer;
@@ -2325,11 +3935,32 @@ function runtime_data_layer_summary(): array {
       'use_postgres' => false,
       'shadow_write' => false,
       'json_fallback' => false,
+      'database_configured' => false,
+      'database_host' => '',
+      'database_port' => 0,
+      'database_name' => '',
+      'database_schema' => 'public',
+      'database_username' => '',
+      'database_probe_reachable' => false,
+      'database_probe_error' => '',
       'postgres_path_active' => false,
       'postgres_reachable' => false,
       'postgres_error' => $e->getMessage(),
     ];
   }
+}
+
+function runtime_domain_read_mode(string $domain): string {
+  $summary = runtime_data_layer_summary();
+  $key = strtolower(trim($domain)) . '_read_mode';
+  $mode = strtolower(trim((string)($summary[$key] ?? 'default')));
+  return in_array($mode, ['default', 'json', 'postgres_primary', 'postgres_only'], true)
+    ? $mode
+    : 'default';
+}
+
+function runtime_domain_requires_postgres_authority(string $domain): bool {
+  return in_array(runtime_domain_read_mode($domain), ['postgres_primary', 'postgres_only'], true);
 }
 
 function mes_runtime_supports_live_stream(array $mode): bool {
@@ -2338,96 +3969,96 @@ function mes_runtime_supports_live_stream(array $mode): bool {
     && (bool)($mode['postgres_reachable'] ?? false);
 }
 
-function edge_connector_service(): \HESEM\QMS\Services\EdgeConnectorService {
+function edge_connector_service(): \MOM\Services\EdgeConnectorService {
   require_once __DIR__ . '/api/services/EdgeConnectorService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\EdgeConnectorService();
+    $service = new \MOM\Services\EdgeConnectorService();
   }
   return $service;
 }
 
-function mtconnect_polling_service(): \HESEM\QMS\Services\MtconnectPollingService {
+function mtconnect_polling_service(): \MOM\Services\MtconnectPollingService {
   global $DATA_DIR;
   require_once __DIR__ . '/api/services/MtconnectPollingService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\MtconnectPollingService($DATA_DIR, dirname(__DIR__));
+    $service = new \MOM\Services\MtconnectPollingService($DATA_DIR, dirname(__DIR__));
   }
   return $service;
 }
 
-function mes_adapter_service(): \HESEM\QMS\Services\MesAdapterService {
+function mes_adapter_service(): \MOM\Services\MesAdapterService {
   require_once __DIR__ . '/api/services/MesAdapterService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\MesAdapterService();
+    $service = new \MOM\Services\MesAdapterService();
   }
   return $service;
 }
 
-function mes_alarm_service(): \HESEM\QMS\Services\MesAlarmService {
+function mes_alarm_service(): \MOM\Services\MesAlarmService {
   require_once __DIR__ . '/api/services/MesAlarmService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\MesAlarmService();
+    $service = new \MOM\Services\MesAlarmService();
   }
   return $service;
 }
 
-function mes_nc_release_service(): \HESEM\QMS\Services\MesNcReleaseService {
+function mes_nc_release_service(): \MOM\Services\MesNcReleaseService {
   require_once __DIR__ . '/api/services/MesNcReleaseService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\MesNcReleaseService();
+    $service = new \MOM\Services\MesNcReleaseService();
   }
   return $service;
 }
 
-function mes_tool_offset_service(): \HESEM\QMS\Services\MesToolOffsetService {
+function mes_tool_offset_service(): \MOM\Services\MesToolOffsetService {
   require_once __DIR__ . '/api/services/MesToolOffsetService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\MesToolOffsetService();
+    $service = new \MOM\Services\MesToolOffsetService();
   }
   return $service;
 }
 
-function epicor_integration_service(): \HESEM\QMS\Services\EpicorIntegrationService {
+function epicor_integration_service(): \MOM\Services\EpicorIntegrationService {
   require_once __DIR__ . '/api/services/EpicorIntegrationService.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\EpicorIntegrationService();
+    $service = new \MOM\Services\EpicorIntegrationService();
   }
   return $service;
 }
 
-function epicor_transport_adapter(): \HESEM\QMS\Services\EpicorTransportAdapter {
+function epicor_transport_adapter(): \MOM\Services\EpicorTransportAdapter {
   global $DATA_DIR;
   require_once __DIR__ . '/api/services/EpicorTransportAdapter.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\EpicorTransportAdapter($DATA_DIR);
+    $service = new \MOM\Services\EpicorTransportAdapter($DATA_DIR);
   }
   return $service;
 }
 
-function epicor_outbox_worker(): \HESEM\QMS\Services\OutboxWorker {
+function epicor_outbox_worker(): \MOM\Services\OutboxWorker {
   global $DATA_DIR;
   require_once __DIR__ . '/api/services/OutboxWorker.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\OutboxWorker($DATA_DIR);
+    $service = new \MOM\Services\OutboxWorker($DATA_DIR);
   }
   return $service;
 }
 
-function epicor_inbound_worker(): \HESEM\QMS\Services\EpicorInboundWorker {
+function epicor_inbound_worker(): \MOM\Services\EpicorInboundWorker {
   global $DATA_DIR;
   require_once __DIR__ . '/api/services/EpicorInboundWorker.php';
   static $service = null;
   if ($service === null) {
-    $service = new \HESEM\QMS\Services\EpicorInboundWorker($DATA_DIR);
+    $service = new \MOM\Services\EpicorInboundWorker($DATA_DIR);
   }
   return $service;
 }
@@ -2814,7 +4445,7 @@ function runtime_cutover_postgres_counts(array $runtimeMode): array {
   }
 
   require_once __DIR__ . '/database/Connection.php';
-  $connection = \HESEM\QMS\Database\Connection::getInstance((array)(require __DIR__ . '/database/config.php'));
+  $connection = \MOM\Database\Connection::getInstance((array)(require __DIR__ . '/database/config.php'));
 
   $sqlMap = [
     'master_data' => [
@@ -3183,10 +4814,14 @@ function shadow_sync_master_data_store(array $data): void {
     + count((array)($data['revisions'] ?? []))
     + count((array)($data['machines'] ?? []))
     + count((array)($data['work_centers'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('master_data');
   try {
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
-    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+    if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_master_data_authority_unavailable');
+      }
       observe_shadow_sync('master_data', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3194,7 +4829,10 @@ function shadow_sync_master_data_store(array $data): void {
       ]);
       return;
     }
-    $layer->syncMasterDataStore($data);
+    $synced = $layer->syncMasterDataStore($data);
+    if ($mustSync && $synced !== true) {
+      throw new RuntimeException('runtime_master_data_shadow_sync_failed');
+    }
     observe_shadow_sync('master_data', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3209,6 +4847,9 @@ function shadow_sync_master_data_store(array $data): void {
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -3218,11 +4859,15 @@ function shadow_sync_orders_store(array $data): void {
     + count((array)($data['job_orders'] ?? []))
     + count((array)($data['work_orders'] ?? []))
     + count((array)($data['form_links'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('orders');
   try {
     $master = load_master_data_store();
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
-    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+    if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_orders_authority_unavailable');
+      }
       observe_shadow_sync('orders', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3230,8 +4875,11 @@ function shadow_sync_orders_store(array $data): void {
       ]);
       return;
     }
-    $layer->syncMasterDataStore($master);
-    $layer->syncOrdersStore($data);
+    $masterSynced = $layer->syncMasterDataStore($master);
+    $ordersSynced = $layer->syncOrdersStore($data);
+    if ($mustSync && ($masterSynced !== true || $ordersSynced !== true)) {
+      throw new RuntimeException('runtime_orders_shadow_sync_failed');
+    }
     observe_shadow_sync('orders', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3247,6 +4895,9 @@ function shadow_sync_orders_store(array $data): void {
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -3262,12 +4913,16 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
     + count((array)($data['machine_alarm_events'] ?? []))
     + count((array)($data['nc_download_receipts'] ?? []))
     + count((array)($data['mes_tool_preset_offsets'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('mes');
   try {
     $orders = is_array($orders) ? $orders : load_orders_store();
     $master = is_array($master) ? $master : load_master_data_store();
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
-    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+    if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_mes_authority_unavailable');
+      }
       observe_shadow_sync('mes', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3275,9 +4930,12 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
       ]);
       return;
     }
-    $layer->syncMasterDataStore($master);
-    $layer->syncOrdersStore($orders);
-    $layer->syncMesRuntimeStore($data, $orders, $master);
+    $masterSynced = $layer->syncMasterDataStore($master);
+    $ordersSynced = $layer->syncOrdersStore($orders);
+    $mesSynced = $layer->syncMesRuntimeStore($data, $orders, $master);
+    if ($mustSync && ($masterSynced !== true || $ordersSynced !== true || $mesSynced !== true)) {
+      throw new RuntimeException('runtime_mes_shadow_sync_failed');
+    }
     observe_shadow_sync('mes', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3295,6 +4953,9 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -3303,10 +4964,14 @@ function shadow_sync_epicor_runtime_store(array $data): void {
   $itemCount = count((array)($data['sync_runs'] ?? []))
     + count((array)($data['reconciliation_exceptions'] ?? []))
     + count((array)($data['outbox_events'] ?? []));
+  $mustSync = runtime_domain_requires_postgres_authority('epicor');
   try {
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
-    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+    if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
+      if ($mustSync) {
+        throw new RuntimeException('runtime_epicor_authority_unavailable');
+      }
       observe_shadow_sync('epicor', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
         'runtime_mode' => $mode,
         'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3314,7 +4979,10 @@ function shadow_sync_epicor_runtime_store(array $data): void {
       ]);
       return;
     }
-    $layer->syncEpicorRuntimeStore($data);
+    $synced = $layer->syncEpicorRuntimeStore($data);
+    if ($mustSync && $synced !== true) {
+      throw new RuntimeException('runtime_epicor_shadow_sync_failed');
+    }
     observe_shadow_sync('epicor', true, 'Shadow sync completed.', [
       'runtime_mode' => $mode,
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
@@ -3329,6 +4997,9 @@ function shadow_sync_epicor_runtime_store(array $data): void {
       'duration_ms' => round((microtime(true) - $started) * 1000, 2),
       'item_count' => $itemCount,
     ]);
+    if ($mustSync) {
+      throw $e;
+    }
   }
 }
 
@@ -3362,11 +5033,33 @@ function load_mes_runtime_store(): array {
   global $MES_RUNTIME_FILE;
   ensure_dir(dirname($MES_RUNTIME_FILE));
   $data = read_json_file($MES_RUNTIME_FILE);
+  $defaults = mes_runtime_default();
+  try {
+    $layer = runtime_data_layer();
+    $data = $layer->getRuntimeMesRuntimeStore();
+    $readMeta = $layer->getLastReadMeta();
+    observe_primary_read('mes', $readMeta, [
+      'item_count' => runtime_store_item_count($data),
+      'scope' => 'mes_runtime',
+    ]);
+  } catch (Throwable $e) {
+    $data = read_json_file($MES_RUNTIME_FILE);
+    $readMeta = [
+      'source' => 'json_fallback',
+      'fallback' => true,
+      'error' => $e->getMessage(),
+      'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'JSON_ONLY'),
+      'timestamp' => now_iso(),
+    ];
+    observe_primary_read('mes', $readMeta, [
+      'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
+      'scope' => 'mes_runtime',
+    ]);
+  }
   if (!is_array($data)) {
-    $data = mes_runtime_default();
+    $data = $defaults;
     write_json_file($MES_RUNTIME_FILE, $data);
   }
-  $defaults = mes_runtime_default();
   foreach ($defaults as $key => $value) {
     if ($key === '_meta') continue;
     $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
@@ -3380,8 +5073,13 @@ function save_mes_runtime_store(array $data): void {
   ensure_dir(dirname($MES_RUNTIME_FILE));
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('mes')) {
+    shadow_sync_mes_runtime_store($data);
+  }
   write_json_file($MES_RUNTIME_FILE, $data);
-  shadow_sync_mes_runtime_store($data);
+  if (!runtime_domain_requires_postgres_authority('mes')) {
+    shadow_sync_mes_runtime_store($data);
+  }
 }
 
 function epicor_runtime_default(): array {
@@ -3454,8 +5152,13 @@ function save_epicor_runtime_store(array $data): void {
   ensure_dir(dirname($EPICOR_RUNTIME_FILE));
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
+  if (runtime_domain_requires_postgres_authority('epicor')) {
+    shadow_sync_epicor_runtime_store($data);
+  }
   write_json_file($EPICOR_RUNTIME_FILE, $data);
-  shadow_sync_epicor_runtime_store($data);
+  if (!runtime_domain_requires_postgres_authority('epicor')) {
+    shadow_sync_epicor_runtime_store($data);
+  }
 }
 
 function release_followup_default_policy_store(): array {
@@ -4333,7 +6036,7 @@ function upsert_epicor_runtime_item(array &$rows, string $idKey, array $item): a
 }
 
 function mes_runtime_id(string $prefix): string {
-  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   return strtoupper($prefix) . '-' . $dt->format('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
 }
 
@@ -4580,7 +6283,7 @@ function order_late_days(string $plannedDate = '', string $actualDate = '', stri
   try {
     $compare = trim($actualDate) !== ''
       ? new DateTimeImmutable($actualDate)
-      : new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+      : new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   } catch (Throwable) {
     return 0;
   }
@@ -5437,6 +7140,81 @@ function compute_order_dashboard_stats(array $store, array $hierarchy = [], ?arr
   ];
 }
 
+function build_manual_runtime_summary(array $master, array $orders): array {
+  $masterCounts = [];
+  foreach (['customers', 'parts', 'revisions', 'work_centers', 'machines', 'operators'] as $key) {
+    $masterCounts[$key] = count(array_values(is_array($master[$key] ?? null) ? $master[$key] : []));
+  }
+
+  $salesOrders = array_values(is_array($orders['sales_orders'] ?? null) ? $orders['sales_orders'] : []);
+  $jobOrders = array_values(is_array($orders['job_orders'] ?? null) ? $orders['job_orders'] : []);
+  $workOrders = array_values(is_array($orders['work_orders'] ?? null) ? $orders['work_orders'] : []);
+  $rows = [];
+
+  foreach ($salesOrders as $so) {
+    if (!is_array($so)) continue;
+    $rows[] = [
+      'type' => 'SO',
+      'id' => (string)($so['so_number'] ?? ''),
+      'title' => implode(' · ', array_values(array_filter([
+        trim((string)($so['customer_name'] ?? $so['customer_id'] ?? '')),
+        trim((string)($so['customer_po'] ?? '')) !== '' ? ('PO ' . trim((string)($so['customer_po'] ?? ''))) : '',
+      ], static fn($value) => $value !== ''))),
+      'status' => (string)($so['status'] ?? ''),
+      'updated_at' => (string)($so['updated_at'] ?? $so['created_at'] ?? ''),
+    ];
+  }
+
+  foreach ($jobOrders as $jo) {
+    if (!is_array($jo)) continue;
+    $rows[] = [
+      'type' => 'JO',
+      'id' => (string)($jo['jo_number'] ?? ''),
+      'title' => implode(' / ', array_values(array_filter([
+        trim((string)($jo['part_number'] ?? '')),
+        trim((string)($jo['part_revision'] ?? '')),
+      ], static fn($value) => $value !== ''))),
+      'status' => (string)($jo['status'] ?? ''),
+      'updated_at' => (string)($jo['updated_at'] ?? $jo['created_at'] ?? ''),
+    ];
+  }
+
+  foreach ($workOrders as $wo) {
+    if (!is_array($wo)) continue;
+    $operation = trim((string)($wo['operation_number'] ?? ''));
+    $rows[] = [
+      'type' => 'WO',
+      'id' => (string)($wo['wo_number'] ?? ''),
+      'title' => implode(' · ', array_values(array_filter([
+        $operation !== '' ? ('OP' . $operation) : '',
+        trim((string)($wo['operation_desc'] ?? '')),
+        trim((string)($wo['machine_id'] ?? '')),
+      ], static fn($value) => $value !== ''))),
+      'status' => (string)($wo['status'] ?? ''),
+      'updated_at' => (string)($wo['updated_at'] ?? $wo['created_at'] ?? ''),
+    ];
+  }
+
+  usort($rows, static function (array $a, array $b): int {
+    return strcmp((string)($b['updated_at'] ?? ''), (string)($a['updated_at'] ?? ''));
+  });
+
+  $recentRows = array_slice($rows, 0, 10);
+
+  return [
+    'master_counts' => $masterCounts,
+    'order_counts' => [
+      'so' => count($salesOrders),
+      'jo' => count($jobOrders),
+      'wo' => count($workOrders),
+    ],
+    'recent_rows' => $recentRows,
+    'last_event_at' => (string)($recentRows[0]['updated_at'] ?? ''),
+    'master_updated_at' => (string)($master['_meta']['updated'] ?? ''),
+    'orders_updated_at' => (string)($orders['_meta']['updated'] ?? ''),
+  ];
+}
+
 function find_order_record(array $store, string $entity, string $id): ?array {
   $meta = order_entity_config($entity);
   foreach (($store[$meta['store_key']] ?? []) as $row) {
@@ -5469,7 +7247,7 @@ function mes_minutes_between(string $startAt = '', string $endAt = '', ?DateTime
   if ($startAt === '') return 0.0;
   try {
     $start = new DateTimeImmutable($startAt);
-    $end = $endAt !== '' ? new DateTimeImmutable($endAt) : ($now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon')));
+    $end = $endAt !== '' ? new DateTimeImmutable($endAt) : ($now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh')));
     $seconds = max(0, $end->getTimestamp() - $start->getTimestamp());
     return round($seconds / 60, 1);
   } catch (Throwable) {
@@ -5485,7 +7263,7 @@ function mes_timestamp_age_seconds(string $timestamp = '', ?DateTimeImmutable $n
   } catch (Throwable) {
     return null;
   }
-  $now = $now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $now = $now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   return max(0, $now->getTimestamp() - $dt->getTimestamp());
 }
 
@@ -5594,13 +7372,13 @@ function load_mes_shift_patterns(): array {
   $data = read_json_file($file);
   if (!is_array($data)) {
     return [
-      'timezone' => 'Asia/Saigon',
+      'timezone' => 'Asia/Ho_Chi_Minh',
       'shift_handover_grace_minutes' => 45,
       'stale_progress_minutes' => 90,
       'shifts' => [],
     ];
   }
-  $data['timezone'] = trim((string)($data['timezone'] ?? 'Asia/Saigon')) ?: 'Asia/Saigon';
+  $data['timezone'] = trim((string)($data['timezone'] ?? 'Asia/Ho_Chi_Minh')) ?: 'Asia/Ho_Chi_Minh';
   $data['shift_handover_grace_minutes'] = max(0, (int)($data['shift_handover_grace_minutes'] ?? 45));
   $data['stale_progress_minutes'] = max(15, (int)($data['stale_progress_minutes'] ?? 90));
   $data['shifts'] = array_values(array_filter((array)($data['shifts'] ?? []), fn($row) => is_array($row)));
@@ -5616,7 +7394,7 @@ function mes_shift_time_to_minutes(string $value): ?int {
 }
 
 function mes_resolve_current_shift(array $patterns, DateTimeImmutable $now): array {
-  $timezone = new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Saigon'));
+  $timezone = new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Ho_Chi_Minh'));
   $localNow = $now->setTimezone($timezone);
   $currentMinutes = ((int)$localNow->format('H')) * 60 + (int)$localNow->format('i');
 
@@ -7223,7 +9001,7 @@ function mes_pg_notify_channels(): array {
 function mes_pg_open_notify_stream(): ?array {
   try {
     require_once __DIR__ . '/database/Connection.php';
-    $connection = \HESEM\QMS\Database\Connection::getInstance();
+    $connection = \MOM\Database\Connection::getInstance();
     $pdo = $connection->getPdo();
     if (!method_exists($pdo, 'pgsqlGetNotify')) {
       return null;
@@ -8570,7 +10348,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $formLinksByOrder = mes_form_link_index($orders);
   $gateRules = load_mes_gate_rules();
   $shiftPatterns = load_mes_shift_patterns();
-  $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   $currentShift = mes_resolve_current_shift($shiftPatterns, $now);
   $connectorFeeds = mes_latest_rows_by_machine((array)($mes['connector_feeds'] ?? []), 'updated_at');
   $machineSignals = mes_latest_rows_by_machine((array)($mes['machine_signals'] ?? []), 'signal_at');
@@ -9238,7 +11016,7 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
   $id = trim((string)($item[$idKey] ?? ''));
   if ($id === '') throw new RuntimeException('missing_master_key');
 
-  $normalized = $item;
+  $normalized = master_data_normalize_item($entity, $item);
   $normalized[$idKey] = $id;
   $normalized['updated_at'] = now_iso();
   $normalized['updated_by'] = $username;
@@ -10981,7 +12759,7 @@ function normalize_master_context(array $context): array {
 }
 
 function build_issued_filename(string $formCode, string $formRevision, string $recordId, string $username, string $ext = 'xlsx'): string {
-  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   $stampDate = $dt->format('Ymd');
   $stampTime = $dt->format('Hi');
   $initials = build_user_initials($username);
@@ -10992,7 +12770,7 @@ function build_received_filename(array $allocation, int $receiptVersion, string 
   $formCode = (string)($allocation['form_code'] ?? 'FORM');
   $formRevision = (string)($allocation['form_revision'] ?? 'V0');
   $recordId = (string)($allocation['record_id'] ?? 'RECORD');
-  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $dt = new DateTimeImmutable('now', new DateTimeZone('Asia/Ho_Chi_Minh'));
   return sprintf('%s_%s_%s_%s_R%02d.%s', $formCode, $formRevision, $recordId, $dt->format('Ymd'), $receiptVersion, $ext);
 }
 
@@ -11008,7 +12786,7 @@ function build_hidden_sheet_payload(array $allocation, array $formEntry): array 
     'form_revision' => (string)($allocation['form_revision'] ?? 'V0'),
     'download_timestamp' => $issuedAt,
     'download_user' => $downloadUser,
-    'system_origin' => 'HESEM-QMS-v3',
+    'system_origin' => 'HESEM-MOM-v3',
     'allocation_id' => (string)($allocation['allocation_id'] ?? ''),
     'expected_filename_pattern' => (string)($allocation['expected_filename_pattern'] ?? ''),
     'max_file_size_mb' => 25,
@@ -11154,7 +12932,7 @@ function verify_hidden_sheet_metadata(array $metadata, ?array $allocation, strin
   $warnings = [];
   $status = 'verified';
 
-  if (($metadata['system_origin'] ?? '') !== 'HESEM-QMS-v3') {
+  if (($metadata['system_origin'] ?? '') !== 'HESEM-MOM-v3') {
     $issues[] = 'origin_invalid';
   }
 
@@ -11344,32 +13122,51 @@ function clear_auth_session_state(): void {
     $_SESSION['enroll_user'],
     $_SESSION['enroll_secret'],
     $_SESSION['enroll_started'],
-    $_SESSION['last_active']
+    $_SESSION['last_active'],
+    $_SESSION['user_scope'],
+    $_SESSION['org_scope']
   );
+}
+
+function extract_user_scope(array $user): array {
+  $scope = [];
+  foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+    $value = $user[$field] ?? null;
+    if (!is_scalar($value)) continue;
+    $text = trim((string)$value);
+    if ($text === '') continue;
+    $scope[$field] = $text;
+  }
+  return $scope;
 }
 
 function set_preauth_session(string $username): void {
   if (session_status() !== PHP_SESSION_ACTIVE) session_init();
-  session_regenerate_id(true);
+  session_regenerate_id_safe(true);
   clear_auth_session_state();
   $_SESSION['preauth_user'] = strtolower(trim($username));
   $_SESSION['preauth_started'] = time();
   $_SESSION['mfa_ok'] = false;
 }
 
-function set_authenticated_session(string $username): void {
+function set_authenticated_session(string $username, array $user = []): void {
   if (session_status() !== PHP_SESSION_ACTIVE) session_init();
-  session_regenerate_id(true);
+  session_regenerate_id_safe(true);
   clear_auth_session_state();
   $_SESSION['user'] = strtolower(trim($username));
   $_SESSION['mfa_ok'] = true;
   $_SESSION['last_active'] = time();
+  $scope = extract_user_scope($user);
+  if ($scope !== []) {
+    $_SESSION['user_scope'] = $scope;
+    $_SESSION['org_scope'] = $scope;
+  }
 }
 
 function destroy_auth_session(): void {
   if (session_status() !== PHP_SESSION_ACTIVE) session_init();
   clear_auth_session_state();
-  if (ini_get('session.use_cookies')) {
+  if (ini_get('session.use_cookies') && !headers_sent()) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 3600, $params['path'] ?: '/', $params['domain'] ?? '', (bool)($params['secure'] ?? false), (bool)($params['httponly'] ?? true));
   }
@@ -11403,41 +13200,205 @@ function password_policy(string $pw): array {
   return [true, ''];
 }
 
+function normalize_session_dir(string $path): string {
+  $path = trim($path);
+  if ($path === '') return '';
+  if (strpos($path, ';') !== false) {
+    $parts = explode(';', $path);
+    $path = (string)end($parts);
+  }
+  return rtrim($path, "/\\");
+}
+
+function session_dir_candidates(): array {
+  global $DATA_DIR;
+
+  // Ensure primary session dir exists early (VPS deployments)
+  $primary = $DATA_DIR . '/sessions';
+  if ($primary !== '' && !is_dir($primary)) {
+    @mkdir($primary, 0775, true);
+  }
+
+  $candidates = [
+    $primary,
+    sys_get_temp_dir() . '/hesem-sessions',
+    normalize_session_dir((string)session_save_path()),
+    '/var/lib/php/sessions',
+    sys_get_temp_dir(),
+  ];
+
+  $unique = [];
+  foreach ($candidates as $candidate) {
+    $candidate = normalize_session_dir((string)$candidate);
+    if ($candidate === '' || in_array($candidate, $unique, true)) continue;
+    $unique[] = $candidate;
+  }
+
+  return $unique;
+}
+
 // ---------- Session + Cookies ----------
 function session_init(): void {
-  global $DATA_DIR;
   if (session_status() === PHP_SESSION_ACTIVE) return;
 
-  // Use an application-owned session directory to avoid server session.save_path issues
-  $sessDir = $DATA_DIR . '/sessions';
-  ensure_dir($sessDir);
-  @session_save_path($sessDir);
-
+  $isCliLike = in_array(PHP_SAPI, ['cli', 'phpdbg'], true);
   $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https')
     || ((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on');
+  $headersMutable = !headers_sent();
+  $headerlessSessionMode = $isCliLike || !$headersMutable;
 
-  @ini_set('session.use_only_cookies', '1');
-  @ini_set('session.use_strict_mode', '1');
-  @ini_set('session.cookie_httponly', '1');
-  @ini_set('session.cookie_samesite', 'Lax');
-  if ($https) {
-    @ini_set('session.cookie_secure', '1');
+  // Smoke tests and CLI helpers may touch session_init() after writing output.
+  // In that case we only need an in-memory session array, not HTTP cookie/session I/O.
+  if ($isCliLike && !$headersMutable) {
+    if (!is_array($_SESSION ?? null)) {
+      $_SESSION = [];
+    }
+    return;
+  }
+
+  if ($headerlessSessionMode) {
+    @ini_set('session.use_cookies', '0');
+    if (PHP_VERSION_ID < 80500) {
+      @ini_set('session.use_only_cookies', '0');
+    }
+    @ini_set('session.cache_limiter', '');
+  } else {
+    @ini_set('session.use_only_cookies', '1');
+    @ini_set('session.use_strict_mode', '1');
+    @ini_set('session.cookie_httponly', '1');
+    @ini_set('session.cookie_samesite', 'Lax');
+    if ($https) {
+      @ini_set('session.cookie_secure', '1');
+    }
   }
 
   // Host-only cookie (do not set Domain attribute) to maximize compatibility on subdomains
   $domain = '';
+  $sessionName = $https ? '__Host-HESEMSESSID' : 'HESEMSESSID';
 
-  session_name($https ? '__Host-HESEMSESSID' : 'HESEMSESSID');
-  session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => $domain,
-    'secure' => $https,
-    'httponly' => true,
-    'samesite' => 'Lax',
-  ]);
+  if (!$headerlessSessionMode) {
+    session_name($sessionName);
+    session_set_cookie_params([
+      'lifetime' => 0,
+      'path' => '/',
+      'domain' => $domain,
+      'secure' => $https,
+      'httponly' => true,
+      'samesite' => 'Lax',
+    ]);
+  }
+
+  $lastError = null;
+  foreach (session_dir_candidates() as $sessDir) {
+    ensure_dir($sessDir);
+    if (!is_dir($sessDir) || !is_writable($sessDir)) {
+      continue;
+    }
+
+    if ($headersMutable) {
+      @session_save_path($sessDir);
+    }
+
+    if ($headerlessSessionMode && session_id() === '') {
+      @session_id(bin2hex(random_bytes(16)));
+    }
+
+    try {
+      session_start();
+      return;
+    } catch (\Throwable $e) {
+      $lastError = $e;
+      if (session_status() === PHP_SESSION_ACTIVE) {
+        @session_write_close();
+      }
+      if (session_exception_allows_fresh_start($e)) {
+        if (session_start_with_fresh_id()) {
+          return;
+        }
+      }
+    }
+  }
+
+  if ($lastError instanceof \Throwable) {
+    throw $lastError;
+  }
+
   session_start();
+}
+
+function session_exception_allows_fresh_start(\Throwable $e): bool {
+  $message = strtolower(trim($e->getMessage()));
+  if ($message === '') return false;
+
+  return str_contains($message, 'session_start(): open(')
+    || str_contains($message, 'failed to read session data')
+    || str_contains($message, 'permission denied')
+    || str_contains($message, 'no such file or directory');
+}
+
+function session_start_with_fresh_id(): bool {
+  if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true) && headers_sent()) {
+    if (!is_array($_SESSION ?? null)) {
+      $_SESSION = [];
+    }
+    return true;
+  }
+
+  $cookieName = session_name();
+  if ($cookieName !== '' && isset($_COOKIE[$cookieName])) {
+    unset($_COOKIE[$cookieName]);
+  }
+
+  if (session_status() === PHP_SESSION_ACTIVE) {
+    @session_write_close();
+  }
+
+  @ini_set('session.use_cookies', '0');
+  if (PHP_VERSION_ID < 80500) {
+    @ini_set('session.use_only_cookies', '0');
+  }
+  @ini_set('session.cache_limiter', '');
+  @session_id(bin2hex(random_bytes(16)));
+
+  try {
+    session_start();
+    return true;
+  } catch (\Throwable $retryError) {
+    @error_log('[API] Session recovery failed: ' . $retryError->getMessage() . ' in ' . $retryError->getFile() . ':' . $retryError->getLine());
+    if (session_status() === PHP_SESSION_ACTIVE) {
+      @session_write_close();
+    }
+  }
+
+  return false;
+}
+
+function session_regenerate_id_safe(bool $deleteOldSession = true): void {
+  if (session_status() !== PHP_SESSION_ACTIVE) {
+    return;
+  }
+
+  try {
+    if (@session_regenerate_id($deleteOldSession)) {
+      return;
+    }
+  } catch (Throwable $e) {
+    @error_log('[API] session_regenerate_id failed: ' . $e->getMessage());
+  }
+
+  if ($deleteOldSession) {
+    try {
+      if (@session_regenerate_id(false)) {
+        @error_log('[API] session_regenerate_id fallback kept old session file');
+        return;
+      }
+    } catch (Throwable $e) {
+      @error_log('[API] session_regenerate_id fallback failed: ' . $e->getMessage());
+    }
+  }
+
+  @error_log('[API] session_regenerate_id skipped; continuing with current session id');
 }
 
 function csrf_token(): string {
@@ -11458,6 +13419,8 @@ function require_csrf(): void {
 
 function api_request_allowed_origins(): array {
   $defaults = [
+    'https://eqms.hesemeng.com',
+    'https://*.hesemeng.com',
     'https://qms.hesem.com.vn',
     'https://*.hesem.com.vn',
     'http://localhost:3000',
@@ -11577,13 +13540,21 @@ function shell_run(string $command, ?int &$exitCode = null): string {
 }
 
 function git_shell_command(string $repoDir, array $args): string {
+  $safeDirectories = array_values(array_unique(array_filter([
+    str_replace('\\', '/', trim($repoDir)),
+    (($real = realpath($repoDir)) !== false) ? str_replace('\\', '/', $real) : '',
+  ], static fn($value) => is_string($value) && $value !== '')));
   $parts = [
     'GIT_TERMINAL_PROMPT=0',
     'GIT_SSH_COMMAND=' . escapeshellarg('ssh -oBatchMode=yes'),
     'git',
-    '-C',
-    escapeshellarg($repoDir),
   ];
+  foreach ($safeDirectories as $safeDirectory) {
+    $parts[] = '-c';
+    $parts[] = escapeshellarg('safe.directory=' . $safeDirectory);
+  }
+  $parts[] = '-C';
+  $parts[] = escapeshellarg($repoDir);
   foreach ($args as $arg) {
     $parts[] = escapeshellarg((string)$arg);
   }
@@ -11617,7 +13588,7 @@ function git_status_entry_path(string $line): string {
 function git_qms_data_relative_path(string $path): string {
   $p = ltrim(str_replace('\\', '/', trim($path)), '/');
   if ($p === '') return '';
-  $marker = 'qms-data/';
+  $marker = 'data/';
   $pos = strpos($p, $marker);
   if ($pos !== false) {
     return substr($p, $pos);
@@ -11630,7 +13601,7 @@ function git_qms_data_path_variants(string $suffix): array {
   if ($clean === '') return [];
   return array_values(array_unique([
     $clean,
-    '01-QMS-Portal/' . $clean,
+    'mom/' . $clean,
     '1-QMS-Portal/' . $clean,
   ]));
 }
@@ -11638,37 +13609,37 @@ function git_qms_data_path_variants(string $suffix): array {
 function git_is_runtime_noise_path(string $path): bool {
   $p = git_qms_data_relative_path($path);
   if ($p === '') return false;
-  if ($p === 'qms-data/config/users.json') return true;
-  if ($p === 'qms-data/audit.log') return true;
-  if ($p === 'qms-data/php_error.log') return true;
-  if ($p === 'qms-data/scan_cache.json') return true;
-  if (str_starts_with($p, 'qms-data/sessions/')) {
+  if ($p === 'data/config/users.json') return true;
+  if ($p === 'data/audit.log') return true;
+  if ($p === 'data/php_error.log') return true;
+  if ($p === 'data/scan_cache.json') return true;
+  if (str_starts_with($p, 'data/sessions/')) {
     return basename($p) !== 'README.md';
   }
-  if (str_starts_with($p, 'qms-data/ratelimit/')) {
+  if (str_starts_with($p, 'data/ratelimit/')) {
     return basename($p) !== 'README.md';
   }
-  if (str_starts_with($p, 'qms-data/allocations/')) {
+  if (str_starts_with($p, 'data/allocations/')) {
     return !in_array(basename($p), ['.htaccess', 'README.md'], true);
   }
-  if (str_starts_with($p, 'qms-data/counters/')) {
+  if (str_starts_with($p, 'data/counters/')) {
     return !in_array(basename($p), ['_registry.json', '.htaccess', 'README.md'], true);
   }
-  if (str_starts_with($p, 'qms-data/online-forms/drafts/')) {
+  if (str_starts_with($p, 'data/online-forms/drafts/')) {
     return !in_array(basename($p), ['.htaccess', 'README.md'], true);
   }
-  if (str_starts_with($p, 'qms-data/online-forms/audit/')) {
+  if (str_starts_with($p, 'data/online-forms/audit/')) {
     return !in_array(basename($p), ['.htaccess', 'README.md'], true);
   }
-  if (str_starts_with($p, 'qms-data/form-workflow/')) return true;
+  if (str_starts_with($p, 'data/form-workflow/')) return true;
   return false;
 }
 
 function git_is_presync_telemetry_path(string $path): bool {
   $p = git_qms_data_relative_path($path);
   if ($p === '') return false;
-  if (str_starts_with($p, 'qms-data/runtime-shadow/')) return true;
-  return (bool)preg_match('#^qms-data/audit/audit_\d{4}-\d{2}\.jsonl$#', $p);
+  if (str_starts_with($p, 'data/runtime-shadow/')) return true;
+  return (bool)preg_match('#^data/audit/audit_\d{4}-\d{2}\.jsonl$#', $p);
 }
 
 function git_filter_non_runtime_status_lines(array $statusLines, bool $excludePresyncTelemetry = false): array {
@@ -11892,16 +13863,16 @@ function git_cleanup_runtime_noise(string $repoReal): void {
 
   // Clean untracked runtime files/dirs in known noisy locations.
   $cleanTargets = [
-    'qms-data/audit.log',
-    'qms-data/form-workflow',
-    'qms-data/sessions',
-    'qms-data/ratelimit',
-    'qms-data/allocations',
-    'qms-data/counters',
-    'qms-data/online-forms/drafts',
-    'qms-data/online-forms/audit',
-    'qms-data/php_error.log',
-    'qms-data/scan_cache.json',
+    'data/audit.log',
+    'data/form-workflow',
+    'data/sessions',
+    'data/ratelimit',
+    'data/allocations',
+    'data/counters',
+    'data/online-forms/drafts',
+    'data/online-forms/audit',
+    'data/php_error.log',
+    'data/scan_cache.json',
   ];
   foreach ($cleanTargets as $target) {
     foreach (git_qms_data_path_variants($target) as $variant) {
@@ -11911,7 +13882,7 @@ function git_cleanup_runtime_noise(string $repoReal): void {
   }
 
   // Ensure tracked runtime file returns to HEAD state.
-  foreach (git_qms_data_path_variants('qms-data/config/users.json') as $variant) {
+  foreach (git_qms_data_path_variants('data/config/users.json') as $variant) {
     $usersRestoreCode = 0;
     git_command(['restore', '--', $variant], $repoReal, $usersRestoreCode);
   }
@@ -11968,31 +13939,68 @@ function git_discard_meaningful_local_changes(string $repoDir): array {
     ];
   }
 
+  // Build a map of path => status-code from porcelain output so we can
+  // reliably classify tracked vs untracked without calling git ls-files
+  // for each file (which can give wrong results on some cPanel git builds).
+  $statusCodeMap = [];
+  foreach ($meaningfulLines as $line) {
+    if (!is_string($line) || strlen($line) < 3) continue;
+    $xy = substr($line, 0, 2);
+    $p  = git_status_entry_path($line);
+    if ($p !== '') $statusCodeMap[$p] = $xy;
+  }
+
   $tracked = [];
   $untracked = [];
   foreach ($meaningfulPaths as $path) {
-    if (git_is_tracked_path($repoReal, $path)) {
-      $tracked[] = $path;
-    } else {
+    $xy = $statusCodeMap[$path] ?? null;
+    // '??' is the only porcelain code that means truly untracked.
+    // Everything else (M, A, D, R, C, U, combinations) is tracked.
+    if ($xy === '??' || $xy === null) {
       $untracked[] = $path;
+    } else {
+      $tracked[] = $path;
     }
   }
   $tracked = array_values(array_unique($tracked));
   $untracked = array_values(array_unique($untracked));
 
+  // --- Restore tracked files to HEAD ---
   if (!empty($tracked)) {
+    // Try git restore first (git >= 2.23), fall back to git checkout.
     $restoreCode = 0;
     $restoreOut = git_command(['restore', '--source=HEAD', '--staged', '--worktree', '--', ...$tracked], $repoReal, $restoreCode);
     if ($restoreCode !== 0) {
-      throw new RuntimeException('git_discard_failed' . ($restoreOut !== '' ? ': ' . $restoreOut : ''));
+      // Fallback: git checkout HEAD -- <paths>
+      $checkoutCode = 0;
+      $checkoutOut = git_command(['checkout', 'HEAD', '--', ...$tracked], $repoReal, $checkoutCode);
+      if ($checkoutCode !== 0) {
+        throw new RuntimeException('git_discard_failed' . ($checkoutOut !== '' ? ': ' . $checkoutOut : ''));
+      }
     }
   }
 
+  // --- Remove untracked files ---
   if (!empty($untracked)) {
     $cleanCode = 0;
     $cleanOut = git_command(['clean', '-fd', '--', ...$untracked], $repoReal, $cleanCode);
     if ($cleanCode !== 0) {
       throw new RuntimeException('git_discard_failed' . ($cleanOut !== '' ? ': ' . $cleanOut : ''));
+    }
+  }
+
+  // --- Nuclear fallback: if files still remain, force reset ---
+  $midStatusCode = 0;
+  $midStatusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $midStatusCode);
+  if ($midStatusCode === 0) {
+    $midLines = git_filter_non_runtime_status_lines(split_nonempty_lines($midStatusOut), true);
+    $midPaths = git_filter_non_runtime_paths(git_collect_paths_from_status_lines($midLines), true);
+    if (!empty($midPaths)) {
+      // Some files survived — force-checkout + clean everything meaningful
+      $resetCode = 0;
+      git_command(['checkout', 'HEAD', '--', '.'], $repoReal, $resetCode);
+      $cleanAllCode = 0;
+      git_command(['clean', '-fd'], $repoReal, $cleanAllCode);
     }
   }
 
@@ -12227,47 +14235,25 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
     throw new RuntimeException('not_a_git_repo');
   }
 
-  // Auto-clean runtime noise before safety checks so Pull can run without
-  // manual cleanup in cPanel Terminal.
+  // Auto-clean runtime noise so pull can run without manual cleanup.
   git_cleanup_runtime_noise($repoReal);
-
-  $stagedCode = 0;
-  $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
-  if ($stagedCode !== 0) {
-    throw new RuntimeException('git_index_check_failed');
-  }
-  $stagedFiles = split_nonempty_lines($stagedOut);
-  $stagedMeaningful = git_filter_non_runtime_paths($stagedFiles, true);
-  if (!empty($stagedMeaningful)) {
-    throw new RuntimeException('staged_changes_present: ' . git_join_paths_for_error($stagedMeaningful));
-  }
-
-  $statusCode = 0;
-  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
-  if ($statusCode !== 0) {
-    throw new RuntimeException('git_status_failed');
-  }
-  $dirtyLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut), true);
-  if (!empty($dirtyLines)) {
-    $dirtyPaths = git_collect_paths_from_status_lines($dirtyLines);
-    throw new RuntimeException('working_tree_dirty: ' . git_join_paths_for_error($dirtyPaths));
-  }
 
   $branchCode = 0;
   $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
   if ($branchCode !== 0 || $branch === '') $branch = 'main';
   $headBefore = git_head_commit($repoReal);
 
+  // Fetch remote state.
   $fetchCode = 0;
   $fetchOut = git_command(['fetch', 'origin', $branch], $repoReal, $fetchCode);
   if ($fetchCode !== 0) {
     throw new RuntimeException('git_fetch_failed' . ($fetchOut !== '' ? ': ' . $fetchOut : ''));
   }
 
-  $behindCode = 0;
-  $behindOut = git_command(['rev-list', '--count', $branch . '..origin/' . $branch], $repoReal, $behindCode);
-  $behindCount = $behindCode === 0 ? (int)trim($behindOut) : 0;
-  if ($behindCount <= 0) {
+  // Check if remote has new commits (compare local HEAD vs origin).
+  $localHead = trim((string)git_command(['rev-parse', $branch], $repoReal, $code));
+  $remoteHead = trim((string)git_command(['rev-parse', 'origin/' . $branch], $repoReal, $code));
+  if ($localHead === $remoteHead) {
     return [
       'pulled' => false,
       'branch' => $branch,
@@ -12281,11 +14267,17 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
     ];
   }
 
-  $pullCode = 0;
-  $pullOut = git_command(['pull', '--ff-only', 'origin', $branch], $repoReal, $pullCode);
-  if ($pullCode !== 0) {
+  // Force-reset local branch to match remote — works regardless of dirty
+  // working tree, staged changes, or diverged branches (same behaviour as
+  // cPanel Git Version Control "Update from Remote").
+  $resetCode = 0;
+  $pullOut = git_command(['reset', '--hard', 'origin/' . $branch], $repoReal, $resetCode);
+  if ($resetCode !== 0) {
     throw new RuntimeException('git_pull_failed' . ($pullOut !== '' ? ': ' . $pullOut : ''));
   }
+
+  // Clean leftover untracked files that are no longer in the remote tree.
+  git_command(['clean', '-fd'], $repoReal, $cleanCode);
 
   $headAfter = git_head_commit($repoReal);
   $changedFiles = [];
@@ -12519,15 +14511,22 @@ function otpauth_url(string $issuer, string $account, string $secretB32): string
 
 function sanitize_user_for_client(array $user): array {
   return [
+    'employee_id' => (string)($user['employee_id'] ?? ''),
     'username' => (string)($user['username'] ?? ''),
     'active'   => (bool)($user['active'] ?? true),
     'role'     => (string)($user['role'] ?? 'user'),
     'name'     => (string)($user['name'] ?? ''),
     'dept'     => (string)($user['dept'] ?? ''),
     'title'    => (string)($user['title'] ?? ''),
+    'hcm_org_unit_id' => (string)($user['hcm_org_unit_id'] ?? ''),
+    'hcm_position_id' => (string)($user['hcm_position_id'] ?? ''),
     'cccd'     => (string)($user['cccd'] ?? ''),
     'phone'    => (string)($user['phone'] ?? ''),
     'personal_email' => (string)($user['personal_email'] ?? ''),
+    'org_company_code' => (string)($user['org_company_code'] ?? ''),
+    'org_legal_entity_code' => (string)($user['org_legal_entity_code'] ?? ''),
+    'org_plant_id' => (string)($user['org_plant_id'] ?? ''),
+    'org_site_id' => (string)($user['org_site_id'] ?? ''),
     'mfa'      => ['enabled' => (bool)(($user['mfa']['enabled'] ?? false))],
     'updated_at' => (string)($user['updated_at'] ?? ''),
     'created_at' => (string)($user['created_at'] ?? ''),
@@ -12581,6 +14580,9 @@ if (defined('API_HELPERS_ONLY')) {
 // ---------- Boot ----------
 ensure_dir($DATA_DIR);
 migrate_legacy_data_dir($LEGACY_DATA_DIR, $DATA_DIR);
+if ($DATA_DIR === normalize_runtime_dir($LEGACY_DATA_DIR) && is_dir($LEGACY_COMPAT_DATA_DIR)) {
+  migrate_legacy_data_dir($LEGACY_COMPAT_DATA_DIR, $DATA_DIR);
+}
 ensure_dir($CONF_DIR);
 ensure_dir($RL_DIR);
 session_init();
@@ -12628,7 +14630,7 @@ switch ($action) {
       $enrollRemaining > 0
     ) {
       $settings = is_array($store['settings'] ?? null) ? $store['settings'] : [];
-      $issuer = (string)($settings['issuer'] ?? 'HESEM QMS');
+      $issuer = (string)($settings['issuer'] ?? 'HESEM MOM');
       $mfaPending = false;
       $enrollPending = true;
       api_json([
@@ -12694,9 +14696,11 @@ switch ($action) {
 
   case 'role_perms_get': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    require_logged_in($store);
+    $me = require_logged_in($store);
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
     $perms = load_role_permissions($ROLE_PERMS_FILE);
-    api_json(['ok' => true, 'perms' => $perms, 'server_time' => now_iso()]);
+    $roleDocs = portal_load_role_docs($PORTAL_CONFIG_JS_FILE, $PORTAL_ROLE_DOCS_FILE);
+    api_json(['ok' => true, 'perms' => $perms, 'role_docs' => $roleDocs, 'server_time' => now_iso()]);
   }
 
   case 'admin_role_perms_save': {
@@ -12711,15 +14715,21 @@ switch ($action) {
     $data = read_json_body();
     $in = $data['perms'] ?? null;
     if (!is_array($in)) api_json(['ok' => false, 'error' => 'invalid_perms'], 400);
+    $roleDocsInput = $data['role_docs'] ?? null;
+    if ($roleDocsInput !== null && !is_array($roleDocsInput)) {
+      api_json(['ok' => false, 'error' => 'invalid_role_docs'], 400);
+    }
 
-    $clean = [];
+    $clean = load_role_permissions($ROLE_PERMS_FILE);
+    if (!is_array($clean)) {
+      $clean = [];
+    }
     foreach ($in as $role => $v) {
       $roleKey = (string)$role;
       if ($roleKey === '') continue;
       $row = is_array($v) ? $v : [];
-      $clean[$roleKey] = [
-        'canCreateDocs' => (bool)($row['canCreateDocs'] ?? false),
-      ];
+      $existing = is_array($clean[$roleKey] ?? null) ? $clean[$roleKey] : [];
+      $clean[$roleKey] = merge_role_permission_row($existing, $row);
     }
     // Ensure defaults always exist (safety)
     foreach (default_role_permissions() as $k => $v) {
@@ -12727,7 +14737,10 @@ switch ($action) {
     }
 
     save_role_permissions($ROLE_PERMS_FILE, $clean);
-    api_json(['ok' => true, 'perms' => $clean, 'server_time' => now_iso()]);
+    $roleDocs = $roleDocsInput === null
+      ? portal_load_role_docs($PORTAL_CONFIG_JS_FILE, $PORTAL_ROLE_DOCS_FILE)
+      : portal_save_role_docs($PORTAL_ROLE_DOCS_FILE, $roleDocsInput, $PORTAL_CONFIG_JS_FILE);
+    api_json(['ok' => true, 'perms' => $clean, 'role_docs' => $roleDocs, 'server_time' => now_iso()]);
   }
 
   case 'admin_git_sync': {
@@ -13002,6 +15015,10 @@ switch ($action) {
       if ($code !== '') $clean[] = $code;
     }
     save_doc_visibility($DOC_VIS_FILE, $clean);
+    portal_legacy_admin_audit_log('admin_docs_visibility_save', [
+      'count' => count($clean),
+      'hidden' => array_values(array_unique($clean)),
+    ], $me);
     api_json(['ok' => true, 'hidden' => array_values(array_unique($clean)), 'server_time' => now_iso()]);
   }
 
@@ -13025,7 +15042,38 @@ switch ($action) {
 
     $saved = portal_save_display_config($PORTAL_DISPLAY_CONFIG_FILE, $configIn);
     invalidate_scan_cache($DATA_DIR);
+    portal_legacy_admin_audit_log('admin_portal_display_config_save', [
+      'extensions_enabled' => count((array)($saved['extensions']['enabled'] ?? [])),
+      'sidebar_hidden_core_items' => count((array)($saved['sidebar']['hidden_core_items'] ?? [])),
+      'sidebar_hidden_sections' => count((array)($saved['sidebar']['hidden_sections'] ?? [])),
+      'sidebar_hidden_categories' => count((array)($saved['sidebar']['hidden_categories'] ?? [])),
+    ], $me);
     api_json(['ok' => true, 'config' => portal_display_config_public_payload($saved), 'server_time' => now_iso()]);
+  }
+
+  case 'module_access_get': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    require_logged_in($store);
+    $config = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
+    api_json(['ok' => true, 'config' => module_access_public_payload($config), 'server_time' => now_iso()]);
+  }
+
+  case 'admin_module_access_save': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    $data = read_json_body();
+    $configIn = $data['config'] ?? null;
+    if (!is_array($configIn)) api_json(['ok' => false, 'error' => 'invalid_config'], 400);
+
+    $saved = module_access_save_config($MODULE_ACCESS_CONFIG_FILE, $configIn);
+    portal_legacy_admin_audit_log('admin_module_access_save', [
+      'portal_enabled' => count(array_filter((array)($saved['portal_modules'] ?? []), static fn($policy) => is_array($policy) && (($policy['enabled'] ?? true) !== false))),
+      'admin_enabled' => count(array_filter((array)($saved['admin_tabs'] ?? []), static fn($policy) => is_array($policy) && (($policy['enabled'] ?? true) !== false))),
+    ], $me);
+    api_json(['ok' => true, 'config' => module_access_public_payload($saved), 'server_time' => now_iso()]);
   }
 
 
@@ -13059,6 +15107,10 @@ switch ($action) {
       'require_consent' => true,
     ];
     $settings = $store['data_collection'] ?? $defaults;
+    $shadow = portal_system_config_shadow_read('data_collection_settings');
+    if (is_array($shadow)) {
+      $settings = is_array($shadow['settings'] ?? null) ? (array)$shadow['settings'] : $shadow;
+    }
     // merge defaults for any missing keys
     foreach ($defaults as $k => $v) {
       if (!isset($settings[$k])) $settings[$k] = $v;
@@ -13079,14 +15131,38 @@ switch ($action) {
     }
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
     $allowed = ['collect_gps', 'collect_ip', 'collect_device', 'collect_navigation', 'collect_connection', 'require_consent'];
-    $current = $store['data_collection'] ?? [];
+    $before = is_array($store['data_collection'] ?? null) ? (array)$store['data_collection'] : [];
+    $current = $before;
     foreach ($allowed as $key) {
       if (isset($input[$key])) {
         $current[$key] = (bool)$input[$key];
       }
     }
     $store['data_collection'] = $current;
-    users_save($USERS_FILE, $store);
+    $changedKeys = [];
+    foreach ($allowed as $key) {
+      $beforeValue = array_key_exists($key, $before) ? (bool)$before[$key] : null;
+      $afterValue = array_key_exists($key, $current) ? (bool)$current[$key] : null;
+      if ($beforeValue !== $afterValue) {
+        $changedKeys[] = $key;
+      }
+    }
+    try {
+      users_save($USERS_FILE, $store);
+      portal_system_config_shadow_write('data_collection_settings', [
+        'settings' => $current,
+        'updated_by' => (string)($me['username'] ?? ''),
+        'updated_at' => now_iso(),
+      ]);
+    } catch (Throwable $e) {
+      api_json(['ok' => false, 'error' => 'save_failed', 'detail' => $e->getMessage()], 500);
+    }
+    portal_legacy_admin_audit_log('save_data_settings', [
+      'changed_keys' => $changedKeys,
+      'before' => $before,
+      'after' => $current,
+      'count' => count($changedKeys),
+    ], $me);
     api_json(['ok' => true, 'settings' => $current]);
   }
 
@@ -13271,7 +15347,7 @@ switch ($action) {
     // Compute relative link back to root index (depends on folder depth)
     $folderTrim = trim($folder, '/');
     $depth = ($folderTrim === '') ? 0 : count(array_filter(explode('/', $folderTrim)));
-    $rootHref = str_repeat('../', $depth) . '01-QMS-Portal/portal.html';
+    $rootHref = str_repeat('../', $depth) . 'mom/portal.html';
     $assetsCss = str_repeat('../', $depth) . 'assets/style.css';
     $assetsJs  = str_repeat('../', $depth) . 'assets/app.js';
 
@@ -13280,7 +15356,7 @@ switch ($action) {
       '<head>' . "\n" .
       '  <meta charset="utf-8"/>' . "\n" .
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>' . "\n" .
-      '  <title>' . $safeCode . ' — ' . $safeTitle . ' | HESEM QMS</title>' . "\n" .
+      '  <title>' . $safeCode . ' — ' . $safeTitle . ' | HESEM MOM</title>' . "\n" .
       '  <link rel="stylesheet" href="' . $assetsCss . '"/>' . "\n" .
       '</head>' . "\n" .
       '<body>' . "\n" .
@@ -13319,7 +15395,7 @@ switch ($action) {
       '<head>' . "\n" .
       '  <meta charset="utf-8"/>' . "\n" .
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>' . "\n" .
-      '  <title>' . $safeCode . ' - ' . $safeTitle . ' | HESEM QMS</title>' . "\n" .
+      '  <title>' . $safeCode . ' - ' . $safeTitle . ' | HESEM MOM</title>' . "\n" .
       '  <link rel="stylesheet" href="' . $assetsCss . '"/>' . "\n" .
       '</head>' . "\n" .
       '<body>' . "\n" .
@@ -14867,22 +16943,16 @@ case 'doc_save_draft': {
     if (!$isAdmin) api_json(['ok' => false, 'error' => 'forbidden'], 403);
 
     $out = [];
-    $i = 1;
     foreach (($store['users'] ?? []) as $u) {
       if (!is_array($u)) continue;
-      $out[] = [
-        'id' => $i++,
-        'name' => (string)($u['name'] ?? ''),
-        'username' => (string)($u['username'] ?? ''),
-        'role' => (string)($u['role'] ?? 'user'),
-        'dept' => (string)($u['dept'] ?? ''),
-        'title' => (string)($u['title'] ?? ''),
-        'active' => (bool)($u['active'] ?? true),
-        'mfa' => ['enabled' => (bool)(($u['mfa']['enabled'] ?? false))],
-        'updated_at' => (string)($u['updated_at'] ?? ''),
-        'created_at' => (string)($u['created_at'] ?? ''),
-      ];
+      $row = sanitize_user_for_client($u);
+      $row['id'] = $row['employee_id'] !== '' ? $row['employee_id'] : ($row['username'] !== '' ? $row['username'] : uniqid('user_', true));
+      $out[] = $row;
     }
+
+    usort($out, static function(array $a, array $b): int {
+      return strcasecmp((string)($a['name'] ?? ''), (string)($b['name'] ?? ''));
+    });
 
     api_json(['ok' => true, 'users' => $out, 'server_time' => now_iso()]);
   }
@@ -14909,6 +16979,12 @@ case 'doc_save_draft': {
     $cccd = trim((string)($data['cccd'] ?? ''));
     $phone = trim((string)($data['phone'] ?? ''));
     $personal_email = trim((string)($data['personal_email'] ?? ''));
+    $hcmOrgUnitId = trim((string)($data['hcm_org_unit_id'] ?? ''));
+    $hcmPositionId = trim((string)($data['hcm_position_id'] ?? ''));
+    $orgCompanyCode = trim((string)($data['org_company_code'] ?? ''));
+    $orgLegalEntityCode = trim((string)($data['org_legal_entity_code'] ?? ''));
+    $orgPlantId = trim((string)($data['org_plant_id'] ?? ''));
+    $orgSiteId = trim((string)($data['org_site_id'] ?? ''));
 
     $passwordProvided = isset($data['password']) && trim((string)$data['password']) !== '';
     $plainPassword = $passwordProvided ? (string)$data['password'] : null;
@@ -14924,6 +17000,9 @@ case 'doc_save_draft': {
     foreach ($users as $i => $u) {
       if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
         $found = true;
+        $users[$i]['employee_id'] = trim((string)($users[$i]['employee_id'] ?? '')) !== ''
+          ? (string)$users[$i]['employee_id']
+          : portal_auth_employee_id_for_user($users[$i]);
         $users[$i]['name'] = $name !== '' ? $name : ($users[$i]['name'] ?? $username);
         $users[$i]['dept'] = $dept;
         $users[$i]['title'] = $title;
@@ -14932,6 +17011,12 @@ case 'doc_save_draft': {
         $users[$i]['cccd'] = $cccd;
         $users[$i]['phone'] = $phone;
         $users[$i]['personal_email'] = $personal_email;
+        $users[$i]['hcm_org_unit_id'] = $hcmOrgUnitId;
+        $users[$i]['hcm_position_id'] = $hcmPositionId;
+        $users[$i]['org_company_code'] = $orgCompanyCode;
+        $users[$i]['org_legal_entity_code'] = $orgLegalEntityCode;
+        $users[$i]['org_plant_id'] = $orgPlantId;
+        $users[$i]['org_site_id'] = $orgSiteId;
         $users[$i]['updated_at'] = now_iso();
 
         if ($passwordProvided) {
@@ -14940,6 +17025,16 @@ case 'doc_save_draft': {
           unset($users[$i]['mfa']);
           // Clear any legacy keys
           unset($users[$i]['mfa_enabled'], $users[$i]['mfa_secret'], $users[$i]['pin']);
+        }
+
+        $linkage = portal_auth_normalize_user_linkage($users[$i], $ROOT_DIR);
+        $users[$i]['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $users[$i]['hcm_org_unit_id'] ?? '');
+        $users[$i]['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $users[$i]['hcm_position_id'] ?? '');
+        if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
+          $users[$i]['dept'] = (string)$linkage['dept_code'];
+        }
+        if (trim((string)($linkage['position_title'] ?? '')) !== '') {
+          $users[$i]['title'] = (string)$linkage['position_title'];
         }
         break;
       }
@@ -14951,6 +17046,11 @@ case 'doc_save_draft': {
       }
 
       $users[] = [
+        'employee_id' => portal_auth_employee_id_for_user([
+          'username' => $username,
+          'personal_email' => $personal_email,
+          'cccd' => $cccd,
+        ]),
         'username' => $username,
         'password_hash' => password_hash((string)$plainPassword, PASSWORD_DEFAULT),
         'name' => $name !== '' ? $name : $username,
@@ -14961,10 +17061,28 @@ case 'doc_save_draft': {
         'cccd' => $cccd,
         'phone' => $phone,
         'personal_email' => $personal_email,
+        'hcm_org_unit_id' => $hcmOrgUnitId,
+        'hcm_position_id' => $hcmPositionId,
+        'org_company_code' => $orgCompanyCode,
+        'org_legal_entity_code' => $orgLegalEntityCode,
+        'org_plant_id' => $orgPlantId,
+        'org_site_id' => $orgSiteId,
         'mfa' => ['enabled' => false],
         'created_at' => now_iso(),
         'updated_at' => now_iso(),
       ];
+      $lastIndex = count($users) - 1;
+      if ($lastIndex >= 0) {
+        $linkage = portal_auth_normalize_user_linkage($users[$lastIndex], $ROOT_DIR);
+        $users[$lastIndex]['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $users[$lastIndex]['hcm_org_unit_id'] ?? '');
+        $users[$lastIndex]['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $users[$lastIndex]['hcm_position_id'] ?? '');
+        if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
+          $users[$lastIndex]['dept'] = (string)$linkage['dept_code'];
+        }
+        if (trim((string)($linkage['position_title'] ?? '')) !== '') {
+          $users[$lastIndex]['title'] = (string)$linkage['position_title'];
+        }
+      }
     }
 
     $store['users'] = $users;
@@ -14975,6 +17093,9 @@ case 'doc_save_draft': {
     }
 
     $updated = find_user_by_username($store, $username);
+    if (is_array($updated)) {
+      portal_auth_shadow_sync_user($updated, $ROOT_DIR);
+    }
     api_json([
       'ok' => true,
       'user' => $updated ? sanitize_user_for_client($updated) : null,
@@ -15004,9 +17125,11 @@ case 'doc_save_draft': {
     $users = $store['users'] ?? [];
     $found = false;
     $newUsers = [];
+    $deletedUser = null;
     foreach ($users as $u) {
       if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
         $found = true;
+        $deletedUser = is_array($u) ? $u : null;
         continue; // skip = remove
       }
       $newUsers[] = $u;
@@ -15016,6 +17139,11 @@ case 'doc_save_draft': {
 
     $store['users'] = $newUsers;
     users_save($USERS_FILE, $store);
+    portal_auth_shadow_deactivate_user(
+      $username,
+      is_array($deletedUser) ? (string)($deletedUser['employee_id'] ?? '') : null,
+      $ROOT_DIR
+    );
     api_json(['ok' => true, 'deleted' => $username]);
   }
 
@@ -15037,6 +17165,9 @@ case 'doc_save_draft': {
     foreach ($users as $i => $u) {
       if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
         $found = true;
+        $users[$i]['employee_id'] = trim((string)($users[$i]['employee_id'] ?? '')) !== ''
+          ? (string)$users[$i]['employee_id']
+          : portal_auth_employee_id_for_user($users[$i]);
         $users[$i]['password_hash'] = password_hash($newPw, PASSWORD_DEFAULT);
         $users[$i]['updated_at'] = now_iso();
         // Reset MFA enrollment (force re-enroll)
@@ -15053,6 +17184,11 @@ case 'doc_save_draft': {
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
       api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+    }
+
+    $updated = find_user_by_username($store, $username);
+    if (is_array($updated)) {
+      portal_auth_shadow_sync_user($updated, $ROOT_DIR);
     }
 
     api_json(['ok' => true, 'username' => $username, 'temp_password' => $newPw]);
@@ -15091,7 +17227,7 @@ case 'auth_login': {
 
     // When system MFA is globally disabled, skip MFA entirely — just log in
     if (!$requireMfa) {
-      set_authenticated_session($username);
+      set_authenticated_session($username, $user);
       $user['last_login'] = now_iso();
       $user['updated_at'] = now_iso();
       update_user($store, $user);
@@ -15113,7 +17249,7 @@ case 'auth_login': {
       api_json(['ok' => false, 'error' => 'invalid_code'], 401);
     }
 
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
 
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
@@ -15153,7 +17289,7 @@ case 'auth_login': {
       $_SESSION['enroll_secret'] = $secretB32;
       $_SESSION['enroll_started'] = time();
 
-      $issuer = (string)($settings['issuer'] ?? 'HESEM QMS');
+      $issuer = (string)($settings['issuer'] ?? 'HESEM MOM');
 
       api_json([
         'ok' => true,
@@ -15170,7 +17306,7 @@ case 'auth_login': {
     }
 
     // No MFA required
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
     update_user($store, $user);
@@ -15231,7 +17367,7 @@ if ($username === '') {
 
     if (!totp_verify($secretB32, $code, 1, 30, 6)) api_json(['ok' => false, 'error' => 'invalid_code'], 401);
 
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
 
     $user['last_login'] = now_iso();
     $user['updated_at'] = now_iso();
@@ -15287,7 +17423,7 @@ if ($username === '') {
       api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
     }
 
-    set_authenticated_session($username);
+    set_authenticated_session($username, $user);
 
     api_json([
       'ok' => true,
@@ -15337,9 +17473,9 @@ if ($username === '') {
         if (!str_ends_with($filename, '.html')) continue;
         $relFound = rel_path($file->getPathname(), $ROOT_DIR);
         if (
-          str_starts_with($relFound, '01-QMS-Portal/')
+          str_starts_with($relFound, 'mom/')
           || str_starts_with($relFound, 'assets/')
-          || str_starts_with($relFound, '11-Glossary/')
+          || str_starts_with($relFound, 'mom/docs/glossary/')
         ) {
           continue;
         }
@@ -15478,8 +17614,8 @@ if ($username === '') {
     if (!is_dir($folderAbs)) api_json(['ok' => false, 'error' => 'folder_not_found'], 404);
 
     // Safety: don't allow deleting top-level system folders
-    $topLevelProtected = ['01-QMS-Portal', 'assets', '11-Glossary',
-      '02-Tai-Lieu-He-Thong', '03-Tai-Lieu-Van-Hanh', '04-Bieu-Mau', '10-Training-Academy'];
+    $topLevelProtected = ['mom', 'assets', 'mom/docs/glossary',
+      'mom/docs/system', 'mom/docs/operations', 'mom/docs/forms', 'mom/docs/training'];
     $folderName = basename($folderPath);
     if (in_array($folderPath, $topLevelProtected) || in_array($folderName, $topLevelProtected)) {
       api_json(['ok' => false, 'error' => 'cannot_delete_system_folder'], 403);
@@ -15661,9 +17797,9 @@ if ($username === '') {
         if ($file->isFile() && str_ends_with($file->getFilename(), '.html')) {
           $relFound = rel_path($file->getPathname(), $ROOT_DIR);
           if (
-            str_starts_with($relFound, '01-QMS-Portal/')
+            str_starts_with($relFound, 'mom/')
             || str_starts_with($relFound, 'assets/')
-            || str_starts_with($relFound, '11-Glossary/')
+            || str_starts_with($relFound, 'mom/docs/glossary/')
           ) {
             continue;
           }
@@ -15767,7 +17903,7 @@ if ($username === '') {
       }
     }
 
-    $SKIP_DIRS = ['01-QMS-Portal', 'assets', '11-Glossary', 'archive', '_Archive', '_archive', '_Deleted', '.git'];
+    $SKIP_DIRS = ['mom', 'assets', 'mom/docs/glossary', 'archive', '_Archive', '_archive', '_Deleted', '.git'];
     $docs = [];
     $tree = [];
     $seen = [];
@@ -15887,13 +18023,20 @@ if ($username === '') {
     // Smart cat from subfolder name — for container folders
     function cat_from_subfolder(string $subName): ?string {
       $map = [
-        'Quality-Manual' => 'MAN', 'Policies-Objectives' => 'POL',
-        'SOPs' => 'SOP', 'Work-Instructions' => 'WI', 'Reference' => 'ANNEX',
+        'Quality-Manual' => 'MAN', 'quality-manual' => 'MAN',
+        'Policies-Objectives' => 'POL', 'policies' => 'POL',
+        'SOPs' => 'SOP', 'sops' => 'SOP',
+        'Work-Instructions' => 'WI', 'work-instructions' => 'WI',
+        'Reference' => 'ANNEX', 'references' => 'ANNEX',
         'ANNEX-System' => 'ANNEX', 'ANNEX-Standards' => 'ANNEX', 'ANNEX-Digital' => 'ANNEX',
-        'Organization' => 'ORG', 'Org-Chart' => 'ORG', 'Department-Handbooks' => 'ORG',
-        'Job-Descriptions' => 'ORG', 'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
+        'Organization' => 'ORG', 'organization' => 'ORG', 'Org-Chart' => 'ORG',
+        'Department-Handbooks' => 'ORG', 'Job-Descriptions' => 'ORG',
+        'RACI-Authority' => 'ORG', 'Labor-Relations' => 'ORG',
         'Bieu-Mau' => 'FRM',
-        'Competency-System' => 'TRN', 'Training-Content' => 'TRN', 'System-Operations' => 'TRN',
+        'Competency-System' => 'TRN', 'competency' => 'TRN',
+        'Training-Content' => 'TRN', 'content' => 'TRN',
+        'System-Operations' => 'TRN', 'system-ops' => 'TRN',
+        'templates' => 'TRN',
       ];
       foreach ($map as $k => $v) {
         if (stripos($subName, $k) !== false) return $v;
@@ -16010,21 +18153,63 @@ if ($username === '') {
     };
 
     // ═══ SCAN TOP-LEVEL FOLDERS ═══
+    // Build scan list: real numbered dirs + virtual mom/docs entries
     $topDirs = @scandir($ROOT_DIR);
     if (!$topDirs) $topDirs = [];
     sort($topDirs);
 
+    // Inject mom/docs/ category roots as virtual top-level entries.
+    // The MOM layout nests real categories below system/operations containers,
+    // so scanning the container roots directly would stop one level too early.
+    $momDocsVirtualMap = []; // topName => [absPath, num, label, cat]
+    $momDocsContainers = [
+      'mom/docs/system/quality-manual'           => [201, 'Quality Manual', 'MAN'],
+      'mom/docs/system/policies'                 => [202, 'Policies', 'POL'],
+      'mom/docs/system/organization'             => [203, 'Organization', 'ORG'],
+      'mom/docs/operations/sops'                 => [301, 'SOPs', 'SOP'],
+      'mom/docs/operations/work-instructions'    => [302, 'Work Instructions', 'WI'],
+      'mom/docs/operations/references'           => [303, 'References', 'ANNEX'],
+      'mom/docs/forms'                           => [400, 'Bieu-Mau', 'FRM'],
+      'mom/docs/training'                        => [1000, 'Training-Academy', 'TRN'],
+    ];
+    foreach ($momDocsContainers as $relPath => [$vNum, $vLabel, $vCat]) {
+      $vAbs = $ROOT_DIR . '/' . $relPath;
+      if (!is_dir($vAbs)) continue;
+      $virtualName = '_mom_' . sprintf('%02d', $vNum) . '_' . basename($relPath);
+      $momDocsVirtualMap[$virtualName] = ['abs' => $vAbs, 'rel' => $relPath, 'num' => $vNum, 'label' => $vLabel, 'cat' => $vCat];
+      $topDirs[] = $virtualName;
+    }
+    sort($topDirs);
+
     foreach ($topDirs as $topName) {
       if ($topName[0] === '.' || in_array($topName, $SKIP_DIRS)) continue;
-      $topAbs = $ROOT_DIR . '/' . $topName;
-      if (!is_dir($topAbs)) continue;
 
-      [$topNum, $topLabel] = parse_folder_num($topName);
-      if ($topNum === null) continue; // Skip unnumbered folders
-      if ($topNum < 2) continue; // 01=Portal, >50=hidden
+      // Determine if this is a real dir or a virtual mom/docs entry
+      $isVirtual = isset($momDocsVirtualMap[$topName]);
+      if ($isVirtual) {
+        $v = $momDocsVirtualMap[$topName];
+        $topAbs = $v['abs'];
+        $topNum = $v['num'];
+        $topLabel = $v['label'];
+        $catCode = $v['cat'];
+        $topRelPath = $v['rel'];
+      } else {
+        $topAbs = $ROOT_DIR . '/' . $topName;
+        if (!is_dir($topAbs)) continue;
+        [$topNum, $topLabel] = parse_folder_num($topName);
+        if ($topNum === null) continue; // Skip unnumbered folders
+        if ($topNum < 2) continue; // 01=Portal, >50=hidden
+        $catCode = scan_derive_cat($topLabel);
+        $topRelPath = $topName;
+      }
 
-      $catCode = scan_derive_cat($topLabel);
-      $topNode = ['path' => $topName, 'num' => $topNum, 'name' => $topLabel, 'cat' => $catCode, 'subs' => [], 'fileCount' => 0];
+      // Skip if this virtual num already found via real numbered dir
+      if ($isVirtual) {
+        $numExists = false;
+        foreach ($tree as $tn) { if (($tn['num'] ?? 0) === $topNum) { $numExists = true; break; } }
+        if ($numExists) continue;
+      }
+      $topNode = ['path' => $topRelPath, 'num' => $topNum, 'name' => $topLabel, 'cat' => $catCode, 'subs' => [], 'fileCount' => 0];
 
       // Scan subfolders
       $subDirs = @scandir($topAbs);
@@ -16032,15 +18217,21 @@ if ($username === '') {
       sort($subDirs);
 
       $hasNumberedSubs = false;
+      $vSubAutoNum = 1; // counter for unnumbered subdirs in virtual mom/docs entries
       foreach ($subDirs as $subName) {
         if ($subName[0] === '.' || $subName === '_Archive' || $subName === 'index.html') continue;
         $subAbs = $topAbs . '/' . $subName;
         if (!is_dir($subAbs)) continue;
 
         [$subNum, $subLabel] = parse_folder_num($subName);
+        // For virtual mom/docs entries, also accept unnumbered subdirs (quality-manual, sops, etc.)
+        if ($subNum === null && $isVirtual) {
+          $subNum = $vSubAutoNum++;
+          $subLabel = ucwords(str_replace('-', ' ', $subName));
+        }
         if ($subNum !== null && $subNum >= 1) {
           $hasNumberedSubs = true;
-          $subNode = ['path' => $topName . '/' . $subName, 'num' => $subNum, 'name' => $subLabel, 'fileCount' => 0];
+          $subNode = ['path' => $topRelPath . '/' . $subName, 'num' => $subNum, 'name' => $subLabel, 'fileCount' => 0];
 
           // Scan for deeper numbered subdirs (e.g., 08-Organization/03-Job-Descriptions/01-JD-EXE/)
           $deepDirs = @scandir($subAbs);
@@ -16055,15 +18246,15 @@ if ($username === '') {
               [$deepNum, $deepLabel] = parse_folder_num($deepName);
               if ($deepNum !== null && $deepNum >= 1) {
                 $hasDeepSubs = true;
-                $deepNode = ['path' => $topName.'/'.$subName.'/'.$deepName, 'num' => $deepNum, 'name' => $deepLabel, 'fileCount' => 0];
+                $deepNode = ['path' => $topRelPath.'/'.$subName.'/'.$deepName, 'num' => $deepNum, 'name' => $deepLabel, 'fileCount' => 0];
                 // Scan files in deep dir
                 $deepFiles = @scandir($deepAbs);
                 if ($deepFiles) foreach ($deepFiles as $fn) {
                   if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
                   if (scan_should_skip_filename($fn, $scanExclusions)) continue;
                   if (is_dir($deepAbs.'/'.$fn)) continue;
-                  $relPath = $topName.'/'.$subName.'/'.$deepName.'/'.$fn;
-                  if ($append_scanned_doc($deepAbs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName.'/'.$deepName)) {
+                  $relPath = $topRelPath.'/'.$subName.'/'.$deepName.'/'.$fn;
+                  if ($append_scanned_doc($deepAbs.'/'.$fn, $relPath, $catCode, $subName, $topRelPath.'/'.$subName.'/'.$deepName)) {
                     $deepNode['fileCount']++;
                     $subNode['fileCount']++;
                     $topNode['fileCount']++;
@@ -16076,14 +18267,14 @@ if ($username === '') {
                   if (!is_dir($l4Abs)) continue;
                   [$l4Num, $l4Label] = parse_folder_num($l4Name);
                   if ($l4Num === null) continue;
-                  $l4Node = ['path' => $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name, 'num' => $l4Num, 'name' => $l4Label, 'fileCount' => 0];
+                  $l4Node = ['path' => $topRelPath.'/'.$subName.'/'.$deepName.'/'.$l4Name, 'num' => $l4Num, 'name' => $l4Label, 'fileCount' => 0];
                   $l4Files = @scandir($l4Abs);
                   if ($l4Files) foreach ($l4Files as $fn) {
                     if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
                     if (scan_should_skip_filename($fn, $scanExclusions)) continue;
                     if (is_dir($l4Abs.'/'.$fn)) continue;
-                    $relPath = $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name.'/'.$fn;
-                    if ($append_scanned_doc($l4Abs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName.'/'.$deepName.'/'.$l4Name)) {
+                    $relPath = $topRelPath.'/'.$subName.'/'.$deepName.'/'.$l4Name.'/'.$fn;
+                    if ($append_scanned_doc($l4Abs.'/'.$fn, $relPath, $catCode, $subName, $topRelPath.'/'.$subName.'/'.$deepName.'/'.$l4Name)) {
                       $l4Node['fileCount']++;
                       $deepNode['fileCount']++;
                       $subNode['fileCount']++;
@@ -16108,8 +18299,8 @@ if ($username === '') {
             if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
             if (scan_should_skip_filename($fn, $scanExclusions)) continue;
             if (is_dir($subAbs.'/'.$fn)) continue;
-            $relPath = $topName.'/'.$subName.'/'.$fn;
-            if ($append_scanned_doc($subAbs.'/'.$fn, $relPath, $catCode, $subName, $topName.'/'.$subName)) {
+            $relPath = $topRelPath.'/'.$subName.'/'.$fn;
+            if ($append_scanned_doc($subAbs.'/'.$fn, $relPath, $catCode, $subName, $topRelPath.'/'.$subName)) {
               $subNode['fileCount']++;
               $topNode['fileCount']++;
             }
@@ -16126,8 +18317,8 @@ if ($username === '') {
           if ($fn[0]==='.'||$fn==='index.html'||$fn[0]==='_') continue;
           if (scan_should_skip_filename($fn, $scanExclusions)) continue;
           if (is_dir($topAbs.'/'.$fn)) continue;
-          $relPath = $topName.'/'.$fn;
-          if ($append_scanned_doc($topAbs.'/'.$fn, $relPath, $catCode, null, $topName)) {
+          $relPath = $topRelPath.'/'.$fn;
+          if ($append_scanned_doc($topAbs.'/'.$fn, $relPath, $catCode, null, $topRelPath)) {
             $topNode['fileCount']++;
           }
         }
@@ -16419,6 +18610,15 @@ if ($username === '') {
     } else {
       header('Content-Disposition: inline; filename="' . rawurlencode(basename($relPath)) . '"');
     }
+    if ($ext === 'html' && !$asAttachment) {
+      $html = @file_get_contents($absPath);
+      if ($html !== false) {
+        $html = portal_rewrite_streamed_html((string)$html, $relPath);
+        header('Content-Length: ' . (string)strlen($html));
+        echo $html;
+        exit;
+      }
+    }
     $size = @filesize($absPath);
     if ($size !== false) header('Content-Length: ' . (string)$size);
     readfile($absPath);
@@ -16683,9 +18883,9 @@ if ($username === '') {
           $rel = substr($absPath, strlen($ROOT_DIR) + 1);
           // Skip portal and data dirs
           if (
-            str_starts_with($rel, '01-QMS-Portal/')
+            str_starts_with($rel, 'mom/')
             || str_starts_with($rel, 'assets/')
-            || str_starts_with($rel, '11-Glossary/')
+            || str_starts_with($rel, 'mom/docs/glossary/')
           ) continue;
       if (!filename_matches_doc_code($file->getFilename(), $oldCode)) continue;
           $foundFile = $absPath;
@@ -16819,6 +19019,11 @@ if ($username === '') {
     api_json(['ok' => true, 'record_types' => load_record_type_registry()]);
   }
 
+  // MVC-named alias — delegates to the complete legacy allocation logic below.
+  // When the MVC AllocationController is reached via the default case, it uses a
+  // different data store (allocation_log.json). Routing allocation_allocate here
+  // ensures all allocations land in allocations.json, which eqms_record_registry reads.
+  case 'allocation_allocate':
   case 'record_id_generate': {
     $me = require_logged_in($store);
     require_csrf();
@@ -16934,6 +19139,7 @@ if ($username === '') {
     ]);
   }
 
+  case 'allocation_history':   // MVC alias → legacy handler
   case 'record_id_history': {
     require_logged_in($store);
     $body = read_json_body();
@@ -16960,6 +19166,7 @@ if ($username === '') {
     api_json(['ok' => true, 'exists' => (bool)$allocation, 'allocation' => $allocation]);
   }
 
+  case 'allocation_void':   // MVC alias → legacy handler
   case 'record_id_void': {
     $me = require_logged_in($store);
     require_csrf();
@@ -17534,6 +19741,22 @@ if ($username === '') {
         $schema = json_decode((string)@file_get_contents($f), true);
         if (!is_array($schema) || empty($schema['form_code'])) continue;
         $code = (string)$schema['form_code'];
+        $codeNum = (int)preg_replace('/\D+/', '', $code);
+        $schemaRecordType = (string)($schema['record_type'] ?? '');
+        if($schemaRecordType === '') {
+          $schemaRecordType = match(true) {
+            $codeNum >= 100 && $codeNum < 200 => 'RISK',
+            $codeNum >= 200 && $codeNum < 300 => 'MR',
+            $codeNum >= 300 && $codeNum < 400 => 'FAI',
+            $codeNum >= 400 && $codeNum < 500 => 'SCAR',
+            $codeNum >= 500 && $codeNum < 600 => 'DOWNTIME',
+            $codeNum >= 600 && $codeNum < 700 => 'NCR',
+            $codeNum >= 700 && $codeNum < 800 => 'MR',
+            $codeNum >= 800 && $codeNum < 900 => 'TRN',
+            $codeNum >= 900 && $codeNum < 1000 => 'AUD',
+            default => 'MR',
+          };
+        }
         $onlineMap[$code] = [
           'form_code' => $code,
           'title' => (string)($schema['title'] ?? $code),
@@ -17545,7 +19768,7 @@ if ($username === '') {
           'online' => ($schema['online'] ?? true) !== false,
           'version' => (string)($schema['version'] ?? 'V1'),
           'standalone_html' => (string)($schema['standalone_html'] ?? ''),
-          'record_type' => (string)($schema['record_type'] ?? ''),
+          'record_type' => $schemaRecordType,
           'roles_allowed' => is_array($schema['roles_allowed'] ?? null) ? $schema['roles_allowed'] : [],
           'schema' => $schema,
         ];
@@ -17580,11 +19803,29 @@ if ($username === '') {
           $num = (int)preg_replace('/\D+/', '', (string)$code);
           $series = (int)floor($num / 100) * 100;
           $category = match (true) {
+            $series >= 100 && $series < 200 => 'management',
+            $series >= 200 && $series < 300 => 'sales',
+            $series >= 300 && $series < 400 => 'engineering',
+            $series >= 400 && $series < 500 => 'scm',
             $series >= 500 && $series < 600 => 'production',
             $series >= 600 && $series < 700 => 'quality',
-            $series >= 800 && $series < 900 => 'hr',
             $series >= 700 && $series < 800 => 'logistics',
+            $series >= 800 && $series < 900 => 'hr',
+            $series >= 900 && $series < 1000 => 'management_review',
             default => 'other',
+          };
+          // Auto-derive record type from series so every form gets a traceable code
+          $autoRecordType = match (true) {
+            $num >= 100 && $num < 200 => 'RISK',
+            $num >= 200 && $num < 300 => 'MR',
+            $num >= 300 && $num < 400 => 'FAI',
+            $num >= 400 && $num < 500 => 'SCAR',
+            $num >= 500 && $num < 600 => 'DOWNTIME',
+            $num >= 600 && $num < 700 => 'NCR',
+            $num >= 700 && $num < 800 => 'MR',
+            $num >= 800 && $num < 900 => 'TRN',
+            $num >= 900 && $num < 1000 => 'AUD',
+            default => 'MR',
           };
           $catalogMap[$code] = [
             'form_code' => (string)$code,
@@ -17599,6 +19840,7 @@ if ($username === '') {
             'blank_filename' => (string)($entry['filename'] ?? ''),
             'template_checksum' => (string)($entry['sha256'] ?? ''),
             'delivery_mode' => (string)($entry['delivery_mode'] ?? 'download'),
+            'record_type' => (string)($entry['record_type'] ?? $autoRecordType),
           ];
         }
       }
@@ -18217,8 +20459,8 @@ if ($username === '') {
     require_once __DIR__ . '/database/Connection.php';
     require_once __DIR__ . '/database/DataLayer.php';
 
-    $dataLayer = new \HESEM\QMS\Database\DataLayer($DATA_DIR, $ROOT_DIR);
-    $ctrl = new \HESEM\QMS\Api\Controllers\DashboardController($dataLayer, $ROOT_DIR, $DATA_DIR);
+    $dataLayer = new \MOM\Database\DataLayer($DATA_DIR, $ROOT_DIR);
+    $ctrl = new \MOM\Api\Controllers\DashboardController($dataLayer, $ROOT_DIR, $DATA_DIR);
     $ctrl->setStore($store);
     $ctrl->handleAction($action);
     break; // handleAction() calls exit, but break for safety
@@ -18288,13 +20530,14 @@ if ($username === '') {
     $entity = trim((string)($body['entity'] ?? ''));
     $item = is_array($body['item'] ?? null) ? $body['item'] : null;
     if ($entity === '' || $item === null) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    $item = master_data_normalize_item($entity, $item);
     $idKey = master_data_entity_key($entity);
     if ($idKey === null) api_json(['ok' => false, 'error' => 'invalid_master_entity'], 400);
 
     try {
       $username = (string)($_SESSION['user'] ?? 'system');
       $service = master_data_service();
-      $currentStore = load_master_data_store();
+      $currentStore = load_master_data_active_store();
       $recordId = trim((string)($item[$idKey] ?? ''));
       if ($recordId === '') api_json(['ok' => false, 'error' => 'missing_master_key'], 400);
 
@@ -18323,7 +20566,7 @@ if ($username === '') {
             'data' => $createResult->data,
           ], $statusCode);
         }
-        $currentStore = load_master_data_store();
+        $currentStore = load_master_data_active_store();
         $saved = null;
         foreach (($currentStore[$entity] ?? []) as $row) {
           if (is_array($row) && (string)($row[$idKey] ?? '') === $recordId) {
@@ -18360,6 +20603,17 @@ if ($username === '') {
         }
         $pending = (($updateResult->data['status'] ?? '') === 'pending');
         $pendingMeta = is_array($updateResult->data ?? null) ? $updateResult->data : [];
+        if ($pending) {
+          $changeId = trim((string)($pendingMeta['change_id'] ?? ''));
+          if ($changeId === '' || !$service->approvePendingChange($changeId, $username)) {
+            api_json([
+              'ok' => false,
+              'error' => 'master_data_auto_approve_failed',
+              'message' => 'Không thể tự động duyệt thay đổi dữ liệu nền vừa tạo.',
+            ], 409);
+          }
+          $pending = false;
+        }
       }
 
       if (!$pending && $requestedStatus !== '' && strtolower((string)($existing['status'] ?? '')) !== strtolower($requestedStatus)) {
@@ -18372,7 +20626,7 @@ if ($username === '') {
         }
       }
 
-      $currentStore = load_master_data_store();
+      $currentStore = load_master_data_active_store();
       $saved = $existing;
       foreach (($currentStore[$entity] ?? []) as $row) {
         if (is_array($row) && (string)($row[$idKey] ?? '') === $recordId) {
@@ -18382,7 +20636,7 @@ if ($username === '') {
       }
       $message = $pending
         ? 'Yêu cầu thay đổi đã được đưa vào hàng chờ phê duyệt.'
-        : 'Đã lưu dữ liệu nền có kiểm soát.';
+        : (!empty($pendingMeta['change_id']) ? 'Đã tự động duyệt và lưu dữ liệu nền.' : 'Đã lưu dữ liệu nền có kiểm soát.');
       if (!$pending) {
         shadow_sync_master_data_store($currentStore);
       }
@@ -19518,7 +21772,7 @@ if ($username === '') {
     $master = load_master_data_store();
     $mes = load_mes_runtime_store();
     $patterns = load_mes_shift_patterns();
-    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Saigon')));
+    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Ho_Chi_Minh')));
     api_json([
       'ok' => true,
       'current_shift' => mes_resolve_current_shift($patterns, $now),
@@ -19540,7 +21794,7 @@ if ($username === '') {
     $master = load_master_data_store();
     $mes = load_mes_runtime_store();
     $patterns = load_mes_shift_patterns();
-    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Saigon')));
+    $now = new DateTimeImmutable('now', new DateTimeZone((string)($patterns['timezone'] ?? 'Asia/Ho_Chi_Minh')));
     $currentShift = mes_resolve_current_shift($patterns, $now);
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $woNumber = trim((string)($body['wo_number'] ?? ''));
@@ -20276,6 +22530,21 @@ if ($username === '') {
     $hierarchy = build_order_hierarchy($bundle['orders'], $bundle['master'], $mesSnapshot);
     $stats = compute_order_dashboard_stats($bundle['orders'], $hierarchy, $mesSnapshot);
     api_json(['ok' => true, 'data' => $stats, 'read_sources' => $bundle['sources'], 'runtime_mode' => $bundle['runtime_mode']]);
+  }
+
+  case 'manual_runtime_summary': {
+    $me = require_logged_in($store);
+    if (!user_has_any_role($me, admin_roles())) {
+      api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    }
+    $bundle = runtime_read_model_bundle(false);
+    $summary = build_manual_runtime_summary((array)($bundle['master'] ?? []), (array)($bundle['orders'] ?? []));
+    api_json([
+      'ok' => true,
+      'data' => $summary,
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
+    ]);
   }
 
   case 'order_hierarchy': {
@@ -21243,7 +23512,7 @@ if ($username === '') {
     if (!evidence_review_sla_can_manage($me)) api_json(['ok' => false, 'error' => 'insufficient_role'], 403);
 
     require_once __DIR__ . '/api/services/ScheduledJobs.php';
-    $jobs = new \HESEM\QMS\Services\ScheduledJobs($DATA_DIR);
+    $jobs = new \MOM\Services\ScheduledJobs($DATA_DIR);
     $result = $jobs->runEvidenceReviewSlaNotifications();
     $bundle = runtime_read_model_bundle(true);
 

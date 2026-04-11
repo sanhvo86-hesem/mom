@@ -1,7 +1,7 @@
 <?php
 /**
  * MimeValidator.php
- * HESEM QMS Portal -- Server-side file upload MIME & extension validation
+ * HESEM MOM Portal -- Server-side file upload MIME & extension validation
  *
  * Validates uploads by checking:
  *  1. File extension against whitelist

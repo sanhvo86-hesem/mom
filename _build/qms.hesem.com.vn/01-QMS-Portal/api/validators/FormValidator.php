@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Validators;
+namespace MOM\Api\Validators;
 
 /**
  * Validates form submissions against JSON Schema definitions from form_schemas.
@@ -10,7 +10,7 @@ namespace HESEM\QMS\Api\Validators;
  * Supports cross-field validation rules, required field checking,
  * type coercion, and bilingual error messages (EN/VI).
  *
- * @package HESEM\QMS\Api\Validators
+ * @package MOM\Api\Validators
  * @since   2.0.0
  */
 class FormValidator

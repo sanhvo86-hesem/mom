@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
+use MOM\Api\Controllers\BaseController;
 use Throwable;
 
 /**
- * CNC program management controller for HESEM QMS Portal.
+ * CNC program management controller for HESEM MOM Portal.
  *
  * Provides API endpoints for CNC program CRUD, version management,
  * approval workflows, and setup sheet tracking.
  *
- * Data stored in `qms-data/cnc-programs/` with per-entity JSON files.
+ * Data stored in `data/cnc-programs/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class CncProgramController extends BaseController

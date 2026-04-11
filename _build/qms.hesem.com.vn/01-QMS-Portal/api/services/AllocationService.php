@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
+use MOM\Database\DataLayer;
 use RuntimeException;
 
 /**
@@ -40,15 +41,19 @@ final readonly class AllocationResult
 }
 
 /**
- * Allocation service for HESEM QMS Portal.
+ * Allocation service for HESEM MOM Portal.
  *
  * Manages the full lifecycle of Record-ID allocations: creation, status
  * updates, history queries, voiding, duplicate checks, TXT placeholder
  * generation, auto-void of expired allocations, and statistics.
  *
- * Uses JSON file storage at `qms-data/allocations/allocation_log.json`.
+ * Supports DataLayer migration ladder:
+ *   JSON_ONLY        → Read/write JSON only
+ *   SHADOW_WRITE     → Read JSON, write BOTH JSON + PostgreSQL
+ *   POSTGRES_PRIMARY → Read PostgreSQL (fallback JSON), write both
+ *   POSTGRES_ONLY    → Read/write PostgreSQL only
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class AllocationService
@@ -74,35 +79,71 @@ final class AllocationService
     /** Days before auto-void for REJECTED. */
     private const AUTO_VOID_REJECTED_DAYS = 30;
 
+    /** Map from upper-case status to DB enum value. */
+    private const STATUS_TO_DB = [
+        'ALLOCATED'   => 'allocated',
+        'DOWNLOADED'  => 'in_use',
+        'SUBMITTED'   => 'submitted',
+        'RECEIVED'    => 'approved',
+        'ARCHIVED'    => 'approved',
+        'VOIDED'      => 'voided',
+        'AUTO-VOIDED' => 'expired',
+        'REJECTED'    => 'voided',
+    ];
+
     /** @var string Absolute path to the allocation log JSON file. */
     private readonly string $logFile;
 
     /** @var string Absolute path to the allocations directory. */
     private readonly string $allocDir;
 
-    /** @var string Absolute path to the qms-data directory. */
+    /** @var string Absolute path to the data directory. */
     private readonly string $dataDir;
 
     /** @var RecordIdGenerator Lazy-loaded ID generator. */
     private ?RecordIdGenerator $idGenerator = null;
 
-    private ?object $db = null;
+    private ?DataLayer $dataLayer = null;
 
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string         $dataDir   Absolute path to data directory.
+     * @param DataLayer|null $dataLayer DataLayer instance for DB integration.
      */
-    public function __construct(string $dataDir, ?object $db = null)
+    public function __construct(string $dataDir, ?DataLayer $dataLayer = null)
     {
-        $this->dataDir  = rtrim(str_replace('\\', '/', $dataDir), '/');
-        $this->allocDir = $this->dataDir . '/allocations';
-        $this->logFile  = $this->allocDir . '/allocation_log.json';
-        $this->db       = $db;
+        $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
+        $this->allocDir  = $this->dataDir . '/allocations';
+        $this->logFile   = $this->allocDir . '/allocation_log.json';
+        $this->dataLayer = $dataLayer;
 
         if (!is_dir($this->allocDir)) {
             @mkdir($this->allocDir, 0775, true);
         }
+    }
+
+    /** Whether we should read from PostgreSQL as primary source. */
+    private function pgReadEnabled(): bool
+    {
+        if ($this->dataLayer === null) return false;
+        $mode = $this->dataLayer->getMode();
+        return $mode === DataLayer::MODE_POSTGRES_PRIMARY || $mode === DataLayer::MODE_POSTGRES_ONLY;
+    }
+
+    /** Whether we should write to PostgreSQL. */
+    private function pgWriteEnabled(): bool
+    {
+        if ($this->dataLayer === null) return false;
+        $mode = $this->dataLayer->getMode();
+        return $mode !== DataLayer::MODE_JSON_ONLY;
+    }
+
+    /** Whether we should still write JSON (all modes except POSTGRES_ONLY). */
+    private function jsonWriteEnabled(): bool
+    {
+        if ($this->dataLayer === null) return true;
+        return $this->dataLayer->getMode() !== DataLayer::MODE_POSTGRES_ONLY;
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -127,9 +168,10 @@ final class AllocationService
         $generator = $this->getIdGenerator();
         $recordId  = $generator->generateId($recordType, $department);
         $now       = gmdate('c');
+        $allocId   = $this->generateUuidV4();
 
         $allocation = [
-            'allocation_id'  => $this->generateUuidV4(),
+            'allocation_id'  => $allocId,
             'record_id'      => $recordId,
             'record_type'    => strtoupper($recordType),
             'department'     => strtoupper($department),
@@ -154,9 +196,17 @@ final class AllocationService
             ],
         ];
 
-        $log   = $this->readLog();
-        $log[] = $allocation;
-        $this->writeLog($log);
+        // JSON write
+        if ($this->jsonWriteEnabled()) {
+            $log   = $this->readLog();
+            $log[] = $allocation;
+            $this->writeLog($log);
+        }
+
+        // PostgreSQL write
+        if ($this->pgWriteEnabled()) {
+            $this->pgInsertAllocation($allocation);
+        }
 
         return $allocation;
     }
@@ -181,6 +231,7 @@ final class AllocationService
 
         $log   = $this->readLog();
         $found = false;
+        $oldStatus = '';
 
         foreach ($log as &$entry) {
             if (($entry['allocation_id'] ?? '') !== $allocationId) {
@@ -214,7 +265,12 @@ final class AllocationService
         unset($entry);
 
         if ($found) {
-            $this->writeLog($log);
+            if ($this->jsonWriteEnabled()) {
+                $this->writeLog($log);
+            }
+            if ($this->pgWriteEnabled()) {
+                $this->pgUpdateStatus($allocationId, $newStatus, $userId, $oldStatus);
+            }
         }
 
         return $found;
@@ -237,6 +293,18 @@ final class AllocationService
      */
     public function getHistory(array $filters = []): array
     {
+        // Try PostgreSQL first when in PG-primary or PG-only mode
+        if ($this->pgReadEnabled()) {
+            try {
+                return $this->pgGetHistory($filters);
+            } catch (\Throwable $e) {
+                error_log('[AllocationService] PG read failed, falling back to JSON: ' . $e->getMessage());
+                if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                    throw $e;
+                }
+            }
+        }
+
         $log    = $this->readLog();
         $result = [];
 
@@ -263,6 +331,22 @@ final class AllocationService
      */
     public function checkDuplicate(string $recordId): bool
     {
+        if ($this->pgReadEnabled()) {
+            try {
+                $db = $this->dataLayer->getConnection();
+                $row = $db->queryOne(
+                    'SELECT 1 FROM allocations WHERE record_id = :rid LIMIT 1',
+                    [':rid' => $recordId]
+                );
+                return $row !== null;
+            } catch (\Throwable $e) {
+                error_log('[AllocationService] PG checkDuplicate failed: ' . $e->getMessage());
+                if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                    throw $e;
+                }
+            }
+        }
+
         $log = $this->readLog();
 
         foreach ($log as $entry) {
@@ -316,7 +400,12 @@ final class AllocationService
         unset($entry);
 
         if ($found) {
-            $this->writeLog($log);
+            if ($this->jsonWriteEnabled()) {
+                $this->writeLog($log);
+            }
+            if ($this->pgWriteEnabled()) {
+                $this->pgVoidAllocation($allocationId, $reason, $userId);
+            }
         }
 
         return $found;
@@ -330,6 +419,27 @@ final class AllocationService
      */
     public function getByRecordId(string $recordId): ?array
     {
+        if ($this->pgReadEnabled()) {
+            try {
+                $db = $this->dataLayer->getConnection();
+                $row = $db->queryOne(
+                    'SELECT * FROM allocations WHERE record_id = :rid',
+                    [':rid' => $recordId]
+                );
+                if ($row !== null) {
+                    return $this->pgRowToAllocation($row);
+                }
+                if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                    return null;
+                }
+            } catch (\Throwable $e) {
+                error_log('[AllocationService] PG getByRecordId failed: ' . $e->getMessage());
+                if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                    throw $e;
+                }
+            }
+        }
+
         $log = $this->readLog();
 
         foreach ($log as $entry) {
@@ -365,7 +475,7 @@ final class AllocationService
         $filePath = $tmpDir . '/' . $filename;
 
         $content = implode("\n", [
-            'HESEM QMS - Record ID Placeholder',
+            'HESEM MOM - Record ID Placeholder',
             '==================================',
             '',
             'Record ID: ' . $recordId,
@@ -471,6 +581,17 @@ final class AllocationService
      */
     public function getAllocationStats(): array
     {
+        if ($this->pgReadEnabled()) {
+            try {
+                return $this->pgGetStats();
+            } catch (\Throwable $e) {
+                error_log('[AllocationService] PG stats failed: ' . $e->getMessage());
+                if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                    throw $e;
+                }
+            }
+        }
+
         $log = $this->readLog();
 
         $byStatus     = [];
@@ -624,20 +745,310 @@ final class AllocationService
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
-    // ── PostgreSQL dual-write ──────────────────────────────────────────────
+    // ── PostgreSQL Integration ─────────────────────────────────────────────
 
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    /**
+     * Insert a new allocation into PostgreSQL.
+     */
+    private function pgInsertAllocation(array $allocation): void
     {
-        if ($this->db === null) return;
         try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
+            $db = $this->dataLayer->getConnection();
+            $now = gmdate('Y-m-d\TH:i:s\Z');
+            $dbStatus = self::STATUS_TO_DB[$allocation['status'] ?? 'ALLOCATED'] ?? 'allocated';
+
+            // Parse year/seq from record_id (e.g., NCR-2026-001)
+            $parts = explode('-', $allocation['record_id'] ?? '');
+            $year = (int)($parts[1] ?? date('Y'));
+            $seq  = (int)($parts[2] ?? 0);
+
+            $context = json_encode([
+                'job_number'     => $allocation['job_number'] ?? null,
+                'status_history' => $allocation['status_history'] ?? [],
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            $db->execute(
+                'INSERT INTO allocations
+                    (allocation_id, record_id, record_type, dept_code, fiscal_year, seq,
+                     form_code, status, master_context, created_by, created_at, updated_by, updated_at)
+                 VALUES
+                    (:aid::uuid, :rid, :rtype::record_type_enum, :dept::dept_code, :year, :seq,
+                     :form, :status::allocation_status_enum, :ctx::jsonb, :user, :now::timestamptz, :user2, :now2::timestamptz)
+                 ON CONFLICT (record_id) DO NOTHING',
+                [
+                    ':aid'   => $allocation['allocation_id'],
+                    ':rid'   => $allocation['record_id'],
+                    ':rtype' => $allocation['record_type'],
+                    ':dept'  => $allocation['department'],
+                    ':year'  => $year,
+                    ':seq'   => $seq,
+                    ':form'  => $allocation['form_code'] ?? null,
+                    ':status' => $dbStatus,
+                    ':ctx'   => $context,
+                    ':user'  => $allocation['requested_by'],
+                    ':now'   => $allocation['requested_at'] ?? $now,
+                    ':user2' => $allocation['requested_by'],
+                    ':now2'  => $allocation['requested_at'] ?? $now,
+                ]
+            );
+
+            // Insert initial event
+            $db->execute(
+                'INSERT INTO allocation_events
+                    (allocation_id, event_type, actor, detail, metadata)
+                 VALUES
+                    (:aid::uuid, :etype::allocation_event_type, :actor, :detail, :meta::jsonb)',
+                [
+                    ':aid'    => $allocation['allocation_id'],
+                    ':etype'  => 'allocated',
+                    ':actor'  => $allocation['requested_by'],
+                    ':detail' => 'Record ID allocated: ' . $allocation['record_id'],
+                    ':meta'   => json_encode(['job_number' => $allocation['job_number'] ?? null]),
+                ]
             );
         } catch (\Throwable $e) {
-            error_log("[AllocationService] Shadow write to {$table} failed: " . $e->getMessage());
+            error_log('[AllocationService] PG insert failed: ' . $e->getMessage());
+            // In SHADOW_WRITE mode, don't throw — JSON is the primary store
+            if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                throw $e;
+            }
         }
+    }
+
+    /**
+     * Update allocation status in PostgreSQL.
+     */
+    private function pgUpdateStatus(string $allocationId, string $newStatus, string $userId, string $oldStatus): void
+    {
+        try {
+            $db = $this->dataLayer->getConnection();
+            $dbStatus = self::STATUS_TO_DB[$newStatus] ?? 'allocated';
+
+            $db->execute(
+                'UPDATE allocations SET status = :status::allocation_status_enum, updated_by = :user, updated_at = now()
+                 WHERE allocation_id = :aid::uuid',
+                [':status' => $dbStatus, ':user' => $userId, ':aid' => $allocationId]
+            );
+
+            // Map status change to event type
+            $eventType = match ($newStatus) {
+                'DOWNLOADED' => 'opened',
+                'SUBMITTED'  => 'submitted',
+                'RECEIVED'   => 'approved',
+                'VOIDED'     => 'voided',
+                'AUTO-VOIDED' => 'expired',
+                'REJECTED'   => 'rejected',
+                default      => 'note_added',
+            };
+
+            $db->execute(
+                'INSERT INTO allocation_events
+                    (allocation_id, event_type, actor, detail)
+                 VALUES
+                    (:aid::uuid, :etype::allocation_event_type, :actor, :detail)',
+                [
+                    ':aid'    => $allocationId,
+                    ':etype'  => $eventType,
+                    ':actor'  => $userId,
+                    ':detail' => "Status changed: {$oldStatus} → {$newStatus}",
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[AllocationService] PG updateStatus failed: ' . $e->getMessage());
+            if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Void an allocation in PostgreSQL.
+     */
+    private function pgVoidAllocation(string $allocationId, string $reason, string $userId): void
+    {
+        try {
+            $db = $this->dataLayer->getConnection();
+
+            $db->execute(
+                'UPDATE allocations SET status = \'voided\'::allocation_status_enum, updated_by = :user, updated_at = now(),
+                    notes = COALESCE(notes, \'\') || :reason
+                 WHERE allocation_id = :aid::uuid',
+                [':user' => $userId, ':reason' => "\n[VOIDED] " . $reason, ':aid' => $allocationId]
+            );
+
+            $db->execute(
+                'INSERT INTO allocation_events
+                    (allocation_id, event_type, actor, detail, metadata)
+                 VALUES
+                    (:aid::uuid, \'voided\'::allocation_event_type, :actor, :detail, :meta::jsonb)',
+                [
+                    ':aid'    => $allocationId,
+                    ':actor'  => $userId,
+                    ':detail' => 'Voided: ' . $reason,
+                    ':meta'   => json_encode(['reason' => $reason]),
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[AllocationService] PG void failed: ' . $e->getMessage());
+            if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Get allocation history from PostgreSQL.
+     *
+     * @param array<string, string> $filters
+     * @return array<int, array<string, mixed>>
+     */
+    private function pgGetHistory(array $filters = []): array
+    {
+        $db = $this->dataLayer->getConnection();
+
+        $where = [];
+        $params = [];
+
+        if (!empty($filters['record_type'])) {
+            $where[] = 'a.record_type = :rtype::record_type_enum';
+            $params[':rtype'] = strtoupper($filters['record_type']);
+        }
+        if (!empty($filters['department'])) {
+            $where[] = 'a.dept_code = :dept::dept_code';
+            $params[':dept'] = strtoupper($filters['department']);
+        }
+        if (!empty($filters['status'])) {
+            $dbStatus = self::STATUS_TO_DB[strtoupper($filters['status'])] ?? null;
+            if ($dbStatus) {
+                $where[] = 'a.status = :status::allocation_status_enum';
+                $params[':status'] = $dbStatus;
+            }
+        }
+        if (!empty($filters['requested_by'])) {
+            $where[] = 'a.created_by = :user';
+            $params[':user'] = $filters['requested_by'];
+        }
+        if (!empty($filters['allocation_id'])) {
+            $where[] = 'a.allocation_id = :aid::uuid';
+            $params[':aid'] = $filters['allocation_id'];
+        }
+        if (!empty($filters['date_from'])) {
+            $where[] = 'a.created_at >= :dfrom::date';
+            $params[':dfrom'] = $filters['date_from'];
+        }
+        if (!empty($filters['date_to'])) {
+            $where[] = 'a.created_at <= (:dto::date + interval \'1 day\')';
+            $params[':dto'] = $filters['date_to'];
+        }
+
+        $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $sql = "SELECT a.*, array_to_json(
+                    COALESCE(
+                        (SELECT array_agg(row_to_json(e.*) ORDER BY e.created_at)
+                         FROM allocation_events e WHERE e.allocation_id = a.allocation_id),
+                        ARRAY[]::json[]
+                    )
+                ) AS events_json
+                FROM allocations a {$whereClause}
+                ORDER BY a.created_at DESC
+                LIMIT 500";
+
+        $rows = $db->query($sql, $params);
+
+        return array_map(fn(array $row) => $this->pgRowToAllocation($row), $rows);
+    }
+
+    /**
+     * Get allocation statistics from PostgreSQL.
+     *
+     * @return array<string, mixed>
+     */
+    private function pgGetStats(): array
+    {
+        $db = $this->dataLayer->getConnection();
+
+        $total = (int)$db->queryScalar('SELECT count(*) FROM allocations');
+
+        $byStatus = [];
+        $rows = $db->query('SELECT status::text, count(*) AS cnt FROM allocations GROUP BY status');
+        foreach ($rows as $r) { $byStatus[strtoupper($r['status'])] = (int)$r['cnt']; }
+
+        $byType = [];
+        $rows = $db->query('SELECT record_type::text, count(*) AS cnt FROM allocations GROUP BY record_type');
+        foreach ($rows as $r) { $byType[$r['record_type']] = (int)$r['cnt']; }
+
+        $byDept = [];
+        $rows = $db->query('SELECT dept_code::text, count(*) AS cnt FROM allocations GROUP BY dept_code');
+        foreach ($rows as $r) { $byDept[$r['dept_code']] = (int)$r['cnt']; }
+
+        $active = (int)$db->queryScalar(
+            "SELECT count(*) FROM allocations WHERE status IN ('allocated', 'in_use', 'submitted')"
+        );
+
+        return [
+            'total'         => $total,
+            'active'        => $active,
+            'by_status'     => $byStatus,
+            'by_type'       => $byType,
+            'by_department' => $byDept,
+        ];
+    }
+
+    /**
+     * Convert a PostgreSQL allocation row to the legacy JSON format.
+     *
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function pgRowToAllocation(array $row): array
+    {
+        // Reverse map DB status to legacy status
+        static $dbToStatus = null;
+        if ($dbToStatus === null) {
+            $dbToStatus = array_flip(self::STATUS_TO_DB);
+        }
+        $status = strtoupper($dbToStatus[$row['status'] ?? ''] ?? $row['status'] ?? 'ALLOCATED');
+
+        $context = is_string($row['master_context'] ?? null)
+            ? json_decode($row['master_context'], true) ?? []
+            : ($row['master_context'] ?? []);
+
+        $events = [];
+        if (!empty($row['events_json'])) {
+            $events = is_string($row['events_json'])
+                ? json_decode($row['events_json'], true) ?? []
+                : $row['events_json'];
+        }
+
+        // Build status_history from events
+        $statusHistory = [];
+        foreach ($events as $evt) {
+            $statusHistory[] = [
+                'from'         => null,
+                'to'           => strtoupper($evt['event_type'] ?? ''),
+                'performed_by' => $evt['actor'] ?? '',
+                'performed_at' => $evt['created_at'] ?? '',
+                'reason'       => $evt['detail'] ?? null,
+            ];
+        }
+
+        return [
+            'allocation_id'  => $row['allocation_id'] ?? '',
+            'record_id'      => $row['record_id'] ?? '',
+            'record_type'    => $row['record_type'] ?? '',
+            'department'     => $row['dept_code'] ?? '',
+            'requested_by'   => $row['created_by'] ?? '',
+            'requested_at'   => $row['created_at'] ?? '',
+            'status'         => $status,
+            'job_number'     => $context['job_number'] ?? ($row['linked_order_id'] ?? null),
+            'form_code'      => $row['form_code'] ?? null,
+            'downloaded_at'  => null,
+            'submitted_at'   => null,
+            'received_at'    => null,
+            'voided_at'      => null,
+            'void_reason'    => null,
+            'status_history' => $statusHistory ?: ($context['status_history'] ?? []),
+        ];
     }
 }

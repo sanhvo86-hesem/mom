@@ -1258,6 +1258,7 @@ function _renderTableTab(){
         '<div><span>' + _esc(_t('Governance mode', 'Governance mode')) + '</span><strong class="tone-' + _esc(item.governance_gap_count ? 'warn' : 'neutral') + '">' + _esc(item.governance_mode || item.governance_status || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Missing columns', 'Missing columns')) + '</span><strong class="tone-' + _esc(item.missing_column_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.missing_column_count || 0)) + '</strong></div>',
         '<div><span>' + _esc(_t('Unexpected columns', 'Unexpected columns')) + '</span><strong class="tone-' + _esc(item.unexpected_column_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.unexpected_column_count || 0)) + '</strong></div>',
+        '<div><span>' + _esc(_t('Type drift', 'Type drift')) + '</span><strong class="tone-' + _esc(item.type_drift_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.type_drift_count || 0)) + '</strong></div>',
         '<div><span>' + _esc(_t('Primary key drift', 'Primary key drift')) + '</span><strong class="tone-' + _esc(item.pk_drift ? 'bad' : 'good') + '">' + _esc(item.pk_drift ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
         '<div><span>' + _esc(_t('Digital thread', 'Digital thread')) + '</span><strong>' + _esc(item.digital_thread ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
       '</div>',
@@ -1282,11 +1283,12 @@ function _renderTableTab(){
           : (!item.db_present)
           ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('Bảng này chưa hiện diện trong PostgreSQL đang probe, nên chưa thể so drift cột/PK.', 'This table is not present in the probed PostgreSQL database yet, so column/PK drift cannot be compared.')) + '</div>'
           : (
-            (!item.missing_column_count && !item.unexpected_column_count && !item.pk_drift)
-              ? '<div class="ds-inline-alert tone-good">' + _esc(_t('Không phát hiện drift cột/PK giữa registry authority và DB thật.', 'No column/PK drift detected between registry authority and the live DB.')) + '</div>'
+            (!item.missing_column_count && !item.unexpected_column_count && !item.type_drift_count && !item.pk_drift)
+              ? '<div class="ds-inline-alert tone-good">' + _esc(_t('Không phát hiện drift cột/type/PK giữa registry authority và DB thật.', 'No column/type/PK drift detected between registry authority and the live DB.')) + '</div>'
               : '<div class="ds-issue-stack">' +
                 (item.missing_column_count ? '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(_t('missing', 'missing'), 'warn') + '<strong>' + _esc(_t('Registry expects columns not present in DB', 'Registry expects columns not present in DB')) + '</strong></div><p>' + _esc((item.missing_columns || []).join(', ')) + '</p></article>' : '') +
                 (item.unexpected_column_count ? '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(_t('unexpected', 'unexpected'), 'warn') + '<strong>' + _esc(_t('DB contains unmanaged columns', 'DB contains unmanaged columns')) + '</strong></div><p>' + _esc((item.unexpected_columns || []).join(', ')) + '</p></article>' : '') +
+                (item.type_drift_count ? '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(_t('type', 'type'), 'warn') + '<strong>' + _esc(_t('DB column types differ from registry', 'DB column types differ from registry')) + '</strong></div><p>' + _esc((item.type_drifts || []).map(function(drift){ return (drift.column || '?') + ': ' + (drift.db || '?') + ' -> ' + (drift.expected || '?'); }).join(', ')) + '</p></article>' : '') +
                 (item.pk_drift ? '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge('pk', 'bad') + '<strong>' + _esc(_t('Primary key posture differs', 'Primary key posture differs')) + '</strong></div><p>' + _esc(_t('Expected', 'Expected') + ': ' + (item.expected_primary_key_fields || []).join(', ') + ' · ' + _t('DB', 'DB') + ': ' + (item.db_primary_key_fields || []).join(', ')) + '</p></article>' : '') +
                 '</div>'
           )

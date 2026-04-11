@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * APQP & PPAP Service for HESEM QMS Portal.
+ * APQP & PPAP Service for HESEM MOM Portal.
  *
  * Manages APQP projects (AS9145 Advanced Product Quality Planning),
  * phase gate reviews, PPAP submissions, and deliverable tracking.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class ApqpPpapService

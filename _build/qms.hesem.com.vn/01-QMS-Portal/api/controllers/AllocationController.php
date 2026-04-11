@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\AllocationService;
-use HESEM\QMS\Services\RecordIdGenerator;
+use MOM\Api\Controllers\BaseController;
+use MOM\Services\AllocationService;
+use MOM\Services\RecordIdGenerator;
 use Throwable;
 
 /**
- * Allocation controller for HESEM QMS Portal.
+ * Allocation controller for HESEM MOM Portal.
  *
  * Handles Record-ID allocation, history, voiding, duplicate checks,
  * status queries, .txt placeholder downloads, expanded type listings,
  * and next-ID preview.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class AllocationController extends BaseController
@@ -37,7 +37,7 @@ class AllocationController extends BaseController
     private function allocationService(): AllocationService
     {
         if ($this->allocationService === null) {
-            $this->allocationService = new AllocationService($this->dataDir);
+            $this->allocationService = new AllocationService($this->dataDir, $this->data);
         }
         return $this->allocationService;
     }
@@ -56,20 +56,14 @@ class AllocationController extends BaseController
     }
 
     /**
+     * Roles that may void or administratively manage allocations they do not own.
+     *
+     * All authenticated users may allocate and download. Only elevated roles
+     * may void records they did not create.
+     *
      * @return array<int, string>
      */
-    private function allocationReadRoles(): array
-    {
-        return array_values(array_unique(array_merge(
-            admin_roles(),
-            ['qms_engineer', 'qa_manager', 'quality_manager', 'quality_engineer', 'internal_auditor']
-        )));
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function allocationWriteRoles(): array
+    private function allocationAdminRoles(): array
     {
         return array_values(array_unique(array_merge(
             admin_roles(),
@@ -78,19 +72,24 @@ class AllocationController extends BaseController
     }
 
     /**
-     * @return void
+     * Record-ID allocation is a governed evidence action, not a general utility.
+     *
+     * Only roles that may originate controlled records/documents should be able
+     * to reserve identifiers; otherwise the system accumulates orphaned IDs and
+     * loses control over auditability and sequence integrity.
      */
-    private function requireAllocationReadAccess(array $user): void
+    private function requireAllocationRequester(array $user): void
     {
-        $this->requireAnyRole($user, $this->allocationReadRoles());
-    }
+        if (user_is_admin($user)) {
+            return;
+        }
 
-    /**
-     * @return void
-     */
-    private function requireAllocationWriteAccess(array $user): void
-    {
-        $this->requireAnyRole($user, $this->allocationWriteRoles());
+        $rolePermsFile = $this->confDir . '/role_permissions.json';
+        if (role_can_create_docs($user, $rolePermsFile)) {
+            return;
+        }
+
+        $this->error('forbidden', 403);
     }
 
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -110,7 +109,7 @@ class AllocationController extends BaseController
     public function allocate(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationWriteAccess($user);
+        $this->requireAllocationRequester($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -174,7 +173,6 @@ class AllocationController extends BaseController
     public function getHistory(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationReadAccess($user);
 
         $filters = [];
 
@@ -237,7 +235,8 @@ class AllocationController extends BaseController
     public function void(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationWriteAccess($user);
+        // Voiding requires elevated role — prevents accidental/unauthorised erasure of records.
+        $this->requireAnyRole($user, $this->allocationAdminRoles());
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -289,7 +288,6 @@ class AllocationController extends BaseController
     public function checkDuplicate(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationReadAccess($user);
 
         $recordId = $this->query('record_id');
         if ($recordId === null || trim($recordId) === '') {
@@ -325,7 +323,6 @@ class AllocationController extends BaseController
     public function getStatus(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationReadAccess($user);
 
         $recordId     = $this->query('record_id');
         $allocationId = $this->query('allocation_id');
@@ -372,7 +369,6 @@ class AllocationController extends BaseController
     public function downloadTxt(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationWriteAccess($user);
 
         $recordId = $this->query('record_id');
         if ($recordId === null || trim($recordId) === '') {
@@ -430,7 +426,6 @@ class AllocationController extends BaseController
     public function getExpandedTypes(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationReadAccess($user);
 
         $department = $this->query('department');
         if ($department !== null && $department !== '') {
@@ -499,7 +494,6 @@ class AllocationController extends BaseController
     public function preview(): never
     {
         $user = $this->requireAuth();
-        $this->requireAllocationReadAccess($user);
 
         $recordType = $this->query('record_type');
         if ($recordType === null || trim($recordType) === '') {

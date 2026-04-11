@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
@@ -165,7 +165,7 @@ final class EpicorIntegrationService
             }
         }
 
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('Asia/Saigon'));
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('Asia/Ho_Chi_Minh'));
         $domainRows = [];
         $degraded = 0;
         $reconciliationOpen = 0;

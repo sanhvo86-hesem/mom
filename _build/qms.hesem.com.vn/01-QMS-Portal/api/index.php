@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 /**
- * HESEM QMS API v2 â€” New MVC Entry Point.
+ * HESEM MOM API v2 â€” New MVC Entry Point.
  *
  * Bootstraps the Router with middleware stack and dispatches to controllers.
  * Falls back to the legacy monolithic api.php for unmapped actions,
  * ensuring full backward compatibility during migration.
  *
- * @package HESEM\QMS\Api
+ * @package MOM\Api
  * @since   2.0.0
  */
 
@@ -22,13 +22,20 @@ error_reporting(E_ALL);
 
 // â”€â”€ Paths â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-$BASE_DIR = dirname(__DIR__); // 01-QMS-Portal
+$BASE_DIR = dirname(__DIR__); // mom
 $ROOT_DIR = realpath($BASE_DIR . '/..') ?: dirname($BASE_DIR);
 
 $DATA_DIR_ENV = trim((string)(getenv('QMS_DATA_DIR') ?: ''));
-$DATA_DIR = $DATA_DIR_ENV !== ''
-    ? rtrim(str_replace('\\', '/', $DATA_DIR_ENV), '/\\')
-    : $BASE_DIR . '/qms-data';
+
+// When api/index.php is required from api.php, $DATA_DIR is already resolved
+// using the smart legacy-detection logic in api.php (resolve_runtime_data_dir).
+// Reusing it avoids a path mismatch where QMS_DATA_DIR still points to the
+// legacy qms-data directory while the actual runtime data lives in mom/data.
+if (!isset($DATA_DIR) || $DATA_DIR === '') {
+    $DATA_DIR = $DATA_DIR_ENV !== ''
+        ? rtrim(str_replace('\\', '/', $DATA_DIR_ENV), '/\\')
+        : (is_dir($BASE_DIR . '/qms-data') ? $BASE_DIR . '/qms-data' : $BASE_DIR . '/data');
+}
 
 $LOG_FILE = $DATA_DIR . '/php_error.log';
 @ini_set('error_log', $LOG_FILE);
@@ -37,16 +44,17 @@ $apiConfig = require __DIR__ . '/config.php';
 
 // â”€â”€ Autoloader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// Simple PSR-4-like autoloader for HESEM\QMS namespace
+// Simple PSR-4-like autoloader for MOM namespace
 spl_autoload_register(function (string $class): void {
     // Namespace prefix -> directory mappings
     $map = [
-        'HESEM\\QMS\\Api\\Controllers\\'  => __DIR__ . '/controllers/',
-        'HESEM\\QMS\\Api\\Middleware\\'    => __DIR__ . '/middleware/',
-        'HESEM\\QMS\\Api\\Validators\\'    => __DIR__ . '/validators/',
-        'HESEM\\QMS\\Services\\'           => __DIR__ . '/services/',
-        'HESEM\\QMS\\Api\\'               => __DIR__ . '/',
-        'HESEM\\QMS\\Database\\'           => dirname(__DIR__) . '/database/',
+        'MOM\\Api\\Controllers\\'  => __DIR__ . '/controllers/',
+        'MOM\\Api\\Middleware\\'    => __DIR__ . '/middleware/',
+        'MOM\\Api\\Validators\\'    => __DIR__ . '/validators/',
+        'MOM\\Api\\Services\\'      => __DIR__ . '/services/',
+        'MOM\\Services\\'           => __DIR__ . '/services/',
+        'MOM\\Api\\'               => __DIR__ . '/',
+        'MOM\\Database\\'           => dirname(__DIR__) . '/database/',
     ];
 
     foreach ($map as $prefix => $baseDir) {
@@ -74,7 +82,6 @@ if (!function_exists('api_json')) {
     // The API_HELPERS_ONLY guard prevents the boot section and switch statement
     // from executing, so we can bootstrap the MVC router ourselves.
     define('API_HELPERS_ONLY', true);
-    define('API_THROW_RESPONSES', true);
     require_once $BASE_DIR . '/api.php';
 }
 
@@ -90,44 +97,50 @@ if (!isset($store)) {
 
 // â”€â”€ Import Classes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-use HESEM\QMS\Api\Router;
-use HESEM\QMS\Api\Middleware\AuthMiddleware;
-use HESEM\QMS\Api\Middleware\CorsMiddleware;
-use HESEM\QMS\Api\Middleware\RateLimitMiddleware;
-use HESEM\QMS\Api\Middleware\AuditMiddleware;
-use HESEM\QMS\Api\Controllers\AuthController;
-use HESEM\QMS\Api\Controllers\DocumentController;
-use HESEM\QMS\Api\Controllers\FormController;
-use HESEM\QMS\Api\Controllers\FileController;
-use HESEM\QMS\Api\Controllers\UserController;
-use HESEM\QMS\Api\Controllers\AdminController;
-use HESEM\QMS\Api\Controllers\AdminMetadataStudioController;
-use HESEM\QMS\Api\Controllers\DictController;
-use HESEM\QMS\Api\Controllers\DashboardController;
-use HESEM\QMS\Api\Controllers\OrderController;
-use HESEM\QMS\Api\Controllers\ExceptionController;
-use HESEM\QMS\Api\Controllers\SupplierController;
-use HESEM\QMS\Api\Controllers\QuoteController;
-use HESEM\QMS\Api\Controllers\EvidenceController;
-use HESEM\QMS\Api\Controllers\FmeaController;
-use HESEM\QMS\Api\Controllers\ApqpController;
-use HESEM\QMS\Api\Controllers\DispatchController;
-use HESEM\QMS\Api\Controllers\LogisticsController;
-use HESEM\QMS\Api\Controllers\MasterDataController;
-use HESEM\QMS\Api\Controllers\MobileController;
-use HESEM\QMS\Api\Controllers\CncProgramController;
-use HESEM\QMS\Api\Controllers\ProductPassportController;
-use HESEM\QMS\Api\Controllers\AiSchedulingController;
-use HESEM\QMS\Api\Controllers\CustomerPortalController;
-use HESEM\QMS\Api\Controllers\ComplianceReportController;
-use HESEM\QMS\Api\Controllers\KnowledgeController;
-use HESEM\QMS\Api\Controllers\CiController;
-use HESEM\QMS\Api\Controllers\EnergyController;
-use HESEM\QMS\Api\Controllers\GenericCrudController;
-use HESEM\QMS\Api\Controllers\ModuleSchemaController;
-use HESEM\QMS\Api\Controllers\SchemaStudioController;
-use HESEM\QMS\Api\Controllers\RegistryController;
-use HESEM\QMS\Database\DataLayer;
+use MOM\Api\Router;
+use MOM\Api\Middleware\AuthMiddleware;
+use MOM\Api\Middleware\CorsMiddleware;
+use MOM\Api\Middleware\RateLimitMiddleware;
+use MOM\Api\Middleware\AuditMiddleware;
+use MOM\Api\Controllers\AuthController;
+use MOM\Api\Controllers\DocumentController;
+use MOM\Api\Controllers\FormController;
+use MOM\Api\Controllers\FileController;
+use MOM\Api\Controllers\UserController;
+use MOM\Api\Controllers\AdminController;
+use MOM\Api\Controllers\AdminMetadataStudioController;
+use MOM\Api\Controllers\DictController;
+use MOM\Api\Controllers\DashboardController;
+use MOM\Api\Controllers\OrderController;
+use MOM\Api\Controllers\ExceptionController;
+use MOM\Api\Controllers\SupplierController;
+use MOM\Api\Controllers\QuoteController;
+use MOM\Api\Controllers\EvidenceController;
+use MOM\Api\Controllers\FmeaController;
+use MOM\Api\Controllers\ApqpController;
+use MOM\Api\Controllers\DispatchController;
+use MOM\Api\Controllers\LogisticsController;
+use MOM\Api\Controllers\MasterDataController;
+use MOM\Api\Controllers\MobileController;
+use MOM\Api\Controllers\CncProgramController;
+use MOM\Api\Controllers\ProductPassportController;
+use MOM\Api\Controllers\AiSchedulingController;
+use MOM\Api\Controllers\CustomerPortalController;
+use MOM\Api\Controllers\ComplianceReportController;
+use MOM\Api\Controllers\KnowledgeController;
+use MOM\Api\Controllers\CiController;
+use MOM\Api\Controllers\EnergyController;
+use MOM\Api\Controllers\FinanceController;
+use MOM\Api\Controllers\VpsController;
+use MOM\Api\Controllers\GenericCrudController;
+use MOM\Api\Controllers\ModuleSchemaController;
+use MOM\Api\Controllers\SchemaStudioController;
+use MOM\Api\Controllers\RegistryController;
+use MOM\Api\Controllers\ApprovalGroupController;
+use MOM\Api\Controllers\AllocationController;
+use MOM\Api\Controllers\CustomerPurchaseOrderController;
+use MOM\Api\Controllers\OperationalOverrideController;
+use MOM\Database\DataLayer;
 
 // â”€â”€ Bootstrap DataLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -201,6 +214,9 @@ $router->actions([
     'record_id_peek'      => [FormController::class, 'peekNextId'],
     'form_version_stream' => [FormController::class, 'streamVersion'],
     'form_upload_draft'   => [FormController::class, 'uploadDraft'],
+    'form_draft_save'     => [FormController::class, 'saveDraft'],
+    'form_draft_get'      => [FormController::class, 'getDraft'],
+    'form_draft_list'     => [FormController::class, 'listDrafts'],
 ]);
 
 // Files & Folders
@@ -236,6 +252,11 @@ $router->actions([
     'save_data_settings'               => [AdminController::class, 'saveSettings'],
     'admin_portal_display_config_get'  => [AdminController::class, 'getPortalConfig'],
     'admin_portal_display_config_save' => [AdminController::class, 'savePortalConfig'],
+    'module_access_get'                => [AdminController::class, 'getModuleAccessConfig'],
+    'admin_module_access_save'         => [AdminController::class, 'saveModuleAccessConfig'],
+    'admin_audit_trail_list'           => [AdminController::class, 'getAuditTrail'],
+    'user_doc_overrides_get'           => [AdminController::class, 'getUserDocumentOverrides'],
+    'admin_user_doc_overrides_save'    => [AdminController::class, 'saveUserDocumentOverrides'],
     'admin_mfa_settings_get'           => [AdminController::class, 'getMfaSettings'],
     'admin_mfa_settings_save'          => [AdminController::class, 'saveMfaSettings'],
     'admin_metadata_studio_summary'    => [AdminMetadataStudioController::class, 'getSummary'],
@@ -267,6 +288,37 @@ $router->actions([
     'spc_alerts'           => [DashboardController::class, 'spcAlerts'],
 ]);
 
+// VPS Control Tower
+$router->actions([
+    'vps_control_overview' => [VpsController::class, 'overview'],
+    'vps_control_host'     => [VpsController::class, 'host'],
+    'vps_control_action'   => [VpsController::class, 'runAction'],
+    'vps_control_asset'    => [VpsController::class, 'asset'],
+    'vps_file_list'        => [VpsController::class, 'fileList'],
+    'vps_file_search'      => [VpsController::class, 'fileSearch'],
+    'vps_file_read'        => [VpsController::class, 'fileRead'],
+    'vps_file_mutate'      => [VpsController::class, 'fileMutate'],
+    'vps_file_upload'      => [VpsController::class, 'fileUpload'],
+    'vps_terminal_auth'    => [VpsController::class, 'terminalAuth'],
+    'vps_observability_auth' => [VpsController::class, 'observabilityAuth'],
+]);
+
+// Allocation & Record ID Management
+$router->actions([
+    'allocation_allocate'       => [AllocationController::class, 'allocate'],
+    'allocation_history'        => [AllocationController::class, 'getHistory'],
+    'allocation_void'           => [AllocationController::class, 'void'],
+    'record_id_check_duplicate' => [AllocationController::class, 'checkDuplicate'],
+    'upload_allocation_status'  => [AllocationController::class, 'getStatus'],
+    'record_id_download_txt'    => [AllocationController::class, 'downloadTxt'],
+    'record_id_types_expanded'  => [AllocationController::class, 'getExpandedTypes'],
+    'record_id_preview'         => [AllocationController::class, 'preview'],
+    // Legacy aliases (fallback from 09h-allocation-tracker.js)
+    'record_id_generate'        => [AllocationController::class, 'allocate'],
+    'record_id_history'         => [AllocationController::class, 'getHistory'],
+    'record_id_void'            => [AllocationController::class, 'void'],
+]);
+
 // Orders (SO/JO/WO)
 $router->actions([
     'order_so_list'           => [OrderController::class, 'listSalesOrders'],
@@ -291,6 +343,8 @@ $router->actions([
     'order_search'            => [OrderController::class, 'search'],
     'order_link_form'         => [OrderController::class, 'linkForm'],
     'order_shipment_gate'     => [OrderController::class, 'checkShipmentReadiness'],
+    'order_shipment_gate_override' => [OrderController::class, 'overrideShipmentGate'],
+    'order_shipment_gate_overrides' => [OrderController::class, 'listShipmentGateOverrides'],
     'order_schedule_get'      => [OrderController::class, 'getSchedule'],
     'order_schedule_slot'     => [OrderController::class, 'createScheduleSlot'],
     'order_schedule_update'   => [OrderController::class, 'updateScheduleSlot'],
@@ -315,6 +369,28 @@ $router->actions([
     'exception_copq_summary'    => [ExceptionController::class, 'copqSummary'],
     'exception_trends'          => [ExceptionController::class, 'trends'],
     'exception_escalate'        => [ExceptionController::class, 'escalate'],
+]);
+
+// Finance control objects
+$router->actions([
+    'finance_period_close_list' => [FinanceController::class, 'listPeriodCloses'],
+    'finance_period_close_create' => [FinanceController::class, 'createPeriodClose'],
+    'finance_period_close_transition' => [FinanceController::class, 'transitionPeriodClose'],
+    'finance_backdate_exception_list' => [FinanceController::class, 'listBackdateExceptions'],
+    'finance_backdate_exception_create' => [FinanceController::class, 'createBackdateException'],
+    'finance_backdate_exception_transition' => [FinanceController::class, 'transitionBackdateException'],
+    'finance_credit_memo_list' => [FinanceController::class, 'listCreditMemos'],
+    'finance_credit_memo_create' => [FinanceController::class, 'createCreditMemo'],
+    'finance_debit_memo_list' => [FinanceController::class, 'listDebitMemos'],
+    'finance_debit_memo_create' => [FinanceController::class, 'createDebitMemo'],
+]);
+
+// Commercial customer purchase-order controls
+$router->actions([
+    'customer_purchase_order_list' => [CustomerPurchaseOrderController::class, 'listPurchaseOrders'],
+    'customer_purchase_order_detail' => [CustomerPurchaseOrderController::class, 'getPurchaseOrder'],
+    'customer_purchase_order_create' => [CustomerPurchaseOrderController::class, 'createPurchaseOrder'],
+    'customer_purchase_order_transition' => [CustomerPurchaseOrderController::class, 'transitionPurchaseOrder'],
 ]);
 
 // Supplier Quality Management
@@ -572,6 +648,20 @@ $router->actions([
     'schema_studio_load_registry'   => [SchemaStudioController::class, 'loadFromRegistry'],
     'schema_studio_validate'        => [SchemaStudioController::class, 'validateSchema'],
     'schema_studio_apply_migration' => [SchemaStudioController::class, 'applyMigration'],
+    'schema_studio_table_preview'   => [SchemaStudioController::class, 'previewTableData'],
+    'schema_studio_table_row_save'  => [SchemaStudioController::class, 'saveTableRow'],
+    'schema_studio_list_releases'   => [SchemaStudioController::class, 'listReleaseBundles'],
+    'schema_studio_compile_registry'=> [SchemaStudioController::class, 'compileRegistryBundle'],
+    'schema_studio_release_bundle'  => [SchemaStudioController::class, 'createReleaseBundle'],
+    'schema_studio_diagnose'        => [SchemaStudioController::class, 'diagnoseSchema'],
+    'schema_studio_operations_report'=> [SchemaStudioController::class, 'getOperationsReport'],
+    'schema_studio_command_center_report'=> [SchemaStudioController::class, 'getCommandCenterReport'],
+    'schema_studio_round6_report'   => [SchemaStudioController::class, 'getRound6Report'],
+    'schema_studio_round7_report'   => [SchemaStudioController::class, 'getRound7Report'],
+    'schema_studio_round9_report'   => [SchemaStudioController::class, 'getRound9Report'],
+    'schema_studio_round10_report'  => [SchemaStudioController::class, 'getRound10Report'],
+    'schema_studio_round11_report'  => [SchemaStudioController::class, 'getRound11Report'],
+    'schema_studio_round12_report'  => [SchemaStudioController::class, 'getRound12Report'],
     'schema_studio_export'          => [SchemaStudioController::class, 'export'],
 ]);
 
@@ -587,11 +677,33 @@ $router->actions([
     'registry_domain_field_packs'=> [RegistryController::class, 'getDomainFieldPacks'],
     'registry_relation_map'      => [RegistryController::class, 'getRelationMap'],
     'registry_endpoint_catalog'  => [RegistryController::class, 'getEndpointCatalog'],
+    'registry_table_registry'    => [RegistryController::class, 'getTableRegistry'],
+    'registry_manifest'          => [RegistryController::class, 'getRegistryManifest'],
+    'registry_compliance_crosswalk'=> [RegistryController::class, 'getComplianceCrosswalk'],
+    'registry_global_capability_audit'=> [RegistryController::class, 'getGlobalCapabilityAudit'],
+    'registry_system_contract'   => [RegistryController::class, 'getSystemContract'],
     'registry_iot_connectors'    => [RegistryController::class, 'getIotConnectors'],
     'registry_full'              => [RegistryController::class, 'getFull'],
     'registry_update'            => [RegistryController::class, 'updateRegistry'],
     'admin_design_config'        => [AdminController::class, 'getDesignConfig'],
     'admin_design_config_save'   => [AdminController::class, 'saveDesignConfig'],
+]);
+
+// ── Foundation Governance Contract Slice: Internal Action Keys ──────────────
+
+$router->actions([
+    'registerOrganizationNode'  => [MasterDataController::class, 'registerOrganizationNode'],
+    'amendOrganizationNode'     => [MasterDataController::class, 'amendOrganizationNode'],
+    'reparentOrganizationNode'  => [MasterDataController::class, 'reparentOrganizationNode'],
+    'deactivateOrganizationNode'=> [MasterDataController::class, 'deactivateOrganizationNode'],
+    'registerParty'             => [MasterDataController::class, 'registerParty'],
+    'amendPartyIdentity'        => [MasterDataController::class, 'amendPartyIdentity'],
+    'assignPartyRole'           => [MasterDataController::class, 'assignPartyRole'],
+    'registerPartySite'         => [MasterDataController::class, 'registerPartySite'],
+    'registerPartyContact'      => [MasterDataController::class, 'registerPartyContact'],
+    'registerCalendar'          => [MasterDataController::class, 'registerCalendar'],
+    'registerShift'             => [MasterDataController::class, 'registerShiftEntry'],
+    'requestApproval'           => [ApprovalGroupController::class, 'requestApproval'],
 ]);
 
 // Registry-backed generic CRUD
@@ -615,15 +727,29 @@ foreach ($tableRegistry as $tableName => $tableMeta) {
     }
 
     $prefix = $domain . '.' . $safeTable;
+    $primaryKey = $tableMeta['primaryKey'] ?? null;
+    $hasPrimaryKey = false;
+    if (is_string($primaryKey) && trim($primaryKey) !== '') {
+        $hasPrimaryKey = true;
+    } elseif (is_array($primaryKey)) {
+        $pkFields = array_values(array_filter(array_map(static fn($value): string => trim((string)$value), $primaryKey), static fn(string $value): bool => $value !== ''));
+        $hasPrimaryKey = $pkFields !== [];
+    }
+
     $router->actions([
         $prefix . '.list'   => [GenericCrudController::class, 'listRecords'],
-        $prefix . '.detail' => [GenericCrudController::class, 'getDetail'],
         $prefix . '.create' => [GenericCrudController::class, 'createRecord'],
-        $prefix . '.update' => [GenericCrudController::class, 'updateRecord'],
-        $prefix . '.delete' => [GenericCrudController::class, 'deleteRecord'],
     ]);
 
-    if (!empty($tableMeta['statusColumn'])) {
+    if ($hasPrimaryKey) {
+        $router->actions([
+            $prefix . '.detail' => [GenericCrudController::class, 'getDetail'],
+            $prefix . '.update' => [GenericCrudController::class, 'updateRecord'],
+            $prefix . '.delete' => [GenericCrudController::class, 'deleteRecord'],
+        ]);
+    }
+
+    if ($hasPrimaryKey && !empty($tableMeta['statusColumn'])) {
         $router->action($prefix . '.transition', GenericCrudController::class, 'transitionRecord');
     }
 }
@@ -768,6 +894,17 @@ $router->delete('/api/dictionary', DictController::class, 'delete');
 // Meta / API catalog
 $router->get('/api/meta/catalog', ModuleSchemaController::class, 'apiCatalog');
 
+// System contract registry for frontend/AI tooling
+$router->get('/api/system/contracts', RegistryController::class, 'getSystemContract');
+$router->get('/api/registry/table-registry', RegistryController::class, 'getTableRegistry');
+$router->get('/api/registry/endpoint-catalog', RegistryController::class, 'getEndpointCatalog');
+$router->get('/api/registry/workflow-library', RegistryController::class, 'getWorkflowLibrary');
+$router->get('/api/registry/status-options', RegistryController::class, 'getStatusOptions');
+$router->get('/api/registry/relation-map', RegistryController::class, 'getRelationMap');
+$router->get('/api/registry/compliance-crosswalk', RegistryController::class, 'getComplianceCrosswalk');
+$router->get('/api/registry/global-capability-audit', RegistryController::class, 'getGlobalCapabilityAudit');
+$router->get('/api/registry/manifest', RegistryController::class, 'getRegistryManifest');
+
 // Generic runtime entity access
 $router->get('/api/runtime/{domain}/{table}', GenericCrudController::class, 'listRecords');
 $router->get('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'getDetail');
@@ -775,6 +912,52 @@ $router->post('/api/runtime/{domain}/{table}', GenericCrudController::class, 'cr
 $router->put('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'updateRecord');
 $router->delete('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'deleteRecord');
 $router->post('/api/runtime/{domain}/{table}/{id}/transition', GenericCrudController::class, 'transitionRecord');
+
+// ── Foundation Governance Contract Slice: Public REST Routes ────────────────
+
+// Foundation read-through
+$router->get('/api/v1/foundation/organizations', MasterDataController::class, 'listFoundationOrganizations');
+$router->get('/api/v1/foundation/parties', MasterDataController::class, 'listFoundationParties');
+$router->get('/api/v1/foundation/calendars', MasterDataController::class, 'listFoundationCalendars');
+
+// Governance approval-group
+$router->get('/api/v1/governance/approval-groups', ApprovalGroupController::class, 'listApprovalGroups');
+$router->get('/api/v1/governance/approval-groups/{approvalGroupId}', ApprovalGroupController::class, 'getApprovalGroup');
+$router->post('/api/v1/governance/approval-groups/{approvalGroupId}:decide', ApprovalGroupController::class, 'decideApprovalGroup');
+$router->get('/api/v1/governance/approval-groups/{approvalGroupId}/timeline', ApprovalGroupController::class, 'listApprovalGroupTimeline');
+$router->get('/api/v1/governance/approval-groups/{approvalGroupId}/attachments', EvidenceController::class, 'listApprovalGroupAttachments');
+
+// Governance attachments
+$router->get('/api/v1/governance/attachments/{attachmentId}', EvidenceController::class, 'getGovernanceAttachment');
+$router->post('/api/v1/governance/attachments', EvidenceController::class, 'createGovernanceAttachment');
+
+// Governance override controls
+$router->get('/api/v1/governance/override-controls', OperationalOverrideController::class, 'listOverrides');
+$router->get('/api/v1/governance/override-controls/{overrideId}', OperationalOverrideController::class, 'getOverride');
+$router->post('/api/v1/governance/override-controls', OperationalOverrideController::class, 'createOverride');
+$router->post('/api/v1/governance/override-controls/{overrideId}:transition', OperationalOverrideController::class, 'transitionOverride');
+
+// Finance control objects
+$router->get('/api/v1/finance/period-closes', FinanceController::class, 'listPeriodCloses');
+$router->get('/api/v1/finance/period-closes/{periodCloseId}', FinanceController::class, 'getPeriodClose');
+$router->post('/api/v1/finance/period-closes', FinanceController::class, 'createPeriodClose');
+$router->post('/api/v1/finance/period-closes/{periodCloseId}:transition', FinanceController::class, 'transitionPeriodClose');
+$router->get('/api/v1/finance/backdate-exceptions', FinanceController::class, 'listBackdateExceptions');
+$router->get('/api/v1/finance/backdate-exceptions/{backdateExceptionId}', FinanceController::class, 'getBackdateException');
+$router->post('/api/v1/finance/backdate-exceptions', FinanceController::class, 'createBackdateException');
+$router->post('/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition', FinanceController::class, 'transitionBackdateException');
+$router->get('/api/v1/finance/credit-memos', FinanceController::class, 'listCreditMemos');
+$router->get('/api/v1/finance/credit-memos/{creditMemoId}', FinanceController::class, 'getCreditMemo');
+$router->post('/api/v1/finance/credit-memos', FinanceController::class, 'createCreditMemo');
+$router->get('/api/v1/finance/debit-memos', FinanceController::class, 'listDebitMemos');
+$router->get('/api/v1/finance/debit-memos/{debitMemoId}', FinanceController::class, 'getDebitMemo');
+$router->post('/api/v1/finance/debit-memos', FinanceController::class, 'createDebitMemo');
+
+// Commercial customer purchase-order objects
+$router->get('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'listPurchaseOrders');
+$router->get('/api/v1/commercial/customer-purchase-orders/{customerPoId}', CustomerPurchaseOrderController::class, 'getPurchaseOrder');
+$router->post('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'createPurchaseOrder');
+$router->post('/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition', CustomerPurchaseOrderController::class, 'transitionPurchaseOrder');
 
 // Folders
 $router->get('/api/folders', FileController::class, 'scanFolders');
@@ -790,6 +973,9 @@ $router->post('/api/documents/snapshot', DocumentController::class, 'docsSnapsho
 
 // Forms â€” draft upload
 $router->post('/api/forms/upload-draft', FormController::class, 'uploadDraft');
+$router->post('/api/forms/drafts', FormController::class, 'saveDraft');
+$router->get('/api/forms/drafts', FormController::class, 'listDrafts');
+$router->get('/api/forms/{code}/draft', FormController::class, 'getDraft');
 
 // Dashboards
 $router->get('/api/dashboard/executive', DashboardController::class, 'executive');
@@ -798,6 +984,18 @@ $router->get('/api/dashboard/production', DashboardController::class, 'productio
 $router->get('/api/dashboard/supplier', DashboardController::class, 'supplier');
 $router->get('/api/dashboard/department', DashboardController::class, 'department');
 $router->get('/api/dashboard/widget', DashboardController::class, 'widget');
+
+// VPS Control Tower
+$router->get('/api/vps/overview', VpsController::class, 'overview');
+$router->get('/api/vps/host', VpsController::class, 'host');
+$router->post('/api/vps/action', VpsController::class, 'runAction');
+$router->get('/api/vps/files', VpsController::class, 'fileList');
+$router->get('/api/vps/files/search', VpsController::class, 'fileSearch');
+$router->get('/api/vps/files/read', VpsController::class, 'fileRead');
+$router->post('/api/vps/files/mutate', VpsController::class, 'fileMutate');
+$router->post('/api/vps/files/upload', VpsController::class, 'fileUpload');
+$router->get('/api/vps/terminal/auth', VpsController::class, 'terminalAuth');
+$router->get('/api/vps/observability/auth', VpsController::class, 'observabilityAuth');
 
 // KPI
 $router->get('/api/kpi/alerts', DashboardController::class, 'kpiAlerts');

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Database;
+namespace MOM\Database;
 
 use RuntimeException;
 
@@ -148,7 +148,7 @@ final class RuntimeShadowSync
             if ($itemId === '') {
                 continue;
             }
-            $description = trim((string)($row['part_description'] ?? $itemId));
+            $description = trim((string)($row['part_description'] ?? $row['description'] ?? $itemId));
             $this->upsert('items', [
                 'item_id' => $itemId,
                 'description' => $description,
@@ -601,6 +601,7 @@ final class RuntimeShadowSync
                 'status' => strtolower(trim((string)($row['status'] ?? 'pending'))),
                 'started_at' => $this->parseTimestamp((string)($row['actual_start'] ?? '')),
                 'metadata' => $metadata,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['actual_start'] ?? '')) ?? date(DATE_ATOM),
             ], ['job_order_id', 'operation_seq'], ['metadata']);
 
             $priority = $this->mapSoPriority((string)($salesRow['priority'] ?? 'standard'));
@@ -1264,7 +1265,7 @@ final class RuntimeShadowSync
                 'metadata' => $row,
                 'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['resolved_at'] ?? $row['detected_at'] ?? '')) ?? date(DATE_ATOM),
                 'updated_by' => trim((string)($row['updated_by'] ?? '')) ?: null,
-            ], ['reconciliation_id'], ['metadata']);
+            ], ['reconciliation_id'], ['expected_value', 'actual_value', 'metadata']);
         }
     }
 
@@ -1341,11 +1342,11 @@ final class RuntimeShadowSync
                 'description' => substr($label, 0, 300),
                 'example' => json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                 'required' => false,
-                'enum_values' => null,
+                'enum_values' => [],
                 'used_in' => null,
                 'validation' => null,
                 'format' => null,
-            ], ['category', 'key']);
+            ], ['category', 'key'], ['enum_values']);
         }
     }
 

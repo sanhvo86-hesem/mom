@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 /**
  * Circuit Breaker for external service calls (Epicor, etc.)

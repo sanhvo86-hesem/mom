@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Middleware;
+namespace MOM\Api\Middleware;
 
-use HESEM\QMS\Api\Controllers\ExitException;
+use MOM\Api\Controllers\ExitException;
 
 /**
  * Rate-limiting middleware using a token-bucket algorithm.
@@ -12,7 +12,7 @@ use HESEM\QMS\Api\Controllers\ExitException;
  * Per-user rate limiting with configurable limits per endpoint group.
  * State is stored in JSON files under the ratelimit directory.
  *
- * @package HESEM\QMS\Api\Middleware
+ * @package MOM\Api\Middleware
  * @since   2.0.0
  */
 class RateLimitMiddleware
@@ -28,6 +28,9 @@ class RateLimitMiddleware
 
     /** @var array<string, array{max: int, window: int}> Per-action overrides. */
     private array $endpointLimits;
+
+    /** @var array<int, string> Actions that must bypass generic request throttling. */
+    private array $exemptActions;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -55,6 +58,15 @@ class RateLimitMiddleware
             'admin_git_sync'     => ['max' => 5,  'window' => 60],
             'admin_git_pull'     => ['max' => 5,  'window' => 60],
         ], $endpointLimits);
+
+        // These actions are only reachable through nginx internal auth_request
+        // and may fan out into dozens of subrequests for a single page load.
+        // Applying the generic per-user limiter here causes false 429s for
+        // Netdata/Grafana assets and chart APIs.
+        $this->exemptActions = [
+            'vps_terminal_auth',
+            'vps_observability_auth',
+        ];
     }
 
     /**
@@ -82,6 +94,10 @@ class RateLimitMiddleware
      */
     public function check(string $action): void
     {
+        if (in_array($action, $this->exemptActions, true)) {
+            return;
+        }
+
         // Determine user key
         $userKey = 'anon_' . $this->clientIp();
         if (!empty($_SESSION['user'])) {

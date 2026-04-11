@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
@@ -21,7 +21,7 @@ use RuntimeException;
  *
  * Based on: AS9100D, Boeing/Safran best practices, AIAG 8D methodology
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.1.0
  */
 final class QualityIntegrationService

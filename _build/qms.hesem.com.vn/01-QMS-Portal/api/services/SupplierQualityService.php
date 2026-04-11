@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Supplier Quality Management Service for HESEM QMS Portal.
+ * Supplier Quality Management Service for HESEM MOM Portal.
  *
  * Manages supplier scorecards, incoming inspections, skip-lot switching
  * (ANSI Z1.4), Approved Supplier List (ASL), SCARs, and supplier audits.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class SupplierQualityService
@@ -80,7 +80,7 @@ final class SupplierQualityService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string      $dataDir Absolute path to qms-data directory.
+     * @param string      $dataDir Absolute path to data directory.
      * @param object|null $db      Optional database connection for PostgreSQL dual-write.
      */
     public function __construct(string $dataDir, ?object $db = null)

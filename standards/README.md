@@ -14,10 +14,11 @@ The `core-standards/` directory contains immutable rules, naming conventions, di
 ## Hierarchy of application
 
 1. `01-immutable-rules.md` is the highest standard.
-2. When `01` does not speak directly, thematic thematic files (`19`, `20`, `22`, `23`, `24`...) trump older general files.
-3. `05-html-templates.md`, `11-html-structure-guide.md`, portal/runtime, and release documentation are proof of deployment; If it deviates from the standard, fix the implementation according to the standard, do not pull the standard back according to the drift.
-4. `general_note.md` and `rule_update_content.md` are backward compatibility/summary documents; If it conflicts with `core-standards/` then `core-standards/` wins.
-5. Points that have not been finalized after comparison are recorded at `31-core-standard-reconciliation-log.md`.
+2. For frontend runtime modules, MOM portal, Module Builder, Template Studio, ERP/MES/eQMS dashboards, online forms rendered inside portal, and layout-template decisions, `36-frontend-module-layout-template-standard.md` is the mandatory frontend authority after `01`.
+3. When `01` and `36` do not speak directly, thematic files (`19`, `20`, `22`, `23`, `24`...) trump older general files.
+4. `05-html-templates.md`, `11-html-structure-guide.md`, portal/runtime, and release documentation are proof of deployment; If it deviates from the standard, fix the implementation according to the standard, do not pull the standard back according to the drift.
+5. `general_note.md` and `rule_update_content.md` are backward compatibility/summary documents; If it conflicts with `core-standards/` then `core-standards/` wins.
+6. Points that have not been finalized after comparison are recorded at `31-core-standard-reconciliation-log.md`.
 
 ---
 
@@ -73,6 +74,19 @@ The `core-standards/` directory contains immutable rules, naming conventions, di
 | **29** | **`29-wi-annex-research-redraft-method.md`** | **⭐ Research method - rewrite WI/ANNEX according to each document, with external benchmark and source rule** |
 | **30** | **`30-wi-annex-translation-role-bundle-rules.md`** | **⭐ Language rule, role code, D-code, bundle and anti half-English for WI/ANNEX** |
 | **31** | **`31-core-standard-reconciliation-log.md`** | **⭐ Log for reconciliation, reconciled points, conflicts that need to be decided, unclear points that need to be confirmed** |
+
+### Frontend, MOM portal, and module builder standards
+
+These files are mandatory for frontend/runtime module work. For conflicts, `36-frontend-module-layout-template-standard.md` wins unless `01-immutable-rules.md` speaks directly.
+
+| # | File | Content |
+|---|------|----------|
+| 30 | `30-hesem-design-system.md` | Design system foundation: tokens, component rules, block architecture and layout schema reference |
+| 32 | `32-module-architecture-v2.md` | Workflow-first MOM/MES/eQMS module architecture |
+| 33 | `33-api-mapping-per-module.md` | UI-to-API mapping reference; generated registries win when stale |
+| 34 | `34-module-builder-architecture.md` | Module Builder architecture, gap audit and block roadmap |
+| 35 | `35-language-convention.md` | Language convention for runtime/frontend text |
+| 36 | `36-frontend-module-layout-template-standard.md` | **Mandatory frontend module layout/template SSOT: authority map, template contract, block contract, visual rules, accessibility, audit and QA gates** |
 
 ### Reference files
 
@@ -155,6 +169,16 @@ The `core-standards/` directory contains immutable rules, naming conventions, di
    - `Department code & handbook link`
 5. Review the organizational matrix, ANNEX, and related SOPs before closing
 
+### Create or edit frontend MOM/ERP/MES/eQMS module
+
+1. Read `01-immutable-rules.md` for repository-wide immutable rules.
+2. Read `36-frontend-module-layout-template-standard.md` before choosing layout, template, block, renderer, token, data binding, accessibility, audit or QA behavior.
+3. Confirm the module build packet exists and references business contracts plus generated registries.
+4. Use only approved `templateId`, zones and block contracts.
+5. Bind UI only to approved registry endpoints; do not invent endpoint or field behavior.
+6. Implement loading, empty, error, permission-denied, readonly, dirty, saving, saved and conflict states.
+7. Run the required frontend gates: schema, token, inline style, Vietnamese diacritics, API contract, accessibility, keyboard, responsive, visual, permission and audit evidence.
+
 ---
 
 ## Related documents
@@ -169,7 +193,7 @@ The `core-standards/` directory contains immutable rules, naming conventions, di
 
 ---
 
-> **Last updated:** 2026-04-01
+> **Last updated:** 2026-04-11
 > **Scope:** HESEM ENGINEERING — ISO 9001:2026, AS9100D-ready
 ---
 

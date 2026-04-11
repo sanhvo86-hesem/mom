@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\ApqpPpapService;
+use MOM\Api\Controllers\BaseController;
+use MOM\Services\ApqpPpapService;
 use Throwable;
 
 /**
- * APQP & PPAP controller for HESEM QMS Portal.
+ * APQP & PPAP controller for HESEM MOM Portal.
  *
  * Provides API endpoints for Advanced Product Quality Planning
  * (AS9145), phase gate reviews, PPAP submissions and element
@@ -17,7 +17,7 @@ use Throwable;
  *
  * Access requires 'quality', 'engineering', or 'production' role.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class ApqpController extends BaseController

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * HESEM QMS Portal - Database Configuration
+ * HESEM MOM Portal - Database Configuration
  *
  * Environment-driven configuration for PostgreSQL connection and feature flags.
  * All values can be overridden via environment variables for deployment flexibility.
@@ -13,7 +13,7 @@ declare(strict_types=1);
  *   SHADOW_WRITE   - Write to both JSON and PostgreSQL simultaneously (default: true)
  *   JSON_FALLBACK  - Fall back to JSON on PostgreSQL errors (default: true)
  *
- * @package HESEM\QMS\Database
+ * @package MOM\Database
  * @since   1.0.0
  */
 
@@ -31,12 +31,13 @@ return [
     'driver'   => 'pgsql',
     'host'     => getenv('DB_HOST') ?: 'localhost',
     'port'     => (int)(getenv('DB_PORT') ?: 5432),
-    'database' => getenv('DB_NAME') ?: 'hesem_qms',
-    'username' => getenv('DB_USER') ?: 'qms_app',
+    'database' => getenv('DB_NAME') ?: 'mom',
+    'username' => getenv('DB_USER') ?: 'mom_app',
     'password' => getenv('DB_PASS') ?: '',
     'charset'  => 'utf8',
     'schema'   => 'public',
     'sslmode'  => getenv('DB_SSL') ?: 'prefer',
+    'allow_empty_password' => $envBool('DB_ALLOW_EMPTY_PASSWORD', false),
 
     // Connection Pool
     'connect_timeout' => (int)(getenv('DB_CONNECT_TIMEOUT') ?: 5),
@@ -51,6 +52,6 @@ return [
 
     // Logging
     'log_queries'  => $envBool('DB_LOG_QUERIES', false),
-    'log_file'     => getenv('DB_LOG_FILE') ?: __DIR__ . '/../qms-data/db_queries.log',
+    'log_file'     => getenv('DB_LOG_FILE') ?: __DIR__ . '/../data/db_queries.log',
     'slow_query_ms' => (int)(getenv('DB_SLOW_QUERY_MS') ?: 500),
 ];

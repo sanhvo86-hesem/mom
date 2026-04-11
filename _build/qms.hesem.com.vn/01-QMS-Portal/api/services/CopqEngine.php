@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Cost of Poor Quality (COPQ) Engine for HESEM QMS Portal.
+ * Cost of Poor Quality (COPQ) Engine for HESEM MOM Portal.
  *
  * Calculates scrap, rework, warranty, and inspection costs from
  * exception records and work order data. Provides PAF (Prevention,
  * Appraisal, Internal Failure, External Failure) breakdowns and trends.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class CopqEngine

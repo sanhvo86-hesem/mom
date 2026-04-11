@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Database;
+namespace MOM\Database;
 
 use InvalidArgumentException;
 
 /**
- * Fluent SQL Query Builder for HESEM QMS Portal.
+ * Fluent SQL Query Builder for HESEM MOM Portal.
  *
  * Generates parameterised SQL for PostgreSQL. All user-supplied values go
  * through PDO prepared-statement placeholders -- never interpolated.
@@ -21,7 +21,7 @@ use InvalidArgumentException;
  * - JSONB operators (->>, @>, ?)
  * - Pagination helper
  *
- * @package HESEM\QMS\Database
+ * @package MOM\Database
  * @since   1.0.0
  */
 class QueryBuilder

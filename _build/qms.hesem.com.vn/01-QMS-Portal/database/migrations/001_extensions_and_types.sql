@@ -8,11 +8,42 @@ BEGIN;
 -- ============================================================================
 -- EXTENSIONS
 -- ============================================================================
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";       -- UUID generation
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";         -- Cryptographic functions for hashing
-CREATE EXTENSION IF NOT EXISTS "pg_trgm";          -- Trigram similarity for fuzzy search
-CREATE EXTENSION IF NOT EXISTS "btree_gist";       -- GiST index for exclusion constraints
-CREATE EXTENSION IF NOT EXISTS "vector";           -- pgvector for document embeddings
+DO $$
+DECLARE
+    required_extension TEXT;
+    required_extensions CONSTANT TEXT[] := ARRAY[
+        'uuid-ossp',
+        'pgcrypto',
+        'pg_trgm',
+        'btree_gist',
+        'vector'
+    ];
+BEGIN
+    FOREACH required_extension IN ARRAY required_extensions LOOP
+        IF EXISTS (
+            SELECT 1
+            FROM pg_extension
+            WHERE extname = required_extension
+        ) THEN
+            CONTINUE;
+        END IF;
+
+        IF EXISTS (
+            SELECT 1
+            FROM pg_roles
+            WHERE rolname = current_user
+              AND rolsuper = TRUE
+        ) THEN
+            EXECUTE format('CREATE EXTENSION IF NOT EXISTS %I', required_extension);
+            CONTINUE;
+        END IF;
+
+        RAISE EXCEPTION
+            'Extension "%" is required before running migrations with role "%". Pre-create it as a superuser.',
+            required_extension,
+            current_user;
+    END LOOP;
+END $$;
 
 -- NOTE: Apache AGE must be installed separately:
 -- CREATE EXTENSION IF NOT EXISTS age;

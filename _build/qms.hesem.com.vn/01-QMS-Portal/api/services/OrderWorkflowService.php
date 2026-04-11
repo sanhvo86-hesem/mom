@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
@@ -59,10 +59,10 @@ final class EditResult
  * editing by state, cancel/reopen governance, change-history logging,
  * and auto-actions on transition for the SO > JO > WO hierarchy.
  *
- * Reads configuration from qms-data/config/so_jo_wo_config.json.
- * Persists orders in qms-data/orders/orders.json.
+ * Reads configuration from data/config/so_jo_wo_config.json.
+ * Persists orders in data/orders/orders.json.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class OrderWorkflowService
@@ -174,7 +174,7 @@ final class OrderWorkflowService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string      $dataDir Absolute path to qms-data directory.
+     * @param string      $dataDir Absolute path to data directory.
      * @param object|null $db      Optional database connection (Connection instance) for PostgreSQL dual-write.
      */
     public function __construct(private readonly string $dataDir, ?object $db = null)
@@ -1184,6 +1184,11 @@ final class OrderWorkflowService
         $status    = $row['status'] ?? 'draft';
         $metadata  = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $updatedAt = $row['updated_at'] ?? $this->nowIso();
+        $statusColumn = match ($table) {
+            'sales_orders' => 'so_status',
+            'job_orders' => 'job_status',
+            default => throw new \RuntimeException('Unsupported shadow-write table: ' . $table),
+        };
 
         try {
             $existing = null;
@@ -1196,14 +1201,14 @@ final class OrderWorkflowService
 
             if ($existing) {
                 $this->db->execute(
-                    "UPDATE {$table} SET so_status = :status, metadata = :meta::jsonb, updated_at = :at::timestamptz WHERE {$idColumn} = :id",
+                    "UPDATE {$table} SET {$statusColumn} = :status, metadata = :meta::jsonb, updated_at = :at::timestamptz WHERE {$idColumn} = :id",
                     [':status' => $status, ':meta' => $metadata, ':at' => $updatedAt, ':id' => $idValue],
                 );
             } else {
                 // Insert with minimal required fields -- full sync handled by RuntimeShadowSync
                 $this->db->execute(
-                    "INSERT INTO {$table} ({$idColumn}, so_status, metadata, created_at, updated_at) VALUES (:id, :status, :meta::jsonb, :at::timestamptz, :at::timestamptz)
-                     ON CONFLICT ({$idColumn}) DO UPDATE SET so_status = EXCLUDED.so_status, metadata = EXCLUDED.metadata, updated_at = EXCLUDED.updated_at",
+                    "INSERT INTO {$table} ({$idColumn}, {$statusColumn}, metadata, created_at, updated_at) VALUES (:id, :status, :meta::jsonb, :at::timestamptz, :at::timestamptz)
+                     ON CONFLICT ({$idColumn}) DO UPDATE SET {$statusColumn} = EXCLUDED.{$statusColumn}, metadata = EXCLUDED.metadata, updated_at = EXCLUDED.updated_at",
                     [':id' => $idValue, ':status' => $status, ':meta' => $metadata, ':at' => $updatedAt],
                 );
             }

@@ -1,0 +1,162 @@
+<!--
+  v4.6 Prompt 5 - Accessibility Hardening
+  Output type: HTML/CSS patches for existing sections.
+  Merge rule: Prompt 7 chèn các patch này vào file chính, không tạo section mới.
+  Note: Prompt gọi "Section 32 (Internationalization)" nhưng file hiện tại đặt i18n trong Section 34 #a11y-i18n-precision.
+-->
+
+<!-- PATCH P5-B/D/E CSS: INSERT IN <style> AFTER THE EXISTING prefers-reduced-motion BLOCK -->
+<style data-v46-patch="p5-a11y-css-hardening">
+/* === v4.6 ACCESSIBILITY HARDENING PATCH === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-secondary:#94a3b8;
+    --text-tertiary:#64748b;
+  }
+}
+
+html[data-color-scheme-active="dark"] {
+  --text-secondary:#94a3b8;
+  --text-tertiary:#64748b;
+}
+
+.tpl-meta { font-size:0.625rem; }
+.chip { font-size:0.625rem; }
+code { font-size:0.6875rem; }
+.spec-table th { font-size:0.6875rem; }
+
+@media (forced-colors: active) {
+  .chip,
+  .badge,
+  .tag {
+    border:1px solid ButtonText;
+  }
+
+  .btn-primary,
+  .btn-danger {
+    border:2px solid ButtonText;
+    forced-color-adjust:none;
+  }
+
+  .status-indicator,
+  .machine-status {
+    border:2px solid currentColor;
+  }
+
+  .info-box {
+    border-left:4px solid Highlight;
+  }
+
+  .card {
+    border:1px solid ButtonText;
+  }
+
+  .spc-chart,
+  .oee-gauge,
+  .chart-container {
+    forced-color-adjust:none;
+  }
+}
+</style>
+
+<!-- PATCH P5-A: INSERT IN SECTION 34 #a11y-i18n-precision AFTER THE OPENING GRID-2 INFO BOXES; DO NOT INSERT INTO CURRENT SECTION 32 #manufacturing-precision -->
+<div class="info-box info-box-green" data-v46-patch="p5-lang-en-inline-rule" data-patch-target="#a11y-i18n-precision">
+  <strong>DO — Thuộc tính <code>lang</code> cho nội dung hỗn hợp</strong>
+  Khi văn bản tiếng Việt chứa cụm từ tiếng Anh như tên kỹ thuật, tên component, tiêu chí WCAG hoặc API keyword, bọc cụm từ đó trong <code>&lt;span lang="en"&gt;...&lt;/span&gt;</code> để screen reader đọc đúng ngôn ngữ.
+  <br><br>
+  <strong>Ví dụ:</strong><br>
+  <code>&lt;p&gt;Hệ thống hỗ trợ &lt;span lang="en"&gt;dark mode&lt;/span&gt; tự động theo &lt;span lang="en"&gt;prefers-color-scheme&lt;/span&gt;.&lt;/p&gt;</code>
+  <br><br>
+  <strong>Ngoại lệ:</strong> Code blocks (<code>&lt;pre&gt;</code>, <code>&lt;code&gt;</code>) không cần <code>lang="en"</code> vì screen reader thường tự chuyển chế độ khi gặp code. Quy tắc này liên kết với <a href="#content-guidelines">Section 13</a>, <a href="#accessibility">Section 7</a> và <a href="../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 16</a>.
+</div>
+
+<!-- PATCH P5-B NOTE: INSERT IN SECTION 34 #a11y-i18n-precision AFTER VIETNAMESE TYPOGRAPHY REQUIREMENTS -->
+<div class="info-box info-box-amber" data-v46-patch="p5-dark-text-hierarchy-note" data-patch-target="#a11y-i18n-precision">
+  <strong>WARNING — Dark mode text hierarchy</strong>
+  <code>--text-secondary</code> (<code>#94a3b8</code>) và <code>--text-tertiary</code> (<code>#64748b</code>) PHẢI khác nhau trong dark mode để duy trì visual hierarchy. Nếu hai token cùng giá trị, developer không phân biệt được nội dung phụ và metadata. Contrast ratios: secondary <code>5.71:1</code> đạt AA normal; tertiary <code>4.01:1</code> chỉ dùng cho AA large text hoặc metadata không quan trọng.
+</div>
+
+<!-- PATCH P5-B NOTE ALT: INSERT IN SECTION 7 #accessibility AFTER LIVE REGION CARDS IF PROMPT 7 FOLLOWS NOMINAL "SECTION 7" TARGET -->
+<div class="info-box info-box-amber" data-v46-patch="p5-dark-text-hierarchy-section-7" data-patch-target="#accessibility">
+  <strong>WARNING — Dark mode text hierarchy</strong>
+  Accessibility review PHẢI xác nhận <code>--text-secondary</code> và <code>--text-tertiary</code> khác nhau trong cả hai dark mode blocks. Nếu hai token cùng giá trị, screen reviewer và developer không còn tín hiệu phân cấp cho nội dung phụ, metadata và helper text. Xem bảng contrast cập nhật trong <a href="#token-cascade">Section 55</a> và checklist trong <a href="#wcag-22-compliance-checklist">Section 63</a>.
+</div>
+
+<!-- PATCH P5-C: INSERT IN SECTION 55 #token-cascade AFTER MERGE STRATEGY OR AFTER LOCALSTORAGE CARD -->
+<div class="card" data-v46-patch="p5-token-contrast-table" data-patch-target="#token-cascade">
+  <div class="card-header"><span class="chip chip-green">v4.6</span>Bảng contrast — text tokens</div>
+  <div class="card-body">
+    <div class="info-box info-box-amber" style="margin-bottom:14px">
+      <strong>CONTRAST SOURCE OF TRUTH</strong>
+      Bảng này cập nhật lại giá trị thực tế sau v4.5: light <code>--text-tertiary</code> là <code>#6b7280</code>, không còn là <code>#94a3b8</code>. Dark mode <code>--text-secondary</code> và <code>--text-tertiary</code> phải khác nhau theo patch CSS v4.6.
+    </div>
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>Light</th>
+          <th>Dark</th>
+          <th>Light ratio</th>
+          <th>Dark ratio</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--text-primary</code></td><td><code>#1e293b</code></td><td><code>#f1f5f9</code></td><td><code>14.53:1</code></td><td><code>14.18:1</code></td><td>Đạt AA/AAA cho body text.</td></tr>
+        <tr><td><code>--text-secondary</code></td><td><code>#475569</code></td><td><code>#94a3b8</code></td><td><code>7.14:1</code></td><td><code>5.71:1</code></td><td>Đạt AA cho helper text và metadata.</td></tr>
+        <tr><td><code>--text-tertiary</code></td><td><code>#6b7280</code></td><td><code>#64748b</code></td><td><code>4.56:1</code></td><td><code>4.01:1</code></td><td>Light đạt AA normal; dark chỉ dùng cho AA large text hoặc metadata phụ.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH P5-D NOTE: INSERT IN SECTION 34 #a11y-i18n-precision AFTER TYPOGRAPHY REQUIREMENTS -->
+<div class="info-box info-box-green" data-v46-patch="p5-rem-font-size-rule" data-patch-target="#a11y-i18n-precision">
+  <strong>DO — Dùng <code>rem</code> thay vì <code>px</code> cho <code>font-size</code></strong>
+  Tất cả font-size trong CSS runtime PHẢI dùng đơn vị <code>rem</code> để đảm bảo scaling đúng khi user thay đổi browser font size hoặc zoom level. SC 1.4.4 yêu cầu text phải resize được đến 200% mà không mất nội dung. Các selector lõi đã được patch: <code>.tpl-meta</code>, <code>.chip</code>, <code>code</code> và <code>.spec-table th</code>. Xem thêm <a href="#token-reference">Section 20</a> và <a href="../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 7</a>.
+</div>
+
+<!-- PATCH P5-E: INSERT IN SECTION 63 #wcag-22-compliance-checklist OR SECTION 69 #reduced-motion-global-contract -->
+<div class="info-box info-box-blue" data-v46-patch="p5-forced-colors-note" data-patch-target="#wcag-22-compliance-checklist">
+  <strong>Forced Colors (Windows High Contrast)</strong>
+  Hệ thống hỗ trợ <code>@media (forced-colors: active)</code> cho Windows High Contrast mode. Tất cả interactive elements có border rõ ràng, status badges có border phân biệt, và data visualization giữ nguyên màu qua <code>forced-color-adjust: none</code>. SC 1.4.11 Non-text Contrast: tất cả UI components phải có contrast tối thiểu <code>3:1</code> trong mọi chế độ. Quy tắc này mở rộng <a href="#accessibility">Section 7</a>, <a href="#a11y-i18n-precision">Section 34</a>, <a href="#reduced-motion-global-contract">Section 69</a> và <a href="../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 16</a>.
+</div>
+
+<!-- PATCH P5-E ROW: INSERT INTO WCAG TABLE IN SECTION 63 #wcag-22-compliance-checklist -->
+<table class="spec-table" data-v46-patch="p5-wcag-forced-colors-row" data-patch-target="#wcag-22-compliance-checklist">
+  <thead><tr><th>SC</th><th>Tên</th><th>Trạng thái</th><th>Ghi chú</th><th>Section liên quan</th></tr></thead>
+  <tbody>
+    <tr><td><code>1.4.11</code></td><td>Non-text Contrast</td><td><span class="chip chip-green">Đạt</span></td><td>Có patch <code>@media (forced-colors: active)</code>; chip, badge, button, card, info-box và chart container có border/forced-color policy rõ.</td><td><a href="#wcag-22-compliance-checklist">Section 63</a>, <a href="#reduced-motion-global-contract">Section 69</a></td></tr>
+    <tr><td><code>3.1.2</code></td><td>Language of Parts</td><td><span class="chip chip-green">Đạt</span></td><td>Cụm tiếng Anh trong nội dung tiếng Việt phải dùng <code>&lt;span lang="en"&gt;</code>, trừ code blocks.</td><td><a href="#a11y-i18n-precision">Section 34</a>, <a href="#content-guidelines">Section 13</a></td></tr>
+  </tbody>
+</table>
+
+<!-- PATCH P5-F: INSERT IN SECTION 30 #toast-precise AFTER TOAST SPECIFICATIONS TABLE -->
+<div class="info-box info-box-amber" data-v46-patch="p5-toast-auto-dismiss-a11y" data-patch-target="#toast-precise">
+  <strong>WARNING — Toast auto-dismiss và screen readers</strong>
+  Success toast auto-dismiss sau <code>3-5s</code>. Screen reader users KHÔNG THỂ hover để pause timer. Quy tắc bắt buộc:
+  <ul>
+    <li><code>role="status"</code> + <code>aria-live="polite"</code>: assistive technology sẽ đọc khi có thể; nếu toast biến mất trước khi AT đọc, nội dung bị mất.</li>
+    <li>Giữ toast message trong một <code>aria-live</code> container bền vững ở app shell level, visible hoặc visually hidden. Assistive technology đọc từ container, không phụ thuộc vào visual toast node.</li>
+    <li>Error và warning toast PHAI persist khi có rủi ro mất thông tin; không auto-dismiss nếu user cần hành động hoặc cần đọc chi tiết. Success/info ngắn có thể tự đóng nếu live-region copy vẫn còn.</li>
+    <li>Keyboard: <code>F6</code> hoặc shortcut tương đương focus vào toast region khi không có modal focus trap. <code>Escape</code> dismiss toast đang focus.</li>
+  </ul>
+</div>
+
+<!-- PATCH P5-F CONTRACT: INSERT AFTER PATCH P5-F IN SECTION 30 #toast-precise -->
+<div class="card" data-v46-patch="p5-toast-live-region-contract" data-patch-target="#toast-precise">
+  <div class="card-header"><span class="chip chip-amber">v4.6</span>Toast live-region persistence contract</div>
+  <div class="card-body">
+    <table class="spec-table">
+      <thead><tr><th>Toast type</th><th>Visual behavior</th><th>Live-region behavior</th><th>Keyboard rule</th></tr></thead>
+      <tbody>
+        <tr><td>Success</td><td>Tự đóng sau <code>3-5s</code>; pause khi hover/focus nếu focusable.</td><td>Message copy giữ trong live-region container tối thiểu <code>30s</code> hoặc đến announcement acknowledgement.</td><td>Không bắt buộc focus nếu không có action.</td></tr>
+        <tr><td>Info</td><td>Tự đóng sau <code>4-8s</code> nếu không chứa action.</td><td>Message copy giữ trong live-region container như success.</td><td>Nếu có action, action phải reachable bằng keyboard.</td></tr>
+        <tr><td>Warning</td><td>Persist nếu user cần quyết định; chỉ auto-dismiss khi purely informational và có log khác.</td><td>Dùng <code>role="alert"</code> hoặc assertive channel nếu warning chặn thao tác.</td><td><code>F6</code> focus vùng toast khi không ở modal trap; <code>Escape</code> dismiss nếu dismissible.</td></tr>
+        <tr><td>Error</td><td>Không auto-dismiss. User đóng thủ công sau khi đọc hoặc xử lý.</td><td>Assertive announcement, message vẫn tồn tại đến khi user dismiss.</td><td>Close button có accessible name; focus không bị steal khỏi form field đang lỗi.</td></tr>
+      </tbody>
+    </table>
+    <pre class="code-block" style="margin-top:14px">&lt;div id="toast-live-region" role="status" aria-live="polite" aria-atomic="true" class="sr-only"&gt;&lt;/div&gt;
+&lt;div id="toast-visual-stack" aria-hidden="false"&gt;...&lt;/div&gt;</pre>
+  </div>
+</div>

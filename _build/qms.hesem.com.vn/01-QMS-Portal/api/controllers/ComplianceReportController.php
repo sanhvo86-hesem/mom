@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
+use MOM\Api\Controllers\BaseController;
+use MOM\Api\Services\GenericCrudService;
 use Throwable;
 
 /**
- * Compliance Report controller for HESEM QMS Portal.
+ * Compliance Report controller for HESEM MOM Portal.
  *
  * Provides API endpoints for generating compliance reports including
  * management review data, customer quality metrics, supplier reviews,
  * COPQ analysis, and evidence packages for AS9100/ISO audits.
  *
- * Data stored in `qms-data/compliance-reports/` with per-entity JSON files.
+ * Data stored in `data/compliance-reports/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class ComplianceReportController extends BaseController
@@ -372,23 +373,44 @@ class ComplianceReportController extends BaseController
 
         try {
             $scorecardsFile = $this->dataDir . '/supplier/scorecards.json';
-            $incomingFile   = $this->dataDir . '/supplier/incoming.json';
             $scarFile       = $this->dataDir . '/supplier/scar.json';
 
             $scorecards = $this->readJsonFile($scorecardsFile) ?? [];
-            $incoming   = $this->readJsonFile($incomingFile) ?? [];
             $scars      = $this->readJsonFile($scarFile) ?? [];
 
             $supplierId = $this->query('supplier_id');
+            $incoming = [];
+
+            try {
+                $incomingService = new GenericCrudService($this->dataDir);
+                $incomingQuery = [
+                    'limit' => 500,
+                    'sort' => 'received_date',
+                    'direction' => 'desc',
+                ];
+                if ($supplierId !== null && $supplierId !== '') {
+                    $incomingQuery['vendor_id'] = $supplierId;
+                }
+                $incomingResponse = $incomingService->list('quality_management', 'incoming_inspections', $incomingQuery);
+                $incoming = array_values((array)($incomingResponse['records'] ?? []));
+            } catch (Throwable) {
+                $incomingFile = $this->dataDir . '/supplier/incoming.json';
+                $incoming = $this->readJsonFile($incomingFile) ?? [];
+            }
 
             if ($supplierId !== null && $supplierId !== '') {
                 $scorecards = array_filter($scorecards, fn(array $s) => ($s['supplier_id'] ?? '') === $supplierId);
-                $incoming   = array_filter($incoming, fn(array $i) => ($i['supplier_id'] ?? '') === $supplierId);
+                $incoming   = array_filter($incoming, static function (array $i) use ($supplierId): bool {
+                    return ($i['supplier_id'] ?? $i['vendor_id'] ?? '') === $supplierId;
+                });
                 $scars      = array_filter($scars, fn(array $s) => ($s['supplier_id'] ?? '') === $supplierId);
             }
 
             $totalIncoming  = count($incoming);
-            $acceptedCount  = count(array_filter($incoming, fn(array $i) => strtolower($i['disposition'] ?? '') === 'accepted'));
+            $acceptedCount  = count(array_filter($incoming, static function (array $i): bool {
+                $status = strtolower((string)($i['result'] ?? $i['status'] ?? $i['disposition'] ?? ''));
+                return in_array($status, ['accepted', 'pass'], true);
+            }));
 
             $data = [
                 'total_scorecards'     => count($scorecards),

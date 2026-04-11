@@ -123,6 +123,7 @@ smoke_assert(array_key_exists('db_present_table_count', (array)($workspace['metr
 smoke_assert(array_key_exists('operational_risk_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include operational risk counts.');
 smoke_assert(array_key_exists('dependency_outdated_artifact_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include dependency drift counts.');
 smoke_assert(array_key_exists('db_structural_drift_table_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include live DB structural drift counts.');
+smoke_assert(array_key_exists('db_type_drift_column_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include live DB column type drift counts.');
 smoke_assert(array_key_exists('db_probe_applicable', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether live DB probing is actually applicable.');
 smoke_assert(array_key_exists('db_probe_reachable', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether the DB probe actually reached PostgreSQL.');
 smoke_assert(array_key_exists('db_probe_resolved', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether DB presence truth has actually been resolved.');
@@ -205,6 +206,8 @@ smoke_assert(array_key_exists('truthBinding', $firstApi), 'API summaries should 
 smoke_assert(array_key_exists('registry_present', $firstTable), 'Table summaries should expose registry presence.');
 smoke_assert(array_key_exists('db_present', $firstTable), 'Table summaries should expose DB presence.');
 smoke_assert(array_key_exists('column_drift_count', $firstTable), 'Table summaries should expose structural drift counts.');
+smoke_assert(array_key_exists('type_drift_count', $firstTable), 'Table summaries should expose physical column type drift counts.');
+smoke_assert(array_key_exists('type_drifts', $firstTable), 'Table summaries should expose physical column type drift details.');
 smoke_assert(array_key_exists('pk_drift', $firstTable), 'Table summaries should expose primary-key drift posture.');
 smoke_assert(array_key_exists('truth_status', $firstTable), 'Table summaries should expose truth status.');
 smoke_assert(array_key_exists('truthBinding', $firstTable), 'Table summaries should expose truth binding details.');

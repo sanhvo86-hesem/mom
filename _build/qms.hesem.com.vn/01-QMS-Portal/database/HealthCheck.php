@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Database;
+namespace MOM\Database;
 
 /**
- * Database Health Check for HESEM QMS Portal.
+ * Database Health Check for HESEM MOM Portal.
  *
  * Provides a comprehensive diagnostic of the PostgreSQL database state,
  * including connection health, table existence, row counts, migration
@@ -14,14 +14,14 @@ namespace HESEM\QMS\Database;
  * Returns a structured JSON-serialisable status report suitable for
  * admin dashboards and monitoring endpoints.
  *
- * @package HESEM\QMS\Database
+ * @package MOM\Database
  * @since   1.0.0
  */
 class HealthCheck
 {
     private Connection $db;
 
-    /** Path to qms-data directory. */
+    /** Path to data directory. */
     private string $dataDir;
 
     /** Project root. */
@@ -54,7 +54,7 @@ class HealthCheck
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data.
+     * @param string $dataDir Absolute path to data.
      * @param string $rootDir Absolute path to project root.
      */
     public function __construct(string $dataDir, string $rootDir)
@@ -434,7 +434,7 @@ class HealthCheck
         $counts['form_entries'] = $entryCount;
 
         // Glossary
-        $dictFile = $this->rootDir . '/11-Glossary/dict-data.json';
+        $dictFile = $this->rootDir . '/mom/docs/glossary/dict-data.json';
         $dictItems = $this->readJson($dictFile);
         $counts['glossary'] = count($dictItems);
 

@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Database;
+namespace MOM\Database;
 
+use PDO;
 use RuntimeException;
 
 require_once __DIR__ . '/Connection.php';
@@ -11,7 +12,7 @@ require_once __DIR__ . '/QueryBuilder.php';
 require_once __DIR__ . '/RuntimeShadowSync.php';
 
 /**
- * Unified Data Abstraction Layer for HESEM QMS Portal.
+ * Unified Data Abstraction Layer for HESEM MOM Portal.
  *
  * Wraps every data operation behind a strategy pattern that supports four
  * migration modes:
@@ -24,7 +25,7 @@ require_once __DIR__ . '/RuntimeShadowSync.php';
  * Each public method implements both the JSON file path and the PostgreSQL
  * query, then delegates to the appropriate backend based on the active mode.
  *
- * @package HESEM\QMS\Database
+ * @package MOM\Database
  * @since   1.0.0
  */
 class DataLayer
@@ -48,16 +49,16 @@ class DataLayer
         'attempts' => 1,
     ];
 
-    /** Base path for QMS data files (e.g. .../01-QMS-Portal/qms-data). */
+    /** Base path for QMS data files (e.g. .../mom/data). */
     private string $dataDir;
 
-    /** Project root (one level above 01-QMS-Portal). */
+    /** Project root (one level above mom). */
     private string $rootDir;
 
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string     $dataDir Absolute path to qms-data directory.
+     * @param string     $dataDir Absolute path to data directory.
      * @param string     $rootDir Absolute path to project root.
      * @param array|null $config  Database configuration override.
      */
@@ -97,6 +98,40 @@ class DataLayer
     }
 
     /**
+     * Get the underlying database Connection, or null when in JSON_ONLY mode.
+     *
+     * @return Connection|null
+     */
+    public function getConnection(): ?Connection
+    {
+        if ($this->mode === self::MODE_JSON_ONLY) {
+            return null;
+        }
+        return $this->db ?? null;
+    }
+
+    /**
+     * Return the resolved database configuration for server-side observability
+     * and read-only probes.
+     *
+     * @return array<string, mixed>
+     */
+    public function getDatabaseConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
+     * Get the data directory path.
+     *
+     * @return string
+     */
+    public function getDataDir(): string
+    {
+        return $this->dataDir;
+    }
+
+    /**
      * Return a runtime summary of the active storage mode and PostgreSQL reachability.
      *
      * This is safe to call from JSON_ONLY mode and useful for runtime observability.
@@ -106,6 +141,7 @@ class DataLayer
         $usesPostgres = $this->usesPostgres();
         $reachable = false;
         $error = '';
+        $databaseProbe = $this->probeConfiguredDatabase();
 
         if ($usesPostgres) {
             try {
@@ -124,10 +160,81 @@ class DataLayer
             'json_fallback' => (bool)($this->config['json_fallback'] ?? false),
             'read_retry_count' => $this->getReadRetryCount(),
             'read_retry_delay_ms' => $this->getReadRetryDelayMs(),
+            'database_configured' => (bool)($databaseProbe['configured'] ?? false),
+            'database_host' => trim((string)($this->config['host'] ?? '')),
+            'database_port' => max(0, (int)($this->config['port'] ?? 0)),
+            'database_name' => trim((string)($this->config['database'] ?? '')),
+            'database_schema' => trim((string)($this->config['schema'] ?? 'public')),
+            'database_username' => trim((string)($this->config['username'] ?? '')),
+            'database_probe_reachable' => (bool)($databaseProbe['reachable'] ?? false),
+            'database_probe_error' => (string)($databaseProbe['error'] ?? ''),
             'postgres_path_active' => $usesPostgres,
             'postgres_reachable' => $reachable,
             'postgres_error' => $error,
+            'master_data_read_mode' => $this->domainReadMode('master_data'),
+            'orders_read_mode' => $this->domainReadMode('orders'),
+            'mes_read_mode' => $this->domainReadMode('mes'),
+            'epicor_read_mode' => $this->domainReadMode('epicor'),
         ];
+    }
+
+    /**
+     * @return array{configured:bool, reachable:bool, error:string}
+     */
+    private function probeConfiguredDatabase(): array
+    {
+        $configured = $this->hasConfiguredDatabaseProfile();
+        $result = [
+            'configured' => $configured,
+            'reachable' => false,
+            'error' => '',
+        ];
+
+        if (!$configured) {
+            return $result;
+        }
+
+        $dsn = sprintf(
+            'pgsql:host=%s;port=%d;dbname=%s;options=--search_path=%s',
+            trim((string)($this->config['host'] ?? 'localhost')),
+            max(1, (int)($this->config['port'] ?? 5432)),
+            trim((string)($this->config['database'] ?? 'mom')),
+            trim((string)($this->config['schema'] ?? 'public')) !== '' ? trim((string)($this->config['schema'] ?? 'public')) : 'public',
+        );
+
+        try {
+            $pdo = new PDO(
+                $dsn,
+                trim((string)($this->config['username'] ?? '')),
+                (string)($this->config['password'] ?? ''),
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                    PDO::ATTR_STRINGIFY_FETCHES => false,
+                    PDO::ATTR_TIMEOUT => max(1, (int)($this->config['connect_timeout'] ?? 5)),
+                ],
+            );
+            $statementTimeout = max(1000, (int)($this->config['statement_timeout'] ?? 30000));
+            $pdo->exec("SET statement_timeout = {$statementTimeout}");
+            $probe = $pdo->query('SELECT 1 AS ok');
+            $row = $probe instanceof \PDOStatement ? $probe->fetch(PDO::FETCH_ASSOC) : false;
+            $result['reachable'] = ((int)($row['ok'] ?? 0) === 1);
+        } catch (\Throwable $e) {
+            $result['error'] = $e->getMessage();
+        }
+
+        return $result;
+    }
+
+    private function hasConfiguredDatabaseProfile(): bool
+    {
+        $allowEmptyPassword = !empty($this->config['allow_empty_password']);
+        return trim((string)($this->config['host'] ?? '')) !== ''
+            && max(0, (int)($this->config['port'] ?? 0)) > 0
+            && trim((string)($this->config['database'] ?? '')) !== ''
+            && trim((string)($this->config['username'] ?? '')) !== ''
+            && ($allowEmptyPassword || trim((string)($this->config['password'] ?? '')) !== '');
     }
 
     /**
@@ -228,10 +335,12 @@ class DataLayer
      */
     public function getRuntimeMasterDataStore(): array
     {
-        return $this->read(
+        $store = $this->readForDomain(
+            'master_data',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/master-data/master-data.json'),
             pgReader: fn(): array => $this->loadRuntimeMasterDataFromPg(),
         );
+        return $this->normalizeRuntimeMasterDataStore(is_array($store) ? $store : []);
     }
 
     /**
@@ -239,7 +348,8 @@ class DataLayer
      */
     public function getRuntimeOrdersStore(): array
     {
-        return $this->read(
+        return $this->readForDomain(
+            'orders',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/orders/orders.json'),
             pgReader: fn(): array => $this->loadRuntimeOrdersFromPg(),
         );
@@ -250,7 +360,8 @@ class DataLayer
      */
     public function getRuntimeMesRuntimeStore(): array
     {
-        return $this->read(
+        return $this->readForDomain(
+            'mes',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/mes/mes-runtime.json'),
             pgReader: fn(): array => $this->loadRuntimeMesRuntimeFromPg(),
         );
@@ -261,7 +372,8 @@ class DataLayer
      */
     public function getRuntimeEpicorIntegrationStore(): array
     {
-        return $this->read(
+        return $this->readForDomain(
+            'epicor',
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/erp/epicor-runtime.json'),
             pgReader: fn(): array => $this->loadRuntimeEpicorIntegrationFromPg(),
         );
@@ -1201,6 +1313,12 @@ class DataLayer
     {
         return $this->read(
             jsonReader: function () use ($key): mixed {
+                if (\function_exists('portal_system_config_shadow_read')) {
+                    $shadow = \portal_system_config_shadow_read($key);
+                    if (\is_array($shadow)) {
+                        return $shadow;
+                    }
+                }
                 $fileMap = [
                     'portal_display_config' => $this->confDir() . '/portal_display_config.json',
                     'role_permissions'       => $this->confDir() . '/role_permissions.json',
@@ -1246,6 +1364,9 @@ class DataLayer
                 $data = is_array($value) ? $value : ['value' => $value];
                 $data['updated_at'] = $this->nowIso();
                 $this->writeJson($file, $data);
+                if (\function_exists('portal_system_config_shadow_write')) {
+                    \portal_system_config_shadow_write($key, $data);
+                }
                 return true;
             },
             pgWriter: function () use ($key, $value): bool {
@@ -1276,13 +1397,9 @@ class DataLayer
      * @param string $aggregateId   Entity identifier.
      * @param array  $payload       Event payload/details.
      */
-    public function logEvent(string $eventType, string $aggregateType, string $aggregateId, array $payload): void
+    public function logEvent(string $eventType, string $aggregateType, string $aggregateId, array $payload, array $options = []): void
     {
-        // Always write to JSON audit log
-        $logDir = $this->dataDir . '/audit';
-        if (!is_dir($logDir)) {
-            @mkdir($logDir, 0775, true);
-        }
+        $metadata = is_array($options['metadata'] ?? null) ? (array)$options['metadata'] : [];
         $entry = [
             'event_type'     => $eventType,
             'aggregate_type' => $aggregateType,
@@ -1290,6 +1407,27 @@ class DataLayer
             'payload'        => $payload,
             'recorded_at'    => $this->nowIso(),
         ];
+        if (isset($options['actor_id']) && is_scalar($options['actor_id'])) {
+            $entry['actor_id'] = (string)$options['actor_id'];
+        }
+        if (isset($options['actor_name']) && is_scalar($options['actor_name'])) {
+            $entry['actor_name'] = (string)$options['actor_name'];
+        }
+        if (isset($options['ip_address']) && is_scalar($options['ip_address'])) {
+            $entry['ip_address'] = (string)$options['ip_address'];
+        }
+        if (isset($options['session_id']) && is_scalar($options['session_id'])) {
+            $entry['session_id'] = (string)$options['session_id'];
+        }
+        if ($metadata !== []) {
+            $entry['metadata'] = $metadata;
+        }
+
+        // Always write to JSON audit log
+        $logDir = $this->dataDir . '/audit';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0775, true);
+        }
         $logFile = $logDir . '/audit_' . date('Y-m') . '.jsonl';
         @file_put_contents(
             $logFile,
@@ -1297,18 +1435,46 @@ class DataLayer
             FILE_APPEND | LOCK_EX,
         );
 
+        if (!$this->usesPostgres() && \function_exists('portal_system_audit_shadow_write')) {
+            \portal_system_audit_shadow_write($entry);
+        }
+
         // Also write to Postgres when enabled
         if ($this->usesPostgres()) {
             try {
                 $this->db->execute(
-                    'INSERT INTO audit_events (event_type, aggregate_type, aggregate_id, payload, metadata)
-                     VALUES (:type, :agg_type, :agg_id, :payload::jsonb, :meta::jsonb)',
+                    'INSERT INTO audit_events (
+                        event_type,
+                        aggregate_type,
+                        aggregate_id,
+                        actor_id,
+                        actor_name,
+                        payload,
+                        metadata,
+                        ip_address,
+                        session_id
+                     )
+                     VALUES (
+                        :type,
+                        :agg_type,
+                        :agg_id,
+                        :actor_id,
+                        :actor_name,
+                        :payload::jsonb,
+                        :meta::jsonb,
+                        :ip_address::inet,
+                        :session_id::uuid
+                     )',
                     [
                         ':type'     => $eventType,
                         ':agg_type' => $aggregateType,
                         ':agg_id'   => $aggregateId,
+                        ':actor_id' => isset($entry['actor_id']) && trim((string)$entry['actor_id']) !== '' ? (string)$entry['actor_id'] : null,
+                        ':actor_name' => isset($entry['actor_name']) && trim((string)$entry['actor_name']) !== '' ? (string)$entry['actor_name'] : null,
                         ':payload'  => json_encode($payload, JSON_UNESCAPED_UNICODE),
-                        ':meta'     => json_encode(['source' => 'api'], JSON_UNESCAPED_UNICODE),
+                        ':meta'     => json_encode($metadata !== [] ? $metadata : ['source' => 'api'], JSON_UNESCAPED_UNICODE),
+                        ':ip_address' => isset($entry['ip_address']) && trim((string)$entry['ip_address']) !== '' ? (string)$entry['ip_address'] : null,
+                        ':session_id' => isset($entry['session_id']) && trim((string)$entry['session_id']) !== '' ? (string)$entry['session_id'] : null,
                     ],
                 );
             } catch (\Throwable $e) {
@@ -1328,6 +1494,12 @@ class DataLayer
     {
         return $this->read(
             jsonReader: function () use ($filters): array {
+                if (\function_exists('portal_system_audit_shadow_read')) {
+                    $shadow = \portal_system_audit_shadow_read($filters);
+                    if (\is_array($shadow)) {
+                        return $shadow;
+                    }
+                }
                 $dir = $this->dataDir . '/audit';
                 if (!is_dir($dir)) {
                     return [];
@@ -1344,6 +1516,39 @@ class DataLayer
                             $entries[] = $entry;
                         }
                     }
+                }
+                if (!empty($filters['event_type'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['event_type'] ?? $row['action'] ?? '') === (string)$filters['event_type']));
+                }
+                if (!empty($filters['aggregate_type'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['aggregate_type'] ?? 'api_action') === (string)$filters['aggregate_type']));
+                }
+                if (!empty($filters['aggregate_id'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['aggregate_id'] ?? '') === (string)$filters['aggregate_id']));
+                }
+                if (!empty($filters['actor_name'])) {
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['actor_name'] ?? $row['user'] ?? '') === (string)$filters['actor_name']));
+                }
+                if (!empty($filters['from'])) {
+                    $from = (string)$filters['from'];
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['recorded_at'] ?? $row['timestamp'] ?? '') >= $from));
+                }
+                if (!empty($filters['to'])) {
+                    $to = (string)$filters['to'];
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['recorded_at'] ?? $row['timestamp'] ?? '') <= $to));
+                }
+                if (!empty($filters['search'])) {
+                    $needle = mb_strtolower((string)$filters['search']);
+                    $entries = array_values(array_filter($entries, static function (array $row) use ($needle): bool {
+                        $haystack = mb_strtolower(json_encode([
+                            'actor_name' => $row['actor_name'] ?? $row['user'] ?? '',
+                            'event_type' => $row['event_type'] ?? $row['action'] ?? '',
+                            'aggregate_type' => $row['aggregate_type'] ?? '',
+                            'aggregate_id' => $row['aggregate_id'] ?? '',
+                            'payload' => $row['payload'] ?? [],
+                        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '');
+                        return $needle === '' || str_contains($haystack, $needle);
+                    }));
                 }
                 // Newest first
                 usort($entries, fn($a, $b) => strcmp(
@@ -1366,11 +1571,24 @@ class DataLayer
                 if (!empty($filters['aggregate_id'])) {
                     $qb->where('aggregate_id', $filters['aggregate_id']);
                 }
+                if (!empty($filters['actor_name'])) {
+                    $qb->where('actor_name', $filters['actor_name']);
+                }
                 if (!empty($filters['from'])) {
                     $qb->where('recorded_at', '>=', $filters['from']);
                 }
                 if (!empty($filters['to'])) {
                     $qb->where('recorded_at', '<=', $filters['to']);
+                }
+                if (!empty($filters['search'])) {
+                    $needle = '%' . (string)$filters['search'] . '%';
+                    $qb->whereRaw('(coalesce(actor_name, \'\') ILIKE ? OR coalesce(event_type, \'\') ILIKE ? OR coalesce(aggregate_type, \'\') ILIKE ? OR coalesce(aggregate_id, \'\') ILIKE ? OR CAST(payload AS text) ILIKE ?)', [
+                        $needle,
+                        $needle,
+                        $needle,
+                        $needle,
+                        $needle,
+                    ]);
                 }
                 $qb->limit((int)($filters['limit'] ?? 100));
                 return $qb->get();
@@ -1393,7 +1611,7 @@ class DataLayer
     {
         return $this->read(
             jsonReader: function () use ($filters): array {
-                $dictFile = $this->rootDir . '/11-Glossary/dict-data.json';
+                $dictFile = $this->rootDir . '/mom/docs/glossary/dict-data.json';
                 $items = $this->readJson($dictFile);
                 return $this->applyArrayFilters($items, $filters);
             },
@@ -1456,8 +1674,8 @@ class DataLayer
 
         return $this->write(
             jsonWriter: function () use ($data, $term): bool {
-                $dictFile = $this->rootDir . '/11-Glossary/dict-data.json';
-                $jsFile = $this->rootDir . '/11-Glossary/dict-data.js';
+                $dictFile = $this->rootDir . '/mom/docs/glossary/dict-data.json';
+                $jsFile = $this->rootDir . '/mom/docs/glossary/dict-data.js';
                 $items = $this->readJson($dictFile);
                 $found = false;
                 foreach ($items as &$it) {
@@ -1511,8 +1729,8 @@ class DataLayer
         $term = trim($id);
         return $this->write(
             jsonWriter: function () use ($term): bool {
-                $dictFile = $this->rootDir . '/11-Glossary/dict-data.json';
-                $jsFile = $this->rootDir . '/11-Glossary/dict-data.js';
+                $dictFile = $this->rootDir . '/mom/docs/glossary/dict-data.json';
+                $jsFile = $this->rootDir . '/mom/docs/glossary/dict-data.js';
                 $items = $this->readJson($dictFile);
                 $items = array_values(array_filter($items, function ($it) use ($term): bool {
                     return strcasecmp(trim((string)($it['term'] ?? '')), $term) !== 0;
@@ -1725,6 +1943,27 @@ class DataLayer
     }
 
     /**
+     * Read using the global mode unless a per-domain override is configured.
+     *
+     * Supported override values:
+     * - default          => follow global mode
+     * - json             => force JSON
+     * - postgres_primary => force PostgreSQL with JSON fallback
+     * - postgres_only    => force PostgreSQL only
+     */
+    private function readForDomain(string $domain, callable $jsonReader, callable $pgReader): mixed
+    {
+        $override = $this->domainReadMode($domain);
+
+        return match ($override) {
+            'json' => $this->jsonRead($jsonReader),
+            'postgres_primary' => $this->pgWithFallback($pgReader, $jsonReader),
+            'postgres_only' => $this->pgRead($pgReader),
+            default => $this->read($jsonReader, $pgReader),
+        };
+    }
+
+    /**
      * Strategy dispatcher for WRITE operations.
      *
      * @param callable $jsonWriter Writes to JSON (returns bool).
@@ -1858,6 +2097,15 @@ class DataLayer
     private function usesPostgres(): bool
     {
         return $this->mode !== self::MODE_JSON_ONLY;
+    }
+
+    private function domainReadMode(string $domain): string
+    {
+        $key = strtolower(trim($domain)) . '_read_mode';
+        $raw = strtolower(trim((string)($this->config[$key] ?? 'default')));
+        return in_array($raw, ['default', 'json', 'postgres_primary', 'postgres_only'], true)
+            ? $raw
+            : 'default';
     }
 
     /**
@@ -2103,6 +2351,28 @@ class DataLayer
             'source' => 'postgres_primary_pilot',
             'description' => 'Governed runtime ' . $domain . ' rebuilt from PostgreSQL mirror tables.',
         ];
+    }
+
+    /**
+     * Keep legacy and current field names aligned for master-data consumers.
+     */
+    private function normalizeRuntimeMasterDataStore(array $store): array
+    {
+        $parts = array_values(is_array($store['parts'] ?? null) ? $store['parts'] : []);
+        $store['parts'] = array_map(static function ($row): array {
+            if (!is_array($row)) {
+                return [];
+            }
+            $partDescription = trim((string)($row['part_description'] ?? ''));
+            $legacyDescription = trim((string)($row['description'] ?? ''));
+            $canonicalDescription = $partDescription !== '' ? $partDescription : $legacyDescription;
+            if ($canonicalDescription !== '') {
+                $row['part_description'] = $canonicalDescription;
+                $row['description'] = $canonicalDescription;
+            }
+            return $row;
+        }, $parts);
+        return $store;
     }
 
     /**

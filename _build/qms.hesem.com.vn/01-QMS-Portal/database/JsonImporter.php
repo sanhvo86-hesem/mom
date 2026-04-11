@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Database;
+namespace MOM\Database;
 
 use RuntimeException;
 
 /**
- * One-Time JSON-to-PostgreSQL Migration Importer for HESEM QMS Portal.
+ * One-Time JSON-to-PostgreSQL Migration Importer for HESEM MOM Portal.
  *
  * Reads existing JSON data files and imports them into the corresponding
  * PostgreSQL tables defined in schema.sql. Designed for a single migration
@@ -17,17 +17,17 @@ use RuntimeException;
  * - Error collection and summary
  * - Idempotent upsert logic (safe to re-run)
  *
- * @package HESEM\QMS\Database
+ * @package MOM\Database
  * @since   1.0.0
  */
 class JsonImporter
 {
     private Connection $db;
 
-    /** Absolute path to qms-data directory. */
+    /** Absolute path to data directory. */
     private string $dataDir;
 
-    /** Project root (parent of 01-QMS-Portal). */
+    /** Project root (parent of mom). */
     private string $rootDir;
 
     /** Dry-run flag: when true, validate only without writing. */
@@ -48,7 +48,7 @@ class JsonImporter
     // -- Construction -----------------------------------------------------------
 
     /**
-     * @param string        $dataDir  Absolute path to qms-data.
+     * @param string        $dataDir  Absolute path to data.
      * @param string        $rootDir  Absolute path to project root.
      * @param bool          $dryRun   Validate only, do not write.
      * @param callable|null $progress Progress callback.
@@ -423,7 +423,7 @@ class JsonImporter
      */
     public function importGlossary(): void
     {
-        $file = $this->rootDir . '/11-Glossary/dict-data.json';
+        $file = $this->rootDir . '/mom/docs/glossary/dict-data.json';
         $items = $this->readJson($file);
 
         $imported = 0;

@@ -1,0 +1,347 @@
+<!-- v4.6 Prompt 6: CSS Polish & Manufacturing Additions.
+     Merge CSS patches into the main <style> block and existing sections.
+     Merge new sections before Changelog as Sections 85 and 86. -->
+
+<!-- PATCH A/C/D/F2: CSS block updates -->
+<style data-v46-p6-css-patch="css-polish-container-query-teal">
+/* Replace stale root comment with:
+   @container queries: implemented v4.5, tokens --cq-sm/md/lg/xl, live rules in Section 67 */
+
+/* Color-on-teal pairing: keep contrast explicit instead of leaving light/dark modes inconsistent. */
+:root{
+  --teal-action-bg:var(--color-teal-700);
+  --color-on-teal:#ffffff;
+}
+
+@media(prefers-color-scheme:dark){
+  :root{
+    --teal-action-bg:var(--color-teal-400);
+    --color-on-teal:#1e293b;
+  }
+}
+
+html[data-color-scheme-active="dark"]{
+  --teal-action-bg:var(--color-teal-400);
+  --color-on-teal:#1e293b;
+}
+
+/* Container name coverage for documented zones in Section 67. */
+.zone-main{container-type:inline-size;container-name:zone-main}
+.zone-sidebar{container-type:inline-size;container-name:zone-sidebar}
+.zone-kpi-bar{container-type:inline-size;container-name:zone-kpi}
+.zone-chart-area{container-type:inline-size;container-name:zone-chart zone-chart-area}
+.zone-footer{container-type:inline-size;container-name:zone-footer}
+
+/* CSS custom properties are not reliable in @container conditions across target browsers.
+   Keep pixel thresholds and annotate the matching --cq-* token for governance. */
+@container zone-main (max-width: 600px /* = --cq-lg */){
+  .block-data-table{
+    display:block;
+    overflow-x:auto;
+  }
+  .block-data-table[data-reflow="cards"]{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:var(--gap-sm);
+  }
+  .block-chart{
+    min-height:200px;
+  }
+  .block-chart .chart-legend{
+    display:none;
+  }
+}
+
+@container zone-sidebar (max-width: 320px /* = --cq-sm */){
+  .block-filter-panel{
+    display:block;
+  }
+  .block-filter-panel .filter-group{
+    display:none;
+  }
+  .block-filter-panel .filter-summary{
+    display:flex;
+  }
+}
+
+@container zone-kpi (max-width: 480px /* = --cq-md */){
+  .block-kpi-row{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--gap-sm);
+  }
+}
+
+@container zone-chart-area (min-width: 600px /* = --cq-lg */){
+  .chart-container{min-height:320px}
+  .chart-legend{display:flex;flex-wrap:wrap;gap:var(--gap-sm)}
+}
+
+@container zone-chart-area (max-width: 599px){
+  .chart-container{min-height:200px}
+  .chart-legend{display:none}
+  .chart-legend-toggle{display:inline-flex}
+}
+
+@container zone-footer (min-width: 480px /* = --cq-md */){
+  .footer-actions{display:flex;gap:var(--space-3);align-items:center;justify-content:flex-end}
+}
+
+@container zone-footer (max-width: 479px){
+  .footer-actions{display:grid;grid-template-columns:1fr;gap:var(--space-2)}
+}
+</style>
+
+<!-- PATCH B: Insert into #token-reference after the spacing scale table/card header update. -->
+<div class="card" data-v46-p6-patch="spacing-scale-naming" data-patch-target="#token-reference" data-patch-position="after-spacing-scale-card">
+  <div class="card-header"><span class="chip chip-blue">v4.6</span>Spacing scale naming correction</div>
+  <div class="card-body">
+    <div class="info-box info-box-blue" style="margin-bottom:14px">
+      <strong>LƯU Ý</strong>
+      Đổi label spacing cũ thành <code>Spacing Scale (4px unit, pragmatic 13-step scale)</code>. Scale dựa trên đơn vị <code>4px</code> nhưng một số bước như <code>20px</code>, <code>40px</code>, <code>56px</code> và <code>80px</code> là giá trị pragmatic phù hợp với use cases thực tế, không phải strict exponential spacing.
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Mục</th><th>Trước</th><th>Sau</th><th>Lý do</th></tr></thead>
+      <tbody>
+        <tr><td>Card header</td><td>Nhãn spacing cũ</td><td><code>Spacing Scale (4px unit, pragmatic 13-step scale)</code></td><td>Tránh hiểu sai rằng mọi step đều đi theo strict exponential scale.</td></tr>
+        <tr><td>Governance note</td><td>Không có</td><td>Thêm info-box này ngay dưới bảng spacing.</td><td>Giải thích vì sao token <code>--space-5</code>, <code>--space-8</code>, <code>--space-10</code>, <code>--space-12</code> không đi theo strict sequence.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH E: Inline color cleanup guidance for non-sample diagrams. -->
+<div class="card" data-v46-p6-patch="inline-color-cleanup" data-patch-target="global-inline-styles" data-patch-position="mechanical-replace-safe">
+  <div class="card-header"><span class="chip chip-green">v4.6</span>Non-sample inline color cleanup</div>
+  <div class="card-body">
+    <div class="info-box info-box-green" style="margin-bottom:14px">
+      <strong>DO</strong>
+      Thay hardcoded inline colors trong layer diagrams, explanatory rows và non-swatch UI bằng semantic tokens. Giữ nguyên literal hex trong theme preview cards, palette swatches, code samples và branding gradient của <code>.doc-header</code>.
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Find</th><th>Replace</th><th>Phạm vi được thay</th><th>Không thay trong</th></tr></thead>
+      <tbody>
+        <tr><td><code>color:#64748b</code></td><td><code>color:var(--text-secondary)</code></td><td>Layer diagrams, meta labels, explanatory rows.</td><td>Theme token code blocks và color swatches.</td></tr>
+        <tr><td><code>color:#2563eb</code></td><td><code>color:var(--color-info-600)</code></td><td>Information labels trong diagram.</td><td>Palette examples hiển thị literal blue.</td></tr>
+        <tr><td><code>color:#d97706</code></td><td><code>color:var(--color-warning-600)</code></td><td>Warning labels trong diagram.</td><td>Theme preview hoặc code sample.</td></tr>
+        <tr><td><code>color:#16a34a</code></td><td><code>color:var(--color-success-600)</code></td><td>Success labels trong diagram.</td><td>Manufacturing status swatches.</td></tr>
+        <tr><td><code>color:#7c3aed</code></td><td><code>color:var(--color-purple-600)</code></td><td>Reference/advanced labels trong diagram.</td><td>Theme preview hoặc literal token table.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH F: Insert into #visual-themes after the theme grid or use to normalize existing theme maps. -->
+<div class="card" data-v46-p6-patch="theme-token-maps-6-20" data-patch-target="#visual-themes" data-patch-position="after-theme-grid">
+  <div class="card-header"><span class="chip chip-purple">v4.6</span>Theme token maps cho themes 6-20</div>
+  <div class="card-body">
+    <div class="info-box info-box-purple" style="margin-bottom:14px">
+      <strong>CROSS-REF</strong>
+      Section 36 phải có machine-readable token map cho đủ <code>20/20</code> visual themes để giảm mismatch giữa catalog và runtime theme manager. Các map dưới đây dùng shape rút gọn tối thiểu 9 tokens; merge logic nên bỏ qua theme nào đã có <code>data-theme-token-map="true"</code> tương đương.
+    </div>
+    <pre class="code-block">[
+  {"themeId":"sunrise-warm","tokens":{"--brand-primary":"#9a3412","--brand-light":"#ea580c","--brand-dark":"#7c2d12","--accent":"#f59e0b","--bg-page":"#fffbeb","--bg-surface":"#ffffff","--text-primary":"#431407","--text-secondary":"#9a3412","--border":"#fed7aa"}},
+  {"themeId":"sunset-ember","tokens":{"--brand-primary":"#7c2d12","--brand-light":"#dc2626","--brand-dark":"#450a0a","--accent":"#f97316","--bg-page":"#fef2f2","--bg-surface":"#fff7ed","--text-primary":"#450a0a","--text-secondary":"#991b1b","--border":"#fecaca"}},
+  {"themeId":"arctic-snow","tokens":{"--brand-primary":"#1e3a5f","--brand-light":"#3b82f6","--brand-dark":"#0f172a","--accent":"#60a5fa","--bg-page":"#f8fafc","--bg-surface":"#ffffff","--text-primary":"#0f172a","--text-secondary":"#475569","--border":"#dbeafe"}},
+  {"themeId":"cherry-blossom","tokens":{"--brand-primary":"#9d174d","--brand-light":"#ec4899","--brand-dark":"#500724","--accent":"#f9a8d4","--bg-page":"#fdf2f8","--bg-surface":"#ffffff","--text-primary":"#500724","--text-secondary":"#9d174d","--border":"#fbcfe8"}},
+  {"themeId":"lavender-dream","tokens":{"--brand-primary":"#6d28d9","--brand-light":"#8b5cf6","--brand-dark":"#2e1065","--accent":"#c084fc","--bg-page":"#faf5ff","--bg-surface":"#ffffff","--text-primary":"#2e1065","--text-secondary":"#6d28d9","--border":"#ddd6fe"}},
+  {"themeId":"industrial-steel","tokens":{"--brand-primary":"#374151","--brand-light":"#6b7280","--brand-dark":"#111827","--accent":"#94a3b8","--bg-page":"#f3f4f6","--bg-surface":"#ffffff","--text-primary":"#111827","--text-secondary":"#4b5563","--border":"#d1d5db"}},
+  {"themeId":"shopfloor-signal","tokens":{"--brand-primary":"#dc2626","--brand-light":"#16a34a","--brand-dark":"#18181b","--accent":"#d97706","--bg-page":"#fff7ed","--bg-surface":"#ffffff","--text-primary":"#111827","--text-secondary":"#374151","--border":"#fed7aa"}},
+  {"themeId":"executive-glass","tokens":{"--brand-primary":"#0f172a","--brand-light":"#2563eb","--brand-dark":"#020617","--accent":"#38bdf8","--bg-page":"#eef4ff","--bg-surface":"#ffffff","--text-primary":"#0f172a","--text-secondary":"#475569","--border":"#bfdbfe"}},
+  {"themeId":"compliance-paper","tokens":{"--brand-primary":"#57534e","--brand-light":"#78716c","--brand-dark":"#1c1917","--accent":"#a16207","--bg-page":"#fafaf9","--bg-surface":"#fffbeb","--text-primary":"#1c1917","--text-secondary":"#57534e","--border":"#e7e5e4"}},
+  {"themeId":"focus-mode","tokens":{"--brand-primary":"#18181b","--brand-light":"#3f3f46","--brand-dark":"#09090b","--accent":"#27272a","--bg-page":"#fafafa","--bg-surface":"#ffffff","--text-primary":"#18181b","--text-secondary":"#52525b","--border":"#e4e4e7"}},
+  {"themeId":"vibrant-energy","tokens":{"--brand-primary":"#7c3aed","--brand-light":"#06b6d4","--brand-dark":"#1e1b4b","--accent":"#f97316","--bg-page":"#f5f3ff","--bg-surface":"#ffffff","--text-primary":"#1e1b4b","--text-secondary":"#5b21b6","--border":"#c4b5fd"}},
+  {"themeId":"soft-pastel","tokens":{"--brand-primary":"#6366f1","--brand-light":"#a5b4fc","--brand-dark":"#312e81","--accent":"#f9a8d4","--bg-page":"#f8fafc","--bg-surface":"#ffffff","--text-primary":"#312e81","--text-secondary":"#4f46e5","--border":"#e0e7ff"}},
+  {"themeId":"earth-tone","tokens":{"--brand-primary":"#78350f","--brand-light":"#92400e","--brand-dark":"#422006","--accent":"#ca8a04","--bg-page":"#fefce8","--bg-surface":"#fff7ed","--text-primary":"#422006","--text-secondary":"#78350f","--border":"#fde68a"}},
+  {"themeId":"neon-pulse","tokens":{"--brand-primary":"#09090b","--brand-light":"#22c55e","--brand-dark":"#000000","--accent":"#06b6d4","--bg-page":"#09090b","--bg-surface":"#18181b","--text-primary":"#f4f4f5","--text-secondary":"#d4d4d8","--border":"#3f3f46"}},
+  {"themeId":"zen-minimal","tokens":{"--brand-primary":"#737373","--brand-light":"#a3a3a3","--brand-dark":"#171717","--accent":"#d4d4d4","--bg-page":"#fafafa","--bg-surface":"#ffffff","--text-primary":"#171717","--text-secondary":"#525252","--border":"#e5e5e5"}}
+]</pre>
+  </div>
+</div>
+
+<!-- PATCH C/D: Insert into #container-queries-preview after the first CSS card or replace the existing CSS sample. -->
+<div class="card" data-v46-p6-patch="container-query-token-consistency" data-patch-target="#container-queries-preview" data-patch-position="replace-css-sample">
+  <div class="card-header"><span class="chip chip-green">v4.6</span>Container query thresholds and missing zones</div>
+  <div class="card-body">
+    <div class="info-box info-box-amber" style="margin-bottom:14px">
+      <strong>IMPLEMENTATION NOTE</strong>
+      Không dùng <code>var(--cq-*)</code> trực tiếp trong <code>@container</code> conditions vì browser support không ổn định cho custom properties trong query conditions. Dùng hardcoded threshold có comment mapping sang token để spec và live CSS không lệch.
+    </div>
+    <pre class="code-block">.zone-main{container-type:inline-size;container-name:zone-main}
+.zone-sidebar{container-type:inline-size;container-name:zone-sidebar}
+.zone-kpi-bar{container-type:inline-size;container-name:zone-kpi}
+.zone-chart-area{container-type:inline-size;container-name:zone-chart zone-chart-area}
+.zone-footer{container-type:inline-size;container-name:zone-footer}
+
+@container zone-main (max-width: 600px /* = --cq-lg */){...}
+@container zone-sidebar (max-width: 320px /* = --cq-sm */){...}
+@container zone-kpi (max-width: 480px /* = --cq-md */){...}
+@container zone-chart-area (min-width: 600px /* = --cq-lg */){...}
+@container zone-footer (max-width: 479px){...}</pre>
+  </div>
+</div>
+
+<!-- PATCH I: Insert into Section 70 #oee-calculation-contract after the OEE data schema card. -->
+<div class="info-box info-box-blue" data-v46-p6-patch="copq-dashboard-contract" data-patch-target="#oee-calculation-contract" data-patch-position="after-data-schema" style="margin-bottom:18px">
+  <strong>COPQ (Cost of Poor Quality) Dashboard Contract</strong>
+  <ul style="margin:8px 0 0;padding-left:18px">
+    <li><strong>Formula:</strong> COPQ = Scrap Cost + Rework Cost + Warranty Cost + Inspection Labor + Sorting Cost.</li>
+    <li><strong>Data Sources:</strong> NCR cho scrap/rework amounts, Customer Complaints cho warranty, IQC cho inspection hours, Sorting records cho sorting cost.</li>
+    <li><strong>KPI Cards:</strong> Total COPQ, COPQ % Revenue, COPQ by Category, COPQ Trend monthly.</li>
+    <li><strong>Drill-down:</strong> Click category để mở danh sách NCR, complaint hoặc sorting record đóng góp vào chi phí.</li>
+    <li><strong>Tokens:</strong> Reuse <code>--color-error-*</code> cho cost indicators, <code>--chart-*</code> cho pie/pareto và <code>--bg-error</code> cho alert surface.</li>
+  </ul>
+</div>
+
+<section class="section" id="shift-handover-production" data-v46-section="manufacturing-shift-handover">
+  <h2 class="section-title"><span class="section-number">85</span>Shift Handover — Giao ca sản xuất <span class="chip" style="margin-left:12px;font-size:10px;vertical-align:middle;background:var(--bg-surface-alt);color:var(--text-secondary)">REFERENCE</span></h2>
+  <p class="section-subtitle">Khi ca làm việc thay đổi, operator và trưởng ca cần bàn giao tình trạng máy, work order đang chạy, cảnh báo, quality hold, vật tư, ghi chú đặc biệt và chữ ký giao/nhận. Pattern này mở rộng <a href="#shop-floor-mode">Section 14</a>, <a href="#shift-themes">Section 16</a>, <a href="#realtime-dashboard">Section 19</a>, <a href="#manufacturing-precision">Section 32</a> và yêu cầu Standard 36 về shift handover tại <a href="../../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 23</a>.</p>
+
+  <div class="grid-3" style="margin-bottom:18px">
+    <div class="info-box info-box-blue"><strong>USE CASE</strong>Ca giao phải cho ca nhận biết máy nào đang chạy, WO nào còn WIP, alarm nào đang được shelving, NCR/quality hold nào còn mở và approval nào đang chờ để không mất ngữ cảnh vận hành.</div>
+    <div class="info-box info-box-green"><strong>DO</strong>Luôn hiển thị open exceptions, WIP, machine status, quality holds và pending approvals trước ghi chú tự do. Ghi chú chỉ bổ sung bối cảnh, không thay thế dữ liệu có cấu trúc.</div>
+    <div class="info-box info-box-purple"><strong>CROSS-REF</strong>Alarm shelving trong giao ca tham chiếu ISA-18.2: cảnh báo đang tạm ẩn phải có owner, expiry và reason code trước khi ca nhận xác nhận.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Form</span>Trường bắt buộc cho phiếu giao ca</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>Trường</th><th>Kiểu dữ liệu</th><th>Rule</th><th>Ví dụ</th></tr></thead>
+        <tbody>
+          <tr><td>Ca giao</td><td><code>shiftOutgoing</code></td><td>Bắt buộc, lấy từ shift calendar và user đang đăng nhập.</td><td><code>Ca 1 - 06:00-14:00</code></td></tr>
+          <tr><td>Ca nhận</td><td><code>shiftIncoming</code></td><td>Bắt buộc, không được trùng ca giao.</td><td><code>Ca 2 - 14:00-22:00</code></td></tr>
+          <tr><td>Máy / Line</td><td><code>machineId[]</code></td><td>Cho phép nhiều máy nếu trưởng ca bàn giao cell.</td><td><code>HAAS-VF2SS-03</code></td></tr>
+          <tr><td>Tình trạng máy</td><td><code>running|idle|setup|maintenance|blocked|alarm|offline|unknown</code></td><td>Khớp state machine của Standard 36.</td><td><span class="chip chip-green">running</span></td></tr>
+          <tr><td>WO đang chạy</td><td><code>workOrderId, status, percentComplete</code></td><td>Phải link tới work order lifecycle ở <a href="#work-order-lifecycle">Section 59</a>.</td><td><code>WO-2026-044 · 72%</code></td></tr>
+          <tr><td>Cảnh báo / Issues</td><td><code>issue[]</code></td><td>Mỗi issue có severity, owner, due time và escalation path.</td><td>Spindle load tăng bất thường, đã báo maintenance.</td></tr>
+          <tr><td>Vật tư đang dùng</td><td><code>materialLot[]</code></td><td>Ghi lot, heat number nếu có, remaining quantity và vị trí.</td><td><code>MAT-AL6061-T6-0426</code></td></tr>
+          <tr><td>Ghi chú đặc biệt</td><td><code>handoverNote</code></td><td>Không thay thế issue có cấu trúc; tối đa 1000 ký tự.</td><td>Chờ QC xác nhận first-off trước khi tăng tốc.</td></tr>
+          <tr><td>Chữ ký giao / nhận</td><td><code>signatureOutgoing, signatureIncoming</code></td><td>Bắt buộc với line regulated; audit timestamp server-side.</td><td>Operator A giao, Operator B nhận.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">Token table</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Token</th><th>Map</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td><code>--handover-open-bg</code></td><td><code>var(--bg-warning)</code></td><td>Open issue summary.</td></tr>
+            <tr><td><code>--handover-critical-border</code></td><td><code>var(--border-error)</code></td><td>Critical exception card.</td></tr>
+            <tr><td><code>--handover-ok-bg</code></td><td><code>var(--bg-success)</code></td><td>No open issue state.</td></tr>
+            <tr><td><code>--handover-signature-border</code></td><td><code>var(--border-info)</code></td><td>Signature confirmation area.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Runtime contract</div>
+      <div class="card-body">
+        <pre class="code-block">{
+  "handoverId": "SHIFT-HO-2026-0411-CA1-CA2",
+  "machineIds": ["HAAS-VF2SS-03"],
+  "openExceptionsRequired": true,
+  "qualityHoldsRequired": true,
+  "alarmShelvingReviewRequired": true,
+  "signatures": ["outgoingOperator", "incomingOperator"],
+  "auditEvent": "shift_handover_completed"
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="offline-pwa-shop-floor" data-v46-section="manufacturing-offline-pwa">
+  <h2 class="section-title"><span class="section-number">86</span>Hỗ trợ Offline &amp; PWA cho Shop Floor <span class="chip chip-blue" style="margin-left:12px;font-size:10px;vertical-align:middle">TARGET</span></h2>
+  <p class="section-subtitle">Shop-floor tablets thường mất kết nối, đổi Wi-Fi, dùng chế độ kiosk hoặc cần scan liên tục. Offline/PWA pattern bảo đảm operator biết dữ liệu có cũ hay không, action nào đang queue và conflict nào cần xử lý khi reconnect. Section này mở rộng <a href="#shop-floor-mode">Section 14</a>, <a href="#operator-interface">Section 18</a>, <a href="#realtime-dashboard">Section 19</a>, <a href="#error-boundary-fallback-ui">Section 68</a> và mobile scanner archetype trong <a href="../../standards/36-frontend-module-layout-template-standard.md">Standard 36 Section 10</a>.</p>
+
+  <div class="grid-3" style="margin-bottom:18px">
+    <div class="info-box info-box-amber"><strong>STALE DATA</strong>Khi dữ liệu cũ hơn ngưỡng module, hiển thị badge <span class="chip chip-amber">Dữ liệu cũ 5 phút</span> cạnh title hoặc KPI nguồn dữ liệu. Badge phải có timestamp tuyệt đối trong tooltip/popover.</div>
+    <div class="info-box info-box-red"><strong>OFFLINE QUEUE</strong>Khi mất mạng, action ghi vào IndexedDB queue và hiển thị badge <span class="chip chip-red">Offline — 3 actions pending</span>. Không báo “đã lưu” nếu action chỉ mới lưu cục bộ.</div>
+    <div class="info-box info-box-blue"><strong>SYNC CONFLICT</strong>Khi reconnect, conflict mở dialog chọn giữ local, giữ server hoặc merge. Dialog phải có diff đủ record id, field, local value, server value và audit consequence.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Offline</span>Queue and sync state matrix</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>State</th><th>Trigger</th><th>UI</th><th>Data rule</th><th>ARIA</th></tr></thead>
+        <tbody>
+          <tr><td>Online fresh</td><td>API/WebSocket healthy, data age dưới threshold.</td><td><span class="chip chip-green">Đồng bộ</span></td><td>Action gửi server ngay, local cache cập nhật sau success.</td><td><code>role="status"</code> chỉ announce khi vừa phục hồi.</td></tr>
+          <tr><td>Online stale</td><td>Dữ liệu quá ngưỡng stale nhưng network còn.</td><td><span class="chip chip-amber">Dữ liệu cũ 5 phút</span></td><td>Cho thao tác đọc; action ghi cần refresh trước nếu regulated.</td><td>Status polite, không spam mỗi phút.</td></tr>
+          <tr><td>Offline queueing</td><td>Network down, service worker hoặc fetch fail.</td><td><span class="chip chip-red">Offline — 3 actions pending</span></td><td>Ghi IndexedDB queue với idempotency key, timestamp và user id.</td><td><code>role="alert"</code> khi action đầu tiên chuyển sang queue.</td></tr>
+          <tr><td>Syncing</td><td>Reconnect và queue bắt đầu flush.</td><td>Progress row-level, disable destructive retry trùng.</td><td>Flush theo thứ tự tạo; retry exponential; không reorder regulated signatures.</td><td><code>aria-busy="true"</code> trên queue panel.</td></tr>
+          <tr><td>Conflict</td><td>Server version khác local base version.</td><td>Conflict dialog với Keep local / Keep server / Merge.</td><td>Không auto-merge field regulated, e-signature hoặc disposition.</td><td><code>role="dialog"</code>, focus vào summary conflict.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><span class="chip chip-green">Cycle Count</span>Physical inventory offline-safe flow</div>
+      <div class="card-body">
+        <div class="info-box info-box-green" style="margin-bottom:14px">
+          <strong>PHYSICAL INVENTORY PATTERN</strong>
+          Cycle count và physical inventory PHẢI hỗ trợ scan offline, duplicate scan detection, variance reason code và supervisor approval khi chênh lệch vượt threshold. Pattern này xử lý P2 manufacturing gap về kiểm kê kho.
+        </div>
+        <table class="spec-table">
+          <thead><tr><th>Bước</th><th>Rule</th><th>Offline behavior</th></tr></thead>
+          <tbody>
+            <tr><td>Freeze scope</td><td>Khóa location/bin hoặc material lot trong phạm vi count.</td><td>Cache freeze snapshot và cảnh báo nếu snapshot quá cũ.</td></tr>
+            <tr><td>Scan item</td><td>Barcode phải resolve material, lot, bin và UOM.</td><td>Unknown code lưu queue với trạng thái cần resolve.</td></tr>
+            <tr><td>Count entry</td><td>Nhập quantity, UOM, condition và optional photo evidence.</td><td>Lưu IndexedDB với idempotency key.</td></tr>
+            <tr><td>Variance</td><td>Nếu lệch vượt threshold, bắt buộc reason code và supervisor review.</td><td>Không post final adjustment khi offline; giữ pending approval.</td></tr>
+            <tr><td>Reconcile</td><td>ERP adjustment chỉ tạo sau khi sync không conflict.</td><td>Conflict dialog hiển thị local count, server movement mới và đề xuất recount.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Token table</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Token</th><th>Map</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td><code>--offline-indicator-bg</code></td><td><code>var(--bg-error)</code></td><td>Offline banner surface.</td></tr>
+            <tr><td><code>--stale-data-border</code></td><td><code>var(--border-warning)</code></td><td>Stale badge and card border.</td></tr>
+            <tr><td><code>--sync-conflict-bg</code></td><td><code>var(--bg-warning)</code></td><td>Conflict dialog header or summary.</td></tr>
+            <tr><td><code>--offline-queue-text</code></td><td><code>var(--text-primary)</code></td><td>Queue row text.</td></tr>
+            <tr><td><code>--offline-success-bg</code></td><td><code>var(--bg-success)</code></td><td>Queue flushed confirmation.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">IndexedDB queue contract</div>
+    <div class="card-body">
+      <pre class="code-block">{
+  "queueName": "hesem_offline_actions",
+  "storage": "IndexedDB",
+  "record": {
+    "idempotencyKey": "uuid",
+    "moduleId": "inventory-cycle-count",
+    "recordId": "COUNT-2026-0411-003",
+    "baseVersion": "server-version-at-edit-start",
+    "actionType": "count-submit|handover-sign|inspection-result|wip-move",
+    "payload": {},
+    "createdAt": "server-or-device-time-with-offset",
+    "createdBy": "userId",
+    "syncState": "queued|syncing|synced|conflict|failed"
+  },
+  "conflictPolicy": {
+    "regulatedFields": "manual-review-required",
+    "nonRegulatedFields": "field-level-merge-allowed",
+    "auditTrail": "required"
+  }
+}</pre>
+    </div>
+  </div>
+</section>

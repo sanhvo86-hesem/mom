@@ -1,0 +1,428 @@
+{
+  "product": "HESEM VPS Control Tower",
+  "quick_command": "ssh root@103.110.87.55",
+  "dns_strategy": {
+    "current_mode": "AZDIGI client-portal DNS",
+    "limitation": "Nếu zone còn nằm ở portal nhà cung cấp không có API ổn định cho stack này, dashboard chỉ dừng ở mức inventory và nhắc việc. Nó chưa thể là control plane DNS đúng nghĩa.",
+    "recommended_next": "Chuyển zone sang Cloudflare DNS API hoặc PowerDNS authoritative API để dashboard sửa record, diff zone và audit thay đổi một cách chuẩn hóa."
+  },
+  "architecture_layers": [
+    {
+      "title": "Portal orchestration layer",
+      "body": "Portal hiện tại là UI điều phối: inventory, host health, safe action, terminal links, DNS strategy, audit và runbook.",
+      "points": [
+        "Không làm arbitrary shell trực tiếp trong PHP.",
+        "Gom host, service, container, ingress, DNS vào một bảng điều khiển thống nhất.",
+        "Giữ trail điều hành thay vì thao tác rải rác qua nhiều tab."
+      ]
+    },
+    {
+      "title": "Terminal gateway layer",
+      "body": "Browser nên dùng xterm.js, còn lớp terminal/gateway dùng ttyd hoặc bastion SSH riêng để có UX mạnh và sạch hơn Terminal mặc định trên macOS.",
+      "points": [
+        "Mỗi host hoặc bastion có terminal URL riêng.",
+        "Auth, MFA, SSH key, session policy nằm ở lớp gateway.",
+        "Portal chỉ mở hoặc nhúng gateway đã harden."
+      ]
+    },
+    {
+      "title": "Observability layer",
+      "body": "Netdata và/hoặc exporter + OTel + Grafana tạo thành lớp metric/alert chuẩn. Repo này đã có nền OTel collector cục bộ.",
+      "points": [
+        "Theo dõi CPU, RAM, disk, network, process, container.",
+        "Alert theo SLA thay vì chờ shell vào xem mới biết có sự cố.",
+        "Host health không phụ thuộc log thủ công."
+      ]
+    },
+    {
+      "title": "DNS and ingress layer",
+      "body": "DNS phải chuyển sang mô hình API-first hoặc self-host authoritative. Nếu không, dashboard không thể kiểm soát record một cách bền vững.",
+      "points": [
+        "Cloudflare DNS API phù hợp nếu muốn nhanh.",
+        "PowerDNS HTTP API phù hợp nếu muốn tự làm authoritative server.",
+        "Ingress, TLS, vhost và reverse proxy phải nằm cùng inventory với DNS."
+      ]
+    }
+  ],
+  "references": [
+    {
+      "title": "xterm.js",
+      "url": "https://xtermjs.org/docs/",
+      "note": "Terminal UI renderer trong browser."
+    },
+    {
+      "title": "ttyd",
+      "url": "https://tsl0922.github.io/ttyd/",
+      "note": "Web terminal gateway để mở shell qua browser."
+    },
+    {
+      "title": "ttyd Releases",
+      "url": "https://github.com/tsl0922/ttyd/releases",
+      "note": "Nguồn binary phát hành chính thức cho terminal gateway."
+    },
+    {
+      "title": "ttyd Auth Proxy",
+      "url": "https://github.com/tsl0922/ttyd/wiki/Auth-Proxy",
+      "note": "Mẫu reverse proxy dùng header auth cho ttyd phía sau Nginx."
+    },
+    {
+      "title": "Netdata Agent",
+      "url": "https://learn.netdata.cloud/docs/netdata-agent/installation/linux",
+      "note": "Realtime infrastructure telemetry."
+    },
+    {
+      "title": "Netdata behind Nginx",
+      "url": "https://learn.netdata.cloud/docs/netdata-agent/configuration/securing-agents/running-the-agent-behind-a-reverse-proxy/nginx",
+      "note": "Netdata qua reverse proxy Nginx dưới subpath."
+    },
+    {
+      "title": "Portainer Edge Agent",
+      "url": "https://docs.portainer.io/advanced/edge-agent",
+      "note": "Nếu estate Docker lớn, đây là lớp điều phối container phù hợp hơn việc ép portal PHP gánh hết."
+    },
+    {
+      "title": "Grafana Alerting",
+      "url": "https://grafana.com/docs/grafana/latest/alerting/",
+      "note": "Alerting và dashboard cho control plane."
+    },
+    {
+      "title": "Grafana Debian/Ubuntu install",
+      "url": "https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/",
+      "note": "APT install chính thức cho Grafana."
+    },
+    {
+      "title": "Grafana Auth Proxy",
+      "url": "https://grafana.com/docs/grafana/latest/setup-grafana/configure-access/configure-authentication/auth-proxy/",
+      "note": "Cho phép tin cậy header user từ reverse proxy."
+    },
+    {
+      "title": "Grafana allow_embedding",
+      "url": "https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/",
+      "note": "Thiết lập self-host để Grafana có thể nhúng qua iframe."
+    },
+    {
+      "title": "Cloudflare DNS API",
+      "url": "https://developers.cloudflare.com/api/resources/dns/subresources/records/methods/edit/",
+      "note": "API-first DNS khi cần bỏ portal DNS thủ công."
+    },
+    {
+      "title": "PowerDNS HTTP API",
+      "url": "https://doc.powerdns.com/authoritative/http-api/",
+      "note": "Tự giữ authoritative DNS nếu muốn toàn quyền."
+    }
+  ],
+  "runbook_steps": [
+    {
+      "phase": "P0",
+      "title": "Inventory + bastion",
+      "body": "Khóa inventory host, domain, DNS, service, docker project, log path và bastion SSH trước. Nếu inventory chưa đúng thì dashboard chỉ là hình đẹp."
+    },
+    {
+      "phase": "P1",
+      "title": "Read-only control tower",
+      "body": "Bật host health, service status, Docker inventory, ingress map, DNS inventory, alert links. Chưa cho quyền thao tác write."
+    },
+    {
+      "phase": "P2",
+      "title": "Safe actions",
+      "body": "Chỉ bật action whitelisted như health snapshot, nginx -t, docker ps, listen ports, recent logs. Mỗi action phải audit được."
+    },
+    {
+      "phase": "P3",
+      "title": "Terminal gateway",
+      "body": "Triển khai ttyd hoặc gateway tương đương, nối vào xterm.js trong portal và ép auth/MFA/SSH key qua bastion."
+    },
+    {
+      "phase": "P4",
+      "title": "Observability stack",
+      "body": "Bật Netdata và Grafana sau cùng domain qua Nginx auth_request để có metrics, dashboard và alert trong cùng control plane."
+    },
+    {
+      "phase": "P5",
+      "title": "DNS API cutover",
+      "body": "Di chuyển zone khỏi nơi chỉ có web portal sang provider có API hoặc self-host authoritative DNS để dashboard sửa record, diff zone và rollout ingress được thật."
+    }
+  ],
+  "operational_findings": [
+    {
+      "title": "Netdata PostgreSQL collector phải khai báo tường minh",
+      "status": "warning",
+      "url": "https://learn.netdata.cloud/docs/collecting-metrics/collectors/databases/postgresql",
+      "body": "Host hiện tại đã từng log lỗi collector PostgreSQL do thiếu role/DSN phù hợp. Cách đúng là để collector này tắt mặc định và chỉ bật khi đã cấp DSN hoặc account read-only rõ ràng."
+    },
+    {
+      "title": "Grafana nên được provision từ Git",
+      "status": "next",
+      "url": "https://grafana.com/docs/grafana/latest/administration/provisioning/",
+      "body": "Datasource và dashboard nên nằm trong provisioning files để tránh drift sau khi sửa tay trên UI, nhất là khi control plane sẽ mở rộng sang nhiều host."
+    },
+    {
+      "title": "ttyd phải ở sau trusted auth proxy",
+      "status": "ok",
+      "url": "https://github.com/tsl0922/ttyd/wiki/Auth-Proxy",
+      "body": "Portal đang bảo vệ ttyd qua Nginx auth_request. Tiếp tục giữ terminal gateway ở loopback hoặc socket nội bộ thay vì để nó tin header từ client bên ngoài."
+    }
+  ],
+  "quick_commands": [
+    {
+      "label": "SSH primary VPS",
+      "command": "ssh root@103.110.87.55"
+    },
+    {
+      "label": "Bootstrap VPS from repo",
+      "command": "ssh root@103.110.87.55 \"bash -s\" < mom/ops/vps/setup-vps.sh"
+    },
+    {
+      "label": "Health check after deploy",
+      "command": "ssh root@103.110.87.55 \"php_fpm=$(systemctl list-units --type=service --all 'php*-fpm.service' --no-legend 2>/dev/null | awk '{print $1}' | head -n 1); nginx -t && if [ -n \\\"$php_fpm\\\" ]; then systemctl is-active \\\"$php_fpm\\\"; fi && systemctl is-active postgresql\""
+    },
+    {
+      "label": "Install terminal gateway",
+      "command": "ssh root@103.110.87.55 \"bash -s\" < mom/ops/vps/install-terminal-gateway.sh"
+    },
+    {
+      "label": "Install observability stack",
+      "command": "ssh root@103.110.87.55 \"bash -s\" < mom/ops/vps/install-observability-stack.sh"
+    }
+  ],
+  "terminal_gateway": {
+    "install_script": "./ops/vps/install-terminal-gateway.sh",
+    "setup_doc": "./docs/system/vps-terminal-gateway-setup-2026-04-09.md",
+    "auth_model": "Portal session -> nginx auth_request -> ttyd auth header",
+    "stack": "ttyd 1.7.x behind Nginx reverse proxy on 127.0.0.1 with /ops/terminal/* paths"
+  },
+  "observability_stack": {
+    "install_script": "./ops/vps/install-observability-stack.sh",
+    "setup_doc": "./docs/system/vps-observability-stack-setup-2026-04-09.md",
+    "auth_model": "Portal session -> nginx auth_request -> Netdata/Grafana reverse proxy",
+    "stack": "Netdata 19999 and Grafana 3000 behind Nginx auth-proxied subpaths"
+  },
+  "next_features": [
+    {
+      "title": "Multi-host observability hub",
+      "status": "next",
+      "url": "https://learn.netdata.cloud/docs/netdata-parents/parent-child-configuration-reference",
+      "body": "Dựng Netdata parent-child để gom nhiều VPS vào một điểm quan sát trung tâm, thay vì mỗi host tự đứng riêng."
+    },
+    {
+      "title": "Dashboards as code",
+      "status": "next",
+      "url": "https://grafana.com/docs/grafana/latest/administration/provisioning/",
+      "body": "Provision datasource và dashboard bằng file trong Git để Grafana không bị drift khi sửa tay trên UI."
+    },
+    {
+      "title": "Container fleet control",
+      "status": "later",
+      "url": "https://docs.portainer.io/admin/environments/add/docker/edge",
+      "body": "Nếu số Docker workload tăng, nối Portainer Edge Agent để control plane quản nhiều host và group/tag môi trường."
+    },
+    {
+      "title": "Scoped DNS automation",
+      "status": "later",
+      "url": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+      "body": "Chuyển DNS write sang API token giới hạn theo zone và quyền, để dashboard sửa record mà không cần quay lại portal thủ công."
+    }
+  ],
+  "hosts": [
+    {
+      "id": "hesem-vps-01",
+      "label": "HESEM Primary VPS",
+      "provider": "AZDIGI VPS",
+      "mode": "ssh",
+      "ssh_target": "root@103.110.87.55",
+      "public_ip": "103.110.87.55",
+      "roles": [
+        "reverse-proxy",
+        "portal",
+        "postgres",
+        "terminal-gateway",
+        "observability",
+        "file-explorer"
+      ],
+      "services": [
+        {
+          "name": "nginx",
+          "label": "Nginx",
+          "kind": "systemd",
+          "unit_candidates": ["nginx"]
+        },
+        {
+          "name": "php-fpm",
+          "label": "PHP-FPM",
+          "kind": "systemd",
+          "unit_candidates": ["php8.2-fpm", "php8.3-fpm", "php8.4-fpm", "php-fpm"]
+        },
+        {
+          "name": "postgresql",
+          "label": "PostgreSQL",
+          "kind": "systemd",
+          "unit_candidates": ["postgresql"]
+        },
+        {
+          "name": "hesem-ttyd-primary",
+          "label": "Terminal gateway (primary)",
+          "kind": "systemd",
+          "unit_candidates": ["hesem-ttyd-primary"]
+        },
+        {
+          "name": "hesem-ttyd-readonly",
+          "label": "Terminal gateway (readonly)",
+          "kind": "systemd",
+          "unit_candidates": ["hesem-ttyd-readonly"]
+        },
+        {
+          "name": "netdata",
+          "label": "Netdata Agent",
+          "kind": "systemd",
+          "unit_candidates": ["netdata"]
+        },
+        {
+          "name": "grafana-server",
+          "label": "Grafana",
+          "kind": "systemd",
+          "unit_candidates": ["grafana-server"]
+        }
+      ],
+      "safe_actions": [
+        "health",
+        "docker_ps",
+        "nginx_test",
+        "ports",
+        "recent_logs",
+        "terminal_gateway_logs",
+        "observability_logs"
+      ],
+      "sites": [
+        {
+          "host": "qms.hesem.com.vn",
+          "url": "https://qms.hesem.com.vn",
+          "role": "Main portal"
+        },
+        {
+          "host": "eqms.hesemeng.com",
+          "url": "https://eqms.hesemeng.com",
+          "role": "Portal alias"
+        },
+        {
+          "host": "files.hesemeng.com",
+          "url": "https://files.hesemeng.com",
+          "role": "Portal alias"
+        },
+        {
+          "host": "portainer.hesemeng.com",
+          "url": "https://portainer.hesemeng.com",
+          "role": "Portal alias"
+        }
+      ],
+      "dns_records": [
+        {
+          "name": "hesemeng.com",
+          "type": "A",
+          "value": "103.110.87.55"
+        },
+        {
+          "name": "eqms.hesemeng.com",
+          "type": "A",
+          "value": "103.110.87.55"
+        },
+        {
+          "name": "files.hesemeng.com",
+          "type": "A",
+          "value": "103.110.87.55"
+        },
+        {
+          "name": "portainer.hesemeng.com",
+          "type": "A",
+          "value": "103.110.87.55"
+        },
+        {
+          "name": "www.hesemeng.com",
+          "type": "CNAME",
+          "value": "hesemeng.com"
+        }
+      ],
+      "terminals": [
+        {
+          "id": "primary",
+          "label": "Primary shell",
+          "url": "/ops/terminal/primary/",
+          "note": "Interactive ttyd shell protected by portal session through nginx auth_request.",
+          "embed": true,
+          "access": "write",
+          "service_name": "hesem-ttyd-primary",
+          "internal_url": "http://127.0.0.1:7681/",
+          "expected_http_codes": [200, 401, 403, 407]
+        },
+        {
+          "id": "readonly",
+          "label": "Readonly diagnostics",
+          "url": "/ops/terminal/readonly/",
+          "note": "Readonly ttyd diagnostics view for quick triage without write access.",
+          "embed": true,
+          "access": "read",
+          "service_name": "hesem-ttyd-readonly",
+          "internal_url": "http://127.0.0.1:7682/",
+          "expected_http_codes": [200, 401, 403, 407]
+        }
+      ],
+      "observability": [
+        {
+          "id": "netdata",
+          "label": "Netdata live metrics",
+          "url": "/ops/netdata/",
+          "note": "Realtime CPU, RAM, disk, network and process telemetry through Netdata behind Nginx.",
+          "embed": true,
+          "kind": "metrics",
+          "access": "read",
+          "service_name": "netdata",
+          "internal_url": "http://127.0.0.1:19999/api/v1/info",
+          "expected_http_codes": [200]
+        },
+        {
+          "id": "grafana",
+          "label": "Grafana dashboards",
+          "url": "/ops/grafana/",
+          "note": "Embedded Grafana workspace protected by auth proxy for team dashboards and alerts.",
+          "embed": true,
+          "kind": "dashboard",
+          "access": "read",
+          "service_name": "grafana-server",
+          "internal_url": "http://127.0.0.1:3000/api/health",
+          "expected_http_codes": [200]
+        }
+      ],
+      "file_roots": [
+        {
+          "id": "portal_app",
+          "label": "Portal app",
+          "path": "/var/www/eqms.hesemeng.com/mom",
+          "note": "Application code, docs, styles, scripts and API sources."
+        },
+        {
+          "id": "portal_data",
+          "label": "Portal data",
+          "path": "/var/www/eqms.hesemeng.com/mom/data",
+          "note": "Runtime data and logs with secret preview/download guardrails."
+        },
+        {
+          "id": "nginx",
+          "label": "Nginx config",
+          "path": "/etc/nginx",
+          "note": "Ingress, TLS and reverse proxy configuration."
+        },
+        {
+          "id": "nginx_logs",
+          "label": "Nginx logs",
+          "path": "/var/log/nginx",
+          "note": "Access and error logs for live request triage."
+        },
+        {
+          "id": "systemd",
+          "label": "Systemd units",
+          "path": "/etc/systemd/system",
+          "note": "Service units for terminal, observability and app runtime."
+        }
+      ]
+    }
+  ]
+}

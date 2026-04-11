@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 /**
- * Authentication controller for HESEM QMS Portal.
+ * Authentication controller for HESEM MOM Portal.
  *
  * Handles login, MFA verification, MFA enrollment, logout, and status checks.
  * Replicates exact behavior of the legacy api.php auth actions.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   2.0.0
  */
 class AuthController extends BaseController
@@ -60,7 +60,7 @@ class AuthController extends BaseController
             $enrollRemaining > 0
         ) {
             $settings = is_array($this->store['settings'] ?? null) ? $this->store['settings'] : [];
-            $issuer = (string)($settings['issuer'] ?? 'HESEM QMS');
+            $issuer = (string)($settings['issuer'] ?? 'HESEM MOM');
 
             $this->json([
                 'ok'                 => true,
@@ -178,7 +178,7 @@ class AuthController extends BaseController
                     $this->error('invalid_code', 401);
                 }
 
-                set_authenticated_session($username);
+                set_authenticated_session($username, $user);
                 $this->updateLastLogin($user, $username);
 
                 $this->json([
@@ -211,7 +211,7 @@ class AuthController extends BaseController
             $_SESSION['enroll_secret']  = $secretB32;
             $_SESSION['enroll_started'] = time();
 
-            $issuer = (string)($settings['issuer'] ?? 'HESEM QMS');
+            $issuer = (string)($settings['issuer'] ?? 'HESEM MOM');
 
             $this->json([
                 'ok'                 => true,
@@ -228,7 +228,7 @@ class AuthController extends BaseController
         }
 
         // No MFA required
-        set_authenticated_session($username);
+        set_authenticated_session($username, $user);
         $this->updateLastLogin($user, $username);
 
         $this->json([
@@ -309,7 +309,7 @@ class AuthController extends BaseController
             $this->error('invalid_code', 401);
         }
 
-        set_authenticated_session($username);
+        set_authenticated_session($username, $user);
         $this->updateLastLogin($user, $username);
 
         $this->json([
@@ -370,7 +370,7 @@ class AuthController extends BaseController
         update_user($this->store, $user);
         $this->saveUsersStore();
 
-        set_authenticated_session($username);
+        set_authenticated_session($username, $user);
 
         $this->json([
             'ok'         => true,

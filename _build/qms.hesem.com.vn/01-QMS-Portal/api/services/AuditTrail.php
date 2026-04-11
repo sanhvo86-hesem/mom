@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
-use HESEM\QMS\Database\Connection;
+use MOM\Database\Connection;
 use DateTimeImmutable;
 use DateTimeInterface;
 use RuntimeException;
@@ -103,7 +103,7 @@ final readonly class AuditEvent
  * Supports both PostgreSQL (JSONB payload) and JSON file storage, following
  * the DataLayer migration-mode pattern.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class AuditTrail
@@ -120,7 +120,7 @@ final class AuditTrail
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string          $dataDir Absolute path to qms-data directory.
+     * @param string          $dataDir Absolute path to data directory.
      * @param Connection|null $db      Optional database connection.
      */
     public function __construct(

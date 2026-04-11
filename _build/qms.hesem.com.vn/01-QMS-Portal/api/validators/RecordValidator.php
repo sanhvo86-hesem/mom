@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Validators;
+namespace MOM\Api\Validators;
 
 /**
  * Validates record creation and updates (NCR, CAPA, FAI, etc.).
@@ -10,7 +10,7 @@ namespace HESEM\QMS\Api\Validators;
  * Enforces department permissions, naming patterns, and required
  * fields per record type.
  *
- * @package HESEM\QMS\Api\Validators
+ * @package MOM\Api\Validators
  * @since   2.0.0
  */
 class RecordValidator

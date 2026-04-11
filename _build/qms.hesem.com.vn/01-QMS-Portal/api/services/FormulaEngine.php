@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 use InvalidArgumentException;
@@ -14,7 +14,7 @@ use InvalidArgumentException;
  * operators, comparison operators, and a whitelisted set of aggregate/logic
  * functions: SUM, COUNT, AVG, MIN, MAX, IF, AND, OR, ROUND, ABS, CONCAT.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class FormulaEngine
@@ -37,7 +37,7 @@ final class FormulaEngine
         '*'   => 6, '/'  => 6, '%'  => 6,
     ];
 
-    /** @var string Absolute path to the qms-data directory. */
+    /** @var string Absolute path to the data directory. */
     private readonly string $dataDir;
 
     /** @var array<string, array>|null Cached formula definitions. */
@@ -46,7 +46,7 @@ final class FormulaEngine
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
+     * @param string $dataDir Absolute path to data directory.
      */
     public function __construct(string $dataDir)
     {

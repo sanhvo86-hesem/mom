@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Middleware;
+namespace MOM\Api\Middleware;
 
-use HESEM\QMS\Api\Controllers\ExitException;
+use MOM\Api\Controllers\ExitException;
 
 /**
- * CORS middleware for HESEM QMS API.
+ * CORS middleware for HESEM MOM API.
  *
  * Handles Cross-Origin Resource Sharing headers and preflight OPTIONS requests.
  * Configurable allowed origins with sensible defaults for the QMS portal.
  *
- * @package HESEM\QMS\Api\Middleware
+ * @package MOM\Api\Middleware
  * @since   2.0.0
  */
 class CorsMiddleware

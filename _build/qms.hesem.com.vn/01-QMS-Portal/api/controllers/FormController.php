@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 use Throwable;
 
 /**
- * Online forms controller for HESEM QMS Portal.
+ * Online forms controller for HESEM MOM Portal.
  *
  * Handles form listing, schema retrieval, entry submission,
  * entry queries, record ID generation, and form version streaming.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   2.0.0
  */
 class FormController extends BaseController
@@ -95,7 +95,7 @@ class FormController extends BaseController
         $entryData['form_code']      = $code;
 
         // Process form workflow if applicable
-        require_once $this->rootDir . '/01-QMS-Portal/form_workflow.php';
+        require_once $this->rootDir . '/mom/form_workflow.php';
 
         // Save entry
         $entriesDir = $this->dataDir . '/online-forms/entries/' . $code;
@@ -114,6 +114,9 @@ class FormController extends BaseController
         $allEntries = $this->readJsonFile($consolidatedFile) ?? [];
         $allEntries[] = $entryData;
         $this->writeJsonFile($consolidatedFile, $allEntries);
+
+        // PostgreSQL dual-write
+        $this->pgWriteFormEntry($code, $entryId, $entryData, $me);
 
         $this->auditLog('online_form_submit', ['code' => $code, 'entry_id' => $entryId]);
         $this->success(['entry_id' => $entryId]);
@@ -549,6 +552,257 @@ class FormController extends BaseController
      */
     private function portalConfigJsFile(): string
     {
-        return $this->rootDir . '/01-QMS-Portal/scripts/portal/01-data-config.js';
+        return $this->rootDir . '/mom/scripts/portal/01-data-config.js';
+    }
+
+    // ── Draft API ───────────────────────────────────────────────────────────
+
+    /**
+     * POST saveDraft — Auto-save a form draft.
+     *
+     * Action: `form_draft_save`
+     *
+     * @return never
+     */
+    public function saveDraft(): never
+    {
+        if ($this->method() !== 'POST') $this->error('method_not_allowed', 405);
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $code = $this->normalizeFormCode((string)($body['code'] ?? ''));
+        $allocId = trim((string)($body['allocation_id'] ?? ''));
+        $fieldValues = $body['field_values'] ?? $body['data'] ?? [];
+        $signatures = $body['signatures'] ?? [];
+        $userId = (string)($me['username'] ?? '');
+
+        if (!is_array($fieldValues)) $this->error('invalid_field_values', 400);
+
+        // JSON file draft
+        $draftDir = $this->dataDir . '/online-forms/drafts/' . $code;
+        if (!is_dir($draftDir)) @mkdir($draftDir, 0775, true);
+        $draftFile = $draftDir . '/' . $userId . ($allocId ? '_' . $allocId : '') . '.json';
+        $existing = $this->readJsonFile($draftFile) ?? [];
+        $version = ((int)($existing['version'] ?? 0)) + 1;
+
+        $draft = [
+            'form_code'     => $code,
+            'allocation_id' => $allocId ?: null,
+            'user_id'       => $userId,
+            'field_values'  => $fieldValues,
+            'signatures'    => is_array($signatures) ? $signatures : [],
+            'version'       => $version,
+            'saved_at'      => $this->nowIso(),
+        ];
+        $this->writeJsonFile($draftFile, $draft);
+
+        // PostgreSQL dual-write
+        $this->pgSaveDraft($draft);
+
+        $this->success(['version' => $version, 'saved_at' => $draft['saved_at']]);
+    }
+
+    /**
+     * GET getDraft — Retrieve the latest draft for a form.
+     *
+     * Action: `form_draft_get`
+     *
+     * @return never
+     */
+    public function getDraft(): never
+    {
+        $me = $this->requireAuth();
+
+        $code = $this->normalizeFormCode((string)($this->query('code') ?? ''));
+        $allocId = trim((string)($this->query('allocation_id') ?? ''));
+        $userId = (string)($me['username'] ?? '');
+
+        // Try PostgreSQL first
+        $mode = $this->data->getMode();
+        if ($mode === \MOM\Database\DataLayer::MODE_POSTGRES_PRIMARY || $mode === \MOM\Database\DataLayer::MODE_POSTGRES_ONLY) {
+            try {
+                $db = $this->data->getConnection();
+                $sql = 'SELECT * FROM form_drafts WHERE form_code = :code AND user_id = :user';
+                $params = [':code' => $code, ':user' => $userId];
+                if ($allocId !== '') {
+                    $sql .= ' AND allocation_id = :aid::uuid';
+                    $params[':aid'] = $allocId;
+                }
+                $sql .= ' ORDER BY saved_at DESC LIMIT 1';
+                $row = $db->queryOne($sql, $params);
+                if ($row !== null) {
+                    $fieldValues = is_string($row['field_values'] ?? null)
+                        ? json_decode($row['field_values'], true) : ($row['field_values'] ?? []);
+                    $sigs = is_string($row['signatures'] ?? null)
+                        ? json_decode($row['signatures'], true) : ($row['signatures'] ?? []);
+                    $this->success([
+                        'draft' => [
+                            'form_code'     => $row['form_code'],
+                            'allocation_id' => $row['allocation_id'],
+                            'user_id'       => $row['user_id'],
+                            'field_values'  => $fieldValues,
+                            'signatures'    => $sigs,
+                            'version'       => (int)$row['version'],
+                            'saved_at'      => $row['saved_at'],
+                        ],
+                    ]);
+                }
+                if ($mode === \MOM\Database\DataLayer::MODE_POSTGRES_ONLY) {
+                    $this->success(['draft' => null]);
+                }
+            } catch (\Throwable $e) {
+                error_log('[FormController] PG getDraft failed: ' . $e->getMessage());
+                if ($mode === \MOM\Database\DataLayer::MODE_POSTGRES_ONLY) {
+                    throw $e;
+                }
+            }
+        }
+
+        // JSON fallback
+        $draftDir = $this->dataDir . '/online-forms/drafts/' . $code;
+        $draftFile = $draftDir . '/' . $userId . ($allocId ? '_' . $allocId : '') . '.json';
+        $draft = $this->readJsonFile($draftFile);
+
+        $this->success(['draft' => $draft]);
+    }
+
+    /**
+     * GET listDrafts — List all drafts for the current user.
+     *
+     * Action: `form_draft_list`
+     *
+     * @return never
+     */
+    public function listDrafts(): never
+    {
+        $me = $this->requireAuth();
+        $userId = (string)($me['username'] ?? '');
+
+        $mode = $this->data->getMode();
+        if ($mode === \MOM\Database\DataLayer::MODE_POSTGRES_PRIMARY || $mode === \MOM\Database\DataLayer::MODE_POSTGRES_ONLY) {
+            try {
+                $db = $this->data->getConnection();
+                $rows = $db->query(
+                    'SELECT draft_id, form_code, allocation_id, version, saved_at
+                     FROM form_drafts WHERE user_id = :user ORDER BY saved_at DESC LIMIT 100',
+                    [':user' => $userId]
+                );
+                $this->success(['drafts' => $rows]);
+            } catch (\Throwable $e) {
+                error_log('[FormController] PG listDrafts failed: ' . $e->getMessage());
+                if ($mode === \MOM\Database\DataLayer::MODE_POSTGRES_ONLY) {
+                    throw $e;
+                }
+            }
+        }
+
+        // JSON fallback: scan draft directories
+        $drafts = [];
+        $baseDir = $this->dataDir . '/online-forms/drafts';
+        if (is_dir($baseDir)) {
+            foreach (scandir($baseDir) ?: [] as $formDir) {
+                if ($formDir === '.' || $formDir === '..') continue;
+                $formPath = $baseDir . '/' . $formDir;
+                if (!is_dir($formPath)) continue;
+                foreach (scandir($formPath) ?: [] as $file) {
+                    if (!str_starts_with($file, $userId)) continue;
+                    $draft = $this->readJsonFile($formPath . '/' . $file);
+                    if (is_array($draft)) $drafts[] = $draft;
+                }
+            }
+        }
+
+        $this->success(['drafts' => $drafts]);
+    }
+
+    // ── PostgreSQL Helpers ──────────────────────────────────────────────────
+
+    /**
+     * Write a form entry to PostgreSQL (dual-write).
+     */
+    private function pgWriteFormEntry(string $code, string $entryId, array $entryData, array $user): void
+    {
+        $mode = $this->data->getMode();
+        if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) return;
+
+        try {
+            $db = $this->data->getConnection();
+            $dataJson = json_encode($entryData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            // Find latest schema version
+            $schemaRow = $db->queryOne(
+                'SELECT version FROM form_schemas WHERE form_code = :code ORDER BY version DESC LIMIT 1',
+                [':code' => $code]
+            );
+            $version = $schemaRow ? (int)$schemaRow['version'] : 1;
+
+            $db->execute(
+                'INSERT INTO form_entries (entry_id, form_code, form_version, data, submitted_by, workflow_state, metadata)
+                 VALUES (:eid::uuid, :code, :ver, :data::jsonb, (SELECT user_id FROM users WHERE username = :uname LIMIT 1), \'draft\'::workflow_status,
+                         :meta::jsonb)
+                 ON CONFLICT (entry_id) DO UPDATE SET data = EXCLUDED.data, metadata = EXCLUDED.metadata',
+                [
+                    ':eid'   => $this->normalizeUuid($entryId),
+                    ':code'  => $code,
+                    ':ver'   => $version,
+                    ':data'  => $dataJson,
+                    ':uname' => (string)($user['username'] ?? ''),
+                    ':meta'  => json_encode(['source' => 'form_submit', 'original_entry_id' => $entryId]),
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[FormController] PG form entry write failed: ' . $e->getMessage());
+            // In shadow_write mode, don't throw
+        }
+    }
+
+    /**
+     * Save a draft to PostgreSQL.
+     */
+    private function pgSaveDraft(array $draft): void
+    {
+        $mode = $this->data->getMode();
+        if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) return;
+
+        try {
+            $db = $this->data->getConnection();
+
+            $fieldJson = json_encode($draft['field_values'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $sigJson   = json_encode($draft['signatures'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $allocId   = !empty($draft['allocation_id']) ? $draft['allocation_id'] : null;
+
+            $db->execute(
+                'INSERT INTO form_drafts (form_code, allocation_id, user_id, field_values, signatures)
+                 VALUES (:code, :aid::uuid, :user, :fv::jsonb, :sig::jsonb)
+                 ON CONFLICT (form_code, allocation_id, user_id)
+                 DO UPDATE SET field_values = EXCLUDED.field_values, signatures = EXCLUDED.signatures',
+                [
+                    ':code' => $draft['form_code'],
+                    ':aid'  => $allocId,
+                    ':user' => $draft['user_id'],
+                    ':fv'   => $fieldJson,
+                    ':sig'  => $sigJson,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[FormController] PG draft save failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Normalize an entry ID to UUID format for PostgreSQL.
+     * If the entry ID isn't a valid UUID, generate a deterministic UUID v5 from it.
+     */
+    private function normalizeUuid(string $id): string
+    {
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $id)) {
+            return strtolower($id);
+        }
+        // Create a deterministic UUID from the non-UUID entry_id
+        $hash = md5('hesem-form-entry:' . $id);
+        return substr($hash, 0, 8) . '-' . substr($hash, 8, 4) . '-4' . substr($hash, 13, 3)
+            . '-' . dechex(8 | (hexdec(substr($hash, 16, 1)) & 3)) . substr($hash, 17, 3)
+            . '-' . substr($hash, 20, 12);
     }
 }

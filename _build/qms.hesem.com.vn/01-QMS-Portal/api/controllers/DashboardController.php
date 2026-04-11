@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Database\DataLayer;
-use HESEM\QMS\Database\Connection;
-use HESEM\QMS\Services\DateRange;
-use HESEM\QMS\Services\KpiEngine;
-use HESEM\QMS\Services\SpcEngine;
-use HESEM\QMS\Services\DashboardService;
+use MOM\Database\DataLayer;
+use MOM\Database\Connection;
+use MOM\Services\DateRange;
+use MOM\Services\KpiEngine;
+use MOM\Services\SpcEngine;
+use MOM\Services\DashboardService;
 
 /**
- * Dashboard & Analytics API controller for HESEM QMS Portal.
+ * Dashboard & Analytics API controller for HESEM MOM Portal.
  *
  * Exposes RESTful endpoints and legacy ?action= routes for:
  * - Executive, quality, production, supplier, and department dashboards
@@ -20,7 +20,7 @@ use HESEM\QMS\Services\DashboardService;
  * - SPC capability analysis and control chart data
  * - Widget-level data for dashboard components
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   4.0.0
  */
 final class DashboardController extends BaseController

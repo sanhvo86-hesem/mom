@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api;
+namespace MOM\Api;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Api\Controllers\ExitException;
-use HESEM\QMS\Database\DataLayer;
+use MOM\Api\Controllers\BaseController;
+use MOM\Api\Controllers\ExitException;
+use MOM\Database\DataLayer;
 use RuntimeException;
 use Throwable;
 
 /**
- * PSR-7 style router for HESEM QMS Portal API.
+ * PSR-7 style router for HESEM MOM Portal API.
  *
  * Maps legacy `?action=xxx` parameters to Controller methods while also
  * supporting RESTful routes (e.g. `GET /api/documents`, `POST /api/forms/FRM-631/entries`).
@@ -21,7 +21,7 @@ use Throwable;
  * - Middleware pipeline: auth -> CORS -> rate-limit -> audit -> controller -> response
  * - Proper HTTP status codes and JSON error handling
  *
- * @package HESEM\QMS\Api
+ * @package MOM\Api
  * @since   2.0.0
  */
 class Router
@@ -41,7 +41,7 @@ class Router
     /** @var string Absolute project root path. */
     private string $rootDir;
 
-    /** @var string Absolute qms-data path. */
+    /** @var string Absolute data path. */
     private string $dataDir;
 
     /** @var array|null User store. */
@@ -58,7 +58,7 @@ class Router
     /**
      * @param DataLayer $data    Data layer instance.
      * @param string    $rootDir Project root path.
-     * @param string    $dataDir qms-data path.
+     * @param string    $dataDir data path.
      */
     public function __construct(DataLayer $data, string $rootDir, string $dataDir)
     {

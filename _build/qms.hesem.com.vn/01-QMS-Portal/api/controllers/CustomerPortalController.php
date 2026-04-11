@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
+use MOM\Api\Controllers\BaseController;
 use Throwable;
 
 /**
- * Customer portal controller for HESEM QMS Portal.
+ * Customer portal controller for HESEM MOM Portal.
  *
  * Manages external portal users, access grants, complaint submissions,
  * document access tracking, and usage analytics.
  *
- * Data stored in `qms-data/customer-portal/` with per-entity JSON files.
+ * Data stored in `data/customer-portal/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class CustomerPortalController extends BaseController

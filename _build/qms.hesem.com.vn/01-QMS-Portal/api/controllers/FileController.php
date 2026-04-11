@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -11,12 +11,12 @@ use RuntimeException;
 use Throwable;
 
 /**
- * File and folder management controller for HESEM QMS Portal.
+ * File and folder management controller for HESEM MOM Portal.
  *
  * Handles filesystem scanning, folder CRUD, document move/rename/delete,
  * and folder descriptions.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   2.0.0
  */
 class FileController extends BaseController
@@ -35,7 +35,7 @@ class FileController extends BaseController
         $displayConfigFile  = $this->confDir . '/portal_display_config.json';
         $displayConfig      = portal_load_display_config($displayConfigFile);
         $enabledExtensions  = portal_display_config_enabled_extensions($displayConfig);
-        $portalConfigJsFile = $this->rootDir . '/01-QMS-Portal/scripts/portal/01-data-config.js';
+        $portalConfigJsFile = $this->rootDir . '/mom/scripts/portal/01-data-config.js';
         $docVisFile         = $this->confDir . '/docs_visibility.json';
         $customDocsFile     = $this->confDir . '/docs_custom.json';
         $formRegistryFile   = $this->confDir . '/form_control_registry.json';
@@ -64,10 +64,10 @@ class FileController extends BaseController
 
         // Full filesystem scan
         $scanDirs = [
-            '02-Tai-Lieu-He-Thong',
-            '03-Tai-Lieu-Van-Hanh',
-            '04-Bieu-Mau',
-            '10-Training-Academy',
+            'mom/docs/system',
+            'mom/docs/operations',
+            'mom/docs/forms',
+            'mom/docs/training',
         ];
 
         $allDocs   = [];
@@ -557,10 +557,10 @@ class FileController extends BaseController
     private function managedRootPrefixes(): array
     {
         return [
-            '02-Tai-Lieu-He-Thong',
-            '03-Tai-Lieu-Van-Hanh',
-            '04-Bieu-Mau',
-            '10-Training-Academy',
+            'mom/docs/system',
+            'mom/docs/operations',
+            'mom/docs/forms',
+            'mom/docs/training',
         ];
     }
 

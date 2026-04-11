@@ -12,16 +12,17 @@ if (!is_string($rootDir) || $rootDir === '') {
     throw new RuntimeException('Unable to resolve project root directory.');
 }
 
-$dataDir = $baseDir . '/qms-data';
+$dataDir = is_dir($baseDir . '/qms-data') ? $baseDir . '/qms-data' : $baseDir . '/data';
 
 spl_autoload_register(static function (string $class) use ($baseDir): void {
     $map = [
-        'HESEM\\QMS\\Api\\Controllers\\' => $baseDir . '/api/controllers/',
-        'HESEM\\QMS\\Api\\Middleware\\' => $baseDir . '/api/middleware/',
-        'HESEM\\QMS\\Api\\Validators\\' => $baseDir . '/api/validators/',
-        'HESEM\\QMS\\Services\\' => $baseDir . '/api/services/',
-        'HESEM\\QMS\\Api\\' => $baseDir . '/api/',
-        'HESEM\\QMS\\Database\\' => $baseDir . '/database/',
+        'MOM\\Api\\Controllers\\' => $baseDir . '/api/controllers/',
+        'MOM\\Api\\Middleware\\' => $baseDir . '/api/middleware/',
+        'MOM\\Api\\Validators\\' => $baseDir . '/api/validators/',
+        'MOM\\Api\\Services\\' => $baseDir . '/api/services/',
+        'MOM\\Services\\' => $baseDir . '/api/services/',
+        'MOM\\Api\\' => $baseDir . '/api/',
+        'MOM\\Database\\' => $baseDir . '/database/',
     ];
 
     foreach ($map as $prefix => $dir) {
@@ -61,4 +62,3 @@ function smoke_assert(bool $condition, string $message): void
         throw new RuntimeException($message);
     }
 }
-

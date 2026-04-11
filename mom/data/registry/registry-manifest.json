@@ -2,20 +2,20 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-11T06:15:25.107Z",
+    "generatedAt": "2026-04-11T08:49:04.263Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "8074b143-180a-4fdc-b838-a3bd4e63a2d2"
+    "publication_run_id": "f2594699-0b3e-43dd-a3c3-f21ed31618ad"
   },
   "coverage": {
     "router_actions": 3578,
     "field_registry_actions": 3603,
-    "field_definitions": 48601,
-    "unique_field_keys": 4572,
+    "field_definitions": 48637,
+    "unique_field_keys": 4574,
     "status_sets": 733,
     "workflow_count": 277,
-    "relation_edges": 3127,
-    "validation_rules": 43701,
+    "relation_edges": 3128,
+    "validation_rules": 43733,
     "formula_count": 1177,
     "domain_pack_count": 3948,
     "scalar_record_endpoints": 3472,
@@ -213,7 +213,7 @@
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 3127
+      "records": 3128
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
@@ -233,7 +233,7 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 43701
+      "records": 43733
     },
     "computed-formulas.json": {
       "kind": "formula-library",

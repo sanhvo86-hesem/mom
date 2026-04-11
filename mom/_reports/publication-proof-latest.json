@@ -1,23 +1,23 @@
 {
-  "publication_run_id": "4af66317-2c52-4b46-af69-9fed6a13dc5e",
-  "generatedAt": "2026-04-11T06:15:35.587Z",
-  "source_commit": "2ff76b4f",
+  "publication_run_id": "3e4feb88-c641-4e5b-8b5b-d897922f0ebc",
+  "generatedAt": "2026-04-11T08:49:13.569Z",
+  "source_commit": "68af0dfa",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "fe57f6f5116fc4a303f26b63d40b6471cee1d76f52c161c23595569ad93dafcd",
-    "frontend-foundation-catalog.json": "9c50a0d05f4cad509229009f9cc422cdc6197c23703c0f2fa950247e9d5bf2f6",
-    "registry-manifest.json": "56f033adbb6a99e03b816f3e00a94091c0aa24550010add844caf7b13d8dc644",
-    "registry-quality-report.json": "6f13a57ab3e310bba47af5aa42d6a27460202bc348fd955824124c3123f798c9",
-    "domain-field-packs.json": "c80d10160d8c37d42937cb698cb0aaaf557500bec02a4d6feb99e577fd9c0c0b",
-    "data-fields-part2.json": "954c581d56b727790409433315d45557f0a13bbe965e8485f757d86ab914eef9",
-    "wave-gap-ledger.json": "88bd1c61c0c44b929f37dbfa8845cc368a1015dd56e56e5bf04fbb31bbf0064d",
-    "global-erp-mom-capability-audit.json": "923b75ef99a18188e366da3c4a8ffdddd441ef5a464ec9478c7147ceea017026",
-    "system-contract-runtime-projections.json": "5df352809c0cbaead12d859a44a0e67f077544e2ea194fe62d0e2bb4cc64a74e",
-    "system-contract-registry-contracts.json": "018ef2ed5efb8229ec8b2c34672250708769883ac9f57a6f8de81c8503114804",
-    "system-contract-diagnostics.json": "b090299dae3d2af7ddc115dfe96186888896501d56cbab985df46890aeb91a5d",
-    "system-contract-manifest.json": "bc061ce7cb1a8915a8754ee3dfd4498bd8404bdee41d96751862ff121f118f02"
+    "endpoint-catalog.json": "ce685fa9da2c035e836ace63dcdd7d4ab5e6b76429a82831c8277fa0be51252f",
+    "frontend-foundation-catalog.json": "4aff9fd621d6884f5bb60fd45519a53f33fad71a3fb1bb6f2c8d2ad428daba42",
+    "registry-manifest.json": "10a005efc83f874be59b80d33d7a2f1fdcb70ee7262e1e08fd4325f8bde631a7",
+    "registry-quality-report.json": "32777e39ddc5861e39c3c262446eed3030e7d42753126c585924eccc7e7d1754",
+    "domain-field-packs.json": "ac3776bc7ebff4b6de894a3ca0056790f707a87cbd6def74962f6b9c2f97e66b",
+    "data-fields-part2.json": "24a8729e1350be326d4326e51d45a373a0c16551668d238065009ff21edf051c",
+    "wave-gap-ledger.json": "64efdd8e66592889f10876f8ca98acd32daba550dd21683eea1789736fe0b2d6",
+    "global-erp-mom-capability-audit.json": "8130710f048f119942ea51c78797bade62f3cacc2c0580034f8b4d33881fe084",
+    "system-contract-runtime-projections.json": "6989c7b6551adf2d4693cb69581e8423031c60993c83b4792b07c2e57764306d",
+    "system-contract-registry-contracts.json": "b55240a0abe66898a520e0fd27fc779ce2c32f5e46499da9cb7e9e4c1b24f423",
+    "system-contract-diagnostics.json": "c2299f92ec3bc0f0cdd99276764b4286148cc3fea70e7f1ca5340d4bb31a6077",
+    "system-contract-manifest.json": "a7bf60bbc84e628c022ac0409579c851bb9245eb5100a4025fdca86ea5775996"
   },
   "summary_counts": {
     "ready": 669,
@@ -47,7 +47,7 @@
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['8074b143-180a-4fdc-b838-a3bd4e63a2d2']"
+      "detail": "distinct_run_ids=['f2594699-0b3e-43dd-a3c3-f21ed31618ad']"
     },
     {
       "name": "approval_group_not_split_truth",

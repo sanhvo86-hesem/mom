@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 use RuntimeException;
 
 /**
- * Compliance report service for HESEM QMS Portal.
+ * Compliance report service for HESEM MOM Portal.
  *
  * Generates management review inputs, customer quality reports,
  * supplier review packages, audit evidence bundles, COPQ analysis,
  * and shipment evidence packages per AS9100D / NADCAP requirements.
  *
- * Uses JSON file storage in `qms-data/reports/generated/` with
- * templates loaded from `qms-data/config/compliance_report_templates.json`.
+ * Uses JSON file storage in `data/reports/generated/` with
+ * templates loaded from `data/config/compliance_report_templates.json`.
  *
- * @package HESEM\QMS\Services
+ * @package MOM\Services
  * @since   3.0.0
  */
 final class ComplianceReportService
 {
-    /** @var string Absolute path to qms-data directory. */
+    /** @var string Absolute path to data directory. */
     private readonly string $dataDir;
 
     /** @var string Absolute path to config directory. */
@@ -41,8 +41,8 @@ final class ComplianceReportService
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param string $dataDir Absolute path to qms-data directory.
-     * @param string $confDir Absolute path to qms-data/config directory.
+     * @param string $dataDir Absolute path to data directory.
+     * @param string $confDir Absolute path to data/config directory.
      */
     public function __construct(string $dataDir, string $confDir, ?object $db = null)
     {

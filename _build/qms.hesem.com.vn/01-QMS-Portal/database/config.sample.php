@@ -1,6 +1,6 @@
 <?php
 /**
- * HESEM QMS Database Configuration.
+ * HESEM MOM Database Configuration.
  * Copy this file to config.php and fill in your PostgreSQL credentials.
  *
  * Operating Modes (migration ladder):
@@ -13,8 +13,8 @@ return [
     // PostgreSQL connection
     'host'     => getenv('PGHOST')     ?: 'localhost',
     'port'     => (int)(getenv('PGPORT') ?: 5432),
-    'dbname'   => getenv('PGDATABASE') ?: 'hesem_qms',
-    'user'     => getenv('PGUSER')     ?: 'qms_app',
+    'dbname'   => getenv('PGDATABASE') ?: 'mom',
+    'user'     => getenv('PGUSER')     ?: 'mom_app',
     'password' => getenv('PGPASSWORD') ?: '',
     'sslmode'  => getenv('PGSSLMODE')  ?: 'prefer',
 

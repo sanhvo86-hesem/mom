@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
 /**
  * Normalizes MES connector payloads from MTConnect, OPC UA, DNC, and manual

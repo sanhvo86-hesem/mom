@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
+use MOM\Api\Controllers\BaseController;
 use Throwable;
 
 /**
- * Energy Dashboard controller for HESEM QMS Portal.
+ * Energy Dashboard controller for HESEM MOM Portal.
  *
  * Provides API endpoints for energy monitoring including overview KPIs,
  * per-machine energy detail, per-part energy calculations, and cost trends.
  *
- * Reads energy snapshots from `qms-data/mes/` (written by MES integration).
+ * Reads energy snapshots from `data/mes/` (written by MES integration).
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class EnergyController extends BaseController

@@ -1,7 +1,7 @@
 <?php
 /**
  * UploadHardeningService.php
- * HESEM QMS Portal -- Upload hardening pipeline
+ * HESEM MOM Portal -- Upload hardening pipeline
  *
  * Flow:
  *   upload -> quarantine (UUID filename) -> verify -> accepted / rejected

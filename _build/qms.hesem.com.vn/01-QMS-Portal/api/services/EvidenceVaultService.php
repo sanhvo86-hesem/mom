@@ -2,60 +2,64 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Services;
+namespace MOM\Services;
 
+use MOM\Database\DataLayer;
 use RuntimeException;
 
 /**
- * Evidence Vault Service for HESEM QMS Portal.
+ * Evidence Vault Service for HESEM MOM Portal.
  *
  * Tamper-evident digital evidence storage with SHA-256 hash chain,
  * custody logging, and entity linking. Ensures full traceability
  * of quality records, machine logs, and measurement data.
  *
- * @package HESEM\QMS\Services
+ * Supports DataLayer migration ladder:
+ *   JSON_ONLY        → Read/write JSON only
+ *   SHADOW_WRITE     → Read JSON, write BOTH JSON + PostgreSQL
+ *   POSTGRES_PRIMARY → Read PostgreSQL (fallback JSON), write both
+ *   POSTGRES_ONLY    → Read/write PostgreSQL only
+ *
+ * @package MOM\Services
  * @since   4.0.0
  */
 final class EvidenceVaultService
 {
     private readonly string $dataDir;
     private readonly string $evidenceDir;
-    private ?object $db = null;
+    private ?DataLayer $dataLayer = null;
     private readonly string $vaultFile;
     private readonly string $custodyFile;
     private readonly string $linksFile;
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir, ?object $db = null)
+    public function __construct(string $dataDir, ?DataLayer $dataLayer = null)
     {
         $this->dataDir     = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->evidenceDir = $this->dataDir . '/evidence';
         $this->vaultFile   = $this->evidenceDir . '/vault.json';
         $this->custodyFile = $this->evidenceDir . '/custody.json';
         $this->linksFile   = $this->evidenceDir . '/links.json';
-        $this->db          = $db;
+        $this->dataLayer   = $dataLayer;
 
         if (!is_dir($this->evidenceDir)) {
             @mkdir($this->evidenceDir, 0775, true);
         }
     }
 
-    // ── Shadow Write ────────────────────────────────────────────────────────
+    // ── DataLayer Mode Helpers ──────────────────────────────────────────────
 
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    private function pgWriteEnabled(): bool
     {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[EvidenceVaultService] Shadow write to {$table} failed: " . $e->getMessage());
-        }
+        if ($this->dataLayer === null) return false;
+        return $this->dataLayer->getMode() !== DataLayer::MODE_JSON_ONLY;
+    }
+
+    private function jsonWriteEnabled(): bool
+    {
+        if ($this->dataLayer === null) return true;
+        return $this->dataLayer->getMode() !== DataLayer::MODE_POSTGRES_ONLY;
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -63,14 +67,50 @@ final class EvidenceVaultService
     /**
      * Store a new evidence record in the vault.
      *
-     * Computes SHA-256 of the file content, extends the hash chain, and saves.
+     * Accepts either (file, metadata, userId) from controller upload,
+     * or (evidence, userId) for direct programmatic use.
      *
-     * @param array  $evidence Evidence data (must include 'file_hash' or 'content').
-     * @param string $userId   Storing user.
+     * @param array       $fileOrEvidence  File upload array or evidence data.
+     * @param array|string $metadataOrUser Metadata array (when file upload) or userId string (legacy).
+     * @param string|null  $userId         User ID (when file upload).
      * @return array Created evidence record with chain metadata.
      */
-    public function store(array $evidence, string $userId): array
+    public function store(array $fileOrEvidence, array|string $metadataOrUser = '', ?string $userId = null): array
     {
+        // Normalize the multi-signature call into (evidence, userId)
+        if (is_array($metadataOrUser)) {
+            // Called as store($file, $metadata, $userId) from controller
+            $file = $fileOrEvidence;
+            $metadata = $metadataOrUser;
+            $actorId = $userId ?? 'unknown';
+
+            $tmpPath = $file['tmp_name'] ?? '';
+            $originalName = $file['name'] ?? 'unknown';
+            $fileHash = is_file($tmpPath) ? hash_file('sha256', $tmpPath) : hash('sha256', $originalName . $this->nowIso());
+
+            $uploadDir = $this->dataDir . '/uploads/evidence';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0775, true);
+            }
+            $storedName = $this->generateUuidV4() . '_' . basename($originalName);
+            $storedPath = $uploadDir . '/' . $storedName;
+            if (is_file($tmpPath)) {
+                @move_uploaded_file($tmpPath, $storedPath);
+            }
+
+            $evidence = array_merge($metadata, [
+                'filename'    => $originalName,
+                'file_hash'   => $fileHash,
+                'stored_path' => $storedPath,
+                'mime_type'   => $file['type'] ?? 'application/octet-stream',
+                'file_size'   => $file['size'] ?? 0,
+            ]);
+        } else {
+            // Called as store($evidence, $userId) — legacy/programmatic path
+            $evidence = $fileOrEvidence;
+            $actorId = is_string($metadataOrUser) ? $metadataOrUser : ($userId ?? 'unknown');
+        }
+
         $vault = $this->loadVault();
         $now   = $this->nowIso();
 
@@ -96,7 +136,7 @@ final class EvidenceVaultService
             'file_hash'      => $fileHash,
             'chain_hash'     => $chainHash,
             'chain_sequence' => $chainSequence,
-            'stored_by'      => $userId,
+            'stored_by'      => $actorId,
             'stored_at'      => $now,
             'created_at'     => $now,
         ]);
@@ -105,10 +145,15 @@ final class EvidenceVaultService
         unset($record['content']);
 
         $vault[] = $record;
-        $this->saveVault($vault);
+        if ($this->jsonWriteEnabled()) {
+            $this->saveVault($vault);
+        }
+
+        // PostgreSQL dual-write
+        $this->pgInsertEvidence($record);
 
         // Record initial custody event
-        $this->recordCustody($record['evidence_id'], 'stored', $userId, 'Initial storage in vault');
+        $this->recordCustody($record['evidence_id'], 'stored', $actorId, 'Initial storage in vault');
 
         return $record;
     }
@@ -214,9 +259,27 @@ final class EvidenceVaultService
 
     /**
      * Link evidence to an entity (e.g., WO, SO, NCR).
+     *
+     * Accepts either (evidenceId, entityType, entityId, userId) for programmatic use,
+     * or (evidenceId, recordId, recordType, userId, note) from the controller.
+     *
+     * @return array|null The created link record, or null if already exists.
      */
-    public function link(string $evidenceId, string $entityType, string $entityId, string $userId): void
+    public function link(string $evidenceId, string $entityTypeOrRecordId, string $entityIdOrRecordType, string $userId, ?string $note = null): ?array
     {
+        // Normalize: if 5th arg ($note) is provided, the caller used the controller
+        // signature link($evidenceId, $recordId, $recordType, $userId, $note).
+        // The controller sends (evidenceId, recordId, recordType, userId, note)
+        // so entityTypeOrRecordId = recordId and entityIdOrRecordType = recordType.
+        // We swap to match internal semantics.
+        if ($note !== null) {
+            $entityType = $entityIdOrRecordType;
+            $entityId   = $entityTypeOrRecordId;
+        } else {
+            $entityType = $entityTypeOrRecordId;
+            $entityId   = $entityIdOrRecordType;
+        }
+
         $links = $this->loadLinks();
 
         // Check for duplicate
@@ -225,20 +288,29 @@ final class EvidenceVaultService
                 && ($link['evidence_id'] ?? '') === $evidenceId
                 && ($link['entity_type'] ?? '') === $entityType
                 && ($link['entity_id'] ?? '') === $entityId) {
-                return; // Already linked
+                return null; // Already linked
             }
         }
 
-        $links[] = [
+        $linkRecord = [
             'link_id'      => $this->generateUuidV4(),
             'evidence_id'  => $evidenceId,
             'entity_type'  => $entityType,
             'entity_id'    => $entityId,
             'linked_at'    => $this->nowIso(),
             'linked_by'    => $userId,
+            'note'         => $note,
         ];
 
-        $this->saveLinks($links);
+        $links[] = $linkRecord;
+        if ($this->jsonWriteEnabled()) {
+            $this->saveLinks($links);
+        }
+
+        // PostgreSQL dual-write
+        $this->pgInsertLink($linkRecord);
+
+        return $linkRecord;
     }
 
     /**
@@ -246,22 +318,37 @@ final class EvidenceVaultService
      */
     public function unlink(string $evidenceId, string $entityType, string $entityId, string $userId): void
     {
-        $links   = $this->loadLinks();
-        $updated = [];
+        if ($this->jsonWriteEnabled()) {
+            $links   = $this->loadLinks();
+            $updated = [];
 
-        foreach ($links as $link) {
-            if (!is_array($link)) {
-                continue;
+            foreach ($links as $link) {
+                if (!is_array($link)) {
+                    continue;
+                }
+                if (($link['evidence_id'] ?? '') === $evidenceId
+                    && ($link['entity_type'] ?? '') === $entityType
+                    && ($link['entity_id'] ?? '') === $entityId) {
+                    continue; // Skip this link (remove it)
+                }
+                $updated[] = $link;
             }
-            if (($link['evidence_id'] ?? '') === $evidenceId
-                && ($link['entity_type'] ?? '') === $entityType
-                && ($link['entity_id'] ?? '') === $entityId) {
-                continue; // Skip this link (remove it)
-            }
-            $updated[] = $link;
+
+            $this->saveLinks($updated);
         }
 
-        $this->saveLinks($updated);
+        // PostgreSQL: delete the link
+        if ($this->pgWriteEnabled()) {
+            try {
+                $db = $this->dataLayer->getConnection();
+                $db->execute(
+                    'DELETE FROM evidence_links WHERE evidence_id = :eid::uuid AND entity_type = :etype AND entity_id = :entityid',
+                    [':eid' => $evidenceId, ':etype' => $entityType, ':entityid' => $entityId]
+                );
+            } catch (\Throwable $e) {
+                error_log('[EvidenceVaultService] PG unlink failed: ' . $e->getMessage());
+            }
+        }
 
         // Record custody event for unlink
         $this->recordCustody($evidenceId, 'unlinked', $userId,
@@ -316,9 +403,7 @@ final class EvidenceVaultService
      */
     public function recordCustody(string $evidenceId, string $action, string $userId, ?string $reason = null): void
     {
-        $custody = $this->loadCustody();
-
-        $custody[] = [
+        $event = [
             'event_id'    => $this->generateUuidV4(),
             'evidence_id' => $evidenceId,
             'action'      => $action,
@@ -327,7 +412,14 @@ final class EvidenceVaultService
             'timestamp'   => $this->nowIso(),
         ];
 
-        $this->saveCustody($custody);
+        if ($this->jsonWriteEnabled()) {
+            $custody = $this->loadCustody();
+            $custody[] = $event;
+            $this->saveCustody($custody);
+        }
+
+        // PostgreSQL dual-write
+        $this->pgInsertCustody($event);
     }
 
     /**
@@ -350,6 +442,122 @@ final class EvidenceVaultService
         usort($result, fn(array $a, array $b) => strcmp($b['timestamp'] ?? '', $a['timestamp'] ?? ''));
 
         return $result;
+    }
+
+    // ── Governance attachment helpers ──────────────────────────────────────
+
+    /**
+     * List attachments for a governed entity (e.g., approval_group) from the DB.
+     *
+     * @return list<array>
+     */
+    public function listGovernanceAttachments(string $entityName, string $entityId, object $db): array
+    {
+        try {
+            $stmt = $db->prepare(
+                "SELECT attachment_id, entity_name, entity_id, file_name, content_type,
+                        file_size_bytes, checksum_sha256, uploaded_by_party_id, created_at,
+                        updated_at, row_version, evidence_chain_hash
+                 FROM attachment
+                 WHERE entity_name = :en AND entity_id = :eid
+                 ORDER BY created_at DESC, attachment_id DESC"
+            );
+            $stmt->execute([':en' => $entityName, ':eid' => $entityId]);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get a single governance attachment by ID from the DB.
+     *
+     * @return array|null
+     */
+    public function getGovernanceAttachment(string $attachmentId, object $db): ?array
+    {
+        try {
+            $stmt = $db->prepare(
+                "SELECT attachment_id, entity_name, entity_id, file_name, content_type,
+                        file_size_bytes, checksum_sha256, uploaded_by_party_id, created_at,
+                        updated_at, row_version, evidence_chain_hash
+                 FROM attachment
+                 WHERE attachment_id = :aid"
+            );
+            $stmt->execute([':aid' => $attachmentId]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return is_array($row) ? $row : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Create a governance attachment record in the DB.
+     *
+     * @return array The created attachment row.
+     */
+    public function createGovernanceAttachment(array $file, string $approvalGroupId, string $uploadedByPartyId, object $db, ?string $commentText = null, ?string $documentTypeCode = null): array
+    {
+        $originalName = $file['name'] ?? 'unknown';
+        $tmpPath = $file['tmp_name'] ?? '';
+        $contentType = $file['type'] ?? 'application/octet-stream';
+        $fileSize = $file['size'] ?? 0;
+
+        $checksum = is_file($tmpPath) ? hash_file('sha256', $tmpPath) : hash('sha256', $originalName . $this->nowIso());
+
+        $uploadDir = $this->dataDir . '/uploads/evidence';
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0775, true);
+        }
+        $storedName = $this->generateUuidV4() . '_' . basename($originalName);
+        $storedPath = $uploadDir . '/' . $storedName;
+        if (is_file($tmpPath)) {
+            @move_uploaded_file($tmpPath, $storedPath);
+        }
+
+        $attachmentId = $this->generateUuidV4();
+
+        try {
+            $stmt = $db->prepare(
+                "INSERT INTO attachment (attachment_id, entity_name, entity_id, file_name, storage_uri,
+                                        checksum_sha256, content_type, file_size_bytes, uploaded_by_party_id)
+                 VALUES (:aid, 'approval_group', :eid, :fn, :uri, :cs, :ct, :fs, :up)"
+            );
+            $stmt->execute([
+                ':aid' => $attachmentId,
+                ':eid' => $approvalGroupId,
+                ':fn'  => $originalName,
+                ':uri' => $storedPath,
+                ':cs'  => $checksum,
+                ':ct'  => $contentType,
+                ':fs'  => $fileSize,
+                ':up'  => $uploadedByPartyId,
+            ]);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Failed to create attachment: ' . $e->getMessage());
+        }
+
+        return $this->getGovernanceAttachment($attachmentId, $db) ?? [
+            'attachment_id' => $attachmentId,
+            'entity_name'   => 'approval_group',
+            'entity_id'     => $approvalGroupId,
+            'file_name'     => $originalName,
+        ];
+    }
+
+    /**
+     * Compute a strong ETag for an attachment row.
+     */
+    public function computeAttachmentETag(array $row): string
+    {
+        $canonical = json_encode([
+            'attachment_id'    => $row['attachment_id'] ?? '',
+            'checksum_sha256'  => $row['checksum_sha256'] ?? '',
+            'row_version'      => (int)($row['row_version'] ?? 1),
+            'updated_at'       => $row['updated_at'] ?? '',
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return '"' . hash('sha256', $canonical) . '"';
     }
 
     /**
@@ -545,5 +753,126 @@ final class EvidenceVaultService
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    // ── PostgreSQL Integration ─────────────────────────────────────────────
+
+    /**
+     * Insert evidence record into evidence_vault table.
+     */
+    private function pgInsertEvidence(array $record): void
+    {
+        if (!$this->pgWriteEnabled()) return;
+        try {
+            $db = $this->dataLayer->getConnection();
+            $meta = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            $db->execute(
+                'INSERT INTO evidence_vault
+                    (evidence_id, evidence_type, title, description, file_name, file_path,
+                     file_hash, mime_type, file_size, chain_hash, chain_sequence,
+                     stored_by, metadata)
+                 VALUES
+                    (:eid::uuid, :etype::evidence_type_enum, :title, :desc, :fname, :fpath,
+                     :fhash, :mime, :fsize, :chash, :cseq,
+                     :user, :meta::jsonb)
+                 ON CONFLICT (evidence_id) DO NOTHING',
+                [
+                    ':eid'   => $record['evidence_id'],
+                    ':etype' => $this->mapEvidenceType($record['type'] ?? 'document'),
+                    ':title' => $record['title'] ?? '',
+                    ':desc'  => $record['description'] ?? '',
+                    ':fname' => $record['filename'] ?? $record['original_name'] ?? '',
+                    ':fpath' => $record['stored_path'] ?? '',
+                    ':fhash' => $record['file_hash'] ?? '',
+                    ':mime'  => $record['mime_type'] ?? 'application/octet-stream',
+                    ':fsize' => (int)($record['file_size'] ?? 0),
+                    ':chash' => $record['chain_hash'] ?? '',
+                    ':cseq'  => (int)($record['chain_sequence'] ?? 0),
+                    ':user'  => $record['stored_by'] ?? 'unknown',
+                    ':meta'  => $meta,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[EvidenceVaultService] PG insert evidence failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Insert custody event into evidence_chain_custody table.
+     */
+    private function pgInsertCustody(array $event): void
+    {
+        if (!$this->pgWriteEnabled()) return;
+        try {
+            $db = $this->dataLayer->getConnection();
+            $custodyAction = $this->mapCustodyAction($event['action'] ?? 'accessed');
+
+            $db->execute(
+                'INSERT INTO evidence_chain_custody
+                    (custody_id, evidence_id, action, actor, reason)
+                 VALUES
+                    (:cid::uuid, :eid::uuid, :action::custody_action_enum, :actor, :reason)
+                 ON CONFLICT DO NOTHING',
+                [
+                    ':cid'    => $event['event_id'],
+                    ':eid'    => $event['evidence_id'],
+                    ':action' => $custodyAction,
+                    ':actor'  => $event['user'] ?? 'unknown',
+                    ':reason' => $event['reason'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[EvidenceVaultService] PG insert custody failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Insert link into evidence_links table.
+     */
+    private function pgInsertLink(array $linkRecord): void
+    {
+        if (!$this->pgWriteEnabled()) return;
+        try {
+            $db = $this->dataLayer->getConnection();
+
+            $db->execute(
+                'INSERT INTO evidence_links
+                    (link_id, evidence_id, entity_type, entity_id, linked_by, note)
+                 VALUES
+                    (:lid::uuid, :eid::uuid, :etype, :entityid, :user, :note)
+                 ON CONFLICT DO NOTHING',
+                [
+                    ':lid'      => $linkRecord['link_id'],
+                    ':eid'      => $linkRecord['evidence_id'],
+                    ':etype'    => $linkRecord['entity_type'] ?? '',
+                    ':entityid' => $linkRecord['entity_id'] ?? '',
+                    ':user'     => $linkRecord['linked_by'] ?? '',
+                    ':note'     => $linkRecord['note'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[EvidenceVaultService] PG insert link failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Map evidence type to DB enum value.
+     */
+    private function mapEvidenceType(string $type): string
+    {
+        $valid = ['photo', 'document', 'certificate', 'measurement', 'video', 'audio', 'log', 'report', 'other'];
+        $type = strtolower(trim($type));
+        return in_array($type, $valid, true) ? $type : 'document';
+    }
+
+    /**
+     * Map custody action to DB enum value.
+     */
+    private function mapCustodyAction(string $action): string
+    {
+        $valid = ['stored', 'accessed', 'exported', 'transferred', 'sealed', 'released', 'archived'];
+        $action = strtolower(trim($action));
+        return in_array($action, $valid, true) ? $action : 'accessed';
     }
 }

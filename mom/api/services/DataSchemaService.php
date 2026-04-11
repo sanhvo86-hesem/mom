@@ -264,6 +264,7 @@ final class DataSchemaService
                 'db_structural_drift_table_count' => (int)($connection['structural_drift_table_count'] ?? 0),
                 'db_missing_column_count' => (int)($connection['missing_column_count'] ?? 0),
                 'db_unexpected_column_count' => (int)($connection['unexpected_column_count'] ?? 0),
+                'db_type_drift_column_count' => (int)($connection['type_drift_column_count'] ?? 0),
                 'db_pk_drift_table_count' => (int)($connection['pk_drift_table_count'] ?? 0),
                 'migration_tracking_present' => !empty($connection['migration_table_present']),
                 'applied_migration_count' => (int)($connection['applied_migration_count'] ?? 0),
@@ -764,6 +765,30 @@ final class DataSchemaService
         }
 
         return array_values(array_unique($rows));
+    }
+
+    /**
+     * @param mixed $keyGroups list<list<string>>
+     * @param list<string> $expectedFields
+     */
+    private function keySequenceExists(mixed $keyGroups, array $expectedFields): bool
+    {
+        $expected = array_values(array_filter($expectedFields, static fn(string $field): bool => $field !== ''));
+        if ($expected === [] || !is_array($keyGroups)) {
+            return false;
+        }
+
+        foreach ($keyGroups as $group) {
+            if (!is_array($group)) {
+                continue;
+            }
+            $candidate = array_values(array_filter($group, 'is_string'));
+            if ($candidate === $expected) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1362,6 +1387,7 @@ final class DataSchemaService
         $structuralDrift = [];
         $missingColumnCount = 0;
         $unexpectedColumnCount = 0;
+        $typeDriftCount = 0;
         $pkDriftCount = 0;
         $authorityTableCount = count($tables);
 
@@ -1371,12 +1397,14 @@ final class DataSchemaService
             }
             $missingColumns = array_values(array_filter((array)($table['missing_columns'] ?? []), 'is_scalar'));
             $unexpectedColumns = array_values(array_filter((array)($table['unexpected_columns'] ?? []), 'is_scalar'));
+            $typeDrifts = array_values(array_filter((array)($table['type_drifts'] ?? []), 'is_array'));
             $pkDrift = !empty($table['pk_drift']);
-            if ($missingColumns === [] && $unexpectedColumns === [] && !$pkDrift) {
+            if ($missingColumns === [] && $unexpectedColumns === [] && $typeDrifts === [] && !$pkDrift) {
                 continue;
             }
             $missingColumnCount += count($missingColumns);
             $unexpectedColumnCount += count($unexpectedColumns);
+            $typeDriftCount += count($typeDrifts);
             if ($pkDrift) {
                 $pkDriftCount += 1;
             }
@@ -1386,13 +1414,14 @@ final class DataSchemaService
                 'domain' => (string)($table['domain'] ?? ''),
                 'missing_columns' => array_slice($missingColumns, 0, 8),
                 'unexpected_columns' => array_slice($unexpectedColumns, 0, 8),
+                'type_drifts' => array_slice($typeDrifts, 0, 8),
                 'pk_drift' => $pkDrift,
             ];
         }
 
         usort($structuralDrift, static function (array $a, array $b): int {
-            $aScore = count((array)($a['missing_columns'] ?? [])) + count((array)($a['unexpected_columns'] ?? [])) + (!empty($a['pk_drift']) ? 1 : 0);
-            $bScore = count((array)($b['missing_columns'] ?? [])) + count((array)($b['unexpected_columns'] ?? [])) + (!empty($b['pk_drift']) ? 1 : 0);
+            $aScore = count((array)($a['missing_columns'] ?? [])) + count((array)($a['unexpected_columns'] ?? [])) + count((array)($a['type_drifts'] ?? [])) + (!empty($a['pk_drift']) ? 1 : 0);
+            $bScore = count((array)($b['missing_columns'] ?? [])) + count((array)($b['unexpected_columns'] ?? [])) + count((array)($b['type_drifts'] ?? [])) + (!empty($b['pk_drift']) ? 1 : 0);
             return $bScore <=> $aScore;
         });
 
@@ -1433,6 +1462,7 @@ final class DataSchemaService
             'structural_drift_table_count' => count($structuralDrift),
             'missing_column_count' => $missingColumnCount,
             'unexpected_column_count' => $unexpectedColumnCount,
+            'type_drift_column_count' => $typeDriftCount,
             'pk_drift_table_count' => $pkDriftCount,
             'structural_drift' => array_slice($structuralDrift, 0, 20),
             'error' => (string)($dbProbe['error'] ?? ''),
@@ -1804,6 +1834,9 @@ final class DataSchemaService
                 if (!empty($item['unexpected_columns'])) {
                     $parts[] = 'unexpected ' . count((array)$item['unexpected_columns']);
                 }
+                if (!empty($item['type_drifts'])) {
+                    $parts[] = 'type ' . count((array)$item['type_drifts']);
+                }
                 if (!empty($item['pk_drift'])) {
                     $parts[] = 'pk';
                 }
@@ -1815,7 +1848,7 @@ final class DataSchemaService
                 'blocking' => true,
                 'title' => 'Live DB structure diverges from registry authority',
                 'detail' => implode(', ', $labels),
-                'nextAction' => 'Reconcile missing/unexpected columns and PK posture before treating runtime preview and release posture as truthful.',
+                'nextAction' => 'Reconcile missing/unexpected/type-drift columns and PK posture before treating runtime preview and release posture as truthful.',
             ];
         }
 
@@ -2231,7 +2264,9 @@ final class DataSchemaService
             'db_table_count' => 0,
             'present_lookup' => [],
             'column_lookup' => [],
+            'column_type_lookup' => [],
             'pk_lookup' => [],
+            'unique_key_lookup' => [],
             'present_table_count' => 0,
             'missing_table_count' => 0,
             'missing_tables' => [],
@@ -2274,7 +2309,10 @@ final class DataSchemaService
             }
 
             $columnStmt = $pdo->prepare("
-                SELECT c.relname AS table_name, a.attname AS column_name
+                SELECT
+                    c.relname AS table_name,
+                    a.attname AS column_name,
+                    format_type(a.atttypid, a.atttypmod) AS column_type
                 FROM pg_class c
                 JOIN pg_namespace n
                   ON n.oid = c.relnamespace
@@ -2289,6 +2327,7 @@ final class DataSchemaService
             ");
             $columnStmt->execute(['schema' => $schemaName]);
             $columnLookup = [];
+            $columnTypeLookup = [];
             foreach ($columnStmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
                 $tableName = trim((string)($row['table_name'] ?? ''));
                 $columnName = trim((string)($row['column_name'] ?? ''));
@@ -2298,7 +2337,11 @@ final class DataSchemaService
                 if (!isset($columnLookup[$tableName])) {
                     $columnLookup[$tableName] = [];
                 }
+                if (!isset($columnTypeLookup[$tableName])) {
+                    $columnTypeLookup[$tableName] = [];
+                }
                 $columnLookup[$tableName][$columnName] = true;
+                $columnTypeLookup[$tableName][$columnName] = trim((string)($row['column_type'] ?? ''));
             }
 
             $pkStmt = $pdo->prepare("
@@ -2331,6 +2374,43 @@ final class DataSchemaService
                     $pkLookup[$tableName] = [];
                 }
                 $pkLookup[$tableName][] = $columnName;
+            }
+
+            $uniqueStmt = $pdo->prepare("
+                SELECT
+                    c.relname AS table_name,
+                    string_agg(a.attname, ',' ORDER BY k.ordinality) AS column_names
+                FROM pg_index ix
+                JOIN pg_class c
+                  ON c.oid = ix.indrelid
+                JOIN pg_namespace n
+                  ON n.oid = c.relnamespace
+                JOIN unnest(ix.indkey) WITH ORDINALITY AS k(attnum, ordinality)
+                  ON true
+                JOIN pg_attribute a
+                  ON a.attrelid = c.oid
+                 AND a.attnum = k.attnum
+                WHERE n.nspname = :schema
+                  AND ix.indisunique
+                  AND ix.indpred IS NULL
+                  AND ix.indexprs IS NULL
+                  AND c.relkind IN ('r', 'p')
+                  AND NOT c.relispartition
+                GROUP BY c.relname, ix.indexrelid
+                ORDER BY c.relname, ix.indexrelid
+            ");
+            $uniqueStmt->execute(['schema' => $schemaName]);
+            $uniqueKeyLookup = [];
+            foreach ($uniqueStmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+                $tableName = trim((string)($row['table_name'] ?? ''));
+                $columns = $this->scalarStringList(explode(',', (string)($row['column_names'] ?? '')));
+                if ($tableName === '' || $columns === [] || $this->isInternalDatabaseTable($tableName)) {
+                    continue;
+                }
+                if (!isset($uniqueKeyLookup[$tableName])) {
+                    $uniqueKeyLookup[$tableName] = [];
+                }
+                $uniqueKeyLookup[$tableName][] = $columns;
             }
 
             $migrationMeta = $pdo->query("
@@ -2382,7 +2462,9 @@ final class DataSchemaService
             $result['db_table_count'] = count($dbTables);
             $result['present_lookup'] = $dbLookup;
             $result['column_lookup'] = $columnLookup;
+            $result['column_type_lookup'] = $columnTypeLookup;
             $result['pk_lookup'] = $pkLookup;
+            $result['unique_key_lookup'] = $uniqueKeyLookup;
             $result['present_table_count'] = count($tableKeys) - count($missing);
             $result['missing_table_count'] = count($missing);
             $result['missing_tables'] = array_slice($missing, 0, 50);
@@ -2520,7 +2602,9 @@ final class DataSchemaService
         $governanceCarriers = $this->governanceCarrierTables($tables);
         $dbLookup = is_array($dbProbe['present_lookup'] ?? null) ? $dbProbe['present_lookup'] : [];
         $dbColumnLookup = is_array($dbProbe['column_lookup'] ?? null) ? $dbProbe['column_lookup'] : [];
+        $dbColumnTypeLookup = is_array($dbProbe['column_type_lookup'] ?? null) ? $dbProbe['column_type_lookup'] : [];
         $dbPkLookup = is_array($dbProbe['pk_lookup'] ?? null) ? $dbProbe['pk_lookup'] : [];
+        $dbUniqueKeyLookup = is_array($dbProbe['unique_key_lookup'] ?? null) ? $dbProbe['unique_key_lookup'] : [];
         $dbProbeApplicable = !empty($dbProbe['db_probe_applicable']);
         $dbProbeResolved = !empty($dbProbe['db_probe_resolved']);
         $tableKeys = $this->allTableKeys($tableRegistry, $relationMap);
@@ -2539,6 +2623,7 @@ final class DataSchemaService
             $table = is_array($tables[$key] ?? null) ? $tables[$key] : [];
             $entity = is_array($entities[$key] ?? null) ? $entities[$key] : [];
             $columns = is_array($table['columns'] ?? null) ? array_keys($table['columns']) : [];
+            $columnMetaLookup = is_array($table['columns'] ?? null) ? $table['columns'] : [];
             $fieldNames = $columns !== [] ? $columns : $this->scalarStringList($entity['fields'] ?? []);
             $governanceMissing = $this->scalarStringList($entity['governanceMissing'] ?? []);
             if ($governanceMissing === [] && $fieldNames !== []) {
@@ -2563,7 +2648,40 @@ final class DataSchemaService
             $dbStatus = $this->tableDbStatus($dbProbeApplicable, $dbProbeResolved, $dbPresent, $migrationLedgerEmpty, $dbTargetIncomplete);
             $missingColumns = $dbPresent === true ? array_values(array_diff($fieldNames, $dbColumns)) : [];
             $unexpectedColumns = $dbPresent === true ? array_values(array_diff($dbColumns, $fieldNames)) : [];
-            $pkDrift = $dbPresent === true && $expectedPkFields !== [] && $dbPkFields !== $expectedPkFields;
+            $typeDrifts = [];
+            if ($dbPresent === true) {
+                $dbColumnTypes = is_array($dbColumnTypeLookup[$key] ?? null) ? $dbColumnTypeLookup[$key] : [];
+                foreach ($fieldNames as $fieldName) {
+                    if (!is_string($fieldName) || $fieldName === '' || !isset($dbColumnTypes[$fieldName])) {
+                        continue;
+                    }
+                    $columnMeta = is_array($columnMetaLookup[$fieldName] ?? null) ? $columnMetaLookup[$fieldName] : [];
+                    $expectedType = trim((string)($columnMeta['type'] ?? ''));
+                    $dbType = trim((string)$dbColumnTypes[$fieldName]);
+                    if ($expectedType === '' || $dbType === '') {
+                        continue;
+                    }
+                    if ($this->normalizeSqlTypeSignature($expectedType) === $this->normalizeSqlTypeSignature($dbType)) {
+                        continue;
+                    }
+                    $typeDrifts[] = [
+                        'column' => $fieldName,
+                        'expected' => $expectedType,
+                        'db' => $dbType,
+                    ];
+                }
+            }
+            $pkExactMatch = $expectedPkFields !== [] && $dbPkFields === $expectedPkFields;
+            $contractKeyUnique = $expectedPkFields !== [] && $this->keySequenceExists($dbUniqueKeyLookup[$key] ?? [], $expectedPkFields);
+            $pkContractStatus = $expectedPkFields === []
+                ? 'not_declared'
+                : ($dbPresent !== true
+                    ? 'not_probed'
+                    : ($pkExactMatch
+                        ? 'primary_key_match'
+                        : ($contractKeyUnique ? 'compatible_unique_contract_key' : 'drift')));
+            $pkDrift = $dbPresent === true && $expectedPkFields !== [] && $pkContractStatus === 'drift';
+            $physicalPkDrift = $dbPresent === true && $expectedPkFields !== [] && $dbPkFields !== $expectedPkFields;
             $migration = trim((string)($table['migration'] ?? ''));
             $migrationPath = $migration !== '' ? $this->rootDir . '/mom/database/migrations/' . $migration : '';
             $migrationSourcePresent = $migrationPath !== '' && is_file($migrationPath);
@@ -2636,11 +2754,17 @@ final class DataSchemaService
                 'db_column_count' => count($dbColumns),
                 'missing_column_count' => count($missingColumns),
                 'unexpected_column_count' => count($unexpectedColumns),
-                'column_drift_count' => count($missingColumns) + count($unexpectedColumns),
+                'column_drift_count' => count($missingColumns) + count($unexpectedColumns) + count($typeDrifts),
                 'missing_columns' => array_slice($missingColumns, 0, 12),
                 'unexpected_columns' => array_slice($unexpectedColumns, 0, 12),
+                'type_drift_count' => count($typeDrifts),
+                'type_drifts' => array_slice($typeDrifts, 0, 12),
                 'expected_primary_key_fields' => $expectedPkFields,
                 'db_primary_key_fields' => $dbPkFields,
+                'db_unique_key_fields' => array_slice((array)($dbUniqueKeyLookup[$key] ?? []), 0, 8),
+                'primary_key_contract_status' => $pkContractStatus,
+                'physical_pk_drift' => $physicalPkDrift,
+                'contract_key_unique' => $contractKeyUnique,
                 'pk_drift' => $pkDrift,
             ];
         }
@@ -3066,8 +3190,9 @@ final class DataSchemaService
             }
             $missingColumns = array_values(array_filter((array)($table['missing_columns'] ?? []), 'is_scalar'));
             $unexpectedColumns = array_values(array_filter((array)($table['unexpected_columns'] ?? []), 'is_scalar'));
+            $typeDrifts = array_values(array_filter((array)($table['type_drifts'] ?? []), 'is_array'));
             $pkDrift = !empty($table['pk_drift']);
-            if ($missingColumns === [] && $unexpectedColumns === [] && !$pkDrift) {
+            if ($missingColumns === [] && $unexpectedColumns === [] && $typeDrifts === [] && !$pkDrift) {
                 continue;
             }
             $structuralDrift[] = [
@@ -3076,12 +3201,13 @@ final class DataSchemaService
                 'domain' => (string)($table['domain'] ?? ''),
                 'missing' => $missingColumns,
                 'unexpected' => $unexpectedColumns,
+                'type_drifts' => array_slice($typeDrifts, 0, 8),
                 'pk_drift' => $pkDrift,
             ];
         }
         usort($structuralDrift, static function (array $a, array $b): int {
-            $aScore = count((array)($a['missing'] ?? [])) + count((array)($a['unexpected'] ?? [])) + (!empty($a['pk_drift']) ? 1 : 0);
-            $bScore = count((array)($b['missing'] ?? [])) + count((array)($b['unexpected'] ?? [])) + (!empty($b['pk_drift']) ? 1 : 0);
+            $aScore = count((array)($a['missing'] ?? [])) + count((array)($a['unexpected'] ?? [])) + count((array)($a['type_drifts'] ?? [])) + (!empty($a['pk_drift']) ? 1 : 0);
+            $bScore = count((array)($b['missing'] ?? [])) + count((array)($b['unexpected'] ?? [])) + count((array)($b['type_drifts'] ?? [])) + (!empty($b['pk_drift']) ? 1 : 0);
             return $bScore <=> $aScore;
         });
 
@@ -3103,6 +3229,21 @@ final class DataSchemaService
             'stress_scenarios' => array_slice(array_values(array_filter((array)($stressAudit['critical'] ?? []), 'is_array')), 0, 8),
             'migration_hotspots' => $migrationHotspots,
         ];
+    }
+
+    private function normalizeSqlTypeSignature(string $type): string
+    {
+        $normalized = strtoupper(trim((string)preg_replace('/\s+/', ' ', $type)));
+        $normalized = str_replace('CHARACTER VARYING', 'VARCHAR', $normalized);
+        $normalized = str_replace('CHARACTER(', 'CHAR(', $normalized);
+        $normalized = str_replace('TIMESTAMP WITH TIME ZONE', 'TIMESTAMPTZ', $normalized);
+        $normalized = str_replace('TIMESTAMP WITHOUT TIME ZONE', 'TIMESTAMP', $normalized);
+        $normalized = str_replace('TIME WITH TIME ZONE', 'TIMETZ', $normalized);
+        $normalized = str_replace('TIME WITHOUT TIME ZONE', 'TIME', $normalized);
+        $normalized = str_replace('INTEGER[]', 'INT[]', $normalized);
+        $normalized = preg_replace('/\bINTEGER\b/', 'INT', $normalized) ?? $normalized;
+        $normalized = preg_replace('/\bDOUBLE PRECISION\b/', 'FLOAT8', $normalized) ?? $normalized;
+        return $normalized;
     }
 
     /**

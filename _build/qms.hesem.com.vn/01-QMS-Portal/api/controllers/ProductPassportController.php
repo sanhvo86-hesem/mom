@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
 use Throwable;
 
 /**
- * Digital Product Passport controller for HESEM QMS Portal.
+ * Digital Product Passport controller for HESEM MOM Portal.
  *
  * Provides API endpoints for passport CRUD, lifecycle event tracking,
  * forward/backward genealogy tracing, and QR code data generation.
  *
- * Data stored in `qms-data/passports/` with per-entity JSON files.
+ * Data stored in `data/passports/` with per-entity JSON files.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class ProductPassportController extends BaseController

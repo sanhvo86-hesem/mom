@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\FmeaService;
+use MOM\Api\Controllers\BaseController;
+use MOM\Services\FmeaService;
 use Throwable;
 
 /**
- * FMEA & Control Plan controller for HESEM QMS Portal.
+ * FMEA & Control Plan controller for HESEM MOM Portal.
  *
  * Provides API endpoints for FMEA management (DFMEA/PFMEA per
  * AIAG/VDA 2019), failure mode CRUD, recommended actions with
@@ -18,7 +18,7 @@ use Throwable;
  *
  * Access requires 'quality' or 'engineering' role.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class FmeaController extends BaseController

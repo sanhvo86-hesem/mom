@@ -2,24 +2,26 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\EvidenceVaultService;
+use MOM\Api\Controllers\BaseController;
+use MOM\Api\Services\IdempotencyService;
+use MOM\Api\Services\RecordConflictException;
+use MOM\Services\EvidenceVaultService;
 use Throwable;
 
 /**
- * Evidence vault controller for HESEM QMS Portal.
+ * Evidence vault controller for HESEM MOM Portal.
  *
  * Provides API endpoints for evidence management including upload,
  * linking to entities, chain-of-custody tracking, hash-chain
  * integrity verification, and full-text search.
  *
- * Evidence metadata in `qms-data/evidence/vault.json`, custody log
- * in `qms-data/evidence/custody.json`, actual files in
- * `qms-data/uploads/evidence/`.
+ * Evidence metadata in `data/evidence/vault.json`, custody log
+ * in `data/evidence/custody.json`, actual files in
+ * `data/uploads/evidence/`.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class EvidenceController extends BaseController
@@ -29,6 +31,7 @@ class EvidenceController extends BaseController
 
     /** @var array|null Cached evidence access-control config. */
     private ?array $evidenceConfig = null;
+    private ?IdempotencyService $idempotencyService = null;
 
     // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -40,9 +43,107 @@ class EvidenceController extends BaseController
     private function evidenceService(): EvidenceVaultService
     {
         if ($this->evidenceSvc === null) {
-            $this->evidenceSvc = new EvidenceVaultService($this->dataDir);
+            $this->evidenceSvc = new EvidenceVaultService($this->dataDir, $this->data);
         }
         return $this->evidenceSvc;
+    }
+
+    private function idempotency(): IdempotencyService
+    {
+        if ($this->idempotencyService === null) {
+            $this->idempotencyService = new IdempotencyService($this->dataDir);
+        }
+
+        return $this->idempotencyService;
+    }
+
+    private function parseIdempotencyKey(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_scalar($value)) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Invalid Idempotency-Key', 400);
+        }
+
+        $text = trim((string)$value);
+        if ($text === '') {
+            return null;
+        }
+        if (strlen($text) > 200 || preg_match('/^[A-Za-z0-9._:\-]+$/', $text) !== 1) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Invalid Idempotency-Key', 400);
+        }
+
+        return $text;
+    }
+
+    /**
+     * @param array<string, mixed> $file
+     */
+    private function fileSha256(array $file): string
+    {
+        $tmpName = trim((string)($file['tmp_name'] ?? ''));
+        if ($tmpName === '' || !is_file($tmpName)) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Uploaded file is unavailable for integrity verification', 422);
+        }
+
+        $hash = hash_file('sha256', $tmpName);
+        if (!is_string($hash) || trim($hash) === '') {
+            $this->sliceProblem('urn:qms:problem:server-error', 'Unable to fingerprint uploaded file', 500);
+        }
+
+        return $hash;
+    }
+
+    /**
+     * @param array<string, mixed> $file
+     * @return array<string, mixed>
+     */
+    private function governanceAttachmentIdempotency(array $file, string $approvalGroupId, ?string $commentText, ?string $documentTypeCode, string $actorPartyId): array
+    {
+        $postKey = $this->parseIdempotencyKey($_POST['idempotency_key'] ?? null)
+            ?? $this->parseIdempotencyKey($_POST['request_id'] ?? null);
+        $explicitKey = $this->parseIdempotencyKey($this->requestHeader('Idempotency-Key'))
+            ?? $this->parseIdempotencyKey($this->query('idempotency_key'))
+            ?? $this->parseIdempotencyKey($this->query('request_id'))
+            ?? $postKey;
+
+        $fingerprint = [
+            'approval_group_id' => $approvalGroupId,
+            'actor_party_id' => $actorPartyId,
+            'comment_text' => $commentText,
+            'document_type_code' => $documentTypeCode,
+            'file_name' => (string)($file['name'] ?? ''),
+            'file_size' => (int)($file['size'] ?? 0),
+            'file_sha256' => $this->fileSha256($file),
+        ];
+
+        if ($explicitKey !== null) {
+            return [
+                'scope_key' => implode('|', ['governance_attachment', $approvalGroupId, $actorPartyId]),
+                'key' => $explicitKey,
+                'key_source' => 'header_or_body',
+                'mode' => 'client_token',
+                'kind' => 'create',
+                'domain' => 'governance',
+                'table' => 'attachment',
+                'user_id' => $actorPartyId,
+                'fingerprint' => $fingerprint,
+            ];
+        }
+
+        return [
+            'scope_key' => implode('|', ['governance_attachment', $approvalGroupId, $actorPartyId]),
+            'key' => 'drv-attachment-create-' . hash('sha256', json_encode($fingerprint, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+            'key_source' => 'derived:file_checksum_payload',
+            'mode' => 'derived_payload_window',
+            'kind' => 'create',
+            'domain' => 'governance',
+            'table' => 'attachment',
+            'user_id' => $actorPartyId,
+            'ttl_seconds' => $this->idempotency()->retryWindowSeconds(),
+            'fingerprint' => $fingerprint,
+        ];
     }
 
     /**
@@ -397,6 +498,206 @@ class EvidenceController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('verify_chain_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ══ Governance Attachment Routes (Foundation Governance Contract Slice) ═══
+
+    /**
+     * Emit an RFC 9457 problem detail.
+     */
+    private function sliceProblem(string $type, string $title, int $status, ?string $detail = null): never
+    {
+        $body = ['type' => $type, 'title' => $title, 'status' => $status];
+        if ($detail !== null) {
+            $body['detail'] = $detail;
+        }
+        throw ExitException::json($body, $status, ['Content-Type' => 'application/problem+json']);
+    }
+
+    private function sliceJson(array $payload, int $code = 200, array $headers = []): never
+    {
+        throw ExitException::json($payload, $code, array_merge(
+            ['Content-Type' => 'application/json'],
+            $headers
+        ));
+    }
+
+    /**
+     * GET /api/v1/governance/approval-groups/{approvalGroupId}/attachments
+     */
+    public function listApprovalGroupAttachments(): never
+    {
+        $this->requireAuth();
+
+        $groupId = $this->query('approvalGroupId') ?? '';
+        if ($groupId === '') {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Missing approvalGroupId', 400);
+        }
+
+        $db = $this->data->getConnection();
+        if ($db === null) {
+            $this->sliceProblem('urn:qms:problem:server-error', 'Database unavailable', 503);
+        }
+
+        try {
+            $rows = $this->evidenceService()->listGovernanceAttachments('approval_group', $groupId, $db);
+
+            $data = array_map(function (array $r): array {
+                return [
+                    'attachmentId'       => $r['attachment_id'],
+                    'entityName'         => $r['entity_name'],
+                    'entityId'           => $r['entity_id'],
+                    'fileName'           => $r['file_name'],
+                    'contentType'        => $r['content_type'],
+                    'fileSizeBytes'      => $r['file_size_bytes'] !== null ? (int)$r['file_size_bytes'] : null,
+                    'checksumSha256'     => $r['checksum_sha256'] ?? '',
+                    'uploadedByPartyId'  => $r['uploaded_by_party_id'],
+                    'createdAt'          => $r['created_at'] ? (new \DateTimeImmutable($r['created_at']))->format('c') : null,
+                    'etag'               => $this->evidenceService()->computeAttachmentETag($r),
+                ];
+            }, $rows);
+
+            $this->sliceJson([
+                'data'     => $data,
+                'pageInfo' => [
+                    'limit'           => count($data),
+                    'hasNextPage'     => false,
+                    'hasPreviousPage' => false,
+                    'startCursor'     => null,
+                    'endCursor'       => null,
+                    'sort'            => [['field' => 'created_at', 'direction' => 'desc']],
+                ],
+            ]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET /api/v1/governance/attachments/{attachmentId}
+     */
+    public function getGovernanceAttachment(): never
+    {
+        $this->requireAuth();
+
+        $attachmentId = $this->query('attachmentId') ?? '';
+        if ($attachmentId === '') {
+            $this->sliceProblem('urn:qms:problem:invalid-request', 'Missing attachmentId', 400);
+        }
+
+        $db = $this->data->getConnection();
+        if ($db === null) {
+            $this->sliceProblem('urn:qms:problem:server-error', 'Database unavailable', 503);
+        }
+
+        try {
+            $row = $this->evidenceService()->getGovernanceAttachment($attachmentId, $db);
+            if ($row === null) {
+                $this->sliceProblem('urn:qms:problem:resource-not-found', 'Attachment not found', 404);
+            }
+
+            $etag = $this->evidenceService()->computeAttachmentETag($row);
+
+            $this->sliceJson([
+                'data' => [
+                    'attachmentId'       => $row['attachment_id'],
+                    'entityName'         => $row['entity_name'],
+                    'entityId'           => $row['entity_id'],
+                    'fileName'           => $row['file_name'],
+                    'contentType'        => $row['content_type'],
+                    'fileSizeBytes'      => $row['file_size_bytes'] !== null ? (int)$row['file_size_bytes'] : null,
+                    'checksumSha256'     => $row['checksum_sha256'] ?? '',
+                    'evidenceChainHash'  => $row['evidence_chain_hash'],
+                    'uploadedByPartyId'  => $row['uploaded_by_party_id'],
+                    'createdAt'          => $row['created_at'] ? (new \DateTimeImmutable($row['created_at']))->format('c') : null,
+                    'updatedAt'          => $row['updated_at'] ? (new \DateTimeImmutable($row['updated_at']))->format('c') : null,
+                    'rowVersion'         => (int)($row['row_version'] ?? 1),
+                ],
+            ], 200, ['ETag' => $etag]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST /api/v1/governance/attachments
+     */
+    public function createGovernanceAttachment(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+
+        $approvalGroupId = $_POST['approvalGroupId'] ?? '';
+        if ($approvalGroupId === '') {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Missing approvalGroupId', 422);
+        }
+
+        $file = $this->uploadedFile('file');
+        if ($file === null) {
+            $this->sliceProblem('urn:qms:problem:validation-error', 'Missing file', 422);
+        }
+
+        $db = $this->data->getConnection();
+        if ($db === null) {
+            $this->sliceProblem('urn:qms:problem:server-error', 'Database unavailable', 503);
+        }
+
+        $actorPartyId = (string)($user['party_id'] ?? $user['username'] ?? 'unknown');
+        $commentText = $_POST['commentText'] ?? null;
+        $documentTypeCode = $_POST['documentTypeCode'] ?? null;
+        $idempotency = $this->governanceAttachmentIdempotency($file, (string)$approvalGroupId, is_scalar($commentText) ? (string)$commentText : null, is_scalar($documentTypeCode) ? (string)$documentTypeCode : null, $actorPartyId);
+
+        try {
+            $execution = $this->idempotency()->execute($idempotency, function () use ($file, $approvalGroupId, $actorPartyId, $db, $commentText, $documentTypeCode): array {
+                $row = $this->evidenceService()->createGovernanceAttachment(
+                    $file, $approvalGroupId, $actorPartyId, $db, $commentText, $documentTypeCode
+                );
+
+                $etag = $this->evidenceService()->computeAttachmentETag($row);
+                return [
+                    'status_code' => 201,
+                    'payload' => [
+                        'data' => [
+                            'attachmentId'       => $row['attachment_id'],
+                            'entityName'         => $row['entity_name'] ?? 'approval_group',
+                            'entityId'           => $row['entity_id'] ?? $approvalGroupId,
+                            'fileName'           => $row['file_name'],
+                            'checksumSha256'     => $row['checksum_sha256'] ?? '',
+                            'createdAt'          => $row['created_at'] ?? null,
+                        ],
+                        'etag' => $etag,
+                        'location' => '/api/v1/governance/attachments/' . ($row['attachment_id'] ?? ''),
+                    ],
+                ];
+            });
+
+            $payload = is_array($execution['payload'] ?? null) ? (array)$execution['payload'] : [];
+            $etag = trim((string)($payload['etag'] ?? ''));
+            $location = trim((string)($payload['location'] ?? ''));
+            unset($payload['etag'], $payload['location']);
+
+            $headers = [];
+            if ($etag !== '') {
+                $headers['ETag'] = $etag;
+            }
+            if ($location !== '') {
+                $headers['Location'] = $location;
+            }
+
+            $this->sliceJson($payload, (int)($execution['status_code'] ?? 201), $headers);
+        } catch (RecordConflictException $e) {
+            $this->sliceProblem('urn:qms:problem:idempotency-conflict', 'Idempotency conflict', 409, $e->getMessage());
+        } catch (\RuntimeException $e) {
+            if (strpos($e->getMessage(), 'no longer accepts') !== false) {
+                $this->sliceProblem('urn:qms:problem:invalid-state-transition', 'Approval group no longer accepts attachments', 409, $e->getMessage());
+            }
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->sliceProblem('urn:qms:problem:server-error', 'Server error', 500, $e->getMessage());
         }
     }
 

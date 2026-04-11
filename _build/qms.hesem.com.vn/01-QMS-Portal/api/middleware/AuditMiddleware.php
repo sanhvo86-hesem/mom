@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Middleware;
+namespace MOM\Api\Middleware;
 
-use HESEM\QMS\Api\Controllers\ExitException;
+use MOM\Api\Controllers\ExitException;
 use Throwable;
 
 /**
- * Audit trail middleware for HESEM QMS API.
+ * Audit trail middleware for HESEM MOM API.
  *
  * Logs every API call with action, user, IP, timestamp,
  * request summary, and response status to a JSONL audit file.
  *
- * @package HESEM\QMS\Api\Middleware
+ * @package MOM\Api\Middleware
  * @since   2.0.0
  */
 class AuditMiddleware

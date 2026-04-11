@@ -25759,3 +25759,331 @@ CREATE TRIGGER trg_work_order_row_version BEFORE UPDATE ON work_order FOR EACH R
 
 COMMIT;
 -- <<< END MIGRATION: 091_runtime_governance_continuity.sql
+
+-- >>> BEGIN MIGRATION: 092_risk_register_contract_alignment.sql
+-- ============================================================================
+-- Migration 092: Risk Register Contract Alignment
+-- Replays the additive risk_register contract fields that were introduced into
+-- the 078 source after some runtime databases had already recorded 078 as
+-- applied. This keeps the immutable migration ledger truthful without editing
+-- history or requiring destructive table rebuilds.
+--
+-- Safety: additive columns, idempotent backfill, no deletes, no PK replacement.
+-- Rollback: Manual rollback only if every dependent API/registry contract has
+-- been superseded; dropping these columns would remove audit/risk context.
+-- ============================================================================
+
+BEGIN;
+
+ALTER TABLE risk_register
+    ADD COLUMN IF NOT EXISTS risk_register_id UUID,
+    ADD COLUMN IF NOT EXISTS risk_domain VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_entity_name VARCHAR(80),
+    ADD COLUMN IF NOT EXISTS source_entity_id UUID,
+    ADD COLUMN IF NOT EXISTS severity_code VARCHAR(30),
+    ADD COLUMN IF NOT EXISTS occurrence_code VARCHAR(30),
+    ADD COLUMN IF NOT EXISTS detection_code VARCHAR(30),
+    ADD COLUMN IF NOT EXISTS mitigation_text TEXT,
+    ADD COLUMN IF NOT EXISTS status_code VARCHAR(30) NOT NULL DEFAULT 'open';
+
+UPDATE risk_register
+SET risk_register_id = COALESCE(risk_register_id, gen_random_uuid()),
+    risk_domain = COALESCE(
+        risk_domain,
+        CASE risk_category::text
+            WHEN 'Quality' THEN 'quality'
+            WHEN 'Delivery' THEN 'delivery'
+            WHEN 'Safety' THEN 'safety'
+            WHEN 'Financial' THEN 'financial'
+            WHEN 'Regulatory' THEN 'regulatory'
+            WHEN 'Supplier' THEN 'supplier'
+            WHEN 'Technology' THEN 'technology'
+            WHEN 'Human Resource' THEN 'people'
+            ELSE 'quality'
+        END
+    ),
+    mitigation_text = COALESCE(mitigation_text, mitigation_action),
+    severity_code = COALESCE(
+        severity_code,
+        CASE
+            WHEN impact >= 5 THEN 'critical'
+            WHEN impact = 4 THEN 'high'
+            WHEN impact = 3 THEN 'medium'
+            ELSE 'low'
+        END
+    ),
+    occurrence_code = COALESCE(
+        occurrence_code,
+        CASE
+            WHEN likelihood >= 5 THEN 'frequent'
+            WHEN likelihood = 4 THEN 'high'
+            WHEN likelihood = 3 THEN 'medium'
+            WHEN likelihood = 2 THEN 'low'
+            ELSE 'rare'
+        END
+    ),
+    detection_code = COALESCE(
+        detection_code,
+        CASE residual_risk::text
+            WHEN 'Critical' THEN 'weak'
+            WHEN 'High' THEN 'weak'
+            WHEN 'Medium' THEN 'moderate'
+            WHEN 'Low' THEN 'strong'
+            ELSE 'unrated'
+        END
+    )
+WHERE risk_register_id IS NULL
+   OR risk_domain IS NULL
+   OR mitigation_text IS NULL
+   OR severity_code IS NULL
+   OR occurrence_code IS NULL
+   OR detection_code IS NULL;
+
+ALTER TABLE risk_register
+    ALTER COLUMN risk_register_id SET DEFAULT gen_random_uuid(),
+    ALTER COLUMN risk_register_id SET NOT NULL,
+    ALTER COLUMN risk_domain SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_risk_register_canonical_id ON risk_register (risk_register_id);
+CREATE INDEX IF NOT EXISTS idx_risk_register_status_code ON risk_register (status_code);
+CREATE INDEX IF NOT EXISTS idx_risk_register_domain ON risk_register (risk_domain);
+
+COMMIT;
+-- <<< END MIGRATION: 092_risk_register_contract_alignment.sql
+
+-- >>> BEGIN MIGRATION: 093_runtime_observed_contract_columns.sql
+-- ============================================================================
+-- Migration 093: Runtime observed contract columns
+-- ============================================================================
+-- Purpose:
+--   Promote columns that already exist in the operational runtime database into
+--   the schema authority so Data Schema reports real runtime contracts rather
+--   than treating live, used columns as ungoverned extras.
+--
+-- No-data-loss rule:
+--   Only additive ALTER TABLE operations, metadata/default backfill, and
+--   non-destructive compatibility indexes are used here. Existing primary keys
+--   and production data are not rewritten.
+-- ============================================================================
+
+-- Audit idempotency / deduplication hash observed in the operational audit path.
+ALTER TABLE audit_events
+    ADD COLUMN IF NOT EXISTS source_event_hash TEXT;
+
+DO $$
+DECLARE
+    audit_events_is_partitioned BOOLEAN := FALSE;
+BEGIN
+    SELECT c.relkind = 'p'
+    INTO audit_events_is_partitioned
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname = 'audit_events';
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_index i
+        JOIN pg_class t ON t.oid = i.indrelid
+        JOIN pg_namespace n ON n.oid = t.relnamespace
+        JOIN unnest(i.indkey) WITH ORDINALITY AS k(attnum, ordinality) ON true
+        JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = k.attnum
+        WHERE n.nspname = 'public'
+          AND t.relname = 'audit_events'
+          AND i.indisunique
+          AND i.indpred IS NULL
+        GROUP BY i.indexrelid
+        HAVING string_agg(a.attname, ',' ORDER BY k.ordinality) = 'source_event_hash'
+            OR string_agg(a.attname, ',' ORDER BY k.ordinality) = 'source_event_hash,recorded_at'
+    ) THEN
+        IF audit_events_is_partitioned THEN
+            CREATE UNIQUE INDEX ux_audit_events_source_event_hash_recorded_at
+                ON audit_events (source_event_hash, recorded_at);
+        ELSE
+            CREATE UNIQUE INDEX ux_audit_events_source_event_hash
+                ON audit_events (source_event_hash)
+                WHERE source_event_hash IS NOT NULL;
+        END IF;
+    END IF;
+END $$;
+
+-- Role metadata is used by the admin bootstrap/runtime authorization layer.
+ALTER TABLE roles
+    ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+
+-- Runtime bitemporal/audit stamps observed on access-control mappings.
+ALTER TABLE user_roles
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+-- Runtime revision stamps used by item revision screens and sync logic.
+ALTER TABLE item_revisions
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+-- MES event tables retain ingestion/update timestamps for replay safety.
+ALTER TABLE mes_connectivity_events
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_downtime_events
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_equipment_extended
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_erp_reconciliation_exceptions
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_erp_sync_runs
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_machine_alarms
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_material_consumption
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_operation_execution
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE mes_shift_handover
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+ALTER TABLE job_operations
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+-- Keep the legacy runtime identifier visible as an alternate key while the
+-- canonical registry key remains variable_id.
+ALTER TABLE variable_registry
+    ADD COLUMN IF NOT EXISTS variable_registry_id UUID,
+    ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+UPDATE variable_registry
+SET variable_registry_id = variable_id
+WHERE variable_registry_id IS NULL;
+
+ALTER TABLE variable_registry
+    ALTER COLUMN variable_registry_id SET DEFAULT uuid_generate_v4(),
+    ALTER COLUMN variable_registry_id SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_variable_registry_legacy_id
+    ON variable_registry (variable_registry_id);
+-- <<< END MIGRATION: 093_runtime_observed_contract_columns.sql
+
+-- >>> BEGIN MIGRATION: 094_department_enum_operational_alignment.sql
+-- ============================================================================
+-- HESEM MOM - Department Enum Operational Alignment
+-- ============================================================================
+-- Purpose:
+--   Production DB contains live department codes FIN and GEN that were not
+--   represented in the canonical dept_code enum.  Add them to the authority
+--   enum so live data can be promoted without coercion loss or FK failure.
+--
+-- Data safety:
+--   ADD VALUE is additive-only and does not rewrite or delete existing rows.
+-- ============================================================================
+
+ALTER TYPE dept_code ADD VALUE IF NOT EXISTS 'FIN';
+ALTER TYPE dept_code ADD VALUE IF NOT EXISTS 'GEN';
+-- <<< END MIGRATION: 094_department_enum_operational_alignment.sql
+
+-- >>> BEGIN MIGRATION: 095_department_master_operational_alignment.sql
+-- ============================================================================
+-- HESEM MOM - Department Master Operational Alignment
+-- ============================================================================
+-- Purpose:
+--   Seed canonical metadata for live department codes added in migration 094.
+--   Existing department records are preserved; this only fills blank metadata.
+-- ============================================================================
+
+INSERT INTO departments (dept_code, label, label_vi, icon, color, record_types, form_series)
+VALUES
+    ('FIN', 'Finance / Accounting', 'Tài chính / Kế toán', 'FIN', '#0f766e', ARRAY[]::TEXT[], ARRAY[]::INT[]),
+    ('GEN', 'General / Administration', 'Hành chính / Tổng vụ', 'GEN', '#64748b', ARRAY[]::TEXT[], ARRAY[]::INT[])
+ON CONFLICT (dept_code) DO UPDATE
+SET
+    label = COALESCE(NULLIF(departments.label, ''), EXCLUDED.label),
+    label_vi = COALESCE(NULLIF(departments.label_vi, ''), EXCLUDED.label_vi),
+    icon = COALESCE(NULLIF(departments.icon, ''), EXCLUDED.icon),
+    color = COALESCE(NULLIF(departments.color, ''), EXCLUDED.color),
+    record_types = CASE
+        WHEN departments.record_types IS NULL OR array_length(departments.record_types, 1) IS NULL THEN EXCLUDED.record_types
+        ELSE departments.record_types
+    END,
+    form_series = CASE
+        WHEN departments.form_series IS NULL OR array_length(departments.form_series, 1) IS NULL THEN EXCLUDED.form_series
+        ELSE departments.form_series
+    END;
+-- <<< END MIGRATION: 095_department_master_operational_alignment.sql
+
+-- >>> BEGIN MIGRATION: 096_runtime_identifier_and_state_contract_alignment.sql
+-- ============================================================================
+-- HESEM MOM - Runtime Identifier and State Contract Alignment
+-- ============================================================================
+-- Purpose:
+--   Align authority schema with actual runtime contracts for MES records whose
+--   public identifiers are generated as stable alphanumeric document IDs by the
+--   backend/API layer.  Keep strict typing where it represents a true controlled
+--   value set, but do not coerce business IDs into UUIDs when the system already
+--   uses readable immutable IDs.
+--
+-- Data safety:
+--   All changes are type-widening or additive.  Existing values are preserved.
+-- ============================================================================
+
+ALTER TABLE departments
+    ALTER COLUMN color TYPE VARCHAR(64) USING color::text;
+
+ALTER TYPE material_consumption_type ADD VALUE IF NOT EXISTS 'VERIFY';
+
+ALTER TABLE mes_material_consumption
+    ALTER COLUMN consumption_id TYPE VARCHAR(80) USING consumption_id::text;
+
+ALTER TABLE mes_genealogy_operations
+    DROP CONSTRAINT IF EXISTS mes_genealogy_operations_genealogy_id_fkey;
+
+ALTER TABLE mes_part_genealogy
+    ALTER COLUMN genealogy_id TYPE VARCHAR(80) USING genealogy_id::text;
+
+ALTER TABLE mes_genealogy_operations
+    ALTER COLUMN genealogy_id TYPE VARCHAR(80) USING genealogy_id::text;
+
+ALTER TABLE mes_genealogy_operations
+    ADD CONSTRAINT mes_genealogy_operations_genealogy_id_fkey
+    FOREIGN KEY (genealogy_id) REFERENCES mes_part_genealogy(genealogy_id);
+
+ALTER TABLE mes_shift_handover
+    ALTER COLUMN handover_id TYPE VARCHAR(80) USING handover_id::text,
+    ALTER COLUMN machine_state TYPE VARCHAR(40) USING machine_state::text;
+
+ALTER TABLE mes_shift_handover
+    DROP CONSTRAINT IF EXISTS chk_mes_shift_handover_machine_state_runtime;
+
+ALTER TABLE mes_shift_handover
+    ADD CONSTRAINT chk_mes_shift_handover_machine_state_runtime
+    CHECK (
+        machine_state IS NULL
+        OR lower(machine_state) IN (
+            'running',
+            'setup',
+            'inspection',
+            'on_hold',
+            'down',
+            'idle',
+            'maintenance',
+            'offline',
+            'productive',
+            'standby',
+            'engineering',
+            'scheduled_down',
+            'unscheduled_down',
+            'non_scheduled'
+        )
+    );
+-- <<< END MIGRATION: 096_runtime_identifier_and_state_contract_alignment.sql

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\MobileWorkQueueService;
+use MOM\Api\Controllers\BaseController;
+use MOM\Services\MobileWorkQueueService;
 use Throwable;
 
 /**
- * Mobile Shop Floor controller for HESEM QMS Portal.
+ * Mobile Shop Floor controller for HESEM MOM Portal.
  *
  * Provides API endpoints for operator work queues, time clock
  * (clock-in/clock-out), first-piece and in-process inspection
@@ -20,7 +20,7 @@ use Throwable;
  * setup technicians, supervisors). Operator identification uses
  * the session user mapped to employee_id via users.json.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class MobileController extends BaseController

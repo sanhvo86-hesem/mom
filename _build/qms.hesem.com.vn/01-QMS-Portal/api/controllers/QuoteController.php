@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace HESEM\QMS\Api\Controllers;
+namespace MOM\Api\Controllers;
 
-use HESEM\QMS\Api\Controllers\BaseController;
-use HESEM\QMS\Services\QuoteService;
+use MOM\Api\Controllers\BaseController;
+use MOM\Services\QuoteService;
 use Throwable;
 
 /**
- * Quote controller for HESEM QMS Portal.
+ * Quote controller for HESEM MOM Portal.
  *
  * Provides API endpoints for quoting and estimation including
  * quote CRUD, status transitions, SO conversion, cycle-time
  * estimation, material cost estimation, and pipeline KPIs.
  *
- * Data stored in `qms-data/quotes/` with quotes.json,
+ * Data stored in `data/quotes/` with quotes.json,
  * rate-cards.json, and material-templates.json.
  *
- * @package HESEM\QMS\Api\Controllers
+ * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class QuoteController extends BaseController
