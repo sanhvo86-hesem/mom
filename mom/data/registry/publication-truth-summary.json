@@ -2,8 +2,8 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "c6ca5fcd-23b1-4f28-8661-e672b97d3859",
-    "generated_at": "2026-04-10T12:22:49.571Z",
+    "publication_run_id": "4d3f16f3-705e-42e6-9ce3-34f689aefa5f",
+    "generated_at": "2026-04-11T02:15:00.858Z",
     "schema_authority": "table-registry.json backed by database/migrations and publication generators",
     "table_count": 658,
     "entity_counts": {
@@ -26,7 +26,7 @@
     },
     "openapi": {
       "version": "3.1.2",
-      "path_count": 73,
+      "path_count": 85,
       "foundation_governance_paths": 10
     },
     "publishability": {

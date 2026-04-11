@@ -294,6 +294,9 @@ $router->actions([
     'vps_control_host'     => [VpsController::class, 'host'],
     'vps_control_action'   => [VpsController::class, 'runAction'],
     'vps_control_asset'    => [VpsController::class, 'asset'],
+    'vps_file_list'        => [VpsController::class, 'fileList'],
+    'vps_file_search'      => [VpsController::class, 'fileSearch'],
+    'vps_file_read'        => [VpsController::class, 'fileRead'],
     'vps_terminal_auth'    => [VpsController::class, 'terminalAuth'],
     'vps_observability_auth' => [VpsController::class, 'observabilityAuth'],
 ]);
@@ -672,6 +675,11 @@ $router->actions([
     'registry_domain_field_packs'=> [RegistryController::class, 'getDomainFieldPacks'],
     'registry_relation_map'      => [RegistryController::class, 'getRelationMap'],
     'registry_endpoint_catalog'  => [RegistryController::class, 'getEndpointCatalog'],
+    'registry_table_registry'    => [RegistryController::class, 'getTableRegistry'],
+    'registry_manifest'          => [RegistryController::class, 'getRegistryManifest'],
+    'registry_compliance_crosswalk'=> [RegistryController::class, 'getComplianceCrosswalk'],
+    'registry_global_capability_audit'=> [RegistryController::class, 'getGlobalCapabilityAudit'],
+    'registry_system_contract'   => [RegistryController::class, 'getSystemContract'],
     'registry_iot_connectors'    => [RegistryController::class, 'getIotConnectors'],
     'registry_full'              => [RegistryController::class, 'getFull'],
     'registry_update'            => [RegistryController::class, 'updateRegistry'],
@@ -884,6 +892,17 @@ $router->delete('/api/dictionary', DictController::class, 'delete');
 // Meta / API catalog
 $router->get('/api/meta/catalog', ModuleSchemaController::class, 'apiCatalog');
 
+// System contract registry for frontend/AI tooling
+$router->get('/api/system/contracts', RegistryController::class, 'getSystemContract');
+$router->get('/api/registry/table-registry', RegistryController::class, 'getTableRegistry');
+$router->get('/api/registry/endpoint-catalog', RegistryController::class, 'getEndpointCatalog');
+$router->get('/api/registry/workflow-library', RegistryController::class, 'getWorkflowLibrary');
+$router->get('/api/registry/status-options', RegistryController::class, 'getStatusOptions');
+$router->get('/api/registry/relation-map', RegistryController::class, 'getRelationMap');
+$router->get('/api/registry/compliance-crosswalk', RegistryController::class, 'getComplianceCrosswalk');
+$router->get('/api/registry/global-capability-audit', RegistryController::class, 'getGlobalCapabilityAudit');
+$router->get('/api/registry/manifest', RegistryController::class, 'getRegistryManifest');
+
 // Generic runtime entity access
 $router->get('/api/runtime/{domain}/{table}', GenericCrudController::class, 'listRecords');
 $router->get('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'getDetail');
@@ -968,6 +987,9 @@ $router->get('/api/dashboard/widget', DashboardController::class, 'widget');
 $router->get('/api/vps/overview', VpsController::class, 'overview');
 $router->get('/api/vps/host', VpsController::class, 'host');
 $router->post('/api/vps/action', VpsController::class, 'runAction');
+$router->get('/api/vps/files', VpsController::class, 'fileList');
+$router->get('/api/vps/files/search', VpsController::class, 'fileSearch');
+$router->get('/api/vps/files/read', VpsController::class, 'fileRead');
 $router->get('/api/vps/terminal/auth', VpsController::class, 'terminalAuth');
 $router->get('/api/vps/observability/auth', VpsController::class, 'observabilityAuth');
 

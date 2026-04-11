@@ -58,6 +58,8 @@ REQUIRED_ARTIFACTS = [
     REG / "operational-stress-governance-policy.json",
     REG / "operational-stress-catalog.json",
     REG / "operational-stress-report.json",
+    REG / "global-erp-mom-capability-catalog.json",
+    REG / "global-erp-mom-capability-audit.json",
     REG / "wave-gap-ledger.json",
     REG / "publication-truth-summary.json",
     REG / "publication-entity-accounting.json",
@@ -112,6 +114,12 @@ def main() -> int:
     print("\nGate B: OpenAPI version")
     oa = (PORTAL / "api" / "openapi.yaml").read_text(encoding="utf-8")
     check("openapi_version_3.1.2", oa.startswith('openapi: "3.1.2"'), f"Got: {oa[:30]}")
+    check("openapi_system_contract_path",
+          "/api/system/contracts:" in oa,
+          "OpenAPI must expose the read-only system contract endpoint for frontend/AI tooling")
+    check("openapi_runtime_generic_path",
+          "/api/runtime/{domain}/{table}:" in oa,
+          "OpenAPI must document generic registry-backed runtime access")
 
     # Gate C: Publication convergence (shared run_id)
     print("\nGate C: Publication convergence")
@@ -652,6 +660,29 @@ def main() -> int:
         check("stress_manifest_asset_registered",
               "operational-stress-report.json" in (rm.get("assets") or {}),
               "operational-stress-report.json missing from registry-manifest assets")
+
+    global_catalog_path = REG / "global-erp-mom-capability-catalog.json"
+    global_audit_path = REG / "global-erp-mom-capability-audit.json"
+    if global_catalog_path.is_file():
+        global_catalog = load(global_catalog_path)
+        check("global_capability_catalog_populated",
+              len(global_catalog.get("capabilities", [])) >= 15,
+              f"capability_count={len(global_catalog.get('capabilities', []))}")
+        check("global_capability_sources_populated",
+              len(global_catalog.get("sourceRefs", {})) >= 10,
+              f"source_count={len(global_catalog.get('sourceRefs', {}))}")
+    if global_audit_path.is_file():
+        global_audit = load(global_audit_path)
+        global_summary = global_audit.get("summary", {})
+        check("global_capability_audit_present",
+              global_summary.get("capability_count", 0) >= 15,
+              f"capability_count={global_summary.get('capability_count')}")
+        check("global_capability_audit_blocks_high_gaps",
+              global_summary.get("blocking_gap_count", 1) == 0,
+              f"blocking_gap_count={global_summary.get('blocking_gap_count')}")
+        check("global_capability_manifest_asset_registered",
+              "global-erp-mom-capability-audit.json" in (rm.get("assets") or {}),
+              "global-erp-mom-capability-audit.json missing from registry-manifest assets")
 
     # Summary
     total = checks_passed + checks_failed

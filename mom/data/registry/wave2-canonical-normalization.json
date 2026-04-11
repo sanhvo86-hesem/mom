@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T20:20:00+07:00",
+    "generatedAt": "2026-04-11T02:14:55.258Z",
     "description": "Explicit Wave 2 normalization decisions for canonical resource mapping, service-backed slices, and archive isolation."
   },
   "catalog_alignment_targets": {

@@ -96,6 +96,9 @@ def main() -> int:
     dump_json(POLICY_PATH, policy)
 
     normalization = load_json(NORMALIZATION_PATH)
+    normalization.setdefault("_meta", {})
+    normalization["_meta"]["generatedAt"] = utc_now()
+    dump_json(NORMALIZATION_PATH, normalization)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     frontend_catalog = load_json(FRONTEND_PATH)
     workflow_library = load_json(WORKFLOW_PATH)

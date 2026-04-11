@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "4.0",
-    "generatedAt": "2026-04-10T12:22:35.283Z",
+    "generatedAt": "2026-04-11T02:14:47.371Z",
     "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
     "sourceEndpointCount": 3,
     "generatedEndpointCount": 3603,

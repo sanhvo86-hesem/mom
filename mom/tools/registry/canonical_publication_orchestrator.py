@@ -21,10 +21,11 @@ Single entry-point that runs the full publication pipeline in sequence:
   15. generate_wave6_finance_projection_governance.py (wave-6 finance/projection closure report)
   16. generate_operational_stress_report.py   (stress/exception reality assessment)
   17. generate_business_contract_bundle.py    (authored object package bundle)
-  18. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
-  19. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
-  20. Generate publication proof artifact     (_reports/publication-proof-latest.json)
-  21. Generate wave/gap ledger                (wave-gap-ledger.json)
+  18. generate_global_erp_mom_capability_audit.py (global ERP+MOM capability audit)
+  19. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
+  20. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
+  21. Generate publication proof artifact     (_reports/publication-proof-latest.json)
+  22. Generate wave/gap ledger                (wave-gap-ledger.json)
 
 The proof artifact contains checksums, counts, and invariant checks so that
 downstream consumers can verify the publication run is consistent.
@@ -75,6 +76,7 @@ QUALITY_REPORT = REGISTRY_DIR / "registry-quality-report.json"
 DOMAIN_FIELD_PACKS = REGISTRY_DIR / "domain-field-packs.json"
 DATA_FIELDS_P2 = REGISTRY_DIR / "data-fields-part2.json"
 WAVE_GAP_LEDGER = REGISTRY_DIR / "wave-gap-ledger.json"
+GLOBAL_CAPABILITY_AUDIT = REGISTRY_DIR / "global-erp-mom-capability-audit.json"
 
 PROOF_ARTIFACT = REPORTS_DIR / "publication-proof-latest.json"
 
@@ -91,6 +93,7 @@ ARTIFACT_FILES = [
     DOMAIN_FIELD_PACKS,
     DATA_FIELDS_P2,
     WAVE_GAP_LEDGER,
+    GLOBAL_CAPABILITY_AUDIT,
 ]
 
 
@@ -783,7 +786,15 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 17: Compact truth/accounting summaries
+    # Step 17: Global ERP+MOM capability assessment
+    step_results["global_erp_mom_capability_audit"] = run_step(
+        "Global ERP+MOM Capability Audit (generate_global_erp_mom_capability_audit.py)",
+        [sys.executable, "generate_global_erp_mom_capability_audit.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 18: Compact truth/accounting summaries
     step_results["publication_truth_summaries"] = run_step(
         "Publication Truth Summaries (generate_publication_truth_summaries.py)",
         [sys.executable, "generate_publication_truth_summaries.py"],
@@ -791,7 +802,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 18: Synchronize workspace-design / authority artifacts to the same publication cycle
+    # Step 19: Synchronize workspace-design / authority artifacts to the same publication cycle
     step_results["schema_authority_sync"] = run_step(
         "Schema Authority Sync (refresh_data_schema_authority.php --skip-publication)",
         ["php", str(PORTAL_ROOT / "tools" / "schema" / "refresh_data_schema_authority.php"), "--skip-publication"],
@@ -799,7 +810,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 19-20: Proof + wave/gap ledger
+    # Step 20-21: Proof + wave/gap ledger
     print(f"\n{'=' * 72}")
     print("STEP: Wave/Gap Ledger Generation")
     print(f"{'=' * 72}")

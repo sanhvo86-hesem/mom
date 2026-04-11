@@ -1,18 +1,19 @@
 {
-  "publication_run_id": "b53a3486-6f53-4bf0-b758-fa381a529f3a",
-  "generatedAt": "2026-04-10T12:22:49.914Z",
-  "source_commit": "4eb6a1d4",
+  "publication_run_id": "a762f7e4-2225-4583-94e8-1be313ae9a08",
+  "generatedAt": "2026-04-11T02:15:01.178Z",
+  "source_commit": "d4b4c575",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "103c58233c8cdb2c6136ad287e7781d093270a90c8be82ecfbe30b3f0e892274",
-    "frontend-foundation-catalog.json": "07e5436cd015f64b15f3d957d38d1288d878a9762c9957a5a0698fa4f2fa797b",
-    "registry-manifest.json": "e327b26b7aefde4c2976daa74e336c62044605b9655c61b676ab5a622b82477a",
-    "registry-quality-report.json": "a61bf381c089bb5162504c5194c80452f2e21aa95e6110199dee0b6ec54a0031",
-    "domain-field-packs.json": "773935c8066c8a59d31dc7be1a21a769d6edceee8646389d7b7d5f911d1d53c9",
-    "data-fields-part2.json": "41768ed306d2dcfcae6c208ad306a299aaf59c39ddd4478122ce9fd6748a4c38",
-    "wave-gap-ledger.json": "5ed7c481a526a4078bf6d710748777019266bda99f4b2570f801bf2c7e5bde50"
+    "endpoint-catalog.json": "3c9dc76a4f4e6f0e0962f660a82540424e30dd18324bdf79061deda99f5be57d",
+    "frontend-foundation-catalog.json": "2ca7e98a274b4056547d79908b17e5034733a9807f3c3d53fcafd73f36fe8bb8",
+    "registry-manifest.json": "751f9d64e9dbcc51994dca3dbbf2aeb1cd40aa9aebf227e49fb832b578d1d1b9",
+    "registry-quality-report.json": "989a84b728d3d6136db364cb4fbdb64378ba90d2e9f6e5efb023963b218a9120",
+    "domain-field-packs.json": "2af0c1858288093f3362180448952f087807ae50ed34547bfb747ca462442e34",
+    "data-fields-part2.json": "45f1d8bb11018a0333c8af9b6d13573b86a8cd5a9842c3bc736bfd75419dadbe",
+    "wave-gap-ledger.json": "1b9ac9713978b08aeffbdf778caa896442cda4881ad18dd18daaab32e1f4bf7b",
+    "global-erp-mom-capability-audit.json": "9995fc6fc5be70f664fc5fa30aced4a676c8248e4936b0d70d3daa38ba4d0b6c"
   },
   "summary_counts": {
     "ready": 669,
@@ -42,7 +43,7 @@
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['c6ca5fcd-23b1-4f28-8661-e672b97d3859']"
+      "detail": "distinct_run_ids=['4d3f16f3-705e-42e6-9ce3-34f689aefa5f']"
     },
     {
       "name": "approval_group_not_split_truth",
@@ -68,6 +69,7 @@
     "wave6_finance_projection_governance": "OK",
     "operational_stress_governance": "OK",
     "business_contract_bundle": "OK",
+    "global_erp_mom_capability_audit": "OK",
     "publication_truth_summaries": "OK",
     "schema_authority_sync": "OK",
     "wave_gap_ledger": "OK"

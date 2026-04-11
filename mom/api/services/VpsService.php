@@ -8,6 +8,10 @@ use RuntimeException;
 
 final class VpsService
 {
+    private const FILE_PREVIEW_MAX_BYTES = 262144;
+    private const FILE_DOWNLOAD_MAX_BYTES = 10485760;
+    private const FILE_SEARCH_MAX_RESULTS = 160;
+
     /** @var list<string> */
     private array $configCandidates;
 
@@ -37,6 +41,7 @@ final class VpsService
         $siteCount = 0;
         $terminalCount = 0;
         $observabilityCount = 0;
+        $fileRootCount = 0;
         $reachableHosts = 0;
         $terminalReadyHosts = 0;
         $observabilityReadyHosts = 0;
@@ -61,6 +66,7 @@ final class VpsService
             $siteCount += count((array)($snapshot['sites'] ?? []));
             $terminalCount += count((array)($snapshot['terminals'] ?? []));
             $observabilityCount += count((array)($snapshot['observability'] ?? []));
+            $fileRootCount += count((array)($snapshot['file_roots'] ?? []));
             $healthySites += count(array_filter((array)($snapshot['sites'] ?? []), static fn(array $site): bool => ($site['status'] ?? '') === 'ok'));
             $healthyDnsRecords += count(array_filter((array)($snapshot['dns_records'] ?? []), static fn(array $row): bool => ($row['status'] ?? '') === 'ok'));
             $healthyTerminals += count(array_filter((array)($snapshot['terminals'] ?? []), static fn(array $terminal): bool => ($terminal['status'] ?? '') === 'ok'));
@@ -82,6 +88,7 @@ final class VpsService
             'dns_records' => $dnsRecords,
             'terminals_count' => $terminalCount,
             'observability_panels' => $observabilityCount,
+            'file_roots_count' => $fileRootCount,
             'terminal_ready_hosts' => $terminalReadyHosts,
             'observability_ready_hosts' => $observabilityReadyHosts,
             'healthy_sites' => $healthySites,
@@ -160,6 +167,62 @@ final class VpsService
     {
         $host = $this->findHost($hostId);
         return $this->resolveObservabilityPanel($host, $panelId);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function listFiles(string $hostId, string $rootId, string $path = '', bool $showHidden = false): array
+    {
+        $host = $this->findHost($hostId);
+        $root = $this->resolveFileRoot($host, $rootId);
+
+        return $this->runFileExplorerOperation($host, $root, 'list', [
+            'path' => $this->normalizeExplorerPath($path),
+            'show_hidden' => $showHidden ? '1' : '0',
+            'limit' => self::FILE_SEARCH_MAX_RESULTS,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function searchFiles(string $hostId, string $rootId, string $path, string $query, bool $showHidden = false): array
+    {
+        $query = trim($query);
+        if ($query === '') {
+            throw new RuntimeException('missing_file_search_query');
+        }
+
+        $host = $this->findHost($hostId);
+        $root = $this->resolveFileRoot($host, $rootId);
+
+        return $this->runFileExplorerOperation($host, $root, 'search', [
+            'path' => $this->normalizeExplorerPath($path),
+            'query' => substr($query, 0, 120),
+            'show_hidden' => $showHidden ? '1' : '0',
+            'limit' => self::FILE_SEARCH_MAX_RESULTS,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function readFile(string $hostId, string $rootId, string $path, bool $download = false): array
+    {
+        $path = $this->normalizeExplorerPath($path);
+        if ($path === '') {
+            throw new RuntimeException('missing_file_path');
+        }
+
+        $host = $this->findHost($hostId);
+        $root = $this->resolveFileRoot($host, $rootId);
+
+        return $this->runFileExplorerOperation($host, $root, 'read', [
+            'path' => $path,
+            'download' => $download ? '1' : '0',
+            'max_bytes' => $download ? self::FILE_DOWNLOAD_MAX_BYTES : self::FILE_PREVIEW_MAX_BYTES,
+        ]);
     }
 
     public function runAction(string $hostId, string $actionId, bool $allowWrite = false): array
@@ -389,7 +452,7 @@ final class VpsService
                     'mode' => 'ssh',
                     'ssh_target' => 'root@103.110.87.55',
                     'public_ip' => '103.110.87.55',
-                    'roles' => ['reverse-proxy', 'portal', 'postgres', 'terminal-gateway', 'observability'],
+                    'roles' => ['reverse-proxy', 'portal', 'postgres', 'terminal-gateway', 'observability', 'file-explorer'],
                     'services' => [
                         ['name' => 'nginx', 'label' => 'Nginx', 'kind' => 'systemd', 'unit_candidates' => ['nginx']],
                         ['name' => 'php-fpm', 'label' => 'PHP-FPM', 'kind' => 'systemd', 'unit_candidates' => ['php8.2-fpm', 'php8.3-fpm', 'php8.4-fpm', 'php-fpm']],
@@ -461,6 +524,38 @@ final class VpsService
                             'service_name' => 'grafana-server',
                             'internal_url' => 'http://127.0.0.1:3000/api/health',
                             'expected_http_codes' => [200],
+                        ],
+                    ],
+                    'file_roots' => [
+                        [
+                            'id' => 'portal_app',
+                            'label' => 'Portal app',
+                            'path' => '/var/www/eqms.hesemeng.com/mom',
+                            'note' => 'Application code, docs, styles, scripts and API sources.',
+                        ],
+                        [
+                            'id' => 'portal_data',
+                            'label' => 'Portal data',
+                            'path' => '/var/www/eqms.hesemeng.com/mom/data',
+                            'note' => 'Runtime data and logs with secret preview/download guardrails.',
+                        ],
+                        [
+                            'id' => 'nginx',
+                            'label' => 'Nginx config',
+                            'path' => '/etc/nginx',
+                            'note' => 'Ingress, TLS and reverse proxy configuration.',
+                        ],
+                        [
+                            'id' => 'nginx_logs',
+                            'label' => 'Nginx logs',
+                            'path' => '/var/log/nginx',
+                            'note' => 'Access and error logs for live request triage.',
+                        ],
+                        [
+                            'id' => 'systemd',
+                            'label' => 'Systemd units',
+                            'path' => '/etc/systemd/system',
+                            'note' => 'Service units for terminal, observability and app runtime.',
                         ],
                     ],
                 ],
@@ -570,6 +665,496 @@ final class VpsService
     }
 
     /**
+     * @return list<array<string, mixed>>
+     */
+    private function fileRootsForHost(array $host): array
+    {
+        $declared = array_values(array_filter((array)($host['file_roots'] ?? []), 'is_array'));
+        $roots = $declared !== [] ? $declared : $this->defaultFileRoots($host);
+        $normalized = [];
+        $seen = [];
+        foreach ($roots as $index => $root) {
+            try {
+                $item = $this->normalizeFileRoot($root, $index);
+            } catch (RuntimeException) {
+                continue;
+            }
+            if (isset($seen[$item['id']])) {
+                continue;
+            }
+            $seen[$item['id']] = true;
+            $normalized[] = $item;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function defaultFileRoots(array $host): array
+    {
+        $local = $this->resolveExecutionMode($host) === 'local';
+        $portalRoot = $local ? ($this->rootDir . '/mom') : '/var/www/eqms.hesemeng.com/mom';
+
+        return [
+            [
+                'id' => 'portal',
+                'label' => 'Portal app',
+                'path' => $portalRoot,
+                'note' => 'Application code and deployed portal assets.',
+            ],
+            [
+                'id' => 'portal_data',
+                'label' => 'Portal data',
+                'path' => $portalRoot . '/data',
+                'note' => 'Runtime data directory with guarded secret previews.',
+            ],
+            [
+                'id' => 'nginx',
+                'label' => 'Nginx config',
+                'path' => '/etc/nginx',
+                'note' => 'Ingress and reverse-proxy configuration.',
+            ],
+            [
+                'id' => 'nginx_logs',
+                'label' => 'Nginx logs',
+                'path' => '/var/log/nginx',
+                'note' => 'Access and error logs for live ingress triage.',
+            ],
+            [
+                'id' => 'systemd',
+                'label' => 'Systemd units',
+                'path' => '/etc/systemd/system',
+                'note' => 'Local service unit files used by the control plane.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeFileRoot(array $root, int $index): array
+    {
+        $rawPath = trim((string)($root['path'] ?? ''));
+        if ($rawPath === '') {
+            throw new RuntimeException('invalid_file_root_path');
+        }
+        $path = str_replace('\\', '/', $rawPath);
+        while (str_starts_with($path, './')) {
+            $path = $this->rootDir . '/' . substr($path, 2);
+        }
+        $path = preg_replace('#/+#', '/', $path);
+        $path = is_string($path) ? rtrim($path, '/') : '';
+        if ($path === '' || !str_starts_with($path, '/')) {
+            throw new RuntimeException('invalid_file_root_path');
+        }
+
+        $id = strtolower(trim((string)($root['id'] ?? '')));
+        $id = preg_replace('/[^a-z0-9._-]+/', '-', $id);
+        $id = is_string($id) ? trim($id, '-') : '';
+        if ($id === '') {
+            $id = 'root-' . ($index + 1);
+        }
+
+        $denyPatterns = array_values(array_unique(array_filter(array_map(
+            static fn($value): string => strtolower(trim((string)$value)),
+            array_merge($this->defaultFileDenyPatterns(), (array)($root['deny_patterns'] ?? []))
+        ), static fn(string $value): bool => $value !== '')));
+
+        return [
+            'id' => $id,
+            'label' => trim((string)($root['label'] ?? '')) ?: basename($path),
+            'path' => $path,
+            'note' => trim((string)($root['note'] ?? '')),
+            'read_only' => true,
+            'max_preview_bytes' => max(1024, min((int)($root['max_preview_bytes'] ?? self::FILE_PREVIEW_MAX_BYTES), self::FILE_PREVIEW_MAX_BYTES)),
+            'max_download_bytes' => max(1024, min((int)($root['max_download_bytes'] ?? self::FILE_DOWNLOAD_MAX_BYTES), self::FILE_DOWNLOAD_MAX_BYTES)),
+            'deny_patterns' => $denyPatterns,
+            'policy' => 'allowlist-root/read-only/no-dotdot/secret-preview-deny',
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function defaultFileDenyPatterns(): array
+    {
+        return [
+            '.env',
+            '.env.local',
+            '.env.production',
+            '*.key',
+            '*.pem',
+            '*.p12',
+            '*.pfx',
+            'id_rsa',
+            'id_ed25519',
+            'authorized_keys',
+            'shadow',
+            'gshadow',
+            'private_key',
+            'database-password',
+            'secret',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function resolveFileRoot(array $host, string $rootId): array
+    {
+        $roots = $this->fileRootsForHost($host);
+        if ($roots === []) {
+            throw new RuntimeException('file_root_not_configured');
+        }
+
+        $rootId = trim($rootId);
+        if ($rootId === '') {
+            return $roots[0];
+        }
+
+        foreach ($roots as $root) {
+            if ((string)($root['id'] ?? '') === $rootId) {
+                return $root;
+            }
+        }
+
+        throw new RuntimeException('file_root_not_found:' . $rootId);
+    }
+
+    private function normalizeExplorerPath(string $path): string
+    {
+        $normalized = trim(str_replace('\\', '/', $path));
+        $normalized = preg_replace('#/+#', '/', $normalized);
+        $normalized = is_string($normalized) ? ltrim($normalized, '/') : '';
+        if ($normalized === '' || $normalized === '.') {
+            return '';
+        }
+
+        $segments = [];
+        foreach (explode('/', $normalized) as $segment) {
+            $segment = trim($segment);
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+            if ($segment === '..' || str_contains($segment, "\0")) {
+                throw new RuntimeException('invalid_file_path');
+            }
+            $segments[] = $segment;
+        }
+
+        return implode('/', $segments);
+    }
+
+    /**
+     * @param array<string, mixed> $host
+     * @param array<string, mixed> $root
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    private function runFileExplorerOperation(array $host, array $root, string $operation, array $options): array
+    {
+        $command = $this->fileExplorerCommand($operation, $root, $options);
+        $run = $this->executeOnHost($host, $command);
+        $output = trim((string)($run['output'] ?? ''));
+
+        if ($output === '') {
+            throw new RuntimeException((string)($run['error'] ?? 'file_explorer_failed'));
+        }
+
+        $decoded = json_decode($output, true);
+        if (!is_array($decoded)) {
+            throw new RuntimeException('file_explorer_bad_response');
+        }
+
+        if (($decoded['ok'] ?? false) !== true) {
+            throw new RuntimeException((string)($decoded['error'] ?? 'file_explorer_failed'));
+        }
+
+        unset($decoded['ok']);
+        $decoded['host_id'] = (string)($host['id'] ?? '');
+        $decoded['root'] = [
+            'id' => (string)($root['id'] ?? ''),
+            'label' => (string)($root['label'] ?? ''),
+            'path' => (string)($root['path'] ?? ''),
+            'note' => (string)($root['note'] ?? ''),
+            'read_only' => true,
+            'policy' => (string)($root['policy'] ?? ''),
+        ];
+
+        return $decoded;
+    }
+
+    /**
+     * @param array<string, mixed> $root
+     * @param array<string, mixed> $options
+     */
+    private function fileExplorerCommand(string $operation, array $root, array $options): string
+    {
+        $env = [
+            'VPS_EXPLORER_OP' => $operation,
+            'VPS_EXPLORER_ROOT' => (string)($root['path'] ?? ''),
+            'VPS_EXPLORER_PATH' => (string)($options['path'] ?? ''),
+            'VPS_EXPLORER_QUERY' => (string)($options['query'] ?? ''),
+            'VPS_EXPLORER_HIDDEN' => (string)($options['show_hidden'] ?? '0'),
+            'VPS_EXPLORER_LIMIT' => (string)($options['limit'] ?? self::FILE_SEARCH_MAX_RESULTS),
+            'VPS_EXPLORER_MAX_BYTES' => (string)($options['max_bytes'] ?? ($root['max_preview_bytes'] ?? self::FILE_PREVIEW_MAX_BYTES)),
+            'VPS_EXPLORER_DOWNLOAD' => (string)($options['download'] ?? '0'),
+            'VPS_EXPLORER_DENY' => base64_encode((string)json_encode((array)($root['deny_patterns'] ?? []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
+        ];
+
+        $assignments = [];
+        foreach ($env as $key => $value) {
+            $assignments[] = $key . '=' . escapeshellarg($value);
+        }
+
+        return implode(' ', $assignments)
+            . " php <<'__VPS_FILE_EXPLORER_PHP__'\n"
+            . $this->fileExplorerPhpScript()
+            . "\n__VPS_FILE_EXPLORER_PHP__";
+    }
+
+    private function fileExplorerPhpScript(): string
+    {
+        return <<<'PHP'
+<?php
+declare(strict_types=1);
+
+function out(array $payload): never {
+    echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit(0);
+}
+
+function fail(string $error, array $extra = []): never {
+    out(array_merge(['ok' => false, 'error' => $error], $extra));
+}
+
+function norm_rel(string $path): string {
+    $path = trim(str_replace('\\', '/', $path));
+    $path = preg_replace('#/+#', '/', $path) ?: '';
+    $path = ltrim($path, '/');
+    if ($path === '' || $path === '.') return '';
+    $parts = [];
+    foreach (explode('/', $path) as $part) {
+        $part = trim($part);
+        if ($part === '' || $part === '.') continue;
+        if ($part === '..' || str_contains($part, "\0")) fail('invalid_file_path');
+        $parts[] = $part;
+    }
+    return implode('/', $parts);
+}
+
+function inside_root(string $path, string $root): bool {
+    $path = rtrim(str_replace('\\', '/', $path), '/');
+    $root = rtrim(str_replace('\\', '/', $root), '/');
+    return $path === $root || str_starts_with($path . '/', $root . '/');
+}
+
+function denied_rel(string $rel, array $deny): bool {
+    $relLower = strtolower(trim(str_replace('\\', '/', $rel), '/'));
+    $baseLower = strtolower(basename($relLower));
+    foreach ($deny as $pattern) {
+        $pattern = strtolower(trim((string)$pattern));
+        if ($pattern === '') continue;
+        if (function_exists('fnmatch') && (fnmatch($pattern, $baseLower) || fnmatch($pattern, $relLower))) return true;
+        if (str_starts_with($pattern, '*.')) {
+            $suffix = substr($pattern, 1);
+            if ($suffix !== '' && str_ends_with($baseLower, $suffix)) return true;
+        }
+        if ($baseLower === $pattern || $relLower === $pattern || str_contains($relLower, '/' . $pattern)) return true;
+    }
+    return false;
+}
+
+function hidden_rel(string $rel): bool {
+    foreach (explode('/', trim($rel, '/')) as $part) {
+        if ($part !== '' && str_starts_with($part, '.')) return true;
+    }
+    return false;
+}
+
+function text_like(string $path, string $ext, string $mime): bool {
+    $textExt = ['txt','log','md','markdown','php','js','css','html','htm','json','yaml','yml','xml','csv','tsv','sql','sh','bash','zsh','ini','conf','service','timer','env','vue','ts','tsx','jsx','py','rb','go','java','c','h','cpp','hpp'];
+    if (in_array($ext, $textExt, true)) return true;
+    if (str_starts_with(strtolower($mime), 'text/')) return true;
+    $sample = @file_get_contents($path, false, null, 0, 4096);
+    if (!is_string($sample) || $sample === '') return false;
+    if (str_contains($sample, "\0")) return false;
+    $len = strlen($sample);
+    $bad = 0;
+    for ($i = 0; $i < $len; $i += 1) {
+        $ord = ord($sample[$i]);
+        if ($ord < 9 || ($ord > 13 && $ord < 32)) $bad += 1;
+    }
+    return ($bad / max(1, $len)) < 0.05;
+}
+
+function child_count(string $dir, bool $showHidden): int {
+    $items = @scandir($dir);
+    if (!is_array($items)) return 0;
+    $count = 0;
+    foreach ($items as $name) {
+        if ($name === '.' || $name === '..') continue;
+        if (!$showHidden && str_starts_with($name, '.')) continue;
+        $count += 1;
+        if ($count >= 999) return $count;
+    }
+    return $count;
+}
+
+function entry_for(string $abs, string $rel, string $rootReal, bool $showHidden, array $deny, int $maxPreview): array {
+    $real = realpath($abs);
+    $link = is_link($abs);
+    $inside = is_string($real) && inside_root($real, $rootReal);
+    $denied = denied_rel($rel, $deny) || !$inside;
+    $isDir = $inside && is_dir($real);
+    $isFile = $inside && is_file($real);
+    $ext = $isFile ? strtolower((string)pathinfo($abs, PATHINFO_EXTENSION)) : '';
+    $size = $isFile ? (int)(@filesize($abs) ?: 0) : 0;
+    $mime = $isFile && function_exists('mime_content_type') ? (string)(@mime_content_type($abs) ?: '') : '';
+    $readable = $inside && is_readable($abs);
+    $previewable = $isFile && $readable && !$denied && $size <= $maxPreview && text_like($abs, $ext, $mime);
+    return [
+        'name' => basename($abs),
+        'relative_path' => $rel,
+        'type' => $isDir ? 'directory' : ($link ? 'symlink' : 'file'),
+        'extension' => $ext,
+        'size_bytes' => $size,
+        'modified_at' => is_string($real) && file_exists($real) ? gmdate('c', (int)(@filemtime($real) ?: time())) : '',
+        'mode' => substr(sprintf('%o', (int)(@fileperms($abs) ?: 0)), -4),
+        'readable' => $readable,
+        'writable' => $inside && is_writable($abs),
+        'denied' => $denied,
+        'previewable' => $previewable,
+        'downloadable' => $isFile && $readable && !$denied,
+        'mime' => $mime,
+        'child_count' => $isDir ? child_count($real, $showHidden) : 0,
+    ];
+}
+
+$op = trim((string)getenv('VPS_EXPLORER_OP'));
+$rootRaw = trim((string)getenv('VPS_EXPLORER_ROOT'));
+$rel = norm_rel((string)getenv('VPS_EXPLORER_PATH'));
+$query = trim((string)getenv('VPS_EXPLORER_QUERY'));
+$showHidden = (string)getenv('VPS_EXPLORER_HIDDEN') === '1';
+$download = (string)getenv('VPS_EXPLORER_DOWNLOAD') === '1';
+$limit = max(1, min(500, (int)getenv('VPS_EXPLORER_LIMIT')));
+$maxBytes = max(1024, min(10485760, (int)getenv('VPS_EXPLORER_MAX_BYTES')));
+$denyRaw = base64_decode((string)getenv('VPS_EXPLORER_DENY'), true);
+$deny = is_string($denyRaw) ? json_decode($denyRaw, true) : [];
+$deny = is_array($deny) ? $deny : [];
+
+$rootReal = realpath($rootRaw);
+if (!is_string($rootReal) || !is_dir($rootReal)) fail('file_root_unreachable');
+$target = $rootReal . ($rel !== '' ? '/' . $rel : '');
+$targetReal = realpath($target);
+if (!is_string($targetReal) || !inside_root($targetReal, $rootReal)) fail('file_path_not_found');
+
+if ($op === 'list') {
+    if (!is_dir($targetReal)) fail('file_path_not_directory');
+    $items = @scandir($targetReal);
+    if (!is_array($items)) fail('file_directory_read_failed');
+    $entries = [];
+    foreach ($items as $name) {
+        if ($name === '.' || $name === '..') continue;
+        $childRel = $rel === '' ? $name : ($rel . '/' . $name);
+        if (!$showHidden && hidden_rel($childRel)) continue;
+        $entries[] = entry_for($targetReal . '/' . $name, $childRel, $rootReal, $showHidden, $deny, $maxBytes);
+    }
+    usort($entries, static function(array $a, array $b): int {
+        if (($a['type'] === 'directory') !== ($b['type'] === 'directory')) return $a['type'] === 'directory' ? -1 : 1;
+        return strnatcasecmp((string)$a['name'], (string)$b['name']);
+    });
+    out([
+        'ok' => true,
+        'mode' => 'list',
+        'path' => $rel,
+        'parent_path' => $rel === '' ? '' : trim((string)dirname($rel), '.'),
+        'entries' => $entries,
+        'summary' => [
+            'count' => count($entries),
+            'directories' => count(array_filter($entries, static fn(array $entry): bool => $entry['type'] === 'directory')),
+            'files' => count(array_filter($entries, static fn(array $entry): bool => $entry['type'] === 'file')),
+            'denied' => count(array_filter($entries, static fn(array $entry): bool => (bool)$entry['denied'])),
+            'show_hidden' => $showHidden,
+        ],
+    ]);
+}
+
+if ($op === 'search') {
+    if ($query === '') fail('missing_file_search_query');
+    if (!is_dir($targetReal)) fail('file_path_not_directory');
+    $needle = strtolower($query);
+    $entries = [];
+    $stack = [[$targetReal, $rel, 0]];
+    $visited = 0;
+    while ($stack !== [] && count($entries) < $limit && $visited < 5000) {
+        [$dir, $dirRel, $depth] = array_pop($stack);
+        $items = @scandir($dir);
+        if (!is_array($items)) continue;
+        foreach ($items as $name) {
+            if ($name === '.' || $name === '..') continue;
+            $childRel = $dirRel === '' ? $name : ($dirRel . '/' . $name);
+            if (!$showHidden && hidden_rel($childRel)) continue;
+            $abs = $dir . '/' . $name;
+            $entry = entry_for($abs, $childRel, $rootReal, $showHidden, $deny, $maxBytes);
+            $visited += 1;
+            if (str_contains(strtolower($childRel), $needle)) {
+                $entries[] = $entry;
+                if (count($entries) >= $limit) break;
+            }
+            if ($entry['type'] === 'directory' && !(bool)$entry['denied'] && $depth < 8) {
+                $real = realpath($abs);
+                if (is_string($real)) $stack[] = [$real, $childRel, $depth + 1];
+            }
+        }
+    }
+    usort($entries, static fn(array $a, array $b): int => strnatcasecmp((string)$a['relative_path'], (string)$b['relative_path']));
+    out([
+        'ok' => true,
+        'mode' => 'search',
+        'path' => $rel,
+        'query' => $query,
+        'entries' => $entries,
+        'summary' => [
+            'count' => count($entries),
+            'visited' => $visited,
+            'limit' => $limit,
+            'show_hidden' => $showHidden,
+        ],
+    ]);
+}
+
+if ($op === 'read') {
+    if (!is_file($targetReal)) fail('file_path_not_file');
+    if (denied_rel($rel, $deny)) fail('file_access_denied');
+    if (!is_readable($targetReal)) fail('file_not_readable');
+    $entry = entry_for($targetReal, $rel, $rootReal, $showHidden, $deny, $maxBytes);
+    $size = (int)$entry['size_bytes'];
+    if ($size > $maxBytes) fail('file_too_large', ['file' => $entry, 'max_bytes' => $maxBytes]);
+    $raw = @file_get_contents($targetReal);
+    if (!is_string($raw)) fail('file_read_failed');
+    $ext = (string)$entry['extension'];
+    $mime = (string)$entry['mime'];
+    $text = text_like($targetReal, $ext, $mime);
+    out([
+        'ok' => true,
+        'mode' => 'read',
+        'path' => $rel,
+        'file' => $entry,
+        'encoding' => $text ? 'utf-8' : 'base64',
+        'content' => $text ? $raw : '',
+        'content_base64' => $download ? base64_encode($raw) : '',
+        'truncated' => false,
+    ]);
+}
+
+fail('unknown_file_explorer_operation');
+PHP;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function findHost(string $hostId): array
@@ -664,6 +1249,7 @@ final class VpsService
                 'summary' => '',
                 'reachable' => false,
             ], array_values(array_filter((array)($host['observability'] ?? []), 'is_array')))),
+            'file_roots' => $this->fileRootsForHost($host),
             'system' => [
                 'hostname' => '',
                 'os' => '',

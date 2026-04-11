@@ -2,12 +2,12 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-10T12:22:41.451Z",
+    "generatedAt": "2026-04-11T02:14:52.602Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "c6ca5fcd-23b1-4f28-8661-e672b97d3859"
+    "publication_run_id": "4d3f16f3-705e-42e6-9ce3-34f689aefa5f"
   },
   "summary": {
     "endpoint_count": 3610,

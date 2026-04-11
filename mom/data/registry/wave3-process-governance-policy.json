@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T21:30:00+07:00",
+    "generatedAt": "2026-04-11T02:14:55.529Z",
     "description": "Wave 3 process-object governance policy for extracting missing lifecycle owners and blocking duplicate process objects."
   },
   "objective": {

@@ -115,6 +115,11 @@ tags:
     description: |
       Commercial demand objects -- customer purchase orders and quote-to-order commitment controls.
       Doi tuong cau thuong mai -- PO khach hang va kiem soat cam ket quote-to-order.
+  - name: System Contract
+    description: |
+      Read-only backend contract registry for frontend and AI tooling: table registry,
+      endpoint catalog, workflows, status options, compliance crosswalk and global ERP+MOM audit.
+      Hop dong backend read-only de frontend/AI khong phai doan logic he thong.
 
 paths:
   # ═══════════════════════════════════════════════════════════════════════════
@@ -3456,6 +3461,428 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # SYSTEM CONTRACT REGISTRY
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/system/contracts:
+    get:
+      operationId: systemContractsGet
+      tags: [System Contract]
+      summary: Read the complete backend system contract
+      description: |
+        Returns the read-only system contract for frontend and AI tooling. This
+        endpoint is the canonical discovery surface for table registry, endpoint
+        catalog, workflow library, status sets, relationship map, runtime access
+        policy, authored business-contract indexes and global ERP+MOM capability audit.
+
+        Storage authority remains `database/migrations/*.sql -> database/schema.sql`.
+        Runtime generic access is documented separately at `/api/runtime/{domain}/{table}`.
+
+        **Legacy action:** `registry_system_contract`
+      responses:
+        '200':
+          description: System contract returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemContractEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/table-registry:
+    get:
+      operationId: registryTableRegistryGet
+      tags: [System Contract]
+      summary: Read the table registry
+      description: |
+        Returns the table registry used by registry-backed runtime CRUD and Schema Studio.
+
+        **Legacy action:** `registry_table_registry`
+      responses:
+        '200':
+          description: Table registry returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/endpoint-catalog:
+    get:
+      operationId: registryEndpointCatalogGet
+      tags: [System Contract]
+      summary: Read the endpoint catalog
+      description: |
+        Returns the generated endpoint catalog, including registry-backed runtime endpoints.
+
+        **Legacy action:** `registry_endpoint_catalog`
+      responses:
+        '200':
+          description: Endpoint catalog returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/workflow-library:
+    get:
+      operationId: registryWorkflowLibraryGet
+      tags: [System Contract]
+      summary: Read the workflow library
+      description: |
+        Returns workflow state models and transition rules.
+
+        **Legacy action:** `registry_workflow_library`
+      responses:
+        '200':
+          description: Workflow library returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/status-options:
+    get:
+      operationId: registryStatusOptionsGet
+      tags: [System Contract]
+      summary: Read status/dropdown option sets
+      description: |
+        Returns canonical status option sets. Optional query parameter `key`
+        narrows the response to one status set.
+
+        **Legacy action:** `registry_status_options`
+      parameters:
+        - name: key
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status options returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/relation-map:
+    get:
+      operationId: registryRelationMapGet
+      tags: [System Contract]
+      summary: Read the relationship map
+      description: |
+        Returns relationship edges used by Schema Studio and frontend navigation.
+
+        **Legacy action:** `registry_relation_map`
+      responses:
+        '200':
+          description: Relation map returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/compliance-crosswalk:
+    get:
+      operationId: registryComplianceCrosswalkGet
+      tags: [System Contract]
+      summary: Read the compliance crosswalk
+      description: |
+        Returns standards and compliance crosswalk metadata for backend coverage review.
+
+        **Legacy action:** `registry_compliance_crosswalk`
+      responses:
+        '200':
+          description: Compliance crosswalk returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/global-capability-audit:
+    get:
+      operationId: registryGlobalCapabilityAuditGet
+      tags: [System Contract]
+      summary: Read the global ERP+MOM capability audit
+      description: |
+        Returns the source-backed audit that maps global ERP, MOM, MES and EQMS
+        capability expectations to current backend registry, contracts, workflows,
+        endpoint catalog and OpenAPI visibility.
+
+        **Legacy action:** `registry_global_capability_audit`
+      responses:
+        '200':
+          description: Global capability audit returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/registry/manifest:
+    get:
+      operationId: registryManifestGet
+      tags: [System Contract]
+      summary: Read the registry manifest
+      description: |
+        Returns registry asset coverage and publication metadata.
+
+        **Legacy action:** `registry_manifest`
+      responses:
+        '200':
+          description: Registry manifest returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistryDocumentEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/runtime/{domain}/{table}:
+    get:
+      operationId: runtimeEntityList
+      tags: [System Contract]
+      summary: List records from a registry-backed runtime table
+      description: |
+        Generic registry-backed runtime access. Use `/api/system/contracts` or
+        `/api/registry/table-registry` first to discover valid domain/table pairs,
+        primary keys, workflow fields and access policy.
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Runtime records returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: runtimeEntityCreate
+      tags: [System Contract]
+      summary: Create a registry-backed runtime record
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Runtime record created.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/runtime/{domain}/{table}/{id}:
+    get:
+      operationId: runtimeEntityDetail
+      tags: [System Contract]
+      summary: Get one registry-backed runtime record
+      parameters:
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Runtime record returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: runtimeEntityUpdate
+      tags: [System Contract]
+      summary: Update one registry-backed runtime record
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Runtime record updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      operationId: runtimeEntityDelete
+      tags: [System Contract]
+      summary: Delete or archive one registry-backed runtime record according to policy
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Runtime record deleted or archived.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/runtime/{domain}/{table}/{id}/transition:
+    post:
+      operationId: runtimeEntityTransition
+      tags: [System Contract]
+      summary: Transition one registry-backed runtime record
+      description: |
+        Executes a governed status transition through the workflow bridge where
+        the table has a managed status field.
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - name: domain
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Runtime record transitioned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          $ref: '#/components/responses/Conflict'
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPONENTS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -3496,6 +3923,91 @@ components:
           type: string
           format: date-time
           description: Server UTC timestamp (ISO 8601).
+
+    RegistryDocumentEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              additionalProperties: true
+              description: Registry document payload.
+            count:
+              type: integer
+              description: Optional record count for the returned registry.
+
+    SystemContractEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [data, summary]
+          properties:
+            summary:
+              type: object
+              required: [tableCount, endpointCount, workflowCount, contractObjectCount, globalCapabilityCount]
+              properties:
+                tableCount:
+                  type: integer
+                endpointCount:
+                  type: integer
+                workflowCount:
+                  type: integer
+                statusSetCount:
+                  type: integer
+                relationEntityCount:
+                  type: integer
+                contractObjectCount:
+                  type: integer
+                contractPackageCount:
+                  type: integer
+                globalCapabilityCount:
+                  type: integer
+                globalCapabilityBlockingGapCount:
+                  type: integer
+            data:
+              type: object
+              additionalProperties: true
+              properties:
+                summary:
+                  type: object
+                  additionalProperties: true
+                storage_authority:
+                  type: object
+                  properties:
+                    databaseSchemaSource:
+                      type: string
+                    tableCount:
+                      type: integer
+                    schemaName:
+                      type: string
+                    databaseName:
+                      type: string
+                table_registry:
+                  type: object
+                  additionalProperties: true
+                endpoint_catalog:
+                  type: object
+                  additionalProperties: true
+                workflow_library:
+                  type: object
+                  additionalProperties: true
+                status_options:
+                  type: object
+                  additionalProperties: true
+                relation_map:
+                  type: object
+                  additionalProperties: true
+                runtime_access_policy:
+                  type: object
+                  additionalProperties: true
+                business_contracts:
+                  type: object
+                  additionalProperties: true
+                global_capability_audit:
+                  type: object
+                  additionalProperties: true
 
     ErrorResponse:
       type: object

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-09T22:45:00+07:00",
+    "generatedAt": "2026-04-11T02:14:54.958Z",
     "description": "Wave 1 lifecycle normalization overlay for core operational entities, recovery objects, and execution-critical masters."
   },
   "mode_default_for_normalized_core": "guarded_transition_runtime",
@@ -17,11 +17,47 @@
       "status_set_key": "customers_customer_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "prospective", "label": "Tiềm năng", "labelEn": "Prospective", "allowedTransitionsFrom": [] },
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["prospective", "inactive", "on_hold"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["active"] },
-        { "value": "inactive", "label": "Ngưng hoạt động", "labelEn": "Inactive", "allowedTransitionsFrom": ["active", "on_hold"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["inactive"] }
+        {
+          "value": "prospective",
+          "label": "Tiềm năng",
+          "labelEn": "Prospective",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "prospective",
+            "inactive",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng hoạt động",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "inactive"
+          ]
+        }
       ]
     },
     "vendors": {
@@ -35,12 +71,57 @@
       "status_set_key": "vendors_vendor_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "pending", "label": "Chờ đánh giá", "labelEn": "Pending Qualification", "allowedTransitionsFrom": [] },
-        { "value": "qualified", "label": "Đạt đánh giá", "labelEn": "Qualified", "allowedTransitionsFrom": ["pending", "on_hold"] },
-        { "value": "spend_authorized", "label": "Được phép mua", "labelEn": "Spend Authorized", "allowedTransitionsFrom": ["qualified", "on_hold"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["qualified", "spend_authorized", "blocked"] },
-        { "value": "blocked", "label": "Bị khóa", "labelEn": "Blocked", "allowedTransitionsFrom": ["spend_authorized", "on_hold"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["blocked"] }
+        {
+          "value": "pending",
+          "label": "Chờ đánh giá",
+          "labelEn": "Pending Qualification",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Đạt đánh giá",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "pending",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "spend_authorized",
+          "label": "Được phép mua",
+          "labelEn": "Spend Authorized",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "spend_authorized",
+            "blocked"
+          ]
+        },
+        {
+          "value": "blocked",
+          "label": "Bị khóa",
+          "labelEn": "Blocked",
+          "allowedTransitionsFrom": [
+            "spend_authorized",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "blocked"
+          ]
+        }
       ]
     },
     "items": {
@@ -54,11 +135,46 @@
       "status_set_key": "items_item_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "prototype", "label": "Mẫu thử", "labelEn": "Prototype", "allowedTransitionsFrom": [] },
-        { "value": "engineering", "label": "Kỹ thuật", "labelEn": "Engineering", "allowedTransitionsFrom": ["prototype"] },
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["engineering", "inactive"] },
-        { "value": "inactive", "label": "Ngưng dùng", "labelEn": "Inactive", "allowedTransitionsFrom": ["active"] },
-        { "value": "obsolete", "label": "Lỗi thời", "labelEn": "Obsolete", "allowedTransitionsFrom": ["inactive", "engineering"] }
+        {
+          "value": "prototype",
+          "label": "Mẫu thử",
+          "labelEn": "Prototype",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "engineering",
+          "label": "Kỹ thuật",
+          "labelEn": "Engineering",
+          "allowedTransitionsFrom": [
+            "prototype"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "engineering",
+            "inactive"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng dùng",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "obsolete",
+          "label": "Lỗi thời",
+          "labelEn": "Obsolete",
+          "allowedTransitionsFrom": [
+            "inactive",
+            "engineering"
+          ]
+        }
       ]
     },
     "hcm_employees": {
@@ -72,12 +188,56 @@
       "status_set_key": "hcm_employees_employment_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "preboarding", "label": "Tiền nhận việc", "labelEn": "Preboarding", "allowedTransitionsFrom": [] },
-        { "value": "active", "label": "Đang làm việc", "labelEn": "Active", "allowedTransitionsFrom": ["preboarding", "inactive", "suspended"] },
-        { "value": "suspended", "label": "Tạm đình chỉ", "labelEn": "Suspended", "allowedTransitionsFrom": ["active"] },
-        { "value": "inactive", "label": "Ngưng công tác", "labelEn": "Inactive", "allowedTransitionsFrom": ["active", "suspended"] },
-        { "value": "terminated", "label": "Chấm dứt", "labelEn": "Terminated", "allowedTransitionsFrom": ["inactive", "suspended"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["terminated"] }
+        {
+          "value": "preboarding",
+          "label": "Tiền nhận việc",
+          "labelEn": "Preboarding",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Đang làm việc",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "preboarding",
+            "inactive",
+            "suspended"
+          ]
+        },
+        {
+          "value": "suspended",
+          "label": "Tạm đình chỉ",
+          "labelEn": "Suspended",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng công tác",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active",
+            "suspended"
+          ]
+        },
+        {
+          "value": "terminated",
+          "label": "Chấm dứt",
+          "labelEn": "Terminated",
+          "allowedTransitionsFrom": [
+            "inactive",
+            "suspended"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "terminated"
+          ]
+        }
       ]
     },
     "employees": {
@@ -91,12 +251,56 @@
       "status_set_key": "employees_employment_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "preboarding", "label": "Tiền nhận việc", "labelEn": "Preboarding", "allowedTransitionsFrom": [] },
-        { "value": "active", "label": "Đang làm việc", "labelEn": "Active", "allowedTransitionsFrom": ["preboarding", "inactive", "suspended"] },
-        { "value": "suspended", "label": "Tạm đình chỉ", "labelEn": "Suspended", "allowedTransitionsFrom": ["active"] },
-        { "value": "inactive", "label": "Ngưng công tác", "labelEn": "Inactive", "allowedTransitionsFrom": ["active", "suspended"] },
-        { "value": "terminated", "label": "Chấm dứt", "labelEn": "Terminated", "allowedTransitionsFrom": ["inactive", "suspended"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["terminated"] }
+        {
+          "value": "preboarding",
+          "label": "Tiền nhận việc",
+          "labelEn": "Preboarding",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Đang làm việc",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "preboarding",
+            "inactive",
+            "suspended"
+          ]
+        },
+        {
+          "value": "suspended",
+          "label": "Tạm đình chỉ",
+          "labelEn": "Suspended",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng công tác",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active",
+            "suspended"
+          ]
+        },
+        {
+          "value": "terminated",
+          "label": "Chấm dứt",
+          "labelEn": "Terminated",
+          "allowedTransitionsFrom": [
+            "inactive",
+            "suspended"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "terminated"
+          ]
+        }
       ]
     },
     "equipment": {
@@ -110,13 +314,67 @@
       "status_set_key": "equipment_equipment_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "commissioning", "label": "Đang nghiệm thu", "labelEn": "Commissioning", "allowedTransitionsFrom": [] },
-        { "value": "qualified", "label": "Đủ điều kiện", "labelEn": "Qualified", "allowedTransitionsFrom": ["commissioning", "on_hold"] },
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["qualified", "on_hold", "lockout"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["active", "qualified"] },
-        { "value": "lockout", "label": "Khóa an toàn", "labelEn": "Lockout", "allowedTransitionsFrom": ["active", "on_hold"] },
-        { "value": "retired", "label": "Ngừng sử dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["active", "lockout", "on_hold"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+        {
+          "value": "commissioning",
+          "label": "Đang nghiệm thu",
+          "labelEn": "Commissioning",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "commissioning",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "on_hold",
+            "lockout"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active",
+            "qualified"
+          ]
+        },
+        {
+          "value": "lockout",
+          "label": "Khóa an toàn",
+          "labelEn": "Lockout",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "active",
+            "lockout",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
       ]
     },
     "tools": {
@@ -130,13 +388,63 @@
       "status_set_key": "tools_tool_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "new", "label": "Mới", "labelEn": "New", "allowedTransitionsFrom": [] },
-        { "value": "qualified", "label": "Đủ điều kiện", "labelEn": "Qualified", "allowedTransitionsFrom": ["new", "worn"] },
-        { "value": "in_use", "label": "Đang sử dụng", "labelEn": "In Use", "allowedTransitionsFrom": ["qualified"] },
-        { "value": "worn", "label": "Mòn", "labelEn": "Worn", "allowedTransitionsFrom": ["in_use"] },
-        { "value": "broken", "label": "Hỏng", "labelEn": "Broken", "allowedTransitionsFrom": ["in_use", "worn"] },
-        { "value": "retired", "label": "Loại bỏ", "labelEn": "Retired", "allowedTransitionsFrom": ["broken", "worn"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+        {
+          "value": "new",
+          "label": "Mới",
+          "labelEn": "New",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "new",
+            "worn"
+          ]
+        },
+        {
+          "value": "in_use",
+          "label": "Đang sử dụng",
+          "labelEn": "In Use",
+          "allowedTransitionsFrom": [
+            "qualified"
+          ]
+        },
+        {
+          "value": "worn",
+          "label": "Mòn",
+          "labelEn": "Worn",
+          "allowedTransitionsFrom": [
+            "in_use"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Hỏng",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "in_use",
+            "worn"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Loại bỏ",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "broken",
+            "worn"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
       ]
     },
     "crm_customer_touchpoints": {
@@ -150,13 +458,65 @@
       "status_set_key": "crm_customer_touchpoints_touchpoint_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "open", "label": "Mở", "labelEn": "Open", "allowedTransitionsFrom": [] },
-        { "value": "in_progress", "label": "Đang xử lý", "labelEn": "In Progress", "allowedTransitionsFrom": ["open", "waiting_customer", "escalated"] },
-        { "value": "waiting_customer", "label": "Chờ khách hàng", "labelEn": "Waiting Customer", "allowedTransitionsFrom": ["in_progress"] },
-        { "value": "escalated", "label": "Leo thang", "labelEn": "Escalated", "allowedTransitionsFrom": ["open", "in_progress", "waiting_customer"] },
-        { "value": "resolved", "label": "Đã xử lý", "labelEn": "Resolved", "allowedTransitionsFrom": ["in_progress", "escalated"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["resolved"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+        {
+          "value": "open",
+          "label": "Mở",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang xử lý",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "open",
+            "waiting_customer",
+            "escalated"
+          ]
+        },
+        {
+          "value": "waiting_customer",
+          "label": "Chờ khách hàng",
+          "labelEn": "Waiting Customer",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "escalated",
+          "label": "Leo thang",
+          "labelEn": "Escalated",
+          "allowedTransitionsFrom": [
+            "open",
+            "in_progress",
+            "waiting_customer"
+          ]
+        },
+        {
+          "value": "resolved",
+          "label": "Đã xử lý",
+          "labelEn": "Resolved",
+          "allowedTransitionsFrom": [
+            "in_progress",
+            "escalated"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "resolved"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
       ]
     },
     "purchase_requisitions": {
@@ -170,11 +530,46 @@
       "status_set_key": "purchase_requisitions_requisition_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
-        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["submitted"] },
-        { "value": "sourced", "label": "Đã tìm nguồn", "labelEn": "Sourced", "allowedTransitionsFrom": ["approved"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "submitted", "approved"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "sourced",
+          "label": "Đã tìm nguồn",
+          "labelEn": "Sourced",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "submitted",
+            "approved"
+          ]
+        }
       ]
     },
     "supplier_asns": {
@@ -188,13 +583,64 @@
       "status_set_key": "supplier_asns_asn_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "planned", "label": "Đã lên kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
-        { "value": "confirmed", "label": "Đã xác nhận", "labelEn": "Confirmed", "allowedTransitionsFrom": ["planned"] },
-        { "value": "receiving", "label": "Đang nhận", "labelEn": "Receiving", "allowedTransitionsFrom": ["confirmed", "discrepant"] },
-        { "value": "received", "label": "Đã nhận", "labelEn": "Received", "allowedTransitionsFrom": ["receiving"] },
-        { "value": "discrepant", "label": "Sai lệch", "labelEn": "Discrepant", "allowedTransitionsFrom": ["confirmed", "receiving"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["received", "discrepant"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "confirmed"] }
+        {
+          "value": "planned",
+          "label": "Đã lên kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "confirmed",
+          "label": "Đã xác nhận",
+          "labelEn": "Confirmed",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "receiving",
+          "label": "Đang nhận",
+          "labelEn": "Receiving",
+          "allowedTransitionsFrom": [
+            "confirmed",
+            "discrepant"
+          ]
+        },
+        {
+          "value": "received",
+          "label": "Đã nhận",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": [
+            "receiving"
+          ]
+        },
+        {
+          "value": "discrepant",
+          "label": "Sai lệch",
+          "labelEn": "Discrepant",
+          "allowedTransitionsFrom": [
+            "confirmed",
+            "receiving"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "received",
+            "discrepant"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "confirmed"
+          ]
+        }
       ]
     },
     "improvement_projects": {
@@ -208,16 +654,90 @@
       "status_set_key": "improvement_projects_improvement_status_set",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
-        { "value": "under_review", "label": "Đang xem xét", "labelEn": "Under Review", "allowedTransitionsFrom": ["submitted"] },
-        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
-        { "value": "implemented", "label": "Đã triển khai", "labelEn": "Implemented", "allowedTransitionsFrom": ["approved", "on_hold"] },
-        { "value": "on_hold", "label": "Tạm dừng", "labelEn": "On Hold", "allowedTransitionsFrom": ["submitted", "under_review", "approved", "implemented"] },
-        { "value": "verified", "label": "Đã xác nhận", "labelEn": "Verified", "allowedTransitionsFrom": ["implemented"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["verified"] },
-        { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "allowedTransitionsFrom": ["submitted", "under_review"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed", "rejected"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "value": "implemented",
+          "label": "Đã triển khai",
+          "labelEn": "Implemented",
+          "allowedTransitionsFrom": [
+            "approved",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "submitted",
+            "under_review",
+            "approved",
+            "implemented"
+          ]
+        },
+        {
+          "value": "verified",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "allowedTransitionsFrom": [
+            "implemented"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "verified"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Từ chối",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "submitted",
+            "under_review"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed",
+            "rejected"
+          ]
+        }
       ]
     },
     "mes_dispatch_queue": {
@@ -231,14 +751,74 @@
       "status_set_key": "mes_dispatch_queue_queue_status_set",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "planned", "label": "Đã lên kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
-        { "value": "released", "label": "Đã phát hành", "labelEn": "Released", "allowedTransitionsFrom": ["planned", "on_hold"] },
-        { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "allowedTransitionsFrom": ["released"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["planned", "released", "in_progress"] },
-        { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "allowedTransitionsFrom": ["in_progress"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["completed"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "released", "on_hold"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed", "cancelled"] }
+        {
+          "value": "planned",
+          "label": "Đã lên kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "planned",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "planned",
+            "released",
+            "in_progress"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "completed"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "released",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed",
+            "cancelled"
+          ]
+        }
       ]
     },
     "production_schedule": {
@@ -252,15 +832,85 @@
       "status_set_key": "production_schedule_schedule_status_set",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "under_review", "label": "Đang xem xét", "labelEn": "Under Review", "allowedTransitionsFrom": ["draft", "on_hold"] },
-        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
-        { "value": "published", "label": "Đã công bố", "labelEn": "Published", "allowedTransitionsFrom": ["approved"] },
-        { "value": "frozen", "label": "Đã đóng băng", "labelEn": "Frozen", "allowedTransitionsFrom": ["published"] },
-        { "value": "on_hold", "label": "Tạm dừng", "labelEn": "On Hold", "allowedTransitionsFrom": ["draft", "under_review", "approved", "published", "frozen"] },
-        { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "allowedTransitionsFrom": ["published", "frozen"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "under_review", "approved"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["completed", "cancelled"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "value": "published",
+          "label": "Đã công bố",
+          "labelEn": "Published",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "frozen",
+          "label": "Đã đóng băng",
+          "labelEn": "Frozen",
+          "allowedTransitionsFrom": [
+            "published"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "draft",
+            "under_review",
+            "approved",
+            "published",
+            "frozen"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "published",
+            "frozen"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "under_review",
+            "approved"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "completed",
+            "cancelled"
+          ]
+        }
       ]
     },
     "purchase_receipts": {
@@ -274,13 +924,66 @@
       "status_set_key": "purchase_receipts_receipt_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "received", "label": "Đã nhận", "labelEn": "Received", "allowedTransitionsFrom": [] },
-        { "value": "under_iqc", "label": "Đang IQC", "labelEn": "Under IQC", "allowedTransitionsFrom": ["received", "quarantined"] },
-        { "value": "accepted", "label": "Đã chấp nhận", "labelEn": "Accepted", "allowedTransitionsFrom": ["under_iqc"] },
-        { "value": "quarantined", "label": "Cách ly", "labelEn": "Quarantined", "allowedTransitionsFrom": ["received", "under_iqc", "accepted"] },
-        { "value": "putaway", "label": "Đã nhập kho", "labelEn": "Put Away", "allowedTransitionsFrom": ["accepted"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["putaway", "accepted"] },
-        { "value": "reversed", "label": "Đảo nhận", "labelEn": "Reversed", "allowedTransitionsFrom": ["quarantined", "closed", "accepted"] }
+        {
+          "value": "received",
+          "label": "Đã nhận",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "under_iqc",
+          "label": "Đang IQC",
+          "labelEn": "Under IQC",
+          "allowedTransitionsFrom": [
+            "received",
+            "quarantined"
+          ]
+        },
+        {
+          "value": "accepted",
+          "label": "Đã chấp nhận",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "under_iqc"
+          ]
+        },
+        {
+          "value": "quarantined",
+          "label": "Cách ly",
+          "labelEn": "Quarantined",
+          "allowedTransitionsFrom": [
+            "received",
+            "under_iqc",
+            "accepted"
+          ]
+        },
+        {
+          "value": "putaway",
+          "label": "Đã nhập kho",
+          "labelEn": "Put Away",
+          "allowedTransitionsFrom": [
+            "accepted"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "putaway",
+            "accepted"
+          ]
+        },
+        {
+          "value": "reversed",
+          "label": "Đảo nhận",
+          "labelEn": "Reversed",
+          "allowedTransitionsFrom": [
+            "quarantined",
+            "closed",
+            "accepted"
+          ]
+        }
       ]
     },
     "purchase_receipt_corrections": {
@@ -294,11 +997,46 @@
       "status_set_key": "purchase_receipt_corrections_correction_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
-        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["submitted"] },
-        { "value": "posted", "label": "Đã hạch toán", "labelEn": "Posted", "allowedTransitionsFrom": ["approved"] },
-        { "value": "voided", "label": "Hủy bỏ", "labelEn": "Voided", "allowedTransitionsFrom": ["draft", "submitted", "approved"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "posted",
+          "label": "Đã hạch toán",
+          "labelEn": "Posted",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "voided",
+          "label": "Hủy bỏ",
+          "labelEn": "Voided",
+          "allowedTransitionsFrom": [
+            "draft",
+            "submitted",
+            "approved"
+          ]
+        }
       ]
     },
     "ap_invoices": {
@@ -312,14 +1050,74 @@
       "status_set_key": "ap_invoices_invoice_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "matched", "label": "Đã đối chiếu", "labelEn": "Matched", "allowedTransitionsFrom": ["draft", "on_hold"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["draft", "matched", "posted"] },
-        { "value": "posted", "label": "Đã hạch toán", "labelEn": "Posted", "allowedTransitionsFrom": ["matched"] },
-        { "value": "partially_paid", "label": "Thanh toán một phần", "labelEn": "Partially Paid", "allowedTransitionsFrom": ["posted"] },
-        { "value": "paid", "label": "Đã thanh toán", "labelEn": "Paid", "allowedTransitionsFrom": ["posted", "partially_paid"] },
-        { "value": "voided", "label": "Đã hủy", "labelEn": "Voided", "allowedTransitionsFrom": ["draft", "on_hold"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["paid", "voided"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "matched",
+          "label": "Đã đối chiếu",
+          "labelEn": "Matched",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "draft",
+            "matched",
+            "posted"
+          ]
+        },
+        {
+          "value": "posted",
+          "label": "Đã hạch toán",
+          "labelEn": "Posted",
+          "allowedTransitionsFrom": [
+            "matched"
+          ]
+        },
+        {
+          "value": "partially_paid",
+          "label": "Thanh toán một phần",
+          "labelEn": "Partially Paid",
+          "allowedTransitionsFrom": [
+            "posted"
+          ]
+        },
+        {
+          "value": "paid",
+          "label": "Đã thanh toán",
+          "labelEn": "Paid",
+          "allowedTransitionsFrom": [
+            "posted",
+            "partially_paid"
+          ]
+        },
+        {
+          "value": "voided",
+          "label": "Đã hủy",
+          "labelEn": "Voided",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "paid",
+            "voided"
+          ]
+        }
       ]
     },
     "tms_shipments": {
@@ -333,14 +1131,74 @@
       "status_set_key": "tms_shipments_shipment_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "planned", "label": "Đã lập kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
-        { "value": "blocked", "label": "Bị chặn", "labelEn": "Blocked", "allowedTransitionsFrom": ["planned", "ready", "released"] },
-        { "value": "ready", "label": "Sẵn sàng", "labelEn": "Ready", "allowedTransitionsFrom": ["planned", "blocked"] },
-        { "value": "released", "label": "Đã xuất", "labelEn": "Released", "allowedTransitionsFrom": ["ready"] },
-        { "value": "dispatched", "label": "Đã điều xe", "labelEn": "Dispatched", "allowedTransitionsFrom": ["released"] },
-        { "value": "delivered", "label": "Đã giao", "labelEn": "Delivered", "allowedTransitionsFrom": ["dispatched"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["delivered"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "blocked", "ready", "released"] }
+        {
+          "value": "planned",
+          "label": "Đã lập kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "blocked",
+          "label": "Bị chặn",
+          "labelEn": "Blocked",
+          "allowedTransitionsFrom": [
+            "planned",
+            "ready",
+            "released"
+          ]
+        },
+        {
+          "value": "ready",
+          "label": "Sẵn sàng",
+          "labelEn": "Ready",
+          "allowedTransitionsFrom": [
+            "planned",
+            "blocked"
+          ]
+        },
+        {
+          "value": "released",
+          "label": "Đã xuất",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "ready"
+          ]
+        },
+        {
+          "value": "dispatched",
+          "label": "Đã điều xe",
+          "labelEn": "Dispatched",
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "value": "delivered",
+          "label": "Đã giao",
+          "labelEn": "Delivered",
+          "allowedTransitionsFrom": [
+            "dispatched"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "delivered"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "blocked",
+            "ready",
+            "released"
+          ]
+        }
       ]
     },
     "warehouses": {
@@ -354,11 +1212,47 @@
       "status_set_key": "warehouses_warehouse_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "planned", "label": "Kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["planned", "inactive", "on_hold"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["active"] },
-        { "value": "inactive", "label": "Ngưng hoạt động", "labelEn": "Inactive", "allowedTransitionsFrom": ["active", "on_hold"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["inactive"] }
+        {
+          "value": "planned",
+          "label": "Kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "planned",
+            "inactive",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "inactive",
+          "label": "Ngưng hoạt động",
+          "labelEn": "Inactive",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "inactive"
+          ]
+        }
       ]
     },
     "inventory_transactions": {
@@ -373,12 +1267,57 @@
       "status_set_key": "inventory_transactions_posting_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "pending_review", "label": "Chờ xem xét", "labelEn": "Pending Review", "allowedTransitionsFrom": ["draft", "on_hold"] },
-        { "value": "posted", "label": "Đã ghi nhận", "labelEn": "Posted", "allowedTransitionsFrom": ["pending_review"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["draft", "pending_review", "posted"] },
-        { "value": "reversed", "label": "Đảo giao dịch", "labelEn": "Reversed", "allowedTransitionsFrom": ["posted", "on_hold"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "pending_review"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "pending_review",
+          "label": "Chờ xem xét",
+          "labelEn": "Pending Review",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "posted",
+          "label": "Đã ghi nhận",
+          "labelEn": "Posted",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "draft",
+            "pending_review",
+            "posted"
+          ]
+        },
+        {
+          "value": "reversed",
+          "label": "Đảo giao dịch",
+          "labelEn": "Reversed",
+          "allowedTransitionsFrom": [
+            "posted",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "pending_review"
+          ]
+        }
       ]
     },
     "work_orders": {
@@ -392,13 +1331,64 @@
       "status_set_key": "work_orders_work_order_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "planned", "label": "Đã lên kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": ["draft"] },
-        { "value": "released", "label": "Đã phát hành", "labelEn": "Released", "allowedTransitionsFrom": ["planned"] },
-        { "value": "in_production", "label": "Đang sản xuất", "labelEn": "In Production", "allowedTransitionsFrom": ["released", "quality_hold"] },
-        { "value": "quality_hold", "label": "Giữ chất lượng", "labelEn": "Quality Hold", "allowedTransitionsFrom": ["released", "in_production"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["in_production"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "planned", "released"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "planned",
+          "label": "Đã lên kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "in_production",
+          "label": "Đang sản xuất",
+          "labelEn": "In Production",
+          "allowedTransitionsFrom": [
+            "released",
+            "quality_hold"
+          ]
+        },
+        {
+          "value": "quality_hold",
+          "label": "Giữ chất lượng",
+          "labelEn": "Quality Hold",
+          "allowedTransitionsFrom": [
+            "released",
+            "in_production"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "in_production"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "planned",
+            "released"
+          ]
+        }
       ]
     },
     "job_operations": {
@@ -413,13 +1403,64 @@
       "status_set_key": "job_operations_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "pending", "label": "Chờ xử lý", "labelEn": "Pending", "allowedTransitionsFrom": [] },
-        { "value": "ready", "label": "Sẵn sàng", "labelEn": "Ready", "allowedTransitionsFrom": ["pending", "quality_hold"] },
-        { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "allowedTransitionsFrom": ["ready"] },
-        { "value": "quality_hold", "label": "Giữ chất lượng", "labelEn": "Quality Hold", "allowedTransitionsFrom": ["ready", "in_progress"] },
-        { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "allowedTransitionsFrom": ["in_progress"] },
-        { "value": "scrapped", "label": "Loại bỏ", "labelEn": "Scrapped", "allowedTransitionsFrom": ["in_progress", "quality_hold"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["pending", "ready"] }
+        {
+          "value": "pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "ready",
+          "label": "Sẵn sàng",
+          "labelEn": "Ready",
+          "allowedTransitionsFrom": [
+            "pending",
+            "quality_hold"
+          ]
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "ready"
+          ]
+        },
+        {
+          "value": "quality_hold",
+          "label": "Giữ chất lượng",
+          "labelEn": "Quality Hold",
+          "allowedTransitionsFrom": [
+            "ready",
+            "in_progress"
+          ]
+        },
+        {
+          "value": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "scrapped",
+          "label": "Loại bỏ",
+          "labelEn": "Scrapped",
+          "allowedTransitionsFrom": [
+            "in_progress",
+            "quality_hold"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "pending",
+            "ready"
+          ]
+        }
       ]
     },
     "ipqc_inspections": {
@@ -433,12 +1474,54 @@
       "status_set_key": "ipqc_inspections_inspection_status",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "queued", "label": "Đã xếp hàng", "labelEn": "Queued", "allowedTransitionsFrom": [] },
-        { "value": "in_progress", "label": "Đang kiểm", "labelEn": "In Progress", "allowedTransitionsFrom": ["queued", "reinspect"] },
-        { "value": "accepted", "label": "Đạt", "labelEn": "Accepted", "allowedTransitionsFrom": ["in_progress"] },
-        { "value": "rejected", "label": "Không đạt", "labelEn": "Rejected", "allowedTransitionsFrom": ["in_progress"] },
-        { "value": "reinspect", "label": "Kiểm lại", "labelEn": "Reinspect", "allowedTransitionsFrom": ["rejected"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["accepted", "rejected"] }
+        {
+          "value": "queued",
+          "label": "Đã xếp hàng",
+          "labelEn": "Queued",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang kiểm",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "queued",
+            "reinspect"
+          ]
+        },
+        {
+          "value": "accepted",
+          "label": "Đạt",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Không đạt",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "reinspect",
+          "label": "Kiểm lại",
+          "labelEn": "Reinspect",
+          "allowedTransitionsFrom": [
+            "rejected"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "accepted",
+            "rejected"
+          ]
+        }
       ]
     },
     "oqc_inspections": {
@@ -453,10 +1536,37 @@
       "status_set_key": "oqc_inspections_result_status",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "pending", "label": "Chờ kết quả", "labelEn": "Pending", "allowedTransitionsFrom": [] },
-        { "value": "accepted", "label": "Đạt", "labelEn": "Accepted", "allowedTransitionsFrom": ["pending"] },
-        { "value": "rejected", "label": "Không đạt", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending"] },
-        { "value": "waived", "label": "Miễn kiểm", "labelEn": "Waived", "allowedTransitionsFrom": ["pending", "rejected"] }
+        {
+          "value": "pending",
+          "label": "Chờ kết quả",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "accepted",
+          "label": "Đạt",
+          "labelEn": "Accepted",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Không đạt",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending"
+          ]
+        },
+        {
+          "value": "waived",
+          "label": "Miễn kiểm",
+          "labelEn": "Waived",
+          "allowedTransitionsFrom": [
+            "pending",
+            "rejected"
+          ]
+        }
       ]
     },
     "rma_orders": {
@@ -471,14 +1581,70 @@
       "status_set_key": "rma_orders_rma_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "requested", "label": "Yêu cầu", "labelEn": "Requested", "allowedTransitionsFrom": [] },
-        { "value": "authorized", "label": "Đã chấp thuận", "labelEn": "Authorized", "allowedTransitionsFrom": ["requested"] },
-        { "value": "received", "label": "Đã nhận", "labelEn": "Received", "allowedTransitionsFrom": ["authorized"] },
-        { "value": "in_evaluation", "label": "Đang đánh giá", "labelEn": "In Evaluation", "allowedTransitionsFrom": ["received"] },
-        { "value": "repaired", "label": "Đã sửa", "labelEn": "Repaired", "allowedTransitionsFrom": ["in_evaluation"] },
-        { "value": "replaced", "label": "Đã thay", "labelEn": "Replaced", "allowedTransitionsFrom": ["in_evaluation"] },
-        { "value": "credited", "label": "Đã ghi có", "labelEn": "Credited", "allowedTransitionsFrom": ["in_evaluation"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["repaired", "replaced", "credited"] }
+        {
+          "value": "requested",
+          "label": "Yêu cầu",
+          "labelEn": "Requested",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "authorized",
+          "label": "Đã chấp thuận",
+          "labelEn": "Authorized",
+          "allowedTransitionsFrom": [
+            "requested"
+          ]
+        },
+        {
+          "value": "received",
+          "label": "Đã nhận",
+          "labelEn": "Received",
+          "allowedTransitionsFrom": [
+            "authorized"
+          ]
+        },
+        {
+          "value": "in_evaluation",
+          "label": "Đang đánh giá",
+          "labelEn": "In Evaluation",
+          "allowedTransitionsFrom": [
+            "received"
+          ]
+        },
+        {
+          "value": "repaired",
+          "label": "Đã sửa",
+          "labelEn": "Repaired",
+          "allowedTransitionsFrom": [
+            "in_evaluation"
+          ]
+        },
+        {
+          "value": "replaced",
+          "label": "Đã thay",
+          "labelEn": "Replaced",
+          "allowedTransitionsFrom": [
+            "in_evaluation"
+          ]
+        },
+        {
+          "value": "credited",
+          "label": "Đã ghi có",
+          "labelEn": "Credited",
+          "allowedTransitionsFrom": [
+            "in_evaluation"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "repaired",
+            "replaced",
+            "credited"
+          ]
+        }
       ]
     },
     "pm_maintenance_plans": {
@@ -492,12 +1658,57 @@
       "status_set_key": "pm_maintenance_plans_status_set",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["draft", "on_hold"] },
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["approved", "on_hold"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["approved", "active"] },
-        { "value": "retired", "label": "Ngừng áp dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["approved", "active", "on_hold"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "draft",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "approved",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Ngừng áp dụng",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
       ]
     },
     "ehs_incidents": {
@@ -511,13 +1722,63 @@
       "status_set_key": "ehs_incidents_incident_status",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "reported", "label": "Đã báo cáo", "labelEn": "Reported", "allowedTransitionsFrom": [] },
-        { "value": "triaged", "label": "Đã phân loại", "labelEn": "Triaged", "allowedTransitionsFrom": ["reported"] },
-        { "value": "contained", "label": "Đã ngăn chặn", "labelEn": "Contained", "allowedTransitionsFrom": ["triaged", "investigating"] },
-        { "value": "investigating", "label": "Đang điều tra", "labelEn": "Investigating", "allowedTransitionsFrom": ["triaged", "contained"] },
-        { "value": "corrective_action", "label": "Hành động khắc phục", "labelEn": "Corrective Action", "allowedTransitionsFrom": ["investigating", "contained"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["corrective_action"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+        {
+          "value": "reported",
+          "label": "Đã báo cáo",
+          "labelEn": "Reported",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "triaged",
+          "label": "Đã phân loại",
+          "labelEn": "Triaged",
+          "allowedTransitionsFrom": [
+            "reported"
+          ]
+        },
+        {
+          "value": "contained",
+          "label": "Đã ngăn chặn",
+          "labelEn": "Contained",
+          "allowedTransitionsFrom": [
+            "triaged",
+            "investigating"
+          ]
+        },
+        {
+          "value": "investigating",
+          "label": "Đang điều tra",
+          "labelEn": "Investigating",
+          "allowedTransitionsFrom": [
+            "triaged",
+            "contained"
+          ]
+        },
+        {
+          "value": "corrective_action",
+          "label": "Hành động khắc phục",
+          "labelEn": "Corrective Action",
+          "allowedTransitionsFrom": [
+            "investigating",
+            "contained"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "corrective_action"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
       ]
     },
     "qual_compliance_obligations": {
@@ -531,12 +1792,58 @@
       "status_set_key": "qual_compliance_obligations_obligation_status",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "open", "label": "Mở", "labelEn": "Open", "allowedTransitionsFrom": [] },
-        { "value": "due", "label": "Đến hạn", "labelEn": "Due", "allowedTransitionsFrom": ["open"] },
-        { "value": "overdue", "label": "Quá hạn", "labelEn": "Overdue", "allowedTransitionsFrom": ["open", "due"] },
-        { "value": "waived", "label": "Miễn trừ", "labelEn": "Waived", "allowedTransitionsFrom": ["open", "due", "overdue"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["open", "due", "overdue", "waived"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+        {
+          "value": "open",
+          "label": "Mở",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "due",
+          "label": "Đến hạn",
+          "labelEn": "Due",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "overdue",
+          "label": "Quá hạn",
+          "labelEn": "Overdue",
+          "allowedTransitionsFrom": [
+            "open",
+            "due"
+          ]
+        },
+        {
+          "value": "waived",
+          "label": "Miễn trừ",
+          "labelEn": "Waived",
+          "allowedTransitionsFrom": [
+            "open",
+            "due",
+            "overdue"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "open",
+            "due",
+            "overdue",
+            "waived"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
       ]
     },
     "ehs_permit_register": {
@@ -550,14 +1857,74 @@
       "status_set_key": "ehs_permit_register_status_set",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
-        { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["submitted"] },
-        { "value": "active", "label": "Hiệu lực", "labelEn": "Active", "allowedTransitionsFrom": ["approved", "suspended"] },
-        { "value": "suspended", "label": "Tạm ngưng", "labelEn": "Suspended", "allowedTransitionsFrom": ["approved", "active"] },
-        { "value": "expired", "label": "Hết hạn", "labelEn": "Expired", "allowedTransitionsFrom": ["approved", "active", "suspended"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["active", "suspended", "expired"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Đã duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hiệu lực",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "approved",
+            "suspended"
+          ]
+        },
+        {
+          "value": "suspended",
+          "label": "Tạm ngưng",
+          "labelEn": "Suspended",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active"
+          ]
+        },
+        {
+          "value": "expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "allowedTransitionsFrom": [
+            "approved",
+            "active",
+            "suspended"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "active",
+            "suspended",
+            "expired"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
       ]
     },
     "lean_5s_audits": {
@@ -571,12 +1938,52 @@
       "status_set_key": "lean_5s_audits_status_set",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "planned", "label": "Đã lập kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
-        { "value": "in_progress", "label": "Đang đánh giá", "labelEn": "In Progress", "allowedTransitionsFrom": ["planned"] },
-        { "value": "follow_up", "label": "Theo dõi hành động", "labelEn": "Follow Up", "allowedTransitionsFrom": ["in_progress"] },
-        { "value": "verified", "label": "Đã xác nhận", "labelEn": "Verified", "allowedTransitionsFrom": ["follow_up"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["verified"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+        {
+          "value": "planned",
+          "label": "Đã lập kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang đánh giá",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "follow_up",
+          "label": "Theo dõi hành động",
+          "labelEn": "Follow Up",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "verified",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "allowedTransitionsFrom": [
+            "follow_up"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "verified"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
       ]
     },
     "pm_equipment_master": {
@@ -590,13 +1997,67 @@
       "status_set_key": "pm_equipment_master_status_set",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "commissioning", "label": "Đang nghiệm thu", "labelEn": "Commissioning", "allowedTransitionsFrom": [] },
-        { "value": "qualified", "label": "Đủ điều kiện", "labelEn": "Qualified", "allowedTransitionsFrom": ["commissioning", "on_hold"] },
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["qualified", "on_hold", "lockout"] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["qualified", "active"] },
-        { "value": "lockout", "label": "Khóa an toàn", "labelEn": "Lockout", "allowedTransitionsFrom": ["active", "on_hold"] },
-        { "value": "retired", "label": "Ngừng sử dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["active", "on_hold", "lockout"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["retired"] }
+        {
+          "value": "commissioning",
+          "label": "Đang nghiệm thu",
+          "labelEn": "Commissioning",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
+          "allowedTransitionsFrom": [
+            "commissioning",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "on_hold",
+            "lockout"
+          ]
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "qualified",
+            "active"
+          ]
+        },
+        {
+          "value": "lockout",
+          "label": "Khóa an toàn",
+          "labelEn": "Lockout",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold",
+            "lockout"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "retired"
+          ]
+        }
       ]
     },
     "audit": {
@@ -610,14 +2071,79 @@
       "status_set_key": "audit_status_code",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "allowedTransitionsFrom": ["draft"] },
-        { "value": "under_review", "label": "Đang xem xét", "labelEn": "Under Review", "allowedTransitionsFrom": ["submitted"] },
-        { "value": "approved", "label": "Đã phê duyệt", "labelEn": "Approved", "allowedTransitionsFrom": ["under_review"] },
-        { "value": "implemented", "label": "Đã triển khai", "labelEn": "Implemented", "allowedTransitionsFrom": ["approved"] },
-        { "value": "verified", "label": "Đã xác nhận", "labelEn": "Verified", "allowedTransitionsFrom": ["implemented"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["verified", "draft", "submitted", "under_review", "approved", "implemented"] },
-        { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "allowedTransitionsFrom": ["closed", "draft", "submitted", "under_review", "approved", "implemented", "verified"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "allowedTransitionsFrom": [
+            "submitted"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "under_review"
+          ]
+        },
+        {
+          "value": "implemented",
+          "label": "Đã triển khai",
+          "labelEn": "Implemented",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "verified",
+          "label": "Đã xác nhận",
+          "labelEn": "Verified",
+          "allowedTransitionsFrom": [
+            "implemented"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "verified",
+            "draft",
+            "submitted",
+            "under_review",
+            "approved",
+            "implemented"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Từ chối",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "closed",
+            "draft",
+            "submitted",
+            "under_review",
+            "approved",
+            "implemented",
+            "verified"
+          ]
+        }
       ]
     },
     "deviation": {
@@ -631,10 +2157,39 @@
       "status_set_key": "deviation_status_code",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "pending", "label": "Chờ xử lý", "labelEn": "Pending", "allowedTransitionsFrom": [] },
-        { "value": "partial", "label": "Một phần", "labelEn": "Partial", "allowedTransitionsFrom": ["pending", "broken"] },
-        { "value": "complete", "label": "Hoàn chỉnh", "labelEn": "Complete", "allowedTransitionsFrom": ["pending", "partial"] },
-        { "value": "broken", "label": "Đứt gãy", "labelEn": "Broken", "allowedTransitionsFrom": ["pending", "partial"] }
+        {
+          "value": "pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "allowedTransitionsFrom": [
+            "pending",
+            "broken"
+          ]
+        },
+        {
+          "value": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "allowedTransitionsFrom": [
+            "pending",
+            "partial"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "pending",
+            "partial"
+          ]
+        }
       ]
     },
     "deviations": {
@@ -649,11 +2204,44 @@
       "status_set_key": "exception_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "open", "label": "Mở", "labelEn": "Open", "allowedTransitionsFrom": [] },
-        { "value": "in_progress", "label": "Đang xử lý", "labelEn": "In Progress", "allowedTransitionsFrom": ["open"] },
-        { "value": "pending_review", "label": "Chờ xem xét", "labelEn": "Pending Review", "allowedTransitionsFrom": ["in_progress"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["pending_review"] },
-        { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "allowedTransitionsFrom": ["pending_review"] }
+        {
+          "value": "open",
+          "label": "Mở",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang xử lý",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "pending_review",
+          "label": "Chờ xem xét",
+          "labelEn": "Pending Review",
+          "allowedTransitionsFrom": [
+            "in_progress"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        },
+        {
+          "value": "rejected",
+          "label": "Từ chối",
+          "labelEn": "Rejected",
+          "allowedTransitionsFrom": [
+            "pending_review"
+          ]
+        }
       ]
     },
     "engineering_change_requests": {
@@ -667,10 +2255,39 @@
       "status_set_key": "engineering_change_requests_ecr_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "pending", "label": "Chờ xử lý", "labelEn": "Pending", "allowedTransitionsFrom": [] },
-        { "value": "partial", "label": "Một phần", "labelEn": "Partial", "allowedTransitionsFrom": ["pending", "broken"] },
-        { "value": "complete", "label": "Hoàn chỉnh", "labelEn": "Complete", "allowedTransitionsFrom": ["pending", "partial"] },
-        { "value": "broken", "label": "Đứt gãy", "labelEn": "Broken", "allowedTransitionsFrom": ["pending", "partial"] }
+        {
+          "value": "pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "allowedTransitionsFrom": [
+            "pending",
+            "broken"
+          ]
+        },
+        {
+          "value": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "allowedTransitionsFrom": [
+            "pending",
+            "partial"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "pending",
+            "partial"
+          ]
+        }
       ]
     },
     "item": {
@@ -684,11 +2301,47 @@
       "status_set_key": "item_status_code",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": ["draft", "hold"] },
-        { "value": "hold", "label": "Tạm giữ", "labelEn": "Hold", "allowedTransitionsFrom": ["draft", "active"] },
-        { "value": "obsolete_requested", "label": "Yêu cầu ngưng dùng", "labelEn": "Obsolete Requested", "allowedTransitionsFrom": ["active", "hold"] },
-        { "value": "obsolete", "label": "Ngưng dùng", "labelEn": "Obsolete", "allowedTransitionsFrom": ["obsolete_requested"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "draft",
+            "hold"
+          ]
+        },
+        {
+          "value": "hold",
+          "label": "Tạm giữ",
+          "labelEn": "Hold",
+          "allowedTransitionsFrom": [
+            "draft",
+            "active"
+          ]
+        },
+        {
+          "value": "obsolete_requested",
+          "label": "Yêu cầu ngưng dùng",
+          "labelEn": "Obsolete Requested",
+          "allowedTransitionsFrom": [
+            "active",
+            "hold"
+          ]
+        },
+        {
+          "value": "obsolete",
+          "label": "Ngưng dùng",
+          "labelEn": "Obsolete",
+          "allowedTransitionsFrom": [
+            "obsolete_requested"
+          ]
+        }
       ]
     },
     "ap_ar_invoices": {
@@ -702,13 +2355,68 @@
       "status_set_key": "ap_ar_invoices_payment_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "draft", "label": "Nháp", "labelEn": "Draft", "allowedTransitionsFrom": [] },
-        { "value": "open", "label": "Mở", "labelEn": "Open", "allowedTransitionsFrom": ["draft", "disputed"] },
-        { "value": "partial", "label": "Thanh toán một phần", "labelEn": "Partially Paid", "allowedTransitionsFrom": ["open"] },
-        { "value": "paid", "label": "Đã thanh toán", "labelEn": "Paid", "allowedTransitionsFrom": ["open", "partial", "disputed"] },
-        { "value": "disputed", "label": "Tranh chấp", "labelEn": "Disputed", "allowedTransitionsFrom": ["open", "partial"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["draft", "open", "partial", "disputed"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["paid", "cancelled"] }
+        {
+          "value": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "open",
+          "label": "Mở",
+          "labelEn": "Open",
+          "allowedTransitionsFrom": [
+            "draft",
+            "disputed"
+          ]
+        },
+        {
+          "value": "partial",
+          "label": "Thanh toán một phần",
+          "labelEn": "Partially Paid",
+          "allowedTransitionsFrom": [
+            "open"
+          ]
+        },
+        {
+          "value": "paid",
+          "label": "Đã thanh toán",
+          "labelEn": "Paid",
+          "allowedTransitionsFrom": [
+            "open",
+            "partial",
+            "disputed"
+          ]
+        },
+        {
+          "value": "disputed",
+          "label": "Tranh chấp",
+          "labelEn": "Disputed",
+          "allowedTransitionsFrom": [
+            "open",
+            "partial"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "draft",
+            "open",
+            "partial",
+            "disputed"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "paid",
+            "cancelled"
+          ]
+        }
       ]
     },
     "fin_fixed_assets": {
@@ -722,11 +2430,46 @@
       "status_set_key": "fin_fixed_assets_asset_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "active", "label": "Hoạt động", "labelEn": "Active", "allowedTransitionsFrom": [] },
-        { "value": "on_hold", "label": "Tạm giữ", "labelEn": "On Hold", "allowedTransitionsFrom": ["active"] },
-        { "value": "retired", "label": "Ngừng sử dụng", "labelEn": "Retired", "allowedTransitionsFrom": ["active", "on_hold"] },
-        { "value": "disposed", "label": "Đã thanh lý", "labelEn": "Disposed", "allowedTransitionsFrom": ["retired", "on_hold"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["disposed"] }
+        {
+          "value": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "on_hold",
+          "label": "Tạm giữ",
+          "labelEn": "On Hold",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "value": "retired",
+          "label": "Ngừng sử dụng",
+          "labelEn": "Retired",
+          "allowedTransitionsFrom": [
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "disposed",
+          "label": "Đã thanh lý",
+          "labelEn": "Disposed",
+          "allowedTransitionsFrom": [
+            "retired",
+            "on_hold"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "disposed"
+          ]
+        }
       ]
     },
     "freight_orders": {
@@ -740,13 +2483,63 @@
       "status_set_key": "freight_orders_freight_status",
       "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
-        { "value": "planned", "label": "Đã lập kế hoạch", "labelEn": "Planned", "allowedTransitionsFrom": [] },
-        { "value": "tendered", "label": "Đã chào vận chuyển", "labelEn": "Tendered", "allowedTransitionsFrom": ["planned"] },
-        { "value": "booked", "label": "Đã đặt chỗ", "labelEn": "Booked", "allowedTransitionsFrom": ["tendered", "planned"] },
-        { "value": "in_transit", "label": "Đang vận chuyển", "labelEn": "In Transit", "allowedTransitionsFrom": ["booked"] },
-        { "value": "delivered", "label": "Đã giao", "labelEn": "Delivered", "allowedTransitionsFrom": ["in_transit"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["delivered"] },
-        { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "allowedTransitionsFrom": ["planned", "tendered", "booked"] }
+        {
+          "value": "planned",
+          "label": "Đã lập kế hoạch",
+          "labelEn": "Planned",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "tendered",
+          "label": "Đã chào vận chuyển",
+          "labelEn": "Tendered",
+          "allowedTransitionsFrom": [
+            "planned"
+          ]
+        },
+        {
+          "value": "booked",
+          "label": "Đã đặt chỗ",
+          "labelEn": "Booked",
+          "allowedTransitionsFrom": [
+            "tendered",
+            "planned"
+          ]
+        },
+        {
+          "value": "in_transit",
+          "label": "Đang vận chuyển",
+          "labelEn": "In Transit",
+          "allowedTransitionsFrom": [
+            "booked"
+          ]
+        },
+        {
+          "value": "delivered",
+          "label": "Đã giao",
+          "labelEn": "Delivered",
+          "allowedTransitionsFrom": [
+            "in_transit"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "delivered"
+          ]
+        },
+        {
+          "value": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "allowedTransitionsFrom": [
+            "planned",
+            "tendered",
+            "booked"
+          ]
+        }
       ]
     },
     "safety_observations": {
@@ -760,11 +2553,45 @@
       "status_set_key": "safety_observations_observation_status",
       "lifecycle_mode": "persisted",
       "status_options": [
-        { "value": "logged", "label": "Đã ghi nhận", "labelEn": "Logged", "allowedTransitionsFrom": [] },
-        { "value": "assigned", "label": "Đã giao xử lý", "labelEn": "Assigned", "allowedTransitionsFrom": ["logged"] },
-        { "value": "in_progress", "label": "Đang xử lý", "labelEn": "In Progress", "allowedTransitionsFrom": ["assigned"] },
-        { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "allowedTransitionsFrom": ["assigned", "in_progress"] },
-        { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "allowedTransitionsFrom": ["closed"] }
+        {
+          "value": "logged",
+          "label": "Đã ghi nhận",
+          "labelEn": "Logged",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "assigned",
+          "label": "Đã giao xử lý",
+          "labelEn": "Assigned",
+          "allowedTransitionsFrom": [
+            "logged"
+          ]
+        },
+        {
+          "value": "in_progress",
+          "label": "Đang xử lý",
+          "labelEn": "In Progress",
+          "allowedTransitionsFrom": [
+            "assigned"
+          ]
+        },
+        {
+          "value": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "allowedTransitionsFrom": [
+            "assigned",
+            "in_progress"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Lưu trữ",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "closed"
+          ]
+        }
       ]
     }
   },

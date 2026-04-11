@@ -68,6 +68,22 @@ function smoke_reflection_method(object|string $target, string $method): Reflect
     return $reflection;
 }
 
+function smoke_exit_payload(callable $callback): array
+{
+    try {
+        $callback();
+    } catch (ExitException $e) {
+        return [
+            'status' => $e->getStatusCode(),
+            'payload' => $e->getPayload(),
+            'headers' => $e->getHeaders(),
+            'body' => $e->getBody(),
+        ];
+    }
+
+    throw new RuntimeException('Expected controller call to terminate via ExitException.');
+}
+
 smoke_reset_request_state();
 
 // api_json should unwind through the structured response exception in router mode.
@@ -83,6 +99,7 @@ $dataLayer = new DataLayer(QMS_TEST_DATA_DIR, QMS_TEST_ROOT_DIR);
 $router = new Router($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR);
 $router->action('auth_login', AuthController::class, 'login');
 $router->get('/api/meta/catalog', ModuleSchemaController::class, 'apiCatalog');
+$router->get('/api/system/contracts', RegistryController::class, 'getSystemContract');
 
 // Legacy action alias should normalize correctly.
 smoke_reset_request_state();
@@ -96,6 +113,12 @@ $_SERVER['REQUEST_METHOD'] = 'GET';
 $_SERVER['REQUEST_URI'] = '/api/meta/catalog';
 $resolved = $router->resolve();
 smoke_assert($resolved['action'] === 'GET:/api/meta/catalog', 'Router did not resolve REST route.');
+
+smoke_reset_request_state();
+$_SERVER['REQUEST_METHOD'] = 'GET';
+$_SERVER['REQUEST_URI'] = '/api/system/contracts';
+$resolved = $router->resolve();
+smoke_assert($resolved['action'] === 'GET:/api/system/contracts', 'Router did not resolve system contract route.');
 
 // Auth middleware must block protected routes when no session exists.
 smoke_reset_request_state();
@@ -502,6 +525,19 @@ try {
     smoke_assert($e->getStatusCode() === 403, 'Registry read guard returned wrong status.');
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Registry read guard returned wrong error.');
 }
+
+smoke_reset_request_state();
+$_SESSION['user'] = 'qms-runtime-user';
+$_SESSION['mfa_ok'] = true;
+$systemContractController = (new RegistryController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($genericPermissionStore);
+$systemContractResponse = smoke_exit_payload(static function () use ($systemContractController): void {
+    $systemContractController->getSystemContract();
+});
+$systemContractPayload = $systemContractResponse['payload'];
+smoke_assert(($systemContractResponse['status'] ?? null) === 200, 'System contract endpoint should return 200 for registry readers.');
+smoke_assert((int)($systemContractPayload['summary']['tableCount'] ?? 0) >= 600, 'System contract should expose the full table registry.');
+smoke_assert((int)($systemContractPayload['summary']['endpointCount'] ?? 0) >= 3000, 'System contract should expose the endpoint catalog.');
+smoke_assert((int)($systemContractPayload['summary']['globalCapabilityCount'] ?? 0) >= 15, 'System contract should expose global ERP+MOM capability audit coverage.');
 
 $builderStore = [
     'settings' => ['require_mfa' => false],
@@ -1078,6 +1114,7 @@ if (is_dir($financeControlTempDir)) {
 }
 mkdir($financeControlTempDir . '/data', 0775, true);
 $financeControlService = new FinanceControlService($financeControlTempDir . '/data');
+$futureBackdateExceptionExpiry = (new DateTimeImmutable('+2 days'))->format(DATE_ATOM);
 $periodClose = $financeControlService->createPeriodClose([
     'period_code' => '2026-04',
     'ledger_scope' => 'AP',
@@ -1094,7 +1131,7 @@ $backdateException = $financeControlService->createBackdateException([
     'approval_reference' => 'APR-AR-001',
     'original_event_at' => '2026-04-01T08:15:00+07:00',
     'requested_posting_date' => '2026-04-02',
-    'expires_at' => '2026-04-10T23:59:00+07:00',
+    'expires_at' => $futureBackdateExceptionExpiry,
 ], 'finance-user');
 smoke_assert(($backdateException['exception_status'] ?? null) === 'approved', 'Finance backdate exception must create an approved governed exception record.');
 smoke_assert((($backdateException['e_signature'] ?? [])['signature_status'] ?? null) === 'applied', 'Finance backdate exception must carry signature evidence.');

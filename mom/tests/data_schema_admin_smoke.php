@@ -134,6 +134,8 @@ smoke_assert(array_key_exists('business_contract_state_model_count', (array)($wo
 smoke_assert(array_key_exists('business_contract_deprecation_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose business contract deprecation counts.');
 smoke_assert(array_key_exists('operational_blind_spot_critical_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include critical operational blind-spot counts.');
 smoke_assert(array_key_exists('operational_stress_critical_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include critical operational stress counts.');
+smoke_assert(array_key_exists('global_capability_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include global ERP+MOM capability counts.');
+smoke_assert(array_key_exists('global_capability_blocking_gap_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include global ERP+MOM blocking gap counts.');
 smoke_assert(array_key_exists('present_lookup', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose DB table lookup data.');
 smoke_assert(array_key_exists('db_probe_applicable', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the DB probe is active or intentionally not applicable.');
 smoke_assert(array_key_exists('db_probe_reachable', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the DB probe reached PostgreSQL.');
@@ -179,6 +181,9 @@ smoke_assert(isset($firstVariable['key']), 'At least one variable category shoul
 smoke_assert(count((array)($workspace['lists']['designs'] ?? [])) === 1, 'Data Schema workspace should expose exactly one active design.');
 smoke_assert((string)((($workspace['lists']['designs'] ?? [])[0]['id'] ?? '')) === 'workspace', 'Data Schema workspace should expose workspace as the single active design.');
 smoke_assert(is_array(($workspace['artifacts']['business_contract_bundle'] ?? null)), 'Data Schema workspace should expose the business contract bundle summary.');
+smoke_assert(is_array(($workspace['artifacts']['global_capability_audit'] ?? null)), 'Data Schema workspace should expose the global ERP+MOM capability audit summary.');
+smoke_assert((int)($workspace['artifacts']['global_capability_audit']['summary']['capabilityCount'] ?? 0) >= 15, 'Global capability audit should cover the broad ERP+MOM process map.');
+smoke_assert((int)($workspace['artifacts']['global_capability_audit']['summary']['blockingGapCount'] ?? -1) === 0, 'Global capability audit should have zero blocking gaps before frontend build-out.');
 smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary']['packageCount'] ?? 0) > 0, 'Business contract bundle summary should expose authored package coverage.');
 smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary']['objectCount'] ?? 0) > 0, 'Business contract bundle summary should expose canonical object coverage.');
 smoke_assert((float)($workspace['artifacts']['business_contract_bundle']['summary']['authoredCoverageRatio'] ?? 0) >= 0.50, 'Business contract bundle summary should keep at least 50% authored coverage across canonical objects.');

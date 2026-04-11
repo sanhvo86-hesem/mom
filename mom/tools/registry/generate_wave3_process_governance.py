@@ -76,6 +76,13 @@ def canonical_resource_spec(canonical_catalog: dict, resource_key: str) -> dict:
 def main() -> int:
     policy = load_json(POLICY_PATH)
     normalization = load_json(NORMALIZATION_PATH)
+    generated_at = utc_now()
+    policy.setdefault("_meta", {})
+    policy["_meta"]["generatedAt"] = generated_at
+    dump_json(POLICY_PATH, policy)
+    normalization.setdefault("_meta", {})
+    normalization["_meta"]["generatedAt"] = generated_at
+    dump_json(NORMALIZATION_PATH, normalization)
     canonical_catalog = load_json(CANONICAL_PATH)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     frontend_catalog = load_json(FRONTEND_PATH)

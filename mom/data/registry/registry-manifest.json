@@ -2,10 +2,10 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-10T12:22:41.451Z",
+    "generatedAt": "2026-04-11T02:14:52.602Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "c6ca5fcd-23b1-4f28-8661-e672b97d3859"
+    "publication_run_id": "4d3f16f3-705e-42e6-9ce3-34f689aefa5f"
   },
   "coverage": {
     "router_actions": 3578,
@@ -175,6 +175,19 @@
       "override_resources": 3,
       "snapshot_resources": 5,
       "mes_execution_blockers": 0
+    },
+    "global_erp_mom_capability_audit": {
+      "capability_count": 18,
+      "covered": 16,
+      "service_backed_covered": 1,
+      "gap": 0,
+      "conditional_extension": 1,
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "watch": 18,
+      "blocking_gap_count": 0,
+      "frontend_ready": true
     }
   },
   "assets": {
@@ -333,6 +346,14 @@
     "operational-stress-report.json": {
       "kind": "operational-stress-report",
       "records": 12
+    },
+    "global-erp-mom-capability-catalog.json": {
+      "kind": "global-erp-mom-capability-catalog",
+      "records": 18
+    },
+    "global-erp-mom-capability-audit.json": {
+      "kind": "global-erp-mom-capability-audit",
+      "records": 18
     },
     "publication-entity-accounting.json": {
       "kind": "publication-entity-accounting",

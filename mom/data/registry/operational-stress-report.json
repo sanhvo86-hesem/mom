@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T12:24:30.138Z",
+    "generatedAt": "2026-04-11T02:14:59.855Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -100,7 +100,7 @@
       "credit_memo_mentions": 18,
       "debit_memo_mentions": 18,
       "backdate_exception_mentions": 28,
-      "archive_mentions": 15247,
+      "archive_mentions": 15249,
       "snapshot_mentions": 1062,
       "esign_mentions": 169,
       "cycle_count_mentions": 339
@@ -318,7 +318,7 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 15247,
+        "archive_mentions": 15249,
         "correction_markers": 339,
         "esign_mentions": 169
       },

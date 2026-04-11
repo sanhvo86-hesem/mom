@@ -1,0 +1,986 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-11T02:14:57.632Z",
+    "description": "Source-backed global ERP+MOM+MES+EQMS capability catalog used to audit backend coverage before frontend build-out.",
+    "purpose": "Prevent AI/frontend tools from guessing backend scope by making global process expectations explicit."
+  },
+  "sourceRefs": {
+    "isa_95_iec_62264": {
+      "label": "ISA-95 / IEC 62264 enterprise-control integration",
+      "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-standards-committees/isa95"
+    },
+    "isa_88": {
+      "label": "ISA-88 batch/procedural control",
+      "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-standards-committees/isa88"
+    },
+    "iso_9001": {
+      "label": "ISO 9001 quality management",
+      "url": "https://www.iso.org/iso-9001-quality-management.html"
+    },
+    "iatf_aiag_core_tools": {
+      "label": "AIAG / IATF automotive core tools: APQP, PPAP, FMEA, MSA, SPC",
+      "url": "https://www.aiag.org/quality/automotive-core-tools"
+    },
+    "iso_55000": {
+      "label": "ISO 55000 asset management",
+      "url": "https://www.iso.org/standard/55088.html"
+    },
+    "iso_45001": {
+      "label": "ISO 45001 occupational health and safety",
+      "url": "https://www.iso.org/iso-45001-occupational-health-and-safety.html"
+    },
+    "iso_14001": {
+      "label": "ISO 14001 environmental management",
+      "url": "https://www.iso.org/iso-14001-environmental-management.html"
+    },
+    "iso_10012_17025": {
+      "label": "ISO 10012 / ISO/IEC 17025 measurement and calibration control",
+      "url": "https://www.iso.org/standard/81230.html"
+    },
+    "fda_21_cfr_11": {
+      "label": "21 CFR Part 11 electronic records and signatures",
+      "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+    },
+    "apqc_pcf": {
+      "label": "APQC Process Classification Framework",
+      "url": "https://www.apqc.org/process-performance-management/process-frameworks"
+    },
+    "scor_ds": {
+      "label": "ASCM SCOR Digital Standard",
+      "url": "https://www.ascm.org/corporate-transformation/standards-tools/scor-ds/"
+    },
+    "nist_ot": {
+      "label": "NIST SP 800-82 OT security",
+      "url": "https://csrc.nist.gov/pubs/sp/800/82/r3/final"
+    },
+    "opc_ua": {
+      "label": "OPC UA industrial interoperability",
+      "url": "https://www.opcfoundation.org/about/opc-technologies/opc-ua/"
+    },
+    "gs1_epcis": {
+      "label": "GS1 EPCIS traceability event data",
+      "url": "https://www.gs1.org/standards/epcis"
+    },
+    "openapi_json_schema_rfc9457": {
+      "label": "OpenAPI 3.1, JSON Schema 2020-12, RFC 9457 API errors",
+      "url": "https://spec.openapis.org/oas/v3.1.1.html"
+    }
+  },
+  "capabilities": [
+    {
+      "id": "enterprise_master_data_and_identity",
+      "label": "Enterprise master data, identity, org/site scope",
+      "sourceRefs": [
+        "apqc_pcf",
+        "iso_9001"
+      ],
+      "userPromptCoverage": [
+        "customers",
+        "suppliers",
+        "employees",
+        "assets",
+        "equipment",
+        "tools",
+        "tax",
+        "government"
+      ],
+      "requiredTables": {
+        "organization_scope": [
+          "org_",
+          "mdm_site_parameters"
+        ],
+        "party_master": [
+          "customers",
+          "suppliers",
+          "commercial_accounts",
+          "crm_accounts"
+        ],
+        "employee_master": [
+          "employees",
+          "hcm_employees"
+        ],
+        "asset_equipment_tool_master": [
+          "equipment",
+          "pm_equipment_master",
+          "fin_fixed_assets",
+          "tools",
+          "tooling_"
+        ],
+        "localization_tax_compliance": [
+          "fin_tax_",
+          "fin_country_tax_profiles",
+          "qual_compliance_obligations"
+        ]
+      },
+      "requiredContracts": [
+        "master_data.customers",
+        "master_data.suppliers",
+        "master_data.employees",
+        "master_data.assets",
+        "master_data.equipment",
+        "master_data.tools",
+        "master_data.compliance-obligations"
+      ],
+      "requiredEndpointTerms": [
+        "master_data.",
+        "/api/runtime/master_data"
+      ]
+    },
+    {
+      "id": "quote_to_cash_customer_lifecycle",
+      "label": "Quote-to-cash, customer PO, SO, shipping, AR, return loop",
+      "sourceRefs": [
+        "apqc_pcf",
+        "scor_ds",
+        "iso_9001"
+      ],
+      "userPromptCoverage": [
+        "quote",
+        "customer care",
+        "customer PO",
+        "SO",
+        "shipping",
+        "returns",
+        "finance"
+      ],
+      "requiredTables": {
+        "quote_pipeline": [
+          "quotes",
+          "quote_lines",
+          "crm_quotes_pipeline"
+        ],
+        "customer_purchase_order": [
+          "customer_purchase_orders",
+          "customer_po"
+        ],
+        "sales_order": [
+          "sales_orders",
+          "sales_order_lines"
+        ],
+        "shipment_delivery": [
+          "shipments",
+          "shipment_packages",
+          "tms_shipments"
+        ],
+        "customer_return": [
+          "rma_orders",
+          "svc_return_authorizations",
+          "customer_returns"
+        ],
+        "ar_revenue": [
+          "ar_invoices",
+          "fin_revenue_schedules",
+          "com_credit_profiles"
+        ]
+      },
+      "requiredContracts": [
+        "commercial_customer.quotations",
+        "commercial_customer.customer-purchase-orders",
+        "commercial_customer.sales-orders",
+        "commercial_customer.customer-care-cases",
+        "inventory_logistics.shipments",
+        "inventory_logistics.customer-returns",
+        "finance.ar-invoices"
+      ],
+      "serviceBackedTableGroups": {
+        "customer_purchase_order": [
+          "commercial_customer.customer-purchase-orders"
+        ]
+      },
+      "requiredEndpointTerms": [
+        "quote",
+        "customer-purchase-orders",
+        "sales_orders",
+        "shipments"
+      ]
+    },
+    {
+      "id": "procure_to_pay_supplier_quality",
+      "label": "Procure-to-pay, supplier quality, receiving and AP control",
+      "sourceRefs": [
+        "scor_ds",
+        "iso_9001"
+      ],
+      "userPromptCoverage": [
+        "supplier",
+        "supplier PO",
+        "IQC",
+        "warehouse",
+        "AP"
+      ],
+      "requiredTables": {
+        "supplier_master_asl": [
+          "suppliers",
+          "approved_supplier_list",
+          "srm_supplier_"
+        ],
+        "requisition_po": [
+          "purchase_requisitions",
+          "purchase_orders",
+          "purchase_order_lines"
+        ],
+        "supplier_asn_receipt": [
+          "supplier_asns",
+          "purchase_receipts",
+          "incoming_inspections"
+        ],
+        "supplier_quality": [
+          "scar_records",
+          "osc_supplier_nonconformances",
+          "supplier_audit_schedule"
+        ],
+        "ap_invoice": [
+          "ap_invoices",
+          "ap_invoice_lines"
+        ]
+      },
+      "requiredContracts": [
+        "master_data.suppliers",
+        "procurement_supplier_quality.purchase-requisitions",
+        "procurement_supplier_quality.supplier-purchase-orders",
+        "procurement_supplier_quality.supplier-asns",
+        "procurement_supplier_quality.purchase-receipts",
+        "procurement_supplier_quality.iqc-inspections",
+        "finance.ap-invoices"
+      ],
+      "requiredEndpointTerms": [
+        "supplier",
+        "purchase_orders",
+        "incoming_inspections",
+        "ap_invoices"
+      ]
+    },
+    {
+      "id": "plan_to_produce_mom_mes",
+      "label": "Plan-to-produce MOM/MES execution from demand to WO close",
+      "sourceRefs": [
+        "isa_95_iec_62264",
+        "apqc_pcf"
+      ],
+      "userPromptCoverage": [
+        "production planning",
+        "SO",
+        "JO",
+        "WO",
+        "IPQC",
+        "OEE",
+        "plant performance"
+      ],
+      "requiredTables": {
+        "sop_mrp_aps": [
+          "sop_plans",
+          "mrp_planned_orders",
+          "aps_schedule_blocks",
+          "aps_capacity_buckets"
+        ],
+        "production_orders": [
+          "production_schedule",
+          "job_orders",
+          "work_orders",
+          "work_order_operations"
+        ],
+        "dispatch_execution": [
+          "mes_dispatch_queue",
+          "mes_job_execution",
+          "mes_operation_execution"
+        ],
+        "wip_trace": [
+          "mes_wip_movements",
+          "mes_material_consumption",
+          "trace_genealogy_"
+        ],
+        "performance": [
+          "mes_oee_snapshots",
+          "plant_performance_snapshots",
+          "mes_production_kpi_daily"
+        ]
+      },
+      "requiredContracts": [
+        "planning_production.production-plans",
+        "planning_production.job-orders",
+        "planning_production.work-orders",
+        "planning_production.production-operations",
+        "planning_production.dispatch-lists",
+        "analytics.mes-oee-snapshots",
+        "analytics.plant-performance-snapshots"
+      ],
+      "requiredEndpointTerms": [
+        "orders",
+        "work_orders",
+        "job_orders",
+        "dispatch",
+        "mes_"
+      ]
+    },
+    {
+      "id": "quality_planning_core_tools",
+      "label": "Quality planning core tools: APQP, PPAP, FMEA, Control Plan, MSA, SPC",
+      "sourceRefs": [
+        "iatf_aiag_core_tools",
+        "iso_9001",
+        "iso_10012_17025"
+      ],
+      "userPromptCoverage": [
+        "MSA",
+        "SPC",
+        "CAP",
+        "quality planning"
+      ],
+      "requiredTables": {
+        "apqp_ppap": [
+          "apqp_projects",
+          "apqp_gate_reviews",
+          "ppap_submissions"
+        ],
+        "fmea_control_plan": [
+          "fmea_records",
+          "fmea_failure_modes",
+          "control_plans",
+          "control_plan_characteristics"
+        ],
+        "msa_measurement": [
+          "calibration_grr_studies",
+          "calibration_records"
+        ],
+        "spc_control": [
+          "spc_data",
+          "mes_spc_control_limits",
+          "mes_spc_violations"
+        ],
+        "sample_plans": [
+          "qual_sample_plans",
+          "qual_sample_batches"
+        ]
+      },
+      "requiredContracts": [
+        "quality_improvement.msa-studies",
+        "quality_improvement.spc-observations",
+        "quality_improvement.corrective-actions"
+      ],
+      "requiredEndpointTerms": [
+        "apqp",
+        "fmea",
+        "spc",
+        "calibration_grr"
+      ]
+    },
+    {
+      "id": "inspection_lot_iqc_ipqc_oqc_fqc",
+      "label": "Inspection backbone: IQC, IPQC, OQC/FQC, sampling, quarantine, disposition",
+      "sourceRefs": [
+        "iso_9001",
+        "iatf_aiag_core_tools"
+      ],
+      "userPromptCoverage": [
+        "IQC",
+        "IPQC",
+        "OQC",
+        "FQC",
+        "QA/QC mixed situations"
+      ],
+      "requiredTables": {
+        "incoming_iqc": [
+          "incoming_inspections",
+          "incoming_inspection_results"
+        ],
+        "inprocess_ipqc": [
+          "ipqc_inspections",
+          "ipqc_inspection_results",
+          "mes_inline_measurements"
+        ],
+        "outgoing_final": [
+          "oqc_inspections",
+          "qual_first_article_packages"
+        ],
+        "inspection_lot": [
+          "inspection_lot",
+          "lot_master",
+          "qual_sample_plans"
+        ],
+        "quarantine": [
+          "wms_quarantine_holds",
+          "qual_containment_actions"
+        ]
+      },
+      "requiredContracts": [
+        "procurement_supplier_quality.iqc-inspections",
+        "planning_production.ipqc-inspections",
+        "quality_improvement.oqc-inspections",
+        "quality_improvement.fqc-inspections"
+      ],
+      "requiredEndpointTerms": [
+        "incoming_inspections",
+        "ipqc",
+        "oqc",
+        "inspection"
+      ]
+    },
+    {
+      "id": "nonconformance_capa_mrb_deviation_concession",
+      "label": "NCR, CAPA, MRB, deviation, concession, containment and effectiveness",
+      "sourceRefs": [
+        "iso_9001",
+        "iatf_aiag_core_tools",
+        "fda_21_cfr_11"
+      ],
+      "userPromptCoverage": [
+        "NCR",
+        "CAP",
+        "MSA",
+        "returns",
+        "improvement"
+      ],
+      "requiredTables": {
+        "ncr": [
+          "ncr_records",
+          "nonconformance"
+        ],
+        "capa": [
+          "capa_records",
+          "capa_8d_steps",
+          "capa_effectiveness_checks"
+        ],
+        "mrb": [
+          "ncr_mrb_decisions"
+        ],
+        "deviation_concession": [
+          "deviations",
+          "deviation",
+          "concessions"
+        ],
+        "containment_effectiveness": [
+          "qual_containment_actions",
+          "qual_effectiveness_reviews"
+        ]
+      },
+      "requiredContracts": [
+        "quality_improvement.nonconformances",
+        "quality_improvement.corrective-actions",
+        "quality_improvement.deviations",
+        "quality_improvement.concessions",
+        "quality_improvement.improvement-actions"
+      ],
+      "requiredEndpointTerms": [
+        "exceptions",
+        "ncr_records",
+        "capa",
+        "deviations",
+        "concessions"
+      ]
+    },
+    {
+      "id": "warehouse_traceability_genealogy",
+      "label": "Warehouse, inventory, lot/serial genealogy, labels, recall and stock accuracy",
+      "sourceRefs": [
+        "scor_ds",
+        "gs1_epcis",
+        "isa_95_iec_62264"
+      ],
+      "userPromptCoverage": [
+        "warehouse",
+        "inventory",
+        "shipping",
+        "returns"
+      ],
+      "requiredTables": {
+        "inventory_master": [
+          "inventory_items",
+          "warehouses",
+          "inventory_locations"
+        ],
+        "inventory_movement": [
+          "inventory_transactions",
+          "inventory_ledger",
+          "inventory_movements"
+        ],
+        "cycle_count": [
+          "wms_cycle_count_plans",
+          "wms_cycle_count_results"
+        ],
+        "lot_serial": [
+          "lot_master",
+          "serial_master",
+          "trace_serial_events"
+        ],
+        "genealogy_recall": [
+          "trace_genealogy_links",
+          "trace_recall_campaigns",
+          "trace_label_templates"
+        ]
+      },
+      "requiredContracts": [
+        "inventory_logistics.inventory-items",
+        "inventory_logistics.inventory-movements",
+        "inventory_logistics.stock-balances",
+        "inventory_logistics.cycle-count-plans",
+        "inventory_logistics.warehouses"
+      ],
+      "requiredEndpointTerms": [
+        "inventory",
+        "wms_",
+        "trace_"
+      ]
+    },
+    {
+      "id": "maintenance_eam_reliability",
+      "label": "Maintenance, EAM, spare parts, reliability and equipment readiness",
+      "sourceRefs": [
+        "iso_55000",
+        "isa_95_iec_62264"
+      ],
+      "userPromptCoverage": [
+        "factory machinery",
+        "asset",
+        "maintenance"
+      ],
+      "requiredTables": {
+        "equipment_hierarchy": [
+          "pm_equipment_master",
+          "pm_functional_locations",
+          "equipment"
+        ],
+        "maintenance_plans": [
+          "pm_maintenance_plans",
+          "pm_maintenance_plan_items"
+        ],
+        "maintenance_work": [
+          "pm_work_orders",
+          "maintenance_work_orders",
+          "pm_work_order_operations"
+        ],
+        "condition_reliability": [
+          "pm_condition_monitoring",
+          "pm_reliability_metrics",
+          "pm_failure_history"
+        ],
+        "spare_parts": [
+          "pm_spare_parts_inventory",
+          "pm_work_order_parts"
+        ]
+      },
+      "requiredContracts": [
+        "master_data.equipment",
+        "maintenance_ehs.maintenance-plans",
+        "maintenance_ehs.maintenance-work-orders"
+      ],
+      "requiredEndpointTerms": [
+        "maintenance",
+        "pm_"
+      ]
+    },
+    {
+      "id": "ehs_compliance_sustainability",
+      "label": "EHS, permits, incidents, environment, emergency/fire readiness, PPE, sustainability",
+      "sourceRefs": [
+        "iso_45001",
+        "iso_14001",
+        "apqc_pcf"
+      ],
+      "userPromptCoverage": [
+        "environment",
+        "fire prevention",
+        "safety",
+        "5S",
+        "government agencies"
+      ],
+      "requiredTables": {
+        "ehs_incidents": [
+          "ehs_incidents",
+          "safety_observations"
+        ],
+        "permits_obligations": [
+          "ehs_permit_register",
+          "qual_compliance_obligations",
+          "ehs_regulatory_submissions"
+        ],
+        "emergency_fire": [
+          "ehs_emergency_drills",
+          "ehs_training_matrix"
+        ],
+        "environment_waste": [
+          "ehs_emissions_monitoring",
+          "ehs_waste_streams",
+          "ehs_waste_shipments"
+        ],
+        "ppe_exposure": [
+          "ehs_ppe_requirements",
+          "ehs_ppe_issue_logs",
+          "ehs_exposure_assessments"
+        ]
+      },
+      "requiredContracts": [
+        "maintenance_ehs.incidents",
+        "maintenance_ehs.safety-observations",
+        "maintenance_ehs.permits",
+        "maintenance_ehs.five-s-audits",
+        "master_data.compliance-obligations"
+      ],
+      "requiredEndpointTerms": [
+        "ehs_",
+        "safety",
+        "permit",
+        "five_s"
+      ]
+    },
+    {
+      "id": "hcm_competency_training_access",
+      "label": "HCM, competency, certification, attendance, role/access and operator qualification",
+      "sourceRefs": [
+        "iso_9001",
+        "iso_45001",
+        "fda_21_cfr_11"
+      ],
+      "userPromptCoverage": [
+        "employees",
+        "safety expiry",
+        "training"
+      ],
+      "requiredTables": {
+        "employee_skills": [
+          "hcm_employee_skills",
+          "hcm_skills_catalog",
+          "competency"
+        ],
+        "certification": [
+          "hcm_certifications",
+          "hcm_employee_certifications",
+          "employee_certifications"
+        ],
+        "attendance_labor": [
+          "hcm_attendance_records",
+          "labor_capture",
+          "labor_transactions"
+        ],
+        "operator_qualification": [
+          "mes_operator_qualifications",
+          "mes_operator_sessions"
+        ],
+        "access_roles": [
+          "role",
+          "permissions",
+          "portal_users"
+        ]
+      },
+      "requiredContracts": [
+        "master_data.employees"
+      ],
+      "requiredEndpointTerms": [
+        "employees",
+        "operator",
+        "hcm_",
+        "role"
+      ]
+    },
+    {
+      "id": "document_evidence_audit_esign",
+      "label": "Document control, evidence vault, immutable audit trail and e-signature posture",
+      "sourceRefs": [
+        "iso_9001",
+        "fda_21_cfr_11",
+        "openapi_json_schema_rfc9457"
+      ],
+      "userPromptCoverage": [
+        "auto audit",
+        "gate control",
+        "compliance"
+      ],
+      "requiredTables": {
+        "documents": [
+          "documents",
+          "document",
+          "qual_certificate_templates"
+        ],
+        "evidence": [
+          "evidence",
+          "qual_compliance_evidence",
+          "trace_material_certificates"
+        ],
+        "audit_trail": [
+          "audit_trail",
+          "audit_events",
+          "passport_access_log"
+        ],
+        "approval": [
+          "approval",
+          "mdm_approval_policies"
+        ],
+        "electronic_signature": [
+          "e_signature",
+          "signature",
+          "override_controls"
+        ]
+      },
+      "requiredEndpointTerms": [
+        "documents",
+        "evidence",
+        "approval",
+        "override-controls"
+      ]
+    },
+    {
+      "id": "integration_resilience_ot_edge",
+      "label": "ERP/MES/OT integration, edge connectors, outbox, reconciliation and cyber/OT posture",
+      "sourceRefs": [
+        "nist_ot",
+        "opc_ua",
+        "isa_95_iec_62264"
+      ],
+      "userPromptCoverage": [
+        "machine control",
+        "MES",
+        "ERP sync",
+        "auto audit"
+      ],
+      "requiredTables": {
+        "machine_telemetry": [
+          "mes_machine_telemetry",
+          "mes_machine_state_events",
+          "machine_event"
+        ],
+        "connectivity": [
+          "mes_connectivity_adapters",
+          "mes_connectivity_events",
+          "iot"
+        ],
+        "erp_sync": [
+          "mes_erp_inbound_queue",
+          "mes_erp_outbound_queue",
+          "mes_erp_sync_runs"
+        ],
+        "reconciliation": [
+          "mes_erp_reconciliation_exceptions"
+        ],
+        "alarm_playbook": [
+          "mes_alarm_catalog",
+          "mes_alarm_playbooks"
+        ]
+      },
+      "requiredContracts": [
+        "integration_resilience.reconciliation-exceptions"
+      ],
+      "requiredEndpointTerms": [
+        "mes_",
+        "iot",
+        "reconciliation"
+      ]
+    },
+    {
+      "id": "lean_ci_kpi_plant_performance",
+      "label": "Lean manufacturing, 5S, CI, OEE, tier meetings, QRQC, KPI and COPQ",
+      "sourceRefs": [
+        "iso_9001",
+        "apqc_pcf",
+        "isa_95_iec_62264"
+      ],
+      "userPromptCoverage": [
+        "lean manufacturing",
+        "KPI",
+        "continuous improvement",
+        "OEE",
+        "5S"
+      ],
+      "requiredTables": {
+        "lean": [
+          "lean_5s_audits",
+          "lean_kaizen_events",
+          "lean_qrqc_events",
+          "lean_tier_meetings"
+        ],
+        "ci": [
+          "improvement_projects",
+          "sop_action_items",
+          "quality_predictions"
+        ],
+        "oee": [
+          "mes_oee_snapshots",
+          "mes_oee_loss_events"
+        ],
+        "copq": [
+          "copq",
+          "capa_effectiveness_checks",
+          "qual_escape_events"
+        ],
+        "kpi": [
+          "mes_production_kpi_daily",
+          "aps_kpi_snapshots",
+          "plant_performance_snapshots"
+        ]
+      },
+      "requiredContracts": [
+        "maintenance_ehs.five-s-audits",
+        "quality_improvement.improvement-actions",
+        "analytics.mes-oee-snapshots",
+        "analytics.plant-performance-snapshots"
+      ],
+      "requiredEndpointTerms": [
+        "dashboard",
+        "kpi",
+        "ci_",
+        "lean",
+        "oee"
+      ]
+    },
+    {
+      "id": "plm_change_bom_routing_work_instruction",
+      "label": "PLM, engineering change, BOM, routing, work instructions and requirement trace",
+      "sourceRefs": [
+        "apqc_pcf",
+        "iso_9001",
+        "isa_95_iec_62264"
+      ],
+      "userPromptCoverage": [
+        "production factors",
+        "BOM",
+        "route",
+        "engineering change"
+      ],
+      "requiredTables": {
+        "change_control": [
+          "plm_change_requests",
+          "plm_change_orders",
+          "change_control"
+        ],
+        "bom": [
+          "bom",
+          "bom_components",
+          "bom_version",
+          "production_order_bom_snapshot"
+        ],
+        "routing": [
+          "routing",
+          "production_order_route_snapshot",
+          "eng_standard_operations"
+        ],
+        "work_instruction": [
+          "eng_work_instructions",
+          "eng_work_instruction_steps"
+        ],
+        "requirement_trace": [
+          "plm_requirements",
+          "plm_requirement_traces"
+        ]
+      },
+      "requiredContracts": [
+        "analytics.production-bom-snapshots",
+        "analytics.production-route-snapshots"
+      ],
+      "requiredEndpointTerms": [
+        "bom",
+        "route",
+        "plm_",
+        "work_instruction"
+      ]
+    },
+    {
+      "id": "finance_costing_valuation_close_control",
+      "label": "Finance, costing, valuation, asset accounting, tax, period close and backdate control",
+      "sourceRefs": [
+        "apqc_pcf"
+      ],
+      "userPromptCoverage": [
+        "finance accounting",
+        "tax",
+        "asset",
+        "inventory valuation"
+      ],
+      "requiredTables": {
+        "period_close": [
+          "period_closes",
+          "fin_multi_book_ledgers"
+        ],
+        "ap_ar": [
+          "ap_invoices",
+          "ar_invoices",
+          "ap_ar_invoices"
+        ],
+        "costing": [
+          "fin_cost_versions",
+          "fin_standard_cost_rollups",
+          "mes_cost_tracking"
+        ],
+        "inventory_valuation": [
+          "inventory_valuations",
+          "inventory_balance_snapshot"
+        ],
+        "fixed_assets_tax": [
+          "fin_fixed_assets",
+          "fin_asset_depreciation",
+          "fin_tax_jurisdictions"
+        ]
+      },
+      "requiredContracts": [
+        "finance.period-closes",
+        "finance.backdate-exceptions",
+        "finance.ap-invoices",
+        "finance.ar-invoices",
+        "finance.inventory-valuations",
+        "finance.fixed-asset-capitalizations"
+      ],
+      "requiredEndpointTerms": [
+        "finance",
+        "period-closes",
+        "ap_invoices",
+        "inventory_valuations"
+      ]
+    },
+    {
+      "id": "system_contract_api_ai_readiness",
+      "label": "AI/frontend contract clarity: OpenAPI, registry catalog, workflows, schema authority",
+      "sourceRefs": [
+        "openapi_json_schema_rfc9457"
+      ],
+      "userPromptCoverage": [
+        "AI tools must not guess system logic",
+        "backend before frontend"
+      ],
+      "requiredTables": {
+        "schema_authority": [
+          "schema_migrations",
+          "migration",
+          "mdm_data_stewards"
+        ]
+      },
+      "requiredOpenApiTerms": [
+        "/api/system/contracts",
+        "/api/runtime/{domain}/{table}",
+        "/api/registry/endpoint-catalog"
+      ],
+      "requiredEndpointTerms": [
+        "endpoint_catalog",
+        "registry_full",
+        "registry_workflow_library",
+        "registry_endpoint_catalog"
+      ],
+      "purpose": "Expose the complete backend contract in documented REST paths so frontend and AI tooling can read truth instead of inferring it from code or local files."
+    },
+    {
+      "id": "batch_recipe_process_manufacturing_extension",
+      "label": "Batch/process manufacturing recipe extension",
+      "sourceRefs": [
+        "isa_88",
+        "isa_95_iec_62264"
+      ],
+      "userPromptCoverage": [
+        "additional worldwide MOM coverage beyond current CNC/discrete focus"
+      ],
+      "conditional": true,
+      "requiredTables": {
+        "batch": [
+          "trace_genealogy_batches",
+          "osc_dispatch_batches",
+          "qual_sample_batches"
+        ],
+        "recipe": [
+          "recipe",
+          "batch_recipe"
+        ]
+      },
+      "requiredEndpointTerms": [
+        "batch",
+        "recipe"
+      ],
+      "purpose": "Keep this isolated as a conditional extension unless HESEM needs batch/process manufacturing. Do not create fake recipe tables for a discrete/CNC deployment."
+    }
+  ]
+}

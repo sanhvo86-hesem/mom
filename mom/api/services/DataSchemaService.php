@@ -58,6 +58,7 @@ final class DataSchemaService
         $dataFieldsIndex = $this->readJson($this->registryPath('data-fields-index'));
         $blindSpotReport = $this->readJson($this->registryPath('operational-blind-spot-report'));
         $stressReport = $this->readJson($this->registryPath('operational-stress-report'));
+        $globalCapabilityAudit = $this->readJson($this->registryPath('global-erp-mom-capability-audit'));
         $contractGlossary = $this->readJson($this->contractsPath('glossary.json'));
         $contractDomainMap = $this->readJson($this->contractsPath('domain-map.json'));
         $contractAuthorityReport = $this->readJson($this->contractsPath('authority-report.json'));
@@ -103,12 +104,14 @@ final class DataSchemaService
             'data_fields_index' => $dataFieldsIndex,
             'blind_spot_report' => $blindSpotReport,
             'stress_report' => $stressReport,
+            'global_capability_audit' => $globalCapabilityAudit,
         ]);
         $savePolicy = $this->savePolicy();
         $operational = $this->buildOperationalState($artifactInventory, $qualityReport, $diagnostics, $connection, $tables, $savePolicy, $blindSpotReport, $stressReport);
         $highlights = $this->buildHighlights($relationMap, $diagnostics, $qualityReport, $migrationGap, $tables, $connection, $blindSpotReport, $stressReport);
         $blindSpotAudit = $this->buildOperationalAuditSummary($blindSpotReport, 'scenario_id');
         $stressAudit = $this->buildOperationalAuditSummary($stressReport, 'scenario_id');
+        $globalCapabilityAuditSummary = $this->buildOperationalAuditSummary($globalCapabilityAudit, 'id');
 
         $dbProbeApplicable = !empty($connection['db_probe_applicable']);
         $dbProbeResolved = !empty($connection['db_probe_resolved']);
@@ -211,6 +214,11 @@ final class DataSchemaService
                 'operational_blind_spot_high_count' => (int)($blindSpotAudit['summary']['high'] ?? 0),
                 'operational_stress_critical_count' => (int)($stressAudit['summary']['critical'] ?? 0),
                 'operational_stress_high_count' => (int)($stressAudit['summary']['high'] ?? 0),
+                'global_capability_count' => (int)($globalCapabilityAudit['summary']['capability_count'] ?? 0),
+                'global_capability_covered_count' => (int)($globalCapabilityAudit['summary']['covered'] ?? 0),
+                'global_capability_gap_count' => (int)($globalCapabilityAudit['summary']['gap'] ?? 0),
+                'global_capability_blocking_gap_count' => (int)($globalCapabilityAudit['summary']['blocking_gap_count'] ?? 0),
+                'global_capability_conditional_extension_count' => (int)($globalCapabilityAudit['summary']['conditional_extension'] ?? 0),
                 'release_gate_blocked' => !empty($operational['releaseGate']['blocking']),
             ],
             'artifacts' => [
@@ -320,10 +328,22 @@ final class DataSchemaService
                         'watch' => (int)($stressReport['summary']['watch'] ?? 0),
                     ],
                 ],
+                'global_capability_audit' => [
+                    'generatedAt' => (string)($globalCapabilityAudit['_meta']['generatedAt'] ?? ''),
+                    'summary' => [
+                        'capabilityCount' => (int)($globalCapabilityAudit['summary']['capability_count'] ?? 0),
+                        'covered' => (int)($globalCapabilityAudit['summary']['covered'] ?? 0),
+                        'gap' => (int)($globalCapabilityAudit['summary']['gap'] ?? 0),
+                        'conditionalExtension' => (int)($globalCapabilityAudit['summary']['conditional_extension'] ?? 0),
+                        'blockingGapCount' => (int)($globalCapabilityAudit['summary']['blocking_gap_count'] ?? 0),
+                        'frontendReady' => (bool)($globalCapabilityAudit['summary']['frontend_ready'] ?? false),
+                    ],
+                ],
             ],
             'audits' => [
                 'blind_spots' => $blindSpotAudit,
                 'stress' => $stressAudit,
+                'global_capabilities' => $globalCapabilityAuditSummary,
             ],
             'operational' => $operational,
             'highlights' => $highlights,
@@ -855,6 +875,23 @@ final class DataSchemaService
                     $this->registryPath('endpoint-catalog'),
                     $this->registryPath('canonical-backend-standardization-catalog'),
                     $this->registryPath('registry-manifest'),
+                ],
+            ],
+            'global_capability_audit' => [
+                'label' => 'Global ERP+MOM capability audit',
+                'category' => 'quality',
+                'path' => $this->registryPath('global-erp-mom-capability-audit'),
+                'targetAgeSeconds' => 7200,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('global-erp-mom-capability-catalog'),
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('endpoint-catalog'),
+                    $this->registryPath('workflow-library'),
+                    $this->registryPath('registry-manifest'),
+                    $this->rootDir . '/mom/api/openapi.yaml',
+                    $this->rootDir . '/mom/contracts/object-index.json',
+                    $this->rootDir . '/mom/contracts/package-index.json',
                 ],
             ],
         ];

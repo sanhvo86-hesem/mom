@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "generatedAt": "2026-04-11T02:14:57.337581+00:00",
     "description": "Canonical event inventory for ERP+MOM business objects using CloudEvents-compatible type naming.",
     "eventCount": 219
   },

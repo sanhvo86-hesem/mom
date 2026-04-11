@@ -482,6 +482,135 @@ final class VpsController extends BaseController
         }
     }
 
+    public function fileList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+
+        $hostId = trim((string)($this->input('host_id') ?? ''));
+        if ($hostId === '') {
+            $this->error('missing_host_id', 400);
+        }
+
+        $rootId = trim((string)($this->input('root_id') ?? ''));
+        $path = trim((string)($this->input('path') ?? ''));
+        $showHidden = $this->input('hidden') === '1';
+
+        try {
+            $this->success([
+                'explorer' => $this->service->listFiles($hostId, $rootId, $path, $showHidden),
+            ]);
+        } catch (RuntimeException $e) {
+            $this->rethrowResponse($e);
+            $message = $e->getMessage();
+            $status = match (true) {
+                str_starts_with($message, 'host_not_found') => 404,
+                str_starts_with($message, 'file_root_not_found') => 404,
+                str_starts_with($message, 'file_root_unreachable') => 404,
+                str_starts_with($message, 'file_path_not_found') => 404,
+                str_starts_with($message, 'invalid_file_path') => 400,
+                default => 400,
+            };
+            $this->error('vps_file_list_failed', $status, $message);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('vps_file_list_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function fileSearch(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+
+        $hostId = trim((string)($this->input('host_id') ?? ''));
+        if ($hostId === '') {
+            $this->error('missing_host_id', 400);
+        }
+
+        $rootId = trim((string)($this->input('root_id') ?? ''));
+        $path = trim((string)($this->input('path') ?? ''));
+        $query = trim((string)($this->input('q') ?? ''));
+        $showHidden = $this->input('hidden') === '1';
+
+        try {
+            $this->success([
+                'explorer' => $this->service->searchFiles($hostId, $rootId, $path, $query, $showHidden),
+            ]);
+        } catch (RuntimeException $e) {
+            $this->rethrowResponse($e);
+            $message = $e->getMessage();
+            $status = match (true) {
+                str_starts_with($message, 'host_not_found') => 404,
+                str_starts_with($message, 'file_root_not_found') => 404,
+                str_starts_with($message, 'file_root_unreachable') => 404,
+                str_starts_with($message, 'file_path_not_found') => 404,
+                str_starts_with($message, 'missing_file_search_query') => 400,
+                str_starts_with($message, 'invalid_file_path') => 400,
+                default => 400,
+            };
+            $this->error('vps_file_search_failed', $status, $message);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('vps_file_search_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function fileRead(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+
+        $hostId = trim((string)($this->input('host_id') ?? ''));
+        if ($hostId === '') {
+            $this->error('missing_host_id', 400);
+        }
+
+        $rootId = trim((string)($this->input('root_id') ?? ''));
+        $path = trim((string)($this->input('path') ?? ''));
+        $download = $this->input('download') !== null;
+
+        try {
+            $result = $this->service->readFile($hostId, $rootId, $path, $download);
+            if ($download) {
+                $raw = base64_decode((string)($result['content_base64'] ?? ''), true);
+                if (!is_string($raw)) {
+                    throw new RuntimeException('file_download_decode_failed');
+                }
+                $file = is_array($result['file'] ?? null) ? $result['file'] : [];
+                $fileName = basename((string)($file['relative_path'] ?? $path));
+                $ext = strtolower(trim((string)($file['extension'] ?? pathinfo($fileName, PATHINFO_EXTENSION))));
+                $this->rawResponse($raw, 200, [
+                    'Content-Type' => (string)($file['mime'] ?? '') ?: $this->assetMimeType($ext),
+                    'Content-Disposition' => 'attachment; filename="' . rawurlencode($fileName) . '"',
+                ]);
+            }
+
+            unset($result['content_base64']);
+            $this->success([
+                'explorer' => $result,
+            ]);
+        } catch (RuntimeException $e) {
+            $this->rethrowResponse($e);
+            $message = $e->getMessage();
+            $status = match (true) {
+                str_starts_with($message, 'host_not_found') => 404,
+                str_starts_with($message, 'file_root_not_found') => 404,
+                str_starts_with($message, 'file_root_unreachable') => 404,
+                str_starts_with($message, 'file_path_not_found') => 404,
+                str_starts_with($message, 'file_path_not_file') => 400,
+                str_starts_with($message, 'file_access_denied') => 403,
+                str_starts_with($message, 'file_too_large') => 413,
+                str_starts_with($message, 'invalid_file_path') => 400,
+                default => 400,
+            };
+            $this->error('vps_file_read_failed', $status, $message);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('vps_file_read_failed', 500, $e->getMessage());
+        }
+    }
+
     public function asset(): never
     {
         $user = $this->requireAuth();

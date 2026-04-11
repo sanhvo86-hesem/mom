@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T12:54:33.613014+00:00",
+    "generatedAt": "2026-04-11T02:14:57.337581+00:00",
     "description": "Canonical ERP+MOM object inventory for the business contract authority layer.",
     "objectCount": 64,
     "authoredPackageCount": 64
@@ -242,7 +242,7 @@
       ],
       "kpiSignals": [
         "oee_pct",
-        "fp y_pct",
+        "first_pass_yield_pct",
         "on_time_delivery_pct",
         "safety_event_rate"
       ],
@@ -4119,9 +4119,7 @@
         "quarantine",
         "release"
       ],
-      "keyRelationships": [
-        "measuring_device_id -> msa_studies.measuring_device_id"
-      ],
+      "keyRelationships": [],
       "currentRuntimeEndpoints": [
         {
           "action": "calibration_equipment.tools.create",
