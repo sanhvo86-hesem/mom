@@ -30,6 +30,17 @@ function _api(action, payload, method, timeoutMs){
     body: (method || 'GET') === 'GET' ? undefined : JSON.stringify(payload || {})
   }).then(function(r){ return r.json(); });
 }
+function _apiFormData(action, formData, timeoutMs){
+  if(typeof apiCallFormData === 'function') return apiCallFormData(action, formData, timeoutMs || 180000);
+  var headers = {};
+  if(typeof csrfToken !== 'undefined' && csrfToken) headers['X-CSRF-Token'] = csrfToken;
+  return fetch('api.php?action=' + encodeURIComponent(action), {
+    method: 'POST',
+    credentials: 'include',
+    headers: headers,
+    body: formData
+  }).then(function(r){ return r.json(); });
+}
 function _toast(message, type){
   if(typeof showToast === 'function') return showToast(message, type);
   console[type === 'error' ? 'error' : 'log'](message);
@@ -140,6 +151,15 @@ var state = {
   fileLoading: false,
   fileExplorer: null,
   filePreview: null,
+  fileSelectedPath: '',
+  fileSelectedType: '',
+  fileSelectedName: '',
+  fileClipboard: null,
+  fileOperationBusy: '',
+  fileContextMenu: null,
+  fileUploadTarget: '',
+  fileEditing: false,
+  fileEditContent: '',
   fileHistory: [''],
   fileHistoryIndex: 0,
   host: null,
@@ -182,6 +202,12 @@ function _syncFileRootSelection(host){
     state.filePath = '';
     state.fileExplorer = null;
     state.filePreview = null;
+    state.fileSelectedPath = '';
+    state.fileSelectedType = '';
+    state.fileSelectedName = '';
+    state.fileContextMenu = null;
+    state.fileEditing = false;
+    state.fileEditContent = '';
     _resetFileHistory('');
     return;
   }
@@ -193,6 +219,12 @@ function _syncFileRootSelection(host){
     state.filePath = '';
     state.fileExplorer = null;
     state.filePreview = null;
+    state.fileSelectedPath = '';
+    state.fileSelectedType = '';
+    state.fileSelectedName = '';
+    state.fileContextMenu = null;
+    state.fileEditing = false;
+    state.fileEditContent = '';
     _resetFileHistory('');
   }
 }
@@ -295,6 +327,12 @@ async function _loadHost(showSpinner){
     state.selectedFileRootId = '';
     state.fileExplorer = null;
     state.filePreview = null;
+    state.fileSelectedPath = '';
+    state.fileSelectedType = '';
+    state.fileSelectedName = '';
+    state.fileContextMenu = null;
+    state.fileEditing = false;
+    state.fileEditContent = '';
     _resetFileHistory('');
     _toast(_t('Không thể tải chi tiết host.', 'Could not load the host detail.'), 'error');
   }finally{
@@ -364,6 +402,12 @@ function _setHost(hostId){
   state.fileQuery = '';
   state.fileExplorer = null;
   state.filePreview = null;
+  state.fileSelectedPath = '';
+  state.fileSelectedType = '';
+  state.fileSelectedName = '';
+  state.fileContextMenu = null;
+  state.fileEditing = false;
+  state.fileEditContent = '';
   _resetFileHistory('');
   state.actionResult = null;
   _loadHost(true);
@@ -388,6 +432,12 @@ function _setFileRoot(rootId){
   state.fileQuery = '';
   state.fileExplorer = null;
   state.filePreview = null;
+  state.fileSelectedPath = '';
+  state.fileSelectedType = '';
+  state.fileSelectedName = '';
+  state.fileContextMenu = null;
+  state.fileEditing = false;
+  state.fileEditContent = '';
   _resetFileHistory('');
   _loadFiles('', true);
 }
@@ -407,6 +457,12 @@ async function _loadFiles(path, showToastOnSuccess, fromHistory){
   state.filePath = String(path || '');
   state.fileQuery = '';
   state.filePreview = null;
+  state.fileSelectedPath = '';
+  state.fileSelectedType = '';
+  state.fileSelectedName = '';
+  state.fileContextMenu = null;
+  state.fileEditing = false;
+  state.fileEditContent = '';
   _paint();
   try{
     var res = await _api('vps_file_list', _fileParams({path: state.filePath}), 'GET', 30000);
@@ -451,6 +507,12 @@ async function _searchFiles(query){
   state.fileLoading = true;
   state.fileQuery = query;
   state.filePreview = null;
+  state.fileSelectedPath = '';
+  state.fileSelectedType = '';
+  state.fileSelectedName = '';
+  state.fileContextMenu = null;
+  state.fileEditing = false;
+  state.fileEditContent = '';
   _paint();
   try{
     var res = await _api('vps_file_search', _fileParams({q: query}), 'GET', 30000);
@@ -465,21 +527,302 @@ async function _searchFiles(query){
   }
 }
 
-async function _readFile(path){
+async function _readFile(path, editAfterRead){
   if(!path || !state.selectedHostId || !state.selectedFileRootId || state.fileLoading) return;
   state.fileLoading = true;
+  state.fileSelectedPath = String(path || '');
+  state.fileSelectedType = state.fileSelectedType || 'file';
+  state.fileSelectedName = state.fileSelectedName || _fileBaseName(path);
   state.filePreview = null;
+  state.fileEditing = false;
+  state.fileEditContent = '';
   _paint();
   try{
     var res = await _api('vps_file_read', _fileParams({path: path}), 'GET', 30000);
     if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'file_read_failed');
     state.filePreview = res.explorer || null;
+    if(state.filePreview && state.filePreview.file){
+      state.fileSelectedPath = String(state.filePreview.file.relative_path || state.filePreview.path || path || '');
+      state.fileSelectedType = String(state.filePreview.file.type || 'file');
+      state.fileSelectedName = String(state.filePreview.file.name || _fileBaseName(state.fileSelectedPath));
+    }
+    if(editAfterRead){
+      if(state.filePreview && state.filePreview.encoding === 'utf-8' && typeof state.filePreview.content === 'string'){
+        state.fileEditing = true;
+        state.fileEditContent = String(state.filePreview.content || '');
+      }else{
+        _toast(_t('File này không phải text hoặc vượt giới hạn edit.', 'This file is not text or exceeds the edit limit.'), 'error');
+      }
+    }
   }catch(err){
     state.filePreview = {error: (err && err.message) || 'file_read_failed'};
     _toast(_t('Không thể đọc file.', 'Could not read the file.'), 'error');
   }finally{
     state.fileLoading = false;
     _paint();
+  }
+}
+
+function _selectFile(path, type, name, preview){
+  state.fileSelectedPath = String(path || '');
+  state.fileSelectedType = String(type || 'file');
+  state.fileSelectedName = String(name || _fileBaseName(path));
+  state.fileContextMenu = null;
+  state.fileEditing = false;
+  state.fileEditContent = '';
+  if(preview && state.fileSelectedType !== 'directory'){
+    _readFile(state.fileSelectedPath);
+    return;
+  }
+  state.filePreview = null;
+  _paint();
+}
+
+async function _mutateFile(operation, payload){
+  if(state.fileOperationBusy || !state.selectedHostId || !state.selectedFileRootId) return;
+  payload = payload || {};
+  state.fileOperationBusy = operation;
+  _paint();
+  try{
+    var res = await _api('vps_file_mutate', Object.assign({
+      host_id: state.selectedHostId,
+      root_id: state.selectedFileRootId,
+      operation: operation
+    }, payload), 'POST', 120000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'file_mutate_failed');
+    var result = res.explorer || {};
+    if(operation === 'move' && state.fileClipboard && state.fileClipboard.mode === 'cut'){
+      state.fileClipboard = null;
+    }
+    state.fileSelectedPath = '';
+    state.fileSelectedType = '';
+    state.fileSelectedName = '';
+    state.fileEditing = false;
+    state.fileEditContent = '';
+    state.fileOperationBusy = '';
+    _toast(_t('Đã cập nhật file.', 'File operation completed.'), 'success');
+    await _loadFiles(String(result.path || state.filePath || ''), false, true);
+  }catch(err){
+    state.fileOperationBusy = '';
+    _paint();
+    _toast((err && err.message) || _t('Không thể cập nhật file.', 'File operation failed.'), 'error');
+  }
+}
+
+function _fileCurrentRoot(){
+  return (state.fileExplorer && state.fileExplorer.root) || _selectedFileRoot(state.host) || {};
+}
+
+function _fileIsReadOnly(){
+  return !!(_fileCurrentRoot().read_only);
+}
+
+function _closeFileContextMenu(repaint){
+  state.fileContextMenu = null;
+  if(repaint) _paint();
+}
+
+function _openFileContextMenu(event, item){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  item = item || {};
+  var path = String(item.path || '');
+  var type = String(item.type || '');
+  var name = String(item.name || _fileBaseName(path));
+  if(path){
+    state.fileSelectedPath = path;
+    state.fileSelectedType = type || 'file';
+    state.fileSelectedName = name;
+    state.filePreview = null;
+    state.fileEditing = false;
+    state.fileEditContent = '';
+  }
+  var x = event ? Number(event.clientX || 0) : 80;
+  var y = event ? Number(event.clientY || 0) : 80;
+  var width = 236;
+  var height = 350;
+  if(typeof window !== 'undefined'){
+    x = Math.max(8, Math.min(x, Math.max(8, window.innerWidth - width - 8)));
+    y = Math.max(8, Math.min(y, Math.max(8, window.innerHeight - height - 8)));
+  }
+  state.fileContextMenu = {
+    x: x,
+    y: y,
+    path: path,
+    type: type || (path ? 'file' : ''),
+    name: name,
+    scope: path ? 'item' : 'folder',
+    targetPath: path && type === 'directory' ? path : String(state.filePath || '')
+  };
+  _paint();
+}
+
+function _triggerFileUpload(targetPath){
+  if(_fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileUploadTarget = String(targetPath || state.filePath || '');
+  state.fileContextMenu = null;
+  _paint();
+  setTimeout(function(){
+    var input = state.container ? state.container.querySelector('[data-file-upload-input]') : null;
+    if(input) input.click();
+  }, 0);
+}
+
+function _newFolder(targetPath){
+  if(_fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileContextMenu = null;
+  var name = window.prompt(_t('Tên thư mục mới', 'New folder name'), _t('Thư mục mới', 'New folder'));
+  if(!name){
+    _paint();
+    return;
+  }
+  _mutateFile('mkdir', {path: String(targetPath || state.filePath || ''), name: name});
+}
+
+function _renameSelected(){
+  if(!state.fileSelectedPath || _fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileContextMenu = null;
+  var name = window.prompt(_t('Tên mới', 'New name'), state.fileSelectedName || _fileBaseName(state.fileSelectedPath));
+  if(!name){
+    _paint();
+    return;
+  }
+  _mutateFile('rename', {path: state.fileSelectedPath, name: name});
+}
+
+function _copySelected(mode){
+  if(!state.fileSelectedPath || state.fileOperationBusy) return;
+  mode = mode === 'cut' ? 'cut' : 'copy';
+  if(mode === 'cut' && _fileIsReadOnly()) return;
+  state.fileClipboard = {mode: mode, path: state.fileSelectedPath, name: state.fileSelectedName || _fileBaseName(state.fileSelectedPath), type: state.fileSelectedType || 'file'};
+  state.fileContextMenu = null;
+  _toast(mode === 'cut' ? _t('Đã cut vào clipboard.', 'Cut to clipboard.') : _t('Đã copy vào clipboard.', 'Copied to clipboard.'), 'success');
+  _paint();
+}
+
+function _pasteFile(targetPath){
+  if(!state.fileClipboard || !state.fileClipboard.path || _fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileContextMenu = null;
+  _mutateFile(state.fileClipboard.mode === 'cut' ? 'move' : 'copy', {
+    path: state.fileClipboard.path,
+    target_path: String(targetPath || state.filePath || ''),
+    name: state.fileClipboard.name || ''
+  });
+}
+
+function _deleteSelected(){
+  if(!state.fileSelectedPath || _fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileContextMenu = null;
+  var label = state.fileSelectedName || _fileBaseName(state.fileSelectedPath);
+  if(!window.confirm(_t('Xóa mục này khỏi VPS?', 'Delete this item from the VPS?') + '\n' + label)){
+    _paint();
+    return;
+  }
+  _mutateFile('delete', {path: state.fileSelectedPath});
+}
+
+function _zipSelected(){
+  if(!state.fileSelectedPath || _fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileContextMenu = null;
+  var baseName = state.fileSelectedName || _fileBaseName(state.fileSelectedPath);
+  var defaultName = baseName + '.zip';
+  var name = window.prompt(_t('Tên file ZIP', 'ZIP file name'), defaultName);
+  if(!name){
+    _paint();
+    return;
+  }
+  _mutateFile('zip', {
+    path: state.fileSelectedPath,
+    target_path: _fileParentPath(state.fileSelectedPath),
+    name: name
+  });
+}
+
+function _unzipSelected(){
+  if(!state.fileSelectedPath || !_fileIsZip(state.fileSelectedPath) || _fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileContextMenu = null;
+  var folderName = window.prompt(_t('Giải nén vào thư mục', 'Extract to folder'), _fileNameWithoutZip(state.fileSelectedPath));
+  if(!folderName){
+    _paint();
+    return;
+  }
+  _mutateFile('unzip', {
+    path: state.fileSelectedPath,
+    target_path: _fileParentPath(state.fileSelectedPath),
+    name: folderName
+  });
+}
+
+function _openSelected(){
+  state.fileContextMenu = null;
+  if(!state.fileSelectedPath){
+    _paint();
+    return;
+  }
+  if(state.fileSelectedType === 'directory') _loadFiles(state.fileSelectedPath, true);
+  else _readFile(state.fileSelectedPath);
+}
+
+function _editSelectedText(){
+  if(!state.fileSelectedPath || state.fileSelectedType === 'directory' || _fileIsReadOnly() || state.fileOperationBusy) return;
+  state.fileContextMenu = null;
+  if(state.filePreview && state.filePreview.path === state.fileSelectedPath && state.filePreview.encoding === 'utf-8' && typeof state.filePreview.content === 'string'){
+    state.fileEditing = true;
+    state.fileEditContent = String(state.filePreview.content || '');
+    _paint();
+    return;
+  }
+  _readFile(state.fileSelectedPath, true);
+}
+
+function _cancelTextEdit(){
+  state.fileEditing = false;
+  state.fileEditContent = '';
+  _paint();
+}
+
+function _saveTextEdit(){
+  if(!state.fileSelectedPath || state.fileSelectedType === 'directory' || _fileIsReadOnly() || state.fileOperationBusy) return;
+  var editor = state.container ? state.container.querySelector('[data-file-editor]') : null;
+  var content = editor ? String(editor.value || '') : String(state.fileEditContent || '');
+  state.fileEditContent = content;
+  var parent = _fileParentPath(state.fileSelectedPath);
+  var name = _fileBaseName(state.fileSelectedPath);
+  var blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
+  var file = null;
+  try{
+    file = new File([blob], name, {type: 'text/plain;charset=utf-8'});
+  }catch(_err){
+    file = blob;
+  }
+  _uploadFiles([file], parent, true, name);
+}
+
+async function _uploadFiles(files, targetPath, overwrite, forcedName){
+  files = Array.prototype.slice.call(files || []).filter(Boolean);
+  if(!files.length || state.fileOperationBusy || !state.selectedHostId || !state.selectedFileRootId) return;
+  var formData = new FormData();
+  formData.append('host_id', state.selectedHostId || '');
+  formData.append('root_id', state.selectedFileRootId || '');
+  formData.append('path', String(targetPath || state.filePath || ''));
+  if(overwrite) formData.append('overwrite', '1');
+  files.forEach(function(file){ formData.append('files[]', file, forcedName || file.name || 'upload.bin'); });
+  state.fileOperationBusy = 'upload';
+  _paint();
+  try{
+    var res = await _apiFormData('vps_file_upload', formData, 240000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'file_upload_failed');
+    state.fileOperationBusy = '';
+    state.fileEditing = false;
+    state.fileEditContent = '';
+    _toast(_t('Đã tải file lên VPS.', 'Files uploaded to the VPS.'), 'success');
+    await _loadFiles(String(targetPath || state.filePath || ''), false, true);
+  }catch(err){
+    state.fileOperationBusy = '';
+    _paint();
+    _toast((err && err.message) || _t('Không thể upload file.', 'Could not upload files.'), 'error');
   }
 }
 
@@ -954,6 +1297,20 @@ function _fileBaseName(path){
   return parts.length ? parts[parts.length - 1] : '/';
 }
 
+function _fileParentPath(path){
+  var parts = String(path || '').split('/').filter(Boolean);
+  parts.pop();
+  return parts.join('/');
+}
+
+function _fileNameWithoutZip(path){
+  return _fileBaseName(path).replace(/\.zip$/i, '') || 'archive';
+}
+
+function _fileIsZip(path){
+  return /\.zip$/i.test(String(path || ''));
+}
+
 function _fileTypeLabel(item){
   item = item || {};
   if(item.type === 'directory') return _t('File folder', 'File folder');
@@ -1014,6 +1371,12 @@ function _fileToolbar(explorer){
   explorer = explorer || {};
   var path = String(explorer.path || state.filePath || '');
   var parent = path ? String(explorer.parent_path || '') : '';
+  var root = explorer.root || _selectedFileRoot(state.host) || {};
+  var readOnly = !!root.read_only;
+  var hasSelection = !!state.fileSelectedPath;
+  var selectedIsZip = _fileIsZip(state.fileSelectedPath);
+  var hasClipboard = !!(state.fileClipboard && state.fileClipboard.path);
+  var busy = !!state.fileOperationBusy;
   var backDisabled = state.fileHistoryIndex <= 0;
   var forwardDisabled = state.fileHistoryIndex >= state.fileHistory.length - 1;
   var searching = explorer.mode === 'search' || !!state.fileQuery;
@@ -1026,7 +1389,18 @@ function _fileToolbar(explorer){
       '<button class="vps-win-cmd text" data-file-refresh="1">' + _esc(_t('Refresh', 'Refresh')) + '</button>' +
       '<button class="vps-win-cmd text" data-file-hidden="1">' + _esc(state.fileShowHidden ? _t('Hide dotfiles', 'Hide dotfiles') : _t('Show dotfiles', 'Show dotfiles')) + '</button>' +
       '<button class="vps-win-cmd text" data-file-clear-search="1"' + (!state.fileQuery ? ' disabled' : '') + '>' + _esc(_t('Clear search', 'Clear search')) + '</button>' +
-      '<span class="vps-win-mode">' + _esc(searching ? _t('Search results', 'Search results') : _t('Read-only', 'Read-only')) + '</span>' +
+      '<span class="vps-win-separator"></span>' +
+      '<button class="vps-win-cmd text" data-file-upload-trigger="1"' + (readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('Upload', 'Upload')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-new-folder="1"' + (readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('New folder', 'New folder')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-rename="1"' + (!hasSelection || readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('Rename', 'Rename')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-copy="1"' + (!hasSelection || busy ? ' disabled' : '') + '>' + _esc(_t('Copy', 'Copy')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-cut="1"' + (!hasSelection || readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('Cut', 'Cut')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-paste="1"' + (!hasClipboard || readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('Paste', 'Paste')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-zip="1"' + (!hasSelection || readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('Zip', 'Zip')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-unzip="1"' + (!selectedIsZip || readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('Extract ZIP', 'Extract ZIP')) + '</button>' +
+      '<button class="vps-win-cmd text danger" data-file-delete="1"' + (!hasSelection || readOnly || busy ? ' disabled' : '') + '>' + _esc(_t('Delete', 'Delete')) + '</button>' +
+      '<input class="vps-win-upload-input" type="file" multiple data-file-upload-input>' +
+      '<span class="vps-win-mode">' + _esc(busy ? _t('Working...', 'Working...') : (searching ? _t('Search results', 'Search results') : (readOnly ? _t('Read-only', 'Read-only') : _t('Writable', 'Writable')))) + '</span>' +
     '</div>' +
     '<div class="vps-win-address-row">' +
       '<div class="vps-win-address">' +
@@ -1056,9 +1430,7 @@ function _fileTable(explorer){
   if(!entries.length){
     return '<div class="vps-win-empty">' + _esc(_t('Không có file phù hợp trong phạm vi này.', 'No matching files in this scope.')) + '</div>';
   }
-  var selectedPath = state.filePreview && state.filePreview.file
-    ? String(state.filePreview.file.relative_path || state.filePreview.path || '')
-    : '';
+  var selectedPath = String(state.fileSelectedPath || '');
   return '<div class="vps-win-table-wrap"><table class="vps-win-table"><thead><tr>' +
     '<th>' + _esc(_t('Name', 'Name')) + '</th>' +
     '<th>' + _esc(_t('Date modified', 'Date modified')) + '</th>' +
@@ -1069,9 +1441,9 @@ function _fileTable(explorer){
     var isFile = item.type === 'file' || item.type === 'symlink';
     var path = item.relative_path || '';
     var nameButton = isDir
-      ? '<button class="vps-win-name dir" data-file-open="' + _esc(path) + '">' + _fileIcon(item) + '<span><strong>' + _esc(item.name || path || '/') + '</strong>' + (path ? '<small>' + _esc(_fileDisplayPath(path)) + '</small>' : '') + '</span></button>'
-      : '<button class="vps-win-name" data-file-read="' + _esc(path) + '">' + _fileIcon(item) + '<span><strong>' + _esc(item.name || path || '/') + '</strong>' + (item.denied ? '<small>' + _esc(_t('Guarded by policy', 'Guarded by policy')) + '</small>' : (path ? '<small>' + _esc(_fileDisplayPath(path)) + '</small>' : '')) + '</span></button>';
-    return '<tr' + (selectedPath && selectedPath === String(path) ? ' class="selected"' : '') + '>' +
+      ? '<button class="vps-win-name dir" data-file-select="' + _esc(path) + '" data-file-type="directory" data-file-name="' + _esc(item.name || path || '/') + '">' + _fileIcon(item) + '<span><strong>' + _esc(item.name || path || '/') + '</strong>' + (path ? '<small>' + _esc(_fileDisplayPath(path)) + '</small>' : '') + '</span></button>'
+      : '<button class="vps-win-name" data-file-select="' + _esc(path) + '" data-file-type="' + _esc(item.type || 'file') + '" data-file-name="' + _esc(item.name || path || '/') + '">' + _fileIcon(item) + '<span><strong>' + _esc(item.name || path || '/') + '</strong>' + (item.denied ? '<small>' + _esc(_t('Guarded by policy', 'Guarded by policy')) + '</small>' : (path ? '<small>' + _esc(_fileDisplayPath(path)) + '</small>' : '')) + '</span></button>';
+    return '<tr draggable="true" data-file-row-path="' + _esc(path) + '" data-file-row-type="' + _esc(item.type || '') + '" data-file-row-name="' + _esc(item.name || path || '/') + '"' + (isDir ? ' data-file-drop-target="' + _esc(path) + '"' : '') + (selectedPath && selectedPath === String(path) ? ' class="selected"' : '') + '>' +
       '<td>' + nameButton + '</td>' +
       '<td>' + _esc(_fmtTime(item.modified_at)) + '</td>' +
       '<td>' + _esc(_fileTypeLabel(item)) + (isDir && item.child_count != null ? '<small>' + _esc(_fmtInt(item.child_count) + ' items') + '</small>' : '') + '</td>' +
@@ -1083,6 +1455,37 @@ function _fileTable(explorer){
 function _fileDetailsPane(){
   var preview = state.filePreview || null;
   var root = _selectedFileRoot(state.host);
+  if(!preview && state.fileSelectedPath && state.fileSelectedType === 'directory'){
+    return '' +
+      '<div class="vps-win-details-head">' +
+        _fileIcon({type:'directory'}, true) +
+        '<strong>' + _esc(state.fileSelectedName || _fileBaseName(state.fileSelectedPath)) + '</strong>' +
+        '<span>' + _esc(_fileDisplayPath(state.fileSelectedPath)) + '</span>' +
+      '</div>' +
+      '<div class="vps-win-detail-actions">' +
+        '<button class="vps-win-btn" data-file-open="' + _esc(state.fileSelectedPath) + '">' + _esc(_t('Open', 'Open')) + '</button>' +
+      '</div>' +
+      '<div class="vps-win-detail-list">' +
+        '<div><span>' + _esc(_t('Type', 'Type')) + '</span><strong>' + _esc(_t('File folder', 'File folder')) + '</strong></div>' +
+        '<div><span>' + _esc(_t('Path', 'Path')) + '</span><strong>' + _esc(_fileDisplayPath(state.fileSelectedPath)) + '</strong></div>' +
+      '</div>';
+  }
+  if(!preview && state.fileSelectedPath){
+    return '' +
+      '<div class="vps-win-details-head">' +
+        _fileIcon({type:state.fileSelectedType || 'file'}, true) +
+        '<strong>' + _esc(state.fileSelectedName || _fileBaseName(state.fileSelectedPath)) + '</strong>' +
+        '<span>' + _esc(_fileDisplayPath(state.fileSelectedPath)) + '</span>' +
+      '</div>' +
+      '<div class="vps-win-detail-actions">' +
+        '<button class="vps-win-btn primary" data-file-read="' + _esc(state.fileSelectedPath) + '">' + _esc(_t('Open', 'Open')) + '</button>' +
+        '<a class="vps-win-btn" href="' + _esc(_fileDownloadHref(state.fileSelectedPath)) + '">' + _esc(_t('Download', 'Download')) + '</a>' +
+      '</div>' +
+      '<div class="vps-win-detail-list">' +
+        '<div><span>' + _esc(_t('Type', 'Type')) + '</span><strong>' + _esc(_fileTypeLabel({type:state.fileSelectedType || 'file'})) + '</strong></div>' +
+        '<div><span>' + _esc(_t('Path', 'Path')) + '</span><strong>' + _esc(_fileDisplayPath(state.fileSelectedPath)) + '</strong></div>' +
+      '</div>';
+  }
   if(!preview){
     return '' +
       '<div class="vps-win-details-head">' +
@@ -1102,6 +1505,7 @@ function _fileDetailsPane(){
   var file = preview.file || {};
   var content = String(preview.content || '');
   var filePath = file.relative_path || preview.path || '';
+  var canEditText = !file.denied && !_fileIsReadOnly() && preview.encoding === 'utf-8' && typeof preview.content === 'string';
   return '' +
     '<div class="vps-win-details-head">' +
       _fileIcon(file, true) +
@@ -1110,6 +1514,8 @@ function _fileDetailsPane(){
     '</div>' +
     '<div class="vps-win-detail-actions">' +
       (file.downloadable ? '<a class="vps-win-btn primary" href="' + _esc(_fileDownloadHref(filePath)) + '">' + _esc(_t('Download', 'Download')) + '</a>' : '') +
+      (canEditText && !state.fileEditing ? '<button class="vps-win-btn" data-file-edit="1">' + _esc(_t('Edit text', 'Edit text')) + '</button>' : '') +
+      (canEditText && state.fileEditing ? '<button class="vps-win-btn primary" data-file-edit-save="1">' + _esc(_t('Save', 'Save')) + '</button><button class="vps-win-btn" data-file-edit-cancel="1">' + _esc(_t('Cancel', 'Cancel')) + '</button>' : '') +
     '</div>' +
     '<div class="vps-win-detail-list">' +
       '<div><span>' + _esc(_t('Type', 'Type')) + '</span><strong>' + _esc(_fileTypeLabel(file)) + '</strong></div>' +
@@ -1118,9 +1524,51 @@ function _fileDetailsPane(){
       '<div><span>MIME</span><strong>' + _esc(file.mime || '—') + '</strong></div>' +
       '<div><span>' + _esc(_t('Mode', 'Mode')) + '</span><strong>' + _esc(file.mode || '—') + '</strong></div>' +
     '</div>' +
-    (content
+    (state.fileEditing
+      ? '<textarea class="vps-win-editor" data-file-editor spellcheck="false">' + _esc(state.fileEditContent) + '</textarea>'
+      : content
       ? '<div class="vps-win-preview"><pre>' + _esc(content) + '</pre></div>'
       : '<div class="vps-win-note warn">' + _esc(file.denied ? _t('File này khớp guardrail bảo mật nên không được preview.', 'This file matches a security guardrail and cannot be previewed.') : _t('File này không phải text hoặc vượt giới hạn preview.', 'This file is not text or exceeds the preview limit.')) + '</div>');
+}
+
+function _fileContextMenu(){
+  var menu = state.fileContextMenu || null;
+  if(!menu) return '';
+  var path = String(menu.path || '');
+  var targetPath = String(menu.targetPath || state.filePath || '');
+  var isItem = menu.scope === 'item' && !!path;
+  var isDir = isItem && menu.type === 'directory';
+  var isFile = isItem && !isDir;
+  var isZip = isFile && _fileIsZip(path);
+  var readOnly = _fileIsReadOnly();
+  var busy = !!state.fileOperationBusy;
+  var canWrite = !readOnly && !busy;
+  var hasClipboard = !!(state.fileClipboard && state.fileClipboard.path);
+  var style = 'left:' + _esc(menu.x || 0) + 'px;top:' + _esc(menu.y || 0) + 'px;';
+  return '' +
+    '<div class="vps-win-context-menu" style="' + style + '" data-file-context-menu>' +
+      '<div class="vps-win-context-title">' +
+        '<strong>' + _esc(isItem ? (menu.name || _fileBaseName(path)) : _t('Current folder', 'Current folder')) + '</strong>' +
+        '<span>' + _esc(isItem ? _fileDisplayPath(path) : _fileDisplayPath(targetPath)) + '</span>' +
+      '</div>' +
+      (isItem ? '<button data-file-context-action="open">' + _esc(isDir ? _t('Open', 'Open') : _t('Open preview', 'Open preview')) + '</button>' : '') +
+      (isFile ? '<button data-file-context-action="edit"' + (!canWrite ? ' disabled' : '') + '>' + _esc(_t('Edit text', 'Edit text')) + '</button>' : '') +
+      (isFile ? '<a href="' + _esc(_fileDownloadHref(path)) + '">' + _esc(_t('Download', 'Download')) + '</a>' : '') +
+      (isItem ? '<div class="vps-win-context-sep"></div>' : '') +
+      (isItem ? '<button data-file-context-action="copy"' + (busy ? ' disabled' : '') + '>' + _esc(_t('Copy', 'Copy')) + '</button>' : '') +
+      (isItem ? '<button data-file-context-action="cut"' + (!canWrite ? ' disabled' : '') + '>' + _esc(_t('Cut', 'Cut')) + '</button>' : '') +
+      '<button data-file-context-action="paste"' + (!canWrite || !hasClipboard ? ' disabled' : '') + '>' + _esc(_t('Paste', 'Paste')) + (hasClipboard ? ' <span>' + _esc(state.fileClipboard.mode === 'cut' ? _t('Move here', 'Move here') : _t('Copy here', 'Copy here')) + '</span>' : '') + '</button>' +
+      (isItem ? '<button data-file-context-action="zip"' + (!canWrite ? ' disabled' : '') + '>' + _esc(_t('Compress to ZIP', 'Compress to ZIP')) + '</button>' : '') +
+      (isZip ? '<button data-file-context-action="unzip"' + (!canWrite ? ' disabled' : '') + '>' + _esc(_t('Extract ZIP', 'Extract ZIP')) + '</button>' : '') +
+      '<div class="vps-win-context-sep"></div>' +
+      '<button data-file-context-action="upload"' + (!canWrite ? ' disabled' : '') + '>' + _esc(isDir ? _t('Upload here', 'Upload here') : _t('Upload', 'Upload')) + '</button>' +
+      '<button data-file-context-action="new-folder"' + (!canWrite ? ' disabled' : '') + '>' + _esc(_t('New folder', 'New folder')) + '</button>' +
+      (isItem ? '<button data-file-context-action="rename"' + (!canWrite ? ' disabled' : '') + '>' + _esc(_t('Rename', 'Rename')) + '</button>' : '') +
+      (isItem ? '<button class="danger" data-file-context-action="delete"' + (!canWrite ? ' disabled' : '') + '>' + _esc(_t('Delete', 'Delete')) + '</button>' : '') +
+      '<div class="vps-win-context-sep"></div>' +
+      '<button data-file-context-action="refresh">' + _esc(_t('Refresh', 'Refresh')) + '</button>' +
+      '<button data-file-context-action="hidden">' + _esc(state.fileShowHidden ? _t('Hide dotfiles', 'Hide dotfiles') : _t('Show dotfiles', 'Show dotfiles')) + '</button>' +
+    '</div>';
 }
 
 function _filesTab(host){
@@ -1132,7 +1580,7 @@ function _filesTab(host){
   var summary = explorer && explorer.summary ? explorer.summary : {};
   var root = _selectedFileRoot(host);
   var entriesCount = summary.count != null ? Number(summary.count || 0) : (explorer && Array.isArray(explorer.entries) ? explorer.entries.length : 0);
-  var selectedName = state.filePreview && state.filePreview.file ? _fileBaseName(state.filePreview.file.relative_path || state.filePreview.path || '') : '';
+  var selectedName = state.fileSelectedName || (state.filePreview && state.filePreview.file ? _fileBaseName(state.filePreview.file.relative_path || state.filePreview.path || '') : '');
   return '' +
     '<section class="vps-win-explorer" aria-label="File Explorer">' +
       '<div class="vps-win-titlebar">' +
@@ -1142,13 +1590,14 @@ function _filesTab(host){
       _fileToolbar(explorer || {path: state.filePath || ''}) +
       '<div class="vps-win-body">' +
         _fileNavigationPane(host) +
-        '<main class="vps-win-main">' + _fileTable(explorer || {entries: []}) + '</main>' +
+        '<main class="vps-win-main" data-file-current-path="' + _esc(state.filePath || '') + '" data-file-current-query="' + _esc(state.fileQuery || '') + '">' + _fileTable(explorer || {entries: []}) + '</main>' +
         '<aside class="vps-win-details" aria-label="Details pane">' + _fileDetailsPane() + '</aside>' +
       '</div>' +
+      _fileContextMenu() +
       '<div class="vps-win-statusbar">' +
         '<span>' + _esc(_fmtInt(entriesCount) + ' items') + '</span>' +
         '<span>' + _esc(selectedName ? (_t('Selected', 'Selected') + ': ' + selectedName) : _t('No item selected', 'No item selected')) + '</span>' +
-        '<span>' + _esc(root && root.path ? root.path : '') + '</span>' +
+        '<span>' + _esc(root && root.path ? ((root.read_only ? _t('Read-only', 'Read-only') : _t('Writable', 'Writable')) + ' • ' + root.path) : '') + '</span>' +
       '</div>' +
     '</section>';
 }
@@ -1257,8 +1706,52 @@ function _paint(){
     state.container.innerHTML = '<div class="vps-ct"><div class="vps-panel"><div class="vps-panel-body"><div class="vps-empty">' + _esc(_t('Đang tải trạng thái VPS live...', 'Loading the live VPS state...')) + '</div></div></div></div>';
     return;
   }
+  var fileScroll = null;
+  if(state.tab === 'files'){
+    var currentMain = state.container.querySelector('.vps-win-main');
+    if(currentMain){
+      var samePath = String(currentMain.getAttribute('data-file-current-path') || '') === String(state.filePath || '');
+      var sameQuery = String(currentMain.getAttribute('data-file-current-query') || '') === String(state.fileQuery || '');
+      if(samePath && sameQuery){
+        fileScroll = {
+          top: currentMain.scrollTop || 0,
+          left: currentMain.scrollLeft || 0
+        };
+      }
+    }
+  }
   state.container.innerHTML = '<div class="vps-ct' + (state.tab === 'files' ? ' vps-ct-file-mode' : '') + '">' + _body() + '</div>';
   _bind();
+  if(fileScroll){
+    var nextMain = state.container.querySelector('.vps-win-main');
+    if(nextMain){
+      nextMain.scrollTop = fileScroll.top;
+      nextMain.scrollLeft = fileScroll.left;
+    }
+  }
+}
+
+function _fitFileContextMenu(){
+  if(!state.container) return;
+  var menu = state.container.querySelector('[data-file-context-menu]');
+  if(!menu) return;
+  var viewport = window.visualViewport || null;
+  var vw = viewport ? viewport.width : window.innerWidth;
+  var vh = viewport ? viewport.height : window.innerHeight;
+  var ox = viewport ? viewport.offsetLeft : 0;
+  var oy = viewport ? viewport.offsetTop : 0;
+  var margin = 8;
+  var left = parseFloat(menu.style.left || '0') || 0;
+  var top = parseFloat(menu.style.top || '0') || 0;
+  var rect = menu.getBoundingClientRect();
+  var rightLimit = ox + vw - margin;
+  var bottomLimit = oy + vh - margin;
+  if(rect.right > rightLimit) left -= rect.right - rightLimit;
+  if(rect.bottom > bottomLimit) top -= rect.bottom - bottomLimit;
+  left = Math.max(ox + margin, Math.min(left, rightLimit - Math.min(rect.width, vw - margin * 2)));
+  top = Math.max(oy + margin, Math.min(top, bottomLimit - Math.min(rect.height, vh - margin * 2)));
+  menu.style.left = Math.round(left) + 'px';
+  menu.style.top = Math.round(top) + 'px';
 }
 
 function _bind(){
@@ -1283,6 +1776,19 @@ function _bind(){
   });
   state.container.querySelectorAll('[data-file-open]').forEach(function(btn){
     btn.onclick = function(){ _loadFiles(btn.getAttribute('data-file-open') || '', true); };
+  });
+  state.container.querySelectorAll('[data-file-select]').forEach(function(btn){
+    btn.onclick = function(event){
+      event.preventDefault();
+      _selectFile(btn.getAttribute('data-file-select') || '', btn.getAttribute('data-file-type') || 'file', btn.getAttribute('data-file-name') || '', true);
+    };
+    btn.ondblclick = function(event){
+      event.preventDefault();
+      var path = btn.getAttribute('data-file-select') || '';
+      var type = btn.getAttribute('data-file-type') || 'file';
+      if(type === 'directory') _loadFiles(path, true);
+      else _readFile(path);
+    };
   });
   state.container.querySelectorAll('[data-file-parent]').forEach(function(btn){
     btn.onclick = function(){ _loadFiles(btn.getAttribute('data-file-parent') || '', true); };
@@ -1341,6 +1847,196 @@ function _bind(){
       _loadFiles(state.filePath || '', false, true);
     };
   });
+  state.container.querySelectorAll('[data-file-upload-trigger]').forEach(function(btn){
+    btn.onclick = function(){
+      _triggerFileUpload(state.filePath || '');
+    };
+  });
+  state.container.querySelectorAll('[data-file-upload-input]').forEach(function(input){
+    input.onchange = function(){
+      _uploadFiles(input.files, state.fileUploadTarget || state.filePath || '');
+      state.fileUploadTarget = '';
+      input.value = '';
+    };
+  });
+  state.container.querySelectorAll('[data-file-new-folder]').forEach(function(btn){
+    btn.onclick = function(){
+      _newFolder(state.filePath || '');
+    };
+  });
+  state.container.querySelectorAll('[data-file-rename]').forEach(function(btn){
+    btn.onclick = function(){
+      _renameSelected();
+    };
+  });
+  state.container.querySelectorAll('[data-file-copy]').forEach(function(btn){
+    btn.onclick = function(){
+      _copySelected('copy');
+    };
+  });
+  state.container.querySelectorAll('[data-file-cut]').forEach(function(btn){
+    btn.onclick = function(){
+      _copySelected('cut');
+    };
+  });
+  state.container.querySelectorAll('[data-file-paste]').forEach(function(btn){
+    btn.onclick = function(){
+      _pasteFile(state.filePath || '');
+    };
+  });
+  state.container.querySelectorAll('[data-file-zip]').forEach(function(btn){
+    btn.onclick = function(){
+      _zipSelected();
+    };
+  });
+  state.container.querySelectorAll('[data-file-unzip]').forEach(function(btn){
+    btn.onclick = function(){
+      _unzipSelected();
+    };
+  });
+  state.container.querySelectorAll('[data-file-delete]').forEach(function(btn){
+    btn.onclick = function(){
+      _deleteSelected();
+    };
+  });
+  state.container.querySelectorAll('[data-file-edit]').forEach(function(btn){
+    btn.onclick = function(){ _editSelectedText(); };
+  });
+  state.container.querySelectorAll('[data-file-edit-save]').forEach(function(btn){
+    btn.onclick = function(){ _saveTextEdit(); };
+  });
+  state.container.querySelectorAll('[data-file-edit-cancel]').forEach(function(btn){
+    btn.onclick = function(){ _cancelTextEdit(); };
+  });
+  state.container.querySelectorAll('[data-file-context-action]').forEach(function(btn){
+    btn.onclick = function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      var action = btn.getAttribute('data-file-context-action') || '';
+      var targetPath = state.fileContextMenu ? String(state.fileContextMenu.targetPath || state.filePath || '') : String(state.filePath || '');
+      if(action === 'open') _openSelected();
+      if(action === 'edit') _editSelectedText();
+      if(action === 'copy') _copySelected('copy');
+      if(action === 'cut') _copySelected('cut');
+      if(action === 'paste') _pasteFile(targetPath);
+      if(action === 'zip') _zipSelected();
+      if(action === 'unzip') _unzipSelected();
+      if(action === 'upload') _triggerFileUpload(targetPath);
+      if(action === 'new-folder') _newFolder(targetPath);
+      if(action === 'rename') _renameSelected();
+      if(action === 'delete') _deleteSelected();
+      if(action === 'refresh'){
+        _closeFileContextMenu(false);
+        if(state.fileQuery) _searchFiles(state.fileQuery);
+        else _loadFiles(state.filePath || '', false, true);
+      }
+      if(action === 'hidden'){
+        _closeFileContextMenu(false);
+        state.fileShowHidden = !state.fileShowHidden;
+        if(state.fileQuery) _searchFiles(state.fileQuery);
+        else _loadFiles(state.filePath || '', false, true);
+      }
+    };
+  });
+  state.container.querySelectorAll('[data-file-context-menu]').forEach(function(menu){
+    menu.onclick = function(event){ event.stopPropagation(); };
+    menu.oncontextmenu = function(event){ event.preventDefault(); event.stopPropagation(); };
+  });
+  state.container.querySelectorAll('[data-file-row-path]').forEach(function(row){
+    row.onclick = function(event){
+      if(event.target && event.target.closest && event.target.closest('button,a,input,textarea')) return;
+      _selectFile(
+        row.getAttribute('data-file-row-path') || '',
+        row.getAttribute('data-file-row-type') || 'file',
+        row.getAttribute('data-file-row-name') || '',
+        false
+      );
+    };
+    row.ondblclick = function(event){
+      if(event.target && event.target.closest && event.target.closest('button,a,input,textarea')) return;
+      event.preventDefault();
+      var path = row.getAttribute('data-file-row-path') || '';
+      var type = row.getAttribute('data-file-row-type') || 'file';
+      if(type === 'directory') _loadFiles(path, true);
+      else _readFile(path);
+    };
+    row.oncontextmenu = function(event){
+      _openFileContextMenu(event, {
+        path: row.getAttribute('data-file-row-path') || '',
+        type: row.getAttribute('data-file-row-type') || 'file',
+        name: row.getAttribute('data-file-row-name') || ''
+      });
+    };
+    row.ondragstart = function(event){
+      var path = row.getAttribute('data-file-row-path') || '';
+      if(!path || !event.dataTransfer) return;
+      event.dataTransfer.effectAllowed = 'copyMove';
+      event.dataTransfer.setData('text/plain', path);
+      event.dataTransfer.setData('application/x-vps-file-path', path);
+    };
+  });
+  state.container.querySelectorAll('[data-file-drop-target]').forEach(function(row){
+    row.ondragover = function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      if(event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      row.classList.add('drop-target');
+    };
+    row.ondragleave = function(){ row.classList.remove('drop-target'); };
+    row.ondrop = function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      row.classList.remove('drop-target');
+      if(event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length){
+        _uploadFiles(event.dataTransfer.files, row.getAttribute('data-file-drop-target') || state.filePath || '');
+        return;
+      }
+      var source = event.dataTransfer ? (event.dataTransfer.getData('application/x-vps-file-path') || event.dataTransfer.getData('text/plain')) : '';
+      var target = row.getAttribute('data-file-drop-target') || '';
+      if(source && target && source !== target && _fileParentPath(source) !== target) _mutateFile('move', {path: source, target_path: target});
+    };
+  });
+  var dropZone = state.container.querySelector('.vps-win-main');
+  if(dropZone){
+    dropZone.oncontextmenu = function(event){
+      if(event.target && event.target.closest && event.target.closest('[data-file-row-path]')) return;
+      _openFileContextMenu(event, {path: '', type: '', name: _t('Current folder', 'Current folder')});
+    };
+    dropZone.ondragover = function(event){
+      event.preventDefault();
+      if(event.dataTransfer) event.dataTransfer.dropEffect = event.dataTransfer.files && event.dataTransfer.files.length ? 'copy' : 'move';
+      dropZone.classList.add('drag-over');
+    };
+    dropZone.ondragleave = function(event){
+      if(event.currentTarget === dropZone) dropZone.classList.remove('drag-over');
+    };
+    dropZone.ondrop = function(event){
+      event.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if(event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length){
+        _uploadFiles(event.dataTransfer.files, state.filePath || '');
+        return;
+      }
+      var source = event.dataTransfer ? (event.dataTransfer.getData('application/x-vps-file-path') || event.dataTransfer.getData('text/plain')) : '';
+      if(source && _fileParentPath(source) !== String(state.filePath || '')) _mutateFile('move', {path: source, target_path: state.filePath || ''});
+    };
+  }
+  state.container.onclick = function(event){
+    if(!state.fileContextMenu) return;
+    if(event.target && event.target.closest && event.target.closest('[data-file-context-menu]')) return;
+    _closeFileContextMenu(true);
+  };
+  state.container.onkeydown = function(event){
+    if(event.key === 'Escape' && state.fileContextMenu){
+      event.preventDefault();
+      _closeFileContextMenu(true);
+    }
+  };
+  if(state.fileContextMenu && typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'){
+    window.requestAnimationFrame(_fitFileContextMenu);
+  }else{
+    _fitFileContextMenu();
+  }
   state.container.querySelectorAll('[data-refresh-live]').forEach(function(btn){
     btn.onclick = function(){ _refresh(); };
   });

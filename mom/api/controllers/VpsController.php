@@ -611,6 +611,140 @@ final class VpsController extends BaseController
         }
     }
 
+    public function fileMutate(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['host_id', 'root_id', 'operation']);
+
+        $hostId = trim((string)($body['host_id'] ?? ''));
+        $rootId = trim((string)($body['root_id'] ?? ''));
+        $operation = trim((string)($body['operation'] ?? ''));
+        if ($hostId === '' || $rootId === '' || $operation === '') {
+            $this->error('invalid_vps_file_mutation_request', 400);
+        }
+
+        try {
+            $result = $this->service->mutateFile($hostId, $rootId, $operation, [
+                'path' => (string)($body['path'] ?? ''),
+                'target_path' => (string)($body['target_path'] ?? ''),
+                'name' => (string)($body['name'] ?? ''),
+                'overwrite' => !empty($body['overwrite']),
+            ]);
+            $this->auditLog('vps_file_mutate', [
+                'host_id' => $hostId,
+                'root_id' => $rootId,
+                'operation' => $operation,
+                'path' => (string)($body['path'] ?? ''),
+                'target_path' => (string)($body['target_path'] ?? ''),
+            ]);
+            $this->success([
+                'explorer' => $result,
+            ]);
+        } catch (RuntimeException $e) {
+            $this->rethrowResponse($e);
+            $message = $e->getMessage();
+            $status = match (true) {
+                str_starts_with($message, 'host_not_found') => 404,
+                str_starts_with($message, 'file_root_not_found') => 404,
+                str_starts_with($message, 'file_root_unreachable') => 404,
+                str_starts_with($message, 'file_path_not_found') => 404,
+                str_starts_with($message, 'file_exists') => 409,
+                str_starts_with($message, 'file_access_denied') => 403,
+                str_starts_with($message, 'file_root_read_only') => 403,
+                str_starts_with($message, 'upload_too_large') => 413,
+                str_starts_with($message, 'file_operation_limit') => 413,
+                str_starts_with($message, 'upload_stage_failed') => 502,
+                str_starts_with($message, 'zip_unavailable') => 501,
+                str_starts_with($message, 'file_zip_failed') => 500,
+                str_starts_with($message, 'file_unzip_failed') => 500,
+                str_starts_with($message, 'file_not_zip') => 400,
+                str_starts_with($message, 'invalid_file_path') => 400,
+                str_starts_with($message, 'invalid_file_name') => 400,
+                str_starts_with($message, 'invalid_file_operation') => 400,
+                default => 400,
+            };
+            $this->error('vps_file_mutate_failed', $status, $message);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('vps_file_mutate_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function fileUpload(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireReadAccess($user);
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
+
+        $hostId = trim((string)($_POST['host_id'] ?? ''));
+        $rootId = trim((string)($_POST['root_id'] ?? ''));
+        $path = trim((string)($_POST['path'] ?? ''));
+        $overwrite = (string)($_POST['overwrite'] ?? '') === '1';
+        if ($hostId === '' || $rootId === '') {
+            $this->error('invalid_vps_file_upload_request', 400);
+        }
+
+        $files = $_FILES['files'] ?? null;
+        if (!is_array($files) || !isset($files['name'], $files['tmp_name'], $files['error'])) {
+            $this->error('missing_upload_files', 400);
+        }
+
+        $names = is_array($files['name']) ? $files['name'] : [$files['name']];
+        $tmps = is_array($files['tmp_name']) ? $files['tmp_name'] : [$files['tmp_name']];
+        $errors = is_array($files['error']) ? $files['error'] : [$files['error']];
+        $results = [];
+
+        try {
+            foreach ($names as $index => $name) {
+                $error = (int)($errors[$index] ?? UPLOAD_ERR_NO_FILE);
+                if ($error !== UPLOAD_ERR_OK) {
+                    throw new RuntimeException('upload_failed:' . $error);
+                }
+                $tmp = (string)($tmps[$index] ?? '');
+                if ($tmp === '' || !is_uploaded_file($tmp)) {
+                    throw new RuntimeException('upload_temp_unreadable');
+                }
+                $results[] = $this->service->uploadFile($hostId, $rootId, $path, $tmp, (string)$name, $overwrite);
+            }
+            $this->auditLog('vps_file_upload', [
+                'host_id' => $hostId,
+                'root_id' => $rootId,
+                'path' => $path,
+                'count' => count($results),
+            ]);
+            $this->success([
+                'uploads' => $results,
+            ]);
+        } catch (RuntimeException $e) {
+            $this->rethrowResponse($e);
+            $message = $e->getMessage();
+            $status = match (true) {
+                str_starts_with($message, 'host_not_found') => 404,
+                str_starts_with($message, 'file_root_not_found') => 404,
+                str_starts_with($message, 'file_root_unreachable') => 404,
+                str_starts_with($message, 'file_path_not_found') => 404,
+                str_starts_with($message, 'file_exists') => 409,
+                str_starts_with($message, 'file_access_denied') => 403,
+                str_starts_with($message, 'file_root_read_only') => 403,
+                str_starts_with($message, 'upload_too_large') => 413,
+                str_starts_with($message, 'upload_stage_failed') => 502,
+                str_starts_with($message, 'invalid_file_path') => 400,
+                str_starts_with($message, 'invalid_file_name') => 400,
+                default => 400,
+            };
+            $this->error('vps_file_upload_failed', $status, $message);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('vps_file_upload_failed', 500, $e->getMessage());
+        }
+    }
+
     public function asset(): never
     {
         $user = $this->requireAuth();

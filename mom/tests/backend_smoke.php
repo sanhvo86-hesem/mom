@@ -538,6 +538,10 @@ smoke_assert(($systemContractResponse['status'] ?? null) === 200, 'System contra
 smoke_assert((int)($systemContractPayload['summary']['tableCount'] ?? 0) >= 600, 'System contract should expose the full table registry.');
 smoke_assert((int)($systemContractPayload['summary']['endpointCount'] ?? 0) >= 3000, 'System contract should expose the endpoint catalog.');
 smoke_assert((int)($systemContractPayload['summary']['globalCapabilityCount'] ?? 0) >= 15, 'System contract should expose global ERP+MOM capability audit coverage.');
+smoke_assert((int)($systemContractPayload['summary']['systemContractCriticalGapCount'] ?? -1) === 0, 'System contract authority diagnostics should expose zero critical gaps.');
+smoke_assert(is_array(($systemContractPayload['data']['system_contract_authority'] ?? null)), 'System contract endpoint should expose DB-derived authority artifacts.');
+smoke_assert((string)(($systemContractPayload['data']['system_contract_authority']['manifest']['_meta'] ?? [])['authorityLayer'] ?? '') === 'system_contract_registry', 'System contract authority manifest should declare the registry authority layer.');
+smoke_assert((bool)(($systemContractPayload['data']['system_contract_authority']['manifest']['_meta'] ?? [])['workspaceDraftUsed'] ?? true) === false, 'System contract authority must not be generated from the workspace draft.');
 
 $builderStore = [
     'settings' => ['require_mfa' => false],

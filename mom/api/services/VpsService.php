@@ -11,6 +11,7 @@ final class VpsService
     private const FILE_PREVIEW_MAX_BYTES = 262144;
     private const FILE_DOWNLOAD_MAX_BYTES = 10485760;
     private const FILE_SEARCH_MAX_RESULTS = 160;
+    private const FILE_UPLOAD_MAX_BYTES = 67108864;
 
     /** @var list<string> */
     private array $configCandidates;
@@ -223,6 +224,64 @@ final class VpsService
             'download' => $download ? '1' : '0',
             'max_bytes' => $download ? self::FILE_DOWNLOAD_MAX_BYTES : self::FILE_PREVIEW_MAX_BYTES,
         ]);
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    public function mutateFile(string $hostId, string $rootId, string $operation, array $options): array
+    {
+        $operation = strtolower(trim($operation));
+        if (!in_array($operation, ['mkdir', 'rename', 'copy', 'move', 'delete', 'zip', 'unzip'], true)) {
+            throw new RuntimeException('invalid_file_operation');
+        }
+
+        $host = $this->findHost($hostId);
+        $root = $this->resolveFileRoot($host, $rootId);
+
+        return $this->runFileExplorerOperation($host, $root, $operation, [
+            'path' => $this->normalizeExplorerPath((string)($options['path'] ?? '')),
+            'target_path' => $this->normalizeExplorerPath((string)($options['target_path'] ?? '')),
+            'name' => $this->normalizeExplorerName((string)($options['name'] ?? '')),
+            'overwrite' => !empty($options['overwrite']) ? '1' : '0',
+            'max_bytes' => self::FILE_UPLOAD_MAX_BYTES,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function uploadFile(string $hostId, string $rootId, string $directory, string $tmpPath, string $originalName, bool $overwrite = false): array
+    {
+        $directory = $this->normalizeExplorerPath($directory);
+        $name = $this->normalizeExplorerName($originalName);
+        if ($name === '') {
+            throw new RuntimeException('missing_upload_name');
+        }
+        if ($tmpPath === '' || !is_file($tmpPath) || !is_readable($tmpPath)) {
+            throw new RuntimeException('upload_temp_unreadable');
+        }
+        $size = (int)(@filesize($tmpPath) ?: 0);
+        if ($size > self::FILE_UPLOAD_MAX_BYTES) {
+            throw new RuntimeException('upload_too_large');
+        }
+
+        $host = $this->findHost($hostId);
+        $root = $this->resolveFileRoot($host, $rootId);
+        $remoteTmp = $this->stageUploadForHost($host, $tmpPath);
+
+        try {
+            return $this->runFileExplorerOperation($host, $root, 'upload', [
+                'path' => $directory,
+                'name' => $name,
+                'upload_tmp' => $remoteTmp,
+                'overwrite' => $overwrite ? '1' : '0',
+                'max_bytes' => self::FILE_UPLOAD_MAX_BYTES,
+            ]);
+        } finally {
+            $this->cleanupStagedUpload($host, $remoteTmp, $tmpPath);
+        }
     }
 
     public function runAction(string $hostId, string $actionId, bool $allowWrite = false): array
@@ -762,16 +821,19 @@ final class VpsService
             array_merge($this->defaultFileDenyPatterns(), (array)($root['deny_patterns'] ?? []))
         ), static fn(string $value): bool => $value !== '')));
 
+        $readOnly = filter_var($root['read_only'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
         return [
             'id' => $id,
             'label' => trim((string)($root['label'] ?? '')) ?: basename($path),
             'path' => $path,
             'note' => trim((string)($root['note'] ?? '')),
-            'read_only' => true,
+            'read_only' => $readOnly,
             'max_preview_bytes' => max(1024, min((int)($root['max_preview_bytes'] ?? self::FILE_PREVIEW_MAX_BYTES), self::FILE_PREVIEW_MAX_BYTES)),
             'max_download_bytes' => max(1024, min((int)($root['max_download_bytes'] ?? self::FILE_DOWNLOAD_MAX_BYTES), self::FILE_DOWNLOAD_MAX_BYTES)),
+            'max_upload_bytes' => max(1024, min((int)($root['max_upload_bytes'] ?? self::FILE_UPLOAD_MAX_BYTES), self::FILE_UPLOAD_MAX_BYTES)),
             'deny_patterns' => $denyPatterns,
-            'policy' => 'allowlist-root/read-only/no-dotdot/secret-preview-deny',
+            'policy' => $readOnly ? 'allowlist-root/read-only/no-dotdot/secret-deny' : 'allowlist-root/write-enabled/no-dotdot/secret-deny',
         ];
     }
 
@@ -847,6 +909,20 @@ final class VpsService
         return implode('/', $segments);
     }
 
+    private function normalizeExplorerName(string $name): string
+    {
+        $name = trim(str_replace(["\\", '/', "\0"], '', $name));
+        if ($name === '' || $name === '.' || $name === '..') {
+            return '';
+        }
+        $name = preg_replace('/[\x00-\x1F\x7F]+/', '', $name);
+        $name = is_string($name) ? trim($name) : '';
+        if ($name === '' || $name === '.' || $name === '..') {
+            return '';
+        }
+        return substr($name, 0, 180);
+    }
+
     /**
      * @param array<string, mixed> $host
      * @param array<string, mixed> $root
@@ -879,7 +955,7 @@ final class VpsService
             'label' => (string)($root['label'] ?? ''),
             'path' => (string)($root['path'] ?? ''),
             'note' => (string)($root['note'] ?? ''),
-            'read_only' => true,
+            'read_only' => (bool)($root['read_only'] ?? false),
             'policy' => (string)($root['policy'] ?? ''),
         ];
 
@@ -896,11 +972,16 @@ final class VpsService
             'VPS_EXPLORER_OP' => $operation,
             'VPS_EXPLORER_ROOT' => (string)($root['path'] ?? ''),
             'VPS_EXPLORER_PATH' => (string)($options['path'] ?? ''),
+            'VPS_EXPLORER_TARGET_PATH' => (string)($options['target_path'] ?? ''),
+            'VPS_EXPLORER_NAME' => (string)($options['name'] ?? ''),
+            'VPS_EXPLORER_UPLOAD_TMP' => (string)($options['upload_tmp'] ?? ''),
             'VPS_EXPLORER_QUERY' => (string)($options['query'] ?? ''),
             'VPS_EXPLORER_HIDDEN' => (string)($options['show_hidden'] ?? '0'),
             'VPS_EXPLORER_LIMIT' => (string)($options['limit'] ?? self::FILE_SEARCH_MAX_RESULTS),
             'VPS_EXPLORER_MAX_BYTES' => (string)($options['max_bytes'] ?? ($root['max_preview_bytes'] ?? self::FILE_PREVIEW_MAX_BYTES)),
             'VPS_EXPLORER_DOWNLOAD' => (string)($options['download'] ?? '0'),
+            'VPS_EXPLORER_OVERWRITE' => (string)($options['overwrite'] ?? '0'),
+            'VPS_EXPLORER_READ_ONLY' => !empty($root['read_only']) ? '1' : '0',
             'VPS_EXPLORER_DENY' => base64_encode((string)json_encode((array)($root['deny_patterns'] ?? []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
         ];
 
@@ -1003,6 +1084,168 @@ function child_count(string $dir, bool $showHidden): int {
     return $count;
 }
 
+function clean_leaf_name(string $name): string {
+    $name = trim(str_replace(["\\", '/', "\0"], '', $name));
+    $name = preg_replace('/[\x00-\x1F\x7F]+/', '', $name) ?: '';
+    $name = trim($name);
+    if ($name === '' || $name === '.' || $name === '..') fail('invalid_file_name');
+    return substr($name, 0, 180);
+}
+
+function ensure_write_allowed(bool $readOnly): void {
+    if ($readOnly) fail('file_root_read_only');
+}
+
+function existing_real(string $rootReal, string $rel): string {
+    $target = $rootReal . ($rel !== '' ? '/' . $rel : '');
+    $real = realpath($target);
+    if (!is_string($real) || !inside_root($real, $rootReal)) fail('file_path_not_found');
+    return $real;
+}
+
+function parent_real(string $rootReal, string $rel): string {
+    $parent = $rel === '' ? $rootReal : existing_real($rootReal, $rel);
+    if (!is_dir($parent)) fail('file_path_not_directory');
+    return $parent;
+}
+
+function join_rel_path(string $parentRel, string $name): string {
+    $parentRel = norm_rel($parentRel);
+    $name = clean_leaf_name($name);
+    return $parentRel === '' ? $name : ($parentRel . '/' . $name);
+}
+
+function ensure_rel_not_denied(string $rel, array $deny): void {
+    if (denied_rel($rel, $deny)) fail('file_access_denied');
+}
+
+function destination_for(string $rootReal, string $parentRel, string $name, bool $overwrite, array $deny): array {
+    $parent = parent_real($rootReal, $parentRel);
+    $destRel = join_rel_path($parentRel, $name);
+    ensure_rel_not_denied($destRel, $deny);
+    $dest = $parent . '/' . clean_leaf_name($name);
+    $existing = realpath($dest);
+    if (is_string($existing) && !inside_root($existing, $rootReal)) fail('file_path_not_found');
+    if (file_exists($dest) && !$overwrite) fail('file_exists');
+    return [$dest, $destRel, $parent];
+}
+
+function rrmdir_guarded(string $path, string $rootReal, int &$count = 0): void {
+    $real = realpath($path);
+    if (!is_string($real) || !inside_root($real, $rootReal)) fail('file_path_not_found');
+    if (is_link($path) || is_file($path)) {
+        if (!@unlink($path)) fail('file_delete_failed');
+        $count += 1;
+        return;
+    }
+    if (!is_dir($path)) fail('file_path_not_found');
+    $items = @scandir($path);
+    if (!is_array($items)) fail('file_directory_read_failed');
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') continue;
+        $count += 1;
+        if ($count > 6000) fail('file_operation_limit');
+        rrmdir_guarded($path . '/' . $item, $rootReal, $count);
+    }
+    if (!@rmdir($path)) fail('file_delete_failed');
+}
+
+function copy_guarded(string $source, string $dest, string $rootReal, int &$count = 0): void {
+    $sourceReal = realpath($source);
+    if (!is_string($sourceReal) || !inside_root($sourceReal, $rootReal)) fail('file_path_not_found');
+    if (is_link($source)) fail('file_symlink_not_supported');
+    if (is_file($source)) {
+        if (!@copy($source, $dest)) fail('file_copy_failed');
+        @chmod($dest, (int)(@fileperms($source) ?: 0644) & 0777);
+        $count += 1;
+        return;
+    }
+    if (!is_dir($source)) fail('file_path_not_found');
+    if (str_starts_with(rtrim($dest, '/') . '/', rtrim($sourceReal, '/') . '/')) fail('file_invalid_destination');
+    if (!is_dir($dest) && !@mkdir($dest, 0775, true)) fail('file_copy_failed');
+    $items = @scandir($source);
+    if (!is_array($items)) fail('file_directory_read_failed');
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') continue;
+        $count += 1;
+        if ($count > 6000) fail('file_operation_limit');
+        copy_guarded($source . '/' . $item, $dest . '/' . $item, $rootReal, $count);
+    }
+}
+
+function add_to_zip_guarded(ZipArchive $zip, string $source, string $baseRel, string $rootReal, array $deny, int &$count = 0): void {
+    $sourceReal = realpath($source);
+    if (!is_string($sourceReal) || !inside_root($sourceReal, $rootReal)) fail('file_path_not_found');
+    $baseRel = trim(str_replace('\\', '/', $baseRel), '/');
+    ensure_rel_not_denied($baseRel, $deny);
+    if (is_link($source)) fail('file_symlink_not_supported');
+    if (is_file($sourceReal)) {
+        if (!$zip->addFile($sourceReal, $baseRel)) fail('file_zip_failed');
+        $count += 1;
+        return;
+    }
+    if (!is_dir($sourceReal)) fail('file_path_not_found');
+    $dirRel = $baseRel === '' ? basename($sourceReal) : $baseRel;
+    $zip->addEmptyDir($dirRel);
+    $items = @scandir($sourceReal);
+    if (!is_array($items)) fail('file_directory_read_failed');
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') continue;
+        $childAbs = $sourceReal . '/' . $item;
+        $childRel = $dirRel === '' ? $item : ($dirRel . '/' . $item);
+        ensure_rel_not_denied($childRel, $deny);
+        $count += 1;
+        if ($count > 6000) fail('file_operation_limit');
+        add_to_zip_guarded($zip, $childAbs, $childRel, $rootReal, $deny, $count);
+    }
+}
+
+function unzip_guarded(string $zipPath, string $destDir, string $destRel, string $rootReal, array $deny, int &$count = 0): void {
+    if (!class_exists('ZipArchive')) fail('zip_unavailable');
+    $zipReal = realpath($zipPath);
+    $destReal = realpath($destDir);
+    if (!is_string($zipReal) || !inside_root($zipReal, $rootReal) || !is_file($zipReal)) fail('file_path_not_file');
+    if (!is_string($destReal) || !inside_root($destReal, $rootReal) || !is_dir($destReal)) fail('file_path_not_directory');
+    $zip = new ZipArchive();
+    if ($zip->open($zipReal) !== true) fail('file_unzip_failed');
+    for ($i = 0; $i < $zip->numFiles; $i += 1) {
+        $name = (string)$zip->getNameIndex($i);
+        $clean = norm_rel($name);
+        if ($clean === '') continue;
+        $targetRel = $destRel === '' ? $clean : ($destRel . '/' . $clean);
+        ensure_rel_not_denied($targetRel, $deny);
+        $target = $destReal . '/' . $clean;
+        $targetParent = dirname($target);
+        $targetParentReal = realpath($targetParent);
+        if ($targetParentReal === false) {
+            $candidate = $targetParent;
+            $missing = [];
+            while (!is_dir($candidate)) {
+                $missing[] = basename($candidate);
+                $candidate = dirname($candidate);
+            }
+            $baseReal = realpath($candidate);
+            if (!is_string($baseReal) || !inside_root($baseReal, $rootReal)) {
+                $zip->close();
+                fail('file_invalid_destination');
+            }
+        } elseif (!inside_root((string)$targetParentReal, $rootReal)) {
+            $zip->close();
+            fail('file_invalid_destination');
+        }
+        $count += 1;
+        if ($count > 6000) {
+            $zip->close();
+            fail('file_operation_limit');
+        }
+    }
+    if (!$zip->extractTo($destReal)) {
+        $zip->close();
+        fail('file_unzip_failed');
+    }
+    $zip->close();
+}
+
 function entry_for(string $abs, string $rel, string $rootReal, bool $showHidden, array $deny, int $maxPreview): array {
     $real = realpath($abs);
     $link = is_link($abs);
@@ -1036,22 +1279,25 @@ function entry_for(string $abs, string $rel, string $rootReal, bool $showHidden,
 $op = trim((string)getenv('VPS_EXPLORER_OP'));
 $rootRaw = trim((string)getenv('VPS_EXPLORER_ROOT'));
 $rel = norm_rel((string)getenv('VPS_EXPLORER_PATH'));
+$targetRel = norm_rel((string)getenv('VPS_EXPLORER_TARGET_PATH'));
+$name = trim((string)getenv('VPS_EXPLORER_NAME'));
+$uploadTmp = trim((string)getenv('VPS_EXPLORER_UPLOAD_TMP'));
 $query = trim((string)getenv('VPS_EXPLORER_QUERY'));
 $showHidden = (string)getenv('VPS_EXPLORER_HIDDEN') === '1';
 $download = (string)getenv('VPS_EXPLORER_DOWNLOAD') === '1';
+$overwrite = (string)getenv('VPS_EXPLORER_OVERWRITE') === '1';
+$readOnly = (string)getenv('VPS_EXPLORER_READ_ONLY') === '1';
 $limit = max(1, min(500, (int)getenv('VPS_EXPLORER_LIMIT')));
-$maxBytes = max(1024, min(10485760, (int)getenv('VPS_EXPLORER_MAX_BYTES')));
+$maxBytes = max(1024, min(67108864, (int)getenv('VPS_EXPLORER_MAX_BYTES')));
 $denyRaw = base64_decode((string)getenv('VPS_EXPLORER_DENY'), true);
 $deny = is_string($denyRaw) ? json_decode($denyRaw, true) : [];
 $deny = is_array($deny) ? $deny : [];
 
 $rootReal = realpath($rootRaw);
 if (!is_string($rootReal) || !is_dir($rootReal)) fail('file_root_unreachable');
-$target = $rootReal . ($rel !== '' ? '/' . $rel : '');
-$targetReal = realpath($target);
-if (!is_string($targetReal) || !inside_root($targetReal, $rootReal)) fail('file_path_not_found');
 
 if ($op === 'list') {
+    $targetReal = existing_real($rootReal, $rel);
     if (!is_dir($targetReal)) fail('file_path_not_directory');
     $items = @scandir($targetReal);
     if (!is_array($items)) fail('file_directory_read_failed');
@@ -1083,6 +1329,7 @@ if ($op === 'list') {
 }
 
 if ($op === 'search') {
+    $targetReal = existing_real($rootReal, $rel);
     if ($query === '') fail('missing_file_search_query');
     if (!is_dir($targetReal)) fail('file_path_not_directory');
     $needle = strtolower($query);
@@ -1126,7 +1373,182 @@ if ($op === 'search') {
     ]);
 }
 
+if ($op === 'mkdir') {
+    ensure_write_allowed($readOnly);
+    $folderName = clean_leaf_name($name);
+    [$dest, $destRel] = destination_for($rootReal, $rel, $folderName, false, $deny);
+    if (!@mkdir($dest, 0775, false)) fail('file_mkdir_failed');
+    out([
+        'ok' => true,
+        'mode' => 'mkdir',
+        'path' => $rel,
+        'destination_path' => $destRel,
+        'entry' => entry_for($dest, $destRel, $rootReal, $showHidden, $deny, $maxBytes),
+    ]);
+}
+
+if ($op === 'rename') {
+    ensure_write_allowed($readOnly);
+    if ($rel === '') fail('missing_file_path');
+    ensure_rel_not_denied($rel, $deny);
+    $source = existing_real($rootReal, $rel);
+    $newName = clean_leaf_name($name);
+    $parentRel = trim((string)dirname($rel), '.');
+    $parentRel = $parentRel === '/' ? '' : norm_rel($parentRel);
+    [$dest, $destRel] = destination_for($rootReal, $parentRel, $newName, $overwrite, $deny);
+    if (file_exists($dest) && $overwrite) {
+        $count = 0;
+        rrmdir_guarded($dest, $rootReal, $count);
+    }
+    if (!@rename($source, $dest)) fail('file_rename_failed');
+    out([
+        'ok' => true,
+        'mode' => 'rename',
+        'path' => $parentRel,
+        'source_path' => $rel,
+        'destination_path' => $destRel,
+        'entry' => entry_for($dest, $destRel, $rootReal, $showHidden, $deny, $maxBytes),
+    ]);
+}
+
+if ($op === 'copy' || $op === 'move') {
+    ensure_write_allowed($readOnly);
+    if ($rel === '') fail('missing_file_path');
+    ensure_rel_not_denied($rel, $deny);
+    $source = existing_real($rootReal, $rel);
+    $baseName = clean_leaf_name($name !== '' ? $name : basename($rel));
+    [$dest, $destRel] = destination_for($rootReal, $targetRel, $baseName, $overwrite, $deny);
+    $sourceReal = realpath($source);
+    if (!is_string($sourceReal)) fail('file_path_not_found');
+    if (is_dir($sourceReal) && str_starts_with(rtrim($dest, '/') . '/', rtrim($sourceReal, '/') . '/')) fail('file_invalid_destination');
+    if (file_exists($dest) && $overwrite) {
+        $count = 0;
+        rrmdir_guarded($dest, $rootReal, $count);
+    }
+    if ($op === 'copy') {
+        $count = 0;
+        copy_guarded($source, $dest, $rootReal, $count);
+    } else {
+        if (!@rename($source, $dest)) fail('file_move_failed');
+    }
+    out([
+        'ok' => true,
+        'mode' => $op,
+        'path' => $targetRel,
+        'source_path' => $rel,
+        'destination_path' => $destRel,
+        'entry' => entry_for($dest, $destRel, $rootReal, $showHidden, $deny, $maxBytes),
+    ]);
+}
+
+if ($op === 'delete') {
+    ensure_write_allowed($readOnly);
+    if ($rel === '') fail('missing_file_path');
+    ensure_rel_not_denied($rel, $deny);
+    $source = existing_real($rootReal, $rel);
+    $parentRel = trim((string)dirname($rel), '.');
+    $parentRel = $parentRel === '/' ? '' : norm_rel($parentRel);
+    $count = 0;
+    rrmdir_guarded($source, $rootReal, $count);
+    out([
+        'ok' => true,
+        'mode' => 'delete',
+        'path' => $parentRel,
+        'source_path' => $rel,
+        'deleted_items' => $count,
+    ]);
+}
+
+if ($op === 'upload') {
+    ensure_write_allowed($readOnly);
+    $folder = parent_real($rootReal, $rel);
+    $fileName = clean_leaf_name($name);
+    [$dest, $destRel] = destination_for($rootReal, $rel, $fileName, $overwrite, $deny);
+    $tmpReal = realpath($uploadTmp);
+    if (!is_string($tmpReal) || !is_file($tmpReal) || !is_readable($tmpReal)) fail('upload_temp_unreadable');
+    $size = (int)(@filesize($tmpReal) ?: 0);
+    if ($size > $maxBytes) fail('upload_too_large');
+    if (file_exists($dest) && $overwrite) {
+        $count = 0;
+        rrmdir_guarded($dest, $rootReal, $count);
+    }
+    if (!@copy($tmpReal, $dest)) fail('file_upload_failed');
+    @chmod($dest, 0664);
+    out([
+        'ok' => true,
+        'mode' => 'upload',
+        'path' => $rel,
+        'destination_path' => $destRel,
+        'entry' => entry_for($dest, $destRel, $rootReal, $showHidden, $deny, $maxBytes),
+    ]);
+}
+
+if ($op === 'zip') {
+    ensure_write_allowed($readOnly);
+    if (!class_exists('ZipArchive')) fail('zip_unavailable');
+    if ($rel === '') fail('missing_file_path');
+    ensure_rel_not_denied($rel, $deny);
+    $source = existing_real($rootReal, $rel);
+    $parentRel = $targetRel !== '' ? $targetRel : trim((string)dirname($rel), '.');
+    $parentRel = $parentRel === '/' ? '' : norm_rel($parentRel);
+    $zipName = $name !== '' ? clean_leaf_name($name) : (basename($rel) . '.zip');
+    if (!str_ends_with(strtolower($zipName), '.zip')) {
+        $zipName .= '.zip';
+    }
+    [$dest, $destRel] = destination_for($rootReal, $parentRel, $zipName, $overwrite, $deny);
+    if (file_exists($dest) && $overwrite) {
+        $count = 0;
+        rrmdir_guarded($dest, $rootReal, $count);
+    }
+    $zip = new ZipArchive();
+    if ($zip->open($dest, ZipArchive::CREATE) !== true) fail('file_zip_failed');
+    $count = 0;
+    add_to_zip_guarded($zip, $source, basename($rel), $rootReal, $deny, $count);
+    if (!$zip->close()) fail('file_zip_failed');
+    out([
+        'ok' => true,
+        'mode' => 'zip',
+        'path' => $parentRel,
+        'source_path' => $rel,
+        'destination_path' => $destRel,
+        'entry' => entry_for($dest, $destRel, $rootReal, $showHidden, $deny, $maxBytes),
+        'zipped_items' => $count,
+    ]);
+}
+
+if ($op === 'unzip') {
+    ensure_write_allowed($readOnly);
+    if ($rel === '') fail('missing_file_path');
+    ensure_rel_not_denied($rel, $deny);
+    $source = existing_real($rootReal, $rel);
+    if (!is_file($source)) fail('file_path_not_file');
+    if (strtolower((string)pathinfo($source, PATHINFO_EXTENSION)) !== 'zip') fail('file_not_zip');
+    $destRel = $targetRel !== '' ? $targetRel : trim((string)dirname($rel), '.');
+    $destRel = $destRel === '/' ? '' : norm_rel($destRel);
+    if ($name !== '') {
+        [$folderDest, $folderRel] = destination_for($rootReal, $destRel, clean_leaf_name($name), $overwrite, $deny);
+        if (file_exists($folderDest) && $overwrite) {
+            $count = 0;
+            rrmdir_guarded($folderDest, $rootReal, $count);
+        }
+        if (!is_dir($folderDest) && !@mkdir($folderDest, 0775, true)) fail('file_mkdir_failed');
+        $destRel = $folderRel;
+    }
+    ensure_rel_not_denied($destRel, $deny);
+    $destDir = parent_real($rootReal, $destRel);
+    $count = 0;
+    unzip_guarded($source, $destDir, $destRel, $rootReal, $deny, $count);
+    out([
+        'ok' => true,
+        'mode' => 'unzip',
+        'path' => $destRel,
+        'source_path' => $rel,
+        'extracted_items' => $count,
+    ]);
+}
+
 if ($op === 'read') {
+    $targetReal = existing_real($rootReal, $rel);
     if (!is_file($targetReal)) fail('file_path_not_file');
     if (denied_rel($rel, $deny)) fail('file_access_denied');
     if (!is_readable($targetReal)) fail('file_not_readable');
@@ -1862,6 +2284,55 @@ BASH;
         }
 
         return false;
+    }
+
+    private function stageUploadForHost(array $host, string $tmpPath): string
+    {
+        if ($this->resolveExecutionMode($host) === 'local') {
+            return $tmpPath;
+        }
+
+        $target = trim((string)($host['ssh_target'] ?? ''));
+        if ($target === '') {
+            throw new RuntimeException('ssh_target_missing');
+        }
+        if (!$this->shellAvailable()) {
+            throw new RuntimeException('exec_unavailable');
+        }
+
+        $remoteTmp = '/tmp/mom-vps-upload-' . bin2hex(random_bytes(12));
+        $command = implode(' ', [
+            'scp',
+            '-q',
+            '-oBatchMode=yes',
+            '-oStrictHostKeyChecking=yes',
+            '-oConnectTimeout=8',
+            escapeshellarg($tmpPath),
+            escapeshellarg($target . ':' . $remoteTmp),
+        ]);
+
+        $exitCode = 1;
+        try {
+            $output = (string)\shell_run($command, $exitCode);
+        } catch (\Throwable $e) {
+            throw new RuntimeException('upload_stage_failed:' . $e->getMessage());
+        }
+        if ($exitCode !== 0) {
+            throw new RuntimeException('upload_stage_failed:' . trim($output));
+        }
+
+        return $remoteTmp;
+    }
+
+    private function cleanupStagedUpload(array $host, string $remoteTmp, string $localTmp): void
+    {
+        if ($remoteTmp === '' || $remoteTmp === $localTmp || $this->resolveExecutionMode($host) === 'local') {
+            return;
+        }
+        try {
+            $this->executeOnHost($host, 'rm -f -- ' . escapeshellarg($remoteTmp));
+        } catch (\Throwable) {
+        }
     }
 
     /**

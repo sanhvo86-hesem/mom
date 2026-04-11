@@ -5221,6 +5221,7 @@ class SchemaStudioController extends BaseController
             'writePolicy' => (string)($meta['writePolicy'] ?? ($readOnly ? 'read_only_generated_artifact' : 'editable_with_revision_guard')),
             'deletePolicy' => (string)($meta['deletePolicy'] ?? ($readOnly ? 'do_not_delete_regenerate_from_authority' : 'archive_or_replace_do_not_hard_delete')),
             'dataLossImpact' => (string)($meta['dataLossImpact'] ?? ($readOnly ? 'No DB data loss, but contract visibility is lost until regenerated.' : 'No DB data loss, but editable design, baseline, diff, compiler, and release workflows lose their working surface.')),
+            'blankDraft' => !empty($meta['blankDraft']),
             'canDelete' => false,
             'readOnly' => $readOnly,
             'editable' => !$readOnly,
@@ -5238,16 +5239,18 @@ class SchemaStudioController extends BaseController
         $workspace = $this->loadDesignDocument(self::SYSTEM_DESIGN_ID);
         $designs = [];
         if (is_array($workspace)) {
+            $workspaceMeta = is_array($workspace['_meta'] ?? null) ? $workspace['_meta'] : [];
             $designs[] = $this->buildDesignSummary($workspace, [
                 'id' => self::SYSTEM_DESIGN_ID,
-                'displayName' => 'Workspace Design Draft',
-                'designType' => 'workspace_design',
-                'authorityLayer' => 'design_workspace',
-                'authorityViewKind' => 'design_draft',
-                'purpose' => 'Editable design draft for controlled schema design, baseline, diff, compiler, and release review. It is not the physical DB schema.',
-                'writePolicy' => 'editable_with_revision_guard',
-                'deletePolicy' => 'archive_or_replace_do_not_hard_delete',
-                'dataLossImpact' => 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.',
+                'displayName' => (string)($workspaceMeta['displayName'] ?? 'Workspace Design Draft'),
+                'designType' => (string)($workspaceMeta['designType'] ?? 'workspace_design'),
+                'authorityLayer' => (string)($workspaceMeta['authorityLayer'] ?? 'design_workspace'),
+                'authorityViewKind' => (string)($workspaceMeta['authorityViewKind'] ?? 'design_draft'),
+                'purpose' => (string)($workspaceMeta['purpose'] ?? 'Editable design draft for controlled schema design, baseline, diff, compiler, and release review. It is not the physical DB schema.'),
+                'writePolicy' => (string)($workspaceMeta['writePolicy'] ?? 'editable_with_revision_guard'),
+                'deletePolicy' => (string)($workspaceMeta['deletePolicy'] ?? 'archive_or_replace_do_not_hard_delete'),
+                'dataLossImpact' => (string)($workspaceMeta['dataLossImpact'] ?? 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.'),
+                'blankDraft' => !empty($workspaceMeta['blankDraft']),
                 'readOnly' => false,
                 'editable' => true,
             ]);

@@ -297,6 +297,8 @@ $router->actions([
     'vps_file_list'        => [VpsController::class, 'fileList'],
     'vps_file_search'      => [VpsController::class, 'fileSearch'],
     'vps_file_read'        => [VpsController::class, 'fileRead'],
+    'vps_file_mutate'      => [VpsController::class, 'fileMutate'],
+    'vps_file_upload'      => [VpsController::class, 'fileUpload'],
     'vps_terminal_auth'    => [VpsController::class, 'terminalAuth'],
     'vps_observability_auth' => [VpsController::class, 'observabilityAuth'],
 ]);
@@ -990,6 +992,8 @@ $router->post('/api/vps/action', VpsController::class, 'runAction');
 $router->get('/api/vps/files', VpsController::class, 'fileList');
 $router->get('/api/vps/files/search', VpsController::class, 'fileSearch');
 $router->get('/api/vps/files/read', VpsController::class, 'fileRead');
+$router->post('/api/vps/files/mutate', VpsController::class, 'fileMutate');
+$router->post('/api/vps/files/upload', VpsController::class, 'fileUpload');
 $router->get('/api/vps/terminal/auth', VpsController::class, 'terminalAuth');
 $router->get('/api/vps/observability/auth', VpsController::class, 'observabilityAuth');
 

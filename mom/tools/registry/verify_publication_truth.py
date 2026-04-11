@@ -60,6 +60,10 @@ REQUIRED_ARTIFACTS = [
     REG / "operational-stress-report.json",
     REG / "global-erp-mom-capability-catalog.json",
     REG / "global-erp-mom-capability-audit.json",
+    REG / "system-contract-runtime-projections.json",
+    REG / "system-contract-registry-contracts.json",
+    REG / "system-contract-diagnostics.json",
+    REG / "system-contract-manifest.json",
     REG / "wave-gap-ledger.json",
     REG / "publication-truth-summary.json",
     REG / "publication-entity-accounting.json",
@@ -269,6 +273,55 @@ def main() -> int:
         refs = sa_data.get("reference_sql_artifacts", [])
         check("schema_refs_non_authoritative", all(r.get("authority") is False for r in refs),
               "some reference artifacts have authority=true")
+
+    # Gate J2: System contract authority must be full and DB-derived
+    print("\nGate J2: System contract authority")
+    system_runtime_path = REG / "system-contract-runtime-projections.json"
+    system_contracts_path = REG / "system-contract-registry-contracts.json"
+    system_diagnostics_path = REG / "system-contract-diagnostics.json"
+    system_manifest_path = REG / "system-contract-manifest.json"
+    if all(p.is_file() for p in [system_runtime_path, system_contracts_path, system_diagnostics_path, system_manifest_path]):
+        system_runtime = load(system_runtime_path)
+        system_contracts = load(system_contracts_path)
+        system_diagnostics = load(system_diagnostics_path)
+        system_manifest = load(system_manifest_path)
+        table_registry = load(REG / "table-registry.json")
+        relation_map = load(REG / "relation-map.json")
+        workflow_library = load(REG / "workflow-library.json")
+        table_count = len(table_registry.get("tables") or {})
+        relation_count = len(relation_map.get("edges") or relation_map.get("relations") or [])
+        workflow_count = len(workflow_library.get("workflows") or {})
+        runtime_summary = system_runtime.get("summary", {})
+        manifest_summary = system_manifest.get("summary", {})
+        diagnostics_summary = system_diagnostics.get("summary", {})
+        system_meta = system_manifest.get("_meta", {})
+        check("system_contract_authority_layer",
+              system_meta.get("authorityLayer") == "system_contract_registry",
+              f"authorityLayer={system_meta.get('authorityLayer')}")
+        check("system_contract_not_workspace_draft",
+              system_meta.get("designId") != "workspace" and system_meta.get("workspaceDraftUsed") is False,
+              f"designId={system_meta.get('designId')} workspaceDraftUsed={system_meta.get('workspaceDraftUsed')}")
+        check("system_contract_table_count_matches_registry",
+              manifest_summary.get("tableCount") == table_count and runtime_summary.get("tableCount") == table_count,
+              f"manifest={manifest_summary.get('tableCount')} runtime={runtime_summary.get('tableCount')} registry={table_count}")
+        check("system_contract_relation_count_matches_registry",
+              manifest_summary.get("relationCount") == relation_count and runtime_summary.get("relationCount") == relation_count,
+              f"manifest={manifest_summary.get('relationCount')} runtime={runtime_summary.get('relationCount')} registry={relation_count}")
+        check("system_contract_endpoint_count_matches_catalog",
+              manifest_summary.get("endpointCount") == endpoint_actual and runtime_summary.get("endpointCount") == endpoint_actual,
+              f"manifest={manifest_summary.get('endpointCount')} runtime={runtime_summary.get('endpointCount')} catalog={endpoint_actual}")
+        check("system_contract_workflow_count_matches_library",
+              manifest_summary.get("workflowCount") == workflow_count and runtime_summary.get("workflowCount") == workflow_count,
+              f"manifest={manifest_summary.get('workflowCount')} runtime={runtime_summary.get('workflowCount')} library={workflow_count}")
+        check("system_contract_contract_count_matches_tables",
+              len(system_contracts.get("contracts") or []) == table_count,
+              f"contracts={len(system_contracts.get('contracts') or [])} tables={table_count}")
+        check("system_contract_runtime_tables_match_registry",
+              len(system_runtime.get("tables") or []) == table_count,
+              f"runtime_tables={len(system_runtime.get('tables') or [])} registry={table_count}")
+        check("system_contract_diagnostics_clear_blockers",
+              diagnostics_summary.get("criticalGapCount") == 0 and diagnostics_summary.get("blockerCount") == 0,
+              f"critical={diagnostics_summary.get('criticalGapCount')} blockers={diagnostics_summary.get('blockerCount')}")
 
     # Gate K: Truth summary consistency
     print("\nGate K: Truth summary consistency")

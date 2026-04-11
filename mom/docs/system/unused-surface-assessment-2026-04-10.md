@@ -152,8 +152,10 @@ Keep as system authority:
 - [table-registry.json](/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My%20Drive/sanh/git/hesemeqms/mom/data/registry/table-registry.json)
 - [endpoint-catalog.json](/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My%20Drive/sanh/git/hesemeqms/mom/data/registry/endpoint-catalog.json)
 - [relation-map.json](/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My%20Drive/sanh/git/hesemeqms/mom/data/registry/relation-map.json)
-- [workspace.json](/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My%20Drive/sanh/git/hesemeqms/mom/data/schema-studio/designs/workspace.json)
 - the whole [mom/contracts](/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My%20Drive/sanh/git/hesemeqms/mom/contracts) authority layer
+
+Keep as non-authoritative design surface:
+- [workspace.json](/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My%20Drive/sanh/git/hesemeqms/mom/data/schema-studio/designs/workspace.json), intentionally blank from 2026-04-11 onward
 
 Keep as compatibility but not authority:
 - the 26 `compatibility_alias_api` surfaces in [package-index.json](/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My%20Drive/sanh/git/hesemeqms/mom/contracts/package-index.json)

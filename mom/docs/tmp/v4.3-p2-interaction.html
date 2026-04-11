@@ -1,0 +1,300 @@
+<section class="section" id="interaction-patterns">
+  <h2 class="section-title"><span class="section-number">??</span>Quy chuẩn Tương tác Chuyên sâu</h2>
+  <p class="section-subtitle">Section tạm cho Prompt 2/8. Prompt 8 sẽ chèn sau <code>toast-precise</code> và trước <code>visual-themes</code>. Mọi tương tác dưới đây phải khớp Section 4, 21, 22, 23, 26, 29 và 30; developer không được tự diễn giải thêm khi triển khai.</p>
+
+  <div class="grid-3">
+    <div class="info-box info-box-blue"><strong>PHẠM VI ÁP DỤNG</strong>Áp dụng cho Kanban, Gantt, Template Studio, Block Editor, NCR/CAPA, approval flow, form dài, global search và upload bằng chứng cho part <code>AERO-BRK-2024</code>, vật tư <code>MAT-AL6061-T6</code>, máy <code>Haas VF-2SS</code>, <code>DMG MORI NLX 2500</code>.</div>
+    <div class="info-box info-box-green"><strong>CROSS-REFERENCE BẮT BUỘC</strong>Xem thêm <a href="#component-states">Section 4</a> state matrix, <a href="#form-rules">Section 21</a> form rules, <a href="#table-rules">Section 22</a> table rules, <a href="#modal-rules">Section 23</a> modal rules, <a href="#keyboard-rules">Section 26</a> keyboard, <a href="#block-schema">Section 29</a> block schema, <a href="#toast-precise">Section 30</a> toast.</div>
+    <div class="info-box info-box-amber"><strong>I18N RULE</strong>Mọi chuỗi hiển thị trong component runtime phải khai báo dạng <code>{ vi: "...", en: "..." }</code>. Ví dụ: <code>{ vi: "Đang lưu...", en: "Saving..." }</code>. Không hardcode label tiếng Việt trực tiếp trong JS.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-blue">Pattern 1</span>Drag &amp; Drop — Kanban, Gantt, Template Studio, Block Editor</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Giá trị</th><th>Token/CSS</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Khởi đầu</strong></td><td>Mouse kích hoạt sau khi pointer di chuyển ngưỡng <code>calc(var(--space-1) + 1 device-pixel)</code>; touch kích hoạt bằng long-press <code>250ms</code> và haptic nếu thiết bị hỗ trợ; keyboard dùng Space để nhấc, Arrow để di chuyển, Space để thả, Escape để hủy.</td><td><code>touch-action:none</code> khi dragging; focus vẫn dùng <code>var(--focus-ring)</code>.</td><td>Operator kéo thẻ <code>NCR-2026-041</code> từ "Đang điều tra" sang "Chờ CAPA" bằng keyboard khi kiểm NCR trên tablet xưởng.</td></tr>
+          <tr><td><strong>Preview / ghost</strong></td><td>Ghost là clone bán trong suốt, offset bằng <code>var(--space-2)</code> từ cursor; item gốc giảm opacity còn <code>var(--opacity-disabled)</code>, border dashed để giữ vị trí cũ.</td><td><code>opacity:.7</code>, <code>border-style:dashed</code>, <code>border-color:var(--border)</code>, <code>border-radius:var(--radius-xs)</code>, <code>cursor:grabbing</code>, body lock bằng <code>overflow:hidden</code>.</td><td>Kéo job <code>JO-2026-1187</code> giữa các máy <code>Haas VF-2SS</code> và <code>Mazak INTEGREX i-500</code> không làm trang cuộn ngoài ý muốn.</td></tr>
+          <tr><td><strong>Drop zones</strong></td><td>Zone hợp lệ dùng dashed border theo brand; zone không hợp lệ dùng red semantic; insertion indicator nằm giữa items và chỉ hiện khi vị trí drop đã xác định.</td><td><code>border-style:dashed</code>, <code>border-color:var(--brand-2)</code>; invalid dùng <code>var(--red)</code>; hover layer dùng <code>var(--opacity-hover)</code>.</td><td>Block <code>chart-gauge</code> chỉ được drop vào zone <code>main</code> hoặc <code>kpi-bar</code>; sidebar không hợp lệ báo ngay.</td></tr>
+          <tr><td><strong>Animation FLIP</strong></td><td>Items bị đẩy animate bằng <code>var(--duration-normal)</code> và <code>var(--ease-in-out)</code>; item được thả snap bằng <code>var(--duration-fast)</code> và <code>var(--ease-spring)</code>; reduced motion tắt animation.</td><td><code>transform</code> only, không animate layout property; reduced motion dùng teleport trực tiếp.</td><td>Planner reschedule job cho <code>DMG MORI NLX 2500</code> không gây layout shift trong Gantt.</td></tr>
+          <tr><td><strong>Multi-item drag</strong></td><td>Chọn nhiều bằng checkbox hoặc Ctrl+click; ghost hiển thị count badge <code>+N</code>; tất cả selected items animate đồng thời và giữ thứ tự ban đầu.</td><td>Selection layer dùng <code>var(--opacity-selected)</code>; badge dùng <code>var(--radius-full)</code>.</td><td>Planner kéo ba lệnh <code>WO-2026-019</code>, <code>WO-2026-020</code>, <code>WO-2026-021</code> sang ca đêm.</td></tr>
+          <tr><td><strong>Cross-zone rules</strong></td><td>Kanban respect WIP limit; Gantt snap theo time grid; Template editor chỉ cho phép block có type nằm trong <code>allowedBlocks</code>; vượt WIP phải mở confirm dialog.</td><td>Warning dùng <code>var(--amber)</code>; confirm dùng modal <code>size=sm</code>, <code>persistent:false</code>; xem <a href="#modal-rules">Section 23</a>.</td><td>Column "Đang kiểm" đạt WIP limit cho <code>AERO-BRK-2024</code>, drop hiển thị warning và yêu cầu xác nhận.</td></tr>
+          <tr><td><strong>Accessibility</strong></td><td>ARIA live region thông báo nhấc, di chuyển, thả, hủy; keyboard thay thế đầy đủ mouse/touch; drag mode không xung đột table shortcut vì Space chỉ dùng khi item focus trong drag context.</td><td><code>aria-grabbed</code>, <code>aria-dropeffect</code>, <code>role="application"</code> chỉ dùng trong vùng editor phức tạp.</td><td>Screen reader đọc: <code>{ vi: "Đã di chuyển NCR-2026-041 đến vị trí 3 trong 8.", en: "Moved NCR-2026-041 to position 3 of 8." }</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Dùng keyboard DnD hoàn chỉnh cho <code>kanban-board</code>, <code>gantt-chart</code>, <code>template-editor</code>. Mọi drop phải validate bằng schema từ <a href="#block-schema">Section 29</a> trước khi mutate UI.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không chỉ hỗ trợ mouse drag. Không đổi trạng thái thật trước khi rule WIP, permission và allowed zone đã pass.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-cyan">Pattern 2</span>Select / Dropdown State Matrix</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>State</th><th>Trigger</th><th>Visual / Interaction</th><th>Token / ARIA</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>default</td><td>Field chưa focus</td><td>Hiển thị placeholder hoặc giá trị đã chọn; không mở panel.</td><td><code>border:var(--border)</code>, <code>background:var(--bg-input)</code>, placeholder <code>var(--text-tertiary)</code>.</td><td>Chọn máy mặc định cho <code>Haas VF-2SS</code>.</td></tr>
+          <tr><td>focus</td><td>Tab hoặc click</td><td>Mở dropdown xuống, tự flip lên khi không đủ viewport phía dưới.</td><td><code>outline:var(--focus-ring)</code>, <code>outline-offset:var(--focus-offset)</code>.</td><td>QA focus vào field "Phân loại lỗi".</td></tr>
+          <tr><td>open</td><td>Click hoặc ArrowDown</td><td>Panel scroll nội bộ, không đẩy layout; active option được giữ khi filter.</td><td><code>max-height:calc(var(--space-12) * 3)</code>, <code>box-shadow:var(--shadow-md)</code>, <code>z-index:var(--z-dropdown)</code>.</td><td>Danh sách part number lọc còn <code>AERO-BRK-2024</code>.</td></tr>
+          <tr><td>option-hover</td><td>Pointer hover hoặc keyboard active</td><td>State layer nhẹ, không đổi selected value cho đến Enter/click.</td><td>Layer opacity <code>var(--opacity-hover)</code>.</td><td>Hover supplier <code>ACME Precision</code>.</td></tr>
+          <tr><td>option-selected</td><td>Enter/click chọn option</td><td>Check icon trailing, font-weight mạnh hơn, panel đóng trừ multi-select.</td><td>Layer opacity <code>var(--opacity-pressed)</code>, <code>aria-selected="true"</code>.</td><td>Chọn vật tư <code>MAT-AL6061-T6</code>.</td></tr>
+          <tr><td>multi-select</td><td>Field cấu hình nhiều giá trị</td><td>Render removable chips trong input, tối đa ba chip hiển thị, phần còn lại là <code>+N thêm</code>.</td><td>Chip dùng <code>var(--radius-full)</code>, remove button có accessible name.</td><td>Filter NCR theo "Open", "Critical", "Customer complaint".</td></tr>
+          <tr><td>loading-options</td><td>Async search đang gọi API</td><td>Spinner theo text body, căn giữa panel, không xóa query người dùng đang gõ.</td><td><code>aria-busy="true"</code>, text <code>{ vi: "Đang tải...", en: "Loading..." }</code>.</td><td>Tìm customer khi tạo <code>SO-2026-001</code>.</td></tr>
+          <tr><td>empty-options</td><td>Không có kết quả</td><td>Text centered, giữ nút create-new nếu field cho phép tạo.</td><td><code>role="status"</code>, text <code>{ vi: "Không tìm thấy", en: "No results found" }</code>.</td><td>Không tìm thấy tooling cho máy <code>Mazak INTEGREX i-500</code>.</td></tr>
+          <tr><td>disabled</td><td>Permission hoặc workflow lock</td><td>Không mở dropdown, giữ value readable nếu cần đối chiếu.</td><td><code>opacity:var(--opacity-disabled)</code>, <code>aria-disabled="true"</code>, cursor not-allowed.</td><td>Không cho đổi trạng thái lot đã release.</td></tr>
+          <tr><td>error</td><td>Validation fail</td><td>Border error, helper text bên dưới, focus vào field đầu tiên khi submit fail.</td><td><code>border-color:var(--red)</code>, <code>aria-invalid="true"</code>, <code>aria-describedby</code>.</td><td>Chưa chọn reason code khi reject CAPA.</td></tr>
+          <tr><td>type-ahead</td><td>User gõ khi panel mở</td><td>Debounce <code>150ms</code>, highlight matching text, Home/End nhảy đầu/cuối list.</td><td>Keyboard theo <a href="#keyboard-rules">Section 26</a>; không dùng onChange validation của <a href="#form-rules">Section 21</a>.</td><td>Gõ "Nguyễn" để tìm <code>Nguyễn Văn Thành</code>.</td></tr>
+          <tr><td>clear / create-new</td><td>Field clearable hoặc createable</td><td>Clear icon nằm trailing; create option nằm cuối list và xác nhận bằng Enter.</td><td>Clear button <code>aria-label="{ vi: 'Xóa lựa chọn', en: 'Clear selection' }"</code>.</td><td>Tạo nhanh reason code "Tool wear abnormal".</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Dropdown filter trong bảng phải dùng cùng z-index, keyboard và empty/loading behavior với select trong form để khớp <a href="#table-rules">Section 22</a>.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không validate select onChange nếu user vẫn đang gõ type-ahead. Không để disabled field làm mất khả năng đọc dữ liệu quan trọng.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-indigo">Pattern 3</span>Tooltip Component Spec</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Spec bắt buộc</th><th>Token/CSS</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Trigger</td><td>Hover delay <code>200ms</code> mặc định; focus hiển thị ngay; icon-only action dùng delay <code>500ms</code> để khớp navigation tooltip.</td><td><code>var(--duration-fast)</code>, <code>var(--duration-slow)</code>.</td><td>Tooltip giải thích chỉ số <code>Cpk 1.67</code>.</td></tr>
+          <tr><td>Position</td><td>Auto ưu tiên top; flip bottom/left/right khi bị cắt bởi viewport; không che trigger.</td><td><code>z-index:var(--z-tooltip)</code>.</td><td>Tooltip cho biểu đồ OEE <code>93.4%</code> không bị cắt ở mép chart.</td></tr>
+          <tr><td>Arrow</td><td>Tam giác đều bằng kích thước <code>var(--radius-md)</code>, fill trùng background tooltip, căn giữa theo cạnh target.</td><td><code>background:var(--bg-elevated)</code>.</td><td>Tooltip warning cho calibration due soon.</td></tr>
+          <tr><td>Kích thước</td><td>Max width <code>calc(var(--space-12) * 3 + var(--space-8))</code>, padding <code>var(--space-2) var(--space-3)</code>, word-wrap.</td><td><code>border-radius:var(--radius-sm)</code>, <code>box-shadow:var(--shadow-md)</code>.</td><td>Hiển thị đầy đủ "AERO-BRK-2024 - bracket hàng không".</td></tr>
+          <tr><td>Typography</td><td>Caption role, color primary, line-height đủ đọc tiếng Việt có dấu.</td><td><code>font-size:var(--text-caption)</code>, <code>color:var(--text-primary)</code>.</td><td>Chuỗi <code>{ vi: "Đã hiệu chuẩn bởi Trần Thị Mai", en: "Calibrated by Tran Thi Mai" }</code>.</td></tr>
+          <tr><td>Dismiss</td><td>Mouse-leave grace <code>100ms</code>, scroll, Escape, blur; interactive tooltip giữ mở khi cursor ở trong và grace <code>300ms</code>.</td><td><code>transition:opacity var(--duration-fast) var(--ease-out)</code>.</td><td>Tooltip chứa link mở hồ sơ gauge.</td></tr>
+          <tr><td>Truncation</td><td>Chỉ hiện khi text thật sự overflow ellipsis; nội dung tooltip là full text gốc, không phải bản rút gọn.</td><td>Kiểm tra <code>scrollWidth &gt; clientWidth</code> trước khi mount.</td><td>Tên khách hàng dài trong table không spam tooltip.</td></tr>
+          <tr><td>Mobile</td><td>Long-press hiển thị; tap bên ngoài dismiss; không có thông tin nào chỉ phụ thuộc hover.</td><td>Touch target theo density hiện tại.</td><td>Operator xem tooltip trạng thái máy trên tablet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Dùng tooltip cho giải thích ngắn hoặc full text bị truncate; dùng modal/drawer nếu nội dung cần thao tác phức tạp.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không dùng tooltip để chứa lỗi form bắt buộc, warning regulatory hoặc nội dung phải đọc trước khi ký.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-green">Pattern 4</span>Auto-save, Dirty State và Unsaved Changes Guard</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Rule</th><th>Spec chính xác</th><th>Token / ARIA</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Trigger</td><td>Auto-save debounce <code>2000ms</code> sau keystroke cuối hoặc on blur; Ctrl+S gọi save ngay và reset debounce.</td><td><code>var(--duration-slower)</code> cho indicator transition; xem <a href="#keyboard-rules">Section 26</a>.</td><td>QA sửa root cause cho <code>CAPA-2026-014</code>.</td></tr>
+          <tr><td>Indicator</td><td>Nằm top-right form header: saving, saved, error, offline. Không chiếm chỗ làm dịch layout.</td><td><code>role="status"</code>; saving text <code>{ vi: "Đang lưu...", en: "Saving..." }</code>.</td><td>Form ECO báo "Đã lưu lúc 14:35".</td></tr>
+          <tr><td>Dirty tracking</td><td>Deep compare current values với snapshot save gần nhất; field đổi có left border semantic warning.</td><td><code>border-left:var(--radius-xs) solid var(--amber)</code>.</td><td>Field "Material" đổi từ <code>MAT-AL6061-T6</code> sang <code>MAT-SS316L</code>.</td></tr>
+          <tr><td>Conflict</td><td>Server trả <code>409</code> thì inline alert mô tả user/time và mở lựa chọn diff nếu user cần xem.</td><td>Alert dùng <code>var(--color-warning-50)</code> hoặc dark equivalent qua token.</td><td><code>{ vi: "Bản ghi này đã được chỉnh sửa bởi Nguyễn Văn Thành lúc 14:32.", en: "This record was edited by Nguyen Van Thanh at 14:32." }</code></td></tr>
+          <tr><td>Offline queue</td><td>Thay đổi được queue cục bộ với timestamp, recordId, version; khi online retry theo thứ tự tạo.</td><td>Cloud-off icon dùng <code>var(--text-tertiary)</code>.</td><td>Tablet mất mạng khi nhập inspection của <code>LOT-AL6061-2026-04</code>.</td></tr>
+          <tr><td>Navigation guard</td><td>Route change, browser back, Escape/backdrop trong modal đều kiểm dirty trước; modal dirty dùng confirm <code>size=sm</code>.</td><td><code>persistent:true</code> theo <a href="#modal-rules">Section 23</a>; border flash <code>var(--red)</code> trong <code>200ms</code>.</td><td>Form NCR chưa lưu không bị đóng khi bấm backdrop.</td></tr>
+          <tr><td>Buttons</td><td>Confirm dirty dùng Secondary "Hủy thay đổi" và Primary "Tiếp tục chỉnh sửa"; destructive wording phải rõ hậu quả.</td><td>Labels: <code>{ vi: "Tiếp tục chỉnh sửa", en: "Keep editing" }</code>.</td><td>Planner tránh mất thay đổi lịch máy.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Auto-save chỉ báo trạng thái nhẹ, nhưng conflict phải có diff rõ. Form regulated vẫn cần explicit submit/sign theo Section 15 khi áp dụng 21 CFR Part 11.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không đóng modal dirty bằng Escape. Không dùng toast success thay cho indicator save trong form đang mở.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-amber">Pattern 5</span>Optimistic Updates</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Giai đoạn</th><th>Spec bắt buộc</th><th>Token / Feedback</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>User action</td><td>Cập nhật UI ngay sang state mới, disable action button, hiển thị spinner cạnh status; lưu snapshot rollback.</td><td><code>aria-busy="true"</code>, spinner size theo <code>var(--text-caption)</code>.</td><td>Click "Phê duyệt" cho <code>FAI-2026-009</code>.</td></tr>
+          <tr><td>Server success</td><td>Nếu response thành công trong <code>3000ms</code>, bỏ spinner, flash success border <code>500ms</code>, toast success theo Section 30.</td><td><code>var(--green)</code>, <code>var(--duration-slower)</code>, <code>role="status"</code>.</td><td>Status badge đổi sang <code>{ vi: "Đã phê duyệt", en: "Approved" }</code>.</td></tr>
+          <tr><td>Server failure</td><td>Rollback UI về snapshot cũ bằng <code>var(--duration-normal)</code>, hiện error toast có action retry.</td><td>Toast error <code>role="alert"</code>, action label <code>{ vi: "Thử lại", en: "Retry" }</code>.</td><td>Mạng fail khi release <code>WO-2026-044</code>.</td></tr>
+          <tr><td>Conflict</td><td>Với <code>409</code>, không retry mù; hiển thị inline alert trong record và mời tải bản mới nhất hoặc mở diff.</td><td>Warning semantic; link đến Pattern 6 conflict resolution.</td><td>Nguyễn Văn Thành đã đổi cùng inspection result.</td></tr>
+          <tr><td>Phạm vi</td><td>Chỉ dùng cho status transition đơn lẻ hoặc field edit có rollback an toàn. Không dùng cho batch operation, delete, e-signature, record release có regulatory impact.</td><td>Destructive action phải dùng confirm theo <a href="#modal-rules">Section 23</a>.</td><td>Không optimistic delete chứng chỉ vật liệu.</td></tr>
+          <tr><td>Audit</td><td>Optimistic state không ghi audit trail cho đến khi server xác nhận; UI phải phân biệt pending với committed.</td><td>Pending badge dùng <code>var(--amber)</code>.</td><td>Approval pending không xuất hiện trong audit trail trước server success.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Dùng optimistic update cho hành động nhanh, reversible và ít rủi ro như mark reviewed, assign owner, đổi priority.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không optimistic cho delete, batch approve, e-signature hoặc thay đổi làm phát hành hồ sơ regulated.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-purple">Pattern 6</span>Concurrent Editing Conflict Resolution</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Spec bắt buộc</th><th>Token / ARIA</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Presence</td><td>Khi user khác mở cùng record, header hiển thị avatar badge, tên rút gọn và trạng thái đang chỉnh sửa.</td><td>Badge dùng <code>var(--radius-full)</code>, text secondary.</td><td><code>{ vi: "Nguyễn V.T cũng đang chỉnh sửa", en: "Nguyen V.T is also editing" }</code>.</td></tr>
+          <tr><td>Soft lock</td><td>Không hard-lock mặc định; cho parallel edit, detect conflict khi save bằng version hoặc updatedAt.</td><td>Record context lưu <code>recordVersion</code>.</td><td>QA và Engineering cùng sửa NCR.</td></tr>
+          <tr><td>Save conflict</td><td>Server trả <code>409</code> mở modal <code>size=lg</code> split-pane diff: trái thay đổi của bạn, phải phiên bản server.</td><td><code>z-index:var(--z-modal)</code>, focus trap theo <a href="#modal-rules">Section 23</a>.</td><td>Trái: root cause mới; phải: server đã thêm containment action.</td></tr>
+          <tr><td>Highlight</td><td>Field chỉ bạn đổi dùng warning surface; field server đổi dùng info surface; field cả hai cùng đổi dùng error surface ở cả hai bên.</td><td>Warning <code>var(--amber)</code>, info <code>var(--brand-2)</code>, error <code>var(--red)</code>.</td><td>Hai người cùng đổi field "Disposition".</td></tr>
+          <tr><td>Actions</td><td>Modal có ba action: ghi đè bằng thay đổi của tôi, tải phiên bản server, gộp từng field. Action destructive phải được xác nhận.</td><td>Labels có i18n; primary chỉ đặt vào action an toàn nhất theo context.</td><td>CAPA regulated mặc định ưu tiên "Gộp từng field".</td></tr>
+          <tr><td>Merge mode</td><td>Mỗi field conflict có radio toggle "của tôi" hoặc "của họ"; preview kết quả trước khi submit merge.</td><td><code>role="radiogroup"</code>, error summary nếu thiếu quyết định.</td><td>Gộp field corrective action của Trần Thị Mai với due date server.</td></tr>
+          <tr><td>Field lock tùy chọn</td><td>Regulated records có thể show lock icon khi user khác focus field; unlock sau blur hoặc timeout <code>30000ms</code>.</td><td>Lock icon dùng <code>var(--text-tertiary)</code>; tooltip theo Pattern 3.</td><td>Chữ ký điện tử không cho hai người edit cùng intent.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Luôn cho user xem diff trước khi ghi đè server. Conflict modal phải có keyboard flow đầy đủ và mô tả rõ changedBy/time.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không silently overwrite. Không dùng toast duy nhất cho conflict vì user cần quyết định từng field.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-blue">Pattern 7</span>Deep-linking &amp; URL Structure</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Spec bắt buộc</th><th>Token / API</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Pattern</td><td><code>/{module}/{view}/{recordId}?tab={tabKey}&amp;filter={encoded}&amp;page={n}&amp;sort={col:dir}</code>. Query keys dùng English ổn định.</td><td>Route parser không phụ thuộc label tiếng Việt.</td><td><code>/sales/orders/SO-2026-001?tab=quality</code></td></tr>
+          <tr><td>Examples</td><td>Tối thiểu ba URL shareable cho record, list và machine view.</td><td>RecordId giữ nguyên case.</td><td><code>/quality/ncr?filter=status:open&amp;sort=createdAt:desc&amp;page=2</code><br><code>/production/machines/Haas-VF-2SS?tab=oee&amp;filter=shift:night</code><br><code>/inventory/materials/MAT-AL6061-T6?tab=traceability</code></td></tr>
+          <tr><td>URL updates</td><td>Tab/filter/sort/page dùng <code>replaceState</code>; module switch và record open dùng <code>pushState</code>.</td><td>Không làm back button đi qua từng tweak filter.</td><td>Đổi sort trong NCR list không tạo history entry mới.</td></tr>
+          <tr><td>Restore state</td><td>Paste URL vào session mới phải restore tab, filter, page, sort và selected record; localStorage chỉ là fallback.</td><td>Active tab query ưu tiên hơn localStorage.</td><td>Mở link quality tab của <code>SO-2026-001</code> từ email.</td></tr>
+          <tr><td>Invalid / 404</td><td>Không redirect âm thầm; hiển thị empty state "Không tìm thấy bản ghi" với link về list view.</td><td>Text <code>{ vi: "Không tìm thấy bản ghi", en: "Record not found" }</code>; link focus dùng <code>var(--focus-ring)</code>.</td><td>Record NCR bị archive nhưng link cũ vẫn mở thông báo rõ.</td></tr>
+          <tr><td>Security</td><td>URL không chứa token, password, ITAR payload hoặc dữ liệu nhạy cảm; filter encoded chỉ chứa key/value được whitelist.</td><td>Unauthorized record dùng restricted state với text <code>var(--text-tertiary)</code>, không expose field.</td><td>ITAR drawing không xuất hiện trong query string.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Mọi list/report quan trọng phải shareable bằng URL và khôi phục state chính xác, đặc biệt khi gửi link giữa QA, planner và production.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không dùng back button để undo từng filter tweak. Không lưu thông tin mật trong query.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-teal">Pattern 8</span>Comment / Discussion Thread cho NCR, CAPA, ECO</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Spec bắt buộc</th><th>Token / ARIA</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Comment card</td><td>Avatar circle kích thước <code>var(--space-7)</code>, tên + role + relative timestamp, body text, menu edit/delete theo permission.</td><td><code>role="article"</code>, <code>aria-label</code> gồm author/time.</td><td>Bình luận của <code>Trần Thị Mai - QA Manager</code> trên <code>NCR-2026-041</code>.</td></tr>
+          <tr><td>Reply threading</td><td>Nested đúng một cấp; reply indent bằng <code>var(--space-7)</code>; không cho nested sâu hơn để tránh mất scan rhythm.</td><td>Thread container dùng <code>aria-labelledby</code>.</td><td>Engineering trả lời trực tiếp containment action.</td></tr>
+          <tr><td>@mention</td><td>Gõ @ mở autocomplete debounce <code>200ms</code>; mention highlight bằng brand state layer và font weight medium.</td><td><code>color:var(--brand-2)</code>, layer <code>var(--opacity-selected)</code>.</td><td><code>@Nguyễn Văn Thành</code> nhận notification về fixture issue.</td></tr>
+          <tr><td>Attachment</td><td>File chip có icon, filename, size semantic, image preview, document download; upload dùng Pattern 11.</td><td>Chip radius <code>var(--radius-lg)</code>; icon text gap <code>var(--gap-sm)</code>.</td><td>Đính kèm ảnh lỗi burr trên <code>AERO-BRK-2024</code>.</td></tr>
+          <tr><td>Resolved</td><td>Thread resolved giảm emphasis và strikethrough title ngắn; vẫn đọc được nội dung và có thể reopen theo permission.</td><td><code>opacity:var(--opacity-disabled)</code>; status label i18n.</td><td>CAPA comment đã xử lý được đánh dấu resolved.</td></tr>
+          <tr><td>Rich text</td><td>Cho bold, italic, inline code, code block, link. Không full WYSIWYG editor trong thread.</td><td>Sanitize HTML trước khi render.</td><td>Quote field <code>measuredDiameter</code> khi giải thích sai lệch.</td></tr>
+          <tr><td>Empty state</td><td>Hiển thị câu bắt đầu bình luận đầu tiên và CTA mở editor nếu user có quyền.</td><td><code>{ vi: "Chưa có thảo luận. Bắt đầu bằng cách viết bình luận đầu tiên.", en: "No discussion yet. Start by writing the first comment." }</code>.</td><td>ECO mới tạo chưa có discussion.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Comment thread phải giữ audit-friendly metadata: author, role, timestamp, edit history và resolved state.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không dùng comment làm workflow approval chính thức. Approval vẫn đi qua <code>approval-buttons</code> và e-signature khi cần.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-pink">Pattern 9</span>Search Results UX — Global Search Ctrl+K</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Spec bắt buộc</th><th>Token / Keyboard</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Trigger</td><td><code>Ctrl+K</code> mở global search; <code>Ctrl+/</code> mở command palette; hai overlay không mở đồng thời.</td><td>Theo <a href="#keyboard-rules">Section 26</a>; overlay dùng <code>var(--z-modal)</code>.</td><td>Tìm nhanh <code>SO-2026-001</code>.</td></tr>
+          <tr><td>Input</td><td>Focus tự động vào ô search; query debounce <code>150ms</code>; Escape đóng và trả focus về trigger.</td><td><code>var(--focus-ring)</code>, <code>aria-label="{ vi: 'Tìm kiếm toàn cục', en: 'Global search' }"</code>.</td><td>Gõ <code>AERO-BRK</code> để thấy sales order, job, NCR.</td></tr>
+          <tr><td>Grouping</td><td>Kết quả nhóm theo module: Sales, Production, Quality, Inventory, Documents; mỗi group có count và xem thêm.</td><td>Group heading dùng <code>var(--text-overline)</code>.</td><td>Quality hiển thị NCR/CAPA liên quan.</td></tr>
+          <tr><td>Result row</td><td>Mỗi row có icon type, title, subtitle, matched fragment, meta trạng thái và owner nếu có.</td><td>Hover layer <code>var(--opacity-hover)</code>, selected layer <code>var(--opacity-selected)</code>.</td><td><code>AERO-BRK-2024</code> subtitle "Part number - Customer Aerospace".</td></tr>
+          <tr><td>Keyboard</td><td>Arrow navigate, Enter mở record, Cmd/Ctrl+Enter mở tab mới nếu browser hỗ trợ, Home/End nhảy đầu/cuối, Escape đóng.</td><td><code>aria-activedescendant</code> cho active result.</td><td>Planner mở ngay <code>WO-2026-044</code>.</td></tr>
+          <tr><td>No result</td><td>Hiển thị empty state có suggestion sửa query và link advanced search.</td><td><code>{ vi: "Không tìm thấy kết quả phù hợp", en: "No matching results" }</code>.</td><td>Không tìm thấy supplier cũ.</td></tr>
+          <tr><td>Permission</td><td>Không render kết quả user không có quyền; restricted record có thể hiện title masked nếu policy cho phép.</td><td>Unauthorized state không expose field nhạy cảm.</td><td>ITAR drawing không hiện với user thường.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Search phải mở record bằng deep link chuẩn của Pattern 7 và giữ keyboard model nhất quán với Section 26.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không trả dữ liệu vượt quyền rồi mask ở client. Filter permission phải xảy ra trước khi response tới UI.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-dark">Pattern 10</span>Wizard / Stepper Behavioral Rules</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Spec bắt buộc</th><th>Token / ARIA</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Structure</td><td>Stepper có label, status và optional SLA; step current là duy nhất; completed không editable trừ khi workflow cho phép quay lại.</td><td><code>role="list"</code>, mỗi step <code>role="listitem"</code>.</td><td>Wizard tạo shipment cho <code>SO-2026-001</code>.</td></tr>
+          <tr><td>Navigation</td><td>Next validate step hiện tại; Back không validate; direct click step sau bị chặn nếu required step trước chưa pass.</td><td>Error summary link tới field đầu tiên theo <a href="#form-rules">Section 21</a>.</td><td>Không cho sang bước carrier nếu thiếu package weight.</td></tr>
+          <tr><td>Save draft</td><td>Wizard dài phải có draft save hoặc auto-save; dirty dot hiển thị trên step đã thay đổi.</td><td>Dirty dùng <code>var(--amber)</code>; indicator theo Pattern 4.</td><td>NPI intake lưu draft sau khi nhập customer drawing.</td></tr>
+          <tr><td>Progress</td><td>Completed dùng success, current dùng brand, pending dùng neutral, error step dùng red; không dùng màu đơn lẻ, luôn có icon/text.</td><td><code>var(--green)</code>, <code>var(--brand-2)</code>, <code>var(--red)</code>.</td><td>CAPA 8D bước D4 overdue hiển thị icon cảnh báo.</td></tr>
+          <tr><td>Modal wizard</td><td>Wizard trong modal dùng size <code>lg</code> trở lên; mobile fullscreen; Escape tuân thủ dirty guard.</td><td>Theo <a href="#modal-rules">Section 23</a>.</td><td>Quick create customer contact nhiều bước.</td></tr>
+          <tr><td>Labels</td><td>Step label luôn i18n và ngắn; description có thể dài nhưng không thay label.</td><td><code>{ vi: "Đóng gói", en: "Packaging" }</code>.</td><td>Shipment wizard step "Chứng từ".</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Dùng wizard cho luồng tuyến tính có validation theo bước, như shipment, NPI intake, onboarding hoặc CAPA closure.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không dùng wizard cho form ngắn. Không ẩn lỗi ở step cũ mà không có badge/error summary.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-amber">Pattern 11</span>File Upload Drag-Drop Zone</div>
+    <div class="card-body">
+      <table class="spec-table">
+        <thead><tr><th>Quy tắc</th><th>Spec bắt buộc</th><th>Token / ARIA</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td>Zone default</td><td>Drop zone có border dashed, icon upload, headline, helper text, button browse; click zone mở file picker.</td><td><code>border-style:dashed</code>, <code>border-color:var(--border)</code>, radius <code>var(--radius-2xl)</code>.</td><td>Upload chứng chỉ vật liệu cho <code>MAT-AL6061-T6</code>.</td></tr>
+          <tr><td>Drag hover</td><td>Khi file kéo vào, zone chuyển brand border và surface nhẹ; nếu file type không hợp lệ chuyển error state ngay.</td><td>Valid dùng <code>var(--brand-2)</code>, invalid dùng <code>var(--red)</code>.</td><td>Kéo file ảnh lỗi vào NCR; kéo file executable bị từ chối.</td></tr>
+          <tr><td>Validation</td><td>Validate type, size, maxFiles, duplicate filename và virus scan state; lỗi hiển thị inline theo từng file.</td><td><code>aria-invalid</code> trên item lỗi; text error dùng <code>var(--red)</code>.</td><td>Ảnh defect vượt giới hạn cấu hình bị báo trước upload.</td></tr>
+          <tr><td>Progress</td><td>Mỗi file có progress bar, retry, cancel; upload fail không xóa item để user retry.</td><td><code>role="progressbar"</code>, <code>aria-valuenow</code>, progress color <code>var(--brand-2)</code>.</td><td>Upload ảnh burr từ tablet xưởng mạng yếu.</td></tr>
+          <tr><td>Preview</td><td>Image có thumbnail; PDF/document có icon + filename + size; click mở preview nếu user có quyền.</td><td>Thumbnail radius <code>var(--radius-lg)</code>, shadow <code>var(--shadow-xs)</code>.</td><td>Xem preview bản vẽ <code>DWG-AERO-BRK-2024</code>.</td></tr>
+          <tr><td>Accessibility</td><td>Drop zone cũng là button keyboard; Enter/Space mở picker; paste clipboard image được hỗ trợ khi focus trong zone.</td><td><code>role="button"</code>, <code>tabindex="0"</code>, live region cho upload status.</td><td>QA paste ảnh microscope vào evidence vault.</td></tr>
+          <tr><td>Security</td><td>Không trust extension; server sniff MIME, scan malware, strip EXIF nhạy cảm nếu policy yêu cầu.</td><td>Restricted file hiển thị lock state và tooltip theo Pattern 3.</td><td>Ảnh inspection chứa GPS metadata bị strip trước lưu.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="info-box info-box-green"><strong>DO</strong>Upload evidence phải giữ trạng thái từng file, hỗ trợ retry và liên kết record rõ ràng bằng <code>recordType</code>/<code>recordId</code>.</div>
+    <div class="info-box info-box-red"><strong>DON'T</strong>Không chỉ hỗ trợ drag-drop. Luôn có browse button và keyboard path tương đương.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Interaction Runtime Contract — dùng chung cho 11 pattern</div>
+    <div class="card-body">
+      <div class="code-block">{
+  "sectionId": "interaction-patterns",
+  "version": "v4.3-p2",
+  "i18nRequired": true,
+  "labels": {
+    "saving": { "vi": "Đang lưu...", "en": "Saving..." },
+    "saved": { "vi": "Đã lưu", "en": "Saved" },
+    "retry": { "vi": "Thử lại", "en": "Retry" },
+    "recordNotFound": { "vi": "Không tìm thấy bản ghi", "en": "Record not found" }
+  },
+  "events": [
+    "drag:start",
+    "drag:move",
+    "drag:drop",
+    "form:autosave",
+    "record:conflict",
+    "search:open",
+    "upload:progress"
+  ],
+  "tokenDependencies": [
+    "--focus-ring",
+    "--bg-input",
+    "--bg-elevated",
+    "--shadow-md",
+    "--z-dropdown",
+    "--z-tooltip",
+    "--z-modal",
+    "--duration-fast",
+    "--duration-normal",
+    "--ease-spring",
+    "--opacity-disabled"
+  ],
+  "doNotUseFor": [
+    "delete optimistic update",
+    "batch approval optimistic update",
+    "hover-only mobile information",
+    "client-side permission filtering only"
+  ]
+}</div>
+    </div>
+  </div>
+</section>

@@ -49,8 +49,19 @@ final class DataSchemaService
         $relationMap = $this->readRelationMapLight();
         $schemaLibrary = $this->readJson($this->registryPath('schema-library'));
         $variableLibrary = $this->readJson($this->configDir . '/variable_library.json');
-        $manifest = $this->readJson($this->registryPath('schema-studio-enterprise-manifest'));
-        $diagnostics = $this->readJson($this->registryPath('schema-studio-diagnostics'));
+        $systemContractManifest = $this->readJson($this->registryPath('system-contract-manifest'));
+        $systemContractDiagnostics = $this->readJson($this->registryPath('system-contract-diagnostics'));
+        $systemContractRuntimeProjections = $this->readJson($this->registryPath('system-contract-runtime-projections'));
+        $systemContractRegistryContracts = $this->readJson($this->registryPath('system-contract-registry-contracts'));
+        $schemaStudioManifest = $this->readJson($this->registryPath('schema-studio-enterprise-manifest'));
+        $schemaStudioDiagnostics = $this->readJson($this->registryPath('schema-studio-diagnostics'));
+        $manifest = $systemContractManifest !== [] ? $systemContractManifest : $schemaStudioManifest;
+        $diagnostics = $systemContractDiagnostics !== [] ? $systemContractDiagnostics : $schemaStudioDiagnostics;
+        $workspaceDesignPath = $this->schemaStudioPath('designs/workspace.json');
+        $workspaceBaselinePath = $this->schemaStudioPath('snapshots/workspace.baseline.json');
+        $workspaceDesignAvailable = is_file($workspaceDesignPath);
+        $workspaceBaselineAvailable = is_file($workspaceBaselinePath);
+        $workspaceDesignArtifactOrphaned = !$workspaceDesignAvailable && ($schemaStudioManifest !== [] || $schemaStudioDiagnostics !== []);
         $qualityReport = $this->readJson($this->registryPath('registry-quality-report'));
         $registryManifest = $this->readJson($this->registryPath('registry-manifest'));
         $schemaAuthority = $this->readJson($this->registryPath('schema-authority-summary'));
@@ -96,8 +107,12 @@ final class DataSchemaService
             'contract_events' => $contractEvents,
             'contract_deprecation_ledger' => $contractDeprecationLedger,
             'contract_migration_manifest' => $contractMigrationManifest,
-            'schema_diagnostics' => $diagnostics,
-            'schema_manifest' => $manifest,
+            'system_contract_runtime_projections' => $systemContractRuntimeProjections,
+            'system_contract_registry_contracts' => $systemContractRegistryContracts,
+            'system_contract_diagnostics' => $systemContractDiagnostics,
+            'system_contract_manifest' => $systemContractManifest,
+            'schema_diagnostics' => $schemaStudioDiagnostics,
+            'schema_manifest' => $schemaStudioManifest,
             'registry_manifest' => $registryManifest,
             'schema_authority' => $schemaAuthority,
             'migration_gap' => $migrationGap,
@@ -151,6 +166,10 @@ final class DataSchemaService
 
         $manifestSummary = (array)($manifest['summary'] ?? []);
         $diagnosticsSummary = (array)($diagnostics['summary'] ?? []);
+        $systemContractManifestSummary = (array)($systemContractManifest['summary'] ?? []);
+        $systemContractDiagnosticsSummary = (array)($systemContractDiagnostics['summary'] ?? []);
+        $schemaStudioManifestSummary = (array)($schemaStudioManifest['summary'] ?? []);
+        $schemaStudioDiagnosticsSummary = (array)($schemaStudioDiagnostics['summary'] ?? []);
         $qualitySummary = (array)($qualityReport['summary'] ?? []);
         $publishability = (array)($qualityReport['publishability'] ?? []);
         $registryCoverage = (array)($registryManifest['coverage'] ?? []);
@@ -219,28 +238,68 @@ final class DataSchemaService
                 'global_capability_gap_count' => (int)($globalCapabilityAudit['summary']['gap'] ?? 0),
                 'global_capability_blocking_gap_count' => (int)($globalCapabilityAudit['summary']['blocking_gap_count'] ?? 0),
                 'global_capability_conditional_extension_count' => (int)($globalCapabilityAudit['summary']['conditional_extension'] ?? 0),
+                'system_contract_table_count' => (int)($systemContractManifestSummary['tableCount'] ?? 0),
+                'system_contract_endpoint_count' => (int)($systemContractManifestSummary['endpointCount'] ?? 0),
+                'system_contract_workflow_count' => (int)($systemContractManifestSummary['workflowCount'] ?? 0),
+                'system_contract_critical_gap_count' => (int)($systemContractDiagnosticsSummary['criticalGapCount'] ?? $systemContractManifestSummary['criticalGapCount'] ?? 0),
+                'workspace_design_available' => $workspaceDesignAvailable,
+                'workspace_baseline_available' => $workspaceBaselineAvailable,
+                'workspace_design_artifact_orphaned' => $workspaceDesignArtifactOrphaned,
                 'release_gate_blocked' => !empty($operational['releaseGate']['blocking']),
             ],
             'artifacts' => [
-                'schema_studio_manifest' => [
-                    'generatedAt' => (string)($manifest['_meta']['generatedAt'] ?? ''),
+                'system_contract_registry' => [
+                    'generatedAt' => (string)($systemContractManifest['_meta']['generatedAt'] ?? ''),
+                    'authorityLayer' => (string)($systemContractManifest['_meta']['authorityLayer'] ?? ''),
+                    'source' => (string)($systemContractManifest['_meta']['source'] ?? ''),
                     'summary' => [
-                        'projectionCount' => (int)($manifestSummary['projectionCount'] ?? 0),
-                        'fieldCount' => (int)($manifestSummary['fieldCount'] ?? 0),
-                        'policyCount' => (int)($manifestSummary['policyCount'] ?? 0),
-                        'releaseCount' => (int)($manifestSummary['releaseCount'] ?? 0),
-                        'canonicalCoveragePercent' => (int)($manifestSummary['canonicalCoveragePercent'] ?? 0),
-                        'registrySyncScore' => (int)($manifestSummary['registrySyncScore'] ?? 0),
+                        'tableCount' => (int)($systemContractManifestSummary['tableCount'] ?? 0),
+                        'relationCount' => (int)($systemContractManifestSummary['relationCount'] ?? 0),
+                        'endpointCount' => (int)($systemContractManifestSummary['endpointCount'] ?? 0),
+                        'workflowCount' => (int)($systemContractManifestSummary['workflowCount'] ?? 0),
+                        'contractCount' => (int)($systemContractManifestSummary['contractCount'] ?? 0),
+                        'workflowBindingCoveragePercent' => (int)($systemContractManifestSummary['workflowBindingCoveragePercent'] ?? 0),
+                        'criticalGapCount' => (int)($systemContractDiagnosticsSummary['criticalGapCount'] ?? $systemContractManifestSummary['criticalGapCount'] ?? 0),
+                        'releaseReadinessScore' => (int)($systemContractManifestSummary['releaseReadinessScore'] ?? 0),
+                    ],
+                ],
+                'schema_studio_manifest' => [
+                    'generatedAt' => (string)($schemaStudioManifest['_meta']['generatedAt'] ?? ''),
+                    'sourceAvailable' => $workspaceDesignAvailable,
+                    'baselineAvailable' => $workspaceBaselineAvailable,
+                    'orphaned' => $workspaceDesignArtifactOrphaned,
+                    'authorityLayer' => 'design_workspace',
+                    'summary' => [
+                        'projectionCount' => (int)($schemaStudioManifestSummary['projectionCount'] ?? 0),
+                        'fieldCount' => (int)($schemaStudioManifestSummary['fieldCount'] ?? 0),
+                        'policyCount' => (int)($schemaStudioManifestSummary['policyCount'] ?? 0),
+                        'releaseCount' => (int)($schemaStudioManifestSummary['releaseCount'] ?? 0),
+                        'canonicalCoveragePercent' => (int)($schemaStudioManifestSummary['canonicalCoveragePercent'] ?? 0),
+                        'registrySyncScore' => (int)($schemaStudioManifestSummary['registrySyncScore'] ?? 0),
                     ],
                 ],
                 'diagnostics' => [
                     'generatedAt' => (string)($diagnostics['_meta']['generatedAt'] ?? ''),
+                    'authorityLayer' => (string)($diagnostics['_meta']['authorityLayer'] ?? ''),
                     'summary' => [
                         'graphDensityScore' => (int)($diagnosticsSummary['graphDensityScore'] ?? 0),
                         'metadataCompletenessPercent' => (int)($diagnosticsSummary['metadataCompletenessPercent'] ?? 0),
                         'workflowBindingCoveragePercent' => (int)($diagnosticsSummary['workflowBindingCoveragePercent'] ?? 0),
                         'blockerCount' => (int)($diagnosticsSummary['blockerCount'] ?? 0),
                         'hotspotCount' => (int)($diagnosticsSummary['hotspotCount'] ?? 0),
+                    ],
+                ],
+                'schema_studio_diagnostics' => [
+                    'generatedAt' => (string)($schemaStudioDiagnostics['_meta']['generatedAt'] ?? ''),
+                    'sourceAvailable' => $workspaceDesignAvailable,
+                    'baselineAvailable' => $workspaceBaselineAvailable,
+                    'orphaned' => $workspaceDesignArtifactOrphaned,
+                    'authorityLayer' => 'design_workspace',
+                    'summary' => [
+                        'tableCount' => (int)($schemaStudioDiagnosticsSummary['tableCount'] ?? 0),
+                        'workflowBindingCoveragePercent' => (int)($schemaStudioDiagnosticsSummary['workflowBindingCoveragePercent'] ?? 0),
+                        'blockerCount' => (int)($schemaStudioDiagnosticsSummary['blockerCount'] ?? 0),
+                        'hotspotCount' => (int)($schemaStudioDiagnosticsSummary['hotspotCount'] ?? 0),
                     ],
                 ],
                 'registry_quality' => [
@@ -681,6 +740,66 @@ final class DataSchemaService
                 'requiredForRelease' => true,
                 'dependencyPaths' => [],
             ],
+            'system_contract_runtime_projections' => [
+                'label' => 'System contract runtime projections',
+                'category' => 'authority',
+                'path' => $this->registryPath('system-contract-runtime-projections'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('relation-map'),
+                    $this->registryPath('endpoint-catalog'),
+                    $this->registryPath('workflow-library'),
+                    $this->registryPath('schema-authority-summary'),
+                    $this->registryPath('global-erp-mom-capability-audit'),
+                ],
+            ],
+            'system_contract_registry_contracts' => [
+                'label' => 'System contract registry contracts',
+                'category' => 'authority',
+                'path' => $this->registryPath('system-contract-registry-contracts'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('relation-map'),
+                    $this->registryPath('endpoint-catalog'),
+                    $this->registryPath('workflow-library'),
+                ],
+            ],
+            'system_contract_diagnostics' => [
+                'label' => 'System contract diagnostics',
+                'category' => 'authority',
+                'path' => $this->registryPath('system-contract-diagnostics'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('system-contract-runtime-projections'),
+                    $this->registryPath('system-contract-registry-contracts'),
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('relation-map'),
+                    $this->registryPath('endpoint-catalog'),
+                    $this->registryPath('workflow-library'),
+                    $this->registryPath('schema-authority-summary'),
+                    $this->registryPath('global-erp-mom-capability-audit'),
+                ],
+            ],
+            'system_contract_manifest' => [
+                'label' => 'System contract manifest',
+                'category' => 'authority',
+                'path' => $this->registryPath('system-contract-manifest'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('system-contract-runtime-projections'),
+                    $this->registryPath('system-contract-registry-contracts'),
+                    $this->registryPath('system-contract-diagnostics'),
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('endpoint-catalog'),
+                    $this->registryPath('workflow-library'),
+                ],
+            ],
             'contract_glossary' => [
                 'label' => 'Business contract glossary',
                 'category' => 'authority',
@@ -767,33 +886,26 @@ final class DataSchemaService
                 ],
             ],
             'schema_diagnostics' => [
-                'label' => 'Schema diagnostics',
-                'category' => 'authority',
+                'label' => 'Workspace design diagnostics',
+                'category' => 'design_workspace',
                 'path' => $this->registryPath('schema-studio-diagnostics'),
                 'targetAgeSeconds' => 14400,
-                'requiredForRelease' => true,
+                'requiredForRelease' => false,
                 'dependencyPaths' => [
-                    $this->registryPath('endpoint-catalog'),
-                    $this->registryPath('relation-map'),
-                    $this->registryPath('table-registry'),
-                    $this->registryPath('schema-library'),
-                    $this->configDir . '/variable_library.json',
                     $this->schemaStudioPath('designs/workspace.json'),
                     $this->schemaStudioPath('snapshots/workspace.baseline.json'),
                 ],
             ],
             'schema_manifest' => [
-                'label' => 'Schema enterprise manifest',
-                'category' => 'authority',
+                'label' => 'Workspace design enterprise manifest',
+                'category' => 'design_workspace',
                 'path' => $this->registryPath('schema-studio-enterprise-manifest'),
                 'targetAgeSeconds' => 14400,
-                'requiredForRelease' => true,
+                'requiredForRelease' => false,
                 'dependencyPaths' => [
-                    $this->registryPath('endpoint-catalog'),
-                    $this->registryPath('relation-map'),
-                    $this->registryPath('table-registry'),
-                    $this->registryPath('schema-library'),
-                    $this->configDir . '/variable_library.json',
+                    $this->registryPath('schema-studio-runtime-projections'),
+                    $this->registryPath('schema-studio-registry-contracts'),
+                    $this->registryPath('schema-studio-diagnostics'),
                     $this->schemaStudioPath('designs/workspace.json'),
                     $this->schemaStudioPath('snapshots/workspace.baseline.json'),
                 ],
@@ -945,6 +1057,7 @@ final class DataSchemaService
         $agingCount = 0;
         $staleCount = 0;
         $dependencyOutdatedCount = 0;
+        $dependencyMissingCount = 0;
         foreach ($items as $item) {
             $status = (string)($item['status'] ?? '');
             if ($status === 'missing') {
@@ -956,6 +1069,9 @@ final class DataSchemaService
             }
             if ((string)($item['dependencyStatus'] ?? '') === 'outdated') {
                 $dependencyOutdatedCount += 1;
+            }
+            if ((string)($item['dependencyStatus'] ?? '') === 'source_missing') {
+                $dependencyMissingCount += 1;
             }
         }
 
@@ -969,6 +1085,7 @@ final class DataSchemaService
                 'agingCount' => $agingCount,
                 'staleCount' => $staleCount,
                 'dependencyOutdatedCount' => $dependencyOutdatedCount,
+                'dependencyMissingCount' => $dependencyMissingCount,
                 'driftSeconds' => $driftSeconds,
                 'allArtifactDriftSeconds' => $allDriftSeconds,
                 'driftLabel' => $driftSeconds > 0 ? $this->humanDuration($driftSeconds) : '0s',
@@ -997,7 +1114,12 @@ final class DataSchemaService
         $ageSeconds = $basisTimestamp === null ? null : max(0, time() - $basisTimestamp);
         $latestDependencyTimestamp = null;
         $latestDependencyPath = '';
+        $missingDependencyPaths = [];
         foreach ($dependencyPaths as $dependencyPath) {
+            if (!is_file($dependencyPath)) {
+                $missingDependencyPaths[] = ltrim(str_replace($this->rootDir, '', $dependencyPath), '/');
+                continue;
+            }
             $dependencyTimestamp = array_key_exists($dependencyPath, $knownDependencyTimestamps)
                 ? $knownDependencyTimestamps[$dependencyPath]
                 : $this->artifactTimestampForPath($dependencyPath);
@@ -1014,7 +1136,7 @@ final class DataSchemaService
             : 0;
         $dependencyStatus = $dependencyPaths === []
             ? 'n/a'
-            : ($sourceDriftSeconds > self::ARTIFACT_DEPENDENCY_GRACE_SECONDS ? 'outdated' : 'aligned');
+            : ($missingDependencyPaths !== [] ? 'source_missing' : ($sourceDriftSeconds > self::ARTIFACT_DEPENDENCY_GRACE_SECONDS ? 'outdated' : 'aligned'));
 
         $status = 'missing';
         if ($exists) {
@@ -1040,6 +1162,8 @@ final class DataSchemaService
             'sizeBytes' => $sizeBytes,
             'sizeLabel' => $this->humanBytes($sizeBytes),
             'dependencyStatus' => $dependencyStatus,
+            'missingDependencyCount' => count($missingDependencyPaths),
+            'missingDependencyPaths' => array_slice($missingDependencyPaths, 0, 8),
             'sourceDriftSeconds' => $sourceDriftSeconds,
             'sourceDriftLabel' => $sourceDriftSeconds > 0 ? $this->humanDuration($sourceDriftSeconds) : '0s',
             'latestDependencyAt' => $latestDependencyTimestamp !== null ? gmdate('c', $latestDependencyTimestamp) : '',
@@ -1370,7 +1494,7 @@ final class DataSchemaService
                 'blocking' => true,
                 'title' => 'Derived artifacts lag behind their source documents',
                 'detail' => implode(', ', $labels),
-                'nextAction' => 'Re-run diagnose/compile so release artifacts catch up with newer registry and workspace inputs.',
+                'nextAction' => 'Regenerate the affected authority pipeline so release artifacts catch up with newer registry inputs.',
             ];
         }
 
@@ -2118,18 +2242,21 @@ final class DataSchemaService
                 'lastCompiledAt' => (string)($enterprise['last_compiled_at'] ?? ''),
                 'lastReleaseId' => (string)($enterprise['last_release_id'] ?? ''),
                 'lastReleaseAt' => (string)($enterprise['last_release_at'] ?? ''),
-                'designType' => 'workspace_design',
-                'authorityLayer' => 'design_workspace',
-                'authorityViewKind' => 'design_draft',
-                'source' => 'data/schema-studio/designs/workspace.json',
-                'schemaName' => 'public',
-                'databaseName' => 'mom',
-                'physicalDbSchema' => 'public',
-                'authoritySource' => 'data/schema-studio/designs/workspace.json',
-                'purpose' => 'Editable design draft for controlled schema design, baseline, diff, compiler, and release review. It is not the physical DB schema.',
-                'writePolicy' => 'editable_with_revision_guard',
-                'deletePolicy' => 'archive_or_replace_do_not_hard_delete',
-                'dataLossImpact' => 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.',
+                'designType' => (string)($meta['designType'] ?? 'workspace_design'),
+                'authorityLayer' => (string)($meta['authorityLayer'] ?? 'design_workspace'),
+                'authorityViewKind' => (string)($meta['authorityViewKind'] ?? 'design_draft'),
+                'authorityRole' => (string)($meta['authorityRole'] ?? 'non_authoritative_editing_surface'),
+                'source' => (string)($meta['source'] ?? 'data/schema-studio/designs/workspace.json'),
+                'schemaName' => (string)($meta['schemaName'] ?? 'public'),
+                'databaseName' => (string)($meta['databaseName'] ?? 'mom'),
+                'physicalDbSchema' => (string)($meta['physicalDbSchema'] ?? 'public'),
+                'runtimeAuthority' => (string)($meta['runtimeAuthority'] ?? 'system_contract_registry'),
+                'authoritySource' => (string)($meta['authoritySource'] ?? 'data/schema-studio/designs/workspace.json'),
+                'purpose' => (string)($meta['purpose'] ?? 'Editable design draft for controlled schema design, baseline, diff, compiler, and release review. It is not the physical DB schema.'),
+                'writePolicy' => (string)($meta['writePolicy'] ?? 'editable_with_revision_guard'),
+                'deletePolicy' => (string)($meta['deletePolicy'] ?? 'archive_or_replace_do_not_hard_delete'),
+                'dataLossImpact' => (string)($meta['dataLossImpact'] ?? 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.'),
+                'blankDraft' => !empty($meta['blankDraft']),
                 'canDelete' => false,
                 'readOnly' => false,
                 'editable' => true,
@@ -2373,7 +2500,9 @@ final class DataSchemaService
                 continue;
             }
             $qualityBlockers[] = [
-                'source' => 'schema_diagnostics',
+                'source' => (string)($diagnostics['_meta']['authorityLayer'] ?? '') === 'system_contract_registry'
+                    ? 'system_contract_diagnostics'
+                    : 'schema_diagnostics',
                 'severity' => (string)($blocker['severity'] ?? 'medium'),
                 'title' => (string)($blocker['title'] ?? 'diagnostic_blocker'),
                 'detail' => (string)($blocker['detail'] ?? ''),
@@ -2448,7 +2577,7 @@ final class DataSchemaService
                 'api_action' => 'schema_studio_load_registry',
                 'method' => 'POST',
                 'writes' => false,
-                'description' => 'Create a working schema document from the current registry and relation map.',
+                'description' => 'Create an editable workspace draft from the current registry and relation map. This does not change runtime authority.',
             ],
             [
                 'id' => 'reverse_engineer',
@@ -2457,7 +2586,7 @@ final class DataSchemaService
                 'api_action' => 'schema_studio_reverse_engineer',
                 'method' => 'POST',
                 'writes' => false,
-                'description' => 'Introspect PostgreSQL and build a working schema document from live tables and foreign keys.',
+                'description' => 'Introspect PostgreSQL and build an editable workspace draft from live tables and foreign keys.',
             ],
             [
                 'id' => 'validate',
@@ -2466,7 +2595,7 @@ final class DataSchemaService
                 'api_action' => 'schema_studio_validate',
                 'method' => 'POST',
                 'writes' => false,
-                'description' => 'Run structural validation rules against the current working schema.',
+                'description' => 'Run structural validation rules against the selected design layer.',
             ],
             [
                 'id' => 'diagnose',
@@ -2475,7 +2604,7 @@ final class DataSchemaService
                 'api_action' => 'schema_studio_diagnose',
                 'method' => 'POST',
                 'writes' => false,
-                'description' => 'Generate diagnostics, blockers, hotspots and governance recommendations.',
+                'description' => 'Generate design-layer diagnostics, blockers, hotspots and governance recommendations.',
             ],
             [
                 'id' => 'compile',
@@ -2484,7 +2613,7 @@ final class DataSchemaService
                 'api_action' => 'schema_studio_compile_registry',
                 'method' => 'POST',
                 'writes' => true,
-                'description' => 'Build runtime projections, contracts and enterprise manifest artifacts.',
+                'description' => 'Compile workspace design artifacts only. Runtime contract artifacts are generated by the system contract authority pipeline.',
             ],
             [
                 'id' => 'release',
@@ -2493,7 +2622,7 @@ final class DataSchemaService
                 'api_action' => 'schema_studio_release_bundle',
                 'method' => 'POST',
                 'writes' => true,
-                'description' => 'Generate a governed release bundle with typed diff, risk and approval posture.',
+                'description' => 'Generate a governed workspace release bundle with typed diff, risk and approval posture.',
             ],
             [
                 'id' => 'set_baseline',
@@ -2502,7 +2631,7 @@ final class DataSchemaService
                 'api_action' => 'schema_studio_set_baseline',
                 'method' => 'POST',
                 'writes' => true,
-                'description' => 'Persist the current working schema as the baseline for future diff and release flows.',
+                'description' => 'Persist the editable workspace draft as the baseline for future design diff and review flows.',
             ],
         ];
     }

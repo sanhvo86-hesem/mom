@@ -32,13 +32,13 @@ Verified locally on 2026-04-10:
 - the authority chain is `database/migrations/*.sql -> database/schema.sql`
 - authoritative physical table count is `658`
 - `mom/data/registry/table-registry.json` also catalogs `658` tables
-- `mom/data/schema-studio/designs/workspace.json` currently contains `101` tables and `161` relationships
+- `mom/data/schema-studio/designs/workspace.json` was reset on 2026-04-11 to an intentional blank draft with `0` tables and `0` relationships
 - `SchemaStudioController` and `DataSchemaService` intentionally expose one editable design: `workspace`
 - runtime services and generators still depend heavily on `table-registry.json`, `relation-map.json`, and `endpoint-catalog.json`
 
 Implication:
 
-- `workspace` is not the full backend schema
+- `workspace` is not the backend schema; it is now an empty non-authoritative design surface
 - `table-registry` is not the physical schema authority
 - both are needed today, but for different jobs
 - the architecture needs an explicit layered authority model
@@ -494,20 +494,20 @@ Mandatory safeguards:
 - persisted representations must round-trip during the deprecation window
 - dual-write is forbidden except within time-bounded migration bridges with parity checks
 
-## How To Handle The Current 658 vs 101 Reality
+## How To Handle The Current 658 vs Blank Workspace Reality
 
 The current repo should explicitly adopt this model:
 
 - `658` = full physical + registry-backed platform contract scope
-- `101` = curated workspace design subset
+- `0` = intentional blank editable workspace draft
 
-The correct long-term fix is not to collapse `658` into `101`.
+The correct long-term fix is not to collapse `658` into a design draft.
 
 The correct fix is:
 
 1. keep one physical database schema authority
 2. keep one full generated system contract registry
-3. keep one editable workspace design
+3. keep one editable blank workspace design for future controlled experiments
 4. present them in the UI as different layers, not as competing schemas
 
 Recommended Schema Studio model:
@@ -668,4 +668,3 @@ That is the structure that supports:
 - explainable workflow logic
 - safer AI-assisted implementation
 - long-term maintainability without hidden semantic drift
-

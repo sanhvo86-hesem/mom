@@ -24,8 +24,9 @@ Single entry-point that runs the full publication pipeline in sequence:
   18. generate_global_erp_mom_capability_audit.py (global ERP+MOM capability audit)
   19. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
   20. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
-  21. Generate publication proof artifact     (_reports/publication-proof-latest.json)
+  21. generate_system_contract_authority.py   (DB-derived full system contract)
   22. Generate wave/gap ledger                (wave-gap-ledger.json)
+  23. Generate publication proof artifact     (_reports/publication-proof-latest.json)
 
 The proof artifact contains checksums, counts, and invariant checks so that
 downstream consumers can verify the publication run is consistent.
@@ -77,6 +78,10 @@ DOMAIN_FIELD_PACKS = REGISTRY_DIR / "domain-field-packs.json"
 DATA_FIELDS_P2 = REGISTRY_DIR / "data-fields-part2.json"
 WAVE_GAP_LEDGER = REGISTRY_DIR / "wave-gap-ledger.json"
 GLOBAL_CAPABILITY_AUDIT = REGISTRY_DIR / "global-erp-mom-capability-audit.json"
+SYSTEM_CONTRACT_RUNTIME_PROJECTIONS = REGISTRY_DIR / "system-contract-runtime-projections.json"
+SYSTEM_CONTRACT_REGISTRY_CONTRACTS = REGISTRY_DIR / "system-contract-registry-contracts.json"
+SYSTEM_CONTRACT_DIAGNOSTICS = REGISTRY_DIR / "system-contract-diagnostics.json"
+SYSTEM_CONTRACT_MANIFEST = REGISTRY_DIR / "system-contract-manifest.json"
 
 PROOF_ARTIFACT = REPORTS_DIR / "publication-proof-latest.json"
 
@@ -94,6 +99,10 @@ ARTIFACT_FILES = [
     DATA_FIELDS_P2,
     WAVE_GAP_LEDGER,
     GLOBAL_CAPABILITY_AUDIT,
+    SYSTEM_CONTRACT_RUNTIME_PROJECTIONS,
+    SYSTEM_CONTRACT_REGISTRY_CONTRACTS,
+    SYSTEM_CONTRACT_DIAGNOSTICS,
+    SYSTEM_CONTRACT_MANIFEST,
 ]
 
 
@@ -810,7 +819,15 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 20-21: Proof + wave/gap ledger
+    # Step 20: DB-derived full system contract artifacts
+    step_results["system_contract_authority"] = run_step(
+        "System Contract Authority (generate_system_contract_authority.py)",
+        [sys.executable, "generate_system_contract_authority.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 21-22: Proof + wave/gap ledger
     print(f"\n{'=' * 72}")
     print("STEP: Wave/Gap Ledger Generation")
     print(f"{'=' * 72}")

@@ -3966,6 +3966,8 @@ components:
                   type: integer
                 globalCapabilityBlockingGapCount:
                   type: integer
+                systemContractCriticalGapCount:
+                  type: integer
             data:
               type: object
               additionalProperties: true
@@ -3984,6 +3986,10 @@ components:
                       type: string
                     databaseName:
                       type: string
+                system_contract_authority:
+                  type: object
+                  additionalProperties: true
+                  description: DB-derived read-only authority artifacts generated from table-registry, endpoint-catalog, workflow-library, relation-map, and schema authority. This is not the editable Workspace Design Draft.
                 table_registry:
                   type: object
                   additionalProperties: true

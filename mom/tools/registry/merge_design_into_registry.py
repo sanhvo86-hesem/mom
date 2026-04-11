@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """
-Merge Design Schema into Registry
-===================================
-Transfers ALL valuable content from the Canonical Design file into
-the table-registry, then the design file can be removed.
+Retired design-to-registry bridge.
 
-What gets merged:
-- 81 tables that only exist in design (not in registry)
-- Views, security policies as registry metadata
-- Relations into relation-map.json
+The active Schema Studio workspace is intentionally blank and non-authoritative.
+Do not use it to infer or mutate the system registry. This utility is retained
+only for historical recovery of archived drafts and exits safely when the active
+workspace is blank.
 """
 
 import json
@@ -16,10 +13,10 @@ import re
 from pathlib import Path
 from datetime import datetime, timezone
 
-PORTAL = Path(__file__).resolve().parent.parent.parent
-DESIGN_FILE = PORTAL / "mom" / "data" / "schema-studio" / "designs" / "workspace.json"
-TABLE_REGISTRY = PORTAL / "mom" / "data" / "registry" / "table-registry.json"
-RELATION_MAP = PORTAL / "mom" / "data" / "registry" / "relation-map.json"
+PORTAL = Path(__file__).resolve().parents[2]
+DESIGN_FILE = PORTAL / "data" / "schema-studio" / "designs" / "workspace.json"
+TABLE_REGISTRY = PORTAL / "data" / "registry" / "table-registry.json"
+RELATION_MAP = PORTAL / "data" / "registry" / "relation-map.json"
 
 # Domain assignments for canonical tables based on ISA-95 layers
 DOMAIN_MAP = {
@@ -105,6 +102,10 @@ def main():
     print("=" * 60)
 
     design = json.loads(DESIGN_FILE.read_text(encoding="utf-8"))
+    if design.get("_meta", {}).get("blankDraft") is True:
+        print("Active workspace is a blank non-authoritative draft; nothing will be merged.")
+        return
+
     registry = json.loads(TABLE_REGISTRY.read_text(encoding="utf-8"))
     tables = registry.get("tables", {})
 

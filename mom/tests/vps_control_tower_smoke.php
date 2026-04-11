@@ -38,6 +38,19 @@ function vps_smoke_exit_payload(callable $callback): array
     throw new RuntimeException('Expected controller call to terminate via ExitException.');
 }
 
+function vps_smoke_set_json_body(object $controller, array $body): void
+{
+    $ref = new ReflectionObject($controller);
+    while ($ref->getParentClass() !== false) {
+        if ($ref->hasProperty('jsonBodyCache')) {
+            break;
+        }
+        $ref = $ref->getParentClass();
+    }
+    $property = $ref->getProperty('jsonBodyCache');
+    $property->setValue($controller, $body);
+}
+
 $tmpDataDir = sys_get_temp_dir() . '/mom-vps-control-' . bin2hex(random_bytes(6));
 @mkdir($tmpDataDir . '/config', 0775, true);
 $explorerRoot = $tmpDataDir . '/explorer-root';
@@ -159,6 +172,47 @@ try {
         throw new RuntimeException('Unexpected secret key read.');
     } catch (RuntimeException $e) {
         smoke_assert(str_starts_with($e->getMessage(), 'file_access_denied'), 'File explorer should block guarded secret files.');
+    }
+    $mkdir = $service->mutateFile('local-vps', 'test_root', 'mkdir', ['path' => '', 'name' => 'uploads']);
+    smoke_assert(($mkdir['mode'] ?? null) === 'mkdir' && is_dir($explorerRoot . '/uploads'), 'File explorer should create folders.');
+    $uploadTmp = tempnam($tmpDataDir, 'upload-');
+    smoke_assert(is_string($uploadTmp), 'Upload temp file should be created.');
+    file_put_contents($uploadTmp, "uploaded payload\n");
+    $upload = $service->uploadFile('local-vps', 'test_root', 'uploads', $uploadTmp, 'client.txt');
+    smoke_assert(($upload['mode'] ?? null) === 'upload' && is_file($explorerRoot . '/uploads/client.txt'), 'File explorer should upload files.');
+    $rename = $service->mutateFile('local-vps', 'test_root', 'rename', ['path' => 'uploads/client.txt', 'name' => 'renamed.txt']);
+    smoke_assert(($rename['destination_path'] ?? null) === 'uploads/renamed.txt' && is_file($explorerRoot . '/uploads/renamed.txt'), 'File explorer should rename files.');
+    $copy = $service->mutateFile('local-vps', 'test_root', 'copy', ['path' => 'uploads/renamed.txt', 'target_path' => '', 'name' => 'copied.txt']);
+    smoke_assert(($copy['destination_path'] ?? null) === 'copied.txt' && is_file($explorerRoot . '/copied.txt'), 'File explorer should copy files.');
+    $move = $service->mutateFile('local-vps', 'test_root', 'move', ['path' => 'copied.txt', 'target_path' => 'uploads', 'name' => 'moved.txt']);
+    smoke_assert(($move['destination_path'] ?? null) === 'uploads/moved.txt' && is_file($explorerRoot . '/uploads/moved.txt') && !is_file($explorerRoot . '/copied.txt'), 'File explorer should move files for cut/paste and drag/drop.');
+    $delete = $service->mutateFile('local-vps', 'test_root', 'delete', ['path' => 'uploads/moved.txt']);
+    smoke_assert(($delete['mode'] ?? null) === 'delete' && !is_file($explorerRoot . '/uploads/moved.txt'), 'File explorer should delete files.');
+    if (class_exists(ZipArchive::class)) {
+        $zip = $service->mutateFile('local-vps', 'test_root', 'zip', ['path' => 'uploads/renamed.txt', 'target_path' => '', 'name' => 'renamed-test.zip']);
+        smoke_assert(($zip['destination_path'] ?? null) === 'uploads/renamed-test.zip' && is_file($explorerRoot . '/uploads/renamed-test.zip'), 'File explorer should compress files to ZIP next to the selected item.');
+        $unzip = $service->mutateFile('local-vps', 'test_root', 'unzip', ['path' => 'uploads/renamed-test.zip', 'target_path' => 'uploads', 'name' => 'renamed-test']);
+        smoke_assert(($unzip['path'] ?? null) === 'uploads/renamed-test' && is_file($explorerRoot . '/uploads/renamed-test/renamed.txt'), 'File explorer should extract ZIP files.');
+        smoke_assert(file_get_contents($explorerRoot . '/uploads/renamed-test/renamed.txt') === "uploaded payload\n", 'Extracted ZIP content should match the source file.');
+        try {
+            $service->mutateFile('local-vps', 'test_root', 'unzip', ['path' => 'uploads/renamed.txt']);
+            throw new RuntimeException('Unexpected non-zip extract.');
+        } catch (RuntimeException $e) {
+            smoke_assert(str_starts_with($e->getMessage(), 'file_not_zip'), 'File explorer should reject extracting non-ZIP files.');
+        }
+    } else {
+        try {
+            $service->mutateFile('local-vps', 'test_root', 'zip', ['path' => 'uploads/renamed.txt', 'name' => 'renamed-test.zip']);
+            throw new RuntimeException('Unexpected ZIP support without ZipArchive.');
+        } catch (RuntimeException $e) {
+            smoke_assert(str_starts_with($e->getMessage(), 'zip_unavailable'), 'File explorer should report missing ZipArchive support.');
+        }
+    }
+    try {
+        $service->mutateFile('local-vps', 'test_root', 'delete', ['path' => 'secret.key']);
+        throw new RuntimeException('Unexpected guarded file delete.');
+    } catch (RuntimeException $e) {
+        smoke_assert(str_starts_with($e->getMessage(), 'file_access_denied'), 'File explorer should block mutation of guarded secret files.');
     }
 
     try {
@@ -318,6 +372,23 @@ try {
         'File download should force attachment disposition.'
     );
     smoke_assert((string)($resp['body'] ?? '') === "hello file explorer\nline two\n", 'File download body should stream raw content.');
+
+    vps_smoke_reset_request_state();
+    set_authenticated_session('admin-user', ['role' => 'admin']);
+    $_SESSION['csrf'] = 'vps-smoke-csrf';
+    $_SERVER['HTTP_X_CSRF_TOKEN'] = 'vps-smoke-csrf';
+    vps_smoke_set_json_body($controller, [
+        'host_id' => 'local-vps',
+        'root_id' => 'test_root',
+        'operation' => 'mkdir',
+        'path' => '',
+        'name' => 'controller-folder',
+    ]);
+    $resp = vps_smoke_exit_payload(static function () use ($controller): void {
+        $controller->fileMutate();
+    });
+    smoke_assert($resp['status'] === 200, 'Authorized file mutation request should succeed.');
+    smoke_assert(is_dir($explorerRoot . '/controller-folder'), 'File mutation should create the controller folder.');
 
     vps_smoke_reset_request_state();
     set_authenticated_session('admin-user', ['role' => 'admin']);

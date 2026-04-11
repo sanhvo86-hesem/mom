@@ -3,7 +3,7 @@
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
     "publication_run_id": "4d3f16f3-705e-42e6-9ce3-34f689aefa5f",
-    "generated_at": "2026-04-11T02:15:00.858Z",
+    "generated_at": "2026-04-11T04:25:41.063Z",
     "schema_authority": "table-registry.json backed by database/migrations and publication generators",
     "table_count": 658,
     "entity_counts": {

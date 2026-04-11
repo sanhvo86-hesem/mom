@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T02:14:57.632Z",
+    "generatedAt": "2026-04-11T03:55:21.996Z",
     "description": "Source-backed global ERP+MOM+MES+EQMS capability catalog used to audit backend coverage before frontend build-out.",
     "purpose": "Prevent AI/frontend tools from guessing backend scope by making global process expectations explicit."
   },

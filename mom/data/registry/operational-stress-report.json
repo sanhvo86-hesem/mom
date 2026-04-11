@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T02:14:59.855Z",
+    "generatedAt": "2026-04-11T04:25:40.007Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -102,7 +102,7 @@
       "backdate_exception_mentions": 28,
       "archive_mentions": 15249,
       "snapshot_mentions": 1062,
-      "esign_mentions": 169,
+      "esign_mentions": 170,
       "cycle_count_mentions": 339
     },
     "idempotency_runtime_contract": {
@@ -267,7 +267,7 @@
       "evidence": {
         "override_mentions": 123,
         "waiver_mentions": 24,
-        "esign_mentions": 169,
+        "esign_mentions": 170,
         "override_resources": [
           "quality_improvement.concessions",
           "quality_improvement.deviations",
@@ -320,7 +320,7 @@
       "evidence": {
         "archive_mentions": 15249,
         "correction_markers": 339,
-        "esign_mentions": 169
+        "esign_mentions": 170
       },
       "required_controls": [
         "traceable_supersede_chain",

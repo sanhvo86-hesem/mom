@@ -108,7 +108,10 @@ Validation after cleanup:
 - `endpoint-catalog.json`
 - `relation-map.json`
 - `mom/contracts/*`
-- `workspace.json`
+
+### Keep as non-authoritative design surface
+
+- `workspace.json`, intentionally blank from 2026-04-11 onward
 
 ### Keep as compatibility
 

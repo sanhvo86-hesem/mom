@@ -195,7 +195,7 @@ def build_glossary(timestamp: str) -> dict[str, Any]:
         },
         {
             "term": "workspace design",
-            "definition": "Curated editable design artifact used for visualization and architecture work, not for full backend authority.",
+            "definition": "Blank editable design surface reserved for controlled future experiments. It is intentionally non-authoritative and must not be used to infer backend schema, API, workflow, or DB truth.",
             "source_of_truth": ["mom/data/schema-studio/designs/workspace.json"],
         },
         {

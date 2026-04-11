@@ -136,6 +136,9 @@ smoke_assert(array_key_exists('operational_blind_spot_critical_count', (array)($
 smoke_assert(array_key_exists('operational_stress_critical_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include critical operational stress counts.');
 smoke_assert(array_key_exists('global_capability_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include global ERP+MOM capability counts.');
 smoke_assert(array_key_exists('global_capability_blocking_gap_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include global ERP+MOM blocking gap counts.');
+smoke_assert(array_key_exists('workspace_design_available', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether the editable workspace design source exists.');
+smoke_assert(($workspace['metrics']['workspace_design_available'] ?? false) === true, 'Normal Data Schema workspace should find the editable workspace design source.');
+smoke_assert(($workspace['metrics']['workspace_design_artifact_orphaned'] ?? true) === false, 'Normal Data Schema workspace should not mark Schema Studio artifacts orphaned.');
 smoke_assert(array_key_exists('present_lookup', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose DB table lookup data.');
 smoke_assert(array_key_exists('db_probe_applicable', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the DB probe is active or intentionally not applicable.');
 smoke_assert(array_key_exists('db_probe_reachable', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the DB probe reached PostgreSQL.');
@@ -182,16 +185,42 @@ $schemaDesigns = array_values(array_filter((array)($workspace['lists']['designs'
 $schemaDesignIds = array_map(static fn(array $design): string => (string)($design['id'] ?? ''), $schemaDesigns);
 smoke_assert(in_array('workspace', $schemaDesignIds, true), 'Data Schema workspace should expose workspace as the editable design layer.');
 smoke_assert(in_array('system_contract_registry', $schemaDesignIds, true), 'Data Schema workspace should expose the full system contract registry as a read-only schema layer.');
+$workspaceDesignSummary = null;
 $registryDesignSummary = null;
 foreach ($schemaDesigns as $schemaDesign) {
+    if ((string)($schemaDesign['id'] ?? '') === 'workspace') {
+        $workspaceDesignSummary = $schemaDesign;
+    }
     if ((string)($schemaDesign['id'] ?? '') === 'system_contract_registry') {
         $registryDesignSummary = $schemaDesign;
-        break;
     }
 }
+smoke_assert(is_array($workspaceDesignSummary), 'Data Schema workspace design summary should be present.');
+smoke_assert(!empty($workspaceDesignSummary['blankDraft']), 'Workspace design summary should explicitly declare the active draft as blank.');
+smoke_assert((int)($workspaceDesignSummary['tableCount'] ?? -1) === 0, 'Workspace design summary should stay empty so it cannot be confused with system schema authority.');
+smoke_assert((string)($workspaceDesignSummary['runtimeAuthority'] ?? '') === 'system_contract_registry', 'Workspace design summary should point runtime authority to the system contract registry.');
 smoke_assert(is_array($registryDesignSummary), 'Data Schema registry design summary should be present.');
 smoke_assert(!empty($registryDesignSummary['readOnly']), 'Data Schema registry design summary should be read-only.');
 smoke_assert((int)($registryDesignSummary['tableCount'] ?? 0) >= 600, 'Data Schema registry design summary should expose full platform table coverage.');
+smoke_assert((int)($workspace['metrics']['system_contract_table_count'] ?? 0) >= 600, 'Data Schema metrics should expose full system contract table coverage.');
+smoke_assert((int)($workspace['metrics']['system_contract_endpoint_count'] ?? 0) >= 3000, 'Data Schema metrics should expose full system contract endpoint coverage.');
+smoke_assert((int)($workspace['metrics']['system_contract_workflow_count'] ?? 0) >= 250, 'Data Schema metrics should expose full system contract workflow coverage.');
+smoke_assert((int)($workspace['metrics']['system_contract_critical_gap_count'] ?? -1) === 0, 'System contract diagnostics should have zero critical gaps.');
+smoke_assert(is_array(($workspace['artifacts']['system_contract_registry'] ?? null)), 'Data Schema workspace should expose the DB-derived system contract registry summary.');
+smoke_assert((string)($workspace['artifacts']['system_contract_registry']['authorityLayer'] ?? '') === 'system_contract_registry', 'System contract artifact should declare the registry authority layer.');
+smoke_assert((int)($workspace['artifacts']['system_contract_registry']['summary']['tableCount'] ?? 0) >= 600, 'System contract artifact summary should expose full platform table coverage.');
+smoke_assert(is_array(($workspace['artifacts']['schema_studio_manifest'] ?? null)), 'Workspace design manifest should remain visible as a non-runtime design artifact.');
+smoke_assert(($workspace['artifacts']['schema_studio_manifest']['sourceAvailable'] ?? false) === true, 'Workspace design manifest should expose source availability.');
+smoke_assert(($workspace['artifacts']['schema_studio_manifest']['orphaned'] ?? true) === false, 'Workspace design manifest should not be orphaned while workspace.json exists.');
+smoke_assert((int)($workspace['artifacts']['schema_studio_manifest']['summary']['projectionCount'] ?? -1) === 0, 'Workspace design manifest should compile the intentional blank draft to zero design projections.');
+$artifactItemsById = [];
+foreach ((array)($workspace['operational']['freshness']['artifacts'] ?? []) as $artifactItem) {
+    if (is_array($artifactItem) && isset($artifactItem['id'])) {
+        $artifactItemsById[(string)$artifactItem['id']] = $artifactItem;
+    }
+}
+smoke_assert(!empty($artifactItemsById['system_contract_manifest']['requiredForRelease']), 'System contract manifest should be required for release decisions.');
+smoke_assert(empty($artifactItemsById['schema_manifest']['requiredForRelease']), 'Workspace design manifest should not be required for runtime release decisions.');
 smoke_assert(is_array(($workspace['artifacts']['business_contract_bundle'] ?? null)), 'Data Schema workspace should expose the business contract bundle summary.');
 smoke_assert(is_array(($workspace['artifacts']['global_capability_audit'] ?? null)), 'Data Schema workspace should expose the global ERP+MOM capability audit summary.');
 smoke_assert((int)($workspace['artifacts']['global_capability_audit']['summary']['capabilityCount'] ?? 0) >= 15, 'Global capability audit should cover the broad ERP+MOM process map.');
@@ -462,6 +491,9 @@ $designResponse = data_schema_smoke_exit_payload(static function () use ($schema
 smoke_assert($designResponse['status'] === 200, 'Schema Studio getDesign should load for admin users.');
 smoke_assert(is_array(($designResponse['payload']['revisions'] ?? null)), 'Schema Studio getDesign should expose revision fingerprints.');
 smoke_assert((bool)(($designResponse['payload']['save_policy'] ?? [])['requiresRevision'] ?? false), 'Schema Studio getDesign should advertise revision-guarded writes.');
+smoke_assert(!empty($designResponse['payload']['schema']['_meta']['blankDraft']), 'Schema Studio getDesign should expose that the active workspace draft is intentionally blank.');
+smoke_assert(count((array)($designResponse['payload']['schema']['tables'] ?? [])) === 0, 'Schema Studio active workspace should load with zero design tables.');
+smoke_assert(count((array)($designResponse['payload']['baseline']['tables'] ?? [])) === 0, 'Schema Studio active workspace baseline should load with zero design tables.');
 
 data_schema_smoke_reset_request_state();
 data_schema_smoke_trace('design-compile-missing-revision');

@@ -349,6 +349,10 @@ class RegistryController extends BaseController
             $runtimeAccessPolicy = $this->rawRegistryDocument('runtime-access-policy');
             $registryManifest = $this->rawRegistryDocument('registry-manifest');
             $globalAudit = $this->rawRegistryDocument('global-erp-mom-capability-audit');
+            $systemContractManifest = $this->rawRegistryDocument('system-contract-manifest');
+            $systemContractDiagnostics = $this->rawRegistryDocument('system-contract-diagnostics');
+            $systemContractRuntimeProjections = $this->rawRegistryDocument('system-contract-runtime-projections');
+            $systemContractRegistryContracts = $this->rawRegistryDocument('system-contract-registry-contracts');
             $objectIndex = $this->rawContractDocument('object-index.json');
             $packageIndex = $this->rawContractDocument('package-index.json');
             $authorityReport = $this->rawContractDocument('authority-report.json');
@@ -364,6 +368,7 @@ class RegistryController extends BaseController
                 'contractPackageCount' => count((array)($packageIndex['packages'] ?? [])),
                 'globalCapabilityCount' => (int)($globalAudit['summary']['capability_count'] ?? 0),
                 'globalCapabilityBlockingGapCount' => (int)($globalAudit['summary']['blocking_gap_count'] ?? 0),
+                'systemContractCriticalGapCount' => (int)($systemContractDiagnostics['summary']['criticalGapCount'] ?? 0),
             ];
 
             $this->success([
@@ -382,6 +387,12 @@ class RegistryController extends BaseController
                     'status_options' => $statusOptions,
                     'relation_map' => $relationMap,
                     'runtime_access_policy' => $runtimeAccessPolicy,
+                    'system_contract_authority' => [
+                        'manifest' => $systemContractManifest,
+                        'diagnostics' => $systemContractDiagnostics,
+                        'runtime_projections' => $systemContractRuntimeProjections,
+                        'registry_contracts' => $systemContractRegistryContracts,
+                    ],
                     'business_contracts' => [
                         'authority_report' => $authorityReport,
                         'object_index' => $objectIndex,

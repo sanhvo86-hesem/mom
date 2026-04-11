@@ -1,0 +1,505 @@
+<section class="section" id="manufacturing-precision">
+    <h2 class="section-title"><span class="section-number">??</span>Manufacturing Domain Precision</h2>
+    <p class="section-subtitle">Bổ sung các quy chuẩn chính xác cho MES/eQMS trong môi trường CNC precision machining. Section này không thay thế các section <code>shop-floor-mode</code>, <code>compliance-forms</code>, <code>operator-interface</code>, <code>realtime-dashboard</code> hoặc <code>block-engine</code>; nó khóa các giá trị màu, trạng thái, schema và feedback còn thiếu để developer không phải đoán khi triển khai runtime.</p>
+
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="info-box info-box-blue">
+        <strong>CROSS-REFERENCE BẮT BUỘC</strong>
+        Dùng section <code>14 shop-floor-mode</code> cho nguyên tắc đọc xa và touch target nền, section <code>15 compliance-forms</code> cho e-signature/audit trail, section <code>18 operator-interface</code> cho operator panel, section <code>19 realtime-dashboard</code> cho freshness, và section <code>32 block-engine</code> cho block type contract.
+      </div>
+      <div class="info-box info-box-amber">
+        <strong>QUY TẮC KHÔNG MÂU THUẪN</strong>
+        Các màu trạng thái máy trong section này là fixed manufacturing tokens. Không map chúng sang visual theme, không đổi theo ca, không dùng palette brand thay thế, và luôn hiển thị kèm icon + text để không phụ thuộc vào màu đơn lẻ.
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-teal">Traceability</span>Ma trận liên kết block engine</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Phần</th>
+              <th>Block type chính</th>
+              <th>Block type hỗ trợ</th>
+              <th>Template liên quan</th>
+              <th>Ghi chú triển khai</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>3.1 Machine status</td><td><code>machine-status-tile</code>, <code>andon-signal</code></td><td><code>oee-gauge</code>, <code>kpi-row</code></td><td>T38, T43, T48</td><td>State token bất biến qua theme và dark mode.</td></tr>
+            <tr><td>3.2 SPC rules</td><td><code>spc-control-chart</code></td><td><code>anomaly-alert</code>, <code>data-table</code></td><td>T53, T54, T57, T60</td><td>Rule engine trả về rule id, zone và evidence points.</td></tr>
+            <tr><td>3.3 CAPA 8D</td><td><code>nav-stepper</code>, <code>form-wizard</code></td><td><code>kanban-board</code>, <code>audit-finding-card</code></td><td>T53, T57, T60</td><td>D0-D8 là controlled workflow, không chỉ là progress UI.</td></tr>
+            <tr><td>3.4 Glove mode</td><td><code>action-toolbar</code></td><td><code>form-standard</code>, <code>data-table</code></td><td>T38, T41, T48</td><td>Override bằng <code>[data-glove-mode="true"]</code>, không sửa density mặc định.</td></tr>
+            <tr><td>3.5 Calibration</td><td><code>environmental-gauge</code>, <code>data-cards</code></td><td><code>scheduler-calendar</code>, <code>notification-center</code></td><td>T10, T53, T60</td><td>Instrument manager dùng data-cards/data-table cho tới khi có block riêng.</td></tr>
+            <tr><td>3.6 Training matrix</td><td><code>data-table</code>, <code>chart-donut</code></td><td><code>form-standard</code>, <code>video-player</code></td><td>T97, T106, HR templates</td><td>Status cell cần text + icon + expiry date.</td></tr>
+            <tr><td>3.7 Barcode/QR</td><td><code>form-standard</code>, <code>data-list</code></td><td><code>notification-center</code>, <code>anomaly-alert</code></td><td>T38, T41, T66</td><td><code>barcode-input</code> là schema candidate ở section 29; runtime fallback dùng input chuẩn.</td></tr>
+            <tr><td>3.8 Alarm management</td><td><code>alarm-list</code></td><td><code>andon-signal</code>, <code>anomaly-alert</code>, <code>notification-center</code></td><td>T10, T41, T50</td><td>Áp dụng ISA-18.2: priority, shelving, ack và escalation.</td></tr>
+            <tr><td>3.9 Recipe/batch S88</td><td><code>batch-traveler</code>, <code>routing-flow</code></td><td><code>workflow-diagram</code>, <code>data-timeline</code></td><td>T38, T43, T48</td><td>Recipe step phải có parameter bounds và e-signature gate.</td></tr>
+            <tr><td>3.10 Multi-plant nav</td><td><code>data-tree</code>, <code>nav-breadcrumb</code></td><td><code>nav-sidebar-tree</code>, <code>machine-status-tile</code></td><td>T01, T10, T38</td><td>Hierarchy cố định: Enterprise to Site to Area to Line to Cell.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-green">3.1</span>Machine Status Exact Color Tokens</div>
+      <div class="card-body">
+        <div class="info-box info-box-green" style="margin-bottom:14px">
+          <strong>FIXED TOKENS</strong>
+          Machine status không được dùng <code>--brand</code>, <code>--green</code>, theme preset hoặc shift theme làm nguồn màu. Mỗi trạng thái phải render bằng token dưới đây, có icon, text uppercase <code>11px</code>, font weight <code>800</code>, line-height <code>1.2</code> và minimum indicator <code>24px</code>.
+        </div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>Light token set</th>
+              <th>Dark token set</th>
+              <th>Icon</th>
+              <th>Required label</th>
+              <th>Block usage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Running</td><td><code>--machine-running:#16a34a</code><br><code>surface:#f0fdf4</code><br><code>border:#86efac</code><br><code>text:#14532d</code></td><td><code>--machine-running-dark:#4ade80</code><br><code>surface:#052e16</code><br><code>border:#22c55e</code><br><code>text:#bbf7d0</code></td><td><code>circle-dot</code></td><td><code>RUNNING</code> / <span lang="vi">ĐANG CHẠY</span></td><td><code>machine-status-tile</code>, <code>andon-signal</code></td></tr>
+            <tr><td>Setup</td><td><code>--machine-setup:#7c3aed</code><br><code>surface:#f5f3ff</code><br><code>border:#c4b5fd</code><br><code>text:#4c1d95</code></td><td><code>--machine-setup-dark:#a78bfa</code><br><code>surface:#2e1065</code><br><code>border:#8b5cf6</code><br><code>text:#ddd6fe</code></td><td><code>wrench</code></td><td><code>SETUP</code> / <span lang="vi">THIẾT LẬP</span></td><td><code>machine-status-tile</code>, <code>routing-flow</code></td></tr>
+            <tr><td>Paused</td><td><code>--machine-paused:#d97706</code><br><code>surface:#fffbeb</code><br><code>border:#fcd34d</code><br><code>text:#78350f</code></td><td><code>--machine-paused-dark:#fbbf24</code><br><code>surface:#451a03</code><br><code>border:#f59e0b</code><br><code>text:#fde68a</code></td><td><code>pause-circle</code></td><td><code>PAUSED</code> / <span lang="vi">TẠM DỪNG</span></td><td><code>machine-status-tile</code>, <code>data-timeline</code></td></tr>
+            <tr><td>Stopped</td><td><code>--machine-stopped:#dc2626</code><br><code>surface:#fef2f2</code><br><code>border:#fca5a5</code><br><code>text:#7f1d1d</code></td><td><code>--machine-stopped-dark:#f87171</code><br><code>surface:#450a0a</code><br><code>border:#ef4444</code><br><code>text:#fecaca</code></td><td><code>x-circle</code></td><td><code>STOPPED</code> / <span lang="vi">DỪNG</span></td><td><code>machine-status-tile</code>, <code>alarm-list</code></td></tr>
+            <tr><td>PM</td><td><code>--machine-pm:#2563eb</code><br><code>surface:#eff6ff</code><br><code>border:#93c5fd</code><br><code>text:#1e3a8a</code></td><td><code>--machine-pm-dark:#60a5fa</code><br><code>surface:#172554</code><br><code>border:#3b82f6</code><br><code>text:#bfdbfe</code></td><td><code>tool</code></td><td><code>PM</code> / <span lang="vi">BẢO TRÌ</span></td><td><code>scheduler-calendar</code>, <code>machine-status-tile</code></td></tr>
+            <tr><td>Idle</td><td><code>--machine-idle:#64748b</code><br><code>surface:#f1f5f9</code><br><code>border:#cbd5e1</code><br><code>text:#334155</code></td><td><code>--machine-idle-dark:#94a3b8</code><br><code>surface:#0f172a</code><br><code>border:#475569</code><br><code>text:#e2e8f0</code></td><td><code>minus-circle</code></td><td><code>IDLE</code> / <span lang="vi">CHỜ</span></td><td><code>machine-status-tile</code>, <code>kpi-row</code></td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">.machine-status-badge {
+  min-height: 24px;
+  padding: 6px 10px;
+  border: 1px solid var(--machine-status-border);
+  background: var(--machine-status-surface);
+  color: var(--machine-status-text);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}</pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-red">3.2</span>SPC Western Electric Rules Visualization</div>
+      <div class="card-body">
+        <div class="grid-2" style="margin-bottom:14px">
+          <div class="info-box info-box-red">
+            <strong>OUT-OF-CONTROL VISUAL</strong>
+            Điểm vi phạm phải có marker <code>9px</code>, fill <code>#dc2626</code>, ring <code>3px #fca5a5</code>, label rule id dạng <code>WE-01</code> và vertical guide dashed <code>1px</code>. Không chỉ đổi màu đường line.
+          </div>
+          <div class="info-box info-box-blue">
+            <strong>ZONE COLORING</strong>
+            Zone C dùng <code>#dbeafe</code>, Zone B dùng <code>#fef3c7</code>, Zone A dùng <code>#fee2e2</code>. Dark mode lần lượt dùng <code>#1e3a8a</code>, <code>#78350f</code>, <code>#7f1d1d</code> với opacity <code>0.32</code>.
+          </div>
+        </div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Rule id</th>
+              <th>Điều kiện phát hiện</th>
+              <th>Highlight</th>
+              <th>Tooltip bắt buộc</th>
+              <th>Action hint</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>WE-01</code></td><td>1 điểm nằm ngoài <code>±3σ</code> so với centerline.</td><td>Điểm đỏ, ring đỏ, label <code>3SIGMA</code>.</td><td>Giá trị, UCL/LCL, delta sigma, timestamp.</td><td>Mở NCR hoặc containment nếu ảnh hưởng lô.</td></tr>
+            <tr><td><code>WE-02</code></td><td>2 trong 3 điểm liên tiếp nằm ngoài <code>±2σ</code> cùng một phía.</td><td>2 điểm vi phạm đỏ, điểm còn lại amber.</td><td>Sequence index và phía trên/dưới CL.</td><td>Kiểm tra tool wear, offset hoặc material lot.</td></tr>
+            <tr><td><code>WE-03</code></td><td>4 trong 5 điểm liên tiếp nằm ngoài <code>±1σ</code> cùng một phía.</td><td>Vùng window 5 điểm có background amber <code>500ms</code>.</td><td>Số điểm vi phạm trong window.</td><td>Yêu cầu process engineer review trend.</td></tr>
+            <tr><td><code>WE-04</code></td><td>8 điểm liên tiếp cùng phía centerline.</td><td>Polyline segment dày <code>3px</code>, màu amber.</td><td>Run length, start/end sample id.</td><td>Kiểm tra shift setup hoặc gauge bias.</td></tr>
+            <tr><td><code>WE-05</code></td><td>6 điểm liên tiếp tăng liên tục hoặc giảm liên tục.</td><td>Mũi tên trend nhỏ tại điểm cuối, màu <code>#d97706</code>.</td><td>Direction, slope, elapsed time.</td><td>Xác nhận drift nhiệt, mòn dao hoặc coolant.</td></tr>
+            <tr><td><code>WE-06</code></td><td>14 điểm liên tiếp alternating lên/xuống.</td><td>Marker alternate shape circle/square, màu purple.</td><td>Pattern length và sample range.</td><td>Kiểm tra phương pháp lấy mẫu hoặc operator switching.</td></tr>
+            <tr><td><code>WE-07</code></td><td>15 điểm liên tiếp nằm trong Zone C, hai phía centerline.</td><td>Zone C overlay xanh, label <code>LOW VARIATION</code>.</td><td>Window 15, sigma estimate.</td><td>Kiểm tra stratification hoặc subgroup sai.</td></tr>
+            <tr><td><code>WE-08</code></td><td>8 điểm liên tiếp nằm ngoài Zone C, cả hai phía centerline.</td><td>Zone B/A markers amber đỏ, không tô center.</td><td>Window 8, count above/below.</td><td>Kiểm tra over-control hoặc mixed process stream.</td></tr>
+          </tbody>
+        </table>
+        <table class="spec-table" style="margin-top:14px">
+          <thead><tr><th>Config key</th><th>Required value</th><th>Ghi chú</th></tr></thead>
+          <tbody>
+            <tr><td><code>ruleSet</code></td><td><code>"western-electric-8"</code></td><td>Không dùng boolean mơ hồ như <code>showRules:true</code>.</td></tr>
+            <tr><td><code>zoneBands</code></td><td><code>[C:0-1σ, B:1-2σ, A:2-3σ]</code></td><td>Render đối xứng trên và dưới centerline.</td></tr>
+            <tr><td><code>pointAriaLabel</code></td><td><code>{vi:"Mẫu 24 vi phạm WE-02", en:"Sample 24 violates WE-02"}</code></td><td>Screen reader phải đọc được rule id và mức độ.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-purple">3.3</span>CAPA 8D Stepper Block - JSON Schema</div>
+      <div class="card-body">
+        <div class="info-box info-box-purple" style="margin-bottom:14px">
+          <strong>VISUAL STATE</strong>
+          Step circle <code>32px</code>. Completed: fill <code>#16a34a</code> + icon check. Current: fill <code>#2563eb</code> + pulse ring <code>0 0 0 6px rgba(37,99,235,.16)</code> mỗi <code>1500ms</code>. Pending: gray outline <code>#cbd5e1</code>. Overdue: fill <code>#dc2626</code> + icon exclamation.
+        </div>
+        <pre class="code-block">{
+  "type": "capa-8d-stepper",
+  "version": "4.3",
+  "labels": {
+    "vi": "Bộ bước CAPA 8D",
+    "en": "CAPA 8D stepper"
+  },
+  "allowedZones": ["header", "main", "sidebar", "footer"],
+  "props": {
+    "caseId": { "type": "string", "example": "CAPA-2026-0411" },
+    "orientation": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal" },
+    "activeStep": { "type": "enum", "values": ["D0","D1","D2","D3","D4","D5","D6","D7","D8"] },
+    "steps": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "id": { "type": "enum", "values": ["D0","D1","D2","D3","D4","D5","D6","D7","D8"] },
+        "label": { "type": "i18n", "required": ["vi", "en"] },
+        "status": { "type": "enum", "values": ["not-started", "current", "completed", "blocked", "overdue"] },
+        "owner": { "type": "string", "example": "Nguyễn Văn Thành" },
+        "ownerRole": { "type": "string", "example": "QA Engineer" },
+        "slaHours": { "type": "number", "example": 48 },
+        "dueAt": { "type": "datetime", "timezone": "Asia/Ho_Chi_Minh" },
+        "completionDate": { "type": ["datetime", "null"] },
+        "evidenceRequired": { "type": "boolean", "default": true },
+        "signatureRequired": { "type": "boolean", "default": false }
+      }
+    },
+    "guardRules": {
+      "skipDisallowed": true,
+      "overdueEscalationHours": 4,
+      "requiresReasonOnReturn": true,
+      "requiresEffectivenessCheckForD7": true
+    }
+  },
+  "events": {
+    "onStepOpen": "capa.step.open",
+    "onEvidenceAttach": "capa.evidence.attach",
+    "onStepComplete": "capa.step.complete",
+    "onReturnForCorrection": "capa.step.return",
+    "onEscalateOverdue": "capa.step.escalate"
+  },
+  "accessibility": {
+    "role": "list",
+    "stepRole": "listitem",
+    "activeStepAriaCurrent": "step",
+    "statusLiveRegion": "polite",
+    "labels": {
+      "vi": "Bước {id}: {label}. Trạng thái {status}. Chủ sở hữu {owner}. Hạn {dueAt}.",
+      "en": "Step {id}: {label}. Status {status}. Owner {owner}. Due {dueAt}."
+    },
+    "keyboard": ["Tab", "Shift+Tab", "Enter", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]
+  }
+}</pre>
+        <table class="spec-table" style="margin-top:14px">
+          <thead><tr><th>Step</th><th>Label vi/en</th><th>Exit criteria</th><th>Signature</th></tr></thead>
+          <tbody>
+            <tr><td>D0</td><td><code>{vi:"Chuẩn bị", en:"Prepare"}</code></td><td>Case created, scope locked.</td><td>No</td></tr>
+            <tr><td>D1</td><td><code>{vi:"Lập nhóm", en:"Form team"}</code></td><td>Owner, QA, Production, Engineering assigned.</td><td>No</td></tr>
+            <tr><td>D2</td><td><code>{vi:"Mô tả vấn đề", en:"Describe problem"}</code></td><td>Problem statement, part, lot, machine, evidence complete.</td><td>No</td></tr>
+            <tr><td>D3</td><td><code>{vi:"Ngăn chặn tạm thời", en:"Interim containment"}</code></td><td>Containment action and affected inventory disposition recorded.</td><td>QA required</td></tr>
+            <tr><td>D4</td><td><code>{vi:"Phân tích nguyên nhân", en:"Root cause analysis"}</code></td><td>5 Why/Fishbone evidence attached.</td><td>No</td></tr>
+            <tr><td>D5</td><td><code>{vi:"Chọn hành động", en:"Choose corrective actions"}</code></td><td>Action plan approved with owner and due date.</td><td>Owner required</td></tr>
+            <tr><td>D6</td><td><code>{vi:"Triển khai", en:"Implement actions"}</code></td><td>Implementation evidence and verification data complete.</td><td>No</td></tr>
+            <tr><td>D7</td><td><code>{vi:"Ngăn ngừa tái diễn", en:"Prevent recurrence"}</code></td><td>Effectiveness window and recurrence check passed.</td><td>QA required</td></tr>
+            <tr><td>D8</td><td><code>{vi:"Ghi nhận và đóng", en:"Recognize and close"}</code></td><td>Final review, lessons learned, closure approval.</td><td>Management required</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-amber">3.4</span>Glove-Friendly Touch Mode</div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Selector / token</th>
+              <th>Giá trị chính xác</th>
+              <th>Áp dụng cho</th>
+              <th>Không được làm</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>[data-glove-mode="true"] --hds-touch-target</code></td><td><code>60px x 60px</code></td><td>Button, icon button, checkbox, radio, row action.</td><td>Không giữ target 48px của shop-floor base.</td></tr>
+            <tr><td><code>--hds-control-h</code></td><td><code>64px</code></td><td>Input, select, scanner input, action button.</td><td>Không dùng input dưới 56px khi glove mode bật.</td></tr>
+            <tr><td><code>--hds-control-gap</code></td><td><code>20px</code></td><td>Button group, toolbar, form row.</td><td>Không đặt STOP sát START/RESUME.</td></tr>
+            <tr><td><code>--hds-table-row-h</code></td><td><code>72px</code></td><td>Dispatch table, work queue, scan list.</td><td>Không collapse row khi hover hoặc selected.</td></tr>
+            <tr><td><code>--hds-action-min-w</code></td><td><code>120px</code></td><td>START, STOP, PAUSE, CHECK, REPORT.</td><td>Không dùng label icon-only cho hành động chính.</td></tr>
+            <tr><td><code>--hds-hit-slop</code></td><td><code>6px</code></td><td>Camera scan, checkbox, close button.</td><td>Không mở rộng hit area chồng lên control khác.</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">[data-glove-mode="true"] {
+  --hds-touch-target: 60px;
+  --hds-control-h: 64px;
+  --hds-control-gap: 20px;
+  --hds-table-row-h: 72px;
+  --hds-action-min-w: 120px;
+  --hds-hit-slop: 6px;
+}
+
+[data-glove-mode="true"] .operator-primary-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 20px;
+}
+
+[data-glove-mode="true"] .operator-primary-actions button {
+  min-height: 64px;
+  min-width: 120px;
+  width: 100%;
+}</pre>
+        <div class="grid-2" style="margin-top:14px">
+          <div class="info-box info-box-green">
+            <strong>GOOD</strong>
+            START, STOP và PAUSE full-width trong vùng action chính, text lớn <code>18px</code>, icon <code>32px</code>, reason modal riêng cho STOP.
+          </div>
+          <div class="info-box info-box-red">
+            <strong>DON'T</strong>
+            Không dùng icon-only button, không để START/STOP trong cùng một segmented control, không dùng hover-only affordance trên kiosk hoặc panel cạnh máy.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-blue">3.5</span>Calibration Status Indicators</div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Rule</th>
+              <th>Token set</th>
+              <th>Visual trong <code>environmental-gauge</code></th>
+              <th>Visual trong instrument manager</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Current</td><td>Ngày hiệu chuẩn còn <code>&gt;30</code> ngày.</td><td><code>#16a34a</code>, surface <code>#f0fdf4</code>, border <code>#86efac</code></td><td>Badge <code>CAL OK</code>, icon check, no pulse.</td><td>Cell xanh + ngày hết hạn + certificate link.</td></tr>
+            <tr><td>Due Soon</td><td>Còn <code>0-30</code> ngày, chưa quá hạn.</td><td><code>#d97706</code>, surface <code>#fffbeb</code>, border <code>#fcd34d</code></td><td>Amber ring <code>2px</code>, tooltip “Còn {days} ngày”.</td><td>Row sort lên đầu nhóm cần theo dõi.</td></tr>
+            <tr><td>Overdue</td><td>Ngày hiện tại lớn hơn due date.</td><td><code>#dc2626</code>, surface <code>#fef2f2</code>, border <code>#fca5a5</code></td><td>Red badge <code>OVERDUE</code>, chart confidence hạ xuống.</td><td>Disable chọn instrument cho inspection mới.</td></tr>
+            <tr><td>Out-of-Tolerance</td><td>Kết quả hiệu chuẩn fail hoặc drift ngoài giới hạn.</td><td><code>#dc2626</code>, surface <code>#450a0a</code> dark alert, border <code>#ef4444</code></td><td>Flash red <code>300ms</code> x <code>3</code>, sau đó giữ solid red.</td><td>Require impact assessment, link NCR/CAPA.</td></tr>
+          </tbody>
+        </table>
+        <table class="spec-table" style="margin-top:14px">
+          <thead><tr><th>Field</th><th>Required</th><th>Example</th><th>Validation</th></tr></thead>
+          <tbody>
+            <tr><td><code>instrumentId</code></td><td>Yes</td><td><code>CAL-IPQC-MIC-042</code></td><td>Unique, immutable after first use.</td></tr>
+            <tr><td><code>calibrationDueDate</code></td><td>Yes</td><td><code>2026-05-11</code></td><td>ISO date, timezone-aware display.</td></tr>
+            <tr><td><code>certificateUrl</code></td><td>Yes for calibrated tools</td><td><code>/evidence/CAL-2026-042.pdf</code></td><td>Must open controlled evidence vault record.</td></tr>
+            <tr><td><code>statusAriaLabel</code></td><td>Yes</td><td><code>{vi:"Panme CAL-IPQC-MIC-042 quá hạn 3 ngày", en:"Micrometer CAL-IPQC-MIC-042 overdue by 3 days"}</code></td><td>Không chỉ dùng màu hoặc icon.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-pink">3.6</span>Training Matrix Display</div>
+      <div class="card-body">
+        <div class="info-box info-box-blue" style="margin-bottom:14px">
+          <strong>MATRIX CONTRACT</strong>
+          Hàng là employee, cột là skill hoặc competency. Header cột sticky, cột employee frozen trái <code>220px</code>, cell tối thiểu <code>112px x 56px</code>, hỗ trợ filter theo phòng ban, skill, status và expiry window.
+        </div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Token + icon</th>
+              <th>Cell content</th>
+              <th>Filter key</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Certified</td><td><code>#16a34a</code> + check</td><td>Level, expiry date, cert id.</td><td><code>certified</code></td><td>Open certificate evidence.</td></tr>
+            <tr><td>In Training</td><td><code>#2563eb</code> + progress ring <code>12px</code></td><td>Percent complete, module name, trainer.</td><td><code>in_training</code></td><td>Continue course or schedule assessment.</td></tr>
+            <tr><td>Expired</td><td><code>#dc2626</code> + warning</td><td>Expired date, days overdue, supervisor.</td><td><code>expired</code></td><td>Create retraining task.</td></tr>
+            <tr><td>Not Required</td><td><code>#64748b</code> + dash</td><td>Dash + reason code.</td><td><code>not_required</code></td><td>No action; hide from gap count.</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">{
+  "type": "training-matrix",
+  "usesBlocks": ["data-table", "chart-donut", "form-standard"],
+  "rowKey": "employeeId",
+  "frozenColumns": ["employeeName", "department", "shift"],
+  "filters": ["department", "skill", "status", "expiresWithinDays"],
+  "labels": {
+    "vi": {
+      "certified": "Đã chứng nhận",
+      "in_training": "Đang đào tạo",
+      "expired": "Hết hạn",
+      "not_required": "Không yêu cầu"
+    },
+    "en": {
+      "certified": "Certified",
+      "in_training": "In training",
+      "expired": "Expired",
+      "not_required": "Not required"
+    }
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-cyan">3.7</span>Barcode/QR Scan Feedback</div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Outcome</th>
+              <th>Visual feedback</th>
+              <th>Audio feedback</th>
+              <th>Haptic</th>
+              <th>Runtime action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Success</td><td>Green flash <code>#16a34a</code> trong <code>300ms</code>, border ring <code>2px #86efac</code>.</td><td>Beep sine <code>1000Hz</code> trong <code>100ms</code>, volume max <code>0.25</code>.</td><td><code>navigator.vibrate(35)</code></td><td>Append vào multi-scan list, clear input sau <code>150ms</code>.</td></tr>
+            <tr><td>Failure</td><td>Red flash <code>#dc2626</code> trong <code>300ms</code>, shake <code>6px</code> trong <code>180ms</code>.</td><td>Buzz square <code>300Hz</code> trong <code>200ms</code>, volume max <code>0.30</code>.</td><td><code>navigator.vibrate([60,30,60])</code></td><td>Giữ input, select text, show inline reason.</td></tr>
+            <tr><td>Duplicate</td><td>Amber flash <code>#d97706</code> trong <code>300ms</code>.</td><td>Two short beeps <code>700Hz</code>, mỗi beep <code>70ms</code>.</td><td><code>navigator.vibrate(50)</code></td><td>Không append; highlight dòng đã scan trước.</td></tr>
+            <tr><td>Manual fallback</td><td>Input height <code>64px</code>, helper text luôn hiện.</td><td>No auto sound until submit.</td><td>None</td><td>Validate format before commit.</td></tr>
+          </tbody>
+        </table>
+        <table class="spec-table" style="margin-top:14px">
+          <thead><tr><th>Format</th><th>Regex</th><th>Ví dụ hợp lệ</th><th>Lỗi hiển thị</th></tr></thead>
+          <tbody>
+            <tr><td>Work order</td><td><code>^WO-[0-9]{4}-[0-9]{4}$</code></td><td><code>WO-2026-0891</code></td><td><code>{vi:"Mã WO phải có dạng WO-2026-0891", en:"WO code must match WO-2026-0891"}</code></td></tr>
+            <tr><td>Serial</td><td><code>^SN-[A-Z0-9]{8,16}$</code></td><td><code>SN-AERO24B991</code></td><td><code>{vi:"Serial không đúng định dạng", en:"Serial format is invalid"}</code></td></tr>
+            <tr><td>Material lot</td><td><code>^MAT-[A-Z0-9-]{6,24}$</code></td><td><code>MAT-AL6061-T6-0426</code></td><td><code>{vi:"Mã lô vật tư không hợp lệ", en:"Material lot is invalid"}</code></td></tr>
+            <tr><td>Tool ID</td><td><code>^TL-[A-Z0-9-]{4,20}$</code></td><td><code>TL-EM10-CARB-02</code></td><td><code>{vi:"Mã dao không hợp lệ", en:"Tool ID is invalid"}</code></td></tr>
+          </tbody>
+        </table>
+        <div class="info-box info-box-amber" style="margin-top:14px">
+          <strong>MULTI-SCAN MODE</strong>
+          Danh sách scan chạy phải hiển thị count, last scan timestamp, duplicate count và nút “Hoàn tất”. Không auto-submit mỗi mã nếu flow yêu cầu đối chiếu số lượng, lot hoặc serial trước khi commit.
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-red">3.8</span>ISA-18.2 Alarm Management Patterns</div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Color + icon</th>
+              <th>Ack rule</th>
+              <th>Shelving rule</th>
+              <th>Escalation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Critical</td><td><code>#dc2626</code> + <code>octagon-alert</code></td><td>Ack bắt buộc trong <code>60s</code>, reason required.</td><td>Không cho shelving nếu safety hoặc quality hold.</td><td>Escalate supervisor sau <code>2min</code>, QA sau <code>5min</code>.</td></tr>
+            <tr><td>High</td><td><code>#d97706</code> + <code>triangle-alert</code></td><td>Ack trong <code>5min</code>.</td><td>Shelve tối đa <code>30min</code>, reason required.</td><td>Escalate lead sau <code>10min</code>.</td></tr>
+            <tr><td>Medium</td><td><code>#2563eb</code> + <code>info</code></td><td>Ack theo ca hoặc khi nhận việc.</td><td>Shelve tối đa <code>4h</code>.</td><td>Daily review nếu lặp lại trên 5 lần/ca.</td></tr>
+            <tr><td>Low</td><td><code>#64748b</code> + <code>bell</code></td><td>Optional ack.</td><td>Shelve tối đa <code>24h</code>.</td><td>Trend review hằng tuần.</td></tr>
+          </tbody>
+        </table>
+        <table class="spec-table" style="margin-top:14px">
+          <thead><tr><th>Block</th><th>Required fields</th><th>Visual behavior</th><th>Audit evidence</th></tr></thead>
+          <tbody>
+            <tr><td><code>alarm-list</code></td><td><code>alarmId</code>, <code>priority</code>, <code>sourceTag</code>, <code>startedAt</code>, <code>ackState</code>, <code>shelvedUntil</code></td><td>Newest critical stays pinned top, row height <code>56px</code>.</td><td>Ack user, reason, timestamp, source machine.</td></tr>
+            <tr><td><code>andon-signal</code></td><td><code>state</code>, <code>priority</code>, <code>escalationTarget</code></td><td>Critical banner sticky header, no auto-dismiss.</td><td>Event log linked to machine event.</td></tr>
+            <tr><td><code>anomaly-alert</code></td><td><code>ruleId</code>, <code>evidenceLink</code>, <code>recommendedAction</code></td><td>Inline recommendation visible without modal.</td><td>Rule version and input data snapshot.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-teal">3.9</span>Recipe/Batch Process S88 Visualization</div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>S88 level</th>
+              <th>UI representation</th>
+              <th>Required fields</th>
+              <th>Control rule</th>
+              <th>Block type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Recipe</td><td>Header card + version chip.</td><td><code>recipeId</code>, <code>revision</code>, <code>effectiveDate</code>, <code>approvedBy</code></td><td>Approved recipe is read-only; revision change requires reason.</td><td><code>batch-traveler</code></td></tr>
+            <tr><td>Procedure</td><td>Vertical phase timeline.</td><td><code>procedureId</code>, <code>sequence</code>, <code>expectedDurationMin</code></td><td>No skip unless deviation approved.</td><td><code>routing-flow</code></td></tr>
+            <tr><td>Unit procedure</td><td>Expandable step group.</td><td><code>unitId</code>, <code>equipmentClass</code>, <code>operatorRole</code></td><td>Equipment must match qualification and calibration state.</td><td><code>workflow-diagram</code></td></tr>
+            <tr><td>Operation</td><td>Checklist row with parameter bounds.</td><td><code>parameter</code>, <code>target</code>, <code>min</code>, <code>max</code>, <code>actual</code></td><td>Out-of-bound actual requires exception reason.</td><td><code>inspection-checklist</code></td></tr>
+            <tr><td>Phase</td><td>Current phase pill + timer.</td><td><code>phaseState</code>, <code>startedAt</code>, <code>completedAt</code>, <code>evidence</code></td><td>Phase completion can require e-signature.</td><td><code>data-timeline</code></td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">{
+  "type": "s88-batch-visual",
+  "usesBlocks": ["batch-traveler", "routing-flow", "workflow-diagram", "inspection-checklist", "data-timeline"],
+  "states": ["planned", "ready", "running", "hold", "deviation", "complete", "released"],
+  "parameterDisplay": {
+    "targetColumnWidth": "96px",
+    "actualColumnWidth": "112px",
+    "outOfToleranceColor": "#dc2626",
+    "reviewRequiredIcon": "triangle-alert"
+  },
+  "labels": {
+    "vi": "Hiển thị mẻ/recipe S88",
+    "en": "S88 recipe and batch visualization"
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-dark">3.10</span>Multi-Plant Hierarchy Navigation</div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Hierarchy level</th>
+              <th>Label contract</th>
+              <th>Navigation component</th>
+              <th>Data shown at level</th>
+              <th>Drill-down behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Enterprise</td><td><code>{vi:"Tập đoàn", en:"Enterprise"}</code></td><td><code>nav-breadcrumb</code>, <code>data-tree</code></td><td>Sites, global OEE, open critical alarms.</td><td>Click site to load site dashboard; no machine detail here.</td></tr>
+            <tr><td>Site</td><td><code>{vi:"Nhà máy", en:"Site"}</code></td><td><code>nav-sidebar-tree</code></td><td>Areas, shifts, site KPIs, quality holds.</td><td>Preserve selected date/shift filter.</td></tr>
+            <tr><td>Area</td><td><code>{vi:"Khu vực", en:"Area"}</code></td><td><code>data-tree</code></td><td>Lines/cells, WIP, downtime by reason.</td><td>Expand inline on desktop, full-screen drill on mobile.</td></tr>
+            <tr><td>Line</td><td><code>{vi:"Chuyền", en:"Line"}</code></td><td><code>machine-status-tile</code> grid</td><td>Machines, active jobs, alarms, bottleneck.</td><td>Select machine opens side panel.</td></tr>
+            <tr><td>Cell</td><td><code>{vi:"Ô sản xuất", en:"Cell"}</code></td><td><code>machine-status-tile</code>, <code>sensor-card</code></td><td>Machine state, sensors, operator, current WO.</td><td>Open operator interface or maintenance history.</td></tr>
+          </tbody>
+        </table>
+        <table class="spec-table" style="margin-top:14px">
+          <thead><tr><th>Constraint</th><th>Exact rule</th><th>Reason</th></tr></thead>
+          <tbody>
+            <tr><td>Breadcrumb length</td><td>Show max <code>5</code> levels; collapse middle with menu when viewport under <code>920px</code>.</td><td>Giữ ngữ cảnh mà không vỡ layout mobile.</td></tr>
+            <tr><td>Tree indentation</td><td><code>16px</code> per level, icon column <code>24px</code>, label min width <code>160px</code>.</td><td>Dễ scan khi có nhiều plant/line/cell.</td></tr>
+            <tr><td>State aggregation</td><td>Parent state = highest priority child state: Critical &gt; Stopped &gt; Paused &gt; Setup &gt; PM &gt; Running &gt; Idle.</td><td>Không che trạng thái nghiêm trọng ở cấp trên.</td></tr>
+            <tr><td>URL shape</td><td><code>?enterprise=HESEM&amp;site=VN-BD&amp;area=CNC&amp;line=L02&amp;cell=VF2SS-01</code></td><td>Deep link và audit screenshot có thể tái mở đúng ngữ cảnh.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="chip chip-green">Do / Don't</span>Ví dụ triển khai bắt buộc</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Ngữ cảnh</th>
+              <th>Do</th>
+              <th>Don't</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Machine status</td><td>Dùng token fixed, icon, nhãn chữ và dark token riêng.</td><td>Không dùng <code>var(--green)</code> hoặc đổi trạng thái theo theme.</td></tr>
+            <tr><td>SPC alert</td><td>Hiển thị rule id, điểm vi phạm, tooltip evidence và action hint.</td><td>Không chỉ vẽ một điểm đỏ không giải thích vì sao vi phạm.</td></tr>
+            <tr><td>CAPA 8D</td><td>Khóa D0-D8 bằng schema, SLA, owner, e-signature gate và audit event.</td><td>Không dùng progress bar phần trăm thay cho workflow có trách nhiệm.</td></tr>
+            <tr><td>Glove mode</td><td>Bật bằng attribute riêng và tăng target lên <code>60px</code>.</td><td>Không tăng toàn bộ density mặc định làm hỏng desktop admin UI.</td></tr>
+            <tr><td>Calibration</td><td>Disable instrument quá hạn khi tạo inspection mới và giữ certificate link.</td><td>Không cho chọn dụng cụ out-of-tolerance chỉ bằng warning nhẹ.</td></tr>
+            <tr><td>Barcode scan</td><td>Có manual fallback, validation rõ và multi-scan list có count.</td><td>Không auto-submit im lặng khi scan fail hoặc duplicate.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>

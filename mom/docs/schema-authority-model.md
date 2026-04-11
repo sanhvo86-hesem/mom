@@ -9,16 +9,35 @@ This project separates database authority, generated system contracts, and edita
 | Physical DB schema | Runtime data storage in PostgreSQL | PostgreSQL schema `public` | Database writes only through application/runtime or governed migrations | Never delete from Schema Studio |
 | DB authority | Versioned structural source of truth | `database/migrations/*.sql` -> `database/schema.sql` | Governed migration review, deployment gate, rollback planning | Immutable history; supersede with a later migration |
 | System Contract Registry | Full backend contract for AI, frontend, API, workflow, and audit visibility | `data/registry/table-registry.json` and generated registry artifacts | Read-only generated artifact | Regenerate from authority; do not hand-edit or hard-delete |
-| Workspace Design Draft | Editable schema design surface for baseline, diff, review, compiler, and release workflow | `data/schema-studio/designs/workspace.json` | Editable with revision guard and audit trail | Archive or replace through a controlled change; do not hard-delete while Schema Studio needs an editable surface |
+| Workspace Design Draft | Blank editable design surface for future controlled experiments only | `data/schema-studio/designs/workspace.json` | Editable with revision guard and audit trail | Archive or replace through a controlled change; do not hard-delete while Schema Studio needs an editable surface |
+
+## Active Workspace State
+
+As of 2026-04-11, `data/schema-studio/designs/workspace.json` and `data/schema-studio/snapshots/workspace.baseline.json` are intentionally blank. They contain zero tables and zero relations by design.
+
+This prevents AI, frontend, and backend tools from mistaking an old curated 101-table draft for the real ERP+MOM schema. The real backend contract remains the System Contract Registry, and the physical DB authority remains migrations plus the generated schema snapshot.
+
+## Runtime Contract Artifacts
+
+The runtime/API/frontend contract must be generated from registry authority, not from the editable workspace draft.
+
+| Artifact | Role | Source Inputs |
+| --- | --- | --- |
+| `data/registry/system-contract-runtime-projections.json` | Full table/relation/workflow/endpoint projection for runtime and AI tooling | `table-registry`, `relation-map`, `endpoint-catalog`, `workflow-library` |
+| `data/registry/system-contract-registry-contracts.json` | Full table contract index, one contract per registry table | `table-registry`, `endpoint-catalog`, `workflow-library` |
+| `data/registry/system-contract-diagnostics.json` | Release gate diagnostics for the published system contract | registry authority artifacts and global capability audit |
+| `data/registry/system-contract-manifest.json` | Single read-only manifest for the full backend contract layer | generated system-contract artifacts |
+
+`schema-studio-*` artifacts remain valid only as workspace/design outputs. With the active blank workspace they should compile to zero design projections and must not be used as the source of truth for runtime release decisions.
 
 ## Workspace Deletion Impact
 
-Deleting `workspace.json` does not delete database rows and does not remove the generated system registry. It does remove the editable Schema Studio surface, including design baseline/diff, compiler, and release-bundle workflows until a replacement workspace is created.
+Deleting or blanking `workspace.json` does not delete database rows and does not remove the generated system registry. It only changes the editable Schema Studio design surface.
 
 If a workspace is retired, use an archive/replacement flow:
 
 1. Export and archive the current workspace document and baseline.
-2. Create a replacement workspace from the current System Contract Registry or an approved target design.
+2. Create a replacement workspace from the current System Contract Registry, live DB reverse engineering, or an approved target design.
 3. Preserve revision/audit evidence for the retired workspace.
 4. Keep System Contract Registry read-only and regenerate it from migrations/registry publication tooling.
 
